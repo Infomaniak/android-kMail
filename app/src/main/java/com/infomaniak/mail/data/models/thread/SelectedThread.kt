@@ -19,7 +19,7 @@ package com.infomaniak.mail.data.models.thread
 
 @Suppress("DataClassPrivateConstructor")
 data class SelectedThread private constructor(
-    private val uid: String,
+    val uid: String,
     val isFavorite: Boolean,
     val unseenMessagesCount: Int,
 ) {

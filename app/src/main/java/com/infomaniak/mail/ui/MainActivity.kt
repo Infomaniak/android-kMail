@@ -220,6 +220,9 @@ class MainActivity : ThemedActivity() {
                 R.id.replyBottomSheetDialog,
                 R.id.detailedContactBottomSheetDialog,
                 R.id.threadActionsBottomSheetDialog -> R.color.backgroundColorSecondary
+                R.id.threadListFragment -> {
+                    if (mainViewModel.isMultiSelectOn) R.color.elevatedBackground else R.color.backgroundColor
+                }
                 else -> R.color.backgroundColor
             }
         )

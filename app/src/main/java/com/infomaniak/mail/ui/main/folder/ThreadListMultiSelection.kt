@@ -21,6 +21,7 @@ import android.transition.AutoTransition
 import android.transition.TransitionManager
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import com.infomaniak.lib.core.utils.safeNavigate
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -68,7 +69,16 @@ class ThreadListMultiSelection {
                 R.id.quickActionArchive -> notYetImplemented()
                 R.id.quickActionFavorite -> notYetImplemented()
                 R.id.quickActionDelete -> notYetImplemented()
-                R.id.quickActionMenu -> notYetImplemented()
+                R.id.quickActionMenu -> {
+                    safeNavigate(
+                        if (mainViewModel.selectedThreads.count() == 1) {
+                            val threadUid = mainViewModel.selectedThreads.single().uid
+                            ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(threadUid)
+                        } else {
+                            ThreadListFragmentDirections.actionThreadListFragmentToMultiSelectBottomSheetDialog()
+                        }
+                    )
+                }
             }
         }
     }
