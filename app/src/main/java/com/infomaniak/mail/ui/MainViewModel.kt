@@ -445,16 +445,31 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //endregion
 
     //region Archive
-    fun archiveThreadOrMessage(threadUid: String, message: Message? = null) = viewModelScope.launch(Dispatchers.IO) {
+    fun archiveMessage(threadUid: String, message: Message) {
+        archive(threadsUids = listOf(threadUid), message = message)
+    }
+
+    fun archiveThread(threadUid: String) {
+        archive(threadsUids = listOf(threadUid))
+    }
+
+    fun archiveThreads(threadsUids: List<String>) {
+        archive(threadsUids = threadsUids)
+    }
+
+    private fun archive(
+        threadsUids: List<String> = emptyList(),
+        message: Message? = null,
+    ) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = currentMailbox.value!!
-        val thread = ThreadController.getThread(threadUid)!!
+        val threads = threadsUids.mapNotNull(ThreadController::getThread)
 
         val isArchived = message?.let { it.folder.role == FolderRole.ARCHIVE } ?: isCurrentFolderRole(FolderRole.ARCHIVE)
 
         val destinationFolderRole = if (isArchived) FolderRole.INBOX else FolderRole.ARCHIVE
         val destinationFolder = FolderController.getFolder(destinationFolderRole)!!
 
-        val messages = getMessagesToMove(listOf(thread), message)
+        val messages = getMessagesToMove(threads, message)
 
         val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
 
@@ -463,7 +478,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             refreshFolders(mailbox, messagesFoldersIds, destinationFolder.id)
         }
 
-        showMoveSnackbar(listOf(thread), message, messages, apiResponse, destinationFolder)
+        showMoveSnackbar(threads, message, messages, apiResponse, destinationFolder)
     }
     //endregion
 

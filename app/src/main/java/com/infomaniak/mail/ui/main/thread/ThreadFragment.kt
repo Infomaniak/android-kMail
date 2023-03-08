@@ -167,7 +167,7 @@ class ThreadFragment : Fragment() {
                 }
                 R.id.quickActionArchive -> with(mainViewModel) {
                     trackThreadActionsEvent("archive", isCurrentFolderRole(FolderRole.ARCHIVE))
-                    archiveThreadOrMessage(threadUid)
+                    archiveThread(threadUid)
                 }
                 R.id.quickActionDelete -> {
                     trackThreadActionsEvent("trash")

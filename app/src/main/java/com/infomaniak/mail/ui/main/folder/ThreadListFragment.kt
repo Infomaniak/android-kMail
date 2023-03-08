@@ -288,7 +288,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 true
             }
             SwipeAction.ARCHIVE -> {
-                archiveThreadOrMessage(threadUid)
+                archiveThread(threadUid)
                 isCurrentFolderRole(FolderRole.ARCHIVE)
             }
             SwipeAction.DELETE -> {
