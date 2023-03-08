@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -60,7 +60,7 @@ class SimpleSettingView @JvmOverloads constructor(
 
     override fun addView(child: View, index: Int, params: ViewGroup.LayoutParams?) {
         if (isBindingInflated) {
-            binding.cardview.addView(child, index, params)
+            binding.cardView.addView(child, index, params)
         } else {
             super.addView(child, index, params)
         }

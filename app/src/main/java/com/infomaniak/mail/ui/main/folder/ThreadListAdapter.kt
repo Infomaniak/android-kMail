@@ -175,14 +175,14 @@ class ThreadListAdapter(
 
         val selectedThread = SelectedThread(thread)
 
-        root.setOnClickListener {
+        selectionCardView.setOnClickListener {
             if (multiSelection?.isEnabled == true) toggleSelection(selectedThread) else onThreadClicked?.invoke(thread)
         }
 
         if (multiSelection != null) {
             updateSelectedState(selectedThread)
 
-            root.setOnLongClickListener {
+            selectionCardView.setOnLongClickListener {
                 if (!multiSelection.isEnabled) multiSelection.isEnabled = true
                 toggleSelection(selectedThread)
                 true
@@ -201,7 +201,7 @@ class ThreadListAdapter(
     private fun CardviewThreadItemBinding.updateSelectedState(selectedThread: SelectedThread) {
         // TODO : Modify the ui accordingly
         val isSelected = multiSelection?.selectedItems?.contains(selectedThread) == true
-        root.backgroundTintList = if (isSelected) {
+        selectionCardView.backgroundTintList = if (isSelected) {
             ColorStateList.valueOf(context.getAttributeColor(RMaterial.attr.colorPrimaryContainer))
         } else {
             context.getColorStateList(R.color.backgroundColor)
@@ -212,10 +212,6 @@ class ThreadListAdapter(
 
         checkedState.isVisible = isSelected
         uncheckedState.isVisible = multiSelection?.isEnabled == true && threadDensity != LARGE && !isSelected
-
-        // TransitionManager.endTransitions(checkMarkLayout)
-        // TransitionManager.beginDelayedTransition(textContent, TransitionSet().addTransition(ChangeBounds()))
-        // TransitionManager.beginDelayedTransition(root)
     }
 
     private fun CardviewThreadItemBinding.setupThreadDensityDependentUi() {
