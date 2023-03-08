@@ -218,7 +218,6 @@
     <string name="restoreEmailsText">All emails will come back to your inbox.</string>
     <string name="restoreEmailsTitle">Restore your emails</string>
     <string name="scheduledMessagesFolder">Scheduled messages</string>
-    <string name="searchAllMessages">All messages</string>
     <string name="searchFieldPlaceholder">Search an email</string>
     <string name="searchFilterAttachment">Attachments</string>
     <string name="searchFilterFolder">All folders</string>

@@ -20,7 +20,6 @@
 package com.infomaniak.mail.data.models.thread
 
 import android.content.Context
-import androidx.annotation.IdRes
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.RealmInstantSerializer
@@ -206,13 +205,13 @@ class Thread : RealmObject {
         return message.preview
     }
 
-    enum class ThreadFilter(@IdRes val filterNameRes: Int) {
-        ALL(R.string.searchAllMessages),
-        SEEN(R.string.searchFilterRead),
-        UNSEEN(R.string.searchFilterUnread),
-        STARRED(R.string.favoritesFolder),
-        ATTACHMENTS(R.string.searchFilterAttachment),
-        FOLDER(R.string.searchFilterFolder),
+    enum class ThreadFilter {
+        ALL,
+        SEEN,
+        UNSEEN,
+        STARRED,
+        ATTACHMENTS,
+        FOLDER,
     }
 
     companion object {

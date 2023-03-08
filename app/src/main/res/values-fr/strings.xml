@@ -215,7 +215,6 @@
     <string name="restoreEmailsText">Tous les e-mails reviendront dans votre boîte de réception.</string>
     <string name="restoreEmailsTitle">Restaurer vos e-mails</string>
     <string name="scheduledMessagesFolder">Messages programmés</string>
-    <string name="searchAllMessages">Tous les messages</string>
     <string name="searchFieldPlaceholder">Rechercher un message</string>
     <string name="searchFilterAttachment">Pièces-jointes</string>
     <string name="searchFilterFolder">Tous les dossiers</string>
