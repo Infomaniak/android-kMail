@@ -463,11 +463,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun computeReadFavoriteStatus(selectedThreads: MutableSet<SelectedThread>): Pair<Boolean, Boolean> {
         var shouldUnRead = true
-        var shouldUnFavorite = true
+        var shouldUnFavorite = selectedThreads.isNotEmpty()
 
         for (thread in selectedThreads) {
-            val isSeen = thread.unseenMessagesCount == 0
-            shouldUnRead = shouldUnRead && isSeen
+            shouldUnRead = shouldUnRead && thread.unseenMessagesCount == 0
             shouldUnFavorite = shouldUnFavorite && thread.isFavorite
 
             if (!shouldUnRead && !shouldUnFavorite) break
