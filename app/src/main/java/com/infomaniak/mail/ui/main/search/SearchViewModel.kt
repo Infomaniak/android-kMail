@@ -17,10 +17,12 @@
  */
 package com.infomaniak.mail.ui.main.search
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.SingleLiveEvent
+import com.infomaniak.mail.MatomoMail.trackSearchEvent
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
@@ -94,9 +96,14 @@ class SearchViewModel : ViewModel() {
         selectedFolder = folder
     }
 
-    fun toggleFilter(filter: ThreadFilter) {
+    fun toggleFilter(filter: ThreadFilter, context: Context?) {
         resetPagination()
-        if (selectedFilters.contains(filter)) filter.unselect() else filter.select()
+        if (selectedFilters.contains(filter)) {
+            filter.unselect()
+        } else {
+            context?.trackSearchEvent(filter.matomoValue)
+            filter.select()
+        }
     }
 
     fun unselectMutuallyExclusiveFilters() {

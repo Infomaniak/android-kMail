@@ -32,6 +32,14 @@ object MatomoMail : MatomoCore {
         trackEvent("message", name, value = value)
     }
 
+    fun Fragment.trackSearchEvent(name: String, value: Boolean? = null) {
+        activity?.trackSearchEvent(name, value)
+    }
+
+    fun Context.trackSearchEvent(name: String, value: Boolean? = null) {
+        trackEvent(category = "search", name = name, value = value?.toFloat())
+    }
+
     fun Context.trackNewMessageEvent(name: String, value: Float? = null, action: TrackerAction = TrackerAction.CLICK) {
         trackEvent("newMessage", name, action, value)
     }
