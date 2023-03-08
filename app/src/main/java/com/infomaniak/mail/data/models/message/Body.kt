@@ -15,14 +15,46 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+// @file:UseSerializers(RealmListSerializer::class, RealmInstantSerializer::class)
+
 package com.infomaniak.mail.data.models.message
 
 import io.realm.kotlin.types.EmbeddedRealmObject
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.JsonTransformingSerializer
 
 @Serializable
 class Body : EmbeddedRealmObject {
     var value: String = ""
     var type: String = ""
+    // TODO: Realm doesn't allow us to do that for now:
+    // TODO: | Caused by: io.realm.kotlin.internal.interop.RealmCoreLogicException: [18]: Schema validation failed due to the following errors:
+    // TODO: | - Cycles containing embedded objects are not currently supported: 'Body.subBody.body'
+    // TODO: | - Cycles containing embedded objects are not currently supported: 'SubBody.body.subBody'
+    // var subBody: RealmList<SubBody> = realmListOf()
+    // TODO: In the meantime, we store the `subBody` as a JSON String, and
+    // TODO: we'll have to manually deserialize it when we want to use it.
+    @Serializable(JsonAsStringSerializer::class)
     var subBody: String? = null
+}
+
+// @Serializable
+// class SubBody : EmbeddedRealmObject {
+//     var body: Body? = null
+//     var name: String? = null
+//     var type: String? = null
+//     var date: RealmInstant = Date().toRealmInstant()
+//     var subject: String? = null
+//     var from: RealmList<Recipient> = realmListOf()
+//     var to: RealmList<Recipient> = realmListOf()
+//     @SerialName("part_id")
+//     var partId: String? = null
+// }
+
+// Documentation: https://kotlinlang.org/api/kotlinx.serialization/kotlinx-serialization-json/kotlinx.serialization.json/-json-transforming-serializer/
+object JsonAsStringSerializer : JsonTransformingSerializer<String>(String.serializer()) {
+    override fun transformDeserialize(element: JsonElement): JsonElement = JsonPrimitive(element.toString())
 }
