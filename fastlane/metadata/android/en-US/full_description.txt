@@ -1,0 +1,20 @@
+Secure email for your emails
+
+The kMail app requires your email addresses to be with Infomaniak.
+This app allows you to manage your Infomaniak addresses in a completely secure environment. This is a beta version that will quickly evolve according to your feedback.
+
+With the kMail app, you can :
+
+Create a free @ik.me @etik.com or @ikmail.com address with 20 GB of storage, without advertising and managed in Switzerland, in compliance with the RGPD.
+Send and receive emails from your Infomaniak email addresses.
+Set kMail as your default email application.
+Search for a specific message or your unread emails, favorites or attachments.
+Switch from one account to another to access all your email addresses managed at Infomaniak.
+Be notified immediately of the arrival of new emails (push).
+Organize your emails in personalized folders.
+Scan to move, archive and delete emails quickly.
+Customize your experience (dark/light theme, accent color, display density, scanning actions in the inbox, etc.).
+Protect access to the kMail app (depending on how you lock your device).
+With kMail, you keep full control of your data and communicate in a secure, sovereign and constantly evolving ecosystem. The kMail app is developed by Infomaniak and its code is open source and available on our GitHub.
+
+Infomaniak is a leading cloud provider in Europe and the leading developer of productivity solutions in Switzerland for over 29 years. The company is exclusively owned by its employees and stands out for its commitment to privacy, the local economy and ecology.

@@ -1,0 +1,20 @@
+Der sichere Nachrichtendienst für Ihre E-Mails
+
+Die kMail-App erfordert, dass Ihre E-Mail-Adressen bei Infomaniak liegen.
+Diese App ermöglicht es Ihnen, Ihre Infomaniak-Adressen in einer vollständig gesicherten Umgebung zu verwalten. Es handelt sich um eine Beta-Version, die sich aufgrund Ihres Feedbacks schnell weiterentwickeln wird.
+
+Mit der kMail-App können Sie :
+
+Eine kostenlose @ik.me @etik.com oder @ikmail.com-Adresse mit 20 GB Speicherplatz einrichten, die werbefrei ist und in der Schweiz unter Einhaltung der DSGVO verwaltet wird.
+Senden und empfangen Sie E-Mails von Ihren Infomaniak-Mailadressen.
+Legen Sie kMail als Standard-E-Mail-Anwendung fest.
+Suchen Sie nach einer bestimmten Nachricht oder Ihren ungelesenen, favorisierten oder angehängten E-Mails.
+Zwischen Konten wechseln, um auf alle Ihre bei Infomaniak verwalteten Mailadressen zuzugreifen.
+Sofort über den Eingang neuer E-Mails benachrichtigt werden (Push).
+Organisieren Sie Ihre E-Mails in personalisierten Ordnern.
+Scannen Sie, um E-Mails schnell zu verschieben, zu archivieren oder zu löschen.
+Ihre Erfahrung individuell anpassen (dunkles/helles Thema, Akzentfarbe, Anzeigedichte, Wischaktionen im Posteingang usw.).
+Den Zugriff auf die kMail-App schützen (je nachdem, wie Ihr Gerät gesperrt ist).
+Mit kMail behalten Sie die volle Kontrolle über Ihre Daten und kommunizieren in einem sicheren, souveränen und sich ständig weiterentwickelnden Ökosystem. Die kMail-App wird von Infomaniak entwickelt und ihr Code ist Open Source und auf unserem GitHub verfügbar.
+
+Infomaniak ist ein führender Cloud-Anbieter in Europa und seit über 29 Jahren der führende Entwickler von Produktivitätslösungen in der Schweiz. Das Unternehmen gehört ausschließlich seinen Mitarbeitern und zeichnet sich durch sein Engagement für die Privatsphäre, die lokale Wirtschaft und die Ökologie aus.

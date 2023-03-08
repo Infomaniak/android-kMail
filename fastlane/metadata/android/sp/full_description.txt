@@ -1,0 +1,20 @@
+Correo seguro para sus correos electrónicos
+
+La aplicación kMail requiere que sus direcciones de correo electrónico sean de Infomaniak.
+Esta aplicación le permite gestionar sus direcciones Infomaniak en un entorno totalmente seguro. Se trata de una versión beta que evolucionará rápidamente en función de sus comentarios.
+
+Con la aplicación kMail podrá
+
+Crear una dirección @ik.me @etik.com o @ikmail.com gratuita con 20 GB de almacenamiento, sin publicidad y gestionada en Suiza, de conformidad con el RGPD.
+Enviar y recibir correos electrónicos desde sus direcciones de correo electrónico Infomaniak.
+Establezca kMail como su aplicación de correo electrónico predeterminada.
+Buscar un mensaje concreto o sus correos no leídos, favoritos o adjuntos.
+Pasar de una cuenta a otra para acceder a todas sus direcciones de correo electrónico gestionadas en Infomaniak.
+Ser notificado inmediatamente de la llegada de nuevos correos electrónicos (push).
+Organice sus correos electrónicos en carpetas personalizadas.
+Escanear para desplazar, archivar y suprimir rápidamente los correos electrónicos.
+Personalice su experiencia (tema oscuro/claro, color de acento, densidad de visualización, acciones de exploración en la bandeja de entrada, etc.).
+Proteja el acceso a la aplicación kMail (dependiendo de cómo esté bloqueado su dispositivo).
+Con kMail, mantienes el control total de tus datos y te comunicas en un ecosistema seguro, soberano y en constante evolución. La aplicación kMail ha sido desarrollada por Infomaniak y su código es de código abierto y está disponible en nuestro GitHub.
+
+Infomaniak es un proveedor de servicios en la nube líder en Europa y el principal desarrollador de soluciones de productividad en Suiza desde hace más de 29 años. La empresa es propiedad exclusiva de sus empleados y destaca por su compromiso con la privacidad, la economía local y la ecología.

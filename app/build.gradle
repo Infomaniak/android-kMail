@@ -23,8 +23,8 @@ android {
         applicationId 'com.infomaniak.mail'
         minSdk 25
         targetSdk 33
-        versionCode 1_00_000_16
-        versionName '1.0.0-alpha16'
+        versionCode 1_00_000_17
+        versionName '1.0.0-alpha17'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 
         setProperty "archivesBaseName", "kmail-$versionName ($versionCode)"
@@ -67,7 +67,6 @@ android {
             dimension 'distribution'
             apply plugin: 'com.google.gms.google-services'
             getIsDefault().set(true)
-            dependencies { implementation 'com.google.firebase:firebase-messaging-ktx:23.1.1' }
         }
         fdroid { dimension 'distribution' }
     }
@@ -78,6 +77,8 @@ dependencies {
     implementation project(path: ':Core:BugTracker')
 
     implementation "io.realm.kotlin:library-base:$rootProject.ext.realm_kotlin_version"
+
+    standardImplementation 'com.google.firebase:firebase-messaging-ktx:23.1.2'
 
     implementation 'com.airbnb.android:lottie:6.0.0'
     implementation 'com.ernestoyaquello.dragdropswiperecyclerview:drag-drop-swipe-recyclerview:1.1.1'
