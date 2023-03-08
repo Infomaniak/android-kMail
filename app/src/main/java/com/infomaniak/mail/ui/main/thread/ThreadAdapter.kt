@@ -21,6 +21,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.webkit.WebView
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
@@ -39,6 +40,7 @@ import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadViewHolder
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.Utils
 import java.util.*
+import com.google.android.material.R as RMaterial
 
 class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBinding.OnRealmChanged<Message> {
 
@@ -79,34 +81,52 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
                 newItem.isFavorite == oldItem.isFavorite
     }
 
-    override fun onBindViewHolder(holder: ThreadViewHolder, position: Int, payloads: MutableList<Any>) = with(holder) {
+    override fun onBindViewHolder(holder: ThreadViewHolder, position: Int, payloads: MutableList<Any>) = with(holder.binding) {
         val message = messages[position]
 
         val payload = payloads.firstOrNull()
         if (payload is NotificationType) {
             if (payload == NotificationType.AVATAR && !message.isDraft) {
-                binding.userAvatar.loadAvatar(message.from.first(), contacts)
+                userAvatar.loadAvatar(message.from.first(), contacts)
             } else if (payload == NotificationType.TOGGLE_LIGHT_MODE) {
-                isThemeTheSameMap[message.uid] = !isThemeTheSameMap[message.uid]!!
-                val webViewSettings = binding.messageBody.settings
-
-                if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
-                    WebSettingsCompat.setAlgorithmicDarkeningAllowed(webViewSettings, isThemeTheSameMap[message.uid]!!)
-                }
-
-                @SuppressLint("SetJavaScriptEnabled")
-                webViewSettings.javaScriptEnabled = true
-                if (isThemeTheSameMap[message.uid]!!) addBackgroundJs() else removeBackgroundJs()
-                webViewSettings.javaScriptEnabled = false
+                val isThemeTheSame = !isThemeTheSameMap[message.uid]!!
+                isThemeTheSameMap[message.uid] = isThemeTheSame
+                bodyWebView.toggleWebViewTheme(isThemeTheSame)
+                quoteWebView.toggleWebViewTheme(isThemeTheSame)
+                toggleQuoteButtonTheme(isThemeTheSame)
             }
         } else {
-            super.onBindViewHolder(this, position, payloads)
+            super.onBindViewHolder(holder, position, payloads)
         }
     }
 
-    private fun ThreadViewHolder.addBackgroundJs() {
-        val css = binding.context.readRawResource(R.raw.custom_dark_mode)
-        binding.messageBody.evaluateJavascript(
+    private fun WebView.toggleWebViewTheme(isThemeTheSame: Boolean) {
+
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
+            WebSettingsCompat.setAlgorithmicDarkeningAllowed(settings, isThemeTheSame)
+        }
+
+        @SuppressLint("SetJavaScriptEnabled")
+        settings.javaScriptEnabled = true
+
+        if (isThemeTheSame) addBackgroundJs() else removeBackgroundJs()
+
+        settings.javaScriptEnabled = false
+    }
+
+    private fun ItemMessageBinding.toggleQuoteButtonTheme(isThemeTheSame: Boolean) {
+        if (isThemeTheSame) {
+            quoteButtonFrameLayout.setBackgroundColor(context.getColor(R.color.background_color_dark))
+            quoteButton.setTextColor(context.getAttributeColor(RMaterial.attr.colorPrimary))
+        } else {
+            quoteButtonFrameLayout.setBackgroundColor(context.getColor(R.color.background_color_light))
+            quoteButton.setTextColor(context.getAttributeColor(RMaterial.attr.colorPrimaryInverse))
+        }
+    }
+
+    private fun WebView.addBackgroundJs() {
+        val css = context.readRawResource(R.raw.custom_dark_mode)
+        evaluateJavascript(
             """ var style = document.createElement('style')
                 document.head.appendChild(style)
                 style.id = "$DARK_BACKGROUND_STYLE_ID"
@@ -116,9 +136,9 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         )
     }
 
-    private fun ThreadViewHolder.removeBackgroundJs() {
+    private fun WebView.removeBackgroundJs() {
         val removeBackgroundStyleScript = "document.getElementById(\"$DARK_BACKGROUND_STYLE_ID\").remove()"
-        binding.messageBody.evaluateJavascript(removeBackgroundStyleScript, null)
+        evaluateJavascript(removeBackgroundStyleScript, null)
     }
 
     override fun onBindViewHolder(holder: ThreadViewHolder, position: Int): Unit = with(holder) {
@@ -126,9 +146,18 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
 
         initMapForNewMessage(message, position)
 
+        message.body?.let { body ->
+            val (messageBody, messageQuote) = MessageBodyUtils.splitBodyAndQuote(body.value)
+
+            message.hasQuote = messageQuote != null
+
+            loadBodyInWebView(message.uid, messageBody, body.type)
+            loadQuoteInWebView(message.uid, messageQuote, body.type)
+            if (binding.context.isNightModeEnabled()) binding.toggleQuoteButtonTheme(isThemeTheSameMap[message.uid]!!)
+        }
+
         bindHeader(message)
         bindAttachment(message)
-        loadBodyInWebView(message)
 
         binding.displayExpandedCollapsedMessage(message)
     }
@@ -141,26 +170,42 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         if (isThemeTheSameMap[message.uid] == null) isThemeTheSameMap[message.uid] = true
     }
 
-    private fun ThreadViewHolder.loadBodyInWebView(message: Message) = with(binding) {
+    private fun ThreadViewHolder.loadBodyInWebView(uid: String, body: String, type: String) = with(binding) {
+        bodyWebView.applyWebViewContent(uid, body, type)
+    }
+
+    private fun ThreadViewHolder.loadQuoteInWebView(uid: String, quote: String?, type: String) = with(binding) {
+
+        if (quote == null) return@with
+
+        quoteButton.setOnClickListener {
+            val textId = if (quoteFrameLayout.isVisible) R.string.messageShowQuotedText else R.string.messageHideQuotedText
+            quoteButton.text = context.getString(textId)
+            quoteFrameLayout.isVisible = !quoteFrameLayout.isVisible
+        }
+
+        quoteWebView.applyWebViewContent(uid, quote, type)
+    }
+
+    private fun WebView.applyWebViewContent(uid: String, bodyWebView: String, type: String) {
+
         if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
-            WebSettingsCompat.setAlgorithmicDarkeningAllowed(messageBody.settings, isThemeTheSameMap[message.uid]!!)
+            WebSettingsCompat.setAlgorithmicDarkeningAllowed(settings, isThemeTheSameMap[uid]!!)
         }
-        // TODO: Make prettier WebView, add button to hide/display the conversation inside Message body like WebApp ?
-        message.body?.let {
-            var styledBody = it.value
-            if (it.type == TEXT_HTML) {
-                if (context.isNightModeEnabled() && isThemeTheSameMap[message.uid]!!) {
-                    styledBody = context.injectCssInHtml(R.raw.custom_dark_mode, styledBody, DARK_BACKGROUND_STYLE_ID)
-                }
-                styledBody = context.injectCssInHtml(R.raw.remove_margin, styledBody)
-                styledBody = context.injectCssInHtml(R.raw.add_padding, styledBody)
+
+        var styledBody = bodyWebView
+        if (type == TEXT_HTML) {
+            if (context.isNightModeEnabled() && isThemeTheSameMap[uid]!!) {
+                styledBody = context.injectCssInHtml(R.raw.custom_dark_mode, styledBody, DARK_BACKGROUND_STYLE_ID)
             }
-
-            val margin = if (it.type == TEXT_HTML) NO_MARGIN else plainTextMargin
-            messageBody.setMarginsRelative(margin, NO_MARGIN, margin, NO_MARGIN)
-
-            messageBody.loadDataWithBaseURL("", styledBody, it.type, Utils.UTF_8, "")
+            styledBody = context.injectCssInHtml(R.raw.remove_margin, styledBody)
+            styledBody = context.injectCssInHtml(R.raw.add_padding, styledBody)
         }
+
+        val margin = if (type == TEXT_HTML) NO_MARGIN else plainTextMargin
+        setMarginsRelative(margin, NO_MARGIN, margin, NO_MARGIN)
+
+        loadDataWithBaseURL("", styledBody, type, Utils.UTF_8, "")
     }
 
     private fun ThreadViewHolder.bindHeader(message: Message) = with(binding) {
@@ -285,16 +330,27 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
 
     private fun ItemMessageBinding.displayExpandedCollapsedMessage(message: Message) {
         val isExpanded = isExpandedMap[message.uid]!!
+
         collapseMessageDetails(message)
         setHeaderState(message, isExpanded)
-        if (isExpanded) displayAttachments(message.attachments) else hideAttachments()
+
+        if (isExpanded) {
+            displayAttachments(message.attachments)
+            if (message.hasQuote) quoteButton.text = context.getString(R.string.messageShowQuotedText)
+            quoteButtonFrameLayout.isVisible = message.hasQuote
+        } else {
+            hideAttachments()
+            quoteButtonFrameLayout.isGone = true
+        }
+
+        quoteFrameLayout.isGone = true
 
         if (message.body?.value == null) {
             messageLoader.isVisible = isExpanded
-            webViewFrameLayout.isVisible = false
+            bodyFrameLayout.isGone = true
         } else {
-            messageLoader.isVisible = false
-            webViewFrameLayout.isVisible = isExpanded
+            messageLoader.isGone = true
+            bodyFrameLayout.isVisible = isExpanded
         }
     }
 
@@ -397,7 +453,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
 
         fun initWebViewClientIfNeeded(attachments: List<Attachment>) {
             if (doesWebViewNeedInit) {
-                binding.messageBody.initWebViewClient(attachments)
+                binding.bodyWebView.initWebViewClient(attachments)
                 doesWebViewNeedInit = false
             }
         }

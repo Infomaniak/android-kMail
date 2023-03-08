@@ -400,16 +400,60 @@
     </androidx.appcompat.widget.LinearLayoutCompat>
 
     <FrameLayout
-        android:id="@+id/webViewFrameLayout"
+        android:id="@+id/bodyFrameLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/quoteButtonFrameLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/attachmentsDownloadAllButton">
 
         <WebView
-            android:id="@+id/messageBody"
+            android:id="@+id/bodyWebView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="horizontal" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/quoteButtonFrameLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/quoteFrameLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/bodyFrameLayout"
+        tools:visibility="visible">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/quoteButton"
+            style="@style/TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/marginStandardSmall"
+            android:insetLeft="@dimen/alternativeMargin"
+            android:insetTop="@dimen/marginStandardVerySmall"
+            android:insetRight="@dimen/alternativeMargin"
+            android:insetBottom="@dimen/marginStandardVerySmall"
+            android:minHeight="0dp"
+            android:padding="@dimen/marginStandardVerySmall"
+            android:text="@string/messageShowQuotedText" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/quoteFrameLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/quoteButtonFrameLayout"
+        tools:visibility="visible">
+
+        <WebView
+            android:id="@+id/quoteWebView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:scrollbars="horizontal" />
