@@ -53,7 +53,7 @@ object MessageBodyUtils {
         val currentQuoteDescriptor = handleQuoteDescriptors(htmlDocumentWithoutQuote, htmlQuotes).ifEmpty { blockquote }
 
         val (body, quote) = splitBodyAndQuote(htmlQuotes, htmlDocumentWithQuote, currentQuoteDescriptor)
-        return MessageBodyQuote(messageBody = body, quote = quote)
+        return MessageBodyQuote(messageBody = if (quote.isNullOrBlank()) messageBody else body, quote = quote)
     }
 
     private fun handleBlockQuote(htmlDocumentWithoutQuote: Document, htmlQuotes: MutableList<Element>) {
