@@ -32,15 +32,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@drawable/ic_close">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/sendButton"
-            style="@style/IconButton"
-            android:layout_gravity="end"
-            app:icon="@drawable/ic_send" />
-
-    </com.google.android.material.appbar.MaterialToolbar>
+        app:navigationIcon="@drawable/ic_close" />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragmentContainer"
@@ -67,7 +59,7 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_height="wrap_content"
             android:orientation="horizontal">
 
             <com.google.android.material.divider.MaterialDivider
@@ -133,6 +125,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:contentDescription="@string/buttonSchedule"
+                android:visibility="gone"
                 app:icon="@drawable/ic_editor_clock"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/editorBold"
@@ -192,8 +185,17 @@
                 android:minWidth="0dp"
                 app:icon="@drawable/ic_editor_list"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/editorStrikeThrough"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/sendButton"
+                style="@style/IconButton"
+                android:layout_width="80dp"
+                android:layout_gravity="end"
+                app:icon="@drawable/ic_send"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.constraintlayout.widget.Group
@@ -207,7 +209,7 @@
                 android:id="@+id/editorActions"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:constraint_referenced_ids="editorAttachment,editorCamera,editorClock" />
+                app:constraint_referenced_ids="editorAttachment,editorCamera" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
