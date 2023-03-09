@@ -18,22 +18,13 @@
 package com.infomaniak.mail.data.models.thread
 
 class SelectedThread(thread: Thread) {
-    val uid: String
-    val isFavorite: Boolean
-    val unseenMessagesCount: Int
-
-    init {
-        uid = thread.uid
-        isFavorite = thread.isFavorite
-        unseenMessagesCount = thread.unseenMessagesCount
-    }
+    val uid = thread.uid
+    val isFavorite = thread.isFavorite
+    val unseenMessagesCount = thread.unseenMessagesCount
 
     override fun equals(other: Any?): Boolean = other is SelectedThread && uid == other.uid
 
     override fun hashCode(): Int {
-        var result = uid.hashCode()
-        result = 31 * result + isFavorite.hashCode()
-        result = 31 * result + unseenMessagesCount
-        return result
+        return uid.hashCode()
     }
 }
