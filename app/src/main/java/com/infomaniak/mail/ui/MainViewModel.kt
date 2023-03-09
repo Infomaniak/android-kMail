@@ -405,7 +405,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val destinationFolder = FolderController.getFolder(destinationFolderId)!!
         val thread = ThreadController.getThread(threadUid)!!
         val message = messageUid?.let { MessageController.getMessage(it)!! }
-        val messages = getMessagesToMove(thread, message)
+        val messages = getMessagesToMove(listOf(thread), message)
 
         val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolderId)
 
@@ -438,9 +438,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         snackBarManager.postValue(snackbarTitle, undoData)
     }
 
-    private fun getMessagesToMove(thread: Thread, message: Message?) = when (message) {
-        null -> MessageController.getMovableMessages(thread)
-        else -> MessageController.getMessageAndDuplicates(thread, message)
+    private fun getMessagesToMove(threads: List<Thread>, message: Message?) = when (message) {
+        null -> threads.flatMap(MessageController::getMovableMessages)
+        else -> MessageController.getMessageAndDuplicates(threads.first(), message)
     }
     //endregion
 
@@ -454,7 +454,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val destinationFolderRole = if (isArchived) FolderRole.INBOX else FolderRole.ARCHIVE
         val destinationFolder = FolderController.getFolder(destinationFolderRole)!!
 
-        val messages = getMessagesToMove(thread, message)
+        val messages = getMessagesToMove(listOf(thread), message)
 
         val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
 
