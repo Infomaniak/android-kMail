@@ -30,10 +30,11 @@ class SimpleMailboxAdapter : RecyclerView.Adapter<SimpleMailboxAdapter.SimpleMai
         return SimpleMailboxViewHolder(ItemMailboxMyAccountBinding.inflate(LayoutInflater.from(parent.context), parent, false))
     }
 
-    override fun onBindViewHolder(holder: SimpleMailboxViewHolder, position: Int): Unit = with(holder.binding) {
-        email.apply {
+    override fun onBindViewHolder(holder: SimpleMailboxViewHolder, position: Int) {
+        holder.binding.email.apply {
             text = mailboxes[position]
             setOnClickListener { context.trackAccountEvent("selectMailAddress") }
+            isFocusable = false
         }
     }
 

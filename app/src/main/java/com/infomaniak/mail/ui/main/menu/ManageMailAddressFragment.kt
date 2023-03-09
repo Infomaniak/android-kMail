@@ -68,6 +68,7 @@ class ManageMailAddressFragment : Fragment() {
             ResourcesCompat.getDrawable(resources, R.drawable.divider, null)?.let {
                 addItemDecoration(DividerItemDecorator(it))
             }
+            isFocusable = false
         }
 
         observeAccountsLive()
