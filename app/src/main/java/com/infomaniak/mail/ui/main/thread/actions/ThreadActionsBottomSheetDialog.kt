@@ -74,7 +74,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
                 override fun onDelete() {
                     trackBottomSheetThreadActionsEvent("trash")
-                    mainViewModel.deleteThreadOrMessage(threadUid)
+                    mainViewModel.deleteThread(threadUid)
                 }
                 //endregion
 

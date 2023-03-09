@@ -172,7 +172,7 @@ class ThreadFragment : Fragment() {
                 }
                 R.id.quickActionDelete -> {
                     trackThreadActionsEvent("trash")
-                    mainViewModel.deleteThreadOrMessage(threadUid)
+                    mainViewModel.deleteThread(threadUid)
                 }
                 R.id.quickActionMenu -> {
                     trackThreadActionsEvent("openBottomSheet")
