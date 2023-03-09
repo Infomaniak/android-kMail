@@ -29,7 +29,6 @@ import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.views.ViewHolder
-import com.infomaniak.mail.MatomoMail.toFloat
 import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
@@ -291,7 +290,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
             detailedFieldsGroup.isVisible = isExpanded
             ccGroup.isVisible = isExpanded && message.cc.isNotEmpty()
             bccGroup.isVisible = isExpanded && message.bcc.isNotEmpty()
-            context.trackMessageEvent("openDetails", isExpanded.toFloat())
+            context.trackMessageEvent("openDetails", isExpanded)
         }
     }
 
@@ -337,7 +336,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
     private fun ItemMessageBinding.displayExpandedCollapsedMessage(message: Message, shouldTrack: Boolean = true) {
         val isExpanded = isExpandedMap[message.uid]!!
 
-        if (shouldTrack) context.trackMessageEvent("openMessage", isExpanded.toFloat())
+        if (shouldTrack) context.trackMessageEvent("openMessage", isExpanded)
 
         collapseMessageDetails(message)
         setHeaderState(message, isExpanded)

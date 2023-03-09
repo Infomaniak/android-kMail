@@ -325,6 +325,10 @@ class SearchFragment : Fragment() {
         noHistory.isGone = isThereHistory
     }
 
+    private fun Fragment.trackSearchEvent(name: String, value: Boolean? = null) {
+        activity?.trackSearchEvent(name, value)
+    }
+
     enum class VisibilityMode {
         RECENT_SEARCHES, LOADING, NO_RESULTS, RESULTS
     }

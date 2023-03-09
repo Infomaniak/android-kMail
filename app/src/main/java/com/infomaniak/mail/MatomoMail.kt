@@ -28,28 +28,24 @@ object MatomoMail : MatomoCore {
     override val Context.tracker: Tracker get() = (this as ApplicationMain).matomoTracker
     override val siteId = 9
 
-    fun Context.trackMessageEvent(name: String, value: Float? = null) {
-        trackEvent("message", name, value = value)
-    }
-
-    fun Fragment.trackSearchEvent(name: String, value: Boolean? = null) {
-        activity?.trackSearchEvent(name, value)
+    fun Context.trackMessageEvent(name: String, value: Boolean? = null) {
+        trackEvent("message", name, value = value?.toFloat())
     }
 
     fun Context.trackSearchEvent(name: String, value: Boolean? = null) {
         trackEvent(category = "search", name = name, value = value?.toFloat())
     }
 
-    fun Context.trackNewMessageEvent(name: String, value: Float? = null, action: TrackerAction = TrackerAction.CLICK) {
+    fun Fragment.trackNewMessageEvent(name: String) {
+        activity?.trackNewMessageEvent(name)
+    }
+
+    fun Context.trackNewMessageEvent(name: String, action: TrackerAction = TrackerAction.CLICK, value: Float? = null) {
         trackEvent("newMessage", name, action, value)
     }
 
-    fun Fragment.trackNewMessageEvent(name: String, value: Float? = null) {
-        activity?.trackNewMessageEvent(name, value)
-    }
-
-    fun Fragment.trackMenuDrawerEvent(name: String, value: Float? = null) {
-        activity?.trackMenuDrawerEvent(name, value = value)
+    fun Fragment.trackMenuDrawerEvent(name: String, value: Boolean? = null) {
+        activity?.trackMenuDrawerEvent(name, value = value?.toFloat())
     }
 
     fun Context.trackMenuDrawerEvent(name: String, action: TrackerAction = TrackerAction.CLICK, value: Float? = null) {

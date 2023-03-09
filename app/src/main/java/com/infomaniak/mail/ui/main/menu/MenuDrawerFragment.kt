@@ -36,7 +36,6 @@ import com.infomaniak.lib.bugtracker.BugTrackerActivityArgs
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.BuildConfig
-import com.infomaniak.mail.MatomoMail.toFloat
 import com.infomaniak.mail.MatomoMail.trackCreateFolderEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackScreen
@@ -100,12 +99,12 @@ class MenuDrawerFragment : MenuFoldersFragment() {
                 isVisible = !isVisible
                 mailboxExpandButton.toggleChevron(!isVisible)
                 mailboxSwitcherText.setTextAppearance(if (isVisible) R.style.BodyMedium_Accent else R.style.BodyMedium)
-                trackMenuDrawerEvent("mailboxes", isVisible.toFloat())
+                trackMenuDrawerEvent("mailboxes", isVisible)
             }
         }
 
         customFolders.setOnClickListener {
-            trackMenuDrawerEvent("customFolders", (!customFolders.isCollapsed).toFloat())
+            trackMenuDrawerEvent("customFolders", !customFolders.isCollapsed)
             customFoldersLayout.isGone = customFolders.isCollapsed
         }
 
@@ -143,7 +142,7 @@ class MenuDrawerFragment : MenuFoldersFragment() {
         }
 
         advancedActions.setOnClickListener {
-            trackMenuDrawerEvent("advancedActions", (!advancedActions.isCollapsed).toFloat())
+            trackMenuDrawerEvent("advancedActions", !advancedActions.isCollapsed)
             advancedActionsLayout.isGone = advancedActions.isCollapsed
         }
 

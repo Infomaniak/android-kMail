@@ -354,8 +354,8 @@ class ThreadFragment : Fragment() {
         trackEvent("threadActions", name, value = value?.toMailActionValue())
     }
 
-    private fun trackMessageEvent(name: String, value: Float? = null) {
-        activity?.trackMessageEvent(name, value)
+    private fun trackMessageEvent(name: String) {
+        activity?.trackMessageEvent(name)
     }
 
     private fun trackMessageActionsEvent(name: String) {

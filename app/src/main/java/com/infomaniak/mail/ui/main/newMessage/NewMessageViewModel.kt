@@ -298,7 +298,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
         if (action == DraftAction.SEND) {
             val trackerData = listOf("numberOfTo" to to, "numberOfCC" to cc, "numberOfBCC" to bcc)
             trackerData.forEach { (eventName, recipients) ->
-                context.trackNewMessageEvent(eventName, recipients.size.toFloat(), TrackerAction.DATA)
+                context.trackNewMessageEvent(eventName, TrackerAction.DATA, recipients.size.toFloat())
             }
         }
     }

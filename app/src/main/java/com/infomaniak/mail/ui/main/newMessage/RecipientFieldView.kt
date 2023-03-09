@@ -29,7 +29,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.hideKeyboard
 import com.infomaniak.lib.core.utils.showKeyboard
-import com.infomaniak.mail.MatomoMail.toFloat
 import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.MergedContact
@@ -85,7 +84,7 @@ class RecipientFieldView @JvmOverloads constructor(
 
             if (isToggleable) {
                 chevron.setOnClickListener {
-                    context.trackMessageEvent("openRecipientsFields", isCollapsed.toFloat())
+                    context.trackMessageEvent("openRecipientsFields", isCollapsed)
                     isCollapsed = !isCollapsed
                     if (isCollapsed) autoCompleteInput.hideKeyboard()
                 }

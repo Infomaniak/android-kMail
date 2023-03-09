@@ -78,7 +78,7 @@ class SearchViewModel : ViewModel() {
     }
 
     fun refreshSearch() {
-        searchQuery(searchQuery.value ?: "")
+        searchQuery(searchQuery.value)
     }
 
     fun searchQuery(query: String, resetPagination: Boolean = true) {
@@ -115,7 +115,7 @@ class SearchViewModel : ViewModel() {
 
     fun nextPage() {
         if (isLastPage) return
-        searchQuery(query = searchQuery.value ?: "", resetPagination = false)
+        searchQuery(query = searchQuery.value, resetPagination = false)
     }
 
     override fun onCleared() {
