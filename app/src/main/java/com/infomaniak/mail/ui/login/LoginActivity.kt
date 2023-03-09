@@ -24,6 +24,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
@@ -42,13 +43,13 @@ import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.Utils.lockOrientationForSmallScreens
-import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.hideProgress
 import com.infomaniak.lib.core.utils.initProgress
 import com.infomaniak.lib.core.utils.showProgress
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.lib.login.InfomaniakLogin.ErrorStatus
+import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackScreen
@@ -78,8 +79,8 @@ class LoginActivity : AppCompatActivity() {
     private val webViewLoginResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         with(result) {
             if (resultCode == RESULT_OK) {
-                val authCode = data?.extras?.getString(InfomaniakLogin.CODE_TAG)
-                val translatedError = data?.extras?.getString(InfomaniakLogin.ERROR_TRANSLATED_TAG)
+                val authCode = data?.getStringExtra(InfomaniakLogin.CODE_TAG)
+                val translatedError = data?.getStringExtra(InfomaniakLogin.ERROR_TRANSLATED_TAG)
                 when {
                     translatedError?.isNotBlank() == true -> showError(translatedError)
                     authCode?.isNotBlank() == true -> authenticateUser(authCode)
@@ -89,6 +90,10 @@ class LoginActivity : AppCompatActivity() {
                 enableConnectButtons()
             }
         }
+    }
+
+    private val createAccountResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
+        result.handleCreateAccountActivityResult()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) = with(binding) {
@@ -137,8 +142,15 @@ class LoginActivity : AppCompatActivity() {
         }
 
         signInButton.setOnClickListener {
+            signInButton.isEnabled = false
+            connectButton.isEnabled = false
             trackAccountEvent("openCreationWebview")
-            openUrl("https://www.infomaniak.com/fr/hebergement/service-mail/") // TODO
+            infomaniakLogin.startCreateAccountWebView(
+                resultLauncher = createAccountResultLauncher,
+                createAccountUrl = BuildConfig.CREATE_ACCOUNT_URL,
+                successHost = BuildConfig.CREATE_ACCOUNT_SUCCESS_HOST,
+                cancelHost = BuildConfig.CREATE_ACCOUNT_CANCEL_HOST,
+            )
         }
 
         introViewModel.currentAccentColor.observe(this@LoginActivity) { accentColor ->
@@ -151,6 +163,20 @@ class LoginActivity : AppCompatActivity() {
     private fun handleOnBackPressed() = with(binding) {
         onBackPressedDispatcher.addCallback(this@LoginActivity) {
             if (introViewpager.currentItem == 0) finish() else introViewpager.currentItem -= 1
+        }
+    }
+
+    private fun ActivityResult.handleCreateAccountActivityResult() {
+        if (resultCode == RESULT_OK) {
+            val translatedError = data?.getStringExtra(InfomaniakLogin.ERROR_TRANSLATED_TAG)
+            when {
+                translatedError.isNullOrBlank() -> infomaniakLogin.startWebViewLogin(webViewLoginResultLauncher, false)
+                else -> showError(translatedError)
+            }
+        }
+        with(binding) {
+            connectButton.isEnabled = true
+            signInButton.isEnabled = true
         }
     }
 
