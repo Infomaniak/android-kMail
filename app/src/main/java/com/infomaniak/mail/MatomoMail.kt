@@ -56,6 +56,10 @@ object MatomoMail : MatomoCore {
         trackEvent("menuDrawer", name, action, value)
     }
 
+    fun Fragment.trackCreateFolderEvent(name: String) {
+        trackEvent("createFolder", name)
+    }
+
     // We need to invert this logical value to keep a coherent value for analytics
     fun Boolean.toMailActionValue() = (!this).toFloat()
 }

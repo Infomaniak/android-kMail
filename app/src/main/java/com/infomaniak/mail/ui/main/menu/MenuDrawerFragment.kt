@@ -37,6 +37,7 @@ import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.toFloat
+import com.infomaniak.mail.MatomoMail.trackCreateFolderEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.R
@@ -109,7 +110,7 @@ class MenuDrawerFragment : MenuFoldersFragment() {
         }
 
         customFolders.setOnActionClickListener {
-            trackMenuDrawerEvent("createNewFolder")
+            trackCreateFolderEvent("fromMenuDrawer")
             createFolderDialog.show()
         }
 
@@ -270,6 +271,9 @@ class MenuDrawerFragment : MenuFoldersFragment() {
         hint = R.string.newFolderDialogHint,
         confirmButtonText = R.string.buttonCreate,
         onErrorCheck = { folderName -> checkForFolderCreationErrors(folderName) },
-        onPositiveButtonClicked = { folderName -> mainViewModel.createNewFolder(folderName!!.toString()) },
+        onPositiveButtonClicked = { folderName ->
+            trackCreateFolderEvent("confirm")
+            mainViewModel.createNewFolder(folderName!!.toString())
+        },
     )
 }

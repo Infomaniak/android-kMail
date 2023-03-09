@@ -24,6 +24,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.infomaniak.lib.core.utils.openAppNotificationSettings
+import com.infomaniak.mail.MatomoMail.toFloat
+import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentSettingsBinding
 import com.infomaniak.mail.ui.MainViewModel
@@ -91,6 +93,7 @@ class SettingsFragment : Fragment() {
 
         settingsAppLock.apply {
             setOnClickListener {
+                trackEvent("settingsGeneral", "lock", value = isChecked.toFloat())
                 localSettings.isAppLocked = isChecked
                 notYetImplemented()
             }

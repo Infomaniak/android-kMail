@@ -77,7 +77,9 @@ class LocalSettings private constructor(context: Context) {
     enum class ThreadDensity(@StringRes val localisedNameRes: Int) {
         COMPACT(R.string.settingsDensityOptionCompact),
         NORMAL(R.string.settingsDensityOptionNormal),
-        LARGE(R.string.settingsDensityOptionLarge),
+        LARGE(R.string.settingsDensityOptionLarge);
+
+        override fun toString() = name.lowercase()
     }
     //endregion
 
@@ -90,6 +92,8 @@ class LocalSettings private constructor(context: Context) {
         SYSTEM(R.string.settingsOptionSystemTheme, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM),
         LIGHT(R.string.settingsOptionLightTheme, AppCompatDelegate.MODE_NIGHT_NO),
         DARK(R.string.settingsOptionDarkTheme, AppCompatDelegate.MODE_NIGHT_YES);
+
+        override fun toString() = name.lowercase()
     }
     //endregion
 
@@ -128,6 +132,8 @@ class LocalSettings private constructor(context: Context) {
         fun getSecondaryBackground(context: Context): Int = context.getColor(secondaryBackground)
 
         fun getRipple(context: Context): Int = context.getColor(ripple)
+
+        override fun toString() = name.lowercase()
     }
     //endregion
 
@@ -140,17 +146,27 @@ class LocalSettings private constructor(context: Context) {
         get() = getEnum(SWIPE_LEFT_KEY, INITIAL_SWIPE_ACTION)
         set(value) = putEnum(SWIPE_LEFT_KEY, value)
 
-    enum class SwipeAction(@StringRes val nameRes: Int, @ColorRes val colorRes: Int, @DrawableRes val iconRes: Int?) {
-        DELETE(R.string.actionDelete, R.color.swipeDelete, R.drawable.ic_bin),
-        ARCHIVE(R.string.actionArchive, R.color.swipeArchive, R.drawable.ic_archive_folder),
-        READ_UNREAD(R.string.settingsSwipeActionReadUnread, R.color.swipeReadUnread, R.drawable.ic_envelope),
-        MOVE(R.string.actionMove, R.color.swipeMove, R.drawable.ic_email_action_move),
-        FAVORITE(R.string.actionShortStar, R.color.swipeFavorite, R.drawable.ic_star),
-        POSTPONE(R.string.actionPostpone, R.color.swipePostpone, R.drawable.ic_alarm_clock),
-        SPAM(R.string.actionSpam, R.color.swipeSpam, R.drawable.ic_spam),
-        QUICKACTIONS_MENU(R.string.settingsSwipeActionQuickActionsMenu, R.color.swipeQuickActionMenu, R.drawable.ic_param_dots),
-        TUTORIAL(R.string.settingsSwipeActionNone, R.color.progressbarTrackColor, null),
-        NONE(R.string.settingsSwipeActionNone, R.color.swipeNone, null);
+    enum class SwipeAction(
+        @StringRes val nameRes: Int,
+        @ColorRes val colorRes: Int,
+        @DrawableRes val iconRes: Int?,
+        val matomoValue: String,
+    ) {
+        DELETE(R.string.actionDelete, R.color.swipeDelete, R.drawable.ic_bin, "trash"),
+        ARCHIVE(R.string.actionArchive, R.color.swipeArchive, R.drawable.ic_archive_folder, "archive"),
+        READ_UNREAD(R.string.settingsSwipeActionReadUnread, R.color.swipeReadUnread, R.drawable.ic_envelope, "markAsSeen"),
+        MOVE(R.string.actionMove, R.color.swipeMove, R.drawable.ic_email_action_move, "move"),
+        FAVORITE(R.string.actionShortStar, R.color.swipeFavorite, R.drawable.ic_star, "favorite"),
+        POSTPONE(R.string.actionPostpone, R.color.swipePostpone, R.drawable.ic_alarm_clock, "postpone"),
+        SPAM(R.string.actionSpam, R.color.swipeSpam, R.drawable.ic_spam, "spam"),
+        QUICKACTIONS_MENU(
+            R.string.settingsSwipeActionQuickActionsMenu,
+            R.color.swipeQuickActionMenu,
+            R.drawable.ic_param_dots,
+            "quickActions",
+        ),
+        TUTORIAL(R.string.settingsSwipeActionNone, R.color.progressbarTrackColor, null, "tutorial"),
+        NONE(R.string.settingsSwipeActionNone, R.color.swipeNone, null, "none");
 
         @ColorInt
         fun getBackgroundColor(context: Context): Int {

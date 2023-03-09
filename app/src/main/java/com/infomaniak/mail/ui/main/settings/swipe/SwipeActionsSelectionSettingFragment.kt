@@ -24,6 +24,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.mail.MatomoMail.toFloat
+import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.SwipeAction
@@ -74,5 +76,11 @@ class SwipeActionsSelectionSettingFragment : Fragment() {
             R.string.settingsSwipeRight -> swipeRight = swipeAction
             R.string.settingsSwipeLeft -> swipeLeft = swipeAction
         }
+
+        trackEvent(
+            category = "SettingsSwipeActions",
+            name = "${swipeAction.matomoValue}Swipe",
+            value = (navigationArgs.titleResId == R.string.settingsSwipeLeft).toFloat(),
+        )
     }
 }

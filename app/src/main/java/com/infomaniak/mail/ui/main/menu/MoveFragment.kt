@@ -25,6 +25,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
+import com.infomaniak.mail.MatomoMail.trackCreateFolderEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.FragmentMoveBinding
@@ -56,7 +57,10 @@ class MoveFragment : MenuFoldersFragment() {
 
     private fun setupListeners() = with(binding) {
         toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
-        iconAddFolder.setOnClickListener { createFolderDialog.show() }
+        iconAddFolder.setOnClickListener {
+            trackCreateFolderEvent("fromMove")
+            createFolderDialog.show()
+        }
     }
 
     private fun observeFolderId() = with(navigationArgs) {
@@ -91,6 +95,7 @@ class MoveFragment : MenuFoldersFragment() {
             confirmButtonText = R.string.newFolderDialogMovePositiveButton,
             onErrorCheck = { folderName -> checkForFolderCreationErrors(folderName) },
             onPositiveButtonClicked = { folderName ->
+                trackCreateFolderEvent("confirm")
                 mainViewModel.moveToNewFolder(folderName!!.toString(), threadUid, messageUid)
             },
         )
