@@ -296,7 +296,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 false
             }
             SwipeAction.FAVORITE -> {
-                toggleFavoriteStatus(threadUid)
+                toggleThreadFavoriteStatus(threadUid)
                 true
             }
             SwipeAction.MOVE -> {

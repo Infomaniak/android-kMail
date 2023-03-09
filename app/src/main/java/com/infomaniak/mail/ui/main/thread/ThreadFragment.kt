@@ -74,6 +74,7 @@ class ThreadFragment : Fragment() {
     private val threadAdapter by lazy { ThreadAdapter() }
 
     private var valueAnimator: ValueAnimator? = null
+    private var isFavorite = false
 
     // When opening the Thread, we want to scroll to the last Message, but only once.
     private var shouldScrollToBottom = AtomicBoolean(true)
@@ -151,8 +152,8 @@ class ThreadFragment : Fragment() {
         })
 
         iconFavorite.setOnClickListener {
-            trackThreadActionsEvent("favorite", threadViewModel.isThreadFavorite)
-            mainViewModel.toggleFavoriteStatus(threadUid)
+            trackThreadActionsEvent("favorite", isFavorite)
+            mainViewModel.toggleThreadFavoriteStatus(threadUid)
         }
 
         quickActionBar.setOnItemClickListener { menuId ->
@@ -333,6 +334,8 @@ class ThreadFragment : Fragment() {
             }
             iconTint = ColorStateList.valueOf(color)
         }
+
+        isFavorite = thread.isFavorite
     }
 
     private fun onMessagesUpdate(messages: List<Message>) {
