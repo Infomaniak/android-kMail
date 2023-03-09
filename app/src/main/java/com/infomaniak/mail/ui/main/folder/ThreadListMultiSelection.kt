@@ -62,22 +62,34 @@ class ThreadListMultiSelection {
         observerMultiSelection()
     }
 
-    private fun setupMultiSelectionActions() = with(threadListFragment) {
+    private fun setupMultiSelectionActions() = with(mainViewModel) {
         binding.quickActionBar.setOnItemClickListener { menuId ->
+            val selectedThreadsUids = selectedThreads.map { it.uid }
             when (menuId) {
-                R.id.quickActionUnread -> notYetImplemented()
-                R.id.quickActionArchive -> notYetImplemented()
-                R.id.quickActionFavorite -> notYetImplemented()
-                R.id.quickActionDelete -> notYetImplemented()
+                R.id.quickActionUnread -> {
+                    threadListFragment.notYetImplemented()
+                    isMultiSelectOn = false
+                }
+                R.id.quickActionArchive -> {
+                    threadListFragment.notYetImplemented()
+                    isMultiSelectOn = false
+                }
+                R.id.quickActionFavorite -> {
+                    threadListFragment.notYetImplemented()
+                    isMultiSelectOn = false
+                }
+                R.id.quickActionDelete -> {
+                    threadListFragment.notYetImplemented()
+                    isMultiSelectOn = false
+                }
                 R.id.quickActionMenu -> {
-                    safeNavigate(
-                        if (mainViewModel.selectedThreads.count() == 1) {
-                            val threadUid = mainViewModel.selectedThreads.single().uid
-                            ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(threadUid)
-                        } else {
-                            ThreadListFragmentDirections.actionThreadListFragmentToMultiSelectBottomSheetDialog()
-                        }
-                    )
+                    val direction = if (selectedThreadsUids.count() == 1) {
+                        isMultiSelectOn = false
+                        ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(selectedThreadsUids.single())
+                    } else {
+                        ThreadListFragmentDirections.actionThreadListFragmentToMultiSelectBottomSheetDialog()
+                    }
+                    threadListFragment.safeNavigate(direction)
                 }
             }
         }
