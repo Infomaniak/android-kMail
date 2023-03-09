@@ -24,6 +24,7 @@
     app:cardCornerRadius="20dp">
 
     <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/searchInputLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center_vertical"

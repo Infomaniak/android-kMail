@@ -48,6 +48,7 @@ import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.lib.core.utils.parcelableArrayListExtra
 import com.infomaniak.lib.core.utils.parcelableExtra
+import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition.INLINE
 import com.infomaniak.mail.data.models.Mailbox
@@ -233,6 +234,7 @@ class NewMessageFragment : Fragment() {
             signatureWebView.loadDataWithBaseURL("", signature, ClipDescription.MIMETYPE_TEXT_HTML, Utils.UTF_8, "")
 
             removeSignature.setOnClickListener {
+                trackNewMessageEvent("deleteSignature")
                 draft.uiSignature = null
                 separatedSignature.isGone = true
             }

@@ -22,6 +22,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.AccentColor
@@ -51,6 +52,7 @@ class AccentColorSettingFragment : Fragment() {
 
         onItemCheckedListener { _, _, accentColor ->
             chooseColor(accentColor as AccentColor)
+            trackEvent("settingsAccentColor", accentColor.toString())
         }
     }
 

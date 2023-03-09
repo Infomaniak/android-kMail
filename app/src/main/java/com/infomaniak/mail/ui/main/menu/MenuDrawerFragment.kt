@@ -36,6 +36,8 @@ import com.infomaniak.lib.bugtracker.BugTrackerActivityArgs
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.BuildConfig
+import com.infomaniak.mail.MatomoMail.trackCreateFolderEvent
+import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.RealmDatabase
@@ -58,6 +60,7 @@ class MenuDrawerFragment : MenuFoldersFragment() {
     private var canNavigate = AtomicBoolean(true)
 
     private val addressAdapter = MenuDrawerSwitchUserMailboxesAdapter { selectedMailbox ->
+        trackMenuDrawerEvent("switchMailbox")
         // TODO: This works, but... The splashscreen blinks.
         AccountUtils.currentMailboxId = selectedMailbox.mailboxId
         RealmDatabase.close()
@@ -96,12 +99,19 @@ class MenuDrawerFragment : MenuFoldersFragment() {
                 isVisible = !isVisible
                 mailboxExpandButton.toggleChevron(!isVisible)
                 mailboxSwitcherText.setTextAppearance(if (isVisible) R.style.BodyMedium_Accent else R.style.BodyMedium)
+                trackMenuDrawerEvent("mailboxes", isVisible)
             }
         }
 
-        customFolders.setOnClickListener { customFoldersLayout.isGone = customFolders.isCollapsed }
+        customFolders.setOnClickListener {
+            trackMenuDrawerEvent("customFolders", !customFolders.isCollapsed)
+            customFoldersLayout.isGone = customFolders.isCollapsed
+        }
 
-        customFolders.setOnActionClickListener { createFolderDialog.show() }
+        customFolders.setOnActionClickListener {
+            trackCreateFolderEvent("fromMenuDrawer")
+            createFolderDialog.show()
+        }
 
         feedback.setOnClickListener {
             closeDrawer()
@@ -119,25 +129,32 @@ class MenuDrawerFragment : MenuFoldersFragment() {
                     startActivity(this)
                 }
             } else {
+                trackMenuDrawerEvent("feedback")
                 context.openUrl(BuildConfig.FEEDBACK_USER_REPORT)
             }
         }
 
         help.setOnClickListener {
+            trackMenuDrawerEvent("help")
             notYetImplemented()
             closeDrawer()
             menuDrawerSafeNavigate(R.id.helpFragment)
         }
 
-        advancedActions.setOnClickListener { advancedActionsLayout.isGone = advancedActions.isCollapsed }
+        advancedActions.setOnClickListener {
+            trackMenuDrawerEvent("advancedActions", !advancedActions.isCollapsed)
+            advancedActionsLayout.isGone = advancedActions.isCollapsed
+        }
 
         importMails.setOnClickListener {
+            trackMenuDrawerEvent("importEmails")
             closeDrawer()
             // TODO: Import mails
             notYetImplemented()
         }
 
         restoreMails.setOnClickListener {
+            trackMenuDrawerEvent("restoreEmails")
             closeDrawer()
             // TODO: Restore mails
             notYetImplemented()
@@ -253,6 +270,9 @@ class MenuDrawerFragment : MenuFoldersFragment() {
         hint = R.string.newFolderDialogHint,
         confirmButtonText = R.string.buttonCreate,
         onErrorCheck = { folderName -> checkForFolderCreationErrors(folderName) },
-        onPositiveButtonClicked = { folderName -> mainViewModel.createNewFolder(folderName!!.toString()) },
+        onPositiveButtonClicked = { folderName ->
+            trackCreateFolderEvent("confirm")
+            mainViewModel.createNewFolder(folderName!!.toString())
+        },
     )
 }

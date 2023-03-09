@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.main.user
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.databinding.ItemMailboxMyAccountBinding
 
 class SimpleMailboxAdapter : RecyclerView.Adapter<SimpleMailboxAdapter.SimpleMailboxViewHolder>() {
@@ -29,8 +30,16 @@ class SimpleMailboxAdapter : RecyclerView.Adapter<SimpleMailboxAdapter.SimpleMai
         return SimpleMailboxViewHolder(ItemMailboxMyAccountBinding.inflate(LayoutInflater.from(parent.context), parent, false))
     }
 
-    override fun onBindViewHolder(holder: SimpleMailboxViewHolder, position: Int): Unit = with(holder.binding) {
-        email.text = mailboxes[position]
+    override fun onBindViewHolder(holder: SimpleMailboxViewHolder, position: Int) {
+        holder.binding.email.apply {
+            text = mailboxes[position]
+
+            // This line is added to track if users click on these addresses thinking they allow to change the current mailbox.
+            // It will be useful to determine if the UX needs to be rethought.
+            setOnClickListener { context.trackAccountEvent("selectMailAddress") }
+            // This is needed because the added click listener make the textView focusable
+            isFocusable = false
+        }
     }
 
     override fun getItemCount(): Int = mailboxes.count()

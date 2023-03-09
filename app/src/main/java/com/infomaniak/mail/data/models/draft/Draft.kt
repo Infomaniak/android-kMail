@@ -152,9 +152,9 @@ class Draft : RealmObject {
         }
     }
 
-    enum class DraftAction(val apiCallValue: String) {
-        SAVE("save"),
-        SEND("send"),
+    enum class DraftAction(val apiCallValue: String, val matomoValue: String) {
+        SAVE("save", "saveDraft"),
+        SEND("send", "sendMail"),
     }
 
     enum class DraftMode {

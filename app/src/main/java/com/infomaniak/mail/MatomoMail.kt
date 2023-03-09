@@ -18,6 +18,7 @@
 package com.infomaniak.mail
 
 import android.content.Context
+import androidx.fragment.app.Fragment
 import com.infomaniak.lib.core.MatomoCore
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import org.matomo.sdk.Tracker
@@ -26,4 +27,35 @@ object MatomoMail : MatomoCore {
 
     override val Context.tracker: Tracker get() = (this as ApplicationMain).matomoTracker
     override val siteId = 9
+
+    fun Context.trackMessageEvent(name: String, value: Boolean? = null) {
+        trackEvent("message", name, value = value?.toFloat())
+    }
+
+    fun Context.trackSearchEvent(name: String, value: Boolean? = null) {
+        trackEvent(category = "search", name = name, value = value?.toFloat())
+    }
+
+    fun Fragment.trackNewMessageEvent(name: String) {
+        context?.trackNewMessageEvent(name)
+    }
+
+    fun Context.trackNewMessageEvent(name: String, action: TrackerAction = TrackerAction.CLICK, value: Float? = null) {
+        trackEvent("newMessage", name, action, value)
+    }
+
+    fun Fragment.trackMenuDrawerEvent(name: String, value: Boolean? = null) {
+        context?.trackMenuDrawerEvent(name, value = value?.toFloat())
+    }
+
+    fun Context.trackMenuDrawerEvent(name: String, action: TrackerAction = TrackerAction.CLICK, value: Float? = null) {
+        trackEvent("menuDrawer", name, action, value)
+    }
+
+    fun Fragment.trackCreateFolderEvent(name: String) {
+        trackEvent("createFolder", name)
+    }
+
+    // We need to invert this logical value to keep a coherent value for analytics
+    fun Boolean.toMailActionValue() = (!this).toFloat()
 }

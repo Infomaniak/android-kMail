@@ -23,6 +23,7 @@ import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
 import androidx.recyclerview.widget.RecyclerView
+import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.databinding.ItemContactBinding
@@ -73,6 +74,7 @@ class ContactAdapter(
         userEmail.text = searchQuery
         userAvatar.loadUnknownUserAvatar()
         root.setOnClickListener {
+            context.trackNewMessageEvent("addNewRecipient")
             if (usedContacts.contains(searchQuery)) setSnackBar(R.string.addUnknownRecipientAlreadyUsed) else onAddUnrecognizedContact()
         }
     }

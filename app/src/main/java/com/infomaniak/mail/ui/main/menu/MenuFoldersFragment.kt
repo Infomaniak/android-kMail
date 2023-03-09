@@ -59,7 +59,7 @@ abstract class MenuFoldersFragment : Fragment() {
         val allFolders = defaultFolders + customFolders
 
         return when {
-            folderName.length > 255 -> context?.getString(R.string.errorNewFolderNameTooLong)
+            folderName.length > 255 -> getString(R.string.errorNewFolderNameTooLong)
             allFolders.any { it.name == folderName.toString() } -> context?.getString(R.string.errorNewFolderAlreadyExists)
             else -> null
         }

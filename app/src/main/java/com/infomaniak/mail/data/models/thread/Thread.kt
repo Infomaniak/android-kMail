@@ -205,13 +205,13 @@ class Thread : RealmObject {
         return message.preview
     }
 
-    enum class ThreadFilter {
-        ALL,
-        SEEN,
-        UNSEEN,
-        STARRED,
-        ATTACHMENTS,
-        FOLDER,
+    enum class ThreadFilter(val matomoValue: String) {
+        ALL("folderFilter"),
+        SEEN("readFilter"),
+        UNSEEN("unreadFilter"),
+        STARRED("favoriteFilter"),
+        ATTACHMENTS("attachmentFilter"),
+        FOLDER("folderFilter"),
     }
 
     companion object {

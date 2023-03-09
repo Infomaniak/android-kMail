@@ -42,6 +42,7 @@ import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListen
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollState
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.showKeyboard
+import com.infomaniak.mail.MatomoMail.trackSearchEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.Folder
@@ -80,6 +81,7 @@ class SearchFragment : Fragment() {
         RecentSearchAdapter(
             searchQueries = localSettings.recentSearches.toMutableList(),
             onSearchQueryClicked = {
+                trackSearchEvent("fromHistory")
                 with(binding.searchBar.searchTextInput) {
                     setText(it)
                     requestFocus()
@@ -87,6 +89,7 @@ class SearchFragment : Fragment() {
                 }
             },
             onSearchQueryDeleted = { history ->
+                trackSearchEvent("deleteFromHistory")
                 val isThereHistory = history.isNotEmpty()
                 localSettings.recentSearches = history
                 updateHistoryEmptyStateVisibility(isThereHistory)
@@ -195,22 +198,29 @@ class SearchFragment : Fragment() {
             }
         }
 
-        searchBar.searchTextInput.apply {
-            showKeyboard()
-
-            doOnTextChanged { text, _, _, _ ->
-                if (searchViewModel.previousSearch != null) {
-                    searchViewModel.previousSearch = null
-                    return@doOnTextChanged
-                }
-                searchViewModel.searchQuery(text.toString())
+        with(searchBar) {
+            searchInputLayout.setEndIconOnClickListener {
+                searchTextInput.text?.clear()
+                trackSearchEvent("deleteSearch")
             }
+            searchTextInput.apply {
+                showKeyboard()
 
-            setOnEditorActionListener { _, actionId, _ ->
-                if (actionId == EditorInfo.IME_ACTION_SEARCH && !text.isNullOrBlank()) {
+                doOnTextChanged { text, _, _, _ ->
+                    if (searchViewModel.previousSearch != null) {
+                        searchViewModel.previousSearch = null
+                        return@doOnTextChanged
+                    }
                     searchViewModel.searchQuery(text.toString())
                 }
-                true // Keep keyboard open
+
+                setOnEditorActionListener { _, actionId, _ ->
+                    if (actionId == EditorInfo.IME_ACTION_SEARCH && !text.isNullOrBlank()) {
+                        trackSearchEvent("validateSearch")
+                        searchViewModel.searchQuery(text.toString())
+                    }
+                    true // Keep keyboard open
+                }
             }
         }
 
@@ -259,6 +269,7 @@ class SearchFragment : Fragment() {
     private fun onFolderSelected(folder: Folder?, title: String) = with(binding) {
         updateFolderDropDownUi(folder, title)
         searchViewModel.selectFolder(folder)
+        trackSearchEvent(ThreadFilter.FOLDER.matomoValue, folder != null)
     }
 
     private fun updateFolderDropDownUi(folder: Folder?, title: String) = with(binding) {
@@ -312,6 +323,10 @@ class SearchFragment : Fragment() {
     private fun updateHistoryEmptyStateVisibility(isThereHistory: Boolean) = with(binding) {
         recentSearches.isVisible = isThereHistory
         noHistory.isGone = isThereHistory
+    }
+
+    private fun Fragment.trackSearchEvent(name: String, value: Boolean? = null) {
+        requireContext().trackSearchEvent(name, value)
     }
 
     enum class VisibilityMode {

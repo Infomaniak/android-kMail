@@ -17,10 +17,13 @@
  */
 package com.infomaniak.mail.ui.main.search
 
+import android.app.Application
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.SingleLiveEvent
+import com.infomaniak.mail.MatomoMail.trackSearchEvent
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
@@ -38,8 +41,9 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
-class SearchViewModel : ViewModel() {
+class SearchViewModel(application: Application) : AndroidViewModel(application) {
 
+    private inline val context: Context get() = getApplication<Application>()
     private val searchQuery = MutableStateFlow("")
     private val _selectedFilters = MutableStateFlow(emptySet<ThreadFilter>())
     private inline val selectedFilters get() = _selectedFilters.value.toMutableSet()
@@ -76,7 +80,7 @@ class SearchViewModel : ViewModel() {
     }
 
     fun refreshSearch() {
-        searchQuery(searchQuery.value ?: "")
+        searchQuery(searchQuery.value)
     }
 
     fun searchQuery(query: String, resetPagination: Boolean = true) {
@@ -96,7 +100,12 @@ class SearchViewModel : ViewModel() {
 
     fun toggleFilter(filter: ThreadFilter) {
         resetPagination()
-        if (selectedFilters.contains(filter)) filter.unselect() else filter.select()
+        if (selectedFilters.contains(filter)) {
+            filter.unselect()
+        } else {
+            context.trackSearchEvent(filter.matomoValue)
+            filter.select()
+        }
     }
 
     fun unselectMutuallyExclusiveFilters() {
@@ -108,7 +117,7 @@ class SearchViewModel : ViewModel() {
 
     fun nextPage() {
         if (isLastPage) return
-        searchQuery(query = searchQuery.value ?: "", resetPagination = false)
+        searchQuery(query = searchQuery.value, resetPagination = false)
     }
 
     override fun onCleared() {

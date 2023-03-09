@@ -35,6 +35,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.infomaniak.lib.core.InfomaniakCore
+import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.models.ApiError
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.models.user.User
@@ -49,6 +50,7 @@ import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.lib.login.InfomaniakLogin.ErrorStatus
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
+import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings.AccentColor
@@ -263,6 +265,7 @@ class LoginActivity : AppCompatActivity() {
                             }
                             else -> {
                                 apiResponse.data?.let { mailboxes ->
+                                    context.trackEvent("userInfo", "nbMailboxes", TrackerAction.DATA, mailboxes.count().toFloat())
                                     AccountUtils.addUser(it)
                                     MailboxController.updateMailboxes(context, mailboxes)
 

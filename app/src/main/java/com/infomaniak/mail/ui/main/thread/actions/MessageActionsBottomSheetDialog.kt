@@ -24,6 +24,7 @@ import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.ui.main.menu.MoveFragmentArgs
 import com.infomaniak.mail.utils.animatedNavigation
@@ -55,32 +56,39 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             initOnClickListener(object : OnActionClick {
                 //region Main actions
                 override fun onReply() {
+                    trackBottomSheetMessageActionsEvent("reply")
                     safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUid, currentClassName)
                 }
 
                 override fun onReplyAll() {
+                    trackBottomSheetMessageActionsEvent("replyAll")
                     safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUid, currentClassName)
                 }
 
                 override fun onForward() {
+                    trackBottomSheetMessageActionsEvent("forward")
                     safeNavigateToNewMessageActivity(DraftMode.FORWARD, messageUid, currentClassName)
                 }
 
                 override fun onDelete() {
+                    trackBottomSheetMessageActionsEvent("trash")
                     mainViewModel.deleteThreadOrMessage(threadUid, message)
                 }
                 //endregion
 
                 //region Actions
-                override fun onArchive() {
-                    mainViewModel.archiveThreadOrMessage(threadUid, message)
+                override fun onArchive(): Unit = with(mainViewModel) {
+                    trackBottomSheetMessageActionsEvent("archive", message.folder.role == FolderRole.ARCHIVE)
+                    archiveThreadOrMessage(threadUid, message)
                 }
 
                 override fun onReadUnread() {
+                    trackBottomSheetMessageActionsEvent("markAsSeen", message.isSeen)
                     mainViewModel.toggleSeenStatus(threadUid, message)
                 }
 
                 override fun onMove() {
+                    trackBottomSheetMessageActionsEvent("move")
                     animatedNavigation(
                         resId = R.id.moveFragment,
                         args = MoveFragmentArgs(threadUid, messageUid).toBundle(),
@@ -89,10 +97,12 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 }
 
                 override fun onPostpone() {
+                    trackBottomSheetMessageActionsEvent("postpone")
                     notYetImplemented()
                 }
 
                 override fun onFavorite() {
+                    trackBottomSheetMessageActionsEvent("favorite", message.isFavorite)
                     mainViewModel.toggleFavoriteStatus(threadUid, message)
                 }
 
@@ -107,6 +117,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 }
 
                 override fun onPrint() {
+                    trackBottomSheetMessageActionsEvent("print")
                     notYetImplemented()
                 }
 

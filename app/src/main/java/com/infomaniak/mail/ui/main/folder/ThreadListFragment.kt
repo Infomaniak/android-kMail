@@ -44,9 +44,13 @@ import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnItemSwipeListene
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListener
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollDirection
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollState
+import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.utils.setPaddingRelative
+import com.infomaniak.mail.MatomoMail.trackEvent
+import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
+import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.Companion.DEFAULT_SWIPE_ACTION_LEFT
@@ -189,7 +193,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun setupListeners() = with(binding) {
 
-        toolbar.setNavigationOnClickListener { (activity as? MainActivity)?.binding?.drawerLayout?.open() }
+        toolbar.setNavigationOnClickListener {
+            trackMenuDrawerEvent("openByButton")
+            (activity as? MainActivity)?.binding?.drawerLayout?.open()
+        }
 
         searchButton.setOnClickListener {
             safeNavigate(
@@ -202,6 +209,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
 
         newMessageFab.setOnClickListener {
+            trackNewMessageEvent("openFromFab")
             safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToNewMessageActivity())
         }
 
@@ -243,6 +251,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
      * Thread in the RecyclerView, or remove it when the swipe is done.
      */
     private fun performSwipeActionOnThread(swipeAction: SwipeAction, threadUid: String): Boolean = with(mainViewModel) {
+
+        trackEvent("swipeActions", swipeAction.matomoValue, TrackerAction.DRAG)
 
         val shouldKeepItem = when (swipeAction) {
             SwipeAction.TUTORIAL -> {
