@@ -398,12 +398,12 @@ class ThreadListAdapter(
 
     fun selectUnselectAll() {
         multiSelection?.selectedItems?.value?.let { selectedItems ->
-            if (selectedItems.count() == threadCount) {
-                selectedItems.clear()
-            } else {
+            if (selectedItems.count() < threadCount) {
                 dataSet.forEachIndexed { index, item ->
                     if (getItemViewType(index) == DisplayType.THREAD.layout) selectedItems.add(SelectedThread(item as Thread))
                 }
+            } else {
+                selectedItems.clear()
             }
             multiSelection.selectedItems.value = selectedItems
             updateSelection()
