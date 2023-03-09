@@ -25,6 +25,8 @@ import androidx.fragment.app.activityViewModels
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetMultiSelectBinding
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
+import com.infomaniak.mail.utils.animatedNavigation
 import com.infomaniak.mail.utils.notYetImplemented
 
 class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
@@ -44,7 +46,14 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         binding.mainActions.setClosingOnClickListener { id: Int ->
             val selectedThreadsUids = selectedThreads.map { it.uid }
             when (id) {
-                R.id.actionMove -> notYetImplemented()
+                R.id.actionMove -> {
+                    animatedNavigation(
+                        ThreadListFragmentDirections.actionThreadListFragmentToMoveFragment(
+                            threadsUids = selectedThreadsUids.toTypedArray(),
+                        ),
+                        currentClassName = currentClassName,
+                    )
+                }
                 R.id.actionSpam -> notYetImplemented()
                 // R.id.actionPostpone -> notYetImplemented()
             }

@@ -77,9 +77,9 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 //endregion
 
                 //region Actions
-                override fun onArchive() = with(mainViewModel) {
+                override fun onArchive() {
                     trackBottomSheetMessageActionsEvent("archive", message.folder.role == FolderRole.ARCHIVE)
-                    archiveMessage(threadUid, message)
+                    mainViewModel.archiveMessage(threadUid, message)
                 }
 
                 override fun onReadUnread() {
@@ -91,7 +91,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     trackBottomSheetMessageActionsEvent("move")
                     animatedNavigation(
                         resId = R.id.moveFragment,
-                        args = MoveFragmentArgs(threadUid, messageUid).toBundle(),
+                        args = MoveFragmentArgs(arrayOf(threadUid), messageUid).toBundle(),
                         currentClassName = currentClassName,
                     )
                 }
