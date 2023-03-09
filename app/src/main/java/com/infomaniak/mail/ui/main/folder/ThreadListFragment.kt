@@ -416,6 +416,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
+    //region Multi selection observer
     private fun observerMultiSelection() = with(binding) {
         mainViewModel.isMultiSelectOn.observe(viewLifecycleOwner) { isMultiSelectOn ->
             if (!isMultiSelectOn) {
@@ -423,40 +424,60 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 threadListAdapter.updateSelection()
             }
 
-            toolbar.isGone = isMultiSelectOn
-            toolbarSelection.isVisible = isMultiSelectOn
-
-            (activity as MainActivity).setDrawerLockMode(!isMultiSelectOn)
-            if (isMultiSelectOn) threadsList.apply {
-                disableSwipeDirection(DirectionFlag.LEFT)
-                disableSwipeDirection(DirectionFlag.RIGHT)
-            }
-            else {
-                unlockSwipeActionsIfSet()
-            }
-
-            val noUnread = mainViewModel.currentFolderLive.value?.let { it.unreadCount == 0 } == true
-            binding.unreadCountChip.isGone = isMultiSelectOn || noUnread
-
-            newMessageFab.isGone = isMultiSelectOn
-            quickActionBar.isVisible = isMultiSelectOn
-            val navBarColor = context.getColor(if (isMultiSelectOn) R.color.elevatedBackground else R.color.backgroundColor)
-            requireActivity().window.navigationBarColor = navBarColor
+            displaySelectionToolbar(isMultiSelectOn)
+            lockDrawerAndSwipe(isMultiSelectOn)
+            hideUnreadChip(isMultiSelectOn)
+            displayMultiSelectActions(isMultiSelectOn)
         }
 
         mainViewModel.selectedThreads.observe(viewLifecycleOwner) { selectedThreads ->
-            val threadCount = selectedThreads.count()
-            selectedCount.text = resources.getQuantityString(R.plurals.multipleSelectionCount, threadCount, threadCount)
+            updateSelectedCount(selectedThreads)
+            updateMultiSelectActionsStatus(selectedThreads)
+        }
+    }
 
-            val (shouldRead, shouldFavorite) = computeReadFavoriteStatus(selectedThreads)
+    private fun displaySelectionToolbar(isMultiSelectOn: Boolean) = with(binding) {
+        toolbar.isGone = isMultiSelectOn
+        toolbarSelection.isVisible = isMultiSelectOn
+    }
 
-            quickActionBar.apply {
-                changeIcon(0, if (shouldRead) R.drawable.ic_envelope_open else R.drawable.ic_envelope)
-                changeText(0, if (shouldRead) R.string.actionShortMarkAsRead else R.string.actionShortMarkAsUnread)
+    private fun lockDrawerAndSwipe(isMultiSelectOn: Boolean) = with(binding) {
+        (activity as MainActivity).setDrawerLockMode(!isMultiSelectOn)
+        if (isMultiSelectOn) threadsList.apply {
+            disableSwipeDirection(DirectionFlag.LEFT)
+            disableSwipeDirection(DirectionFlag.RIGHT)
+        }
+        else {
+            unlockSwipeActionsIfSet()
+        }
+    }
 
-                changeIcon(2, if (shouldFavorite) R.drawable.ic_star else R.drawable.ic_unstar)
-                // changeText(2, if (shouldFavorite) R.string.actionShortStar else R.string.actionShortStar) TODO : Use correct string
-            }
+    private fun hideUnreadChip(isMultiSelectOn: Boolean) {
+        val noUnread = mainViewModel.currentFolderLive.value?.let { it.unreadCount == 0 } == true
+        binding.unreadCountChip.isGone = isMultiSelectOn || noUnread
+    }
+
+    private fun displayMultiSelectActions(isMultiSelectOn: Boolean) = with(binding) {
+        newMessageFab.isGone = isMultiSelectOn
+        quickActionBar.isVisible = isMultiSelectOn
+        val navBarColor = context.getColor(if (isMultiSelectOn) R.color.elevatedBackground else R.color.backgroundColor)
+        requireActivity().window.navigationBarColor = navBarColor
+    }
+
+    private fun updateSelectedCount(selectedThreads: MutableSet<SelectedThread>) {
+        val threadCount = selectedThreads.count()
+        binding.selectedCount.text = resources.getQuantityString(R.plurals.multipleSelectionCount, threadCount, threadCount)
+    }
+
+    private fun updateMultiSelectActionsStatus(selectedThreads: MutableSet<SelectedThread>) {
+        val (shouldRead, shouldFavorite) = computeReadFavoriteStatus(selectedThreads)
+
+        binding.quickActionBar.apply {
+            changeIcon(0, if (shouldRead) R.drawable.ic_envelope_open else R.drawable.ic_envelope)
+            changeText(0, if (shouldRead) R.string.actionShortMarkAsRead else R.string.actionShortMarkAsUnread)
+
+            changeIcon(2, if (shouldFavorite) R.drawable.ic_star else R.drawable.ic_unstar)
+            // changeText(2, if (shouldFavorite) R.string.actionShortStar else R.string.actionShortStar) TODO : Use correct string
         }
     }
 
@@ -472,6 +493,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
         return !shouldUnRead to !shouldUnFavorite
     }
+    //endregion
 
     private fun updateUpdatedAt(newLastUpdatedDate: Date? = null) {
 
