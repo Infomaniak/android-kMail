@@ -33,6 +33,7 @@ import com.infomaniak.mail.ui.main.user.ManageMailAddressViewModel
 import com.infomaniak.mail.ui.main.user.SimpleMailboxAdapter
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.animatedNavigation
+import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.createDescriptionDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -59,7 +60,7 @@ class ManageMailAddressFragment : Fragment() {
         changeAccountButton.setOnClickListener { animatedNavigation(ManageMailAddressFragmentDirections.actionManageMailAddressFragmentToSwitchUserFragment()) }
 
         disconnectAccountButton.setOnClickListener {
-            activity?.trackAccountEvent("logOut")
+            context.trackAccountEvent("logOut")
             logoutAlert.show()
         }
 
@@ -75,7 +76,7 @@ class ManageMailAddressFragment : Fragment() {
     }
 
     private fun removeCurrentUser() = lifecycleScope.launch(Dispatchers.IO) {
-        activity?.trackAccountEvent("logOutConfirm")
+        requireContext().trackAccountEvent("logOutConfirm")
         AccountUtils.removeUser(requireContext(), AccountUtils.currentUser!!)
     }
 

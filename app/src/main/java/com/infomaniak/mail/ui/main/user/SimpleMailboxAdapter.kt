@@ -33,7 +33,11 @@ class SimpleMailboxAdapter : RecyclerView.Adapter<SimpleMailboxAdapter.SimpleMai
     override fun onBindViewHolder(holder: SimpleMailboxViewHolder, position: Int) {
         holder.binding.email.apply {
             text = mailboxes[position]
+
+            // This line is added to track if users click on these addresses thinking they allow to change the current mailbox.
+            // It will be useful to determine if the UX needs to be rethought.
             setOnClickListener { context.trackAccountEvent("selectMailAddress") }
+            // This is needed because the added click listener make the textView focusable
             isFocusable = false
         }
     }

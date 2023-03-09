@@ -200,6 +200,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
         field.remove(recipient)
         updateIsSendingAllowed()
         saveDraftDebouncing()
+        context.trackNewMessageEvent("deleteRecipient")
     }
 
     fun updateMailSubject(newSubject: String?) = with(draft) {
@@ -296,7 +297,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     private fun trackSendingDraftEvent(action: DraftAction) = with(draft) {
         context.trackNewMessageEvent(action.matomoValue)
         if (action == DraftAction.SEND) {
-            val trackerData = listOf("numberOfTo" to to, "numberOfCC" to cc, "numberOfBCC" to bcc)
+            val trackerData = listOf("numberOfTo" to to, "numberOfCc" to cc, "numberOfBcc" to bcc)
             trackerData.forEach { (eventName, recipients) ->
                 context.trackNewMessageEvent(eventName, TrackerAction.DATA, recipients.size.toFloat())
             }

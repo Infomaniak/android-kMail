@@ -50,7 +50,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         binding.postpone.isGone = true
         setSpamUi()
 
-        threadActionsViewModel.getMessageUidToReplyTo(
+        threadActionsViewModel.getThreadAndMessageUidToReplyTo(
             threadUid,
             messageUidToReplyTo,
         ).observe(viewLifecycleOwner) { (thread, messageUidToReply) ->
@@ -81,7 +81,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 //region Actions
                 override fun onArchive(): Unit = with(mainViewModel) {
                     trackBottomSheetThreadActionsEvent("archive", isCurrentFolderRole(FolderRole.ARCHIVE))
-                    mainViewModel.archiveThreadOrMessage(threadUid)
+                    archiveThreadOrMessage(threadUid)
                 }
 
                 override fun onReadUnread() {

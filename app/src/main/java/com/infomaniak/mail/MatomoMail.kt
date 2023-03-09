@@ -37,7 +37,7 @@ object MatomoMail : MatomoCore {
     }
 
     fun Fragment.trackNewMessageEvent(name: String) {
-        activity?.trackNewMessageEvent(name)
+        context?.trackNewMessageEvent(name)
     }
 
     fun Context.trackNewMessageEvent(name: String, action: TrackerAction = TrackerAction.CLICK, value: Float? = null) {
@@ -45,7 +45,7 @@ object MatomoMail : MatomoCore {
     }
 
     fun Fragment.trackMenuDrawerEvent(name: String, value: Boolean? = null) {
-        activity?.trackMenuDrawerEvent(name, value = value?.toFloat())
+        context?.trackMenuDrawerEvent(name, value = value?.toFloat())
     }
 
     fun Context.trackMenuDrawerEvent(name: String, action: TrackerAction = TrackerAction.CLICK, value: Float? = null) {

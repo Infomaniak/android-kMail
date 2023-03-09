@@ -45,7 +45,6 @@ import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.MatomoMail.toMailActionValue
 import com.infomaniak.mail.MatomoMail.trackEvent
-import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRoutes
@@ -229,7 +228,7 @@ class ThreadFragment : Fragment() {
                 }
             }
             onAttachmentClicked = { attachment ->
-                trackMessageEvent("openAttachment")
+                trackAttachmentActionsEvent("openAttachment")
                 if (attachment.openWithIntent(requireContext()).hasSupportedApplications(requireContext())) {
                     attachment.display()
                 } else {
@@ -237,7 +236,7 @@ class ThreadFragment : Fragment() {
                 }
             }
             onDownloadAllClicked = { message ->
-                trackMessageEvent("downloadAll")
+                trackAttachmentActionsEvent("downloadAll")
                 downloadAllAttachments(message)
             }
             onReplyClicked = { message ->
@@ -354,8 +353,8 @@ class ThreadFragment : Fragment() {
         trackEvent("threadActions", name, value = value?.toMailActionValue())
     }
 
-    private fun trackMessageEvent(name: String) {
-        activity?.trackMessageEvent(name)
+    private fun trackAttachmentActionsEvent(name: String) {
+        trackEvent("attachmentActions", name)
     }
 
     private fun trackMessageActionsEvent(name: String) {
