@@ -25,6 +25,7 @@ import androidx.activity.viewModels
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.google.android.material.button.MaterialButton
+import com.infomaniak.mail.MatomoMail.ACTION_POSTPONE_NAME
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
@@ -141,7 +142,7 @@ class NewMessageActivity : ThemedActivity() {
         ATTACHMENT("importFile"),
         CAMERA("importFromCamera"),
         LINK("addLink"),
-        CLOCK("postpone"),
+        CLOCK(ACTION_POSTPONE_NAME),
         BOLD("bold"),
         ITALIC("italic"),
         UNDERLINE("underline"),

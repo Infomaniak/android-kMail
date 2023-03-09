@@ -24,6 +24,17 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_FAVORITE_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_FORWARD_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_MARK_AS_SEEN_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_MOVE_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_POSTPONE_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_PRINT_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_REPLY_ALL_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_REPLY_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_SPAM_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_TRASH_NAME
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
@@ -58,40 +69,40 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             initOnClickListener(object : OnActionClick {
                 //region Main actions
                 override fun onReply() {
-                    trackBottomSheetThreadActionsEvent("reply")
+                    trackBottomSheetThreadActionsEvent(ACTION_REPLY_NAME)
                     safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUidToReply, currentClassName)
                 }
 
                 override fun onReplyAll() {
-                    trackBottomSheetThreadActionsEvent("replyAll")
+                    trackBottomSheetThreadActionsEvent(ACTION_REPLY_ALL_NAME)
                     safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUidToReply, currentClassName)
                 }
 
                 override fun onForward() {
-                    trackBottomSheetThreadActionsEvent("forward")
+                    trackBottomSheetThreadActionsEvent(ACTION_FORWARD_NAME)
                     safeNavigateToNewMessageActivity(DraftMode.FORWARD, messageUidToReply, currentClassName)
                 }
 
                 override fun onDelete() {
-                    trackBottomSheetThreadActionsEvent("trash")
+                    trackBottomSheetThreadActionsEvent(ACTION_TRASH_NAME)
                     mainViewModel.deleteThread(threadUid)
                 }
                 //endregion
 
                 //region Actions
                 override fun onArchive() = with(mainViewModel) {
-                    trackBottomSheetThreadActionsEvent("archive", isCurrentFolderRole(FolderRole.ARCHIVE))
+                    trackBottomSheetThreadActionsEvent(ACTION_ARCHIVE_NAME, isCurrentFolderRole(FolderRole.ARCHIVE))
                     archiveThread(threadUid)
                 }
 
                 override fun onReadUnread() {
-                    trackBottomSheetThreadActionsEvent("markAsSeen", thread.unseenMessagesCount == 0)
+                    trackBottomSheetThreadActionsEvent(ACTION_MARK_AS_SEEN_NAME, thread.unseenMessagesCount == 0)
                     mainViewModel.toggleThreadSeenStatus(threadUid)
                     findNavController().popBackStack(R.id.threadFragment, inclusive = true)
                 }
 
                 override fun onMove() {
-                    trackBottomSheetThreadActionsEvent("move")
+                    trackBottomSheetThreadActionsEvent(ACTION_MOVE_NAME)
                     animatedNavigation(
                         resId = R.id.moveFragment,
                         args = MoveFragmentArgs(arrayOf(threadUid)).toBundle(),
@@ -100,24 +111,24 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 }
 
                 override fun onPostpone() {
-                    trackBottomSheetThreadActionsEvent("postpone")
+                    trackBottomSheetThreadActionsEvent(ACTION_POSTPONE_NAME)
                     TODO("Not yet implemented")
                 }
 
                 override fun onFavorite() {
-                    trackBottomSheetThreadActionsEvent("favorite", thread.isFavorite)
+                    trackBottomSheetThreadActionsEvent(ACTION_FAVORITE_NAME, thread.isFavorite)
                     mainViewModel.toggleThreadFavoriteStatus(threadUid)
                 }
 
                 override fun onSpam() = with(mainViewModel) {
-                    trackBottomSheetThreadActionsEvent("spam", isCurrentFolderRole(FolderRole.SPAM))
+                    trackBottomSheetThreadActionsEvent(ACTION_SPAM_NAME, isCurrentFolderRole(FolderRole.SPAM))
                     toggleThreadSpamStatus(threadUid)
                 }
 
                 override fun onReportJunk() = Unit
 
                 override fun onPrint() {
-                    trackBottomSheetThreadActionsEvent("print")
+                    trackBottomSheetThreadActionsEvent(ACTION_PRINT_NAME)
                     notYetImplemented()
                 }
 

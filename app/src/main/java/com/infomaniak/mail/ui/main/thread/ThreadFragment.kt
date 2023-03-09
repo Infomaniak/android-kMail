@@ -43,6 +43,12 @@ import com.infomaniak.lib.core.utils.getBackNavigationResult
 import com.infomaniak.lib.core.utils.hasSupportedApplications
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.views.DividerItemDecorator
+import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_FAVORITE_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_FORWARD_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_REPLY_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_TRASH_NAME
+import com.infomaniak.mail.MatomoMail.OPEN_FROM_DRAFT_NAME
 import com.infomaniak.mail.MatomoMail.toMailActionValue
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
@@ -152,26 +158,26 @@ class ThreadFragment : Fragment() {
         })
 
         iconFavorite.setOnClickListener {
-            trackThreadActionsEvent("favorite", isFavorite)
+            trackThreadActionsEvent(ACTION_FAVORITE_NAME, isFavorite)
             mainViewModel.toggleThreadFavoriteStatus(threadUid)
         }
 
         quickActionBar.setOnItemClickListener { menuId ->
             when (menuId) {
                 R.id.quickActionReply -> {
-                    trackThreadActionsEvent("reply")
+                    trackThreadActionsEvent(ACTION_REPLY_NAME)
                     threadViewModel.clickOnQuickActionBar(threadUid, menuId)
                 }
                 R.id.quickActionForward -> {
-                    trackThreadActionsEvent("forward")
+                    trackThreadActionsEvent(ACTION_FORWARD_NAME)
                     threadViewModel.clickOnQuickActionBar(threadUid, menuId)
                 }
                 R.id.quickActionArchive -> with(mainViewModel) {
-                    trackThreadActionsEvent("archive", isCurrentFolderRole(FolderRole.ARCHIVE))
+                    trackThreadActionsEvent(ACTION_ARCHIVE_NAME, isCurrentFolderRole(FolderRole.ARCHIVE))
                     archiveThread(threadUid)
                 }
                 R.id.quickActionDelete -> {
-                    trackThreadActionsEvent("trash")
+                    trackThreadActionsEvent(ACTION_TRASH_NAME)
                     mainViewModel.deleteThread(threadUid)
                 }
                 R.id.quickActionMenu -> {
@@ -212,7 +218,7 @@ class ThreadFragment : Fragment() {
                 safeNavigate(ThreadFragmentDirections.actionThreadFragmentToDetailedContactBottomSheetDialog(contact))
             }
             onDraftClicked = { message ->
-                trackNewMessageEvent("openFromDraft")
+                trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
                 safeNavigate(
                     ThreadFragmentDirections.actionThreadFragmentToNewMessageActivity(
                         draftExists = true,
@@ -241,7 +247,7 @@ class ThreadFragment : Fragment() {
                 downloadAllAttachments(message)
             }
             onReplyClicked = { message ->
-                trackMessageActionsEvent("reply")
+                trackMessageActionsEvent(ACTION_REPLY_NAME)
                 replyTo(message)
             }
             onMenuClicked = { message ->

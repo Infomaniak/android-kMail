@@ -52,6 +52,7 @@ import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.mail.BuildConfig
+import com.infomaniak.mail.MatomoMail.OPEN_FROM_DRAFT_NAME
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity
@@ -241,7 +242,7 @@ fun Fragment.safeNavigateToNewMessageActivity(draftMode: DraftMode, messageUid: 
 
 fun Fragment.navigateToThread(thread: Thread, mainViewModel: MainViewModel) {
     if (thread.isOnlyOneDraft()) { // Directly go to NewMessage screen
-        trackNewMessageEvent("openFromDraft")
+        trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
         mainViewModel.navigateToSelectedDraft(thread.messages.first()).observe(viewLifecycleOwner) {
             safeNavigate(
                 R.id.newMessageActivity,

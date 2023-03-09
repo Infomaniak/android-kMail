@@ -28,6 +28,21 @@ object MatomoMail : MatomoCore {
     override val Context.tracker: Tracker get() = (this as ApplicationMain).matomoTracker
     override val siteId = 9
 
+    //region Tracker Name
+    const val OPEN_FROM_DRAFT_NAME = "openFromDraft"
+    const val ACTION_REPLY_NAME = "reply"
+    const val ACTION_REPLY_ALL_NAME = "replyAll"
+    const val ACTION_FORWARD_NAME = "forward"
+    const val ACTION_TRASH_NAME = "trash"
+    const val ACTION_ARCHIVE_NAME = "archive"
+    const val ACTION_MARK_AS_SEEN_NAME = "markAsSeen"
+    const val ACTION_MOVE_NAME = "move"
+    const val ACTION_FAVORITE_NAME = "favorite"
+    const val ACTION_SPAM_NAME = "spam"
+    const val ACTION_PRINT_NAME = "print"
+    const val ACTION_POSTPONE_NAME = "postpone"
+    //endregion
+
     fun Context.trackMessageEvent(name: String, value: Boolean? = null) {
         trackEvent("message", name, value = value?.toFloat())
     }

@@ -24,6 +24,13 @@ import androidx.appcompat.app.AppCompatDelegate
 import com.infomaniak.lib.core.api.ApiController.json
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.lib.core.utils.transaction
+import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_FAVORITE_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_MARK_AS_SEEN_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_MOVE_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_POSTPONE_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_SPAM_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_TRASH_NAME
 import com.infomaniak.mail.R
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -152,13 +159,18 @@ class LocalSettings private constructor(context: Context) {
         @DrawableRes val iconRes: Int?,
         val matomoValue: String,
     ) {
-        DELETE(R.string.actionDelete, R.color.swipeDelete, R.drawable.ic_bin, "trash"),
-        ARCHIVE(R.string.actionArchive, R.color.swipeArchive, R.drawable.ic_archive_folder, "archive"),
-        READ_UNREAD(R.string.settingsSwipeActionReadUnread, R.color.swipeReadUnread, R.drawable.ic_envelope, "markAsSeen"),
-        MOVE(R.string.actionMove, R.color.swipeMove, R.drawable.ic_email_action_move, "move"),
-        FAVORITE(R.string.actionShortStar, R.color.swipeFavorite, R.drawable.ic_star, "favorite"),
-        POSTPONE(R.string.actionPostpone, R.color.swipePostpone, R.drawable.ic_alarm_clock, "postpone"),
-        SPAM(R.string.actionSpam, R.color.swipeSpam, R.drawable.ic_spam, "spam"),
+        DELETE(R.string.actionDelete, R.color.swipeDelete, R.drawable.ic_bin, ACTION_TRASH_NAME),
+        ARCHIVE(R.string.actionArchive, R.color.swipeArchive, R.drawable.ic_archive_folder, ACTION_ARCHIVE_NAME),
+        READ_UNREAD(
+            R.string.settingsSwipeActionReadUnread,
+            R.color.swipeReadUnread,
+            R.drawable.ic_envelope,
+            ACTION_MARK_AS_SEEN_NAME
+        ),
+        MOVE(R.string.actionMove, R.color.swipeMove, R.drawable.ic_email_action_move, ACTION_MOVE_NAME),
+        FAVORITE(R.string.actionShortStar, R.color.swipeFavorite, R.drawable.ic_star, ACTION_FAVORITE_NAME),
+        POSTPONE(R.string.actionPostpone, R.color.swipePostpone, R.drawable.ic_alarm_clock, ACTION_POSTPONE_NAME),
+        SPAM(R.string.actionSpam, R.color.swipeSpam, R.drawable.ic_spam, ACTION_SPAM_NAME),
         QUICKACTIONS_MENU(
             R.string.settingsSwipeActionQuickActionsMenu,
             R.color.swipeQuickActionMenu,

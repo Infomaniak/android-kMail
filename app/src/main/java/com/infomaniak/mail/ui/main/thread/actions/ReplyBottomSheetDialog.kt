@@ -22,6 +22,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.mail.MatomoMail.ACTION_REPLY_ALL_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_REPLY_NAME
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
@@ -48,7 +50,7 @@ open class ReplyBottomSheetDialog : ActionsBottomSheetDialog() {
                 R.id.actionReplyAll -> safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUid, currentClassName)
             }
 
-            trackEvent("replyBottomSheet", if (id == R.id.actionReply) "reply" else "replyAll")
+            trackEvent("replyBottomSheet", if (id == R.id.actionReply) ACTION_REPLY_NAME else ACTION_REPLY_ALL_NAME)
         }
     }
 }
