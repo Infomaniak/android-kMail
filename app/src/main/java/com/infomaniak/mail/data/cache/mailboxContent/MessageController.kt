@@ -52,6 +52,7 @@ object MessageController {
     private inline val defaultRealm get() = RealmDatabase.mailboxContent()
 
     private val isNotDraft = "${Message::isDraft.name} == false"
+    private val isNotScheduled = "${Message::isScheduled.name} == false"
 
     //region Queries
     private fun getMessageQuery(uid: String, realm: TypedRealm): RealmSingleQuery<Message> {
@@ -90,11 +91,10 @@ object MessageController {
 
     fun getMovableMessages(thread: Thread): List<Message> {
         val byFolderId = "${Message::folderId.name} == '${thread.folderId}'"
-        return getMessagesAndDuplicates(thread, byFolderId)
+        return getMessagesAndDuplicates(thread, "$byFolderId AND $isNotScheduled")
     }
 
     fun getUnscheduledMessages(thread: Thread): List<Message> {
-        val isNotScheduled = "${Message::isScheduled.name} == false"
         return getMessagesAndDuplicates(thread, isNotScheduled)
     }
 
