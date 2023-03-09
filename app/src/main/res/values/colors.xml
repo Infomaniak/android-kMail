@@ -84,7 +84,7 @@
     <color name="backgroundDisabledPrimaryButton">@color/shark</color>
 
     <color name="menuDrawerBackgroundColor">@color/backgroundColorSecondary</color>
-    <color name="newMessageBackgroundColor">@color/backgroundColorSecondary</color>
+    <color name="newMessageBackgroundColor">@color/backgroundColor</color>
 
     <!-- Texts -->
     <color name="primaryTextColor">@color/orca</color>

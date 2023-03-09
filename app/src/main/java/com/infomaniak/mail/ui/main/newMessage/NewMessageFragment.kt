@@ -225,7 +225,7 @@ class NewMessageFragment : Fragment() {
 
         draft.uiSignature?.let { html ->
             var signature = if (context.isNightModeEnabled()) {
-                context.injectCssInHtml(R.raw.custom_dark_mode_signature, html)
+                context.injectCssInHtml(R.raw.custom_dark_mode, html)
             } else {
                 html
             }
@@ -249,7 +249,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun WebView.loadQuote(html: String) {
-        var quote = if (context.isNightModeEnabled()) context.injectCssInHtml(R.raw.custom_dark_mode_signature, html) else html
+        var quote = if (context.isNightModeEnabled()) context.injectCssInHtml(R.raw.custom_dark_mode, html) else html
         quote = context.injectCssInHtml(R.raw.remove_margin, quote)
         loadDataWithBaseURL("", quote, ClipDescription.MIMETYPE_TEXT_HTML, Utils.UTF_8, "")
     }
