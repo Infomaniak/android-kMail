@@ -211,7 +211,7 @@ class ThreadListAdapter(
         checkMarkLayout.isVisible = multiSelection?.isEnabled == true
 
         checkedState.isVisible = isSelected
-        uncheckedState.isVisible = multiSelection?.isEnabled == true && threadDensity != LARGE && !isSelected
+        uncheckedState.isVisible = threadDensity != LARGE && !isSelected
     }
 
     private fun CardviewThreadItemBinding.setupThreadDensityDependentUi() {
