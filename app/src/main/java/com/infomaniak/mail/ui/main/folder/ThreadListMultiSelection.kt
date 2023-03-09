@@ -42,6 +42,7 @@ class ThreadListMultiSelection {
     lateinit var unlockSwipeActionsIfSet: () -> Unit
     lateinit var localSettings: LocalSettings
 
+    private var shouldMultiselectRead: Boolean = false
     private var shouldMultiselectFavorite: Boolean = true
 
     fun initMultiSelection(
@@ -69,7 +70,7 @@ class ThreadListMultiSelection {
             val selectedThreadsUids = selectedThreads.map { it.uid }
             when (menuId) {
                 R.id.quickActionUnread -> {
-                    threadListFragment.notYetImplemented()
+                    toggleThreadsSeenStatus(selectedThreadsUids, shouldMultiselectRead)
                     isMultiSelectOn = false
                 }
                 R.id.quickActionArchive -> {
@@ -164,7 +165,6 @@ class ThreadListMultiSelection {
     }
 
     private fun updateMultiSelectActionsStatus(selectedThreads: MutableSet<SelectedThread>) {
-        val shouldMultiselectRead: Boolean
         computeReadFavoriteStatus(selectedThreads).let { (shouldRead, shouldFavorite) ->
             shouldMultiselectRead = shouldRead
             shouldMultiselectFavorite = shouldFavorite

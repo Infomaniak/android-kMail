@@ -84,7 +84,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
                 override fun onReadUnread() {
                     trackBottomSheetMessageActionsEvent("markAsSeen", message.isSeen)
-                    mainViewModel.toggleSeenStatus(threadUid, message)
+                    mainViewModel.toggleMessageSeenStatus(threadUid, message)
                 }
 
                 override fun onMove() {

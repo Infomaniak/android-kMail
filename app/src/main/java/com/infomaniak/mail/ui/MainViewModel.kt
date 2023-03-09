@@ -46,7 +46,6 @@ import com.infomaniak.mail.utils.ApiErrorException.ErrorCodes
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.NotificationUtils.cancelNotification
-import com.infomaniak.mail.utils.SharedViewModelUtils.markAsSeen
 import com.infomaniak.mail.utils.SharedViewModelUtils.refreshFolders
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import io.realm.kotlin.ext.copyFromRealm
@@ -483,29 +482,52 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //endregion
 
     //region Seen
-    fun toggleSeenStatus(threadUid: String, message: Message? = null) = viewModelScope.launch(Dispatchers.IO) {
-        val mailbox = currentMailbox.value!!
-        val thread = ThreadController.getThread(threadUid)!!
+    fun toggleMessageSeenStatus(threadUid: String, message: Message) {
+        toggleSeenStatus(threadsUids = listOf(threadUid), message = message)
+    }
 
-        val isSeen = message?.isSeen ?: (thread.unseenMessagesCount == 0)
+    fun toggleThreadSeenStatus(threadUid: String) {
+        toggleSeenStatus(threadsUids = listOf(threadUid))
+    }
+
+    fun toggleThreadsSeenStatus(threadsUids: List<String>, shouldRead: Boolean) {
+        toggleSeenStatus(threadsUids = threadsUids, shouldRead = shouldRead)
+    }
+
+    private fun toggleSeenStatus(
+        threadsUids: List<String> = emptyList(),
+        message: Message? = null,
+        shouldRead: Boolean = true,
+    ) = viewModelScope.launch(Dispatchers.IO) {
+        val mailbox = currentMailbox.value!!
+        val threads = threadsUids.mapNotNull(ThreadController::getThread)
+
+        val isSeen = when {
+            message != null -> message.isSeen
+            threads.count() == 1 -> threads.single().unseenMessagesCount == 0
+            else -> !shouldRead
+        }
 
         if (isSeen) {
-            markAsUnseen(mailbox, thread, message)
+            markAsUnseen(mailbox, threads, message)
         } else {
-            markAsSeen(mailbox, thread, message)
+            SharedViewModelUtils.markAsSeen(mailbox, threads, message)
         }
     }
 
-    private suspend fun markAsUnseen(mailbox: Mailbox, thread: Thread, message: Message? = null) {
-
-        val messages = when (message) {
-            null -> MessageController.getLastMessageToExecuteAction(thread)
-            else -> MessageController.getMessageAndDuplicates(thread, message)
-        }
-
+    private fun markAsUnseen(
+        mailbox: Mailbox,
+        threads: List<Thread>,
+        message: Message? = null,
+    ) = viewModelScope.launch(Dispatchers.IO) {
+        val messages = getMessagesToMarkAsUnseen(threads, message)
         val isSuccess = ApiRepository.markMessagesAsUnseen(mailbox.uuid, messages.getUids()).isSuccess()
-
         if (isSuccess) refreshFolders(mailbox, messages.getFoldersIds())
+    }
+
+    private fun getMessagesToMarkAsUnseen(threads: List<Thread>, message: Message?) = when (message) {
+        null -> threads.flatMap(MessageController::getLastMessageToExecuteAction)
+        else -> MessageController.getMessageAndDuplicates(threads.first(), message)
     }
     //endregion
 
