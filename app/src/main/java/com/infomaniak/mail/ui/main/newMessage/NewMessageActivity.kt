@@ -145,7 +145,7 @@ class NewMessageActivity : ThemedActivity() {
         BOLD("bold"),
         ITALIC("italic"),
         UNDERLINE("underline"),
-        STRIKE_THROUGH("crossedOut"),
-        UNORDERED_LIST("list"),
+        STRIKE_THROUGH("strikeThrough"),
+        UNORDERED_LIST("unorderedList"),
     }
 }

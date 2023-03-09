@@ -58,40 +58,40 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             initOnClickListener(object : OnActionClick {
                 //region Main actions
                 override fun onReply() {
-                    trackThreadActionsEvent("replyThread")
+                    trackBottomSheetThreadActionsEvent("reply")
                     safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUidToReply, currentClassName)
                 }
 
                 override fun onReplyAll() {
-                    trackThreadActionsEvent("replyAllThread")
+                    trackBottomSheetThreadActionsEvent("replyAll")
                     safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUidToReply, currentClassName)
                 }
 
                 override fun onForward() {
-                    trackThreadActionsEvent("forwardThread")
+                    trackBottomSheetThreadActionsEvent("forward")
                     safeNavigateToNewMessageActivity(DraftMode.FORWARD, messageUidToReply, currentClassName)
                 }
 
                 override fun onDelete() {
-                    trackThreadActionsEvent("trashThread")
+                    trackBottomSheetThreadActionsEvent("trash")
                     mainViewModel.deleteThreadOrMessage(threadUid)
                 }
                 //endregion
 
                 //region Actions
                 override fun onArchive(): Unit = with(mainViewModel) {
-                    trackThreadActionsEvent("archiveThread", isCurrentFolderRole(FolderRole.ARCHIVE))
+                    trackBottomSheetThreadActionsEvent("archive", isCurrentFolderRole(FolderRole.ARCHIVE))
                     mainViewModel.archiveThreadOrMessage(threadUid)
                 }
 
                 override fun onReadUnread() {
-                    trackThreadActionsEvent("markAsSeenThread", thread.unseenMessagesCount == 0)
+                    trackBottomSheetThreadActionsEvent("markAsSeen", thread.unseenMessagesCount == 0)
                     mainViewModel.toggleSeenStatus(threadUid)
                     findNavController().popBackStack(R.id.threadFragment, inclusive = true)
                 }
 
                 override fun onMove() {
-                    trackThreadActionsEvent("moveThread")
+                    trackBottomSheetThreadActionsEvent("move")
                     animatedNavigation(
                         resId = R.id.moveFragment,
                         args = MoveFragmentArgs(threadUid).toBundle(),
@@ -100,24 +100,24 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 }
 
                 override fun onPostpone() {
-                    trackThreadActionsEvent("postponeThread")
+                    trackBottomSheetThreadActionsEvent("postpone")
                     TODO("Not yet implemented")
                 }
 
                 override fun onFavorite() {
-                    trackThreadActionsEvent("favoriteThread", thread.isFavorite)
+                    trackBottomSheetThreadActionsEvent("favorite", thread.isFavorite)
                     mainViewModel.toggleFavoriteStatus(threadUid)
                 }
 
                 override fun onSpam(): Unit = with(mainViewModel) {
-                    trackThreadActionsEvent("spamThread", isCurrentFolderRole(FolderRole.SPAM))
+                    trackBottomSheetThreadActionsEvent("spam", isCurrentFolderRole(FolderRole.SPAM))
                     toggleSpamOrHam(threadUid)
                 }
 
                 override fun onReportJunk() = Unit
 
                 override fun onPrint() {
-                    trackThreadActionsEvent("printThread")
+                    trackBottomSheetThreadActionsEvent("print")
                     notYetImplemented()
                 }
 

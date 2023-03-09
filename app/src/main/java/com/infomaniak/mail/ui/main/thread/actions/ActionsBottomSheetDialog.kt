@@ -41,11 +41,11 @@ abstract class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
         }
     }
 
-    protected fun Fragment.trackMessageActionsEvent(name: String, value: Boolean? = null) {
+    protected fun Fragment.trackBottomSheetMessageActionsEvent(name: String, value: Boolean? = null) {
         trackEvent(category = "bottomSheetMessageActions", name = name, value = value?.toMailActionValue())
     }
 
-    protected fun Fragment.trackThreadActionsEvent(name: String, value: Boolean? = null) {
+    protected fun Fragment.trackBottomSheetThreadActionsEvent(name: String, value: Boolean? = null) {
         trackEvent(category = "bottomSheetThreadActions", name = name, value = value?.toMailActionValue())
     }
 }

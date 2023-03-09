@@ -78,7 +78,7 @@ class SwipeActionsSelectionSettingFragment : Fragment() {
         }
 
         trackEvent(
-            category = "SettingsSwipeActions",
+            category = "settingsSwipeActions",
             name = "${swipeAction.matomoValue}Swipe",
             value = (navigationArgs.titleResId == R.string.settingsSwipeLeft).toFloat(),
         )

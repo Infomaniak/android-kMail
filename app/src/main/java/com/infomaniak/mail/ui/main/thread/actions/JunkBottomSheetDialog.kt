@@ -54,12 +54,12 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
         setSpamUi(message)
 
         spam.setClosingOnClickListener {
-            trackMessageActionsEvent("spamMessage", message.isSpam)
+            trackBottomSheetMessageActionsEvent("spam", message.isSpam)
             mainViewModel.toggleSpamOrHam(threadUid, message)
         }
 
         phishing.setClosingOnClickListener {
-            trackMessageActionsEvent("signalPhishingMessage")
+            trackBottomSheetMessageActionsEvent("signalPhishing")
             createDescriptionDialog(
                 title = getString(R.string.reportPhishingTitle),
                 description = getString(R.string.reportPhishingDescription),
@@ -69,7 +69,7 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
         }
 
         blockSender.setClosingOnClickListener {
-            trackMessageActionsEvent("blockUserMessage")
+            trackBottomSheetMessageActionsEvent("blockUser")
             mainViewModel.blockUser(message)
         }
     }

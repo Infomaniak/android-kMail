@@ -50,6 +50,7 @@ import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.lib.login.InfomaniakLogin.ErrorStatus
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
+import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings.AccentColor
@@ -264,7 +265,7 @@ class LoginActivity : AppCompatActivity() {
                             }
                             else -> {
                                 apiResponse.data?.let { mailboxes ->
-                                    context.trackAccountEvent("nbMailboxes", TrackerAction.DATA, mailboxes.count().toFloat())
+                                    context.trackEvent("userInfo", "nbMailboxes", TrackerAction.DATA, mailboxes.count().toFloat())
                                     AccountUtils.addUser(it)
                                     MailboxController.updateMailboxes(context, mailboxes)
 
