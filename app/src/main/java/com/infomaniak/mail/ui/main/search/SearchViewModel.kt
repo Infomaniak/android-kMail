@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.search
 
+import android.app.Application
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.*
@@ -40,8 +41,9 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
-class SearchViewModel : ViewModel() {
+class SearchViewModel(application: Application) : AndroidViewModel(application) {
 
+    private inline val context: Context get() = getApplication<Application>()
     private val searchQuery = MutableStateFlow("")
     private val _selectedFilters = MutableStateFlow(emptySet<ThreadFilter>())
     private inline val selectedFilters get() = _selectedFilters.value.toMutableSet()
@@ -96,7 +98,7 @@ class SearchViewModel : ViewModel() {
         selectedFolder = folder
     }
 
-    fun toggleFilter(filter: ThreadFilter, context: Context) {
+    fun toggleFilter(filter: ThreadFilter) {
         resetPagination()
         if (selectedFilters.contains(filter)) {
             filter.unselect()

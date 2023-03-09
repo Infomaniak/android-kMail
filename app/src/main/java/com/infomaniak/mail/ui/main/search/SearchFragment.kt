@@ -51,7 +51,6 @@ import com.infomaniak.mail.databinding.FragmentSearchBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
 import com.infomaniak.mail.utils.addStickyDateDecoration
-import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.getLocalizedNameOrAllFolders
 import com.infomaniak.mail.utils.navigateToThread
 
@@ -182,7 +181,7 @@ class SearchFragment : Fragment() {
                 return@setOnCheckedChangeListener
             }
 
-            searchViewModel.toggleFilter(ThreadFilter.ATTACHMENTS, context)
+            searchViewModel.toggleFilter(ThreadFilter.ATTACHMENTS)
         }
 
         mutuallyExclusiveChipGroup.setOnCheckedStateChangeListener { chipGroup, _ ->
@@ -192,9 +191,9 @@ class SearchFragment : Fragment() {
             }
 
             when (chipGroup.checkedChipId) {
-                R.id.read -> searchViewModel.toggleFilter(ThreadFilter.SEEN, context)
-                R.id.unread -> searchViewModel.toggleFilter(ThreadFilter.UNSEEN, context)
-                R.id.favorites -> searchViewModel.toggleFilter(ThreadFilter.STARRED, context)
+                R.id.read -> searchViewModel.toggleFilter(ThreadFilter.SEEN)
+                R.id.unread -> searchViewModel.toggleFilter(ThreadFilter.UNSEEN)
+                R.id.favorites -> searchViewModel.toggleFilter(ThreadFilter.STARRED)
                 else -> searchViewModel.unselectMutuallyExclusiveFilters()
             }
         }
