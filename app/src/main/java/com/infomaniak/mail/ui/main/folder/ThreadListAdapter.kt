@@ -398,17 +398,19 @@ class ThreadListAdapter(
 
     fun selectUnselectAll() {
         multiSelection?.selectedItems?.value?.let { selectedItems ->
-            if (selectedItems.count() < threadCount) {
+            if (isEverythingSelected(selectedItems)) {
+                selectedItems.clear()
+            } else {
                 dataSet.forEachIndexed { index, item ->
                     if (getItemViewType(index) == DisplayType.THREAD.layout) selectedItems.add(SelectedThread(item as Thread))
                 }
-            } else {
-                selectedItems.clear()
             }
             multiSelection.selectedItems.value = selectedItems
             updateSelection()
         }
     }
+
+    fun isEverythingSelected(selectedItems: MutableSet<SelectedThread>) = selectedItems.count() >= threadCount
 
     private enum class DisplayType(val layout: Int) {
         THREAD(R.layout.cardview_thread_item),

@@ -432,6 +432,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         mainViewModel.selectedThreads.observe(viewLifecycleOwner) { selectedThreads ->
             updateSelectedCount(selectedThreads)
+            updateSelectAllLabel(selectedThreads)
             updateMultiSelectActionsStatus(selectedThreads)
         }
     }
@@ -468,6 +469,15 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun updateSelectedCount(selectedThreads: MutableSet<SelectedThread>) {
         val threadCount = selectedThreads.count()
         binding.selectedCount.text = resources.getQuantityString(R.plurals.multipleSelectionCount, threadCount, threadCount)
+    }
+
+    private fun updateSelectAllLabel(selectedThreads: MutableSet<SelectedThread>) {
+        val selectAllLabel = if (threadListAdapter.isEverythingSelected(selectedThreads)) {
+            R.string.buttonUnselectAll
+        } else {
+            R.string.buttonSelectAll
+        }
+        binding.selectAll.setText(selectAllLabel)
     }
 
     private fun updateMultiSelectActionsStatus(selectedThreads: MutableSet<SelectedThread>) {

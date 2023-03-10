@@ -38,6 +38,7 @@
     <string name="actionReportJunk">Signaler comme indésirable</string>
     <string name="actionShortMarkAsRead">Lu</string>
     <string name="actionShortMarkAsUnread">Non lu</string>
+    <string name="actionShortSpam">Spam</string>
     <string name="actionShortStar">Favoris</string>
     <string name="actionSpam">Signaler comme spam</string>
     <string name="actionStar">Ajouter aux favoris</string>
@@ -104,6 +105,7 @@
     <string name="buttonTextOptionsOpen">Ouvrir le formatage de texte</string>
     <string name="buttonUnderlined">Souligner</string>
     <string name="buttonUnlock">Déverrouiller</string>
+    <string name="buttonUnselectAll">Aucun</string>
     <string name="buttonValid">Valider</string>
     <string name="ccTitle">Cc :</string>
     <string name="commercialFolder">Promotions</string>
@@ -215,6 +217,7 @@
     <string name="restoreEmailsText">Tous les e-mails reviendront dans votre boîte de réception.</string>
     <string name="restoreEmailsTitle">Restaurer vos e-mails</string>
     <string name="scheduledMessagesFolder">Messages programmés</string>
+    <string name="searchAllMessages">Tous les messages</string>
     <string name="searchFieldPlaceholder">Rechercher un message</string>
     <string name="searchFilterAttachment">Pièces-jointes</string>
     <string name="searchFilterFolder">Tous les dossiers</string>
