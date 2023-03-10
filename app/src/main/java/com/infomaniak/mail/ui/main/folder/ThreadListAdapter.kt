@@ -177,7 +177,7 @@ class ThreadListAdapter(
             if (multiSelection?.isEnabled?.value == true) toggleSelection(selectedThread) else onThreadClicked?.invoke(thread)
         }
 
-        multiSelection?.let {
+        if (multiSelection != null) {
             updateSelectedState(selectedThread)
 
             root.setOnLongClickListener {

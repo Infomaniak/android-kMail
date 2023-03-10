@@ -443,11 +443,12 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun lockDrawerAndSwipe(isMultiSelectOn: Boolean) = with(binding) {
         (activity as MainActivity).setDrawerLockMode(!isMultiSelectOn)
-        if (isMultiSelectOn) threadsList.apply {
-            disableSwipeDirection(DirectionFlag.LEFT)
-            disableSwipeDirection(DirectionFlag.RIGHT)
-        }
-        else {
+        if (isMultiSelectOn) {
+            threadsList.apply {
+                disableSwipeDirection(DirectionFlag.LEFT)
+                disableSwipeDirection(DirectionFlag.RIGHT)
+            }
+        } else {
             unlockSwipeActionsIfSet()
         }
     }
