@@ -71,7 +71,7 @@ class ThreadListMultiSelection {
                     isMultiSelectOn = false
                 }
                 R.id.quickActionArchive -> {
-                    threadListFragment.notYetImplemented()
+                    archiveThreads(selectedThreadsUids)
                     isMultiSelectOn = false
                 }
                 R.id.quickActionFavorite -> {
