@@ -23,7 +23,7 @@ import androidx.core.view.isVisible
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.LocalSettings.*
+import com.infomaniak.mail.data.LocalSettings.ThreadDensity
 import com.infomaniak.mail.data.models.thread.SelectedThread
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
@@ -86,7 +86,7 @@ class ThreadListMultiSelection {
 
         mainViewModel.selectedThreadsLiveData.observe(threadListFragment.viewLifecycleOwner) { selectedThreads ->
             updateSelectedCount(selectedThreads)
-            updateSelectAllLabel(selectedThreads)
+            updateSelectAllLabel()
             updateMultiSelectActionsStatus(selectedThreads)
         }
     }
@@ -129,12 +129,8 @@ class ThreadListMultiSelection {
         )
     }
 
-    private fun updateSelectAllLabel(selectedThreads: MutableSet<SelectedThread>) {
-        val selectAllLabel = if (threadListAdapter.isEverythingSelected(selectedThreads)) {
-            R.string.buttonUnselectAll
-        } else {
-            R.string.buttonSelectAll
-        }
+    private fun updateSelectAllLabel() {
+        val selectAllLabel = if (mainViewModel.isEverythingSelected) R.string.buttonUnselectAll else R.string.buttonSelectAll
         binding.selectAll.setText(selectAllLabel)
     }
 

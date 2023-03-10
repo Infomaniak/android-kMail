@@ -219,7 +219,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
 
         cancel.setOnClickListener { mainViewModel.isMultiSelectOn = false }
-        selectAll.setOnClickListener { threadListAdapter.selectOrUnselectAll() }
+        selectAll.setOnClickListener {
+            mainViewModel.selectOrUnselectAll()
+            threadListAdapter.updateSelection()
+        }
 
         searchButton.setOnClickListener {
             safeNavigate(

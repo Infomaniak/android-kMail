@@ -78,6 +78,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val selectedThreadsLiveData = MutableLiveData(mutableSetOf<SelectedThread>())
     inline val selectedThreads
         get() = selectedThreadsLiveData.value!!
+
+    val isEverythingSelected get() = selectedThreads.count() == currentThreadsLiveToObserve.value?.list?.count()
     //endregion
 
     val snackBarManager by lazy { SnackBarManager() }
@@ -645,6 +647,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun navigateToSelectedDraft(message: Message) = liveData(coroutineContext) {
         val localUuid = DraftController.getDraftByMessageUid(message.uid)?.localUuid
         emit(ThreadListViewModel.SelectedDraft(localUuid, message.draftResource, message.uid))
+    }
+
+    fun selectOrUnselectAll() {
+        if (isEverythingSelected) {
+            selectedThreads.clear()
+        } else {
+            currentThreadsLiveToObserve.value?.list?.forEach { thread ->
+                selectedThreads.add(SelectedThread(thread))
+            }
+        }
+
+        publishSelectedItems()
     }
 
     fun publishSelectedItems() {
