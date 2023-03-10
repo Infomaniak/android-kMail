@@ -168,6 +168,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             multiSelection = object : MultiSelectionListener<SelectedThread> {
                 override var isEnabled by mainViewModel::isMultiSelectOn
                 override val selectedItems by mainViewModel::selectedThreads
+                override val publishSelectedItems = mainViewModel::publishSelectedItems
             }
         )
 
@@ -420,7 +421,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun observerMultiSelection() = with(binding) {
         mainViewModel.isMultiSelectOnLiveData.observe(viewLifecycleOwner) { isMultiSelectOn ->
             if (!isMultiSelectOn) {
-                mainViewModel.selectedThreads.value?.clear()
+                mainViewModel.selectedThreadsLiveData.value?.clear()
                 threadListAdapter.updateSelection()
             }
 
@@ -430,7 +431,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             displayMultiSelectActions(isMultiSelectOn)
         }
 
-        mainViewModel.selectedThreads.observe(viewLifecycleOwner) { selectedThreads ->
+        mainViewModel.selectedThreadsLiveData.observe(viewLifecycleOwner) { selectedThreads ->
             updateSelectedCount(selectedThreads)
             updateSelectAllLabel(selectedThreads)
             updateMultiSelectActionsStatus(selectedThreads)
