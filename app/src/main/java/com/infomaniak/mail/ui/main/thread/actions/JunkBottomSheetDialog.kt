@@ -35,8 +35,6 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
     private val navigationArgs: JunkBottomSheetDialogArgs by navArgs()
     private val mainViewModel: MainViewModel by activityViewModels()
 
-    override val currentClassName: String by lazy { JunkBottomSheetDialog::class.java.name }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetJunkBinding.inflate(inflater, container, false).also { binding = it }.root
     }

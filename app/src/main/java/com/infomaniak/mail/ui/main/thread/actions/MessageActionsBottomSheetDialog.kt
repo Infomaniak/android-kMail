@@ -35,7 +35,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
     private val navigationArgs: MessageActionsBottomSheetDialogArgs by navArgs()
 
-    override val currentClassName: String by lazy { MessageActionsBottomSheetDialog::class.java.name }
+    private val currentClassName: String by lazy { MessageActionsBottomSheetDialog::class.java.name }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(navigationArgs) {
         super.onViewCreated(view, savedInstanceState)

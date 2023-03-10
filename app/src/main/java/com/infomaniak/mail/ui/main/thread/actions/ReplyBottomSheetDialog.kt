@@ -33,7 +33,7 @@ open class ReplyBottomSheetDialog : ActionsBottomSheetDialog() {
     private lateinit var binding: BottomSheetReplyBinding
     private val navigationArgs: ReplyBottomSheetDialogArgs by navArgs()
 
-    override val currentClassName: String by lazy { ReplyBottomSheetDialog::class.java.name }
+    private val currentClassName: String by lazy { ReplyBottomSheetDialog::class.java.name }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetReplyBinding.inflate(inflater, container, false).also { binding = it }.root

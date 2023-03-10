@@ -44,7 +44,7 @@ class DetailedContactBottomSheetDialog : ActionsBottomSheetDialog() {
     private val navigationArgs: DetailedContactBottomSheetDialogArgs by navArgs()
     private val mainViewModel: MainViewModel by activityViewModels()
 
-    override val currentClassName: String by lazy { DetailedContactBottomSheetDialog::class.java.name }
+    private val currentClassName: String by lazy { DetailedContactBottomSheetDialog::class.java.name }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetDetailedContactBinding.inflate(inflater, container, false).also { binding = it }.root

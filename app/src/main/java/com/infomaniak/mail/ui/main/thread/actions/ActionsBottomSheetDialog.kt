@@ -25,8 +25,6 @@ import com.infomaniak.mail.MatomoMail.trackEvent
 
 abstract class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
 
-    protected abstract val currentClassName: String
-
     protected fun ActionItemView.setClosingOnClickListener(callback: () -> Unit) {
         setOnClickListener {
             findNavController().popBackStack()

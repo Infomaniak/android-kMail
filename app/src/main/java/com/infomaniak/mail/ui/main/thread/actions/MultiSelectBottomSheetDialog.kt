@@ -32,7 +32,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
     private lateinit var binding: BottomSheetMultiSelectBinding
     private val mainViewModel: MainViewModel by activityViewModels()
 
-    override val currentClassName: String by lazy { ActionsBottomSheetDialog::class.java.name }
+    private val currentClassName: String by lazy { MultiSelectBottomSheetDialog::class.java.name }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetMultiSelectBinding.inflate(inflater, container, false).also { binding = it }.root
