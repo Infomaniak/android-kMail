@@ -17,10 +17,14 @@
  */
 package com.infomaniak.mail.ui.main.folder
 
+import android.transition.AutoTransition
+import android.transition.TransitionManager
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.LocalSettings.ThreadDensity
 import com.infomaniak.mail.data.models.thread.SelectedThread
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
@@ -35,6 +39,7 @@ class ThreadListMultiSelection {
     lateinit var threadListFragment: ThreadListFragment
     lateinit var threadListAdapter: ThreadListAdapter
     lateinit var unlockSwipeActionsIfSet: () -> Unit
+    lateinit var localSettings: LocalSettings
 
     fun initMultiSelection(
         binding: FragmentThreadListBinding,
@@ -42,12 +47,14 @@ class ThreadListMultiSelection {
         threadListFragment: ThreadListFragment,
         threadListAdapter: ThreadListAdapter,
         unlockSwipeActionsIfSet: () -> Unit,
+        localSettings: LocalSettings,
     ) {
         this.binding = binding
         this.mainViewModel = mainViewModel
         this.threadListFragment = threadListFragment
         this.threadListAdapter = threadListAdapter
         this.unlockSwipeActionsIfSet = unlockSwipeActionsIfSet
+        this.localSettings = localSettings
 
         setupMultiSelectionActions()
 
@@ -68,10 +75,9 @@ class ThreadListMultiSelection {
 
     private fun observerMultiSelection() = with(binding) {
         mainViewModel.isMultiSelectOnLiveData.observe(threadListFragment.viewLifecycleOwner) { isMultiSelectOn ->
-            if (!isMultiSelectOn) {
-                mainViewModel.selectedThreadsLiveData.value?.clear()
-                threadListAdapter.updateSelection()
-            }
+            threadListAdapter.updateSelection()
+            if (localSettings.threadDensity != ThreadDensity.LARGE) TransitionManager.beginDelayedTransition(threadsList)
+            if (!isMultiSelectOn) mainViewModel.selectedThreads.clear()
 
             displaySelectionToolbar(isMultiSelectOn)
             lockDrawerAndSwipe(isMultiSelectOn)
@@ -81,12 +87,16 @@ class ThreadListMultiSelection {
 
         mainViewModel.selectedThreadsLiveData.observe(threadListFragment.viewLifecycleOwner) { selectedThreads ->
             updateSelectedCount(selectedThreads)
-            updateSelectAllLabel(selectedThreads)
+            updateSelectAllLabel()
             updateMultiSelectActionsStatus(selectedThreads)
         }
     }
 
     private fun displaySelectionToolbar(isMultiSelectOn: Boolean) = with(binding) {
+        val autoTransition = AutoTransition()
+        autoTransition.duration = TOOLBAR_FADE_DURATION
+        TransitionManager.beginDelayedTransition(toolbarLayout, autoTransition)
+
         toolbar.isGone = isMultiSelectOn
         toolbarSelection.isVisible = isMultiSelectOn
     }
@@ -124,12 +134,8 @@ class ThreadListMultiSelection {
         )
     }
 
-    private fun updateSelectAllLabel(selectedThreads: MutableSet<SelectedThread>) {
-        val selectAllLabel = if (threadListAdapter.isEverythingSelected(selectedThreads)) {
-            R.string.buttonUnselectAll
-        } else {
-            R.string.buttonSelectAll
-        }
+    private fun updateSelectAllLabel() {
+        val selectAllLabel = if (mainViewModel.isEverythingSelected) R.string.buttonUnselectAll else R.string.buttonSelectAll
         binding.selectAll.setText(selectAllLabel)
     }
 
@@ -155,5 +161,9 @@ class ThreadListMultiSelection {
             if (!shouldUnRead && !shouldUnFavorite) break
         }
         return !shouldUnRead to !shouldUnFavorite
+    }
+
+    companion object {
+        const val TOOLBAR_FADE_DURATION = 150L
     }
 }

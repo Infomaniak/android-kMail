@@ -25,6 +25,7 @@ import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.core.view.isGone
@@ -69,7 +70,6 @@ class ThreadListAdapter(
     private val multiSelection: MultiSelectionListener<SelectedThread>? = null,
 ) : DragDropSwipeAdapter<Any, ThreadViewHolder>(mutableListOf()), RealmChangesBinding.OnRealmChanged<Thread> {
 
-    private var threadCount = -1
     private lateinit var recyclerView: RecyclerView
 
     private val localSettings by lazy { LocalSettings.getInstance(context) }
@@ -77,6 +77,8 @@ class ThreadListAdapter(
     private val cardCornerRadius by lazy { context.resources.getDimension(R.dimen.alternativeMargin) }
     private val threadMarginCompact by lazy { context.resources.getDimension(RCore.dimen.marginStandardVerySmall).toInt() }
     private val threadMarginOther by lazy { context.resources.getDimension(RCore.dimen.marginStandardSmall).toInt() }
+    private val checkMarkSizeLarge by lazy { context.resources.getDimension(R.dimen.userAvatarSizeLarge).toInt() }
+    private val checkMarkSizeOther by lazy { context.resources.getDimension(R.dimen.checkMarkSizeOther).toInt() }
 
     private var swipingIsAuthorized: Boolean = true
     private var displaySeeAllButton = false // TODO: Manage this for intelligent mailbox
@@ -173,14 +175,15 @@ class ThreadListAdapter(
 
         val selectedThread = SelectedThread(thread)
 
-        root.setOnClickListener {
+        selectionCardView.setOnClickListener {
             if (multiSelection?.isEnabled == true) toggleSelection(selectedThread) else onThreadClicked?.invoke(thread)
         }
 
         if (multiSelection != null) {
             updateSelectedState(selectedThread)
 
-            root.setOnLongClickListener {
+            selectionCardView.setOnLongClickListener {
+                if (!multiSelection.isEnabled) multiSelection.isEnabled = true
                 toggleSelection(selectedThread)
                 true
             }
@@ -188,7 +191,6 @@ class ThreadListAdapter(
     }
 
     private fun CardviewThreadItemBinding.toggleSelection(selectedThread: SelectedThread) = with(multiSelection!!) {
-        isEnabled = true
         with(selectedItems) {
             if (contains(selectedThread)) remove(selectedThread) else add(selectedThread)
             publishSelectedItems()
@@ -199,11 +201,17 @@ class ThreadListAdapter(
     private fun CardviewThreadItemBinding.updateSelectedState(selectedThread: SelectedThread) {
         // TODO : Modify the ui accordingly
         val isSelected = multiSelection?.selectedItems?.contains(selectedThread) == true
-        root.backgroundTintList = if (isSelected) {
+        selectionCardView.backgroundTintList = if (isSelected) {
             ColorStateList.valueOf(context.getAttributeColor(RMaterial.attr.colorPrimaryContainer))
         } else {
             context.getColorStateList(R.color.backgroundColor)
         }
+
+        expeditorAvatar.isVisible = !isSelected && threadDensity == LARGE
+        checkMarkLayout.isVisible = multiSelection?.isEnabled == true
+
+        checkedState.isVisible = isSelected
+        uncheckedState.isVisible = threadDensity != LARGE && !isSelected
     }
 
     private fun CardviewThreadItemBinding.setupThreadDensityDependentUi() {
@@ -212,6 +220,18 @@ class ThreadListAdapter(
 
         expeditorAvatar.isVisible = threadDensity == LARGE
         mailBodyPreview.isGone = threadDensity == COMPACT
+
+        checkMarkBackground.reshapeToDensity()
+        uncheckedState.reshapeToDensity()
+    }
+
+    private fun ImageView.reshapeToDensity() {
+        val checkMarkSize = if (threadDensity == LARGE) checkMarkSizeLarge else checkMarkSizeOther
+        layoutParams.apply {
+            width = checkMarkSize
+            height = checkMarkSize
+        }
+        requestLayout()
     }
 
     private fun CardviewThreadItemBinding.displayAvatar(thread: Thread) {
@@ -379,7 +399,6 @@ class ThreadListAdapter(
     override fun createDiffUtil(oldList: List<Any>, newList: List<Any>): DragDropSwipeDiffCallback<Any>? = null
 
     override fun updateList(itemList: List<Thread>) {
-        threadCount = itemList.count()
         dataSet = formatList(itemList, recyclerView.context, folderRole, threadDensity)
     }
 
@@ -395,22 +414,6 @@ class ThreadListAdapter(
     fun updateSelection() {
         notifyItemRangeChanged(0, itemCount, NotificationType.SELECTED_STATE)
     }
-
-    fun selectUnselectAll() {
-        multiSelection?.selectedItems?.let { selectedItems ->
-            if (isEverythingSelected(selectedItems)) {
-                selectedItems.clear()
-            } else {
-                dataSet.forEachIndexed { index, item ->
-                    if (getItemViewType(index) == DisplayType.THREAD.layout) selectedItems.add(SelectedThread(item as Thread))
-                }
-            }
-            multiSelection.publishSelectedItems()
-            updateSelection()
-        }
-    }
-
-    fun isEverythingSelected(selectedItems: MutableSet<SelectedThread>) = selectedItems.count() >= threadCount
 
     private enum class DisplayType(val layout: Int) {
         THREAD(R.layout.cardview_thread_item),

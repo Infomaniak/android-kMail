@@ -22,195 +22,265 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <!-- This needs to be passed as the handle used for dragging cards around in the DragDropSwipeRecyclerview library -->
-    <View
-        android:id="@+id/goneHandle"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="gone" />
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/threadCard"
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/selectionCardView"
+        style="@style/CardViewMail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="@dimen/marginStandardVerySmall"
-        android:paddingEnd="@dimen/marginStandardMedium"
-        tools:layout_marginBottom="@dimen/marginStandardSmall"
-        tools:layout_marginTop="@dimen/marginStandardSmall">
+        android:layout_marginVertical="2dp"
+        android:layout_marginStart="@dimen/marginStandardVerySmall"
+        app:cardCornerRadius="@null"
+        app:shapeAppearanceOverlay="@style/MenuDrawerItemShapeAppearance">
 
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/newMailBullet"
-            android:layout_width="8dp"
-            android:layout_height="8dp"
-            android:layout_marginEnd="@dimen/marginStandardSmall"
-            android:contentDescription="@string/contentDescriptionIconNewMail"
-            android:src="?android:attr/colorPrimary"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:shapeAppearanceOverlay="@style/CircleImageView"
-            tools:visibility="visible" />
-
-        <com.infomaniak.mail.views.AvatarView
-            android:id="@+id/expeditorAvatar"
-            android:layout_width="@dimen/userAvatarSizeLarge"
-            android:layout_height="@dimen/userAvatarSizeLarge"
-            android:layout_marginStart="@dimen/marginStandardVerySmall"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/newMailBullet"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:src="@tools:sample/avatars"
-            tools:visibility="visible" />
+        <!-- This needs to be passed as the handle used for dragging cards around in the DragDropSwipeRecyclerview library -->
+        <View
+            android:id="@+id/goneHandle"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="0dp"
+            android:id="@+id/threadCard"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/alternativeMargin"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/expeditorAvatar"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_goneMarginStart="@dimen/marginStandardSmall">
+            android:paddingStart="@dimen/marginStandardVerySmall"
+            android:paddingEnd="@dimen/marginStandardMedium"
+            tools:layout_marginBottom="@dimen/marginStandardSmall"
+            tools:layout_marginTop="@dimen/marginStandardSmall">
 
-            <TextView
-                android:id="@+id/draftPrefix"
-                style="@style/BodyMedium.Error"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/marginStandardVerySmall"
-                android:text="@string/draftPrefix"
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/newMailBullet"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:layout_marginEnd="@dimen/marginStandardSmall"
+                android:contentDescription="@string/contentDescriptionIconNewMail"
+                android:src="?android:attr/colorPrimary"
                 android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="@id/expeditor"
-                app:layout_constraintEnd_toStartOf="@id/expeditor"
-                app:layout_constraintHorizontal_bias="0"
-                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/expeditor"
+                app:layout_constraintTop_toTopOf="parent"
+                app:shapeAppearanceOverlay="@style/CircleImageView"
                 tools:visibility="visible" />
 
-            <TextView
-                android:id="@+id/expeditor"
-                style="@style/BodyMedium"
+            <FrameLayout
+                android:id="@+id/avatarFrameLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/marginStandardSmall"
-                android:ellipsize="end"
-                android:lines="1"
-                app:layout_constrainedWidth="true"
-                app:layout_constraintEnd_toStartOf="@+id/threadCountCard"
-                app:layout_constraintStart_toEndOf="@id/draftPrefix"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="@tools:sample/full_names" />
+                android:layout_marginStart="@dimen/marginStandardVerySmall"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/newMailBullet"
+                app:layout_constraintTop_toTopOf="parent">
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/threadCountCard"
-                style="@style/CardViewMail"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/marginStandardSmall"
-                android:visibility="gone"
-                app:cardCornerRadius="2dp"
-                app:layout_constraintBottom_toBottomOf="@id/expeditor"
-                app:layout_constraintEnd_toStartOf="@id/mailDate"
-                app:layout_constraintStart_toEndOf="@id/expeditor"
-                app:layout_constraintTop_toTopOf="@id/expeditor"
-                app:strokeColor="@color/progressbarTrackColor"
-                app:strokeWidth="1dp"
-                tools:visibility="visible">
+                <com.infomaniak.mail.views.AvatarView
+                    android:id="@+id/expeditorAvatar"
+                    android:layout_width="@dimen/userAvatarSizeLarge"
+                    android:layout_height="@dimen/userAvatarSizeLarge"
+                    android:visibility="gone"
+                    tools:src="@tools:sample/avatars"
+                    tools:visibility="visible" />
 
-                <TextView
-                    android:id="@+id/threadCountText"
-                    style="@style/Label.Secondary"
+                <FrameLayout
+                    android:id="@+id/checkMarkLayout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingHorizontal="@dimen/marginStandardVerySmall"
-                    tools:text="8" />
+                    android:visibility="gone">
 
-            </com.google.android.material.card.MaterialCardView>
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/checkedState"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        tools:visibility="visible">
 
-            <TextView
-                android:id="@+id/mailDate"
-                style="@style/BodySmall.Secondary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="end"
-                app:layout_constraintBottom_toBottomOf="@id/expeditor"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/expeditor"
-                tools:text="@tools:sample/date/hhmm" />
+                        <com.google.android.material.imageview.ShapeableImageView
+                            android:id="@+id/checkMarkBackground"
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:background="?attr/colorPrimary"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:shapeAppearanceOverlay="@style/CircleImageView"
+                            tools:layout_height="@dimen/userAvatarSizeLarge"
+                            tools:layout_width="@dimen/userAvatarSizeLarge" />
 
-            <TextView
-                android:id="@+id/mailSubject"
-                style="@style/Body"
+                        <ImageView
+                            android:id="@+id/checkMarkCheck"
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_check"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:tint="?attr/colorOnPrimary"
+                            tools:ignore="ContentDescription" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <ImageView
+                        android:id="@+id/uncheckedState"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:src="@drawable/ic_checkbox_unchecked"
+                        tools:ignore="ContentDescription"
+                        tools:layout_height="@dimen/userAvatarSizeLarge"
+                        tools:layout_width="@dimen/userAvatarSizeLarge" />
+
+                </FrameLayout>
+            </FrameLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/textContent"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/marginStandardVerySmall"
-                android:ellipsize="end"
-                android:lines="1"
-                app:layout_constraintEnd_toStartOf="@id/iconAttachment"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/expeditor"
-                tools:text="@tools:sample/lorem[10]" />
-
-            <ImageView
-                android:id="@+id/iconCalendar"
-                android:layout_width="@dimen/mediumIconSize"
-                android:layout_height="@dimen/mediumIconSize"
-                android:layout_marginStart="@dimen/marginStandardSmall"
-                android:contentDescription="@string/contentDescriptionIconCalendar"
-                android:src="@drawable/ic_calendar"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="@id/iconFavorite"
-                app:layout_constraintEnd_toStartOf="@id/iconFavorite"
-                app:layout_constraintStart_toEndOf="@id/iconAttachment"
-                app:layout_constraintTop_toTopOf="@id/iconFavorite"
-                app:tint="@color/iconColorPrimaryText"
-                tools:visibility="visible" />
-
-            <ImageView
-                android:id="@+id/iconAttachment"
-                android:layout_width="@dimen/mediumIconSize"
-                android:layout_height="@dimen/mediumIconSize"
-                android:layout_marginStart="@dimen/marginStandardSmall"
-                android:contentDescription="@string/contentDescriptionIconAttachments"
-                android:src="@drawable/ic_attachment"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="@id/iconFavorite"
-                app:layout_constraintEnd_toStartOf="@id/iconCalendar"
-                app:layout_constraintStart_toEndOf="@id/mailSubject"
-                app:layout_constraintTop_toTopOf="@id/iconFavorite"
-                app:tint="@color/iconColorPrimaryText"
-                tools:visibility="visible" />
-
-            <ImageView
-                android:id="@+id/iconFavorite"
-                android:layout_width="@dimen/mediumIconSize"
-                android:layout_height="@dimen/mediumIconSize"
-                android:layout_marginStart="@dimen/marginStandardSmall"
-                android:contentDescription="@string/contentDescriptionIconFavorite"
-                android:src="@drawable/ic_star_filled"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="@id/mailSubject"
+                android:layout_marginStart="@dimen/alternativeMargin"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/iconCalendar"
-                app:layout_constraintTop_toTopOf="@id/mailSubject"
-                tools:visibility="visible" />
+                app:layout_constraintStart_toEndOf="@id/avatarFrameLayout"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_goneMarginStart="@dimen/marginStandardSmall">
 
-            <TextView
-                android:id="@+id/mailBodyPreview"
-                style="@style/BodySmall.Secondary"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="@dimen/marginStandardVerySmall"
-                android:ellipsize="end"
-                android:lines="1"
-                app:layout_constrainedWidth="true"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/mailSubject"
-                tools:text="@tools:sample/lorem/random" />
+                <TextView
+                    android:id="@+id/draftPrefix"
+                    style="@style/BodyMedium.Error"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/marginStandardVerySmall"
+                    android:text="@string/draftPrefix"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="@id/expeditor"
+                    app:layout_constraintEnd_toStartOf="@id/expeditor"
+                    app:layout_constraintHorizontal_bias="0"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/expeditor"
+                    tools:visibility="visible" />
 
+                <TextView
+                    android:id="@+id/expeditor"
+                    style="@style/BodyMedium"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/marginStandardSmall"
+                    android:ellipsize="end"
+                    android:lines="1"
+                    app:layout_constrainedWidth="true"
+                    app:layout_constraintEnd_toStartOf="@+id/threadCountCard"
+                    app:layout_constraintStart_toEndOf="@id/draftPrefix"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="@tools:sample/full_names" />
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/threadCountCard"
+                    style="@style/CardViewMail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/marginStandardSmall"
+                    android:visibility="gone"
+                    app:cardCornerRadius="2dp"
+                    app:layout_constraintBottom_toBottomOf="@id/expeditor"
+                    app:layout_constraintEnd_toStartOf="@id/mailDate"
+                    app:layout_constraintStart_toEndOf="@id/expeditor"
+                    app:layout_constraintTop_toTopOf="@id/expeditor"
+                    app:strokeColor="@color/progressbarTrackColor"
+                    app:strokeWidth="1dp"
+                    tools:visibility="visible">
+
+                    <TextView
+                        android:id="@+id/threadCountText"
+                        style="@style/Label.Secondary"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="@dimen/marginStandardVerySmall"
+                        tools:text="8" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <TextView
+                    android:id="@+id/mailDate"
+                    style="@style/BodySmall.Secondary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    app:layout_constraintBottom_toBottomOf="@id/expeditor"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/expeditor"
+                    tools:text="@tools:sample/date/hhmm" />
+
+                <TextView
+                    android:id="@+id/mailSubject"
+                    style="@style/Body"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/marginStandardVerySmall"
+                    android:ellipsize="end"
+                    android:lines="1"
+                    app:layout_constraintEnd_toStartOf="@id/iconAttachment"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/expeditor"
+                    tools:text="@tools:sample/lorem[10]" />
+
+                <ImageView
+                    android:id="@+id/iconCalendar"
+                    android:layout_width="@dimen/mediumIconSize"
+                    android:layout_height="@dimen/mediumIconSize"
+                    android:layout_marginStart="@dimen/marginStandardSmall"
+                    android:contentDescription="@string/contentDescriptionIconCalendar"
+                    android:src="@drawable/ic_calendar"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="@id/iconFavorite"
+                    app:layout_constraintEnd_toStartOf="@id/iconFavorite"
+                    app:layout_constraintStart_toEndOf="@id/iconAttachment"
+                    app:layout_constraintTop_toTopOf="@id/iconFavorite"
+                    app:tint="@color/iconColorPrimaryText"
+                    tools:visibility="visible" />
+
+                <ImageView
+                    android:id="@+id/iconAttachment"
+                    android:layout_width="@dimen/mediumIconSize"
+                    android:layout_height="@dimen/mediumIconSize"
+                    android:layout_marginStart="@dimen/marginStandardSmall"
+                    android:contentDescription="@string/contentDescriptionIconAttachments"
+                    android:src="@drawable/ic_attachment"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="@id/iconFavorite"
+                    app:layout_constraintEnd_toStartOf="@id/iconCalendar"
+                    app:layout_constraintStart_toEndOf="@id/mailSubject"
+                    app:layout_constraintTop_toTopOf="@id/iconFavorite"
+                    app:tint="@color/iconColorPrimaryText"
+                    tools:visibility="visible" />
+
+                <ImageView
+                    android:id="@+id/iconFavorite"
+                    android:layout_width="@dimen/mediumIconSize"
+                    android:layout_height="@dimen/mediumIconSize"
+                    android:layout_marginStart="@dimen/marginStandardSmall"
+                    android:contentDescription="@string/contentDescriptionIconFavorite"
+                    android:src="@drawable/ic_star_filled"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="@id/mailSubject"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/iconCalendar"
+                    app:layout_constraintTop_toTopOf="@id/mailSubject"
+                    tools:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/mailBodyPreview"
+                    style="@style/BodySmall.Secondary"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="@dimen/marginStandardVerySmall"
+                    android:ellipsize="end"
+                    android:lines="1"
+                    app:layout_constrainedWidth="true"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/mailSubject"
+                    tools:text="@tools:sample/lorem/random" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
 </com.google.android.material.card.MaterialCardView>
