@@ -174,7 +174,7 @@ class ThreadListAdapter(
         val selectedThread = SelectedThread(thread)
 
         root.setOnClickListener {
-            if (multiSelection?.isEnabled?.value == true) toggleSelection(selectedThread) else onThreadClicked?.invoke(thread)
+            if (multiSelection?.isEnabled == true) toggleSelection(selectedThread) else onThreadClicked?.invoke(thread)
         }
 
         if (multiSelection != null) {
@@ -188,7 +188,7 @@ class ThreadListAdapter(
     }
 
     private fun CardviewThreadItemBinding.toggleSelection(selectedThread: SelectedThread) = with(multiSelection!!) {
-        isEnabled.value = true
+        isEnabled = true
         selectedItems.value?.let {
             if (it.contains(selectedThread)) it.remove(selectedThread) else it.add(selectedThread)
             selectedItems.value = it // Trigger the observer

@@ -131,7 +131,7 @@ class MainActivity : ThemedActivity() {
         }
 
         fun closeMultiSelect() {
-            mainViewModel.isMultiSelectOn.value = false
+            mainViewModel.isMultiSelectOn = false
         }
 
         fun popBack() {
@@ -145,7 +145,7 @@ class MainActivity : ThemedActivity() {
         onBackPressedDispatcher.addCallback(this@MainActivity) {
             when {
                 drawerLayout.isOpen -> closeDrawer()
-                mainViewModel.isMultiSelectOn.value == true -> closeMultiSelect()
+                mainViewModel.isMultiSelectOn -> closeMultiSelect()
                 else -> popBack()
             }
         }

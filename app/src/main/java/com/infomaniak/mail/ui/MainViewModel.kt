@@ -68,7 +68,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val mergedContacts = MutableLiveData<Map<Recipient, MergedContact>?>()
 
     //region Multi selection
-    val isMultiSelectOn = MutableLiveData(false)
+    val isMultiSelectOnLiveData = MutableLiveData(false)
+    inline var isMultiSelectOn
+        get() = isMultiSelectOnLiveData.value!!
+        set(value) {
+            isMultiSelectOnLiveData.value = value
+        }
     val selectedThreads = MutableLiveData(mutableSetOf<SelectedThread>())
     //endregion
 

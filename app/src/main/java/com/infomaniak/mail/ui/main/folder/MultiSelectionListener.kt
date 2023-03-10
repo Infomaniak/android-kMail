@@ -20,6 +20,6 @@ package com.infomaniak.mail.ui.main.folder
 import androidx.lifecycle.MutableLiveData
 
 interface MultiSelectionListener<T> {
-    val isEnabled: MutableLiveData<Boolean>
+    var isEnabled: Boolean
     val selectedItems: MutableLiveData<MutableSet<T>>
 }

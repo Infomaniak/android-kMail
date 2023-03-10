@@ -166,7 +166,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             contacts = mainViewModel.mergedContacts.value ?: emptyMap(),
             onSwipeFinished = { isRecoveringFinished.value = true },
             multiSelection = object : MultiSelectionListener<SelectedThread> {
-                override val isEnabled by mainViewModel::isMultiSelectOn
+                override var isEnabled by mainViewModel::isMultiSelectOn
                 override val selectedItems by mainViewModel::selectedThreads
             }
         )
@@ -207,7 +207,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             (activity as? MainActivity)?.binding?.drawerLayout?.open()
         }
 
-        cancel.setOnClickListener { mainViewModel.isMultiSelectOn.value = false }
+        cancel.setOnClickListener { mainViewModel.isMultiSelectOn = false }
         selectAll.setOnClickListener { threadListAdapter.selectUnselectAll() }
 
         searchButton.setOnClickListener {
@@ -418,7 +418,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     //region Multi selection observer
     private fun observerMultiSelection() = with(binding) {
-        mainViewModel.isMultiSelectOn.observe(viewLifecycleOwner) { isMultiSelectOn ->
+        mainViewModel.isMultiSelectOnLiveData.observe(viewLifecycleOwner) { isMultiSelectOn ->
             if (!isMultiSelectOn) {
                 mainViewModel.selectedThreads.value?.clear()
                 threadListAdapter.updateSelection()
@@ -529,7 +529,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         binding.unreadCountChip.apply {
             text = resources.getQuantityString(R.plurals.threadListHeaderUnreadCount, unreadCount, formatUnreadCount(unreadCount))
-            isGone = unreadCount == 0 || mainViewModel.isMultiSelectOn.value == true
+            isGone = unreadCount == 0 || mainViewModel.isMultiSelectOn
         }
     }
 
