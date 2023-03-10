@@ -45,6 +45,7 @@
     <string name="actionReportJunk">Report junk</string>
     <string name="actionShortMarkAsRead">Read</string>
     <string name="actionShortMarkAsUnread">Unread</string>
+    <string name="actionShortSpam">Spam</string>
     <string name="actionShortStar">Favorites</string>
     <string name="actionSpam">Report spam</string>
     <string name="actionStar">Add to favorites</string>
@@ -110,6 +111,7 @@
     <string name="buttonTextOptionsOpen">Open text formatting</string>
     <string name="buttonUnderlined">Underline</string>
     <string name="buttonUnlock">Unlock</string>
+    <string name="buttonUnselectAll">None</string>
     <string name="buttonValid">Validate</string>
     <string name="ccTitle">Cc:</string>
     <string name="commercialFolder">Promotions</string>
@@ -218,6 +220,7 @@
     <string name="restoreEmailsText">All emails will come back to your inbox.</string>
     <string name="restoreEmailsTitle">Restore your emails</string>
     <string name="scheduledMessagesFolder">Scheduled messages</string>
+    <string name="searchAllMessages">All messages</string>
     <string name="searchFieldPlaceholder">Search an email</string>
     <string name="searchFilterAttachment">Attachments</string>
     <string name="searchFilterFolder">All folders</string>

@@ -59,6 +59,7 @@ import com.infomaniak.mail.data.LocalSettings.SwipeAction
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity.COMPACT
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.thread.SelectedThread
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
@@ -77,6 +78,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private lateinit var binding: FragmentThreadListBinding
     private val mainViewModel: MainViewModel by activityViewModels()
     private val threadListViewModel: ThreadListViewModel by viewModels()
+
+    private val threadListMultiSelection by lazy { ThreadListMultiSelection() }
 
     private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
 
@@ -104,6 +107,14 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         setupUserAvatar()
         setupUnreadCountChip()
 
+        threadListMultiSelection.initMultiSelection(
+            binding = binding,
+            mainViewModel = mainViewModel,
+            threadListFragment = this,
+            threadListAdapter = threadListAdapter,
+            unlockSwipeActionsIfSet = ::unlockSwipeActionsIfSet,
+        )
+
         observeCurrentThreads()
         observeDownloadState()
         observeCurrentFolder()
@@ -124,19 +135,21 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         updateSwipeActionsAccordingToSettings()
     }
 
-    private fun updateSwipeActionsAccordingToSettings() {
-        binding.threadsList.apply {
-            behindSwipedItemBackgroundColor = localSettings.swipeLeft.getBackgroundColor(requireContext())
-            behindSwipedItemBackgroundSecondaryColor = localSettings.swipeRight.getBackgroundColor(requireContext())
+    private fun updateSwipeActionsAccordingToSettings() = with(binding.threadsList) {
+        behindSwipedItemBackgroundColor = localSettings.swipeLeft.getBackgroundColor(requireContext())
+        behindSwipedItemBackgroundSecondaryColor = localSettings.swipeRight.getBackgroundColor(requireContext())
 
-            behindSwipedItemIconDrawableId = localSettings.swipeLeft.iconRes
-            behindSwipedItemIconSecondaryDrawableId = localSettings.swipeRight.iconRes
+        behindSwipedItemIconDrawableId = localSettings.swipeLeft.iconRes
+        behindSwipedItemIconSecondaryDrawableId = localSettings.swipeRight.iconRes
 
-            val leftIsSet = localSettings.swipeLeft != SwipeAction.NONE
-            if (leftIsSet) enableSwipeDirection(DirectionFlag.LEFT) else disableSwipeDirection(DirectionFlag.LEFT)
-            val rightIsSet = localSettings.swipeRight != SwipeAction.NONE
-            if (rightIsSet) enableSwipeDirection(DirectionFlag.RIGHT) else disableSwipeDirection(DirectionFlag.RIGHT)
-        }
+        unlockSwipeActionsIfSet()
+    }
+
+    private fun unlockSwipeActionsIfSet() = with(binding.threadsList) {
+        val leftIsSet = localSettings.swipeLeft != SwipeAction.NONE
+        if (leftIsSet) enableSwipeDirection(DirectionFlag.LEFT) else disableSwipeDirection(DirectionFlag.LEFT)
+        val rightIsSet = localSettings.swipeRight != SwipeAction.NONE
+        if (rightIsSet) enableSwipeDirection(DirectionFlag.RIGHT) else disableSwipeDirection(DirectionFlag.RIGHT)
     }
 
     override fun onRefresh() {
@@ -160,6 +173,11 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             folderRole = mainViewModel.currentFolder.value?.role,
             contacts = mainViewModel.mergedContacts.value ?: emptyMap(),
             onSwipeFinished = { isRecoveringFinished.value = true },
+            multiSelection = object : MultiSelectionListener<SelectedThread> {
+                override var isEnabled by mainViewModel::isMultiSelectOn
+                override val selectedItems by mainViewModel::selectedThreads
+                override val publishSelectedItems = mainViewModel::publishSelectedItems
+            }
         )
 
         binding.threadsList.apply {
@@ -197,6 +215,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             trackMenuDrawerEvent("openByButton")
             (activity as? MainActivity)?.binding?.drawerLayout?.open()
         }
+
+        cancel.setOnClickListener { mainViewModel.isMultiSelectOn = false }
+        selectAll.setOnClickListener { threadListAdapter.selectUnselectAll() }
 
         searchButton.setOnClickListener {
             safeNavigate(
@@ -392,6 +413,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
+    //region Multi selection observer
+
+    //endregion
+
     private fun updateUpdatedAt(newLastUpdatedDate: Date? = null) {
 
         newLastUpdatedDate?.let { lastUpdatedDate = it }
@@ -415,7 +440,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         binding.unreadCountChip.apply {
             text = resources.getQuantityString(R.plurals.threadListHeaderUnreadCount, unreadCount, formatUnreadCount(unreadCount))
-            isVisible = unreadCount > 0
+            isGone = unreadCount == 0 || mainViewModel.isMultiSelectOn
         }
     }
 

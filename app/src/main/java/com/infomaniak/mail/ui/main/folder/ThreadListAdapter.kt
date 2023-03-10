@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.folder
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Canvas
 import android.os.Build
 import android.view.HapticFeedbackConstants
@@ -45,6 +46,7 @@ import com.infomaniak.mail.data.LocalSettings.ThreadDensity.LARGE
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.data.models.thread.SelectedThread
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.CardviewThreadItemBinding
 import com.infomaniak.mail.databinding.ItemThreadDateSeparatorBinding
@@ -53,6 +55,7 @@ import com.infomaniak.mail.databinding.ItemThreadSeeAllButtonBinding
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter.ThreadViewHolder
 import com.infomaniak.mail.utils.*
 import kotlin.math.abs
+import com.google.android.material.R as RMaterial
 import com.infomaniak.lib.core.R as RCore
 
 // TODO: Do we want to extract features from LoaderAdapter (in Core) and put them here?
@@ -63,8 +66,10 @@ class ThreadListAdapter(
     private var folderRole: FolderRole?,
     private var contacts: Map<Recipient, MergedContact>,
     private val onSwipeFinished: () -> Unit,
+    private val multiSelection: MultiSelectionListener<SelectedThread>? = null,
 ) : DragDropSwipeAdapter<Any, ThreadViewHolder>(mutableListOf()), RealmChangesBinding.OnRealmChanged<Thread> {
 
+    private var threadCount = -1
     private lateinit var recyclerView: RecyclerView
 
     private val localSettings by lazy { LocalSettings.getInstance(context) }
@@ -101,10 +106,15 @@ class ThreadListAdapter(
     }
 
     override fun onBindViewHolder(holder: ThreadViewHolder, position: Int, payloads: MutableList<Any>) {
-        if (payloads.firstOrNull() is Unit && holder.itemViewType == DisplayType.THREAD.layout) {
+        val payload = payloads.firstOrNull()
+        if (payload is NotificationType && holder.itemViewType == DisplayType.THREAD.layout) {
             val binding = holder.binding as CardviewThreadItemBinding
             val thread = dataSet[position] as Thread
-            binding.displayAvatar(thread)
+
+            when (payload) {
+                NotificationType.AVATAR -> binding.displayAvatar(thread)
+                NotificationType.SELECTED_STATE -> binding.updateSelectedState(SelectedThread(thread))
+            }
         } else {
             super.onBindViewHolder(holder, position, payloads)
         }
@@ -137,28 +147,63 @@ class ThreadListAdapter(
         }
     }
 
-    private fun CardviewThreadItemBinding.displayThread(thread: Thread) = with(thread) {
+    private fun CardviewThreadItemBinding.displayThread(thread: Thread) {
         setupThreadDensityDependentUi()
 
-        displayAvatar(thread = this)
-        expeditor.text = formatRecipientNames(computeDisplayedRecipients())
-        mailSubject.text = context.formatSubject(subject)
-        mailBodyPreview.text = computePreview().ifBlank { context.getString(R.string.noBodyTitle) }
-        mailDate.text = formatDate(context)
+        displayAvatar(thread)
 
-        draftPrefix.isVisible = hasDrafts
+        with(thread) {
+            expeditor.text = formatRecipientNames(computeDisplayedRecipients())
+            mailSubject.text = context.formatSubject(subject)
+            mailBodyPreview.text = computePreview().ifBlank { context.getString(R.string.noBodyTitle) }
+            mailDate.text = formatDate(context)
 
-        iconAttachment.isVisible = hasAttachments
-        iconCalendar.isGone = true // TODO: See with API when we should display this icon
-        iconFavorite.isVisible = isFavorite
+            draftPrefix.isVisible = hasDrafts
 
-        val messagesCount = messages.count()
-        threadCount.text = messagesCount.toString()
-        threadCountCardview.isVisible = messagesCount > 1
+            iconAttachment.isVisible = hasAttachments
+            iconCalendar.isGone = true // TODO: See with API when we should display this icon
+            iconFavorite.isVisible = isFavorite
 
-        if (unseenMessagesCount == 0) setThreadUiRead() else setThreadUiUnread()
+            val messagesCount = messages.count()
+            threadCountText.text = messagesCount.toString()
+            threadCountCard.isVisible = messagesCount > 1
 
-        root.setOnClickListener { onThreadClicked?.invoke(this@with) }
+            if (unseenMessagesCount == 0) setThreadUiRead() else setThreadUiUnread()
+        }
+
+        val selectedThread = SelectedThread(thread)
+
+        root.setOnClickListener {
+            if (multiSelection?.isEnabled == true) toggleSelection(selectedThread) else onThreadClicked?.invoke(thread)
+        }
+
+        if (multiSelection != null) {
+            updateSelectedState(selectedThread)
+
+            root.setOnLongClickListener {
+                toggleSelection(selectedThread)
+                true
+            }
+        }
+    }
+
+    private fun CardviewThreadItemBinding.toggleSelection(selectedThread: SelectedThread) = with(multiSelection!!) {
+        isEnabled = true
+        with(selectedItems) {
+            if (contains(selectedThread)) remove(selectedThread) else add(selectedThread)
+            publishSelectedItems()
+        }
+        updateSelectedState(selectedThread)
+    }
+
+    private fun CardviewThreadItemBinding.updateSelectedState(selectedThread: SelectedThread) {
+        // TODO : Modify the ui accordingly
+        val isSelected = multiSelection?.selectedItems?.contains(selectedThread) == true
+        root.backgroundTintList = if (isSelected) {
+            ColorStateList.valueOf(context.getAttributeColor(RMaterial.attr.colorPrimaryContainer))
+        } else {
+            context.getColorStateList(R.color.backgroundColor)
+        }
     }
 
     private fun CardviewThreadItemBinding.setupThreadDensityDependentUi() {
@@ -189,8 +234,8 @@ class ThreadListAdapter(
 
     private fun CardviewThreadItemBinding.setThreadUiRead() {
         newMailBullet.isInvisible = true
-        threadCount.setTextAppearance(R.style.Label_Secondary)
-        threadCountCardview.apply {
+        threadCountText.setTextAppearance(R.style.Label_Secondary)
+        threadCountCard.apply {
             strokeColor = context.getColor(R.color.cardViewStrokeColor)
             setCardBackgroundColor(context.getColor(R.color.backgroundColorTertiary))
         }
@@ -198,8 +243,8 @@ class ThreadListAdapter(
 
     private fun CardviewThreadItemBinding.setThreadUiUnread() {
         newMailBullet.isVisible = true
-        threadCount.setTextAppearance(R.style.LabelMedium)
-        threadCountCardview.apply {
+        threadCountText.setTextAppearance(R.style.LabelMedium)
+        threadCountCard.apply {
             strokeColor = context.getColor(R.color.primaryTextColor)
             setCardBackgroundColor(context.getColor(R.color.backgroundColor))
         }
@@ -334,23 +379,49 @@ class ThreadListAdapter(
     override fun createDiffUtil(oldList: List<Any>, newList: List<Any>): DragDropSwipeDiffCallback<Any>? = null
 
     override fun updateList(itemList: List<Thread>) {
+        threadCount = itemList.count()
         dataSet = formatList(itemList, recyclerView.context, folderRole, threadDensity)
     }
 
     fun updateContacts(newContacts: Map<Recipient, MergedContact>) {
         contacts = newContacts
-        notifyItemRangeChanged(0, itemCount, Unit)
+        notifyItemRangeChanged(0, itemCount, NotificationType.AVATAR)
     }
 
     fun updateFolderRole(newRole: FolderRole?) {
         folderRole = newRole
     }
 
+    fun updateSelection() {
+        notifyItemRangeChanged(0, itemCount, NotificationType.SELECTED_STATE)
+    }
+
+    fun selectUnselectAll() {
+        multiSelection?.selectedItems?.let { selectedItems ->
+            if (isEverythingSelected(selectedItems)) {
+                selectedItems.clear()
+            } else {
+                dataSet.forEachIndexed { index, item ->
+                    if (getItemViewType(index) == DisplayType.THREAD.layout) selectedItems.add(SelectedThread(item as Thread))
+                }
+            }
+            multiSelection.publishSelectedItems()
+            updateSelection()
+        }
+    }
+
+    fun isEverythingSelected(selectedItems: MutableSet<SelectedThread>) = selectedItems.count() >= threadCount
+
     private enum class DisplayType(val layout: Int) {
         THREAD(R.layout.cardview_thread_item),
         DATE_SEPARATOR(R.layout.item_thread_date_separator),
         FLUSH_FOLDER_BUTTON(R.layout.item_thread_flush_folder_button),
         SEE_ALL_BUTTON(R.layout.item_thread_see_all_button),
+    }
+
+    private enum class NotificationType {
+        AVATAR,
+        SELECTED_STATE,
     }
 
     private data class SwipeActionUiData(@ColorRes val colorRes: Int, @DrawableRes val iconRes: Int?)

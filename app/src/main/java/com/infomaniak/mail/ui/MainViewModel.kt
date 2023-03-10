@@ -35,6 +35,7 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.thread.SelectedThread
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.ui.main.SnackBarManager
@@ -60,10 +61,25 @@ import com.infomaniak.lib.core.R as RCore
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private inline val context: Context get() = getApplication<Application>()
+
     val isInternetAvailable = SingleLiveEvent<Boolean>()
-    var isDownloadingChanges = MutableLiveData(false)
+    val isDownloadingChanges = MutableLiveData(false)
     val isNewFolderCreated = SingleLiveEvent<Boolean>()
-    var mergedContacts = MutableLiveData<Map<Recipient, MergedContact>?>()
+    val mergedContacts = MutableLiveData<Map<Recipient, MergedContact>?>()
+
+    //region Multi selection
+    val isMultiSelectOnLiveData = MutableLiveData(false)
+    inline var isMultiSelectOn
+        get() = isMultiSelectOnLiveData.value!!
+        set(value) {
+            isMultiSelectOnLiveData.value = value
+        }
+
+    val selectedThreadsLiveData = MutableLiveData(mutableSetOf<SelectedThread>())
+    inline val selectedThreads
+        get() = selectedThreadsLiveData.value!!
+    //endregion
+
     val snackBarManager by lazy { SnackBarManager() }
 
     val toggleLightThemeForMessage = SingleLiveEvent<Message>()
@@ -110,14 +126,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         folder?.let { ThreadController.getThreadsAsync(it, filter) } ?: emptyFlow()
     }.asLiveData(coroutineContext)
 
-    fun isCurrentFolderRole(role: FolderRole) = currentFolder.value?.role == role
-    //endregion
-
     private fun observeFolderAndFilter() = MediatorLiveData<Pair<Folder?, ThreadFilter>>().apply {
         value = currentFolder.value to currentFilter.value!!
         addSource(currentFolder) { value = it to value!!.second }
         addSource(currentFilter) { value = value?.first to it }
     }.asFlow()
+
+    fun isCurrentFolderRole(role: FolderRole) = currentFolder.value?.role == role
+    //endregion
 
     private fun selectMailbox(mailbox: Mailbox) {
         if (mailbox.objectId != _currentMailboxObjectId.value) {
@@ -629,6 +645,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun navigateToSelectedDraft(message: Message) = liveData(coroutineContext) {
         val localUuid = DraftController.getDraftByMessageUid(message.uid)?.localUuid
         emit(ThreadListViewModel.SelectedDraft(localUuid, message.draftResource, message.uid))
+    }
+
+    fun publishSelectedItems() {
+        selectedThreadsLiveData.value = selectedThreads
     }
 
     private companion object {

@@ -34,42 +34,92 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <com.google.android.material.appbar.MaterialToolbar
-                android:id="@+id/toolbar"
+            <FrameLayout
+                android:id="@+id/toolbarLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:contentInsetEnd="0dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:navigationContentDescription="@string/contentDescriptionButtonMenu"
-                app:navigationIcon="@drawable/ic_burger"
-                tools:title="Boite de réception">
+                app:layout_constraintTop_toTopOf="parent">
 
-                <LinearLayout
-                    android:layout_width="wrap_content"
+                <com.google.android.material.appbar.MaterialToolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:orientation="horizontal">
+                    app:contentInsetEnd="0dp"
+                    app:navigationContentDescription="@string/contentDescriptionButtonMenu"
+                    app:navigationIcon="@drawable/ic_burger"
+                    tools:title="Boite de réception"
+                    tools:visibility="gone">
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/searchButton"
-                        style="@style/IconButton"
-                        app:icon="@drawable/ic_search"
-                        app:iconSize="24dp"
-                        app:iconTint="?android:attr/colorPrimary" />
-
-                    <com.infomaniak.mail.views.AvatarView
-                        android:id="@+id/userAvatar"
+                    <LinearLayout
                         android:layout_width="wrap_content"
-                        android:layout_height="30dp"
-                        android:layout_gravity="center"
-                        android:layout_marginHorizontal="@dimen/marginStandardMedium"
-                        tools:src="@tools:sample/avatars[12]" />
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:orientation="horizontal">
 
-                </LinearLayout>
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/searchButton"
+                            style="@style/IconButton"
+                            app:icon="@drawable/ic_search"
+                            app:iconSize="24dp"
+                            app:iconTint="?android:attr/colorPrimary" />
 
-            </com.google.android.material.appbar.MaterialToolbar>
+                        <com.infomaniak.mail.views.AvatarView
+                            android:id="@+id/userAvatar"
+                            android:layout_width="wrap_content"
+                            android:layout_height="30dp"
+                            android:layout_gravity="center"
+                            android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                            tools:src="@tools:sample/avatars[12]" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.appbar.MaterialToolbar>
+
+                <com.google.android.material.appbar.MaterialToolbar
+                    android:id="@+id/toolbarSelection"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:contentInsetEnd="0dp"
+                    app:contentInsetStart="0dp"
+                    app:navigationIcon="@null"
+                    tools:visibility="visible">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/cancel"
+                            style="@style/TextButtonSecondary"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/buttonCancel" />
+
+                        <TextView
+                            android:id="@+id/selectedCount"
+                            style="@style/H1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:ellipsize="end"
+                            android:gravity="center"
+                            android:lines="1"
+                            tools:text="2 sélectionnés" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/selectAll"
+                            style="@style/TextButtonSecondary"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/buttonSelectAll" />
+
+                    </LinearLayout>
+                </com.google.android.material.appbar.MaterialToolbar>
+            </FrameLayout>
 
             <LinearLayout
                 android:id="@+id/updatedAtLayout"
@@ -81,7 +131,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/unreadCountChip"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/toolbar">
+                app:layout_constraintTop_toBottomOf="@id/toolbarLayout">
 
                 <TextView
                     android:id="@+id/noNetwork"
@@ -129,38 +179,52 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/appBarLayout">
 
-        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/swipeRefreshLayout"
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-            <FrameLayout
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                android:id="@+id/swipeRefreshLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="true">
+
+                    <com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
+                        android:id="@+id/threadsList"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:clipToPadding="false"
+                        android:paddingBottom="@dimen/recyclerViewPaddingBottom"
+                        app:behind_swiped_item_icon_margin="@dimen/marginStandard"
+                        tools:listitem="@layout/cardview_thread_item" />
+
+                    <com.infomaniak.mail.ui.main.EmptyStateView
+                        android:id="@+id/emptyState"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:visibility="gone"
+                        app:description="@string/noEmailDescription"
+                        app:icon="@drawable/ic_empty_state_no_mail"
+                        app:title="@string/noEmailTitle" />
+
+                </FrameLayout>
+            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+            <com.infomaniak.mail.views.BottomQuickActionBarView
+                android:id="@+id/quickActionBar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="true">
+                android:layout_gravity="bottom"
+                android:visibility="gone"
+                app:menu="@menu/multiselection_menu"
+                tools:visibility="visible" />
 
-                <com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
-                    android:id="@+id/threadsList"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:clipToPadding="false"
-                    android:paddingBottom="@dimen/recyclerViewPaddingBottom"
-                    app:behind_swiped_item_icon_margin="@dimen/marginStandard"
-                    tools:listitem="@layout/cardview_thread_item" />
-
-                <com.infomaniak.mail.ui.main.EmptyStateView
-                    android:id="@+id/emptyState"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:visibility="gone"
-                    app:description="@string/noEmailDescription"
-                    app:icon="@drawable/ic_empty_state_no_mail"
-                    app:title="@string/noEmailTitle" />
-
-            </FrameLayout>
-
-        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
     </com.google.android.material.card.MaterialCardView>
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton

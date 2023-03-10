@@ -130,6 +130,10 @@ class MainActivity : ThemedActivity() {
             (menuDrawerFragment.getFragment() as? MenuDrawerFragment)?.closeDrawer()
         }
 
+        fun closeMultiSelect() {
+            mainViewModel.isMultiSelectOn = false
+        }
+
         fun popBack() {
             if (navController.currentDestination?.id == R.id.threadListFragment) {
                 finish()
@@ -139,7 +143,11 @@ class MainActivity : ThemedActivity() {
         }
 
         onBackPressedDispatcher.addCallback(this@MainActivity) {
-            if (drawerLayout.isOpen) closeDrawer() else popBack()
+            when {
+                drawerLayout.isOpen -> closeDrawer()
+                mainViewModel.isMultiSelectOn -> closeMultiSelect()
+                else -> popBack()
+            }
         }
     }
 
@@ -233,7 +241,7 @@ class MainActivity : ThemedActivity() {
         trackScreen(displayName.substringAfter("${BuildConfig.APPLICATION_ID}:id"), label.toString())
     }
 
-    private fun setDrawerLockMode(isUnlocked: Boolean) {
+    fun setDrawerLockMode(isUnlocked: Boolean) {
         binding.drawerLayout.setDrawerLockMode(if (isUnlocked) LOCK_MODE_UNLOCKED else LOCK_MODE_LOCKED_CLOSED)
     }
 
