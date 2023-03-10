@@ -420,18 +420,19 @@ class ThreadListAdapter(
         notifyItemRangeChanged(0, itemCount, NotificationType.SELECTED_STATE)
     }
 
-    fun selectUnselectAll() {
-        multiSelection?.selectedItems?.let { selectedItems ->
-            if (isEverythingSelected(selectedItems)) {
-                selectedItems.clear()
-            } else {
-                dataSet.forEachIndexed { index, item ->
-                    if (getItemViewType(index) == DisplayType.THREAD.layout) selectedItems.add(SelectedThread(item as Thread))
-                }
+    fun selectOrUnselectAll() {
+        val selectedItems = multiSelection!!.selectedItems
+
+        if (isEverythingSelected(selectedItems)) {
+            selectedItems.clear()
+        } else {
+            dataSet.forEachIndexed { index, item ->
+                if (getItemViewType(index) == DisplayType.THREAD.layout) selectedItems.add(SelectedThread(item as Thread))
             }
-            multiSelection.publishSelectedItems()
-            updateSelection()
         }
+
+        multiSelection.publishSelectedItems()
+        updateSelection()
     }
 
     fun isEverythingSelected(selectedItems: MutableSet<SelectedThread>) = selectedItems.count() >= threadCount

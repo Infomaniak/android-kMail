@@ -149,6 +149,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun unlockSwipeActionsIfSet() = with(binding.threadsList) {
         val leftIsSet = localSettings.swipeLeft != SwipeAction.NONE
         if (leftIsSet) enableSwipeDirection(DirectionFlag.LEFT) else disableSwipeDirection(DirectionFlag.LEFT)
+
         val rightIsSet = localSettings.swipeRight != SwipeAction.NONE
         if (rightIsSet) enableSwipeDirection(DirectionFlag.RIGHT) else disableSwipeDirection(DirectionFlag.RIGHT)
     }
@@ -218,7 +219,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
 
         cancel.setOnClickListener { mainViewModel.isMultiSelectOn = false }
-        selectAll.setOnClickListener { threadListAdapter.selectUnselectAll() }
+        selectAll.setOnClickListener { threadListAdapter.selectOrUnselectAll() }
 
         searchButton.setOnClickListener {
             safeNavigate(
