@@ -38,17 +38,17 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         return BottomSheetMultiSelectBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(mainViewModel) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.mainActions.setClosingOnClickListener { id: Int ->
+            val selectedThreadsUids = selectedThreads.map { it.uid }
             when (id) {
                 R.id.actionMove -> notYetImplemented()
                 R.id.actionSpam -> notYetImplemented()
                 // R.id.actionPostpone -> notYetImplemented()
             }
-
-            mainViewModel.isMultiSelectOn = false
+            isMultiSelectOn = false
         }
     }
 }
