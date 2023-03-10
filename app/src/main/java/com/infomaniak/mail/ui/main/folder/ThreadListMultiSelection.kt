@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.folder
 
+import android.transition.AutoTransition
 import android.transition.TransitionManager
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -92,6 +93,10 @@ class ThreadListMultiSelection {
     }
 
     private fun displaySelectionToolbar(isMultiSelectOn: Boolean) = with(binding) {
+        val autoTransition = AutoTransition()
+        autoTransition.duration = TOOLBAR_FADE_DURATION
+        TransitionManager.beginDelayedTransition(toolbarLayout, autoTransition)
+
         toolbar.isGone = isMultiSelectOn
         toolbarSelection.isVisible = isMultiSelectOn
     }
@@ -156,5 +161,9 @@ class ThreadListMultiSelection {
             if (!shouldUnRead && !shouldUnFavorite) break
         }
         return !shouldUnRead to !shouldUnFavorite
+    }
+
+    companion object {
+        const val TOOLBAR_FADE_DURATION = 150L
     }
 }
