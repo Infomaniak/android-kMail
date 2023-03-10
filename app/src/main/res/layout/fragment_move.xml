@@ -22,40 +22,45 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/background"
-        app:contentInsetEnd="0dp"
-        app:titleTextAppearance="@style/H2">
+        android:layout_height="wrap_content">
 
-        <LinearLayout
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical">
+            android:layout_height="?attr/actionBarSize"
+            app:contentInsetEnd="0dp">
 
-            <TextView
-                android:id="@+id/toolbarSubject"
-                style="@style/H1"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:ellipsize="end"
-                android:gravity="center"
-                android:lines="1"
-                android:text="@string/actionMove" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/iconAddFolder"
-                style="@style/IconButton"
-                android:layout_gravity="center_vertical|end"
-                android:layout_marginEnd="@dimen/marginStandardMedium"
-                app:icon="@drawable/ic_folder_add"
-                app:iconSize="24dp"
-                app:iconTint="?android:attr/colorPrimary" />
-        </LinearLayout>
-    </com.google.android.material.appbar.MaterialToolbar>
+                <TextView
+                    android:id="@+id/toolbarSubject"
+                    style="@style/H1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:lines="1"
+                    android:text="@string/actionMove" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/iconAddFolder"
+                    style="@style/IconButton"
+                    android:layout_gravity="center_vertical|end"
+                    android:layout_marginEnd="@dimen/marginStandardMedium"
+                    app:icon="@drawable/ic_folder_add"
+                    app:iconSize="24dp"
+                    app:iconTint="?android:attr/colorPrimary" />
+
+            </LinearLayout>
+        </com.google.android.material.appbar.MaterialToolbar>
+    </com.google.android.material.appbar.AppBarLayout>
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/background"

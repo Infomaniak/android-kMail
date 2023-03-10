@@ -39,7 +39,7 @@ class SyncMailboxesWorker(appContext: Context, params: WorkerParameters) : BaseC
         Log.d(TAG, "Work launched")
 
         AccountUtils.getAllUsersSync().forEach { user ->
-            MailboxController.getMailboxes(user.id, mailboxInfoRealm).forEach loopMailboxes@{ mailbox ->
+            MailboxController.getMailboxes(user.id, mailboxInfoRealm).forEach { mailbox ->
                 fetchMessagesManager.execute(user.id, mailbox)
             }
         }
