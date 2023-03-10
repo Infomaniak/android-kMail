@@ -126,14 +126,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         folder?.let { ThreadController.getThreadsAsync(it, filter) } ?: emptyFlow()
     }.asLiveData(coroutineContext)
 
-    fun isCurrentFolderRole(role: FolderRole) = currentFolder.value?.role == role
-    //endregion
-
     private fun observeFolderAndFilter() = MediatorLiveData<Pair<Folder?, ThreadFilter>>().apply {
         value = currentFolder.value to currentFilter.value!!
         addSource(currentFolder) { value = it to value!!.second }
         addSource(currentFilter) { value = value?.first to it }
     }.asFlow()
+
+    fun isCurrentFolderRole(role: FolderRole) = currentFolder.value?.role == role
+    //endregion
 
     private fun selectMailbox(mailbox: Mailbox) {
         if (mailbox.objectId != _currentMailboxObjectId.value) {

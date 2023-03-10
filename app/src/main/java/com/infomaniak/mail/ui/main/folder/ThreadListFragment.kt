@@ -79,6 +79,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private val mainViewModel: MainViewModel by activityViewModels()
     private val threadListViewModel: ThreadListViewModel by viewModels()
 
+    private val threadListMultiSelection by lazy { ThreadListMultiSelection() }
+
     private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
 
     private lateinit var threadListAdapter: ThreadListAdapter
@@ -104,7 +106,14 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         setupListeners()
         setupUserAvatar()
         setupUnreadCountChip()
-        setupMultiSelectionActions()
+
+        threadListMultiSelection.initMultiSelection(
+            binding = binding,
+            mainViewModel = mainViewModel,
+            threadListFragment = this,
+            threadListAdapter = threadListAdapter,
+            unlockSwipeActionsIfSet = ::unlockSwipeActionsIfSet,
+        )
 
         observeCurrentThreads()
         observeDownloadState()
@@ -113,7 +122,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         observeUpdatedAtTriggers()
         observeContacts()
         observerDraftsActionsCompletedWorks()
-        observerMultiSelection()
     }
 
     override fun onResume(): Unit = with(binding) {
@@ -339,18 +347,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun setupMultiSelectionActions() {
-        binding.quickActionBar.setOnItemClickListener { menuId ->
-            when (menuId) {
-                R.id.quickActionUnread -> notYetImplemented()
-                R.id.quickActionArchive -> notYetImplemented()
-                R.id.quickActionFavorite -> notYetImplemented()
-                R.id.quickActionDelete -> notYetImplemented()
-                R.id.quickActionMenu -> notYetImplemented()
-            }
-        }
-    }
-
     private fun observeCurrentThreads() = with(threadListViewModel) {
         mainViewModel.currentThreadsLiveToObserve.bindResultsChangeToAdapter(viewLifecycleOwner, threadListAdapter).apply {
             recyclerView = binding.threadsList
@@ -418,93 +414,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     //region Multi selection observer
-    private fun observerMultiSelection() = with(binding) {
-        mainViewModel.isMultiSelectOnLiveData.observe(viewLifecycleOwner) { isMultiSelectOn ->
-            if (!isMultiSelectOn) {
-                mainViewModel.selectedThreadsLiveData.value?.clear()
-                threadListAdapter.updateSelection()
-            }
 
-            displaySelectionToolbar(isMultiSelectOn)
-            lockDrawerAndSwipe(isMultiSelectOn)
-            hideUnreadChip(isMultiSelectOn)
-            displayMultiSelectActions(isMultiSelectOn)
-        }
-
-        mainViewModel.selectedThreadsLiveData.observe(viewLifecycleOwner) { selectedThreads ->
-            updateSelectedCount(selectedThreads)
-            updateSelectAllLabel(selectedThreads)
-            updateMultiSelectActionsStatus(selectedThreads)
-        }
-    }
-
-    private fun displaySelectionToolbar(isMultiSelectOn: Boolean) = with(binding) {
-        toolbar.isGone = isMultiSelectOn
-        toolbarSelection.isVisible = isMultiSelectOn
-    }
-
-    private fun lockDrawerAndSwipe(isMultiSelectOn: Boolean) = with(binding) {
-        (activity as MainActivity).setDrawerLockMode(!isMultiSelectOn)
-        if (isMultiSelectOn) {
-            threadsList.apply {
-                disableSwipeDirection(DirectionFlag.LEFT)
-                disableSwipeDirection(DirectionFlag.RIGHT)
-            }
-        } else {
-            unlockSwipeActionsIfSet()
-        }
-    }
-
-    private fun hideUnreadChip(isMultiSelectOn: Boolean) {
-        val noUnread = mainViewModel.currentFolderLive.value?.let { it.unreadCount == 0 } == true
-        binding.unreadCountChip.isGone = isMultiSelectOn || noUnread
-    }
-
-    private fun displayMultiSelectActions(isMultiSelectOn: Boolean) = with(binding) {
-        newMessageFab.isGone = isMultiSelectOn
-        quickActionBar.isVisible = isMultiSelectOn
-        val navBarColor = context.getColor(if (isMultiSelectOn) R.color.elevatedBackground else R.color.backgroundColor)
-        requireActivity().window.navigationBarColor = navBarColor
-    }
-
-    private fun updateSelectedCount(selectedThreads: MutableSet<SelectedThread>) {
-        val threadCount = selectedThreads.count()
-        binding.selectedCount.text = resources.getQuantityString(R.plurals.multipleSelectionCount, threadCount, threadCount)
-    }
-
-    private fun updateSelectAllLabel(selectedThreads: MutableSet<SelectedThread>) {
-        val selectAllLabel = if (threadListAdapter.isEverythingSelected(selectedThreads)) {
-            R.string.buttonUnselectAll
-        } else {
-            R.string.buttonSelectAll
-        }
-        binding.selectAll.setText(selectAllLabel)
-    }
-
-    private fun updateMultiSelectActionsStatus(selectedThreads: MutableSet<SelectedThread>) {
-        val (shouldRead, shouldFavorite) = computeReadFavoriteStatus(selectedThreads)
-
-        binding.quickActionBar.apply {
-            changeIcon(0, if (shouldRead) R.drawable.ic_envelope_open else R.drawable.ic_envelope)
-            changeText(0, if (shouldRead) R.string.actionShortMarkAsRead else R.string.actionShortMarkAsUnread)
-
-            changeIcon(2, if (shouldFavorite) R.drawable.ic_star else R.drawable.ic_unstar)
-            // changeText(2, if (shouldFavorite) R.string.actionShortStar else R.string.actionShortStar) TODO : Use correct string
-        }
-    }
-
-    private fun computeReadFavoriteStatus(selectedThreads: MutableSet<SelectedThread>): Pair<Boolean, Boolean> {
-        var shouldUnRead = true
-        var shouldUnFavorite = selectedThreads.isNotEmpty()
-
-        for (thread in selectedThreads) {
-            shouldUnRead = shouldUnRead && thread.unseenMessagesCount == 0
-            shouldUnFavorite = shouldUnFavorite && thread.isFavorite
-
-            if (!shouldUnRead && !shouldUnFavorite) break
-        }
-        return !shouldUnRead to !shouldUnFavorite
-    }
     //endregion
 
     private fun updateUpdatedAt(newLastUpdatedDate: Date? = null) {
