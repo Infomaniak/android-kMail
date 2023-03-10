@@ -165,8 +165,8 @@ class ThreadListAdapter(
             iconFavorite.isVisible = isFavorite
 
             val messagesCount = messages.count()
-            threadCount.text = messagesCount.toString()
-            threadCountCardview.isVisible = messagesCount > 1
+            threadCountText.text = messagesCount.toString()
+            threadCountCard.isVisible = messagesCount > 1
 
             if (unseenMessagesCount == 0) setThreadUiRead() else setThreadUiUnread()
         }
@@ -234,8 +234,8 @@ class ThreadListAdapter(
 
     private fun CardviewThreadItemBinding.setThreadUiRead() {
         newMailBullet.isInvisible = true
-        threadCount.setTextAppearance(R.style.Label_Secondary)
-        threadCountCardview.apply {
+        threadCountText.setTextAppearance(R.style.Label_Secondary)
+        threadCountCard.apply {
             strokeColor = context.getColor(R.color.cardViewStrokeColor)
             setCardBackgroundColor(context.getColor(R.color.backgroundColorTertiary))
         }
@@ -243,8 +243,8 @@ class ThreadListAdapter(
 
     private fun CardviewThreadItemBinding.setThreadUiUnread() {
         newMailBullet.isVisible = true
-        threadCount.setTextAppearance(R.style.LabelMedium)
-        threadCountCardview.apply {
+        threadCountText.setTextAppearance(R.style.LabelMedium)
+        threadCountCard.apply {
             strokeColor = context.getColor(R.color.primaryTextColor)
             setCardBackgroundColor(context.getColor(R.color.backgroundColor))
         }

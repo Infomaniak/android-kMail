@@ -98,13 +98,13 @@
                 android:ellipsize="end"
                 android:lines="1"
                 app:layout_constrainedWidth="true"
-                app:layout_constraintEnd_toStartOf="@+id/threadCountCardview"
+                app:layout_constraintEnd_toStartOf="@+id/threadCountCard"
                 app:layout_constraintStart_toEndOf="@id/draftPrefix"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="@tools:sample/full_names" />
 
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/threadCountCardview"
+                android:id="@+id/threadCountCard"
                 style="@style/CardViewMail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -120,7 +120,7 @@
                 tools:visibility="visible">
 
                 <TextView
-                    android:id="@+id/threadCount"
+                    android:id="@+id/threadCountText"
                     style="@style/Label.Secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
