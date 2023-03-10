@@ -280,6 +280,18 @@
                       </LayoutPositions>
                     </value>
                   </entry>
+                  <entry key="multiSelectBottomSheetDialog">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="1232" />
+                            <option name="y" value="766" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
                   <entry key="newMessageActivity">
                     <value>
                       <LayoutPositions>
@@ -587,7 +599,7 @@
                         <option name="myPosition">
                           <Point>
                             <option name="x" value="988" />
-                            <option name="y" value="3409" />
+                            <option name="y" value="3395" />
                           </Point>
                         </option>
                         <option name="myPositions">
@@ -603,6 +615,11 @@
                               </value>
                             </entry>
                             <entry key="action_threadListFragment_to_moveFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                            <entry key="action_threadListFragment_to_multiSelectBottomSheetDialog">
                               <value>
                                 <LayoutPositions />
                               </value>

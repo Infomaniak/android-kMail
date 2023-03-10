@@ -50,6 +50,9 @@
         <action
             android:id="@+id/action_threadListFragment_to_moveFragment"
             app:destination="@id/moveFragment" />
+        <action
+            android:id="@+id/action_threadListFragment_to_multiSelectBottomSheetDialog"
+            app:destination="@id/multiSelectBottomSheetDialog" />
     </fragment>
 
     <activity
@@ -470,5 +473,11 @@
             android:name="attachmentType"
             app:argType="com.infomaniak.mail.data.models.Attachment$AttachmentType" />
     </dialog>
+
+    <dialog
+        android:id="@+id/multiSelectBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.main.thread.actions.MultiSelectBottomSheetDialog"
+        android:label="MultiSelectBottomSheetDialog"
+        tools:layout="@layout/bottom_sheet_multi_select" />
 
 </navigation>
