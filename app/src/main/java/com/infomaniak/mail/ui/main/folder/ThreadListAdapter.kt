@@ -25,6 +25,7 @@ import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.core.view.isGone
@@ -220,21 +221,17 @@ class ThreadListAdapter(
         expeditorAvatar.isVisible = threadDensity == LARGE
         mailBodyPreview.isGone = threadDensity == COMPACT
 
+        checkMarkBackground.reshapeToDensity()
+        uncheckedState.reshapeToDensity()
+    }
+
+    private fun ImageView.reshapeToDensity() {
         val checkMarkSize = if (threadDensity == LARGE) checkMarkSizeLarge else checkMarkSizeOther
-        checkMarkBackground.apply {
-            layoutParams.apply {
-                width = checkMarkSize
-                height = checkMarkSize
-            }
-            requestLayout()
+        layoutParams.apply {
+            width = checkMarkSize
+            height = checkMarkSize
         }
-        uncheckedState.apply {
-            layoutParams.apply {
-                width = checkMarkSize
-                height = checkMarkSize
-            }
-            requestLayout()
-        }
+        requestLayout()
     }
 
     private fun CardviewThreadItemBinding.displayAvatar(thread: Thread) {
