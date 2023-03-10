@@ -17,14 +17,15 @@
  */
 package com.infomaniak.mail.data.models.thread
 
-class SelectedThread(thread: Thread) {
-    val uid = thread.uid
-    val isFavorite = thread.isFavorite
-    val unseenMessagesCount = thread.unseenMessagesCount
+@Suppress("DataClassPrivateConstructor")
+data class SelectedThread private constructor(
+    private val uid: String,
+    val isFavorite: Boolean,
+    val unseenMessagesCount: Int,
+) {
+
+    constructor(thread: Thread) : this(thread.uid, thread.isFavorite, thread.unseenMessagesCount)
 
     override fun equals(other: Any?): Boolean = other is SelectedThread && uid == other.uid
-
-    override fun hashCode(): Int {
-        return uid.hashCode()
-    }
+    override fun hashCode(): Int = uid.hashCode()
 }
