@@ -40,6 +40,7 @@ import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadViewHolder
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.Utils
+import org.jsoup.Jsoup
 import java.util.*
 import com.google.android.material.R as RMaterial
 
@@ -201,12 +202,24 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
             }
             styledBody = context.injectCssInHtml(R.raw.remove_margin, styledBody)
             styledBody = context.injectCssInHtml(R.raw.add_padding, styledBody)
+        } else {
+            styledBody = createHtmlForPlainText(styledBody)
+            if (context.isNightModeEnabled()) {
+                styledBody = context.injectCssInHtml(R.raw.custom_dark_mode, styledBody, DARK_BACKGROUND_STYLE_ID)
+            }
         }
 
         val margin = if (type == TEXT_HTML) NO_MARGIN else plainTextMargin
         setMarginsRelative(margin, NO_MARGIN, margin, NO_MARGIN)
 
-        loadDataWithBaseURL("", styledBody, type, Utils.UTF_8, "")
+        loadDataWithBaseURL("", styledBody, TEXT_HTML, Utils.UTF_8, "")
+    }
+
+    private fun createHtmlForPlainText(text: String): String {
+        Jsoup.parse("").apply {
+            body().appendElement("pre").text(text).attr("style", "word-wrap: break-word; white-space: pre-wrap;")
+            return html()
+        }
     }
 
     private fun ThreadViewHolder.bindHeader(message: Message) = with(binding) {
