@@ -33,7 +33,12 @@ class ThreadActionsViewModel : ViewModel() {
     }
 
     fun getThreadAndMessageUidToReplyTo(threadUid: String, messageUidToReplyTo: String?) = liveData(coroutineContext) {
-        val thread = ThreadController.getThread(threadUid)!!
+
+        val thread = ThreadController.getThread(threadUid) ?: run {
+            emit(null)
+            return@liveData
+        }
+
         val uidToReplyTo = messageUidToReplyTo ?: MessageController.getMessageToReplyTo(thread).uid
 
         emit(thread to uidToReplyTo)

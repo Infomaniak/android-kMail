@@ -65,7 +65,15 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         threadActionsViewModel.getThreadAndMessageUidToReplyTo(
             threadUid,
             messageUidToReplyTo,
-        ).observe(viewLifecycleOwner) { (thread, messageUidToReply) ->
+        ).observe(viewLifecycleOwner) { result ->
+
+            if (result == null) {
+                findNavController().popBackStack()
+                return@observe
+            }
+
+            val thread = result.first
+            val messageUidToReply = result.second
 
             initOnClickListener(object : OnActionClick {
                 //region Main actions
