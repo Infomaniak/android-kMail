@@ -292,7 +292,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 isCurrentFolderRole(FolderRole.ARCHIVE)
             }
             SwipeAction.DELETE -> {
-                deleteThreadOrMessage(threadUid)
+                deleteThread(threadUid)
                 false
             }
             SwipeAction.FAVORITE -> {

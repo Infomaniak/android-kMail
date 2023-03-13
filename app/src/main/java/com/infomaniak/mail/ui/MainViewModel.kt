@@ -328,9 +328,24 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     //region Delete
-    fun deleteThreadOrMessage(threadUid: String, message: Message? = null) = viewModelScope.launch(Dispatchers.IO) {
+    fun deleteMessage(threadUid: String, message: Message) {
+        deleteThreadsOrMessage(threadsUids = listOf(threadUid), message = message)
+    }
+
+    fun deleteThread(threadUid: String) {
+        deleteThreadsOrMessage(threadsUids = listOf(threadUid))
+    }
+
+    fun deleteThreads(threadsUids: List<String>) {
+        deleteThreadsOrMessage(threadsUids = threadsUids)
+    }
+
+    private fun deleteThreadsOrMessage(
+        threadsUids: List<String> = emptyList(),
+        message: Message? = null,
+    ) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = currentMailbox.value!!
-        val thread = ThreadController.getThread(threadUid)!!
+        val threads = threadsUids.mapNotNull(ThreadController::getThread)
         var trashId: String? = null
         var undoResource: String? = null
 
@@ -338,11 +353,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 || isCurrentFolderRole(FolderRole.SPAM)
                 || isCurrentFolderRole(FolderRole.TRASH)
 
-        val messages = when {
-            message != null -> MessageController.getMessageAndDuplicates(thread, message)
-            shouldPermanentlyDelete -> thread.messages + thread.duplicates
-            else -> MessageController.getUnscheduledMessages(thread)
-        }
+        val messages = getMessagesToDelete(threads, message)
         val uids = messages.getUids()
 
         val isSuccess = if (shouldPermanentlyDelete) {
@@ -356,9 +367,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         if (isSuccess) refreshFolders(mailbox, messages.getFoldersIds(exception = trashId), trashId)
 
-        val undoDestinationId = message?.folderId ?: thread.folderId
+        val undoDestinationId = message?.folderId ?: threads.first().folderId
         val undoFoldersIds = (messages.getFoldersIds(exception = undoDestinationId) + trashId).filterNotNull()
-        showDeleteSnackbar(isSuccess, shouldPermanentlyDelete, message, undoResource, undoFoldersIds, undoDestinationId)
+        showDeleteSnackbar(
+            isSuccess,
+            shouldPermanentlyDelete,
+            message,
+            undoResource,
+            undoFoldersIds,
+            undoDestinationId,
+            threads.count(),
+        )
     }
 
     private fun showDeleteSnackbar(
@@ -368,19 +387,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         undoResource: String?,
         undoFoldersIds: List<String>,
         undoDestinationId: String?,
+        numberOfImpactedThreads: Int,
     ) {
 
         val snackbarTitle = if (isSuccess) {
             val destination = context.getString(FolderRole.TRASH.folderNameRes)
             when {
                 shouldPermanentlyDelete && message == null -> {
-                    context.resources.getQuantityString(R.plurals.snackbarThreadDeletedPermanently, 1)
+                    context.resources.getQuantityString(R.plurals.snackbarThreadDeletedPermanently, numberOfImpactedThreads)
                 }
                 shouldPermanentlyDelete && message != null -> {
                     context.resources.getString(R.string.snackbarMessageDeletedPermanently)
                 }
                 !shouldPermanentlyDelete && message == null -> {
-                    context.resources.getQuantityString(R.plurals.snackbarThreadMoved, 1, destination)
+                    context.resources.getQuantityString(R.plurals.snackbarThreadMoved, numberOfImpactedThreads, destination)
                 }
                 else -> {
                     context.resources.getString(R.string.snackbarMessageMoved, destination)
@@ -391,6 +411,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         snackBarManager.postValue(snackbarTitle, undoResource?.let { UndoData(it, undoFoldersIds, undoDestinationId) })
+    }
+
+    private fun getMessagesToDelete(threads: List<Thread>, message: Message?) = when (message) {
+        null -> threads.flatMap(MessageController::getUnscheduledMessages)
+        else -> MessageController.getMessageAndDuplicates(threads.first(), message)
     }
     //endregion
 

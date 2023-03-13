@@ -82,7 +82,7 @@ class ThreadListMultiSelection {
                     isMultiSelectOn = false
                 }
                 R.id.quickActionDelete -> {
-                    threadListFragment.notYetImplemented()
+                    deleteThreads(selectedThreadsUids)
                     isMultiSelectOn = false
                 }
                 R.id.quickActionMenu -> {
