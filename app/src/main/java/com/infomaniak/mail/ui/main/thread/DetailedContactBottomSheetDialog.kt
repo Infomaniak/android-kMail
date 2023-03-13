@@ -29,7 +29,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.safeNavigate
-import com.infomaniak.mail.MatomoMail.trackEvent
+import com.infomaniak.mail.MatomoMail.trackContactActionsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetDetailedContactBinding
 import com.infomaniak.mail.ui.MainViewModel
@@ -94,9 +94,5 @@ class DetailedContactBottomSheetDialog : ActionsBottomSheetDialog() {
         mainViewModel.mergedContacts.observeNotNull(viewLifecycleOwner) {
             binding.userAvatar.loadAvatar(navigationArgs.recipient, it)
         }
-    }
-
-    private fun trackContactActionsEvent(name: String) {
-        trackEvent("contactActions", name)
     }
 }

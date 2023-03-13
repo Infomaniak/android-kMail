@@ -49,9 +49,10 @@ import com.infomaniak.mail.MatomoMail.ACTION_FORWARD_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_REPLY_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_TRASH_NAME
 import com.infomaniak.mail.MatomoMail.OPEN_FROM_DRAFT_NAME
-import com.infomaniak.mail.MatomoMail.toMailActionValue
-import com.infomaniak.mail.MatomoMail.trackEvent
+import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
+import com.infomaniak.mail.MatomoMail.trackMessageActionsEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
+import com.infomaniak.mail.MatomoMail.trackThreadActionsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.models.Attachment
@@ -356,18 +357,6 @@ class ThreadFragment : Fragment() {
         // TODO: (either via a classic Back button, or via this `popBackStack`) will probably
         // TODO: do nothing instead of going back to the ThreadList fragment (as it should be).
         findNavController().popBackStack()
-    }
-
-    private fun trackThreadActionsEvent(name: String, value: Boolean? = null) {
-        trackEvent("threadActions", name, value = value?.toMailActionValue())
-    }
-
-    private fun trackAttachmentActionsEvent(name: String) {
-        trackEvent("attachmentActions", name)
-    }
-
-    private fun trackMessageActionsEvent(name: String) {
-        trackEvent("messageActions", name)
     }
 
     enum class HeaderState {

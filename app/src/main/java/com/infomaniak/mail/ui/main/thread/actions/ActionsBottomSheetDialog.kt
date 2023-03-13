@@ -17,11 +17,8 @@
  */
 package com.infomaniak.mail.ui.main.thread.actions
 
-import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.infomaniak.mail.MatomoMail.toMailActionValue
-import com.infomaniak.mail.MatomoMail.trackEvent
 
 abstract class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
 
@@ -37,13 +34,5 @@ abstract class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
             findNavController().popBackStack()
             callback(id)
         }
-    }
-
-    protected fun Fragment.trackBottomSheetMessageActionsEvent(name: String, value: Boolean? = null) {
-        trackEvent(category = "bottomSheetMessageActions", name = name, value = value?.toMailActionValue())
-    }
-
-    protected fun Fragment.trackBottomSheetThreadActionsEvent(name: String, value: Boolean? = null) {
-        trackEvent(category = "bottomSheetThreadActions", name = name, value = value?.toMailActionValue())
     }
 }

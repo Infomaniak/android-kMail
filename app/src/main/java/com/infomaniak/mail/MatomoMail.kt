@@ -19,8 +19,11 @@ package com.infomaniak.mail
 
 import android.content.Context
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavDestination
 import com.infomaniak.lib.core.MatomoCore
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
+import com.infomaniak.mail.data.models.draft.Draft
+import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import org.matomo.sdk.Tracker
 
 object MatomoMail : MatomoCore {
@@ -42,6 +45,48 @@ object MatomoMail : MatomoCore {
     const val ACTION_PRINT_NAME = "print"
     const val ACTION_POSTPONE_NAME = "postpone"
     //endregion
+
+    fun Context.trackDestination(navDestination: NavDestination) = with(navDestination) {
+        trackScreen(displayName.substringAfter("${BuildConfig.APPLICATION_ID}:id"), label.toString())
+    }
+
+    fun Context.trackSendingDraftEvent(action: DraftAction, draft: Draft) = with(draft) {
+        trackNewMessageEvent(action.matomoValue)
+        if (action == DraftAction.SEND) {
+            val trackerData = listOf("numberOfTo" to to, "numberOfCc" to cc, "numberOfBcc" to bcc)
+            trackerData.forEach { (eventName, recipients) ->
+                trackNewMessageEvent(eventName, TrackerAction.DATA, recipients.size.toFloat())
+            }
+        }
+    }
+
+    fun Fragment.trackContactActionsEvent(name: String) {
+        trackEvent("contactActions", name)
+    }
+
+    fun Fragment.trackAttachmentActionsEvent(name: String) {
+        trackEvent("attachmentActions", name)
+    }
+
+    fun Fragment.trackBottomSheetMessageActionsEvent(name: String, value: Boolean? = null) {
+        trackEvent(category = "bottomSheetMessageActions", name = name, value = value?.toMailActionValue())
+    }
+
+    fun Fragment.trackBottomSheetThreadActionsEvent(name: String, value: Boolean? = null) {
+        trackEvent(category = "bottomSheetThreadActions", name = name, value = value?.toMailActionValue())
+    }
+
+    fun Fragment.trackThreadActionsEvent(name: String, value: Boolean? = null) {
+        trackEvent("threadActions", name, value = value?.toMailActionValue())
+    }
+
+    fun Fragment.trackMessageActionsEvent(name: String) {
+        trackEvent("messageActions", name)
+    }
+
+    fun Fragment.trackSearchEvent(name: String, value: Boolean? = null) {
+        requireContext().trackSearchEvent(name, value)
+    }
 
     fun Context.trackMessageEvent(name: String, value: Boolean? = null) {
         trackEvent("message", name, value = value?.toFloat())
@@ -72,5 +117,5 @@ object MatomoMail : MatomoCore {
     }
 
     // We need to invert this logical value to keep a coherent value for analytics
-    fun Boolean.toMailActionValue() = (!this).toFloat()
+    private fun Boolean.toMailActionValue() = (!this).toFloat()
 }
