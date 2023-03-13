@@ -25,12 +25,12 @@ import com.infomaniak.lib.core.api.ApiController.json
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.lib.core.utils.transaction
 import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_DELETE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_FAVORITE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_MARK_AS_SEEN_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_MOVE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_POSTPONE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_SPAM_NAME
-import com.infomaniak.mail.MatomoMail.ACTION_TRASH_NAME
 import com.infomaniak.mail.R
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -159,7 +159,7 @@ class LocalSettings private constructor(context: Context) {
         @DrawableRes val iconRes: Int?,
         val matomoValue: String,
     ) {
-        DELETE(R.string.actionDelete, R.color.swipeDelete, R.drawable.ic_bin, ACTION_TRASH_NAME),
+        DELETE(R.string.actionDelete, R.color.swipeDelete, R.drawable.ic_bin, ACTION_DELETE_NAME),
         ARCHIVE(R.string.actionArchive, R.color.swipeArchive, R.drawable.ic_archive_folder, ACTION_ARCHIVE_NAME),
         READ_UNREAD(
             R.string.settingsSwipeActionReadUnread,

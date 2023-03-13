@@ -23,6 +23,7 @@ import android.util.Log
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.SingleLiveEvent
+import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxContent.*
@@ -760,8 +761,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun selectOrUnselectAll() {
         if (isEverythingSelected) {
+            context.trackMultiSelectionEvent("none")
             selectedThreads.clear()
         } else {
+            context.trackMultiSelectionEvent("all")
             currentThreadsLiveToObserve.value?.list?.forEach { thread ->
                 selectedThreads.add(SelectedThread(thread))
             }

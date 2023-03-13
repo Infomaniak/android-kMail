@@ -25,6 +25,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_DELETE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_FAVORITE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_FORWARD_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_MARK_AS_SEEN_NAME
@@ -34,7 +35,6 @@ import com.infomaniak.mail.MatomoMail.ACTION_PRINT_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_REPLY_ALL_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_REPLY_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_SPAM_NAME
-import com.infomaniak.mail.MatomoMail.ACTION_TRASH_NAME
 import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder.FolderRole
@@ -93,7 +93,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 }
 
                 override fun onDelete() {
-                    trackBottomSheetThreadActionsEvent(ACTION_TRASH_NAME)
+                    trackBottomSheetThreadActionsEvent(ACTION_DELETE_NAME)
                     mainViewModel.deleteThread(threadUid)
                 }
                 //endregion

@@ -43,7 +43,7 @@ object MatomoMail : MatomoCore {
     const val ACTION_REPLY_NAME = "reply"
     const val ACTION_REPLY_ALL_NAME = "replyAll"
     const val ACTION_FORWARD_NAME = "forward"
-    const val ACTION_TRASH_NAME = "trash"
+    const val ACTION_DELETE_NAME = "delete"
     const val ACTION_ARCHIVE_NAME = "archive"
     const val ACTION_MARK_AS_SEEN_NAME = "markAsSeen"
     const val ACTION_MOVE_NAME = "move"
@@ -131,7 +131,7 @@ object MatomoMail : MatomoCore {
         trackEvent("createFolder", name)
     }
 
-    fun Fragment.trackMultiSelectionEvent(name: String, action: TrackerAction) {
+    fun Context.trackMultiSelectionEvent(name: String, action: TrackerAction = TrackerAction.CLICK) {
         trackEvent("multiSelection", name, action)
     }
 

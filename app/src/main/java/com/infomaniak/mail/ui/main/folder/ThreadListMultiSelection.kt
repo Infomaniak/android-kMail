@@ -24,9 +24,9 @@ import androidx.core.view.isVisible
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_DELETE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_FAVORITE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_MARK_AS_SEEN_NAME
-import com.infomaniak.mail.MatomoMail.ACTION_TRASH_NAME
 import com.infomaniak.mail.MatomoMail.OPEN_ACTION_BOTTOM_SHEET
 import com.infomaniak.mail.MatomoMail.trackMultiSelectActionEvent
 import com.infomaniak.mail.R
@@ -93,7 +93,7 @@ class ThreadListMultiSelection {
                     isMultiSelectOn = false
                 }
                 R.id.quickActionDelete -> {
-                    threadListFragment.trackMultiSelectActionEvent(ACTION_TRASH_NAME, selectedThreadsCount)
+                    threadListFragment.trackMultiSelectActionEvent(ACTION_DELETE_NAME, selectedThreadsCount)
                     deleteThreads(selectedThreadsUids)
                     isMultiSelectOn = false
                 }

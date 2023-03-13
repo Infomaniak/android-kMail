@@ -37,7 +37,9 @@ import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeAdapter
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.ernestoyaquello.dragdropswiperecyclerview.util.DragDropSwipeDiffCallback
 import com.google.android.material.card.MaterialCardView
+import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.utils.*
+import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.SwipeAction
@@ -183,6 +185,7 @@ class ThreadListAdapter(
             updateSelectedState(selectedThread)
 
             selectionCardView.setOnLongClickListener {
+                context.trackMultiSelectionEvent("enable", TrackerAction.LONG_PRESS)
                 if (!multiSelection.isEnabled) multiSelection.isEnabled = true
                 toggleSelection(selectedThread)
                 true
