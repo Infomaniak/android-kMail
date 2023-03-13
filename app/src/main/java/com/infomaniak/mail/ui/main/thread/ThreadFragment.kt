@@ -48,6 +48,7 @@ import com.infomaniak.mail.MatomoMail.ACTION_FAVORITE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_FORWARD_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_REPLY_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_TRASH_NAME
+import com.infomaniak.mail.MatomoMail.OPEN_ACTION_BOTTOM_SHEET
 import com.infomaniak.mail.MatomoMail.OPEN_FROM_DRAFT_NAME
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
 import com.infomaniak.mail.MatomoMail.trackMessageActionsEvent
@@ -188,7 +189,7 @@ class ThreadFragment : Fragment() {
                     mainViewModel.deleteThread(threadUid)
                 }
                 R.id.quickActionMenu -> {
-                    trackThreadActionsEvent("openBottomSheet")
+                    trackThreadActionsEvent(OPEN_ACTION_BOTTOM_SHEET)
                     threadViewModel.clickOnQuickActionBar(threadUid, menuId)
                 }
             }

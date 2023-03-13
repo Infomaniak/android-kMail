@@ -23,6 +23,12 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
 import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_FAVORITE_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_MARK_AS_SEEN_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_TRASH_NAME
+import com.infomaniak.mail.MatomoMail.OPEN_ACTION_BOTTOM_SHEET
+import com.infomaniak.mail.MatomoMail.trackMultiSelectActionEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity
@@ -68,24 +74,31 @@ class ThreadListMultiSelection {
     private fun setupMultiSelectionActions() = with(mainViewModel) {
         binding.quickActionBar.setOnItemClickListener { menuId ->
             val selectedThreadsUids = selectedThreads.map { it.uid }
+            val selectedThreadsCount = selectedThreadsUids.count()
+
             when (menuId) {
                 R.id.quickActionUnread -> {
+                    threadListFragment.trackMultiSelectActionEvent(ACTION_MARK_AS_SEEN_NAME, selectedThreadsCount)
                     toggleThreadsSeenStatus(selectedThreadsUids, shouldMultiselectRead)
                     isMultiSelectOn = false
                 }
                 R.id.quickActionArchive -> {
+                    threadListFragment.trackMultiSelectActionEvent(ACTION_ARCHIVE_NAME, selectedThreadsCount)
                     archiveThreads(selectedThreadsUids)
                     isMultiSelectOn = false
                 }
                 R.id.quickActionFavorite -> {
+                    threadListFragment.trackMultiSelectActionEvent(ACTION_FAVORITE_NAME, selectedThreadsCount)
                     toggleThreadsFavoriteStatus(selectedThreadsUids, shouldMultiselectFavorite)
                     isMultiSelectOn = false
                 }
                 R.id.quickActionDelete -> {
+                    threadListFragment.trackMultiSelectActionEvent(ACTION_TRASH_NAME, selectedThreadsCount)
                     deleteThreads(selectedThreadsUids)
                     isMultiSelectOn = false
                 }
                 R.id.quickActionMenu -> {
+                    threadListFragment.trackMultiSelectActionEvent(OPEN_ACTION_BOTTOM_SHEET, selectedThreadsCount)
                     val direction = if (selectedThreadsUids.count() == 1) {
                         isMultiSelectOn = false
                         ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(selectedThreadsUids.single())

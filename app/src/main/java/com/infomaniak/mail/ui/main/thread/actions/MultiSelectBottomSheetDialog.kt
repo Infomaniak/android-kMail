@@ -22,6 +22,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import com.infomaniak.mail.MatomoMail.ACTION_MOVE_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_SPAM_NAME
+import com.infomaniak.mail.MatomoMail.trackMultiSelectActionEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetMultiSelectBinding
 import com.infomaniak.mail.ui.MainViewModel
@@ -44,8 +47,11 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
         binding.mainActions.setClosingOnClickListener { id: Int ->
             val selectedThreadsUids = selectedThreads.map { it.uid }
+            val selectedThreadsCount = selectedThreadsUids.count()
+
             when (id) {
                 R.id.actionMove -> {
+                    trackMultiSelectActionEvent(ACTION_MOVE_NAME, selectedThreadsCount, isFromBottomSheet = true)
                     animatedNavigation(
                         ThreadListFragmentDirections.actionThreadListFragmentToMoveFragment(
                             threadsUids = selectedThreadsUids.toTypedArray(),
@@ -53,8 +59,14 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                         currentClassName = currentClassName,
                     )
                 }
-                R.id.actionSpam -> toggleThreadsSpamStatus(selectedThreadsUids)
-                // R.id.actionPostpone -> notYetImplemented()
+                R.id.actionSpam -> {
+                    trackMultiSelectActionEvent(ACTION_SPAM_NAME, selectedThreadsCount, isFromBottomSheet = true)
+                    toggleThreadsSpamStatus(selectedThreadsUids)
+                }
+                // R.id.actionPostpone -> {
+                //     trackMultiSelectActionEvent(ACTION_POSTPONE_NAME, selectedThreadsCount, isFromBottomSheet = true)
+                //     notYetImplemented()
+                // }
             }
             isMultiSelectOn = false
         }
