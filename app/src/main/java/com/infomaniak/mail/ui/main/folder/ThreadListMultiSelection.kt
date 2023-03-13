@@ -31,7 +31,6 @@ import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.context
-import com.infomaniak.mail.utils.notYetImplemented
 
 class ThreadListMultiSelection {
 

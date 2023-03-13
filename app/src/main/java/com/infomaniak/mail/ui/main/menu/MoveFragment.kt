@@ -84,7 +84,7 @@ class MoveFragment : MenuFoldersFragment() {
     }
 
     override fun onFolderSelected(folderId: String): Unit = with(navigationArgs) {
-        mainViewModel.moveTo(folderId, threadsUids, messageUid)
+        mainViewModel.moveThreadsOrMessageTo(folderId, threadsUids, messageUid)
         findNavController().popBackStack()
     }
 
