@@ -23,6 +23,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.mail.MatomoMail.ACTION_SPAM_NAME
+import com.infomaniak.mail.MatomoMail.trackBottomSheetMessageActionsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.BottomSheetJunkBinding
@@ -52,7 +54,7 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
         setSpamUi(message)
 
         spam.setClosingOnClickListener {
-            trackBottomSheetMessageActionsEvent("spam", message.isSpam)
+            trackBottomSheetMessageActionsEvent(ACTION_SPAM_NAME, message.isSpam)
             mainViewModel.toggleMessageSpamStatus(threadUid, message)
         }
 

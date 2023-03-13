@@ -31,10 +31,9 @@ import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.networking.LiveDataNetworkStatus
-import com.infomaniak.mail.BuildConfig
+import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
-import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.R
 import com.infomaniak.mail.checkPlayServices
 import com.infomaniak.mail.databinding.ActivityMainBinding
@@ -226,7 +225,7 @@ class MainActivity : ThemedActivity() {
             }
         )
 
-        destination.trackDestination()
+        trackDestination(destination)
     }
 
     @SuppressLint("RestrictedApi")
@@ -236,11 +235,6 @@ class MainActivity : ThemedActivity() {
             message = "Accessed to destination : $displayName"
             level = SentryLevel.INFO
         })
-    }
-
-    @SuppressLint("RestrictedApi")
-    private fun NavDestination.trackDestination() {
-        trackScreen(displayName.substringAfter("${BuildConfig.APPLICATION_ID}:id"), label.toString())
     }
 
     fun setDrawerLockMode(isUnlocked: Boolean) {
