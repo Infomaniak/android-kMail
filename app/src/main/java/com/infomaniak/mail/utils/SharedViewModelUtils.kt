@@ -32,11 +32,11 @@ object SharedViewModelUtils {
 
     var fetchFolderMessagesJob: Job? = null
 
-    suspend fun markAsSeen(mailbox: Mailbox, thread: Thread, message: Message? = null) {
+    suspend fun markAsSeen(mailbox: Mailbox, threads: List<Thread>, message: Message? = null) {
 
-        val messages = when {
-            message != null -> MessageController.getMessageAndDuplicates(thread, message)
-            else -> MessageController.getUnseenMessages(thread)
+        val messages = when (message) {
+            null -> threads.flatMap(MessageController::getUnseenMessages)
+            else -> MessageController.getMessageAndDuplicates(threads.first(), message)
         }
 
         val isSuccess = ApiRepository.markMessagesAsSeen(mailbox.uuid, messages.getUids()).isSuccess()

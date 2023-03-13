@@ -70,7 +70,7 @@ class ThreadViewModel : ViewModel() {
 
         emit(Triple(thread, isExpandedMap, isThemeTheSameMap))
 
-        if (thread.unseenMessagesCount > 0) SharedViewModelUtils.markAsSeen(mailbox, thread)
+        if (thread.unseenMessagesCount > 0) SharedViewModelUtils.markAsSeen(mailbox, listOf(thread))
     }
 
     fun fetchIncompleteMessages(messages: List<Message>) {

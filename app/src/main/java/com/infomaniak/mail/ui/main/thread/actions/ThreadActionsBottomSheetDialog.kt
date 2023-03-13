@@ -86,7 +86,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
                 override fun onReadUnread() {
                     trackBottomSheetThreadActionsEvent("markAsSeen", thread.unseenMessagesCount == 0)
-                    mainViewModel.toggleSeenStatus(threadUid)
+                    mainViewModel.toggleThreadSeenStatus(threadUid)
                     findNavController().popBackStack(R.id.threadFragment, inclusive = true)
                 }
 
