@@ -163,7 +163,11 @@ class ThreadFragment : Fragment() {
             mainViewModel.toggleThreadFavoriteStatus(threadUid)
         }
 
-        if (mainViewModel.isCurrentFolderRole(FolderRole.ARCHIVE)) quickActionBar.disable(2) else quickActionBar.enable(2)
+        if (mainViewModel.isCurrentFolderRole(FolderRole.ARCHIVE)) {
+            quickActionBar.disable(ARCHIVE_INDEX)
+        } else {
+            quickActionBar.enable(ARCHIVE_INDEX)
+        }
 
         quickActionBar.setOnItemClickListener { menuId ->
             when (menuId) {
@@ -368,6 +372,7 @@ class ThreadFragment : Fragment() {
 
     private companion object {
         const val COLLAPSE_TITLE_THRESHOLD = 0.5
+        const val ARCHIVE_INDEX = 2
 
         fun allAttachmentsFileName(subject: String) = "kMail-attachments-$subject.zip"
     }

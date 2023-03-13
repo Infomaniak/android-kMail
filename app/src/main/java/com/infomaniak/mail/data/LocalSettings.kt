@@ -165,7 +165,7 @@ class LocalSettings private constructor(context: Context) {
             R.string.settingsSwipeActionReadUnread,
             R.color.swipeReadUnread,
             R.drawable.ic_envelope,
-            ACTION_MARK_AS_SEEN_NAME
+            ACTION_MARK_AS_SEEN_NAME,
         ),
         MOVE(R.string.actionMove, R.color.swipeMove, R.drawable.ic_email_action_move, ACTION_MOVE_NAME),
         FAVORITE(R.string.actionShortStar, R.color.swipeFavorite, R.drawable.ic_star, ACTION_FAVORITE_NAME),
@@ -181,9 +181,7 @@ class LocalSettings private constructor(context: Context) {
         NONE(R.string.settingsSwipeActionNone, R.color.swipeNone, null, "none");
 
         @ColorInt
-        fun getBackgroundColor(context: Context): Int {
-            return context.getColor(colorRes)
-        }
+        fun getBackgroundColor(context: Context): Int = context.getColor(colorRes)
     }
 
     fun getSwipeAction(@StringRes nameRes: Int): SwipeAction = when (nameRes) {
