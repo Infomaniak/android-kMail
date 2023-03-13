@@ -181,7 +181,7 @@ object MessageController {
                 FolderRole.INBOX -> listOf(FolderRole.SENT, FolderRole.DRAFT)
                 FolderRole.SENT -> listOf(FolderRole.INBOX, FolderRole.DRAFT)
                 FolderRole.DRAFT -> listOf(FolderRole.INBOX, FolderRole.SENT)
-                else -> return@async emptyList()
+                else -> emptyList()
             }
 
             roles.forEach { role ->
