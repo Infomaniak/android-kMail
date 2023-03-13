@@ -84,4 +84,6 @@ class BottomQuickActionBarView @JvmOverloads constructor(
     fun disable(index: Int) {
         buttons[index].isEnabled = false
     }
+
+    fun getButtonCount() = buttons.count()
 }
