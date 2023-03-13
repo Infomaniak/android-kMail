@@ -109,9 +109,9 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     mainViewModel.toggleThreadFavoriteStatus(threadUid)
                 }
 
-                override fun onSpam(): Unit = with(mainViewModel) {
+                override fun onSpam() = with(mainViewModel) {
                     trackBottomSheetThreadActionsEvent("spam", isCurrentFolderRole(FolderRole.SPAM))
-                    toggleSpamOrHam(threadUid)
+                    toggleThreadSpamStatus(threadUid)
                 }
 
                 override fun onReportJunk() = Unit

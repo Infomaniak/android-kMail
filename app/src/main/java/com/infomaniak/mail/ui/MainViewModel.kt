@@ -612,21 +612,30 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //endregion
 
     //region Spam
-    fun toggleSpamOrHam(
-        threadUid: String,
+    fun toggleMessageSpamStatus(threadUid: String, message: Message, displaySnackbar: Boolean = true) {
+        toggleThreadsOrMessageSpamStatus(threadsUids = listOf(threadUid), message = message, displaySnackbar = displaySnackbar)
+    }
+
+    fun toggleThreadSpamStatus(threadUid: String) {
+        toggleThreadsOrMessageSpamStatus(threadsUids = listOf(threadUid))
+    }
+
+    fun toggleThreadsSpamStatus(threadsUids: List<String>) {
+        toggleThreadsOrMessageSpamStatus(threadsUids = threadsUids)
+    }
+
+    private fun toggleThreadsOrMessageSpamStatus(
+        threadsUids: List<String> = emptyList(),
         message: Message? = null,
         displaySnackbar: Boolean = true,
     ) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = currentMailbox.value!!
-        val thread = ThreadController.getThread(threadUid)!!
+        val threads = threadsUids.mapNotNull(ThreadController::getThread)
 
         val destinationFolderRole = if (isSpam(message)) FolderRole.INBOX else FolderRole.SPAM
         val destinationFolder = FolderController.getFolder(destinationFolderRole)!!
 
-        val messages = when (message) {
-            null -> MessageController.getUnscheduledMessages(thread)
-            else -> MessageController.getMessageAndDuplicates(thread, message)
-        }
+        val messages = getMessagesToSpamOrHam(threads, message)
 
         val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
 
@@ -635,8 +644,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         if (displaySnackbar) {
-            showMoveSnackbar(listOf(thread), message, messages, apiResponse, destinationFolder)
+            showMoveSnackbar(threads, message, messages, apiResponse, destinationFolder)
         }
+    }
+
+    private fun getMessagesToSpamOrHam(threads: List<Thread>, message: Message?) = when (message) {
+        null -> threads.flatMap(MessageController::getUnscheduledMessages)
+        else -> MessageController.getMessageAndDuplicates(threads.first(), message)
     }
     //endregion
 
@@ -647,7 +661,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val apiResponse = ApiRepository.reportPhishing(mailboxUuid, message.folderId, message.shortUid)
 
         val snackbarTitle = if (apiResponse.isSuccess()) {
-            if (!isCurrentFolderRole(FolderRole.SPAM)) toggleSpamOrHam(threadUid, message, displaySnackbar = false)
+            if (!isCurrentFolderRole(FolderRole.SPAM)) toggleMessageSpamStatus(threadUid, message, displaySnackbar = false)
             R.string.snackbarReportPhishingConfirmation
         } else {
             RCore.string.anErrorHasOccurred

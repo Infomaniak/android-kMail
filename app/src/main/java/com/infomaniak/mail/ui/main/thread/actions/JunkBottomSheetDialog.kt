@@ -53,7 +53,7 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
 
         spam.setClosingOnClickListener {
             trackBottomSheetMessageActionsEvent("spam", message.isSpam)
-            mainViewModel.toggleSpamOrHam(threadUid, message)
+            mainViewModel.toggleMessageSpamStatus(threadUid, message)
         }
 
         phishing.setClosingOnClickListener {
