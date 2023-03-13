@@ -171,15 +171,20 @@ class ThreadListMultiSelection {
         }
 
         binding.quickActionBar.apply {
-            changeIcon(0, if (shouldMultiselectRead) R.drawable.ic_envelope_open else R.drawable.ic_envelope)
-            changeText(0, if (shouldMultiselectRead) R.string.actionShortMarkAsRead else R.string.actionShortMarkAsUnread)
 
-            changeIcon(2, if (shouldMultiselectFavorite) R.drawable.ic_star else R.drawable.ic_unstar)
+            val readIcon = if (shouldMultiselectRead) R.drawable.ic_envelope_open else R.drawable.ic_envelope
+            changeIcon(READ_UNREAD_INDEX, readIcon)
+
+            val readText = if (shouldMultiselectRead) R.string.actionShortMarkAsRead else R.string.actionShortMarkAsUnread
+            changeText(READ_UNREAD_INDEX, readText)
+
+            val favoriteIcon = if (shouldMultiselectFavorite) R.drawable.ic_star else R.drawable.ic_unstar
+            changeIcon(FAVORITE_INDEX, favoriteIcon)
 
             val isSelectionEmpty = selectedThreads.isEmpty()
             val isInsideArchive = mainViewModel.isCurrentFolderRole(FolderRole.ARCHIVE)
             for (index in 0 until getButtonCount()) {
-                val shouldDisable = isSelectionEmpty || (isInsideArchive && index == 1)
+                val shouldDisable = isSelectionEmpty || (isInsideArchive && index == ARCHIVE_INDEX)
                 if (shouldDisable) disable(index) else enable(index)
             }
         }
@@ -198,7 +203,11 @@ class ThreadListMultiSelection {
         return !shouldUnRead to !shouldUnFavorite
     }
 
-    companion object {
+    private companion object {
         const val TOOLBAR_FADE_DURATION = 150L
+
+        const val READ_UNREAD_INDEX = 0
+        const val ARCHIVE_INDEX = 1
+        const val FAVORITE_INDEX = 2
     }
 }
