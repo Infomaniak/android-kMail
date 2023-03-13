@@ -325,7 +325,7 @@ object MessageController {
         messages.forEach { message ->
             scope.ensureActive()
 
-            val existingMessage = folder.messages.firstOrNull { it.uid == message.uid }
+            val existingMessage = folder.messages.firstOrNull { it == message }
             if (existingMessage != null) {
                 SentryDebug.sendAlreadyExistingMessage(folder, existingMessage, message)
                 return@forEach
@@ -433,7 +433,7 @@ object MessageController {
             for (thread in message.threads.reversed()) {
                 scope.ensureActive()
 
-                val isSuccess = thread.messages.removeIf { it.uid == messageUid }
+                val isSuccess = thread.messages.remove(message)
                 val numberOfMessagesInFolder = thread.messages.count { it.folderId == thread.folderId }
 
                 // We need to save this value because the Thread could be deleted before we use this `folderId`.

@@ -129,7 +129,7 @@ object ThreadController {
         fun MutableRealm.keepOldMessagesAndAddToSearchFolder(remoteThread: Thread, searchFolder: Folder) {
             remoteThread.messages.forEach { remoteMessage: Message ->
                 MessageController.getMessage(remoteMessage.uid, this)?.let { localMessage ->
-                    val position = remoteThread.messages.indexOfFirst { it.uid == localMessage.uid }
+                    val position = remoteThread.messages.indexOf(localMessage)
                     remoteThread.messages[position] = localMessage.copyFromRealm()
                 } ?: run {
                     remoteMessage.isFromSearch = true

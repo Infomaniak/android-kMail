@@ -426,7 +426,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
     }
 
     fun toggleLightMode(message: Message) {
-        val index = messages.indexOfFirst { it.uid == message.uid }
+        val index = messages.indexOf(message)
         notifyItemChanged(index, NotificationType.TOGGLE_LIGHT_MODE)
     }
 
