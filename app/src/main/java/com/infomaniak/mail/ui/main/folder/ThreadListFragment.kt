@@ -312,7 +312,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 true
             }
             SwipeAction.SPAM -> {
-                toggleSpamOrHam(threadUid)
+                toggleThreadSpamStatus(threadUid)
                 false
             }
             SwipeAction.NONE -> throw IllegalStateException("Cannot swipe on an action which is not set")

@@ -27,7 +27,6 @@ import com.infomaniak.mail.databinding.BottomSheetMultiSelectBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.utils.animatedNavigation
-import com.infomaniak.mail.utils.notYetImplemented
 
 class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
@@ -54,7 +53,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                         currentClassName = currentClassName,
                     )
                 }
-                R.id.actionSpam -> notYetImplemented()
+                R.id.actionSpam -> toggleThreadsSpamStatus(selectedThreadsUids)
                 // R.id.actionPostpone -> notYetImplemented()
             }
             isMultiSelectOn = false

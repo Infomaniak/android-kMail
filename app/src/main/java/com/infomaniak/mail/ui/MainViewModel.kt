@@ -420,7 +420,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //endregion
 
     //region Move
-    fun moveTo(
+    fun moveThreadsOrMessageTo(
         destinationFolderId: String,
         threadsUids: Array<String> = emptyArray(),
         messageUid: String? = null,
@@ -471,18 +471,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     //region Archive
     fun archiveMessage(threadUid: String, message: Message) {
-        archive(threadsUids = listOf(threadUid), message = message)
+        archiveThreadsOrMessage(threadsUids = listOf(threadUid), message = message)
     }
 
     fun archiveThread(threadUid: String) {
-        archive(threadsUids = listOf(threadUid))
+        archiveThreadsOrMessage(threadsUids = listOf(threadUid))
     }
 
     fun archiveThreads(threadsUids: List<String>) {
-        archive(threadsUids = threadsUids)
+        archiveThreadsOrMessage(threadsUids = threadsUids)
     }
 
-    private fun archive(
+    private fun archiveThreadsOrMessage(
         threadsUids: List<String> = emptyList(),
         message: Message? = null,
     ) = viewModelScope.launch(Dispatchers.IO) {
@@ -509,18 +509,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     //region Seen
     fun toggleMessageSeenStatus(threadUid: String, message: Message) {
-        toggleSeenStatus(threadsUids = listOf(threadUid), message = message)
+        toggleThreadsOrMessageSeenStatus(threadsUids = listOf(threadUid), message = message)
     }
 
     fun toggleThreadSeenStatus(threadUid: String) {
-        toggleSeenStatus(threadsUids = listOf(threadUid))
+        toggleThreadsOrMessageSeenStatus(threadsUids = listOf(threadUid))
     }
 
     fun toggleThreadsSeenStatus(threadsUids: List<String>, shouldRead: Boolean) {
-        toggleSeenStatus(threadsUids = threadsUids, shouldRead = shouldRead)
+        toggleThreadsOrMessageSeenStatus(threadsUids = threadsUids, shouldRead = shouldRead)
     }
 
-    private fun toggleSeenStatus(
+    private fun toggleThreadsOrMessageSeenStatus(
         threadsUids: List<String> = emptyList(),
         message: Message? = null,
         shouldRead: Boolean = true,
@@ -559,18 +559,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     //region Favorite
     fun toggleMessageFavoriteStatus(threadUid: String, message: Message) {
-        toggleFavoriteStatus(threadsUids = listOf(threadUid), message = message)
+        toggleThreadsOrMessageFavoriteStatus(threadsUids = listOf(threadUid), message = message)
     }
 
     fun toggleThreadFavoriteStatus(threadUid: String) {
-        toggleFavoriteStatus(threadsUids = listOf(threadUid))
+        toggleThreadsOrMessageFavoriteStatus(threadsUids = listOf(threadUid))
     }
 
     fun toggleThreadsFavoriteStatus(threadsUids: List<String>, shouldFavorite: Boolean) {
-        toggleFavoriteStatus(threadsUids = threadsUids, shouldFavorite = shouldFavorite)
+        toggleThreadsOrMessageFavoriteStatus(threadsUids = threadsUids, shouldFavorite = shouldFavorite)
     }
 
-    private fun toggleFavoriteStatus(
+    private fun toggleThreadsOrMessageFavoriteStatus(
         threadsUids: List<String> = emptyList(),
         message: Message? = null,
         shouldFavorite: Boolean = true,
@@ -612,21 +612,30 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //endregion
 
     //region Spam
-    fun toggleSpamOrHam(
-        threadUid: String,
+    fun toggleMessageSpamStatus(threadUid: String, message: Message, displaySnackbar: Boolean = true) {
+        toggleThreadsOrMessageSpamStatus(threadsUids = listOf(threadUid), message = message, displaySnackbar = displaySnackbar)
+    }
+
+    fun toggleThreadSpamStatus(threadUid: String) {
+        toggleThreadsOrMessageSpamStatus(threadsUids = listOf(threadUid))
+    }
+
+    fun toggleThreadsSpamStatus(threadsUids: List<String>) {
+        toggleThreadsOrMessageSpamStatus(threadsUids = threadsUids)
+    }
+
+    private fun toggleThreadsOrMessageSpamStatus(
+        threadsUids: List<String> = emptyList(),
         message: Message? = null,
         displaySnackbar: Boolean = true,
     ) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = currentMailbox.value!!
-        val thread = ThreadController.getThread(threadUid)!!
+        val threads = threadsUids.mapNotNull(ThreadController::getThread)
 
         val destinationFolderRole = if (isSpam(message)) FolderRole.INBOX else FolderRole.SPAM
         val destinationFolder = FolderController.getFolder(destinationFolderRole)!!
 
-        val messages = when (message) {
-            null -> MessageController.getUnscheduledMessages(thread)
-            else -> MessageController.getMessageAndDuplicates(thread, message)
-        }
+        val messages = getMessagesToSpamOrHam(threads, message)
 
         val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
 
@@ -635,8 +644,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         if (displaySnackbar) {
-            showMoveSnackbar(listOf(thread), message, messages, apiResponse, destinationFolder)
+            showMoveSnackbar(threads, message, messages, apiResponse, destinationFolder)
         }
+    }
+
+    private fun getMessagesToSpamOrHam(threads: List<Thread>, message: Message?) = when (message) {
+        null -> threads.flatMap(MessageController::getUnscheduledMessages)
+        else -> MessageController.getMessageAndDuplicates(threads.first(), message)
     }
     //endregion
 
@@ -647,7 +661,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val apiResponse = ApiRepository.reportPhishing(mailboxUuid, message.folderId, message.shortUid)
 
         val snackbarTitle = if (apiResponse.isSuccess()) {
-            if (!isCurrentFolderRole(FolderRole.SPAM)) toggleSpamOrHam(threadUid, message, displaySnackbar = false)
+            if (!isCurrentFolderRole(FolderRole.SPAM)) toggleMessageSpamStatus(threadUid, message, displaySnackbar = false)
             R.string.snackbarReportPhishingConfirmation
         } else {
             RCore.string.anErrorHasOccurred
@@ -714,7 +728,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun moveToNewFolder(name: String, threadsUids: Array<String>, messageUid: String?) = viewModelScope.launch(Dispatchers.IO) {
         val newFolderId = createNewFolderSync(name) ?: return@launch
-        moveTo(newFolderId, threadsUids, messageUid)
+        moveThreadsOrMessageTo(newFolderId, threadsUids, messageUid)
         isNewFolderCreated.postValue(true)
     }
     //endregion
