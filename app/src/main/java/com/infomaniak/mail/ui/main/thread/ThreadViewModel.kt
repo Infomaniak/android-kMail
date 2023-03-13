@@ -36,13 +36,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlin.properties.Delegates
 
 class ThreadViewModel : ViewModel() {
 
     val quickActionBarClicks = SingleLiveEvent<Pair<Message, Int>>()
-
-    var isThreadFavorite by Delegates.notNull<Boolean>()
 
     private val coroutineContext = viewModelScope.coroutineContext + Dispatchers.IO
     private var fetchMessagesJob: Job? = null
@@ -70,8 +67,6 @@ class ThreadViewModel : ViewModel() {
             isExpandedMap[message.uid] = message.shouldBeExpanded(index, thread.messages.lastIndex)
             isThemeTheSameMap[message.uid] = true
         }
-
-        isThreadFavorite = thread.isFavorite
 
         emit(Triple(thread, isExpandedMap, isThemeTheSameMap))
 

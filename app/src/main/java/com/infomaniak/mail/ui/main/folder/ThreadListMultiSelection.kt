@@ -42,6 +42,8 @@ class ThreadListMultiSelection {
     lateinit var unlockSwipeActionsIfSet: () -> Unit
     lateinit var localSettings: LocalSettings
 
+    private var shouldMultiselectFavorite: Boolean = true
+
     fun initMultiSelection(
         binding: FragmentThreadListBinding,
         mainViewModel: MainViewModel,
@@ -75,7 +77,7 @@ class ThreadListMultiSelection {
                     isMultiSelectOn = false
                 }
                 R.id.quickActionFavorite -> {
-                    threadListFragment.notYetImplemented()
+                    toggleThreadsFavoriteStatus(selectedThreadsUids, shouldMultiselectFavorite)
                     isMultiSelectOn = false
                 }
                 R.id.quickActionDelete -> {
@@ -162,13 +164,17 @@ class ThreadListMultiSelection {
     }
 
     private fun updateMultiSelectActionsStatus(selectedThreads: MutableSet<SelectedThread>) {
-        val (shouldRead, shouldFavorite) = computeReadFavoriteStatus(selectedThreads)
+        val shouldMultiselectRead: Boolean
+        computeReadFavoriteStatus(selectedThreads).let { (shouldRead, shouldFavorite) ->
+            shouldMultiselectRead = shouldRead
+            shouldMultiselectFavorite = shouldFavorite
+        }
 
         binding.quickActionBar.apply {
-            changeIcon(0, if (shouldRead) R.drawable.ic_envelope_open else R.drawable.ic_envelope)
-            changeText(0, if (shouldRead) R.string.actionShortMarkAsRead else R.string.actionShortMarkAsUnread)
+            changeIcon(0, if (shouldMultiselectRead) R.drawable.ic_envelope_open else R.drawable.ic_envelope)
+            changeText(0, if (shouldMultiselectRead) R.string.actionShortMarkAsRead else R.string.actionShortMarkAsUnread)
 
-            changeIcon(2, if (shouldFavorite) R.drawable.ic_star else R.drawable.ic_unstar)
+            changeIcon(2, if (shouldMultiselectFavorite) R.drawable.ic_star else R.drawable.ic_unstar)
         }
     }
 

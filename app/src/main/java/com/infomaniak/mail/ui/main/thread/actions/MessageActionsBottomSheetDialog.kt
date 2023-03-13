@@ -103,7 +103,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
                 override fun onFavorite() {
                     trackBottomSheetMessageActionsEvent("favorite", message.isFavorite)
-                    mainViewModel.toggleFavoriteStatus(threadUid, message)
+                    mainViewModel.toggleMessageFavoriteStatus(threadUid, message)
                 }
 
                 override fun onSpam() = Unit

@@ -510,24 +510,56 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //endregion
 
     //region Favorite
-    fun toggleFavoriteStatus(threadUid: String, message: Message? = null) = viewModelScope.launch(Dispatchers.IO) {
-        val mailbox = currentMailbox.value!!
-        val thread = ThreadController.getThread(threadUid)!!
+    fun toggleMessageFavoriteStatus(threadUid: String, message: Message) {
+        toggleFavoriteStatus(threadsUids = listOf(threadUid), message = message)
+    }
 
-        val messages = when {
-            message != null -> MessageController.getMessageAndDuplicates(thread, message)
-            thread.isFavorite -> MessageController.getFavoriteMessages(thread)
-            else -> MessageController.getLastMessageToExecuteAction(thread)
+    fun toggleThreadFavoriteStatus(threadUid: String) {
+        toggleFavoriteStatus(threadsUids = listOf(threadUid))
+    }
+
+    fun toggleThreadsFavoriteStatus(threadsUids: List<String>, shouldFavorite: Boolean) {
+        toggleFavoriteStatus(threadsUids = threadsUids, shouldFavorite = shouldFavorite)
+    }
+
+    private fun toggleFavoriteStatus(
+        threadsUids: List<String> = emptyList(),
+        message: Message? = null,
+        shouldFavorite: Boolean = true,
+    ) = viewModelScope.launch(Dispatchers.IO) {
+        val mailbox = currentMailbox.value!!
+        val threads = threadsUids.mapNotNull(ThreadController::getThread)
+
+        val isFavorite = when {
+            message != null -> message.isFavorite
+            threads.count() == 1 -> threads.single().isFavorite
+            else -> !shouldFavorite
+        }
+
+        val messages = if (isFavorite) {
+            getMessagesToUnfavorite(threads, message)
+        } else {
+            getMessagesToFavorite(threads, message)
         }
         val uids = messages.getUids()
 
-        val isSuccess = if (message?.isFavorite ?: thread.isFavorite) {
+        val isSuccess = if (isFavorite) {
             ApiRepository.removeFromFavorites(mailbox.uuid, uids).isSuccess()
         } else {
             ApiRepository.addToFavorites(mailbox.uuid, uids).isSuccess()
         }
 
         if (isSuccess) refreshFolders(mailbox, messages.getFoldersIds())
+    }
+
+    private fun getMessagesToFavorite(threads: List<Thread>, message: Message?) = when (message) {
+        null -> threads.flatMap(MessageController::getLastMessageToExecuteAction)
+        else -> MessageController.getMessageAndDuplicates(threads.first(), message)
+    }
+
+    private fun getMessagesToUnfavorite(threads: List<Thread>, message: Message?) = when (message) {
+        null -> threads.flatMap(MessageController::getFavoriteMessages)
+        else -> MessageController.getMessageAndDuplicates(threads.first(), message)
     }
     //endregion
 
