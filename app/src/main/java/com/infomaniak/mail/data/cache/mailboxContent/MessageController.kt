@@ -350,7 +350,10 @@ object MessageController {
                 }
             }
 
-            val allExistingMessages = (existingThreads.flatMap { it.messages } + message).toSet()
+            val allExistingMessages = mutableSetOf<Message>().apply {
+                existingThreads.forEach { addAll(it.messages) }
+                add(message)
+            }
             existingThreads.forEach { thread ->
                 scope.ensureActive()
                 allExistingMessages.forEach { existingMessage ->
