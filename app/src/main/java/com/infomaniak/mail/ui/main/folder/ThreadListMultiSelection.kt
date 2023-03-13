@@ -26,6 +26,7 @@ import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.thread.SelectedThread
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
@@ -174,6 +175,13 @@ class ThreadListMultiSelection {
             changeText(0, if (shouldMultiselectRead) R.string.actionShortMarkAsRead else R.string.actionShortMarkAsUnread)
 
             changeIcon(2, if (shouldMultiselectFavorite) R.drawable.ic_star else R.drawable.ic_unstar)
+
+            val isSelectionEmpty = selectedThreads.isEmpty()
+            val isInsideArchive = mainViewModel.isCurrentFolderRole(FolderRole.ARCHIVE)
+            for (index in 0 until getButtonCount()) {
+                val shouldDisable = isSelectionEmpty || (isInsideArchive && index == 1)
+                if (shouldDisable) disable(index) else enable(index)
+            }
         }
     }
 
