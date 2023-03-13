@@ -50,11 +50,8 @@ import com.infomaniak.mail.utils.NotificationUtils.cancelNotification
 import com.infomaniak.mail.utils.SharedViewModelUtils.refreshFolders
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import io.realm.kotlin.ext.copyFromRealm
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import com.infomaniak.lib.core.R as RCore
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -317,15 +314,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private fun refreshThreads(
         mailbox: Mailbox? = currentMailbox.value,
         folderId: String? = currentFolderId,
-    ) = viewModelScope.launch(viewModelScope.handlerIO) {
+    ) {
 
-        if (mailbox == null || folderId == null) return@launch
+        if (mailbox == null || folderId == null) return
+        val folder = FolderController.getFolder(folderId) ?: return
 
-        FolderController.getFolder(folderId)?.let { folder ->
-            isDownloadingChanges.postValue(true)
+        isDownloadingChanges.postValue(true)
+
+        viewModelScope.launch(viewModelScope.handlerIO) {
             MessageController.fetchCurrentFolderMessages(mailbox, folder)
-            isDownloadingChanges.postValue(false)
         }
+
+        isDownloadingChanges.postValue(false)
     }
 
     //region Delete
