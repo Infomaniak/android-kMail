@@ -187,7 +187,7 @@
                 android:layout_gravity="center_vertical"
                 android:visibility="gone"
                 app:description="@string/searchNoResultsDescription"
-                app:icon="@drawable/ic_search"
+                app:icon="@drawable/ic_empty_state_search"
                 app:title="@string/searchNoResultsTitle"
                 tools:visibility="visible" />
 
