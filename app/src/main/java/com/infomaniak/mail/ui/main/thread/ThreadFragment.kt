@@ -156,6 +156,8 @@ class ThreadFragment : Fragment() {
             mainViewModel.toggleThreadFavoriteStatus(threadUid)
         }
 
+        if (mainViewModel.isCurrentFolderRole(FolderRole.ARCHIVE)) quickActionBar.disable(2) else quickActionBar.enable(2)
+
         quickActionBar.setOnItemClickListener { menuId ->
             when (menuId) {
                 R.id.quickActionReply -> {

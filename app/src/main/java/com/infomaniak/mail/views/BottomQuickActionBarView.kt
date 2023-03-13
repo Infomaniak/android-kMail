@@ -76,4 +76,12 @@ class BottomQuickActionBarView @JvmOverloads constructor(
     fun changeText(index: Int, @StringRes text: Int) {
         buttons[index].setText(text)
     }
+
+    fun enable(index: Int) {
+        buttons[index].isEnabled = true
+    }
+
+    fun disable(index: Int) {
+        buttons[index].isEnabled = false
+    }
 }
