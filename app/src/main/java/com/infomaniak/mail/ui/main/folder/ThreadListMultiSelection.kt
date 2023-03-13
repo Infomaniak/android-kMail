@@ -21,8 +21,8 @@ import android.transition.AutoTransition
 import android.transition.TransitionManager
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import com.infomaniak.lib.core.utils.safeNavigate
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
+import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity

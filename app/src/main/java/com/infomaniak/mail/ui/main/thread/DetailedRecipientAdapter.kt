@@ -37,7 +37,7 @@ class DetailedRecipientAdapter(
         return DetailedRecipientViewHolder(ItemDetailedContactBinding.inflate(LayoutInflater.from(parent.context), parent, false))
     }
 
-    override fun onBindViewHolder(holder: DetailedRecipientViewHolder, position: Int): Unit = with(holder.binding) {
+    override fun onBindViewHolder(holder: DetailedRecipientViewHolder, position: Int) = with(holder.binding) {
         val recipient = recipients[position]
 
         fillInUserNameAndEmail(recipient, name, emailAddress)

@@ -122,7 +122,7 @@ class ThreadListAdapter(
         }
     }
 
-    override fun onBindViewHolder(item: Any, viewHolder: ThreadViewHolder, position: Int): Unit = with(viewHolder.binding) {
+    override fun onBindViewHolder(item: Any, viewHolder: ThreadViewHolder, position: Int) = with(viewHolder.binding) {
         when (getItemViewType(position)) {
             DisplayType.THREAD.layout -> (this as CardviewThreadItemBinding).displayThread(item as Thread)
             DisplayType.DATE_SEPARATOR.layout -> (this as ItemThreadDateSeparatorBinding).displayDateSeparator(item as String)
@@ -343,7 +343,7 @@ class ThreadListAdapter(
         canvasUnder: Canvas?,
         canvasOver: Canvas?,
         isUserControlled: Boolean,
-    ): Unit = with(viewHolder.binding) {
+    ) = with(viewHolder.binding) {
         val dx = abs(offsetX)
         val progress = dx.toFloat() / root.width
 

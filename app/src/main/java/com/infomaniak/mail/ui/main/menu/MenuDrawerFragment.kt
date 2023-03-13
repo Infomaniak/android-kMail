@@ -256,7 +256,7 @@ class MenuDrawerFragment : MenuFoldersFragment() {
         closeDropdowns()
     }
 
-    fun closeDropdowns(): Unit = with(binding) {
+    fun closeDropdowns() = with(binding) {
         addressesList.isGone = true
         mailboxExpandButton.rotation = ResourcesCompat.getFloat(resources, R.dimen.angleViewNotRotated)
         customFoldersLayout.isVisible = true

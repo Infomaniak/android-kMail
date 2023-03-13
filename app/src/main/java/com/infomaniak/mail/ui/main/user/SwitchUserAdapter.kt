@@ -52,7 +52,7 @@ class SwitchUserAdapter(
         }
     }
 
-    override fun onBindViewHolder(holder: SwitchUserAccountViewHolder, position: Int): Unit = with(holder.binding) {
+    override fun onBindViewHolder(holder: SwitchUserAccountViewHolder, position: Int) = with(holder.binding) {
         val account = accounts[position]
 
         userAvatar.loadAvatar(account)

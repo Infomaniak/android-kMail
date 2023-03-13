@@ -142,7 +142,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         evaluateJavascript(removeBackgroundStyleScript, null)
     }
 
-    override fun onBindViewHolder(holder: ThreadViewHolder, position: Int): Unit = with(holder) {
+    override fun onBindViewHolder(holder: ThreadViewHolder, position: Int) = with(holder) {
         val message = messages[position]
 
         initMapForNewMessage(message, position)

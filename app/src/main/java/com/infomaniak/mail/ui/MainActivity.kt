@@ -26,7 +26,6 @@ import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.annotation.FloatRange
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.drawerlayout.widget.DrawerLayout.*
 import androidx.lifecycle.distinctUntilChanged
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
@@ -85,8 +84,8 @@ class MainActivity : ThemedActivity() {
 
         override fun onDrawerStateChanged(newState: Int) {
             when (newState) {
-                STATE_DRAGGING -> hasDragged = true
-                STATE_IDLE -> hasDragged = false
+                DrawerLayout.STATE_DRAGGING -> hasDragged = true
+                DrawerLayout.STATE_IDLE -> hasDragged = false
                 else -> Unit
             }
         }
@@ -245,7 +244,8 @@ class MainActivity : ThemedActivity() {
     }
 
     fun setDrawerLockMode(isUnlocked: Boolean) {
-        binding.drawerLayout.setDrawerLockMode(if (isUnlocked) LOCK_MODE_UNLOCKED else LOCK_MODE_LOCKED_CLOSED)
+        val drawerLockMode = if (isUnlocked) DrawerLayout.LOCK_MODE_UNLOCKED else DrawerLayout.LOCK_MODE_LOCKED_CLOSED
+        binding.drawerLayout.setDrawerLockMode(drawerLockMode)
     }
 
     private fun colorSystemBarsWithMenuDrawer(@FloatRange(0.0, 1.0) slideOffset: Float = FULLY_SLID) {

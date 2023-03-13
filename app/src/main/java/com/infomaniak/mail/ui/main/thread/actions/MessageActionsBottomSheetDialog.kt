@@ -77,7 +77,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 //endregion
 
                 //region Actions
-                override fun onArchive(): Unit = with(mainViewModel) {
+                override fun onArchive() = with(mainViewModel) {
                     trackBottomSheetMessageActionsEvent("archive", message.folder.role == FolderRole.ARCHIVE)
                     archiveMessage(threadUid, message)
                 }

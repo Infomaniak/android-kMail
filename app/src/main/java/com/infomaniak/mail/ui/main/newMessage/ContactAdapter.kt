@@ -57,7 +57,7 @@ class ContactAdapter(
         return if (position < contacts.count()) KNOWN_CONTACT.id else UNKNOWN_CONTACT.id
     }
 
-    override fun onBindViewHolder(holder: ContactViewHolder, position: Int): Unit = with(holder.binding) {
+    override fun onBindViewHolder(holder: ContactViewHolder, position: Int) = with(holder.binding) {
         if (getItemViewType(position) == KNOWN_CONTACT.id) bindContact(position) else bindAddNewUser()
     }
 

@@ -125,7 +125,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         observerDraftsActionsCompletedWorks()
     }
 
-    override fun onResume(): Unit = with(binding) {
+    override fun onResume() = with(binding) {
         super.onResume()
 
         unreadCountChip.apply { isCloseIconVisible = isChecked } // TODO: Do we need this? If yes, do we need it HERE?

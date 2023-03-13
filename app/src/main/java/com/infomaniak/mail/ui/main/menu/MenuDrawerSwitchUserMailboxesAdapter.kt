@@ -38,7 +38,7 @@ class MenuDrawerSwitchUserMailboxesAdapter(
     override fun onBindViewHolder(
         holder: MenuDrawerSwitchUserMailboxViewHolder,
         position: Int,
-    ): Unit = with(holder.binding.emailAddress) {
+    ) = with(holder.binding.emailAddress) {
         val mailbox = mailboxes[position]
         text = mailbox.email
         badge = mailbox.inboxUnreadCount

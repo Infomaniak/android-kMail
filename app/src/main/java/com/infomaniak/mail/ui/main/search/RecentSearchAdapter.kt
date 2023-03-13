@@ -32,7 +32,7 @@ class RecentSearchAdapter(
         return RecentSearchViewHolder(ItemRecentSearchBinding.inflate(LayoutInflater.from(parent.context), parent, false))
     }
 
-    override fun onBindViewHolder(holder: RecentSearchViewHolder, position: Int): Unit = with(holder.binding) {
+    override fun onBindViewHolder(holder: RecentSearchViewHolder, position: Int) = with(holder.binding) {
         val searchQuery = searchQueries[position]
         searchQueryButton.text = searchQuery
         root.setOnClickListener { onSearchQueryClicked(searchQuery) }

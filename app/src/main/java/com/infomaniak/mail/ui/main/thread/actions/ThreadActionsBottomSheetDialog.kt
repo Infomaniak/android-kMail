@@ -79,7 +79,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 //endregion
 
                 //region Actions
-                override fun onArchive(): Unit = with(mainViewModel) {
+                override fun onArchive() = with(mainViewModel) {
                     trackBottomSheetThreadActionsEvent("archive", isCurrentFolderRole(FolderRole.ARCHIVE))
                     archiveThread(threadUid)
                 }

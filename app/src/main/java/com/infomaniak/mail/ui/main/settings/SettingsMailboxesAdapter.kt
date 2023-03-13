@@ -35,7 +35,7 @@ class SettingsMailboxesAdapter(
         return SettingsMailboxViewHolder(ItemSettingsMailboxBinding.inflate(LayoutInflater.from(parent.context), parent, false))
     }
 
-    override fun onBindViewHolder(holder: SettingsMailboxViewHolder, position: Int): Unit = with(holder.binding.root) {
+    override fun onBindViewHolder(holder: SettingsMailboxViewHolder, position: Int) = with(holder.binding.root) {
         val mailbox = mailboxes[position]
         setTitle(mailbox.email)
         setOnClickListener { onMailboxSelected(mailbox) }
