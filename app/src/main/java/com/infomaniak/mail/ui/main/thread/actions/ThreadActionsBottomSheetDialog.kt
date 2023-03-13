@@ -94,7 +94,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     trackBottomSheetThreadActionsEvent("move")
                     animatedNavigation(
                         resId = R.id.moveFragment,
-                        args = MoveFragmentArgs(threadUid).toBundle(),
+                        args = MoveFragmentArgs(arrayOf(threadUid)).toBundle(),
                         currentClassName = currentClassName,
                     )
                 }

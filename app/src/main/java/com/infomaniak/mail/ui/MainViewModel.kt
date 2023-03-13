@@ -422,22 +422,23 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //region Move
     fun moveTo(
         destinationFolderId: String,
-        threadUid: String,
+        threadsUids: Array<String> = emptyArray(),
         messageUid: String? = null,
     ) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = currentMailbox.value!!
         val destinationFolder = FolderController.getFolder(destinationFolderId)!!
-        val thread = ThreadController.getThread(threadUid)!!
+        val threads = threadsUids.mapNotNull(ThreadController::getThread)
         val message = messageUid?.let { MessageController.getMessage(it)!! }
-        val messages = getMessagesToMove(listOf(thread), message)
 
-        val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolderId)
+        val messages = getMessagesToMove(threads, message)
+
+        val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
 
         if (apiResponse.isSuccess()) {
-            refreshFolders(mailbox, messages.getFoldersIds(exception = destinationFolderId), destinationFolderId)
+            refreshFolders(mailbox, messages.getFoldersIds(exception = destinationFolder.id), destinationFolder.id)
         }
 
-        showMoveSnackbar(listOf(thread), message, messages, apiResponse, destinationFolder)
+        showMoveSnackbar(threads, message, messages, apiResponse, destinationFolder)
     }
 
     private fun showMoveSnackbar(
@@ -711,9 +712,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun createNewFolder(name: String) = viewModelScope.launch(Dispatchers.IO) { createNewFolderSync(name) }
 
-    fun moveToNewFolder(name: String, threadUid: String, messageUid: String?) = viewModelScope.launch(Dispatchers.IO) {
+    fun moveToNewFolder(name: String, threadsUids: Array<String>, messageUid: String?) = viewModelScope.launch(Dispatchers.IO) {
         val newFolderId = createNewFolderSync(name) ?: return@launch
-        moveTo(newFolderId, threadUid, messageUid)
+        moveTo(newFolderId, threadsUids, messageUid)
         isNewFolderCreated.postValue(true)
     }
     //endregion

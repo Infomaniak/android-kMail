@@ -247,8 +247,8 @@
         android:label="MoveFragment"
         tools:layout="@layout/fragment_move">
         <argument
-            android:name="threadUid"
-            app:argType="string" />
+            android:name="threadsUids"
+            app:argType="string[]" />
         <argument
             android:name="messageUid"
             android:defaultValue="@null"
@@ -478,6 +478,10 @@
         android:id="@+id/multiSelectBottomSheetDialog"
         android:name="com.infomaniak.mail.ui.main.thread.actions.MultiSelectBottomSheetDialog"
         android:label="MultiSelectBottomSheetDialog"
-        tools:layout="@layout/bottom_sheet_multi_select" />
+        tools:layout="@layout/bottom_sheet_multi_select" >
+        <action
+            android:id="@+id/action_multiSelectBottomSheetDialog_to_moveFragment"
+            app:destination="@id/moveFragment" />
+    </dialog>
 
 </navigation>
