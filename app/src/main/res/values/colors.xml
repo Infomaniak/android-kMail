@@ -76,7 +76,7 @@
     <color name="backgroundColor">@color/background_color_light</color>
     <color name="backgroundColorSecondary">@color/white</color>
     <color name="backgroundColorTertiary">@color/white</color>
-    <color name="backgroundHeaderColor">@color/background</color>
+    <color name="backgroundHeaderColor">@color/header_color_light</color>
     <color name="backgroundLoginWebviewColor">@color/background</color>
     <color name="backgroundOnBoardingColor">@color/white</color>
     <color name="backgroundSnackbarColor">@color/orca</color>
