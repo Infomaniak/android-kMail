@@ -30,6 +30,7 @@
         android:layout_marginVertical="2dp"
         android:layout_marginStart="@dimen/marginStandardVerySmall"
         app:cardCornerRadius="@null"
+        app:cardPreventCornerOverlap="false"
         app:shapeAppearanceOverlay="@style/MenuDrawerItemShapeAppearance">
 
         <!-- This needs to be passed as the handle used for dragging cards around in the DragDropSwipeRecyclerview library -->
@@ -43,7 +44,6 @@
             android:id="@+id/threadCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="@dimen/marginStandardVerySmall"
             android:paddingEnd="@dimen/marginStandardMedium"
             tools:layout_marginBottom="@dimen/marginStandardSmall"
             tools:layout_marginTop="@dimen/marginStandardSmall">
@@ -52,6 +52,7 @@
                 android:id="@+id/newMailBullet"
                 android:layout_width="8dp"
                 android:layout_height="8dp"
+                android:layout_marginStart="@dimen/marginStandardVerySmall"
                 android:layout_marginEnd="@dimen/marginStandardSmall"
                 android:contentDescription="@string/contentDescriptionIconNewMail"
                 android:src="?android:attr/colorPrimary"
@@ -66,7 +67,7 @@
                 android:id="@+id/avatarFrameLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/marginStandardVerySmall"
+                android:layout_marginStart="@dimen/marginStandardSmall"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@id/newMailBullet"
                 app:layout_constraintTop_toTopOf="parent">
@@ -75,6 +76,7 @@
                     android:id="@+id/expeditorAvatar"
                     android:layout_width="@dimen/userAvatarSizeLarge"
                     android:layout_height="@dimen/userAvatarSizeLarge"
+                    android:layout_marginEnd="@dimen/marginStandardSmall"
                     android:visibility="gone"
                     tools:src="@tools:sample/avatars"
                     tools:visibility="visible" />
@@ -83,6 +85,7 @@
                     android:id="@+id/checkMarkLayout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/marginStandardSmall"
                     android:visibility="gone">
 
                     <androidx.constraintlayout.widget.ConstraintLayout
@@ -136,11 +139,9 @@
                 android:id="@+id/textContent"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/alternativeMargin"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/avatarFrameLayout"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_goneMarginStart="@dimen/marginStandardSmall">
+                app:layout_constraintTop_toTopOf="parent">
 
                 <TextView
                     android:id="@+id/draftPrefix"
