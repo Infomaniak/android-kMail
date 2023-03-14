@@ -22,6 +22,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.NavDestination
 import com.infomaniak.lib.core.MatomoCore
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
+import com.infomaniak.lib.core.utils.capitalizeFirstChar
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import org.matomo.sdk.Tracker
@@ -31,12 +32,18 @@ object MatomoMail : MatomoCore {
     override val Context.tracker: Tracker get() = (this as ApplicationMain).matomoTracker
     override val siteId = 9
 
+    // region TrackerCategory
+    private const val THREAD_ACTION_CATEGORY = "threadActions"
+    private const val THREAD_BOTTOM_SHEET_ACTION_CATEGORY = "bottomSheetThreadActions"
+    //endregion
+
     //region Tracker Name
+    const val OPEN_ACTION_BOTTOM_SHEET = "openBottomSheet"
     const val OPEN_FROM_DRAFT_NAME = "openFromDraft"
     const val ACTION_REPLY_NAME = "reply"
     const val ACTION_REPLY_ALL_NAME = "replyAll"
     const val ACTION_FORWARD_NAME = "forward"
-    const val ACTION_TRASH_NAME = "trash"
+    const val ACTION_DELETE_NAME = "delete"
     const val ACTION_ARCHIVE_NAME = "archive"
     const val ACTION_MARK_AS_SEEN_NAME = "markAsSeen"
     const val ACTION_MOVE_NAME = "move"
@@ -73,11 +80,19 @@ object MatomoMail : MatomoCore {
     }
 
     fun Fragment.trackBottomSheetThreadActionsEvent(name: String, value: Boolean? = null) {
-        trackEvent(category = "bottomSheetThreadActions", name = name, value = value?.toMailActionValue())
+        trackEvent(category = THREAD_BOTTOM_SHEET_ACTION_CATEGORY, name = name, value = value?.toMailActionValue())
+    }
+
+    private fun Fragment.trackBottomSheetMultiSelectThreadActionsEvent(name: String, value: Int) {
+        trackEvent(category = THREAD_BOTTOM_SHEET_ACTION_CATEGORY, name = name, value = value.toFloat())
     }
 
     fun Fragment.trackThreadActionsEvent(name: String, value: Boolean? = null) {
-        trackEvent("threadActions", name, value = value?.toMailActionValue())
+        trackEvent(category = THREAD_ACTION_CATEGORY, name = name, value = value?.toMailActionValue())
+    }
+
+    private fun Fragment.trackMultiSelectThreadActionsEvent(name: String, value: Int) {
+        trackEvent(category = THREAD_ACTION_CATEGORY, name = name, value = value.toFloat())
     }
 
     fun Fragment.trackMessageActionsEvent(name: String) {
@@ -116,6 +131,21 @@ object MatomoMail : MatomoCore {
         trackEvent("createFolder", name)
     }
 
-    // We need to invert this logical value to keep a coherent value for analytics
+    fun Context.trackMultiSelectionEvent(name: String, action: TrackerAction = TrackerAction.CLICK) {
+        trackEvent("multiSelection", name, action)
+    }
+
+    fun Fragment.trackMultiSelectActionEvent(name: String, value: Int, isFromBottomSheet: Boolean = false) {
+        val trackerName = "${if (value == 1) "bulkSingle" else "bulk"}${name.capitalizeFirstChar()}"
+
+        if (isFromBottomSheet) {
+            trackBottomSheetMultiSelectThreadActionsEvent(trackerName, value)
+        } else {
+            trackMultiSelectThreadActionsEvent(trackerName, value)
+        }
+    }
+
+    // We need to invert this logical value to keep a coherent value for analytics because actions
+    // conditions are inverted (ex: if the condition is `message.isSpam`, then we want to unspam)
     private fun Boolean.toMailActionValue() = (!this).toFloat()
 }

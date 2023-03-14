@@ -50,6 +50,7 @@ import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.utils.setPaddingRelative
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
+import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -218,7 +219,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             (activity as? MainActivity)?.binding?.drawerLayout?.open()
         }
 
-        cancel.setOnClickListener { mainViewModel.isMultiSelectOn = false }
+        cancel.setOnClickListener {
+            context.trackMultiSelectionEvent("cancel")
+            mainViewModel.isMultiSelectOn = false
+        }
         selectAll.setOnClickListener {
             mainViewModel.selectOrUnselectAll()
             threadListAdapter.updateSelection()

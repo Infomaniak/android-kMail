@@ -44,10 +44,11 @@ import com.infomaniak.lib.core.utils.hasSupportedApplications
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_DELETE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_FAVORITE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_FORWARD_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_REPLY_NAME
-import com.infomaniak.mail.MatomoMail.ACTION_TRASH_NAME
+import com.infomaniak.mail.MatomoMail.OPEN_ACTION_BOTTOM_SHEET
 import com.infomaniak.mail.MatomoMail.OPEN_FROM_DRAFT_NAME
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
 import com.infomaniak.mail.MatomoMail.trackMessageActionsEvent
@@ -184,11 +185,11 @@ class ThreadFragment : Fragment() {
                     archiveThread(threadUid)
                 }
                 R.id.quickActionDelete -> {
-                    trackThreadActionsEvent(ACTION_TRASH_NAME)
+                    trackThreadActionsEvent(ACTION_DELETE_NAME)
                     mainViewModel.deleteThread(threadUid)
                 }
                 R.id.quickActionMenu -> {
-                    trackThreadActionsEvent("openBottomSheet")
+                    trackThreadActionsEvent(OPEN_ACTION_BOTTOM_SHEET)
                     threadViewModel.clickOnQuickActionBar(threadUid, menuId)
                 }
             }
