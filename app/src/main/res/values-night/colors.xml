@@ -45,6 +45,7 @@
     <color name="backgroundSnackbarColor">@color/rabbit</color>
     <color name="elevatedBackground">@color/bat</color>
     <color name="backgroundDisabledPrimaryButton">@color/elephant</color>
+    <color name="backgroundWaveSystemColor">@color/bat</color>
 
     <!-- Texts -->
     <color name="primaryTextColor">@color/rabbit</color>

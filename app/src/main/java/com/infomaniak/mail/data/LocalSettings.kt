@@ -132,6 +132,14 @@ class LocalSettings private constructor(context: Context) {
             R.color.blueBoardingSecondaryBackground,
             R.color.blueMailRipple,
             1,
+        ),
+        SYSTEM(
+            R.string.settingsOptionSystemTheme,
+            -1,
+            R.color.secondaryTextColor,
+            R.color.backgroundWaveSystemColor,
+            R.color.backgroundWaveSystemColor,
+            2,
         );
 
         fun getPrimary(context: Context): Int = context.getColor(primary)

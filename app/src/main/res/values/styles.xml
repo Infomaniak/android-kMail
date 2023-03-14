@@ -456,7 +456,7 @@
         <item name="materialThemeOverlay">@style/FloatingActionButtonThemeOverlay</item>
     </style>
 
-    <style name="FloatingActionButtonThemeOverlay" parent="">
+    <style name="FloatingActionButtonThemeOverlay">
         <item name="colorContainer">?android:attr/colorPrimary</item>
         <item name="colorOnContainer">?attr/colorOnPrimary</item>
     </style>

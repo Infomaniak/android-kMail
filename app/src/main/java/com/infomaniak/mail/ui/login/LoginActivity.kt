@@ -70,7 +70,7 @@ import com.infomaniak.lib.core.R as RCore
 
 class LoginActivity : AppCompatActivity() {
 
-    private val binding by lazy { ActivityLoginBinding.inflate(layoutInflater) }
+    val binding by lazy { ActivityLoginBinding.inflate(layoutInflater) }
     private val navigationArgs by lazy { LoginActivityArgs.fromBundle(intent.extras ?: bundleOf()) }
     private val introViewModel: IntroViewModel by viewModels()
 
@@ -153,8 +153,8 @@ class LoginActivity : AppCompatActivity() {
             )
         }
 
-        introViewModel.currentAccentColor.observe(this@LoginActivity) { accentColor ->
-            updateUi(accentColor)
+        introViewModel.currentAccentColor.observe(this@LoginActivity) { (oldAccentColor, newAccentColor) ->
+            updateUi(oldAccentColor, newAccentColor)
         }
 
         trackScreen()
@@ -180,9 +180,9 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateUi(accentColor: AccentColor) = with(binding) {
-        animatePrimaryColorElements(accentColor)
-        animateSecondaryColorElements(accentColor)
+    private fun updateUi(oldAccentColor: AccentColor, newAccentColor: AccentColor) = with(binding) {
+        animatePrimaryColorElements(oldAccentColor, newAccentColor)
+        animateSecondaryColorElements(oldAccentColor, newAccentColor)
     }
 
     private fun authenticateUser(authCode: String) = lifecycleScope.launch(Dispatchers.IO) {
@@ -228,10 +228,10 @@ class LoginActivity : AppCompatActivity() {
         signInButton.isEnabled = true
     }
 
-    private fun animatePrimaryColorElements(accentColor: AccentColor) = with(binding) {
-        val newPrimary = accentColor.getPrimary(this@LoginActivity)
-        val oldPrimary = dotsIndicator.selectedDotColor
-        val ripple = accentColor.getRipple(this@LoginActivity)
+    private fun animatePrimaryColorElements(oldAccentColor: AccentColor, newAccentColor: AccentColor) = with(binding) {
+        val newPrimary = newAccentColor.getPrimary(this@LoginActivity)
+        val oldPrimary = oldAccentColor.getPrimary(this@LoginActivity)
+        val ripple = newAccentColor.getRipple(this@LoginActivity)
 
         animateColorChange(oldPrimary, newPrimary) { color ->
             val singleColorStateList = ColorStateList.valueOf(color)
@@ -243,9 +243,9 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun animateSecondaryColorElements(accentColor: AccentColor) {
-        val newSecondaryBackground = accentColor.getSecondaryBackground(this@LoginActivity)
-        val oldSecondaryBackground = window.statusBarColor
+    private fun animateSecondaryColorElements(oldAccentColor: AccentColor, newAccentColor: AccentColor) {
+        val newSecondaryBackground = newAccentColor.getSecondaryBackground(this@LoginActivity)
+        val oldSecondaryBackground = oldAccentColor.getSecondaryBackground(this@LoginActivity)
         animateColorChange(oldSecondaryBackground, newSecondaryBackground) { color ->
             window.statusBarColor = color
         }
