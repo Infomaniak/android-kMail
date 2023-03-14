@@ -54,7 +54,7 @@ object MatomoMail : MatomoCore {
     const val ACTION_POSTPONE_NAME = "postpone"
     //endregion
 
-    @SuppressLint("RestrictedApi")
+    @SuppressLint("RestrictedApi") // This `SuppressLint` is there so the CI can build
     fun Context.trackDestination(navDestination: NavDestination) = with(navDestination) {
         trackScreen(displayName.substringAfter("${BuildConfig.APPLICATION_ID}:id"), label.toString())
     }
