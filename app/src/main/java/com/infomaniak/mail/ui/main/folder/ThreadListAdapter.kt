@@ -449,7 +449,9 @@ class ThreadListAdapter(
 
             val formattedList = mutableListOf<Any>()
 
-            if (folderRole == FolderRole.TRASH || folderRole == FolderRole.SPAM) formattedList.add(folderRole)
+            if ((folderRole == FolderRole.TRASH || folderRole == FolderRole.SPAM) && threads.isNotEmpty()) {
+                formattedList.add(folderRole)
+            }
 
             if (threadDensity == COMPACT) return formattedList.apply { addAll(threads) }
 

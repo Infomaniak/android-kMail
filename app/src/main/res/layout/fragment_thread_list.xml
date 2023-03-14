@@ -201,16 +201,18 @@
                         android:clipToPadding="false"
                         android:paddingBottom="@dimen/recyclerViewPaddingBottom"
                         app:behind_swiped_item_icon_margin="@dimen/marginStandard"
-                        tools:listitem="@layout/cardview_thread_item" />
+                        tools:listitem="@layout/cardview_thread_item"
+                        tools:visibility="gone" />
 
                     <com.infomaniak.mail.ui.main.EmptyStateView
                         android:id="@+id/emptyState"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:visibility="gone"
-                        app:description="@string/noEmailDescription"
-                        app:icon="@drawable/ic_empty_folder"
-                        app:title="@string/noEmailTitle" />
+                        tools:description="@string/noEmailDescription"
+                        tools:icon="@drawable/ic_empty_folder"
+                        tools:title="@string/noEmailTitle"
+                        tools:visibility="visible" />
 
                 </FrameLayout>
             </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

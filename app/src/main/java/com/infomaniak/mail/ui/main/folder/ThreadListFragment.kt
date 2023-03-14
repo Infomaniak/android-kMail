@@ -118,6 +118,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             localSettings = localSettings,
         )
 
+        observeNetworkStatus()
         observeCurrentThreads()
         observeDownloadState()
         observeCurrentFolder()
@@ -193,11 +194,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             disableDragDirection(DirectionFlag.RIGHT)
             disableDragDirection(DirectionFlag.LEFT)
             addStickyDateDecoration(threadListAdapter, localSettings.threadDensity)
-        }
-
-        mainViewModel.isInternetAvailable.observe(viewLifecycleOwner) { isAvailable ->
-            TransitionManager.beginDelayedTransition(binding.root)
-            binding.noNetwork.isGone = isAvailable
         }
 
         threadListAdapter.apply {
@@ -357,6 +353,14 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
+    private fun observeNetworkStatus() {
+        mainViewModel.isInternetAvailable.observe(viewLifecycleOwner) { isAvailable ->
+            TransitionManager.beginDelayedTransition(binding.root)
+            binding.noNetwork.isGone = isAvailable
+            updateThreadsVisibility()
+        }
+    }
+
     private fun observeCurrentThreads() = with(threadListViewModel) {
         mainViewModel.currentThreadsLiveToObserve.bindResultsChangeToAdapter(viewLifecycleOwner, threadListAdapter).apply {
             recyclerView = binding.threadsList
@@ -460,44 +464,42 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         binding.toolbar.title = folderName
     }
 
-    private fun updateThreadsVisibility() = with(threadListViewModel) {
-        if (currentFolderCursor != null && currentThreadsCount == 0) {
-            displayNoEmailView()
-        } else {
-            displayThreadsView()
+    private fun updateThreadsVisibility() = with(mainViewModel) {
+
+        val thereAreThreads = (threadListViewModel.currentThreadsCount ?: 0) > 0
+        val cursorIsNull = threadListViewModel.currentFolderCursor == null
+        val isNetworkConnected = isInternetAvailable.value == true
+        val isBooting = threadListViewModel.currentThreadsCount == null && !cursorIsNull && isNetworkConnected
+
+        when {
+            isBooting || thereAreThreads || (cursorIsNull && isNetworkConnected) -> {
+                binding.emptyState.isGone = true
+            }
+            cursorIsNull -> {
+                setEmptyState(R.drawable.ic_no_network_big, "No signal", "No signal description")
+            }
+            isCurrentFolderRole(FolderRole.INBOX) -> {
+                setEmptyState(R.drawable.ic_drawer_inbox, "Empty inbox", "Empty inbox description")
+            }
+            isCurrentFolderRole(FolderRole.TRASH) -> {
+                setEmptyState(R.drawable.ic_empty_trash, "Empty trash", "Empty trash description")
+            }
+            else -> {
+                setEmptyState(R.drawable.ic_empty_folder, "Empty folder", "Empty folder description")
+            }
         }
     }
 
-    private fun displayNoEmailView() = with(binding) {
+    private fun setEmptyState(drawableId: Int, titleText: String, descText: String) = with(binding) {
 
-        threadsList.isGone = true
+        threadListAdapter.updateList(emptyList())
 
         emptyState.apply {
-            val noSignal = false
-            when {
-                noSignal -> {
-                    illustration = getDrawable(context, R.drawable.ic_no_network_big)
-                    title = "No signal"
-                    description = "No signal description"
-                }
-                mainViewModel.isCurrentFolderRole(FolderRole.TRASH) -> {
-                    illustration = getDrawable(context, R.drawable.ic_empty_trash)
-                    title = "Empty trash"
-                    description = "Empty trash description"
-                }
-                else -> {
-                    illustration = getDrawable(context, R.drawable.ic_empty_folder)
-                    title = "Empty folder"
-                    description = "Empty folder description"
-                }
-            }
+            illustration = getDrawable(context, drawableId)
+            title = titleText
+            description = descText
             isVisible = true
         }
-    }
-
-    private fun displayThreadsView() = with(binding) {
-        emptyState.isGone = true
-        threadsList.isVisible = true
     }
 
     private fun firstMessageHasChanged(threads: List<Thread>): Boolean {

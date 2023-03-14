@@ -23,6 +23,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewEmptyStateBinding
@@ -44,13 +45,19 @@ class EmptyStateView @JvmOverloads constructor(
     var title: CharSequence?
         get() = binding.title.text
         set(value) {
-            binding.title.text = value
+            binding.title.apply {
+                isVisible = true
+                text = value
+            }
         }
 
     var description: CharSequence?
         get() = binding.description.text
         set(value) {
-            binding.description.text = value
+            binding.description.apply {
+                isVisible = true
+                text = value
+            }
         }
 
     init {
