@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak kMail - Android
-  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~ Copyright (C) 2022-2023 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -132,6 +132,7 @@
             android:layout_height="match_parent"
             android:layout_marginHorizontal="0dp"
             android:orientation="horizontal"
+            app:tabBackground="@color/elevatedBackground"
             app:tabGravity="fill"
             app:tabIndicator="@drawable/indicator_full_tab"
             app:tabIndicatorAnimationDuration="@integer/loginLayoutAnimationDuration"
@@ -139,9 +140,8 @@
             app:tabIndicatorGravity="stretch"
             app:tabMode="fixed"
             app:tabRippleColor="@android:color/transparent"
-            tools:tabBackground="@color/blueBoardingSecondaryBackground"
-            tools:tabSelectedTextColor="@color/white"
-            tools:tabTextColor="@color/blueMail">
+            app:tabSelectedTextColor="?attr/colorOnPrimary"
+            app:tabTextColor="@color/secondaryTextColor">
 
             <com.google.android.material.tabs.TabItem
                 android:layout_width="0dp"
@@ -154,6 +154,12 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/accentColorBlueTitle" />
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/settingsOptionSystemTheme" />
 
         </com.google.android.material.tabs.TabLayout>
     </com.google.android.material.card.MaterialCardView>

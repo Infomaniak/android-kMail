@@ -19,11 +19,11 @@ package com.infomaniak.mail.ui.login
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -58,12 +58,11 @@ import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoardingColors
 import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoardingPinkColors
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
 import com.infomaniak.mail.utils.changePathColor
-import com.infomaniak.mail.utils.getAttributeColor
+import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.utils.repeatFrame
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import com.google.android.material.R as RMaterial
 
 class IntroFragment : Fragment() {
 
@@ -82,9 +81,17 @@ class IntroFragment : Fragment() {
         when (navigationArgs.position) {
             0 -> introViewModel.currentAccentColor.value?.let { accentColor ->
                 pinkBlueSwitch.isVisible = true
+
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                    pinkBlueTabLayout.removeTab(pinkBlueTabLayout.getTabAt(SYSTEM_TAB_INDEX)!!)
+                } else {
+                    pinkBlueTabLayout.getTabAt(SYSTEM_TAB_INDEX)!!.view.setOnClickListener { notYetImplemented() }
+                }
+
                 val selectedTab = pinkBlueTabLayout.getTabAt(accentColor.introTabIndex)
                 pinkBlueTabLayout.selectTab(selectedTab)
                 setTabSelectedListener()
+
                 iconLayout.apply {
                     setAnimation(R.raw.illu_onboarding_1)
                     repeatFrame(54, 138)
@@ -127,7 +134,9 @@ class IntroFragment : Fragment() {
     private fun setTabSelectedListener() = with(binding) {
         pinkBlueTabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
+                if (tab?.position == SYSTEM_TAB_INDEX) return
                 val newSelectedAccentColor = if (pinkBlueTabLayout.selectedTabPosition == PINK.introTabIndex) PINK else BLUE
+                if (newSelectedAccentColor == localSettings.accentColor) return
                 localSettings.accentColor = newSelectedAccentColor
                 triggerUiUpdateWhenAnimationEnd(newSelectedAccentColor)
             }
@@ -211,40 +220,21 @@ class IntroFragment : Fragment() {
     }
 
     private fun updateAccentColorPickerPageUi(accentColor: AccentColor) {
-        animateTabIndicatorAndTextColor(accentColor, requireContext())
-        animateTabBackgroundColor(accentColor, requireContext())
+        animateTabIndicatorColor(accentColor, requireContext())
     }
 
-    private fun animateTabIndicatorAndTextColor(accentColor: AccentColor, context: Context) = with(binding) {
+    private fun animateTabIndicatorColor(accentColor: AccentColor, context: Context) = with(binding) {
         val isPink = accentColor == PINK
         val newPrimary = accentColor.getPrimary(context)
-        val colorOnPrimary = context.getAttributeColor(RMaterial.attr.colorOnPrimary)
         val oldPrimary = if (isPink) BLUE.getPrimary(context) else PINK.getPrimary(context)
 
         animateColorChange(oldPrimary, newPrimary) { color ->
             pinkBlueTabLayout.setSelectedTabIndicatorColor(color)
         }
-        animateColorChange(newPrimary, oldPrimary) { color ->
-            pinkBlueTabLayout.setTabTextColors(color, colorOnPrimary)
-        }
-    }
-
-    private fun animateTabBackgroundColor(accentColor: AccentColor, context: Context) = with(binding) {
-        val isPink = accentColor == PINK
-        val tabBackgroundRes = if (isPink) R.color.blueBoardingSecondaryBackground else R.color.pinkBoardingSecondaryBackground
-        val tabBackground = ContextCompat.getColor(context, tabBackgroundRes)
-        val oldBackground = if (isPink) {
-            BLUE.getSecondaryBackground(context)
-        } else {
-            PINK.getSecondaryBackground(context)
-        }
-
-        animateColorChange(oldBackground, tabBackground) { color ->
-            pinkBlueTabLayout.setBackgroundColor(color)
-        }
     }
 
     private companion object {
         const val ACCENT_COLOR_PICKER_PAGE = 0
+        const val SYSTEM_TAB_INDEX = 2
     }
 }
