@@ -25,9 +25,9 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
 import android.util.Patterns
-import android.util.TypedValue
 import android.view.View
 import android.webkit.WebView
+import androidx.annotation.AttrRes
 import androidx.annotation.IdRes
 import androidx.annotation.RawRes
 import androidx.annotation.StringRes
@@ -45,6 +45,7 @@ import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.SimpleColorFilter
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
+import com.google.android.material.color.MaterialColors
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.models.ApiResponse
@@ -155,10 +156,8 @@ fun View.toggleChevron(
     animate().rotation(angle).setDuration(duration).start()
 }
 
-fun Context.getAttributeColor(attribute: Int): Int {
-    val typedValue = TypedValue()
-    theme.resolveAttribute(attribute, typedValue, true)
-    return typedValue.data
+fun Context.getAttributeColor(@AttrRes attribute: Int): Int {
+    return MaterialColors.getColor(this, attribute, "Attribute color can't be resolved")
 }
 
 fun Context.formatSubject(subject: String?): String {
