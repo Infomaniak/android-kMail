@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavDestination
@@ -53,6 +54,7 @@ object MatomoMail : MatomoCore {
     const val ACTION_POSTPONE_NAME = "postpone"
     //endregion
 
+    @SuppressLint("RestrictedApi") // This `SuppressLint` is there so the CI can build
     fun Context.trackDestination(navDestination: NavDestination) = with(navDestination) {
         trackScreen(displayName.substringAfter("${BuildConfig.APPLICATION_ID}:id"), label.toString())
     }
