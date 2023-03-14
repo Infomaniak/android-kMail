@@ -28,6 +28,7 @@ import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.MessageBodyUtils
 import com.infomaniak.mail.utils.toDate
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
@@ -115,6 +116,8 @@ object DraftController {
                 val (toList, ccList) = previousMessage.getRecipientsForReplyTo(draftMode == DraftMode.REPLY_ALL)
                 to = toList.toRealmList()
                 cc = ccList.toRealmList()
+
+                body += context.replyQuote(previousMessage)
             }
             DraftMode.FORWARD -> {
                 forwardedUid = previousMessage.uid
@@ -130,9 +133,24 @@ object DraftController {
         }
     }
 
-    private fun Context.forwardQuote(message: Message): String {
+    private fun Context.replyQuote(message: Message): String {
 
-        fun Recipient.forwardedDisplay(): String = "${("$name ").ifBlank { "" }}&lt;$email&gt;"
+        val date = message.date.toDate()
+        val from = message.from.first().quotedDisplay()
+        val messageReplyHeader = getString(R.string.messageReplyHeader, date, from)
+        val previousBody = message.body?.value ?: ""
+
+        return """
+            <div id=\"answerContentMessage\" class="${MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME}" >
+            <div>$messageReplyHeader</div>
+            <blockquote class=\"ws-ng-quote\">
+            $previousBody
+            </blockquote>
+        </div>
+        """.trimIndent()
+    }
+
+    private fun Context.forwardQuote(message: Message): String {
 
         val messageForwardHeader = getString(R.string.messageForwardHeader)
         val fromTitle = getString(R.string.fromTitle)
@@ -143,18 +161,18 @@ object DraftController {
         val previousBody = message.body?.value ?: ""
 
         val ccList = if (message.cc.isNotEmpty()) {
-            "<div>$ccTitle ${message.cc.joinToString { it.forwardedDisplay() }}<br></div>"
+            "<div>$ccTitle ${message.cc.joinToString { it.quotedDisplay() }}<br></div>"
         } else {
             ""
         }
 
         return """
-            <div class="${Draft.INFOMANIAK_QUOTE_HTML_CLASS_NAME}">
+            <div class="${MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME}">
             <div>---------- $messageForwardHeader ---------<br></div>
-            <div>$fromTitle ${message.from.first().forwardedDisplay()}<br></div>
+            <div>$fromTitle ${message.from.first().quotedDisplay()}<br></div>
             <div>$dateTitle ${message.date.toDate()}<br></div>
             <div>$subjectTitle ${message.subject}<br></div>
-            <div>$toTitle ${message.to.joinToString { it.forwardedDisplay() }}<br></div>
+            <div>$toTitle ${message.to.joinToString { it.quotedDisplay() }}<br></div>
             $ccList
             <div><br></div>
             <div><br></div>
@@ -162,6 +180,8 @@ object DraftController {
             </div>
         """.trimIndent()
     }
+
+    private fun Recipient.quotedDisplay(): String = "${("$name ").ifBlank { "" }}&lt;$email&gt;"
 
     private fun formatSubject(draftMode: DraftMode, subject: String): String {
 

@@ -140,7 +140,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     private fun splitSignatureAndQuoteFromBody() {
 
         fun Document.split(divClassName: String, defaultValue: String): Pair<String, String?> {
-            return getElementsByClass(divClassName).lastOrNull()?.let {
+            return getElementsByClass(divClassName).firstOrNull()?.let {
                 it.remove()
                 val first = body().html()
                 val second = if (it.html().isBlank()) null else it.outerHtml()
@@ -148,10 +148,22 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
             } ?: (defaultValue to null)
         }
 
+        fun String.lastIndexOfOrMax(string: String): Int {
+            val index = lastIndexOf(string)
+            return if (index == -1) Int.MAX_VALUE else index
+        }
+
         val doc = Jsoup.parse(draft.body)
 
-        val (bodyWithQuote, signature) = doc.split(Draft.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME, draft.body)
-        val (body, quote) = doc.split(Draft.INFOMANIAK_QUOTE_HTML_CLASS_NAME, bodyWithQuote)
+        val (bodyWithQuote, signature) = doc.split(MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME, draft.body)
+
+        val replyPosition = draft.body.lastIndexOfOrMax(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME)
+        val forwardPosition = draft.body.lastIndexOfOrMax(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME)
+        val (body, quote) = if (replyPosition < forwardPosition) {
+            doc.split(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME, bodyWithQuote)
+        } else {
+            doc.split(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME, bodyWithQuote)
+        }
 
         draft.apply {
             uiBody = body.htmlToText()

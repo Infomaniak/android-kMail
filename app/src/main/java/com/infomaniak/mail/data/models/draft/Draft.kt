@@ -26,6 +26,7 @@ import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.utils.MessageBodyUtils
 import com.infomaniak.mail.utils.toRealmInstant
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.realmListOf
@@ -142,7 +143,7 @@ class Draft : RealmObject {
         })
 
         if (defaultSignature.content.isNotEmpty()) {
-            body += "<div class=\"$INFOMANIAK_SIGNATURE_HTML_CLASS_NAME\">${defaultSignature.content}</div>"
+            body += """<div class="${MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME}">${defaultSignature.content}</div>"""
         }
     }
 
@@ -165,9 +166,6 @@ class Draft : RealmObject {
     }
 
     companion object {
-        const val INFOMANIAK_SIGNATURE_HTML_CLASS_NAME = "editorUserSignature"
-        const val INFOMANIAK_QUOTE_HTML_CLASS_NAME = "forwardContentMessage"
-
         val actionPropertyName get() = Draft::_action.name
         private val draftJson = Json(ApiController.json) { encodeDefaults = true }
     }
