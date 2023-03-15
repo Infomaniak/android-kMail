@@ -63,6 +63,7 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.getInfomaniakLogin
+import com.infomaniak.mail.utils.notYetImplemented
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -70,7 +71,7 @@ import com.infomaniak.lib.core.R as RCore
 
 class LoginActivity : AppCompatActivity() {
 
-    val binding by lazy { ActivityLoginBinding.inflate(layoutInflater) }
+    private val binding by lazy { ActivityLoginBinding.inflate(layoutInflater) }
     private val navigationArgs by lazy { LoginActivityArgs.fromBundle(intent.extras ?: bundleOf()) }
     private val introViewModel: IntroViewModel by viewModels()
 
@@ -259,6 +260,10 @@ class LoginActivity : AppCompatActivity() {
         startActivity(Intent(this@LoginActivity, NoMailboxActivity::class.java))
         connectButton.hideProgress(R.string.buttonLogin)
         signInButton.isEnabled = true
+    }
+
+    fun notYetImplemented() {
+        notYetImplemented(binding.nextButton)
     }
 
     companion object {

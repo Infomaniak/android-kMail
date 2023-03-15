@@ -58,7 +58,6 @@ import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoardingColors
 import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoardingPinkColors
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
 import com.infomaniak.mail.utils.changePathColor
-import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.utils.repeatFrame
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -85,7 +84,7 @@ class IntroFragment : Fragment() {
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
                     pinkBlueTabLayout.removeTab(pinkBlueTabLayout.getTabAt(SYSTEM_TAB_INDEX)!!)
                 } else {
-                    pinkBlueTabLayout.getTabAt(SYSTEM_TAB_INDEX)!!.view.setOnClickListener { notYetImplemented((requireActivity() as LoginActivity).binding.nextButton) }
+                    pinkBlueTabLayout.getTabAt(SYSTEM_TAB_INDEX)!!.view.setOnClickListener { (requireActivity() as LoginActivity).notYetImplemented() }
                 }
 
                 val selectedTab = pinkBlueTabLayout.getTabAt(accentColor.introTabIndex)
