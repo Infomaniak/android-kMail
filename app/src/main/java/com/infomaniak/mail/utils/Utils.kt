@@ -22,4 +22,6 @@ import java.nio.charset.StandardCharsets
 object Utils {
 
     val UTF_8: String = StandardCharsets.UTF_8.name()
+    const val TEXT_HTML: String = "text/html"
+    const val TEXT_PLAIN: String = "text/plain"
 }

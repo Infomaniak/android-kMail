@@ -40,6 +40,8 @@ import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadViewHolder
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.Utils
+import com.infomaniak.mail.utils.Utils.TEXT_HTML
+import com.infomaniak.mail.utils.Utils.TEXT_PLAIN
 import org.jsoup.Jsoup
 import java.util.*
 import com.google.android.material.R as RMaterial
@@ -149,7 +151,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         initMapForNewMessage(message, position)
 
         message.body?.let { body ->
-            val (messageBody, messageQuote) = MessageBodyUtils.splitBodyAndQuote(body.value)
+            val (messageBody, messageQuote) = MessageBodyUtils.splitBodyAndQuote(body)
 
             message.hasQuote = messageQuote != null
 
@@ -431,16 +433,11 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
     }
 
     private companion object {
-        const val TEXT_HTML: String = "text/html"
-        const val TEXT_PLAIN: String = "text/plain"
-
         const val FORMAT_EMAIL_DATE_HOUR = "HH:mm"
         const val FORMAT_EMAIL_DATE_SHORT_DATE = "d MMM"
         const val FORMAT_EMAIL_DATE_LONG_DATE = "d MMM yyyy"
 
         const val DARK_BACKGROUND_STYLE_ID = "dark_background_style"
-
-        const val NO_MARGIN = 0
     }
 
     class ThreadViewHolder(
