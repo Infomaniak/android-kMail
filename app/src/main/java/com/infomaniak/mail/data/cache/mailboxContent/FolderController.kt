@@ -69,7 +69,7 @@ object FolderController {
     //endregion
 
     //region Get data
-    fun getRootsFolders(
+    private fun getRootsFolders(
         exceptionsFoldersIds: List<String> = emptyList(),
         realm: TypedRealm = defaultRealm,
     ): RealmResults<Folder> {

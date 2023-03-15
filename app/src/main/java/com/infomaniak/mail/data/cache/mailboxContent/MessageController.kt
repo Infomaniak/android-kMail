@@ -150,14 +150,14 @@ object MessageController {
     }
 
     fun MutableRealm.deleteMessages(messages: List<Message>) {
-        messages.reversed().forEach { deleteMessage(it.uid, realm = this) }
+        messages.reversed().forEach { message ->
+            deleteMessage(message)
+        }
     }
 
-    private fun deleteMessage(uid: String, realm: MutableRealm) {
-        getMessage(uid, realm)?.let { message ->
-            DraftController.getDraftByMessageUid(message.uid, realm)?.let(realm::delete)
-            realm.delete(message)
-        }
+    private fun MutableRealm.deleteMessage(message: Message) {
+        DraftController.getDraftByMessageUid(message.uid, realm = this)?.let(::delete)
+        delete(message)
     }
 
     fun deleteSearchMessages(realm: MutableRealm) = with(realm) {
@@ -451,7 +451,7 @@ object MessageController {
                 impactedFolders.add(threadFolderId)
             }
 
-            deleteMessage(messageUid, this)
+            deleteMessage(message)
         }
 
         threads.forEach {
