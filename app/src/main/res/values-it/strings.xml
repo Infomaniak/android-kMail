@@ -190,6 +190,7 @@
     <string name="noFolderTitle">You don’t have any folder yet …</string>
     <string name="noMailboxDescription">You do not have an email address associated with your Infomaniak account. To add an address, tap the button below.</string>
     <string name="noMailboxTitle">No email address associated with this account</string>
+    <string name="noNetwork">No signal</string>
     <string name="noSubjectTitle">(no subject)</string>
     <string name="notificationGeneralChannelName">Notifiche generali</string>
     <string name="notificationNewMessagesChannelName">New emails</string>

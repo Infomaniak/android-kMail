@@ -139,7 +139,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:drawablePadding="@dimen/marginStandardSmall"
-                    android:text="@string/emptyStateNetworkTitle"
+                    android:text="@string/noNetwork"
                     android:visibility="gone"
                     app:drawableStartCompat="@drawable/ic_no_network" />
 
