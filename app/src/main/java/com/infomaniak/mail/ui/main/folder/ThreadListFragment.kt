@@ -25,6 +25,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
+import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
@@ -117,6 +120,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             localSettings = localSettings,
         )
 
+        observeNetworkStatus()
         observeCurrentThreads()
         observeDownloadState()
         observeCurrentFolder()
@@ -192,11 +196,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             disableDragDirection(DirectionFlag.RIGHT)
             disableDragDirection(DirectionFlag.LEFT)
             addStickyDateDecoration(threadListAdapter, localSettings.threadDensity)
-        }
-
-        mainViewModel.isInternetAvailable.observe(viewLifecycleOwner) { isAvailable ->
-            TransitionManager.beginDelayedTransition(binding.root)
-            binding.noNetwork.isGone = isAvailable
         }
 
         threadListAdapter.apply {
@@ -356,6 +355,14 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
+    private fun observeNetworkStatus() {
+        mainViewModel.isInternetAvailable.observe(viewLifecycleOwner) { isAvailable ->
+            TransitionManager.beginDelayedTransition(binding.root)
+            binding.noNetwork.isGone = isAvailable
+            updateThreadsVisibility()
+        }
+    }
+
     private fun observeCurrentThreads() = with(threadListViewModel) {
         mainViewModel.currentThreadsLiveToObserve.bindResultsChangeToAdapter(viewLifecycleOwner, threadListAdapter).apply {
             recyclerView = binding.threadsList
@@ -460,21 +467,31 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun updateThreadsVisibility() = with(threadListViewModel) {
-        if (currentFolderCursor != null && currentThreadsCount == 0) {
-            displayNoEmailView()
-        } else {
-            displayThreadsView()
+
+        val thereAreThreads = (currentThreadsCount ?: 0) > 0
+        val cursorIsNull = currentFolderCursor == null
+        val isNetworkConnected = mainViewModel.isInternetAvailable.value == true
+        val isBooting = currentThreadsCount == null && !cursorIsNull && isNetworkConnected
+
+        when {
+            isBooting || thereAreThreads || (cursorIsNull && isNetworkConnected) -> binding.emptyStateView.isGone = true
+            cursorIsNull -> setEmptyState(EmptyState.NETWORK)
+            mainViewModel.isCurrentFolderRole(FolderRole.INBOX) -> setEmptyState(EmptyState.INBOX)
+            mainViewModel.isCurrentFolderRole(FolderRole.TRASH) -> setEmptyState(EmptyState.TRASH)
+            else -> setEmptyState(EmptyState.FOLDER)
         }
     }
 
-    private fun displayNoEmailView() = with(binding) {
-        threadsList.isGone = true
-        emptyState.isVisible = true
-    }
+    private fun setEmptyState(emptyState: EmptyState) = with(binding) {
 
-    private fun displayThreadsView() = with(binding) {
-        emptyState.isGone = true
-        threadsList.isVisible = true
+        threadListAdapter.updateList(emptyList())
+
+        emptyStateView.apply {
+            illustration = getDrawable(context, emptyState.drawableId)
+            title = getString(emptyState.titleId)
+            description = getString(emptyState.descriptionId)
+            isVisible = true
+        }
     }
 
     private fun firstMessageHasChanged(threads: List<Thread>): Boolean {
@@ -496,4 +513,15 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun scrollToTop() = binding.threadsList.layoutManager?.scrollToPosition(0)
+
+    private enum class EmptyState(
+        @DrawableRes val drawableId: Int,
+        @StringRes val titleId: Int,
+        @StringRes val descriptionId: Int,
+    ) {
+        NETWORK(R.drawable.ic_empty_state_network, R.string.emptyStateNetworkTitle, R.string.emptyStateNetworkDescription),
+        INBOX(R.drawable.ic_empty_state_inbox, R.string.emptyStateInboxTitle, R.string.emptyStateInboxDescription),
+        TRASH(R.drawable.ic_empty_state_trash, R.string.emptyStateTrashTitle, R.string.emptyStateTrashDescription),
+        FOLDER(R.drawable.ic_empty_state_folder, R.string.emptyStateFolderTitle, R.string.emptyStateFolderDescription),
+    }
 }

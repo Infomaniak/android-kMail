@@ -478,7 +478,7 @@
         android:id="@+id/multiSelectBottomSheetDialog"
         android:name="com.infomaniak.mail.ui.main.thread.actions.MultiSelectBottomSheetDialog"
         android:label="MultiSelectBottomSheetDialog"
-        tools:layout="@layout/bottom_sheet_multi_select" >
+        tools:layout="@layout/bottom_sheet_multi_select">
         <action
             android:id="@+id/action_multiSelectBottomSheetDialog_to_moveFragment"
             app:destination="@id/moveFragment" />
