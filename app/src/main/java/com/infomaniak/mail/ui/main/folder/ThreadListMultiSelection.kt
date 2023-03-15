@@ -152,8 +152,8 @@ class ThreadListMultiSelection {
     }
 
     private fun hideUnreadChip(isMultiSelectOn: Boolean) {
-        val noUnread = mainViewModel.currentFolderLive.value?.let { it.unreadCount == 0 } == true
-        binding.unreadCountChip.isGone = isMultiSelectOn || noUnread
+        val thereAreUnread = mainViewModel.currentFolderLive.value?.let { it.unreadCount > 0 } == true
+        binding.unreadCountChip.isVisible = thereAreUnread && !isMultiSelectOn
     }
 
     private fun displayMultiSelectActions(isMultiSelectOn: Boolean) = with(binding) {
