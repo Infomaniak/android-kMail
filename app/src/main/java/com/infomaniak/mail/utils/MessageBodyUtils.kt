@@ -17,6 +17,8 @@
  */
 package com.infomaniak.mail.utils
 
+import com.infomaniak.mail.data.models.message.Body
+import com.infomaniak.mail.utils.Utils.TEXT_PLAIN
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
@@ -48,16 +50,18 @@ object MessageBodyUtils {
         "blockquote[type=\"cite\"]",
     )
 
-    fun splitBodyAndQuote(messageBody: String): MessageBodyQuote {
-        val htmlDocumentWithQuote = Jsoup.parse(messageBody)
-        val htmlDocumentWithoutQuote = Jsoup.parse(messageBody)
+    fun splitBodyAndQuote(initialBody: Body): MessageBodyQuote {
+        if (initialBody.type == TEXT_PLAIN) return MessageBodyQuote(initialBody.value, null)
+
+        val htmlDocumentWithQuote = Jsoup.parse(initialBody.value)
+        val htmlDocumentWithoutQuote = Jsoup.parse(initialBody.value)
         val htmlQuotes = mutableListOf<Element>()
 
         handleBlockQuote(htmlDocumentWithoutQuote, htmlQuotes)
         val currentQuoteDescriptor = handleQuoteDescriptors(htmlDocumentWithoutQuote, htmlQuotes).ifEmpty { blockquote }
 
         val (body, quote) = splitBodyAndQuote(htmlQuotes, htmlDocumentWithQuote, currentQuoteDescriptor)
-        return MessageBodyQuote(messageBody = if (quote.isNullOrBlank()) messageBody else body, quote = quote)
+        return MessageBodyQuote(messageBody = if (quote.isNullOrBlank()) initialBody.value else body, quote = quote)
     }
 
     private fun handleBlockQuote(htmlDocumentWithoutQuote: Document, htmlQuotes: MutableList<Element>) {

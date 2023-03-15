@@ -118,10 +118,14 @@ class FetchMessagesManager(private val context: Context) {
         if (message.isSeen) return // Ignore if it has already been seen
 
         val subject = context.formatSubject(message.subject)
-        val preview = message.body?.value?.ifBlank { null }
-            ?.let { "\n${MessageBodyUtils.splitBodyAndQuote(it).messageBody.htmlToText().trim()}" }
-            ?: message.preview.ifBlank { null }?.let { "\n${it.trim()}" }
-            ?: ""
+        val preview = if (message.body?.value.isNullOrBlank()) {
+            ""
+        } else {
+            message.body
+                ?.let { "\n${MessageBodyUtils.splitBodyAndQuote(it).messageBody.htmlToText().trim()}" }
+                ?: message.preview.ifBlank { null }?.let { "\n${it.trim()}" }
+                ?: ""
+        }
         val formattedPreview = preview.replace("\\n+\\s*".toRegex(), "\n") // Ignore multiple/start whitespaces
         val description = "$subject$formattedPreview"
 
