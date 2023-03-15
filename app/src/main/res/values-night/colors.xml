@@ -54,6 +54,7 @@
     <color name="tertiaryTextColor">@color/elephant</color>
     <color name="snackbarTextColor">@color/orca</color>
     <color name="staffOnlyColor">@color/prince_dark</color>
+    <color name="onColorfulBackground">@color/bat</color>
     <color name="textDisabledPrimaryButton">@color/bat</color>
 
     <!-- Separators -->
