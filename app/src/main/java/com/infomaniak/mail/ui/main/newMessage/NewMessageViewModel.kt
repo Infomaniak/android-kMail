@@ -103,7 +103,10 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
                     isNewMessage = true
                     createDraft(draftMode, previousMessageUid, recipient)
                 }
-                true
+
+                if (draft.identityId.isNullOrBlank()) draft.addMissingSignatureData(realm = this)
+
+                return@writeBlocking true
             }
 
             if (isSuccess) {

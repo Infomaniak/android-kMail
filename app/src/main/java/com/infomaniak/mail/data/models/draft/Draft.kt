@@ -51,10 +51,6 @@ class Draft : RealmObject {
 
     var date: RealmInstant = Date().toRealmInstant()
 
-    @SerialName("reply_to")
-    var replyTo: RealmList<Recipient> = realmListOf()
-
-    var from: RealmList<Recipient> = realmListOf()
     var to: RealmList<Recipient> = realmListOf()
     var cc: RealmList<Recipient> = realmListOf()
     var bcc: RealmList<Recipient> = realmListOf()
@@ -126,23 +122,17 @@ class Draft : RealmObject {
         mimeType?.let { this.mimeType = it }
     }
 
-    fun initSignature(realm: MutableRealm) {
+    fun addMissingSignatureData(realm: MutableRealm) {
+        initSignature(realm, addContent = false)
+    }
+
+    fun initSignature(realm: MutableRealm, addContent: Boolean = true) {
 
         val defaultSignature = SignatureController.getDefaultSignature(realm)
 
         identityId = defaultSignature.id.toString()
 
-        from = realmListOf(Recipient().apply {
-            this.email = defaultSignature.sender
-            this.name = defaultSignature.fullName
-        })
-
-        replyTo = realmListOf(Recipient().apply {
-            this.email = defaultSignature.replyTo
-            this.name = ""
-        })
-
-        if (defaultSignature.content.isNotEmpty()) {
+        if (addContent && defaultSignature.content.isNotEmpty()) {
             body += """<div class="${MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME}">${defaultSignature.content}</div>"""
         }
     }
