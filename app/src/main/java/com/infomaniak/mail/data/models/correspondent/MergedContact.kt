@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.models.correspondent
 
 import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.annotations.Ignore
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.parcelize.Parcelize
 
@@ -30,6 +31,7 @@ class MergedContact : RealmObject, Correspondent {
     override var name: String = ""
     var avatar: String? = null
 
+    @delegate:Ignore
     override val initials by lazy { computeInitials() }
 
     fun initLocalValues(email: String, name: String, avatar: String? = null): MergedContact {

@@ -19,6 +19,7 @@ package com.infomaniak.mail.data.models.correspondent
 
 import android.os.Parcel
 import io.realm.kotlin.types.EmbeddedRealmObject
+import io.realm.kotlin.types.annotations.Ignore
 import kotlinx.parcelize.Parceler
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
@@ -29,6 +30,7 @@ class Recipient : EmbeddedRealmObject, Correspondent {
     override var email: String = ""
     override var name: String = ""
 
+    @delegate:Ignore
     override val initials by lazy { computeInitials() }
 
     fun initLocalValues(email: String? = null, name: String? = null): Recipient {
