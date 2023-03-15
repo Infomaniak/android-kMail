@@ -41,6 +41,7 @@ import com.infomaniak.mail.firebase.RegisterFirebaseBroadcastReceiver
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.utils.PermissionUtils
 import com.infomaniak.mail.utils.UiUtils
+import com.infomaniak.mail.utils.updateNavigationBarColor
 import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -211,19 +212,19 @@ class MainActivity : ThemedActivity() {
             window.statusBarColor = getColor(it)
         }
 
-        window.navigationBarColor = getColor(
-            when (destination.id) {
-                R.id.threadFragment -> R.color.elevatedBackground
-                R.id.messageActionBottomSheetDialog,
-                R.id.replyBottomSheetDialog,
-                R.id.detailedContactBottomSheetDialog,
-                R.id.threadActionsBottomSheetDialog -> R.color.backgroundColorSecondary
-                R.id.threadListFragment -> {
-                    if (mainViewModel.isMultiSelectOn) R.color.elevatedBackground else R.color.backgroundColor
-                }
-                else -> R.color.backgroundColor
+        val colorRes = when (destination.id) {
+            R.id.threadFragment -> R.color.elevatedBackground
+            R.id.messageActionBottomSheetDialog,
+            R.id.replyBottomSheetDialog,
+            R.id.detailedContactBottomSheetDialog,
+            R.id.threadActionsBottomSheetDialog -> R.color.backgroundColorSecondary
+            R.id.threadListFragment -> {
+                if (mainViewModel.isMultiSelectOn) R.color.elevatedBackground else R.color.backgroundColor
             }
-        )
+            else -> R.color.backgroundColor
+        }
+
+        window.updateNavigationBarColor(getColor(colorRes))
 
         trackDestination(destination)
     }
@@ -242,13 +243,13 @@ class MainActivity : ThemedActivity() {
         binding.drawerLayout.setDrawerLockMode(drawerLockMode)
     }
 
-    private fun colorSystemBarsWithMenuDrawer(@FloatRange(0.0, 1.0) slideOffset: Float = FULLY_SLID) {
+    private fun colorSystemBarsWithMenuDrawer(@FloatRange(0.0, 1.0) slideOffset: Float = FULLY_SLID) = with(window) {
         if (slideOffset == FULLY_SLID) {
-            window.statusBarColor = menuDrawerBackgroundColor
-            window.navigationBarColor = menuDrawerBackgroundColor
+            statusBarColor = menuDrawerBackgroundColor
+            updateNavigationBarColor(menuDrawerBackgroundColor)
         } else {
-            window.statusBarColor = UiUtils.pointBetweenColors(backgroundHeaderColor, menuDrawerBackgroundColor, slideOffset)
-            window.navigationBarColor = UiUtils.pointBetweenColors(backgroundColor, menuDrawerBackgroundColor, slideOffset)
+            statusBarColor = UiUtils.pointBetweenColors(backgroundHeaderColor, menuDrawerBackgroundColor, slideOffset)
+            updateNavigationBarColor(UiUtils.pointBetweenColors(backgroundColor, menuDrawerBackgroundColor, slideOffset))
         }
     }
 

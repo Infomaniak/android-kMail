@@ -38,6 +38,7 @@ import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.context
+import com.infomaniak.mail.utils.updateNavigationBarColor
 
 class ThreadListMultiSelection {
 
@@ -160,7 +161,7 @@ class ThreadListMultiSelection {
         newMessageFab.isGone = isMultiSelectOn
         quickActionBar.isVisible = isMultiSelectOn
         val navBarColor = context.getColor(if (isMultiSelectOn) R.color.elevatedBackground else R.color.backgroundColor)
-        threadListFragment.requireActivity().window.navigationBarColor = navBarColor
+        threadListFragment.requireActivity().window.updateNavigationBarColor(navBarColor)
     }
 
     private fun updateSelectedCount(selectedThreads: MutableSet<SelectedThread>) {
