@@ -20,11 +20,13 @@
     <!-- Primary colors -->
     <color name="pinkMail">@color/pink_mail_primary_dark</color>
     <color name="pinkMailInverse">@color/pink_mail_primary_light</color>
+    <color name="pinkMailOnPrimary">@color/pink_mail_on_primary_dark</color>
     <color name="pinkMailContainer">@color/pink_mail_container_dark</color>
     <color name="pinkBoardingSecondaryBackground">@color/bat</color>
     <color name="pinkMailRipple">@color/pink_mail_ripple_dark</color>
     <color name="blueMail">@color/blue_mail_primary_dark</color>
     <color name="blueMailInverse">@color/blue_mail_primary_light</color>
+    <color name="blueMailOnPrimary">@color/blue_mail_on_primary_dark</color>
     <color name="blueMailContainer">@color/blue_mail_container_dark</color>
     <color name="blueBoardingSecondaryBackground">@color/bat</color>
     <color name="blueMailRipple">@color/blue_mail_ripple_dark</color>
@@ -50,9 +52,9 @@
     <color name="primaryTextColor">@color/rabbit</color>
     <color name="secondaryTextColor">@color/shark</color>
     <color name="tertiaryTextColor">@color/elephant</color>
-    <color name="colorOnPrimary">@color/bat</color>
     <color name="snackbarTextColor">@color/orca</color>
     <color name="staffOnlyColor">@color/prince_dark</color>
+    <color name="textDisabledPrimaryButton">@color/bat</color>
 
     <!-- Separators -->
     <color name="separatorColor">@color/orca</color>

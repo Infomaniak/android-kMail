@@ -44,7 +44,6 @@
         <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>
         <item name="collapsingToolbarLayoutStyle">@style/AppThemeCollapsingToolbarLayoutTheme</item>
         <item name="colorError">@color/redDestructiveAction</item>
-        <item name="colorOnPrimary">@color/colorOnPrimary</item>
         <item name="colorOnSurfaceInverse">@color/snackbarTextColor</item>
         <item name="colorSurfaceInverse">@color/backgroundSnackbarColor</item>
         <item name="extendedFloatingActionButtonStyle">@style/ExtendedFloatingActionButtonStyle</item>
@@ -62,6 +61,7 @@
     <style name="AppTheme.Pink">
         <item name="colorPrimary">@color/pinkMail</item>
         <item name="colorPrimaryInverse">@color/pinkMailInverse</item>
+        <item name="colorOnPrimary">@color/pinkMailOnPrimary</item>
         <item name="colorPrimaryDark">#00FF00</item>
 
         <item name="colorPrimaryContainer">@color/pinkMailContainer</item>
@@ -79,6 +79,7 @@
     <style name="AppTheme.Blue">
         <item name="colorPrimary">@color/blueMail</item>
         <item name="colorPrimaryInverse">@color/blueMailInverse</item>
+        <item name="colorOnPrimary">@color/blueMailOnPrimary</item>
         <item name="colorPrimaryDark">#00FF00</item>
 
         <item name="colorPrimaryContainer">@color/blueMailContainer</item>
