@@ -127,14 +127,15 @@ object ThreadController {
     suspend fun initAndGetSearchFolderThreads(remoteThreads: List<Thread>): List<Thread> = withContext(Dispatchers.IO) {
 
         fun MutableRealm.keepOldMessagesAndAddToSearchFolder(remoteThread: Thread, searchFolder: Folder) {
-            remoteThread.messages.forEach { remoteMessage: Message ->
-                MessageController.getMessage(remoteMessage.uid, this)?.let { localMessage ->
-                    val position = remoteThread.messages.indexOfFirst { it.uid == localMessage.uid }
-                    remoteThread.messages[position] = localMessage.copyFromRealm()
+            remoteThread.messages.forEachIndexed { index: Int, remoteMessage: Message ->
+                val message = MessageController.getMessage(remoteMessage.uid, realm = this)?.let { localMessage ->
+                    remoteThread.messages[index] = localMessage.copyFromRealm()
+                    return@let localMessage
                 } ?: run {
                     remoteMessage.isFromSearch = true
+                    return@run remoteMessage
                 }
-                searchFolder.messages.add(remoteMessage)
+                searchFolder.messages.add(message)
             }
         }
 
