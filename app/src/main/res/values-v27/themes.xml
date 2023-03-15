@@ -32,4 +32,8 @@
         <item name="android:windowLightNavigationBar">true</item>
     </style>
 
+    <style name="AppTheme.Lock" parent="AppTheme.LockBase">
+        <item name="android:windowLightNavigationBar">true</item>
+    </style>
+
 </resources>

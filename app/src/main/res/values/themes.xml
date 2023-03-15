@@ -94,6 +94,16 @@
         <item name="customGradientColor">#89CFFF</item>
     </style>
 
+    <!-- AppLock -->
+
+    <style name="AppTheme.LockBase" parent="AppTheme.Pink">
+        <item name="appIcon">@drawable/ic_logo_infomaniak_mail</item>
+        <item name="primaryButtonStyle">@style/TextButtonPrimary</item>
+        <item name="titleStyle">@style/H2</item>
+    </style>
+
+    <style name="AppTheme.Lock" parent="AppTheme.LockBase" />
+
     <!-- Login -->
 
     <style name="AppTheme.LoginBase" parent="AppTheme.Pink">
