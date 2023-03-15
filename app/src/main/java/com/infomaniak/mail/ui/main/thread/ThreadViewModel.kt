@@ -54,7 +54,7 @@ class ThreadViewModel : ViewModel() {
         MessageController.getSortedMessages(threadUid)?.asFlow()?.asLiveData()?.let { emitSource(it) }
     }
 
-    fun openThread(threadUid: String) = liveData(Dispatchers.IO) {
+    fun openThread(threadUid: String) = liveData(coroutineContext) {
 
         val thread = ThreadController.getThread(threadUid) ?: run {
             emit(null)
