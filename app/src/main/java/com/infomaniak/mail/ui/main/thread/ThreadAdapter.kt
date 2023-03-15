@@ -190,29 +190,24 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
     }
 
     private fun WebView.applyWebViewContent(uid: String, bodyWebView: String, type: String) {
-
         if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
             WebSettingsCompat.setAlgorithmicDarkeningAllowed(settings, isThemeTheSameMap[uid]!!)
         }
 
-        var styledBody = bodyWebView
-        if (type == TEXT_HTML) {
-            if (context.isNightModeEnabled() && isThemeTheSameMap[uid]!!) {
-                styledBody = context.injectCssInHtml(R.raw.custom_dark_mode, styledBody, DARK_BACKGROUND_STYLE_ID)
-            }
-            styledBody = context.injectCssInHtml(R.raw.remove_margin, styledBody)
-            styledBody = context.injectCssInHtml(R.raw.add_padding, styledBody)
-        } else {
-            styledBody = createHtmlForPlainText(styledBody)
-            if (context.isNightModeEnabled()) {
-                styledBody = context.injectCssInHtml(R.raw.custom_dark_mode, styledBody, DARK_BACKGROUND_STYLE_ID)
-            }
-        }
-
-        val margin = if (type == TEXT_HTML) NO_MARGIN else plainTextMargin
-        setMarginsRelative(margin, NO_MARGIN, margin, NO_MARGIN)
+        var styledBody = if (type == TEXT_PLAIN) createHtmlForPlainText(bodyWebView) else bodyWebView
+        styledBody = processMailDisplay(styledBody)
 
         loadDataWithBaseURL("", styledBody, TEXT_HTML, Utils.UTF_8, "")
+    }
+
+    private fun WebView.processMailDisplay(styledBody: String): String {
+        var processedBody = styledBody
+        if (context.isNightModeEnabled()) {
+            processedBody = context.injectCssInHtml(R.raw.custom_dark_mode, processedBody, DARK_BACKGROUND_STYLE_ID)
+        }
+        processedBody = context.injectCssInHtml(R.raw.remove_margin, processedBody)
+        processedBody = context.injectCssInHtml(R.raw.add_padding, processedBody)
+        return processedBody
     }
 
     private fun createHtmlForPlainText(text: String): String {
@@ -437,6 +432,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
 
     private companion object {
         const val TEXT_HTML: String = "text/html"
+        const val TEXT_PLAIN: String = "text/plain"
 
         const val FORMAT_EMAIL_DATE_HOUR = "HH:mm"
         const val FORMAT_EMAIL_DATE_SHORT_DATE = "d MMM"
