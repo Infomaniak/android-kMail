@@ -350,10 +350,20 @@ object MessageController {
                 }
             }
 
+            val allExistingMessages = mutableSetOf<Message>().apply {
+                existingThreads.forEach { addAll(it.messages) }
+                add(message)
+            }
             existingThreads.forEach { thread ->
                 scope.ensureActive()
-                thread.messagesIds += message.messageIds
-                thread.addMessageWithConditions(message, realm = this)
+                allExistingMessages.forEach { existingMessage ->
+                    scope.ensureActive()
+                    if (!thread.messages.map { it.uid }.contains(existingMessage.uid)) {
+                        thread.messagesIds += existingMessage.messageIds
+                        thread.addMessageWithConditions(existingMessage, realm = this)
+                    }
+                }
+
                 threadsToUpsert[thread.uid] = upsertThread(thread)
             }
         }
