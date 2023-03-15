@@ -139,9 +139,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:drawablePadding="@dimen/marginStandardSmall"
-                    android:text="@string/noNetworkTitle"
+                    android:text="@string/emptyStateNetworkTitle"
                     android:visibility="gone"
-                    app:drawableStartCompat="@drawable/ic_no_network_small" />
+                    app:drawableStartCompat="@drawable/ic_no_network" />
 
                 <TextView
                     android:id="@+id/updatedAt"
@@ -150,7 +150,7 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:lines="1"
-                    tools:text="@string/noNetworkDescription" />
+                    tools:text="@string/emptyStateNetworkDescription" />
             </LinearLayout>
 
             <com.google.android.material.chip.Chip
@@ -205,13 +205,13 @@
                         tools:visibility="gone" />
 
                     <com.infomaniak.mail.ui.main.EmptyStateView
-                        android:id="@+id/emptyState"
+                        android:id="@+id/emptyStateView"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:visibility="gone"
-                        tools:description="@string/noEmailDescription"
-                        tools:icon="@drawable/ic_empty_folder"
-                        tools:title="@string/noEmailTitle"
+                        tools:description="@string/emptyStateInboxDescription"
+                        tools:icon="@drawable/ic_empty_state_folder"
+                        tools:title="@string/emptyStateInboxTitle"
                         tools:visibility="visible" />
 
                 </FrameLayout>

@@ -25,6 +25,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
@@ -472,32 +474,22 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         val isBooting = threadListViewModel.currentThreadsCount == null && !cursorIsNull && isNetworkConnected
 
         when {
-            isBooting || thereAreThreads || (cursorIsNull && isNetworkConnected) -> {
-                binding.emptyState.isGone = true
-            }
-            cursorIsNull -> {
-                setEmptyState(R.drawable.ic_no_network_big, "No signal", "No signal description")
-            }
-            isCurrentFolderRole(FolderRole.INBOX) -> {
-                setEmptyState(R.drawable.ic_drawer_inbox, "Empty inbox", "Empty inbox description")
-            }
-            isCurrentFolderRole(FolderRole.TRASH) -> {
-                setEmptyState(R.drawable.ic_empty_trash, "Empty trash", "Empty trash description")
-            }
-            else -> {
-                setEmptyState(R.drawable.ic_empty_folder, "Empty folder", "Empty folder description")
-            }
+            isBooting || thereAreThreads || (cursorIsNull && isNetworkConnected) -> binding.emptyStateView.isGone = true
+            cursorIsNull -> setEmptyState(EmptyState.NETWORK)
+            isCurrentFolderRole(FolderRole.INBOX) -> setEmptyState(EmptyState.INBOX)
+            isCurrentFolderRole(FolderRole.TRASH) -> setEmptyState(EmptyState.TRASH)
+            else -> setEmptyState(EmptyState.FOLDER)
         }
     }
 
-    private fun setEmptyState(drawableId: Int, titleText: String, descText: String) = with(binding) {
+    private fun setEmptyState(emptyState: EmptyState) = with(binding) {
 
         threadListAdapter.updateList(emptyList())
 
-        emptyState.apply {
-            illustration = getDrawable(context, drawableId)
-            title = titleText
-            description = descText
+        emptyStateView.apply {
+            illustration = getDrawable(context, emptyState.drawableId)
+            title = getString(emptyState.titleId)
+            description = getString(emptyState.descriptionId)
             isVisible = true
         }
     }
@@ -521,4 +513,15 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun scrollToTop() = binding.threadsList.layoutManager?.scrollToPosition(0)
+
+    private enum class EmptyState(
+        @DrawableRes val drawableId: Int,
+        @StringRes val titleId: Int,
+        @StringRes val descriptionId: Int,
+    ) {
+        NETWORK(R.drawable.ic_empty_state_network, R.string.emptyStateNetworkTitle, R.string.emptyStateNetworkDescription),
+        INBOX(R.drawable.ic_empty_state_inbox, R.string.emptyStateInboxTitle, R.string.emptyStateInboxDescription),
+        TRASH(R.drawable.ic_empty_state_trash, R.string.emptyStateTrashTitle, R.string.emptyStateTrashDescription),
+        FOLDER(R.drawable.ic_empty_state_folder, R.string.emptyStateFolderTitle, R.string.emptyStateFolderDescription),
+    }
 }

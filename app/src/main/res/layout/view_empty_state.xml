@@ -28,7 +28,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         tools:ignore="ContentDescription"
-        tools:src="@drawable/ic_empty_folder" />
+        tools:src="@drawable/ic_empty_state_inbox" />
 
     <TextView
         android:id="@+id/title"
@@ -37,7 +37,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/marginStandard"
         android:gravity="center"
-        tools:text="@string/noEmailTitle" />
+        tools:text="@string/emptyStateInboxTitle" />
 
     <TextView
         android:id="@+id/description"
@@ -47,6 +47,6 @@
         android:layout_marginTop="@dimen/marginStandardVerySmall"
         android:gravity="center"
         android:lineSpacingMultiplier="1"
-        tools:text="@string/noEmailDescription" />
+        tools:text="@string/emptyStateInboxDescription" />
 
 </LinearLayout>

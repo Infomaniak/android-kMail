@@ -176,7 +176,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal"
-                    android:text="@string/searchNoHistoryDescription" />
+                    android:text="@string/emptyStateHistoryDescription" />
 
             </FrameLayout>
 
@@ -186,9 +186,9 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:visibility="gone"
-                app:description="@string/searchNoResultsDescription"
+                app:description="@string/emptyStateSearchDescription"
                 app:icon="@drawable/ic_empty_state_search"
-                app:title="@string/searchNoResultsTitle"
+                app:title="@string/emptyStateSearchTitle"
                 tools:visibility="visible" />
 
         </FrameLayout>
