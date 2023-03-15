@@ -314,18 +314,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private fun refreshThreads(
         mailbox: Mailbox? = currentMailbox.value,
         folderId: String? = currentFolderId,
-    ) {
+    ) = viewModelScope.launch(viewModelScope.handlerIO) {
 
-        if (mailbox == null || folderId == null) return
-        val folder = FolderController.getFolder(folderId) ?: return
+        if (mailbox == null || folderId == null) return@launch
 
-        isDownloadingChanges.postValue(true)
-
-        viewModelScope.launch(viewModelScope.handlerIO) {
-            MessageController.fetchCurrentFolderMessages(mailbox, folder)
+        FolderController.getFolder(folderId)?.let { folder ->
+            isDownloadingChanges.postValue(true)
+            runCatching { MessageController.fetchCurrentFolderMessages(mailbox, folder) }
+            isDownloadingChanges.postValue(false)
         }
-
-        isDownloadingChanges.postValue(false)
     }
 
     //region Delete
