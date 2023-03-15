@@ -85,7 +85,7 @@ class IntroFragment : Fragment() {
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
                     pinkBlueTabLayout.removeTab(pinkBlueTabLayout.getTabAt(SYSTEM_TAB_INDEX)!!)
                 } else {
-                    pinkBlueTabLayout.getTabAt(SYSTEM_TAB_INDEX)!!.view.setOnClickListener { notYetImplemented() }
+                    pinkBlueTabLayout.getTabAt(SYSTEM_TAB_INDEX)!!.view.setOnClickListener { notYetImplemented((requireActivity() as LoginActivity).binding.nextButton) }
                 }
 
                 val selectedTab = pinkBlueTabLayout.getTabAt(accentColor.introTabIndex)
@@ -134,7 +134,10 @@ class IntroFragment : Fragment() {
     private fun setTabSelectedListener() = with(binding) {
         pinkBlueTabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
-                if (tab?.position == SYSTEM_TAB_INDEX) return
+                if (tab?.position == SYSTEM_TAB_INDEX) {
+                    val previousTab = pinkBlueTabLayout.getTabAt(localSettings.accentColor.introTabIndex)
+                    pinkBlueTabLayout.selectTab(previousTab)
+                }
                 val newSelectedAccentColor = if (pinkBlueTabLayout.selectedTabPosition == PINK.introTabIndex) PINK else BLUE
                 if (newSelectedAccentColor == localSettings.accentColor) return
                 localSettings.accentColor = newSelectedAccentColor
