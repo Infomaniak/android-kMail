@@ -20,11 +20,13 @@
     <!-- Primary colors -->
     <color name="pinkMail">@color/pink_mail_primary_light</color>
     <color name="pinkMailInverse">@color/pink_mail_primary_dark</color>
+    <color name="pinkMailOnPrimary">@color/pink_mail_on_primary_light</color>
     <color name="pinkMailContainer">@color/pink_mail_container_light</color>
     <color name="pinkBoardingSecondaryBackground">@color/pinkMailContainer</color>
     <color name="pinkMailRipple">@color/pink_mail_ripple_light</color>
     <color name="blueMail">@color/primary</color>
     <color name="blueMailInverse">@color/blue_mail_primary_dark</color>
+    <color name="blueMailOnPrimary">@color/blue_mail_on_primary_light</color>
     <color name="blueMailContainer">@color/blue_mail_container_light</color>
     <color name="blueBoardingSecondaryBackground">@color/blueMailContainer</color>
     <color name="blueMailRipple">@color/blue_mail_ripple_light</color>
@@ -41,6 +43,8 @@
     <color name="pink_mail_ripple_dark">#1EEF8BA4</color>
     <color name="pink_mail_container_light">#F7E8EF</color>
     <color name="pink_mail_container_dark">#5D0F2B</color>
+    <color name="pink_mail_on_primary_light">#FEF8F7</color>
+    <color name="pink_mail_on_primary_dark">#3F0018</color>
 
     <color name="blue_mail_primary_light">@color/infomaniak</color>
     <color name="blue_mail_primary_dark">#4CB7FF</color>
@@ -48,6 +52,8 @@
     <color name="blue_mail_ripple_dark">#1E4CB7FF</color>
     <color name="blue_mail_container_light">#F4F6FD</color>
     <color name="blue_mail_container_dark">#0F3256</color>
+    <color name="blue_mail_on_primary_light">#FBFBFE</color>
+    <color name="blue_mail_on_primary_dark">#061C35</color>
 
     <color name="background_color_light">@color/white</color>
     <color name="background_color_dark">#101010</color>
@@ -90,10 +96,10 @@
     <color name="primaryTextColor">@color/orca</color>
     <color name="secondaryTextColor">@color/elephant</color>
     <color name="tertiaryTextColor">@color/shark</color>
-    <color name="colorOnPrimary">@color/white</color>
     <color name="snackbarTextColor">@color/mouse</color>
     <color name="draftTextColor">@color/redDestructiveAction</color>
     <color name="staffOnlyColor">@color/prince_light</color>
+    <color name="textDisabledPrimaryButton">@color/white</color>
 
     <!-- Separators -->
     <color name="separatorColor">@color/mouse</color>
