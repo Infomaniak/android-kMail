@@ -23,10 +23,10 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.infomaniak.lib.core.utils.FormatterFileSize
+import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.databinding.ItemAttachmentBinding
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter.AttachmentViewHolder
-import com.infomaniak.mail.utils.context
 
 class AttachmentAdapter(
     private val shouldDisplayCloseButton: Boolean = false,
@@ -44,7 +44,7 @@ class AttachmentAdapter(
         val attachment = attachments[position]
 
         fileName.text = attachment.name
-        fileDetails.text = FormatterFileSize.formatShortFileSize(context, attachment.size.toLong())
+        fileDetails.text = FormatterFileSize.formatShortFileSize(context, attachment.size)
         icon.load(attachment.getFileTypeFromExtension().icon)
 
         if (!shouldDisplayCloseButton) {

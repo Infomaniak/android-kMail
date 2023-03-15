@@ -23,13 +23,13 @@ import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
 import androidx.recyclerview.widget.RecyclerView
+import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.databinding.ItemContactBinding
 import com.infomaniak.mail.ui.main.newMessage.ContactAdapter.ContactType.*
 import com.infomaniak.mail.ui.main.newMessage.ContactAdapter.ContactViewHolder
-import com.infomaniak.mail.utils.context
 
 @SuppressLint("NotifyDataSetChanged")
 class ContactAdapter(

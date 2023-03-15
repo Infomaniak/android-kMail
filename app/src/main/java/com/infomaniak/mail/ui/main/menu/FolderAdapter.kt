@@ -23,13 +23,13 @@ import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.RecyclerView
+import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.*
 import com.infomaniak.mail.databinding.ItemFolderMenuDrawerBinding
 import com.infomaniak.mail.ui.main.menu.FolderAdapter.FolderViewHolder
-import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.views.MenuDrawerItemView.*
 import kotlin.math.min
 import com.infomaniak.lib.core.R as RCore

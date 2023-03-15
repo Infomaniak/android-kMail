@@ -22,6 +22,7 @@ import android.transition.TransitionManager
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
+import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_DELETE_NAME
@@ -37,7 +38,6 @@ import com.infomaniak.mail.data.models.thread.SelectedThread
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.updateNavigationBarColor
 
 class ThreadListMultiSelection {

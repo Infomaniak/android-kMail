@@ -25,6 +25,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.R
@@ -33,7 +34,6 @@ import com.infomaniak.mail.ui.main.user.ManageMailAddressViewModel
 import com.infomaniak.mail.ui.main.user.SimpleMailboxAdapter
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.animatedNavigation
-import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.createDescriptionDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

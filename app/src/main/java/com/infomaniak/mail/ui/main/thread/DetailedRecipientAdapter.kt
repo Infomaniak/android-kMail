@@ -20,12 +20,12 @@ package com.infomaniak.mail.ui.main.thread
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ItemDetailedContactBinding
 import com.infomaniak.mail.ui.main.thread.DetailedRecipientAdapter.DetailedRecipientViewHolder
 import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
-import com.infomaniak.mail.utils.context
 
 class DetailedRecipientAdapter(
     private val onContactClicked: ((contact: Recipient) -> Unit)?,

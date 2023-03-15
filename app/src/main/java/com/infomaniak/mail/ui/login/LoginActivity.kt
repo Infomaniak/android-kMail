@@ -43,6 +43,7 @@ import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.Utils.lockOrientationForSmallScreens
+import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.hideProgress
 import com.infomaniak.lib.core.utils.initProgress
 import com.infomaniak.lib.core.utils.showProgress
@@ -61,7 +62,6 @@ import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.ActivityLoginBinding
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
-import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.getInfomaniakLogin
 import com.infomaniak.mail.utils.notYetImplemented
 import kotlinx.coroutines.Dispatchers
