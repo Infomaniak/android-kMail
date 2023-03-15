@@ -88,9 +88,9 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Scanner
 
-fun Fragment.notYetImplemented() = showSnackbar(getString(R.string.workInProgressTitle))
+fun Fragment.notYetImplemented(anchor: View? = null) = showSnackbar(getString(R.string.workInProgressTitle), anchor)
 
-fun Activity.notYetImplemented() = showSnackbar(getString(R.string.workInProgressTitle))
+fun Activity.notYetImplemented(anchor: View? = null) = showSnackbar(getString(R.string.workInProgressTitle), anchor)
 
 fun String.isEmail(): Boolean = Patterns.EMAIL_ADDRESS.matcher(this).matches()
 
