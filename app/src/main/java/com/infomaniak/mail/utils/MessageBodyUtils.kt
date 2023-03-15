@@ -23,6 +23,10 @@ import org.jsoup.nodes.Element
 
 object MessageBodyUtils {
 
+    const val INFOMANIAK_SIGNATURE_HTML_CLASS_NAME = "editorUserSignature"
+    const val INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME = "ik_mail_quote"
+    const val INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME = "forwardContentMessage"
+
     private const val blockquote = "blockquote"
 
     private val quoteDescriptors = arrayOf(
@@ -35,7 +39,7 @@ object MessageBodyUtils {
         "#reply139content",
         ".gmail_extra",
         ".gmail_quote",
-        ".ik_mail_quote",
+        ".${INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME}",
         ".moz-cite-prefix",
         ".protonmail_quote",
         ".yahoo_quoted",
