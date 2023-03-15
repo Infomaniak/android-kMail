@@ -22,10 +22,12 @@ import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.Context
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.OpenableColumns
 import android.util.Patterns
 import android.view.View
+import android.view.Window
 import android.webkit.WebView
 import androidx.annotation.AttrRes
 import androidx.annotation.IdRes
@@ -400,4 +402,8 @@ fun Context.getLocalizedNameOrAllFolders(folder: Folder?): String {
 
 fun Context.getInfomaniakLogin(): InfomaniakLogin {
     return InfomaniakLogin(this, appUID = BuildConfig.APPLICATION_ID, clientID = BuildConfig.CLIENT_ID)
+}
+
+fun Window.updateNavigationBarColor(color: Int) {
+    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O) navigationBarColor = color
 }

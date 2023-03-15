@@ -33,6 +33,7 @@ import com.infomaniak.mail.databinding.ActivityNewMessageBinding
 import com.infomaniak.mail.ui.ThemedActivity
 import com.infomaniak.mail.utils.getAttributeColor
 import com.infomaniak.mail.utils.observeNotNull
+import com.infomaniak.mail.utils.updateNavigationBarColor
 import com.google.android.material.R as RMaterial
 
 class NewMessageActivity : ThemedActivity() {
@@ -85,7 +86,7 @@ class NewMessageActivity : ThemedActivity() {
         val backgroundColor = getColor(R.color.newMessageBackgroundColor)
         window.apply {
             statusBarColor = backgroundColor
-            navigationBarColor = backgroundColor
+            updateNavigationBarColor(backgroundColor)
         }
     }
 
