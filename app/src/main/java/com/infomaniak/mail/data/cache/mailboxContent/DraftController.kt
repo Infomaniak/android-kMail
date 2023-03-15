@@ -50,7 +50,7 @@ object DraftController {
 
     //region Queries
     private fun getDraftsQuery(query: String? = null, realm: TypedRealm): RealmQuery<Draft> = with(realm) {
-        return@with query?.let { query(it) } ?: query()
+        return@with query?.let(::query) ?: query()
     }
 
     private fun getOrphanDraftsQuery(realm: TypedRealm): RealmQuery<Draft> {
