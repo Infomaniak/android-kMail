@@ -283,8 +283,8 @@ class ThreadListAdapter(
     private fun ItemThreadFlushFolderButtonBinding.displayFlushFolderButton(folderRole: FolderRole) {
 
         val (hintTextId, buttonTextId) = when (folderRole) {
-            FolderRole.TRASH -> R.string.threadListTrashHint to R.string.threadListEmptyTrashButton
             FolderRole.SPAM -> R.string.threadListSpamHint to R.string.threadListEmptySpamButton
+            FolderRole.TRASH -> R.string.threadListTrashHint to R.string.threadListEmptyTrashButton
             else -> throw IllegalStateException("We are trying to flush a non-flushable folder.")
         }
 

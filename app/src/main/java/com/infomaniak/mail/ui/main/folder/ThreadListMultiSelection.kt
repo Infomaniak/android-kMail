@@ -38,6 +38,7 @@ import com.infomaniak.mail.data.models.thread.SelectedThread
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.utils.createDescriptionDialog
 import com.infomaniak.mail.utils.updateNavigationBarColor
 
 class ThreadListMultiSelection {
@@ -94,9 +95,29 @@ class ThreadListMultiSelection {
                     isMultiSelectOn = false
                 }
                 R.id.quickActionDelete -> {
-                    threadListFragment.trackMultiSelectActionEvent(ACTION_DELETE_NAME, selectedThreadsCount)
-                    deleteThreads(selectedThreadsUids)
-                    isMultiSelectOn = false
+
+                    fun delete() {
+                        threadListFragment.trackMultiSelectActionEvent(ACTION_DELETE_NAME, selectedThreadsCount)
+                        deleteThreads(selectedThreadsUids)
+                        isMultiSelectOn = false
+                    }
+
+                    val titleId = when (currentFolder.value?.role) {
+                        FolderRole.DRAFT -> R.string.threadListEmptyDraftButton
+                        FolderRole.SPAM -> R.string.threadListEmptySpamButton
+                        FolderRole.TRASH -> R.string.threadListEmptyTrashButton
+                        else -> null
+                    }
+
+                    if (titleId == null) {
+                        delete()
+                    } else {
+                        threadListFragment.createDescriptionDialog(
+                            title = threadListFragment.getString(titleId),
+                            description = threadListFragment.getString(R.string.threadListEmptyFolderAlertDescription),
+                            onPositiveButtonClicked = { delete() },
+                        ).show()
+                    }
                 }
                 R.id.quickActionMenu -> {
                     threadListFragment.trackMultiSelectActionEvent(OPEN_ACTION_BOTTOM_SHEET, selectedThreadsCount)
