@@ -199,11 +199,9 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
                 if (data == null) {
                     throwErrorAsException()
                 } else {
-                    DraftController.updateDraft(draft.localUuid, realm) {
-                        it.remoteUuid = data?.draftRemoteUuid
-                        it.messageUid = data?.messageUid
-                        it.action = null
-                    }
+                    draft.remoteUuid = data?.draftRemoteUuid
+                    draft.messageUid = data?.messageUid
+                    draft.action = null
                     scheduledDate = dateFormatWithTimezone.format(Date())
                 }
             }
