@@ -96,7 +96,7 @@ class ThreadListMultiSelection {
                 }
                 R.id.quickActionDelete -> {
 
-                    fun delete() {
+                    fun multiselectDelete() {
                         threadListFragment.trackMultiSelectActionEvent(ACTION_DELETE_NAME, selectedThreadsCount)
                         deleteThreads(selectedThreadsUids)
                         isMultiSelectOn = false
@@ -109,14 +109,16 @@ class ThreadListMultiSelection {
                         else -> null
                     }
 
-                    if (titleId == null) {
-                        delete()
-                    } else {
+                    val shouldDisplayConfirmationDialog = titleId != null
+
+                    if (shouldDisplayConfirmationDialog) {
                         threadListFragment.createDescriptionDialog(
-                            title = threadListFragment.getString(titleId),
+                            title = threadListFragment.getString(titleId!!),
                             description = threadListFragment.getString(R.string.threadListEmptyFolderAlertDescription),
-                            onPositiveButtonClicked = { delete() },
+                            onPositiveButtonClicked = { multiselectDelete() },
                         ).show()
+                    } else {
+                        multiselectDelete()
                     }
                 }
                 R.id.quickActionMenu -> {
