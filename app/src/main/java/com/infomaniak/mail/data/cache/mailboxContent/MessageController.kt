@@ -156,7 +156,16 @@ object MessageController {
     }
 
     private fun MutableRealm.deleteMessage(message: Message) {
-        DraftController.getDraftByMessageUid(message.uid, realm = this)?.let(::delete)
+
+        DraftController.getDraftByMessageUid(message.uid, realm = this)?.let { draft ->
+            if (draft.action == null) {
+                delete(draft)
+            } else {
+                draft.parentMessageHasBeenDeleted = true
+                draft.remoteUuid = null
+            }
+        }
+
         delete(message)
     }
 
