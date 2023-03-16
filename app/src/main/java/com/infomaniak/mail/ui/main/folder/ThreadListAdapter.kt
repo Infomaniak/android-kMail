@@ -67,7 +67,7 @@ class ThreadListAdapter(
     context: Context,
     private val threadDensity: ThreadDensity,
     private var folderRole: FolderRole?,
-    private var contacts: Map<Recipient, MergedContact>,
+    private var contacts: Map<String, Map<String, MergedContact>>,
     private val onSwipeFinished: () -> Unit,
     private val multiSelection: MultiSelectionListener<SelectedThread>? = null,
 ) : DragDropSwipeAdapter<Any, ThreadViewHolder>(mutableListOf()), RealmChangesBinding.OnRealmChanged<Thread> {
@@ -408,7 +408,7 @@ class ThreadListAdapter(
         dataSet = formatList(itemList, recyclerView.context, folderRole, threadDensity)
     }
 
-    fun updateContacts(newContacts: Map<Recipient, MergedContact>) {
+    fun updateContacts(newContacts: Map<String, Map<String, MergedContact>>) {
         contacts = newContacts
         notifyItemRangeChanged(0, itemCount, NotificationType.AVATAR)
     }

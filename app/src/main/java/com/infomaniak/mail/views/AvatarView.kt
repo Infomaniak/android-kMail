@@ -56,8 +56,10 @@ class AvatarView @JvmOverloads constructor(
         return binding.avatarImage.loadAvatar(user.id, user.avatar, user.getInitials(), context.simpleImageLoader, color)
     }
 
-    fun loadAvatar(recipient: Recipient, contacts: Map<Recipient, MergedContact>) {
-        binding.avatarImage.loadCorrespondentAvatar(contacts[recipient] ?: recipient)
+    fun loadAvatar(recipient: Recipient, contacts: Map<String, Map<String, MergedContact>>) {
+        val recipientsForEmail = contacts[recipient.email]
+        val mergedContact = recipientsForEmail?.getOrElse(recipient.name) { recipientsForEmail.entries.elementAt(0).value }
+        binding.avatarImage.loadCorrespondentAvatar(mergedContact ?: recipient)
     }
 
     fun loadAvatar(mergedContact: MergedContact) {
