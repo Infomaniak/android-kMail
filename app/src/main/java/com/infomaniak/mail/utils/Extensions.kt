@@ -141,7 +141,6 @@ fun Date.isLastWeek(): Boolean {
 //endregion
 
 //region UI
-
 fun View.toggleChevron(
     isCollapsed: Boolean,
     collapsedAngle: Float? = null,
