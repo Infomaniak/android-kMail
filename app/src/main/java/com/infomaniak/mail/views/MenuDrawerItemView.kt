@@ -27,12 +27,12 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.content.res.getDimensionPixelSizeOrThrow
 import androidx.core.view.isVisible
 import com.google.android.material.shape.ShapeAppearanceModel
+import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ItemMenuDrawerBinding
 import com.infomaniak.mail.utils.UiUtils.formatUnreadCount
-import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.getAttributeColor
 import com.google.android.material.R as RMaterial
 import com.infomaniak.lib.core.R as RCore

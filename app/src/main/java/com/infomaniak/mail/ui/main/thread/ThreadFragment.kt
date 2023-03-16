@@ -38,10 +38,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
-import com.infomaniak.lib.core.utils.DownloadManagerUtils
-import com.infomaniak.lib.core.utils.getBackNavigationResult
-import com.infomaniak.lib.core.utils.hasSupportedApplications
-import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_DELETE_NAME
@@ -64,9 +61,12 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialog
-import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
+import com.infomaniak.mail.utils.formatSubject
+import com.infomaniak.mail.utils.getAttributeColor
+import com.infomaniak.mail.utils.observeNotNull
+import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.min
 import kotlin.math.roundToInt

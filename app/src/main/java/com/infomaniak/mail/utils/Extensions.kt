@@ -42,7 +42,6 @@ import androidx.lifecycle.LiveData
 import androidx.navigation.NavDirections
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
-import androidx.viewbinding.ViewBinding
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.SimpleColorFilter
@@ -142,8 +141,6 @@ fun Date.isLastWeek(): Boolean {
 //endregion
 
 //region UI
-inline val ViewBinding.context: Context get() = root.context
-
 fun View.toggleChevron(
     isCollapsed: Boolean,
     collapsedAngle: Float? = null,

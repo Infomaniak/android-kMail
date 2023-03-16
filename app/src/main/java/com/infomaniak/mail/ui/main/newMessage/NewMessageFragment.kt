@@ -43,11 +43,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
-import com.infomaniak.lib.core.utils.FilePicker
+import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
-import com.infomaniak.lib.core.utils.isNightModeEnabled
-import com.infomaniak.lib.core.utils.parcelableArrayListExtra
-import com.infomaniak.lib.core.utils.parcelableExtra
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition.INLINE
@@ -60,7 +57,10 @@ import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.*
 import com.infomaniak.mail.ui.main.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
-import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.Utils
+import com.infomaniak.mail.utils.initWebViewClient
+import com.infomaniak.mail.utils.injectCssInHtml
+import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import com.google.android.material.R as RMaterial
 
