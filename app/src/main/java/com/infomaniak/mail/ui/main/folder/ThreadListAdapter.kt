@@ -146,7 +146,10 @@ class ThreadListAdapter(
     override fun getItemId(position: Int): Long {
         return when (val item = dataSet[position]) {
             is Thread -> item.uid.hashCode().toLong()
-            is String -> item.hashCode().toLong()
+            // We need to add the position to the id, because otherwise a mail whose date is in the future would create
+            // another labeled section (for ex. "next week"), thus having the same hashCode than the first "next week" section
+            // TODO: Add a section label "Future" ?
+            is String -> item.hashCode().toLong() + position
             else -> super.getItemId(position)
         }
     }
