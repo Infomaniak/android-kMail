@@ -60,7 +60,9 @@ abstract class MenuFoldersFragment : Fragment() {
 
         return when {
             folderName.length > 255 -> getString(R.string.errorNewFolderNameTooLong)
-            allFolders.any { it.name == folderName.toString() } -> context?.getString(R.string.errorNewFolderAlreadyExists)
+            allFolders.any { it.parent == null && it.name == folderName.toString() } -> {
+                context?.getString(R.string.errorNewFolderAlreadyExists)
+            }
             else -> null
         }
     }
