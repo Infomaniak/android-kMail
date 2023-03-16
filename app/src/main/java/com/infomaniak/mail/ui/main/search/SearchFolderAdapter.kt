@@ -74,7 +74,7 @@ class SearchFolderAdapter(
             findViewById<MenuDrawerItemView>(R.id.menuDrawerItem).apply {
                 val entryName: String = context.getLocalizedNameOrAllFolders(folder)
                 text = entryName
-                icon = AppCompatResources.getDrawable(context, folder?.getIcon() ?: R.drawable.ic_folder)
+                icon = AppCompatResources.getDrawable(context, folder?.getIcon() ?: R.drawable.ic_all_folders)
 
                 setSelectedState(folder == selectedFolder)
 

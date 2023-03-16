@@ -1,0 +1,41 @@
+<!--
+  ~ Infomaniak kMail - Android
+  ~ Copyright (C) 2023 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:pathData="M18.75,6.75V5.25C18.75,4.852 18.592,4.471 18.311,4.189C18.029,3.908 17.648,3.75 17.25,3.75H8.25V2.25C8.25,1.852 8.092,1.471 7.811,1.189C7.529,0.908 7.148,0.75 6.75,0.75H2.25C1.852,0.75 1.471,0.908 1.189,1.189C0.908,1.471 0.75,1.852 0.75,2.25V18.55"
+        android:strokeWidth="1"
+        android:strokeColor="#000000"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M3.75,20.25V8.25C3.75,7.852 3.908,7.471 4.189,7.189C4.471,6.908 4.852,6.75 5.25,6.75H20.25C20.648,6.75 21.029,6.908 21.311,7.189C21.592,7.471 21.75,7.852 21.75,8.25V9.75"
+        android:strokeWidth="1"
+        android:strokeColor="#000000"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M21.75,9.75H8.25C7.422,9.75 6.75,10.422 6.75,11.25V21.75C6.75,22.578 7.422,23.25 8.25,23.25H21.75C22.578,23.25 23.25,22.578 23.25,21.75V11.25C23.25,10.422 22.578,9.75 21.75,9.75Z"
+        android:strokeWidth="1"
+        android:strokeColor="#000000"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>
