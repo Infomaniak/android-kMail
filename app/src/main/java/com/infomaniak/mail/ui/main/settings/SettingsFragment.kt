@@ -95,10 +95,11 @@ class SettingsFragment : Fragment() {
         }
 
         settingsAppLock.apply {
+            trackEvent("settingsGeneral", "lock", value = isChecked.toFloat())
+            isChecked = localSettings.isAppLocked
             setOnClickListener {
-                trackEvent("settingsGeneral", "lock", value = isChecked.toFloat())
-                localSettings.isAppLocked = isChecked
-                notYetImplemented()
+                // Reverse switch (before official parameter changed) by silent click
+                reverseSwitch(requireActivity(), localSettings)
             }
         }
 
