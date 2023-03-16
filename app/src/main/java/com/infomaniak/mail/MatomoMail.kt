@@ -147,6 +147,18 @@ object MatomoMail : MatomoCore {
         }
     }
 
+    fun Context.trackUserInfo(name: String, value: Int) {
+        trackEvent("userInfo", name, TrackerAction.DATA, value.toFloat())
+    }
+
+    fun Fragment.trackOnBoardingEvent(name: String, value: Boolean) {
+        trackEvent(category = "onBoarding", name = name, value = value.toFloat())
+    }
+
+    fun Fragment.trackThreadListEvent(name: String) {
+        trackEvent("threadList", name)
+    }
+
     // We need to invert this logical value to keep a coherent value for analytics because actions
     // conditions are inverted (ex: if the condition is `message.isSpam`, then we want to unspam)
     private fun Boolean.toMailActionValue() = (!this).toFloat()

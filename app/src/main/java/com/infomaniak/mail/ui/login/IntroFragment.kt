@@ -32,6 +32,7 @@ import androidx.navigation.fragment.navArgs
 import com.airbnb.lottie.LottieAnimationView
 import com.google.android.material.tabs.TabLayout
 import com.infomaniak.lib.core.utils.isNightModeEnabled
+import com.infomaniak.mail.MatomoMail.trackOnBoardingEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.AccentColor
@@ -141,6 +142,8 @@ class IntroFragment : Fragment() {
                 if (newSelectedAccentColor == localSettings.accentColor) return
                 localSettings.accentColor = newSelectedAccentColor
                 triggerUiUpdateWhenAnimationEnd(newSelectedAccentColor)
+
+                trackOnBoardingEvent("switchColor", newSelectedAccentColor == BLUE)
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab?) = Unit

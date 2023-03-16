@@ -56,6 +56,7 @@ import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
+import com.infomaniak.mail.MatomoMail.trackThreadListEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.Companion.DEFAULT_SWIPE_ACTION_LEFT
@@ -204,10 +205,23 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
             onThreadClicked = { thread -> navigateToThread(thread, mainViewModel) }
             onFlushClicked = { dialogTitle ->
+
+                val trackerName = when {
+                    mainViewModel.isCurrentFolderRole(FolderRole.TRASH) -> "emptyTrash"
+                    mainViewModel.isCurrentFolderRole(FolderRole.DRAFT) -> "emptyDraft"
+                    mainViewModel.isCurrentFolderRole(FolderRole.SPAM) -> "emptySpam"
+                    else -> null
+                }
+
+                trackerName?.let { trackThreadListEvent(it) }
+
                 createDescriptionDialog(
                     title = dialogTitle,
                     description = getString(R.string.threadListEmptyFolderAlertDescription),
-                    onPositiveButtonClicked = { mainViewModel.flushFolder() },
+                    onPositiveButtonClicked = {
+                        trackThreadListEvent("${trackerName}Confirm")
+                        mainViewModel.flushFolder()
+                    },
                 ).show()
             }
         }
@@ -351,6 +365,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun setupUnreadCountChip() = with(binding) {
         unreadCountChip.apply {
             setOnClickListener {
+                trackThreadListEvent("unreadFilter")
                 isCloseIconVisible = isChecked
                 mainViewModel.currentFilter.value = if (isChecked) ThreadFilter.UNSEEN else ThreadFilter.ALL
             }
