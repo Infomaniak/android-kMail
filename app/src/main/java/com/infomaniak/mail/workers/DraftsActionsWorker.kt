@@ -110,10 +110,10 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
             var hasRemoteException = false
 
             drafts.reversed().forEach { draft ->
-                try {
+                runCatching {
                     draft.uploadAttachments(realm = this)
                     executeDraftAction(draft, mailbox.uuid, realm = this, okHttpClient)?.also(scheduledDates::add)
-                } catch (exception: Exception) {
+                }.onFailure { exception ->
                     exception.printStackTrace()
                     if (exception is ApiController.NetworkException) throw exception
                     Sentry.captureException(exception)
@@ -149,10 +149,10 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
 
     private fun Draft.uploadAttachments(realm: MutableRealm): Result {
         getNotUploadedAttachments(this).forEach { attachment ->
-            try {
+            runCatching {
                 attachment.startUpload(this.localUuid, realm)
-            } catch (exception: Exception) {
-                if (exception.isNetworkException()) throw ApiController.NetworkException()
+            }.onFailure { exception ->
+                if ((exception as Exception).isNetworkException()) throw ApiController.NetworkException()
                 throw exception
             }
         }
