@@ -19,17 +19,14 @@ package com.infomaniak.mail.ui.main.settings
 
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Log
 import android.view.LayoutInflater
-import android.widget.CompoundButton
 import android.widget.FrameLayout
 import androidx.annotation.StringRes
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
-import com.infomaniak.lib.applock.LockActivity
 import com.infomaniak.lib.core.utils.getAttributes
-import com.infomaniak.lib.core.utils.requestCredentials
+import com.infomaniak.lib.core.utils.silentlyReverseSwitch
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.ViewItemSettingBinding
@@ -105,21 +102,10 @@ class ItemSettingView @JvmOverloads constructor(
         }
     }
 
-    fun reverseSwitch(activity: FragmentActivity, localSettings: LocalSettings) = with(binding.toggle) {
-        if (action == Action.TOGGLE && tag == null) {
-            silentClick()
-            activity.requestCredentials {
-                Log.i(LockActivity.FACE_ID_LOG_TAG, "success")
-                silentClick() // Click that doesn't pass in listener
-                localSettings.isAppLocked = isChecked
-            }
+    fun FragmentActivity.reverseSwitch(localSettings: LocalSettings) {
+        if (action == Action.TOGGLE) {
+            silentlyReverseSwitch(binding.toggle) { isChecked -> localSettings.isAppLocked = isChecked }
         }
-    }
-
-    private fun CompoundButton.silentClick() {
-        tag = true
-        performClick()
-        tag = null
     }
 
     private enum class Action {

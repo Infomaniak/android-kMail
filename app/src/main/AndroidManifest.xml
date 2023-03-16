@@ -79,8 +79,8 @@
 
         <activity
             android:name="com.infomaniak.lib.applock.LockActivity"
-            android:theme="@style/AppTheme.Lock"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/AppTheme.Lock" />
 
         <activity
             android:name=".ui.login.NoMailboxActivity"
