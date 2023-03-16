@@ -90,8 +90,6 @@ class Draft : RealmObject {
     var localUuid: String = UUID.randomUUID().toString()
     @Transient
     var messageUid: String? = null
-    @Transient
-    var parentMessageHasBeenDeleted: Boolean = false
     //endregion
 
     //region UI data (Transient & Ignore)

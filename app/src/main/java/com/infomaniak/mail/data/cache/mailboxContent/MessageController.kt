@@ -161,7 +161,6 @@ object MessageController {
             if (draft.action == null) {
                 delete(draft)
             } else {
-                draft.parentMessageHasBeenDeleted = true
                 draft.remoteUuid = null
             }
         }

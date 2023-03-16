@@ -196,7 +196,6 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
 
         when (draft.action) {
             DraftAction.SAVE -> with(ApiRepository.saveDraft(mailboxUuid, draft, okHttpClient)) {
-                if (draft.parentMessageHasBeenDeleted) realm.delete(draft)
                 if (data == null) {
                     throwErrorAsException()
                 } else {
@@ -211,7 +210,6 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
                     scheduledDate = data?.scheduledDate
                     realm.delete(draft)
                 } else {
-                    if (draft.parentMessageHasBeenDeleted) realm.delete(draft)
                     throwErrorAsException()
                 }
             }
