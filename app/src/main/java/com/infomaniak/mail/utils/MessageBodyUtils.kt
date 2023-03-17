@@ -40,13 +40,13 @@ object MessageBodyUtils {
         "#origbody",
         "#oriMsgHtmlSeperator",
         "#reply139content",
-        ".gmail_extra",
-        ".gmail_quote",
-        ".${INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME}",
-        ".moz-cite-prefix",
-        ".protonmail_quote",
-        ".yahoo_quoted",
-        ".zmail_extra", // Zoho
+        anyCssClassContaining("gmail_extra"),
+        anyCssClassContaining("gmail_quote"),
+        anyCssClassContaining(INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME),
+        anyCssClassContaining("moz-cite-prefix"),
+        anyCssClassContaining("protonmail_quote"),
+        anyCssClassContaining("yahoo_quoted"),
+        anyCssClassContaining("zmail_extra"), // Zoho
         "[name=\"quote\"]", // GMX
         "blockquote[type=\"cite\"]",
     )
@@ -111,9 +111,23 @@ object MessageBodyUtils {
         }
     }
 
-    private fun Document.selectElementAndFollowingSiblings(cssQuery: String): Elements {
-        return select("$cssQuery, $cssQuery ~ *")
+    //region Utils
+    /**
+     * Some mail clients rename classes to prefix them with example.
+     * We match all the css classes that contain the quote, in case this one has been renamed.
+     * @return a new css query
+     */
+    private fun anyCssClassContaining(cssClass: String) = "[class*=$cssClass]"
+
+    /**
+     * Some mail clients add the history in a new block, at the same level as the old one.
+     * And so we match the current block, as well as all those that follow and that are at the same level
+     * @return [Elements] which contains all the blocks that have been matched
+     */
+    private fun Document.selectElementAndFollowingSiblings(quoteDescriptor: String): Elements {
+        return select("$quoteDescriptor, $quoteDescriptor ~ *")
     }
+    //endregion
 
     data class MessageBodyQuote(
         val messageBody: String,
