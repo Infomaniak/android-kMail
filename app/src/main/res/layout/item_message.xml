@@ -173,140 +173,174 @@
 
     </com.google.android.material.card.MaterialCardView>
 
-    <TextView
-        android:id="@+id/fromPrefix"
-        style="@style/BodySmall.Secondary"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/messageDetails"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/marginStandardMedium"
-        android:text="@string/fromTitle"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/messageHeader" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/fromRecyclerView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/marginStandardSmall"
-        android:paddingStart="@dimen/marginStandardVerySmall"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        android:paddingBottom="@dimen/marginStandardMedium"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/prefixBarrier"
-        app:layout_constraintTop_toTopOf="@id/fromPrefix"
-        tools:ignore="RtlSymmetry"
-        tools:itemCount="2"
-        tools:listitem="@layout/item_detailed_contact" />
-
-    <TextView
-        android:id="@+id/toPrefix"
-        style="@style/BodySmall.Secondary"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/marginStandardMedium"
-        android:layout_marginTop="@dimen/marginStandardSmall"
-        android:text="@string/toTitle"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/fromRecyclerView" />
+        app:layout_constraintTop_toBottomOf="@id/messageHeader">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/toRecyclerView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/marginStandardSmall"
-        android:paddingStart="@dimen/marginStandardVerySmall"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/prefixBarrier"
-        app:layout_constraintTop_toTopOf="@id/toPrefix"
-        tools:ignore="RtlSymmetry"
-        tools:itemCount="3"
-        tools:listitem="@layout/item_detailed_contact" />
+        <TextView
+            android:id="@+id/fromPrefix"
+            style="@style/BodySmall.Secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/marginStandardMedium"
+            android:text="@string/fromTitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/ccPrefix"
-        style="@style/BodySmall.Secondary"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/marginStandardMedium"
-        android:layout_marginTop="@dimen/marginStandardSmall"
-        android:text="@string/ccTitle"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toRecyclerView" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/fromRecyclerView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/marginStandardSmall"
+            android:paddingStart="@dimen/marginStandardVerySmall"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/prefixBarrier"
+            app:layout_constraintTop_toTopOf="@id/fromPrefix"
+            tools:ignore="RtlSymmetry"
+            tools:itemCount="2"
+            tools:listitem="@layout/item_detailed_contact" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/ccRecyclerView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/marginStandardSmall"
-        android:paddingStart="@dimen/marginStandardVerySmall"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/prefixBarrier"
-        app:layout_constraintTop_toTopOf="@id/ccPrefix"
-        tools:ignore="RtlSymmetry"
-        tools:itemCount="2"
-        tools:listitem="@layout/item_detailed_contact" />
+        <TextView
+            android:id="@+id/toPrefix"
+            style="@style/BodySmall.Secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/marginStandardMedium"
+            android:layout_marginTop="@dimen/marginStandardSmall"
+            android:text="@string/toTitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/fromRecyclerView" />
 
-    <TextView
-        android:id="@+id/bccPrefix"
-        style="@style/BodySmall.Secondary"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/marginStandardMedium"
-        android:layout_marginTop="@dimen/marginStandardSmall"
-        android:text="@string/bccTitle"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ccRecyclerView" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/toRecyclerView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/marginStandardSmall"
+            android:paddingStart="@dimen/marginStandardVerySmall"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/prefixBarrier"
+            app:layout_constraintTop_toTopOf="@id/toPrefix"
+            tools:ignore="RtlSymmetry"
+            tools:itemCount="3"
+            tools:listitem="@layout/item_detailed_contact" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/bccRecyclerView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/marginStandardSmall"
-        android:paddingStart="@dimen/marginStandardVerySmall"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/prefixBarrier"
-        app:layout_constraintTop_toTopOf="@id/bccPrefix"
-        tools:ignore="RtlSymmetry"
-        tools:itemCount="1"
-        tools:listitem="@layout/item_detailed_contact" />
+        <TextView
+            android:id="@+id/ccPrefix"
+            style="@style/BodySmall.Secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/marginStandardMedium"
+            android:layout_marginTop="@dimen/marginStandardSmall"
+            android:text="@string/ccTitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toRecyclerView" />
 
-    <ImageView
-        android:id="@+id/detailedMessagePrefix"
-        android:layout_width="18dp"
-        android:layout_height="18dp"
-        android:layout_marginStart="@dimen/marginStandardMedium"
-        android:layout_marginTop="@dimen/marginStandardSmall"
-        android:src="@drawable/ic_calendar"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/bccRecyclerView"
-        app:tint="@color/iconColor"
-        tools:ignore="ContentDescription" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/ccRecyclerView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/marginStandardSmall"
+            android:paddingStart="@dimen/marginStandardVerySmall"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/prefixBarrier"
+            app:layout_constraintTop_toTopOf="@id/ccPrefix"
+            tools:ignore="RtlSymmetry"
+            tools:itemCount="2"
+            tools:listitem="@layout/item_detailed_contact" />
 
-    <TextView
-        android:id="@+id/detailedMessageDate"
-        style="@style/BodySmall.Secondary"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/marginStandardMedium"
-        app:layout_constraintBottom_toBottomOf="@id/detailedMessagePrefix"
-        app:layout_constraintStart_toEndOf="@id/prefixBarrier"
-        app:layout_constraintTop_toTopOf="@id/detailedMessagePrefix"
-        tools:text="10 juin 2022, 16:36" />
+        <TextView
+            android:id="@+id/bccPrefix"
+            style="@style/BodySmall.Secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/marginStandardMedium"
+            android:layout_marginTop="@dimen/marginStandardSmall"
+            android:text="@string/bccTitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ccRecyclerView" />
 
-    <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/prefixBarrier"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:barrierDirection="right"
-        app:constraint_referenced_ids="fromPrefix,toPrefix,ccPrefix,bccPrefix,detailedMessagePrefix" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/bccRecyclerView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/marginStandardSmall"
+            android:paddingStart="@dimen/marginStandardVerySmall"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/prefixBarrier"
+            app:layout_constraintTop_toTopOf="@id/bccPrefix"
+            tools:ignore="RtlSymmetry"
+            tools:itemCount="1"
+            tools:listitem="@layout/item_detailed_contact" />
+
+        <ImageView
+            android:id="@+id/detailedMessagePrefix"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_marginStart="@dimen/marginStandardMedium"
+            android:layout_marginTop="@dimen/marginStandardSmall"
+            android:src="@drawable/ic_calendar"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/bccRecyclerView"
+            app:tint="@color/iconColor"
+            tools:ignore="ContentDescription" />
+
+        <TextView
+            android:id="@+id/detailedMessageDate"
+            style="@style/BodySmall.Secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/marginStandardMedium"
+            app:layout_constraintBottom_toBottomOf="@id/detailedMessagePrefix"
+            app:layout_constraintStart_toEndOf="@id/prefixBarrier"
+            app:layout_constraintTop_toTopOf="@id/detailedMessagePrefix"
+            tools:text="10 juin 2022, 16:36" />
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/prefixBarrier"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="right"
+            app:constraint_referenced_ids="fromPrefix,toPrefix,ccPrefix,bccPrefix,detailedMessagePrefix" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/toGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:constraint_referenced_ids="toRecyclerView,toPrefix"
+            tools:visibility="visible" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/ccGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:constraint_referenced_ids="ccRecyclerView,ccPrefix"
+            tools:visibility="visible" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/bccGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:constraint_referenced_ids="bccRecyclerView,bccPrefix"
+            tools:visibility="visible" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/attachmentsRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/marginStandardMedium"
         android:clipToPadding="false"
         android:orientation="horizontal"
         android:paddingHorizontal="@dimen/alternativeMargin"
@@ -314,7 +348,7 @@
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/detailedMessageDate"
+        app:layout_constraintTop_toBottomOf="@id/messageDetails"
         app:layout_goneMarginTop="@dimen/marginStandardSmall"
         tools:listitem="@layout/item_attachment" />
 
@@ -466,30 +500,6 @@
         android:layout_height="wrap_content"
         android:visibility="gone"
         app:constraint_referenced_ids="attachmentsIcon,attachmentsSizeText,attachmentsDownloadAllButton"
-        tools:visibility="visible" />
-
-    <androidx.constraintlayout.widget.Group
-        android:id="@+id/ccGroup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:constraint_referenced_ids="ccRecyclerView,ccPrefix"
-        tools:visibility="visible" />
-
-    <androidx.constraintlayout.widget.Group
-        android:id="@+id/bccGroup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:constraint_referenced_ids="bccRecyclerView,bccPrefix"
-        tools:visibility="visible" />
-
-    <androidx.constraintlayout.widget.Group
-        android:id="@+id/detailedFieldsGroup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:constraint_referenced_ids="fromPrefix,fromRecyclerView,toPrefix,toRecyclerView,detailedMessagePrefix,detailedMessageDate"
         tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
