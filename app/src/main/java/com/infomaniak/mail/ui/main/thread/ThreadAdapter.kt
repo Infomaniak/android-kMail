@@ -62,8 +62,6 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
     var onReplyClicked: ((Message) -> Unit)? = null
     var onMenuClicked: ((Message) -> Unit)? = null
 
-    private val plainTextMargin by lazy { 10.toPx() } // Experimentally measured
-
     override fun updateList(itemList: List<Message>) {
         messages = itemList
     }
