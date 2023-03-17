@@ -31,7 +31,7 @@ import kotlinx.coroutines.Dispatchers
 
 class DownloadAttachmentViewModel(application: Application) : AndroidViewModel(application) {
 
-    private inline val context: Context get() = getApplication<Application>()
+    private inline val context: Context get() = getApplication()
 
     /**
      * We keep the Attachment, in case the ViewModel is destroyed before it finishes downloading

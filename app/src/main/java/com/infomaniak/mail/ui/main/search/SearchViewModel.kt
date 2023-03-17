@@ -43,7 +43,8 @@ import kotlinx.coroutines.flow.*
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class SearchViewModel(application: Application) : AndroidViewModel(application) {
 
-    private inline val context: Context get() = getApplication<Application>()
+    private inline val context: Context get() = getApplication()
+
     private val searchQuery = MutableStateFlow("")
     private val _selectedFilters = MutableStateFlow(emptySet<ThreadFilter>())
     private inline val selectedFilters get() = _selectedFilters.value.toMutableSet()
