@@ -52,7 +52,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         private set
     var isExpandedMap = mutableMapOf<String, Boolean>()
     var isThemeTheSameMap = mutableMapOf<String, Boolean>()
-    var contacts: Map<Recipient, MergedContact> = emptyMap()
+    var contacts: Map<String, Map<String, MergedContact>> = emptyMap()
 
     var onContactClicked: ((contact: Recipient) -> Unit)? = null
     var onDeleteDraftClicked: ((message: Message) -> Unit)? = null
@@ -415,7 +415,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         return listOf(*to.toTypedArray(), *cc.toTypedArray(), *bcc.toTypedArray()).joinToString { it.displayedName(context) }
     }
 
-    fun updateContacts(newContacts: Map<Recipient, MergedContact>) {
+    fun updateContacts(newContacts: Map<String, Map<String, MergedContact>>) {
         contacts = newContacts
         notifyItemRangeChanged(0, itemCount, NotificationType.AVATAR)
     }
