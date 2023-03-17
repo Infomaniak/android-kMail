@@ -253,14 +253,14 @@ class SearchFragment : Fragment() {
         }
 
         mainViewModel.currentFoldersLive.value?.let { (defaultFolders, customFolders) ->
-            val folders = defaultFolders.toMutableList<Any>()
-
-            folders.add(0, SearchFolderElement.ALL_FOLDERS)
-            folders.add(SearchFolderElement.SEPARATOR)
-            folders.addAll(customFolders)
+            val folders = defaultFolders.toMutableList<Any>().apply {
+                add(0, SearchFolderElement.ALL_FOLDERS)
+                add(SearchFolderElement.SEPARATOR)
+                addAll(customFolders)
+            }.toList()
 
             popupMenu.setAdapter(
-                SearchFolderAdapter(folders.toList()) { folder, title ->
+                SearchFolderAdapter(folders) { folder, title ->
                     onFolderSelected(folder, title)
                     popupMenu.dismiss()
                 }
