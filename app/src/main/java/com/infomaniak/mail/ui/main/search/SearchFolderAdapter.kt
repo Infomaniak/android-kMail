@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.search
 
+import android.content.Context
 import android.database.DataSetObserver
 import android.view.LayoutInflater
 import android.view.View
@@ -25,12 +26,15 @@ import android.widget.ListAdapter
 import androidx.appcompat.content.res.AppCompatResources
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.databinding.ItemDividerHorizontalBinding
 import com.infomaniak.mail.databinding.ItemSearchFolderBinding
+import com.infomaniak.mail.ui.main.search.SearchFolderAdapter.SearchFolderElement.FOLDER
+import com.infomaniak.mail.ui.main.search.SearchFolderAdapter.SearchFolderElement.SEPARATOR
 import com.infomaniak.mail.utils.getLocalizedNameOrAllFolders
 import com.infomaniak.mail.views.MenuDrawerItemView
 
 class SearchFolderAdapter(
-    val folders: List<Folder?>,
+    val folders: List<Any>,
     val onClickListener: (folder: Folder?, title: String) -> Unit,
 ) : ListAdapter {
 
@@ -42,21 +46,35 @@ class SearchFolderAdapter(
 
     override fun getCount(): Int = folders.count()
 
-    override fun getItem(position: Int): Any? = folders[position]
+    override fun getItem(position: Int): Any = folders[position]
 
-    override fun getItemId(position: Int): Long = folders[position]?.id.hashCode().toLong()
+    override fun getItemId(position: Int): Long = position.toLong()
 
-    override fun hasStableIds(): Boolean = true
+    override fun hasStableIds(): Boolean = false
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         val context = parent!!.context
+        return when (getItemViewType(position)) {
+            SEPARATOR.itemId -> bindSeparator(convertView, context, parent)
+            else -> bindFolder(convertView, context, parent, getItem(position) as? Folder)
+        }
+    }
+
+    private fun bindSeparator(convertView: View?, context: Context?, parent: ViewGroup): View {
+        return (convertView ?: ItemDividerHorizontalBinding.inflate(LayoutInflater.from(context), parent, false).root)
+    }
+
+    private fun bindFolder(
+        convertView: View?,
+        context: Context,
+        parent: ViewGroup?,
+        folder: Folder?,
+    ): View {
         (convertView ?: ItemSearchFolderBinding.inflate(LayoutInflater.from(context), parent, false).root).apply {
             findViewById<MenuDrawerItemView>(R.id.menuDrawerItem).apply {
-                val folder = folders[position]
-
                 val entryName: String = context.getLocalizedNameOrAllFolders(folder)
                 text = entryName
-                icon = AppCompatResources.getDrawable(context, folder?.getIcon() ?: R.drawable.ic_folder)
+                icon = AppCompatResources.getDrawable(context, folder?.getIcon() ?: R.drawable.ic_all_folders)
 
                 setSelectedState(folder == selectedFolder)
 
@@ -70,13 +88,22 @@ class SearchFolderAdapter(
         }
     }
 
-    override fun getItemViewType(position: Int): Int = 0
+    override fun getItemViewType(position: Int): Int = when (val item = getItem(position)) {
+        is SearchFolderElement -> item.itemId
+        else -> FOLDER.itemId
+    }
 
-    override fun getViewTypeCount(): Int = 1
+    override fun getViewTypeCount(): Int = 3
 
     override fun isEmpty(): Boolean = folders.isEmpty()
 
-    override fun areAllItemsEnabled(): Boolean = true
+    override fun areAllItemsEnabled(): Boolean = false
 
-    override fun isEnabled(position: Int): Boolean = true
+    override fun isEnabled(position: Int): Boolean = getItemViewType(position) != SEPARATOR.itemId
+
+    enum class SearchFolderElement(val itemId: Int) {
+        FOLDER(0),
+        ALL_FOLDERS(1),
+        SEPARATOR(2),
+    }
 }

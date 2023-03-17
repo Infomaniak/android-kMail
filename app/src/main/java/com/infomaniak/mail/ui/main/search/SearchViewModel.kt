@@ -20,12 +20,14 @@ package com.infomaniak.mail.ui.main.search
 import android.app.Application
 import android.content.Context
 import android.util.Log
-import androidx.lifecycle.*
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.trackSearchEvent
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
@@ -64,8 +66,6 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
         val searchQuery = if (isLengthTooShort(query)) null else query
         fetchThreads(searchQuery, filters)
     }.asLiveData(coroutineContext)
-
-    val folders = liveData(coroutineContext) { emit(FolderController.getFolders()) }
 
     var selectedFolder: Folder? = null
     var previousSearch: String? = null

@@ -50,6 +50,7 @@ import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentSearchBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
+import com.infomaniak.mail.ui.main.search.SearchFolderAdapter.SearchFolderElement
 import com.infomaniak.mail.utils.addStickyDateDecoration
 import com.infomaniak.mail.utils.getLocalizedNameOrAllFolders
 import com.infomaniak.mail.utils.navigateToThread
@@ -251,9 +252,12 @@ class SearchFragment : Fragment() {
             width = resources.getDimensionPixelSize(R.dimen.maxSearchChipWidth)
         }
 
-        searchViewModel.folders.observe(viewLifecycleOwner) { realmFolders ->
-            val folders = realmFolders.toMutableList<Folder?>()
-            folders.add(0, null)
+        mainViewModel.currentFoldersLive.value?.let { (defaultFolders, customFolders) ->
+            val folders = defaultFolders.toMutableList<Any>().apply {
+                add(0, SearchFolderElement.ALL_FOLDERS)
+                add(SearchFolderElement.SEPARATOR)
+                addAll(customFolders)
+            }.toList()
 
             popupMenu.setAdapter(
                 SearchFolderAdapter(folders) { folder, title ->
