@@ -57,7 +57,7 @@ import com.infomaniak.lib.core.R as RCore
 @OptIn(ExperimentalCoroutinesApi::class)
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
-    private inline val context: Context get() = getApplication<Application>()
+    private inline val context: Context get() = getApplication()
 
     val isInternetAvailable = SingleLiveEvent<Boolean>()
     val isDownloadingChanges = MutableLiveData(false)

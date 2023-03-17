@@ -53,11 +53,12 @@ import org.jsoup.nodes.Document
 
 class NewMessageViewModel(application: Application) : AndroidViewModel(application) {
 
+    private inline val context: Context get() = getApplication()
+
     var draft: Draft = Draft()
 
     private val coroutineContext = viewModelScope.coroutineContext + Dispatchers.IO
     private var autoSaveJob: Job? = null
-    private inline val context: Context get() = getApplication<Application>()
 
     var isAutoCompletionOpened = false
     var isEditorExpanded = false
