@@ -242,6 +242,8 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
             onContactClicked?.invoke(message.from.first())
         }
 
+        setDetailedFieldsVisibility(message)
+
         initWebViewClientIfNeeded(message.attachments)
 
         handleHeaderClick(message)
@@ -274,6 +276,12 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         )
     }
 
+    private fun ItemMessageBinding.setDetailedFieldsVisibility(message: Message) {
+        toGroup.isVisible = message.to.isNotEmpty()
+        ccGroup.isVisible = message.cc.isNotEmpty()
+        bccGroup.isVisible = message.bcc.isNotEmpty()
+    }
+
     private fun ItemMessageBinding.handleHeaderClick(message: Message) {
         messageHeader.setOnClickListener {
             if (isExpandedMap[message.uid] == true) {
@@ -295,9 +303,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
             message.detailsAreExpanded = !message.detailsAreExpanded
             val isExpanded = message.detailsAreExpanded
             recipientChevron.toggleChevron(!isExpanded)
-            detailedFieldsGroup.isVisible = isExpanded
-            ccGroup.isVisible = isExpanded && message.cc.isNotEmpty()
-            bccGroup.isVisible = isExpanded && message.bcc.isNotEmpty()
+            messageDetails.isVisible = isExpanded
             context.trackMessageEvent("openDetails", isExpanded)
         }
     }
@@ -386,9 +392,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
 
     private fun ItemMessageBinding.collapseMessageDetails(message: Message) {
         message.detailsAreExpanded = false
-        ccGroup.isGone = true
-        bccGroup.isGone = true
-        detailedFieldsGroup.isGone = true
+        messageDetails.isGone = true
         recipientChevron.rotation = 0.0f
     }
 
