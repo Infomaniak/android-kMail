@@ -4,7 +4,7 @@ buildscript {
     ext.livedata_version = '2.6.0' // TODO: Temporary support for kDrive, remove this when it's fixed in :Core
     ext.navigation_version = '2.5.3'
     ext.serialization_json_version = '1.5.0' // TODO: Temporary support for kDrive, remove this when it's fixed in :Core
-    ext.java_version = JavaVersion.VERSION_1_8
+    ext.java_version = JavaVersion.VERSION_11
     // Realm Kotlin PRODUCTION
     ext.realm_kotlin_version = '1.7.0'
     // Realm Kotlin SNAPSHOT
