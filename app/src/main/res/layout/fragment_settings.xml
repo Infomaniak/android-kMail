@@ -61,6 +61,13 @@
                 android:text="@string/settingsSectionGeneral" />
 
             <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                android:id="@+id/settingsAppLock"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:itemAction="toggle"
+                app:title="@string/settingsAppLock" />
+
+            <com.infomaniak.mail.ui.main.settings.ItemSettingView
                 android:id="@+id/settingsNotifications"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -74,13 +81,6 @@
                 android:visibility="gone"
                 app:itemAction="chevron"
                 app:title="@string/settingsSendTitle" />
-
-            <com.infomaniak.mail.ui.main.settings.ItemSettingView
-                android:id="@+id/settingsAppLock"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:itemAction="toggle"
-                app:title="@string/settingsAppLock" />
 
             <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
 
