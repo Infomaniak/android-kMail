@@ -314,7 +314,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             }
             SwipeAction.READ_UNREAD -> {
                 toggleThreadSeenStatus(threadUid)
-                true
+                currentFilter.value != ThreadFilter.UNSEEN
             }
             SwipeAction.SPAM -> {
                 toggleThreadSpamStatus(threadUid)
