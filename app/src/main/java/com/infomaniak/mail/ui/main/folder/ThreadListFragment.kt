@@ -38,7 +38,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import androidx.work.Operation
+import androidx.work.Operation.State
 import androidx.work.WorkManager
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.VERTICAL_LIST_WITH_VERTICAL_DRAGGING
@@ -124,6 +124,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         observeNetworkStatus()
         observeCurrentThreads()
         observeDownloadState()
+        observeFilter()
         observeCurrentFolder()
         observeCurrentFolderLive()
         observeUpdatedAtTriggers()
@@ -388,10 +389,20 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
+    private fun observeFilter() {
+        mainViewModel.currentFilter.observe(viewLifecycleOwner) {
+            if (it == ThreadFilter.ALL) {
+                with(binding.unreadCountChip) {
+                    isChecked = false
+                    isCloseIconVisible = false
+                }
+            }
+        }
+    }
+
     private fun observeCurrentFolder() {
         mainViewModel.currentFolder.observeNotNull(viewLifecycleOwner) { folder ->
             lastUpdatedDate = null
-            clearFilter()
             displayFolderName(folder)
             threadListAdapter.updateFolderRole(folder.role)
         }
@@ -426,13 +437,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
 
         WorkManager.getInstance(requireContext()).pruneWork().state.observe(viewLifecycleOwner) {
-            if (it is Operation.State.FAILURE || it is Operation.State.SUCCESS) observeDraftsActions()
+            if (it is State.FAILURE || it is State.SUCCESS) observeDraftsActions()
         }
     }
-
-    //region Multi selection observer
-
-    //endregion
 
     private fun updateUpdatedAt(newLastUpdatedDate: Date? = null) {
 
@@ -451,13 +458,13 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun updateUnreadCount(unreadCount: Int) {
+    private fun updateUnreadCount(unreadCount: Int) = with(mainViewModel) {
 
-        if (mainViewModel.currentFilter.value == ThreadFilter.UNSEEN && unreadCount == 0) clearFilter()
+        if (currentFilter.value == ThreadFilter.UNSEEN && unreadCount == 0) currentFilter.value = ThreadFilter.ALL
 
         binding.unreadCountChip.apply {
             text = resources.getQuantityString(R.plurals.threadListHeaderUnreadCount, unreadCount, formatUnreadCount(unreadCount))
-            isGone = unreadCount == 0 || mainViewModel.isMultiSelectOn
+            isGone = unreadCount == 0 || isMultiSelectOn
         }
     }
 
@@ -499,17 +506,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         val firstMessageCustomUid = "${threads.firstOrNull()?.uid}_${AccountUtils.currentMailboxId}"
         return (firstMessageCustomUid != previousFirstMessageUid).also {
             previousFirstMessageUid = firstMessageCustomUid
-        }
-    }
-
-    private fun clearFilter() {
-        with(mainViewModel.currentFilter) {
-            if (value != ThreadFilter.ALL) value = ThreadFilter.ALL
-        }
-
-        with(binding.unreadCountChip) {
-            isChecked = false
-            isCloseIconVisible = false
         }
     }
 

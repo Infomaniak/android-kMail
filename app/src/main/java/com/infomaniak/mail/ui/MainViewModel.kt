@@ -254,6 +254,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun openFolder(folderId: String) = viewModelScope.launch(Dispatchers.IO) {
         if (folderId == currentFolderId) return@launch
 
+        if (currentFilter.value != ThreadFilter.ALL) currentFilter.postValue(ThreadFilter.ALL)
+
         selectFolder(folderId)
         refreshThreads(folderId = folderId)
     }
