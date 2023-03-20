@@ -49,7 +49,9 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
 
     private val searchQuery = MutableStateFlow("")
     private val _selectedFilters = MutableStateFlow(emptySet<ThreadFilter>())
+    private var _selectedFolder = MutableStateFlow<Folder?>(null)
     private inline val selectedFilters get() = _selectedFilters.value.toMutableSet()
+    val selectedFolder: Folder? get() = _selectedFolder.value
     val visibilityMode = MutableLiveData(VisibilityMode.RECENT_SEARCHES)
     val history = SingleLiveEvent<String>()
 
@@ -62,18 +64,18 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
 
     private val isLastPage get() = resourceNext.isNullOrBlank()
 
-    val searchResults = observeSearchAndFilters().flatMapLatest { (query, filters) ->
+    val searchResults = observeSearchAndFilters().flatMapLatest { (query, filters, folder) ->
         val searchQuery = if (isLengthTooShort(query)) null else query
-        fetchThreads(searchQuery, filters)
+        fetchThreads(searchQuery, filters, folder)
     }.asLiveData(coroutineContext)
 
-    var selectedFolder: Folder? = null
+
     var previousSearch: String? = null
     var previousMutuallyExclusiveChips: Int? = null
     var previousAttachments: Boolean? = null
 
-    private fun observeSearchAndFilters() = searchQuery.combine(_selectedFilters) { query, filters ->
-        query to filters
+    private fun observeSearchAndFilters() = combine(searchQuery, _selectedFilters, _selectedFolder) { query, filters, folder ->
+        Triple(query, filters, folder)
     }.debounce(SEARCH_DEBOUNCE_DURATION)
 
     fun init(dummyFolderId: String) {
@@ -91,12 +93,7 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
 
     fun selectFolder(folder: Folder?) {
         resetPagination()
-        if (folder == null && selectedFilters.contains(ThreadFilter.FOLDER)) {
-            ThreadFilter.FOLDER.unselect()
-        } else if (folder != null) {
-            ThreadFilter.FOLDER.select()
-        }
-        selectedFolder = folder
+        _selectedFolder.value = folder
     }
 
     fun toggleFilter(filter: ThreadFilter) {
@@ -144,7 +141,7 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
 
     private fun isLengthTooShort(query: String?) = query == null || query.length < MIN_SEARCH_QUERY
 
-    private fun fetchThreads(query: String?, filters: Set<ThreadFilter>): Flow<List<Thread>> = flow {
+    private fun fetchThreads(query: String?, filters: Set<ThreadFilter>, folder: Folder?): Flow<List<Thread>> = flow {
 
         suspend fun ApiResponse<ThreadResult>.initSearchFolderThreads() {
             runCatching {
@@ -156,7 +153,7 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
         }
 
         if (isLastPage && resourcePrevious.isNullOrBlank()) SearchUtils.deleteRealmSearchData()
-        if (filters.isEmpty() && query.isNullOrBlank()) {
+        if (filters.isEmpty() && query.isNullOrBlank() && folder == null) {
             visibilityMode.postValue(VisibilityMode.RECENT_SEARCHES)
             return@flow
         }
@@ -164,8 +161,8 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
         visibilityMode.postValue(VisibilityMode.LOADING)
 
         val currentMailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
-        val folderId = selectedFolder?.id ?: dummyFolderId
-        val searchFilters = SearchUtils.searchFilters(query, filters)
+        val folderId = folder?.id ?: dummyFolderId
+        val searchFilters = SearchUtils.searchFilters(query, filters, folder != null)
         val apiResponse = ApiRepository.searchThreads(currentMailbox.uuid, folderId, searchFilters, resourceNext)
 
         if (apiResponse.isSuccess()) with(apiResponse) {
@@ -173,14 +170,15 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
             resourceNext = data?.resourceNext
             resourcePrevious = data?.resourcePrevious
         } else if (isLastPage) {
-            ThreadController.saveThreads(searchMessages = MessageController.searchMessages(query, filters, folderId))
+            val newFilters = if (folder == null) filters else filters + setOf(ThreadFilter.FOLDER)
+            ThreadController.saveThreads(searchMessages = MessageController.searchMessages(query, newFilters, folderId))
         }
 
         emitAll(ThreadController.getSearchThreadsAsync().mapLatest {
             query?.let(history::postValue)
             it.list.also { threads ->
                 val resultsVisibilityMode = when {
-                    selectedFilters.isEmpty() && isLengthTooShort(searchQuery.value) -> VisibilityMode.RECENT_SEARCHES
+                    selectedFilters.isEmpty() && isLengthTooShort(searchQuery.value) && folder == null -> VisibilityMode.RECENT_SEARCHES
                     threads.isEmpty() -> VisibilityMode.NO_RESULTS
                     else -> VisibilityMode.RESULTS
                 }

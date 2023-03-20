@@ -33,8 +33,8 @@ object SearchUtils {
 
     val TAG = SearchUtils::class.simpleName
 
-    fun searchFilters(query: String?, filters: Set<ThreadFilter>): String {
-        val filtersQuery = StringBuilder("severywhere=${if (filters.contains(ThreadFilter.FOLDER)) "0" else "1"}")
+    fun searchFilters(query: String?, filters: Set<ThreadFilter>, hasFolder: Boolean): String {
+        val filtersQuery = StringBuilder("severywhere=${if (hasFolder) "0" else "1"}")
         if (query?.isNotBlank() == true) filtersQuery.append("&scontains=$query")
 
         with(filters) {
