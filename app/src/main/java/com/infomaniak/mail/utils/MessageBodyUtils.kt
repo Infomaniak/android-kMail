@@ -113,7 +113,7 @@ object MessageBodyUtils {
 
     //region Utils
     /**
-     * Some mail clients rename classes to prefix them with example.
+     * Some email clients rename css classes to prefix them for example.
      * We match all the css classes that contain the quote, in case this one has been renamed.
      * @return a new css query
      */
