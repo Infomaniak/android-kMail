@@ -22,6 +22,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.inputmethod.EditorInfo
 import android.widget.FrameLayout
+import androidx.core.view.children
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
@@ -127,11 +128,13 @@ class RecipientFieldView @JvmOverloads constructor(
                 }
 
                 setOnEditorActionListener { _, actionId, _ ->
-                    if (actionId == EditorInfo.IME_ACTION_DONE && autoCompleteInput.text.isNotBlank()) {
+                    if (actionId == EditorInfo.IME_ACTION_DONE && autoCompleteInput.text?.isNotBlank() == true) {
                         contactAdapter!!.addFirstAvailableItem()
                     }
                     true // Keep keyboard open
                 }
+
+                setBackspaceOnEmptyFieldListener(::selectLastChip)
             }
 
             if (isInEditMode) {
@@ -139,6 +142,11 @@ class RecipientFieldView @JvmOverloads constructor(
                 plusChip.isVisible = isToggleable
             }
         }
+    }
+
+    private fun selectLastChip() {
+        val count = binding.itemsChipGroup.childCount
+        if (count > 0) binding.itemsChipGroup.children.elementAt(count - 1).requestFocusFromTouch()
     }
 
     private fun updateCollapsedUiState(isCollapsed: Boolean) = with(binding) {
