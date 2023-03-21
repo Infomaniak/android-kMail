@@ -375,7 +375,11 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         mainViewModel.isInternetAvailable.observe(viewLifecycleOwner) { isAvailable ->
             TransitionManager.beginDelayedTransition(binding.root)
             binding.noNetwork.isGone = isAvailable
-            updateThreadsVisibility()
+            if (isAvailable) {
+                mainViewModel.forceRefreshThreads()
+            } else {
+                updateThreadsVisibility()
+            }
         }
     }
 
