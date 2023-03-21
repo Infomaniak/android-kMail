@@ -22,6 +22,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.inputmethod.EditorInfo
 import android.widget.FrameLayout
+import androidx.core.view.children
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
@@ -127,11 +128,13 @@ class RecipientFieldView @JvmOverloads constructor(
                 }
 
                 setOnEditorActionListener { _, actionId, _ ->
-                    if (actionId == EditorInfo.IME_ACTION_DONE && autoCompleteInput.text.isNotBlank()) {
+                    if (actionId == EditorInfo.IME_ACTION_DONE && autoCompleteInput.text?.isNotBlank() == true) {
                         contactAdapter!!.addFirstAvailableItem()
                     }
                     true // Keep keyboard open
                 }
+
+                setBackspaceOnEmptyFieldListener(::focusLastChip)
             }
 
             if (isInEditMode) {
@@ -139,6 +142,14 @@ class RecipientFieldView @JvmOverloads constructor(
                 plusChip.isVisible = isToggleable
             }
         }
+    }
+
+    private fun focusLastChip() = with(binding) {
+        if (itemsChipGroup.childCount > 0) itemsChipGroup.children.last().requestFocusFromTouch()
+    }
+
+    private fun focusTextField() {
+        binding.autoCompleteInput.requestFocus()
     }
 
     private fun updateCollapsedUiState(isCollapsed: Boolean) = with(binding) {
@@ -196,6 +207,10 @@ class RecipientFieldView @JvmOverloads constructor(
         ChipContactBinding.inflate(LayoutInflater.from(context)).root.apply {
             text = recipient.getNameOrEmail()
             setOnClickListener { removeRecipient(recipient) }
+            setOnBackspaceListener {
+                removeRecipient(recipient)
+                focusTextField()
+            }
             binding.itemsChipGroup.addView(this)
         }
     }

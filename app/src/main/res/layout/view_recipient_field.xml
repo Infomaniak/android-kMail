@@ -56,7 +56,7 @@
         app:layout_constraintTop_toTopOf="@id/singleLineGuide"
         tools:text="@string/bccTitle" />
 
-    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+    <com.infomaniak.mail.ui.main.newMessage.BackspaceAwareAutoComplete
         android:id="@+id/autoCompleteInput"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
