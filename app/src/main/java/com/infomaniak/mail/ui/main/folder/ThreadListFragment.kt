@@ -466,10 +466,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             else -> DateUtils.getRelativeTimeSpanString(lastUpdatedAt.time).toString().replaceFirstChar { it.lowercaseChar() }
         }
 
-        binding.updatedAt.text = if (ago == null) {
-            getString(R.string.noUpdatedAt)
-        } else {
-            getString(R.string.threadListHeaderLastUpdate, ago)
+        binding.updatedAt.text = when (ago) {
+            null -> getString(R.string.noUpdatedAt)
+            else -> getString(R.string.threadListHeaderLastUpdate, ago)
         }
     }
 
