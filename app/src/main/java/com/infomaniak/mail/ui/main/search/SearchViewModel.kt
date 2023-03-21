@@ -169,7 +169,7 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
             resourceNext = data?.resourceNext
             resourcePrevious = data?.resourcePrevious
         } else if (isLastPage) {
-            val newFilters = if (folder == null) filters else filters + setOf(ThreadFilter.FOLDER)
+            val newFilters = if (folder == null) filters else (filters + ThreadFilter.FOLDER)
             ThreadController.saveThreads(searchMessages = MessageController.searchMessages(query, newFilters, folderId))
         }
 
