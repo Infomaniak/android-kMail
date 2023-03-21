@@ -29,7 +29,6 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.core.view.isGone
-import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -468,7 +467,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
 
         binding.updatedAt.apply {
-            isInvisible = ago.isEmpty()
+            isGone = ago.isEmpty()
             if (ago.isNotEmpty()) text = getString(R.string.threadListHeaderLastUpdate, ago)
         }
     }
