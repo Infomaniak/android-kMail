@@ -504,11 +504,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun setEmptyState(emptyState: EmptyState) = with(binding) {
-
-        threadListAdapter.updateList(emptyList())
-
-        emptyStateView.apply {
+    private fun setEmptyState(emptyState: EmptyState) {
+        binding.emptyStateView.apply {
             illustration = getDrawable(context, emptyState.drawableId)
             title = getString(emptyState.titleId)
             description = getString(emptyState.descriptionId)
