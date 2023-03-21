@@ -194,6 +194,7 @@
     <string name="noMailboxDescription">Vous n’avez pas d’adresse mail associée à votre compte Infomaniak. Pour ajouter une adresse, appuyez sur le bouton ci-dessous.</string>
     <string name="noMailboxTitle">Pas d’adresse mail associée à ce compte</string>
     <string name="noNetwork">Pas de signal</string>
+    <string name="noUpdatedAt">Jamais mis à jour</string>
     <string name="noSubjectTitle">(aucun sujet)</string>
     <string name="notificationGeneralChannelName">Notification générales</string>
     <string name="notificationNewMessagesChannelName">Nouveaux e-mails</string>

@@ -461,14 +461,15 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         val lastUpdatedAt = lastUpdatedDate
 
         val ago = when {
-            lastUpdatedAt == null -> ""
+            lastUpdatedAt == null -> null
             Date().time - lastUpdatedAt.time < DateUtils.MINUTE_IN_MILLIS -> getString(R.string.threadListHeaderLastUpdateNow)
             else -> DateUtils.getRelativeTimeSpanString(lastUpdatedAt.time).toString().replaceFirstChar { it.lowercaseChar() }
         }
 
-        binding.updatedAt.apply {
-            isGone = ago.isEmpty()
-            if (ago.isNotEmpty()) text = getString(R.string.threadListHeaderLastUpdate, ago)
+        binding.updatedAt.text = if (ago == null) {
+            getString(R.string.noUpdatedAt)
+        } else {
+            getString(R.string.threadListHeaderLastUpdate, ago)
         }
     }
 
