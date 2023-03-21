@@ -20,8 +20,11 @@ package com.infomaniak.mail.ui.main.newMessage
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.FrameLayout
+import android.widget.PopupWindow
+import android.widget.Toast
 import androidx.core.view.children
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -35,6 +38,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ChipContactBinding
+import com.infomaniak.mail.databinding.ViewContactChipContextMenuBinding
 import com.infomaniak.mail.databinding.ViewRecipientFieldBinding
 import com.infomaniak.mail.utils.isEmail
 import com.infomaniak.mail.utils.toggleChevron
@@ -49,6 +53,28 @@ class RecipientFieldView @JvmOverloads constructor(
 
     private var contactAdapter: ContactAdapter? = null
     private val recipients = mutableSetOf<Recipient>()
+
+    private val contextMenuBinding by lazy {
+        ViewContactChipContextMenuBinding.inflate(
+            LayoutInflater.from(context),
+            null,
+            false
+        )
+    }
+    private val contactPopupWindow by lazy {
+        PopupWindow(context).apply {
+            contentView = contextMenuBinding.root
+            width = ViewGroup.LayoutParams.WRAP_CONTENT
+            height = ViewGroup.LayoutParams.WRAP_CONTENT
+            isOutsideTouchable = true
+
+            // animationStyle = R.style.PopupAnimation
+
+            // elevation = 10f
+            // setBackgroundDrawable(AppCompatResources.getDrawable(context, R.drawable.background_popup))
+            // setBackgroundResource(R.drawable.background_popup)
+        }
+    }
 
     private var onAutoCompletionToggled: ((hasOpened: Boolean) -> Unit)? = null
     private var onToggle: ((isCollapsed: Boolean) -> Unit)? = null
@@ -117,30 +143,34 @@ class RecipientFieldView @JvmOverloads constructor(
                 setSnackBar = { setSnackBar(it) },
             )
 
-            textInput.apply {
-                doOnTextChanged { text, _, _, _ ->
-                    if (text?.isNotEmpty() == true) {
-                        if ((text.trim().count()) > 0) contactAdapter!!.filterField(text) else contactAdapter!!.clear()
-                        if (!isAutoCompletionOpened) openAutoCompletion()
-                    } else if (isAutoCompletionOpened) {
-                        closeAutoCompletion()
-                    }
-                }
-
-                setOnEditorActionListener { _, actionId, _ ->
-                    if (actionId == EditorInfo.IME_ACTION_DONE && textInput.text?.isNotBlank() == true) {
-                        contactAdapter!!.addFirstAvailableItem()
-                    }
-                    true // Keep keyboard open
-                }
-
-                setBackspaceOnEmptyFieldListener(::focusLastChip)
-            }
+            setTextInputListeners()
 
             if (isInEditMode) {
                 singleChip.root.isVisible = isToggleable
                 plusChip.isVisible = isToggleable
             }
+        }
+    }
+
+    private fun ViewRecipientFieldBinding.setTextInputListeners() {
+        textInput.apply {
+            doOnTextChanged { text, _, _, _ ->
+                if (text?.isNotEmpty() == true) {
+                    if ((text.trim().count()) > 0) contactAdapter!!.filterField(text) else contactAdapter!!.clear()
+                    if (!isAutoCompletionOpened) openAutoCompletion()
+                } else if (isAutoCompletionOpened) {
+                    closeAutoCompletion()
+                }
+            }
+
+            setOnEditorActionListener { _, actionId, _ ->
+                if (actionId == EditorInfo.IME_ACTION_DONE && textInput.text?.isNotBlank() == true) {
+                    contactAdapter!!.addFirstAvailableItem()
+                }
+                true // Keep keyboard open
+            }
+
+            setBackspaceOnEmptyFieldListener(::focusLastChip)
         }
     }
 
@@ -206,13 +236,22 @@ class RecipientFieldView @JvmOverloads constructor(
     private fun createChip(recipient: Recipient) {
         ChipContactBinding.inflate(LayoutInflater.from(context)).root.apply {
             text = recipient.getNameOrEmail()
-            setOnClickListener { removeRecipient(recipient) }
+            setOnClickListener { showContactContextMenu(this) }
             setOnBackspaceListener {
                 removeRecipient(recipient)
                 focusTextField()
             }
             binding.itemsChipGroup.addView(this)
         }
+    }
+
+    private fun showContactContextMenu(contactChip: BackspaceAwareChip) {
+        contextMenuBinding.apply {
+            // TODO : Opti only assign listener once but change id every time
+            deleteContact.setOnClickListener { Toast.makeText(context, "Not yet implemented", Toast.LENGTH_SHORT).show() }
+            copyContactAddress.setOnClickListener { Toast.makeText(context, "Not yet implemented", Toast.LENGTH_SHORT).show() }
+        }
+        contactPopupWindow.showAsDropDown(contactChip)
     }
 
     private fun removeRecipient(recipient: Recipient) = with(binding) {

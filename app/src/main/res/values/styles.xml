@@ -488,4 +488,9 @@
         <item name="android:popupBackground">@color/backgroundColorTertiary</item>
     </style>
 
+    <style name="PopupWindowStyle" parent="Widget.Material3.PopupMenu">
+        <item name="android:popupBackground">@drawable/background_popup</item>
+        <item name="android:windowElevation">10dp</item>
+    </style>
+
 </resources>
