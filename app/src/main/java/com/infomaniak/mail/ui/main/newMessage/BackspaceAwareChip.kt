@@ -20,22 +20,21 @@ package com.infomaniak.mail.ui.main.newMessage
 import android.content.Context
 import android.util.AttributeSet
 import android.view.KeyEvent
-import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.chip.Chip
 
-class BackspaceAwareAutoComplete @JvmOverloads constructor(
+class BackspaceAwareChip @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = com.google.android.material.R.attr.editTextStyle
-) : TextInputEditText(context, attrs, defStyleAttr) {
+) : Chip(context, attrs) {
 
-    private var backspaceOnEmptyField: () -> Unit = {}
+    private var onBackspace: () -> Unit = {}
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-        if (keyCode == KeyEvent.KEYCODE_DEL && text.isNullOrEmpty()) backspaceOnEmptyField()
+        if (keyCode == KeyEvent.KEYCODE_DEL) onBackspace()
         return super.onKeyDown(keyCode, event)
     }
 
-    fun setBackspaceOnEmptyFieldListener(listener: () -> Unit) {
-        backspaceOnEmptyField = listener
+    fun setOnBackspaceListener(listener: () -> Unit) {
+        onBackspace = listener
     }
 }
