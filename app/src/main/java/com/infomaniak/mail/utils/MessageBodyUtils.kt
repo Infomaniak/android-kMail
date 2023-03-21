@@ -48,7 +48,6 @@ object MessageBodyUtils {
         anyCssClassContaining("yahoo_quoted"),
         anyCssClassContaining("zmail_extra"), // Zoho
         "[name=\"quote\"]", // GMX
-        "blockquote[type=\"cite\"]",
     )
 
     fun splitBodyAndQuote(initialBody: Body): MessageBodyQuote {
