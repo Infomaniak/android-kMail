@@ -313,8 +313,8 @@
     </style>
 
     <style name="EmailAddressChip" parent="ChipNoIcons">
-        <item name="android:textColor">?attr/colorOnPrimaryContainer</item>
-        <item name="chipBackgroundColor">?attr/colorPrimaryContainer</item>
+        <item name="android:textColor">@color/chip_contact_text_color</item>
+        <item name="chipBackgroundColor">@color/chip_contact_background_color</item>
     </style>
 
     <style name="SearchFilterChip" parent="ChipNoIcons">
