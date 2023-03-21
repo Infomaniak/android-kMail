@@ -69,7 +69,6 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
         fetchThreads(searchQuery, filters, folder)
     }.asLiveData(coroutineContext)
 
-
     var previousSearch: String? = null
     var previousMutuallyExclusiveChips: Int? = null
     var previousAttachments: Boolean? = null
