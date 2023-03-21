@@ -151,8 +151,8 @@ object MatomoMail : MatomoCore {
         trackEvent("userInfo", name, TrackerAction.DATA, value.toFloat())
     }
 
-    fun Fragment.trackOnBoardingEvent(name: String, value: Boolean) {
-        trackEvent(category = "onBoarding", name = name, value = value.toFloat())
+    fun Fragment.trackOnBoardingEvent(name: String) {
+        trackEvent("onBoarding", name)
     }
 
     fun Fragment.trackThreadListEvent(name: String) {
