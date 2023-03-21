@@ -392,7 +392,13 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 updateThreadsVisibility()
             }
             waitingBeforeNotifyAdapter = isRecoveringFinished
-            afterUpdateAdapter = { threads -> if (firstMessageHasChanged(threads)) scrollToTop() }
+            afterUpdateAdapter = { threads ->
+                if (firstMessageHasChanged(threads)) scrollToTop()
+
+                if (mainViewModel.currentFilter.value == ThreadFilter.UNSEEN && threads.isEmpty()) {
+                    mainViewModel.currentFilter.value = ThreadFilter.ALL
+                }
+            }
         }
     }
 
@@ -476,13 +482,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun updateUnreadCount(unreadCount: Int) = with(mainViewModel) {
-
-        if (currentFilter.value == ThreadFilter.UNSEEN && unreadCount == 0) currentFilter.value = ThreadFilter.ALL
-
+    private fun updateUnreadCount(unreadCount: Int) {
         binding.unreadCountChip.apply {
             text = resources.getQuantityString(R.plurals.threadListHeaderUnreadCount, unreadCount, formatUnreadCount(unreadCount))
-            isGone = unreadCount == 0 || isMultiSelectOn
+            isGone = unreadCount == 0 || mainViewModel.isMultiSelectOn
         }
     }
 
@@ -495,12 +498,14 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun updateThreadsVisibility() = with(mainViewModel) {
 
         val thereAreThreads = (threadListViewModel.currentThreadsCount ?: 0) > 0
+        val filterIsEnabled = currentFilter.value != ThreadFilter.ALL
         val cursorIsNull = threadListViewModel.currentFolderCursor == null
         val isNetworkConnected = isInternetAvailable.value == true
         val isBooting = threadListViewModel.currentThreadsCount == null && !cursorIsNull && isNetworkConnected
+        val shouldDisplayThreadsView = isBooting || thereAreThreads || filterIsEnabled || (cursorIsNull && isNetworkConnected)
 
         when {
-            isBooting || thereAreThreads || (cursorIsNull && isNetworkConnected) -> binding.emptyStateView.isGone = true
+            shouldDisplayThreadsView -> binding.emptyStateView.isGone = true
             cursorIsNull -> setEmptyState(EmptyState.NETWORK)
             isCurrentFolderRole(FolderRole.INBOX) -> setEmptyState(EmptyState.INBOX)
             isCurrentFolderRole(FolderRole.TRASH) -> setEmptyState(EmptyState.TRASH)
