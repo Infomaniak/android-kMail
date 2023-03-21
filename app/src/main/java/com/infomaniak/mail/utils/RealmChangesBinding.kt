@@ -79,16 +79,16 @@ class RealmChangesBinding<T : BaseRealmObject, VH : RecyclerView.ViewHolder> pri
 
             is InitialResults -> { // First call
                 realmInitial(list)
-                afterUpdate(list)
+                notifyAfterUpdate(list)
             }
 
             is UpdatedResults -> { // Any update
                 waitingBeforeNotifyAdapter?.observeWaiting {
                     resultsChange.notifyAdapter()
-                    afterUpdate(list)
+                    notifyAfterUpdate(list)
                 } ?: run {
                     resultsChange.notifyAdapter()
-                    afterUpdate(list)
+                    notifyAfterUpdate(list)
                 }
             }
 
@@ -105,23 +105,23 @@ class RealmChangesBinding<T : BaseRealmObject, VH : RecyclerView.ViewHolder> pri
 
             is InitialList -> { // First call
                 realmInitial(list)
-                afterUpdate(list)
+                notifyAfterUpdate(list)
             }
 
             is UpdatedList -> { // Any update
                 waitingBeforeNotifyAdapter?.observeWaiting {
                     listChange.notifyAdapter()
-                    afterUpdate(list)
+                    notifyAfterUpdate(list)
                 } ?: run {
                     listChange.notifyAdapter()
-                    afterUpdate(list)
+                    notifyAfterUpdate(list)
                 }
             }
 
             is DeletedList -> { // Parent has been deleted
                 onRealmChanged.deleteList()
                 recyclerViewAdapter.notifyItemRangeRemoved(0, list.count())
-                afterUpdate(list)
+                notifyAfterUpdate(list)
             }
 
         }
@@ -129,7 +129,7 @@ class RealmChangesBinding<T : BaseRealmObject, VH : RecyclerView.ViewHolder> pri
         previousList = list
     }
 
-    private fun afterUpdate(list: List<T>) {
+    private fun notifyAfterUpdate(list: List<T>) {
         afterUpdateAdapter?.invoke(list)
     }
 
