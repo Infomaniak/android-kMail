@@ -488,18 +488,18 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         binding.toolbar.title = folderName
     }
 
-    private fun updateThreadsVisibility() = with(threadListViewModel) {
+    private fun updateThreadsVisibility() = with(mainViewModel) {
 
-        val thereAreThreads = (currentThreadsCount ?: 0) > 0
-        val cursorIsNull = currentFolderCursor == null
-        val isNetworkConnected = mainViewModel.isInternetAvailable.value == true
-        val isBooting = currentThreadsCount == null && !cursorIsNull && isNetworkConnected
+        val thereAreThreads = (threadListViewModel.currentThreadsCount ?: 0) > 0
+        val cursorIsNull = threadListViewModel.currentFolderCursor == null
+        val isNetworkConnected = isInternetAvailable.value == true
+        val isBooting = threadListViewModel.currentThreadsCount == null && !cursorIsNull && isNetworkConnected
 
         when {
             isBooting || thereAreThreads || (cursorIsNull && isNetworkConnected) -> binding.emptyStateView.isGone = true
             cursorIsNull -> setEmptyState(EmptyState.NETWORK)
-            mainViewModel.isCurrentFolderRole(FolderRole.INBOX) -> setEmptyState(EmptyState.INBOX)
-            mainViewModel.isCurrentFolderRole(FolderRole.TRASH) -> setEmptyState(EmptyState.TRASH)
+            isCurrentFolderRole(FolderRole.INBOX) -> setEmptyState(EmptyState.INBOX)
+            isCurrentFolderRole(FolderRole.TRASH) -> setEmptyState(EmptyState.TRASH)
             else -> setEmptyState(EmptyState.FOLDER)
         }
     }
