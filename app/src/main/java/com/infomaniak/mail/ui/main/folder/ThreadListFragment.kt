@@ -380,7 +380,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun observeCurrentThreads() = with(threadListViewModel) {
-        mainViewModel.currentThreadsLiveToObserve.bindResultsChangeToAdapter(viewLifecycleOwner, threadListAdapter).apply {
+        mainViewModel.currentThreadsLive.bindResultsChangeToAdapter(viewLifecycleOwner, threadListAdapter).apply {
             recyclerView = binding.threadsList
             waitingBeforeNotifyAdapter = isRecoveringFinished
             beforeUpdateAdapter = { threads ->

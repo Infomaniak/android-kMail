@@ -79,7 +79,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     inline val selectedThreads
         get() = selectedThreadsLiveData.value!!
 
-    val isEverythingSelected get() = selectedThreads.count() == currentThreadsLiveToObserve.value?.list?.count()
+    val isEverythingSelected get() = selectedThreads.count() == currentThreadsLive.value?.list?.count()
     //endregion
 
     val snackBarManager by lazy { SnackBarManager() }
@@ -124,7 +124,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     val currentFilter = SingleLiveEvent(ThreadFilter.ALL)
 
-    val currentThreadsLiveToObserve = observeFolderAndFilter().flatMapLatest { (folder, filter) ->
+    val currentThreadsLive = observeFolderAndFilter().flatMapLatest { (folder, filter) ->
         folder?.let { ThreadController.getThreadsAsync(it, filter) } ?: emptyFlow()
     }.asLiveData(coroutineContext)
 
@@ -781,7 +781,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             selectedThreads.clear()
         } else {
             context.trackMultiSelectionEvent("all")
-            currentThreadsLiveToObserve.value?.list?.forEach { thread ->
+            currentThreadsLive.value?.list?.forEach { thread ->
                 selectedThreads.add(SelectedThread(thread))
             }
         }
