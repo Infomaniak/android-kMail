@@ -17,11 +17,14 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import android.content.Context
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.utils.SingleLiveEvent
+import com.infomaniak.mail.MatomoMail.trackUserInfo
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
@@ -36,8 +39,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlin.collections.set
 
-class ThreadViewModel : ViewModel() {
+class ThreadViewModel(application: Application) : AndroidViewModel(application) {
+
+    private inline val context: Context get() = getApplication()
 
     val quickActionBarClicks = SingleLiveEvent<Pair<Message, Int>>()
 
@@ -60,6 +66,8 @@ class ThreadViewModel : ViewModel() {
             emit(null)
             return@liveData
         }
+
+        context.trackUserInfo("nbMessagesInThread", thread.messages.count())
 
         val isExpandedMap = mutableMapOf<String, Boolean>()
         val isThemeTheSameMap = mutableMapOf<String, Boolean>()
