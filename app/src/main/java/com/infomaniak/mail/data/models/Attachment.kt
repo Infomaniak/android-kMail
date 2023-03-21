@@ -24,6 +24,7 @@ import androidx.core.content.FileProvider
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.lib.core.utils.contains
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.LocalStorageUtils
 import io.realm.kotlin.types.EmbeddedRealmObject
@@ -58,6 +59,8 @@ class Attachment : EmbeddedRealmObject {
 
     val disposition: AttachmentDisposition?
         get() = enumValueOfOrNull<AttachmentDisposition>(_disposition)
+
+    inline val downloadUrl get() = ApiRoutes.resource(resource!!)
 
     fun initLocalValues(name: String, size: Long, mimeType: String, uri: String) {
         this.name = name
