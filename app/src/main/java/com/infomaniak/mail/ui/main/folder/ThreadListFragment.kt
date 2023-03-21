@@ -382,12 +382,12 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun observeCurrentThreads() = with(threadListViewModel) {
         mainViewModel.currentThreadsLive.bindResultsChangeToAdapter(viewLifecycleOwner, threadListAdapter).apply {
             recyclerView = binding.threadsList
-            waitingBeforeNotifyAdapter = isRecoveringFinished
             beforeUpdateAdapter = { threads ->
                 currentThreadsCount = threads.count()
                 Log.i("UI", "Received $currentThreadsCount threads")
                 updateThreadsVisibility()
             }
+            waitingBeforeNotifyAdapter = isRecoveringFinished
             afterUpdateAdapter = { threads -> if (firstMessageHasChanged(threads)) scrollToTop() }
         }
     }
