@@ -62,7 +62,7 @@ object MessageBodyUtils {
             if (blockquoteElement == null) "" else blockquote
         }
 
-        val (body, quote) = splitBodyAndQuote(blockquoteElement, htmlDocumentWithQuote, currentQuoteDescriptor)
+        val (body, quote) = splitBodyAndQuote(htmlDocumentWithQuote, currentQuoteDescriptor, blockquoteElement)
         return MessageBodyQuote(messageBody = if (quote.isNullOrBlank()) initialBody.value else body, quote = quote)
     }
 
@@ -86,9 +86,9 @@ object MessageBodyUtils {
     }
 
     private fun splitBodyAndQuote(
-        blockquoteElement: Element?,
         htmlDocumentWithQuote: Document,
         currentQuoteDescriptor: String,
+        blockquoteElement: Element?,
     ): Pair<String, String?> {
         return when {
             currentQuoteDescriptor == blockquote -> {
