@@ -40,6 +40,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:icon="@drawable/ic_contact_action_copy"
+            app:padding="@dimen/marginStandardMedium"
             app:text="Copier l'adresse mail" />
 
         <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
@@ -47,6 +48,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:icon="@drawable/ic_bin"
+            app:padding="@dimen/marginStandardMedium"
             app:text="Supprimer" />
 
     </LinearLayout>

@@ -49,6 +49,7 @@
 
     <declare-styleable name="ActionItemView">
         <attr name="icon" />
+        <attr name="padding" format="dimension" />
         <attr name="text" />
         <attr name="visibleDivider" format="boolean" />
         <attr name="staffOnly" format="boolean" />
