@@ -87,14 +87,14 @@ class RecipientFieldView @JvmOverloads constructor(
                 chevron.setOnClickListener {
                     context.trackMessageEvent("openRecipientsFields", isCollapsed)
                     isCollapsed = !isCollapsed
-                    if (isCollapsed) autoCompleteInput.hideKeyboard()
+                    if (isCollapsed) textInput.hideKeyboard()
                 }
 
                 plusChip.setOnClickListener { isCollapsed = !isCollapsed }
 
                 transparentButton.setOnClickListener {
                     isCollapsed = !isCollapsed
-                    autoCompleteInput.showKeyboard()
+                    textInput.showKeyboard()
                 }
 
                 singleChip.root.setOnClickListener {
@@ -107,7 +107,7 @@ class RecipientFieldView @JvmOverloads constructor(
                 usedContacts = mutableSetOf(),
                 onContactClicked = { addRecipient(it.email, it.name) },
                 onAddUnrecognizedContact = {
-                    val input = autoCompleteInput.text.toString()
+                    val input = textInput.text.toString()
                     if (input.isEmail()) {
                         addRecipient(email = input, name = input)
                     } else {
@@ -117,7 +117,7 @@ class RecipientFieldView @JvmOverloads constructor(
                 setSnackBar = { setSnackBar(it) },
             )
 
-            autoCompleteInput.apply {
+            textInput.apply {
                 doOnTextChanged { text, _, _, _ ->
                     if (text?.isNotEmpty() == true) {
                         if ((text.trim().count()) > 0) contactAdapter!!.filterField(text) else contactAdapter!!.clear()
@@ -128,7 +128,7 @@ class RecipientFieldView @JvmOverloads constructor(
                 }
 
                 setOnEditorActionListener { _, actionId, _ ->
-                    if (actionId == EditorInfo.IME_ACTION_DONE && autoCompleteInput.text?.isNotBlank() == true) {
+                    if (actionId == EditorInfo.IME_ACTION_DONE && textInput.text?.isNotBlank() == true) {
                         contactAdapter!!.addFirstAvailableItem()
                     }
                     true // Keep keyboard open
@@ -149,7 +149,7 @@ class RecipientFieldView @JvmOverloads constructor(
     }
 
     private fun focusTextField() {
-        binding.autoCompleteInput.requestFocus()
+        binding.textInput.requestFocus()
     }
 
     private fun updateCollapsedUiState(isCollapsed: Boolean) = with(binding) {
@@ -174,7 +174,7 @@ class RecipientFieldView @JvmOverloads constructor(
         }
 
         transparentButton.isGone = isTextInputAccessible
-        autoCompleteInput.isVisible = isTextInputAccessible
+        textInput.isVisible = isTextInputAccessible
     }
 
     fun updateContacts(allContacts: List<MergedContact>) {
@@ -245,7 +245,7 @@ class RecipientFieldView @JvmOverloads constructor(
     }
 
     fun clearField() {
-        binding.autoCompleteInput.setText("")
+        binding.textInput.setText("")
     }
 
     fun initRecipients(initialRecipients: List<Recipient>) {
