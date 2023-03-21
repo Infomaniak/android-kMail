@@ -53,15 +53,19 @@ object MessageBodyUtils {
     fun splitBodyAndQuote(initialBody: Body): MessageBodyQuote {
         if (initialBody.type == TEXT_PLAIN) return MessageBodyQuote(initialBody.value, null)
 
-        val htmlDocumentWithQuote = Jsoup.parse(initialBody.value)
-        val htmlDocumentWithoutQuote = Jsoup.parse(initialBody.value)
+        // The original parsed html document in full
+        val originalHtmlDocument = Jsoup.parse(initialBody.value)
+        // Initiated to the original document and it'll be processed by Jsoup to remove quotes.
+        val htmlDocumentWithoutQuote = originalHtmlDocument.clone()
 
+        // Find the last parent blockquote and delete it in htmlDocumentWithoutQuote
         val blockquoteElement = findAndRemoveLastParentBlockquote(htmlDocumentWithoutQuote)
+        // Find the first known parent quote in the html and delete all known quotes descriptor
         val currentQuoteDescriptor = findFirstKnownParentQuoteDescriptor(htmlDocumentWithoutQuote).ifEmpty {
             if (blockquoteElement == null) "" else blockquote
         }
 
-        val (body, quote) = splitBodyAndQuote(htmlDocumentWithQuote, currentQuoteDescriptor, blockquoteElement)
+        val (body, quote) = splitBodyAndQuote(originalHtmlDocument, currentQuoteDescriptor, blockquoteElement)
         return MessageBodyQuote(messageBody = if (quote.isNullOrBlank()) initialBody.value else body, quote = quote)
     }
 
