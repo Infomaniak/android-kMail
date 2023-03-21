@@ -70,34 +70,67 @@ class RealmChangesBinding<T : BaseRealmObject, VH : RecyclerView.ViewHolder> pri
     }
 
     private val resultsChangeObserver: (ResultsChange<T>) -> Unit = { resultsChange ->
-        beforeUpdateAdapter?.invoke(resultsChange.list)
+
+        val list = resultsChange.list
+
+        beforeUpdateAdapter?.invoke(list)
+
         when (resultsChange) {
+
             is InitialResults -> { // First call
-                realmInitial(resultsChange.list)
+                realmInitial(list)
+                notifyAfterUpdate(list)
             }
+
             is UpdatedResults -> { // Any update
-                waitingBeforeNotifyAdapter?.observeWaiting { resultsChange.notifyAdapter() } ?: resultsChange.notifyAdapter()
+                waitingBeforeNotifyAdapter?.observeWaiting {
+                    resultsChange.notifyAdapter()
+                    notifyAfterUpdate(list)
+                } ?: run {
+                    resultsChange.notifyAdapter()
+                    notifyAfterUpdate(list)
+                }
             }
+
         }
-        afterUpdateAdapter?.invoke(resultsChange.list)
     }
 
     private val listChangeObserver: (ListChange<T>) -> Unit = { listChange ->
-        beforeUpdateAdapter?.invoke(listChange.list)
+
+        val list = listChange.list
+
+        beforeUpdateAdapter?.invoke(list)
+
         when (listChange) {
+
             is InitialList -> { // First call
-                realmInitial(listChange.list)
+                realmInitial(list)
+                notifyAfterUpdate(list)
             }
+
             is UpdatedList -> { // Any update
-                waitingBeforeNotifyAdapter?.observeWaiting { listChange.notifyAdapter() } ?: listChange.notifyAdapter()
+                waitingBeforeNotifyAdapter?.observeWaiting {
+                    listChange.notifyAdapter()
+                    notifyAfterUpdate(list)
+                } ?: run {
+                    listChange.notifyAdapter()
+                    notifyAfterUpdate(list)
+                }
             }
+
             is DeletedList -> { // Parent has been deleted
                 onRealmChanged.deleteList()
-                recyclerViewAdapter.notifyItemRangeRemoved(0, listChange.list.count())
+                recyclerViewAdapter.notifyItemRangeRemoved(0, list.count())
+                notifyAfterUpdate(list)
             }
+
         }
-        previousList = listChange.list
-        afterUpdateAdapter?.invoke(listChange.list)
+
+        previousList = list
+    }
+
+    private fun notifyAfterUpdate(list: List<T>) {
+        afterUpdateAdapter?.invoke(list)
     }
 
     fun bindResultsChange(resultsChangeLiveData: LiveData<ResultsChange<T>>) {
