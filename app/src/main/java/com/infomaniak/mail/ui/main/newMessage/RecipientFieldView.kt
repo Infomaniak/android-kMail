@@ -145,8 +145,7 @@ class RecipientFieldView @JvmOverloads constructor(
     }
 
     private fun focusLastChip() = with(binding) {
-        val count = itemsChipGroup.childCount
-        if (count > 0) itemsChipGroup.children.elementAt(count - 1).requestFocusFromTouch()
+        if (itemsChipGroup.childCount > 0) itemsChipGroup.children.last().requestFocusFromTouch()
     }
 
     private fun focusTextField() {
