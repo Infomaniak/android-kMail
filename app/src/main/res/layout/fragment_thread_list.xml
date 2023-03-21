@@ -141,7 +141,8 @@
                     android:drawablePadding="@dimen/marginStandardSmall"
                     android:text="@string/noNetwork"
                     android:visibility="gone"
-                    app:drawableStartCompat="@drawable/ic_no_network" />
+                    app:drawableStartCompat="@drawable/ic_no_network"
+                    tools:visibility="visible" />
 
                 <TextView
                     android:id="@+id/updatedAt"
@@ -150,7 +151,7 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:lines="1"
-                    tools:text="@string/emptyStateNetworkDescription" />
+                    tools:text="@string/noUpdatedAt" />
             </LinearLayout>
 
             <com.google.android.material.chip.Chip

@@ -29,7 +29,6 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.core.view.isGone
-import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -462,14 +461,14 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         val lastUpdatedAt = lastUpdatedDate
 
         val ago = when {
-            lastUpdatedAt == null -> ""
+            lastUpdatedAt == null -> null
             Date().time - lastUpdatedAt.time < DateUtils.MINUTE_IN_MILLIS -> getString(R.string.threadListHeaderLastUpdateNow)
             else -> DateUtils.getRelativeTimeSpanString(lastUpdatedAt.time).toString().replaceFirstChar { it.lowercaseChar() }
         }
 
-        binding.updatedAt.apply {
-            isInvisible = ago.isEmpty()
-            if (ago.isNotEmpty()) text = getString(R.string.threadListHeaderLastUpdate, ago)
+        binding.updatedAt.text = when (ago) {
+            null -> getString(R.string.noUpdatedAt)
+            else -> getString(R.string.threadListHeaderLastUpdate, ago)
         }
     }
 
