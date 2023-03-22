@@ -27,6 +27,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ViewAvatarNameEmailBinding
+import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
 
 class AvatarNameEmailView @JvmOverloads constructor(
     context: Context,
@@ -53,11 +54,14 @@ class AvatarNameEmailView @JvmOverloads constructor(
 
     fun setRecipient(recipient: Recipient, contacts: Map<String, Map<String, MergedContact>>) = with(binding) {
         userAvatar.loadAvatar(recipient, contacts)
-        userName.text = recipient.name
-        userEmail.text = recipient.email
+        fillInUserNameAndEmail(recipient, userName, userEmail)
     }
 
-    fun setMergedContact(mergedContact: MergedContact) = with(binding) {
+    fun updateAvatar(recipient: Recipient, contacts: Map<String, Map<String, MergedContact>>) {
+        binding.userAvatar.loadAvatar(recipient, contacts)
+    }
+
+    fun setAutocompleteMergedContact(mergedContact: MergedContact) = with(binding) {
         userAvatar.loadAvatar(mergedContact)
         userName.text = mergedContact.name
         userEmail.text = mergedContact.email

@@ -31,50 +31,13 @@
 
         <include layout="@layout/view_bottom_sheet_separator" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <com.infomaniak.mail.ui.main.AvatarNameEmailView
+            android:id="@+id/contactDetails"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <com.infomaniak.mail.views.AvatarView
-                android:id="@+id/userAvatar"
-                android:layout_width="32dp"
-                android:layout_height="0dp"
-                android:layout_marginStart="@dimen/marginStandardMedium"
-                android:layout_marginEnd="@dimen/marginStandardVerySmall"
-                app:layout_constraintBottom_toBottomOf="@id/email"
-                app:layout_constraintDimensionRatio="1"
-                app:layout_constraintEnd_toStartOf="@id/name"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/name"
-                tools:src="@tools:sample/avatars[10]" />
-
-            <TextView
-                android:id="@+id/name"
-                style="@style/BodyMedium"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/marginStandardSmall"
-                android:layout_marginEnd="@dimen/marginStandardMedium"
-                app:layout_constraintBottom_toTopOf="@id/email"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/userAvatar"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_chainStyle="packed"
-                tools:text="@tools:sample/full_names" />
-
-            <TextView
-                android:id="@+id/email"
-                style="@style/Body.Secondary"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/marginStandardMedium"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="@id/name"
-                app:layout_constraintTop_toBottomOf="@id/name"
-                tools:text="steph.guy@ik.me" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            android:layout_height="wrap_content"
+            tools:avatar="@tools:sample/avatars[10]"
+            tools:email="steph.guy@ik.me"
+            tools:name="@tools:sample/full_names" />
 
         <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
             android:id="@+id/writeMail"

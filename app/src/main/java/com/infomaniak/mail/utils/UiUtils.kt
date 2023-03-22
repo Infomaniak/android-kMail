@@ -19,6 +19,7 @@ package com.infomaniak.mail.utils
 
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
+import android.content.Context
 import android.graphics.Color
 import android.os.Build
 import android.widget.TextView
@@ -83,24 +84,24 @@ object UiUtils {
 
     fun formatUnreadCount(unread: Int) = if (unread >= 100) "99+" else unread.toString()
 
+    fun Context.getPrettyNameAndEmail(correspondent: Correspondent): Pair<String, String?> = with(correspondent) {
+        return when {
+            isMe() -> getString(R.string.contactMe) to email
+            name.isBlank() || name == email -> email to null
+            else -> name to email
+        }
+    }
+
     fun fillInUserNameAndEmail(
         correspondent: Correspondent,
         nameTextView: TextView,
-        emailTextView: TextView? = null,
+        emailTextView: TextView,
     ) = with(correspondent) {
-        when {
-            isMe() -> {
-                nameTextView.setText(R.string.contactMe)
-                emailTextView?.text = email
-            }
-            name.isBlank() || name == email -> {
-                nameTextView.text = email
-                emailTextView?.isGone = true
-            }
-            else -> {
-                nameTextView.text = name
-                emailTextView?.text = email
-            }
+        val (name, email) = nameTextView.context.getPrettyNameAndEmail(correspondent)
+        nameTextView.text = name
+        emailTextView.apply {
+            text = email
+            isGone = email == null
         }
     }
 

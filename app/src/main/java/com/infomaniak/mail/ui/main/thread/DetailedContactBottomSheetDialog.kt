@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,7 +35,6 @@ import com.infomaniak.mail.databinding.BottomSheetDetailedContactBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.ui.main.thread.actions.ActionsBottomSheetDialog
-import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
 import com.infomaniak.mail.utils.observeNotNull
 
 class DetailedContactBottomSheetDialog : ActionsBottomSheetDialog() {
@@ -52,12 +51,8 @@ class DetailedContactBottomSheetDialog : ActionsBottomSheetDialog() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
-
-        userAvatar.loadAvatar(navigationArgs.recipient, mainViewModel.mergedContacts.value ?: emptyMap())
-        fillInUserNameAndEmail(navigationArgs.recipient, name, email)
-
+        contactDetails.setRecipient(navigationArgs.recipient, mainViewModel.mergedContacts.value ?: emptyMap())
         setupListeners()
-
         observeContacts()
     }
 
@@ -92,7 +87,7 @@ class DetailedContactBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private fun observeContacts() {
         mainViewModel.mergedContacts.observeNotNull(viewLifecycleOwner) {
-            binding.userAvatar.loadAvatar(navigationArgs.recipient, it)
+            binding.contactDetails.updateAvatar(navigationArgs.recipient, it)
         }
     }
 }
