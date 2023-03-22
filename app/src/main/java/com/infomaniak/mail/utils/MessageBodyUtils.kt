@@ -22,6 +22,7 @@ import com.infomaniak.mail.utils.Utils.TEXT_PLAIN
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
+import org.jsoup.select.Elements
 
 object MessageBodyUtils {
 
@@ -39,77 +40,97 @@ object MessageBodyUtils {
         "#origbody",
         "#oriMsgHtmlSeperator",
         "#reply139content",
-        ".gmail_extra",
-        ".gmail_quote",
-        ".${INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME}",
-        ".moz-cite-prefix",
-        ".protonmail_quote",
-        ".yahoo_quoted",
-        ".zmail_extra", // Zoho
+        anyCssClassContaining("gmail_extra"),
+        anyCssClassContaining("gmail_quote"),
+        anyCssClassContaining(INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME),
+        anyCssClassContaining("moz-cite-prefix"),
+        anyCssClassContaining("protonmail_quote"),
+        anyCssClassContaining("yahoo_quoted"),
+        anyCssClassContaining("zmail_extra"), // Zoho
         "[name=\"quote\"]", // GMX
-        "blockquote[type=\"cite\"]",
     )
 
     fun splitBodyAndQuote(initialBody: Body): MessageBodyQuote {
         if (initialBody.type == TEXT_PLAIN) return MessageBodyQuote(initialBody.value, null)
 
-        val htmlDocumentWithQuote = Jsoup.parse(initialBody.value)
-        val htmlDocumentWithoutQuote = Jsoup.parse(initialBody.value)
-        val htmlQuotes = mutableListOf<Element>()
+        // The original parsed html document in full
+        val originalHtmlDocument = Jsoup.parse(initialBody.value)
+        // Initiated to the original document and it'll be processed by Jsoup to remove quotes.
+        val htmlDocumentWithoutQuote = originalHtmlDocument.clone()
 
-        handleBlockQuote(htmlDocumentWithoutQuote, htmlQuotes)
-        val currentQuoteDescriptor = handleQuoteDescriptors(htmlDocumentWithoutQuote, htmlQuotes).ifEmpty { blockquote }
+        // Find the last parent blockquote and delete it in htmlDocumentWithoutQuote
+        val blockquoteElement = findAndRemoveLastParentBlockquote(htmlDocumentWithoutQuote)
+        // Find the first known parent quote in the html and delete all known quotes descriptor
+        val currentQuoteDescriptor = findFirstKnownParentQuoteDescriptor(htmlDocumentWithoutQuote).ifEmpty {
+            if (blockquoteElement == null) "" else blockquote
+        }
 
-        val (body, quote) = splitBodyAndQuote(htmlQuotes, htmlDocumentWithQuote, currentQuoteDescriptor)
+        val (body, quote) = splitBodyAndQuote(originalHtmlDocument, currentQuoteDescriptor, blockquoteElement)
         return MessageBodyQuote(messageBody = if (quote.isNullOrBlank()) initialBody.value else body, quote = quote)
     }
 
-    private fun handleBlockQuote(htmlDocumentWithoutQuote: Document, htmlQuotes: MutableList<Element>) {
-        var quotedContentElements = htmlDocumentWithoutQuote.selectFirst(blockquote)
-
-        while (quotedContentElements != null) {
-            htmlQuotes.add(quotedContentElements)
-            quotedContentElements.remove()
-            quotedContentElements = htmlDocumentWithoutQuote.selectFirst(blockquote)
+    private fun findAndRemoveLastParentBlockquote(htmlDocumentWithoutQuote: Document): Element? {
+        fun Document.selectLastParentBlockquote(): Element? {
+            return selectFirst("$blockquote:not($blockquote $blockquote):last-of-type")
         }
+        return htmlDocumentWithoutQuote.selectLastParentBlockquote()?.also { it.remove() }
     }
 
-    private fun handleQuoteDescriptors(htmlDocumentWithoutQuote: Document, htmlQuotes: MutableList<Element>): String {
+    private fun findFirstKnownParentQuoteDescriptor(htmlDocumentWithoutQuote: Document): String {
         var currentQuoteDescriptor = ""
         for (quoteDescriptor in quoteDescriptors) {
-            val quotedContentElement = htmlDocumentWithoutQuote.select(quoteDescriptor).first()
-            if (quotedContentElement != null) {
-                htmlQuotes.add(quotedContentElement)
+            val quotedContentElement = htmlDocumentWithoutQuote.selectElementAndFollowingSiblings(quoteDescriptor)
+            if (quotedContentElement.isNotEmpty()) {
                 quotedContentElement.remove()
                 currentQuoteDescriptor = quoteDescriptor
-                break
             }
         }
         return currentQuoteDescriptor
     }
 
     private fun splitBodyAndQuote(
-        htmlQuotes: MutableList<Element>,
         htmlDocumentWithQuote: Document,
         currentQuoteDescriptor: String,
+        blockquoteElement: Element?,
     ): Pair<String, String?> {
-        return htmlQuotes.lastOrNull()?.let { htmlQuote ->
-            val quotedContentElements = htmlDocumentWithQuote.select(currentQuoteDescriptor)
-            if (currentQuoteDescriptor == blockquote) {
-                for (quoteElement in quotedContentElements) {
-                    if (quoteElement.toString() == htmlQuote.toString()) {
-                        quoteElement.remove()
+        return when {
+            currentQuoteDescriptor == blockquote -> {
+                for (quotedContentElement in htmlDocumentWithQuote.select(currentQuoteDescriptor)) {
+                    if (quotedContentElement.toString() == blockquoteElement.toString()) {
+                        quotedContentElement.remove()
                         break
                     }
                 }
-                htmlDocumentWithQuote.toString() to htmlQuote.toString()
-            } else {
-                val firstQuotedContent = quotedContentElements.first()
-                firstQuotedContent?.remove()
-                htmlDocumentWithQuote.toString() to firstQuotedContent.toString()
+                htmlDocumentWithQuote.toString() to blockquoteElement.toString()
             }
-        } ?: (htmlDocumentWithQuote.toString() to null)
+            currentQuoteDescriptor.isNotEmpty() -> {
+                val quotedContentElements = htmlDocumentWithQuote.selectElementAndFollowingSiblings(currentQuoteDescriptor)
+                quotedContentElements.remove()
+                htmlDocumentWithQuote.toString() to quotedContentElements.toString()
+            }
+            else -> {
+                htmlDocumentWithQuote.toString() to null
+            }
+        }
     }
+
+    //region Utils
+    /**
+     * Some Email clients rename CSS classes to prefix them.
+     * We match all the CSS classes that contain the quote, in case this one has been renamed.
+     * @return a new CSS query
+     */
+    private fun anyCssClassContaining(cssClass: String) = "[class*=$cssClass]"
+
+    /**
+     * Some Email clients add the Thread's History in a new block, at the same level as the previous one.
+     * So we match the current block, as well as all those that follow and that are at the same level.
+     * @return [Elements] which contains all the blocks that have been matched
+     */
+    private fun Document.selectElementAndFollowingSiblings(quoteDescriptor: String): Elements {
+        return select("$quoteDescriptor, $quoteDescriptor ~ *")
+    }
+    //endregion
 
     data class MessageBodyQuote(
         val messageBody: String,
