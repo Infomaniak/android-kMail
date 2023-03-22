@@ -24,6 +24,7 @@ import android.widget.FrameLayout
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.correspondent.Correspondent
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ViewAvatarNameEmailBinding
@@ -37,6 +38,8 @@ class AvatarNameEmailView @JvmOverloads constructor(
 
     private val binding by lazy { ViewAvatarNameEmailBinding.inflate(LayoutInflater.from(context), this, true) }
 
+    private var processNameAndEmail = true
+
     init {
         attrs?.getAttributes(context, R.styleable.AvatarNameEmailView) {
             with(binding) {
@@ -48,29 +51,39 @@ class AvatarNameEmailView @JvmOverloads constructor(
                 userAvatar.setImageDrawable(getDrawable(R.styleable.AvatarNameEmailView_avatar))
                 userName.text = getString(R.styleable.AvatarNameEmailView_name)
                 userEmail.text = getString(R.styleable.AvatarNameEmailView_email)
+
+                processNameAndEmail = getBoolean(R.styleable.AvatarNameEmailView_processNameAndEmail, processNameAndEmail)
             }
         }
     }
 
     fun setRecipient(recipient: Recipient, contacts: Map<String, Map<String, MergedContact>>) = with(binding) {
         userAvatar.loadAvatar(recipient, contacts)
-        fillInUserNameAndEmail(recipient, userName, userEmail)
+        setNameAndEmail(recipient)
     }
 
-    fun updateAvatar(recipient: Recipient, contacts: Map<String, Map<String, MergedContact>>) {
-        binding.userAvatar.loadAvatar(recipient, contacts)
-    }
-
-    fun setAutocompleteMergedContact(mergedContact: MergedContact) = with(binding) {
+    fun setMergedContact(mergedContact: MergedContact) = with(binding) {
         userAvatar.loadAvatar(mergedContact)
-        userName.text = mergedContact.name
-        userEmail.text = mergedContact.email
+        setNameAndEmail(mergedContact)
+    }
+
+    private fun ViewAvatarNameEmailBinding.setNameAndEmail(correspondent: Correspondent) {
+        if (processNameAndEmail) {
+            fillInUserNameAndEmail(correspondent, userName, userEmail)
+        } else {
+            userName.text = correspondent.name
+            userEmail.text = correspondent.email
+        }
     }
 
     fun setAutocompleteUnknownContact(searchQuery: String) = with(binding) {
         userAvatar.loadUnknownUserAvatar()
         userName.text = context.getString(R.string.addUnknownRecipientTitle)
         userEmail.text = searchQuery
+    }
+
+    fun updateAvatar(recipient: Recipient, contacts: Map<String, Map<String, MergedContact>>) {
+        binding.userAvatar.loadAvatar(recipient, contacts)
     }
 
     override fun setOnClickListener(onClickListener: OnClickListener?) {

@@ -119,9 +119,10 @@
     </declare-styleable>
 
     <declare-styleable name="AvatarNameEmailView">
-        <attr name="avatar" format="reference|color"/>
-        <attr name="name" format="string"/>
-        <attr name="email" format="string"/>
+        <attr name="avatar" format="reference|color" />
+        <attr name="name" format="string" />
+        <attr name="email" format="string" />
         <attr name="padding" />
+        <attr name="processNameAndEmail" format="boolean" />
     </declare-styleable>
 </resources>

@@ -17,23 +17,26 @@
   -->
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     style="@style/CardViewMail"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardBackgroundColor="@color/backgroundColorSecondary"
+    app:cardCornerRadius="@dimen/radius">
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <TextView
+        <com.infomaniak.mail.ui.main.AvatarNameEmailView
+            android:id="@+id/contactDetails"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/marginStandardMedium"
-            android:gravity="center_vertical"
-            android:text="Header"
-            android:textColor="#000000"
-            android:textSize="20sp" />
+            app:processNameAndEmail="false"
+            tools:avatar="@tools:sample/avatars[4]"
+            tools:email="steph.guy@ik.me"
+            tools:name="@tools:sample/full_names" />
 
         <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
             android:id="@+id/copyContactAddress"

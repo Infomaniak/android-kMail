@@ -63,7 +63,7 @@ class ContactAdapter(
 
     private fun ItemContactBinding.bindContact(position: Int) {
         val contact = contacts[position]
-        contactDetails.setAutocompleteMergedContact(contact)
+        contactDetails.setMergedContact(contact)
         root.setOnClickListener { onContactClicked(contact) }
     }
 

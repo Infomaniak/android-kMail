@@ -33,6 +33,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.hideKeyboard
 import com.infomaniak.lib.core.utils.showKeyboard
+import com.infomaniak.lib.core.utils.toPx
 import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.MergedContact
@@ -42,6 +43,7 @@ import com.infomaniak.mail.databinding.ViewContactChipContextMenuBinding
 import com.infomaniak.mail.databinding.ViewRecipientFieldBinding
 import com.infomaniak.mail.utils.isEmail
 import com.infomaniak.mail.utils.toggleChevron
+import kotlin.math.min
 
 class RecipientFieldView @JvmOverloads constructor(
     context: Context,
@@ -54,6 +56,8 @@ class RecipientFieldView @JvmOverloads constructor(
     private var contactAdapter: ContactAdapter? = null
     private val recipients = mutableSetOf<Recipient>()
 
+    private val popupMaxWidth by lazy { 300.toPx() }
+
     private val contextMenuBinding by lazy {
         ViewContactChipContextMenuBinding.inflate(
             LayoutInflater.from(context),
@@ -61,18 +65,17 @@ class RecipientFieldView @JvmOverloads constructor(
             false
         )
     }
+
     private val contactPopupWindow by lazy {
         PopupWindow(context).apply {
             contentView = contextMenuBinding.root
-            width = ViewGroup.LayoutParams.WRAP_CONTENT
             height = ViewGroup.LayoutParams.WRAP_CONTENT
-            isOutsideTouchable = true
 
-            // animationStyle = R.style.PopupAnimation
+            val displayMetrics = context.resources.displayMetrics
+            val percentageOfScreen = (displayMetrics.widthPixels * MAX_WIDTH_PERCENTAGE).toInt()
+            width = min(percentageOfScreen, popupMaxWidth)
 
-            // elevation = 10f
-            // setBackgroundDrawable(AppCompatResources.getDrawable(context, R.drawable.background_popup))
-            // setBackgroundResource(R.drawable.background_popup)
+            isFocusable = true
         }
     }
 
@@ -236,7 +239,7 @@ class RecipientFieldView @JvmOverloads constructor(
     private fun createChip(recipient: Recipient) {
         ChipContactBinding.inflate(LayoutInflater.from(context)).root.apply {
             text = recipient.getNameOrEmail()
-            setOnClickListener { showContactContextMenu(this) }
+            setOnClickListener { showContactContextMenu(recipient) }
             setOnBackspaceListener {
                 removeRecipient(recipient)
                 focusTextField()
@@ -245,13 +248,22 @@ class RecipientFieldView @JvmOverloads constructor(
         }
     }
 
-    private fun showContactContextMenu(contactChip: BackspaceAwareChip) {
+    private fun BackspaceAwareChip.showContactContextMenu(recipient: Recipient) {
         contextMenuBinding.apply {
             // TODO : Opti only assign listener once but change id every time
-            deleteContact.setOnClickListener { Toast.makeText(context, "Not yet implemented", Toast.LENGTH_SHORT).show() }
-            copyContactAddress.setOnClickListener { Toast.makeText(context, "Not yet implemented", Toast.LENGTH_SHORT).show() }
+            deleteContact.setOnClickListener {
+                Toast.makeText(context, "Not yet implemented", Toast.LENGTH_SHORT).show()
+                contactPopupWindow.dismiss()
+            }
+            copyContactAddress.setOnClickListener {
+                Toast.makeText(context, "Not yet implemented", Toast.LENGTH_SHORT).show()
+                contactPopupWindow.dismiss()
+            }
+            contactDetails.setRecipient(recipient, emptyMap())
         }
-        contactPopupWindow.showAsDropDown(contactChip)
+
+        hideKeyboard()
+        contactPopupWindow.showAsDropDown(this)
     }
 
     private fun removeRecipient(recipient: Recipient) = with(binding) {
@@ -295,5 +307,9 @@ class RecipientFieldView @JvmOverloads constructor(
             }
         }
         updateCollapsedChipValues(isCollapsed)
+    }
+
+    private companion object {
+        const val MAX_WIDTH_PERCENTAGE = 0.8
     }
 }

@@ -16,6 +16,7 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -25,6 +26,7 @@
         android:id="@+id/contactDetails"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:processNameAndEmail="false"
         tools:avatar="@tools:sample/avatars[11]"
         tools:email="thiago@silva.com"
         tools:name="@tools:sample/full_names" />
