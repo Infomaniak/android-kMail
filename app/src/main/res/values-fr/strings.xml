@@ -15,7 +15,7 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity">
     <string name="accentColorBlueTitle">Bleu</string>
     <string name="accentColorPinkTitle">Rose</string>
     <string name="actionArchive">Archiver</string>
@@ -320,6 +320,7 @@
     <plurals name="threadListDeletionConfirmationAlertDescription">
         <item quantity="one">Etes-vous sûr de vouloir supprimer ce message définitivement ?</item>
         <item quantity="other">Etes-vous sûr de vouloir supprimer ces messages définitivement ?</item>
+        <item quantity="many">Etes-vous sûr de vouloir supprimer ces messages définitivement ?</item>
     </plurals>
     <plurals name="threadListDeletionConfirmationAlertTitle">
         <item quantity="one">Supprimer %d message</item>
