@@ -63,16 +63,12 @@ class ContactAdapter(
 
     private fun ItemContactBinding.bindContact(position: Int) {
         val contact = contacts[position]
-        userName.text = contact.name
-        userEmail.text = contact.email
-        userAvatar.loadAvatar(contact)
+        contactDetails.setMergedContact(contact)
         root.setOnClickListener { onContactClicked(contact) }
     }
 
     private fun ItemContactBinding.bindAddNewUser() {
-        userName.text = context.getString(R.string.addUnknownRecipientTitle)
-        userEmail.text = searchQuery
-        userAvatar.loadUnknownUserAvatar()
+        contactDetails.setAutocompleteUnknownContact(searchQuery)
         root.setOnClickListener {
             context.trackNewMessageEvent("addNewRecipient")
             if (usedContacts.contains(searchQuery)) setSnackBar(R.string.addUnknownRecipientAlreadyUsed) else onAddUnrecognizedContact()

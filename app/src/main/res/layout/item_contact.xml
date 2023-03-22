@@ -16,58 +16,17 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/newMessageBackgroundColor">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <com.infomaniak.mail.ui.main.AvatarNameEmailView
+        android:id="@+id/contactDetails"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?selectableItemBackground">
+        tools:avatar="@tools:sample/avatars[11]"
+        tools:email="thiago@silva.com"
+        tools:name="@tools:sample/full_names" />
 
-        <com.infomaniak.mail.views.AvatarView
-            android:id="@+id/userAvatar"
-            android:layout_width="@dimen/userAvatarSizeLarge"
-            android:layout_height="@dimen/userAvatarSizeLarge"
-            android:layout_marginVertical="@dimen/marginStandardSmall"
-            android:layout_marginStart="@dimen/marginStandardMedium"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:src="@tools:sample/avatars" />
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="@dimen/marginStandardMedium"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="@id/userAvatar"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0"
-            app:layout_constraintStart_toEndOf="@id/userAvatar"
-            app:layout_constraintTop_toTopOf="@id/userAvatar">
-
-            <TextView
-                android:id="@+id/userName"
-                style="@style/BodyMedium"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:maxLines="1"
-                tools:text="@tools:sample/full_names" />
-
-            <TextView
-                android:id="@+id/userEmail"
-                style="@style/Body.Secondary"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:ellipsize="end"
-                android:maxLines="1"
-                tools:text="thiago@silva.com" />
-
-        </LinearLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

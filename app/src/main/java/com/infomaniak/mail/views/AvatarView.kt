@@ -18,6 +18,7 @@
 package com.infomaniak.mail.views
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
@@ -69,6 +70,8 @@ class AvatarView @JvmOverloads constructor(
     fun loadUnknownUserAvatar() {
         binding.avatarImage.load(R.drawable.ic_unknown_user_avatar)
     }
+
+    fun setImageDrawable(drawable: Drawable?) = binding.avatarImage.setImageDrawable(drawable)
 
     private fun ImageView.loadCorrespondentAvatar(correspondent: Correspondent): Disposable = with(correspondent) {
         val avatar = (correspondent as? MergedContact)?.avatar
