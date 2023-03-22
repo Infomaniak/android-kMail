@@ -15,7 +15,7 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<resources xmlns:tools="http://schemas.android.com/tools" xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2" tools:ignore="ImpliedQuantity">
+<resources>
     <string name="accentColorBlueTitle">Bleu</string>
     <string name="accentColorPinkTitle">Rose</string>
     <string name="actionArchive">Archiver</string>
