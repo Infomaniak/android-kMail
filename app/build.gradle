@@ -30,7 +30,7 @@ android {
         setProperty "archivesBaseName", "kmail-$versionName ($versionCode)"
 
         buildConfigField 'String', 'CLIENT_ID', '"E90BC22D-67A8-452C-BE93-28DA33588CA4"'
-        buildConfigField 'String', 'CREATE_ACCOUNT_URL', '"https://welcome.infomaniak.com/signup/ikmail/steps"'
+        buildConfigField 'String', 'CREATE_ACCOUNT_URL', '"https://welcome.infomaniak.com/signup/ikmail?app=true"'
         buildConfigField 'String', 'CREATE_ACCOUNT_SUCCESS_HOST', '"mail.infomaniak.com"'
         buildConfigField 'String', 'CREATE_ACCOUNT_CANCEL_HOST', '"welcome.infomaniak.com"'
         buildConfigField 'String', 'FEEDBACK_USER_REPORT', '"https://feedback.userreport.com/9f60b46d-7299-4887-b79d-c756cf474c4d#ideas/popular"'
