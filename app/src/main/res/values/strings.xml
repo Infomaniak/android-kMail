@@ -110,7 +110,6 @@
     <string name="buttonTextOptionsClose">Close text formatting</string>
     <string name="buttonTextOptionsOpen">Open text formatting</string>
     <string name="buttonUnderlined">Underline</string>
-    <string name="buttonUnlock">Unlock</string>
     <string name="buttonUnselectAll">None</string>
     <string name="buttonValid">Validate</string>
     <string name="ccTitle">Cc:</string>
@@ -166,15 +165,14 @@
     <string name="helpFAQ">FAQ</string>
     <string name="inboxFolder">Inbox</string>
     <string name="loadingText">Loading…</string>
-    <string name="lockAppTitle">Application locked</string>
     <string name="menuDrawerAdvancedActions">Advanced actions</string>
-    <string name="menuDrawerMailboxStorage">%1$s / %2$s used</string>
-    <string name="messageDetailsDateAt">%1$s at %2$s</string>
+    <string name="menuDrawerMailboxStorage">%s / %s used</string>
+    <string name="messageDetailsDateAt">%s at %s</string>
     <string name="messageDetailsYesterday">Yesterday</string>
     <string name="messageForwardHeader">Forwarded message</string>
     <string name="messageHideQuotedText">Hide the conversation</string>
     <string name="messageIsDraftOption">Draft</string>
-    <string name="messageReplyHeader">On %1$s, %2$s wrote:</string>
+    <string name="messageReplyHeader">On %s, %s wrote:</string>
     <string name="messageShowQuotedText">Display the conversation</string>
     <string name="moreStorageText1">Your mailbox is full and you can‘t receive any more messages 🥲</string>
     <string name="moreStorageText2">You will soon be able to unblock the limits of your ik.me email address (storage limit, sending, forwarding, …)</string>
@@ -198,8 +196,8 @@
     <string name="noMailboxDescription">You do not have an email address associated with your Infomaniak account. To add an address, tap the button below.</string>
     <string name="noMailboxTitle">No email address associated with this account</string>
     <string name="noNetwork">No signal</string>
-    <string name="noUpdatedAt">Never updated</string>
     <string name="noSubjectTitle">(no subject)</string>
+    <string name="noUpdatedAt">Never updated</string>
     <string name="notificationGeneralChannelName">General notifications</string>
     <string name="notificationNewMessagesChannelName">New emails</string>
     <string name="notificationSyncDraftChannelName">Saving drafts</string>
@@ -328,10 +326,10 @@
         <item quantity="one">Delete %d message</item>
         <item quantity="other">Delete %d messages</item>
     </plurals>
-    <string name="threadListEmptyDraftButton">Emptry draft</string>
+    <string name="threadListEmptyDraftButton">Empty drafts</string>
     <string name="threadListEmptyFolderAlertDescription">Are you sure you want to permanently delete all the messages in this folder?</string>
     <string name="threadListEmptySpamButton">Empty spam</string>
-    <string name="threadListEmptyTrashButton">Empty trash</string>
+    <string name="threadListEmptyTrashButton">Empty the trash</string>
     <string name="threadListHeaderLastUpdate">Updated %s</string>
     <string name="threadListHeaderLastUpdateNow">now</string>
     <plurals name="threadListHeaderUnreadCount">
@@ -342,7 +340,6 @@
     <string name="threadListSectionThisMonth">This month</string>
     <string name="threadListSectionThisWeek">This week</string>
     <string name="threadListSectionToday">Today</string>
-    <string name="threadListSectionTwoWeeks">Two weeks ago</string>
     <string name="threadListSpamHint">Messages that have been in the spam folder more than 30 days will be automatically deleted.</string>
     <string name="threadListTrashHint">Messages that have been in trash more than 30 days will be automatically deleted.</string>
     <string name="titleMyAccount">My account</string>

@@ -104,12 +104,11 @@
     <string name="buttonTextOptionsClose">Fermer le formatage de texte</string>
     <string name="buttonTextOptionsOpen">Ouvrir le formatage de texte</string>
     <string name="buttonUnderlined">Souligner</string>
-    <string name="buttonUnlock">Déverrouiller</string>
     <string name="buttonUnselectAll">Aucun</string>
     <string name="buttonValid">Valider</string>
     <string name="ccTitle">Cc :</string>
     <string name="commercialFolder">Promotions</string>
-    <string name="confirmLogoutDescription">Etes-vous sûr de vouloir vous déconnecter du compte %s ?</string>
+    <string name="confirmLogoutDescription">Êtes-vous sûr de vouloir vous déconnecter du compte %s ?</string>
     <string name="confirmLogoutTitle">Me déconnecter</string>
     <string name="contactActionAddToContacts">Ajouter aux contacts</string>
     <string name="contactActionCopyEmailAddress">Copier l’adresse mail</string>
@@ -160,15 +159,14 @@
     <string name="helpFAQ">FAQ</string>
     <string name="inboxFolder">Boîte de réception</string>
     <string name="loadingText">Chargement…</string>
-    <string name="lockAppTitle">Application verrouillée</string>
     <string name="menuDrawerAdvancedActions">Actions avancées</string>
-    <string name="menuDrawerMailboxStorage">%1$s / %2$s utilisés</string>
-    <string name="messageDetailsDateAt">%1$s à %2$s</string>
+    <string name="menuDrawerMailboxStorage">%s / %s utilisés</string>
+    <string name="messageDetailsDateAt">%s à %s</string>
     <string name="messageDetailsYesterday">Hier</string>
     <string name="messageForwardHeader">Message transféré</string>
     <string name="messageHideQuotedText">Cacher la conversation</string>
     <string name="messageIsDraftOption">Brouillon</string>
-    <string name="messageReplyHeader">Le %1$s, %2$s a écrit :</string>
+    <string name="messageReplyHeader">Le %s, %s a écrit :</string>
     <string name="messageShowQuotedText">Afficher la conversation</string>
     <string name="moreStorageText1">Votre boite est pleine et vous ne pouvez plus recevoir de nouveaux messages 🥲</string>
     <string name="moreStorageText2">Vous pourrez prochainement débloquer les limites de votre adresse mail ik.me (stockage limite, envoi, redirection, …)</string>
@@ -194,8 +192,8 @@
     <string name="noMailboxDescription">Vous n’avez pas d’adresse mail associée à votre compte Infomaniak. Pour ajouter une adresse, appuyez sur le bouton ci-dessous.</string>
     <string name="noMailboxTitle">Pas d’adresse mail associée à ce compte</string>
     <string name="noNetwork">Pas de signal</string>
-    <string name="noUpdatedAt">Jamais mis à jour</string>
     <string name="noSubjectTitle">(aucun sujet)</string>
+    <string name="noUpdatedAt">Jamais mis à jour</string>
     <string name="notificationGeneralChannelName">Notification générales</string>
     <string name="notificationNewMessagesChannelName">Nouveaux e-mails</string>
     <string name="notificationSyncDraftChannelName">Sauvegarde des brouillons</string>
@@ -328,9 +326,9 @@
         <item quantity="other">Supprimer %d messages</item>
         <item quantity="many">Supprimer %d de messages</item>
     </plurals>
-    <string name="threadListEmptyDraftButton">Vider le dossier draft</string>
+    <string name="threadListEmptyDraftButton">Vider les brouillons</string>
     <string name="threadListEmptyFolderAlertDescription">Etes-vous sûr de vouloir supprimer définitivement tous les messages de ce dossier ?</string>
-    <string name="threadListEmptySpamButton">Vider le dossier spam</string>
+    <string name="threadListEmptySpamButton">Vider les spams</string>
     <string name="threadListEmptyTrashButton">Vider la corbeille</string>
     <string name="threadListHeaderLastUpdate">Mis à jour %s</string>
     <string name="threadListHeaderLastUpdateNow">à l’instant</string>
@@ -343,7 +341,6 @@
     <string name="threadListSectionThisMonth">Ce mois-ci</string>
     <string name="threadListSectionThisWeek">Cette semaine</string>
     <string name="threadListSectionToday">Aujourd’hui</string>
-    <string name="threadListSectionTwoWeeks">Il y a deux semaines</string>
     <string name="threadListSpamHint">Les messages placés dans le dossier spam pendant plus de 30 jours seront automatiquement supprimés.</string>
     <string name="threadListTrashHint">Les messages placés dans la corbeille pendant plus de 30 jours seront automatiquement supprimés.</string>
     <string name="titleMyAccount">Mon compte</string>
