@@ -243,7 +243,9 @@ object MessageController {
             "Added: ${addedShortUids.count()} | Deleted: ${deletedUids.count()} | Updated: ${updatedMessages.count()} | ${folder.name}",
         )
 
-        val impactedThreads = handleAddedUids(
+        val impactedFoldersIds = handleDeletedUids(scope, deletedUids, realm)
+
+        val impactedThreadsWhenAdding = handleAddedUids(
             scope = scope,
             shortUids = addedShortUids,
             folder = folder,
@@ -253,12 +255,10 @@ object MessageController {
             realm = realm,
         )
 
-        return@with realm.writeBlocking {
+        val impactedCurrentFolderThreads = impactedThreadsWhenAdding.filter { it.folderId == folder.id }
+        impactedFoldersIds += impactedThreadsWhenAdding.map { it.folderId } + folder.id
 
-            val impactedCurrentFolderThreads = impactedThreads.filter { it.folderId == folder.id }
-            val impactedFoldersIds = (impactedThreads.map { it.folderId } + folder.id).toMutableSet()
-
-            impactedFoldersIds += handleDeletedUids(scope, deletedUids)
+        realm.writeBlocking {
             impactedFoldersIds += handleUpdatedUids(scope, updatedMessages, folder.id)
 
             impactedFoldersIds.forEach { folderId ->
@@ -270,9 +270,9 @@ object MessageController {
                 it.lastUpdatedAt = Date().toRealmInstant()
                 it.cursor = cursor
             }
-
-            return@writeBlocking impactedCurrentFolderThreads
         }
+
+        return impactedCurrentFolderThreads
     }
 
     private fun handleAddedUids(
@@ -428,43 +428,46 @@ object MessageController {
         }
     }
 
-    private fun MutableRealm.handleDeletedUids(scope: CoroutineScope, uids: List<String>): Set<String> {
+    private fun handleDeletedUids(scope: CoroutineScope, uids: List<String>, realm: Realm): MutableSet<String> {
 
         val impactedFolders = mutableSetOf<String>()
         val threads = mutableSetOf<Thread>()
 
-        uids.forEach { messageUid ->
-            scope.ensureActive()
+        realm.writeBlocking {
 
-            val message = getMessage(messageUid, this) ?: return@forEach
-
-            for (thread in message.threads.reversed()) {
+            uids.forEach { messageUid ->
                 scope.ensureActive()
 
-                val isSuccess = thread.messages.remove(message)
-                val numberOfMessagesInFolder = thread.messages.count { it.folderId == thread.folderId }
+                val message = getMessage(messageUid, this) ?: return@forEach
 
-                // We need to save this value because the Thread could be deleted before we use this `folderId`.
-                val threadFolderId = thread.folderId
+                for (thread in message.threads.reversed()) {
+                    scope.ensureActive()
 
-                if (numberOfMessagesInFolder == 0) {
-                    threads.removeIf { it.uid == thread.uid }
-                    delete(thread)
-                } else if (isSuccess) {
-                    threads += thread
-                } else {
-                    continue
+                    val isSuccess = thread.messages.remove(message)
+                    val numberOfMessagesInFolder = thread.messages.count { it.folderId == thread.folderId }
+
+                    // We need to save this value because the Thread could be deleted before we use this `folderId`.
+                    val threadFolderId = thread.folderId
+
+                    if (numberOfMessagesInFolder == 0) {
+                        threads.removeIf { it.uid == thread.uid }
+                        delete(thread)
+                    } else if (isSuccess) {
+                        threads += thread
+                    } else {
+                        continue
+                    }
+
+                    impactedFolders.add(threadFolderId)
                 }
 
-                impactedFolders.add(threadFolderId)
+                deleteMessage(message)
             }
 
-            deleteMessage(message)
-        }
-
-        threads.forEach {
-            scope.ensureActive()
-            it.recomputeThread(realm = this)
+            threads.forEach {
+                scope.ensureActive()
+                it.recomputeThread(realm = this)
+            }
         }
 
         return impactedFolders
