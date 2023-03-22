@@ -243,6 +243,13 @@ object MessageController {
             "Added: ${addedShortUids.count()} | Deleted: ${deletedUids.count()} | Updated: ${updatedMessages.count()} | ${folder.name}",
         )
 
+        val impactedFoldersIds = mutableSetOf<String>().apply {
+            realm.writeBlocking {
+                addAll(handleDeletedUids(scope, deletedUids))
+                addAll(handleUpdatedUids(scope, updatedMessages, folder.id))
+            }
+        }
+
         val impactedThreads = handleAddedUids(
             scope = scope,
             shortUids = addedShortUids,
@@ -256,10 +263,7 @@ object MessageController {
         return@with realm.writeBlocking {
 
             val impactedCurrentFolderThreads = impactedThreads.filter { it.folderId == folder.id }
-            val impactedFoldersIds = (impactedThreads.map { it.folderId } + folder.id).toMutableSet()
-
-            impactedFoldersIds += handleDeletedUids(scope, deletedUids)
-            impactedFoldersIds += handleUpdatedUids(scope, updatedMessages, folder.id)
+            impactedFoldersIds += impactedThreads.map { it.folderId } + folder.id
 
             impactedFoldersIds.forEach { folderId ->
                 FolderController.refreshUnreadCount(folderId, mailbox.objectId, realm = this)
