@@ -326,9 +326,9 @@
         <item quantity="other">Supprimer %d messages</item>
         <item quantity="many">Supprimer %d de messages</item>
     </plurals>
-    <string name="threadListEmptyDraftButton">Vider le dossier draft</string>
+    <string name="threadListEmptyDraftButton">Vider les brouillons</string>
     <string name="threadListEmptyFolderAlertDescription">Etes-vous sûr de vouloir supprimer définitivement tous les messages de ce dossier ?</string>
-    <string name="threadListEmptySpamButton">Vider le dossier spam</string>
+    <string name="threadListEmptySpamButton">Vider les spams</string>
     <string name="threadListEmptyTrashButton">Vider la corbeille</string>
     <string name="threadListHeaderLastUpdate">Mis à jour %s</string>
     <string name="threadListHeaderLastUpdateNow">à l’instant</string>

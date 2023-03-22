@@ -44,7 +44,7 @@
     <string name="actionStar">Aggiungi ai preferiti</string>
     <string name="actionUnstar">Elimina dai preferiti</string>
     <string name="actionViewInDark">Visualizzazione in tema scuro</string>
-    <string name="actionViewInLight">Vista in tema di luce</string>
+    <string name="actionViewInLight">Vista in tema chiaro</string>
     <string name="addUnknownRecipientAlreadyUsed">L’e-mail è già utilizzata</string>
     <string name="addUnknownRecipientInvalidEmail">L’e-mail non è valida</string>
     <string name="addUnknownRecipientTitle">Aggiungere un destinatario</string>
@@ -319,7 +319,7 @@
         <item quantity="one">Cancellare %d messaggio</item>
         <item quantity="other">Cancellare %d messaggi</item>
     </plurals>
-    <string name="threadListEmptyDraftButton">Bozza di emptry</string>
+    <string name="threadListEmptyDraftButton">Bozze vuote</string>
     <string name="threadListEmptyFolderAlertDescription">Siete sicuri di voler eliminare definitivamente tutti i messaggi in questa cartella?</string>
     <string name="threadListEmptySpamButton">Spam vuoto</string>
     <string name="threadListEmptyTrashButton">Svuotare la spazzatura</string>
@@ -327,7 +327,7 @@
     <string name="threadListHeaderLastUpdateNow">ora</string>
     <plurals name="threadListHeaderUnreadCount">
         <item quantity="one">%s non letto</item>
-        <item quantity="other">%s non letto</item>
+        <item quantity="other">%s non letti</item>
     </plurals>
     <string name="threadListSectionLastWeek">La scorsa settimana</string>
     <string name="threadListSectionThisMonth">Questo mese</string>

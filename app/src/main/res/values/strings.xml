@@ -326,10 +326,10 @@
         <item quantity="one">Delete %d message</item>
         <item quantity="other">Delete %d messages</item>
     </plurals>
-    <string name="threadListEmptyDraftButton">Emptry draft</string>
+    <string name="threadListEmptyDraftButton">Empty drafts</string>
     <string name="threadListEmptyFolderAlertDescription">Are you sure you want to permanently delete all the messages in this folder?</string>
     <string name="threadListEmptySpamButton">Empty spam</string>
-    <string name="threadListEmptyTrashButton">Empty trash</string>
+    <string name="threadListEmptyTrashButton">Empty the trash</string>
     <string name="threadListHeaderLastUpdate">Updated %s</string>
     <string name="threadListHeaderLastUpdateNow">now</string>
     <plurals name="threadListHeaderUnreadCount">

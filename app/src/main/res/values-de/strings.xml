@@ -267,7 +267,7 @@
     <string name="settingsSendIncludeOriginalMessage">Fügen Sie die ursprüngliche Nachricht in die Antwort ein</string>
     <string name="settingsSendTitle">Senden Sie</string>
     <string name="settingsSwipeActionNone">Keine</string>
-    <string name="settingsSwipeActionQuickActionsMenu">Menü \"Schnelle Aktionen</string>
+    <string name="settingsSwipeActionQuickActionsMenu">Menü Schnelle Aktionen</string>
     <string name="settingsSwipeActionReadUnread">Gelesen / ungelesen</string>
     <string name="settingsSwipeActionToDefine">Zu definieren</string>
     <string name="settingsSwipeActionsTitle">Swipe-Aktionen</string>
@@ -319,10 +319,10 @@
         <item quantity="one">%d Nachricht löschen</item>
         <item quantity="other">%d Nachrichten löschen</item>
     </plurals>
-    <string name="threadListEmptyDraftButton">Leergutentwurf</string>
+    <string name="threadListEmptyDraftButton">Leere Entwürfe</string>
     <string name="threadListEmptyFolderAlertDescription">Sind Sie sicher, dass Sie alle Nachrichten in diesem Ordner dauerhaft löschen wollen?</string>
     <string name="threadListEmptySpamButton">Leerer Spam</string>
-    <string name="threadListEmptyTrashButton">Mülleimer leeren</string>
+    <string name="threadListEmptyTrashButton">Leeren Mülleimer</string>
     <string name="threadListHeaderLastUpdate">Aktualisiert %s</string>
     <string name="threadListHeaderLastUpdateNow">jetzt</string>
     <plurals name="threadListHeaderUnreadCount">

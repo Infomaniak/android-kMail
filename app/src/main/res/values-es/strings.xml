@@ -319,7 +319,7 @@
         <item quantity="one">Borrar %d mensaje</item>
         <item quantity="other">Borrar %d mensajes</item>
     </plurals>
-    <string name="threadListEmptyDraftButton">Borrador de vacío</string>
+    <string name="threadListEmptyDraftButton">Vaciar los borradores</string>
     <string name="threadListEmptyFolderAlertDescription">¿Estás seguro de que quieres borrar definitivamente todos los mensajes de esta carpeta?</string>
     <string name="threadListEmptySpamButton">Spam vacío</string>
     <string name="threadListEmptyTrashButton">Vaciar la basura</string>
