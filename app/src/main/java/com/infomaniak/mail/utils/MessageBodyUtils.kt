@@ -116,15 +116,15 @@ object MessageBodyUtils {
 
     //region Utils
     /**
-     * Some email clients rename css classes to prefix them for example.
-     * We match all the css classes that contain the quote, in case this one has been renamed.
-     * @return a new css query
+     * Some Email clients rename CSS classes to prefix them.
+     * We match all the CSS classes that contain the quote, in case this one has been renamed.
+     * @return a new CSS query
      */
     private fun anyCssClassContaining(cssClass: String) = "[class*=$cssClass]"
 
     /**
-     * Some mail clients add the history in a new block, at the same level as the old one.
-     * And so we match the current block, as well as all those that follow and that are at the same level
+     * Some Email clients add the Thread's History in a new block, at the same level as the previous one.
+     * So we match the current block, as well as all those that follow and that are at the same level.
      * @return [Elements] which contains all the blocks that have been matched
      */
     private fun Document.selectElementAndFollowingSiblings(quoteDescriptor: String): Elements {
