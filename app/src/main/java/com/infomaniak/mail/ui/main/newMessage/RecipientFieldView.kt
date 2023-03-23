@@ -51,19 +51,17 @@ class RecipientFieldView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     private val binding by lazy { ViewRecipientFieldBinding.inflate(LayoutInflater.from(context), this, true) }
-
     private var contactAdapter: ContactAdapter? = null
+
     private var contactMap: Map<String, Map<String, MergedContact>> = emptyMap()
     private val recipients = mutableSetOf<Recipient>()
+    private lateinit var popupRecipient: Recipient
+    private var popupDeletesTheCollapsedChip = false
 
     private val popupMaxWidth by lazy { 300.toPx() }
 
     private val contextMenuBinding by lazy {
-        ViewContactChipContextMenuBinding.inflate(
-            LayoutInflater.from(context),
-            null,
-            false
-        )
+        ViewContactChipContextMenuBinding.inflate(LayoutInflater.from(context), null, false)
     }
 
     private val contactPopupWindow by lazy {
@@ -128,9 +126,7 @@ class RecipientFieldView @JvmOverloads constructor(
                 }
 
                 singleChip.root.setOnClickListener {
-                    singleChip.root.showContactContextMenu(recipients.first()) {
-                        updateCollapsedChipValues(isCollapsed)
-                    }
+                    singleChip.root.showContactContextMenu(recipients.first(), true)
                     updateCollapsedChipValues(isCollapsed)
                 }
             }
@@ -151,6 +147,20 @@ class RecipientFieldView @JvmOverloads constructor(
 
             setTextInputListeners()
 
+            contextMenuBinding.copyContactAddressButton.setOnClickListener {
+                onCopyContactAddress?.invoke(popupRecipient)
+                contactPopupWindow.dismiss()
+            }
+
+            contextMenuBinding.deleteContactButton.setOnClickListener {
+                removeRecipient(popupRecipient)
+                if (popupDeletesTheCollapsedChip) {
+                    popupDeletesTheCollapsedChip = false
+                    updateCollapsedChipValues(true)
+                }
+                contactPopupWindow.dismiss()
+            }
+
             if (isInEditMode) {
                 singleChip.root.isVisible = isToggleable
                 plusChip.isVisible = isToggleable
@@ -158,7 +168,7 @@ class RecipientFieldView @JvmOverloads constructor(
         }
     }
 
-    private fun ViewRecipientFieldBinding.setTextInputListeners() {
+    private fun setTextInputListeners() = with(binding) {
         textInput.apply {
             doOnTextChanged { text, _, _, _ ->
                 if (text?.isNotEmpty() == true) {
@@ -252,20 +262,11 @@ class RecipientFieldView @JvmOverloads constructor(
         }
     }
 
-    private fun BackspaceAwareChip.showContactContextMenu(recipient: Recipient, onRemoved: (() -> Unit)? = null) {
-        contextMenuBinding.apply {
-            // TODO : Opti only assign listener once but change id every time
-            copyContactAddressButton.setOnClickListener {
-                onCopyContactAddress?.invoke(recipient)
-                contactPopupWindow.dismiss()
-            }
-            deleteContactButton.setOnClickListener {
-                removeRecipient(recipient)
-                onRemoved?.invoke()
-                contactPopupWindow.dismiss()
-            }
-            contactDetails.setRecipient(recipient, contactMap)
-        }
+    private fun BackspaceAwareChip.showContactContextMenu(recipient: Recipient, isForSingleChip: Boolean = false) {
+        contextMenuBinding.contactDetails.setRecipient(recipient, contactMap)
+
+        popupRecipient = recipient
+        popupDeletesTheCollapsedChip = isForSingleChip
 
         hideKeyboard()
         contactPopupWindow.showAsDropDown(this)
