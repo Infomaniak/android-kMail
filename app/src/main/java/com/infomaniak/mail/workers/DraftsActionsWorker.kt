@@ -183,10 +183,10 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
         }
     }
 
-    private fun Attachment.updateLocalAttachment(localDraftUuid: String, attachment: Attachment, realm: MutableRealm) {
+    private fun Attachment.updateLocalAttachment(localDraftUuid: String, remoteAttachment: Attachment, realm: MutableRealm) {
         DraftController.updateDraft(localDraftUuid, realm) {
-            realm.delete(it.attachments.first { attachment -> attachment.uuid == uuid })
-            it.attachments.add(attachment)
+            realm.delete(it.attachments.first { localAttachment -> localAttachment.uploadLocalUri == uploadLocalUri })
+            it.attachments.add(remoteAttachment)
         }
     }
 
