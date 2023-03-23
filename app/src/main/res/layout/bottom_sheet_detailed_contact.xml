@@ -35,6 +35,7 @@
             android:id="@+id/contactDetails"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:processNameAndEmail="false"
             tools:avatar="@tools:sample/avatars[10]"
             tools:email="steph.guy@ik.me"
             tools:name="@tools:sample/full_names" />
