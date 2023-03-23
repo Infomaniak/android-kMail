@@ -159,7 +159,7 @@
     <string name="inboxFolder">Bandeja de entrada</string>
     <string name="loadingText">Cargando…</string>
     <string name="menuDrawerAdvancedActions">Acciones avanzadas</string>
-    <string name="menuDrawerMailboxStorage">s / s usado</string>
+    <string name="menuDrawerMailboxStorage">%s / %s usado</string>
     <string name="messageDetailsDateAt">%s a las %s</string>
     <string name="messageDetailsYesterday">Ayer</string>
     <string name="messageForwardHeader">Mensaje reenviado</string>
