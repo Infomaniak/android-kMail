@@ -24,7 +24,6 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.FrameLayout
 import android.widget.PopupWindow
-import android.widget.Toast
 import androidx.core.view.children
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -253,12 +252,11 @@ class RecipientFieldView @JvmOverloads constructor(
     private fun BackspaceAwareChip.showContactContextMenu(recipient: Recipient) {
         contextMenuBinding.apply {
             // TODO : Opti only assign listener once but change id every time
-            deleteContact.setOnClickListener {
-                Toast.makeText(context, "Not yet implemented", Toast.LENGTH_SHORT).show()
+            copyContactAddress.setOnClickListener {
                 contactPopupWindow.dismiss()
             }
-            copyContactAddress.setOnClickListener {
-                Toast.makeText(context, "Not yet implemented", Toast.LENGTH_SHORT).show()
+            deleteContact.setOnClickListener {
+                removeRecipient(recipient)
                 contactPopupWindow.dismiss()
             }
             contactDetails.setRecipient(recipient, contactMap)
