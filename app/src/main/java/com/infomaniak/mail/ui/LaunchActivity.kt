@@ -22,8 +22,11 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDeepLinkBuilder
+import com.infomaniak.lib.applock.LockActivity
+import com.infomaniak.lib.applock.Utils.isKeyguardSecure
 import com.infomaniak.mail.MatomoMail.trackUserId
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.ui.login.LoginActivity
 import com.infomaniak.mail.ui.login.LoginActivityArgs
@@ -39,6 +42,8 @@ class LaunchActivity : AppCompatActivity() {
 
     private val navigationArgs: LaunchActivityArgs? by lazy { intent?.extras?.let { LaunchActivityArgs.fromBundle(it) } }
 
+    private val localSettings by lazy { LocalSettings.getInstance(this) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -47,7 +52,12 @@ class LaunchActivity : AppCompatActivity() {
         lifecycleScope.launch(Dispatchers.IO) {
             val user = AccountUtils.requestCurrentUser()
             trackUserId(AccountUtils.currentUserId)
-            if (user == null) loginUser() else startApp()
+
+            when {
+                user == null -> loginUser()
+                isKeyguardSecure() && localSettings.isAppLocked -> startAppLockActivity()
+                else -> startApp()
+            }
         }
     }
 
@@ -61,6 +71,14 @@ class LaunchActivity : AppCompatActivity() {
         } ?: run {
             startActivity(Intent(this, MainActivity::class.java))
         }
+    }
+
+    private fun startAppLockActivity() {
+        LockActivity.startAppLockActivity(
+            context = this,
+            destinationClass = MainActivity::class.java,
+            primaryColor = localSettings.accentColor.getPrimary(this)
+        )
     }
 
     private fun loginUser() {
