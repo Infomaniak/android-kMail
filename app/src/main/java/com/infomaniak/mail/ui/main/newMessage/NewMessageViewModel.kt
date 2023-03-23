@@ -94,7 +94,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
         with(navigationArgs) {
             val isSuccess = RealmDatabase.mailboxContent().writeBlocking {
                 draft = if (draftExists) {
-                    draftLocalUuid?.let { DraftController.getDraft(it, realm = this)?.copyFromRealm() }
+                    getLatestDraft(draftLocalUuid, realm = this)
                         ?: fetchDraft(draftResource!!, messageUid!!)
                         ?: run {
                             // TODO: Add Loader to block UI while waiting for `fetchDraft` API call to finish
@@ -118,6 +118,10 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
 
             emit(isSuccess)
         }
+    }
+
+    private fun getLatestDraft(draftLocalUuid: String?, realm: MutableRealm): Draft? {
+        return draftLocalUuid?.let { DraftController.getDraft(it, realm)?.copyFromRealm() }
     }
 
     private fun fetchDraft(draftResource: String, messageUid: String): Draft? {
@@ -275,8 +279,17 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun importAttachments(uris: List<Uri>) = viewModelScope.launch(Dispatchers.IO) {
+
+        fun updateUiDraftFromRealm() {
+            RealmDatabase.mailboxContent().writeBlocking {
+                getLatestDraft(draft.localUuid, realm = this)?.let { draft = it }
+            }
+        }
+
         val newAttachments = mutableListOf<Attachment>()
         var attachmentsSize = draft.attachments.sumOf { it.size }
+
+        updateUiDraftFromRealm()
 
         uris.forEach { uri ->
             val availableSpace = FILE_SIZE_25_MB - attachmentsSize
