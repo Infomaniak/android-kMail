@@ -128,7 +128,9 @@ class RecipientFieldView @JvmOverloads constructor(
                 }
 
                 singleChip.root.setOnClickListener {
-                    removeRecipient(recipients.first())
+                    singleChip.root.showContactContextMenu(recipients.first()) {
+                        updateCollapsedChipValues(isCollapsed)
+                    }
                     updateCollapsedChipValues(isCollapsed)
                 }
             }
@@ -250,7 +252,7 @@ class RecipientFieldView @JvmOverloads constructor(
         }
     }
 
-    private fun BackspaceAwareChip.showContactContextMenu(recipient: Recipient) {
+    private fun BackspaceAwareChip.showContactContextMenu(recipient: Recipient, onRemoved: (() -> Unit)? = null) {
         contextMenuBinding.apply {
             // TODO : Opti only assign listener once but change id every time
             copyContactAddressButton.setOnClickListener {
@@ -259,6 +261,7 @@ class RecipientFieldView @JvmOverloads constructor(
             }
             deleteContactButton.setOnClickListener {
                 removeRecipient(recipient)
+                onRemoved?.invoke()
                 contactPopupWindow.dismiss()
             }
             contactDetails.setRecipient(recipient, contactMap)
