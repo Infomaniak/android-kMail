@@ -3,6 +3,28 @@
   <component name="navEditor-manualLayoutAlgorithm2">
     <option name="myPositions">
       <map>
+        <entry key="app_lock_navigation.xml">
+          <value>
+            <LayoutPositions>
+              <option name="myPositions">
+                <map>
+                  <entry key="bugTrackerActivity">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="12" />
+                            <option name="y" value="12" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </LayoutPositions>
+          </value>
+        </entry>
         <entry key="bug_tracker_navigation.xml">
           <value>
             <LayoutPositions>
@@ -129,7 +151,7 @@
                         <option name="myPosition">
                           <Point>
                             <option name="x" value="1232" />
-                            <option name="y" value="3039" />
+                            <option name="y" value="4107" />
                           </Point>
                         </option>
                       </LayoutPositions>
@@ -232,7 +254,7 @@
                         <option name="myPosition">
                           <Point>
                             <option name="x" value="1232" />
-                            <option name="y" value="3395" />
+                            <option name="y" value="3614" />
                           </Point>
                         </option>
                         <option name="myPositions">
@@ -273,8 +295,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="1232" />
-                            <option name="y" value="5040" />
+                            <option name="x" value="1476" />
+                            <option name="y" value="5082" />
                           </Point>
                         </option>
                       </LayoutPositions>
@@ -286,8 +308,17 @@
                         <option name="myPosition">
                           <Point>
                             <option name="x" value="1232" />
-                            <option name="y" value="766" />
+                            <option name="y" value="5039" />
                           </Point>
+                        </option>
+                        <option name="myPositions">
+                          <map>
+                            <entry key="action_multiSelectBottomSheetDialog_to_moveFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                          </map>
                         </option>
                       </LayoutPositions>
                     </value>
@@ -491,7 +522,7 @@
                         <option name="myPosition">
                           <Point>
                             <option name="x" value="1476" />
-                            <option name="y" value="3395" />
+                            <option name="y" value="3614" />
                           </Point>
                         </option>
                       </LayoutPositions>
@@ -599,7 +630,7 @@
                         <option name="myPosition">
                           <Point>
                             <option name="x" value="988" />
-                            <option name="y" value="3395" />
+                            <option name="y" value="4107" />
                           </Point>
                         </option>
                         <option name="myPositions">

@@ -24,7 +24,7 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import com.infomaniak.lib.core.utils.isKeyguardSecure
+import com.infomaniak.lib.applock.Utils.isKeyguardSecure
 import com.infomaniak.lib.core.utils.openAppNotificationSettings
 import com.infomaniak.mail.MatomoMail.toFloat
 import com.infomaniak.mail.MatomoMail.trackEvent

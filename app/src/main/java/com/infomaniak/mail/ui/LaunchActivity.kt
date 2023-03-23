@@ -19,15 +19,11 @@ package com.infomaniak.mail.ui
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDeepLinkBuilder
 import com.infomaniak.lib.applock.LockActivity
-import com.infomaniak.lib.applock.LockActivity.Companion.PRIMARY_COLOR_DATA
-import com.infomaniak.lib.core.utils.clearStack
-import com.infomaniak.lib.core.utils.isKeyguardSecure
-import com.infomaniak.lib.core.utils.whenResultIsOk
+import com.infomaniak.lib.applock.Utils.isKeyguardSecure
 import com.infomaniak.mail.MatomoMail.trackUserId
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -47,10 +43,6 @@ class LaunchActivity : AppCompatActivity() {
     private val navigationArgs: LaunchActivityArgs? by lazy { intent?.extras?.let { LaunchActivityArgs.fromBundle(it) } }
 
     private val localSettings by lazy { LocalSettings.getInstance(this) }
-
-    private val appLockResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        it.whenResultIsOk { startApp() }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,19 +69,20 @@ class LaunchActivity : AppCompatActivity() {
                 .setComponentName(MainActivity::class.java)
                 .createTaskStackBuilder().startActivities()
         } ?: run {
-            startActivity(Intent(this, MainActivity::class.java).clearStack())
+            startActivity(Intent(this, MainActivity::class.java))
         }
     }
 
     private fun startAppLockActivity() {
-        appLockResultLauncher.launch(
-            Intent(this, LockActivity::class.java).putExtra(PRIMARY_COLOR_DATA, localSettings.accentColor.getPrimary(this))
+        LockActivity.startAppLockActivity(
+            context = this,
+            destinationClass = MainActivity::class.java,
+            primaryColor = localSettings.accentColor.getPrimary(this)
         )
     }
 
     private fun loginUser() {
         Intent(this, LoginActivity::class.java).apply {
-            clearStack()
             putExtras(LoginActivityArgs(isFirstAccount = true).toBundle())
             startActivity(this)
         }

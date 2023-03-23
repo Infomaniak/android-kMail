@@ -25,8 +25,8 @@ import androidx.annotation.StringRes
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
+import com.infomaniak.lib.applock.Utils.silentlyReverseSwitch
 import com.infomaniak.lib.core.utils.getAttributes
-import com.infomaniak.lib.core.utils.silentlyReverseSwitch
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.ViewItemSettingBinding
