@@ -24,11 +24,13 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.FrameLayout
 import android.widget.PopupWindow
-import androidx.core.view.children
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.flexbox.FlexDirection
+import com.google.android.flexbox.FlexboxLayoutManager
+import com.google.android.flexbox.JustifyContent
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.hideKeyboard
 import com.infomaniak.lib.core.utils.showKeyboard
@@ -36,7 +38,6 @@ import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
-import com.infomaniak.mail.databinding.ChipContactBinding
 import com.infomaniak.mail.databinding.ViewContactChipContextMenuBinding
 import com.infomaniak.mail.databinding.ViewRecipientFieldBinding
 import com.infomaniak.mail.utils.isEmail
@@ -50,10 +51,10 @@ class RecipientFieldView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     private val binding by lazy { ViewRecipientFieldBinding.inflate(LayoutInflater.from(context), this, true) }
-    private var contactAdapter: ContactAdapter? = null
+    private var contactAdapter: ContactAdapter
+    private var contactChipAdapter: ContactChipAdapter
 
     private var contactMap: Map<String, Map<String, MergedContact>> = emptyMap()
-    private val recipients = mutableSetOf<Recipient>()
     private lateinit var popupRecipient: Recipient
     private var popupDeletesTheCollapsedChip = false
 
@@ -107,29 +108,6 @@ class RecipientFieldView @JvmOverloads constructor(
                 isToggleable = getBoolean(R.styleable.RecipientFieldView_toggleable, isToggleable)
             }
 
-            chevron.isVisible = isToggleable
-            isCollapsed = isToggleable
-
-            if (isToggleable) {
-                chevron.setOnClickListener {
-                    context.trackMessageEvent("openRecipientsFields", isCollapsed)
-                    isCollapsed = !isCollapsed
-                    if (isCollapsed) textInput.hideKeyboard()
-                }
-
-                plusChip.setOnClickListener { isCollapsed = !isCollapsed }
-
-                transparentButton.setOnClickListener {
-                    isCollapsed = !isCollapsed
-                    textInput.showKeyboard()
-                }
-
-                singleChip.root.setOnClickListener {
-                    singleChip.root.showContactContextMenu(recipients.first(), true)
-                    updateCollapsedChipValues(isCollapsed)
-                }
-            }
-
             contactAdapter = ContactAdapter(
                 usedContacts = mutableSetOf(),
                 onContactClicked = { addRecipient(it.email, it.name) },
@@ -144,21 +122,22 @@ class RecipientFieldView @JvmOverloads constructor(
                 setSnackBar = { setSnackBar(it) },
             )
 
-            setTextInputListeners()
-
-            contextMenuBinding.copyContactAddressButton.setOnClickListener {
-                onCopyContactAddress?.invoke(popupRecipient)
-                contactPopupWindow.dismiss()
-            }
-
-            contextMenuBinding.deleteContactButton.setOnClickListener {
-                removeRecipient(popupRecipient)
-                if (popupDeletesTheCollapsedChip) {
-                    popupDeletesTheCollapsedChip = false
-                    updateCollapsedChipValues(true)
+            contactChipAdapter = ContactChipAdapter(
+                openContextMenu = ::showContactContextMenu,
+                onBackspace = { recipient ->
+                    removeRecipient(recipient)
+                    focusTextField()
                 }
-                contactPopupWindow.dismiss()
-            }
+            )
+
+            chevron.isVisible = isToggleable
+            isCollapsed = isToggleable
+
+            setupChipsRecyclerView()
+
+            setToggleRelatedListeners()
+            setTextInputListeners()
+            setPopupMenuListeners()
 
             if (isInEditMode) {
                 singleChip.root.isVisible = isToggleable
@@ -167,11 +146,42 @@ class RecipientFieldView @JvmOverloads constructor(
         }
     }
 
+    private fun setupChipsRecyclerView() = with(binding) {
+        chipsRecyclerView.adapter = contactChipAdapter
+
+        (chipsRecyclerView.layoutManager as FlexboxLayoutManager).apply {
+            flexDirection = FlexDirection.ROW
+            justifyContent = JustifyContent.FLEX_START
+        }
+    }
+
+    private fun setToggleRelatedListeners() = with(binding) {
+        if (isToggleable) {
+            chevron.setOnClickListener {
+                context.trackMessageEvent("openRecipientsFields", isCollapsed)
+                isCollapsed = !isCollapsed
+                if (isCollapsed) textInput.hideKeyboard()
+            }
+
+            plusChip.setOnClickListener { isCollapsed = !isCollapsed }
+
+            transparentButton.setOnClickListener {
+                isCollapsed = !isCollapsed
+                textInput.showKeyboard()
+            }
+
+            singleChip.root.setOnClickListener {
+                showContactContextMenu(contactChipAdapter.getRecipients().first(), singleChip.root, true)
+                updateCollapsedChipValues(isCollapsed)
+            }
+        }
+    }
+
     private fun setTextInputListeners() = with(binding) {
         textInput.apply {
             doOnTextChanged { text, _, _, _ ->
                 if (text?.isNotEmpty() == true) {
-                    if ((text.trim().count()) > 0) contactAdapter!!.filterField(text) else contactAdapter!!.clear()
+                    if ((text.trim().count()) > 0) contactAdapter.filterField(text) else contactAdapter.clear()
                     if (!isAutoCompletionOpened) openAutoCompletion()
                 } else if (isAutoCompletionOpened) {
                     closeAutoCompletion()
@@ -180,7 +190,7 @@ class RecipientFieldView @JvmOverloads constructor(
 
             setOnEditorActionListener { _, actionId, _ ->
                 if (actionId == EditorInfo.IME_ACTION_DONE && textInput.text?.isNotBlank() == true) {
-                    contactAdapter!!.addFirstAvailableItem()
+                    contactAdapter.addFirstAvailableItem()
                 }
                 true // Keep keyboard open
             }
@@ -189,8 +199,26 @@ class RecipientFieldView @JvmOverloads constructor(
         }
     }
 
+    private fun setPopupMenuListeners() {
+        contextMenuBinding.copyContactAddressButton.setOnClickListener {
+            onCopyContactAddress?.invoke(popupRecipient)
+            contactPopupWindow.dismiss()
+        }
+
+        contextMenuBinding.deleteContactButton.setOnClickListener {
+            removeRecipient(popupRecipient)
+            if (popupDeletesTheCollapsedChip) {
+                popupDeletesTheCollapsedChip = false
+                updateCollapsedChipValues(true)
+            }
+            contactPopupWindow.dismiss()
+        }
+    }
+
     private fun focusLastChip() = with(binding) {
-        if (itemsChipGroup.childCount > 0) itemsChipGroup.children.last().requestFocusFromTouch()
+        val count = contactChipAdapter.itemCount
+        // chipsRecyclerView.children.last() won't work because they are not always ordered correctly
+        if (count > 0) chipsRecyclerView.getChildAt(count - 1).requestFocusFromTouch()
     }
 
     private fun focusTextField() {
@@ -201,21 +229,21 @@ class RecipientFieldView @JvmOverloads constructor(
         chevron.toggleChevron(isCollapsed)
 
         updateCollapsedChipValues(isCollapsed)
-        itemsChipGroup.isGone = isCollapsed
+        chipsRecyclerView.isGone = isCollapsed
 
         onToggle?.invoke(isCollapsed)
     }
 
     private fun updateCollapsedChipValues(isCollapsed: Boolean) = with(binding) {
-        val isTextInputAccessible = !isCollapsed || recipients.isEmpty()
+        val isTextInputAccessible = !isCollapsed || contactChipAdapter.isEmpty()
 
         singleChip.root.apply {
             isGone = isTextInputAccessible
-            text = recipients.firstOrNull()?.getNameOrEmail() ?: ""
+            text = contactChipAdapter.getRecipients().firstOrNull()?.getNameOrEmail() ?: ""
         }
         plusChip.apply {
-            isGone = !isCollapsed || recipients.count() <= 1
-            text = "+${recipients.count() - 1}"
+            isGone = !isCollapsed || contactChipAdapter.itemCount <= 1
+            text = "+${contactChipAdapter.itemCount - 1}"
         }
 
         transparentButton.isGone = isTextInputAccessible
@@ -223,7 +251,7 @@ class RecipientFieldView @JvmOverloads constructor(
     }
 
     fun updateContacts(allContacts: List<MergedContact>, newContactMap: Map<String, Map<String, MergedContact>>) {
-        contactAdapter?.updateContacts(allContacts)
+        contactAdapter.updateContacts(allContacts)
         contactMap = newContactMap
     }
 
@@ -238,45 +266,30 @@ class RecipientFieldView @JvmOverloads constructor(
     }
 
     private fun addRecipient(email: String, name: String) {
-        if (recipients.isEmpty()) isCollapsed = false
+        if (contactChipAdapter.isEmpty()) isCollapsed = false
         val recipient = Recipient().initLocalValues(email, name)
-        val recipientIsNew = contactAdapter!!.addUsedContact(email)
+        val recipientIsNew = contactAdapter.addUsedContact(email)
         if (recipientIsNew) {
-            recipients.add(recipient)
-            createChip(recipient)
+            contactChipAdapter.addChip(recipient)
             onContactAdded?.invoke(recipient)
             clearField()
         }
     }
 
-    private fun createChip(recipient: Recipient) {
-        ChipContactBinding.inflate(LayoutInflater.from(context)).root.apply {
-            text = recipient.getNameOrEmail()
-            setOnClickListener { showContactContextMenu(recipient) }
-            setOnBackspaceListener {
-                removeRecipient(recipient)
-                focusTextField()
-            }
-            binding.itemsChipGroup.addView(this)
-        }
-    }
-
-    private fun BackspaceAwareChip.showContactContextMenu(recipient: Recipient, isForSingleChip: Boolean = false) {
+    private fun showContactContextMenu(recipient: Recipient, anchor: BackspaceAwareChip, isForSingleChip: Boolean = false) {
         contextMenuBinding.contactDetails.setRecipient(recipient, contactMap)
 
         popupRecipient = recipient
         popupDeletesTheCollapsedChip = isForSingleChip
 
         hideKeyboard()
-        contactPopupWindow.showAsDropDown(this)
+        contactPopupWindow.showAsDropDown(anchor)
     }
 
     private fun removeRecipient(recipient: Recipient) = with(binding) {
-        val index = recipients.indexOf(recipient)
-        val successfullyRemoved = contactAdapter!!.removeUsedEmail(recipient.email)
+        val successfullyRemoved = contactAdapter.removeUsedEmail(recipient.email)
         if (successfullyRemoved) {
-            recipients.remove(recipient)
-            itemsChipGroup.removeViewAt(index)
+            contactChipAdapter.removeChip(recipient)
             onContactRemoved?.invoke(recipient)
         }
     }
@@ -308,9 +321,8 @@ class RecipientFieldView @JvmOverloads constructor(
 
     fun initRecipients(initialRecipients: List<Recipient>) {
         initialRecipients.forEach {
-            if (recipients.add(it)) {
-                createChip(it)
-                contactAdapter!!.addUsedContact(it.email)
+            if (contactChipAdapter.addChip(it)) {
+                contactAdapter.addUsedContact(it.email)
             }
         }
         updateCollapsedChipValues(isCollapsed)
