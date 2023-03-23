@@ -94,7 +94,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
         with(navigationArgs) {
             val isSuccess = RealmDatabase.mailboxContent().writeBlocking {
                 draft = if (draftExists) {
-                    getLatestDraft(draftLocalUuid, this)
+                    getLatestDraft(draftLocalUuid, realm = this)
                         ?: fetchDraft(draftResource!!, messageUid!!)
                         ?: run {
                             // TODO: Add Loader to block UI while waiting for `fetchDraft` API call to finish
@@ -120,8 +120,8 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    private fun getLatestDraft(draftLocalUuid: String?, mutableRealm: MutableRealm): Draft? {
-        return draftLocalUuid?.let { DraftController.getDraft(it, realm = mutableRealm)?.copyFromRealm() }
+    private fun getLatestDraft(draftLocalUuid: String?, realm: MutableRealm): Draft? {
+        return draftLocalUuid?.let { DraftController.getDraft(it, realm)?.copyFromRealm() }
     }
 
     private fun fetchDraft(draftResource: String, messageUid: String): Draft? {
@@ -279,9 +279,10 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun importAttachments(uris: List<Uri>) = viewModelScope.launch(Dispatchers.IO) {
+
         fun updateUiDraftFromRealm() {
             RealmDatabase.mailboxContent().writeBlocking {
-                getLatestDraft(draft.localUuid, this)?.let { draft = it }
+                getLatestDraft(draft.localUuid, realm = this)?.let { draft = it }
             }
         }
 

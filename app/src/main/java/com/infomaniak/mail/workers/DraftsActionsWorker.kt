@@ -148,9 +148,9 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
     }
 
     private fun Draft.uploadAttachments(realm: MutableRealm): Result {
-        getNotUploadedAttachments(this).forEach { attachment ->
+        getNotUploadedAttachments(draft = this).forEach { attachment ->
             runCatching {
-                attachment.startUpload(this.localUuid, realm)
+                attachment.startUpload(localUuid, realm)
             }.onFailure { exception ->
                 if ((exception as Exception).isNetworkException()) throw ApiController.NetworkException()
                 throw exception
@@ -184,9 +184,9 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
     }
 
     private fun Attachment.updateLocalAttachment(localDraftUuid: String, remoteAttachment: Attachment, realm: MutableRealm) {
-        DraftController.updateDraft(localDraftUuid, realm) {
-            realm.delete(it.attachments.first { localAttachment -> localAttachment.uploadLocalUri == uploadLocalUri })
-            it.attachments.add(remoteAttachment)
+        DraftController.updateDraft(localDraftUuid, realm) { draft ->
+            realm.delete(draft.attachments.first { localAttachment -> localAttachment.uploadLocalUri == uploadLocalUri })
+            draft.attachments.add(remoteAttachment)
         }
     }
 
