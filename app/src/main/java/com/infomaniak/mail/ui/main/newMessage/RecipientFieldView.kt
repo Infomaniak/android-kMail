@@ -83,6 +83,7 @@ class RecipientFieldView @JvmOverloads constructor(
     private var onToggle: ((isCollapsed: Boolean) -> Unit)? = null
     private var onContactRemoved: ((Recipient) -> Unit)? = null
     private var onContactAdded: ((Recipient) -> Unit)? = null
+    private var onCopyContactAddress: ((Recipient) -> Unit)? = null
     private var setSnackBar: ((Int) -> Unit) = {}
 
     private var isToggleable = false
@@ -252,10 +253,11 @@ class RecipientFieldView @JvmOverloads constructor(
     private fun BackspaceAwareChip.showContactContextMenu(recipient: Recipient) {
         contextMenuBinding.apply {
             // TODO : Opti only assign listener once but change id every time
-            copyContactAddress.setOnClickListener {
+            copyContactAddressButton.setOnClickListener {
+                onCopyContactAddress?.invoke(recipient)
                 contactPopupWindow.dismiss()
             }
-            deleteContact.setOnClickListener {
+            deleteContactButton.setOnClickListener {
                 removeRecipient(recipient)
                 contactPopupWindow.dismiss()
             }
@@ -281,6 +283,7 @@ class RecipientFieldView @JvmOverloads constructor(
         onAutoCompletionToggledCallback: (hasOpened: Boolean) -> Unit,
         onContactAddedCallback: ((Recipient) -> Unit),
         onContactRemovedCallback: ((Recipient) -> Unit),
+        onCopyContactAddressCallback: ((Recipient) -> Unit),
         onToggleCallback: ((isCollapsed: Boolean) -> Unit)? = null,
         setSnackBarCallback: (titleRes: Int) -> Unit,
     ) {
@@ -291,6 +294,7 @@ class RecipientFieldView @JvmOverloads constructor(
         onAutoCompletionToggled = onAutoCompletionToggledCallback
         onContactAdded = onContactAddedCallback
         onContactRemoved = onContactRemovedCallback
+        onCopyContactAddress = onCopyContactAddressCallback
 
         setSnackBar = setSnackBarCallback
     }

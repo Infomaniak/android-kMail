@@ -57,10 +57,8 @@ import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.*
 import com.infomaniak.mail.ui.main.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
+import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.Utils
-import com.infomaniak.mail.utils.initWebViewClient
-import com.infomaniak.mail.utils.injectCssInHtml
-import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import com.google.android.material.R as RMaterial
 
@@ -160,6 +158,7 @@ class NewMessageFragment : Fragment() {
             onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(TO, hasOpened) },
             onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, TO) },
             onContactRemovedCallback = { newMessageViewModel.removeRecipientFromField(it, TO) },
+            onCopyContactAddressCallback = { copyRecipientEmailToClipboard(it) },
             onToggleCallback = ::openAdvancedFields,
             setSnackBarCallback = ::setSnackBar,
         )
@@ -169,6 +168,7 @@ class NewMessageFragment : Fragment() {
             onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(CC, hasOpened) },
             onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, CC) },
             onContactRemovedCallback = { newMessageViewModel.removeRecipientFromField(it, CC) },
+            onCopyContactAddressCallback = { copyRecipientEmailToClipboard(it) },
             setSnackBarCallback = ::setSnackBar,
         )
 
@@ -177,6 +177,7 @@ class NewMessageFragment : Fragment() {
             onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(BCC, hasOpened) },
             onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, BCC) },
             onContactRemovedCallback = { newMessageViewModel.removeRecipientFromField(it, BCC) },
+            onCopyContactAddressCallback = { copyRecipientEmailToClipboard(it) },
             setSnackBarCallback = ::setSnackBar,
         )
     }
