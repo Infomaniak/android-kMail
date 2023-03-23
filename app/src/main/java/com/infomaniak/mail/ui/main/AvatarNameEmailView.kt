@@ -68,12 +68,7 @@ class AvatarNameEmailView @JvmOverloads constructor(
     }
 
     private fun ViewAvatarNameEmailBinding.setNameAndEmail(correspondent: Correspondent) {
-        if (processNameAndEmail) {
-            fillInUserNameAndEmail(correspondent, userName, userEmail)
-        } else {
-            userName.text = correspondent.name
-            userEmail.text = correspondent.email
-        }
+        fillInUserNameAndEmail(correspondent, userName, userEmail, ignoreIsMe = !processNameAndEmail)
     }
 
     fun setAutocompleteUnknownContact(searchQuery: String) = with(binding) {

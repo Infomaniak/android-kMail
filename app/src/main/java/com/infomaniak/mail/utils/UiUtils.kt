@@ -84,9 +84,12 @@ object UiUtils {
 
     fun formatUnreadCount(unread: Int) = if (unread >= 100) "99+" else unread.toString()
 
-    fun Context.getPrettyNameAndEmail(correspondent: Correspondent): Pair<String, String?> = with(correspondent) {
+    fun Context.getPrettyNameAndEmail(
+        correspondent: Correspondent,
+        ignoreIsMe: Boolean = false,
+    ): Pair<String, String?> = with(correspondent) {
         return when {
-            isMe() -> getString(R.string.contactMe) to email
+            isMe() && !ignoreIsMe -> getString(R.string.contactMe) to email
             name.isBlank() || name == email -> email to null
             else -> name to email
         }
@@ -96,8 +99,9 @@ object UiUtils {
         correspondent: Correspondent,
         nameTextView: TextView,
         emailTextView: TextView,
+        ignoreIsMe: Boolean = false,
     ) = with(correspondent) {
-        val (name, email) = nameTextView.context.getPrettyNameAndEmail(correspondent)
+        val (name, email) = nameTextView.context.getPrettyNameAndEmail(correspondent, ignoreIsMe)
         nameTextView.text = name
         emailTextView.apply {
             text = email
