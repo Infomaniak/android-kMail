@@ -54,6 +54,7 @@ class RecipientFieldView @JvmOverloads constructor(
     private val binding by lazy { ViewRecipientFieldBinding.inflate(LayoutInflater.from(context), this, true) }
 
     private var contactAdapter: ContactAdapter? = null
+    private var contactMap: Map<String, Map<String, MergedContact>> = emptyMap()
     private val recipients = mutableSetOf<Recipient>()
 
     private val popupMaxWidth by lazy { 300.toPx() }
@@ -210,8 +211,9 @@ class RecipientFieldView @JvmOverloads constructor(
         textInput.isVisible = isTextInputAccessible
     }
 
-    fun updateContacts(allContacts: List<MergedContact>) {
+    fun updateContacts(allContacts: List<MergedContact>, newContactMap: Map<String, Map<String, MergedContact>>) {
         contactAdapter?.updateContacts(allContacts)
+        contactMap = newContactMap
     }
 
     private fun openAutoCompletion() {
@@ -259,7 +261,7 @@ class RecipientFieldView @JvmOverloads constructor(
                 Toast.makeText(context, "Not yet implemented", Toast.LENGTH_SHORT).show()
                 contactPopupWindow.dismiss()
             }
-            contactDetails.setRecipient(recipient, emptyMap())
+            contactDetails.setRecipient(recipient, contactMap)
         }
 
         hideKeyboard()

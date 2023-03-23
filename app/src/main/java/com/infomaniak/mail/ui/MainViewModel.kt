@@ -44,13 +44,12 @@ import com.infomaniak.mail.ui.main.SnackBarManager.*
 import com.infomaniak.mail.ui.main.folder.ThreadListViewModel
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ApiErrorException.ErrorCodes
+import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.NotificationUtils.cancelNotification
 import com.infomaniak.mail.utils.SharedViewModelUtils.refreshFolders
 import com.infomaniak.mail.workers.DraftsActionsWorker
-import io.realm.kotlin.ext.copyFromRealm
-import io.realm.kotlin.notifications.ResultsChange
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import com.infomaniak.lib.core.R as RCore
@@ -295,29 +294,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun observeMergedContactsLive() = viewModelScope.launch(Dispatchers.IO) {
-
-        // TODO: We had this issue: https://sentry.infomaniak.com/share/issue/111cc162315d4873844c9b79be5b2491/
-        // TODO: We fixed it by using `copyFromRealm()` instead of accessing it directly.
-        // TODO: But we don't really know why it crashed in the first place. Maybe there's a memory leak somewhere?
-        fun arrangeMergedContacts(contacts: ResultsChange<MergedContact>): MutableMap<String, MutableMap<String, MergedContact>> {
-            val contactMap = mutableMapOf<String, MutableMap<String, MergedContact>>()
-
-            contacts.list.forEach {
-                val contact = it.copyFromRealm(UInt.MIN_VALUE)
-
-                val mapOfContactsForThisEmail = contactMap[it.email]
-                if (mapOfContactsForThisEmail == null) {
-                    contactMap[it.email] = mutableMapOf(it.name to contact)
-                } else {
-                    mapOfContactsForThisEmail[it.name] = contact
-                }
-            }
-
-            return contactMap
-        }
-
         MergedContactController.getMergedContactsAsync().collect { contacts ->
-            mergedContacts.postValue(arrangeMergedContacts(contacts))
+            mergedContacts.postValue(arrangeMergedContacts(contacts.list))
         }
     }
 

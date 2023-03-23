@@ -191,13 +191,18 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeContacts() {
-        newMessageViewModel.mergedContacts.observe(viewLifecycleOwner, ::updateContactsAdapter)
+        newMessageViewModel.mergedContacts.observe(viewLifecycleOwner) { (sortedContactList, contactMap) ->
+            updateRecipientFieldsContacts(sortedContactList, contactMap)
+        }
     }
 
-    private fun updateContactsAdapter(allContacts: List<MergedContact>) = with(binding) {
-        toField.updateContacts(allContacts)
-        ccField.updateContacts(allContacts)
-        bccField.updateContacts(allContacts)
+    private fun updateRecipientFieldsContacts(
+        sortedContactList: List<MergedContact>,
+        contactMap: Map<String, Map<String, MergedContact>>,
+    ) = with(binding) {
+        toField.updateContacts(sortedContactList, contactMap)
+        ccField.updateContacts(sortedContactList, contactMap)
+        bccField.updateContacts(sortedContactList, contactMap)
     }
 
     private fun toggleAutoCompletion(field: FieldType? = null, isAutoCompletionOpened: Boolean) = with(binding) {
