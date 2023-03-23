@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak kMail - Android
-  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~ Copyright (C) 2022-2023 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -23,6 +23,11 @@
         <item name="android:windowSplashScreenBrandingImage">@drawable/splashscreen_branding_image</item>
     </style>
 
-    <style name="AppTheme.Launcher" parent="AppTheme.Launcher31" />
+    <style name="AppTheme.Launcher31Only" parent="AppTheme.Launcher31">
+        <!-- This hardcoded value should be greater or equal than the longest `duration` in `splashscreen_animated_icon.xml` -->
+        <item name="android:windowSplashScreenAnimationDuration">4242</item>
+    </style>
+
+    <style name="AppTheme.Launcher" parent="AppTheme.Launcher31Only" />
 
 </resources>
