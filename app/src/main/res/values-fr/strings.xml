@@ -347,6 +347,7 @@
     <string name="titleMyAccount">Mon compte</string>
     <string name="titleMyAccounts">Mes comptes</string>
     <string name="toTitle">À :</string>
+    <string name="tooManyRecipients">Vous ne pouvez pas ajouter cette adresse car vous avez atteint la limite de destinataires</string>
     <string name="trashFolder">Corbeille</string>
     <string name="unknownRecipientTitle">(inconnu)</string>
     <string name="urlEntryTitle">Créer un lien hypertexte</string>

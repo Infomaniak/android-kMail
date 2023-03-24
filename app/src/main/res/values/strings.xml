@@ -345,6 +345,7 @@
     <string name="titleMyAccount">My account</string>
     <string name="titleMyAccounts">My accounts</string>
     <string name="toTitle">To:</string>
+    <string name="tooManyRecipients">You can’t add this address because you have reached the limit of recipients</string>
     <string name="trashFolder">Trash</string>
     <string name="unknownRecipientTitle">(unknown)</string>
     <string name="urlEntryTitle">Create a hyperlink</string>

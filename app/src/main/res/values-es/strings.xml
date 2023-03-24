@@ -338,6 +338,7 @@
     <string name="titleMyAccount">Mi cuenta</string>
     <string name="titleMyAccounts">Mis cuentas</string>
     <string name="toTitle">Para:</string>
+    <string name="tooManyRecipients">No puede añadir esta dirección porque ha alcanzado el límite de destinatarios</string>
     <string name="trashFolder">Basura</string>
     <string name="unknownRecipientTitle">(desconocido)</string>
     <string name="urlEntryTitle">Crear un hiperenlace</string>

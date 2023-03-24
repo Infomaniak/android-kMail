@@ -338,6 +338,7 @@
     <string name="titleMyAccount">Il mio account</string>
     <string name="titleMyAccounts">I miei conti</string>
     <string name="toTitle">A:</string>
+    <string name="tooManyRecipients">Non è possibile aggiungere questo indirizzo perché è stato raggiunto il limite di destinatari</string>
     <string name="trashFolder">Rifiuti</string>
     <string name="unknownRecipientTitle">(sconosciuto)</string>
     <string name="urlEntryTitle">Creare un collegamento ipertestuale</string>

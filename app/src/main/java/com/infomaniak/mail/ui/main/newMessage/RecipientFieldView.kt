@@ -266,6 +266,11 @@ class RecipientFieldView @JvmOverloads constructor(
     }
 
     private fun addRecipient(email: String, name: String) {
+        if (contactChipAdapter.itemCount > MAX_ALLOWED_RECIPIENT) {
+            setSnackBar(R.string.tooManyRecipients)
+            return
+        }
+
         if (contactChipAdapter.isEmpty()) isCollapsed = false
         val recipient = Recipient().initLocalValues(email, name)
         val recipientIsNew = contactAdapter.addUsedContact(email)
@@ -330,5 +335,6 @@ class RecipientFieldView @JvmOverloads constructor(
 
     private companion object {
         const val MAX_WIDTH_PERCENTAGE = 0.8
+        const val MAX_ALLOWED_RECIPIENT = 99
     }
 }

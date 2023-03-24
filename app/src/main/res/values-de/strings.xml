@@ -338,6 +338,7 @@
     <string name="titleMyAccount">Mein Konto</string>
     <string name="titleMyAccounts">Meine Konten</string>
     <string name="toTitle">An:</string>
+    <string name="tooManyRecipients">Sie können diese Adresse nicht hinzufügen, da Sie die Höchstzahl an Empfängern erreicht haben</string>
     <string name="trashFolder">Papierkorb</string>
     <string name="unknownRecipientTitle">(unbekannt)</string>
     <string name="urlEntryTitle">Einen Hyperlink erstellen</string>
