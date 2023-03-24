@@ -159,13 +159,13 @@
     <string name="inboxFolder">Posta in arrivo</string>
     <string name="loadingText">Caricamento…</string>
     <string name="menuDrawerAdvancedActions">Azioni avanzate</string>
-    <string name="menuDrawerMailboxStorage">%s / %s usato</string>
-    <string name="messageDetailsDateAt">%s alle %s</string>
+    <string name="menuDrawerMailboxStorage">%1$s / %2$s usato</string>
+    <string name="messageDetailsDateAt">%1$s alle %2$s</string>
     <string name="messageDetailsYesterday">Ieri</string>
     <string name="messageForwardHeader">Messaggio inoltrato</string>
     <string name="messageHideQuotedText">Nascondere la conversazione</string>
     <string name="messageIsDraftOption">Bozza</string>
-    <string name="messageReplyHeader">Il %s, %s ha scritto:</string>
+    <string name="messageReplyHeader">Il %1$s, %2$s ha scritto:</string>
     <string name="messageShowQuotedText">Visualizzare la conversazione</string>
     <string name="moreStorageText1">La casella di posta elettronica è piena e non è possibile ricevere altri messaggi 🥲</string>
     <string name="moreStorageText2">Presto potrete sbloccare i limiti del vostro indirizzo e-mail ik.me (limite di archiviazione, invio, inoltro, …).</string>
@@ -342,6 +342,7 @@
     <string name="unknownRecipientTitle">(sconosciuto)</string>
     <string name="urlEntryTitle">Creare un collegamento ipertestuale</string>
     <string name="urlPlaceholder">URL</string>
+    <string name="urlUserReportAndroid">https://feedback.userreport.com/3cc072b7-61ff-4592-b1aa-307a58fdcec9/</string>
     <string name="webViewCantHandleAction">Non è stata trovata alcuna applicazione in grado di gestire questa azione</string>
     <string name="workInProgressTitle">Disponibile a breve</string>
 </resources>

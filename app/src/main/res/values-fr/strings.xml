@@ -160,13 +160,13 @@
     <string name="inboxFolder">Boîte de réception</string>
     <string name="loadingText">Chargement…</string>
     <string name="menuDrawerAdvancedActions">Actions avancées</string>
-    <string name="menuDrawerMailboxStorage">%s / %s utilisés</string>
-    <string name="messageDetailsDateAt">%s à %s</string>
+    <string name="menuDrawerMailboxStorage">%1$s / %2$s utilisés</string>
+    <string name="messageDetailsDateAt">%1$s à %2$s</string>
     <string name="messageDetailsYesterday">Hier</string>
     <string name="messageForwardHeader">Message transféré</string>
     <string name="messageHideQuotedText">Cacher la conversation</string>
     <string name="messageIsDraftOption">Brouillon</string>
-    <string name="messageReplyHeader">Le %s, %s a écrit :</string>
+    <string name="messageReplyHeader">Le %1$s, %2$s a écrit :</string>
     <string name="messageShowQuotedText">Afficher la conversation</string>
     <string name="moreStorageText1">Votre boite est pleine et vous ne pouvez plus recevoir de nouveaux messages 🥲</string>
     <string name="moreStorageText2">Vous pourrez prochainement débloquer les limites de votre adresse mail ik.me (stockage limite, envoi, redirection, …)</string>
@@ -351,6 +351,7 @@
     <string name="unknownRecipientTitle">(inconnu)</string>
     <string name="urlEntryTitle">Créer un lien hypertexte</string>
     <string name="urlPlaceholder">URL</string>
+    <string name="urlUserReportAndroid">https://feedback.userreport.com/91aeb5c2-f609-4b9c-9787-755e83ed940c/</string>
     <string name="webViewCantHandleAction">Aucune application n’a été trouvée pour gérer cette action</string>
     <string name="workInProgressTitle">Disponible prochainement</string>
 </resources>
