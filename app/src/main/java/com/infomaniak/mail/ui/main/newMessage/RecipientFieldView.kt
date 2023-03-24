@@ -215,10 +215,10 @@ class RecipientFieldView @JvmOverloads constructor(
         }
     }
 
-    private fun focusLastChip() = with(binding) {
+    private fun focusLastChip() {
         val count = contactChipAdapter.itemCount
         // chipsRecyclerView.children.last() won't work because they are not always ordered correctly
-        if (count > 0) chipsRecyclerView.getChildAt(count - 1).requestFocusFromTouch()
+        if (count > 0) binding.chipsRecyclerView.getChildAt(count - 1).requestFocusFromTouch()
     }
 
     private fun focusTextField() {
@@ -286,7 +286,7 @@ class RecipientFieldView @JvmOverloads constructor(
         contactPopupWindow.showAsDropDown(anchor)
     }
 
-    private fun removeRecipient(recipient: Recipient) = with(binding) {
+    private fun removeRecipient(recipient: Recipient) {
         val successfullyRemoved = contactAdapter.removeUsedEmail(recipient.email)
         if (successfullyRemoved) {
             contactChipAdapter.removeChip(recipient)

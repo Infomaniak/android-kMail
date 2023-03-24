@@ -49,9 +49,9 @@ class ContactChipAdapter(
     fun getRecipients() = recipients
 
     fun addChip(recipient: Recipient): Boolean {
-        val addedSuccessfully = recipients.add(recipient)
-        if (addedSuccessfully) notifyItemInserted(itemCount - 1)
-        return addedSuccessfully
+        return recipients.add(recipient).also { addedSuccessfully ->
+            if (addedSuccessfully) notifyItemInserted(itemCount - 1)
+        }
     }
 
     fun removeChip(recipient: Recipient) {
