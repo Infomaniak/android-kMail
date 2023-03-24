@@ -17,7 +17,13 @@
  */
 package com.infomaniak.mail.utils
 
+import com.infomaniak.lib.core.api.ApiController
+import com.infomaniak.lib.core.models.ApiResponse
+import kotlinx.serialization.decodeFromString
+
 class ApiErrorException(override val message: String?) : Exception() {
+
+    inline val apiResponse get() = ApiController.json.decodeFromString<ApiResponse<Any>>(message!!)
 
     object ErrorCodes {
         const val DRAFT_DOES_NOT_EXIST = "draft__not_found"
