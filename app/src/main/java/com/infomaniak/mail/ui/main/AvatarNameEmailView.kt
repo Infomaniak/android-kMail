@@ -33,7 +33,7 @@ import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
 class AvatarNameEmailView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     private val binding by lazy { ViewAvatarNameEmailBinding.inflate(LayoutInflater.from(context), this, true) }

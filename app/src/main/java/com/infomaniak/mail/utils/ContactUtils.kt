@@ -99,7 +99,6 @@ object ContactUtils {
         }
     }
 
-
     // TODO: We had this issue: https://sentry.infomaniak.com/share/issue/111cc162315d4873844c9b79be5b2491/
     // TODO: We fixed it by using `copyFromRealm()` instead of accessing it directly.
     // TODO: But we don't really know why it crashed in the first place. Maybe there's a memory leak somewhere?

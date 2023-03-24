@@ -32,7 +32,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.hideKeyboard
 import com.infomaniak.lib.core.utils.showKeyboard
-import com.infomaniak.lib.core.utils.toPx
 import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.MergedContact
@@ -58,7 +57,7 @@ class RecipientFieldView @JvmOverloads constructor(
     private lateinit var popupRecipient: Recipient
     private var popupDeletesTheCollapsedChip = false
 
-    private val popupMaxWidth by lazy { 300.toPx() }
+    private val popupMaxWidth by lazy { resources.getDimensionPixelSize(R.dimen.contactPopupMaxWidth) }
 
     private val contextMenuBinding by lazy {
         ViewContactChipContextMenuBinding.inflate(LayoutInflater.from(context), null, false)

@@ -45,14 +45,17 @@ class ActionItemView @JvmOverloads constructor(
     init {
         attrs?.getAttributes(context, R.styleable.ActionItemView) {
             with(binding) {
-                button.icon = getDrawable(R.styleable.ActionItemView_icon)
-                button.text = getString(R.styleable.ActionItemView_text)
-                divider.isVisible = getBoolean(R.styleable.ActionItemView_visibleDivider, true)
+                button.apply {
+                    icon = getDrawable(R.styleable.ActionItemView_icon)
+                    text = getString(R.styleable.ActionItemView_text)
 
-                getDimensionPixelSize(R.styleable.ActionItemView_padding, NOT_SET).takeIf { it != NOT_SET }?.let { padding ->
-                    button.iconPadding = padding
-                    button.setPaddingRelative(start = padding, end = padding)
+                    getDimensionPixelSize(R.styleable.ActionItemView_padding, NOT_SET).takeIf { it != NOT_SET }?.let { padding ->
+                        iconPadding = padding
+                        setPaddingRelative(start = padding, end = padding)
+                    }
                 }
+
+                divider.isVisible = getBoolean(R.styleable.ActionItemView_visibleDivider, true)
 
                 if (getBoolean(R.styleable.ActionItemView_staffOnly, false)) {
                     if (isInEditMode || AccountUtils.currentUser?.isStaff == true) {

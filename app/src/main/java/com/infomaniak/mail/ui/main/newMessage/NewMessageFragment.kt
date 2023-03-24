@@ -158,7 +158,7 @@ class NewMessageFragment : Fragment() {
             onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(TO, hasOpened) },
             onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, TO) },
             onContactRemovedCallback = { newMessageViewModel.removeRecipientFromField(it, TO) },
-            onCopyContactAddressCallback = { copyRecipientEmailToClipboard(it) },
+            onCopyContactAddressCallback = ::copyRecipientEmailToClipboard,
             onToggleCallback = ::openAdvancedFields,
             setSnackBarCallback = ::setSnackBar,
         )
@@ -168,7 +168,7 @@ class NewMessageFragment : Fragment() {
             onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(CC, hasOpened) },
             onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, CC) },
             onContactRemovedCallback = { newMessageViewModel.removeRecipientFromField(it, CC) },
-            onCopyContactAddressCallback = { copyRecipientEmailToClipboard(it) },
+            onCopyContactAddressCallback = ::copyRecipientEmailToClipboard,
             setSnackBarCallback = ::setSnackBar,
         )
 
@@ -177,7 +177,7 @@ class NewMessageFragment : Fragment() {
             onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(BCC, hasOpened) },
             onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, BCC) },
             onContactRemovedCallback = { newMessageViewModel.removeRecipientFromField(it, BCC) },
-            onCopyContactAddressCallback = { copyRecipientEmailToClipboard(it) },
+            onCopyContactAddressCallback = ::copyRecipientEmailToClipboard,
             setSnackBarCallback = ::setSnackBar,
         )
     }
