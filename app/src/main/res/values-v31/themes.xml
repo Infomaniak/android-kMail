@@ -24,8 +24,8 @@
     </style>
 
     <style name="AppTheme.Launcher31Only" parent="AppTheme.Launcher31">
-        <!-- This hardcoded value should be greater or equal than the longest `duration` in `splashscreen_animated_icon.xml` -->
-        <item name="android:windowSplashScreenAnimationDuration">4242</item>
+        <!-- Not a magic value: "The maximum animation duration should be limited below 1000ms." -->
+        <item name="android:windowSplashScreenAnimationDuration">1000</item>
     </style>
 
     <style name="AppTheme.Launcher" parent="AppTheme.Launcher31Only" />
