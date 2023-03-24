@@ -40,6 +40,7 @@
         android:nestedScrollingEnabled="false"
         android:orientation="horizontal"
         android:overScrollMode="never"
+        android:paddingVertical="2dp"
         android:visibility="gone"
         app:layoutManager="com.google.android.flexbox.FlexboxLayoutManager"
         app:layout_constraintEnd_toStartOf="@id/chevron"
