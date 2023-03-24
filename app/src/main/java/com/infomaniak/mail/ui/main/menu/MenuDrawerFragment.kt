@@ -131,7 +131,7 @@ class MenuDrawerFragment : MenuFoldersFragment() {
                 }
             } else {
                 trackMenuDrawerEvent("feedback")
-                context.openUrl(BuildConfig.FEEDBACK_USER_REPORT)
+                context.openUrl(getString(R.string.urlUserReportAndroid))
             }
         }
 
