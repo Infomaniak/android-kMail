@@ -95,15 +95,17 @@ class ContactAdapter(
 
                 val finalUserList = mutableListOf<MergedContact>()
                 displayAddUnknownContactButton = true
-                allContacts.forEach {
-                    val standardizedEmail = it.email.standardize()
-                    val matches = it.name.standardize().contains(searchTerm) || standardizedEmail.contains(searchTerm)
+                for (contact in allContacts) {
+                    val standardizedEmail = contact.email.standardize()
+                    val matches = contact.name.standardize().contains(searchTerm) || standardizedEmail.contains(searchTerm)
 
                     val displayNewContact = (matches && searchTerm == standardizedEmail && !usedContacts.contains(searchTerm))
                     if (displayNewContact) displayAddUnknownContactButton = false
 
                     val isAlreadyUsed = usedContacts.contains(standardizedEmail)
-                    if (matches && !isAlreadyUsed) finalUserList.add(it)
+                    if (matches && !isAlreadyUsed) finalUserList.add(contact)
+
+                    if (finalUserList.count() >= MAX_AUTOCOMPLETE_RESULTS) break
                 }
 
                 return FilterResults().apply {
@@ -138,6 +140,10 @@ class ContactAdapter(
     private enum class ContactType(val id: Int) {
         KNOWN_CONTACT(0),
         UNKNOWN_CONTACT(1),
+    }
+
+    private companion object {
+        const val MAX_AUTOCOMPLETE_RESULTS = 10
     }
 
     class ContactViewHolder(val binding: ItemContactBinding) : RecyclerView.ViewHolder(binding.root)
