@@ -20,5 +20,6 @@
     style="@style/EmailAddressChip"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:layout_marginHorizontal="2dp"
     android:ellipsize="end"
     tools:text="@tools:sample/full_names" />
