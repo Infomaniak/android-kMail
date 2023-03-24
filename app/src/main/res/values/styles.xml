@@ -488,4 +488,9 @@
         <item name="android:popupBackground">@color/backgroundColorTertiary</item>
     </style>
 
+    <style name="PopupWindowStyle" parent="Widget.Material3.PopupMenu">
+        <item name="android:overlapAnchor">true</item>
+        <item name="android:popupBackground">@drawable/background_popup</item>
+    </style>
+
 </resources>

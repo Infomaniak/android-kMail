@@ -22,6 +22,7 @@
         <attr name="icon" format="reference" />
         <attr name="text" format="string" />
         <attr name="title" format="string" />
+        <attr name="padding" format="dimension" />
     </declare-styleable>
 
     <declare-styleable name="MenuDrawerItemView">
@@ -49,6 +50,7 @@
 
     <declare-styleable name="ActionItemView">
         <attr name="icon" />
+        <attr name="padding" />
         <attr name="text" />
         <attr name="visibleDivider" format="boolean" />
         <attr name="staffOnly" format="boolean" />
@@ -114,5 +116,13 @@
     <declare-styleable name="RecipientFieldView">
         <attr name="title" />
         <attr name="toggleable" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="AvatarNameEmailView">
+        <attr name="avatar" format="reference|color" />
+        <attr name="name" format="string" />
+        <attr name="email" format="string" />
+        <attr name="padding" />
+        <attr name="processNameAndEmail" format="boolean" />
     </declare-styleable>
 </resources>

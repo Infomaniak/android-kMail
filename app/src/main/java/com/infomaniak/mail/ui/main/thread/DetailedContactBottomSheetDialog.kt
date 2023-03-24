@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,17 +17,12 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
-import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.MatomoMail.trackContactActionsEvent
 import com.infomaniak.mail.R
@@ -35,7 +30,7 @@ import com.infomaniak.mail.databinding.BottomSheetDetailedContactBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.ui.main.thread.actions.ActionsBottomSheetDialog
-import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
+import com.infomaniak.mail.utils.copyRecipientEmailToClipboard
 import com.infomaniak.mail.utils.observeNotNull
 
 class DetailedContactBottomSheetDialog : ActionsBottomSheetDialog() {
@@ -52,12 +47,8 @@ class DetailedContactBottomSheetDialog : ActionsBottomSheetDialog() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
-
-        userAvatar.loadAvatar(navigationArgs.recipient, mainViewModel.mergedContacts.value ?: emptyMap())
-        fillInUserNameAndEmail(navigationArgs.recipient, name, email)
-
+        contactDetails.setRecipient(navigationArgs.recipient, mainViewModel.mergedContacts.value ?: emptyMap())
         setupListeners()
-
         observeContacts()
     }
 
@@ -77,22 +68,13 @@ class DetailedContactBottomSheetDialog : ActionsBottomSheetDialog() {
         }
         copyAddress.setClosingOnClickListener {
             trackContactActionsEvent("copyEmailAddress")
-            copyToClipboard()
-        }
-    }
-
-    private fun copyToClipboard() = with(navigationArgs.recipient) {
-        val clipboardManager = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        clipboardManager.setPrimaryClip(ClipData.newPlainText(email, email))
-
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-            showSnackbar(R.string.snackbarEmailCopiedToClipboard, anchor = activity?.findViewById(R.id.quickActionBar))
+            copyRecipientEmailToClipboard(navigationArgs.recipient, activity?.findViewById(R.id.quickActionBar))
         }
     }
 
     private fun observeContacts() {
         mainViewModel.mergedContacts.observeNotNull(viewLifecycleOwner) {
-            binding.userAvatar.loadAvatar(navigationArgs.recipient, it)
+            binding.contactDetails.updateAvatar(navigationArgs.recipient, it)
         }
     }
 }

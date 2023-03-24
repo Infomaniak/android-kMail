@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak kMail - Android
-  ~ Copyright (C) 2022-2023 Infomaniak Network SA
+  ~ Copyright (C) 2023 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -15,53 +15,44 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    style="@style/CardViewMail"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".ui.main.thread.DetailedContactBottomSheetDialog">
+    android:layout_height="wrap_content"
+    app:cardBackgroundColor="@color/backgroundColorSecondary"
+    app:cardCornerRadius="@dimen/radius">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingBottom="@dimen/marginStandardMedium">
-
-        <include layout="@layout/view_bottom_sheet_separator" />
+        android:orientation="vertical">
 
         <com.infomaniak.mail.ui.main.AvatarNameEmailView
             android:id="@+id/contactDetails"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:processNameAndEmail="false"
-            tools:avatar="@tools:sample/avatars[10]"
+            tools:avatar="@tools:sample/avatars[4]"
             tools:email="steph.guy@ik.me"
             tools:name="@tools:sample/full_names" />
 
         <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
-            android:id="@+id/writeMail"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/marginStandardMedium"
-            app:icon="@drawable/ic_contact_action_write"
-            app:text="@string/contactActionWriteEmail"
-            app:visibleDivider="false" />
-
-        <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
-            android:id="@+id/addToContacts"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:icon="@drawable/ic_contact_action_add_user"
-            app:text="@string/contactActionAddToContacts" />
-
-        <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
-            android:id="@+id/copyAddress"
+            android:id="@+id/copyContactAddressButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:icon="@drawable/ic_contact_action_copy"
-            app:text="@string/contactActionCopyEmailAddress" />
+            app:padding="@dimen/marginStandardMedium"
+            app:text="Copier l'adresse mail" />
+
+        <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
+            android:id="@+id/deleteContactButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:icon="@drawable/ic_bin"
+            app:padding="@dimen/marginStandardMedium"
+            app:text="Supprimer" />
 
     </LinearLayout>
-</androidx.core.widget.NestedScrollView>
+</com.google.android.material.card.MaterialCardView>

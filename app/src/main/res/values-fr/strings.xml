@@ -290,7 +290,7 @@
     <string name="snackbarDisplayProblemReported">Problème d’affichage signalé</string>
     <string name="snackbarDraftDeleted">Brouillon supprimé</string>
     <string name="snackbarDraftSaved">Brouillon enregistré</string>
-    <string name="snackbarEmailCopiedToClipboard">Adresse mail copiée dans le presse papier</string>
+    <string name="snackbarEmailCopiedToClipboard">Adresse mail copiée dans le presse-papiers</string>
     <string name="snackbarEmailSending">E-mail en cours d’envoi</string>
     <string name="snackbarEmailSent">E-mail envoyé</string>
     <string name="snackbarInvalidUrl">URL invalide</string>

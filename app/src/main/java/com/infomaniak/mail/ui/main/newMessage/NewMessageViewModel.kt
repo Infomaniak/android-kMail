@@ -44,6 +44,7 @@ import com.infomaniak.mail.ui.main.SnackBarManager
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType
 import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.realmListOf
@@ -76,7 +77,8 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     private var isNewMessage = false
 
     val mergedContacts = liveData(coroutineContext) {
-        emit(MergedContactController.getMergedContacts(sorted = true))
+        val list = MergedContactController.getMergedContacts(sorted = true)
+        emit(list to arrangeMergedContacts(list))
     }
 
     val mailboxes = liveData(coroutineContext) {

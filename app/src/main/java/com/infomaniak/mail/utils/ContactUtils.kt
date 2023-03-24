@@ -25,6 +25,7 @@ import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.models.correspondent.Contact
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
+import io.realm.kotlin.ext.copyFromRealm
 import io.sentry.Sentry
 import io.sentry.android.core.internal.util.Permissions
 
@@ -96,5 +97,25 @@ object ContactUtils {
                 }
             }
         }
+    }
+
+    // TODO: We had this issue: https://sentry.infomaniak.com/share/issue/111cc162315d4873844c9b79be5b2491/
+    // TODO: We fixed it by using `copyFromRealm()` instead of accessing it directly.
+    // TODO: But we don't really know why it crashed in the first place. Maybe there's a memory leak somewhere?
+    fun arrangeMergedContacts(contacts: List<MergedContact>): Map<String, Map<String, MergedContact>> {
+        val contactMap = mutableMapOf<String, MutableMap<String, MergedContact>>()
+
+        contacts.forEach {
+            val contact = it.copyFromRealm(UInt.MIN_VALUE)
+
+            val mapOfContactsForThisEmail = contactMap[it.email]
+            if (mapOfContactsForThisEmail == null) {
+                contactMap[it.email] = mutableMapOf(it.name to contact)
+            } else {
+                mapOfContactsForThisEmail[it.name] = contact
+            }
+        }
+
+        return contactMap
     }
 }

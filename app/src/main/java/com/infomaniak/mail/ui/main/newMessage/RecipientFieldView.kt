@@ -20,8 +20,10 @@ package com.infomaniak.mail.ui.main.newMessage
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.FrameLayout
+import android.widget.PopupWindow
 import androidx.core.view.children
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -35,9 +37,11 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ChipContactBinding
+import com.infomaniak.mail.databinding.ViewContactChipContextMenuBinding
 import com.infomaniak.mail.databinding.ViewRecipientFieldBinding
 import com.infomaniak.mail.utils.isEmail
 import com.infomaniak.mail.utils.toggleChevron
+import kotlin.math.min
 
 class RecipientFieldView @JvmOverloads constructor(
     context: Context,
@@ -46,14 +50,37 @@ class RecipientFieldView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     private val binding by lazy { ViewRecipientFieldBinding.inflate(LayoutInflater.from(context), this, true) }
-
     private var contactAdapter: ContactAdapter? = null
+
+    private var contactMap: Map<String, Map<String, MergedContact>> = emptyMap()
     private val recipients = mutableSetOf<Recipient>()
+    private lateinit var popupRecipient: Recipient
+    private var popupDeletesTheCollapsedChip = false
+
+    private val popupMaxWidth by lazy { resources.getDimensionPixelSize(R.dimen.contactPopupMaxWidth) }
+
+    private val contextMenuBinding by lazy {
+        ViewContactChipContextMenuBinding.inflate(LayoutInflater.from(context), null, false)
+    }
+
+    private val contactPopupWindow by lazy {
+        PopupWindow(context).apply {
+            contentView = contextMenuBinding.root
+            height = ViewGroup.LayoutParams.WRAP_CONTENT
+
+            val displayMetrics = context.resources.displayMetrics
+            val percentageOfScreen = (displayMetrics.widthPixels * MAX_WIDTH_PERCENTAGE).toInt()
+            width = min(percentageOfScreen, popupMaxWidth)
+
+            isFocusable = true
+        }
+    }
 
     private var onAutoCompletionToggled: ((hasOpened: Boolean) -> Unit)? = null
     private var onToggle: ((isCollapsed: Boolean) -> Unit)? = null
     private var onContactRemoved: ((Recipient) -> Unit)? = null
     private var onContactAdded: ((Recipient) -> Unit)? = null
+    private var onCopyContactAddress: ((Recipient) -> Unit)? = null
     private var setSnackBar: ((Int) -> Unit) = {}
 
     private var isToggleable = false
@@ -98,7 +125,7 @@ class RecipientFieldView @JvmOverloads constructor(
                 }
 
                 singleChip.root.setOnClickListener {
-                    removeRecipient(recipients.first())
+                    singleChip.root.showContactContextMenu(recipients.first(), true)
                     updateCollapsedChipValues(isCollapsed)
                 }
             }
@@ -117,30 +144,48 @@ class RecipientFieldView @JvmOverloads constructor(
                 setSnackBar = { setSnackBar(it) },
             )
 
-            textInput.apply {
-                doOnTextChanged { text, _, _, _ ->
-                    if (text?.isNotEmpty() == true) {
-                        if ((text.trim().count()) > 0) contactAdapter!!.filterField(text) else contactAdapter!!.clear()
-                        if (!isAutoCompletionOpened) openAutoCompletion()
-                    } else if (isAutoCompletionOpened) {
-                        closeAutoCompletion()
-                    }
-                }
+            setTextInputListeners()
 
-                setOnEditorActionListener { _, actionId, _ ->
-                    if (actionId == EditorInfo.IME_ACTION_DONE && textInput.text?.isNotBlank() == true) {
-                        contactAdapter!!.addFirstAvailableItem()
-                    }
-                    true // Keep keyboard open
-                }
+            contextMenuBinding.copyContactAddressButton.setOnClickListener {
+                onCopyContactAddress?.invoke(popupRecipient)
+                contactPopupWindow.dismiss()
+            }
 
-                setBackspaceOnEmptyFieldListener(::focusLastChip)
+            contextMenuBinding.deleteContactButton.setOnClickListener {
+                removeRecipient(popupRecipient)
+                if (popupDeletesTheCollapsedChip) {
+                    popupDeletesTheCollapsedChip = false
+                    updateCollapsedChipValues(true)
+                }
+                contactPopupWindow.dismiss()
             }
 
             if (isInEditMode) {
                 singleChip.root.isVisible = isToggleable
                 plusChip.isVisible = isToggleable
             }
+        }
+    }
+
+    private fun setTextInputListeners() = with(binding) {
+        textInput.apply {
+            doOnTextChanged { text, _, _, _ ->
+                if (text?.isNotEmpty() == true) {
+                    if ((text.trim().count()) > 0) contactAdapter!!.filterField(text) else contactAdapter!!.clear()
+                    if (!isAutoCompletionOpened) openAutoCompletion()
+                } else if (isAutoCompletionOpened) {
+                    closeAutoCompletion()
+                }
+            }
+
+            setOnEditorActionListener { _, actionId, _ ->
+                if (actionId == EditorInfo.IME_ACTION_DONE && textInput.text?.isNotBlank() == true) {
+                    contactAdapter!!.addFirstAvailableItem()
+                }
+                true // Keep keyboard open
+            }
+
+            setBackspaceOnEmptyFieldListener(::focusLastChip)
         }
     }
 
@@ -177,8 +222,9 @@ class RecipientFieldView @JvmOverloads constructor(
         textInput.isVisible = isTextInputAccessible
     }
 
-    fun updateContacts(allContacts: List<MergedContact>) {
+    fun updateContacts(allContacts: List<MergedContact>, newContactMap: Map<String, Map<String, MergedContact>>) {
         contactAdapter?.updateContacts(allContacts)
+        contactMap = newContactMap
     }
 
     private fun openAutoCompletion() {
@@ -206,13 +252,23 @@ class RecipientFieldView @JvmOverloads constructor(
     private fun createChip(recipient: Recipient) {
         ChipContactBinding.inflate(LayoutInflater.from(context)).root.apply {
             text = recipient.getNameOrEmail()
-            setOnClickListener { removeRecipient(recipient) }
+            setOnClickListener { showContactContextMenu(recipient) }
             setOnBackspaceListener {
                 removeRecipient(recipient)
                 focusTextField()
             }
             binding.itemsChipGroup.addView(this)
         }
+    }
+
+    private fun BackspaceAwareChip.showContactContextMenu(recipient: Recipient, isForSingleChip: Boolean = false) {
+        contextMenuBinding.contactDetails.setRecipient(recipient, contactMap)
+
+        popupRecipient = recipient
+        popupDeletesTheCollapsedChip = isForSingleChip
+
+        hideKeyboard()
+        contactPopupWindow.showAsDropDown(this)
     }
 
     private fun removeRecipient(recipient: Recipient) = with(binding) {
@@ -230,6 +286,7 @@ class RecipientFieldView @JvmOverloads constructor(
         onAutoCompletionToggledCallback: (hasOpened: Boolean) -> Unit,
         onContactAddedCallback: ((Recipient) -> Unit),
         onContactRemovedCallback: ((Recipient) -> Unit),
+        onCopyContactAddressCallback: ((Recipient) -> Unit),
         onToggleCallback: ((isCollapsed: Boolean) -> Unit)? = null,
         setSnackBarCallback: (titleRes: Int) -> Unit,
     ) {
@@ -240,6 +297,7 @@ class RecipientFieldView @JvmOverloads constructor(
         onAutoCompletionToggled = onAutoCompletionToggledCallback
         onContactAdded = onContactAddedCallback
         onContactRemoved = onContactRemovedCallback
+        onCopyContactAddress = onCopyContactAddressCallback
 
         setSnackBar = setSnackBarCallback
     }
@@ -256,5 +314,9 @@ class RecipientFieldView @JvmOverloads constructor(
             }
         }
         updateCollapsedChipValues(isCollapsed)
+    }
+
+    private companion object {
+        const val MAX_WIDTH_PERCENTAGE = 0.8
     }
 }

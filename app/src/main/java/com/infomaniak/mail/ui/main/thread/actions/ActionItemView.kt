@@ -29,6 +29,7 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.infomaniak.lib.core.utils.getAttributes
+import com.infomaniak.lib.core.utils.setPaddingRelative
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ItemBottomSheetActionBinding
 import com.infomaniak.mail.utils.AccountUtils
@@ -44,8 +45,16 @@ class ActionItemView @JvmOverloads constructor(
     init {
         attrs?.getAttributes(context, R.styleable.ActionItemView) {
             with(binding) {
-                button.icon = getDrawable(R.styleable.ActionItemView_icon)
-                button.text = getString(R.styleable.ActionItemView_text)
+                button.apply {
+                    icon = getDrawable(R.styleable.ActionItemView_icon)
+                    text = getString(R.styleable.ActionItemView_text)
+
+                    getDimensionPixelSize(R.styleable.ActionItemView_padding, NOT_SET).takeIf { it != NOT_SET }?.let { padding ->
+                        iconPadding = padding
+                        setPaddingRelative(start = padding, end = padding)
+                    }
+                }
+
                 divider.isVisible = getBoolean(R.styleable.ActionItemView_visibleDivider, true)
 
                 if (getBoolean(R.styleable.ActionItemView_staffOnly, false)) {
@@ -73,4 +82,8 @@ class ActionItemView @JvmOverloads constructor(
     }
 
     fun setText(@StringRes textResourceId: Int) = binding.button.setText(textResourceId)
+
+    private companion object {
+        const val NOT_SET = -1
+    }
 }

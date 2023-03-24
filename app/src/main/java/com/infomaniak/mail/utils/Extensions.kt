@@ -20,6 +20,8 @@ package com.infomaniak.mail.utils
 import android.animation.Animator
 import android.animation.ValueAnimator
 import android.app.Activity
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.net.Uri
 import android.os.Build
@@ -60,6 +62,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
@@ -403,4 +406,13 @@ fun Context.getInfomaniakLogin(): InfomaniakLogin {
 
 fun Window.updateNavigationBarColor(color: Int) {
     if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O) navigationBarColor = color
+}
+
+fun Fragment.copyRecipientEmailToClipboard(recipient: Recipient, snackBarAnchor: View? = null) = with(recipient) {
+    val clipboardManager = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    clipboardManager.setPrimaryClip(ClipData.newPlainText(email, email))
+
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+        showSnackbar(R.string.snackbarEmailCopiedToClipboard, anchor = snackBarAnchor)
+    }
 }
