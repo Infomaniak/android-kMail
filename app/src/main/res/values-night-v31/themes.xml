@@ -17,7 +17,7 @@
   -->
 <resources>
 
-    <style name="AppTheme.Launcher" parent="AppTheme.Launcher31Only">
+    <style name="AppTheme.Launcher" parent="AppTheme.Launcher31">
         <item name="android:windowLightStatusBar">false</item>
     </style>
 
