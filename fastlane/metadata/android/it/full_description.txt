@@ -1,20 +1,19 @@
-Email sicure per i vostri messaggi di posta elettronica
+Per potere utilizzare l'app kMail, i tuoi indirizzi e-mail devono essere gestiti da Infomaniak.
+Questa app ti consente di gestire i tuoi indirizzi Infomaniak in un ambiente completamente protetto. È una versione beta che si evolverà rapidamente in base ai feedback degli utenti.
 
-L'applicazione kMail richiede che i vostri indirizzi e-mail siano di Infomaniak.
-Questa applicazione vi permette di gestire i vostri indirizzi Infomaniak in un ambiente completamente sicuro. Si tratta di una versione beta che si evolverà rapidamente in base ai vostri feedback.
+Con l'app kMail, potrai:
 
-Con l'app kMail è possibile :
+- Creare un indirizzo e-mail gratuito @ik.me @etik.com o @ikmail.com con 20 GB di spazio di archiviazione, senza pubblicità e gestito in Svizzera nel rispetto del RGPD.
+- Inviare e ricevere e-mail dai tuoi indirizzi e-mail Infomaniak.
+- Impostare kMail come applicazione di posta predefinita.
+- Cercare un determinato messaggio o le tue e-mail non lette, preferite o con allegati.
+- Passare da un account all'altro per accedere a tutti i tuoi indirizzi gestiti da Infomaniak.
+- Ricevere notifiche immediate sull'arrivo di nuove e-mail (push).
+- Organizzare le tue e-mail in cartelle personalizzate.
+- Scorrere per spostare, archiviare ed eliminare le e-mail in tempi rapidi.
+- Personalizzare la tua esperienza (tema scuro/chiaro, colore principale, densità di visualizzazione, azioni di scorrimento nella posta in arrivo, ecc.).
+- Proteggere l'accesso all'app kMail (a seconda del metodo di blocco del tuo dispositivo).
 
-Creare un indirizzo gratuito @ik.me @etik.com o @ikmail.com con 20 GB di memoria, senza pubblicità e gestito in Svizzera, nel rispetto del RGPD.
-Inviare e ricevere e-mail dai vostri indirizzi e-mail Infomaniak.
-Impostate kMail come applicazione e-mail predefinita.
-Cercare un messaggio specifico o le e-mail non lette, i preferiti o gli allegati.
-Passare da un account all'altro per accedere a tutti gli indirizzi e-mail gestiti da Infomaniak.
-Essere avvisati immediatamente dell'arrivo di nuove e-mail (push).
-Organizzare le e-mail in cartelle personalizzate.
-Scansione per spostare, archiviare ed eliminare rapidamente le e-mail.
-Personalizzate la vostra esperienza (tema scuro/chiaro, colore dell'accento, densità di visualizzazione, azioni di scansione nella casella di posta, ecc.)
-Proteggere l'accesso all'app kMail (a seconda della modalità di blocco del dispositivo).
-Con kMail si mantiene il pieno controllo dei propri dati e si comunica in un ecosistema sicuro, sovrano e in continua evoluzione. L'app kMail è sviluppata da Infomaniak e il suo codice è open source e disponibile su GitHub.
+Con kMail, puoi mantenere il controllo totale dei tuoi dati e comunicare in un ecosistema sicuro, sovrano e in continua evoluzione. L'app kMail è sviluppata da Infomaniak e il suo codice open source è disponibile sul nostro GitHub.
 
-Infomaniak è un fornitore di cloud leader in Europa e il principale sviluppatore di soluzioni di produttività in Svizzera da oltre 29 anni. L'azienda è di proprietà esclusiva dei suoi dipendenti e si distingue per il suo impegno nei confronti della privacy, dell'economia locale e dell'ecologia.
+Infomaniak è un provider cloud chiave operante in Europa e sviluppatore leader di soluzioni di produttività in Svizzera da oltre 29 anni. L'impresa è di proprietà esclusiva dei suoi fondatori e dei suoi addetti e si contraddistingue grazie al suo impegno a favore della privacy, dell'economia locale e dell'ecologia.
