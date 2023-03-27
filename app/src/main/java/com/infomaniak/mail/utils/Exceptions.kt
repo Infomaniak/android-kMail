@@ -27,7 +27,7 @@ class ApiErrorException(override val message: String?) : Exception() {
 
     object ErrorCodes {
         const val DRAFT_DOES_NOT_EXIST = "draft__not_found"
-        const val DRAFT_HAS_MANY_RECIPIENTS = "draft__to_many_recipients"
+        const val DRAFT_HAS_TOO_MANY_RECIPIENTS = "draft__to_many_recipients"
         const val FOLDER_ALREADY_EXISTS = "folder__destination_already_exists"
         const val FOLDER_DOES_NOT_EXIST = "folder__not_exists"
     }

@@ -41,7 +41,7 @@ import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ApiErrorException.ErrorCodes.DRAFT_DOES_NOT_EXIST
-import com.infomaniak.mail.utils.ApiErrorException.ErrorCodes.DRAFT_HAS_MANY_RECIPIENTS
+import com.infomaniak.mail.utils.ApiErrorException.ErrorCodes.DRAFT_HAS_TOO_MANY_RECIPIENTS
 import com.infomaniak.mail.utils.NotificationUtils.showDraftActionsNotification
 import io.realm.kotlin.MutableRealm
 import io.sentry.Sentry
@@ -138,7 +138,7 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
 
     private fun ApiErrorException.handleApiErrors(realm: MutableRealm, draft: Draft) {
         when (apiResponse.error?.code) {
-            DRAFT_DOES_NOT_EXIST, DRAFT_HAS_MANY_RECIPIENTS -> realm.delete(draft)
+            DRAFT_DOES_NOT_EXIST, DRAFT_HAS_TOO_MANY_RECIPIENTS -> realm.delete(draft)
         }
     }
 
