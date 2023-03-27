@@ -92,56 +92,12 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
             if (payload == NotificationType.AVATAR && !message.isDraft) {
                 userAvatar.loadAvatar(message.from.first(), contacts)
             } else if (payload == NotificationType.TOGGLE_LIGHT_MODE) {
-                val isThemeTheSame = !isThemeTheSameMap[message.uid]!!
-                isThemeTheSameMap[message.uid] = isThemeTheSame
-                bodyWebView.toggleWebViewTheme(isThemeTheSame)
-                quoteWebView.toggleWebViewTheme(isThemeTheSame)
-                toggleQuoteButtonTheme(isThemeTheSame)
+                isThemeTheSameMap[message.uid] = !isThemeTheSameMap[message.uid]!!
+                holder.loadBodyAndQuote(message)
             }
         } else {
             super.onBindViewHolder(holder, position, payloads)
         }
-    }
-
-    private fun WebView.toggleWebViewTheme(isThemeTheSame: Boolean) {
-
-        if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
-            WebSettingsCompat.setAlgorithmicDarkeningAllowed(settings, isThemeTheSame)
-        }
-
-        @SuppressLint("SetJavaScriptEnabled")
-        settings.javaScriptEnabled = true
-
-        if (isThemeTheSame) addBackgroundJs() else removeBackgroundJs()
-
-        settings.javaScriptEnabled = false
-    }
-
-    private fun ItemMessageBinding.toggleQuoteButtonTheme(isThemeTheSame: Boolean) {
-        if (isThemeTheSame) {
-            quoteButtonFrameLayout.setBackgroundColor(context.getColor(R.color.background_color_dark))
-            quoteButton.setTextColor(context.getAttributeColor(RMaterial.attr.colorPrimary))
-        } else {
-            quoteButtonFrameLayout.setBackgroundColor(context.getColor(R.color.background_color_light))
-            quoteButton.setTextColor(context.getAttributeColor(RMaterial.attr.colorPrimaryInverse))
-        }
-    }
-
-    private fun WebView.addBackgroundJs() {
-        val css = context.readRawResource(R.raw.custom_dark_mode)
-        evaluateJavascript(
-            """ var style = document.createElement('style')
-                document.head.appendChild(style)
-                style.id = "$DARK_BACKGROUND_STYLE_ID"
-                style.innerHTML = `$css`
-            """.trimIndent(),
-            null,
-        )
-    }
-
-    private fun WebView.removeBackgroundJs() {
-        val removeBackgroundStyleScript = "document.getElementById(\"$DARK_BACKGROUND_STYLE_ID\").remove()"
-        evaluateJavascript(removeBackgroundStyleScript, null)
     }
 
     override fun onBindViewHolder(holder: ThreadViewHolder, position: Int) = with(holder) {
@@ -149,15 +105,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
 
         initMapForNewMessage(message, position)
 
-        message.body?.let { body ->
-            val (messageBody, messageQuote) = MessageBodyUtils.splitBodyAndQuote(body)
-
-            message.hasQuote = messageQuote != null
-
-            loadBodyInWebView(message.uid, messageBody, body.type)
-            loadQuoteInWebView(message.uid, messageQuote, body.type)
-            if (binding.context.isNightModeEnabled()) binding.toggleQuoteButtonTheme(isThemeTheSameMap[message.uid]!!)
-        }
+        loadBodyAndQuote(message)
 
         bindHeader(message)
         bindAttachment(message)
@@ -171,6 +119,22 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         }
 
         if (isThemeTheSameMap[message.uid] == null) isThemeTheSameMap[message.uid] = true
+    }
+
+    private fun ThreadViewHolder.loadBodyAndQuote(message: Message) {
+        message.body?.let { body ->
+            if (alreadySplitBody == null) {
+                val (messageBody, messageQuote) = MessageBodyUtils.splitBodyAndQuote(body)
+                alreadySplitBody = messageBody
+                alreadySplitQuote = messageQuote
+
+                message.hasQuote = messageQuote != null
+            }
+
+            loadBodyInWebView(message.uid, alreadySplitBody!!, body.type)
+            loadQuoteInWebView(message.uid, alreadySplitQuote, body.type)
+            if (binding.context.isNightModeEnabled()) binding.toggleQuoteButtonTheme(isThemeTheSameMap[message.uid]!!)
+        }
     }
 
     private fun ThreadViewHolder.loadBodyInWebView(uid: String, body: String, type: String) = with(binding) {
@@ -196,14 +160,14 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         }
 
         var styledBody = if (type == TEXT_PLAIN) createHtmlForPlainText(bodyWebView) else bodyWebView
-        styledBody = processMailDisplay(styledBody)
+        styledBody = processMailDisplay(styledBody, uid)
 
         loadDataWithBaseURL("", styledBody, TEXT_HTML, Utils.UTF_8, "")
     }
 
-    private fun WebView.processMailDisplay(styledBody: String): String {
+    private fun WebView.processMailDisplay(styledBody: String, uid: String): String {
         var processedBody = styledBody
-        if (context.isNightModeEnabled()) {
+        if (context.isNightModeEnabled() && isThemeTheSameMap[uid] == true) {
             processedBody = context.injectCssInHtml(R.raw.custom_dark_mode, processedBody, DARK_BACKGROUND_STYLE_ID)
         }
         processedBody = context.injectCssInHtml(R.raw.remove_margin, processedBody)
@@ -215,6 +179,16 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         Jsoup.parse("").apply {
             body().appendElement("pre").text(text).attr("style", "word-wrap: break-word; white-space: pre-wrap;")
             return html()
+        }
+    }
+
+    private fun ItemMessageBinding.toggleQuoteButtonTheme(isThemeTheSame: Boolean) {
+        if (isThemeTheSame) {
+            quoteButtonFrameLayout.setBackgroundColor(context.getColor(R.color.background_color_dark))
+            quoteButton.setTextColor(context.getAttributeColor(RMaterial.attr.colorPrimary))
+        } else {
+            quoteButtonFrameLayout.setBackgroundColor(context.getColor(R.color.background_color_light))
+            quoteButton.setTextColor(context.getAttributeColor(RMaterial.attr.colorPrimaryInverse))
         }
     }
 
@@ -456,6 +430,9 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         val attachmentAdapter = AttachmentAdapter { onAttachmentClicked?.invoke(it) }
 
         private var doesWebViewNeedInit = true
+
+        var alreadySplitBody: String? = null
+        var alreadySplitQuote: String? = null
 
         init {
             with(binding) {
