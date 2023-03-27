@@ -87,4 +87,16 @@
     <color name="textInputStrokeColor">@color/shark</color>
     <color name="toggleableTextFormatterBackgroundColor">@color/mouse</color>
 
+    <array name="organizationColors">
+        <item>@color/yellow_dark</item>
+        <item>@color/coral_dark</item>
+        <item>@color/grass_dark</item>
+        <item>@color/fougere_dark</item>
+        <item>@color/cobalt_dark</item>
+        <item>@color/jean_dark</item>
+        <item>@color/tropical_dark</item>
+        <item>@color/mauve_dark</item>
+        <item>@color/prince_dark</item>
+    </array>
+
 </resources>

@@ -28,6 +28,7 @@ import coil.load
 import coil.request.Disposable
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.utils.CoilUtils.simpleImageLoader
+import com.infomaniak.lib.core.utils.UtilsUi.getBackgroundColorBasedOnId
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.mail.R
@@ -54,7 +55,13 @@ class AvatarView @JvmOverloads constructor(
 
     fun loadAvatar(user: User): Disposable {
         val color = context.getColor(R.color.onColorfulBackground)
-        return binding.avatarImage.loadAvatar(user.id, user.avatar, user.getInitials(), context.simpleImageLoader, color)
+        return binding.avatarImage.loadAvatar(
+            backgroundColor = context.getBackgroundColorBasedOnId(user.id, R.array.organizationColors),
+            avatarUrl = user.avatar,
+            initials = user.getInitials(),
+            imageLoader = context.simpleImageLoader,
+            initialsColor = color
+        )
     }
 
     fun loadAvatar(recipient: Recipient, contacts: Map<String, Map<String, MergedContact>>) {
@@ -76,6 +83,12 @@ class AvatarView @JvmOverloads constructor(
     private fun ImageView.loadCorrespondentAvatar(correspondent: Correspondent): Disposable = with(correspondent) {
         val avatar = (correspondent as? MergedContact)?.avatar
         val color = context.getColor(R.color.onColorfulBackground)
-        return loadAvatar(email.hashCode(), avatar, initials, context.imageLoader, color)
+        return loadAvatar(
+            backgroundColor = context.getBackgroundColorBasedOnId(email.hashCode(), R.array.organizationColors),
+            avatarUrl = avatar,
+            initials = initials,
+            imageLoader = context.imageLoader,
+            initialsColor = color
+        )
     }
 }
