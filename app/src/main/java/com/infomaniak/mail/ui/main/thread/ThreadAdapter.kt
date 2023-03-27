@@ -123,16 +123,16 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
 
     private fun ThreadViewHolder.loadBodyAndQuote(message: Message) {
         message.body?.let { body ->
-            if (alreadySplitBody == null) {
+            if (splitBody == null) {
                 val (messageBody, messageQuote) = MessageBodyUtils.splitBodyAndQuote(body)
-                alreadySplitBody = messageBody
-                alreadySplitQuote = messageQuote
+                splitBody = messageBody
+                splitQuote = messageQuote
 
                 message.hasQuote = messageQuote != null
             }
 
-            loadBodyInWebView(message.uid, alreadySplitBody!!, body.type)
-            loadQuoteInWebView(message.uid, alreadySplitQuote, body.type)
+            loadBodyInWebView(message.uid, splitBody!!, body.type)
+            loadQuoteInWebView(message.uid, splitQuote, body.type)
             if (binding.context.isNightModeEnabled()) binding.toggleQuoteButtonTheme(isThemeTheSameMap[message.uid]!!)
         }
     }
@@ -431,8 +431,8 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
 
         private var doesWebViewNeedInit = true
 
-        var alreadySplitBody: String? = null
-        var alreadySplitQuote: String? = null
+        var splitBody: String? = null
+        var splitQuote: String? = null
 
         init {
             with(binding) {
