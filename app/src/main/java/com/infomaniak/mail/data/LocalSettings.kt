@@ -34,6 +34,7 @@ import com.infomaniak.mail.MatomoMail.ACTION_SPAM_NAME
 import com.infomaniak.mail.R
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
+import com.google.android.material.R as RMaterial
 
 class LocalSettings private constructor(context: Context) {
 
@@ -144,6 +145,14 @@ class LocalSettings private constructor(context: Context) {
             R.color.blueBoardingSecondaryBackground,
             R.color.blueMailRipple,
             1,
+        ),
+        SYSTEM(
+            R.string.accentColorSystemTitle,
+            R.style.AppTheme,
+            0,
+            0,
+            0,
+            2,
         );
 
         fun getPrimary(context: Context): Int = context.getColor(primary)

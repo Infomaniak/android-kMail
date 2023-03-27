@@ -27,8 +27,12 @@
     </style>
 
     <style name="AppTheme.Launcher" parent="AppTheme.LauncherBase" />
+    <style name="Theme.Material3.DynamicColors.DayNight.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
 
-    <style name="AppThemeBase" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="AppThemeBase" parent="Theme.Material3.DynamicColors.DayNight.NoActionBar">
         <item name="android:adjustViewBounds">true</item>
         <item name="android:colorBackground">@color/backgroundColor</item>
         <item name="android:fontFamily">@font/suisseintl_regular</item>
