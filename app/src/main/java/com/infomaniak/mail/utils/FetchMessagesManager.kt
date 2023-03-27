@@ -22,8 +22,6 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
-import com.infomaniak.lib.core.api.ApiController
-import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.NotificationUtilsCore
 import com.infomaniak.lib.core.utils.clearStack
 import com.infomaniak.mail.R
@@ -40,7 +38,6 @@ import com.infomaniak.mail.ui.LaunchActivityArgs
 import com.infomaniak.mail.utils.NotificationUtils.showNewMessageNotification
 import io.realm.kotlin.Realm
 import io.sentry.Sentry
-import kotlinx.serialization.decodeFromString
 import okhttp3.OkHttpClient
 
 class FetchMessagesManager(private val context: Context) {
@@ -61,7 +58,7 @@ class FetchMessagesManager(private val context: Context) {
         val newMessagesThreads = runCatching {
             MessageController.fetchCurrentFolderMessages(mailbox, folder, okHttpClient, realm)
         }.getOrElse {
-            if (it is ApiErrorException) handleApiErrors(it) else throw it
+            if (it is ApiErrorException) it.handleApiErrors() else throw it
             return
         }
         Log.d(TAG, "launchWork: ${mailbox.email} has ${newMessagesThreads.count()} new messages")
@@ -141,10 +138,10 @@ class FetchMessagesManager(private val context: Context) {
         showNotification(summaryText, true)
     }
 
-    private fun handleApiErrors(exception: ApiErrorException) {
-        when (ApiController.json.decodeFromString<ApiResponse<Any>>(exception.message!!).error?.code) {
+    private fun ApiErrorException.handleApiErrors() {
+        when (apiResponse.error?.code) {
             ApiErrorException.ErrorCodes.FOLDER_DOES_NOT_EXIST -> Unit
-            else -> Sentry.captureException(exception)
+            else -> Sentry.captureException(this)
         }
     }
 

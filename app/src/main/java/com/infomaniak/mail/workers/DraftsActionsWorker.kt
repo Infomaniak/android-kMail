@@ -40,6 +40,8 @@ import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.ApiErrorException.ErrorCodes.DRAFT_DOES_NOT_EXIST
+import com.infomaniak.mail.utils.ApiErrorException.ErrorCodes.DRAFT_HAS_TOO_MANY_RECIPIENTS
 import com.infomaniak.mail.utils.NotificationUtils.showDraftActionsNotification
 import io.realm.kotlin.MutableRealm
 import io.sentry.Sentry
@@ -114,8 +116,11 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
                     draft.uploadAttachments(realm = this)
                     executeDraftAction(draft, mailbox.uuid, realm = this, okHttpClient)?.also(scheduledDates::add)
                 }.onFailure { exception ->
+                    when (exception) {
+                        is ApiController.NetworkException -> throw exception
+                        is ApiErrorException -> exception.handleApiErrors(realm = this, draft = draft)
+                    }
                     exception.printStackTrace()
-                    if (exception is ApiController.NetworkException) throw exception
                     Sentry.captureException(exception)
                     hasRemoteException = true
                 }
@@ -129,6 +134,12 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
         SentryDebug.sendOrphanDrafts(mailboxContentRealm)
 
         return if (isFailure) Result.failure() else Result.success()
+    }
+
+    private fun ApiErrorException.handleApiErrors(realm: MutableRealm, draft: Draft) {
+        when (apiResponse.error?.code) {
+            DRAFT_DOES_NOT_EXIST, DRAFT_HAS_TOO_MANY_RECIPIENTS -> realm.delete(draft)
+        }
     }
 
     private suspend fun updateFolderAfterDelay(scheduledDates: MutableList<String>) {
