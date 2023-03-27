@@ -41,6 +41,12 @@ class LocalSettings private constructor(context: Context) {
 
     fun removeSettings() = sharedPreferences.transaction { clear() }
 
+    //region App Launches Number
+    var appLaunches: Int
+        get() = sharedPreferences.getInt(APP_LAUNCHES_KEY, DEFAULT_APP_LAUNCHES)
+        set(value) = sharedPreferences.transaction { putInt(APP_LAUNCHES_KEY, value) }
+    //endregion
+
     //region Cancel delay
     var cancelDelay: Int
         get() = sharedPreferences.getInt(CANCEL_DELAY_KEY, DEFAULT_CANCEL_DELAY)
@@ -74,6 +80,12 @@ class LocalSettings private constructor(context: Context) {
     var isAppLocked: Boolean
         get() = sharedPreferences.getBoolean(IS_APP_LOCKED_KEY, DEFAULT_IS_APP_LOCKED)
         set(value) = sharedPreferences.transaction { putBoolean(IS_APP_LOCKED_KEY, value) }
+    //endregion
+
+    //region Update Later
+    var updateLater: Boolean
+        get() = sharedPreferences.getBoolean(UPDATE_LATER_KEY, DEFAULT_UPDATE_LATER)
+        set(value) = sharedPreferences.transaction { putBoolean(UPDATE_LATER_KEY, value) }
     //endregion
 
     //region Thread density
@@ -247,13 +259,13 @@ class LocalSettings private constructor(context: Context) {
         private val TAG = LocalSettings::class.simpleName
 
         //region Default values
+        private const val DEFAULT_APP_LAUNCHES = 0
         private const val DEFAULT_CANCEL_DELAY = 10
         private val DEFAULT_EMAIL_FORWARDING = EmailForwarding.IN_BODY
         private const val DEFAULT_INCLUDE_MESSAGE_IN_REPLY = true
         private const val DEFAULT_ASK_EMAIL_ACKNOWLEDGMENT = false
-
         private const val DEFAULT_IS_APP_LOCKED = false
-
+        private const val DEFAULT_UPDATE_LATER = false
         private val DEFAULT_THREAD_DENSITY = ThreadDensity.LARGE
         private val DEFAULT_THEME = Theme.SYSTEM
         private val DEFAULT_ACCENT_COLOR = AccentColor.PINK
@@ -266,11 +278,13 @@ class LocalSettings private constructor(context: Context) {
 
         //region Keys
         private const val SHARED_PREFS_NAME = "LocalSettingsSharedPref"
+        private const val APP_LAUNCHES_KEY = "appLaunchesKey"
         private const val CANCEL_DELAY_KEY = "cancelDelayKey"
         private const val EMAIL_FORWARDING_KEY = "emailForwardingKey"
         private const val INCLUDE_MESSAGE_IN_REPLY_KEY = "includeMessageInReplyKey"
         private const val ASK_EMAIL_ACKNOWLEDGMENT_KEY = "askEmailAcknowledgmentKey"
         private const val IS_APP_LOCKED_KEY = "isAppLockedKey"
+        private const val UPDATE_LATER_KEY = "updateLaterKey"
         private const val THREAD_DENSITY_KEY = "threadDensityKey"
         private const val THEME_KEY = "themeKey"
         private const val ACCENT_COLOR_KEY = "accentColorKey"

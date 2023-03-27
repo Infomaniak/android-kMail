@@ -34,11 +34,14 @@ import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.networking.LiveDataNetworkStatus
+import com.infomaniak.lib.core.utils.checkUpdateIsAvailable
+import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.checkPlayServices
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.firebase.RegisterFirebaseBroadcastReceiver
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
@@ -56,7 +59,8 @@ class MainActivity : ThemedActivity() {
     val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private val mainViewModel: MainViewModel by viewModels()
 
-    private val permissionUtils by lazy { PermissionUtils(this).also(::registerMainPermissions) }
+    private val permissionUtils by lazy { PermissionUtils(this).also { registerMainPermissions(it) } }
+    private val localSettings by lazy { LocalSettings.getInstance(this) }
 
     private val backgroundColor: Int by lazy { getColor(R.color.backgroundColor) }
     private val backgroundHeaderColor: Int by lazy { getColor(R.color.backgroundHeaderColor) }
@@ -109,6 +113,8 @@ class MainActivity : ThemedActivity() {
         setupNavController()
         setupMenuDrawerCallbacks()
 
+        handleUpdates()
+
         mainViewModel.updateUserInfo()
         loadCurrentMailbox()
 
@@ -128,6 +134,7 @@ class MainActivity : ThemedActivity() {
 
     override fun onResume() {
         super.onResume()
+        localSettings.appLaunches++
         checkPlayServices()
         if (binding.drawerLayout.isOpen) colorSystemBarsWithMenuDrawer()
     }
@@ -259,6 +266,14 @@ class MainActivity : ThemedActivity() {
         } else {
             statusBarColor = UiUtils.pointBetweenColors(backgroundHeaderColor, menuDrawerBackgroundColor, slideOffset)
             updateNavigationBarColor(UiUtils.pointBetweenColors(backgroundColor, menuDrawerBackgroundColor, slideOffset))
+        }
+    }
+
+    private fun handleUpdates() {
+        if (!localSettings.updateLater || localSettings.appLaunches % 10 == 0) {
+            checkUpdateIsAvailable(BuildConfig.APPLICATION_ID, BuildConfig.VERSION_CODE) { updateIsAvailable ->
+                if (updateIsAvailable) navController.navigate(R.id.updateAvailableBottomSheetDialog)
+            }
         }
     }
 
