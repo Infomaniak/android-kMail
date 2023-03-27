@@ -56,7 +56,7 @@ class AvatarView @JvmOverloads constructor(
     fun loadAvatar(user: User): Disposable {
         val color = context.getColor(R.color.onColorfulBackground)
         return binding.avatarImage.loadAvatar(
-            backgroundColor = context.getBackgroundColorBasedOnId(user.id, R.array.organizationColors),
+            backgroundColor = context.getBackgroundColorBasedOnId(user.id, R.array.AvatarColors),
             avatarUrl = user.avatar,
             initials = user.getInitials(),
             imageLoader = context.simpleImageLoader,
@@ -84,7 +84,7 @@ class AvatarView @JvmOverloads constructor(
         val avatar = (correspondent as? MergedContact)?.avatar
         val color = context.getColor(R.color.onColorfulBackground)
         return loadAvatar(
-            backgroundColor = context.getBackgroundColorBasedOnId(email.hashCode(), R.array.organizationColors),
+            backgroundColor = context.getBackgroundColorBasedOnId(email.hashCode(), R.array.AvatarColors),
             avatarUrl = avatar,
             initials = initials,
             imageLoader = context.imageLoader,
