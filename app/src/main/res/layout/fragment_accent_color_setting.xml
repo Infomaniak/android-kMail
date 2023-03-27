@@ -46,8 +46,6 @@
                     android:id="@+id/systemRadioButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:checkMarkColor="?attr/colorPrimary"
-                    app:icon="@drawable/ic_accent_system"
                     app:text="@string/accentColorSystemTitle" />
 
                 <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
