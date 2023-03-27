@@ -176,11 +176,13 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
 
     private fun Attachment.startUpload(localDraftUuid: String, realm: MutableRealm) {
         val attachmentFile = getUploadLocalFile(applicationContext, localDraftUuid).also { if (!it.exists()) return }
+        val headers = HttpUtils.getHeaders(contentType = null).newBuilder()
+            .addUnsafeNonAscii("x-ws-attachment-filename", name)
+            .add("x-ws-attachment-mime-type", mimeType)
+            .add("x-ws-attachment-disposition", "attachment")
+            .build()
         val request = Request.Builder().url(ApiRoutes.createAttachment(mailbox.uuid))
-            .headers(HttpUtils.getHeaders(contentType = null))
-            .addHeader("x-ws-attachment-filename", name)
-            .addHeader("x-ws-attachment-mime-type", mimeType)
-            .addHeader("x-ws-attachment-disposition", "attachment")
+            .headers(headers)
             .post(attachmentFile.asRequestBody(mimeType.toMediaType()))
             .build()
 
