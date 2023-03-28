@@ -89,9 +89,7 @@ object SentryDebug {
     }
 
     fun sendOrphanMessages(previousCursor: String?, folder: Folder, realm: Realm) {
-        val orphanMessages = folder.messages.filter {
-            it.threads.isEmpty() && it.threadsDuplicatedIn.isEmpty()
-        }
+        val orphanMessages = folder.messages.filter { it.isOrphan() }
         if (orphanMessages.isNotEmpty()) {
             Sentry.withScope { scope ->
                 scope.level = SentryLevel.ERROR

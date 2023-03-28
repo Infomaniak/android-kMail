@@ -338,12 +338,12 @@ object MessageController {
             scope.ensureActive()
 
             val existingMessage = folder.messages.firstOrNull { it == message }
-            if (existingMessage != null) {
+            if (existingMessage == null) {
+                folder.messages.add(message)
+            } else if (!existingMessage.isOrphan()) {
                 SentryDebug.sendAlreadyExistingMessage(folder, existingMessage, message)
                 return@forEach
             }
-
-            folder.messages.add(message)
 
             message.initMessageIds()
             message.isSpam = folder.role == FolderRole.SPAM

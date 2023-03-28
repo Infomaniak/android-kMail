@@ -201,7 +201,7 @@ object ThreadController {
                                     messageIds = localMessage.messageIds,
                                     isSpam = localMessage.isSpam,
                                     date = localMessage.date,
-                                    draftLocalUuid,
+                                    draftLocalUuid = draftLocalUuid,
                                 )
 
                                 MessageController.upsertMessage(remoteMessage, realm = this@writeBlocking)
