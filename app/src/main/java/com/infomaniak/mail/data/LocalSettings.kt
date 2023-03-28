@@ -127,25 +127,21 @@ class LocalSettings private constructor(context: Context) {
     enum class AccentColor(
         @StringRes val localisedNameRes: Int,
         @StyleRes val theme: Int,
-        @ColorRes private val secondaryBackground: Int,
         val introTabIndex: Int,
     ) {
         PINK(
             R.string.accentColorPinkTitle,
             R.style.AppTheme_Pink,
-            R.color.pinkBoardingSecondaryBackground,
             0,
         ),
         BLUE(
             R.string.accentColorBlueTitle,
             R.style.AppTheme_Blue,
-            R.color.blueBoardingSecondaryBackground,
             1,
         ),
         SYSTEM(
             R.string.accentColorSystemTitle,
             R.style.AppTheme,
-            0,
             2,
         );
 
@@ -154,8 +150,9 @@ class LocalSettings private constructor(context: Context) {
             return MaterialColors.getColor(baseThemeContext, RMaterial.attr.colorPrimary, 0)
         }
 
-        fun getSecondaryBackground(context: Context): Int {
-            return context.getColor(secondaryBackground)
+        fun getOnboardingSecondaryBackground(context: Context): Int {
+            val baseThemeContext = ContextThemeWrapper(context, theme)
+            return baseThemeContext.getColor(R.color.boarding_secondary_background)
         }
 
         fun getRipple(context: Context): Int {

@@ -218,7 +218,7 @@ class IntroFragment : Fragment() {
     }
 
     private fun updateEachPageUi(accentColor: AccentColor) {
-        val newColor = accentColor.getSecondaryBackground(requireContext())
+        val newColor = accentColor.getOnboardingSecondaryBackground(requireContext())
         val oldColor = requireActivity().window.statusBarColor
         animateColorChange(oldColor, newColor) { color ->
             binding.waveBackground.imageTintList = ColorStateList.valueOf(color)
