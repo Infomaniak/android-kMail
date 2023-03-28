@@ -88,6 +88,22 @@ class IlluColors(val keyPath: KeyPath, val color: Colors) {
             val pinkColor12 = Colors("#FAF0F0", "#F1DDDD")
             val pinkColor13 = Colors("#E10B59", "#DC1A60")
 
+            val pinkColors = listOf(
+                pinkColor1,
+                pinkColor2,
+                pinkColor3,
+                pinkColor4,
+                pinkColor5,
+                pinkColor6,
+                pinkColor7,
+                pinkColor8,
+                pinkColor9,
+                pinkColor10,
+                pinkColor11,
+                pinkColor12,
+                pinkColor13,
+            )
+
             val blueColor1 = Colors("#0098FF", "#0177C7")
             val blueColor2 = Colors("#69C9FF", "#6DCBFF")
             val blueColor3 = Colors("#3981AA", "#56AFE1")
@@ -126,7 +142,7 @@ class IlluColors(val keyPath: KeyPath, val color: Colors) {
 
     companion object {
 
-        private fun keyPath(
+        fun keyPath(
             category: Category,
             group: Int = 1,
             categoryNumber: Int? = null,
@@ -161,7 +177,7 @@ class IlluColors(val keyPath: KeyPath, val color: Colors) {
             IlluColors(keyPath(Category.IPHONESCREEN, 68), commonColor1),
             IlluColors(keyPath(Category.IPHONESCREEN, 70), commonColor1),
         )
-        val illuOnBoardingPinkColors = arrayOf(
+        val illuOnBoardingPinkColors = arrayOf( // DONE
             IlluColors(keyPath(Category.IPHONESCREEN, 1), pinkColor1),
             IlluColors(keyPath(Category.IPHONESCREEN, 2), pinkColor1),
             IlluColors(keyPath(Category.IPHONESCREEN, 3), pinkColor1),
