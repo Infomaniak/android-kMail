@@ -23,7 +23,7 @@
         <item name="android:navigationBarColor">@color/backgroundColor</item>
         <item name="android:statusBarColor">@color/backgroundColor</item>
         <item name="android:windowBackground">@drawable/splashscreen_legacy</item>
-        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightStatusBar">?attr/isLightTheme</item>
     </style>
 
     <style name="AppTheme.Launcher" parent="AppTheme.LauncherBase" />
@@ -40,7 +40,7 @@
         <item name="android:textColorHint">@color/tertiaryTextColor</item>
         <item name="android:textSize">16sp</item>
         <item name="android:windowBackground">@color/backgroundColor</item>
-        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightStatusBar">?attr/isLightTheme</item>
         <item name="appBarLayoutStyle">@style/AppThemeAppBarOverlay</item>
         <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>
         <item name="collapsingToolbarLayoutStyle">@style/AppThemeCollapsingToolbarLayoutTheme</item>
@@ -110,7 +110,7 @@
     <style name="AppTheme.LoginBase" parent="AppTheme.Pink">
         <item name="android:navigationBarColor">@color/backgroundOnBoardingColor</item>
         <item name="android:windowBackground">@color/backgroundOnBoardingColor</item>
-        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightStatusBar">?attr/isLightTheme</item>
         <item name="appBarLayoutStyle">@style/LoginAppBarTheme</item>
     </style>
 

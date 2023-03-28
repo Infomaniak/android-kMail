@@ -60,7 +60,7 @@ class AvatarView @JvmOverloads constructor(
             avatarUrl = user.avatar,
             initials = user.getInitials(),
             imageLoader = context.simpleImageLoader,
-            initialsColor = color
+            initialsColor = color,
         )
     }
 
@@ -88,7 +88,7 @@ class AvatarView @JvmOverloads constructor(
             avatarUrl = avatar,
             initials = initials,
             imageLoader = context.imageLoader,
-            initialsColor = color
+            initialsColor = color,
         )
     }
 }
