@@ -23,7 +23,6 @@ import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.message.Message
-import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.sentry.Breadcrumb
 import io.sentry.Sentry
@@ -88,27 +87,27 @@ object SentryDebug {
         }
     }
 
-    fun sendOrphanMessages(previousCursor: String?, folder: Folder, realm: Realm) {
+    fun sendOrphanMessages(previousCursor: String?, folder: Folder) {
         val orphanMessages = folder.messages.filter { it.isOrphan() }
         if (orphanMessages.isNotEmpty()) {
             Sentry.withScope { scope ->
                 scope.level = SentryLevel.ERROR
                 scope.setExtra("orphanMessages", "${orphanMessages.map { it.uid }}")
                 scope.setExtra("previousCursor", "$previousCursor")
-                scope.setExtra("newCursor", "${realm.writeBlocking { findLatest(folder) }?.cursor}")
+                scope.setExtra("newCursor", "${folder.cursor}")
                 Sentry.captureMessage("We found some orphan Messages.")
             }
         }
     }
 
-    fun sendOrphanThreads(previousCursor: String?, folder: Folder, realm: Realm) {
+    fun sendOrphanThreads(previousCursor: String?, folder: Folder, realm: TypedRealm) {
         val orphanThreads = ThreadController.getOrphanThreads(realm)
         if (orphanThreads.isNotEmpty()) {
             Sentry.withScope { scope ->
                 scope.level = SentryLevel.ERROR
                 scope.setExtra("orphanThreads", "${orphanThreads.map { it.uid }}")
                 scope.setExtra("previousCursor", "$previousCursor")
-                scope.setExtra("newCursor", "${realm.writeBlocking { findLatest(folder) }?.cursor}")
+                scope.setExtra("newCursor", "${folder.cursor}")
                 Sentry.captureMessage("We found some orphan Threads.")
             }
         }

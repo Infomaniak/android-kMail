@@ -223,8 +223,12 @@ object MessageController {
 
         val impactedCurrentFolderThreads = handleMessagesUids(scope, messagesUids, folder, mailbox, okHttpClient, realm)
 
-        SentryDebug.sendOrphanMessages(previousCursor, folder, realm)
-        SentryDebug.sendOrphanThreads(previousCursor, folder, realm)
+        realm.writeBlocking {
+            findLatest(folder)?.let {
+                SentryDebug.sendOrphanMessages(previousCursor, folder = it)
+                SentryDebug.sendOrphanThreads(previousCursor, folder = it, realm = this)
+            }
+        }
 
         return impactedCurrentFolderThreads
     }
