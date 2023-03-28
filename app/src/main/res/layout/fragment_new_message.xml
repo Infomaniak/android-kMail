@@ -243,8 +243,7 @@
                         android:gravity="top"
                         android:hint="@string/newMessagePlaceholderTitle"
                         android:inputType="textMultiLine|textCapSentences"
-                        android:nextFocusUp="@id/subjectTextField"
-                        android:textColorHighlight="?attr/colorControlHighlight" />
+                        android:nextFocusUp="@id/subjectTextField" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
