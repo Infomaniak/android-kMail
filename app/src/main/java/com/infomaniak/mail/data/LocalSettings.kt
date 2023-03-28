@@ -41,7 +41,7 @@ class LocalSettings private constructor(context: Context) {
 
     fun removeSettings() = sharedPreferences.transaction { clear() }
 
-    //region App Launches Number
+    //region App launches count
     var appLaunches: Int
         get() = sharedPreferences.getInt(APP_LAUNCHES_KEY, DEFAULT_APP_LAUNCHES)
         set(value) = sharedPreferences.transaction { putInt(APP_LAUNCHES_KEY, value) }
@@ -82,7 +82,7 @@ class LocalSettings private constructor(context: Context) {
         set(value) = sharedPreferences.transaction { putBoolean(IS_APP_LOCKED_KEY, value) }
     //endregion
 
-    //region Update Later
+    //region Update later
     var updateLater: Boolean
         get() = sharedPreferences.getBoolean(UPDATE_LATER_KEY, DEFAULT_UPDATE_LATER)
         set(value) = sharedPreferences.transaction { putBoolean(UPDATE_LATER_KEY, value) }

@@ -26,7 +26,7 @@ import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.annotation.FloatRange
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.Lifecycle.*
+import androidx.lifecycle.Lifecycle.State
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -34,7 +34,7 @@ import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.networking.LiveDataNetworkStatus
-import com.infomaniak.lib.core.utils.checkUpdateIsAvailable
+import com.infomaniak.lib.stores.checkUpdateIsAvailable
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.MatomoMail.trackEvent
@@ -59,8 +59,8 @@ class MainActivity : ThemedActivity() {
     val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private val mainViewModel: MainViewModel by viewModels()
 
-    private val permissionUtils by lazy { PermissionUtils(this).also { registerMainPermissions(it) } }
     private val localSettings by lazy { LocalSettings.getInstance(this) }
+    private val permissionUtils by lazy { PermissionUtils(this).also(::registerMainPermissions) }
 
     private val backgroundColor: Int by lazy { getColor(R.color.backgroundColor) }
     private val backgroundHeaderColor: Int by lazy { getColor(R.color.backgroundHeaderColor) }
@@ -132,9 +132,13 @@ class MainActivity : ThemedActivity() {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        localSettings.appLaunches++
+    }
+
     override fun onResume() {
         super.onResume()
-        localSettings.appLaunches++
         checkPlayServices()
         if (binding.drawerLayout.isOpen) colorSystemBarsWithMenuDrawer()
     }
