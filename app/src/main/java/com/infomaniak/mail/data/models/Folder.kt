@@ -69,7 +69,7 @@ class Folder : RealmObject {
     // TODO: Remove this before going into production
     @Transient
     @Suppress("PropertyName")
-    var _forceClearAllDatabases: String = "fake_variable_used_to_automatically_clean_Realm_DB"
+    var _forceClearAllDatabasesBecauseWeTryToFixOrphans: String = "fake_variable_used_to_automatically_clean_Realm_DB"
     //endregion
 
     private val _parents by backlinks(Folder::children)
