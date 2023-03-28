@@ -276,10 +276,6 @@ class IlluColors(val keyPath: KeyPath, val color: Colors) {
         val illuOnBoarding2PinkColors = arrayOf(
             IlluColors(keyPath(Category.NOTIFICATION, 4, 2), pinkColor5),
             IlluColors(keyPath(Category.NOTIFICATION, 11, 2), pinkColor1),
-            IlluColors(keyPath(Category.IPHONESCREEN, 54), pinkColor5),
-            IlluColors(keyPath(Category.IPHONESCREEN, 61), pinkColor6),
-            IlluColors(keyPath(Category.IPHONESCREEN, 67), pinkColor1),
-            IlluColors(keyPath(Category.IPHONESCREEN, 72), pinkColor7),
             IlluColors(keyPath(Category.HAND, 1), pinkColor7),
             IlluColors(keyPath(Category.HAND, 4), pinkColor8),
             IlluColors(keyPath(Category.HAND, 5), pinkColor8),
