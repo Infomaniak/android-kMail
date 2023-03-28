@@ -40,7 +40,7 @@ import kotlinx.coroutines.launch
 
 class LaunchActivity : AppCompatActivity() {
 
-    private val navigationArgs: LaunchActivityArgs? by lazy { intent?.extras?.let { LaunchActivityArgs.fromBundle(it) } }
+    private val navigationArgs: LaunchActivityArgs? by lazy { intent?.extras?.let(LaunchActivityArgs::fromBundle) }
 
     private val localSettings by lazy { LocalSettings.getInstance(this) }
 

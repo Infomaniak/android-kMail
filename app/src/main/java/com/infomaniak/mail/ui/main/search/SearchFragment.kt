@@ -161,7 +161,7 @@ class SearchFragment : Fragment() {
     }
 
     private fun observeVisibilityModeUpdates() {
-        searchViewModel.visibilityMode.observe(viewLifecycleOwner) { updateUi(it) }
+        searchViewModel.visibilityMode.observe(viewLifecycleOwner, ::updateUi)
     }
 
     private fun setUi() = with(binding) {

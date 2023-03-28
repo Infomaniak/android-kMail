@@ -75,7 +75,7 @@ object SentryDebug {
             val receivedUids = mutableSetOf<String>().apply {
                 receivedMessages.forEach { add(it.shortUid) }
             }
-            val missingUids = sentUids.filterNot { receivedUids.contains(it) }
+            val missingUids = sentUids.filterNot(receivedUids::contains)
             if (missingUids.isNotEmpty()) {
                 Sentry.withScope { scope ->
                     scope.level = SentryLevel.ERROR
