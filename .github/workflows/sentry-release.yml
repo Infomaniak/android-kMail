@@ -1,0 +1,23 @@
+name: New Sentry Release
+
+on:
+  push:
+    branches: [ master ]
+    tags:
+      - '*'
+
+jobs:
+  release:
+    runs-on: [ self-hosted, Android ]
+    steps:
+      - uses: actions/checkout@v3.5.0
+      - name: Create Sentry release
+        uses: getsentry/action-release@v1.3.1
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: "kmail-android"
+          SENTRY_URL: ${{ secrets.SENTRY_URL }}
+        with:
+          environment: production
+          version: ${{ github.ref_name }}
