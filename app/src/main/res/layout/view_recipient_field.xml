@@ -122,6 +122,7 @@
         android:id="@+id/chevron"
         style="@style/IconButtonSmall"
         android:layout_marginEnd="@dimen/marginStandardMedium"
+        android:contentDescription="@string/contentDescriptionButtonExpandHeader"
         app:icon="@drawable/ic_chevron_down"
         app:layout_constraintBottom_toBottomOf="@id/singleLineGuide"
         app:layout_constraintEnd_toEndOf="parent"

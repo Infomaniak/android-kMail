@@ -112,10 +112,10 @@
                     android:layout_width="@dimen/chevronSize"
                     android:layout_height="@dimen/chevronSize"
                     android:layout_marginHorizontal="@dimen/marginStandardSmall"
+                    android:contentDescription="@string/contentDescriptionButtonExpandRecipients"
                     android:src="@drawable/ic_chevron_down"
                     app:layout_constraintHorizontal_bias="0"
-                    app:tint="@color/iconColor"
-                    tools:ignore="ContentDescription" />
+                    app:tint="@color/iconColor" />
             </LinearLayout>
 
             <com.google.android.material.button.MaterialButton
@@ -123,6 +123,7 @@
                 style="@style/TextButton"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
+                android:importantForAccessibility="no"
                 app:cornerRadius="@dimen/smallCornerRadius"
                 app:layout_constraintBottom_toBottomOf="@id/recipientLayout"
                 app:layout_constraintEnd_toEndOf="@id/recipientLayout"
@@ -156,7 +157,7 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/replyButton"
                 style="@style/IconButton"
-                android:contentDescription="@string/contentDescriptionButtonDeleteDraft"
+                android:contentDescription="@string/actionReply"
                 app:icon="@drawable/ic_email_action_reply"
                 app:layout_constraintEnd_toStartOf="@id/menuButton"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -164,7 +165,7 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/menuButton"
                 style="@style/IconButton"
-                android:contentDescription="@string/contentDescriptionButtonDeleteDraft"
+                android:contentDescription="@string/contentDescriptionOpenMailActions"
                 app:icon="@drawable/ic_param_dots"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -287,11 +288,11 @@
             android:layout_height="18dp"
             android:layout_marginStart="@dimen/marginStandardMedium"
             android:layout_marginTop="@dimen/marginStandardSmall"
+            android:contentDescription="@string/dateTitle"
             android:src="@drawable/ic_calendar"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/bccRecyclerView"
-            app:tint="@color/iconColor"
-            tools:ignore="ContentDescription" />
+            app:tint="@color/iconColor" />
 
         <TextView
             android:id="@+id/detailedMessageDate"
@@ -365,12 +366,12 @@
         android:layout_width="@dimen/mediumIconSize"
         android:layout_height="@dimen/mediumIconSize"
         android:layout_marginStart="@dimen/marginStandardMedium"
+        android:importantForAccessibility="no"
         android:src="@drawable/ic_attachment"
         app:layout_constraintBottom_toBottomOf="@id/attachmentsSizeText"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/attachmentsSizeText"
-        app:tint="@color/iconColor"
-        tools:ignore="ContentDescription" />
+        app:tint="@color/iconColor" />
 
     <TextView
         android:id="@+id/attachmentsSizeText"

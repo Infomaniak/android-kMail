@@ -78,7 +78,7 @@
                     android:id="@+id/listDensityImage"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    tools:ignore="ContentDescription"
+                    android:importantForAccessibility="no"
                     tools:src="@drawable/bg_list_density_large" />
 
             </com.google.android.material.card.MaterialCardView>

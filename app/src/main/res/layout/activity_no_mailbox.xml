@@ -55,13 +55,13 @@
         android:id="@+id/logo"
         android:layout_width="wrap_content"
         android:layout_height="60dp"
+        android:importantForAccessibility="no"
         android:src="@drawable/ic_logo_infomaniak_mail"
         app:layout_constraintBottom_toTopOf="@id/noMailboxIconLayout"
         app:layout_constraintEnd_toStartOf="@id/end"
         app:layout_constraintStart_toEndOf="@id/start"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed"
-        tools:ignore="ContentDescription" />
+        app:layout_constraintVertical_chainStyle="packed" />
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/noMailboxIconLayout"
@@ -71,7 +71,6 @@
         app:layout_constraintEnd_toStartOf="@id/end"
         app:layout_constraintStart_toEndOf="@id/start"
         app:lottie_autoPlay="true"
-        tools:ignore="ContentDescription"
         tools:lottie_rawRes="@raw/illu_no_mailbox" />
 
     <TextView

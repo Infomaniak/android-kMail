@@ -92,6 +92,7 @@
                         android:id="@+id/checkedState"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:contentDescription="@string/contentDescriptionSelectedItem"
                         android:visibility="gone"
                         tools:visibility="visible">
 
@@ -113,13 +114,13 @@
                             android:layout_width="16dp"
                             android:layout_height="16dp"
                             android:layout_gravity="center"
+                            android:importantForAccessibility="no"
                             android:src="@drawable/ic_check"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
-                            app:tint="?attr/colorOnPrimary"
-                            tools:ignore="ContentDescription" />
+                            app:tint="?attr/colorOnPrimary" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -127,8 +128,8 @@
                         android:id="@+id/uncheckedState"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
+                        android:importantForAccessibility="no"
                         android:src="@drawable/ic_checkbox_unchecked"
-                        tools:ignore="ContentDescription"
                         tools:layout_height="@dimen/userAvatarSizeLarge"
                         tools:layout_width="@dimen/userAvatarSizeLarge" />
 

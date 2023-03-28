@@ -20,6 +20,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="0dp"
     android:layout_height="0dp"
+    android:importantForAccessibility="noHideDescendants"
     tools:layout_height="88dp"
     tools:layout_width="match_parent">
 

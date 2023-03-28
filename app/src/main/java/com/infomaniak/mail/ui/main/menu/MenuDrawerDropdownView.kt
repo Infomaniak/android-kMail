@@ -49,7 +49,7 @@ class MenuDrawerDropdownView @JvmOverloads constructor(
                 actionButton.contentDescription = getString(R.styleable.MenuDrawerDropdownView_actionContentDescription)
             }
 
-            binding.expandCustomFolderButton.rotation = getRotation(isCollapsed)
+            expandCustomFolderButton.rotation = getRotation(isCollapsed)
             setOnClickListener(null)
         }
     }
