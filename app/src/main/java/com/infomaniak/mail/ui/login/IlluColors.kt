@@ -23,6 +23,7 @@ import androidx.annotation.ColorInt
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.model.KeyPath
 import com.google.android.material.color.utilities.Hct
+import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.utils.changePathColor
@@ -44,19 +45,19 @@ object IlluColors {
         98,
     )
 
-    val darkTones = listOf(
+    private val darkTones = listOf(
+        69,
+        42,
+        51,
+        67,
+        63,
+        52,
         40,
-        79,
-        87,
-        29,
-        47,
-        64,
-        60,
-        48,
+        57,
         49,
-        26,
-        95,
-        98,
+        69,
+        6,
+        91,
     )
 
     fun LottieAnimationView.changeIllustrationColors(position: Int, accentColor: LocalSettings.AccentColor) {
@@ -211,9 +212,11 @@ object IlluColors {
                 val primary = LocalSettings.AccentColor.SYSTEM.getPrimary(this)
                 val primaryColor = Hct.fromInt(primary)
 
-                val palette = lightTones.map {
+                val tones = if (isNightModeEnabled()) darkTones else lightTones
+
+                val palette = tones.map { tone ->
                     val color = Hct.from(primaryColor.hue, primaryColor.chroma, primaryColor.tone)
-                    color.tone = it.toDouble()
+                    color.tone = tone.toDouble()
                     color.toInt()
                 }
 
