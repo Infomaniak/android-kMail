@@ -189,34 +189,18 @@ class IntroFragment : Fragment() {
         isDark: Boolean,
         position: Int
     ) {
-        val palette = when (accentColor) {
-            PINK -> pinkColors
-            BLUE -> blueColors
-            AccentColor.SYSTEM -> pinkColors // TODO
-        }
-
-        val (
-            illuOnBoardingAccentColors,
-            illuOnBoarding234AccentColors,
-            illuOnBoarding1AccentColors,
-            illuOnBoarding2AccentColors,
-            illuOnBoarding3AccentColors,
-            illuOnBoarding4AccentColors
-        ) = illuColorsFromPalette(palette)
-
-        illuOnBoardingAccentColors.forEach { changePathColor(it, isDark) }
-        when (position) {
-            1, 2, 3 -> illuOnBoarding234AccentColors.forEach { changePathColor(it, isDark) }
-        }
-        when (position) {
-            0 -> illuOnBoarding1AccentColors.forEach { changePathColor(it, isDark) }
-            1 -> illuOnBoarding2AccentColors.forEach { changePathColor(it, isDark) }
-            2 -> illuOnBoarding3AccentColors.forEach { changePathColor(it, isDark) }
-            3 -> illuOnBoarding4AccentColors.forEach { changePathColor(it, isDark) }
-        }
+        val palette = getPaletteFor(accentColor)
+        val pathToColor = getPathsToColorFromPalette(palette)
+        colorPaths(pathToColor, isDark, position)
     }
 
-    private fun illuColorsFromPalette(palette: List<IlluColors.Colors>): IlluOnBoardingColors {
+    private fun getPaletteFor(accentColor: AccentColor) = when (accentColor) {
+        PINK -> pinkColors
+        BLUE -> blueColors
+        AccentColor.SYSTEM -> pinkColors // TODO
+    }
+
+    private fun getPathsToColorFromPalette(palette: List<IlluColors.Colors>): IlluOnBoardingColors {
         val illuOnBoardingAccentColors = listOf(
             IlluColors(keyPath(Category.IPHONESCREEN, 1), palette[0]),
             IlluColors(keyPath(Category.IPHONESCREEN, 2), palette[0]),
@@ -306,6 +290,23 @@ class IntroFragment : Fragment() {
             illuOnBoarding3AccentColors,
             illuOnBoarding4AccentColors,
         )
+    }
+
+    private fun LottieAnimationView.colorPaths(
+        pathToColor: IlluOnBoardingColors,
+        isDark: Boolean,
+        position: Int
+    ) = with(pathToColor) {
+        illuOnBoardingAccentColors.forEach { changePathColor(it, isDark) }
+        when (position) {
+            1, 2, 3 -> illuOnBoarding234AccentColors.forEach { changePathColor(it, isDark) }
+        }
+        when (position) {
+            0 -> illuOnBoarding1AccentColors.forEach { changePathColor(it, isDark) }
+            1 -> illuOnBoarding2AccentColors.forEach { changePathColor(it, isDark) }
+            2 -> illuOnBoarding3AccentColors.forEach { changePathColor(it, isDark) }
+            3 -> illuOnBoarding4AccentColors.forEach { changePathColor(it, isDark) }
+        }
     }
 
     private fun updateEachPageUi(newAccentColor: AccentColor, oldAccentColor: AccentColor) {
