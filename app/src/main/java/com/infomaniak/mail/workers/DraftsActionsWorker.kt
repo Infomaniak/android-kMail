@@ -137,7 +137,7 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
     }
 
     private fun ApiErrorException.handleApiErrors(realm: MutableRealm, draft: Draft) {
-        when (apiResponse.error?.code) {
+        when (errorCode) {
             DRAFT_DOES_NOT_EXIST, DRAFT_HAS_TOO_MANY_RECIPIENTS -> realm.delete(draft)
         }
     }
