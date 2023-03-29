@@ -20,9 +20,9 @@ package com.infomaniak.mail.ui.login
 import android.graphics.Color
 import com.airbnb.lottie.model.KeyPath
 import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.blueColor1
+import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.blueColor10
 import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.blueColor11
 import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.blueColor12
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.blueColor13
 import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.blueColor2
 import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.blueColor3
 import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.blueColor4
@@ -43,9 +43,9 @@ import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.commonColor7
 import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.commonColor8
 import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.commonColor9
 import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor1
+import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor10
 import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor11
 import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor12
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor13
 import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor2
 import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor3
 import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor4
@@ -83,26 +83,23 @@ class IlluColors(val keyPath: KeyPath, val color: Colors) {
             val pinkColor7 = Colors("#FF4388", "#B80043")
             val pinkColor8 = Colors("#D81B60", "#FB2C77")
             val pinkColor9 = Colors("#E10B59", "#DC1A60")
-            val pinkColor11 = Colors("#693D51", "#CA799E")
-            val pinkColor12 = Colors("#F7E8EF", "#282828")
-            val pinkColor13 = Colors("#FAF0F0", "#F1DDDD")
-
-            val pinkColor3_temp = Colors("#AB2456", "#D0759F")
+            val pinkColor10 = Colors("#693D51", "#CA799E")
+            val pinkColor11 = Colors("#F7E8EF", "#282828")
+            val pinkColor12 = Colors("#FAF0F0", "#F1DDDD")
 
             val pinkColors = listOf(
                 pinkColor1,
-                pinkColor6,
-                pinkColor3_temp,
                 pinkColor2,
-                pinkColor5,
                 pinkColor3,
                 pinkColor4,
-                pinkColor11,
-                pinkColor12,
+                pinkColor5,
+                pinkColor6,
                 pinkColor7,
                 pinkColor8,
-                pinkColor13,
                 pinkColor9,
+                pinkColor10,
+                pinkColor11,
+                pinkColor12,
             )
 
             val blueColor1 = Colors("#0098FF", "#0177C7")
@@ -114,9 +111,24 @@ class IlluColors(val keyPath: KeyPath, val color: Colors) {
             val blueColor7 = Colors("#5AC4FF", "#6DCBFF")
             val blueColor8 = Colors("#0A85C9", "#0A85C9")
             val blueColor9 = Colors("#0875A5", "#0875A5")
-            val blueColor11 = Colors("#0B3547", "#266E8D")
-            val blueColor12 = Colors("#EAF8FE", "#282828")
-            val blueColor13 = Colors("#F7FCFF", "#E8F6FF")
+            val blueColor10 = Colors("#0B3547", "#266E8D")
+            val blueColor11 = Colors("#EAF8FE", "#282828")
+            val blueColor12 = Colors("#F7FCFF", "#E8F6FF")
+
+            val blueColors = listOf(
+                blueColor1,
+                blueColor2,
+                blueColor3,
+                blueColor4,
+                blueColor5,
+                blueColor6,
+                blueColor7,
+                blueColor8,
+                blueColor9,
+                blueColor10,
+                blueColor11,
+                blueColor12,
+            )
         }
     }
 
@@ -296,8 +308,8 @@ class IlluColors(val keyPath: KeyPath, val color: Colors) {
             IlluColors(keyPath(Category.NOTIFICATION, 4, 2), pinkColor5),
             IlluColors(keyPath(Category.NOTIFICATION, 11, 2), pinkColor1),
             IlluColors(keyPath(Category.HAND, 1), pinkColor4),
-            IlluColors(keyPath(Category.HAND, 4), pinkColor11),
-            IlluColors(keyPath(Category.HAND, 5), pinkColor11),
+            IlluColors(keyPath(Category.HAND, 4), pinkColor10),
+            IlluColors(keyPath(Category.HAND, 5), pinkColor10),
             IlluColors(keyPath(Category.MOVINGNOTIFICATION, 15, 1), pinkColor1),
             IlluColors(keyPath(Category.MOVINGNOTIFICATION, 4, 2), pinkColor5),
             IlluColors(keyPath(Category.MOVINGNOTIFICATION, 11, 2), pinkColor1),
@@ -306,8 +318,8 @@ class IlluColors(val keyPath: KeyPath, val color: Colors) {
             IlluColors(keyPath(Category.NOTIFICATION, 4, 2), blueColor5),
             IlluColors(keyPath(Category.NOTIFICATION, 11, 2), blueColor1),
             IlluColors(keyPath(Category.HAND, 1), blueColor4),
-            IlluColors(keyPath(Category.HAND, 4), blueColor11),
-            IlluColors(keyPath(Category.HAND, 5), blueColor11),
+            IlluColors(keyPath(Category.HAND, 4), blueColor10),
+            IlluColors(keyPath(Category.HAND, 5), blueColor10),
             IlluColors(keyPath(Category.MOVINGNOTIFICATION, 15, 1), blueColor1),
             IlluColors(keyPath(Category.MOVINGNOTIFICATION, 4, 2), blueColor5),
             IlluColors(keyPath(Category.MOVINGNOTIFICATION, 11, 2), blueColor1),
@@ -329,14 +341,14 @@ class IlluColors(val keyPath: KeyPath, val color: Colors) {
         )
         val illuOnBoarding3PinkColors = arrayOf(
             IlluColors(keyPath(Category.NOTIFICATION, 4, 2), pinkColor1),
-            IlluColors(keyPath(Category.NOTIFICATION, 5, 2), pinkColor12),
+            IlluColors(keyPath(Category.NOTIFICATION, 5, 2), pinkColor11),
             IlluColors(keyPath(Category.NOTIFICATION, 4, 3), pinkColor1),
-            IlluColors(keyPath(Category.NOTIFICATION, 5, 3), pinkColor12),
+            IlluColors(keyPath(Category.NOTIFICATION, 5, 3), pinkColor11),
             IlluColors(keyPath(Category.NOTIFICATION, 4, 4), pinkColor1),
-            IlluColors(keyPath(Category.NOTIFICATION, 5, 4), pinkColor12),
+            IlluColors(keyPath(Category.NOTIFICATION, 5, 4), pinkColor11),
             IlluColors(keyPath(Category.HAND, 1), pinkColor4),
-            IlluColors(keyPath(Category.HAND, 4), pinkColor11),
-            IlluColors(keyPath(Category.HAND, 5), pinkColor11),
+            IlluColors(keyPath(Category.HAND, 4), pinkColor10),
+            IlluColors(keyPath(Category.HAND, 5), pinkColor10),
             IlluColors(keyPath(Category.STAR, 1, finalLayer = FinalLayer.BORDER), pinkColor1),
             IlluColors(keyPath(Category.BIN, 1, finalLayer = FinalLayer.BORDER), pinkColor1),
             IlluColors(keyPath(Category.BIN, 2, finalLayer = FinalLayer.BORDER), pinkColor1),
@@ -351,14 +363,14 @@ class IlluColors(val keyPath: KeyPath, val color: Colors) {
         )
         val illuOnBoarding3BlueColors = arrayOf(
             IlluColors(keyPath(Category.NOTIFICATION, 4, 2), blueColor1),
-            IlluColors(keyPath(Category.NOTIFICATION, 5, 2), blueColor12),
+            IlluColors(keyPath(Category.NOTIFICATION, 5, 2), blueColor11),
             IlluColors(keyPath(Category.NOTIFICATION, 4, 3), blueColor1),
-            IlluColors(keyPath(Category.NOTIFICATION, 5, 3), blueColor12),
+            IlluColors(keyPath(Category.NOTIFICATION, 5, 3), blueColor11),
             IlluColors(keyPath(Category.NOTIFICATION, 4, 4), blueColor1),
-            IlluColors(keyPath(Category.NOTIFICATION, 5, 4), blueColor12),
+            IlluColors(keyPath(Category.NOTIFICATION, 5, 4), blueColor11),
             IlluColors(keyPath(Category.HAND, 1), blueColor4),
-            IlluColors(keyPath(Category.HAND, 4), blueColor11),
-            IlluColors(keyPath(Category.HAND, 5), blueColor11),
+            IlluColors(keyPath(Category.HAND, 4), blueColor10),
+            IlluColors(keyPath(Category.HAND, 5), blueColor10),
             IlluColors(keyPath(Category.STAR, 1, finalLayer = FinalLayer.BORDER), blueColor1),
             IlluColors(keyPath(Category.BIN, 1, finalLayer = FinalLayer.BORDER), blueColor1),
             IlluColors(keyPath(Category.BIN, 2, finalLayer = FinalLayer.BORDER), blueColor1),
@@ -389,7 +401,7 @@ class IlluColors(val keyPath: KeyPath, val color: Colors) {
             IlluColors(keyPath(Category.POINT, 1, 4), pinkColor2),
             IlluColors(keyPath(Category.LETTER, 1), pinkColor7),
             IlluColors(keyPath(Category.LETTER, 2), pinkColor8),
-            IlluColors(keyPath(Category.LETTER, 5), pinkColor13),
+            IlluColors(keyPath(Category.LETTER, 5), pinkColor12),
             IlluColors(keyPath(Category.LETTER, 6), pinkColor9),
             IlluColors(keyPath(Category.LETTER, 7), pinkColor9),
         )
@@ -402,7 +414,7 @@ class IlluColors(val keyPath: KeyPath, val color: Colors) {
             IlluColors(keyPath(Category.POINT, 1, 4), blueColor2),
             IlluColors(keyPath(Category.LETTER, 1), blueColor7),
             IlluColors(keyPath(Category.LETTER, 2), blueColor8),
-            IlluColors(keyPath(Category.LETTER, 5), blueColor13),
+            IlluColors(keyPath(Category.LETTER, 5), blueColor12),
             IlluColors(keyPath(Category.LETTER, 6), blueColor9),
             IlluColors(keyPath(Category.LETTER, 7), blueColor9),
         )
@@ -415,14 +427,14 @@ class IlluColors(val keyPath: KeyPath, val color: Colors) {
 
         val illuNoMailboxPinkColor = arrayOf(
             IlluColors(keyPath(Category.HAND, 1), pinkColor4),
-            IlluColors(keyPath(Category.HAND, 4), pinkColor11),
-            IlluColors(keyPath(Category.HAND, 5), pinkColor11),
+            IlluColors(keyPath(Category.HAND, 4), pinkColor10),
+            IlluColors(keyPath(Category.HAND, 5), pinkColor10),
         )
 
         val illuNoMailboxBlueColor = arrayOf(
             IlluColors(keyPath(Category.HAND, 1), blueColor4),
-            IlluColors(keyPath(Category.HAND, 4), blueColor11),
-            IlluColors(keyPath(Category.HAND, 5), blueColor11),
+            IlluColors(keyPath(Category.HAND, 4), blueColor10),
+            IlluColors(keyPath(Category.HAND, 5), blueColor10),
         )
     }
 }
