@@ -129,7 +129,7 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     private fun ThreadFilter.select() {
-        _selectedFilters.value = SearchUtils.selectFilter(this, selectedFilters)
+        _selectedFilters.value = SearchUtils.selectFilter(filter = this, selectedFilters)
     }
 
     private fun ThreadFilter.unselect() {
@@ -154,8 +154,10 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
             }
         }
 
+        val newFilters = if (folder == null) filters else (filters + ThreadFilter.FOLDER)
+
         if (isLastPage && resourcePrevious.isNullOrBlank()) SearchUtils.deleteRealmSearchData()
-        if (filters.isEmpty() && query.isNullOrBlank() && folder == null) {
+        if (newFilters.isEmpty() && query.isNullOrBlank()) {
             visibilityMode.postValue(VisibilityMode.RECENT_SEARCHES)
             return@flow
         }
@@ -164,7 +166,7 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
 
         val currentMailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
         val folderId = folder?.id ?: dummyFolderId
-        val searchFilters = SearchUtils.searchFilters(query, filters, folder != null)
+        val searchFilters = SearchUtils.searchFilters(query, newFilters)
         val apiResponse = ApiRepository.searchThreads(currentMailbox.uuid, folderId, searchFilters, resourceNext)
 
         if (apiResponse.isSuccess()) with(apiResponse) {
@@ -172,7 +174,6 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
             resourceNext = data?.resourceNext
             resourcePrevious = data?.resourcePrevious
         } else if (isLastPage) {
-            val newFilters = if (folder == null) filters else (filters + ThreadFilter.FOLDER)
             ThreadController.saveThreads(searchMessages = MessageController.searchMessages(query, newFilters, folderId))
         }
 
@@ -180,7 +181,7 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
             query?.let(history::postValue)
             it.list.also { threads ->
                 val resultsVisibilityMode = when {
-                    selectedFilters.isEmpty() && isLengthTooShort(searchQuery) && folder == null -> VisibilityMode.RECENT_SEARCHES
+                    newFilters.isEmpty() && isLengthTooShort(searchQuery) -> VisibilityMode.RECENT_SEARCHES
                     threads.isEmpty() -> VisibilityMode.NO_RESULTS
                     else -> VisibilityMode.RESULTS
                 }
