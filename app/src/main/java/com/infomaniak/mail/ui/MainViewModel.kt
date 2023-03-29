@@ -89,8 +89,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private var refreshThreadsJob: Job? = null
     private var refreshMailboxesAndFoldersJob: Job? = null
 
-    private var isLoadingMailbox = false
-
     val mailboxesLive = MailboxController.getMailboxesAsync(AccountUtils.currentUserId).asLiveData(coroutineContext)
 
     //region Current Mailbox
@@ -159,13 +157,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         updateContacts()
     }
 
-    fun loadCurrentMailbox() {
-        isLoadingMailbox = true
-        viewModelScope.launch(Dispatchers.IO) {
-            loadCurrentMailboxFromLocal()
-            loadCurrentMailboxFromRemote()
-            isLoadingMailbox = false
-        }
+    fun loadCurrentMailbox() = liveData(Dispatchers.IO) {
+        loadCurrentMailboxFromLocal()
+        loadCurrentMailboxFromRemote()
+        emit(null)
     }
 
     private suspend fun loadCurrentMailboxFromLocal() {
@@ -213,8 +208,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun forceRefreshMailboxesAndFolders() {
-
-        if (isLoadingMailbox) return
 
         refreshMailboxesAndFoldersJob?.cancel()
         refreshMailboxesAndFoldersJob = viewModelScope.launch(viewModelScope.handlerIO) {
