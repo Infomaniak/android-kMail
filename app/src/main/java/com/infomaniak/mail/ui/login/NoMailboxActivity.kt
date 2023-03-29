@@ -22,8 +22,13 @@ import com.infomaniak.lib.core.utils.Utils.lockOrientationForSmallScreens
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.mail.BuildConfig.SHOP_URL
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.ActivityNoMailboxBinding
 import com.infomaniak.mail.ui.ThemedActivity
+import com.infomaniak.mail.ui.login.ChangeIlluColors.Category
+import com.infomaniak.mail.ui.login.ChangeIlluColors.IlluColors
+import com.infomaniak.mail.ui.login.ChangeIlluColors.getPaletteFor
+import com.infomaniak.mail.ui.login.ChangeIlluColors.keyPath
 import com.infomaniak.mail.utils.changePathColor
 import com.infomaniak.mail.utils.repeatFrame
 
@@ -37,15 +42,11 @@ class NoMailboxActivity : ThemedActivity() {
         super.onCreate(savedInstanceState)
 
         with(binding) {
-
             setContentView(root)
 
             noMailboxIconLayout.apply {
                 getAccentIndependentSleeveColors().forEach { changePathColor(it) }
-
-                // val sleeveColors = if (isPink) IlluColors.illuNoMailboxPinkColor else IlluColors.illuNoMailboxBlueColor
                 getAccentDependentSleeveColors().forEach { changePathColor(it) }
-
                 setAnimation(R.raw.illu_no_mailbox)
                 repeatFrame(42, 112)
             }
@@ -65,20 +66,21 @@ class NoMailboxActivity : ThemedActivity() {
         val commonColor11 = getColor(R.color.commonColor11)
 
         return listOf(
-            IlluColors(IlluColors.keyPath(IlluColors.Category.LINK, 1), commonColor11),
-            IlluColors(IlluColors.keyPath(IlluColors.Category.IPHONESCREEN, 1), commonColor5),
-            IlluColors(IlluColors.keyPath(IlluColors.Category.IPHONESCREEN, 2), commonColor2),
+            IlluColors(keyPath(Category.LINK, 1), commonColor11),
+            IlluColors(keyPath(Category.IPHONESCREEN, 1), commonColor5),
+            IlluColors(keyPath(Category.IPHONESCREEN, 2), commonColor2),
         )
     }
 
     private fun getAccentDependentSleeveColors(): List<IlluColors> {
-        val pinkColor4 = resources.getIntArray(R.array.pinkColors)[4] // TODO : Use palette
-        val pinkColor10 = resources.getIntArray(R.array.pinkColors)[10]
+        val colors = getPaletteFor(LocalSettings.getInstance(this).accentColor)
+        val pinkColor4 = colors[4]
+        val pinkColor10 = colors[10]
 
         return listOf(
-            IlluColors(IlluColors.keyPath(IlluColors.Category.HAND, 1), pinkColor4),
-            IlluColors(IlluColors.keyPath(IlluColors.Category.HAND, 4), pinkColor10),
-            IlluColors(IlluColors.keyPath(IlluColors.Category.HAND, 5), pinkColor10),
+            IlluColors(keyPath(Category.HAND, 1), pinkColor4),
+            IlluColors(keyPath(Category.HAND, 4), pinkColor10),
+            IlluColors(keyPath(Category.HAND, 5), pinkColor10),
         )
     }
 }
