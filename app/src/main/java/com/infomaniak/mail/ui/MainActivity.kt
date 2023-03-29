@@ -26,7 +26,10 @@ import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.annotation.FloatRange
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.Lifecycle.*
 import androidx.lifecycle.distinctUntilChanged
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
@@ -45,6 +48,7 @@ import com.infomaniak.mail.utils.updateNavigationBarColor
 import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import io.sentry.SentryLevel
+import kotlinx.coroutines.launch
 
 class MainActivity : ThemedActivity() {
 
@@ -106,15 +110,20 @@ class MainActivity : ThemedActivity() {
         setupMenuDrawerCallbacks()
 
         mainViewModel.updateUserInfo()
-        mainViewModel.loadCurrentMailbox()
+        loadCurrentMailbox()
 
         mainViewModel.observeMergedContactsLive()
         permissionUtils.requestMainPermissionsIfNeeded()
     }
 
-    override fun onStart() {
-        super.onStart()
-        mainViewModel.forceRefreshMailboxesAndFolders()
+    private fun loadCurrentMailbox() {
+        mainViewModel.loadCurrentMailbox().observe(this) {
+            lifecycleScope.launch {
+                repeatOnLifecycle(State.STARTED) {
+                    mainViewModel.forceRefreshMailboxesAndFolders()
+                }
+            }
+        }
     }
 
     override fun onResume() {
