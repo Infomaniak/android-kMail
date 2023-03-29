@@ -25,10 +25,10 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.ActivityNoMailboxBinding
 import com.infomaniak.mail.ui.ThemedActivity
-import com.infomaniak.mail.ui.login.ChangeIlluColors.Category
-import com.infomaniak.mail.ui.login.ChangeIlluColors.IlluColors
-import com.infomaniak.mail.ui.login.ChangeIlluColors.getPaletteFor
-import com.infomaniak.mail.ui.login.ChangeIlluColors.keyPath
+import com.infomaniak.mail.ui.login.IlluColors.Category
+import com.infomaniak.mail.ui.login.IlluColors.IlluColors
+import com.infomaniak.mail.ui.login.IlluColors.getPaletteFor
+import com.infomaniak.mail.ui.login.IlluColors.keyPath
 import com.infomaniak.mail.utils.changePathColor
 import com.infomaniak.mail.utils.repeatFrame
 

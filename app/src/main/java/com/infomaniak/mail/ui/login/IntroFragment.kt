@@ -36,7 +36,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.databinding.FragmentIntroBinding
-import com.infomaniak.mail.ui.login.ChangeIlluColors.changeIllustrationColors
+import com.infomaniak.mail.ui.login.IlluColors.changeIllustrationColors
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
 import com.infomaniak.mail.utils.enumValueFrom
 import com.infomaniak.mail.utils.repeatFrame

@@ -25,7 +25,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.utils.changePathColor
 
-object ChangeIlluColors {
+object IlluColors {
     fun LottieAnimationView.changeIllustrationColors(position: Int, accentColor: LocalSettings.AccentColor) {
         updateAccentColorIndependentColors(position)
         updateAccentColorDependentColors(accentColor, position)

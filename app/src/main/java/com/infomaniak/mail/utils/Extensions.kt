@@ -69,7 +69,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.DialogDescriptionBinding
 import com.infomaniak.mail.databinding.DialogInputBinding
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.ui.login.ChangeIlluColors.IlluColors
+import com.infomaniak.mail.ui.login.IlluColors.IlluColors
 import com.infomaniak.mail.ui.main.folder.DateSeparatorItemDecoration
 import com.infomaniak.mail.ui.main.folder.HeaderItemDecoration
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
