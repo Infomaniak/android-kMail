@@ -192,7 +192,6 @@ class IlluColors(val keyPath: KeyPath, val color: Colors) {
             IlluColors(keyPath(Category.IPHONESCREEN, 70), commonColor1),
         )
         val illuOnBoardingPinkColors = arrayOf(
-            // DONE
             IlluColors(keyPath(Category.IPHONESCREEN, 1), pinkColor1),
             IlluColors(keyPath(Category.IPHONESCREEN, 2), pinkColor1),
             IlluColors(keyPath(Category.IPHONESCREEN, 3), pinkColor1),

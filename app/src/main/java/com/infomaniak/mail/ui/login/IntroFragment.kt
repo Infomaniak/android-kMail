@@ -61,7 +61,6 @@ import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoardingBlueColor
 import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoardingColors
 import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoardingPinkColors
 import com.infomaniak.mail.ui.login.IlluColors.Companion.keyPath
-import com.infomaniak.mail.ui.login.IlluColors.FinalLayer
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
 import com.infomaniak.mail.utils.changePathColor
 import com.infomaniak.mail.utils.enumValueFrom
@@ -240,88 +239,86 @@ class IntroFragment : Fragment() {
     private fun illuColorsFromAccentColor(accentColor: AccentColor): IlluOnBoardingColors {
         val palette = pinkColors
 
-        // val illuOnBoardingAccentColors = listOf(
-        //     IlluColors(keyPath(Category.IPHONESCREEN, 1), palette[0]),
-        //     IlluColors(keyPath(Category.IPHONESCREEN, 2), palette[0]),
-        //     IlluColors(keyPath(Category.IPHONESCREEN, 3), palette[0]),
-        //     IlluColors(keyPath(Category.IPHONESCREEN, 4), palette[0]),
-        //     IlluColors(keyPath(Category.IPHONESCREEN, 5), palette[0]),
-        //     IlluColors(keyPath(Category.IPHONESCREEN, 6), palette[0]),
-        //     IlluColors(keyPath(Category.IPHONESCREEN, 9), palette[1]),
-        //     IlluColors(keyPath(Category.IPHONESCREEN, 12), palette[2]),
-        //     IlluColors(keyPath(Category.IPHONESCREEN, 15), palette[0]),
-        //     IlluColors(keyPath(Category.IPHONESCREEN, 19), palette[0]),
-        //     IlluColors(keyPath(Category.IPHONESCREEN, 20), palette[0]),
-        //     IlluColors(keyPath(Category.IPHONESCREEN, 23), palette[0]),
-        //     IlluColors(keyPath(Category.IPHONESCREEN, 24), palette[0]),
-        //     IlluColors(keyPath(Category.IPHONESCREEN, 43), palette[3]),
-        //     IlluColors(keyPath(Category.IPHONESCREEN, 48), palette[4]),
-        // )
-        //
-        // val illuOnBoarding234AccentColors = listOf(
-        //     IlluColors(keyPath(Category.IPHONESCREEN, 54), palette[4]),
-        //     IlluColors(keyPath(Category.IPHONESCREEN, 61), palette[5]),
-        //     IlluColors(keyPath(Category.IPHONESCREEN, 67), palette[0]),
-        //     IlluColors(keyPath(Category.IPHONESCREEN, 72), palette[6]),
-        // )
-        //
-        // val illuOnBoarding1AccentColors = listOf(
-        //     IlluColors(keyPath(Category.CHAT, 1, 1), palette[0]),
-        //     IlluColors(keyPath(Category.CHAT, 1, 2), palette[3]),
-        //     IlluColors(keyPath(Category.IPHONESCREEN, 55), palette[5]),
-        //     IlluColors(keyPath(Category.IPHONESCREEN, 61), palette[0]),
-        //     IlluColors(keyPath(Category.IPHONESCREEN, 66), palette[6]),
-        // )
-        //
-        // val illuOnBoarding2AccentColors = listOf(
-        //     IlluColors(keyPath(Category.NOTIFICATION, 4, 2), palette[4]),
-        //     IlluColors(keyPath(Category.NOTIFICATION, 11, 2), palette[0]),
-        //     IlluColors(keyPath(Category.HAND, 1), palette[6]),
-        //     IlluColors(keyPath(Category.HAND, 4), palette[7]),
-        //     IlluColors(keyPath(Category.HAND, 5), palette[7]),
-        //     IlluColors(keyPath(Category.MOVINGNOTIFICATION, 15, 1), palette[0]),
-        //     IlluColors(keyPath(Category.MOVINGNOTIFICATION, 4, 2), palette[4]),
-        //     IlluColors(keyPath(Category.MOVINGNOTIFICATION, 11, 2), palette[0]),
-        // )
-        //
-        // val illuOnBoarding3AccentColors = listOf(
-        //     IlluColors(keyPath(Category.NOTIFICATION, 4, 2), palette[0]),
-        //     IlluColors(keyPath(Category.NOTIFICATION, 5, 2), palette[8]),
-        //     IlluColors(keyPath(Category.NOTIFICATION, 4, 3), palette[0]),
-        //     IlluColors(keyPath(Category.NOTIFICATION, 5, 3), palette[8]),
-        //     IlluColors(keyPath(Category.NOTIFICATION, 4, 4), palette[0]),
-        //     IlluColors(keyPath(Category.NOTIFICATION, 5, 4), palette[8]),
-        //     IlluColors(keyPath(Category.HAND, 1), palette[6]),
-        //     IlluColors(keyPath(Category.HAND, 4), palette[7]),
-        //     IlluColors(keyPath(Category.HAND, 5), palette[7]),
-        //     IlluColors(keyPath(Category.STAR, 1, finalLayer = FinalLayer.BORDER), palette[0]),
-        //     IlluColors(keyPath(Category.BIN, 1, finalLayer = FinalLayer.BORDER), palette[0]),
-        //     IlluColors(keyPath(Category.BIN, 2, finalLayer = FinalLayer.BORDER), palette[0]),
-        //     IlluColors(keyPath(Category.BIN, 3, finalLayer = FinalLayer.BORDER), palette[0]),
-        //     IlluColors(keyPath(Category.BIN, 4, finalLayer = FinalLayer.BORDER), palette[0]),
-        //     IlluColors(keyPath(Category.BIN, 5, finalLayer = FinalLayer.BORDER), palette[0]),
-        //     IlluColors(keyPath(Category.BIN, 6, finalLayer = FinalLayer.BORDER), palette[0]),
-        //     IlluColors(keyPath(Category.CLOCK, 1), palette[0]),
-        //     IlluColors(keyPath(Category.CLOCK, 2), palette[0]),
-        //     IlluColors(keyPath(Category.CLOCK, 3), palette[0]),
-        //     IlluColors(keyPath(Category.CLOCK, 4), palette[0]),
-        // )
-        //
-        //
-        // val illuOnBoarding4AccentColors = listOf(
-        //     IlluColors(keyPath(Category.WOMAN, 4), palette[4]),
-        //     IlluColors(keyPath(Category.MEN, 5), palette[3]),
-        //     IlluColors(keyPath(Category.POINT, 1, 1), palette[4]),
-        //     IlluColors(keyPath(Category.POINT, 1, 2), palette[4]),
-        //     IlluColors(keyPath(Category.POINT, 1, 3), palette[3]),
-        //     IlluColors(keyPath(Category.POINT, 1, 4), palette[3]),
-        //     IlluColors(keyPath(Category.LETTER, 1), palette[9]),
-        //     IlluColors(keyPath(Category.LETTER, 2), palette[10]),
-        //     IlluColors(keyPath(Category.LETTER, 5), palette[11]),
-        //     IlluColors(keyPath(Category.LETTER, 6), palette[12]),
-        //     IlluColors(keyPath(Category.LETTER, 7), palette[12]),
-        // )
+        val illuOnBoardingAccentColors = listOf(
+            IlluColors(keyPath(Category.IPHONESCREEN, 1), palette[1]),
+            IlluColors(keyPath(Category.IPHONESCREEN, 2), palette[1]),
+            IlluColors(keyPath(Category.IPHONESCREEN, 3), palette[1]),
+            IlluColors(keyPath(Category.IPHONESCREEN, 4), palette[1]),
+            IlluColors(keyPath(Category.IPHONESCREEN, 5), palette[1]),
+            IlluColors(keyPath(Category.IPHONESCREEN, 6), palette[1]),
+            IlluColors(keyPath(Category.IPHONESCREEN, 9), palette[6]),
+            IlluColors(keyPath(Category.IPHONESCREEN, 12), palette[1]),
+            IlluColors(keyPath(Category.IPHONESCREEN, 15), palette[1]),
+            IlluColors(keyPath(Category.IPHONESCREEN, 19), palette[1]),
+            IlluColors(keyPath(Category.IPHONESCREEN, 20), palette[1]),
+            IlluColors(keyPath(Category.IPHONESCREEN, 23), palette[1]),
+            IlluColors(keyPath(Category.IPHONESCREEN, 24), palette[1]),
+            IlluColors(keyPath(Category.IPHONESCREEN, 43), palette[2]),
+            IlluColors(keyPath(Category.IPHONESCREEN, 48), palette[5]),
+        )
 
+        val illuOnBoarding234AccentColors = listOf(
+            IlluColors(keyPath(Category.IPHONESCREEN, 54), palette[5]),
+            IlluColors(keyPath(Category.IPHONESCREEN, 61), palette[3]),
+            IlluColors(keyPath(Category.IPHONESCREEN, 67), palette[1]),
+            IlluColors(keyPath(Category.IPHONESCREEN, 72), palette[4]),
+        )
+
+        val illuOnBoarding1AccentColors = listOf(
+            IlluColors(keyPath(Category.CHAT, 1, 1), palette[1]),
+            IlluColors(keyPath(Category.CHAT, 1, 2), palette[2]),
+            IlluColors(keyPath(Category.IPHONESCREEN, 55), palette[3]),
+            IlluColors(keyPath(Category.IPHONESCREEN, 61), palette[1]),
+            IlluColors(keyPath(Category.IPHONESCREEN, 66), palette[4]),
+        )
+
+        val illuOnBoarding2AccentColors = listOf(
+            IlluColors(keyPath(Category.NOTIFICATION, 4, 2), palette[5]),
+            IlluColors(keyPath(Category.NOTIFICATION, 11, 2), palette[1]),
+            IlluColors(keyPath(Category.HAND, 1), palette[4]),
+            IlluColors(keyPath(Category.HAND, 4), palette[10]),
+            IlluColors(keyPath(Category.HAND, 5), palette[10]),
+            IlluColors(keyPath(Category.MOVINGNOTIFICATION, 15, 1), palette[1]),
+            IlluColors(keyPath(Category.MOVINGNOTIFICATION, 4, 2), palette[5]),
+            IlluColors(keyPath(Category.MOVINGNOTIFICATION, 11, 2), palette[1]),
+        )
+
+        val illuOnBoarding3AccentColors = listOf(
+            IlluColors(keyPath(Category.NOTIFICATION, 4, 2), palette[1]),
+            IlluColors(keyPath(Category.NOTIFICATION, 5, 2), palette[11]),
+            IlluColors(keyPath(Category.NOTIFICATION, 4, 3), palette[1]),
+            IlluColors(keyPath(Category.NOTIFICATION, 5, 3), palette[11]),
+            IlluColors(keyPath(Category.NOTIFICATION, 4, 4), palette[1]),
+            IlluColors(keyPath(Category.NOTIFICATION, 5, 4), palette[11]),
+            IlluColors(keyPath(Category.HAND, 1), palette[4]),
+            IlluColors(keyPath(Category.HAND, 4), palette[10]),
+            IlluColors(keyPath(Category.HAND, 5), palette[10]),
+            IlluColors(keyPath(Category.STAR, 1, finalLayer = IlluColors.FinalLayer.BORDER), palette[1]),
+            IlluColors(keyPath(Category.BIN, 1, finalLayer = IlluColors.FinalLayer.BORDER), palette[1]),
+            IlluColors(keyPath(Category.BIN, 2, finalLayer = IlluColors.FinalLayer.BORDER), palette[1]),
+            IlluColors(keyPath(Category.BIN, 3, finalLayer = IlluColors.FinalLayer.BORDER), palette[1]),
+            IlluColors(keyPath(Category.BIN, 4, finalLayer = IlluColors.FinalLayer.BORDER), palette[1]),
+            IlluColors(keyPath(Category.BIN, 5, finalLayer = IlluColors.FinalLayer.BORDER), palette[1]),
+            IlluColors(keyPath(Category.BIN, 6, finalLayer = IlluColors.FinalLayer.BORDER), palette[1]),
+            IlluColors(keyPath(Category.CLOCK, 1), palette[1]),
+            IlluColors(keyPath(Category.CLOCK, 2), palette[1]),
+            IlluColors(keyPath(Category.CLOCK, 3), palette[1]),
+            IlluColors(keyPath(Category.CLOCK, 4), palette[1]),
+        )
+
+        val illuOnBoarding4AccentColors = listOf(
+            IlluColors(keyPath(Category.WOMAN, 4), palette[5]),
+            IlluColors(keyPath(Category.MEN, 5), palette[2]),
+            IlluColors(keyPath(Category.POINT, 1, 1), palette[5]),
+            IlluColors(keyPath(Category.POINT, 1, 2), palette[5]),
+            IlluColors(keyPath(Category.POINT, 1, 3), palette[2]),
+            IlluColors(keyPath(Category.POINT, 1, 4), palette[2]),
+            IlluColors(keyPath(Category.LETTER, 1), palette[7]),
+            IlluColors(keyPath(Category.LETTER, 2), palette[8]),
+            IlluColors(keyPath(Category.LETTER, 5), palette[12]),
+            IlluColors(keyPath(Category.LETTER, 6), palette[9]),
+            IlluColors(keyPath(Category.LETTER, 7), palette[9]),
+        )
 
         return IlluOnBoardingColors(
             illuOnBoardingAccentColors,
