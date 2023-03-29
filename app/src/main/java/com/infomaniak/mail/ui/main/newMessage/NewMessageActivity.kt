@@ -31,6 +31,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.databinding.ActivityNewMessageBinding
 import com.infomaniak.mail.ui.ThemedActivity
+import com.infomaniak.mail.utils.createDescriptionDialog
 import com.infomaniak.mail.utils.getAttributeColor
 import com.infomaniak.mail.utils.observeNotNull
 import com.infomaniak.mail.utils.updateNavigationBarColor
@@ -79,7 +80,24 @@ class NewMessageActivity : ThemedActivity() {
             sendButton.isEnabled = it
         }
 
-        sendButton.setOnClickListener { saveDraftAndShowToast(DraftAction.SEND) }
+        sendButton.setOnClickListener { tryToSendEmail() }
+    }
+
+    private fun tryToSendEmail() {
+
+        fun sendEmail() {
+            saveDraftAndShowToast(DraftAction.SEND)
+        }
+
+        if (newMessageViewModel.draft.subject.isNullOrBlank()) {
+            createDescriptionDialog(
+                title = getString(R.string.emailWithoutSubjectTitle),
+                description = getString(R.string.emailWithoutSubjectDescription),
+                onPositiveButtonClicked = { sendEmail() },
+            ).show()
+        } else {
+            sendEmail()
+        }
     }
 
     private fun setupSystemBars() {
