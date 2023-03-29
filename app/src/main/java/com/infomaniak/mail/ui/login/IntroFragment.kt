@@ -41,25 +41,14 @@ import com.infomaniak.mail.data.LocalSettings.AccentColor.BLUE
 import com.infomaniak.mail.data.LocalSettings.AccentColor.PINK
 import com.infomaniak.mail.databinding.FragmentIntroBinding
 import com.infomaniak.mail.ui.login.IlluColors.Category
+import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.blueColors
 import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding1BlueColors
 import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding1Colors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding1PinkColors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding234BlueColors
 import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding234Colors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding234PinkColors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding2BlueColors
 import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding2Colors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding2PinkColors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding3BlueColors
 import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding3Colors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding3PinkColors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding4BlueColors
 import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding4Colors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding4PinkColors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoardingBlueColors
 import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoardingColors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoardingPinkColors
 import com.infomaniak.mail.ui.login.IlluColors.Companion.keyPath
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
 import com.infomaniak.mail.utils.changePathColor
@@ -177,7 +166,11 @@ class IntroFragment : Fragment() {
 
     private fun LottieAnimationView.changeIllustrationColors(position: Int, accentColor: AccentColor) {
         val isDark = requireContext().isNightModeEnabled()
+        updateAccentColorIndependentColors(isDark, position)
+        updateAccentColorDependentColors(accentColor, isDark, position)
+    }
 
+    private fun LottieAnimationView.updateAccentColorIndependentColors(isDark: Boolean, position: Int) {
         illuOnBoardingColors.forEach { changePathColor(it, isDark) }
         when (position) {
             1, 2, 3 -> illuOnBoarding234Colors.forEach { changePathColor(it, isDark) }
@@ -189,56 +182,41 @@ class IntroFragment : Fragment() {
             2 -> illuOnBoarding3Colors.forEach { changePathColor(it, isDark) }
             3 -> illuOnBoarding4Colors.forEach { changePathColor(it, isDark) }
         }
+    }
 
-        if (accentColor == PINK) {
-            illuOnBoardingPinkColors.forEach { changePathColor(it, isDark) }
-            when (position) {
-                1, 2, 3 -> illuOnBoarding234PinkColors.forEach { changePathColor(it, isDark) }
-            }
-            when (position) {
-                0 -> illuOnBoarding1PinkColors.forEach { changePathColor(it, isDark) }
-                1 -> illuOnBoarding2PinkColors.forEach { changePathColor(it, isDark) }
-                2 -> illuOnBoarding3PinkColors.forEach { changePathColor(it, isDark) }
-                3 -> illuOnBoarding4PinkColors.forEach { changePathColor(it, isDark) }
-            }
-        } else if (accentColor == BLUE) {
-            illuOnBoardingBlueColors.forEach { changePathColor(it, isDark) }
-            when (position) {
-                1, 2, 3 -> illuOnBoarding234BlueColors.forEach { changePathColor(it, isDark) }
-            }
-            when (position) {
-                0 -> illuOnBoarding1BlueColors.forEach { changePathColor(it, isDark) }
-                1 -> illuOnBoarding2BlueColors.forEach { changePathColor(it, isDark) }
-                2 -> illuOnBoarding3BlueColors.forEach { changePathColor(it, isDark) }
-                3 -> illuOnBoarding4BlueColors.forEach { changePathColor(it, isDark) }
-            }
-        } else {
-            val (
-                illuOnBoardingAccentColors,
-                illuOnBoarding234AccentColors,
-                illuOnBoarding1AccentColors,
-                illuOnBoarding2AccentColors,
-                illuOnBoarding3AccentColors,
-                illuOnBoarding4AccentColors
-            ) = illuColorsFromAccentColor(accentColor)
+    private fun LottieAnimationView.updateAccentColorDependentColors(
+        accentColor: AccentColor,
+        isDark: Boolean,
+        position: Int
+    ) {
+        val palette = when (accentColor) {
+            PINK -> pinkColors
+            BLUE -> blueColors
+            AccentColor.SYSTEM -> pinkColors // TODO
+        }
 
-            illuOnBoardingAccentColors.forEach { changePathColor(it, isDark) }
-            when (position) {
-                1, 2, 3 -> illuOnBoarding234AccentColors.forEach { changePathColor(it, isDark) }
-            }
-            when (position) {
-                0 -> illuOnBoarding1AccentColors.forEach { changePathColor(it, isDark) }
-                1 -> illuOnBoarding2AccentColors.forEach { changePathColor(it, isDark) }
-                2 -> illuOnBoarding3AccentColors.forEach { changePathColor(it, isDark) }
-                3 -> illuOnBoarding4AccentColors.forEach { changePathColor(it, isDark) }
-            }
+        val (
+            illuOnBoardingAccentColors,
+            illuOnBoarding234AccentColors,
+            illuOnBoarding1AccentColors,
+            illuOnBoarding2AccentColors,
+            illuOnBoarding3AccentColors,
+            illuOnBoarding4AccentColors
+        ) = illuColorsFromPalette(palette)
 
+        illuOnBoardingAccentColors.forEach { changePathColor(it, isDark) }
+        when (position) {
+            1, 2, 3 -> illuOnBoarding234AccentColors.forEach { changePathColor(it, isDark) }
+        }
+        when (position) {
+            0 -> illuOnBoarding1AccentColors.forEach { changePathColor(it, isDark) }
+            1 -> illuOnBoarding2AccentColors.forEach { changePathColor(it, isDark) }
+            2 -> illuOnBoarding3AccentColors.forEach { changePathColor(it, isDark) }
+            3 -> illuOnBoarding4AccentColors.forEach { changePathColor(it, isDark) }
         }
     }
 
-    private fun illuColorsFromAccentColor(accentColor: AccentColor): IlluOnBoardingColors {
-        val palette = pinkColors
-
+    private fun illuColorsFromPalette(palette: List<IlluColors.Colors>): IlluOnBoardingColors {
         val illuOnBoardingAccentColors = listOf(
             IlluColors(keyPath(Category.IPHONESCREEN, 1), palette[0]),
             IlluColors(keyPath(Category.IPHONESCREEN, 2), palette[0]),
@@ -352,7 +330,7 @@ class IntroFragment : Fragment() {
         const val ACCENT_COLOR_PICKER_PAGE = 0
     }
 
-    data class IlluOnBoardingColors(
+    private data class IlluOnBoardingColors(
         val illuOnBoardingAccentColors: List<IlluColors>,
         val illuOnBoarding234AccentColors: List<IlluColors>,
         val illuOnBoarding1AccentColors: List<IlluColors>,
