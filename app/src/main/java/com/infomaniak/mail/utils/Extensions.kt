@@ -344,6 +344,13 @@ fun Fragment.createDescriptionDialog(
     description: String,
     @StringRes confirmButtonText: Int = R.string.buttonConfirm,
     onPositiveButtonClicked: () -> Unit,
+) = requireActivity().createDescriptionDialog(title, description, confirmButtonText, onPositiveButtonClicked)
+
+fun Activity.createDescriptionDialog(
+    title: String,
+    description: String,
+    @StringRes confirmButtonText: Int = R.string.buttonConfirm,
+    onPositiveButtonClicked: () -> Unit,
 ) = with(DialogDescriptionBinding.inflate(layoutInflater)) {
 
     dialogTitle.text = title

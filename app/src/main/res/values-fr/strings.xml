@@ -18,6 +18,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity">
     <string name="accentColorBlueTitle">Bleu</string>
     <string name="accentColorPinkTitle">Rose</string>
+    <string name="accentColorSystemTitle">Couleur du système</string>
     <string name="actionArchive">Archiver</string>
     <string name="actionBlockSender">Bloquer l’expéditeur</string>
     <string name="actionDelete">Supprimer</string>
@@ -115,21 +116,28 @@
     <string name="contactActionWriteEmail">Écrire un e-mail</string>
     <string name="contactMe">Moi</string>
     <string name="contactsSearch">Contacts</string>
+    <string name="contentDescriptionAccountSelection">Compte sélectionné</string>
     <string name="contentDescriptionButtonBack">Retour</string>
+    <string name="contentDescriptionButtonDelete">Supprimer %s</string>
     <string name="contentDescriptionButtonDeleteDraft">Supprimer le brouillon</string>
     <string name="contentDescriptionButtonExpandAccountSelection">Déplier la sélection de compte</string>
     <string name="contentDescriptionButtonExpandCustomFolders">Déplier les dossiers personnalisés</string>
     <string name="contentDescriptionButtonExpandHeader">Déplier l’entête</string>
+    <string name="contentDescriptionButtonExpandRecipients">Voir les détails</string>
     <string name="contentDescriptionButtonFilterSearch">Filtrer la recherche</string>
     <string name="contentDescriptionButtonMenu">Menu</string>
     <string name="contentDescriptionButtonNext">Suivant</string>
+    <string name="contentDescriptionButtonOpenSystemSettings">Ouvrir les paramètres de notification du système</string>
     <string name="contentDescriptionButtonSettings">Paramètres</string>
+    <string name="contentDescriptionDownloadIndicator">Téléchargement</string>
     <string name="contentDescriptionIconAttachments">Contient des pièces jointes</string>
     <string name="contentDescriptionIconCalendar">Contient un évènement Calendar</string>
     <string name="contentDescriptionIconFavorite">Est favori</string>
     <string name="contentDescriptionIconFolderSelected">Dossier sélectionné</string>
     <string name="contentDescriptionIconNewMail">Nouveau</string>
     <string name="contentDescriptionIconStorage">État du stockage</string>
+    <string name="contentDescriptionOpenMailActions">Ouvrir les actions du message</string>
+    <string name="contentDescriptionSelectedItem">Sélectionné</string>
     <string name="contentDescriptionUserAvatar">Avatar de l’utilisateur</string>
     <string name="createFolderName">Nom du dossier</string>
     <string name="createFolderNoParent">Aucun</string>
@@ -137,6 +145,8 @@
     <string name="dateTitle">Date :</string>
     <string name="draftFolder">Brouillons</string>
     <string name="draftPrefix">(Brouillon)</string>
+    <string name="emailWithoutSubjectDescription">Vous êtes sur le point d\'envoyer un message sans objet. Voulez-vous continuer ?</string>
+    <string name="emailWithoutSubjectTitle">Objet vide</string>
     <string name="emptyStateFolderDescription">Il n’y a rien à voir par ici.</string>
     <string name="emptyStateFolderTitle">Ce dossier est vide</string>
     <string name="emptyStateHistoryDescription">Lancez votre recherche par contact ou par mots clés</string>

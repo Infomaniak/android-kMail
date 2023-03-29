@@ -18,6 +18,7 @@
 <resources>
     <string name="accentColorBlueTitle">Blu</string>
     <string name="accentColorPinkTitle">Rosa</string>
+    <string name="accentColorSystemTitle">Colore del sistema</string>
     <string name="actionArchive">Archivio</string>
     <string name="actionBlockSender">Bloccare il mittente</string>
     <string name="actionDelete">Cancellare</string>
@@ -114,21 +115,28 @@
     <string name="contactActionWriteEmail">Scrivere un’e-mail</string>
     <string name="contactMe">Me</string>
     <string name="contactsSearch">Contatti</string>
+    <string name="contentDescriptionAccountSelection">Conto selezionato</string>
     <string name="contentDescriptionButtonBack">Indietro</string>
+    <string name="contentDescriptionButtonDelete">Cancellare %s</string>
     <string name="contentDescriptionButtonDeleteDraft">Cancellare la bozza</string>
     <string name="contentDescriptionButtonExpandAccountSelection">Ampliare la selezione dei conti</string>
     <string name="contentDescriptionButtonExpandCustomFolders">Espandere le cartelle personalizzate</string>
     <string name="contentDescriptionButtonExpandHeader">Espandi intestazione</string>
+    <string name="contentDescriptionButtonExpandRecipients">Vedi dettagli</string>
     <string name="contentDescriptionButtonFilterSearch">Filtro di ricerca</string>
     <string name="contentDescriptionButtonMenu">Menu</string>
     <string name="contentDescriptionButtonNext">Avanti</string>
+    <string name="contentDescriptionButtonOpenSystemSettings">Aprire le impostazioni di notifica del sistema</string>
     <string name="contentDescriptionButtonSettings">Impostazioni</string>
+    <string name="contentDescriptionDownloadIndicator">Scaricare</string>
     <string name="contentDescriptionIconAttachments">Dispone di allegati</string>
     <string name="contentDescriptionIconCalendar">Ha un evento di calendario</string>
     <string name="contentDescriptionIconFavorite">È il preferito</string>
     <string name="contentDescriptionIconFolderSelected">Cartella selezionata</string>
     <string name="contentDescriptionIconNewMail">Nuovo</string>
     <string name="contentDescriptionIconStorage">Stato di conservazione</string>
+    <string name="contentDescriptionOpenMailActions">Azioni di apertura dei messaggi</string>
+    <string name="contentDescriptionSelectedItem">Selezionato</string>
     <string name="contentDescriptionUserAvatar">Avatar utente</string>
     <string name="createFolderName">Nome della cartella</string>
     <string name="createFolderNoParent">Nessuno</string>
@@ -136,6 +144,8 @@
     <string name="dateTitle">Data:</string>
     <string name="draftFolder">Bozze</string>
     <string name="draftPrefix">(Bozza)</string>
+    <string name="emailWithoutSubjectDescription">State per inviare un messaggio senza oggetto. Volete continuare?</string>
+    <string name="emailWithoutSubjectTitle">Oggetto vuoto</string>
     <string name="emptyStateFolderDescription">Non c’è nulla da vedere qui.</string>
     <string name="emptyStateFolderTitle">Questa cartella è vuota</string>
     <string name="emptyStateHistoryDescription">Ricerca per contatto o parole chiave</string>
