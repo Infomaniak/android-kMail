@@ -170,12 +170,13 @@ fun Context.formatSubject(subject: String?): String {
     }
 }
 
-fun Context.injectCssInHtml(@RawRes cssResId: Int, html: String, id: String? = null): String {
+fun Context.injectCssInHtml(@RawRes cssResId: Int, html: String, styleId: String? = null): String {
     val css = readRawResource(cssResId)
     return with(Jsoup.parse(html)) {
-        head().appendElement("style").attr("type", "text/css").appendText(css).also { element ->
-            id?.let { element.id(it) }
-        }
+        head().appendElement("style")
+            .attr("type", "text/css")
+            .appendText(css)
+            .also { element -> styleId?.let(element::id) }
         html()
     }
 }

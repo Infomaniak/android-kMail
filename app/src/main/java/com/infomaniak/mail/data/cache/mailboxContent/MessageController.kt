@@ -183,7 +183,7 @@ object MessageController {
 
         fetchFolderMessagesJob?.cancel()
         val job = async {
-            val impactedCurrentFolderThreads = fetchFolderMessages(this, mailbox, folder, okHttpClient, realm)
+            val impactedCurrentFolderThreads = fetchFolderMessages(scope = this, mailbox, folder, okHttpClient, realm)
 
             val roles = when (folder.role) {
                 FolderRole.INBOX -> listOf(FolderRole.SENT, FolderRole.DRAFT)
@@ -194,7 +194,7 @@ object MessageController {
 
             roles.forEach { role ->
                 FolderController.getFolder(role)?.let { folder ->
-                    fetchFolderMessages(this, mailbox, folder, okHttpClient, realm)
+                    fetchFolderMessages(scope = this, mailbox, folder, okHttpClient, realm)
                 }
             }
 

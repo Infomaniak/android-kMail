@@ -52,7 +52,7 @@ class MainActivity : ThemedActivity() {
     val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private val mainViewModel: MainViewModel by viewModels()
 
-    private val permissionUtils by lazy { PermissionUtils(this).also { registerMainPermissions(it) } }
+    private val permissionUtils by lazy { PermissionUtils(this).also(::registerMainPermissions) }
 
     private val backgroundColor: Int by lazy { getColor(R.color.backgroundColor) }
     private val backgroundHeaderColor: Int by lazy { getColor(R.color.backgroundHeaderColor) }
