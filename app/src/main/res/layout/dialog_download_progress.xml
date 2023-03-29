@@ -38,7 +38,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/marginStandardMedium"
-        android:contentDescription="downloading"
+        android:contentDescription="@string/contentDescriptionDownloadIndicator"
         android:indeterminate="true"
         app:indicatorColor="@color/primary"
         app:layout_constraintBottom_toBottomOf="@id/icon"

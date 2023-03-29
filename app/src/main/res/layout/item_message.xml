@@ -123,7 +123,6 @@
                 style="@style/TextButton"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:importantForAccessibility="no"
                 app:cornerRadius="@dimen/smallCornerRadius"
                 app:layout_constraintBottom_toBottomOf="@id/recipientLayout"
                 app:layout_constraintEnd_toEndOf="@id/recipientLayout"

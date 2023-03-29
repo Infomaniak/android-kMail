@@ -91,7 +91,7 @@
                         android:id="@+id/selectedAddressIcon"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:contentDescription="Selected account"
+                        android:contentDescription="@string/contentDescriptionAccountSelection"
                         android:src="@drawable/ic_envelope"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"

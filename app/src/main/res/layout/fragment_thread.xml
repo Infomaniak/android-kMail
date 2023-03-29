@@ -54,6 +54,7 @@
                 android:id="@+id/iconFavorite"
                 style="@style/IconButton"
                 android:layout_marginEnd="@dimen/marginStandardMedium"
+                android:contentDescription="@string/actionStar"
                 app:icon="@drawable/ic_star"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

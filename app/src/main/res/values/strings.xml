@@ -84,6 +84,7 @@
     <string name="buttonClose">Close</string>
     <string name="buttonConfirm">Confirm</string>
     <string name="buttonConfirmRestoreEmails">Restore</string>
+    <string name="buttonContinue">Continue</string>
     <string name="buttonCreate">Create</string>
     <string name="buttonCreateAccount">Create an account</string>
     <string name="buttonCreateFolder">Add a folder</string>
@@ -126,6 +127,8 @@
     <string name="contentDescriptionButtonBack">Back</string>
     <string name="contentDescriptionButtonDelete">Delete %s</string>
     <string name="contentDescriptionButtonDeleteDraft">Delete draft</string>
+    <string name="contentDescriptionButtonDeleteHistory">Delete history entry</string>
+    <string name="contentDescriptionButtonDeleteSignature">Delete signature</string>
     <string name="contentDescriptionButtonExpandAccountSelection">Expand account selection</string>
     <string name="contentDescriptionButtonExpandCustomFolders">Expand custom folders</string>
     <string name="contentDescriptionButtonExpandHeader">Expand header</string>

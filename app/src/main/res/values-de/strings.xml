@@ -77,6 +77,7 @@
     <string name="buttonClose">Schliessen Sie</string>
     <string name="buttonConfirm">Bestätigen Sie</string>
     <string name="buttonConfirmRestoreEmails">Wiederherstellen</string>
+    <string name="buttonContinue">Weiter</string>
     <string name="buttonCreate">erstellen.</string>
     <string name="buttonCreateAccount">Ein Konto erstellen</string>
     <string name="buttonCreateFolder">Einen Ordner hinzufügen</string>
@@ -119,6 +120,8 @@
     <string name="contentDescriptionButtonBack">Zurück</string>
     <string name="contentDescriptionButtonDelete">%s löschen</string>
     <string name="contentDescriptionButtonDeleteDraft">Entwurf löschen</string>
+    <string name="contentDescriptionButtonDeleteHistory">Historieneintrag löschen</string>
+    <string name="contentDescriptionButtonDeleteSignature">Unterschrift löschen</string>
     <string name="contentDescriptionButtonExpandAccountSelection">Kontoauswahl erweitern</string>
     <string name="contentDescriptionButtonExpandCustomFolders">Erweitern von benutzerdefinierten Ordnern</string>
     <string name="contentDescriptionButtonExpandHeader">Kopfzeile erweitern</string>
