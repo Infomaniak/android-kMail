@@ -20,10 +20,7 @@ package com.infomaniak.mail.ui.main.search
 import android.app.Application
 import android.content.Context
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.trackSearchEvent
@@ -47,11 +44,14 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
 
     private inline val context: Context get() = getApplication()
 
-    private val searchQuery = MutableStateFlow("")
+    private val _searchQuery = MutableLiveData("")
     private val _selectedFilters = MutableStateFlow(emptySet<ThreadFilter>())
-    private var _selectedFolder = MutableStateFlow<Folder?>(null)
+    private val _selectedFolder = MutableStateFlow<Folder?>(null)
+
+    private val searchQuery: String get() = _searchQuery.value!!
     private inline val selectedFilters get() = _selectedFilters.value.toMutableSet()
     val selectedFolder: Folder? get() = _selectedFolder.value
+
     val visibilityMode = MutableLiveData(VisibilityMode.RECENT_SEARCHES)
     val history = SingleLiveEvent<String>()
 
@@ -59,6 +59,7 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
 
     /** It is simply used as a default value for the API */
     private lateinit var dummyFolderId: String
+
     private var resourceNext: String? = null
     private var resourcePrevious: String? = null
 
@@ -73,21 +74,23 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
     var previousMutuallyExclusiveChips: Int? = null
     var previousAttachments: Boolean? = null
 
-    private fun observeSearchAndFilters() = combine(searchQuery, _selectedFilters, _selectedFolder) { query, filters, folder ->
-        Triple(query, filters, folder)
-    }.debounce(SEARCH_DEBOUNCE_DURATION)
+    private fun observeSearchAndFilters(): Flow<Triple<String, Set<ThreadFilter>, Folder?>> {
+        return combine(_searchQuery.asFlow(), _selectedFilters, _selectedFolder) { query, filters, folder ->
+            Triple(query, filters, folder)
+        }.debounce(SEARCH_DEBOUNCE_DURATION)
+    }
 
     fun init(dummyFolderId: String) {
         this.dummyFolderId = dummyFolderId
     }
 
     fun refreshSearch() {
-        searchQuery(searchQuery.value)
+        searchQuery(searchQuery)
     }
 
     fun searchQuery(query: String, resetPagination: Boolean = true) {
         if (resetPagination) resetPagination()
-        searchQuery.value = query
+        _searchQuery.value = query
     }
 
     fun selectFolder(folder: Folder?) {
@@ -114,7 +117,7 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
 
     fun nextPage() {
         if (isLastPage) return
-        searchQuery(query = searchQuery.value, resetPagination = false)
+        searchQuery(query = searchQuery, resetPagination = false)
     }
 
     override fun onCleared() {
@@ -177,7 +180,7 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
             query?.let(history::postValue)
             it.list.also { threads ->
                 val resultsVisibilityMode = when {
-                    selectedFilters.isEmpty() && isLengthTooShort(searchQuery.value) && folder == null -> VisibilityMode.RECENT_SEARCHES
+                    selectedFilters.isEmpty() && isLengthTooShort(searchQuery) && folder == null -> VisibilityMode.RECENT_SEARCHES
                     threads.isEmpty() -> VisibilityMode.NO_RESULTS
                     else -> VisibilityMode.RESULTS
                 }
