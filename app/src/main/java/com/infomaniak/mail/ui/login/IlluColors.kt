@@ -17,15 +17,47 @@
  */
 package com.infomaniak.mail.ui.login
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.annotation.ColorInt
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.model.KeyPath
+import com.google.android.material.color.utilities.Hct
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.utils.changePathColor
 
 object IlluColors {
+
+    private val lightTones = listOf(
+        40,
+        79,
+        87,
+        29,
+        47,
+        64,
+        60,
+        48,
+        49,
+        26,
+        95,
+        98,
+    )
+
+    val darkTones = listOf(
+        40,
+        79,
+        87,
+        29,
+        47,
+        64,
+        60,
+        48,
+        49,
+        26,
+        95,
+        98,
+    )
 
     fun LottieAnimationView.changeIllustrationColors(position: Int, accentColor: LocalSettings.AccentColor) {
         updateAccentColorIndependentColors(position)
@@ -170,11 +202,23 @@ object IlluColors {
         colorPaths(pathsToColor, position)
     }
 
+    @SuppressLint("RestrictedApi")
     fun Context.getPaletteFor(accentColor: LocalSettings.AccentColor): IntArray {
         return when (accentColor) {
             LocalSettings.AccentColor.PINK -> resources.getIntArray(R.array.pinkColors)
             LocalSettings.AccentColor.BLUE -> resources.getIntArray(R.array.blueColors)
-            LocalSettings.AccentColor.SYSTEM -> resources.getIntArray(R.array.pinkColors) // TODO : Generate palette from system theme
+            LocalSettings.AccentColor.SYSTEM -> {
+                val primary = LocalSettings.AccentColor.SYSTEM.getPrimary(this)
+                val primaryColor = Hct.fromInt(primary)
+
+                val palette = lightTones.map {
+                    val color = Hct.from(primaryColor.hue, primaryColor.chroma, primaryColor.tone)
+                    color.tone = it.toDouble()
+                    color.toInt()
+                }
+
+                return palette.toIntArray()
+            }
         }
     }
 
