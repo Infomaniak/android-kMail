@@ -35,8 +35,7 @@
             <com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
                 android:id="@+id/radioGroup"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:ignoreDividers="true">
+                android:layout_height="wrap_content">
 
                 <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
                     android:id="@+id/delete"
