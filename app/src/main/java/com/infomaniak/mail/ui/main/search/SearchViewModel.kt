@@ -44,11 +44,11 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
 
     private inline val context: Context get() = getApplication()
 
-    private val _searchQuery = MutableLiveData("")
+    private val _searchQuery = MutableLiveData("" to false)
     private val _selectedFilters = MutableStateFlow(emptySet<ThreadFilter>())
     private val _selectedFolder = MutableStateFlow<Folder?>(null)
 
-    private val searchQuery: String get() = _searchQuery.value!!
+    val searchQuery: String get() = _searchQuery.value!!.first
     private inline val selectedFilters get() = _selectedFilters.value.toMutableSet()
     val selectedFolder: Folder? get() = _selectedFolder.value
 
@@ -66,15 +66,20 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
     private val isLastPage get() = resourceNext.isNullOrBlank()
 
     val searchResults = observeSearchAndFilters().flatMapLatest { (query, filters, folder) ->
-        val searchQuery = if (isLengthTooShort(query)) null else query
-        fetchThreads(searchQuery, filters, folder)
+        val (searchQuery, saveInHistory) = query
+        fetchThreads(
+            query = if (isLengthTooShort(searchQuery)) null else searchQuery,
+            saveInHistory,
+            filters,
+            folder,
+        )
     }.asLiveData(coroutineContext)
 
     var previousSearch: String? = null
     var previousMutuallyExclusiveChips: Int? = null
     var previousAttachments: Boolean? = null
 
-    private fun observeSearchAndFilters(): Flow<Triple<String, Set<ThreadFilter>, Folder?>> {
+    private fun observeSearchAndFilters(): Flow<Triple<Pair<String, Boolean>, Set<ThreadFilter>, Folder?>> {
         return combine(_searchQuery.asFlow(), _selectedFilters, _selectedFolder) { query, filters, folder ->
             Triple(query, filters, folder)
         }.debounce(SEARCH_DEBOUNCE_DURATION)
@@ -88,9 +93,9 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
         searchQuery(searchQuery)
     }
 
-    fun searchQuery(query: String, resetPagination: Boolean = true) {
+    fun searchQuery(query: String, resetPagination: Boolean = true, saveInHistory: Boolean = false) {
         if (resetPagination) resetPagination()
-        _searchQuery.value = query
+        _searchQuery.value = query to saveInHistory
     }
 
     fun selectFolder(folder: Folder?) {
@@ -143,7 +148,12 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
 
     private fun isLengthTooShort(query: String?) = query == null || query.length < MIN_SEARCH_QUERY
 
-    private fun fetchThreads(query: String?, filters: Set<ThreadFilter>, folder: Folder?): Flow<List<Thread>> = flow {
+    private fun fetchThreads(
+        query: String?,
+        saveInHistory: Boolean,
+        filters: Set<ThreadFilter>,
+        folder: Folder?,
+    ): Flow<List<Thread>> = flow {
 
         suspend fun ApiResponse<ThreadResult>.initSearchFolderThreads() {
             runCatching {
@@ -178,7 +188,7 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
         }
 
         emitAll(ThreadController.getSearchThreadsAsync().mapLatest {
-            query?.let(history::postValue)
+            if (saveInHistory) query?.let(history::postValue)
             it.list.also { threads ->
                 val resultsVisibilityMode = when {
                     newFilters.isEmpty() && isLengthTooShort(searchQuery) -> VisibilityMode.RECENT_SEARCHES
