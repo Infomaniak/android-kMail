@@ -231,6 +231,8 @@ class Message : RealmObject {
         folderId = this@Message.folderId
     }
 
+    fun isOrphan(): Boolean = threads.isEmpty() && threadsDuplicatedIn.isEmpty()
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is Message || uid != other.uid) return false

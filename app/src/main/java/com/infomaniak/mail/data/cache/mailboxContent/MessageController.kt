@@ -223,8 +223,12 @@ object MessageController {
 
         val impactedCurrentFolderThreads = handleMessagesUids(scope, messagesUids, folder, mailbox, okHttpClient, realm)
 
-        SentryDebug.sendOrphanMessages(previousCursor, folder, realm)
-        SentryDebug.sendOrphanThreads(previousCursor, folder, realm)
+        realm.writeBlocking {
+            findLatest(folder)?.let {
+                SentryDebug.sendOrphanMessages(previousCursor, folder = it)
+                SentryDebug.sendOrphanThreads(previousCursor, folder = it, realm = this)
+            }
+        }
 
         return impactedCurrentFolderThreads
     }
@@ -338,12 +342,12 @@ object MessageController {
             scope.ensureActive()
 
             val existingMessage = folder.messages.firstOrNull { it == message }
-            if (existingMessage != null) {
+            if (existingMessage == null) {
+                folder.messages.add(message)
+            } else if (!existingMessage.isOrphan()) {
                 SentryDebug.sendAlreadyExistingMessage(folder, existingMessage, message)
                 return@forEach
             }
-
-            folder.messages.add(message)
 
             message.initMessageIds()
             message.isSpam = folder.role == FolderRole.SPAM
