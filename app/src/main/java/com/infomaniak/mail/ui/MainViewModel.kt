@@ -227,12 +227,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }
 
-            Log.d(TAG, "Force refresh quotas")
-            val mailbox = currentMailbox.value!!
-            updateMailboxQuotas(mailbox)
+            _currentMailboxObjectId.value?.let(MailboxController::getMailbox)?.let { mailbox ->
+                Log.d(TAG, "Force refresh quotas")
+                updateMailboxQuotas(mailbox)
 
-            Log.d(TAG, "Force refresh folders")
-            updateFolders(mailbox)
+                Log.d(TAG, "Force refresh folders")
+                updateFolders(mailbox)
+            }
         }
     }
 
