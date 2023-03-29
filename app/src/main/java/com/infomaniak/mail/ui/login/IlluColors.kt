@@ -28,6 +28,7 @@ import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.blueColor3
 import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.blueColor4
 import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.blueColor5
 import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.blueColor6
+import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.blueColor7
 import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.blueColor8
 import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.blueColor9
 import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.commonColor1
@@ -42,18 +43,17 @@ import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.commonColor7
 import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.commonColor8
 import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.commonColor9
 import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor1
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor7
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor8
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor13
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor9
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor6
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor3_temp
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor2
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor5
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor3
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor4
 import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor11
 import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor12
+import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor13
+import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor2
+import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor3
+import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor4
+import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor5
+import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor6
+import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor7
+import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor8
+import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor9
 
 class IlluColors(val keyPath: KeyPath, val color: Colors) {
     fun getLightColor() = Color.parseColor(color.light)
@@ -83,7 +83,6 @@ class IlluColors(val keyPath: KeyPath, val color: Colors) {
             val pinkColor7 = Colors("#FF4388", "#B80043")
             val pinkColor8 = Colors("#D81B60", "#FB2C77")
             val pinkColor9 = Colors("#E10B59", "#DC1A60")
-            val pinkColor10 = Colors("#F789B2", "#F789B2")
             val pinkColor11 = Colors("#693D51", "#CA799E")
             val pinkColor12 = Colors("#F7E8EF", "#282828")
             val pinkColor13 = Colors("#FAF0F0", "#F1DDDD")
@@ -115,7 +114,6 @@ class IlluColors(val keyPath: KeyPath, val color: Colors) {
             val blueColor7 = Colors("#5AC4FF", "#6DCBFF")
             val blueColor8 = Colors("#0A85C9", "#0A85C9")
             val blueColor9 = Colors("#0875A5", "#0875A5")
-            val blueColor10 = Colors("#74B4D1", "#74B4D1")
             val blueColor11 = Colors("#0B3547", "#266E8D")
             val blueColor12 = Colors("#EAF8FE", "#282828")
             val blueColor13 = Colors("#F7FCFF", "#E8F6FF")
@@ -190,7 +188,7 @@ class IlluColors(val keyPath: KeyPath, val color: Colors) {
             IlluColors(keyPath(Category.IPHONESCREEN, 5), pinkColor1),
             IlluColors(keyPath(Category.IPHONESCREEN, 6), pinkColor1),
             IlluColors(keyPath(Category.IPHONESCREEN, 9), pinkColor6),
-            IlluColors(keyPath(Category.IPHONESCREEN, 12), pinkColor3_temp),
+            IlluColors(keyPath(Category.IPHONESCREEN, 12), pinkColor1),
             IlluColors(keyPath(Category.IPHONESCREEN, 15), pinkColor1),
             IlluColors(keyPath(Category.IPHONESCREEN, 19), pinkColor1),
             IlluColors(keyPath(Category.IPHONESCREEN, 20), pinkColor1),
@@ -389,7 +387,7 @@ class IlluColors(val keyPath: KeyPath, val color: Colors) {
             IlluColors(keyPath(Category.POINT, 1, 2), pinkColor5),
             IlluColors(keyPath(Category.POINT, 1, 3), pinkColor2),
             IlluColors(keyPath(Category.POINT, 1, 4), pinkColor2),
-            IlluColors(keyPath(Category.LETTER, 1), pinkColor7), // TODO : Incorrect between blue and pink
+            IlluColors(keyPath(Category.LETTER, 1), pinkColor7),
             IlluColors(keyPath(Category.LETTER, 2), pinkColor8),
             IlluColors(keyPath(Category.LETTER, 5), pinkColor13),
             IlluColors(keyPath(Category.LETTER, 6), pinkColor9),
@@ -402,7 +400,7 @@ class IlluColors(val keyPath: KeyPath, val color: Colors) {
             IlluColors(keyPath(Category.POINT, 1, 2), blueColor5),
             IlluColors(keyPath(Category.POINT, 1, 3), blueColor2),
             IlluColors(keyPath(Category.POINT, 1, 4), blueColor2),
-            IlluColors(keyPath(Category.LETTER, 1), blueColor6), // TODO : Incorrect between blue and pink
+            IlluColors(keyPath(Category.LETTER, 1), blueColor7),
             IlluColors(keyPath(Category.LETTER, 2), blueColor8),
             IlluColors(keyPath(Category.LETTER, 5), blueColor13),
             IlluColors(keyPath(Category.LETTER, 6), blueColor9),
