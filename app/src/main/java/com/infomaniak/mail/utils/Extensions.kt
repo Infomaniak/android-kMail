@@ -200,10 +200,9 @@ fun LottieAnimationView.repeatFrame(firstFrame: Int, lastFrame: Int) {
     })
 }
 
-fun LottieAnimationView.changePathColor(illuColors: IlluColors, isDark: Boolean) {
-    val color = if (isDark) illuColors.getDarkColor() else illuColors.getLightColor()
+fun LottieAnimationView.changePathColor(illuColors: IlluColors) {
     addValueCallback(illuColors.keyPath, LottieProperty.COLOR_FILTER) {
-        SimpleColorFilter(color)
+        SimpleColorFilter(illuColors.color)
     }
 }
 

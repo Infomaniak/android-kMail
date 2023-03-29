@@ -20,10 +20,8 @@ package com.infomaniak.mail.ui.login
 import android.os.Bundle
 import com.infomaniak.lib.core.utils.Utils.lockOrientationForSmallScreens
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
-import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.mail.BuildConfig.SHOP_URL
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.ActivityNoMailboxBinding
 import com.infomaniak.mail.ui.ThemedActivity
 import com.infomaniak.mail.utils.changePathColor
@@ -42,14 +40,11 @@ class NoMailboxActivity : ThemedActivity() {
 
             setContentView(root)
 
-            val isNightModeEnabled = isNightModeEnabled()
-
             noMailboxIconLayout.apply {
-                IlluColors.illuNoMailboxColors.forEach { changePathColor(it, isNightModeEnabled) }
+                getAccentIndependentSleeveColors().forEach { changePathColor(it) }
 
-                val isPink = LocalSettings.getInstance(this@NoMailboxActivity).accentColor == LocalSettings.AccentColor.PINK
-                val sleeveColors = if (isPink) IlluColors.illuNoMailboxPinkColor else IlluColors.illuNoMailboxBlueColor
-                sleeveColors.forEach { changePathColor(it, isNightModeEnabled) }
+                // val sleeveColors = if (isPink) IlluColors.illuNoMailboxPinkColor else IlluColors.illuNoMailboxBlueColor
+                getAccentDependentSleeveColors().forEach { changePathColor(it) }
 
                 setAnimation(R.raw.illu_no_mailbox)
                 repeatFrame(42, 112)
@@ -62,5 +57,28 @@ class NoMailboxActivity : ThemedActivity() {
 
             connectAnotherAccountButton.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
         }
+    }
+
+    private fun getAccentIndependentSleeveColors(): List<IlluColors> {
+        val commonColor2 = getColor(R.color.commonColor2)
+        val commonColor5 = getColor(R.color.commonColor5)
+        val commonColor11 = getColor(R.color.commonColor11)
+
+        return listOf(
+            IlluColors(IlluColors.keyPath(IlluColors.Category.LINK, 1), commonColor11),
+            IlluColors(IlluColors.keyPath(IlluColors.Category.IPHONESCREEN, 1), commonColor5),
+            IlluColors(IlluColors.keyPath(IlluColors.Category.IPHONESCREEN, 2), commonColor2),
+        )
+    }
+
+    private fun getAccentDependentSleeveColors(): List<IlluColors> {
+        val pinkColor4 = resources.getIntArray(R.array.pinkColors)[4] // TODO : Use palette
+        val pinkColor10 = resources.getIntArray(R.array.pinkColors)[10]
+
+        return listOf(
+            IlluColors(IlluColors.keyPath(IlluColors.Category.HAND, 1), pinkColor4),
+            IlluColors(IlluColors.keyPath(IlluColors.Category.HAND, 4), pinkColor10),
+            IlluColors(IlluColors.keyPath(IlluColors.Category.HAND, 5), pinkColor10),
+        )
     }
 }
