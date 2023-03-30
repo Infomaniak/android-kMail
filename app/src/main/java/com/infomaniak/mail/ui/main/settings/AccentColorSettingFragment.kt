@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui.main.settings
 
 import android.graphics.drawable.GradientDrawable
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -26,6 +25,7 @@ import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
 import com.google.android.material.color.DynamicColors
+import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -68,7 +68,7 @@ class AccentColorSettingFragment : Fragment() {
             return@with
         }
 
-        val dynamicPrimaryColor = SYSTEM.getPrimary(requireContext())
+        val dynamicPrimaryColor = SYSTEM.getPrimary(context)
         systemRadioButton.apply {
             setCheckMarkColor(dynamicPrimaryColor)
             setIcon(GradientDrawable().apply {

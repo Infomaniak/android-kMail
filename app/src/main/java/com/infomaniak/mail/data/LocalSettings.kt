@@ -152,7 +152,7 @@ class LocalSettings private constructor(context: Context) {
 
         fun getOnboardingSecondaryBackground(context: Context): Int {
             val baseThemeContext = ContextThemeWrapper(context, theme)
-            return baseThemeContext.getColor(R.color.boarding_secondary_background)
+            return baseThemeContext.getColor(R.color.onboarding_secondary_background)
         }
 
         fun getRipple(context: Context): Int {
