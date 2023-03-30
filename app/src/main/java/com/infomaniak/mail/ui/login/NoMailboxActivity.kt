@@ -45,8 +45,8 @@ class NoMailboxActivity : ThemedActivity() {
             setContentView(root)
 
             noMailboxIconLayout.apply {
-                getAccentIndependentSleeveColors().forEach { changePathColor(it) }
-                getAccentDependentSleeveColors().forEach { changePathColor(it) }
+                getAccentIndependentIlluColors().forEach(::changePathColor)
+                getAccentDependentIlluColors().forEach(::changePathColor)
                 setAnimation(R.raw.illu_no_mailbox)
                 repeatFrame(42, 112)
             }
@@ -60,7 +60,7 @@ class NoMailboxActivity : ThemedActivity() {
         }
     }
 
-    private fun getAccentIndependentSleeveColors(): List<IlluColors> {
+    private fun getAccentIndependentIlluColors(): List<IlluColors> {
         val commonColor2 = getColor(R.color.commonColor2)
         val commonColor5 = getColor(R.color.commonColor5)
         val commonColor11 = getColor(R.color.commonColor11)
@@ -72,7 +72,7 @@ class NoMailboxActivity : ThemedActivity() {
         )
     }
 
-    private fun getAccentDependentSleeveColors(): List<IlluColors> {
+    private fun getAccentDependentIlluColors(): List<IlluColors> {
         val colors = getPaletteFor(LocalSettings.getInstance(this).accentColor)
         val pinkColor4 = colors[4]
         val pinkColor10 = colors[10]
