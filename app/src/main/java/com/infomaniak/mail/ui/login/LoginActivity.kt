@@ -153,7 +153,7 @@ class LoginActivity : AppCompatActivity() {
             )
         }
 
-        introViewModel.currentAccentColor.observe(this@LoginActivity) { (newAccentColor, oldAccentColor) ->
+        introViewModel.updatedAccentColor.observe(this@LoginActivity) { (newAccentColor, oldAccentColor) ->
             updateUi(newAccentColor, oldAccentColor)
         }
 

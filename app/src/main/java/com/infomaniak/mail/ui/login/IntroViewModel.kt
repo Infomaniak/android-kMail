@@ -24,7 +24,7 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.AccentColor
 
 class IntroViewModel(application: Application) : AndroidViewModel(application) {
-    var currentAccentColor: MutableLiveData<Pair<AccentColor, AccentColor>> = MutableLiveData(
+    var updatedAccentColor: MutableLiveData<Pair<AccentColor, AccentColor>> = MutableLiveData(
         LocalSettings.getInstance(application).accentColor to LocalSettings.getInstance(application).accentColor
     )
 }

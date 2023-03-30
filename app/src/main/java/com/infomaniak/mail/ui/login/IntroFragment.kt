@@ -20,7 +20,6 @@ package com.infomaniak.mail.ui.login
 import android.content.Context
 import android.content.res.ColorStateList
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -81,7 +80,7 @@ class IntroFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
         when (navigationArgs.position) {
-            0 -> introViewModel.currentAccentColor.value?.let { (newAccentColor, _) ->
+            0 -> introViewModel.updatedAccentColor.value?.let { (newAccentColor, _) ->
                 pinkBlueSwitch.isVisible = true
 
                 if (!DynamicColors.isDynamicColorAvailable()) {
@@ -151,12 +150,12 @@ class IntroFragment : Fragment() {
         lifecycleScope.launch(Dispatchers.IO) {
             val duration = resources.getInteger(R.integer.loginLayoutAnimationDuration).toLong()
             delay(duration)
-            introViewModel.currentAccentColor.postValue(newAccentColor to oldAccentColor)
+            introViewModel.updatedAccentColor.postValue(newAccentColor to oldAccentColor)
         }
     }
 
     private fun updateUiWhenThemeChanges(position: Int) {
-        introViewModel.currentAccentColor.observe(viewLifecycleOwner) { (newAccentColor, oldAccentColor) ->
+        introViewModel.updatedAccentColor.observe(viewLifecycleOwner) { (newAccentColor, oldAccentColor) ->
             setUi(newAccentColor, oldAccentColor, position)
         }
     }
