@@ -27,6 +27,7 @@ import androidx.core.view.isVisible
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.mail.MatomoMail.ACTION_POSTPONE_NAME
 import com.infomaniak.mail.MatomoMail.trackEvent
+import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.databinding.ActivityNewMessageBinding
@@ -90,11 +91,15 @@ class NewMessageActivity : ThemedActivity() {
         }
 
         if (newMessageViewModel.draft.subject.isNullOrBlank()) {
+            trackNewMessageEvent("sendWithoutSubject")
             createDescriptionDialog(
                 title = getString(R.string.emailWithoutSubjectTitle),
                 description = getString(R.string.emailWithoutSubjectDescription),
                 confirmButtonText = R.string.buttonContinue,
-                onPositiveButtonClicked = { sendEmail() },
+                onPositiveButtonClicked = {
+                    trackNewMessageEvent("sendWithoutSubjectConfirm")
+                    sendEmail()
+                },
             ).show()
         } else {
             sendEmail()
