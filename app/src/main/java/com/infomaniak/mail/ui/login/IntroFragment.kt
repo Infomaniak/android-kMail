@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.login
 
-import android.content.Context
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -32,6 +31,7 @@ import com.airbnb.lottie.LottieAnimationView
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.tabs.TabLayout
 import com.infomaniak.lib.core.utils.capitalizeFirstChar
+import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.mail.MatomoMail.trackOnBoardingEvent
 import com.infomaniak.mail.R
@@ -220,18 +220,14 @@ class IntroFragment : Fragment() {
     }
 
     private fun updateAccentColorPickerPageUi(newAccentColor: AccentColor, oldAccentColor: AccentColor) {
-        animateTabIndicatorColor(newAccentColor, oldAccentColor, requireContext())
+        animateTabIndicatorColor(newAccentColor, oldAccentColor)
     }
 
-    private fun animateTabIndicatorColor(newAccentColor: AccentColor, oldAccentColor: AccentColor, context: Context) =
-        with(binding) {
-            val newPrimary = newAccentColor.getPrimary(context)
-            val oldPrimary = oldAccentColor.getPrimary(context)
-
-            animateColorChange(oldPrimary, newPrimary) { color ->
-                pinkBlueTabLayout.setSelectedTabIndicatorColor(color)
-            }
-        }
+    private fun animateTabIndicatorColor(newAccentColor: AccentColor, oldAccentColor: AccentColor) = with(binding) {
+        val newPrimary = newAccentColor.getPrimary(context)
+        val oldPrimary = oldAccentColor.getPrimary(context)
+        animateColorChange(oldPrimary, newPrimary, applyColor = pinkBlueTabLayout::setSelectedTabIndicatorColor)
+    }
 
     private companion object {
         const val ACCENT_COLOR_PICKER_PAGE = 0
