@@ -93,6 +93,7 @@ class NewMessageActivity : ThemedActivity() {
             createDescriptionDialog(
                 title = getString(R.string.emailWithoutSubjectTitle),
                 description = getString(R.string.emailWithoutSubjectDescription),
+                confirmButtonText = R.string.buttonContinue,
                 onPositiveButtonClicked = { sendEmail() },
             ).show()
         } else {
