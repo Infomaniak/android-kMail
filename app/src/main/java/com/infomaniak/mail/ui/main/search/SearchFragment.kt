@@ -218,7 +218,7 @@ class SearchFragment : Fragment() {
                 setOnEditorActionListener { _, actionId, _ ->
                     if (actionId == EditorInfo.IME_ACTION_SEARCH && !text.isNullOrBlank()) {
                         trackSearchEvent("validateSearch")
-                        searchViewModel.searchQuery(text.toString())
+                        searchViewModel.searchQuery(text.toString(), saveInHistory = true)
                     }
                     true // Keep keyboard open
                 }
@@ -228,7 +228,10 @@ class SearchFragment : Fragment() {
         mailRecyclerView.apply {
             adapter = threadListAdapter.apply {
                 stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
-                onThreadClicked = { thread -> navigateToThread(thread, mainViewModel) }
+                onThreadClicked = { thread ->
+                    searchViewModel.history.value = searchViewModel.searchQuery
+                    navigateToThread(thread, mainViewModel)
+                }
             }
             disableDragDirection(DirectionFlag.DOWN)
             disableDragDirection(DirectionFlag.LEFT)
