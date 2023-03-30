@@ -484,4 +484,10 @@
             app:destination="@id/moveFragment" />
     </dialog>
 
+    <dialog
+        android:id="@+id/updateAvailableBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.bottomSheetDialogs.UpdateAvailableBottomSheetDialog"
+        android:label="UpdateAvailableBottomSheetDialog"
+        tools:layout="@layout/bottom_sheet_information" />
+
 </navigation>
