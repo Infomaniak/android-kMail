@@ -51,6 +51,7 @@ class SwipeActionsSettingsFragment : Fragment() {
                 swipeBackground.setCardBackgroundColor(swipeRight.getBackgroundColor(requireContext()))
                 swipeRight.iconRes?.let(swipeIcon::setImageResource)
                 swipeIcon.isGone = swipeRight.iconRes == null
+                swipeIcon.contentDescription = getString(swipeRight.nameRes)
                 swipeToDefine.isVisible = swipeRight.iconRes == null
             }
 
@@ -58,6 +59,7 @@ class SwipeActionsSettingsFragment : Fragment() {
                 swipeBackground.setCardBackgroundColor(swipeLeft.getBackgroundColor(requireContext()))
                 swipeLeft.iconRes?.let(swipeIcon::setImageResource)
                 swipeIcon.isGone = swipeLeft.iconRes == null
+                swipeIcon.contentDescription = getString(swipeLeft.nameRes)
                 swipeToDefine.isVisible = swipeLeft.iconRes == null
             }
         }

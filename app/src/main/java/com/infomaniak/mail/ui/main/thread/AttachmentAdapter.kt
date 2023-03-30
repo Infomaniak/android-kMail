@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.infomaniak.lib.core.utils.FormatterFileSize
 import com.infomaniak.lib.core.utils.context
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.databinding.ItemAttachmentBinding
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter.AttachmentViewHolder
@@ -51,6 +52,7 @@ class AttachmentAdapter(
             root.setOnClickListener { onAttachmentClicked?.invoke(attachment) }
         } else {
             closeButton.apply {
+                contentDescription = context.getString(R.string.contentDescriptionButtonDelete, attachment.name)
                 setOnClickListener {
                     val index = attachments.indexOf(attachment)
 

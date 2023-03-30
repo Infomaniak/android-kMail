@@ -77,6 +77,7 @@
     <string name="buttonClose">Chiudere</string>
     <string name="buttonConfirm">Confermare</string>
     <string name="buttonConfirmRestoreEmails">Ripristino</string>
+    <string name="buttonContinue">Continua</string>
     <string name="buttonCreate">Creare</string>
     <string name="buttonCreateAccount">Creare un account</string>
     <string name="buttonCreateFolder">Aggiungere una cartella</string>
@@ -119,6 +120,8 @@
     <string name="contentDescriptionButtonBack">Indietro</string>
     <string name="contentDescriptionButtonDelete">Cancellare %s</string>
     <string name="contentDescriptionButtonDeleteDraft">Cancellare la bozza</string>
+    <string name="contentDescriptionButtonDeleteHistory">Cancellare la voce della cronologia</string>
+    <string name="contentDescriptionButtonDeleteSignature">Cancellare la firma</string>
     <string name="contentDescriptionButtonExpandAccountSelection">Ampliare la selezione dei conti</string>
     <string name="contentDescriptionButtonExpandCustomFolders">Espandere le cartelle personalizzate</string>
     <string name="contentDescriptionButtonExpandHeader">Espandi intestazione</string>

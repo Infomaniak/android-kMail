@@ -43,6 +43,7 @@
             android:id="@+id/deleteButton"
             style="@style/IconButton"
             android:layout_marginEnd="@dimen/marginStandardVerySmall"
+            android:contentDescription="@string/contentDescriptionButtonDeleteHistory"
             app:icon="@drawable/ic_close"
             app:iconSize="18dp" />
 

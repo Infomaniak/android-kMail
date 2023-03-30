@@ -54,6 +54,7 @@
                     style="@style/IconButton"
                     android:layout_gravity="center_vertical|end"
                     android:layout_marginEnd="@dimen/marginStandardMedium"
+                    android:contentDescription="@string/buttonCreateFolder"
                     app:icon="@drawable/ic_folder_add"
                     app:iconSize="24dp"
                     app:iconTint="?android:attr/colorPrimary" />

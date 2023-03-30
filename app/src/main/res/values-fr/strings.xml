@@ -78,6 +78,7 @@
     <string name="buttonClose">Fermer</string>
     <string name="buttonConfirm">Confirmer</string>
     <string name="buttonConfirmRestoreEmails">Restaurer</string>
+    <string name="buttonContinue">Continuer</string>
     <string name="buttonCreate">Créer</string>
     <string name="buttonCreateAccount">Créer un compte</string>
     <string name="buttonCreateFolder">Ajouter un dossier</string>
@@ -120,6 +121,8 @@
     <string name="contentDescriptionButtonBack">Retour</string>
     <string name="contentDescriptionButtonDelete">Supprimer %s</string>
     <string name="contentDescriptionButtonDeleteDraft">Supprimer le brouillon</string>
+    <string name="contentDescriptionButtonDeleteHistory">Supprimer l’entrée de l’historique</string>
+    <string name="contentDescriptionButtonDeleteSignature">Supprimer la signature</string>
     <string name="contentDescriptionButtonExpandAccountSelection">Déplier la sélection de compte</string>
     <string name="contentDescriptionButtonExpandCustomFolders">Déplier les dossiers personnalisés</string>
     <string name="contentDescriptionButtonExpandHeader">Déplier l’entête</string>
@@ -145,7 +148,7 @@
     <string name="dateTitle">Date :</string>
     <string name="draftFolder">Brouillons</string>
     <string name="draftPrefix">(Brouillon)</string>
-    <string name="emailWithoutSubjectDescription">Vous êtes sur le point d\'envoyer un message sans objet. Voulez-vous continuer ?</string>
+    <string name="emailWithoutSubjectDescription">Vous êtes sur le point d’envoyer un message sans objet. Voulez-vous continuer ?</string>
     <string name="emailWithoutSubjectTitle">Objet vide</string>
     <string name="emptyStateFolderDescription">Il n’y a rien à voir par ici.</string>
     <string name="emptyStateFolderTitle">Ce dossier est vide</string>

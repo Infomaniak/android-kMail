@@ -30,8 +30,8 @@
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_marginEnd="@dimen/marginStandardMedium"
-        android:visibility="gone"
-        tools:ignore="ContentDescription" />
+        android:importantForAccessibility="no"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/text"
@@ -46,6 +46,7 @@
         android:layout_width="15dp"
         android:layout_height="15dp"
         android:layout_marginStart="@dimen/marginStandardMedium"
+        android:contentDescription="@string/contentDescriptionSelectedItem"
         android:src="@drawable/ic_check"
         android:visibility="invisible"
         app:tint="?android:attr/colorPrimary" />

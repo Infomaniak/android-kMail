@@ -58,6 +58,8 @@ class MainActionsView @JvmOverloads constructor(
                 } else {
                     with(menu[index]) {
                         button.icon = icon
+                        button.contentDescription = title
+                        
                         textView.apply {
                             text = title
                             transferClickTo(button)
