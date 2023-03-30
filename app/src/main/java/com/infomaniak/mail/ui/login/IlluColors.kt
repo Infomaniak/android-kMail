@@ -26,6 +26,7 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.utils.changePathColor
 
 object IlluColors {
+
     fun LottieAnimationView.changeIllustrationColors(position: Int, accentColor: LocalSettings.AccentColor) {
         updateAccentColorIndependentColors(position)
         updateAccentColorDependentColors(accentColor, position)
@@ -271,21 +272,18 @@ object IlluColors {
     //endregion
 
     //region Common
-    private fun LottieAnimationView.colorPaths(
-        pathToColor: IlluOnBoardingColors,
-        position: Int
-    ) = with(pathToColor) {
-        illuAll.forEach { changePathColor(it) }
+    private fun LottieAnimationView.colorPaths(pathToColor: IlluOnBoardingColors, position: Int) = with(pathToColor) {
+        illuAll.forEach(::changePathColor)
 
         when (position) {
-            1, 2, 3 -> illu234.forEach { changePathColor(it) }
+            1, 2, 3 -> illu234.forEach(::changePathColor)
         }
 
         when (position) {
-            0 -> illu1.forEach { changePathColor(it) }
-            1 -> illu2.forEach { changePathColor(it) }
-            2 -> illu3.forEach { changePathColor(it) }
-            3 -> illu4.forEach { changePathColor(it) }
+            0 -> illu1.forEach(::changePathColor)
+            1 -> illu2.forEach(::changePathColor)
+            2 -> illu3.forEach(::changePathColor)
+            3 -> illu4.forEach(::changePathColor)
         }
     }
 
@@ -293,7 +291,7 @@ object IlluColors {
         category: Category,
         group: Int = 1,
         categoryNumber: Int? = null,
-        finalLayer: FinalLayer = FinalLayer.BACKGROUND
+        finalLayer: FinalLayer = FinalLayer.BACKGROUND,
     ): KeyPath {
         val categoryName = categoryNumber?.let { "${category.value} $it" } ?: category.value
         return KeyPath(categoryName, "Groupe $group", "${finalLayer.value} 1")
