@@ -17,126 +17,40 @@
  */
 package com.infomaniak.mail.ui.login
 
-import android.graphics.Color
+import android.content.Context
+import androidx.annotation.ColorInt
+import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.model.KeyPath
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.blueColor1
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.blueColor10
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.blueColor11
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.blueColor2
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.blueColor3
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.blueColor4
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.blueColor5
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.blueColor6
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.blueColor7
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.blueColor8
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.blueColor9
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.commonColor1
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.commonColor10
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.commonColor11
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.commonColor2
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.commonColor3
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.commonColor4
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.commonColor5
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.commonColor6
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.commonColor7
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.commonColor8
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.commonColor9
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor1
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor10
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor11
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor12
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor13
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor2
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor3
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor4
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor5
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor6
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor7
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor8
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.pinkColor9
+import com.infomaniak.mail.R
+import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.utils.changePathColor
 
-class IlluColors(val keyPath: KeyPath, val color: Colors) {
-    fun getLightColor() = Color.parseColor(color.light)
-    fun getDarkColor() = Color.parseColor(color.dark)
+object IlluColors {
 
-    class Colors(val light: String, val dark: String) {
-
-        companion object {
-            val commonColor1 = Colors("#F5F5F5", "#3E3E3E")
-            val commonColor2 = Colors("#E0E0E0", "#4C4C4C")
-            val commonColor3 = Colors("#FAFAFA", "#282828")
-            val commonColor4 = Colors("#C6AC9F", "#996452")
-            val commonColor5 = Colors("#FFFFFF", "#1A1A1A")
-            val commonColor6 = Colors("#340E00", "#996452")
-            val commonColor7 = Colors("#CCCCCC", "#818181")
-            val commonColor8 = Colors("#C4C4C4", "#7C7C7C")
-            val commonColor9 = Colors("#FFFFFF", "#EAEAEA")
-            val commonColor10 = Colors("#F8F8F8", "#E4E4E4")
-            val commonColor11 = Colors("#D9D9D9", "#626262")
-
-            val pinkColor1 = Colors("#BC0055", "#D0759F")
-            val pinkColor2 = Colors("#FF5B97", "#EF0057")
-            val pinkColor3 = Colors("#AB2456", "#D0759F")
-            val pinkColor4 = Colors("#BD95A7", "#AE366D")
-            val pinkColor5 = Colors("#BF4C80", "#E75F9C")
-            val pinkColor6 = Colors("#DFBDCC", "#955873")
-            val pinkColor7 = Colors("#824D65", "#AB6685")
-            val pinkColor8 = Colors("#693D51", "#CA799E")
-            val pinkColor9 = Colors("#F7E8EF", "#282828")
-            val pinkColor10 = Colors("#FF4388", "#B80043")
-            val pinkColor11 = Colors("#D81B60", "#FB2C77")
-            val pinkColor12 = Colors("#FAF0F0", "#F1DDDD")
-            val pinkColor13 = Colors("#E10B59", "#DC1A60")
-
-            val blueColor1 = Colors("#0098FF", "#0177C7")
-            val blueColor2 = Colors("#69C9FF", "#6DCBFF")
-            val blueColor3 = Colors("#3981AA", "#56AFE1")
-            val blueColor4 = Colors("#289CDD", "#0D7DBC")
-            val blueColor5 = Colors("#84BAD8", "#588EAC")
-            val blueColor6 = Colors("#10405B", "#10405B")
-            val blueColor7 = Colors("#0B3547", "#266E8D")
-            val blueColor8 = Colors("#EAF8FE", "#282828")
-            val blueColor9 = Colors("#0A85C9", "#0A85C9")
-            val blueColor10 = Colors("#F7FCFF", "#E8F6FF")
-            val blueColor11 = Colors("#0875A5", "#0875A5")
-        }
+    fun LottieAnimationView.changeIllustrationColors(position: Int, accentColor: LocalSettings.AccentColor) {
+        updateAccentColorIndependentColors(position)
+        updateAccentColorDependentColors(accentColor, position)
     }
 
-    enum class Category(val value: String) {
-        IPHONESCREEN("IPHONE SCREEN"),
-        POINT("POINT"),
-        CHAT("CHAT"),
-        NOTIFICATION("NOTIFICATION"),
-        MOVINGNOTIFICATION("MOVING NOTIF"),
-        ARCHIVES("ARCHIVES"),
-        HAND("HAND"),
-        STAR("STAR"),
-        BIN("BIN"),
-        CLOCK("CLOCK"),
-        WOMAN("WOMAN"),
-        MEN("MEN"),
-        LETTER("LETTER"),
-        LINK("LINK"),
+    //region Accent color independent part
+    private fun LottieAnimationView.updateAccentColorIndependentColors(position: Int) {
+        val pathsToColor = context.getAccentIndependentPathsToColor()
+        colorPaths(pathsToColor, position)
     }
 
-    enum class FinalLayer(val value: String) {
-        BACKGROUND("Fond"),
-        BORDER("Contour"),
-    }
+    private fun Context.getAccentIndependentPathsToColor(): IlluOnBoardingColors {
+        val commonColor1 = getColor(R.color.commonColor1)
+        val commonColor2 = getColor(R.color.commonColor2)
+        val commonColor3 = getColor(R.color.commonColor3)
+        val commonColor4 = getColor(R.color.commonColor4)
+        val commonColor5 = getColor(R.color.commonColor5)
+        val commonColor6 = getColor(R.color.commonColor6)
+        val commonColor7 = getColor(R.color.commonColor7)
+        val commonColor8 = getColor(R.color.commonColor8)
+        val commonColor9 = getColor(R.color.commonColor9)
+        val commonColor10 = getColor(R.color.commonColor10)
 
-    companion object {
-
-        private fun keyPath(
-            category: Category,
-            group: Int = 1,
-            categoryNumber: Int? = null,
-            finalLayer: FinalLayer = FinalLayer.BACKGROUND
-        ): KeyPath {
-            val categoryName = categoryNumber?.let { "${category.value} $it" } ?: category.value
-            return KeyPath(categoryName, "Groupe $group", "${finalLayer.value} 1")
-        }
-
-        val illuOnBoardingColors = arrayOf(
+        val illuOnBoardingColors = listOf(
             IlluColors(keyPath(Category.IPHONESCREEN, 18), commonColor1),
             IlluColors(keyPath(Category.IPHONESCREEN, 22), commonColor2),
             IlluColors(keyPath(Category.IPHONESCREEN, 25), commonColor2),
@@ -161,42 +75,15 @@ class IlluColors(val keyPath: KeyPath, val color: Colors) {
             IlluColors(keyPath(Category.IPHONESCREEN, 68), commonColor1),
             IlluColors(keyPath(Category.IPHONESCREEN, 70), commonColor1),
         )
-        val illuOnBoardingPinkColors = arrayOf(
-            IlluColors(keyPath(Category.IPHONESCREEN, 1), pinkColor1),
-            IlluColors(keyPath(Category.IPHONESCREEN, 2), pinkColor1),
-            IlluColors(keyPath(Category.IPHONESCREEN, 3), pinkColor1),
-            IlluColors(keyPath(Category.IPHONESCREEN, 4), pinkColor1),
-            IlluColors(keyPath(Category.IPHONESCREEN, 5), pinkColor1),
-            IlluColors(keyPath(Category.IPHONESCREEN, 6), pinkColor1),
-            IlluColors(keyPath(Category.IPHONESCREEN, 9), pinkColor2),
-            IlluColors(keyPath(Category.IPHONESCREEN, 12), pinkColor3),
-            IlluColors(keyPath(Category.IPHONESCREEN, 15), pinkColor1),
-            IlluColors(keyPath(Category.IPHONESCREEN, 19), pinkColor1),
-            IlluColors(keyPath(Category.IPHONESCREEN, 20), pinkColor1),
-            IlluColors(keyPath(Category.IPHONESCREEN, 23), pinkColor1),
-            IlluColors(keyPath(Category.IPHONESCREEN, 24), pinkColor1),
-            IlluColors(keyPath(Category.IPHONESCREEN, 43), pinkColor4),
-            IlluColors(keyPath(Category.IPHONESCREEN, 48), pinkColor5),
-        )
-        val illuOnBoardingBlueColors = arrayOf(
-            IlluColors(keyPath(Category.IPHONESCREEN, 1), blueColor1),
-            IlluColors(keyPath(Category.IPHONESCREEN, 2), blueColor1),
-            IlluColors(keyPath(Category.IPHONESCREEN, 3), blueColor1),
-            IlluColors(keyPath(Category.IPHONESCREEN, 4), blueColor1),
-            IlluColors(keyPath(Category.IPHONESCREEN, 5), blueColor1),
-            IlluColors(keyPath(Category.IPHONESCREEN, 6), blueColor1),
-            IlluColors(keyPath(Category.IPHONESCREEN, 9), blueColor2),
-            IlluColors(keyPath(Category.IPHONESCREEN, 12), blueColor1),
-            IlluColors(keyPath(Category.IPHONESCREEN, 15), blueColor1),
-            IlluColors(keyPath(Category.IPHONESCREEN, 19), blueColor1),
-            IlluColors(keyPath(Category.IPHONESCREEN, 20), blueColor1),
-            IlluColors(keyPath(Category.IPHONESCREEN, 23), blueColor1),
-            IlluColors(keyPath(Category.IPHONESCREEN, 24), blueColor1),
-            IlluColors(keyPath(Category.IPHONESCREEN, 43), blueColor3),
-            IlluColors(keyPath(Category.IPHONESCREEN, 48), blueColor4),
+
+        val illuOnBoarding234Colors = listOf(
+            IlluColors(keyPath(Category.IPHONESCREEN, 73), commonColor6),
+            IlluColors(keyPath(Category.IPHONESCREEN, 74), commonColor1),
+            IlluColors(keyPath(Category.IPHONESCREEN, 75), commonColor5),
+            IlluColors(keyPath(Category.IPHONESCREEN, 76), commonColor2),
         )
 
-        val illuOnBoarding1Colors = arrayOf(
+        val illuOnBoarding1Colors = listOf(
             IlluColors(keyPath(Category.POINT, 1, 1), commonColor5),
             IlluColors(keyPath(Category.POINT, 1, 2), commonColor5),
             IlluColors(keyPath(Category.POINT, 1, 3), commonColor5),
@@ -207,41 +94,8 @@ class IlluColors(val keyPath: KeyPath, val color: Colors) {
             IlluColors(keyPath(Category.IPHONESCREEN, 67), commonColor6),
             IlluColors(keyPath(Category.IPHONESCREEN, 69), commonColor5),
         )
-        val illuOnBoarding1PinkColors = arrayOf(
-            IlluColors(keyPath(Category.CHAT, 1, 1), pinkColor1),
-            IlluColors(keyPath(Category.CHAT, 1, 2), pinkColor4),
-            IlluColors(keyPath(Category.IPHONESCREEN, 55), pinkColor6),
-            IlluColors(keyPath(Category.IPHONESCREEN, 61), pinkColor1),
-            IlluColors(keyPath(Category.IPHONESCREEN, 66), pinkColor7),
-        )
-        val illuOnBoarding1BlueColors = arrayOf(
-            IlluColors(keyPath(Category.CHAT, 1, 1), blueColor1),
-            IlluColors(keyPath(Category.CHAT, 1, 2), blueColor3),
-            IlluColors(keyPath(Category.IPHONESCREEN, 55), blueColor5),
-            IlluColors(keyPath(Category.IPHONESCREEN, 61), blueColor1),
-            IlluColors(keyPath(Category.IPHONESCREEN, 66), blueColor6),
-        )
 
-        val illuOnBoarding234Colors = arrayOf(
-            IlluColors(keyPath(Category.IPHONESCREEN, 73), commonColor6),
-            IlluColors(keyPath(Category.IPHONESCREEN, 74), commonColor1),
-            IlluColors(keyPath(Category.IPHONESCREEN, 75), commonColor5),
-            IlluColors(keyPath(Category.IPHONESCREEN, 76), commonColor2),
-        )
-        val illuOnBoarding234PinkColors = arrayOf(
-            IlluColors(keyPath(Category.IPHONESCREEN, 54), pinkColor5),
-            IlluColors(keyPath(Category.IPHONESCREEN, 61), pinkColor6),
-            IlluColors(keyPath(Category.IPHONESCREEN, 67), pinkColor1),
-            IlluColors(keyPath(Category.IPHONESCREEN, 72), pinkColor7),
-        )
-        val illuOnBoarding234BlueColors = arrayOf(
-            IlluColors(keyPath(Category.IPHONESCREEN, 54), blueColor4),
-            IlluColors(keyPath(Category.IPHONESCREEN, 61), blueColor5),
-            IlluColors(keyPath(Category.IPHONESCREEN, 67), blueColor1),
-            IlluColors(keyPath(Category.IPHONESCREEN, 72), blueColor6),
-        )
-
-        val illuOnBoarding2Colors = arrayOf(
+        val illuOnBoarding2Colors = listOf(
             IlluColors(keyPath(Category.NOTIFICATION, 5, 2), commonColor4),
             IlluColors(keyPath(Category.NOTIFICATION, 6, 2), commonColor1),
             IlluColors(keyPath(Category.NOTIFICATION, 9, 2), commonColor7),
@@ -273,32 +127,8 @@ class IlluColors(val keyPath: KeyPath, val color: Colors) {
             IlluColors(keyPath(Category.ARCHIVES, 3), commonColor5),
             IlluColors(keyPath(Category.ARCHIVES, 4), commonColor5),
         )
-        val illuOnBoarding2PinkColors = arrayOf(
-            IlluColors(keyPath(Category.NOTIFICATION, 4, 2), pinkColor5),
-            IlluColors(keyPath(Category.NOTIFICATION, 11, 2), pinkColor1),
-            IlluColors(keyPath(Category.IPHONESCREEN, 54), pinkColor5),
-            IlluColors(keyPath(Category.IPHONESCREEN, 61), pinkColor6),
-            IlluColors(keyPath(Category.IPHONESCREEN, 67), pinkColor1),
-            IlluColors(keyPath(Category.IPHONESCREEN, 72), pinkColor7),
-            IlluColors(keyPath(Category.HAND, 1), pinkColor7),
-            IlluColors(keyPath(Category.HAND, 4), pinkColor8),
-            IlluColors(keyPath(Category.HAND, 5), pinkColor8),
-            IlluColors(keyPath(Category.MOVINGNOTIFICATION, 15, 1), pinkColor1),
-            IlluColors(keyPath(Category.MOVINGNOTIFICATION, 4, 2), pinkColor5),
-            IlluColors(keyPath(Category.MOVINGNOTIFICATION, 11, 2), pinkColor1),
-        )
-        val illuOnBoarding2BlueColors = arrayOf(
-            IlluColors(keyPath(Category.NOTIFICATION, 4, 2), blueColor4),
-            IlluColors(keyPath(Category.NOTIFICATION, 11, 2), blueColor1),
-            IlluColors(keyPath(Category.HAND, 1), blueColor6),
-            IlluColors(keyPath(Category.HAND, 4), blueColor7),
-            IlluColors(keyPath(Category.HAND, 5), blueColor7),
-            IlluColors(keyPath(Category.MOVINGNOTIFICATION, 15, 1), blueColor1),
-            IlluColors(keyPath(Category.MOVINGNOTIFICATION, 4, 2), blueColor4),
-            IlluColors(keyPath(Category.MOVINGNOTIFICATION, 11, 2), blueColor1),
-        )
 
-        val illuOnBoarding3Colors = arrayOf(
+        val illuOnBoarding3Colors = listOf(
             IlluColors(keyPath(Category.NOTIFICATION, 1, 2), commonColor2),
             IlluColors(keyPath(Category.NOTIFICATION, 2, 2), commonColor2),
             IlluColors(keyPath(Category.NOTIFICATION, 3, 2), commonColor5),
@@ -312,52 +142,8 @@ class IlluColors(val keyPath: KeyPath, val color: Colors) {
             IlluColors(keyPath(Category.BIN, 7), commonColor3),
             IlluColors(keyPath(Category.CLOCK, 5), commonColor3),
         )
-        val illuOnBoarding3PinkColors = arrayOf(
-            IlluColors(keyPath(Category.NOTIFICATION, 4, 2), pinkColor1),
-            IlluColors(keyPath(Category.NOTIFICATION, 5, 2), pinkColor9),
-            IlluColors(keyPath(Category.NOTIFICATION, 4, 3), pinkColor1),
-            IlluColors(keyPath(Category.NOTIFICATION, 5, 3), pinkColor9),
-            IlluColors(keyPath(Category.NOTIFICATION, 4, 4), pinkColor1),
-            IlluColors(keyPath(Category.NOTIFICATION, 5, 4), pinkColor9),
-            IlluColors(keyPath(Category.HAND, 1), pinkColor7),
-            IlluColors(keyPath(Category.HAND, 4), pinkColor8),
-            IlluColors(keyPath(Category.HAND, 5), pinkColor8),
-            IlluColors(keyPath(Category.STAR, 1, finalLayer = FinalLayer.BORDER), pinkColor1),
-            IlluColors(keyPath(Category.BIN, 1, finalLayer = FinalLayer.BORDER), pinkColor1),
-            IlluColors(keyPath(Category.BIN, 2, finalLayer = FinalLayer.BORDER), pinkColor1),
-            IlluColors(keyPath(Category.BIN, 3, finalLayer = FinalLayer.BORDER), pinkColor1),
-            IlluColors(keyPath(Category.BIN, 4, finalLayer = FinalLayer.BORDER), pinkColor1),
-            IlluColors(keyPath(Category.BIN, 5, finalLayer = FinalLayer.BORDER), pinkColor1),
-            IlluColors(keyPath(Category.BIN, 6, finalLayer = FinalLayer.BORDER), pinkColor1),
-            IlluColors(keyPath(Category.CLOCK, 1), pinkColor1),
-            IlluColors(keyPath(Category.CLOCK, 2), pinkColor1),
-            IlluColors(keyPath(Category.CLOCK, 3), pinkColor1),
-            IlluColors(keyPath(Category.CLOCK, 4), pinkColor1),
-        )
-        val illuOnBoarding3BlueColors = arrayOf(
-            IlluColors(keyPath(Category.NOTIFICATION, 4, 2), blueColor1),
-            IlluColors(keyPath(Category.NOTIFICATION, 5, 2), blueColor8),
-            IlluColors(keyPath(Category.NOTIFICATION, 4, 3), blueColor1),
-            IlluColors(keyPath(Category.NOTIFICATION, 5, 3), blueColor8),
-            IlluColors(keyPath(Category.NOTIFICATION, 4, 4), blueColor1),
-            IlluColors(keyPath(Category.NOTIFICATION, 5, 4), blueColor8),
-            IlluColors(keyPath(Category.HAND, 1), blueColor6),
-            IlluColors(keyPath(Category.HAND, 4), blueColor7),
-            IlluColors(keyPath(Category.HAND, 5), blueColor7),
-            IlluColors(keyPath(Category.STAR, 1, finalLayer = FinalLayer.BORDER), blueColor1),
-            IlluColors(keyPath(Category.BIN, 1, finalLayer = FinalLayer.BORDER), blueColor1),
-            IlluColors(keyPath(Category.BIN, 2, finalLayer = FinalLayer.BORDER), blueColor1),
-            IlluColors(keyPath(Category.BIN, 3, finalLayer = FinalLayer.BORDER), blueColor1),
-            IlluColors(keyPath(Category.BIN, 4, finalLayer = FinalLayer.BORDER), blueColor1),
-            IlluColors(keyPath(Category.BIN, 5, finalLayer = FinalLayer.BORDER), blueColor1),
-            IlluColors(keyPath(Category.BIN, 6, finalLayer = FinalLayer.BORDER), blueColor1),
-            IlluColors(keyPath(Category.CLOCK, 1), blueColor1),
-            IlluColors(keyPath(Category.CLOCK, 2), blueColor1),
-            IlluColors(keyPath(Category.CLOCK, 3), blueColor1),
-            IlluColors(keyPath(Category.CLOCK, 4), blueColor1),
-        )
 
-        val illuOnBoarding4Colors = arrayOf(
+        val illuOnBoarding4Colors = listOf(
             IlluColors(keyPath(Category.WOMAN, 5), commonColor4),
             IlluColors(keyPath(Category.WOMAN, 6), commonColor1),
             IlluColors(keyPath(Category.MEN, 5), commonColor4),
@@ -365,49 +151,183 @@ class IlluColors(val keyPath: KeyPath, val color: Colors) {
             IlluColors(keyPath(Category.LETTER, 3), commonColor9),
             IlluColors(keyPath(Category.LETTER, 4), commonColor10),
         )
-        val illuOnBoarding4PinkColors = arrayOf(
-            IlluColors(keyPath(Category.WOMAN, 4), pinkColor5),
-            IlluColors(keyPath(Category.MEN, 5), pinkColor4),
-            IlluColors(keyPath(Category.POINT, 1, 1), pinkColor5),
-            IlluColors(keyPath(Category.POINT, 1, 2), pinkColor5),
-            IlluColors(keyPath(Category.POINT, 1, 3), pinkColor4),
-            IlluColors(keyPath(Category.POINT, 1, 4), pinkColor4),
-            IlluColors(keyPath(Category.LETTER, 1), pinkColor10),
-            IlluColors(keyPath(Category.LETTER, 2), pinkColor11),
-            IlluColors(keyPath(Category.LETTER, 5), pinkColor12),
-            IlluColors(keyPath(Category.LETTER, 6), pinkColor13),
-            IlluColors(keyPath(Category.LETTER, 7), pinkColor13),
+
+        return IlluOnBoardingColors(
+            illuOnBoardingColors,
+            illuOnBoarding234Colors,
+            illuOnBoarding1Colors,
+            illuOnBoarding2Colors,
+            illuOnBoarding3Colors,
+            illuOnBoarding4Colors,
         )
-        val illuOnBoarding4BlueColors = arrayOf(
-            IlluColors(keyPath(Category.WOMAN, 4), blueColor4),
-            IlluColors(keyPath(Category.MEN, 5), blueColor3),
-            IlluColors(keyPath(Category.POINT, 1, 1), blueColor4),
-            IlluColors(keyPath(Category.POINT, 1, 2), blueColor4),
-            IlluColors(keyPath(Category.POINT, 1, 3), blueColor3),
-            IlluColors(keyPath(Category.POINT, 1, 4), blueColor3),
-            IlluColors(keyPath(Category.LETTER, 1), blueColor2),
-            IlluColors(keyPath(Category.LETTER, 2), blueColor9),
-            IlluColors(keyPath(Category.LETTER, 5), blueColor10),
-            IlluColors(keyPath(Category.LETTER, 6), blueColor11),
-            IlluColors(keyPath(Category.LETTER, 7), blueColor11),
+    }
+    //endregion
+
+    //region Accent color dependent part
+    private fun LottieAnimationView.updateAccentColorDependentColors(accentColor: LocalSettings.AccentColor, position: Int) {
+        val palette = context.getPaletteFor(accentColor)
+        val pathsToColor = getPathsToColorFromPalette(palette)
+        colorPaths(pathsToColor, position)
+    }
+
+    fun Context.getPaletteFor(accentColor: LocalSettings.AccentColor): IntArray {
+        return when (accentColor) {
+            LocalSettings.AccentColor.PINK -> resources.getIntArray(R.array.pinkColors)
+            LocalSettings.AccentColor.BLUE -> resources.getIntArray(R.array.blueColors)
+            LocalSettings.AccentColor.SYSTEM -> resources.getIntArray(R.array.pinkColors) // TODO : Generate palette from system theme
+        }
+    }
+
+    private fun getPathsToColorFromPalette(@ColorInt palette: IntArray): IlluOnBoardingColors {
+        val illuOnBoardingAccentColors = listOf(
+            IlluColors(keyPath(Category.IPHONESCREEN, 1), palette[0]),
+            IlluColors(keyPath(Category.IPHONESCREEN, 2), palette[0]),
+            IlluColors(keyPath(Category.IPHONESCREEN, 3), palette[0]),
+            IlluColors(keyPath(Category.IPHONESCREEN, 4), palette[0]),
+            IlluColors(keyPath(Category.IPHONESCREEN, 5), palette[0]),
+            IlluColors(keyPath(Category.IPHONESCREEN, 6), palette[0]),
+            IlluColors(keyPath(Category.IPHONESCREEN, 9), palette[5]),
+            IlluColors(keyPath(Category.IPHONESCREEN, 12), palette[0]),
+            IlluColors(keyPath(Category.IPHONESCREEN, 15), palette[0]),
+            IlluColors(keyPath(Category.IPHONESCREEN, 19), palette[0]),
+            IlluColors(keyPath(Category.IPHONESCREEN, 20), palette[0]),
+            IlluColors(keyPath(Category.IPHONESCREEN, 23), palette[0]),
+            IlluColors(keyPath(Category.IPHONESCREEN, 24), palette[0]),
+            IlluColors(keyPath(Category.IPHONESCREEN, 43), palette[1]),
+            IlluColors(keyPath(Category.IPHONESCREEN, 48), palette[4]),
         )
 
-        val illuNoMailboxColors = arrayOf(
-            IlluColors(keyPath(Category.LINK, 1), commonColor11),
-            IlluColors(keyPath(Category.IPHONESCREEN, 1), commonColor5),
-            IlluColors(keyPath(Category.IPHONESCREEN, 2), commonColor2),
+        val illuOnBoarding234AccentColors = listOf(
+            IlluColors(keyPath(Category.IPHONESCREEN, 54), palette[4]),
+            IlluColors(keyPath(Category.IPHONESCREEN, 61), palette[2]),
+            IlluColors(keyPath(Category.IPHONESCREEN, 67), palette[0]),
+            IlluColors(keyPath(Category.IPHONESCREEN, 72), palette[3]),
         )
 
-        val illuNoMailboxPinkColor = arrayOf(
-            IlluColors(keyPath(Category.HAND, 1), pinkColor7),
-            IlluColors(keyPath(Category.HAND, 4), pinkColor8),
-            IlluColors(keyPath(Category.HAND, 5), pinkColor8),
+        val illuOnBoarding1AccentColors = listOf(
+            IlluColors(keyPath(Category.CHAT, 1, 1), palette[0]),
+            IlluColors(keyPath(Category.CHAT, 1, 2), palette[1]),
+            IlluColors(keyPath(Category.IPHONESCREEN, 55), palette[2]),
+            IlluColors(keyPath(Category.IPHONESCREEN, 61), palette[0]),
+            IlluColors(keyPath(Category.IPHONESCREEN, 66), palette[3]),
         )
 
-        val illuNoMailboxBlueColor = arrayOf(
-            IlluColors(keyPath(Category.HAND, 1), blueColor6),
-            IlluColors(keyPath(Category.HAND, 4), blueColor7),
-            IlluColors(keyPath(Category.HAND, 5), blueColor7),
+        val illuOnBoarding2AccentColors = listOf(
+            IlluColors(keyPath(Category.NOTIFICATION, 4, 2), palette[4]),
+            IlluColors(keyPath(Category.NOTIFICATION, 11, 2), palette[0]),
+            IlluColors(keyPath(Category.HAND, 1), palette[3]),
+            IlluColors(keyPath(Category.HAND, 4), palette[9]),
+            IlluColors(keyPath(Category.HAND, 5), palette[9]),
+            IlluColors(keyPath(Category.MOVINGNOTIFICATION, 15, 1), palette[0]),
+            IlluColors(keyPath(Category.MOVINGNOTIFICATION, 4, 2), palette[4]),
+            IlluColors(keyPath(Category.MOVINGNOTIFICATION, 11, 2), palette[0]),
         )
+
+        val illuOnBoarding3AccentColors = listOf(
+            IlluColors(keyPath(Category.NOTIFICATION, 4, 2), palette[0]),
+            IlluColors(keyPath(Category.NOTIFICATION, 5, 2), palette[10]),
+            IlluColors(keyPath(Category.NOTIFICATION, 4, 3), palette[0]),
+            IlluColors(keyPath(Category.NOTIFICATION, 5, 3), palette[10]),
+            IlluColors(keyPath(Category.NOTIFICATION, 4, 4), palette[0]),
+            IlluColors(keyPath(Category.NOTIFICATION, 5, 4), palette[10]),
+            IlluColors(keyPath(Category.HAND, 1), palette[3]),
+            IlluColors(keyPath(Category.HAND, 4), palette[9]),
+            IlluColors(keyPath(Category.HAND, 5), palette[9]),
+            IlluColors(keyPath(Category.STAR, 1, finalLayer = FinalLayer.BORDER), palette[0]),
+            IlluColors(keyPath(Category.BIN, 1, finalLayer = FinalLayer.BORDER), palette[0]),
+            IlluColors(keyPath(Category.BIN, 2, finalLayer = FinalLayer.BORDER), palette[0]),
+            IlluColors(keyPath(Category.BIN, 3, finalLayer = FinalLayer.BORDER), palette[0]),
+            IlluColors(keyPath(Category.BIN, 4, finalLayer = FinalLayer.BORDER), palette[0]),
+            IlluColors(keyPath(Category.BIN, 5, finalLayer = FinalLayer.BORDER), palette[0]),
+            IlluColors(keyPath(Category.BIN, 6, finalLayer = FinalLayer.BORDER), palette[0]),
+            IlluColors(keyPath(Category.CLOCK, 1), palette[0]),
+            IlluColors(keyPath(Category.CLOCK, 2), palette[0]),
+            IlluColors(keyPath(Category.CLOCK, 3), palette[0]),
+            IlluColors(keyPath(Category.CLOCK, 4), palette[0]),
+        )
+
+        val illuOnBoarding4AccentColors = listOf(
+            IlluColors(keyPath(Category.WOMAN, 4), palette[4]),
+            IlluColors(keyPath(Category.MEN, 5), palette[1]),
+            IlluColors(keyPath(Category.POINT, 1, 1), palette[4]),
+            IlluColors(keyPath(Category.POINT, 1, 2), palette[4]),
+            IlluColors(keyPath(Category.POINT, 1, 3), palette[1]),
+            IlluColors(keyPath(Category.POINT, 1, 4), palette[1]),
+            IlluColors(keyPath(Category.LETTER, 1), palette[6]),
+            IlluColors(keyPath(Category.LETTER, 2), palette[7]),
+            IlluColors(keyPath(Category.LETTER, 5), palette[11]),
+            IlluColors(keyPath(Category.LETTER, 6), palette[8]),
+            IlluColors(keyPath(Category.LETTER, 7), palette[8]),
+        )
+
+        return IlluOnBoardingColors(
+            illuOnBoardingAccentColors,
+            illuOnBoarding234AccentColors,
+            illuOnBoarding1AccentColors,
+            illuOnBoarding2AccentColors,
+            illuOnBoarding3AccentColors,
+            illuOnBoarding4AccentColors,
+        )
+    }
+    //endregion
+
+    //region Common
+    private fun LottieAnimationView.colorPaths(pathToColor: IlluOnBoardingColors, position: Int) = with(pathToColor) {
+        illuAll.forEach(::changePathColor)
+
+        when (position) {
+            1, 2, 3 -> illu234.forEach(::changePathColor)
+        }
+
+        when (position) {
+            0 -> illu1.forEach(::changePathColor)
+            1 -> illu2.forEach(::changePathColor)
+            2 -> illu3.forEach(::changePathColor)
+            3 -> illu4.forEach(::changePathColor)
+        }
+    }
+
+    fun keyPath(
+        category: Category,
+        group: Int = 1,
+        categoryNumber: Int? = null,
+        finalLayer: FinalLayer = FinalLayer.BACKGROUND,
+    ): KeyPath {
+        val categoryName = categoryNumber?.let { "${category.value} $it" } ?: category.value
+        return KeyPath(categoryName, "Groupe $group", "${finalLayer.value} 1")
+    }
+    //endregion
+
+    private data class IlluOnBoardingColors(
+        val illuAll: List<IlluColors>,
+        val illu234: List<IlluColors>,
+        val illu1: List<IlluColors>,
+        val illu2: List<IlluColors>,
+        val illu3: List<IlluColors>,
+        val illu4: List<IlluColors>,
+    )
+
+    data class IlluColors(val keyPath: KeyPath, @ColorInt val color: Int)
+
+    enum class Category(val value: String) {
+        IPHONESCREEN("IPHONE SCREEN"),
+        POINT("POINT"),
+        CHAT("CHAT"),
+        NOTIFICATION("NOTIFICATION"),
+        MOVINGNOTIFICATION("MOVING NOTIF"),
+        ARCHIVES("ARCHIVES"),
+        HAND("HAND"),
+        STAR("STAR"),
+        BIN("BIN"),
+        CLOCK("CLOCK"),
+        WOMAN("WOMAN"),
+        MEN("MEN"),
+        LETTER("LETTER"),
+        LINK("LINK"),
+    }
+
+    enum class FinalLayer(val value: String) {
+        BACKGROUND("Fond"),
+        BORDER("Contour"),
     }
 }

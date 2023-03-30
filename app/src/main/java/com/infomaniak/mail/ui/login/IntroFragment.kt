@@ -27,38 +27,17 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
-import com.airbnb.lottie.LottieAnimationView
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.tabs.TabLayout
 import com.infomaniak.lib.core.utils.capitalizeFirstChar
 import com.infomaniak.lib.core.utils.context
-import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.mail.MatomoMail.trackOnBoardingEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.AccentColor
-import com.infomaniak.mail.data.LocalSettings.AccentColor.PINK
 import com.infomaniak.mail.databinding.FragmentIntroBinding
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding1BlueColors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding1Colors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding1PinkColors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding234BlueColors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding234Colors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding234PinkColors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding2BlueColors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding2Colors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding2PinkColors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding3BlueColors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding3Colors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding3PinkColors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding4BlueColors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding4Colors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding4PinkColors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoardingBlueColors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoardingColors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoardingPinkColors
+import com.infomaniak.mail.ui.login.IlluColors.changeIllustrationColors
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
-import com.infomaniak.mail.utils.changePathColor
 import com.infomaniak.mail.utils.enumValueFrom
 import com.infomaniak.mail.utils.repeatFrame
 import kotlinx.coroutines.Dispatchers
@@ -160,55 +139,12 @@ class IntroFragment : Fragment() {
         }
     }
 
-    /**
-     * `animate` is necessary because when the activity is started, we want to avoid animating the color change the first time.
-     */
     private fun setUi(newAccentColor: AccentColor, oldAccentColor: AccentColor, position: Int) {
         updateEachPageUi(newAccentColor, oldAccentColor)
 
         binding.iconLayout.changeIllustrationColors(position, newAccentColor)
 
         if (position == ACCENT_COLOR_PICKER_PAGE) updateAccentColorPickerPageUi(newAccentColor, oldAccentColor)
-    }
-
-    private fun LottieAnimationView.changeIllustrationColors(position: Int, accentColor: AccentColor) {
-        val isDark = requireContext().isNightModeEnabled()
-
-        illuOnBoardingColors.forEach { changePathColor(it, isDark) }
-        when (position) {
-            1, 2, 3 -> illuOnBoarding234Colors.forEach { changePathColor(it, isDark) }
-        }
-
-        when (position) {
-            0 -> illuOnBoarding1Colors.forEach { changePathColor(it, isDark) }
-            1 -> illuOnBoarding2Colors.forEach { changePathColor(it, isDark) }
-            2 -> illuOnBoarding3Colors.forEach { changePathColor(it, isDark) }
-            3 -> illuOnBoarding4Colors.forEach { changePathColor(it, isDark) }
-        }
-
-        if (accentColor == PINK) {
-            illuOnBoardingPinkColors.forEach { changePathColor(it, isDark) }
-            when (position) {
-                1, 2, 3 -> illuOnBoarding234PinkColors.forEach { changePathColor(it, isDark) }
-            }
-            when (position) {
-                0 -> illuOnBoarding1PinkColors.forEach { changePathColor(it, isDark) }
-                1 -> illuOnBoarding2PinkColors.forEach { changePathColor(it, isDark) }
-                2 -> illuOnBoarding3PinkColors.forEach { changePathColor(it, isDark) }
-                3 -> illuOnBoarding4PinkColors.forEach { changePathColor(it, isDark) }
-            }
-        } else {
-            illuOnBoardingBlueColors.forEach { changePathColor(it, isDark) }
-            when (position) {
-                1, 2, 3 -> illuOnBoarding234BlueColors.forEach { changePathColor(it, isDark) }
-            }
-            when (position) {
-                0 -> illuOnBoarding1BlueColors.forEach { changePathColor(it, isDark) }
-                1 -> illuOnBoarding2BlueColors.forEach { changePathColor(it, isDark) }
-                2 -> illuOnBoarding3BlueColors.forEach { changePathColor(it, isDark) }
-                3 -> illuOnBoarding4BlueColors.forEach { changePathColor(it, isDark) }
-            }
-        }
     }
 
     private fun updateEachPageUi(newAccentColor: AccentColor, oldAccentColor: AccentColor) {

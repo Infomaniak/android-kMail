@@ -69,7 +69,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.DialogDescriptionBinding
 import com.infomaniak.mail.databinding.DialogInputBinding
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.ui.login.IlluColors
+import com.infomaniak.mail.ui.login.IlluColors.IlluColors
 import com.infomaniak.mail.ui.main.folder.DateSeparatorItemDecoration
 import com.infomaniak.mail.ui.main.folder.HeaderItemDecoration
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
@@ -200,10 +200,9 @@ fun LottieAnimationView.repeatFrame(firstFrame: Int, lastFrame: Int) {
     })
 }
 
-fun LottieAnimationView.changePathColor(illuColors: IlluColors, isDark: Boolean) {
-    val color = if (isDark) illuColors.getDarkColor() else illuColors.getLightColor()
+fun LottieAnimationView.changePathColor(illuColors: IlluColors) {
     addValueCallback(illuColors.keyPath, LottieProperty.COLOR_FILTER) {
-        SimpleColorFilter(color)
+        SimpleColorFilter(illuColors.color)
     }
 }
 

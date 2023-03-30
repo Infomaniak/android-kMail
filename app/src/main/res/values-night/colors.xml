@@ -81,6 +81,49 @@
     <color name="swipeInbox">@color/shark</color>
     <color name="swipeNone">@color/elephant</color>
 
+    <!-- Onboarding illustration colors -->
+    <array name="pinkColors">
+        <item name="pinkColor1">#D0759F</item>
+        <item name="pinkColor2">#AE366D</item>
+        <item name="pinkColor3">#955873</item>
+        <item name="pinkColor4">#AB6685</item>
+        <item name="pinkColor5">#E75F9C</item>
+        <item name="pinkColor6">#EF0057</item>
+        <item name="pinkColor7">#B80043</item>
+        <item name="pinkColor8">#FB2C77</item>
+        <item name="pinkColor9">#DC1A60</item>
+        <item name="pinkColor10">#CA799E</item>
+        <item name="pinkColor11">#282828</item>
+        <item name="pinkColor12">#F1DDDD</item>
+    </array>
+
+    <array name="blueColors">
+        <item name="blueColor1">#0177C7</item>
+        <item name="blueColor2">#56AFE1</item>
+        <item name="blueColor3">#588EAC</item>
+        <item name="blueColor4">#10405B</item>
+        <item name="blueColor5">#0D7DBC</item>
+        <item name="blueColor6">#6DCBFF</item>
+        <item name="blueColor7">#6DCBFF</item>
+        <item name="blueColor8">#0A85C9</item>
+        <item name="blueColor9">#0875A5</item>
+        <item name="blueColor10">#266E8D</item>
+        <item name="blueColor11">#282828</item>
+        <item name="blueColor12">#E8F6FF</item>
+    </array>
+
+    <color name="commonColor1">#3E3E3E</color>
+    <color name="commonColor2">#4C4C4C</color>
+    <color name="commonColor3">#282828</color>
+    <color name="commonColor4">#996452</color>
+    <color name="commonColor5">#1A1A1A</color>
+    <color name="commonColor6">#996452</color>
+    <color name="commonColor7">#818181</color>
+    <color name="commonColor8">#7C7C7C</color>
+    <color name="commonColor9">#EAEAEA</color>
+    <color name="commonColor10">#E4E4E4</color>
+    <color name="commonColor11">#626262</color>
+
     <!-- Other -->
     <color name="textInputStrokeColor">@color/shark</color>
     <color name="toggleableTextFormatterBackgroundColor">@color/mouse</color>
