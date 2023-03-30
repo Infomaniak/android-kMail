@@ -136,7 +136,7 @@ object DraftController {
     private fun Context.replyQuote(message: Message): String {
 
         val date = message.date.toDate()
-        val from = message.from.first().quotedDisplay()
+        val from = message.fromName(context = this)
         val messageReplyHeader = getString(R.string.messageReplyHeader, date, from)
         val previousBody = message.body?.value ?: ""
 
@@ -169,7 +169,7 @@ object DraftController {
         return """
             <div class="${MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME}">
             <div>---------- $messageForwardHeader ---------<br></div>
-            <div>$fromTitle ${message.from.first().quotedDisplay()}<br></div>
+            <div>$fromTitle ${message.fromName(context = this)}<br></div>
             <div>$dateTitle ${message.date.toDate()}<br></div>
             <div>$subjectTitle ${message.subject}<br></div>
             <div>$toTitle ${message.to.joinToString { it.quotedDisplay() }}<br></div>
@@ -179,6 +179,10 @@ object DraftController {
             $previousBody
             </div>
         """.trimIndent()
+    }
+
+    private fun Message.fromName(context: Context): String {
+        return from.firstOrNull()?.quotedDisplay() ?: context.getString(R.string.unknownRecipientTitle)
     }
 
     private fun Recipient.quotedDisplay(): String = "${("$name ").ifBlank { "" }}&lt;$email&gt;"

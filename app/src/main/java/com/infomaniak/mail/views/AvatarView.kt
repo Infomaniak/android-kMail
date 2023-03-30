@@ -64,10 +64,14 @@ class AvatarView @JvmOverloads constructor(
         )
     }
 
-    fun loadAvatar(recipient: Recipient, contacts: Map<String, Map<String, MergedContact>>) {
-        val recipientsForEmail = contacts[recipient.email]
-        val mergedContact = recipientsForEmail?.getOrElse(recipient.name) { recipientsForEmail.entries.elementAt(0).value }
-        binding.avatarImage.loadCorrespondentAvatar(mergedContact ?: recipient)
+    fun loadAvatar(recipient: Recipient?, contacts: Map<String, Map<String, MergedContact>>) {
+        if (recipient == null) {
+            loadUnknownUserAvatar()
+        } else {
+            val recipientsForEmail = contacts[recipient.email]
+            val mergedContact = recipientsForEmail?.getOrElse(recipient.name) { recipientsForEmail.entries.elementAt(0).value }
+            binding.avatarImage.loadCorrespondentAvatar(mergedContact ?: recipient)
+        }
     }
 
     fun loadAvatar(mergedContact: MergedContact) {

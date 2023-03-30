@@ -186,9 +186,9 @@ class Thread : RealmObject {
 
     fun isOnlyOneDraft(): Boolean = hasDrafts && messages.count() == 1
 
-    fun computeAvatarRecipient(): Recipient {
+    fun computeAvatarRecipient(): Recipient? {
         val message = messages.lastOrNull { it.folder.role != FolderRole.SENT } ?: messages.last()
-        return message.from.first()
+        return message.from.firstOrNull()
     }
 
     fun computeDisplayedRecipients(): RealmList<Recipient> {

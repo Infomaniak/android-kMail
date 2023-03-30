@@ -203,18 +203,21 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
             }
             shortMessageDate.text = ""
         } else {
-            val firstSender = message.from.first()
+            val firstSender = message.from.firstOrNull()
             userAvatar.loadAvatar(firstSender, contacts)
             expeditorName.apply {
-                text = context.getPrettyNameAndEmail(firstSender).first
+                text = firstSender?.let { context.getPrettyNameAndEmail(it).first }
+                    ?: run { context.getString(R.string.unknownRecipientTitle) }
                 setTextAppearance(R.style.BodyMedium)
             }
             shortMessageDate.text = context.mailFormattedDate(messageDate)
         }
 
-        userAvatar.setOnClickListener {
-            context.trackMessageEvent("selectAvatar")
-            onContactClicked?.invoke(message.from.first())
+        message.from.firstOrNull()?.let { recipient ->
+            userAvatar.setOnClickListener {
+                context.trackMessageEvent("selectAvatar")
+                onContactClicked?.invoke(recipient)
+            }
         }
 
         setDetailedFieldsVisibility(message)
@@ -252,6 +255,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
     }
 
     private fun ItemMessageBinding.setDetailedFieldsVisibility(message: Message) {
+        fromGroup.isVisible = message.from.isNotEmpty()
         toGroup.isVisible = message.to.isNotEmpty()
         ccGroup.isVisible = message.cc.isNotEmpty()
         bccGroup.isVisible = message.bcc.isNotEmpty()
