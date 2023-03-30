@@ -31,33 +31,33 @@ import com.infomaniak.mail.utils.changePathColor
 object IlluColors {
 
     private val lightTones = listOf(
-        40,
-        79,
-        87,
-        29,
-        47,
-        64,
-        60,
-        48,
-        49,
-        26,
-        95,
-        98,
+        40.1,
+        64.7,
+        79.1,
+        37.6,
+        48.6,
+        62.5,
+        59.1,
+        47.2,
+        48.4,
+        29.8,
+        93.4,
+        95.4,
     )
 
     private val darkTones = listOf(
-        69,
-        42,
-        51,
-        67,
-        63,
-        52,
-        40,
-        57,
-        49,
-        69,
-        6,
-        91,
+        59.6,
+        41.7,
+        43.4,
+        49.8,
+        58.7,
+        51.0,
+        38.8,
+        56.1,
+        48.1,
+        59.0,
+        14.1,
+        89.4,
     )
 
     fun LottieAnimationView.changeIllustrationColors(position: Int, accentColor: LocalSettings.AccentColor) {
@@ -216,7 +216,7 @@ object IlluColors {
 
                 val palette = tones.map { tone ->
                     val color = Hct.from(primaryColor.hue, primaryColor.chroma, primaryColor.tone)
-                    color.tone = tone.toDouble()
+                    color.tone = tone
                     color.toInt()
                 }
 
