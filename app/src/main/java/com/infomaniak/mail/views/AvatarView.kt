@@ -36,6 +36,7 @@ import com.infomaniak.mail.data.models.correspondent.Correspondent
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ViewAvatarBinding
+import com.infomaniak.mail.utils.AccountUtils
 
 class AvatarView @JvmOverloads constructor(
     context: Context,
@@ -85,6 +86,8 @@ class AvatarView @JvmOverloads constructor(
     fun setImageDrawable(drawable: Drawable?) = binding.avatarImage.setImageDrawable(drawable)
 
     private fun ImageView.loadCorrespondentAvatar(correspondent: Correspondent): Disposable = with(correspondent) {
+        if (correspondent.shouldDisplayUserAvatar()) return@with loadAvatar(AccountUtils.currentUser!!)
+
         val avatar = (correspondent as? MergedContact)?.avatar
         val color = context.getColor(R.color.onColorfulBackground)
         return loadAvatar(
