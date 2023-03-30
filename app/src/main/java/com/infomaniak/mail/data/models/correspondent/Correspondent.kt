@@ -35,8 +35,8 @@ interface Correspondent : Parcelable {
 
     fun computeInitials(): String {
         val (firstName, lastName) = computeFirstAndLastName()
-        val first = firstName.replace(Regex("\\p{Punct}"), "").first()
-        val last = lastName.replace(Regex("\\p{Punct}"), "").firstOrEmpty()
+        val first = firstName.removeControlAndPunctuation().first()
+        val last = lastName.removeControlAndPunctuation().firstOrEmpty()
 
         return "$first$last".uppercase()
     }
@@ -50,6 +50,8 @@ interface Correspondent : Parcelable {
             else -> words.first() to words.last()
         }
     }
+
+    private fun String.removeControlAndPunctuation() = replace(Regex("\\p{Punct}|\\p{C}"), "")
 
     fun displayedName(context: Context): String = if (isMe()) context.getString(R.string.contactMe) else getNameOrEmail()
 }
