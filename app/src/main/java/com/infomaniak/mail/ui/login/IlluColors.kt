@@ -57,7 +57,7 @@ object IlluColors {
         48.1,
         59.0,
         14.1,
-        89.4,
+        96.0,
     )
 
     fun LottieAnimationView.changeIllustrationColors(position: Int, accentColor: LocalSettings.AccentColor) {
