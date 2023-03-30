@@ -133,10 +133,9 @@ class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycleObser
 
     private fun configureInfomaniakCore() {
         InfomaniakCore.init(
+            appVersionCode = BuildConfig.VERSION_CODE,
             appVersionName = BuildConfig.VERSION_NAME,
             clientId = BuildConfig.CLIENT_ID,
-            credentialManager = null,
-            isDebug = BuildConfig.DEBUG,
         )
     }
 
