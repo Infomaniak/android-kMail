@@ -31,7 +31,7 @@ interface Correspondent : Parcelable {
 
     fun isMe(): Boolean = AccountUtils.currentMailboxEmail == this.email
 
-    fun shouldDisplayUserAvatar(): Boolean = isMe() && AccountUtils.currentUser?.email == this.email
+    fun shouldDisplayUserAvatar(): Boolean = isMe() && email == AccountUtils.currentUser?.email
 
     fun getNameOrEmail(): String = name.ifBlank { email }
 
