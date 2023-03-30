@@ -19,8 +19,10 @@ package com.infomaniak.mail.data
 
 import android.content.Context
 import android.util.Log
+import android.view.ContextThemeWrapper
 import androidx.annotation.*
 import androidx.appcompat.app.AppCompatDelegate
+import com.google.android.material.color.MaterialColors
 import com.infomaniak.lib.core.api.ApiController.json
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.lib.core.utils.transaction
@@ -34,6 +36,7 @@ import com.infomaniak.mail.MatomoMail.ACTION_SPAM_NAME
 import com.infomaniak.mail.R
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
+import com.google.android.material.R as RMaterial
 
 class LocalSettings private constructor(context: Context) {
 
@@ -124,33 +127,38 @@ class LocalSettings private constructor(context: Context) {
     enum class AccentColor(
         @StringRes val localisedNameRes: Int,
         @StyleRes val theme: Int,
-        @ColorRes private val primary: Int,
-        @ColorRes private val secondaryBackground: Int,
-        @ColorRes private val ripple: Int,
         val introTabIndex: Int,
     ) {
         PINK(
             R.string.accentColorPinkTitle,
             R.style.AppTheme_Pink,
-            R.color.pinkMail,
-            R.color.pinkBoardingSecondaryBackground,
-            R.color.pinkMailRipple,
             0,
         ),
         BLUE(
             R.string.accentColorBlueTitle,
             R.style.AppTheme_Blue,
-            R.color.blueMail,
-            R.color.blueBoardingSecondaryBackground,
-            R.color.blueMailRipple,
             1,
+        ),
+        SYSTEM(
+            R.string.accentColorSystemTitle,
+            R.style.AppTheme,
+            2,
         );
 
-        fun getPrimary(context: Context): Int = context.getColor(primary)
+        fun getPrimary(context: Context): Int {
+            val baseThemeContext = ContextThemeWrapper(context, theme)
+            return MaterialColors.getColor(baseThemeContext, RMaterial.attr.colorPrimary, 0)
+        }
 
-        fun getSecondaryBackground(context: Context): Int = context.getColor(secondaryBackground)
+        fun getOnboardingSecondaryBackground(context: Context): Int {
+            val baseThemeContext = ContextThemeWrapper(context, theme)
+            return baseThemeContext.getColor(R.color.onboarding_secondary_background)
+        }
 
-        fun getRipple(context: Context): Int = context.getColor(ripple)
+        fun getRipple(context: Context): Int {
+            val baseThemeContext = ContextThemeWrapper(context, theme)
+            return MaterialColors.getColor(baseThemeContext, RMaterial.attr.colorControlHighlight, 0)
+        }
 
         override fun toString() = name.lowercase()
     }

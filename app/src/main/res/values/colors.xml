@@ -23,13 +23,11 @@
     <color name="pinkMailOnPrimary">@color/pink_mail_on_primary_light</color>
     <color name="pinkMailContainer">@color/pink_mail_container_light</color>
     <color name="pinkBoardingSecondaryBackground">@color/pinkMailContainer</color>
-    <color name="pinkMailRipple">@color/pink_mail_ripple_light</color>
     <color name="blueMail">@color/primary</color>
     <color name="blueMailInverse">@color/blue_mail_primary_dark</color>
     <color name="blueMailOnPrimary">@color/blue_mail_on_primary_light</color>
     <color name="blueMailContainer">@color/blue_mail_container_light</color>
     <color name="blueBoardingSecondaryBackground">@color/blueMailContainer</color>
-    <color name="blueMailRipple">@color/blue_mail_ripple_light</color>
 
     <!-- Context / errors -->
     <color name="orangeWarning">@color/orange_light</color>

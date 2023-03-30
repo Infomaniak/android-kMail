@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak kMail - Android
-  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~ Copyright (C) 2022-2023 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -43,11 +43,17 @@
                 android:layout_height="wrap_content">
 
                 <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                    android:id="@+id/systemRadioButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:text="@string/accentColorSystemTitle" />
+
+                <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
                     android:id="@+id/pinkRadioButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:checkMarkColor="@color/pinkMail"
-                    app:icon="@drawable/ic_theme_pink"
+                    app:icon="@drawable/ic_accent_pink"
                     app:text="@string/accentColorPinkTitle" />
 
                 <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
@@ -55,7 +61,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:checkMarkColor="@color/blueMail"
-                    app:icon="@drawable/ic_theme_blue"
+                    app:icon="@drawable/ic_accent_blue"
                     app:text="@string/accentColorBlueTitle" />
 
             </com.infomaniak.mail.ui.main.settings.SettingRadioGroupView>

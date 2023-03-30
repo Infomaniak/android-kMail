@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,17 +17,20 @@
  */
 package com.infomaniak.mail.ui.main.settings
 
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
+import com.google.android.material.color.DynamicColors
+import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.AccentColor
-import com.infomaniak.mail.data.LocalSettings.AccentColor.BLUE
-import com.infomaniak.mail.data.LocalSettings.AccentColor.PINK
+import com.infomaniak.mail.data.LocalSettings.AccentColor.*
 import com.infomaniak.mail.databinding.FragmentAccentColorSettingBinding
 
 class AccentColorSettingFragment : Fragment() {
@@ -43,9 +46,12 @@ class AccentColorSettingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding.radioGroup) {
         super.onViewCreated(view, savedInstanceState)
 
+        setSystemSettingUi()
+
         initBijectionTable(
             R.id.pinkRadioButton to PINK,
             R.id.blueRadioButton to BLUE,
+            R.id.systemRadioButton to SYSTEM,
         )
 
         check(localSettings.accentColor)
@@ -53,6 +59,22 @@ class AccentColorSettingFragment : Fragment() {
         onItemCheckedListener { _, _, accentColor ->
             chooseColor(accentColor as AccentColor)
             trackEvent("settingsAccentColor", accentColor.toString())
+        }
+    }
+
+    private fun setSystemSettingUi() = with(binding) {
+        if (!DynamicColors.isDynamicColorAvailable()) {
+            systemRadioButton.isGone = true
+            return@with
+        }
+
+        val dynamicPrimaryColor = SYSTEM.getPrimary(context)
+        systemRadioButton.apply {
+            setCheckMarkColor(dynamicPrimaryColor)
+            setIcon(GradientDrawable().apply {
+                shape = GradientDrawable.OVAL
+                setColor(dynamicPrimaryColor)
+            })
         }
     }
 

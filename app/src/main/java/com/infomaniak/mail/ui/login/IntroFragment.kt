@@ -19,7 +19,6 @@ package com.infomaniak.mail.ui.login
 
 import android.content.Context
 import android.content.res.ColorStateList
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -30,6 +29,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.airbnb.lottie.LottieAnimationView
+import com.google.android.material.color.DynamicColors
 import com.google.android.material.tabs.TabLayout
 import com.infomaniak.lib.core.utils.capitalizeFirstChar
 import com.infomaniak.lib.core.utils.isNightModeEnabled
@@ -83,10 +83,10 @@ class IntroFragment : Fragment() {
             0 -> introViewModel.currentAccentColor.value?.let { accentColor ->
                 pinkBlueSwitch.isVisible = true
 
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-                    pinkBlueTabLayout.removeTab(pinkBlueTabLayout.getTabAt(SYSTEM_TAB_INDEX)!!)
-                } else {
+                if (DynamicColors.isDynamicColorAvailable()) {
                     pinkBlueTabLayout.getTabAt(SYSTEM_TAB_INDEX)!!.view.setOnClickListener { (requireActivity() as LoginActivity).notYetImplemented() }
+                } else {
+                    pinkBlueTabLayout.removeTab(pinkBlueTabLayout.getTabAt(SYSTEM_TAB_INDEX)!!)
                 }
 
                 val selectedTab = pinkBlueTabLayout.getTabAt(accentColor.introTabIndex)
@@ -218,7 +218,7 @@ class IntroFragment : Fragment() {
     }
 
     private fun updateEachPageUi(accentColor: AccentColor) {
-        val newColor = accentColor.getSecondaryBackground(requireContext())
+        val newColor = accentColor.getOnboardingSecondaryBackground(requireContext())
         val oldColor = requireActivity().window.statusBarColor
         animateColorChange(oldColor, newColor) { color ->
             binding.waveBackground.imageTintList = ColorStateList.valueOf(color)

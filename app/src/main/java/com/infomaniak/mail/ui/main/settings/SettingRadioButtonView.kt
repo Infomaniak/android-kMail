@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +18,11 @@
 package com.infomaniak.mail.ui.main.settings
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
+import androidx.annotation.ColorInt
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.infomaniak.lib.core.utils.getAttributes
@@ -50,10 +52,7 @@ class SettingRadioButtonView @JvmOverloads constructor(
                 )
                 associatedValue = getString(R.styleable.SettingRadioButtonView_value)
 
-                if (iconDrawable != null) icon.apply {
-                    isVisible = true
-                    setImageDrawable(iconDrawable)
-                }
+                setIcon(iconDrawable)
                 text.text = textString
                 checkMark.setColorFilter(checkMarkColor)
 
@@ -72,5 +71,16 @@ class SettingRadioButtonView @JvmOverloads constructor(
 
     fun setText(newText: String) {
         binding.text.text = newText
+    }
+
+    fun setCheckMarkColor(@ColorInt color: Int) {
+        binding.checkMark.setColorFilter(color)
+    }
+
+    fun setIcon(iconDrawable: Drawable?) {
+        binding.icon.apply {
+            isVisible = iconDrawable != null
+            setImageDrawable(iconDrawable)
+        }
     }
 }

@@ -244,7 +244,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun animateSecondaryColorElements(accentColor: AccentColor) {
-        val newSecondaryBackground = accentColor.getSecondaryBackground(this@LoginActivity)
+        val newSecondaryBackground = accentColor.getOnboardingSecondaryBackground(this@LoginActivity)
         val oldSecondaryBackground = window.statusBarColor
         animateColorChange(oldSecondaryBackground, newSecondaryBackground) { color ->
             window.statusBarColor = color
