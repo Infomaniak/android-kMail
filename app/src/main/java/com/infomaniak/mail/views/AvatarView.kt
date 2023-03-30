@@ -36,6 +36,7 @@ import com.infomaniak.mail.data.models.correspondent.Correspondent
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ViewAvatarBinding
+import com.infomaniak.mail.utils.AccountUtils
 
 class AvatarView @JvmOverloads constructor(
     context: Context,
@@ -84,15 +85,19 @@ class AvatarView @JvmOverloads constructor(
 
     fun setImageDrawable(drawable: Drawable?) = binding.avatarImage.setImageDrawable(drawable)
 
-    private fun ImageView.loadCorrespondentAvatar(correspondent: Correspondent): Disposable = with(correspondent) {
-        val avatar = (correspondent as? MergedContact)?.avatar
-        val color = context.getColor(R.color.onColorfulBackground)
-        return loadAvatar(
-            backgroundColor = context.getBackgroundColorBasedOnId(email.hashCode(), R.array.AvatarColors),
-            avatarUrl = avatar,
-            initials = initials,
-            imageLoader = context.imageLoader,
-            initialsColor = color,
-        )
+    private fun ImageView.loadCorrespondentAvatar(correspondent: Correspondent): Disposable {
+        return if (correspondent.shouldDisplayUserAvatar()) {
+            loadAvatar(AccountUtils.currentUser!!)
+        } else {
+            val avatar = (correspondent as? MergedContact)?.avatar
+            val color = context.getColor(R.color.onColorfulBackground)
+            loadAvatar(
+                backgroundColor = context.getBackgroundColorBasedOnId(correspondent.email.hashCode(), R.array.AvatarColors),
+                avatarUrl = avatar,
+                initials = correspondent.initials,
+                imageLoader = context.imageLoader,
+                initialsColor = color,
+            )
+        }
     }
 }

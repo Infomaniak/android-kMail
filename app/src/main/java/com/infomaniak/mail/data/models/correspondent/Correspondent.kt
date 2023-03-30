@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,6 +30,8 @@ interface Correspondent : Parcelable {
     val initials: String
 
     fun isMe(): Boolean = AccountUtils.currentMailboxEmail == this.email
+
+    fun shouldDisplayUserAvatar(): Boolean = isMe() && email == AccountUtils.currentUser?.email
 
     fun getNameOrEmail(): String = name.ifBlank { email }
 
