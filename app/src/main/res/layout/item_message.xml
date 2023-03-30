@@ -312,11 +312,19 @@
             app:constraint_referenced_ids="fromPrefix,toPrefix,ccPrefix,bccPrefix,detailedMessagePrefix" />
 
         <androidx.constraintlayout.widget.Group
+            android:id="@+id/fromGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:constraint_referenced_ids="fromPrefix,fromRecyclerView"
+            tools:visibility="visible" />
+
+        <androidx.constraintlayout.widget.Group
             android:id="@+id/toGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="gone"
-            app:constraint_referenced_ids="toRecyclerView,toPrefix"
+            app:constraint_referenced_ids="toPrefix,toRecyclerView"
             tools:visibility="visible" />
 
         <androidx.constraintlayout.widget.Group
@@ -324,7 +332,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="gone"
-            app:constraint_referenced_ids="ccRecyclerView,ccPrefix"
+            app:constraint_referenced_ids="ccPrefix,ccRecyclerView"
             tools:visibility="visible" />
 
         <androidx.constraintlayout.widget.Group
@@ -332,7 +340,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="gone"
-            app:constraint_referenced_ids="bccRecyclerView,bccPrefix"
+            app:constraint_referenced_ids="bccPrefix,bccRecyclerView"
             tools:visibility="visible" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
