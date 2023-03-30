@@ -65,10 +65,10 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
 
     private val isLastPage get() = resourceNext.isNullOrBlank()
 
-    val searchResults = observeSearchAndFilters().flatMapLatest { (query, filters, folder) ->
-        val (searchQuery, saveInHistory) = query
+    val searchResults = observeSearchAndFilters().flatMapLatest { (queryData, filters, folder) ->
+        val (query, saveInHistory) = queryData
         fetchThreads(
-            query = if (isLengthTooShort(searchQuery)) null else searchQuery,
+            query = if (isLengthTooShort(query)) null else query,
             saveInHistory,
             filters,
             folder,
@@ -80,8 +80,8 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
     var previousAttachments: Boolean? = null
 
     private fun observeSearchAndFilters(): Flow<Triple<Pair<String, Boolean>, Set<ThreadFilter>, Folder?>> {
-        return combine(_searchQuery.asFlow(), _selectedFilters, _selectedFolder) { query, filters, folder ->
-            Triple(query, filters, folder)
+        return combine(_searchQuery.asFlow(), _selectedFilters, _selectedFolder) { queryData, filters, folder ->
+            Triple(queryData, filters, folder)
         }.debounce(SEARCH_DEBOUNCE_DURATION)
     }
 
