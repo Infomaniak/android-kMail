@@ -17,15 +17,48 @@
  */
 package com.infomaniak.mail.ui.login
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.annotation.ColorInt
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.model.KeyPath
+import com.google.android.material.color.utilities.Hct
+import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.utils.changePathColor
 
 object IlluColors {
+
+    private val lightTones = listOf(
+        40.1,
+        64.7,
+        79.1,
+        37.6,
+        48.6,
+        62.5,
+        59.1,
+        47.2,
+        48.4,
+        29.8,
+        93.4,
+        95.4,
+    )
+
+    private val darkTones = listOf(
+        59.6,
+        41.7,
+        43.4,
+        49.8,
+        58.7,
+        51.0,
+        38.8,
+        56.1,
+        48.1,
+        59.0,
+        14.1,
+        96.0,
+    )
 
     fun LottieAnimationView.changeIllustrationColors(position: Int, accentColor: LocalSettings.AccentColor) {
         updateAccentColorIndependentColors(position)
@@ -170,11 +203,25 @@ object IlluColors {
         colorPaths(pathsToColor, position)
     }
 
+    @SuppressLint("RestrictedApi")
     fun Context.getPaletteFor(accentColor: LocalSettings.AccentColor): IntArray {
         return when (accentColor) {
             LocalSettings.AccentColor.PINK -> resources.getIntArray(R.array.pinkColors)
             LocalSettings.AccentColor.BLUE -> resources.getIntArray(R.array.blueColors)
-            LocalSettings.AccentColor.SYSTEM -> resources.getIntArray(R.array.pinkColors) // TODO : Generate palette from system theme
+            LocalSettings.AccentColor.SYSTEM -> {
+                val primary = LocalSettings.AccentColor.SYSTEM.getPrimary(this)
+                val primaryColor = Hct.fromInt(primary)
+
+                val tones = if (isNightModeEnabled()) darkTones else lightTones
+
+                val palette = tones.map { tone ->
+                    val color = Hct.from(primaryColor.hue, primaryColor.chroma, primaryColor.tone)
+                    color.tone = tone
+                    color.toInt()
+                }
+
+                return palette.toIntArray()
+            }
         }
     }
 
