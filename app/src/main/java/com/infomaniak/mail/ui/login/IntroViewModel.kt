@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,5 +24,7 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.AccentColor
 
 class IntroViewModel(application: Application) : AndroidViewModel(application) {
-    var currentAccentColor: MutableLiveData<AccentColor> = MutableLiveData(LocalSettings.getInstance(application).accentColor)
+    var updatedAccentColor: MutableLiveData<Pair<AccentColor, AccentColor>> = MutableLiveData(
+        LocalSettings.getInstance(application).accentColor to LocalSettings.getInstance(application).accentColor
+    )
 }

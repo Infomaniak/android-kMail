@@ -424,3 +424,7 @@ fun Fragment.copyRecipientEmailToClipboard(recipient: Recipient, snackBarAnchor:
         showSnackbar(R.string.snackbarEmailCopiedToClipboard, anchor = snackBarAnchor)
     }
 }
+
+inline infix fun <reified E : Enum<E>, V> ((E) -> V).enumValueFrom(value: V): E? {
+    return enumValues<E>().firstOrNull { this(it) == value }
+}

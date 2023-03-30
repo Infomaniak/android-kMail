@@ -153,8 +153,8 @@ class LoginActivity : AppCompatActivity() {
             )
         }
 
-        introViewModel.currentAccentColor.observe(this@LoginActivity) { accentColor ->
-            updateUi(accentColor)
+        introViewModel.updatedAccentColor.observe(this@LoginActivity) { (newAccentColor, oldAccentColor) ->
+            updateUi(newAccentColor, oldAccentColor)
         }
 
         trackScreen()
@@ -180,9 +180,9 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateUi(accentColor: AccentColor) = with(binding) {
-        animatePrimaryColorElements(accentColor)
-        animateSecondaryColorElements(accentColor)
+    private fun updateUi(newAccentColor: AccentColor, oldAccentColor: AccentColor) {
+        animatePrimaryColorElements(newAccentColor, oldAccentColor)
+        animateSecondaryColorElements(newAccentColor, oldAccentColor)
     }
 
     private fun authenticateUser(authCode: String) = lifecycleScope.launch(Dispatchers.IO) {
@@ -228,24 +228,26 @@ class LoginActivity : AppCompatActivity() {
         signInButton.isEnabled = true
     }
 
-    private fun animatePrimaryColorElements(accentColor: AccentColor) = with(binding) {
-        val newPrimary = accentColor.getPrimary(this@LoginActivity)
-        val oldPrimary = dotsIndicator.selectedDotColor
-        val ripple = accentColor.getRipple(this@LoginActivity)
+    private fun animatePrimaryColorElements(newAccentColor: AccentColor, oldAccentColor: AccentColor) {
+        val newPrimary = newAccentColor.getPrimary(this)
+        val oldPrimary = oldAccentColor.getPrimary(this)
+        val ripple = newAccentColor.getRipple(this)
 
-        animateColorChange(oldPrimary, newPrimary) { color ->
-            val singleColorStateList = ColorStateList.valueOf(color)
-            dotsIndicator.selectedDotColor = color
-            connectButton.setBackgroundColor(color)
-            nextButton.backgroundTintList = singleColorStateList
-            signInButton.setTextColor(color)
-            signInButton.rippleColor = ColorStateList.valueOf(ripple)
+        binding.apply {
+            animateColorChange(oldPrimary, newPrimary) { color ->
+                val singleColorStateList = ColorStateList.valueOf(color)
+                dotsIndicator.selectedDotColor = color
+                connectButton.setBackgroundColor(color)
+                nextButton.backgroundTintList = singleColorStateList
+                signInButton.setTextColor(color)
+                signInButton.rippleColor = ColorStateList.valueOf(ripple)
+            }
         }
     }
 
-    private fun animateSecondaryColorElements(accentColor: AccentColor) {
-        val newSecondaryBackground = accentColor.getOnboardingSecondaryBackground(this@LoginActivity)
-        val oldSecondaryBackground = window.statusBarColor
+    private fun animateSecondaryColorElements(newAccentColor: AccentColor, oldAccentColor: AccentColor) {
+        val newSecondaryBackground = newAccentColor.getOnboardingSecondaryBackground(this)
+        val oldSecondaryBackground = oldAccentColor.getOnboardingSecondaryBackground(this)
         animateColorChange(oldSecondaryBackground, newSecondaryBackground) { color ->
             window.statusBarColor = color
         }

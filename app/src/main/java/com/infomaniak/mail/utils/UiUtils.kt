@@ -114,16 +114,16 @@ object UiUtils {
         @ColorInt newColor: Int,
         duration: Long = 150L,
         animate: Boolean = true,
-        setColor: (color: Int) -> Unit,
+        applyColor: (color: Int) -> Unit,
     ): ValueAnimator? {
         return if (animate) {
             ValueAnimator.ofObject(ArgbEvaluator(), oldColor, newColor).apply {
                 setDuration(duration)
-                addUpdateListener { animator -> setColor(animator.animatedValue as Int) }
+                addUpdateListener { animator -> applyColor(animator.animatedValue as Int) }
                 start()
             }
         } else {
-            setColor(newColor)
+            applyColor(newColor)
             null
         }
     }
