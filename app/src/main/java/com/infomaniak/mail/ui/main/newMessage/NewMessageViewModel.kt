@@ -141,7 +141,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
                 DraftMode.REPLY, DraftMode.REPLY_ALL, DraftMode.FORWARD -> {
                     previousMessageUid
                         ?.let { uid -> MessageController.getMessage(uid, realm = this@createDraft) }
-                        ?.let { message -> setPreviousMessage(draftMode, message, context) }
+                        ?.let { message -> setPreviousMessage(draftMode, message, context, realm = this@createDraft) }
                 }
             }
         }
