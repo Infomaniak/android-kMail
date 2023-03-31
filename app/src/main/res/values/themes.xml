@@ -71,34 +71,26 @@
         <item name="colorPrimary">@color/pinkMail</item>
         <item name="colorPrimaryInverse">@color/pinkMailInverse</item>
         <item name="colorOnPrimary">@color/pinkMailOnPrimary</item>
-        <item name="colorPrimaryDark">#00FF00</item>
 
         <item name="colorPrimaryContainer">@color/pinkMailContainer</item>
         <item name="colorOnPrimaryContainer">@color/pinkMail</item>
 
         <item name="colorAccent">@color/pinkMail</item>
-        <item name="colorSecondary">#00FF00</item>
 
         <item name="colorControlNormal">@color/pinkMail</item>
-
-        <item name="customGradientColor">#FF4388</item>
     </style>
 
     <style name="AppTheme.Blue">
         <item name="colorPrimary">@color/blueMail</item>
         <item name="colorPrimaryInverse">@color/blueMailInverse</item>
         <item name="colorOnPrimary">@color/blueMailOnPrimary</item>
-        <item name="colorPrimaryDark">#00FF00</item>
 
         <item name="colorPrimaryContainer">@color/blueMailContainer</item>
         <item name="colorOnPrimaryContainer">@color/blueMail</item>
 
         <item name="colorAccent">@color/blueMail</item>
-        <item name="colorSecondary">#00FF00</item>
 
         <item name="colorControlNormal">@color/blueMail</item>
-
-        <item name="customGradientColor">#89CFFF</item>
     </style>
 
     <!-- AppLock -->
