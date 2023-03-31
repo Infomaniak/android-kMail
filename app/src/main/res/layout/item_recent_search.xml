@@ -28,6 +28,14 @@
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/marginStandardMedium"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_editor_clock"
+            app:tint="?attr/colorPrimary" />
+
         <TextView
             android:id="@+id/searchQueryButton"
             android:layout_width="0dp"
