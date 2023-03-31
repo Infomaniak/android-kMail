@@ -116,7 +116,7 @@
 
     <declare-styleable name="RecipientFieldView">
         <attr name="title" />
-        <attr name="toggleable" format="boolean" />
+        <attr name="canCollapseEverything" format="boolean" />
     </declare-styleable>
 
     <declare-styleable name="AvatarNameEmailView">

@@ -159,7 +159,7 @@ class NewMessageFragment : Fragment() {
             onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, TO) },
             onContactRemovedCallback = { newMessageViewModel.removeRecipientFromField(it, TO) },
             onCopyContactAddressCallback = ::copyRecipientEmailToClipboard,
-            onToggleCallback = ::openAdvancedFields,
+            onToggleEverythingCallback = ::openAdvancedFields,
             setSnackBarCallback = ::setSnackBar,
         )
 
