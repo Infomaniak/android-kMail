@@ -121,14 +121,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     val currentFilter = SingleLiveEvent(ThreadFilter.ALL)
 
+    val dayHasChangedSinceLastUpdate = SingleLiveEvent(Unit)
+
     val currentThreadsLive = observeFolderAndFilter().flatMapLatest { (folder, filter) ->
         folder?.let { ThreadController.getThreadsAsync(it, filter) } ?: emptyFlow()
     }.asLiveData(coroutineContext)
 
-    private fun observeFolderAndFilter() = MediatorLiveData<Pair<Folder?, ThreadFilter>>().apply {
-        value = currentFolder.value to currentFilter.value!!
-        addSource(currentFolder) { value = it to value!!.second }
-        addSource(currentFilter) { value = value?.first to it }
+    private fun observeFolderAndFilter() = MediatorLiveData<Triple<Folder?, ThreadFilter, Unit>>().apply {
+        value = Triple(currentFolder.value, currentFilter.value!!, dayHasChangedSinceLastUpdate.value!!)
+        addSource(currentFolder) { value = Triple(it, value!!.second, value!!.third) }
+        addSource(currentFilter) { value = Triple(value?.first, it, value!!.third) }
+        addSource(dayHasChangedSinceLastUpdate) { value = Triple(value?.first, value!!.second, Unit) }
     }.asFlow()
 
     fun isCurrentFolderRole(role: FolderRole) = currentFolder.value?.role == role
