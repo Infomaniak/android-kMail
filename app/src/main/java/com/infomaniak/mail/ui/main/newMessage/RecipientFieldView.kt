@@ -140,7 +140,7 @@ class RecipientFieldView @JvmOverloads constructor(
                 gotFocus = { gotFocus?.invoke() }
             )
 
-            chevron.isVisible = canCollapseEverything
+            chevron.isVisible = canCollapseEverything // TODO : hide if  "&& otherFieldsAreAllEmpty()"
             isCollapsed = canCollapseEverything
 
             setupChipsRecyclerView()
@@ -355,6 +355,10 @@ class RecipientFieldView @JvmOverloads constructor(
 
     private fun expand() {
         if (canCollapseEverything) isEverythingCollapsed = false else isCollapsed = false
+    }
+
+    fun setChevronVisibility(isVisible: Boolean) {
+        binding.chevron.isVisible = isVisible
     }
 
     private companion object {

@@ -103,6 +103,11 @@ class NewMessageFragment : Fragment() {
         observeMailboxes()
         observeEditorActions()
         observeNewAttachments()
+        observeChevronVisibility()
+    }
+
+    private fun observeChevronVisibility() {
+        newMessageViewModel.isCollapseChevronVisible.observe(viewLifecycleOwner, binding.toField::setChevronVisibility)
     }
 
     override fun onStart() {

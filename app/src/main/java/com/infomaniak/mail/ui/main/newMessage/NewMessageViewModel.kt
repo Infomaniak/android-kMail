@@ -63,6 +63,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
 
     var isAutoCompletionOpened = false
     var isEditorExpanded = false
+    var isCollapseChevronVisible = SingleLiveEvent(true)
 
     // Boolean: For toggleable actions, `false` if the formatting has been removed and `true` if the formatting has been applied.
     val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
@@ -116,6 +117,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
                 splitSignatureAndQuoteFromBody()
                 saveDraftSnapshot()
                 updateIsSendingAllowed()
+                if (draft.cc.isNotEmpty() || draft.bcc.isNotEmpty()) isCollapseChevronVisible.postValue(false)
             }
 
             emit(isSuccess)
@@ -203,6 +205,8 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun addRecipientToField(recipient: Recipient, type: FieldType) = with(draft) {
+        if (type == FieldType.CC || type == FieldType.BCC) isCollapseChevronVisible.value = false
+
         val field = when (type) {
             FieldType.TO -> to
             FieldType.CC -> cc
@@ -220,6 +224,9 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
             FieldType.BCC -> bcc
         }
         field.remove(recipient)
+
+        if (cc.isEmpty() && bcc.isEmpty()) isCollapseChevronVisible.value = true
+
         updateIsSendingAllowed()
         saveDraftDebouncing()
         context.trackNewMessageEvent("deleteRecipient")
