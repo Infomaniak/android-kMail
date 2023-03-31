@@ -22,6 +22,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
@@ -111,9 +112,11 @@ class FolderAdapter(
 
     @SuppressLint("NotifyDataSetChanged")
     fun setFolders(newFolders: List<Folder>, newCurrentFolderId: String?) {
+        // TODO: Temporary fix, we use a DiffUtil while waiting to do it with Realm or asynchronously.
+        val diffResult = DiffUtil.calculateDiff(FolderDiffCallback(newFolders))
         currentFolderId = newCurrentFolderId
         folders = newFolders
-        notifyDataSetChanged()
+        diffResult.dispatchUpdatesTo(this)
     }
 
     fun updateSelectedState(newCurrentFolderId: String) {
@@ -133,4 +136,24 @@ class FolderAdapter(
     }
 
     class FolderViewHolder(val binding: ItemFolderMenuDrawerBinding) : RecyclerView.ViewHolder(binding.root)
+
+    inner class FolderDiffCallback(private val newFolders: List<Folder>) : DiffUtil.Callback() {
+
+        override fun getOldListSize() = folders.count()
+
+        override fun getNewListSize() = newFolders.count()
+
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return folders[oldItemPosition].id == newFolders[newItemPosition].id
+        }
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            val (oldFolder, newFolder) = folders[oldItemPosition] to newFolders[newItemPosition]
+            return oldFolder.name == newFolder.name &&
+                    oldFolder.isFavorite == newFolder.isFavorite &&
+                    oldFolder.path == newFolder.path &&
+                    oldFolder.unreadCount == newFolder.unreadCount &&
+                    oldFolder.threads.count() == newFolder.threads.count()
+        }
+    }
 }
