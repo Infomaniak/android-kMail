@@ -103,11 +103,7 @@ class NewMessageFragment : Fragment() {
         observeMailboxes()
         observeEditorActions()
         observeNewAttachments()
-        observeChevronVisibility()
-    }
-
-    private fun observeChevronVisibility() {
-        newMessageViewModel.isCollapseChevronVisible.observe(viewLifecycleOwner, binding.toField::setChevronVisibility)
+        observeCcAndBccVisibility()
     }
 
     override fun onStart() {
@@ -437,6 +433,11 @@ class NewMessageFragment : Fragment() {
 
             if (importationResult == ImportationResult.FILE_SIZE_TOO_BIG) showSnackbar(R.string.attachmentFileLimitReached)
         }
+    }
+
+    private fun observeCcAndBccVisibility() = with(newMessageViewModel) {
+        isCollapseChevronVisible.observe(viewLifecycleOwner, binding.toField::setChevronVisibility)
+        initializeFieldsAsOpen.observe(viewLifecycleOwner) { openAdvancedFields(!it) }
     }
 
     override fun onStop() {

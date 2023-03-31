@@ -64,6 +64,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     var isAutoCompletionOpened = false
     var isEditorExpanded = false
     var isCollapseChevronVisible = SingleLiveEvent(true)
+    var initializeFieldsAsOpen = SingleLiveEvent<Boolean>()
 
     // Boolean: For toggleable actions, `false` if the formatting has been removed and `true` if the formatting has been applied.
     val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
@@ -117,7 +118,10 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
                 splitSignatureAndQuoteFromBody()
                 saveDraftSnapshot()
                 updateIsSendingAllowed()
-                if (draft.cc.isNotEmpty() || draft.bcc.isNotEmpty()) isCollapseChevronVisible.postValue(false)
+                if (draft.cc.isNotEmpty() || draft.bcc.isNotEmpty()) {
+                    isCollapseChevronVisible.postValue(false)
+                    initializeFieldsAsOpen.postValue(true)
+                }
             }
 
             emit(isSuccess)
