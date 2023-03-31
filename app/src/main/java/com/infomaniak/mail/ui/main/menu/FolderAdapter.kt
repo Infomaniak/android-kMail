@@ -112,7 +112,7 @@ class FolderAdapter(
 
     @SuppressLint("NotifyDataSetChanged")
     fun setFolders(newFolders: List<Folder>, newCurrentFolderId: String?) {
-        // TODO: Temporary fix, we use a DiffUtil while waiting to realize it with realm or in async
+        // TODO: Temporary fix, we use a DiffUtil while waiting to do it with Realm or asynchronously.
         val diffResult = DiffUtil.calculateDiff(FolderDiffCallback(newFolders))
         currentFolderId = newCurrentFolderId
         folders = newFolders
@@ -149,13 +149,11 @@ class FolderAdapter(
 
         override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
             val (oldFolder, newFolder) = folders[oldItemPosition] to newFolders[newItemPosition]
-            return oldFolder.isFavorite == newFolder.isFavorite &&
-                    oldFolder.path.count() == newFolder.path.count() &&
-                    oldFolder.role == newFolder.role &&
-                    oldFolder.threads.count() == newFolder.threads.count() &&
+            return oldFolder.name == newFolder.name &&
+                    oldFolder.isFavorite == newFolder.isFavorite &&
+                    oldFolder.path == newFolder.path &&
                     oldFolder.unreadCount == newFolder.unreadCount &&
-                    oldFolder.name == newFolder.name
+                    oldFolder.threads.count() == newFolder.threads.count()
         }
-
     }
 }
