@@ -172,7 +172,6 @@ class RecipientFieldView @JvmOverloads constructor(
 
             singleChip.root.setOnClickListener {
                 showContactContextMenu(contactChipAdapter.getRecipients().first(), singleChip.root, true)
-                updateCollapsedChipValues(isCollapsed)
             }
         }
     }
