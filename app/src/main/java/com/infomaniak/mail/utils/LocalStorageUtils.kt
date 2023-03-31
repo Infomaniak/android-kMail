@@ -40,7 +40,6 @@ object LocalStorageUtils {
 
     private inline val File.hasEmptyFiles get() = listFiles().isNullOrEmpty()
 
-
     fun getAttachmentsCacheDir(
         context: Context,
         userId: Int = AccountUtils.currentUserId,
