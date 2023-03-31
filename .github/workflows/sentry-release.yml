@@ -8,7 +8,7 @@ on:
 
 jobs:
   release:
-    runs-on: [ self-hosted, Android ]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3.5.0
       - name: Create Sentry release
