@@ -82,13 +82,13 @@ class RecipientFieldView @JvmOverloads constructor(
     private var onContactRemoved: ((Recipient) -> Unit)? = null
     private var onContactAdded: ((Recipient) -> Unit)? = null
     private var onCopyContactAddress: ((Recipient) -> Unit)? = null
+    private var gotFocus: (() -> Unit)? = null
     private var setSnackBar: ((Int) -> Unit) = {}
 
     private var canCollapseEverything = false
 
-    private var isEverythingCollapsed = false
+    private var isEverythingCollapsed = true
         set(value) {
-            if (value == field) return
             field = value
             isCollapsed = field
             updateCollapsedEverythingUiState(value)
@@ -136,7 +136,8 @@ class RecipientFieldView @JvmOverloads constructor(
                 onBackspace = { recipient ->
                     removeRecipient(recipient)
                     focusTextField()
-                }
+                },
+                gotFocus = { gotFocus?.invoke() }
             )
 
             chevron.isVisible = canCollapseEverything
@@ -172,14 +173,12 @@ class RecipientFieldView @JvmOverloads constructor(
         }
 
         plusChip.setOnClickListener {
-            // isCollapsed = !isCollapsed
-            if (canCollapseEverything) isEverythingCollapsed = false else isCollapsed = false
+            expand()
             textInput.showKeyboard()
         }
 
         transparentButton.setOnClickListener {
-            // isCollapsed = !isCollapsed
-            if (canCollapseEverything) isEverythingCollapsed = false else isCollapsed = false
+            expand()
             textInput.showKeyboard()
         }
 
@@ -207,6 +206,8 @@ class RecipientFieldView @JvmOverloads constructor(
             }
 
             setBackspaceOnEmptyFieldListener(::focusLastChip)
+
+            setOnFocusChangeListener { _, hasFocus -> if (hasFocus) gotFocus?.invoke() }
         }
     }
 
@@ -229,16 +230,16 @@ class RecipientFieldView @JvmOverloads constructor(
     private fun focusLastChip() {
         val count = contactChipAdapter.itemCount
         // chipsRecyclerView.children.last() won't work because they are not always ordered correctly
-        if (count > 0) binding.chipsRecyclerView.getChildAt(count - 1).requestFocusFromTouch()
+        if (count > 0) binding.chipsRecyclerView.getChildAt(count - 1)?.requestFocusFromTouch()
     }
 
     private fun focusTextField() {
         binding.textInput.requestFocus()
     }
 
-    private fun updateCollapsedEverythingUiState(isCollapsed: Boolean) = with(binding) {
-        chevron.toggleChevron(isCollapsed)
-        onToggleEverything?.invoke(isCollapsed)
+    private fun updateCollapsedEverythingUiState(isEverythingCollapsed: Boolean) = with(binding) {
+        chevron.toggleChevron(isEverythingCollapsed)
+        onToggleEverything?.invoke(isEverythingCollapsed)
     }
 
     private fun updateCollapsedUiState(isCollapsed: Boolean) = with(binding) {
@@ -283,7 +284,7 @@ class RecipientFieldView @JvmOverloads constructor(
             return
         }
 
-        if (contactChipAdapter.isEmpty()) isCollapsed = false
+        if (contactChipAdapter.isEmpty()) expand()
         val recipient = Recipient().initLocalValues(email, name)
         val recipientIsNew = contactAdapter.addUsedContact(email)
         if (recipientIsNew) {
@@ -317,6 +318,7 @@ class RecipientFieldView @JvmOverloads constructor(
         onContactAddedCallback: ((Recipient) -> Unit),
         onContactRemovedCallback: ((Recipient) -> Unit),
         onCopyContactAddressCallback: ((Recipient) -> Unit),
+        gotFocusCallback: (() -> Unit),
         onToggleEverythingCallback: ((isCollapsed: Boolean) -> Unit)? = null,
         setSnackBarCallback: (titleRes: Int) -> Unit,
     ) {
@@ -328,6 +330,8 @@ class RecipientFieldView @JvmOverloads constructor(
         onContactAdded = onContactAddedCallback
         onContactRemoved = onContactRemovedCallback
         onCopyContactAddress = onCopyContactAddressCallback
+
+        gotFocus = gotFocusCallback
 
         setSnackBar = setSnackBarCallback
     }
@@ -343,6 +347,14 @@ class RecipientFieldView @JvmOverloads constructor(
             }
         }
         updateCollapsedChipValues(isCollapsed)
+    }
+
+    fun collapse() {
+        isCollapsed = true
+    }
+
+    private fun expand() {
+        if (canCollapseEverything) isEverythingCollapsed = false else isCollapsed = false
     }
 
     private companion object {
