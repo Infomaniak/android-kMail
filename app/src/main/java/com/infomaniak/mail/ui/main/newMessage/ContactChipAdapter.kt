@@ -26,7 +26,6 @@ import com.infomaniak.mail.databinding.ChipContactBinding
 class ContactChipAdapter(
     val openContextMenu: (Recipient, BackspaceAwareChip) -> Unit,
     val onBackspace: (Recipient) -> Unit,
-    val gotFocus: () -> Unit,
 ) : RecyclerView.Adapter<ContactChipAdapter.ContactChipViewHolder>() {
     private val recipients = mutableSetOf<Recipient>()
 
@@ -40,7 +39,6 @@ class ContactChipAdapter(
             text = recipient.getNameOrEmail()
             setOnClickListener { openContextMenu(recipient, root) }
             setOnBackspaceListener { onBackspace(recipient) }
-            setOnFocusChangeListener { _, hasFocus -> if (hasFocus) gotFocus() }
         }
     }
 

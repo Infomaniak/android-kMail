@@ -86,15 +86,13 @@ class RecipientFieldView @JvmOverloads constructor(
     private var setSnackBar: ((Int) -> Unit) = {}
 
     private var canCollapseEverything = false
-    private var otherFieldsAreAllEmpty: Boolean = true
-
+    private var otherFieldsAreAllEmpty = true
     private var isEverythingCollapsed = true
         set(value) {
             field = value
             isSelfCollapsed = field
             updateCollapsedEverythingUiState(value)
         }
-
     private var isSelfCollapsed = true
         set(value) {
             if (value == field) return
@@ -137,8 +135,7 @@ class RecipientFieldView @JvmOverloads constructor(
                 onBackspace = { recipient ->
                     removeRecipient(recipient)
                     focusTextField()
-                },
-                gotFocus = { gotFocus?.invoke() }
+                }
             )
 
             chevron.isVisible = canCollapseEverything
@@ -167,7 +164,7 @@ class RecipientFieldView @JvmOverloads constructor(
     }
 
     private fun setToggleRelatedListeners() = with(binding) {
-        chevron.setOnClickListener {
+        if (canCollapseEverything) chevron.setOnClickListener {
             context.trackMessageEvent("openRecipientsFields", isSelfCollapsed)
             isEverythingCollapsed = !isEverythingCollapsed
             if (isSelfCollapsed) textInput.hideKeyboard()
@@ -231,7 +228,7 @@ class RecipientFieldView @JvmOverloads constructor(
     private fun focusLastChip() {
         val count = contactChipAdapter.itemCount
         // chipsRecyclerView.children.last() won't work because they are not always ordered correctly
-        if (count > 0) binding.chipsRecyclerView.getChildAt(count - 1)?.requestFocusFromTouch()
+        if (count > 0) binding.chipsRecyclerView.getChildAt(count - 1).requestFocusFromTouch()
     }
 
     private fun focusTextField() {

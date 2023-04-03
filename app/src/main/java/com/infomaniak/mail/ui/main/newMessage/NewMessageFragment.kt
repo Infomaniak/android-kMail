@@ -195,7 +195,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun fieldGotFocus(field: FieldType?) = with(binding) {
-        if (lastFieldToTakeFocus == field && lastFieldToTakeFocus != null) return
+        if (lastFieldToTakeFocus == field) return
         when (field) {
             TO -> {
                 ccField.collapse()
