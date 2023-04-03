@@ -22,6 +22,7 @@ import com.infomaniak.lib.core.utils.contains
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
+import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.fetchIncompleteMessages
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
@@ -100,7 +101,14 @@ object DraftController {
     //endregion
 
     //region Open Draft
-    fun Draft.setPreviousMessage(draftMode: DraftMode, previousMessage: Message, context: Context) {
+    fun Draft.setPreviousMessage(draftMode: DraftMode, message: Message, context: Context, realm: MutableRealm) {
+
+        val previousMessage = if (message.isFullyDownloaded) {
+            message
+        } else {
+            realm.fetchIncompleteMessages(listOf(message))
+            MessageController.getMessage(message.uid, realm)!!
+        }
 
         inReplyTo = previousMessage.messageId
 

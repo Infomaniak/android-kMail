@@ -177,44 +177,59 @@ object ThreadController {
         mailbox: Mailbox,
         okHttpClient: OkHttpClient? = null,
         realm: Realm = defaultRealm,
-    ) = withContext(Dispatchers.IO) {
+    ) {
+        val failedFoldersIds = realm.writeBlocking { fetchIncompleteMessages(messages, okHttpClient) }
+        updateFailedFolders(failedFoldersIds, mailbox, okHttpClient, realm)
+    }
 
-        val impactedFoldersIds = mutableSetOf<String>()
+    fun MutableRealm.fetchIncompleteMessages(messages: List<Message>, okHttpClient: OkHttpClient? = null): Set<String> {
 
-        realm.writeBlocking {
-            messages.forEach { localMessage ->
-                if (!localMessage.isFullyDownloaded) {
-                    with(ApiRepository.getMessage(localMessage.resource, okHttpClient)) {
-                        if (isSuccess()) {
-                            data?.also { remoteMessage ->
+        val failedFoldersIds = mutableSetOf<String>()
 
-                                // If we've already got this Message's Draft beforehand, we need to save
-                                // its `draftLocalUuid`, otherwise we'll lose the link between them.
-                                val draftLocalUuid = if (remoteMessage.isDraft) {
-                                    DraftController.getDraftByMessageUid(remoteMessage.uid, realm = this@writeBlocking)?.localUuid
-                                } else {
-                                    null
-                                }
+        messages.forEach { localMessage ->
+            if (!localMessage.isFullyDownloaded) {
+                with(ApiRepository.getMessage(localMessage.resource, okHttpClient)) {
+                    if (isSuccess()) {
+                        data?.also { remoteMessage ->
 
-                                remoteMessage.initLocalValues(
-                                    isFullyDownloaded = true,
-                                    messageIds = localMessage.messageIds,
-                                    isSpam = localMessage.isSpam,
-                                    date = localMessage.date,
-                                    draftLocalUuid = draftLocalUuid,
-                                )
-
-                                MessageController.upsertMessage(remoteMessage, realm = this@writeBlocking)
+                            // If we've already got this Message's Draft beforehand, we need to save
+                            // its `draftLocalUuid`, otherwise we'll lose the link between them.
+                            val draftLocalUuid = if (remoteMessage.isDraft) {
+                                DraftController.getDraftByMessageUid(
+                                    remoteMessage.uid,
+                                    realm = this@fetchIncompleteMessages,
+                                )?.localUuid
+                            } else {
+                                null
                             }
-                        } else {
-                            impactedFoldersIds.add(localMessage.folderId)
+
+                            remoteMessage.initLocalValues(
+                                isFullyDownloaded = true,
+                                messageIds = localMessage.messageIds,
+                                isSpam = localMessage.isSpam,
+                                date = localMessage.date,
+                                draftLocalUuid = draftLocalUuid,
+                            )
+
+                            MessageController.upsertMessage(remoteMessage, realm = this@fetchIncompleteMessages)
                         }
+                    } else {
+                        failedFoldersIds.add(localMessage.folderId)
                     }
                 }
             }
         }
 
-        impactedFoldersIds.forEach { folderId ->
+        return failedFoldersIds
+    }
+
+    private suspend fun updateFailedFolders(
+        failedFoldersIds: Set<String>,
+        mailbox: Mailbox,
+        okHttpClient: OkHttpClient?,
+        realm: Realm,
+    ) = withContext(Dispatchers.IO) {
+        failedFoldersIds.forEach { folderId ->
             FolderController.getFolder(folderId, realm)?.let { folder ->
                 fetchFolderMessagesJob?.cancel()
                 fetchFolderMessagesJob = launch {
