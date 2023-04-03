@@ -185,28 +185,35 @@ class RecipientFieldView @JvmOverloads constructor(
         }
     }
 
-    private fun setTextInputListeners() = with(binding) {
-        textInput.apply {
-            doOnTextChanged { text, _, _, _ ->
-                if (text?.isNotEmpty() == true) {
-                    if ((text.trim().count()) > 0) contactAdapter.filterField(text) else contactAdapter.clear()
-                    if (!isAutoCompletionOpened) openAutoCompletion()
-                } else if (isAutoCompletionOpened) {
-                    closeAutoCompletion()
-                }
+    private fun setTextInputListeners() = with(binding.textInput) {
+
+        fun performContactSearch(text: CharSequence) {
+            if ((text.trim().count()) > 0) {
+                contactAdapter.filterField(text)
+            } else {
+                contactAdapter.clear()
             }
-
-            setOnEditorActionListener { _, actionId, _ ->
-                if (actionId == EditorInfo.IME_ACTION_DONE && textInput.text?.isNotBlank() == true) {
-                    contactAdapter.addFirstAvailableItem()
-                }
-                true // Keep keyboard open
-            }
-
-            setBackspaceOnEmptyFieldListener(::focusLastChip)
-
-            setOnFocusChangeListener { _, hasFocus -> if (hasFocus) gotFocus?.invoke() }
         }
+
+        doOnTextChanged { text, _, _, _ ->
+            if (text?.isNotEmpty() == true) {
+                performContactSearch(text)
+                if (!isAutoCompletionOpened) openAutoCompletion()
+            } else if (isAutoCompletionOpened) {
+                closeAutoCompletion()
+            }
+        }
+
+        setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE && text?.isNotBlank() == true) {
+                contactAdapter.addFirstAvailableItem()
+            }
+            true // Keep keyboard open
+        }
+
+        setBackspaceOnEmptyFieldListener(::focusLastChip)
+
+        setOnFocusChangeListener { _, hasFocus -> if (hasFocus) gotFocus?.invoke() }
     }
 
     private fun setPopupMenuListeners() {
