@@ -47,6 +47,10 @@
         tools:targetApi="S">
 
         <meta-data
+            android:name="io.sentry.auto-init"
+            android:value="false" />
+
+        <meta-data
             android:name="io.sentry.dsn"
             android:value="https://8ddfc8b292d14e69b12ea723aa3287b7@sentry.infomaniak.com/45" />
 
