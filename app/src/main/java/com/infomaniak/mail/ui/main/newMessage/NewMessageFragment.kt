@@ -231,35 +231,33 @@ class NewMessageFragment : Fragment() {
         bodyText.setText(draft.uiBody)
 
         draft.uiSignature?.let { html ->
-            var signature = if (context.isNightModeEnabled()) {
-                context.injectCssInHtml(R.raw.custom_dark_mode, html)
-            } else {
-                html
-            }
-            signature = context.injectCssInHtml(R.raw.remove_margin, signature)
-            signatureWebView.loadDataWithBaseURL("", signature, ClipDescription.MIMETYPE_TEXT_HTML, Utils.UTF_8, "")
-
+            signatureWebView.loadContent(html)
             removeSignature.setOnClickListener {
                 trackNewMessageEvent("deleteSignature")
                 draft.uiSignature = null
-                separatedSignature.isGone = true
+                signatureGroup.isGone = true
             }
-            separatedSignature.isVisible = true
+            signatureGroup.isVisible = true
         }
 
         draft.uiQuote?.let { html ->
             quoteWebView.apply {
-                loadQuote(html)
+                loadContent(html)
                 initWebViewClient(draft.attachments)
-                isVisible = true
             }
+            removeQuote.setOnClickListener {
+                trackNewMessageEvent("deleteQuote")
+                draft.uiQuote = null
+                quoteGroup.isGone = true
+            }
+            quoteGroup.isVisible = true
         }
     }
 
-    private fun WebView.loadQuote(html: String) {
-        var quote = if (context.isNightModeEnabled()) context.injectCssInHtml(R.raw.custom_dark_mode, html) else html
-        quote = context.injectCssInHtml(R.raw.remove_margin, quote)
-        loadDataWithBaseURL("", quote, ClipDescription.MIMETYPE_TEXT_HTML, Utils.UTF_8, "")
+    private fun WebView.loadContent(html: String) {
+        var content = if (context.isNightModeEnabled()) context.injectCssInHtml(R.raw.custom_dark_mode, html) else html
+        content = context.injectCssInHtml(R.raw.remove_margin, content)
+        loadDataWithBaseURL("", content, ClipDescription.MIMETYPE_TEXT_HTML, Utils.UTF_8, "")
     }
 
     private fun populateViewModelWithExternalMailData() {
