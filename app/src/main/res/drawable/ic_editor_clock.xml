@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak kMail - Android
-  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~ Copyright (C) 2022-2023 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -18,13 +18,24 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"
-    android:tint="@color/iconColor"
     android:viewportWidth="24"
     android:viewportHeight="24">
     <path
-        android:fillColor="#000000"
-        android:pathData="M12,24C5.383,24 0,18.617 0,12C0,5.383 5.383,0 12,0C18.617,0 24,5.383 24,12C24,18.617 18.617,24 12,24ZM12,1C5.935,1 1,5.935 1,12C1,18.065 5.935,23 12,23C18.065,23 23,18.065 23,12C23,5.935 18.065,1 12,1Z" />
+        android:pathData="M12,23C18.075,23 23,18.075 23,12C23,5.925 18.075,1 12,1C5.925,1 1,5.925 1,12C1,18.075 5.925,23 12,23Z"
+        android:strokeWidth="1"
+        android:strokeColor="#9F9F9F"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
     <path
-        android:fillColor="#000000"
-        android:pathData="M18.001,18C17.876,18 17.757,17.953 17.663,17.869L11.663,12.369C11.561,12.275 11.502,12.14 11.502,12V6.5C11.502,6.224 11.726,6 12.002,6C12.278,6 12.502,6.224 12.502,6.5V11.78L18.34,17.131C18.438,17.221 18.496,17.344 18.501,17.478C18.507,17.611 18.461,17.739 18.371,17.838C18.275,17.941 18.142,18 18.001,18Z" />
+        android:pathData="M12,12V8.071"
+        android:strokeWidth="1"
+        android:strokeColor="#9F9F9F"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M12,12L16.91,16.911"
+        android:strokeWidth="1"
+        android:strokeColor="#9F9F9F"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
 </vector>
