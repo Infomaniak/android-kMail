@@ -465,7 +465,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun checkLastUpdateDay() {
-        if (lastUpdatedDate?.isToday() == false) mainViewModel.dayHasChangedSinceLastUpdate.value = Unit
+        if (lastUpdatedDate?.isToday() == false) mainViewModel.forceTriggerCurrentFolder()
     }
 
     private fun updateUpdatedAt(newLastUpdatedDate: Date? = null) {

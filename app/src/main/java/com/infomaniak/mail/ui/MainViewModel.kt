@@ -121,18 +121,24 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     val currentFilter = SingleLiveEvent(ThreadFilter.ALL)
 
-    val dayHasChangedSinceLastUpdate = SingleLiveEvent(Unit)
-
     val currentThreadsLive = observeFolderAndFilter().flatMapLatest { (folder, filter) ->
         folder?.let { ThreadController.getThreadsAsync(it, filter) } ?: emptyFlow()
     }.asLiveData(coroutineContext)
 
-    private fun observeFolderAndFilter() = MediatorLiveData<Triple<Folder?, ThreadFilter, Unit>>().apply {
-        value = Triple(currentFolder.value, currentFilter.value!!, dayHasChangedSinceLastUpdate.value!!)
-        addSource(currentFolder) { value = Triple(it, value!!.second, value!!.third) }
-        addSource(currentFilter) { value = Triple(value?.first, it, value!!.third) }
-        addSource(dayHasChangedSinceLastUpdate) { value = Triple(value?.first, value!!.second, Unit) }
+    private fun observeFolderAndFilter() = MediatorLiveData<Pair<Folder?, ThreadFilter>>().apply {
+        value = currentFolder.value to currentFilter.value!!
+        addSource(currentFolder) { value = it to value!!.second }
+        addSource(currentFilter) { value = value?.first to it }
     }.asFlow()
+
+    /**
+     * Force update the `currentFilter` to its current value.
+     * The sole effect will be to force the `currentThreadsLive` to trigger immediately.
+     * The idea is to force the Threads adapter to trigger again, to update the sections headers (Today, Yesterday, etc...).
+     */
+    fun forceTriggerCurrentFolder() {
+        currentFilter.apply { value = value }
+    }
 
     fun isCurrentFolderRole(role: FolderRole) = currentFolder.value?.role == role
     //endregion
