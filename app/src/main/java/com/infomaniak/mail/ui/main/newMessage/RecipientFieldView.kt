@@ -91,11 +91,11 @@ class RecipientFieldView @JvmOverloads constructor(
     private var isEverythingCollapsed = true
         set(value) {
             field = value
-            isCollapsed = field
+            isSelfCollapsed = field
             updateCollapsedEverythingUiState(value)
         }
 
-    private var isCollapsed = true
+    private var isSelfCollapsed = true
         set(value) {
             if (value == field) return
             field = value
@@ -142,7 +142,7 @@ class RecipientFieldView @JvmOverloads constructor(
             )
 
             chevron.isVisible = canCollapseEverything
-            isCollapsed = canCollapseEverything
+            isSelfCollapsed = canCollapseEverything
 
             setupChipsRecyclerView()
 
@@ -168,9 +168,9 @@ class RecipientFieldView @JvmOverloads constructor(
 
     private fun setToggleRelatedListeners() = with(binding) {
         chevron.setOnClickListener {
-            context.trackMessageEvent("openRecipientsFields", isCollapsed)
+            context.trackMessageEvent("openRecipientsFields", isSelfCollapsed)
             isEverythingCollapsed = !isEverythingCollapsed
-            if (isCollapsed) textInput.hideKeyboard()
+            if (isSelfCollapsed) textInput.hideKeyboard()
         }
 
         plusChip.setOnClickListener {
@@ -347,15 +347,15 @@ class RecipientFieldView @JvmOverloads constructor(
                 contactAdapter.addUsedContact(it.email)
             }
         }
-        updateCollapsedChipValues(isCollapsed)
+        updateCollapsedChipValues(isSelfCollapsed)
     }
 
     fun collapse() {
-        isCollapsed = true
+        isSelfCollapsed = true
     }
 
     private fun expand() {
-        if (canCollapseEverything) isEverythingCollapsed = false else isCollapsed = false
+        if (canCollapseEverything) isEverythingCollapsed = false else isSelfCollapsed = false
     }
 
     fun updateOtherFieldsVisibility(isVisible: Boolean) {
