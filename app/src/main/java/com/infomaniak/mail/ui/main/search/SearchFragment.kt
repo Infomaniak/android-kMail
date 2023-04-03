@@ -247,11 +247,11 @@ class SearchFragment : Fragment() {
         updateHistoryEmptyStateVisibility(recentSearchAdapter.getSearchQueries().isNotEmpty())
     }
 
-    private fun createPopupMenu(): ListPopupWindow {
+    private fun createPopupMenu(): ListPopupWindow = with(binding) {
         val popupMenu = ListPopupWindow(requireContext()).apply {
             isModal = true
             inputMethodMode = PopupWindow.INPUT_METHOD_NOT_NEEDED
-            anchorView = binding.folderDropDown
+            anchorView = folderDropDown
             width = resources.getDimensionPixelSize(R.dimen.maxSearchChipWidth)
         }
 
@@ -270,7 +270,7 @@ class SearchFragment : Fragment() {
             )
         }
 
-        return popupMenu
+        popupMenu
     }
 
     private fun onFolderSelected(folder: Folder?, title: String) = with(binding) {
