@@ -37,7 +37,7 @@ interface Correspondent : Parcelable {
 
     fun computeInitials(): String {
         val (firstName, lastName) = computeFirstAndLastName()
-        val first = firstName.removeControlAndPunctuation().first()
+        val first = firstName.removeControlAndPunctuation().ifBlank { firstName }.first()
         val last = lastName.removeControlAndPunctuation().firstOrEmpty()
 
         return "$first$last".uppercase()
