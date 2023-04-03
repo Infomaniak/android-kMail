@@ -59,7 +59,7 @@ class IntroFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
         when (navigationArgs.position) {
-            0 -> introViewModel.updatedAccentColor.value?.let { (newAccentColor, _) ->
+            0 -> introViewModel.updatedAccentColor.value?.let { (newAccentColor) ->
                 pinkBlueSwitch.isVisible = true
 
                 if (!DynamicColors.isDynamicColorAvailable()) {

@@ -47,10 +47,8 @@ import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListen
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollDirection
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollState
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
+import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.Utils
-import com.infomaniak.lib.core.utils.context
-import com.infomaniak.lib.core.utils.safeNavigate
-import com.infomaniak.lib.core.utils.setPaddingRelative
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
@@ -437,8 +435,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             currentFolderCursor = folder.cursor
             Log.i("UI", "Received cursor: $currentFolderCursor")
             updateThreadsVisibility()
-            updateUpdatedAt(folder.lastUpdatedAt?.toDate())
             updateUnreadCount(folder.unreadCount)
+            checkLastUpdateDay()
+            updateUpdatedAt(folder.lastUpdatedAt?.toDate())
             startUpdatedAtJob()
         }
     }
@@ -463,6 +462,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         WorkManager.getInstance(requireContext()).pruneWork().state.observe(viewLifecycleOwner) {
             if (it is State.FAILURE || it is State.SUCCESS) observeDraftsActions()
         }
+    }
+
+    private fun checkLastUpdateDay() {
+        if (lastUpdatedDate?.isToday() == false) mainViewModel.forceTriggerCurrentFolder()
     }
 
     private fun updateUpdatedAt(newLastUpdatedDate: Date? = null) {

@@ -131,6 +131,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         addSource(currentFilter) { value = value?.first to it }
     }.asFlow()
 
+    /**
+     * Force update the `currentFilter` to its current value.
+     * The sole effect will be to force the `currentThreadsLive` to trigger immediately.
+     * The idea is to force the Threads adapter to trigger again, to update the sections headers (Today, Yesterday, etc...).
+     */
+    fun forceTriggerCurrentFolder() {
+        currentFilter.apply { value = value }
+    }
+
     fun isCurrentFolderRole(role: FolderRole) = currentFolder.value?.role == role
     //endregion
 
