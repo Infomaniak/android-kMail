@@ -358,13 +358,13 @@ class RecipientFieldView @JvmOverloads constructor(
         if (canCollapseEverything) isEverythingCollapsed = false else isSelfCollapsed = false
     }
 
-    fun updateOtherFieldsVisibility(isVisible: Boolean) {
-        otherFieldsAreAllEmpty = !isVisible
-        binding.chevron.isVisible = isVisible
+    fun updateOtherFieldsVisibility(otherFieldsAreAllEmpty: Boolean) {
+        this.otherFieldsAreAllEmpty = otherFieldsAreAllEmpty
+        binding.chevron.isVisible = otherFieldsAreAllEmpty
     }
 
     private fun shouldDisplayChevron(): Boolean {
-        return canCollapseEverything && !otherFieldsAreAllEmpty
+        return canCollapseEverything && otherFieldsAreAllEmpty
     }
 
     private companion object {
