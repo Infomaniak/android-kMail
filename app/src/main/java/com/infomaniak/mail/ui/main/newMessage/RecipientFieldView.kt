@@ -86,6 +86,7 @@ class RecipientFieldView @JvmOverloads constructor(
     private var setSnackBar: ((Int) -> Unit) = {}
 
     private var canCollapseEverything = false
+    private var otherFieldsAreAllEmpty: Boolean = true
 
     private var isEverythingCollapsed = true
         set(value) {
@@ -107,7 +108,7 @@ class RecipientFieldView @JvmOverloads constructor(
         get() = autoCompletedContacts.isVisible
         set(value) {
             autoCompletedContacts.isVisible = value
-            binding.chevron.isGone = value || !canCollapseEverything
+            binding.chevron.isGone = value || !shouldDisplayChevron()
         }
 
     init {
@@ -140,7 +141,7 @@ class RecipientFieldView @JvmOverloads constructor(
                 gotFocus = { gotFocus?.invoke() }
             )
 
-            chevron.isVisible = canCollapseEverything // TODO : hide if  "&& otherFieldsAreAllEmpty()"
+            chevron.isVisible = canCollapseEverything
             isCollapsed = canCollapseEverything
 
             setupChipsRecyclerView()
@@ -357,8 +358,13 @@ class RecipientFieldView @JvmOverloads constructor(
         if (canCollapseEverything) isEverythingCollapsed = false else isCollapsed = false
     }
 
-    fun setChevronVisibility(isVisible: Boolean) {
+    fun updateOtherFieldsVisibility(isVisible: Boolean) {
+        otherFieldsAreAllEmpty = !isVisible
         binding.chevron.isVisible = isVisible
+    }
+
+    private fun shouldDisplayChevron(): Boolean {
+        return canCollapseEverything && !otherFieldsAreAllEmpty
     }
 
     private companion object {

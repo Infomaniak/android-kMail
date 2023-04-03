@@ -63,7 +63,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
 
     var isAutoCompletionOpened = false
     var isEditorExpanded = false
-    var isCollapseChevronVisible = SingleLiveEvent(true)
+    var otherFieldsAreAllEmpty = SingleLiveEvent(true)
     var initializeFieldsAsOpen = SingleLiveEvent<Boolean>()
 
     // Boolean: For toggleable actions, `false` if the formatting has been removed and `true` if the formatting has been applied.
@@ -119,7 +119,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
                 saveDraftSnapshot()
                 updateIsSendingAllowed()
                 if (draft.cc.isNotEmpty() || draft.bcc.isNotEmpty()) {
-                    isCollapseChevronVisible.postValue(false)
+                    otherFieldsAreAllEmpty.postValue(false)
                     initializeFieldsAsOpen.postValue(true)
                 }
             }
@@ -209,7 +209,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun addRecipientToField(recipient: Recipient, type: FieldType) = with(draft) {
-        if (type == FieldType.CC || type == FieldType.BCC) isCollapseChevronVisible.value = false
+        if (type == FieldType.CC || type == FieldType.BCC) otherFieldsAreAllEmpty.value = false
 
         val field = when (type) {
             FieldType.TO -> to
@@ -229,7 +229,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
         }
         field.remove(recipient)
 
-        if (cc.isEmpty() && bcc.isEmpty()) isCollapseChevronVisible.value = true
+        if (cc.isEmpty() && bcc.isEmpty()) otherFieldsAreAllEmpty.value = true
 
         updateIsSendingAllowed()
         saveDraftDebouncing()

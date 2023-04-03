@@ -436,7 +436,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeCcAndBccVisibility() = with(newMessageViewModel) {
-        isCollapseChevronVisible.observe(viewLifecycleOwner, binding.toField::setChevronVisibility)
+        otherFieldsAreAllEmpty.observe(viewLifecycleOwner, binding.toField::updateOtherFieldsVisibility)
         initializeFieldsAsOpen.observe(viewLifecycleOwner) { openAdvancedFields(!it) }
     }
 
