@@ -199,10 +199,9 @@
         <item name="android:letterSpacing">0</item>
         <item name="android:textSize">10sp</item>
         <item name="cornerRadius">0dp</item>
-        <item name="iconSize">20dp</item>
-        <item name="layout_constraintWidth_max">80dp</item>
+        <item name="iconSize">24dp</item>
+        <item name="layout_constraintWidth_max">64dp</item>
         <item name="rippleColor">?android:attr/colorControlHighlight</item>
-        <item name="textAllCaps">false</item>
     </style>
 
     <style name="QuickBottomActionBarButton" parent="Widget.Material3.Button.TextButton">
