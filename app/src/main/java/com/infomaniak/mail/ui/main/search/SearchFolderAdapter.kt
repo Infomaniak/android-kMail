@@ -61,7 +61,10 @@ class SearchFolderAdapter(
     }
 
     private fun bindSeparator(convertView: View?, context: Context?, parent: ViewGroup): View {
-        return (convertView ?: ItemDividerHorizontalBinding.inflate(LayoutInflater.from(context), parent, false).root)
+        val dividerRoot = ItemDividerHorizontalBinding.inflate(LayoutInflater.from(context), parent, false).root
+        dividerRoot.setDividerColorResource(R.color.popupSeparatorColor)
+
+        return convertView ?: dividerRoot
     }
 
     private fun bindFolder(

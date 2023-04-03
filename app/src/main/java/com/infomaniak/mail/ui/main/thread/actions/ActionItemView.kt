@@ -55,7 +55,10 @@ class ActionItemView @JvmOverloads constructor(
                     }
                 }
 
-                divider.isVisible = getBoolean(R.styleable.ActionItemView_visibleDivider, true)
+                divider.apply {
+                    isVisible = getBoolean(R.styleable.ActionItemView_visibleDivider, true)
+                    dividerColor = getColor(R.styleable.ActionItemView_dividerColor, context.getColor(R.color.separatorColor))
+                }
 
                 if (getBoolean(R.styleable.ActionItemView_staffOnly, false)) {
                     if (isInEditMode || AccountUtils.currentUser?.isStaff == true) {

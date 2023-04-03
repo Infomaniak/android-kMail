@@ -57,6 +57,7 @@
 
     <!-- Separators -->
     <color name="separatorColor">@color/orca</color>
+    <color name="popupSeparatorColor">@color/elephant</color>
 
     <!-- Icons -->
     <color name="iconColor">@color/shark</color>

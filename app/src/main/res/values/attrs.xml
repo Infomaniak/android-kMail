@@ -53,6 +53,7 @@
         <attr name="padding" />
         <attr name="text" />
         <attr name="visibleDivider" format="boolean" />
+        <attr name="dividerColor" format="color" />
         <attr name="staffOnly" format="boolean" />
     </declare-styleable>
 
