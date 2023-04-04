@@ -189,7 +189,7 @@ class RecipientFieldView @JvmOverloads constructor(
 
         fun performContactSearch(text: CharSequence) {
             if ((text.trim().count()) > 0) {
-                contactAdapter.filterField(text)
+                contactAdapter.searchContacts(text)
             } else {
                 contactAdapter.clear()
             }
