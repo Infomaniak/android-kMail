@@ -108,12 +108,14 @@ object DraftController {
     //endregion
 
     //region Open Draft
-    fun Draft.setPreviousMessage(draftMode: DraftMode, message: Message, context: Context, realm: MutableRealm) {
+    fun Draft.setPreviousMessage(draftMode: DraftMode, message: Message, context: Context, realm: MutableRealm): Boolean {
+
+        var isSuccess = true
 
         val previousMessage = if (message.isFullyDownloaded) {
             message
         } else {
-            realm.fetchIncompleteMessages(listOf(message))
+            isSuccess = realm.fetchIncompleteMessages(listOf(message)).isEmpty()
             MessageController.getMessage(message.uid, realm)!!
         }
 
@@ -151,6 +153,8 @@ object DraftController {
             }
             DraftMode.NEW_MAIL -> Unit
         }
+
+        return isSuccess
     }
 
     private fun Context.replyQuote(message: Message): String {
