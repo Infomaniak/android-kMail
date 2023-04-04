@@ -196,25 +196,15 @@ class NewMessageFragment : Fragment() {
 
     private fun fieldGotFocus(field: FieldType?) = with(binding) {
         if (lastFieldToTakeFocus == field) return
-        when (field) {
-            TO -> {
-                ccField.collapse()
-                bccField.collapse()
-            }
-            CC -> {
-                toField.collapse()
-                bccField.collapse()
-            }
-            BCC -> {
-                toField.collapse()
-                ccField.collapse()
-            }
-            else -> {
-                toField.collapse()
-                ccField.collapse()
-                bccField.collapse()
-            }
+
+        if (field == null && newMessageViewModel.otherFieldsAreAllEmpty.value == true) {
+            toField.collapseEverything()
+        } else {
+            if (field != TO) toField.collapse()
+            if (field != CC) ccField.collapse()
+            if (field != BCC) bccField.collapse()
         }
+
         lastFieldToTakeFocus = field
     }
 
