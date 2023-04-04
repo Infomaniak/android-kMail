@@ -16,11 +16,26 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="22dp"
-    android:height="22dp"
-    android:viewportWidth="22"
-    android:viewportHeight="22">
+    android:width="16dp"
+    android:height="16dp"
+    android:viewportWidth="16"
+    android:viewportHeight="16">
     <path
-        android:fillColor="#9F9F9F"
-        android:pathData="M11,1.833C5.931,1.833 1.834,5.931 1.834,11C1.834,16.069 5.931,20.167 11,20.167C16.069,20.167 20.167,16.069 20.167,11C20.167,5.931 16.069,1.833 11,1.833ZM11,18.333C6.958,18.333 3.667,15.042 3.667,11C3.667,6.957 6.958,3.667 11,3.667C15.043,3.667 18.333,6.957 18.333,11C18.333,15.042 15.043,18.333 11,18.333ZM11,9.707L14.291,6.417L15.583,7.709L12.293,11L15.583,14.291L14.291,15.583L11,12.292L7.709,15.583L6.417,14.291L9.708,11L6.417,7.709L7.709,6.417L11,9.707Z" />
+        android:pathData="M8,15C11.866,15 15,11.866 15,8C15,4.134 11.866,1 8,1C4.134,1 1,4.134 1,8C1,11.866 4.134,15 8,15Z"
+        android:strokeWidth="1.5"
+        android:strokeColor="#9F9F9F"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M5.2,10.8L10.8,5.2"
+        android:strokeWidth="1.5"
+        android:strokeColor="#9F9F9F"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M10.8,10.8L5.2,5.2"
+        android:strokeWidth="1.5"
+        android:strokeColor="#9F9F9F"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
 </vector>
