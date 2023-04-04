@@ -157,7 +157,8 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/postFields"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:paddingBottom="@dimen/marginStandardMedium">
 
                 <TextView
                     android:id="@+id/subjectPrefix"
@@ -274,23 +275,49 @@
                     app:layout_constraintEnd_toEndOf="@id/signatureWebView"
                     app:layout_constraintTop_toTopOf="@id/signatureWebView" />
 
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/removeQuote"
+                    style="@style/IconButtonSmall"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/contentDescriptionButtonDeleteSignature"
+                    android:insetLeft="@dimen/marginStandardVerySmall"
+                    android:insetTop="@dimen/marginStandardVerySmall"
+                    android:insetRight="@dimen/marginStandardVerySmall"
+                    android:insetBottom="@dimen/marginStandardVerySmall"
+                    android:minWidth="0dp"
+                    android:minHeight="0dp"
+                    android:padding="@dimen/marginStandardVerySmall"
+                    app:icon="@drawable/ic_close"
+                    app:layout_constraintDimensionRatio="1"
+                    app:layout_constraintEnd_toEndOf="@id/quoteWebView"
+                    app:layout_constraintTop_toBottomOf="@id/signatureWebView" />
+
                 <WebView
                     android:id="@+id/quoteWebView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/marginStandardMedium"
+                    android:layout_marginHorizontal="@dimen/marginStandardMedium"
                     android:visibility="gone"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/signatureWebView"
+                    app:layout_constraintTop_toBottomOf="@id/removeQuote"
                     tools:visibility="visible" />
 
                 <androidx.constraintlayout.widget.Group
-                    android:id="@+id/separatedSignature"
+                    android:id="@+id/signatureGroup"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:visibility="gone"
                     app:constraint_referenced_ids="signatureWebView,removeSignature"
+                    tools:visibility="visible" />
+
+                <androidx.constraintlayout.widget.Group
+                    android:id="@+id/quoteGroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:constraint_referenced_ids="quoteWebView,removeQuote"
                     tools:visibility="visible" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
