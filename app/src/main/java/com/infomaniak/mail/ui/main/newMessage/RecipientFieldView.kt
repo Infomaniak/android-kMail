@@ -78,14 +78,22 @@ class RecipientFieldView @JvmOverloads constructor(
     }
 
     private var onAutoCompletionToggled: ((hasOpened: Boolean) -> Unit)? = null
-    private var onToggle: ((isCollapsed: Boolean) -> Unit)? = null
+    private var onToggleEverything: ((isCollapsed: Boolean) -> Unit)? = null
     private var onContactRemoved: ((Recipient) -> Unit)? = null
     private var onContactAdded: ((Recipient) -> Unit)? = null
     private var onCopyContactAddress: ((Recipient) -> Unit)? = null
+    private var gotFocus: (() -> Unit)? = null
     private var setSnackBar: ((Int) -> Unit) = {}
 
-    private var isToggleable = false
-    private var isCollapsed = true
+    private var canCollapseEverything = false
+    private var otherFieldsAreAllEmpty = true
+    private var isEverythingCollapsed = true
+        set(value) {
+            field = value
+            isSelfCollapsed = field
+            updateCollapsedEverythingUiState(value)
+        }
+    private var isSelfCollapsed = true
         set(value) {
             if (value == field) return
             field = value
@@ -98,14 +106,14 @@ class RecipientFieldView @JvmOverloads constructor(
         get() = autoCompletedContacts.isVisible
         set(value) {
             autoCompletedContacts.isVisible = value
-            binding.chevron.isGone = value || !isToggleable
+            binding.chevron.isGone = value || !shouldDisplayChevron()
         }
 
     init {
         with(binding) {
             attrs?.getAttributes(context, R.styleable.RecipientFieldView) {
                 prefix.text = getText(R.styleable.RecipientFieldView_title)
-                isToggleable = getBoolean(R.styleable.RecipientFieldView_toggleable, isToggleable)
+                canCollapseEverything = getBoolean(R.styleable.RecipientFieldView_canCollapseEverything, canCollapseEverything)
             }
 
             contactAdapter = ContactAdapter(
@@ -130,8 +138,8 @@ class RecipientFieldView @JvmOverloads constructor(
                 }
             )
 
-            chevron.isVisible = isToggleable
-            isCollapsed = isToggleable
+            chevron.isVisible = canCollapseEverything
+            isSelfCollapsed = canCollapseEverything
 
             setupChipsRecyclerView()
 
@@ -140,8 +148,8 @@ class RecipientFieldView @JvmOverloads constructor(
             setPopupMenuListeners()
 
             if (isInEditMode) {
-                singleChip.root.isVisible = isToggleable
-                plusChip.isVisible = isToggleable
+                singleChip.root.isVisible = canCollapseEverything
+                plusChip.isVisible = canCollapseEverything
             }
         }
     }
@@ -156,47 +164,56 @@ class RecipientFieldView @JvmOverloads constructor(
     }
 
     private fun setToggleRelatedListeners() = with(binding) {
-        if (isToggleable) {
-            chevron.setOnClickListener {
-                context.trackMessageEvent("openRecipientsFields", isCollapsed)
-                isCollapsed = !isCollapsed
-                if (isCollapsed) textInput.hideKeyboard()
-            }
+        if (canCollapseEverything) chevron.setOnClickListener {
+            context.trackMessageEvent("openRecipientsFields", isSelfCollapsed)
+            isEverythingCollapsed = !isEverythingCollapsed
+            if (isSelfCollapsed) textInput.hideKeyboard()
+        }
 
-            plusChip.setOnClickListener { isCollapsed = !isCollapsed }
+        plusChip.setOnClickListener {
+            expand()
+            textInput.showKeyboard()
+        }
 
-            transparentButton.setOnClickListener {
-                isCollapsed = !isCollapsed
-                textInput.showKeyboard()
-            }
+        transparentButton.setOnClickListener {
+            expand()
+            textInput.showKeyboard()
+        }
 
-            singleChip.root.setOnClickListener {
-                showContactContextMenu(contactChipAdapter.getRecipients().first(), singleChip.root, true)
-                updateCollapsedChipValues(isCollapsed)
-            }
+        singleChip.root.setOnClickListener {
+            showContactContextMenu(contactChipAdapter.getRecipients().first(), singleChip.root, true)
         }
     }
 
-    private fun setTextInputListeners() = with(binding) {
-        textInput.apply {
-            doOnTextChanged { text, _, _, _ ->
-                if (text?.isNotEmpty() == true) {
-                    if ((text.trim().count()) > 0) contactAdapter.filterField(text) else contactAdapter.clear()
-                    if (!isAutoCompletionOpened) openAutoCompletion()
-                } else if (isAutoCompletionOpened) {
-                    closeAutoCompletion()
-                }
-            }
+    private fun setTextInputListeners() = with(binding.textInput) {
 
-            setOnEditorActionListener { _, actionId, _ ->
-                if (actionId == EditorInfo.IME_ACTION_DONE && textInput.text?.isNotBlank() == true) {
-                    contactAdapter.addFirstAvailableItem()
-                }
-                true // Keep keyboard open
+        fun performContactSearch(text: CharSequence) {
+            if ((text.trim().count()) > 0) {
+                contactAdapter.filterField(text)
+            } else {
+                contactAdapter.clear()
             }
-
-            setBackspaceOnEmptyFieldListener(::focusLastChip)
         }
+
+        doOnTextChanged { text, _, _, _ ->
+            if (text?.isNotEmpty() == true) {
+                performContactSearch(text)
+                if (!isAutoCompletionOpened) openAutoCompletion()
+            } else if (isAutoCompletionOpened) {
+                closeAutoCompletion()
+            }
+        }
+
+        setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE && text?.isNotBlank() == true) {
+                contactAdapter.addFirstAvailableItem()
+            }
+            true // Keep keyboard open
+        }
+
+        setBackspaceOnEmptyFieldListener(::focusLastChip)
+
+        setOnFocusChangeListener { _, hasFocus -> if (hasFocus) gotFocus?.invoke() }
     }
 
     private fun setPopupMenuListeners() {
@@ -225,13 +242,14 @@ class RecipientFieldView @JvmOverloads constructor(
         binding.textInput.requestFocus()
     }
 
-    private fun updateCollapsedUiState(isCollapsed: Boolean) = with(binding) {
-        chevron.toggleChevron(isCollapsed)
+    private fun updateCollapsedEverythingUiState(isEverythingCollapsed: Boolean) = with(binding) {
+        chevron.toggleChevron(isEverythingCollapsed)
+        onToggleEverything?.invoke(isEverythingCollapsed)
+    }
 
+    private fun updateCollapsedUiState(isCollapsed: Boolean) = with(binding) {
         updateCollapsedChipValues(isCollapsed)
         chipsRecyclerView.isGone = isCollapsed
-
-        onToggle?.invoke(isCollapsed)
     }
 
     private fun updateCollapsedChipValues(isCollapsed: Boolean) = with(binding) {
@@ -271,7 +289,7 @@ class RecipientFieldView @JvmOverloads constructor(
             return
         }
 
-        if (contactChipAdapter.isEmpty()) isCollapsed = false
+        if (contactChipAdapter.isEmpty()) expand()
         val recipient = Recipient().initLocalValues(email, name)
         val recipientIsNew = contactAdapter.addUsedContact(email)
         if (recipientIsNew) {
@@ -305,17 +323,20 @@ class RecipientFieldView @JvmOverloads constructor(
         onContactAddedCallback: ((Recipient) -> Unit),
         onContactRemovedCallback: ((Recipient) -> Unit),
         onCopyContactAddressCallback: ((Recipient) -> Unit),
-        onToggleCallback: ((isCollapsed: Boolean) -> Unit)? = null,
+        gotFocusCallback: (() -> Unit),
+        onToggleEverythingCallback: ((isCollapsed: Boolean) -> Unit)? = null,
         setSnackBarCallback: (titleRes: Int) -> Unit,
     ) {
         autoCompletedContacts = autoComplete
         autoCompletedContacts.adapter = contactAdapter
 
-        onToggle = onToggleCallback
+        onToggleEverything = onToggleEverythingCallback
         onAutoCompletionToggled = onAutoCompletionToggledCallback
         onContactAdded = onContactAddedCallback
         onContactRemoved = onContactRemovedCallback
         onCopyContactAddress = onCopyContactAddressCallback
+
+        gotFocus = gotFocusCallback
 
         setSnackBar = setSnackBarCallback
     }
@@ -330,7 +351,24 @@ class RecipientFieldView @JvmOverloads constructor(
                 contactAdapter.addUsedContact(it.email)
             }
         }
-        updateCollapsedChipValues(isCollapsed)
+        updateCollapsedChipValues(isSelfCollapsed)
+    }
+
+    fun collapse() {
+        isSelfCollapsed = true
+    }
+
+    private fun expand() {
+        if (canCollapseEverything) isEverythingCollapsed = false else isSelfCollapsed = false
+    }
+
+    fun updateOtherFieldsVisibility(otherFieldsAreAllEmpty: Boolean) {
+        this.otherFieldsAreAllEmpty = otherFieldsAreAllEmpty
+        binding.chevron.isVisible = otherFieldsAreAllEmpty
+    }
+
+    private fun shouldDisplayChevron(): Boolean {
+        return canCollapseEverything && otherFieldsAreAllEmpty
     }
 
     private companion object {

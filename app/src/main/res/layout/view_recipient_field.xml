@@ -43,7 +43,7 @@
         android:paddingVertical="2dp"
         android:visibility="gone"
         app:layoutManager="com.google.android.flexbox.FlexboxLayoutManager"
-        app:layout_constraintEnd_toStartOf="@id/chevron"
+        app:layout_constraintEnd_toStartOf="@id/chipsEndGuideline"
         app:layout_constraintStart_toEndOf="@id/prefix"
         app:layout_constraintTop_toTopOf="parent"
         tools:listitem="@layout/chip_contact" />
@@ -83,6 +83,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/marginStandardVerySmall"
+        android:layout_marginEnd="2dp"
         android:visibility="gone"
         app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toBottomOf="@id/singleLineGuide"
@@ -96,10 +97,10 @@
         style="@style/EmailAddressChip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/marginStandardVerySmall"
+        android:layout_marginStart="2dp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/singleLineGuide"
-        app:layout_constraintEnd_toStartOf="@id/chevron"
+        app:layout_constraintEnd_toStartOf="@id/chipsEndGuideline"
         app:layout_constraintStart_toEndOf="@id/singleChip"
         app:layout_constraintTop_toTopOf="@id/singleLineGuide"
         tools:text="+2"
@@ -116,7 +117,15 @@
         app:layout_constraintBottom_toBottomOf="@id/singleLineGuide"
         app:layout_constraintEnd_toStartOf="@id/chevron"
         app:layout_constraintStart_toEndOf="@id/plusChip"
-        app:layout_constraintTop_toTopOf="@id/singleLineGuide" />
+        app:layout_constraintTop_toTopOf="@id/singleLineGuide"
+        tools:visibility="visible" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/chipsEndGuideline"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintGuide_end="48dp" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/chevron"

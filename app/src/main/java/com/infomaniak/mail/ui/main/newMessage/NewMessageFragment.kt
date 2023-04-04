@@ -79,6 +79,7 @@ class NewMessageFragment : Fragment() {
 
     private var mailboxes = emptyList<Mailbox>()
     private var selectedMailboxIndex = 0
+    private var lastFieldToTakeFocus: FieldType? = TO
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentNewMessageBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -93,6 +94,7 @@ class NewMessageFragment : Fragment() {
         initDraftAndViewModel()
 
         focusCorrectView()
+        setOnFocusChangedListeners()
 
         doAfterSubjectChange()
         doAfterBodyChange()
@@ -101,6 +103,7 @@ class NewMessageFragment : Fragment() {
         observeMailboxes()
         observeEditorActions()
         observeNewAttachments()
+        observeCcAndBccVisibility()
     }
 
     override fun onStart() {
@@ -152,6 +155,12 @@ class NewMessageFragment : Fragment() {
         }
     }
 
+    private fun setOnFocusChangedListeners() = with(binding) {
+        val listener = View.OnFocusChangeListener { _, hasFocus -> if (hasFocus) fieldGotFocus(null) }
+        subjectTextField.onFocusChangeListener = listener
+        bodyText.onFocusChangeListener = listener
+    }
+
     private fun setupAutoCompletionFields() = with(binding) {
         toField.initRecipientField(
             autoComplete = autoCompleteTo,
@@ -159,7 +168,8 @@ class NewMessageFragment : Fragment() {
             onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, TO) },
             onContactRemovedCallback = { newMessageViewModel.removeRecipientFromField(it, TO) },
             onCopyContactAddressCallback = ::copyRecipientEmailToClipboard,
-            onToggleCallback = ::openAdvancedFields,
+            gotFocusCallback = { fieldGotFocus(TO) },
+            onToggleEverythingCallback = ::openAdvancedFields,
             setSnackBarCallback = ::setSnackBar,
         )
 
@@ -169,6 +179,7 @@ class NewMessageFragment : Fragment() {
             onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, CC) },
             onContactRemovedCallback = { newMessageViewModel.removeRecipientFromField(it, CC) },
             onCopyContactAddressCallback = ::copyRecipientEmailToClipboard,
+            gotFocusCallback = { fieldGotFocus(CC) },
             setSnackBarCallback = ::setSnackBar,
         )
 
@@ -178,8 +189,33 @@ class NewMessageFragment : Fragment() {
             onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, BCC) },
             onContactRemovedCallback = { newMessageViewModel.removeRecipientFromField(it, BCC) },
             onCopyContactAddressCallback = ::copyRecipientEmailToClipboard,
+            gotFocusCallback = { fieldGotFocus(BCC) },
             setSnackBarCallback = ::setSnackBar,
         )
+    }
+
+    private fun fieldGotFocus(field: FieldType?) = with(binding) {
+        if (lastFieldToTakeFocus == field) return
+        when (field) {
+            TO -> {
+                ccField.collapse()
+                bccField.collapse()
+            }
+            CC -> {
+                toField.collapse()
+                bccField.collapse()
+            }
+            BCC -> {
+                toField.collapse()
+                ccField.collapse()
+            }
+            else -> {
+                toField.collapse()
+                ccField.collapse()
+                bccField.collapse()
+            }
+        }
+        lastFieldToTakeFocus = field
     }
 
     private fun openAdvancedFields(isCollapsed: Boolean) = with(binding) {
@@ -397,6 +433,11 @@ class NewMessageFragment : Fragment() {
 
             if (importationResult == ImportationResult.FILE_SIZE_TOO_BIG) showSnackbar(R.string.attachmentFileLimitReached)
         }
+    }
+
+    private fun observeCcAndBccVisibility() = with(newMessageViewModel) {
+        otherFieldsAreAllEmpty.observe(viewLifecycleOwner, binding.toField::updateOtherFieldsVisibility)
+        initializeFieldsAsOpen.observe(viewLifecycleOwner) { openAdvancedFields(!it) }
     }
 
     override fun onStop() {

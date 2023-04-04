@@ -63,6 +63,8 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
 
     var isAutoCompletionOpened = false
     var isEditorExpanded = false
+    var otherFieldsAreAllEmpty = SingleLiveEvent(true)
+    var initializeFieldsAsOpen = SingleLiveEvent<Boolean>()
 
     // Boolean: For toggleable actions, `false` if the formatting has been removed and `true` if the formatting has been applied.
     val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
@@ -116,6 +118,10 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
                 splitSignatureAndQuoteFromBody()
                 saveDraftSnapshot()
                 updateIsSendingAllowed()
+                if (draft.cc.isNotEmpty() || draft.bcc.isNotEmpty()) {
+                    otherFieldsAreAllEmpty.postValue(false)
+                    initializeFieldsAsOpen.postValue(true)
+                }
             }
 
             emit(isSuccess)
@@ -203,6 +209,8 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun addRecipientToField(recipient: Recipient, type: FieldType) = with(draft) {
+        if (type == FieldType.CC || type == FieldType.BCC) otherFieldsAreAllEmpty.value = false
+
         val field = when (type) {
             FieldType.TO -> to
             FieldType.CC -> cc
@@ -220,6 +228,9 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
             FieldType.BCC -> bcc
         }
         field.remove(recipient)
+
+        if (cc.isEmpty() && bcc.isEmpty()) otherFieldsAreAllEmpty.value = true
+
         updateIsSendingAllowed()
         saveDraftDebouncing()
         context.trackNewMessageEvent("deleteRecipient")

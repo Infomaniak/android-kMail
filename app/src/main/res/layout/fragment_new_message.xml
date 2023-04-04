@@ -93,7 +93,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginVertical="@dimen/marginStandardVerySmall"
                     app:title="@string/toTitle"
-                    app:toggleable="true" />
+                    app:canCollapseEverything="true" />
 
                 <com.google.android.material.divider.MaterialDivider
                     android:id="@+id/divider2"
@@ -118,7 +118,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginVertical="@dimen/marginStandardVerySmall"
                     app:title="@string/ccTitle"
-                    app:toggleable="false" />
+                    app:canCollapseEverything="false" />
 
                 <com.google.android.material.divider.MaterialDivider
                     android:id="@+id/divider3"
@@ -143,7 +143,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginVertical="@dimen/marginStandardVerySmall"
                     app:title="@string/bccTitle"
-                    app:toggleable="false" />
+                    app:canCollapseEverything="false" />
 
                 <com.google.android.material.divider.MaterialDivider
                     android:id="@+id/divider4"
