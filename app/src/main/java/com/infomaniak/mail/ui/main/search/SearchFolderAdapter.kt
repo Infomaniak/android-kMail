@@ -61,7 +61,9 @@ class SearchFolderAdapter(
     }
 
     private fun bindSeparator(convertView: View?, context: Context?, parent: ViewGroup): View {
-        return (convertView ?: ItemDividerHorizontalBinding.inflate(LayoutInflater.from(context), parent, false).root)
+        return convertView ?: ItemDividerHorizontalBinding.inflate(LayoutInflater.from(context), parent, false).root.apply {
+            setDividerColorResource(R.color.popupSeparatorColor)
+        }
     }
 
     private fun bindFolder(
@@ -70,7 +72,7 @@ class SearchFolderAdapter(
         parent: ViewGroup?,
         folder: Folder?,
     ): View {
-        (convertView ?: ItemSearchFolderBinding.inflate(LayoutInflater.from(context), parent, false).root).apply {
+        return (convertView ?: ItemSearchFolderBinding.inflate(LayoutInflater.from(context), parent, false).root).apply {
             findViewById<MenuDrawerItemView>(R.id.menuDrawerItem).apply {
                 val entryName: String = context.getLocalizedNameOrAllFolders(folder)
                 text = entryName
@@ -83,8 +85,6 @@ class SearchFolderAdapter(
                     onClickListener(folder, entryName)
                 }
             }
-
-            return this
         }
     }
 

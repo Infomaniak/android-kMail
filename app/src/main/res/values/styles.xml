@@ -484,7 +484,8 @@
         <item name="boxStrokeErrorColor">@color/redDestructiveAction</item>
     </style>
 
-    <style name="PopupMenuStyle" parent="Widget.Material3.PopupMenu.Overflow">
+    <style name="ListPopupMenuStyle" parent="Widget.Material3.PopupMenu.ListPopupWindow">
+        <item name="android:overlapAnchor">false</item>
         <item name="android:popupBackground">@color/backgroundColorTertiary</item>
     </style>
 

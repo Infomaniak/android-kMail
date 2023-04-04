@@ -110,6 +110,7 @@
 
     <!-- Separators -->
     <color name="separatorColor">@color/mouse</color>
+    <color name="popupSeparatorColor">@color/mouse</color>
 
     <!-- Icons -->
     <color name="iconColorPrimaryText">@color/primaryTextColor</color>
