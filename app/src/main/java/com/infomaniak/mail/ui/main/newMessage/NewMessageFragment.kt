@@ -135,8 +135,12 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun initDraftAndViewModel() {
+
+        displayLoader()
+
         newMessageViewModel.initDraftAndViewModel(newMessageActivityArgs).observe(viewLifecycleOwner) { isSuccess ->
             if (isSuccess) {
+                hideLoader()
                 showKeyboardInCorrectView()
                 populateViewModelWithExternalMailData()
                 populateUiWithViewModel()
@@ -145,6 +149,16 @@ class NewMessageFragment : Fragment() {
                 requireActivity().finish()
             }
         }
+    }
+
+    private fun displayLoader() = with(binding) {
+        fullScreenLoader.isVisible = true
+        compositionNestedScrollView.isGone = true
+    }
+
+    private fun hideLoader() = with(binding) {
+        compositionNestedScrollView.isVisible = true
+        fullScreenLoader.isGone = true
     }
 
     private fun showKeyboardInCorrectView() = with(binding) {
