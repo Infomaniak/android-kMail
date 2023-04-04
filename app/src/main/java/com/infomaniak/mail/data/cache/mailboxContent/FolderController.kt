@@ -24,6 +24,7 @@ import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import io.realm.kotlin.MutableRealm
+import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
@@ -117,8 +118,8 @@ object FolderController {
     //endregion
 
     //region Edit data
-    fun update(remoteFolders: List<Folder>) {
-        RealmDatabase.mailboxContent().writeBlocking {
+    fun update(remoteFolders: List<Folder>, realm: Realm) {
+        realm.writeBlocking {
 
             Log.d(RealmDatabase.TAG, "Folders: Delete outdated data")
             deleteOutdatedFolders(remoteFolders)

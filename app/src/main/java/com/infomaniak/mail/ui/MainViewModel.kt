@@ -26,6 +26,7 @@ import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.*
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.mailboxInfo.QuotasController
@@ -306,8 +307,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun updateFolders(mailbox: Mailbox) {
+        val currentRealm = RealmDatabase.mailboxContent()
         ApiRepository.getFolders(mailbox.uuid).data?.let { folders ->
-            FolderController.update(folders)
+            if (!currentRealm.isClosed()) FolderController.update(folders, currentRealm)
         }
     }
 
