@@ -153,6 +153,7 @@
                     android:ellipsize="end"
                     android:lines="1"
                     tools:text="@string/noUpdatedAt" />
+
             </LinearLayout>
 
             <com.google.android.material.chip.Chip
@@ -170,7 +171,6 @@
                 tools:visibility="visible" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-
     </com.google.android.material.appbar.AppBarLayout>
 
     <com.google.android.material.card.MaterialCardView
