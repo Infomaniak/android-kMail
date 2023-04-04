@@ -119,7 +119,7 @@ class MainActivity : ThemedActivity() {
         loadCurrentMailbox()
 
         mainViewModel.observeMergedContactsLive()
-        permissionUtils.requestMainPermissionsIfNeeded(localSettings.hasOpenedNotifSettings)
+        permissionUtils.requestMainPermissionsIfNeeded()
     }
 
     private fun loadCurrentMailbox() {
@@ -211,6 +211,7 @@ class MainActivity : ThemedActivity() {
     private fun registerMainPermissions(permissionUtils: PermissionUtils) {
         permissionUtils.registerMainPermissions { permissionsResults ->
             if (permissionsResults[Manifest.permission.READ_CONTACTS] == true) mainViewModel.updateUserInfo()
+            if (permissionsResults[Manifest.permission.POST_NOTIFICATIONS] == true) localSettings.hasEnabledNotifSettings = true
         }
     }
 

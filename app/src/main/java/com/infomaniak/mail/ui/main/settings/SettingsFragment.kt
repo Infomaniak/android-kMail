@@ -31,6 +31,7 @@ import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentSettingsBinding
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.utils.PermissionUtils.Companion.hasNotificationPermission
 import com.infomaniak.mail.utils.animatedNavigation
 import com.infomaniak.mail.utils.notYetImplemented
 
@@ -89,7 +90,7 @@ class SettingsFragment : Fragment() {
 
         settingsNotifications.setOnClickListener {
             trackEvent("settingsNotifications", "openNotificationSettings")
-            localSettings.hasOpenedNotifSettings = true
+            if (requireActivity().hasNotificationPermission()) localSettings.hasEnabledNotifSettings = true
             requireContext().openAppNotificationSettings()
         }
 
