@@ -154,6 +154,10 @@ class RecipientFieldView @JvmOverloads constructor(
         }
     }
 
+    fun showKeyboardInTextInput() {
+        binding.textInput.showKeyboard()
+    }
+
     private fun setupChipsRecyclerView() = with(binding) {
         chipsRecyclerView.adapter = contactChipAdapter
 
