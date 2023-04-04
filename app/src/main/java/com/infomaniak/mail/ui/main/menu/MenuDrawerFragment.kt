@@ -228,8 +228,12 @@ class MenuDrawerFragment : MenuFoldersFragment() {
             binding.noFolderText.isVisible = customFolders.isEmpty()
 
             val newCurrentFolderId = currentFolderId ?: return@observe
-            defaultFoldersAdapter.setFolders(defaultFolders, newCurrentFolderId)
-            customFoldersAdapter.setFolders(customFolders, newCurrentFolderId)
+            binding.defaultFoldersList.post {
+                defaultFoldersAdapter.setFolders(defaultFolders, newCurrentFolderId)
+            }
+            binding.customFoldersList.post {
+                customFoldersAdapter.setFolders(customFolders, newCurrentFolderId)
+            }
         }
     }
 
