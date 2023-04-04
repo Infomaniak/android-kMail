@@ -131,6 +131,7 @@
     <string name="contentDescriptionButtonNext">Weiter</string>
     <string name="contentDescriptionButtonOpenSystemSettings">Öffnen Sie die Benachrichtigungseinstellungen des Systems</string>
     <string name="contentDescriptionButtonSettings">Einstellungen</string>
+    <string name="contentDescriptionContactAlreadyUsed">Kontakt bereits als Empfänger verwendet</string>
     <string name="contentDescriptionDownloadIndicator">Herunterladen von</string>
     <string name="contentDescriptionIconAttachments">Hat Anhänge</string>
     <string name="contentDescriptionIconCalendar">Hat Kalender Ereignis</string>

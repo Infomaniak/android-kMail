@@ -132,6 +132,7 @@
     <string name="contentDescriptionButtonNext">Suivant</string>
     <string name="contentDescriptionButtonOpenSystemSettings">Ouvrir les paramètres de notification du système</string>
     <string name="contentDescriptionButtonSettings">Paramètres</string>
+    <string name="contentDescriptionContactAlreadyUsed">Contact déjà utilisé comme destinataire</string>
     <string name="contentDescriptionDownloadIndicator">Téléchargement</string>
     <string name="contentDescriptionIconAttachments">Contient des pièces jointes</string>
     <string name="contentDescriptionIconCalendar">Contient un évènement Calendar</string>
