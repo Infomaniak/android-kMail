@@ -210,9 +210,13 @@ class NewMessageFragment : Fragment() {
                 ccField.collapse()
             }
             else -> {
-                toField.collapse()
-                ccField.collapse()
-                bccField.collapse()
+                if (newMessageViewModel.otherFieldsAreAllEmpty.value == true) {
+                    toField.collapseEverything()
+                } else {
+                    toField.collapse()
+                    ccField.collapse()
+                    bccField.collapse()
+                }
             }
         }
         lastFieldToTakeFocus = field

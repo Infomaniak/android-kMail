@@ -358,6 +358,10 @@ class RecipientFieldView @JvmOverloads constructor(
         isSelfCollapsed = true
     }
 
+    fun collapseEverything() {
+        isEverythingCollapsed = true
+    }
+
     private fun expand() {
         if (canCollapseEverything) isEverythingCollapsed = false else isSelfCollapsed = false
     }
