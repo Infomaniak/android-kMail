@@ -89,6 +89,7 @@ class SettingsFragment : Fragment() {
 
         settingsNotifications.setOnClickListener {
             trackEvent("settingsNotifications", "openNotificationSettings")
+            localSettings.hasOpenedNotifSettings = true
             requireContext().openAppNotificationSettings()
         }
 

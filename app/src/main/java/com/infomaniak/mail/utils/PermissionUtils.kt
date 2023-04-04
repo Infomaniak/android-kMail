@@ -46,9 +46,16 @@ class PermissionUtils {
             }
     }
 
-    fun requestMainPermissionsIfNeeded() {
+    fun requestMainPermissionsIfNeeded(isNotifSystemSettingsOpened: Boolean) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !activity.hasPermissions(mainPermissions)) {
-            mainForActivityResult.launch(mainPermissions)
+            val permissions = if (isNotifSystemSettingsOpened &&
+                !activity.hasPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS))
+            ) {
+                mainPermissions.filterNot { it == Manifest.permission.POST_NOTIFICATIONS }.toTypedArray()
+            } else {
+                mainPermissions
+            }
+            mainForActivityResult.launch(permissions)
         }
     }
 

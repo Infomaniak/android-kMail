@@ -119,7 +119,7 @@ class MainActivity : ThemedActivity() {
         loadCurrentMailbox()
 
         mainViewModel.observeMergedContactsLive()
-        permissionUtils.requestMainPermissionsIfNeeded()
+        permissionUtils.requestMainPermissionsIfNeeded(localSettings.hasOpenedNotifSettings)
     }
 
     private fun loadCurrentMailbox() {
