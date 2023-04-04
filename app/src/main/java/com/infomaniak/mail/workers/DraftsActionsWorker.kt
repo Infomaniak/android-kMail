@@ -69,6 +69,7 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
     private var mailboxId: Int = AppSettings.DEFAULT_ID
     private lateinit var mailbox: Mailbox
     private var userId: Int by Delegates.notNull()
+    private lateinit var userApiToken: String
 
     private val dateFormatWithTimezone by lazy { SimpleDateFormat(FORMAT_DATE_WITH_TIMEZONE, Locale.ROOT) }
 
@@ -81,6 +82,7 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
         userId = inputData.getIntOrNull(USER_ID_KEY) ?: return@withContext Result.failure()
         mailboxId = inputData.getIntOrNull(MAILBOX_ID_KEY) ?: return@withContext Result.failure()
 
+        userApiToken = AccountUtils.getUserById(userId)?.apiToken?.accessToken ?: return@withContext Result.failure()
         mailbox = MailboxController.getMailbox(userId, mailboxId, mailboxInfoRealm) ?: return@withContext Result.failure()
         okHttpClient = AccountUtils.getHttpClient(userId)
 
@@ -177,6 +179,7 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
     private fun Attachment.startUpload(localDraftUuid: String, realm: MutableRealm) {
         val attachmentFile = getUploadLocalFile(applicationContext, localDraftUuid).also { if (!it.exists()) return }
         val headers = HttpUtils.getHeaders(contentType = null).newBuilder()
+            .set("Authorization", "Bearer $userApiToken")
             .addUnsafeNonAscii("x-ws-attachment-filename", name)
             .add("x-ws-attachment-mime-type", mimeType)
             .add("x-ws-attachment-disposition", "attachment")
