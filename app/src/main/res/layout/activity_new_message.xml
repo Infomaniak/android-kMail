@@ -33,7 +33,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:navigationContentDescription="@string/buttonClose"
-        app:navigationIcon="@drawable/ic_close" />
+        app:navigationIcon="@drawable/ic_close_big" />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragmentContainer"

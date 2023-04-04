@@ -337,6 +337,9 @@
         <item name="android:textColor">@color/chip_unread_text_color</item>
         <item name="android:textSize">14sp</item>
         <item name="chipBackgroundColor">@color/chip_unread_background</item>
+        <item name="closeIcon">@drawable/ic_close_small</item>
+        <item name="closeIconEndPadding">@dimen/marginStandardSmall</item>
+        <item name="closeIconSize">@dimen/smallIconSize</item>
         <item name="closeIconTint">?attr/colorOnPrimary</item>
     </style>
 
