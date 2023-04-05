@@ -105,7 +105,7 @@ class ContactAdapter(
                 val nameMatchedIndex = contact.name.standardize().indexOf(searchTerm)
                 val standardizedEmail = contact.email.standardize()
                 val emailMatchedIndex = standardizedEmail.indexOf(searchTerm)
-                val matches = nameMatchedIndex > -1 || emailMatchedIndex > -1
+                val matches = nameMatchedIndex >= 0 || emailMatchedIndex >= 0
 
                 val displayNewContact = (matches && searchTerm == standardizedEmail && !usedContacts.contains(searchTerm))
                 if (displayNewContact) displayAddUnknownContactButton = false
