@@ -92,9 +92,9 @@ class AvatarNameEmailView @JvmOverloads constructor(
         binding.root.setOnClickListener(onClickListener)
     }
 
-    fun highlight(nameIndex: Int, emailIndex: Int, length: Int) = with(binding) {
-        if (nameIndex > -1) userName.highlight(nameIndex, nameIndex + length)
-        if (userEmail.text.isNotBlank() && emailIndex > -1) userEmail.highlight(emailIndex, emailIndex + length)
+    fun highlight(nameStartIndex: Int, emailStartIndex: Int, length: Int) = with(binding) {
+        if (nameStartIndex > -1) userName.highlight(nameStartIndex, nameStartIndex + length)
+        if (emailStartIndex > -1 && userEmail.text.isNotBlank()) userEmail.highlight(emailStartIndex, emailStartIndex + length)
     }
 
     private fun TextView.highlight(
