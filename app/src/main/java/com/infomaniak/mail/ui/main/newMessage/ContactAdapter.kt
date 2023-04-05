@@ -22,6 +22,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
@@ -64,7 +65,10 @@ class ContactAdapter(
     private fun ItemContactBinding.bindContact(position: Int) {
         val contact = contacts[position]
         contactDetails.setMergedContact(contact)
-        root.setOnClickListener { onContactClicked(contact) }
+        val isAlreadyUsed = usedContacts.contains(contact.email)
+        if (!isAlreadyUsed) root.setOnClickListener { onContactClicked(contact) }
+        greyedOutState.isVisible = isAlreadyUsed
+        root.isEnabled = !isAlreadyUsed
     }
 
     private fun ItemContactBinding.bindAddNewUser() {
@@ -102,8 +106,7 @@ class ContactAdapter(
                     val displayNewContact = (matches && searchTerm == standardizedEmail && !usedContacts.contains(searchTerm))
                     if (displayNewContact) displayAddUnknownContactButton = false
 
-                    val isAlreadyUsed = usedContacts.contains(standardizedEmail)
-                    if (matches && !isAlreadyUsed) finalUserList.add(contact)
+                    if (matches) finalUserList.add(contact)
 
                     if (finalUserList.count() >= MAX_AUTOCOMPLETE_RESULTS) break
                 }

@@ -61,6 +61,7 @@
 
     <!-- Icons -->
     <color name="iconColor">@color/shark</color>
+    <color name="disabledIconColor">@color/elephant</color>
     <color name="favoriteYellow">@color/yellow_dark</color>
     <color name="swipeActionIconColor">@color/bat</color>
 

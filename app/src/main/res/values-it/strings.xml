@@ -131,6 +131,7 @@
     <string name="contentDescriptionButtonNext">Avanti</string>
     <string name="contentDescriptionButtonOpenSystemSettings">Aprire le impostazioni di notifica del sistema</string>
     <string name="contentDescriptionButtonSettings">Impostazioni</string>
+    <string name="contentDescriptionContactAlreadyUsed">Contatto già utilizzato come destinatario</string>
     <string name="contentDescriptionDownloadIndicator">Scaricare</string>
     <string name="contentDescriptionIconAttachments">Dispone di allegati</string>
     <string name="contentDescriptionIconCalendar">Ha un evento di calendario</string>

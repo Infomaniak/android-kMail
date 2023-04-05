@@ -138,6 +138,7 @@
     <string name="contentDescriptionButtonNext">Next</string>
     <string name="contentDescriptionButtonOpenSystemSettings">Open system’s notification settings</string>
     <string name="contentDescriptionButtonSettings">Settings</string>
+    <string name="contentDescriptionContactAlreadyUsed">Contact already used as recipient</string>
     <string name="contentDescriptionDownloadIndicator">Downloading</string>
     <string name="contentDescriptionIconAttachments">Has attachments</string>
     <string name="contentDescriptionIconCalendar">Has Calendar event</string>
