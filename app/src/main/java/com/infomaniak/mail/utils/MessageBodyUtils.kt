@@ -51,7 +51,7 @@ object MessageBodyUtils {
     )
 
     fun splitBodyAndQuote(initialBody: Body): MessageBodyQuote {
-        if (initialBody.type == TEXT_PLAIN) return MessageBodyQuote(initialBody.value, null)
+        if (initialBody.type == TEXT_PLAIN) return MessageBodyQuote(initialBody.value)
 
         // The original parsed html document in full
         val originalHtmlDocument = Jsoup.parse(initialBody.value)
@@ -66,13 +66,14 @@ object MessageBodyUtils {
         }
 
         val (body, quote) = splitBodyAndQuote(originalHtmlDocument, currentQuoteDescriptor, blockquoteElement)
-        return MessageBodyQuote(messageBody = if (quote.isNullOrBlank()) initialBody.value else body, quote = quote)
+        return if (quote.isNullOrBlank()) MessageBodyQuote(initialBody.value) else MessageBodyQuote(body, initialBody.value)
     }
 
     private fun findAndRemoveLastParentBlockquote(htmlDocumentWithoutQuote: Document): Element? {
         fun Document.selectLastParentBlockquote(): Element? {
             return selectFirst("$blockquote:not($blockquote $blockquote):last-of-type")
         }
+
         return htmlDocumentWithoutQuote.selectLastParentBlockquote()?.also { it.remove() }
     }
 
@@ -85,6 +86,7 @@ object MessageBodyUtils {
                 currentQuoteDescriptor = quoteDescriptor
             }
         }
+
         return currentQuoteDescriptor
     }
 
@@ -134,6 +136,6 @@ object MessageBodyUtils {
 
     data class MessageBodyQuote(
         val messageBody: String,
-        val quote: String?,
+        val quote: String? = null,
     )
 }

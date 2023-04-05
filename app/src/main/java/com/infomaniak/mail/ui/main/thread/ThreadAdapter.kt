@@ -146,12 +146,17 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         if (quote == null) return@with
 
         quoteButton.setOnClickListener {
-            val textId = if (quoteFrameLayout.isVisible) R.string.messageShowQuotedText else R.string.messageHideQuotedText
+            val textId = if (fullMessageWebView.isVisible) R.string.messageShowQuotedText else R.string.messageHideQuotedText
             quoteButton.text = context.getString(textId)
-            quoteFrameLayout.isVisible = !quoteFrameLayout.isVisible
+            toggleWebViews()
         }
 
-        quoteWebView.applyWebViewContent(uid, quote, type)
+        fullMessageWebView.applyWebViewContent(uid, quote, type)
+    }
+
+    private fun ItemMessageBinding.toggleWebViews() {
+        bodyWebView.isVisible = fullMessageWebView.isVisible
+        fullMessageWebView.isVisible = !fullMessageWebView.isVisible
     }
 
     private fun WebView.applyWebViewContent(uid: String, bodyWebView: String, type: String) {
@@ -343,14 +348,14 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
             quoteButtonFrameLayout.isGone = true
         }
 
-        quoteFrameLayout.isGone = true
+        fullMessageWebView.isGone = true
 
         if (message.body?.value == null) {
             messageLoader.isVisible = isExpanded
-            bodyFrameLayout.isGone = true
+            bodyWebView.isGone = true
         } else {
             messageLoader.isGone = true
-            bodyFrameLayout.isVisible = isExpanded
+            bodyWebView.isVisible = isExpanded
         }
     }
 
@@ -448,9 +453,10 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
             }
         }
 
-        fun initWebViewClientIfNeeded(attachments: List<Attachment>) {
+        fun initWebViewClientIfNeeded(attachments: List<Attachment>) = with(binding) {
             if (doesWebViewNeedInit) {
-                binding.bodyWebView.initWebViewClient(attachments)
+                bodyWebView.initWebViewClient(attachments)
+                fullMessageWebView.initWebViewClient(attachments)
                 doesWebViewNeedInit = false
             }
         }
