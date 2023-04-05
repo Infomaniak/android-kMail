@@ -22,6 +22,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_DELETE_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_FAVORITE_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_MARK_AS_SEEN_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_MOVE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_SPAM_NAME
 import com.infomaniak.mail.MatomoMail.trackMultiSelectActionEvent
@@ -29,6 +33,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetMultiSelectBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
+import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection
 import com.infomaniak.mail.utils.animatedNavigation
 
 class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
@@ -45,10 +50,12 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(mainViewModel) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.mainActions.setClosingOnClickListener { id: Int ->
-            val selectedThreadsUids = selectedThreads.map { it.uid }
-            val selectedThreadsCount = selectedThreadsUids.count()
+        val selectedThreadsUids = selectedThreads.map { it.uid }
+        val selectedThreadsCount = selectedThreadsUids.count()
 
+        val (shouldRead, shouldFavorite) = ThreadListMultiSelection.computeReadFavoriteStatus(selectedThreads)
+
+        binding.mainActions.setClosingOnClickListener { id: Int ->
             when (id) {
                 R.id.actionMove -> {
                     trackMultiSelectActionEvent(ACTION_MOVE_NAME, selectedThreadsCount, isFromBottomSheet = true)
@@ -59,15 +66,39 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                         currentClassName = currentClassName,
                     )
                 }
-                R.id.actionSpam -> {
-                    trackMultiSelectActionEvent(ACTION_SPAM_NAME, selectedThreadsCount, isFromBottomSheet = true)
-                    toggleThreadsSpamStatus(selectedThreadsUids)
+                R.id.actionReadUnread -> {
+                    trackMultiSelectActionEvent(ACTION_MARK_AS_SEEN_NAME, selectedThreadsCount, isFromBottomSheet = true)
+                    toggleThreadsSeenStatus(selectedThreadsUids, shouldRead)
+                    isMultiSelectOn = false
                 }
-                // R.id.actionPostpone -> {
-                //     trackMultiSelectActionEvent(ACTION_POSTPONE_NAME, selectedThreadsCount, isFromBottomSheet = true)
-                //     notYetImplemented()
-                // }
+                R.id.actionArchive -> {
+                    trackMultiSelectActionEvent(ACTION_ARCHIVE_NAME, selectedThreadsCount, isFromBottomSheet = true)
+                    archiveThreads(selectedThreadsUids)
+                    isMultiSelectOn = false
+                }
+                R.id.actionDelete -> {
+                    trackMultiSelectActionEvent(ACTION_DELETE_NAME, selectedThreadsCount, isFromBottomSheet = true)
+                    mainViewModel.deleteThreads(selectedThreadsUids)
+                }
             }
+            isMultiSelectOn = false
+        }
+
+        // binding.postpone.setClosingOnClickListener {
+        //     trackMultiSelectActionEvent(ACTION_POSTPONE_NAME, selectedThreadsCount, isFromBottomSheet = true)
+        //     notYetImplemented()
+        //     isMultiSelectOn = false
+        // }
+
+        binding.spam.setClosingOnClickListener {
+            trackMultiSelectActionEvent(ACTION_SPAM_NAME, selectedThreadsCount, isFromBottomSheet = true)
+            toggleThreadsSpamStatus(selectedThreadsUids)
+            isMultiSelectOn = false
+        }
+
+        binding.favorite.setClosingOnClickListener {
+            trackMultiSelectActionEvent(ACTION_FAVORITE_NAME, selectedThreadsCount, isFromBottomSheet = true)
+            toggleThreadsFavoriteStatus(selectedThreadsUids, shouldFavorite)
             isMultiSelectOn = false
         }
     }

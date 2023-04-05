@@ -21,11 +21,15 @@
         android:icon="@drawable/ic_email_action_move"
         android:title="@string/actionMove" />
     <item
-        android:id="@+id/actionSpam"
-        android:icon="@drawable/ic_spam"
-        android:title="@string/actionShortSpam" />
-    <!--<item-->
-    <!--    android:id="@+id/actionPostpone"-->
-    <!--    android:icon="@drawable/ic_alarm_clock"-->
-    <!--    android:title="@string/actionPostpone" />-->
+        android:id="@+id/actionReadUnread"
+        android:icon="@drawable/ic_envelope"
+        android:title="@string/actionShortMarkAsUnread" />
+    <item
+        android:id="@+id/actionArchive"
+        android:icon="@drawable/ic_archive_folder"
+        android:title="@string/actionArchive" />
+    <item
+        android:id="@+id/actionDelete"
+        android:icon="@drawable/ic_bin"
+        android:title="@string/actionDelete" />
 </menu>

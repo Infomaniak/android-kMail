@@ -227,24 +227,24 @@ class ThreadListMultiSelection {
         }
     }
 
-    private fun computeReadFavoriteStatus(selectedThreads: MutableSet<SelectedThread>): Pair<Boolean, Boolean> {
-        var shouldUnRead = true
-        var shouldUnFavorite = selectedThreads.isNotEmpty()
+    companion object {
+        private const val TOOLBAR_FADE_DURATION = 150L
 
-        for (thread in selectedThreads) {
-            shouldUnRead = shouldUnRead && thread.unseenMessagesCount == 0
-            shouldUnFavorite = shouldUnFavorite && thread.isFavorite
+        private const val READ_UNREAD_INDEX = 0
+        private const val ARCHIVE_INDEX = 1
+        private const val FAVORITE_INDEX = 2
 
-            if (!shouldUnRead && !shouldUnFavorite) break
+        fun computeReadFavoriteStatus(selectedThreads: Set<SelectedThread>): Pair<Boolean, Boolean> {
+            var shouldUnRead = true
+            var shouldUnFavorite = selectedThreads.isNotEmpty()
+
+            for (thread in selectedThreads) {
+                shouldUnRead = shouldUnRead && thread.unseenMessagesCount == 0
+                shouldUnFavorite = shouldUnFavorite && thread.isFavorite
+
+                if (!shouldUnRead && !shouldUnFavorite) break
+            }
+            return !shouldUnRead to !shouldUnFavorite
         }
-        return !shouldUnRead to !shouldUnFavorite
-    }
-
-    private companion object {
-        const val TOOLBAR_FADE_DURATION = 150L
-
-        const val READ_UNREAD_INDEX = 0
-        const val ARCHIVE_INDEX = 1
-        const val FAVORITE_INDEX = 2
     }
 }
