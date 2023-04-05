@@ -31,22 +31,26 @@ import com.infomaniak.mail.data.LocalSettings
 class PermissionUtils {
 
     private var activity: FragmentActivity
+    private var localSettings: LocalSettings
 
     private lateinit var mainForActivityResult: ActivityResultLauncher<Array<String>>
 
     constructor(activity: FragmentActivity) {
         this.activity = activity
+        localSettings = LocalSettings.getInstance(activity)
     }
 
-    constructor(fragment: Fragment) {
-        this.activity = fragment.requireActivity()
-    }
+    constructor(fragment: Fragment) : this(fragment.requireActivity())
 
     fun registerMainPermissions(onPermissionResult: ((permissions: Map<String, Boolean>) -> Unit)? = null) {
         mainForActivityResult =
             activity.registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { authorizedPermissions ->
                 onPermissionResult?.invoke(authorizedPermissions)
             }
+    }
+
+    fun checkNotificationPermissionStatus() {
+        if (activity.hasNotificationPermission()) localSettings.hasAlreadyEnabledNotifications = true
     }
 
     fun requestMainPermissionsIfNeeded() {
@@ -63,11 +67,16 @@ class PermissionUtils {
      */
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun getTiramisuPermissions(): Array<String> {
-        return if (activity.hasNotificationPermission() || LocalSettings.getInstance(activity).hasEnabledNotifications) {
+        return if (activity.hasNotificationPermission() || localSettings.hasAlreadyEnabledNotifications) {
             mainPermissions.filterNot { permission -> permission == Manifest.permission.POST_NOTIFICATIONS }.toTypedArray()
         } else {
             mainPermissions
         }
+    }
+
+    private fun Activity.hasNotificationPermission(): Boolean {
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+                hasPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS))
     }
 
     companion object {
@@ -77,11 +86,6 @@ class PermissionUtils {
                 Manifest.permission.READ_CONTACTS
             )
             else -> arrayOf(Manifest.permission.READ_CONTACTS)
-        }
-
-        fun Activity.hasNotificationPermission(): Boolean {
-            return Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
-                    hasPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS))
         }
     }
 }
