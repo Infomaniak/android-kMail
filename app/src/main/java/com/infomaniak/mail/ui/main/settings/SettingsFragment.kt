@@ -90,7 +90,7 @@ class SettingsFragment : Fragment() {
 
         settingsNotifications.setOnClickListener {
             trackEvent("settingsNotifications", "openNotificationSettings")
-            if (requireActivity().hasNotificationPermission()) localSettings.hasEnabledNotifSettings = true
+            if (requireActivity().hasNotificationPermission()) localSettings.hasEnabledNotifications = true
             requireContext().openAppNotificationSettings()
         }
 

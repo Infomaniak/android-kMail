@@ -211,7 +211,7 @@ class MainActivity : ThemedActivity() {
     private fun registerMainPermissions(permissionUtils: PermissionUtils) {
         permissionUtils.registerMainPermissions { permissionsResults ->
             if (permissionsResults[Manifest.permission.READ_CONTACTS] == true) mainViewModel.updateUserInfo()
-            if (permissionsResults[Manifest.permission.POST_NOTIFICATIONS] == true) localSettings.hasEnabledNotifSettings = true
+            if (permissionsResults[Manifest.permission.POST_NOTIFICATIONS] == true) localSettings.hasEnabledNotifications = true
         }
     }
 

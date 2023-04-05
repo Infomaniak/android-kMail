@@ -58,12 +58,12 @@ class PermissionUtils {
     }
 
     /**
-     * If the user has manually disabled notifications permissions, stop requesting it
-     * Manually disabled means the permission was granted at one point, but is no more
+     * If the user has manually disabled notifications permissions, stop requesting it.
+     * Manually disabled means the permission was granted at one point, but is no more.
      */
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun getTiramisuPermissions(): Array<String> {
-        return if (activity.hasNotificationPermission() || LocalSettings.getInstance(activity).hasEnabledNotifSettings) {
+        return if (activity.hasNotificationPermission() || LocalSettings.getInstance(activity).hasEnabledNotifications) {
             mainPermissions.filterNot { permission -> permission == Manifest.permission.POST_NOTIFICATIONS }.toTypedArray()
         } else {
             mainPermissions
