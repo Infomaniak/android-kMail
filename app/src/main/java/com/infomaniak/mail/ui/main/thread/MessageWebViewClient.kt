@@ -57,8 +57,7 @@ class MessageWebViewClient(
                     runCatching {
                         ApiRepository.downloadAttachment(resource)
                     }.getOrNull()?.body?.byteStream()?.also {
-                        val inputStream = it.readBytes().inputStream()
-                        imageCaches[cid] = inputStream
+                        imageCaches[cid] = it.readBytes().inputStream()
                     }
                 }
 
