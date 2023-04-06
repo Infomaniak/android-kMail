@@ -20,8 +20,6 @@ package com.infomaniak.mail.ui.main.newMessage
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.Filter
-import android.widget.Filterable
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.utils.context
@@ -39,10 +37,10 @@ class ContactAdapter(
     private val onContactClicked: (item: MergedContact) -> Unit,
     private val onAddUnrecognizedContact: () -> Unit,
     private val setSnackBar: (titleRes: Int) -> Unit,
-) : RecyclerView.Adapter<ContactViewHolder>(), Filterable {
+) : RecyclerView.Adapter<ContactViewHolder>() {
 
     private var allContacts: List<MergedContact> = emptyList()
-    private var contacts = mutableListOf<MergedContact>()
+    private var matchedContacts = mutableListOf<MatchedContact>()
 
     private var displayAddUnknownContactButton = true
     private var searchQuery = ""
@@ -56,16 +54,19 @@ class ContactAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (position < contacts.count()) KNOWN_CONTACT.id else UNKNOWN_CONTACT.id
+        return if (position < matchedContacts.count()) KNOWN_CONTACT.id else UNKNOWN_CONTACT.id
     }
 
     override fun onBindViewHolder(holder: ContactViewHolder, position: Int) = with(holder.binding) {
         if (getItemViewType(position) == KNOWN_CONTACT.id) bindContact(position) else bindAddNewUser()
     }
 
-    private fun ItemContactBinding.bindContact(position: Int) {
-        val contact = contacts[position]
-        contactDetails.setMergedContact(contact)
+    private fun ItemContactBinding.bindContact(position: Int) = with(matchedContacts[position]) {
+        contactDetails.apply {
+            setMergedContact(contact)
+            highlight(nameMatchedStartIndex, emailMatchedStartIndex, searchQuery.standardize().count())
+        }
+
         val isAlreadyUsed = usedContacts.contains(contact.email)
         if (!isAlreadyUsed) root.setOnClickListener { onContactClicked(contact) }
         greyedOutState.isVisible = isAlreadyUsed
@@ -80,55 +81,51 @@ class ContactAdapter(
         }
     }
 
-    override fun getItemCount(): Int = contacts.count() + if (displayAddUnknownContactButton) 1 else 0
+    override fun getItemCount(): Int = matchedContacts.count() + if (displayAddUnknownContactButton) 1 else 0
 
-    override fun getItemId(position: Int) = if (getItemViewType(position) == KNOWN_CONTACT.id) contacts[position].id!! else 0
+    override fun getItemId(position: Int): Long {
+        return if (getItemViewType(position) == KNOWN_CONTACT.id) matchedContacts[position].contact.id!! else 0L
+    }
 
     fun addFirstAvailableItem() {
-        contacts.firstOrNull()?.let(onContactClicked) ?: onAddUnrecognizedContact()
+        matchedContacts.firstOrNull()?.let { onContactClicked(it.contact) } ?: onAddUnrecognizedContact()
     }
 
     fun clear() {
-        contacts.clear()
+        matchedContacts.clear()
         notifyDataSetChanged()
     }
 
-    override fun getFilter(): Filter {
-        return object : Filter() {
-            override fun performFiltering(constraint: CharSequence?): FilterResults {
-                val searchTerm = constraint?.standardize() ?: ""
+    fun searchContacts(text: CharSequence) {
+        fun performFiltering(constraint: CharSequence): MutableList<MatchedContact> {
+            val searchTerm = constraint.standardize()
 
-                val finalUserList = mutableListOf<MergedContact>()
-                displayAddUnknownContactButton = true
-                for (contact in allContacts) {
-                    val standardizedEmail = contact.email.standardize()
-                    val matches = contact.name.standardize().contains(searchTerm) || standardizedEmail.contains(searchTerm)
+            val finalUserList = mutableListOf<MatchedContact>()
+            displayAddUnknownContactButton = true
+            for (contact in allContacts) {
+                val nameMatchedIndex = contact.name.standardize().indexOf(searchTerm)
+                val standardizedEmail = contact.email.standardize()
+                val emailMatchedIndex = standardizedEmail.indexOf(searchTerm)
+                val matches = nameMatchedIndex >= 0 || emailMatchedIndex >= 0
 
-                    val displayNewContact = (matches && searchTerm == standardizedEmail && !usedContacts.contains(searchTerm))
-                    if (displayNewContact) displayAddUnknownContactButton = false
+                val displayNewContact = (matches && searchTerm == standardizedEmail && !usedContacts.contains(searchTerm))
+                if (displayNewContact) displayAddUnknownContactButton = false
 
-                    if (matches) finalUserList.add(contact)
+                if (matches) finalUserList.add(MatchedContact(contact, nameMatchedIndex, emailMatchedIndex))
 
-                    if (finalUserList.count() >= MAX_AUTOCOMPLETE_RESULTS) break
-                }
-
-                return FilterResults().apply {
-                    values = finalUserList
-                    count = finalUserList.count()
-                }
+                if (finalUserList.count() >= MAX_AUTOCOMPLETE_RESULTS) break
             }
 
-            override fun publishResults(constraint: CharSequence?, results: FilterResults) {
-                @Suppress("UNCHECKED_CAST")
-                contacts = results.values as MutableList<MergedContact>
-                notifyDataSetChanged()
-            }
+            return finalUserList
         }
-    }
 
-    fun filterField(text: CharSequence) {
+        fun publishResults(results: MutableList<MatchedContact>) {
+            matchedContacts = results
+            notifyDataSetChanged()
+        }
+
         searchQuery = text.toString()
-        filter.filter(text)
+        publishResults(performFiltering(text))
     }
 
     fun removeUsedEmail(email: String) = usedContacts.remove(email.standardize())
@@ -145,6 +142,12 @@ class ContactAdapter(
         KNOWN_CONTACT(0),
         UNKNOWN_CONTACT(1),
     }
+
+    private data class MatchedContact(
+        val contact: MergedContact,
+        val nameMatchedStartIndex: Int,
+        val emailMatchedStartIndex: Int,
+    )
 
     private companion object {
         const val MAX_AUTOCOMPLETE_RESULTS = 10

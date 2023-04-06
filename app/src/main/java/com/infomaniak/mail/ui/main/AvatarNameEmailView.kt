@@ -18,9 +18,14 @@
 package com.infomaniak.mail.ui.main
 
 import android.content.Context
+import android.text.Spannable
+import android.text.style.ForegroundColorSpan
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
+import android.widget.TextView
+import androidx.annotation.ColorInt
+import androidx.core.text.toSpannable
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.mail.R
@@ -29,6 +34,8 @@ import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ViewAvatarNameEmailBinding
 import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
+import com.infomaniak.mail.utils.getAttributeColor
+import com.google.android.material.R as RMaterial
 
 class AvatarNameEmailView @JvmOverloads constructor(
     context: Context,
@@ -83,6 +90,21 @@ class AvatarNameEmailView @JvmOverloads constructor(
 
     override fun setOnClickListener(onClickListener: OnClickListener?) {
         binding.root.setOnClickListener(onClickListener)
+    }
+
+    fun highlight(nameStartIndex: Int, emailStartIndex: Int, length: Int) = with(binding) {
+        if (nameStartIndex >= 0) userName.highlight(nameStartIndex, nameStartIndex + length)
+        if (emailStartIndex >= 0 && userEmail.text.isNotBlank()) userEmail.highlight(emailStartIndex, emailStartIndex + length)
+    }
+
+    private fun TextView.highlight(
+        startIndex: Int,
+        endIndex: Int,
+        @ColorInt color: Int = context.getAttributeColor(RMaterial.attr.colorPrimary)
+    ) {
+        val highlightedText = text.toSpannable()
+        highlightedText.setSpan(ForegroundColorSpan(color), startIndex, endIndex, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
+        text = highlightedText
     }
 
     private companion object {
