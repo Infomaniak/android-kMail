@@ -218,6 +218,9 @@ class ThreadFragment : Fragment() {
         AppCompatResources.getDrawable(context, R.drawable.divider)?.let {
             messagesList.addItemDecoration(DividerItemDecorator(InsetDrawable(it, 0)))
         }
+
+        messagesList.recycledViewPool.setMaxRecycledViews(0, 0)
+
         messagesList.adapter = threadAdapter.apply {
             stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
             contacts = mainViewModel.mergedContacts.value ?: emptyMap()
