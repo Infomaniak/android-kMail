@@ -83,8 +83,9 @@ class ContactAdapter(
 
     override fun getItemCount(): Int = matchedContacts.count() + if (displayAddUnknownContactButton) 1 else 0
 
-    override fun getItemId(position: Int) =
-        if (getItemViewType(position) == KNOWN_CONTACT.id) matchedContacts[position].contact.id!! else 0
+    override fun getItemId(position: Int): Long {
+        return if (getItemViewType(position) == KNOWN_CONTACT.id) matchedContacts[position].contact.id!! else 0L
+    }
 
     fun addFirstAvailableItem() {
         matchedContacts.firstOrNull()?.let { onContactClicked(it.contact) } ?: onAddUnrecognizedContact()
