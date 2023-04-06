@@ -54,7 +54,9 @@ class MessageWebViewClient(
                     cacheFile.inputStream()
                 } else {
                     Log.d(TAG, "shouldInterceptRequest: load ${attachment.name} from remote")
-                    ApiRepository.downloadAttachment(resource).body?.byteStream()?.also {
+                    runCatching {
+                        ApiRepository.downloadAttachment(resource)
+                    }.getOrNull()?.body?.byteStream()?.also {
                         val inputStream = it.readBytes().inputStream()
                         imageCaches[cid] = inputStream
                     }
