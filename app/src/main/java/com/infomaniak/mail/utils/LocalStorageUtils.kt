@@ -70,7 +70,7 @@ object LocalStorageUtils {
         if (exists()) delete()
         inputStream.buffered().use {
             parentFile?.mkdirs()
-            outputStream().use { output -> inputStream.copyTo(output) }
+            if (outputFile.createNewFile()) outputStream().use { output -> inputStream.copyTo(output) }
         }
         AttachmentController.updateSize(resource, outputFile.length())
     }
