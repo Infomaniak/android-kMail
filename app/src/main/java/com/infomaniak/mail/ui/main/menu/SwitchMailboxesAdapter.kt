@@ -36,9 +36,7 @@ class SwitchMailboxesAdapter(
 ) : RecyclerView.Adapter<SwitchMailboxesViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SwitchMailboxesViewHolder {
-        return SwitchMailboxesViewHolder(
-            ItemSwitchMailboxBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        )
+        return SwitchMailboxesViewHolder(ItemSwitchMailboxBinding.inflate(LayoutInflater.from(parent.context), parent, false))
     }
 
     override fun onBindViewHolder(holder: SwitchMailboxesViewHolder, position: Int) = with(holder.binding.emailAddress) {

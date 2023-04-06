@@ -247,7 +247,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
 
         userAvatar.setOnClickListener {
-            safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToManageMailAddressFragment())
+            safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToAccountFragment())
         }
 
         newMessageFab.setOnClickListener {

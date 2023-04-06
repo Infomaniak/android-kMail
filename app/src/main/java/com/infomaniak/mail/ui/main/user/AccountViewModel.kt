@@ -28,7 +28,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-class ManageMailAddressViewModel(application: Application) : AndroidViewModel(application) {
+class AccountViewModel(application: Application) : AndroidViewModel(application) {
 
     private val coroutineContext = viewModelScope.coroutineContext + Dispatchers.IO
 

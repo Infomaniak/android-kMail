@@ -31,25 +31,25 @@ import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.R
-import com.infomaniak.mail.databinding.FragmentManageMailAddressBinding
-import com.infomaniak.mail.ui.main.user.ManageMailAddressViewModel
+import com.infomaniak.mail.databinding.FragmentAccountBinding
+import com.infomaniak.mail.ui.main.user.AccountViewModel
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.animatedNavigation
 import com.infomaniak.mail.utils.createDescriptionDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class ManageMailAddressFragment : Fragment() {
+class AccountFragment : Fragment() {
 
-    private lateinit var binding: FragmentManageMailAddressBinding
-    private val manageMailAddressViewModel: ManageMailAddressViewModel by viewModels()
+    private lateinit var binding: FragmentAccountBinding
+    private val accountViewModel: AccountViewModel by viewModels()
 
     private val logoutAlert by lazy { initLogoutAlert() }
 
     private var mailboxAdapter = SwitchMailboxesAdapter(isInMenuDrawer = false)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return FragmentManageMailAddressBinding.inflate(inflater, container, false).also { binding = it }.root
+        return FragmentAccountBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
@@ -58,7 +58,9 @@ class ManageMailAddressFragment : Fragment() {
             mail.text = user.email
         }
 
-        changeAccountButton.setOnClickListener { animatedNavigation(ManageMailAddressFragmentDirections.actionManageMailAddressFragmentToSwitchUserFragment()) }
+        changeAccountButton.setOnClickListener {
+            animatedNavigation(AccountFragmentDirections.actionAccountFragmentToSwitchUserFragment())
+        }
 
         changeMailboxButton.setOnClickListener {
             // TODO: Add an address tunnel
@@ -86,7 +88,7 @@ class ManageMailAddressFragment : Fragment() {
         AccountUtils.removeUser(requireContext(), AccountUtils.currentUser!!)
     }
 
-    private fun observeAccountsLive() = with(manageMailAddressViewModel) {
+    private fun observeAccountsLive() = with(accountViewModel) {
 
         updateMailboxes()
 
