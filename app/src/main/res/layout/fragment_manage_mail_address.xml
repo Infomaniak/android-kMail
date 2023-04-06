@@ -81,24 +81,37 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/marginStandardSmall"
                     android:layout_marginTop="@dimen/marginStandardMedium"
+                    android:paddingBottom="@dimen/marginStandardMedium"
                     android:text="@string/buttonAccountAssociatedEmailAddresses"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/changeMailboxButton"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/changeAccountButton" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/changeMailboxButton"
+                    style="@style/IconButtonSmall"
+                    android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                    android:contentDescription="@string/buttonAddEmailAddress"
+                    app:icon="@drawable/ic_add_circle"
+                    app:iconTint="?attr/colorPrimary"
+                    app:layout_constraintBottom_toBottomOf="@+id/associatedEmailAddresses"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/associatedEmailAddresses"
+                    app:layout_constraintTop_toTopOf="@+id/associatedEmailAddresses" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/mailboxesRecyclerView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/marginStandardSmall"
-                    android:layout_marginTop="@dimen/marginStandardMedium"
+                    android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
+                    android:layout_marginTop="@dimen/marginStandardVerySmall"
                     android:overScrollMode="never"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/associatedEmailAddresses"
                     tools:itemCount="10"
-                    tools:listitem="@layout/item_mailbox_my_account" />
+                    tools:listitem="@layout/item_switch_mailbox" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.core.widget.NestedScrollView>

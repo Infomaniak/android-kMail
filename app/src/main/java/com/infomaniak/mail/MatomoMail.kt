@@ -52,6 +52,7 @@ object MatomoMail : MatomoCore {
     const val ACTION_SPAM_NAME = "spam"
     const val ACTION_PRINT_NAME = "print"
     const val ACTION_POSTPONE_NAME = "postpone"
+    const val SWITCH_MAILBOX_NAME = "switchMailbox"
     //endregion
 
     @SuppressLint("RestrictedApi") // This `SuppressLint` is there so the CI can build

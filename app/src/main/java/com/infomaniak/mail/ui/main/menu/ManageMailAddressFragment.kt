@@ -25,13 +25,14 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.views.DividerItemDecorator
+import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentManageMailAddressBinding
 import com.infomaniak.mail.ui.main.user.ManageMailAddressViewModel
-import com.infomaniak.mail.ui.main.user.SimpleMailboxAdapter
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.animatedNavigation
 import com.infomaniak.mail.utils.createDescriptionDialog
@@ -45,7 +46,7 @@ class ManageMailAddressFragment : Fragment() {
 
     private val logoutAlert by lazy { initLogoutAlert() }
 
-    private var simpleMailboxAdapter = SimpleMailboxAdapter()
+    private var mailboxAdapter = SwitchMailboxesAdapter(isInMenuDrawer = false)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentManageMailAddressBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -59,13 +60,18 @@ class ManageMailAddressFragment : Fragment() {
 
         changeAccountButton.setOnClickListener { animatedNavigation(ManageMailAddressFragmentDirections.actionManageMailAddressFragmentToSwitchUserFragment()) }
 
+        changeMailboxButton.setOnClickListener {
+            // TODO: Add an address tunnel
+            requireActivity().openUrl(BuildConfig.SHOP_URL)
+        }
+
         disconnectAccountButton.setOnClickListener {
             context.trackAccountEvent("logOut")
             logoutAlert.show()
         }
 
         mailboxesRecyclerView.apply {
-            adapter = simpleMailboxAdapter
+            adapter = mailboxAdapter
             ResourcesCompat.getDrawable(resources, R.drawable.divider, null)?.let {
                 addItemDecoration(DividerItemDecorator(it))
             }
@@ -84,9 +90,7 @@ class ManageMailAddressFragment : Fragment() {
 
         updateMailboxes()
 
-        observeAccountsLive.observe(viewLifecycleOwner) { mailboxes ->
-            simpleMailboxAdapter.updateMailboxes(mailboxes.map { it.email })
-        }
+        observeAccountsLive.observe(viewLifecycleOwner) { mailboxes -> mailboxAdapter.setMailboxes(mailboxes) }
     }
 
     private fun initLogoutAlert() = createDescriptionDialog(
