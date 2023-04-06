@@ -22,6 +22,7 @@ import com.infomaniak.lib.core.api.ApiController.ApiMethod.*
 import com.infomaniak.lib.core.api.ApiRepositoryCore
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.networking.HttpClient
+import com.infomaniak.lib.core.networking.HttpUtils
 import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition
 import com.infomaniak.mail.data.models.addressBook.AddressBooksResult
@@ -41,6 +42,8 @@ import com.infomaniak.mail.utils.SentryDebug
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
 
 object ApiRepository : ApiRepositoryCore() {
 
@@ -223,6 +226,14 @@ object ApiRepository : ApiRepositoryCore() {
 
     fun flushFolder(mailboxUuid: String, folderId: String): ApiResponse<Boolean> {
         return callApi(ApiRoutes.flushFolder(mailboxUuid, folderId), POST)
+    }
+
+    fun downloadAttachment(resource: String): Response {
+        val httpRequest = Request.Builder()
+            .url(ApiRoutes.resource(resource))
+            .headers(HttpUtils.getHeaders(contentType = null))
+            .build()
+        return HttpClient.okHttpClient.newBuilder().build().newCall(httpRequest).execute()
     }
 
     /**
