@@ -28,7 +28,7 @@
     <string name="actionMarkAsUnread">Als ungelesen markieren</string>
     <string name="actionMove">Verschieben</string>
     <string name="actionMoveToInbox">In den Posteingang verschieben</string>
-    <string name="actionNonSpam">Kein Spam</string>
+    <string name="actionNonSpam">Als Nicht-Spam melden</string>
     <string name="actionOpenIn">Öffnen in</string>
     <string name="actionPhishing">Phishing melden</string>
     <string name="actionPostpone">Aufschieben</string>
@@ -231,7 +231,7 @@
     <string name="searchFieldPlaceholder">Eine E-Mail suchen</string>
     <string name="searchFilterAttachment">Anhänge</string>
     <string name="searchFilterFolder">Alle Verzeichnisse</string>
-    <string name="searchFilterRead">Lesen Sie</string>
+    <string name="searchFilterRead">Lesen</string>
     <string name="searchFilterUnread">Ungelesen</string>
     <string name="send">Senden Sie</string>
     <string name="sentFolder">Gesendete Nachrichten</string>

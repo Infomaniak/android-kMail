@@ -30,6 +30,7 @@ import com.infomaniak.mail.MatomoMail.ACTION_MOVE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_SPAM_NAME
 import com.infomaniak.mail.MatomoMail.trackMultiSelectActionEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.BottomSheetMultiSelectBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
@@ -52,8 +53,9 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
         val selectedThreadsUids = selectedThreads.map { it.uid }
         val selectedThreadsCount = selectedThreadsUids.count()
-
         val (shouldRead, shouldFavorite) = ThreadListMultiSelection.computeReadFavoriteStatus(selectedThreads)
+
+        setStateDependentUi(shouldRead, shouldFavorite)
 
         binding.mainActions.setClosingOnClickListener { id: Int ->
             when (id) {
@@ -100,6 +102,30 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
             trackMultiSelectActionEvent(ACTION_FAVORITE_NAME, selectedThreadsCount, isFromBottomSheet = true)
             toggleThreadsFavoriteStatus(selectedThreadsUids, shouldFavorite)
             isMultiSelectOn = false
+        }
+    }
+
+    private fun setStateDependentUi(shouldRead: Boolean, shouldFavorite: Boolean) {
+        val readIcon = if (shouldRead) R.drawable.ic_envelope_open else R.drawable.ic_envelope
+        val readText = if (shouldRead) R.string.actionShortMarkAsRead else R.string.actionShortMarkAsUnread
+        binding.mainActions.setAction(R.id.actionReadUnread, readIcon, readText)
+
+        // val isFromArchive = mainViewModel.currentFolder.value?.role == FolderRole.ARCHIVE
+        // TODO : When decided by UI/UX change how the icon is displayed when trying to archive from inside the archive folder
+
+        val isFromSpam = mainViewModel.currentFolder.value?.role == FolderRole.SPAM
+        val spamIcon = if (isFromSpam) R.drawable.ic_non_spam else R.drawable.ic_spam
+        val spamText = if (isFromSpam) R.string.actionNonSpam else R.string.actionSpam
+        binding.spam.apply {
+            setIconResource(spamIcon)
+            setText(spamText)
+        }
+
+        val favoriteIcon = if (shouldFavorite) R.drawable.ic_star else R.drawable.ic_unstar
+        val favoriteText = if (shouldFavorite) R.string.actionStar else R.string.actionUnstar
+        binding.favorite.apply {
+            setIconResource(favoriteIcon)
+            setText(favoriteText)
         }
     }
 }

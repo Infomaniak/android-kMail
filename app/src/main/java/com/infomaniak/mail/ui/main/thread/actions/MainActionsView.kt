@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,16 +19,19 @@ package com.infomaniak.mail.ui.main.thread.actions
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.graphics.drawable.RippleDrawable
 import android.util.AttributeSet
 import android.view.*
 import android.widget.ActionMenuView
 import android.widget.FrameLayout
 import android.widget.TextView
+import androidx.annotation.DrawableRes
+import androidx.annotation.IdRes
+import androidx.annotation.StringRes
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.res.getResourceIdOrThrow
-import androidx.core.view.get
-import androidx.core.view.isInvisible
-import androidx.core.view.size
+import androidx.core.view.*
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.mail.R
@@ -56,15 +59,8 @@ class MainActionsView @JvmOverloads constructor(
                     button.isInvisible = true
                     textView.isInvisible = true
                 } else {
-                    with(menu[index]) {
-                        button.icon = icon
-                        button.contentDescription = title
-                        
-                        textView.apply {
-                            text = title
-                            transferClickTo(button)
-                        }
-                    }
+                    with(menu[index]) { setAction(index, icon, title.toString()) }
+                    textView.transferClickTo(button)
                 }
             }
         }
@@ -96,5 +92,27 @@ class MainActionsView @JvmOverloads constructor(
         buttons.forEachIndexed { index, button ->
             button.setOnClickListener { callback(menu[index].itemId) }
         }
+    }
+
+    fun setAction(@IdRes menuId: Int, @DrawableRes iconRes: Int, @StringRes titleRes: Int) {
+        val title = context.getString(titleRes)
+        val drawable = AppCompatResources.getDrawable(context, iconRes)
+        val index = getIndexOfMenuItem(menuId)
+        if (index >= 0) setAction(index, drawable, title)
+    }
+
+    private fun getIndexOfMenuItem(menuId: Int): Int {
+        menu.forEachIndexed { index, item ->
+            if (item.itemId == menuId) return index
+        }
+        return -1
+    }
+
+    private fun setAction(index: Int, drawable: Drawable?, title: String) {
+        buttons[index].apply {
+            icon = drawable
+            contentDescription = title
+        }
+        textViews[index].text = title
     }
 }
