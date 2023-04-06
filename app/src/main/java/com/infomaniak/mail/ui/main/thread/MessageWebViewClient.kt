@@ -47,7 +47,6 @@ class MessageWebViewClient(
             val cid = request.url.schemeSpecificPart
             cidDictionary[cid]?.let { attachment ->
                 val cacheFile = attachment.getCacheFile(context)
-                val resource = attachment.resource ?: return super.shouldInterceptRequest(view, request)
 
                 val data = if (attachment.hasUsableCache(context, cacheFile)) {
                     Log.d(TAG, "shouldInterceptRequest: load ${attachment.name} from local")
@@ -55,6 +54,7 @@ class MessageWebViewClient(
                 } else {
                     Log.d(TAG, "shouldInterceptRequest: load ${attachment.name} from remote")
                     runCatching {
+                        val resource = attachment.resource ?: return super.shouldInterceptRequest(view, request)
                         ApiRepository.downloadAttachment(resource)
                     }.getOrNull()?.body?.byteStream()?.also {
                         imageCaches[cid] = it.readBytes().inputStream()
