@@ -442,7 +442,7 @@
     </androidx.appcompat.widget.LinearLayoutCompat>
 
     <FrameLayout
-        android:id="@+id/bodyFrameLayout"
+        android:id="@+id/webViewsFrameLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toTopOf="@id/quoteButtonFrameLayout"
@@ -456,6 +456,12 @@
             android:layout_height="wrap_content"
             android:scrollbars="horizontal" />
 
+        <WebView
+            android:id="@+id/fullMessageWebView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="horizontal"
+            android:visibility="gone" />
     </FrameLayout>
 
     <FrameLayout
@@ -463,10 +469,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@id/quoteFrameLayout"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/bodyFrameLayout"
+        app:layout_constraintTop_toBottomOf="@id/webViewsFrameLayout"
         tools:visibility="visible">
 
         <com.google.android.material.button.MaterialButton
@@ -482,24 +488,6 @@
             android:minHeight="0dp"
             android:padding="@dimen/marginStandardVerySmall"
             android:text="@string/messageShowQuotedText" />
-    </FrameLayout>
-
-    <FrameLayout
-        android:id="@+id/quoteFrameLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/quoteButtonFrameLayout"
-        tools:visibility="visible">
-
-        <WebView
-            android:id="@+id/quoteWebView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:scrollbars="horizontal" />
     </FrameLayout>
 
     <androidx.constraintlayout.widget.Group
