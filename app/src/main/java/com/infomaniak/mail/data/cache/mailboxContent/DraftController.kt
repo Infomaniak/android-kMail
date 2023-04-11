@@ -28,6 +28,7 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.ui.main.thread.MessageWebViewClient.Companion.CID_SCHEME
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.MessageBodyUtils
 import com.infomaniak.mail.utils.toDate
@@ -39,16 +40,21 @@ import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
+import org.jsoup.Jsoup
+import org.jsoup.nodes.TextNode
 
 object DraftController {
+
+    private inline val defaultRealm get() = RealmDatabase.mailboxContent()
 
     private const val PREFIX_REPLY = "Re: "
     private const val PREFIX_FORWARD = "Fw: "
     private const val REGEX_REPLY = "(re|ref|aw|rif|r):"
     private const val REGEX_FORWARD = "(fw|fwd|rv|wg|tr|i):"
-    private const val REGEX_CID = "<img\\s+src=\"cid:([^\">]+)\">"
 
-    private inline val defaultRealm get() = RealmDatabase.mailboxContent()
+    private const val CID_PROTOCOL = "$CID_SCHEME:"
+    private const val SRC_ATTRIBUTE = "src"
+    private const val CID_IMAGE_CSS_QUERY = "img[$SRC_ATTRIBUTE^='$CID_PROTOCOL']"
 
     //region Queries
     private fun getDraftsQuery(query: String? = null, realm: TypedRealm): RealmQuery<Draft> = with(realm) {
@@ -153,16 +159,16 @@ object DraftController {
         val from = message.fromName(context = this)
         val messageReplyHeader = getString(R.string.messageReplyHeader, date, from)
 
-        val previousBody = message.body?.value
-            ?.replace(REGEX_CID.toRegex(), "&lt;$1&gt;")
-            ?.let {
-                var body = it
-                message.attachments.forEach { attachment ->
-                    val cid = attachment.contentId
-                    if (cid != null) body = body.replace(cid, attachment.name)
+        val previousBody = message.body?.value?.let(Jsoup::parse)?.let { document ->
+            val attachmentsMap = message.attachments.associate { it.contentId to it.name }
+            document.select(CID_IMAGE_CSS_QUERY).forEach { element ->
+                val cid = element.attr(SRC_ATTRIBUTE).removePrefix(CID_PROTOCOL)
+                attachmentsMap[cid]?.let { name ->
+                    element.replaceWith(TextNode("<${name}>"))
                 }
-                return@let body
-            } ?: ""
+            }
+            return@let document.outerHtml()
+        } ?: ""
 
         return """
             <div id=\"answerContentMessage\" class="${MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME}" >
