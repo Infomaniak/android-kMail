@@ -46,6 +46,7 @@ object DraftController {
     private const val PREFIX_FORWARD = "Fw: "
     private const val REGEX_REPLY = "(re|ref|aw|rif|r):"
     private const val REGEX_FORWARD = "(fw|fwd|rv|wg|tr|i):"
+    private const val REGEX_CID = "<img\\s+src=\"cid:([^\">]+)\">"
 
     private inline val defaultRealm get() = RealmDatabase.mailboxContent()
 
@@ -151,7 +152,17 @@ object DraftController {
         val date = message.date.toDate()
         val from = message.fromName(context = this)
         val messageReplyHeader = getString(R.string.messageReplyHeader, date, from)
-        val previousBody = message.body?.value ?: ""
+
+        val previousBody = message.body?.value
+            ?.replace(REGEX_CID.toRegex(), "&lt;$1&gt;")
+            ?.let {
+                var body = it
+                message.attachments.forEach { attachment ->
+                    val cid = attachment.contentId
+                    if (cid != null) body = body.replace(cid, attachment.name)
+                }
+                return@let body
+            } ?: ""
 
         return """
             <div id=\"answerContentMessage\" class="${MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME}" >
