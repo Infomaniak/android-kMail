@@ -35,6 +35,7 @@ import com.infomaniak.mail.databinding.BottomSheetMultiSelectBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection
+import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection.Companion.getReadIconAndShortText
 import com.infomaniak.mail.utils.animatedNavigation
 
 class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
@@ -71,16 +72,14 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                 R.id.actionReadUnread -> {
                     trackMultiSelectActionEvent(ACTION_MARK_AS_SEEN_NAME, selectedThreadsCount, isFromBottomSheet = true)
                     toggleThreadsSeenStatus(selectedThreadsUids, shouldRead)
-                    isMultiSelectOn = false
                 }
                 R.id.actionArchive -> {
                     trackMultiSelectActionEvent(ACTION_ARCHIVE_NAME, selectedThreadsCount, isFromBottomSheet = true)
                     archiveThreads(selectedThreadsUids)
-                    isMultiSelectOn = false
                 }
                 R.id.actionDelete -> {
                     trackMultiSelectActionEvent(ACTION_DELETE_NAME, selectedThreadsCount, isFromBottomSheet = true)
-                    mainViewModel.deleteThreads(selectedThreadsUids)
+                    deleteThreads(selectedThreadsUids)
                 }
             }
             isMultiSelectOn = false
@@ -106,16 +105,14 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
     }
 
     private fun setStateDependentUi(shouldRead: Boolean, shouldFavorite: Boolean) {
-        val readIcon = if (shouldRead) R.drawable.ic_envelope_open else R.drawable.ic_envelope
-        val readText = if (shouldRead) R.string.actionShortMarkAsRead else R.string.actionShortMarkAsUnread
+        val (readIcon, readText) = getReadIconAndShortText(shouldRead)
         binding.mainActions.setAction(R.id.actionReadUnread, readIcon, readText)
 
         // val isFromArchive = mainViewModel.currentFolder.value?.role == FolderRole.ARCHIVE
-        // TODO : When decided by UI/UX change how the icon is displayed when trying to archive from inside the archive folder
+        // TODO : When decided by UI/UX, change how the icon is displayed (when trying to archive from inside the Archive folder).
 
         val isFromSpam = mainViewModel.currentFolder.value?.role == FolderRole.SPAM
-        val spamIcon = if (isFromSpam) R.drawable.ic_non_spam else R.drawable.ic_spam
-        val spamText = if (isFromSpam) R.string.actionNonSpam else R.string.actionSpam
+        val (spamIcon, spamText) = getSpamIconAndText(isFromSpam)
         binding.spam.apply {
             setIconResource(spamIcon)
             setText(spamText)
@@ -127,5 +124,9 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
             setIconResource(favoriteIcon)
             setText(favoriteText)
         }
+    }
+
+    private fun getSpamIconAndText(isFromSpam: Boolean): Pair<Int, Int> {
+        return if (isFromSpam) R.drawable.ic_non_spam to R.string.actionNonSpam else R.drawable.ic_spam to R.string.actionSpam
     }
 }

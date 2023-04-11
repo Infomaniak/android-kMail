@@ -105,6 +105,7 @@ class MainActionsView @JvmOverloads constructor(
         menu.forEachIndexed { index, item ->
             if (item.itemId == menuId) return index
         }
+
         return -1
     }
 

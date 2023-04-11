@@ -208,11 +208,8 @@ class ThreadListMultiSelection {
         }
 
         binding.quickActionBar.apply {
-
-            val readIcon = if (shouldMultiselectRead) R.drawable.ic_envelope_open else R.drawable.ic_envelope
+            val (readIcon, readText) = getReadIconAndShortText(shouldMultiselectRead)
             changeIcon(READ_UNREAD_INDEX, readIcon)
-
-            val readText = if (shouldMultiselectRead) R.string.actionShortMarkAsRead else R.string.actionShortMarkAsUnread
             changeText(READ_UNREAD_INDEX, readText)
 
             val favoriteIcon = if (shouldMultiselectFavorite) R.drawable.ic_star else R.drawable.ic_unstar
@@ -235,16 +232,24 @@ class ThreadListMultiSelection {
         private const val FAVORITE_INDEX = 2
 
         fun computeReadFavoriteStatus(selectedThreads: Set<SelectedThread>): Pair<Boolean, Boolean> {
-            var shouldUnRead = true
-            var shouldUnFavorite = selectedThreads.isNotEmpty()
+            var shouldUnread = true
+            var shouldUnfavorite = selectedThreads.isNotEmpty()
 
             for (thread in selectedThreads) {
-                shouldUnRead = shouldUnRead && thread.unseenMessagesCount == 0
-                shouldUnFavorite = shouldUnFavorite && thread.isFavorite
+                shouldUnread = shouldUnread && thread.unseenMessagesCount == 0
+                shouldUnfavorite = shouldUnfavorite && thread.isFavorite
 
-                if (!shouldUnRead && !shouldUnFavorite) break
+                if (!shouldUnread && !shouldUnfavorite) break
             }
-            return !shouldUnRead to !shouldUnFavorite
+            return !shouldUnread to !shouldUnfavorite
+        }
+
+        fun getReadIconAndShortText(shouldRead: Boolean): Pair<Int, Int> {
+            return if (shouldRead) {
+                R.drawable.ic_envelope_open to R.string.actionShortMarkAsRead
+            } else {
+                R.drawable.ic_envelope to R.string.actionShortMarkAsUnread
+            }
         }
     }
 }
