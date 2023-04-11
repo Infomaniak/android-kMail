@@ -70,7 +70,7 @@ object LocalStorageUtils {
         if (exists()) delete()
         inputStream.buffered().use {
             parentFile?.mkdirs()
-            if (outputFile.createNewFile()) outputStream().use { output -> inputStream.copyTo(output) }
+            if (outputFile.createNewFile()) outputStream().use(inputStream::copyTo)
         }
         AttachmentController.updateSize(resource, outputFile.length())
     }
@@ -80,9 +80,7 @@ object LocalStorageUtils {
             val attachmentsCacheDir = getAttachmentsUploadDir(context, localDraftUuid)
             if (!attachmentsCacheDir.exists()) attachmentsCacheDir.mkdirs()
             File(attachmentsCacheDir, fileName).also { file ->
-                FileOutputStream(file).use { outputStream ->
-                    inputStream.copyTo(outputStream)
-                }
+                FileOutputStream(file).use(inputStream::copyTo)
             }
         } ?: run {
             Sentry.withScope { scope ->
