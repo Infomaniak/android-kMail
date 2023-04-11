@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ import com.infomaniak.mail.views.MenuDrawerItemView.SelectionStyle
 
 class SwitchMailboxesAdapter(
     private var mailboxes: List<Mailbox> = emptyList(),
-    private val isInMenuDrawer: Boolean = true
+    private val isInMenuDrawer: Boolean = true,
 ) : RecyclerView.Adapter<SwitchMailboxesViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SwitchMailboxesViewHolder {
@@ -43,7 +43,8 @@ class SwitchMailboxesAdapter(
         val mailbox = mailboxes[position]
         text = mailbox.email
 
-        if (isInMenuDrawer) badge = mailbox.inboxUnreadCount else itemStyle = SelectionStyle.OTHER
+        if (isInMenuDrawer) badge = mailbox.inboxUnreadCount else itemStyle = SelectionStyle.ACCOUNT
+        holder.binding.root.setSelectedState(mailbox.mailboxId == AccountUtils.currentMailboxId)
 
         setOnClickListener {
             if (isInMenuDrawer) {

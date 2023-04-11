@@ -84,6 +84,7 @@ class MenuDrawerItemView @JvmOverloads constructor(
                 binding.root.apply {
                     setMarginsRelative(0)
                     shapeAppearanceModel = shapeAppearanceModel.toBuilder().setAllCornerSizes(0.0f).build()
+                    if (value == SelectionStyle.ACCOUNT) setContentPadding(0, 0, 0, 0)
                 }
             }
         }
@@ -118,10 +119,10 @@ class MenuDrawerItemView @JvmOverloads constructor(
             Color.TRANSPARENT to if (textWeight == TextWeight.MEDIUM) R.style.BodyMedium else R.style.Body
         }
 
-        checkmark.isVisible = isSelected && itemStyle == SelectionStyle.OTHER
-
         root.setCardBackgroundColor(color)
         itemName.setTextAppearance(textAppearance)
+
+        checkmark.isVisible = isSelected && itemStyle != SelectionStyle.MENU_DRAWER
     }
 
     override fun setOnClickListener(onClickListener: OnClickListener?) {
@@ -129,10 +130,13 @@ class MenuDrawerItemView @JvmOverloads constructor(
     }
 
     enum class SelectionStyle {
-        MENU_DRAWER, OTHER
+        MENU_DRAWER,
+        ACCOUNT,
+        OTHER,
     }
 
     enum class TextWeight {
-        REGULAR, MEDIUM
+        REGULAR,
+        MEDIUM,
     }
 }
