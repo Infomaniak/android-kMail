@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
-import android.animation.ValueAnimator
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.drawable.InsetDrawable
@@ -58,12 +57,8 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialog
+import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
-import com.infomaniak.mail.utils.UiUtils.animateColorChange
-import com.infomaniak.mail.utils.formatSubject
-import com.infomaniak.mail.utils.getAttributeColor
-import com.infomaniak.mail.utils.observeNotNull
-import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -78,7 +73,6 @@ class ThreadFragment : Fragment() {
 
     private val threadAdapter by lazy { ThreadAdapter() }
 
-    private var valueAnimator: ValueAnimator? = null
     private var isFavorite = false
 
     // When opening the Thread, we want to scroll to the last Message, but only once.
@@ -133,23 +127,13 @@ class ThreadFragment : Fragment() {
             toolbarSubject.setTextColor(textColor)
         }
 
-        var headerColorState = HeaderState.LOWERED
-        messagesListNestedScrollView.setOnScrollChangeListener { nestedScrollView, _, _, _, _ ->
-            val isAtTheTop = !nestedScrollView.canScrollVertically(-1)
-            if (headerColorState == HeaderState.ELEVATED && !isAtTheTop) return@setOnScrollChangeListener
-
-            val newColor = context.getColor(if (isAtTheTop) R.color.backgroundColor else R.color.elevatedBackground)
-            headerColorState = if (isAtTheTop) HeaderState.LOWERED else HeaderState.ELEVATED
-
-            val oldColor = appBar.backgroundTintList!!.defaultColor
-            if (oldColor == newColor) return@setOnScrollChangeListener
-
-            valueAnimator?.cancel()
-            valueAnimator = animateColorChange(oldColor, newColor, animate = true) { color ->
-                toolbar.setBackgroundColor(color)
-                appBar.backgroundTintList = ColorStateList.valueOf(color)
-                activity?.window?.statusBarColor = color
-            }
+        changeToolbarColorOnScroll(
+            messagesListNestedScrollView,
+            toolbar,
+            R.color.backgroundColor,
+            R.color.elevatedBackground
+        ) { color ->
+            appBar.backgroundTintList = ColorStateList.valueOf(color)
         }
 
         iconFavorite.setOnClickListener {
@@ -354,7 +338,6 @@ class ThreadFragment : Fragment() {
     }
 
     private fun leaveThread() {
-        valueAnimator?.cancel()
         // TODO: The day we'll have the Notifications, this `popBackStack` will probably fail to execute correctly.
         // TODO: When opening a Thread via a Notification, the action of leaving this fragment
         // TODO: (either via a classic Back button, or via this `popBackStack`) will probably

@@ -31,14 +31,14 @@ import android.util.Patterns
 import android.view.View
 import android.view.Window
 import android.webkit.WebView
-import androidx.annotation.AttrRes
-import androidx.annotation.IdRes
-import androidx.annotation.RawRes
-import androidx.annotation.StringRes
+import androidx.annotation.*
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.widget.NestedScrollView
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.navigation.NavDirections
@@ -48,6 +48,7 @@ import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.SimpleColorFilter
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
+import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.infomaniak.lib.core.api.ApiController
@@ -75,6 +76,7 @@ import com.infomaniak.mail.ui.main.folder.HeaderItemDecoration
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.ui.main.thread.MessageWebViewClient
+import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragmentArgs
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
@@ -424,4 +426,41 @@ fun Fragment.copyRecipientEmailToClipboard(recipient: Recipient, snackBarAnchor:
 
 inline infix fun <reified E : Enum<E>, V> ((E) -> V).enumValueFrom(value: V): E? {
     return enumValues<E>().firstOrNull { this(it) == value }
+}
+
+
+fun Fragment.changeToolbarColorOnScroll(
+    nestedScrollView: NestedScrollView,
+    toolbar: MaterialToolbar,
+    @ColorRes loweredColor: Int,
+    @ColorRes elevatedColor: Int,
+    otherUpdates: ((color: Int) -> Unit)? = null,
+) {
+    var valueAnimator: ValueAnimator? = null
+    var oldColor = requireContext().getColor(loweredColor)
+
+    viewLifecycleOwner.lifecycle.addObserver(object : LifecycleEventObserver {
+        override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+            if (event == Lifecycle.Event.ON_DESTROY) valueAnimator?.cancel()
+        }
+    })
+
+    var headerColorState = ThreadFragment.HeaderState.LOWERED
+    nestedScrollView.setOnScrollChangeListener { view, _, _, _, _ ->
+        val isAtTheTop = !view.canScrollVertically(-1)
+        if (headerColorState == ThreadFragment.HeaderState.ELEVATED && !isAtTheTop) return@setOnScrollChangeListener
+
+        val newColor = view.context.getColor(if (isAtTheTop) loweredColor else elevatedColor)
+        headerColorState = if (isAtTheTop) ThreadFragment.HeaderState.LOWERED else ThreadFragment.HeaderState.ELEVATED
+
+        if (oldColor == newColor) return@setOnScrollChangeListener
+
+        valueAnimator?.cancel()
+        valueAnimator = UiUtils.animateColorChange(oldColor, newColor, animate = true) { color ->
+            oldColor = color
+            toolbar.setBackgroundColor(color)
+            activity?.window?.statusBarColor = color
+            otherUpdates?.invoke(color)
+        }
+    }
 }
