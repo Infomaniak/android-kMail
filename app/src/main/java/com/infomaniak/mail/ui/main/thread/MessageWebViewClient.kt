@@ -97,8 +97,9 @@ class MessageWebViewClient(
         imageCaches.clear()
     }
 
-    private companion object {
+    companion object {
         val TAG = MessageWebViewClient::class.simpleName
+
         const val CID_SCHEME = "cid"
     }
 }
