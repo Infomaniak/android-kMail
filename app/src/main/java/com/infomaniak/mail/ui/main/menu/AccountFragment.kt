@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.menu
 
+import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -38,6 +39,7 @@ import com.infomaniak.mail.utils.animatedNavigation
 import com.infomaniak.mail.utils.createDescriptionDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import com.infomaniak.lib.core.R as RCore
 
 class AccountFragment : Fragment() {
 
@@ -75,7 +77,8 @@ class AccountFragment : Fragment() {
         mailboxesRecyclerView.apply {
             adapter = mailboxAdapter
             ResourcesCompat.getDrawable(resources, R.drawable.divider, null)?.let {
-                addItemDecoration(DividerItemDecorator(it))
+                val paddingHorizontal = resources.getDimensionPixelSize(RCore.dimen.marginStandardMedium)
+                addItemDecoration(DividerItemDecorator(InsetDrawable(it, paddingHorizontal, 0, paddingHorizontal, 0)))
             }
             isFocusable = false
         }
