@@ -19,12 +19,9 @@ package com.infomaniak.mail.utils
 
 import android.content.Context
 import android.net.Uri
-import com.infomaniak.lib.core.networking.HttpClient
-import com.infomaniak.lib.core.networking.HttpUtils
-import com.infomaniak.mail.data.api.ApiRoutes
+import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxContent.AttachmentController
 import io.sentry.Sentry
-import okhttp3.Request
 import okhttp3.Response
 import java.io.File
 import java.io.FileOutputStream
@@ -66,16 +63,14 @@ object LocalStorageUtils {
             } ?: false
         }
 
-        val resourceUrl = ApiRoutes.resource(resource)
-        val httpRequest = Request.Builder().url(resourceUrl).headers(HttpUtils.getHeaders(contentType = null)).get().build()
-        return HttpClient.okHttpClient.newCall(httpRequest).execute().saveAttachmentTo(resource, cacheFile)
+        return ApiRepository.downloadAttachment(resource).saveAttachmentTo(resource, cacheFile)
     }
 
-    private fun saveCacheAttachment(resource: String, inputStream: InputStream, outputFile: File) = with(outputFile) {
+    fun saveCacheAttachment(resource: String, inputStream: InputStream, outputFile: File) = with(outputFile) {
         if (exists()) delete()
         inputStream.buffered().use {
             parentFile?.mkdirs()
-            outputStream().use { output -> inputStream.copyTo(output) }
+            if (outputFile.createNewFile()) outputStream().use { output -> inputStream.copyTo(output) }
         }
         AttachmentController.updateSize(resource, outputFile.length())
     }

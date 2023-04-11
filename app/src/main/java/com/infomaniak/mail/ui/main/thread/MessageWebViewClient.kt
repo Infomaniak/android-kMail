@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.main.thread
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.util.ArrayMap
 import android.util.Log
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
@@ -27,14 +28,18 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.Utils
+import java.io.InputStream
 
 class MessageWebViewClient(
     private val context: Context,
     private val cidDictionary: MutableMap<String, Attachment>
 ) : WebViewClient() {
+
+    private val imageCaches = ArrayMap<String, InputStream>()
 
     override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
 
@@ -42,13 +47,21 @@ class MessageWebViewClient(
             val cid = request.url.schemeSpecificPart
             cidDictionary[cid]?.let { attachment ->
                 val cacheFile = attachment.getCacheFile(context)
-                if (!attachment.hasUsableCache(context, cacheFile)) {
-                    Log.d(TAG, "shouldInterceptRequest: cache ${attachment.name} with ${attachment.size}")
-                    LocalStorageUtils.saveAttachmentToCache(attachment.resource!!, cacheFile)
-                    attachment.size = cacheFile.length()
+
+                val data = if (attachment.hasUsableCache(context, cacheFile)) {
+                    Log.d(TAG, "shouldInterceptRequest: load ${attachment.name} from local")
+                    cacheFile.inputStream()
+                } else {
+                    Log.d(TAG, "shouldInterceptRequest: load ${attachment.name} from remote")
+                    runCatching {
+                        val resource = attachment.resource ?: return super.shouldInterceptRequest(view, request)
+                        ApiRepository.downloadAttachment(resource)
+                    }.getOrNull()?.body?.byteStream()?.also {
+                        imageCaches[cid] = it.readBytes().inputStream()
+                    }
                 }
-                Log.i(TAG, "shouldInterceptRequest: load attachment ${attachment.name} from cache with ${cacheFile.length()}")
-                return WebResourceResponse(attachment.mimeType, Utils.UTF_8, cacheFile.inputStream())
+
+                return WebResourceResponse(attachment.mimeType, Utils.UTF_8, data)
             }
         }
 
@@ -67,6 +80,21 @@ class MessageWebViewClient(
             }
         }
         return true
+    }
+
+    override fun onPageFinished(view: WebView?, url: String?) {
+
+        imageCaches.forEach { (cid, inputStream) ->
+            val attachment = cidDictionary[cid]!!
+            val cacheFile = attachment.getCacheFile(context)
+
+            if (!attachment.hasUsableCache(context, cacheFile)) {
+                LocalStorageUtils.saveCacheAttachment(attachment.resource!!, inputStream, cacheFile)
+                Log.i(TAG, "MessageWebViewClient>onPageFinished: ${attachment.name} saved in cache")
+            }
+        }
+
+        imageCaches.clear()
     }
 
     private companion object {
