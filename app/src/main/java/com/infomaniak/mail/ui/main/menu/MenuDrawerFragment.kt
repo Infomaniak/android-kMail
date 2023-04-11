@@ -52,6 +52,7 @@ class MenuDrawerFragment : MenuFoldersFragment() {
     private lateinit var binding: FragmentMenuDrawerBinding
     private val createFolderDialog by lazy { initNewFolderDialog() }
 
+    override val isInMenuDrawer: Boolean = true
     override val defaultFoldersList: RecyclerView by lazy { binding.defaultFoldersList }
     override val customFoldersList: RecyclerView by lazy { binding.customFoldersList }
 
@@ -59,7 +60,7 @@ class MenuDrawerFragment : MenuFoldersFragment() {
 
     private var canNavigate = AtomicBoolean(true)
 
-    private val addressAdapter = SwitchMailboxesAdapter()
+    private val addressAdapter = SwitchMailboxesAdapter(isInMenuDrawer)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentMenuDrawerBinding.inflate(inflater, container, false).also { binding = it }.root
