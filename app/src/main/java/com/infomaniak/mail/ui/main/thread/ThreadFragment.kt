@@ -34,9 +34,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
-import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
@@ -136,27 +134,23 @@ class ThreadFragment : Fragment() {
         }
 
         var headerColorState = HeaderState.LOWERED
-        messagesList.addOnScrollListener(object : OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
+        messagesListNestedScrollView.setOnScrollChangeListener { nestedScrollView, _, _, _, _ ->
+            val isAtTheTop = !nestedScrollView.canScrollVertically(-1)
+            if (headerColorState == HeaderState.ELEVATED && !isAtTheTop) return@setOnScrollChangeListener
 
-                val isAtTheTop = !recyclerView.canScrollVertically(-1)
-                if (headerColorState == HeaderState.ELEVATED && !isAtTheTop) return
+            val newColor = context.getColor(if (isAtTheTop) R.color.backgroundColor else R.color.elevatedBackground)
+            headerColorState = if (isAtTheTop) HeaderState.LOWERED else HeaderState.ELEVATED
 
-                val newColor = context.getColor(if (isAtTheTop) R.color.backgroundColor else R.color.elevatedBackground)
-                headerColorState = if (isAtTheTop) HeaderState.LOWERED else HeaderState.ELEVATED
+            val oldColor = appBar.backgroundTintList!!.defaultColor
+            if (oldColor == newColor) return@setOnScrollChangeListener
 
-                val oldColor = appBar.backgroundTintList!!.defaultColor
-                if (oldColor == newColor) return
-
-                valueAnimator?.cancel()
-                valueAnimator = animateColorChange(oldColor, newColor, animate = true) { color ->
-                    toolbar.setBackgroundColor(color)
-                    appBar.backgroundTintList = ColorStateList.valueOf(color)
-                    activity?.window?.statusBarColor = color
-                }
+            valueAnimator?.cancel()
+            valueAnimator = animateColorChange(oldColor, newColor, animate = true) { color ->
+                toolbar.setBackgroundColor(color)
+                appBar.backgroundTintList = ColorStateList.valueOf(color)
+                activity?.window?.statusBarColor = color
             }
-        })
+        }
 
         iconFavorite.setOnClickListener {
             trackThreadActionsEvent(ACTION_FAVORITE_NAME, isFavorite)
