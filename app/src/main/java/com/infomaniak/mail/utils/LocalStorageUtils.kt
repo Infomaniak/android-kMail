@@ -66,8 +66,8 @@ object LocalStorageUtils {
     }
 
     /**
-     * Saves the attachment in the disk memory.
-     * The file remains unreadable as long as it is in processing
+     * Save the Attachment in disk memory.
+     * The file remains unreadable as long as it's being processed.
      */
     fun saveCacheAttachment(inputStream: InputStream, outputFile: File) = with(outputFile) {
         if (exists()) delete()
