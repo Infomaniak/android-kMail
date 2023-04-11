@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,11 +18,9 @@
 package com.infomaniak.mail.utils
 
 import android.Manifest
-import android.app.Activity
 import android.os.Build
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.infomaniak.lib.core.utils.hasPermissions
@@ -50,42 +48,32 @@ class PermissionUtils {
     }
 
     fun checkNotificationPermissionStatus() {
-        if (activity.hasNotificationPermission()) localSettings.hasAlreadyEnabledNotifications = true
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            activity.hasPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS))
+        ) {
+            localSettings.hasAlreadyEnabledNotifications = true
+        }
     }
 
     fun requestMainPermissionsIfNeeded() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            mainForActivityResult.launch(getTiramisuPermissions())
-        } else {
-            if (!activity.hasPermissions(mainPermissions)) mainForActivityResult.launch(mainPermissions)
-        }
-    }
-
-    /**
-     * If the user has manually disabled notifications permissions, stop requesting it.
-     * Manually disabled means the permission was granted at one point, but is no more.
-     */
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    private fun getTiramisuPermissions(): Array<String> {
-        return if (activity.hasNotificationPermission() || localSettings.hasAlreadyEnabledNotifications) {
-            mainPermissions.filterNot { permission -> permission == Manifest.permission.POST_NOTIFICATIONS }.toTypedArray()
-        } else {
-            mainPermissions
-        }
-    }
-
-    private fun Activity.hasNotificationPermission(): Boolean {
-        return Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
-                hasPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS))
+        val mainPermissions = getMainPermissions(localSettings)
+        if (!activity.hasPermissions(mainPermissions)) mainForActivityResult.launch(mainPermissions)
     }
 
     companion object {
-        val mainPermissions = when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> arrayOf(
-                Manifest.permission.POST_NOTIFICATIONS,
-                Manifest.permission.READ_CONTACTS
-            )
-            else -> arrayOf(Manifest.permission.READ_CONTACTS)
+
+        /**
+         * If the user has manually disabled notifications permissions, stop requesting it.
+         * Manually disabled means the permission was granted at one point, but is no more.
+         */
+        private fun getMainPermissions(localSettings: LocalSettings): Array<String> {
+            val mainPermissions = mutableListOf(Manifest.permission.READ_CONTACTS)
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !localSettings.hasAlreadyEnabledNotifications) {
+                mainPermissions.add(Manifest.permission.POST_NOTIFICATIONS)
+            }
+
+            return mainPermissions.toTypedArray()
         }
     }
 }
