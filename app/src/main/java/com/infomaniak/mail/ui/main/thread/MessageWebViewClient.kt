@@ -20,7 +20,6 @@ package com.infomaniak.mail.ui.main.thread
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.util.ArrayMap
 import android.util.Log
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
@@ -32,14 +31,11 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.Utils
-import java.io.InputStream
 
 class MessageWebViewClient(
     private val context: Context,
     private val cidDictionary: MutableMap<String, Attachment>
 ) : WebViewClient() {
-
-    private val imageCaches = ArrayMap<String, InputStream>()
 
     override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
 
@@ -56,8 +52,9 @@ class MessageWebViewClient(
                     runCatching {
                         val resource = attachment.resource ?: return super.shouldInterceptRequest(view, request)
                         ApiRepository.downloadAttachment(resource)
-                    }.getOrNull()?.body?.byteStream()?.also {
-                        imageCaches[cid] = it.readBytes().inputStream()
+                    }.getOrNull()?.body?.byteStream()?.readBytes()?.let {
+                        LocalStorageUtils.saveCacheAttachment(it.inputStream(), cacheFile)
+                        it.inputStream()
                     }
                 }
 
@@ -80,21 +77,6 @@ class MessageWebViewClient(
             }
         }
         return true
-    }
-
-    override fun onPageFinished(view: WebView?, url: String?) {
-
-        imageCaches.forEach { (cid, inputStream) ->
-            val attachment = cidDictionary[cid]!!
-            val cacheFile = attachment.getCacheFile(context)
-
-            if (!attachment.hasUsableCache(context, cacheFile)) {
-                LocalStorageUtils.saveCacheAttachment(attachment.resource!!, inputStream, cacheFile)
-                Log.i(TAG, "MessageWebViewClient>onPageFinished: ${attachment.name} saved in cache")
-            }
-        }
-
-        imageCaches.clear()
     }
 
     companion object {

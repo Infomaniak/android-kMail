@@ -20,7 +20,6 @@ package com.infomaniak.mail.utils
 import android.content.Context
 import android.net.Uri
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.cache.mailboxContent.AttachmentController
 import io.sentry.Sentry
 import okhttp3.Response
 import java.io.File
@@ -55,24 +54,31 @@ object LocalStorageUtils {
     }
 
     fun saveAttachmentToCache(resource: String, cacheFile: File): Boolean {
-        fun Response.saveAttachmentTo(resource: String, outputFile: File): Boolean {
+        fun Response.saveAttachmentTo(outputFile: File): Boolean {
             if (!isSuccessful) return false
             return body?.byteStream()?.use { inputStream ->
-                saveCacheAttachment(resource, inputStream, outputFile)
+                saveCacheAttachment(inputStream, outputFile)
                 true
             } ?: false
         }
 
-        return ApiRepository.downloadAttachment(resource).saveAttachmentTo(resource, cacheFile)
+        return ApiRepository.downloadAttachment(resource).saveAttachmentTo(cacheFile)
     }
 
-    fun saveCacheAttachment(resource: String, inputStream: InputStream, outputFile: File) = with(outputFile) {
+    /**
+     * Save the Attachment in disk memory.
+     * The file remains unreadable as long as it's being processed.
+     */
+    fun saveCacheAttachment(inputStream: InputStream, outputFile: File) = with(outputFile) {
         if (exists()) delete()
         inputStream.buffered().use {
             parentFile?.mkdirs()
-            if (outputFile.createNewFile()) outputStream().use(inputStream::copyTo)
+            if (createNewFile()) {
+                setReadable(false)
+                outputStream().use(inputStream::copyTo)
+                setReadable(true)
+            }
         }
-        AttachmentController.updateSize(resource, outputFile.length())
     }
 
     fun saveUploadAttachment(context: Context, uri: Uri, fileName: String, localDraftUuid: String): File? {

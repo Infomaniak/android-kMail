@@ -86,7 +86,7 @@ class Attachment : EmbeddedRealmObject {
         mailboxId: Int = AccountUtils.currentMailboxId,
     ): Boolean {
         val file = cacheFile ?: getCacheFile(context, userId, mailboxId)
-        return file.exists() && file.length() == size
+        return file.length() > 0 && file.canRead()
     }
 
     fun isInlineCachedFile(context: Context): Boolean {

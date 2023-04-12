@@ -79,7 +79,6 @@ import com.infomaniak.mail.ui.main.thread.ThreadFragmentArgs
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
-import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.query.Sort
@@ -209,8 +208,7 @@ fun LottieAnimationView.changePathColor(illuColors: IlluColors) {
 fun WebView.initWebViewClient(attachments: List<Attachment>) {
     val cidDictionary = mutableMapOf<String, Attachment>()
     attachments.forEach {
-        val attachment = if (it.isManaged()) it.copyFromRealm() else it
-        if (attachment.contentId?.isNotBlank() == true) cidDictionary[attachment.contentId as String] = attachment
+        if (it.contentId?.isNotBlank() == true) cidDictionary[it.contentId as String] = it
     }
     webViewClient = MessageWebViewClient(context, cidDictionary)
 }
