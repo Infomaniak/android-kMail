@@ -24,7 +24,17 @@
     android:orientation="vertical"
     tools:context=".ui.main.newMessage.NewMessageFragment">
 
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/newMessageBackgroundColor"
+        app:contentInsetEnd="@dimen/marginStandardSmall"
+        app:navigationContentDescription="@string/buttonClose"
+        app:navigationIcon="@drawable/ic_close_big" />
+
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/compositionNestedScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true">
@@ -92,8 +102,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginVertical="@dimen/marginStandardVerySmall"
-                    app:title="@string/toTitle"
-                    app:canCollapseEverything="true" />
+                    app:canCollapseEverything="true"
+                    app:title="@string/toTitle" />
 
                 <com.google.android.material.divider.MaterialDivider
                     android:id="@+id/divider2"
@@ -117,8 +127,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginVertical="@dimen/marginStandardVerySmall"
-                    app:title="@string/ccTitle"
-                    app:canCollapseEverything="false" />
+                    app:canCollapseEverything="false"
+                    app:title="@string/ccTitle" />
 
                 <com.google.android.material.divider.MaterialDivider
                     android:id="@+id/divider3"
@@ -142,8 +152,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginVertical="@dimen/marginStandardVerySmall"
-                    app:title="@string/bccTitle"
-                    app:canCollapseEverything="false" />
+                    app:canCollapseEverything="false"
+                    app:title="@string/bccTitle" />
 
                 <com.google.android.material.divider.MaterialDivider
                     android:id="@+id/divider4"

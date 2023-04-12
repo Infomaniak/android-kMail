@@ -37,8 +37,6 @@
     <!-- Color Tones -->
     <color name="pink_mail_primary_light">#BC0055</color>
     <color name="pink_mail_primary_dark">#EF8BA4</color>
-    <color name="pink_mail_ripple_light">#1EBC0055</color>
-    <color name="pink_mail_ripple_dark">#1EEF8BA4</color>
     <color name="pink_mail_container_light">#F7E8EF</color>
     <color name="pink_mail_container_dark">#5D0F2B</color>
     <color name="pink_mail_on_primary_light">#FEF8F7</color>
@@ -46,8 +44,6 @@
 
     <color name="blue_mail_primary_light">@color/infomaniak</color>
     <color name="blue_mail_primary_dark">#4CB7FF</color>
-    <color name="blue_mail_ripple_light">#1E0098FF</color>
-    <color name="blue_mail_ripple_dark">#1E4CB7FF</color>
     <color name="blue_mail_container_light">#F4F6FD</color>
     <color name="blue_mail_container_dark">#0F3256</color>
     <color name="blue_mail_on_primary_light">#FBFBFE</color>
@@ -97,6 +93,8 @@
 
     <color name="menuDrawerBackgroundColor">@color/backgroundColorSecondary</color>
     <color name="newMessageBackgroundColor">@color/backgroundColor</color>
+    <color name="toolbarLoweredColor">@color/backgroundColor</color>
+    <color name="toolbarElevatedColor">@color/elevatedBackground</color>
 
     <!-- Texts -->
     <color name="primaryTextColor">@color/orca</color>

@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
-import android.animation.ValueAnimator
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.drawable.InsetDrawable
@@ -26,7 +25,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.addCallback
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.ColorUtils
 import androidx.fragment.app.Fragment
@@ -34,9 +32,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
-import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
@@ -60,12 +56,8 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialog
+import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
-import com.infomaniak.mail.utils.UiUtils.animateColorChange
-import com.infomaniak.mail.utils.formatSubject
-import com.infomaniak.mail.utils.getAttributeColor
-import com.infomaniak.mail.utils.observeNotNull
-import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -80,7 +72,6 @@ class ThreadFragment : Fragment() {
 
     private val threadAdapter by lazy { ThreadAdapter() }
 
-    private var valueAnimator: ValueAnimator? = null
     private var isFavorite = false
 
     // When opening the Thread, we want to scroll to the last Message, but only once.
@@ -117,8 +108,6 @@ class ThreadFragment : Fragment() {
         }
 
         mainViewModel.toggleLightThemeForMessage.observe(viewLifecycleOwner, threadAdapter::toggleLightMode)
-
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) { leaveThread() }
     }
 
     private fun setupUi(threadUid: String) = with(binding) {
@@ -135,28 +124,9 @@ class ThreadFragment : Fragment() {
             toolbarSubject.setTextColor(textColor)
         }
 
-        var headerColorState = HeaderState.LOWERED
-        messagesList.addOnScrollListener(object : OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-
-                val isAtTheTop = !recyclerView.canScrollVertically(-1)
-                if (headerColorState == HeaderState.ELEVATED && !isAtTheTop) return
-
-                val newColor = context.getColor(if (isAtTheTop) R.color.backgroundColor else R.color.elevatedBackground)
-                headerColorState = if (isAtTheTop) HeaderState.LOWERED else HeaderState.ELEVATED
-
-                val oldColor = appBar.backgroundTintList!!.defaultColor
-                if (oldColor == newColor) return
-
-                valueAnimator?.cancel()
-                valueAnimator = animateColorChange(oldColor, newColor, animate = true) { color ->
-                    toolbar.setBackgroundColor(color)
-                    appBar.backgroundTintList = ColorStateList.valueOf(color)
-                    activity?.window?.statusBarColor = color
-                }
-            }
-        })
+        changeToolbarColorOnScroll(toolbar, messagesListNestedScrollView) { color ->
+            appBar.backgroundTintList = ColorStateList.valueOf(color)
+        }
 
         iconFavorite.setOnClickListener {
             trackThreadActionsEvent(ACTION_FAVORITE_NAME, isFavorite)
@@ -360,11 +330,6 @@ class ThreadFragment : Fragment() {
     }
 
     private fun leaveThread() {
-        valueAnimator?.cancel()
-        // TODO: The day we'll have the Notifications, this `popBackStack` will probably fail to execute correctly.
-        // TODO: When opening a Thread via a Notification, the action of leaving this fragment
-        // TODO: (either via a classic Back button, or via this `popBackStack`) will probably
-        // TODO: do nothing instead of going back to the ThreadList fragment (as it should be).
         findNavController().popBackStack()
     }
 
