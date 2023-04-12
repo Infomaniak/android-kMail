@@ -208,11 +208,8 @@ class ThreadListMultiSelection {
         }
 
         binding.quickActionBar.apply {
-
-            val readIcon = if (shouldMultiselectRead) R.drawable.ic_envelope_open else R.drawable.ic_envelope
+            val (readIcon, readText) = getReadIconAndShortText(shouldMultiselectRead)
             changeIcon(READ_UNREAD_INDEX, readIcon)
-
-            val readText = if (shouldMultiselectRead) R.string.actionShortMarkAsRead else R.string.actionShortMarkAsUnread
             changeText(READ_UNREAD_INDEX, readText)
 
             val favoriteIcon = if (shouldMultiselectFavorite) R.drawable.ic_star else R.drawable.ic_unstar
@@ -227,24 +224,32 @@ class ThreadListMultiSelection {
         }
     }
 
-    private fun computeReadFavoriteStatus(selectedThreads: MutableSet<SelectedThread>): Pair<Boolean, Boolean> {
-        var shouldUnRead = true
-        var shouldUnFavorite = selectedThreads.isNotEmpty()
+    companion object {
+        private const val TOOLBAR_FADE_DURATION = 150L
 
-        for (thread in selectedThreads) {
-            shouldUnRead = shouldUnRead && thread.unseenMessagesCount == 0
-            shouldUnFavorite = shouldUnFavorite && thread.isFavorite
+        private const val READ_UNREAD_INDEX = 0
+        private const val ARCHIVE_INDEX = 1
+        private const val FAVORITE_INDEX = 2
 
-            if (!shouldUnRead && !shouldUnFavorite) break
+        fun computeReadFavoriteStatus(selectedThreads: Set<SelectedThread>): Pair<Boolean, Boolean> {
+            var shouldUnread = true
+            var shouldUnfavorite = selectedThreads.isNotEmpty()
+
+            for (thread in selectedThreads) {
+                shouldUnread = shouldUnread && thread.unseenMessagesCount == 0
+                shouldUnfavorite = shouldUnfavorite && thread.isFavorite
+
+                if (!shouldUnread && !shouldUnfavorite) break
+            }
+            return !shouldUnread to !shouldUnfavorite
         }
-        return !shouldUnRead to !shouldUnFavorite
-    }
 
-    private companion object {
-        const val TOOLBAR_FADE_DURATION = 150L
-
-        const val READ_UNREAD_INDEX = 0
-        const val ARCHIVE_INDEX = 1
-        const val FAVORITE_INDEX = 2
+        fun getReadIconAndShortText(shouldRead: Boolean): Pair<Int, Int> {
+            return if (shouldRead) {
+                R.drawable.ic_envelope_open to R.string.actionShortMarkAsRead
+            } else {
+                R.drawable.ic_envelope to R.string.actionShortMarkAsUnread
+            }
+        }
     }
 }

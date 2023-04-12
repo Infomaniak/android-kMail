@@ -35,7 +35,7 @@
     <string name="actionMarkAsUnread">Mark as unread</string>
     <string name="actionMove">Move</string>
     <string name="actionMoveToInbox">Move to inbox</string>
-    <string name="actionNonSpam">Not spam</string>
+    <string name="actionNonSpam">Report as not spam</string>
     <string name="actionOpenIn">Open in</string>
     <string name="actionPhishing">Report phishing</string>
     <string name="actionPostpone">Postpone</string>

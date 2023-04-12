@@ -28,7 +28,7 @@
     <string name="actionMarkAsUnread">Marcar como no leído</string>
     <string name="actionMove">Mover</string>
     <string name="actionMoveToInbox">Mover a la bandeja de entrada</string>
-    <string name="actionNonSpam">No spam</string>
+    <string name="actionNonSpam">Notificar como no spam</string>
     <string name="actionOpenIn">Abrir en</string>
     <string name="actionPhishing">Informar sobre phishing</string>
     <string name="actionPostpone">Aplazar</string>
@@ -232,7 +232,7 @@
     <string name="searchFilterAttachment">Archivos adjuntos</string>
     <string name="searchFilterFolder">Todas las carpetas</string>
     <string name="searchFilterRead">Leer</string>
-    <string name="searchFilterUnread">Sin leer</string>
+    <string name="searchFilterUnread">No leídos</string>
     <string name="send">Enviar</string>
     <string name="sentFolder">Mensajes enviados</string>
     <string name="settingsAccentColor">Color de acento</string>
