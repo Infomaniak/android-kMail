@@ -71,6 +71,7 @@ class ThreadFragment : Fragment() {
     private val threadViewModel: ThreadViewModel by viewModels()
 
     private val threadAdapter by lazy { ThreadAdapter() }
+    private val permissionUtils by lazy { PermissionUtils(this) }
 
     private var isFavorite = false
 
@@ -107,6 +108,7 @@ class ThreadFragment : Fragment() {
             observeOpenAttachment()
         }
 
+        permissionUtils.registerDownloadManagerPermission()
         mainViewModel.toggleLightThemeForMessage.observe(viewLifecycleOwner, threadAdapter::toggleLightMode)
     }
 
@@ -219,7 +221,7 @@ class ThreadFragment : Fragment() {
                 if (attachment.openWithIntent(requireContext()).hasSupportedApplications(requireContext())) {
                     attachment.display()
                 } else {
-                    DownloadManagerUtils.scheduleDownload(context, attachment.downloadUrl, attachment.name)
+                    scheduleDownloadManager(attachment.downloadUrl, attachment.name)
                 }
             }
             onDownloadAllClicked = { message ->
@@ -241,6 +243,17 @@ class ThreadFragment : Fragment() {
                     )
                 )
             }
+        }
+    }
+
+    private fun scheduleDownloadManager(downloadUrl: String, filename: String) {
+
+        fun scheduleDownloadManager() = DownloadManagerUtils.scheduleDownload(requireContext(), downloadUrl, filename)
+
+        if (permissionUtils.hasDownloadManagerPermission) {
+            scheduleDownloadManager()
+        } else {
+            permissionUtils.requestDownloadManagerPermission { scheduleDownloadManager() }
         }
     }
 
@@ -297,7 +310,7 @@ class ThreadFragment : Fragment() {
         )
         val truncatedSubject = message.subject?.let { it.substring(0..min(30, it.lastIndex)) }
         val name = allAttachmentsFileName(truncatedSubject ?: "")
-        DownloadManagerUtils.scheduleDownload(requireContext(), url, name)
+        scheduleDownloadManager(url, name)
     }
 
     private fun onThreadUpdate(thread: Thread?) = with(binding) {
