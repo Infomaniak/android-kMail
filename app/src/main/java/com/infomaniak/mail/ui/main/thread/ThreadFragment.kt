@@ -25,7 +25,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.addCallback
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.ColorUtils
 import androidx.fragment.app.Fragment
@@ -109,8 +108,6 @@ class ThreadFragment : Fragment() {
         }
 
         mainViewModel.toggleLightThemeForMessage.observe(viewLifecycleOwner, threadAdapter::toggleLightMode)
-
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) { leaveThread() }
     }
 
     private fun setupUi(threadUid: String) = with(binding) {
@@ -333,10 +330,6 @@ class ThreadFragment : Fragment() {
     }
 
     private fun leaveThread() {
-        // TODO: The day we'll have the Notifications, this `popBackStack` will probably fail to execute correctly.
-        // TODO: When opening a Thread via a Notification, the action of leaving this fragment
-        // TODO: (either via a classic Back button, or via this `popBackStack`) will probably
-        // TODO: do nothing instead of going back to the ThreadList fragment (as it should be).
         findNavController().popBackStack()
     }
 
