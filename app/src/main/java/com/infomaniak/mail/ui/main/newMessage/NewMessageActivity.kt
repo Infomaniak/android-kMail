@@ -130,6 +130,7 @@ class NewMessageActivity : ThemedActivity() {
 
         fun linkEditor(view: MaterialButton, action: EditorAction) {
             view.setOnClickListener {
+                newMessageViewModel.shouldHandleDraftActionWhenLeaving = false
                 trackEvent("editorActions", action.matomoValue)
                 newMessageViewModel.editorAction.value = action to null
             }

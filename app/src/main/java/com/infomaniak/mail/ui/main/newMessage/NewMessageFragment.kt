@@ -432,8 +432,14 @@ class NewMessageFragment : Fragment() {
         initializeFieldsAsOpen.observe(viewLifecycleOwner) { openAdvancedFields(!it) }
     }
 
-    override fun onStop() {
-        DraftsActionsWorker.scheduleWork(requireContext())
+    override fun onStop() = with(newMessageViewModel) {
+
+        if (shouldHandleDraftActionWhenLeaving) {
+            DraftsActionsWorker.scheduleWork(requireContext())
+        } else {
+            shouldHandleDraftActionWhenLeaving = true
+        }
+
         super.onStop()
     }
 
