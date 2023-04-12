@@ -119,6 +119,7 @@ class MainActivity : ThemedActivity() {
         loadCurrentMailbox()
 
         mainViewModel.observeMergedContactsLive()
+
         permissionUtils.requestMainPermissionsIfNeeded()
     }
 

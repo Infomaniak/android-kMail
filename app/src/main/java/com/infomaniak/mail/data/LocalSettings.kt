@@ -79,6 +79,12 @@ class LocalSettings private constructor(context: Context) {
         set(value) = sharedPreferences.transaction { putBoolean(ASK_EMAIL_ACKNOWLEDGMENT_KEY, value) }
     //endregion
 
+    //region Already enabled notifications
+    var hasAlreadyEnabledNotifications: Boolean
+        get() = sharedPreferences.getBoolean(HAS_ALREADY_ENABLED_NOTIFICATIONS_KEY, DEFAULT_HAS_ALREADY_ENABLED_NOTIFICATIONS)
+        set(value) = sharedPreferences.transaction { putBoolean(HAS_ALREADY_ENABLED_NOTIFICATIONS_KEY, value) }
+    //endregion
+
     //region App lock
     var isAppLocked: Boolean
         get() = sharedPreferences.getBoolean(IS_APP_LOCKED_KEY, DEFAULT_IS_APP_LOCKED)
@@ -272,6 +278,7 @@ class LocalSettings private constructor(context: Context) {
         private val DEFAULT_EMAIL_FORWARDING = EmailForwarding.IN_BODY
         private const val DEFAULT_INCLUDE_MESSAGE_IN_REPLY = true
         private const val DEFAULT_ASK_EMAIL_ACKNOWLEDGMENT = false
+        private const val DEFAULT_HAS_ALREADY_ENABLED_NOTIFICATIONS = false
         private const val DEFAULT_IS_APP_LOCKED = false
         private const val DEFAULT_UPDATE_LATER = false
         private val DEFAULT_THREAD_DENSITY = ThreadDensity.LARGE
@@ -291,6 +298,7 @@ class LocalSettings private constructor(context: Context) {
         private const val EMAIL_FORWARDING_KEY = "emailForwardingKey"
         private const val INCLUDE_MESSAGE_IN_REPLY_KEY = "includeMessageInReplyKey"
         private const val ASK_EMAIL_ACKNOWLEDGMENT_KEY = "askEmailAcknowledgmentKey"
+        private const val HAS_ALREADY_ENABLED_NOTIFICATIONS_KEY = "hasAlreadyEnabledNotificationsKey"
         private const val IS_APP_LOCKED_KEY = "isAppLockedKey"
         private const val UPDATE_LATER_KEY = "updateLaterKey"
         private const val THREAD_DENSITY_KEY = "threadDensityKey"
