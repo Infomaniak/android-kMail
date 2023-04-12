@@ -136,8 +136,6 @@ class NewMessageFragment : Fragment() {
 
     private fun initDraftAndViewModel() {
 
-        displayLoader()
-
         newMessageViewModel.initDraftAndViewModel(newMessageActivityArgs).observe(viewLifecycleOwner) { isSuccess ->
             if (isSuccess) {
                 hideLoader()
@@ -149,11 +147,6 @@ class NewMessageFragment : Fragment() {
                 requireActivity().finish()
             }
         }
-    }
-
-    private fun displayLoader() = with(binding) {
-        fullScreenLoader.isVisible = true
-        compositionNestedScrollView.isGone = true
     }
 
     private fun hideLoader() = with(binding) {
