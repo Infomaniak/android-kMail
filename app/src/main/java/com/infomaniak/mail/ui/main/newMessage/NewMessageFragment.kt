@@ -113,13 +113,7 @@ class NewMessageFragment : Fragment() {
 
     private fun initUi() = with(binding) {
         toolbar.setNavigationOnClickListener { activity?.onBackPressedDispatcher?.onBackPressed() }
-
-        changeToolbarColorOnScroll(
-            compositionNestedScrollView,
-            toolbar,
-            R.color.backgroundColor,
-            R.color.elevatedBackground
-        )
+        changeToolbarColorOnScroll(compositionNestedScrollView, toolbar)
 
         if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
             WebSettingsCompat.setAlgorithmicDarkeningAllowed(signatureWebView.settings, true)

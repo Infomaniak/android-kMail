@@ -432,8 +432,8 @@ inline infix fun <reified E : Enum<E>, V> ((E) -> V).enumValueFrom(value: V): E?
 fun Fragment.changeToolbarColorOnScroll(
     nestedScrollView: NestedScrollView,
     toolbar: MaterialToolbar,
-    @ColorRes loweredColor: Int,
-    @ColorRes elevatedColor: Int,
+    @ColorRes loweredColor: Int = R.color.toolbarLoweredColor,
+    @ColorRes elevatedColor: Int = R.color.toolbarElevatedColor,
     otherUpdates: ((color: Int) -> Unit)? = null,
 ) {
     requireContext().changeToolbarColorOnScroll(
@@ -450,8 +450,8 @@ fun Fragment.changeToolbarColorOnScroll(
 fun FragmentActivity.changeToolbarColorOnScroll(
     nestedScrollView: NestedScrollView,
     toolbar: MaterialToolbar,
-    @ColorRes loweredColor: Int,
-    @ColorRes elevatedColor: Int,
+    @ColorRes loweredColor: Int = R.color.toolbarLoweredColor,
+    @ColorRes elevatedColor: Int = R.color.toolbarElevatedColor,
     otherUpdates: ((color: Int) -> Unit)? = null,
 ) {
     changeToolbarColorOnScroll(

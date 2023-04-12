@@ -127,12 +127,7 @@ class ThreadFragment : Fragment() {
             toolbarSubject.setTextColor(textColor)
         }
 
-        changeToolbarColorOnScroll(
-            messagesListNestedScrollView,
-            toolbar,
-            R.color.backgroundColor,
-            R.color.elevatedBackground
-        ) { color ->
+        changeToolbarColorOnScroll(messagesListNestedScrollView, toolbar) { color ->
             appBar.backgroundTintList = ColorStateList.valueOf(color)
         }
 

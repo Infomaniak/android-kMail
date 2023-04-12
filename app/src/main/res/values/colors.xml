@@ -93,6 +93,8 @@
 
     <color name="menuDrawerBackgroundColor">@color/backgroundColorSecondary</color>
     <color name="newMessageBackgroundColor">@color/backgroundColor</color>
+    <color name="toolbarLoweredColor">@color/backgroundColor</color>
+    <color name="toolbarElevatedColor">@color/elevatedBackground</color>
 
     <!-- Texts -->
     <color name="primaryTextColor">@color/orca</color>
