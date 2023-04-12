@@ -120,10 +120,7 @@ class MainActivity : ThemedActivity() {
 
         mainViewModel.observeMergedContactsLive()
 
-        with(permissionUtils) {
-            requestMainPermissionsIfNeeded()
-            checkNotificationPermissionStatus()
-        }
+        permissionUtils.requestMainPermissionsIfNeeded()
     }
 
     private fun loadCurrentMailbox() {
@@ -215,7 +212,6 @@ class MainActivity : ThemedActivity() {
     private fun registerMainPermissions(permissionUtils: PermissionUtils) {
         permissionUtils.registerMainPermissions { permissionsResults ->
             if (permissionsResults[Manifest.permission.READ_CONTACTS] == true) mainViewModel.updateUserInfo()
-            permissionUtils.checkNotificationPermissionStatus()
         }
     }
 

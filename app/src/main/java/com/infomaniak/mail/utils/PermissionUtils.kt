@@ -44,10 +44,11 @@ class PermissionUtils {
         mainForActivityResult =
             activity.registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { authorizedPermissions ->
                 onPermissionResult?.invoke(authorizedPermissions)
+                updateNotificationPermissionSetting()
             }
     }
 
-    fun checkNotificationPermissionStatus() {
+    private fun updateNotificationPermissionSetting() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
             activity.hasPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS))
         ) {
@@ -56,20 +57,22 @@ class PermissionUtils {
     }
 
     fun requestMainPermissionsIfNeeded() {
-        val mainPermissions = getMainPermissions(localSettings)
+        updateNotificationPermissionSetting()
+
+        val mainPermissions = getMainPermissions(mustRequireNotification = !localSettings.hasAlreadyEnabledNotifications)
         if (!activity.hasPermissions(mainPermissions)) mainForActivityResult.launch(mainPermissions)
     }
 
-    companion object {
+    private companion object {
 
         /**
          * If the user has manually disabled notifications permissions, stop requesting it.
          * Manually disabled means the permission was granted at one point, but is no more.
          */
-        private fun getMainPermissions(localSettings: LocalSettings): Array<String> {
+        fun getMainPermissions(mustRequireNotification: Boolean): Array<String> {
             val mainPermissions = mutableListOf(Manifest.permission.READ_CONTACTS)
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !localSettings.hasAlreadyEnabledNotifications) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && mustRequireNotification) {
                 mainPermissions.add(Manifest.permission.POST_NOTIFICATIONS)
             }
 
