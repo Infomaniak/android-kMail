@@ -51,6 +51,10 @@
     <string name="addUnknownRecipientTitle">Añadir un destinatario</string>
     <string name="appSecurityDescription">Protege el acceso a tu aplicación activando el bloqueo del teléfono.</string>
     <string name="archiveFolder">Archivado</string>
+    <string name="attachAddressDescription">Si ya dispone de una dirección de correo electrónico Infomaniak, conéctese ahora.</string>
+    <string name="attachAddressInputHint">Dirección de correo electrónico que desea añadir</string>
+    <string name="attachAddressPasswordInputHint">Contraseña de la dirección de correo electrónico</string>
+    <string name="attachAddressTitle">Añadir dirección de correo electrónico</string>
     <string name="attachmentActionCamera">Cámara</string>
     <string name="attachmentActionFile">Adjuntar un archivo</string>
     <string name="attachmentActionPhotoLibrary">Enviar una foto desde la fototeca</string>
@@ -68,6 +72,7 @@
     <string name="buttonAccountSwitch">Cambiar de cuenta</string>
     <string name="buttonAddAccount">Añadir una cuenta</string>
     <string name="buttonAddEmailAddress">Añadir una dirección de correo electrónico</string>
+    <string name="buttonAttachEmailAddress">Añadir dirección de correo electrónico</string>
     <string name="buttonAttachment">Añadir un archivo adjunto</string>
     <string name="buttonAvailableSoon">Disponible en breve</string>
     <string name="buttonBold">Negrita</string>
@@ -131,6 +136,7 @@
     <string name="contentDescriptionButtonNext">Siguiente</string>
     <string name="contentDescriptionButtonOpenSystemSettings">Abrir la configuración de notificaciones del sistema</string>
     <string name="contentDescriptionButtonSettings">Ajustes</string>
+    <string name="contentDescriptionButtonShowPassword">Mostrar contraseña</string>
     <string name="contentDescriptionContactAlreadyUsed">Contacto ya utilizado como destinatario</string>
     <string name="contentDescriptionDownloadIndicator">Descargar</string>
     <string name="contentDescriptionIconAttachments">Tiene accesorios</string>
@@ -161,15 +167,15 @@
     <string name="emptyStateSearchTitle">Sin resultados</string>
     <string name="emptyStateTrashDescription">Mueve los mensajes a la papelera. Se borrarán definitivamente pasados 30 días.</string>
     <string name="emptyStateTrashTitle">La papelera está vacía</string>
+    <string name="errorAttachAddressInput">Sólo se admiten las direcciones de correo electrónico Infomaniak</string>
     <string name="errorLoginDescription">La conexión ha fallado.</string>
     <string name="errorLoginTitle">Error de inicio de sesión</string>
     <string name="errorNewFolderAlreadyExists">Ya existe una carpeta con este nombre</string>
     <string name="errorNewFolderNameTooLong">El nombre de la carpeta no debe superar los 255 caracteres</string>
+    <string name="failToOpenDraft">No se ha podido abrir el borrador</string>
     <string name="favoritesFolder">Favoritos</string>
     <string name="fromTitle">De:</string>
     <string name="googlePlayServicesAreRequired">Se requieren los servicios de Google Play</string>
-    <string name="helpChatbot">Chatbot</string>
-    <string name="helpFAQ">PREGUNTAS FRECUENTES</string>
     <string name="inboxFolder">Bandeja de entrada</string>
     <string name="loadingText">Cargando…</string>
     <string name="menuDrawerAdvancedActions">Acciones avanzadas</string>

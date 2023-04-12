@@ -51,6 +51,10 @@
     <string name="addUnknownRecipientTitle">Einen Empfänger hinzufügen</string>
     <string name="appSecurityDescription">Schützen Sie den Zugriff auf Ihre App, indem Sie Ihre Telefonsperre aktivieren.</string>
     <string name="archiveFolder">Archiviert</string>
+    <string name="attachAddressDescription">Sie haben bereits eine Infomaniak-Mailadresse, loggen Sie sich jetzt ein.</string>
+    <string name="attachAddressInputHint">Mailadresse hinzufügen</string>
+    <string name="attachAddressPasswordInputHint">Passwort für die Mailadresse</string>
+    <string name="attachAddressTitle">Mailadresse hinzufügen</string>
     <string name="attachmentActionCamera">Kamera</string>
     <string name="attachmentActionFile">Eine Datei anhängen</string>
     <string name="attachmentActionPhotoLibrary">Ein Foto aus der Fotobibliothek senden</string>
@@ -68,6 +72,7 @@
     <string name="buttonAccountSwitch">Konto ändern</string>
     <string name="buttonAddAccount">Account hinzufügen</string>
     <string name="buttonAddEmailAddress">Eine E-Mail-Adresse hinzufügen</string>
+    <string name="buttonAttachEmailAddress">Mailadresse hinzufügen</string>
     <string name="buttonAttachment">Einen Anhang hinzufügen</string>
     <string name="buttonAvailableSoon">Bald verfügbar</string>
     <string name="buttonBold">Kühn</string>
@@ -131,6 +136,7 @@
     <string name="contentDescriptionButtonNext">Weiter</string>
     <string name="contentDescriptionButtonOpenSystemSettings">Öffnen Sie die Benachrichtigungseinstellungen des Systems</string>
     <string name="contentDescriptionButtonSettings">Einstellungen</string>
+    <string name="contentDescriptionButtonShowPassword">Passwort anzeigen</string>
     <string name="contentDescriptionContactAlreadyUsed">Kontakt bereits als Empfänger verwendet</string>
     <string name="contentDescriptionDownloadIndicator">Herunterladen von</string>
     <string name="contentDescriptionIconAttachments">Hat Anhänge</string>
@@ -161,15 +167,15 @@
     <string name="emptyStateSearchTitle">Keine Ergebnisse</string>
     <string name="emptyStateTrashDescription">Verschieben Sie die Nachrichten in den Papierkorb. Sie werden nach 30 Tagen endgültig gelöscht.</string>
     <string name="emptyStateTrashTitle">Der Papierkorb ist leer</string>
+    <string name="errorAttachAddressInput">Nur Infomaniak-Mailadressen werden unterstützt</string>
     <string name="errorLoginDescription">Die Verbindung ist fehlgeschlagen.</string>
     <string name="errorLoginTitle">Login-Fehler</string>
     <string name="errorNewFolderAlreadyExists">Ein Ordner mit diesem Namen existiert bereits</string>
     <string name="errorNewFolderNameTooLong">Der Ordnername sollte nicht länger als 255 Zeichen sein.</string>
+    <string name="failToOpenDraft">Öffnen des Entwurfs fehlgeschlagen</string>
     <string name="favoritesFolder">Favoriten</string>
     <string name="fromTitle">Von:</string>
     <string name="googlePlayServicesAreRequired">Google Play Services sind erforderlich</string>
-    <string name="helpChatbot">Chatbot</string>
-    <string name="helpFAQ">FAQ</string>
     <string name="inboxFolder">Posteingang</string>
     <string name="loadingText">Laden…</string>
     <string name="menuDrawerAdvancedActions">Erweiterte Aktionen</string>
