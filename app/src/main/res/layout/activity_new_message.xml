@@ -23,18 +23,6 @@
     android:clipChildren="false"
     tools:context=".ui.main.newMessage.NewMessageActivity">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/newMessageBackgroundColor"
-        app:contentInsetEnd="@dimen/marginStandardSmall"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:navigationContentDescription="@string/buttonClose"
-        app:navigationIcon="@drawable/ic_close_big" />
-
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragmentContainer"
         android:name="androidx.navigation.fragment.NavHostFragment"
@@ -44,7 +32,7 @@
         app:layout_constraintBottom_toTopOf="@id/editor"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintTop_toTopOf="parent"
         app:navGraph="@navigation/new_message_navigation" />
 
     <com.google.android.material.card.MaterialCardView

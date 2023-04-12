@@ -55,7 +55,7 @@ class NewMessageActivity : ThemedActivity() {
         handleOnBackPressed()
 
         setupSnackBar()
-        setupToolbar()
+        setupSendButton()
         setupSystemBars()
         setupEditorActions()
         setupEditorFormatActionsToggle()
@@ -73,10 +73,7 @@ class NewMessageActivity : ThemedActivity() {
         newMessageViewModel.snackBarManager.setup(this)
     }
 
-    private fun setupToolbar() = with(binding) {
-
-        toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
-
+    private fun setupSendButton() = with(binding) {
         newMessageViewModel.isSendingAllowed.observe(this@NewMessageActivity) {
             sendButton.isEnabled = it
         }

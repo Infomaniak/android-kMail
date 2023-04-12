@@ -37,6 +37,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.NestedScrollView
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
@@ -428,7 +429,6 @@ inline infix fun <reified E : Enum<E>, V> ((E) -> V).enumValueFrom(value: V): E?
     return enumValues<E>().firstOrNull { this(it) == value }
 }
 
-
 fun Fragment.changeToolbarColorOnScroll(
     nestedScrollView: NestedScrollView,
     toolbar: MaterialToolbar,
@@ -436,10 +436,48 @@ fun Fragment.changeToolbarColorOnScroll(
     @ColorRes elevatedColor: Int,
     otherUpdates: ((color: Int) -> Unit)? = null,
 ) {
-    var valueAnimator: ValueAnimator? = null
-    var oldColor = requireContext().getColor(loweredColor)
+    requireContext().changeToolbarColorOnScroll(
+        nestedScrollView,
+        toolbar,
+        loweredColor,
+        elevatedColor,
+        otherUpdates,
+        viewLifecycleOwner.lifecycle,
+        requireActivity(),
+    )
+}
 
-    viewLifecycleOwner.lifecycle.addObserver(object : LifecycleEventObserver {
+fun FragmentActivity.changeToolbarColorOnScroll(
+    nestedScrollView: NestedScrollView,
+    toolbar: MaterialToolbar,
+    @ColorRes loweredColor: Int,
+    @ColorRes elevatedColor: Int,
+    otherUpdates: ((color: Int) -> Unit)? = null,
+) {
+    changeToolbarColorOnScroll(
+        nestedScrollView,
+        toolbar,
+        loweredColor,
+        elevatedColor,
+        otherUpdates,
+        this.lifecycle,
+        this,
+    )
+}
+
+private fun Context.changeToolbarColorOnScroll(
+    nestedScrollView: NestedScrollView,
+    toolbar: MaterialToolbar,
+    @ColorRes loweredColor: Int,
+    @ColorRes elevatedColor: Int,
+    otherUpdates: ((color: Int) -> Unit)?,
+    lifecycle: Lifecycle,
+    activity: Activity,
+) {
+    var valueAnimator: ValueAnimator? = null
+    var oldColor = getColor(loweredColor)
+
+    lifecycle.addObserver(object : LifecycleEventObserver {
         override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
             if (event == Lifecycle.Event.ON_DESTROY) valueAnimator?.cancel()
         }
@@ -459,7 +497,7 @@ fun Fragment.changeToolbarColorOnScroll(
         valueAnimator = UiUtils.animateColorChange(oldColor, newColor, animate = true) { color ->
             oldColor = color
             toolbar.setBackgroundColor(color)
-            activity?.window?.statusBarColor = color
+            activity.window.statusBarColor = color
             otherUpdates?.invoke(color)
         }
     }
