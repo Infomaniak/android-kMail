@@ -87,6 +87,6 @@
             android:contentDescription="@string/contentDescriptionButtonOpenSystemSettings"
             android:src="@drawable/ic_open_external"
             android:visibility="gone" />
-    </FrameLayout>
 
+    </FrameLayout>
 </LinearLayout>

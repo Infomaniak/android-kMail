@@ -62,8 +62,7 @@
                             android:id="@+id/searchButton"
                             style="@style/IconButton"
                             android:contentDescription="@string/searchFieldPlaceholder"
-                            app:icon="@drawable/ic_search"
-                            app:iconSize="24dp"
+                            app:icon="@drawable/ic_search_big"
                             app:iconTint="?android:attr/colorPrimary" />
 
                         <com.infomaniak.mail.views.AvatarView
@@ -75,7 +74,6 @@
                             tools:src="@tools:sample/avatars[12]" />
 
                     </LinearLayout>
-
                 </com.google.android.material.appbar.MaterialToolbar>
 
                 <com.google.android.material.appbar.MaterialToolbar

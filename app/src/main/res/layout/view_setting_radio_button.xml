@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak kMail - Android
-  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~ Copyright (C) 2022-2023 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -27,8 +27,8 @@
 
     <ImageView
         android:id="@+id/icon"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
+        android:layout_width="@dimen/standardIconSize"
+        android:layout_height="@dimen/standardIconSize"
         android:layout_marginEnd="@dimen/marginStandardMedium"
         android:importantForAccessibility="no"
         android:visibility="gone" />
@@ -43,8 +43,8 @@
 
     <ImageView
         android:id="@+id/checkMark"
-        android:layout_width="15dp"
-        android:layout_height="15dp"
+        android:layout_width="@dimen/mediumIconSize"
+        android:layout_height="@dimen/mediumIconSize"
         android:layout_marginStart="@dimen/marginStandardMedium"
         android:contentDescription="@string/contentDescriptionSelectedItem"
         android:src="@drawable/ic_check"

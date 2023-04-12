@@ -64,6 +64,7 @@
                 android:src="@drawable/ic_check"
                 android:visibility="gone"
                 app:tint="?android:attr/colorPrimary" />
+
         </FrameLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

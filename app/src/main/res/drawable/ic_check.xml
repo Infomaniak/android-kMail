@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak kMail - Android
-  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~ Copyright (C) 2022-2023 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -16,11 +16,14 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="24dp"
-    android:height="24dp"
-    android:viewportWidth="24"
-    android:viewportHeight="24">
+    android:width="16dp"
+    android:height="16dp"
+    android:viewportWidth="16"
+    android:viewportHeight="16">
     <path
-        android:fillColor="#000000"
-        android:pathData="M23.612,4.877L11.674,21.289C11.389,21.672 10.965,21.922 10.496,21.985C10.027,22.047 9.553,21.916 9.18,21.621L0.655,14.716C-0.098,14.107 -0.219,12.994 0.383,12.232C0.985,11.47 2.082,11.347 2.835,11.957L9.944,17.718L20.805,2.787C21.161,2.246 21.782,1.946 22.421,2.008C23.06,2.07 23.615,2.482 23.864,3.082C24.112,3.681 24.016,4.371 23.612,4.877Z" />
+        android:pathData="M15,3L5.593,13.419L1,9.085"
+        android:strokeWidth="2"
+        android:strokeColor="#9F9F9F"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
 </vector>
