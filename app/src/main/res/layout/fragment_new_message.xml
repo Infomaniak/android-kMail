@@ -30,9 +30,6 @@
         android:layout_height="?attr/actionBarSize"
         android:background="@color/newMessageBackgroundColor"
         app:contentInsetEnd="@dimen/marginStandardSmall"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         app:navigationContentDescription="@string/buttonClose"
         app:navigationIcon="@drawable/ic_close_big" />
 
