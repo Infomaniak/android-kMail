@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.main.thread
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.webkit.WebView
@@ -167,6 +168,15 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         var styledBody = if (type == TEXT_PLAIN) createHtmlForPlainText(bodyWebView) else bodyWebView
         styledBody = processMailDisplay(styledBody, uid)
 
+        // settings.loadWithOverviewMode = true
+        // settings.useWideViewPort = true
+
+        // settings.builtInZoomControls = true
+        // settings.setSupportZoom(true)
+        // settings.displayZoomControls = false
+
+        Log.e("gibran", "About to load styledBody: ${styledBody}")
+
         loadDataWithBaseURL("", styledBody, TEXT_HTML, Utils.UTF_8, "")
     }
 
@@ -177,6 +187,8 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         }
         processedBody = context.injectCssInHtml(R.raw.remove_margin, processedBody)
         processedBody = context.injectCssInHtml(R.raw.add_padding, processedBody)
+        val primaryColor = context.getAttributeColor(RMaterial.attr.colorPrimary)
+        processedBody = context.injectCssInHtml(R.raw.custom_style, processedBody, customColor = primaryColor)
         return processedBody
     }
 

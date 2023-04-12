@@ -27,6 +27,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.OpenableColumns
+import android.util.Log
 import android.util.Patterns
 import android.view.View
 import android.view.Window
@@ -89,6 +90,7 @@ import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmObject
 import io.sentry.Sentry
 import kotlinx.serialization.encodeToString
+import okhttp3.internal.toHexString
 import org.jsoup.Jsoup
 import java.util.Calendar
 import java.util.Date
@@ -172,8 +174,17 @@ fun Context.formatSubject(subject: String?): String {
     }
 }
 
-fun Context.injectCssInHtml(@RawRes cssResId: Int, html: String, styleId: String? = null): String {
-    val css = readRawResource(cssResId)
+fun Context.injectCssInHtml(
+    @RawRes cssResId: Int,
+    html: String,
+    styleId: String? = null,
+    @ColorInt customColor: Int? = null,
+): String {
+    var css = readRawResource(cssResId)
+    if (customColor != null) {
+        val primaryColor = "#" + customColor.toHexString().substring(2 until 8)
+        css = css.replace("\$primaryColor\$", primaryColor)
+    }
     return with(Jsoup.parse(html)) {
         head().appendElement("style")
             .attr("type", "text/css")
