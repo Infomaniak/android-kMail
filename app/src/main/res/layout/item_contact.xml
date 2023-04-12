@@ -43,7 +43,7 @@
         android:layout_height="0dp"
         android:contentDescription="@string/contentDescriptionContactAlreadyUsed"
         android:labelFor="@id/checkMark"
-        android:src="#80FFFFFF"
+        android:src="@color/selected_contact_scrim"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
