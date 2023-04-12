@@ -42,7 +42,7 @@
             android:id="@+id/searchTextInput"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:drawableStart="@drawable/ic_search"
+            android:drawableStart="@drawable/ic_search_small"
             android:drawablePadding="@dimen/marginStandardSmall"
             android:hint="@string/searchFieldPlaceholder"
             android:imeOptions="actionSearch"
