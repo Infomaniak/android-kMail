@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak kMail - Android
-  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~ Copyright (C) 2022-2023 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -21,6 +21,15 @@
     android:viewportWidth="24"
     android:viewportHeight="24">
     <path
-        android:fillColor="#000000"
-        android:pathData="M14.376,18.713C14.115,18.969 13.975,19.299 13.975,19.66C13.975,20.021 14.115,20.351 14.341,20.571C14.479,20.725 14.65,20.842 14.846,20.913C15.005,20.971 15.171,21 15.34,21C15.509,21 15.675,20.971 15.833,20.913C16.029,20.842 16.2,20.725 16.303,20.607L23.6,13.453C23.861,13.196 24,12.864 24,12.5C24,12.136 23.861,11.804 23.6,11.547L16.304,4.393C16.043,4.137 15.708,4 15.34,4C14.972,4 14.636,4.137 14.376,4.393C14.115,4.649 13.975,4.978 13.975,5.34C13.975,5.701 14.115,6.031 14.376,6.287L19.332,11.154H1.376C1.003,11.154 0.663,11.29 0.4,11.547C0.138,11.805 0,12.139 0,12.506C0,12.867 0.14,13.197 0.4,13.453C0.663,13.71 1.003,13.846 1.376,13.846H19.332L14.376,18.713Z" />
+        android:pathData="M1.25,12H22.75"
+        android:strokeWidth="2.5"
+        android:strokeColor="#9F9F9F"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M14.25,20L22.75,12L14.25,4"
+        android:strokeWidth="2.5"
+        android:strokeColor="#9F9F9F"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
 </vector>
