@@ -41,18 +41,23 @@ class SwitchMailboxesAdapter(
 
     override fun onBindViewHolder(holder: SwitchMailboxesViewHolder, position: Int) = with(holder.binding.emailAddress) {
         val mailbox = mailboxes[position]
+        val isCurrentMailbox = mailbox.mailboxId == AccountUtils.currentMailboxId
+
         text = mailbox.email
 
         if (isInMenuDrawer) badge = mailbox.inboxUnreadCount else itemStyle = SelectionStyle.ACCOUNT
-        holder.binding.root.setSelectedState(mailbox.mailboxId == AccountUtils.currentMailboxId)
 
-        setOnClickListener {
-            if (isInMenuDrawer) {
-                context.trackMenuDrawerEvent(SWITCH_MAILBOX_NAME)
-            } else {
-                context.trackAccountEvent(SWITCH_MAILBOX_NAME)
+        holder.binding.root.setSelectedState(isCurrentMailbox)
+
+        if (!isCurrentMailbox) {
+            setOnClickListener {
+                if (isInMenuDrawer) {
+                    context.trackMenuDrawerEvent(SWITCH_MAILBOX_NAME)
+                } else {
+                    context.trackAccountEvent(SWITCH_MAILBOX_NAME)
+                }
+                onMailboxSelected(mailbox)
             }
-            onMailboxSelected(mailbox)
         }
     }
 
