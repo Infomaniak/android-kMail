@@ -32,14 +32,14 @@ abstract class MenuFoldersFragment : Fragment() {
     protected abstract val defaultFoldersList: RecyclerView
     protected abstract val customFoldersList: RecyclerView
 
-    protected open val isInMenuDrawer: Boolean = true
+    protected abstract val isInMenuDrawer: Boolean
 
     protected val defaultFoldersAdapter: FolderAdapter by lazy {
-        FolderAdapter(onClick = ::onFolderSelected, isInMenuDrawer = isInMenuDrawer)
+        FolderAdapter(isInMenuDrawer, onClick = ::onFolderSelected)
     }
 
     protected val customFoldersAdapter: FolderAdapter by lazy {
-        FolderAdapter(onClick = ::onFolderSelected, isInMenuDrawer = isInMenuDrawer)
+        FolderAdapter(isInMenuDrawer, onClick = ::onFolderSelected)
     }
 
     protected abstract fun onFolderSelected(folderId: String)

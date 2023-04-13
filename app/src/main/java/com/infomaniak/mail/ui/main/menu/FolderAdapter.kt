@@ -36,10 +36,10 @@ import kotlin.math.min
 import com.infomaniak.lib.core.R as RCore
 
 class FolderAdapter(
+    private val isInMenuDrawer: Boolean,
     private var folders: List<Folder> = emptyList(),
     private var currentFolderId: String? = null,
     private val onClick: (folderId: String) -> Unit,
-    private val isInMenuDrawer: Boolean = true,
 ) : RecyclerView.Adapter<FolderViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FolderViewHolder {

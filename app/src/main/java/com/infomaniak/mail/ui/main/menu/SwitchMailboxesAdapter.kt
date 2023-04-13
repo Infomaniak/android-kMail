@@ -31,8 +31,8 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.views.MenuDrawerItemView.SelectionStyle
 
 class SwitchMailboxesAdapter(
+    private val isInMenuDrawer: Boolean,
     private var mailboxes: List<Mailbox> = emptyList(),
-    private val isInMenuDrawer: Boolean = true,
 ) : RecyclerView.Adapter<SwitchMailboxesViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SwitchMailboxesViewHolder {
