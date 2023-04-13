@@ -40,7 +40,8 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadViewHolder
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.CssInjector.Companion.loadCss
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.PRIMARY_COLOR_CODE
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.loadCss
 import com.infomaniak.mail.utils.UiUtils.getPrettyNameAndEmail
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.TEXT_HTML
@@ -71,7 +72,7 @@ class ThreadAdapter(context: Context) : RecyclerView.Adapter<ThreadViewHolder>()
     private val customStyle by lazy {
         context.loadCss(
             R.raw.custom_style,
-            context.getAttributeColor(RMaterial.attr.colorPrimary)
+            listOf(PRIMARY_COLOR_CODE to context.getAttributeColor(RMaterial.attr.colorPrimary))
         )
     }
 
@@ -191,7 +192,7 @@ class ThreadAdapter(context: Context) : RecyclerView.Adapter<ThreadViewHolder>()
         loadDataWithBaseURL("", styledBody, TEXT_HTML, Utils.UTF_8, "")
     }
 
-    private fun WebView.processMailDisplay(styledBody: String, uid: String): String = with(CssInjector(styledBody)) {
+    private fun WebView.processMailDisplay(styledBody: String, uid: String): String = with(HtmlFormatter(styledBody)) {
         if (context.isNightModeEnabled() && isThemeTheSameMap[uid] == true) {
             registerCss(customDarkMode, DARK_BACKGROUND_STYLE_ID)
         }
