@@ -180,15 +180,6 @@ class ThreadAdapter(context: Context) : RecyclerView.Adapter<ThreadViewHolder>()
         var styledBody = if (type == TEXT_PLAIN) createHtmlForPlainText(bodyWebView) else bodyWebView
         styledBody = processMailDisplay(styledBody, uid)
 
-        // settings.loadWithOverviewMode = true
-        // settings.useWideViewPort = true
-
-        // settings.builtInZoomControls = true
-        // settings.setSupportZoom(true)
-        // settings.displayZoomControls = false
-
-        Log.e("gibran", "About to load styledBody: ${styledBody}")
-
         loadDataWithBaseURL("", styledBody, TEXT_HTML, Utils.UTF_8, "")
     }
 
