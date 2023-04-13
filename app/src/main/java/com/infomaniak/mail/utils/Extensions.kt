@@ -150,7 +150,7 @@ fun View.toggleChevron(
     isCollapsed: Boolean,
     collapsedAngle: Float? = null,
     expandedAngle: Float? = null,
-    duration: Long = 300L,
+    duration: Long = 900L,
 ) {
     val angle = if (isCollapsed) {
         collapsedAngle ?: ResourcesCompat.getFloat(context.resources, R.dimen.angleViewNotRotated)
