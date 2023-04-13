@@ -18,21 +18,35 @@
 package com.infomaniak.mail.utils
 
 import android.content.Context
+import android.content.res.Resources
 import androidx.annotation.RawRes
 import okhttp3.internal.toHexString
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
+import kotlin.math.roundToInt
 
 class HtmlFormatter(private val html: String) {
 
     private val cssList = mutableListOf<Pair<String, String?>>()
+    private var metaWidth = -1
 
     fun registerCss(css: String, styleId: String? = null) {
         cssList.add(css to styleId)
     }
 
+    fun registerMetaViewPort() {
+        metaWidth = computeScreenWidthInDp()
+    }
+
+    private fun computeScreenWidthInDp() = with(Resources.getSystem().displayMetrics) {
+        widthPixels / density
+    }.roundToInt()
+
     fun inject(): String = with(Jsoup.parse(html)) {
-        head().injectCss()
+        head().apply {
+            injectCss()
+            injectMetaViewPort()
+        }
         html()
     }
 
@@ -43,6 +57,13 @@ class HtmlFormatter(private val html: String) {
                 .appendText(css)
                 .also { element -> styleId?.let(element::id) }
         }
+    }
+
+    private fun Element.injectMetaViewPort() {
+        if (metaWidth >= 0) appendElement("meta")
+            .attr("name", "viewport")
+            .attr("content", "width=$metaWidth")
+            .attr("maximum-scale", "2")
     }
 
     companion object {
