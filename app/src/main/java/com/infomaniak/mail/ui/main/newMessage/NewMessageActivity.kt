@@ -57,10 +57,9 @@ class NewMessageActivity : ThemedActivity() {
         setupSnackBar()
         setupSendButton()
         setupSystemBars()
-        setupEditorActions()
-        setupEditorFormatActionsToggle()
 
         observeCloseActivity()
+        observeInitSuccess()
     }
 
     private fun handleOnBackPressed() = with(newMessageViewModel) {
@@ -124,6 +123,15 @@ class NewMessageActivity : ThemedActivity() {
 
     private fun observeCloseActivity() {
         newMessageViewModel.shouldCloseActivity.observeNotNull(this) { if (it) finish() }
+    }
+
+    private fun observeInitSuccess() {
+        newMessageViewModel.isInitSuccess.observe(this) { isSuccess ->
+            if (isSuccess) {
+                setupEditorActions()
+                setupEditorFormatActionsToggle()
+            }
+        }
     }
 
     private fun setupEditorActions() = with(binding) {
