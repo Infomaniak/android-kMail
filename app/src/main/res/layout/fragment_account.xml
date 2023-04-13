@@ -90,7 +90,6 @@
                     style="@style/IconButtonSmall"
                     android:layout_marginHorizontal="@dimen/marginStandardSmall"
                     android:contentDescription="@string/buttonAddEmailAddress"
-                    android:visibility="gone"
                     app:icon="@drawable/ic_add_circle"
                     app:iconTint="?attr/colorPrimary"
                     app:layout_constraintBottom_toBottomOf="@+id/associatedEmailAddresses"

@@ -20,21 +20,24 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:title="@string/buttonAddEmailAddress"
+    app:title="Adresse hinzufügen"
     tools:context=".ui.main.user.AccountFragment">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center_horizontal"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
         <TextView
+            android:id="@+id/attachMailboxDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/marginStandardMedium"
             android:layout_marginVertical="@dimen/marginStandard"
-            android:text="@string/attachAddressDescription" />
+            android:text="@string/attachAddressDescription"
+            app:layout_constraintBottom_toTopOf="@id/mailInputLayout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/mailInputLayout"
@@ -44,7 +47,11 @@
             android:layout_marginBottom="@dimen/marginStandardSmall"
             android:hint="@string/attachAddressInputHint"
             app:errorEnabled="true"
-            app:errorIconDrawable="@null">
+            app:errorIconDrawable="@null"
+            app:layout_constraintBottom_toTopOf="@id/passwordInputLayout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/attachMailboxDescription">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/mailInput"
@@ -59,7 +66,10 @@
             android:layout_height="0dp"
             android:layout_marginHorizontal="@dimen/marginStandardMedium"
             android:layout_weight="1"
-            android:hint="@string/attachAddressPasswordInputHint">
+            android:hint="@string/attachAddressPasswordInputHint"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/mailInputLayout">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/passwordInput"
@@ -70,20 +80,14 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/actionButton"
+            android:id="@+id/attachMailboxButton"
             style="@style/TextButtonPrimary"
             android:layout_width="match_parent"
             android:layout_marginHorizontal="@dimen/marginStandard"
             android:layout_marginBottom="@dimen/marginStandardSmall"
-            android:text="@string/buttonAttachEmailAddress" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/secondaryActionButton"
-            style="@style/TextButtonSecondary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/marginStandard"
-            android:layout_marginBottom="@dimen/marginStandardMedium"
-            android:text="@string/buttonCancel" />
-    </LinearLayout>
+            android:text="@string/buttonAttachEmailAddress"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </com.infomaniak.mail.ui.main.menu.SimpleSettingView>

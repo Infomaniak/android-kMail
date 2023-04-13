@@ -27,6 +27,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.infomaniak.lib.core.utils.context
+import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.R
@@ -62,8 +63,9 @@ class AccountFragment : Fragment() {
             animatedNavigation(AccountFragmentDirections.actionAccountFragmentToSwitchUserFragment())
         }
 
-        // TODO: Attach an address tunnel
-        // attachNewMailboxButton.setOnClickListener { }
+        attachNewMailboxButton.setOnClickListener {
+            safeNavigate(AccountFragmentDirections.actionAccountFragmentToAttachMailboxFragment())
+        }
 
         disconnectAccountButton.setOnClickListener {
             context.trackAccountEvent("logOut")
