@@ -20,7 +20,9 @@ package com.infomaniak.mail.utils
 import android.Manifest
 import android.os.Build
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions
+import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
+import androidx.annotation.DeprecatedSinceApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.infomaniak.lib.core.utils.hasPermissions
@@ -29,20 +31,27 @@ import com.infomaniak.mail.data.LocalSettings
 class PermissionUtils {
 
     private var activity: FragmentActivity
+    private var fragment: Fragment? = null
     private var localSettings: LocalSettings
 
     private lateinit var mainForActivityResult: ActivityResultLauncher<Array<String>>
+    private var storageForActivityResult: ActivityResultLauncher<String>? = null
+
+    val hasDownloadManagerPermission
+        get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q || activity.hasPermissions(arrayOf(storagePermission))
 
     constructor(activity: FragmentActivity) {
         this.activity = activity
         localSettings = LocalSettings.getInstance(activity)
     }
 
-    constructor(fragment: Fragment) : this(fragment.requireActivity())
+    constructor(fragment: Fragment) : this(fragment.requireActivity()) {
+        this.fragment = fragment
+    }
 
     fun registerMainPermissions(onPermissionResult: ((permissions: Map<String, Boolean>) -> Unit)? = null) {
         mainForActivityResult =
-            activity.registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { authorizedPermissions ->
+            activity.registerForActivityResult(RequestMultiplePermissions()) { authorizedPermissions ->
                 onPermissionResult?.invoke(authorizedPermissions)
                 updateNotificationPermissionSetting()
             }
@@ -63,7 +72,33 @@ class PermissionUtils {
         if (!activity.hasPermissions(mainPermissions)) mainForActivityResult.launch(mainPermissions)
     }
 
+    //region DownloadManager permissions
+    private var downloadCallback: (() -> Unit)? = null
+
+    /**
+     * Register storage permission only for Android API below 29.
+     */
+    fun registerDownloadManagerPermission() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            storageForActivityResult = fragment?.registerForActivityResult(RequestPermission()) { hasPermission ->
+                if (hasPermission) downloadCallback?.invoke()
+            }
+        }
+    }
+
+    /**
+     * Request storage permission only for Android API below 29.
+     */
+    fun requestDownloadManagerPermission(downloadCallback: () -> Unit) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) storageForActivityResult?.launch(storagePermission)
+        this.downloadCallback = downloadCallback
+    }
+    //endregion
+
     private companion object {
+
+        @get:DeprecatedSinceApi(Build.VERSION_CODES.Q, "Only used for DownloadManager below API 29")
+        const val storagePermission = Manifest.permission.WRITE_EXTERNAL_STORAGE
 
         /**
          * If the user has manually disabled notifications permissions, stop requesting it.
