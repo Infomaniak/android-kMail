@@ -69,13 +69,13 @@
         android:imeOptions="actionDone"
         android:inputType="textEmailAddress"
         android:lines="1"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/singleChip"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toEndOf="@id/prefix"
-        app:layout_constraintTop_toBottomOf="@id/chipsRecyclerView"
-        tools:visibility="gone" />
+        app:layout_constraintTop_toBottomOf="@id/chipsRecyclerView" />
 
     <include
         android:id="@+id/singleChip"
@@ -91,19 +91,6 @@
         app:layout_constraintStart_toEndOf="@id/textInput"
         app:layout_constraintTop_toTopOf="@id/singleLineGuide"
         tools:visibility="visible" />
-
-    <com.infomaniak.lib.core.views.LoaderTextView
-        android:id="@+id/loader"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/alternativeMargin"
-        android:layout_marginEnd="@dimen/marginStandardMedium"
-        android:textSize="14sp"
-        app:layout_constraintBottom_toBottomOf="@id/singleLineGuide"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/prefix"
-        app:layout_constraintTop_toTopOf="@id/singleLineGuide"
-        tools:visibility="gone" />
 
     <com.google.android.material.chip.Chip
         android:id="@+id/plusChip"
@@ -151,5 +138,18 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/singleLineGuide"
         tools:visibility="visible" />
+
+    <com.infomaniak.lib.core.views.LoaderTextView
+        android:id="@+id/loader"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/alternativeMargin"
+        android:layout_marginEnd="@dimen/marginStandardMedium"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="@id/singleLineGuide"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/prefix"
+        app:layout_constraintTop_toTopOf="@id/singleLineGuide"
+        tools:visibility="gone" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

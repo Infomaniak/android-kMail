@@ -154,8 +154,10 @@ class RecipientFieldView @JvmOverloads constructor(
     }
 
     fun hideLoader() = with(binding) {
-        loader.isGone = true
+        textInput.isVisible = true
         chevron.isVisible = canCollapseEverything
+
+        loader.isGone = true
     }
 
     fun showKeyboardInTextInput() {
