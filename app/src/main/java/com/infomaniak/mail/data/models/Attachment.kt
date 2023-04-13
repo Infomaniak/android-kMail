@@ -23,10 +23,12 @@ import androidx.annotation.DrawableRes
 import androidx.core.content.FileProvider
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.lib.core.utils.contains
+import com.infomaniak.lib.core.utils.guessMimeType
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.LocalStorageUtils
+import com.infomaniak.mail.utils.Utils.MIMETYPE_UNKNOWN
 import io.realm.kotlin.types.EmbeddedRealmObject
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -62,6 +64,8 @@ class Attachment : EmbeddedRealmObject {
 
     inline val downloadUrl get() = ApiRoutes.resource(resource!!)
 
+    private inline val safeMimeType get() = if (mimeType == MIMETYPE_UNKNOWN) name.guessMimeType() else mimeType
+
     fun initLocalValues(name: String, size: Long, mimeType: String, uri: String) {
         this.name = name
         this.size = size
@@ -69,7 +73,7 @@ class Attachment : EmbeddedRealmObject {
         this.uploadLocalUri = uri
     }
 
-    fun getFileTypeFromExtension(): AttachmentType = when (mimeType) {
+    fun getFileTypeFromExtension(): AttachmentType = when (safeMimeType) {
         in Regex("application/(zip|rar|x-tar|.*compressed|.*archive)") -> AttachmentType.ARCHIVE
         in Regex("audio/") -> AttachmentType.AUDIO
         in Regex("image/") -> AttachmentType.IMAGE
@@ -117,7 +121,7 @@ class Attachment : EmbeddedRealmObject {
         return Intent().apply {
             action = Intent.ACTION_VIEW
             flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-            setDataAndType(uri, mimeType)
+            setDataAndType(uri, safeMimeType)
         }
     }
 
