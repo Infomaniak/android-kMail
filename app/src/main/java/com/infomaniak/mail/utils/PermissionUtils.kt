@@ -76,7 +76,7 @@ class PermissionUtils {
     private var downloadCallback: (() -> Unit)? = null
 
     /**
-     * Register storage permission only for android Api below 29.
+     * Register storage permission only for Android API below 29.
      */
     fun registerDownloadManagerPermission() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
@@ -87,7 +87,7 @@ class PermissionUtils {
     }
 
     /**
-     * Request storage permission only for android Api below 29.
+     * Request storage permission only for Android API below 29.
      */
     fun requestDownloadManagerPermission(downloadCallback: () -> Unit) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) storageForActivityResult?.launch(storagePermission)
@@ -97,7 +97,7 @@ class PermissionUtils {
 
     private companion object {
 
-        @get:DeprecatedSinceApi(Build.VERSION_CODES.Q, "Only used for downloadManager below api 29")
+        @get:DeprecatedSinceApi(Build.VERSION_CODES.Q, "Only used for DownloadManager below API 29")
         const val storagePermission = Manifest.permission.WRITE_EXTERNAL_STORAGE
 
         /**
