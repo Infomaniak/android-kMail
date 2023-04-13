@@ -161,6 +161,10 @@ class NewMessageFragment : Fragment() {
         fromLoader.isGone = true
         subjectLoader.isGone = true
         bodyLoader.isGone = true
+
+        toField.hideLoader()
+        ccField.hideLoader()
+        bccField.hideLoader()
     }
 
     private fun showKeyboardInCorrectView() = with(binding) {

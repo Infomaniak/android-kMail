@@ -92,6 +92,19 @@
         app:layout_constraintTop_toTopOf="@id/singleLineGuide"
         tools:visibility="visible" />
 
+    <com.infomaniak.lib.core.views.LoaderTextView
+        android:id="@+id/loader"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/alternativeMargin"
+        android:layout_marginEnd="@dimen/marginStandardMedium"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="@id/singleLineGuide"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/prefix"
+        app:layout_constraintTop_toTopOf="@id/singleLineGuide"
+        tools:visibility="gone" />
+
     <com.google.android.material.chip.Chip
         android:id="@+id/plusChip"
         style="@style/EmailAddressChip"
@@ -132,9 +145,11 @@
         style="@style/IconButtonSmall"
         android:layout_marginEnd="@dimen/marginStandardMedium"
         android:contentDescription="@string/contentDescriptionButtonExpandHeader"
+        android:visibility="gone"
         app:icon="@drawable/ic_chevron_down"
         app:layout_constraintBottom_toBottomOf="@id/singleLineGuide"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/singleLineGuide" />
+        app:layout_constraintTop_toTopOf="@id/singleLineGuide"
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
