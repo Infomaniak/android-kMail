@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.menu
 
+import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -29,26 +30,26 @@ import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.R
-import com.infomaniak.mail.databinding.FragmentManageMailAddressBinding
-import com.infomaniak.mail.ui.main.user.ManageMailAddressViewModel
-import com.infomaniak.mail.ui.main.user.SimpleMailboxAdapter
+import com.infomaniak.mail.databinding.FragmentAccountBinding
+import com.infomaniak.mail.ui.main.user.AccountViewModel
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.animatedNavigation
 import com.infomaniak.mail.utils.createDescriptionDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import com.infomaniak.lib.core.R as RCore
 
-class ManageMailAddressFragment : Fragment() {
+class AccountFragment : Fragment() {
 
-    private lateinit var binding: FragmentManageMailAddressBinding
-    private val manageMailAddressViewModel: ManageMailAddressViewModel by viewModels()
+    private lateinit var binding: FragmentAccountBinding
+    private val accountViewModel: AccountViewModel by viewModels()
 
     private val logoutAlert by lazy { initLogoutAlert() }
 
-    private var simpleMailboxAdapter = SimpleMailboxAdapter()
+    private var mailboxAdapter = SwitchMailboxesAdapter(isInMenuDrawer = false)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return FragmentManageMailAddressBinding.inflate(inflater, container, false).also { binding = it }.root
+        return FragmentAccountBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
@@ -57,7 +58,12 @@ class ManageMailAddressFragment : Fragment() {
             mail.text = user.email
         }
 
-        changeAccountButton.setOnClickListener { animatedNavigation(ManageMailAddressFragmentDirections.actionManageMailAddressFragmentToSwitchUserFragment()) }
+        changeAccountButton.setOnClickListener {
+            animatedNavigation(AccountFragmentDirections.actionAccountFragmentToSwitchUserFragment())
+        }
+
+        // TODO: Attach an address tunnel
+        // attachNewMailboxButton.setOnClickListener { }
 
         disconnectAccountButton.setOnClickListener {
             context.trackAccountEvent("logOut")
@@ -65,9 +71,10 @@ class ManageMailAddressFragment : Fragment() {
         }
 
         mailboxesRecyclerView.apply {
-            adapter = simpleMailboxAdapter
+            adapter = mailboxAdapter
             ResourcesCompat.getDrawable(resources, R.drawable.divider, null)?.let {
-                addItemDecoration(DividerItemDecorator(it))
+                val paddingHorizontal = resources.getDimensionPixelSize(RCore.dimen.marginStandardMedium)
+                addItemDecoration(DividerItemDecorator(InsetDrawable(it, paddingHorizontal, 0, paddingHorizontal, 0)))
             }
             isFocusable = false
         }
@@ -80,13 +87,11 @@ class ManageMailAddressFragment : Fragment() {
         AccountUtils.removeUser(requireContext(), AccountUtils.currentUser!!)
     }
 
-    private fun observeAccountsLive() = with(manageMailAddressViewModel) {
+    private fun observeAccountsLive() = with(accountViewModel) {
 
         updateMailboxes()
 
-        observeAccountsLive.observe(viewLifecycleOwner) { mailboxes ->
-            simpleMailboxAdapter.updateMailboxes(mailboxes.map { it.email })
-        }
+        observeAccountsLive.observe(viewLifecycleOwner) { mailboxes -> mailboxAdapter.setMailboxes(mailboxes) }
     }
 
     private fun initLogoutAlert() = createDescriptionDialog(

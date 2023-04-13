@@ -41,7 +41,6 @@ import com.infomaniak.mail.MatomoMail.trackCreateFolderEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.utils.*
@@ -60,13 +59,7 @@ class MenuDrawerFragment : MenuFoldersFragment() {
 
     private var canNavigate = AtomicBoolean(true)
 
-    private val addressAdapter = MenuDrawerSwitchUserMailboxesAdapter { selectedMailbox ->
-        trackMenuDrawerEvent("switchMailbox")
-        // TODO: This works, but... The splashscreen blinks.
-        AccountUtils.currentMailboxId = selectedMailbox.mailboxId
-        RealmDatabase.close()
-        AccountUtils.reloadApp?.invoke()
-    }
+    private val addressAdapter = SwitchMailboxesAdapter()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentMenuDrawerBinding.inflate(inflater, container, false).also { binding = it }.root

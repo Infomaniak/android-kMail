@@ -36,8 +36,8 @@
             android:id="@+id/action_threadListFragment_to_threadFragment"
             app:destination="@id/threadFragment" />
         <action
-            android:id="@+id/action_threadListFragment_to_manageMailAddressFragment"
-            app:destination="@id/manageMailAddressFragment" />
+            android:id="@+id/action_threadListFragment_to_accountFragment"
+            app:destination="@id/accountFragment" />
         <action
             android:id="@+id/action_threadListFragment_to_helpFragment"
             app:destination="@id/helpFragment" />
@@ -263,12 +263,12 @@
         tools:layout="@layout/fragment_help" />
 
     <fragment
-        android:id="@+id/manageMailAddressFragment"
-        android:name="com.infomaniak.mail.ui.main.menu.ManageMailAddressFragment"
-        android:label="ManageMailAddressFragment"
-        tools:layout="@layout/fragment_manage_mail_address">
+        android:id="@+id/accountFragment"
+        android:name="com.infomaniak.mail.ui.main.menu.AccountFragment"
+        android:label="AccountFragment"
+        tools:layout="@layout/fragment_account">
         <action
-            android:id="@+id/action_manageMailAddressFragment_to_switchUserFragment"
+            android:id="@+id/action_accountFragment_to_switchUserFragment"
             app:destination="@id/switchUserFragment" />
     </fragment>
 
