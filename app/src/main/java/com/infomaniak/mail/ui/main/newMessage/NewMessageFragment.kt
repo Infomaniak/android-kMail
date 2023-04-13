@@ -270,7 +270,8 @@ class NewMessageFragment : Fragment() {
     private fun populateUiWithViewModel() = with(binding) {
         val draft = newMessageViewModel.draft
 
-        toField.initRecipients(draft.to)
+        val ccAndBccFieldsAreEmpty = draft.cc.isEmpty() && draft.bcc.isEmpty()
+        toField.initRecipients(draft.to, ccAndBccFieldsAreEmpty)
         ccField.initRecipients(draft.cc)
         bccField.initRecipients(draft.bcc)
 
