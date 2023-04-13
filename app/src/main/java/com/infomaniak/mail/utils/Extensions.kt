@@ -27,12 +27,14 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.OpenableColumns
-import android.util.Log
 import android.util.Patterns
 import android.view.View
 import android.view.Window
 import android.webkit.WebView
-import androidx.annotation.*
+import androidx.annotation.AttrRes
+import androidx.annotation.ColorRes
+import androidx.annotation.IdRes
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.NestedScrollView
@@ -90,7 +92,6 @@ import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmObject
 import io.sentry.Sentry
 import kotlinx.serialization.encodeToString
-import okhttp3.internal.toHexString
 import org.jsoup.Jsoup
 import java.util.Calendar
 import java.util.Date
@@ -171,26 +172,6 @@ fun Context.formatSubject(subject: String?): String {
         getString(R.string.noSubjectTitle)
     } else {
         subject.replace("\n+".toRegex(), " ")
-    }
-}
-
-fun Context.injectCssInHtml(
-    @RawRes cssResId: Int,
-    html: String,
-    styleId: String? = null,
-    @ColorInt customColor: Int? = null,
-): String {
-    var css = readRawResource(cssResId)
-    if (customColor != null) {
-        val primaryColor = "#" + customColor.toHexString().substring(2 until 8)
-        css = css.replace("\$primaryColor\$", primaryColor)
-    }
-    return with(Jsoup.parse(html)) {
-        head().appendElement("style")
-            .attr("type", "text/css")
-            .appendText(css)
-            .also { element -> styleId?.let(element::id) }
-        html()
     }
 }
 

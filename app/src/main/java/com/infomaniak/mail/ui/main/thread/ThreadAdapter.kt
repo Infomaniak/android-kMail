@@ -40,6 +40,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadViewHolder
 import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.CssInjector.Companion.loadCss
 import com.infomaniak.mail.utils.UiUtils.getPrettyNameAndEmail
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.TEXT_HTML
@@ -48,7 +49,7 @@ import org.jsoup.Jsoup
 import java.util.*
 import com.google.android.material.R as RMaterial
 
-class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBinding.OnRealmChanged<Message> {
+class ThreadAdapter(context: Context) : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBinding.OnRealmChanged<Message> {
 
     var messages = listOf<Message>()
         private set
@@ -63,6 +64,16 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
     var onDownloadAllClicked: ((message: Message) -> Unit)? = null
     var onReplyClicked: ((Message) -> Unit)? = null
     var onMenuClicked: ((Message) -> Unit)? = null
+
+    private val customDarkMode by lazy { context.loadCss(R.raw.custom_dark_mode) }
+    private val removeMargin by lazy { context.loadCss(R.raw.remove_margin) }
+    private val addPadding by lazy { context.loadCss(R.raw.add_padding) }
+    private val customStyle by lazy {
+        context.loadCss(
+            R.raw.custom_style,
+            context.getAttributeColor(RMaterial.attr.colorPrimary)
+        )
+    }
 
     override fun updateList(itemList: List<Message>) {
         messages = itemList
@@ -180,16 +191,14 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         loadDataWithBaseURL("", styledBody, TEXT_HTML, Utils.UTF_8, "")
     }
 
-    private fun WebView.processMailDisplay(styledBody: String, uid: String): String {
-        var processedBody = styledBody
+    private fun WebView.processMailDisplay(styledBody: String, uid: String): String = with(CssInjector(styledBody)) {
         if (context.isNightModeEnabled() && isThemeTheSameMap[uid] == true) {
-            processedBody = context.injectCssInHtml(R.raw.custom_dark_mode, processedBody, DARK_BACKGROUND_STYLE_ID)
+            registerCss(customDarkMode, DARK_BACKGROUND_STYLE_ID)
         }
-        processedBody = context.injectCssInHtml(R.raw.remove_margin, processedBody)
-        processedBody = context.injectCssInHtml(R.raw.add_padding, processedBody)
-        val primaryColor = context.getAttributeColor(RMaterial.attr.colorPrimary)
-        processedBody = context.injectCssInHtml(R.raw.custom_style, processedBody, customColor = primaryColor)
-        return processedBody
+        registerCss(removeMargin)
+        registerCss(addPadding)
+        registerCss(customStyle)
+        inject()
     }
 
     private fun createHtmlForPlainText(text: String): String {
