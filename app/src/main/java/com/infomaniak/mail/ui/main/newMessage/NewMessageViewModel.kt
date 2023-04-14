@@ -73,6 +73,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     val shouldCloseActivity = SingleLiveEvent<Boolean?>()
     val isSendingAllowed = MutableLiveData(false)
     val snackBarManager by lazy { SnackBarManager() }
+    var shouldHandleDraftActionWhenLeaving = true
 
     private var snapshot: DraftSnapshot? = null
 
@@ -293,16 +294,8 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
 
     fun importAttachments(uris: List<Uri>) = viewModelScope.launch(Dispatchers.IO) {
 
-        fun updateUiDraftFromRealm() {
-            RealmDatabase.mailboxContent().writeBlocking {
-                getLatestDraft(draft.localUuid, realm = this)?.let { draft = it }
-            }
-        }
-
         val newAttachments = mutableListOf<Attachment>()
         var attachmentsSize = draft.attachments.sumOf { it.size }
-
-        updateUiDraftFromRealm()
 
         uris.forEach { uri ->
             val availableSpace = FILE_SIZE_25_MB - attachmentsSize

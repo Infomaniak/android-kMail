@@ -432,8 +432,18 @@ class NewMessageFragment : Fragment() {
         initializeFieldsAsOpen.observe(viewLifecycleOwner) { openAdvancedFields(!it) }
     }
 
-    override fun onStop() {
-        DraftsActionsWorker.scheduleWork(requireContext())
+    override fun onStop() = with(newMessageViewModel) {
+
+        // TODO: Currently, we don't handle the possibility to leave the App during Draft composition.
+        // TODO: If it happens and we do anything in Realm about that, it will desynchronize the UI &
+        // TODO: Realm, and we'll lost some Draft data. A quick fix to get rid of the current bugs is
+        // TODO: to wait the end of Draft composition before starting DraftsActionsWorker.
+        if (shouldHandleDraftActionWhenLeaving) {
+            DraftsActionsWorker.scheduleWork(requireContext())
+        } else {
+            shouldHandleDraftActionWhenLeaving = true
+        }
+
         super.onStop()
     }
 
