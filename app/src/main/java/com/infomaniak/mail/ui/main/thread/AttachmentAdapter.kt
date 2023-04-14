@@ -46,7 +46,7 @@ class AttachmentAdapter(
 
         fileName.text = attachment.name
         fileDetails.text = FormatterFileSize.formatShortFileSize(context, attachment.size)
-        icon.load(attachment.getFileTypeFromExtension().icon)
+        icon.load(attachment.getFileTypeFromMimeType().icon)
 
         if (!shouldDisplayCloseButton) {
             root.setOnClickListener { onAttachmentClicked?.invoke(attachment) }

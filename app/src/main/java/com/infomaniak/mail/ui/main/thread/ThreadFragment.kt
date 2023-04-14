@@ -265,7 +265,7 @@ class ThreadFragment : Fragment() {
                 ThreadFragmentDirections.actionThreadFragmentToDownloadAttachmentProgressDialog(
                     attachmentResource = resource!!,
                     attachmentName = name,
-                    attachmentType = getFileTypeFromExtension(),
+                    attachmentType = getFileTypeFromMimeType(),
                 )
             )
         }
