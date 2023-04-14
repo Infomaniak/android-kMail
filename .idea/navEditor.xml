@@ -64,6 +64,27 @@
                       </LayoutPositions>
                     </value>
                   </entry>
+                  <entry key="accountFragment">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="12" />
+                            <option name="y" value="12" />
+                          </Point>
+                        </option>
+                        <option name="myPositions">
+                          <map>
+                            <entry key="action_accountFragment_to_switchUserFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                          </map>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
                   <entry key="autoReplySettingFragment">
                     <value>
                       <LayoutPositions>
@@ -244,27 +265,6 @@
                             <option name="x" value="256" />
                             <option name="y" value="12" />
                           </Point>
-                        </option>
-                      </LayoutPositions>
-                    </value>
-                  </entry>
-                  <entry key="manageMailAddressFragment">
-                    <value>
-                      <LayoutPositions>
-                        <option name="myPosition">
-                          <Point>
-                            <option name="x" value="1476" />
-                            <option name="y" value="3614" />
-                          </Point>
-                        </option>
-                        <option name="myPositions">
-                          <map>
-                            <entry key="action_manageMailAddressFragment_to_switchUserFragment">
-                              <value>
-                                <LayoutPositions />
-                              </value>
-                            </entry>
-                          </map>
                         </option>
                       </LayoutPositions>
                     </value>
@@ -635,12 +635,12 @@
                         </option>
                         <option name="myPositions">
                           <map>
-                            <entry key="action_threadListFragment_to_helpFragment">
+                            <entry key="action_threadListFragment_to_accountFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
                             </entry>
-                            <entry key="action_threadListFragment_to_manageMailAddressFragment">
+                            <entry key="action_threadListFragment_to_helpFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
