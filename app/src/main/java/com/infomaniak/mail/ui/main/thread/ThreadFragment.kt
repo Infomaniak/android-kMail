@@ -261,7 +261,7 @@ class ThreadFragment : Fragment() {
         if (hasUsableCache(requireContext()) || isInlineCachedFile(requireContext())) {
             startActivity(openWithIntent(requireContext()))
         } else {
-            findNavController().navigate(
+            safeNavigate(
                 ThreadFragmentDirections.actionThreadFragmentToDownloadAttachmentProgressDialog(
                     attachmentResource = resource!!,
                     attachmentName = name,
