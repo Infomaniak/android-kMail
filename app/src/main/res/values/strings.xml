@@ -58,6 +58,10 @@
     <string name="addUnknownRecipientTitle">Add a recipient</string>
     <string name="appSecurityDescription">Protect access to your app by enabling your phone lock.</string>
     <string name="archiveFolder">Archived</string>
+    <string name="attachAddressDescription">If you already have an Infomaniak email address, connect now.</string>
+    <string name="attachAddressInputHint">Email address to add</string>
+    <string name="attachAddressPasswordInputHint">Email address’ password</string>
+    <string name="attachAddressTitle">Add email address</string>
     <string name="attachmentActionCamera">Camera</string>
     <string name="attachmentActionFile">Attach a file</string>
     <string name="attachmentActionPhotoLibrary">Send a photo from the photo library</string>
@@ -75,6 +79,7 @@
     <string name="buttonAccountSwitch">Change account</string>
     <string name="buttonAddAccount">Add an account</string>
     <string name="buttonAddEmailAddress">Add an email address</string>
+    <string name="buttonAttachEmailAddress">Add this email address</string>
     <string name="buttonAttachment">Add an attachment</string>
     <string name="buttonAvailableSoon">Available soon</string>
     <string name="buttonBold">Bold</string>
@@ -138,6 +143,7 @@
     <string name="contentDescriptionButtonNext">Next</string>
     <string name="contentDescriptionButtonOpenSystemSettings">Open system’s notification settings</string>
     <string name="contentDescriptionButtonSettings">Settings</string>
+    <string name="contentDescriptionButtonShowPassword">Show password</string>
     <string name="contentDescriptionContactAlreadyUsed">Contact already used as recipient</string>
     <string name="contentDescriptionDownloadIndicator">Downloading</string>
     <string name="contentDescriptionIconAttachments">Has attachments</string>
@@ -168,15 +174,15 @@
     <string name="emptyStateSearchTitle">No results</string>
     <string name="emptyStateTrashDescription">Move the messages to the trash. They will be permanently deleted after 30 days.</string>
     <string name="emptyStateTrashTitle">Trash is empty</string>
+    <string name="errorAttachAddressInput">Only Infomaniak email addresses are supported</string>
     <string name="errorLoginDescription">The connection failed.</string>
     <string name="errorLoginTitle">Login error</string>
     <string name="errorNewFolderAlreadyExists">A folder with this name already exists</string>
     <string name="errorNewFolderNameTooLong">The folder name should not exceed 255 characters</string>
+    <string name="failToOpenDraft">Failed to open draft</string>
     <string name="favoritesFolder">Favorites</string>
     <string name="fromTitle">From:</string>
     <string name="googlePlayServicesAreRequired">Google Play Services are required</string>
-    <string name="helpChatbot">Chatbot</string>
-    <string name="helpFAQ">FAQ</string>
     <string name="inboxFolder">Inbox</string>
     <string name="loadingText">Loading…</string>
     <string name="menuDrawerAdvancedActions">Advanced actions</string>

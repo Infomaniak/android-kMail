@@ -51,6 +51,10 @@
     <string name="addUnknownRecipientTitle">Ajoutez un destinataire</string>
     <string name="appSecurityDescription">Protégez l’accès à votre application en activant le verrouillage de votre téléphone.</string>
     <string name="archiveFolder">Archive</string>
+    <string name="attachAddressDescription">Vous possédez déjà une adresse mail Infomaniak, connectez-vous dès maintenant.</string>
+    <string name="attachAddressInputHint">Adresse mail à ajouter</string>
+    <string name="attachAddressPasswordInputHint">Mot de passe de l’adresse mail</string>
+    <string name="attachAddressTitle">Ajoutez une adresse mail</string>
     <string name="attachmentActionCamera">Appareil photo</string>
     <string name="attachmentActionFile">Joindre un fichier</string>
     <string name="attachmentActionPhotoLibrary">Envoyer une photo depuis la photothèque</string>
@@ -69,6 +73,7 @@
     <string name="buttonAccountSwitch">Changer de compte</string>
     <string name="buttonAddAccount">Ajouter un compte</string>
     <string name="buttonAddEmailAddress">Ajouter une adresse mail</string>
+    <string name="buttonAttachEmailAddress">Ajouter l’adresse mail</string>
     <string name="buttonAttachment">Ajouter une pièce jointe</string>
     <string name="buttonAvailableSoon">Bientôt disponible</string>
     <string name="buttonBold">Gras</string>
@@ -132,6 +137,7 @@
     <string name="contentDescriptionButtonNext">Suivant</string>
     <string name="contentDescriptionButtonOpenSystemSettings">Ouvrir les paramètres de notification du système</string>
     <string name="contentDescriptionButtonSettings">Paramètres</string>
+    <string name="contentDescriptionButtonShowPassword">Voir le mot de passe</string>
     <string name="contentDescriptionContactAlreadyUsed">Contact déjà utilisé comme destinataire</string>
     <string name="contentDescriptionDownloadIndicator">Téléchargement</string>
     <string name="contentDescriptionIconAttachments">Contient des pièces jointes</string>
@@ -162,15 +168,15 @@
     <string name="emptyStateSearchTitle">Aucun résultat</string>
     <string name="emptyStateTrashDescription">Déplacez les messages dans la corbeille. Ils seront supprimés définitivement au bout de 30 jours.</string>
     <string name="emptyStateTrashTitle">La corbeille est vide</string>
+    <string name="errorAttachAddressInput">Seules les adresses mails Infomaniak sont supportées</string>
     <string name="errorLoginDescription">La connexion a échoué.</string>
     <string name="errorLoginTitle">Erreur de connexion</string>
     <string name="errorNewFolderAlreadyExists">Un dossier de ce nom existe déjà</string>
     <string name="errorNewFolderNameTooLong">Le nom du dossier ne doit pas dépasser 255 caractères</string>
+    <string name="failToOpenDraft">Échec de l’ouverture du brouillon</string>
     <string name="favoritesFolder">Favoris</string>
     <string name="fromTitle">De :</string>
     <string name="googlePlayServicesAreRequired">Les Google Play Services sont requis</string>
-    <string name="helpChatbot">Chatbot</string>
-    <string name="helpFAQ">FAQ</string>
     <string name="inboxFolder">Boîte de réception</string>
     <string name="loadingText">Chargement…</string>
     <string name="menuDrawerAdvancedActions">Actions avancées</string>

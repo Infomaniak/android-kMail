@@ -32,9 +32,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.webkit.WebView
-import android.widget.ArrayAdapter
-import android.widget.ListPopupWindow
-import android.widget.PopupWindow
+import android.widget.*
 import androidx.core.net.MailTo
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -93,7 +91,6 @@ class NewMessageFragment : Fragment() {
         initUi()
         initDraftAndViewModel()
 
-        focusCorrectView()
         setOnFocusChangedListeners()
 
         doAfterSubjectChange()
@@ -140,21 +137,27 @@ class NewMessageFragment : Fragment() {
     private fun initDraftAndViewModel() {
         newMessageViewModel.initDraftAndViewModel(newMessageActivityArgs).observe(viewLifecycleOwner) { isSuccess ->
             if (isSuccess) {
+                showKeyboardInCorrectView()
                 populateViewModelWithExternalMailData()
                 populateUiWithViewModel()
             } else {
+                displayOpeningDraftErrorToast()
                 requireActivity().finish()
             }
         }
     }
 
-    private fun focusCorrectView() = with(binding) {
+    private fun showKeyboardInCorrectView() = with(binding) {
         when (newMessageActivityArgs.draftMode) {
             DraftMode.REPLY,
-            DraftMode.REPLY_ALL -> bodyText.requestFocus()
+            DraftMode.REPLY_ALL -> bodyText.showKeyboard()
             DraftMode.NEW_MAIL,
-            DraftMode.FORWARD -> toField.requestFocus()
+            DraftMode.FORWARD -> toField.showKeyboardInTextInput()
         }
+    }
+
+    private fun displayOpeningDraftErrorToast() {
+        Toast.makeText(requireActivity(), getString(R.string.failToOpenDraft), Toast.LENGTH_SHORT).show()
     }
 
     private fun setOnFocusChangedListeners() = with(binding) {

@@ -101,13 +101,11 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
                 draft = if (draftExists) {
                     getLatestDraft(draftLocalUuid, realm = this)
                         ?: fetchDraft(draftResource!!, messageUid!!)
-                        ?: run {
-                            // TODO: Add Loader to block UI while waiting for `fetchDraft` API call to finish
-                            return@writeBlocking false
-                        }
+                        ?: run { return@writeBlocking false }
                 } else {
                     isNewMessage = true
                     createDraft(draftMode, previousMessageUid, recipient)
+                        ?: run { return@writeBlocking false }
                 }
 
                 if (draft.identityId.isNullOrBlank()) draft.addMissingSignatureData(realm = this)
@@ -139,7 +137,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    private fun MutableRealm.createDraft(draftMode: DraftMode, previousMessageUid: String?, recipient: Recipient?): Draft {
+    private fun MutableRealm.createDraft(draftMode: DraftMode, previousMessageUid: String?, recipient: Recipient?): Draft? {
         return Draft().apply {
             initLocalValues(priority = Priority.NORMAL, mimeType = ClipDescription.MIMETYPE_TEXT_HTML)
             initSignature(realm = this@createDraft)
@@ -148,7 +146,10 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
                 DraftMode.REPLY, DraftMode.REPLY_ALL, DraftMode.FORWARD -> {
                     previousMessageUid
                         ?.let { uid -> MessageController.getMessage(uid, realm = this@createDraft) }
-                        ?.let { message -> setPreviousMessage(draftMode, message, context, realm = this@createDraft) }
+                        ?.let { message ->
+                            val isSuccess = setPreviousMessage(draftMode, message, context, realm = this@createDraft)
+                            if (!isSuccess) return null
+                        }
                 }
             }
         }
