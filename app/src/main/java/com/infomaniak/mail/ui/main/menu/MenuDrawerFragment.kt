@@ -29,7 +29,6 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.bugtracker.BugTrackerActivity
 import com.infomaniak.lib.bugtracker.BugTrackerActivityArgs
@@ -131,9 +130,8 @@ class MenuDrawerFragment : MenuFoldersFragment() {
 
         help.setOnClickListener {
             trackMenuDrawerEvent("help")
-            notYetImplemented()
+            context.openUrl(BuildConfig.CHATBOT_URL)
             closeDrawer()
-            menuDrawerSafeNavigate(R.id.helpFragment)
         }
 
         advancedActions.setOnClickListener {
@@ -169,12 +167,6 @@ class MenuDrawerFragment : MenuFoldersFragment() {
     @SuppressLint("SetTextI18n")
     private fun displayVersion() {
         binding.appVersionName.text = "kMail Android version ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
-    }
-
-    private fun menuDrawerSafeNavigate(destinationResId: Int) {
-        if (canNavigate.compareAndSet(true, false)) {
-            findNavController().navigate(destinationResId)
-        }
     }
 
     private fun observeCurrentMailbox() {

@@ -39,9 +39,6 @@
             android:id="@+id/action_threadListFragment_to_accountFragment"
             app:destination="@id/accountFragment" />
         <action
-            android:id="@+id/action_threadListFragment_to_helpFragment"
-            app:destination="@id/helpFragment" />
-        <action
             android:id="@+id/action_threadListFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
         <action
@@ -255,12 +252,6 @@
             app:argType="string"
             app:nullable="true" />
     </fragment>
-
-    <fragment
-        android:id="@+id/helpFragment"
-        android:name="com.infomaniak.mail.ui.main.menu.HelpFragment"
-        android:label="HelpFragment"
-        tools:layout="@layout/fragment_help" />
 
     <fragment
         android:id="@+id/accountFragment"
