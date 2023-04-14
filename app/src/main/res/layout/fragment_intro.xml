@@ -122,8 +122,9 @@
         app:layout_constraintEnd_toStartOf="@id/end"
         app:layout_constraintStart_toEndOf="@id/start"
         app:layout_constraintTop_toBottomOf="@id/title"
+        app:layout_constraintVertical_bias="0.25"
         app:layout_constraintWidth_max="300dp"
-        app:layout_constraintWidth_percent="0.6"
+        app:layout_constraintWidth_percent="0.8"
         tools:visibility="visible">
 
         <com.google.android.material.tabs.TabLayout
