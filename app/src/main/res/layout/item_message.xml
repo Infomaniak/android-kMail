@@ -409,6 +409,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/marginStandardMedium"
             android:layout_marginBottom="@dimen/marginStandardVerySmall"
+            android:maxWidth="900dp"
             android:textSize="12sp" />
 
         <com.infomaniak.lib.core.views.LoaderTextView
@@ -416,6 +417,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/marginStandardMedium"
             android:layout_marginBottom="@dimen/marginStandardVerySmall"
+            android:maxWidth="900dp"
             android:textSize="12sp" />
 
         <com.infomaniak.lib.core.views.LoaderTextView
@@ -423,6 +425,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/marginStandardMedium"
             android:layout_marginBottom="@dimen/marginStandardVerySmall"
+            android:maxWidth="900dp"
             android:textSize="12sp" />
 
         <com.infomaniak.lib.core.views.LoaderTextView
@@ -430,6 +433,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/marginStandardMedium"
             android:layout_marginBottom="@dimen/marginStandardVerySmall"
+            android:maxWidth="900dp"
             android:textSize="12sp" />
 
         <com.infomaniak.lib.core.views.LoaderTextView
@@ -437,6 +441,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/marginStandardMedium"
             android:layout_marginBottom="@dimen/marginStandardVerySmall"
+            android:maxWidth="200dp"
             android:textSize="12sp" />
     </LinearLayout>
 

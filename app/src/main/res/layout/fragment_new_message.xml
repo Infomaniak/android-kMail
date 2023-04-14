@@ -88,6 +88,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/alternativeMargin"
+                        android:maxWidth="150dp"
                         android:textSize="14sp"
                         tools:visibility="gone" />
                 </FrameLayout>
@@ -216,6 +217,8 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/alternativeMargin"
+                    android:layout_marginEnd="@dimen/marginLarge"
+                    android:maxWidth="400dp"
                     android:textSize="16sp"
                     app:layout_constraintBottom_toBottomOf="@id/subjectTextFieldGuide"
                     app:layout_constraintEnd_toEndOf="@id/divider5"
@@ -311,29 +314,34 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="@dimen/marginStandardVerySmall"
+                        android:maxWidth="900dp"
                         android:textSize="16sp" />
 
                     <com.infomaniak.lib.core.views.LoaderTextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="@dimen/marginStandardVerySmall"
+                        android:maxWidth="900dp"
                         android:textSize="16sp" />
 
                     <com.infomaniak.lib.core.views.LoaderTextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="@dimen/marginStandardVerySmall"
+                        android:maxWidth="900dp"
                         android:textSize="16sp" />
 
                     <com.infomaniak.lib.core.views.LoaderTextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="@dimen/marginStandardVerySmall"
+                        android:maxWidth="900dp"
                         android:textSize="16sp" />
 
                     <com.infomaniak.lib.core.views.LoaderTextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:maxWidth="200dp"
                         android:textSize="16sp" />
                 </LinearLayout>
 
