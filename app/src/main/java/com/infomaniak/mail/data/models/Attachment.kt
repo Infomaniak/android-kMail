@@ -73,7 +73,7 @@ class Attachment : EmbeddedRealmObject {
         this.uploadLocalUri = uri
     }
 
-    fun getFileTypeFromExtension(): AttachmentType = when (safeMimeType) {
+    fun getFileTypeFromMimeType(): AttachmentType = when (safeMimeType) {
         in Regex("application/(zip|rar|x-tar|.*compressed|.*archive)") -> AttachmentType.ARCHIVE
         in Regex("audio/") -> AttachmentType.AUDIO
         in Regex("image/") -> AttachmentType.IMAGE
