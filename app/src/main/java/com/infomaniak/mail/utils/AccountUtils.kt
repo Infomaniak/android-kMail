@@ -79,12 +79,7 @@ object AccountUtils : CredentialManager() {
     var currentMailboxEmail: String? = null
 
     suspend fun requestCurrentUser(): User? {
-        currentUser = getUserById(currentUserId)
-        if (currentUser == null) {
-            currentUser = userDatabase.userDao().getFirst()
-        }
-
-        return currentUser
+        return (getUserById(currentUserId) ?: userDatabase.userDao().getFirst()).also { currentUser = it }
     }
 
     suspend fun addUser(user: User) {
