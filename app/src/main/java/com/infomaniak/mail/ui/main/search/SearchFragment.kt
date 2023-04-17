@@ -105,7 +105,17 @@ class SearchFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         searchViewModel.init(navigationArgs.dummyFolderId)
-        setUi()
+
+        binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
+        binding.swipeRefreshLayout.setOnRefreshListener { searchViewModel.refreshSearch() }
+
+        setFoldersDropdownUi()
+        setAttachmentsUi()
+        setMutuallyExclusiveChipGroupUi()
+        setSearchBarUi()
+        setMessagesUi()
+        setRecentSearchesUi()
+
         observeVisibilityModeUpdates()
         observeSearchResults()
         observeHistory()
@@ -121,130 +131,13 @@ class SearchFragment : Fragment() {
         super.onStop()
     }
 
-    private fun updateUi(mode: VisibilityMode) = with(binding) {
-
-        fun displayRecentSearches() {
-            showLoadingTimer.cancel()
-            swipeRefreshLayout.apply {
-                isRefreshing = false
-                isEnabled = false
-            }
-
-            recentSearchesLayout.isVisible = true
-            recentSearchesRecyclerView.scrollToPosition(0)
-            mailRecyclerView.isGone = true
-            noResultsEmptyState.isGone = true
-        }
-
-        fun displayLoadingView() {
-            showLoadingTimer.start()
-        }
-
-        fun displaySearchResult(mode: VisibilityMode) {
-            showLoadingTimer.cancel()
-            swipeRefreshLayout.apply {
-                isRefreshing = false
-                isEnabled = true
-            }
-
-            recentSearchesLayout.isGone = true
-            val thereAreResults = mode == VisibilityMode.RESULTS
-            mailRecyclerView.isVisible = thereAreResults
-            noResultsEmptyState.isGone = thereAreResults
-        }
-
-        when (mode) {
-            VisibilityMode.RECENT_SEARCHES -> displayRecentSearches()
-            VisibilityMode.LOADING -> displayLoadingView()
-            VisibilityMode.NO_RESULTS, VisibilityMode.RESULTS -> displaySearchResult(mode)
-        }
-    }
-
-    private fun observeVisibilityModeUpdates() {
-        searchViewModel.visibilityMode.observe(viewLifecycleOwner, ::updateUi)
-    }
-
-    private fun setUi() = with(binding) {
-        toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
-        swipeRefreshLayout.setOnRefreshListener { searchViewModel.refreshSearch() }
-
+    private fun setFoldersDropdownUi() {
         val popupMenu = createPopupMenu()
-
-        folderDropDown.setOnClickListener { popupMenu.show() }
+        binding.folderDropDown.setOnClickListener { popupMenu.show() }
         updateFolderDropDownUi(
             folder = searchViewModel.selectedFolder,
             title = requireContext().getLocalizedNameOrAllFolders(searchViewModel.selectedFolder),
         )
-
-        attachments.setOnCheckedChangeListener { _, _ ->
-            if (searchViewModel.previousAttachments != null) {
-                searchViewModel.previousAttachments = null
-                return@setOnCheckedChangeListener
-            }
-
-            searchViewModel.toggleFilter(ThreadFilter.ATTACHMENTS)
-        }
-
-        mutuallyExclusiveChipGroup.setOnCheckedStateChangeListener { chipGroup, _ ->
-            if (searchViewModel.previousMutuallyExclusiveChips != null) {
-                searchViewModel.previousMutuallyExclusiveChips = null
-                return@setOnCheckedStateChangeListener
-            }
-
-            when (chipGroup.checkedChipId) {
-                R.id.read -> searchViewModel.toggleFilter(ThreadFilter.SEEN)
-                R.id.unread -> searchViewModel.toggleFilter(ThreadFilter.UNSEEN)
-                R.id.favorites -> searchViewModel.toggleFilter(ThreadFilter.STARRED)
-                else -> searchViewModel.unselectMutuallyExclusiveFilters()
-            }
-        }
-
-        with(searchBar) {
-            searchInputLayout.setEndIconOnClickListener {
-                searchTextInput.text?.clear()
-                trackSearchEvent("deleteSearch")
-            }
-            searchTextInput.apply {
-                showKeyboard()
-
-                doOnTextChanged { text, _, _, _ ->
-                    if (searchViewModel.previousSearch != null) {
-                        searchViewModel.previousSearch = null
-                        return@doOnTextChanged
-                    }
-                    searchViewModel.searchQuery(text.toString())
-                }
-
-                setOnEditorActionListener { _, actionId, _ ->
-                    if (actionId == EditorInfo.IME_ACTION_SEARCH && !text.isNullOrBlank()) {
-                        trackSearchEvent("validateSearch")
-                        searchViewModel.searchQuery(text.toString(), saveInHistory = true)
-                    }
-                    true // Keep keyboard open
-                }
-            }
-        }
-
-        mailRecyclerView.apply {
-            adapter = threadListAdapter.apply {
-                stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
-                onThreadClicked = { thread ->
-                    with(searchViewModel) { if (!isLengthTooShort(searchQuery)) history.value = searchQuery }
-                    navigateToThread(thread, mainViewModel)
-                }
-            }
-            disableDragDirection(DirectionFlag.DOWN)
-            disableDragDirection(DirectionFlag.LEFT)
-            disableDragDirection(DirectionFlag.RIGHT)
-            disableDragDirection(DirectionFlag.UP)
-            disableSwipeDirection(DirectionFlag.LEFT)
-            disableSwipeDirection(DirectionFlag.RIGHT)
-            addStickyDateDecoration(threadListAdapter, localSettings.threadDensity)
-            setPagination()
-        }
-
-        recentSearchesRecyclerView.adapter = recentSearchAdapter
-        updateHistoryEmptyStateVisibility(recentSearchAdapter.getSearchQueries().isNotEmpty())
     }
 
     private fun createPopupMenu(): ListPopupWindow {
@@ -288,6 +181,83 @@ class SearchFragment : Fragment() {
         }
     }
 
+    private fun setAttachmentsUi() = with(searchViewModel) {
+        binding.attachments.setOnCheckedChangeListener { _, _ ->
+            if (previousAttachments != null) {
+                previousAttachments = null
+                return@setOnCheckedChangeListener
+            }
+
+            toggleFilter(ThreadFilter.ATTACHMENTS)
+        }
+    }
+
+    private fun setMutuallyExclusiveChipGroupUi() = with(searchViewModel) {
+        binding.mutuallyExclusiveChipGroup.setOnCheckedStateChangeListener { chipGroup, _ ->
+            if (previousMutuallyExclusiveChips != null) {
+                previousMutuallyExclusiveChips = null
+                return@setOnCheckedStateChangeListener
+            }
+
+            when (chipGroup.checkedChipId) {
+                R.id.read -> toggleFilter(ThreadFilter.SEEN)
+                R.id.unread -> toggleFilter(ThreadFilter.UNSEEN)
+                R.id.favorites -> toggleFilter(ThreadFilter.STARRED)
+                else -> unselectMutuallyExclusiveFilters()
+            }
+        }
+    }
+
+    private fun setSearchBarUi() = with(binding.searchBar) {
+        searchInputLayout.setEndIconOnClickListener {
+            searchTextInput.text?.clear()
+            trackSearchEvent("deleteSearch")
+        }
+
+        searchTextInput.apply {
+            showKeyboard()
+
+            doOnTextChanged { text, _, _, _ ->
+                if (searchViewModel.previousSearch != null) {
+                    searchViewModel.previousSearch = null
+                    return@doOnTextChanged
+                }
+                searchViewModel.searchQuery(text.toString())
+            }
+
+            setOnEditorActionListener { _, actionId, _ ->
+                if (actionId == EditorInfo.IME_ACTION_SEARCH && !text.isNullOrBlank()) {
+                    trackSearchEvent("validateSearch")
+                    searchViewModel.searchQuery(text.toString(), saveInHistory = true)
+                }
+                true // Keep keyboard open
+            }
+        }
+    }
+
+    private fun setMessagesUi() {
+        binding.mailRecyclerView.apply {
+
+            adapter = threadListAdapter.apply {
+                stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+                onThreadClicked = { thread ->
+                    with(searchViewModel) { if (!isLengthTooShort(searchQuery)) history.value = searchQuery }
+                    navigateToThread(thread, mainViewModel)
+                }
+            }
+
+            disableDragDirection(DirectionFlag.DOWN)
+            disableDragDirection(DirectionFlag.LEFT)
+            disableDragDirection(DirectionFlag.RIGHT)
+            disableDragDirection(DirectionFlag.UP)
+            disableSwipeDirection(DirectionFlag.LEFT)
+            disableSwipeDirection(DirectionFlag.RIGHT)
+
+            addStickyDateDecoration(threadListAdapter, localSettings.threadDensity)
+            setPagination()
+        }
+    }
+
     private fun DragDropSwipeRecyclerView.setPagination() = with(binding) {
         scrollListener = object : OnListScrollListener {
             override fun onListScrollStateChanged(scrollState: ScrollState) = Unit
@@ -309,6 +279,54 @@ class SearchFragment : Fragment() {
                     }
                 }
             }
+        }
+    }
+
+    private fun setRecentSearchesUi() {
+        binding.recentSearchesRecyclerView.adapter = recentSearchAdapter
+        updateHistoryEmptyStateVisibility(recentSearchAdapter.getSearchQueries().isNotEmpty())
+    }
+
+    private fun observeVisibilityModeUpdates() {
+        searchViewModel.visibilityMode.observe(viewLifecycleOwner, ::updateUi)
+    }
+
+    private fun updateUi(mode: VisibilityMode) = with(binding) {
+
+        fun displayRecentSearches() {
+            showLoadingTimer.cancel()
+            swipeRefreshLayout.apply {
+                isRefreshing = false
+                isEnabled = false
+            }
+
+            recentSearchesLayout.isVisible = true
+            recentSearchesRecyclerView.scrollToPosition(0)
+            mailRecyclerView.isGone = true
+            noResultsEmptyState.isGone = true
+        }
+
+        fun displayLoadingView() {
+            showLoadingTimer.start()
+        }
+
+        fun displaySearchResult(mode: VisibilityMode) {
+            showLoadingTimer.cancel()
+            swipeRefreshLayout.apply {
+                isRefreshing = false
+                isEnabled = true
+            }
+
+            recentSearchesLayout.isGone = true
+            val thereAreResults = mode == VisibilityMode.RESULTS
+            mailRecyclerView.isVisible = thereAreResults
+            noResultsEmptyState.isGone = thereAreResults
+        }
+
+        when (mode) {
+            VisibilityMode.RECENT_SEARCHES -> displayRecentSearches()
+            VisibilityMode.LOADING -> displayLoadingView()
+            VisibilityMode.NO_RESULTS, VisibilityMode.RESULTS -> displaySearchResult(mode)
         }
     }
 
