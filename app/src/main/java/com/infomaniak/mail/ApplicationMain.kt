@@ -45,6 +45,7 @@ import com.infomaniak.mail.MatomoMail.addTrackingCallbackForDebugLog
 import com.infomaniak.mail.MatomoMail.buildTracker
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.ui.LaunchActivity
+import com.infomaniak.mail.ui.LaunchActivityArgs
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.NotificationUtils.initNotificationChannel
 import com.infomaniak.mail.utils.NotificationUtils.showGeneralNotification
@@ -128,7 +129,13 @@ class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycleObser
     }
 
     private fun configureAppReloading() {
-        AccountUtils.reloadApp = { startActivity(Intent(this, LaunchActivity::class.java).clearStack()) }
+        AccountUtils.reloadApp = {
+            Intent(this, LaunchActivity::class.java).apply {
+                clearStack()
+                putExtras(LaunchActivityArgs(shouldLock = false).toBundle())
+                startActivity(this)
+            }
+        }
     }
 
     private fun configureInfomaniakCore() {
