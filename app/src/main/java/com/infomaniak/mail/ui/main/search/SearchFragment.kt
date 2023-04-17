@@ -229,7 +229,7 @@ class SearchFragment : Fragment() {
             adapter = threadListAdapter.apply {
                 stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
                 onThreadClicked = { thread ->
-                    searchViewModel.history.value = searchViewModel.searchQuery
+                    with(searchViewModel) { if (!isLengthTooShort(searchQuery)) history.value = searchQuery }
                     navigateToThread(thread, mainViewModel)
                 }
             }
