@@ -65,25 +65,31 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
 
     private val isLastPage get() = resourceNext.isNullOrBlank()
 
-    val searchResults = observeSearchAndFilters().flatMapLatest { (queryData, filters, folder) ->
-        val (query, saveInHistory) = queryData
-        fetchThreads(
-            query = if (isLengthTooShort(query)) null else query,
-            saveInHistory,
-            filters,
-            folder,
-        )
-    }.asLiveData(coroutineContext)
+    val searchResults: LiveData<List<Thread>> = observeSearchAndFilters()
+        .flatMapLatest { (queryData, filters, folder) ->
+            val (query, saveInHistory) = queryData
+            fetchThreads(
+                query = if (isLengthTooShort(query)) null else query,
+                saveInHistory,
+                filters,
+                folder,
+            )
+        }
+        .asLiveData(coroutineContext)
+
+    private fun observeSearchAndFilters(): Flow<Triple<Pair<String, Boolean>, Set<ThreadFilter>, Folder?>> {
+        return combine(
+            _searchQuery.asFlow(),
+            _selectedFilters,
+            _selectedFolder,
+        ) { queryData, filters, folder ->
+            Triple(queryData, filters, folder)
+        }.debounce(SEARCH_DEBOUNCE_DURATION)
+    }
 
     var previousSearch: String? = null
     var previousMutuallyExclusiveChips: Int? = null
     var previousAttachments: Boolean? = null
-
-    private fun observeSearchAndFilters(): Flow<Triple<Pair<String, Boolean>, Set<ThreadFilter>, Folder?>> {
-        return combine(_searchQuery.asFlow(), _selectedFilters, _selectedFolder) { queryData, filters, folder ->
-            Triple(queryData, filters, folder)
-        }.debounce(SEARCH_DEBOUNCE_DURATION)
-    }
 
     fun init(dummyFolderId: String) {
         this.dummyFolderId = dummyFolderId
@@ -122,7 +128,7 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
 
     fun nextPage() {
         if (isLastPage) return
-        searchQuery(query = searchQuery, resetPagination = false)
+        searchQuery(searchQuery, resetPagination = false)
     }
 
     override fun onCleared() {
