@@ -32,6 +32,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
+import com.infomaniak.lib.applock.LockActivity
+import com.infomaniak.lib.applock.Utils.isKeyguardSecure
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.networking.LiveDataNetworkStatus
 import com.infomaniak.lib.stores.checkUpdateIsAvailable
@@ -52,6 +54,7 @@ import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.launch
+import java.util.Date
 
 class MainActivity : ThemedActivity() {
 
@@ -70,6 +73,8 @@ class MainActivity : ThemedActivity() {
     private val navController by lazy {
         (supportFragmentManager.findFragmentById(R.id.hostFragment) as NavHostFragment).navController
     }
+
+    private var lastAppClosing = Date()
 
     private val drawerListener = object : DrawerLayout.DrawerListener {
 
@@ -141,6 +146,11 @@ class MainActivity : ThemedActivity() {
     override fun onResume() {
         super.onResume()
         checkPlayServices()
+
+        if (isKeyguardSecure() && localSettings.isAppLocked) {
+            LockActivity.lockAfterTimeout(lastAppClosing, this, this::class.java, localSettings.accentColor.getPrimary(this))
+        }
+
         if (binding.drawerLayout.isOpen) colorSystemBarsWithMenuDrawer()
     }
 
@@ -169,6 +179,11 @@ class MainActivity : ThemedActivity() {
                 else -> popBack()
             }
         }
+    }
+
+    override fun onPause() {
+        lastAppClosing = Date()
+        super.onPause()
     }
 
     override fun onDestroy() {
