@@ -87,9 +87,9 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
         }.debounce(SEARCH_DEBOUNCE_DURATION)
     }
 
-    var previousSearch: String? = null
-    var previousMutuallyExclusiveChips: Int? = null
     var previousAttachments: Boolean? = null
+    var previousMutuallyExclusiveChips: Int? = null
+    var previousSearch: String? = null
 
     fun init(dummyFolderId: String) {
         this.dummyFolderId = dummyFolderId
