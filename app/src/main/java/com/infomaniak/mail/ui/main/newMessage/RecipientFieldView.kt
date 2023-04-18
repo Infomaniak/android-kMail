@@ -87,12 +87,14 @@ class RecipientFieldView @JvmOverloads constructor(
 
     private var canCollapseEverything = false
     private var otherFieldsAreAllEmpty = true
+
     private var isEverythingCollapsed = true
         set(value) {
             field = value
             isSelfCollapsed = field
             updateCollapsedEverythingUiState(value)
         }
+
     private var isSelfCollapsed = true
         set(value) {
             if (value == field) return
@@ -138,7 +140,7 @@ class RecipientFieldView @JvmOverloads constructor(
                 }
             )
 
-            isSelfCollapsed = canCollapseEverything
+            isSelfCollapsed = true
 
             setupChipsRecyclerView()
 
@@ -155,7 +157,7 @@ class RecipientFieldView @JvmOverloads constructor(
 
     fun hideLoader() = with(binding) {
         textInput.isVisible = true
-        chevron.isVisible = canCollapseEverything
+        chevron.isVisible = shouldDisplayChevron()
 
         loader.isGone = true
     }
@@ -355,13 +357,18 @@ class RecipientFieldView @JvmOverloads constructor(
         binding.textInput.setText("")
     }
 
-    fun initRecipients(initialRecipients: List<Recipient>) {
+    fun initRecipients(initialRecipients: List<Recipient>, otherFieldsAreAllEmpty: Boolean = true) {
+
         initialRecipients.forEach {
-            if (contactChipAdapter.addChip(it)) {
-                contactAdapter.addUsedContact(it.email)
-            }
+            if (contactChipAdapter.addChip(it)) contactAdapter.addUsedContact(it.email)
         }
+
         updateCollapsedChipValues(isSelfCollapsed)
+
+        if (canCollapseEverything && !otherFieldsAreAllEmpty) {
+            isEverythingCollapsed = false
+            isSelfCollapsed = true
+        }
     }
 
     fun collapse() {
@@ -381,9 +388,7 @@ class RecipientFieldView @JvmOverloads constructor(
         binding.chevron.isVisible = otherFieldsAreAllEmpty
     }
 
-    private fun shouldDisplayChevron(): Boolean {
-        return canCollapseEverything && otherFieldsAreAllEmpty
-    }
+    private fun shouldDisplayChevron(): Boolean = canCollapseEverything && otherFieldsAreAllEmpty
 
     private companion object {
         const val MAX_WIDTH_PERCENTAGE = 0.8
