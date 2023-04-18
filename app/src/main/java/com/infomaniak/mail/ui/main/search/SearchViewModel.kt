@@ -146,7 +146,7 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
         resourcePrevious = null
     }
 
-    private fun isLengthTooShort(query: String?) = query == null || query.length < MIN_SEARCH_QUERY
+    fun isLengthTooShort(query: String?) = query == null || query.length < MIN_SEARCH_QUERY
 
     private fun fetchThreads(
         query: String?,
