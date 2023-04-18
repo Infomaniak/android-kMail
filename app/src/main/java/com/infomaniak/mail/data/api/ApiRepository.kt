@@ -92,6 +92,10 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.mailbox(), GET, okHttpClient = okHttpClient ?: HttpClient.okHttpClient)
     }
 
+    fun addNewMailbox(mailAddress: String, password: String): ApiResponse<Unit> {
+        return callApi(ApiRoutes.addNewMailbox(), POST, mapOf("mail" to mailAddress, "password" to password))
+	}
+
     fun getPermissions(mailboxLinkId: Int, mailboxHostingId: Int): ApiResponse<MailboxPermissions> {
         return callApi(ApiRoutes.permissions(mailboxLinkId, mailboxHostingId), GET)
     }

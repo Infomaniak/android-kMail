@@ -42,6 +42,8 @@ object ApiRoutes {
 
     fun signatures(mailboxHostingId: Int, mailboxName: String) = "${apiMailbox(mailboxHostingId, mailboxName)}/signatures"
 
+    fun addNewMailbox() = "$MAIL_API/api/securedProxy/profile/workspace/mailbox"
+
     fun backups(mailboxHostingId: Int, mailboxName: String) = "${apiMailbox(mailboxHostingId, mailboxName)}/backups"
 
     fun folders(mailboxUuid: String) = "$MAIL_API/api/mail/$mailboxUuid/folder"
