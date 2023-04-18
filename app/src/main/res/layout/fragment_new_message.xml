@@ -60,23 +60,38 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/fromMailAddress"
-                    style="@style/TextButton"
+                <FrameLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/marginStandardMedium"
-                    android:layout_weight="1"
-                    android:clickable="false"
-                    android:focusable="false"
-                    android:gravity="center_vertical"
-                    android:textColor="@color/primaryTextColor"
                     app:layout_constraintBottom_toBottomOf="@id/fromPrefix"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0"
                     app:layout_constraintStart_toEndOf="@id/fromPrefix"
-                    app:layout_constraintTop_toTopOf="@id/fromPrefix"
-                    tools:text="myriam.rais@ik.me" />
+                    app:layout_constraintTop_toTopOf="@id/fromPrefix">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/fromMailAddress"
+                        style="@style/TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:focusable="false"
+                        android:gravity="center_vertical"
+                        android:textColor="@color/primaryTextColor"
+                        android:visibility="gone"
+                        tools:text="myriam.rais@ik.me"
+                        tools:visibility="visible" />
+
+                    <com.infomaniak.lib.core.views.LoaderTextView
+                        android:id="@+id/fromLoader"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/alternativeMargin"
+                        android:maxWidth="150dp"
+                        android:textSize="14sp"
+                        tools:visibility="gone" />
+                </FrameLayout>
 
                 <com.google.android.material.divider.MaterialDivider
                     android:id="@+id/divider1"
@@ -191,9 +206,25 @@
                     android:imeOptions="actionNext"
                     android:inputType="textMultiLine|textEmailSubject|textCapSentences"
                     android:maxLines="@null"
+                    android:visibility="gone"
                     app:layout_constraintEnd_toEndOf="@id/divider5"
                     app:layout_constraintStart_toEndOf="@id/subjectPrefix"
-                    app:layout_constraintTop_toTopOf="@id/subjectTextFieldGuide" />
+                    app:layout_constraintTop_toTopOf="@id/subjectTextFieldGuide"
+                    tools:visibility="visible" />
+
+                <com.infomaniak.lib.core.views.LoaderTextView
+                    android:id="@+id/subjectLoader"
+                    style="@style/EmailAddressTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/alternativeMargin"
+                    android:layout_marginEnd="@dimen/marginLarge"
+                    android:maxWidth="400dp"
+                    app:layout_constraintBottom_toBottomOf="@id/subjectTextFieldGuide"
+                    app:layout_constraintEnd_toEndOf="@id/divider5"
+                    app:layout_constraintStart_toEndOf="@id/subjectPrefix"
+                    app:layout_constraintTop_toTopOf="@id/subjectTextFieldGuide"
+                    tools:visibility="gone" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/subjectTextFieldGuide"
@@ -205,6 +236,13 @@
                     app:layout_constraintTop_toTopOf="parent"
                     tools:visibility="visible" />
 
+                <androidx.constraintlayout.widget.Barrier
+                    android:id="@+id/subjectBarrier"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:barrierDirection="bottom"
+                    app:constraint_referenced_ids="subjectTextField,subjectTextFieldGuide" />
+
                 <com.google.android.material.divider.MaterialDivider
                     android:id="@+id/divider5"
                     android:layout_width="0dp"
@@ -214,7 +252,7 @@
                     app:dividerColor="@color/separatorColor"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/subjectTextField" />
+                    app:layout_constraintTop_toBottomOf="@id/subjectBarrier" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/attachmentsRecyclerView"
@@ -254,9 +292,58 @@
                         android:gravity="top"
                         android:hint="@string/newMessagePlaceholderTitle"
                         android:inputType="textMultiLine|textCapSentences"
-                        android:nextFocusUp="@id/subjectTextField" />
+                        android:nextFocusUp="@id/subjectTextField"
+                        android:visibility="gone"
+                        tools:visibility="visible" />
 
                 </com.google.android.material.textfield.TextInputLayout>
+
+                <LinearLayout
+                    android:id="@+id/bodyLoader"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                    android:layout_marginTop="@dimen/marginStandard"
+                    android:orientation="vertical"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/attachmentsRecyclerView"
+                    tools:visibility="gone">
+
+                    <com.infomaniak.lib.core.views.LoaderTextView
+                        style="@style/Body"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/marginStandardVerySmall"
+                        android:maxWidth="900dp" />
+
+                    <com.infomaniak.lib.core.views.LoaderTextView
+                        style="@style/Body"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/marginStandardVerySmall"
+                        android:maxWidth="900dp" />
+
+                    <com.infomaniak.lib.core.views.LoaderTextView
+                        style="@style/Body"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/marginStandardVerySmall"
+                        android:maxWidth="900dp" />
+
+                    <com.infomaniak.lib.core.views.LoaderTextView
+                        style="@style/Body"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/marginStandardVerySmall"
+                        android:maxWidth="900dp" />
+
+                    <com.infomaniak.lib.core.views.LoaderTextView
+                        style="@style/Body"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:maxWidth="200dp" />
+                </LinearLayout>
 
                 <WebView
                     android:id="@+id/signatureWebView"

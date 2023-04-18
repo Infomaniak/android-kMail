@@ -32,7 +32,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.webkit.WebView
-import android.widget.*
+import android.widget.ArrayAdapter
+import android.widget.ListPopupWindow
+import android.widget.PopupWindow
+import android.widget.Toast
 import androidx.core.net.MailTo
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -135,8 +138,10 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun initDraftAndViewModel() {
+
         newMessageViewModel.initDraftAndViewModel(newMessageActivityArgs).observe(viewLifecycleOwner) { isSuccess ->
             if (isSuccess) {
+                hideLoader()
                 showKeyboardInCorrectView()
                 populateViewModelWithExternalMailData()
                 populateUiWithViewModel()
@@ -145,6 +150,21 @@ class NewMessageFragment : Fragment() {
                 requireActivity().finish()
             }
         }
+    }
+
+    private fun hideLoader() = with(binding) {
+
+        fromMailAddress.isVisible = true
+        subjectTextField.isVisible = true
+        bodyText.isVisible = true
+
+        fromLoader.isGone = true
+        subjectLoader.isGone = true
+        bodyLoader.isGone = true
+
+        toField.hideLoader()
+        ccField.hideLoader()
+        bccField.hideLoader()
     }
 
     private fun showKeyboardInCorrectView() = with(binding) {

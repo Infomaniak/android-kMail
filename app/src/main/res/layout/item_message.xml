@@ -393,7 +393,7 @@
         app:layout_constraintStart_toEndOf="@id/attachmentsSizeText"
         app:layout_constraintTop_toTopOf="@id/attachmentsSizeText" />
 
-    <androidx.appcompat.widget.LinearLayoutCompat
+    <LinearLayout
         android:id="@+id/messageLoader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -405,40 +405,45 @@
         app:layout_constraintTop_toBottomOf="@id/attachmentsDownloadAllButton">
 
         <com.infomaniak.lib.core.views.LoaderTextView
+            style="@style/Label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/marginStandardMedium"
             android:layout_marginBottom="@dimen/marginStandardVerySmall"
-            android:textSize="12sp" />
+            android:maxWidth="900dp" />
 
         <com.infomaniak.lib.core.views.LoaderTextView
+            style="@style/Label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/marginStandardMedium"
             android:layout_marginBottom="@dimen/marginStandardVerySmall"
-            android:textSize="12sp" />
+            android:maxWidth="900dp" />
 
         <com.infomaniak.lib.core.views.LoaderTextView
+            style="@style/Label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/marginStandardMedium"
             android:layout_marginBottom="@dimen/marginStandardVerySmall"
-            android:textSize="12sp" />
+            android:maxWidth="900dp" />
 
         <com.infomaniak.lib.core.views.LoaderTextView
+            style="@style/Label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/marginStandardMedium"
             android:layout_marginBottom="@dimen/marginStandardVerySmall"
-            android:textSize="12sp" />
+            android:maxWidth="900dp" />
 
         <com.infomaniak.lib.core.views.LoaderTextView
+            style="@style/Label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/marginStandardMedium"
             android:layout_marginBottom="@dimen/marginStandardVerySmall"
-            android:textSize="12sp" />
-    </androidx.appcompat.widget.LinearLayoutCompat>
+            android:maxWidth="200dp" />
+    </LinearLayout>
 
     <FrameLayout
         android:id="@+id/webViewsFrameLayout"

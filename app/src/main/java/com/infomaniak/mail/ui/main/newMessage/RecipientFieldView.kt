@@ -138,7 +138,6 @@ class RecipientFieldView @JvmOverloads constructor(
                 }
             )
 
-            chevron.isVisible = canCollapseEverything
             isSelfCollapsed = canCollapseEverything
 
             setupChipsRecyclerView()
@@ -152,6 +151,13 @@ class RecipientFieldView @JvmOverloads constructor(
                 plusChip.isVisible = canCollapseEverything
             }
         }
+    }
+
+    fun hideLoader() = with(binding) {
+        textInput.isVisible = true
+        chevron.isVisible = canCollapseEverything
+
+        loader.isGone = true
     }
 
     fun showKeyboardInTextInput() {

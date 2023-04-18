@@ -68,10 +68,11 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
 
     // Boolean: For toggleable actions, `false` if the formatting has been removed and `true` if the formatting has been applied.
     val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
-    val importedAttachments = MutableLiveData<Pair<MutableList<Attachment>, ImportationResult>>()
-
+    val isInitSuccess = SingleLiveEvent<Boolean>()
     val shouldCloseActivity = SingleLiveEvent<Boolean?>()
+    val importedAttachments = MutableLiveData<Pair<MutableList<Attachment>, ImportationResult>>()
     val isSendingAllowed = MutableLiveData(false)
+
     val snackBarManager by lazy { SnackBarManager() }
     var shouldHandleDraftActionWhenLeaving = true
 
@@ -124,6 +125,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
             }
 
             emit(isSuccess)
+            isInitSuccess.postValue(isSuccess)
         }
     }
 
