@@ -76,7 +76,7 @@ object ApiRoutes {
     fun attachmentToForward(mailboxUuid: String) = "${draft(mailboxUuid)}/attachmentsToForward"
 
     fun search(mailboxUuid: String, folderId: String, filters: String): String {
-        return "${folder(mailboxUuid, folderId)}/message?offset=0&thread=on&$filters"
+        return "${folder(mailboxUuid, folderId)}/message?thread=on&offset=0&$filters"
     }
 
     fun reportPhishing(mailboxUuid: String, folderId: String, shortUid: String): String {
