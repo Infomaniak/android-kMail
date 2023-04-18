@@ -35,7 +35,7 @@ object ApiRoutes {
         return "$MAIL_API/api/securedProxy/1/mail_hostings/$mailboxHostingId/mailboxes/$mailboxName/signatures"
     }
 
-    fun mailbox() = "$MAIL_API/api/mailbox?with=unseen"
+    fun mailbox() = "$MAIL_API/api/mailbox"
 
     fun folders(mailboxUuid: String) = "$MAIL_API/api/mail/$mailboxUuid/folder"
 
