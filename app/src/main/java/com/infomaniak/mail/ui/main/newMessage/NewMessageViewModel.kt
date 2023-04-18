@@ -81,7 +81,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     private var isNewMessage = false
 
     val mergedContacts = liveData(coroutineContext) {
-        val list = MergedContactController.getMergedContacts(sorted = true)
+        val list = MergedContactController.getMergedContacts(sorted = true).copyFromRealm(UInt.MIN_VALUE)
         emit(list to arrangeMergedContacts(list))
     }
 
