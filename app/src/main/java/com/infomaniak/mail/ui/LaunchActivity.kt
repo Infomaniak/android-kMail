@@ -55,7 +55,7 @@ class LaunchActivity : AppCompatActivity() {
 
             when {
                 user == null -> loginUser()
-                isKeyguardSecure() && localSettings.isAppLocked -> startAppLockActivity()
+                navigationArgs?.shouldLock != false && isKeyguardSecure() && localSettings.isAppLocked -> startAppLockActivity()
                 else -> startApp()
             }
         }

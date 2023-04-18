@@ -45,6 +45,7 @@ import com.infomaniak.mail.MatomoMail.addTrackingCallbackForDebugLog
 import com.infomaniak.mail.MatomoMail.buildTracker
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.ui.LaunchActivity
+import com.infomaniak.mail.ui.LaunchActivityArgs
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.NotificationUtils.initNotificationChannel
 import com.infomaniak.mail.utils.NotificationUtils.showGeneralNotification
@@ -128,7 +129,12 @@ class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycleObser
     }
 
     private fun configureAppReloading() {
-        AccountUtils.reloadApp = { startActivity(Intent(this, LaunchActivity::class.java).clearStack()) }
+        AccountUtils.reloadApp = { startActivity(getLaunchIntent()) }
+    }
+
+    private fun getLaunchIntent() = Intent(this, LaunchActivity::class.java).apply {
+        putExtras(LaunchActivityArgs(shouldLock = false).toBundle())
+        clearStack()
     }
 
     private fun configureInfomaniakCore() {
@@ -145,7 +151,7 @@ class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycleObser
     }
 
     private val refreshTokenError: (User) -> Unit = { user ->
-        val openAppIntent = Intent(this, LaunchActivity::class.java).clearStack()
+        val openAppIntent = getLaunchIntent()
         val pendingIntent: PendingIntent = PendingIntent.getActivity(
             this, 0, openAppIntent,
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
