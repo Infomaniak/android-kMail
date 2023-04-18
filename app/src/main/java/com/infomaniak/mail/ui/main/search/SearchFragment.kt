@@ -104,11 +104,10 @@ class SearchFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         searchViewModel.init(navigationArgs.dummyFolderId)
 
-        binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
-        binding.swipeRefreshLayout.setOnRefreshListener { searchViewModel.refreshSearch() }
-
+        setupListeners()
         setFoldersDropdownUi()
         setAttachmentsUi()
         setMutuallyExclusiveChipGroupUi()
@@ -129,6 +128,11 @@ class SearchFragment : Fragment() {
         }
 
         super.onStop()
+    }
+
+    private fun setupListeners() = with(binding) {
+        toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
+        swipeRefreshLayout.setOnRefreshListener { searchViewModel.refreshSearch() }
     }
 
     private fun setFoldersDropdownUi() {
