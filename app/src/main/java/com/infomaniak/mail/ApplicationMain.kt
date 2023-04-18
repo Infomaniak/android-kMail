@@ -129,13 +129,12 @@ class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycleObser
     }
 
     private fun configureAppReloading() {
-        AccountUtils.reloadApp = {
-            Intent(this, LaunchActivity::class.java).apply {
-                clearStack()
-                putExtras(LaunchActivityArgs(shouldLock = false).toBundle())
-                startActivity(this)
-            }
-        }
+        AccountUtils.reloadApp = { startActivity(getLaunchIntent()) }
+    }
+
+    private fun getLaunchIntent() = Intent(this, LaunchActivity::class.java).apply {
+        putExtras(LaunchActivityArgs(shouldLock = false).toBundle())
+        clearStack()
     }
 
     private fun configureInfomaniakCore() {
@@ -152,10 +151,7 @@ class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycleObser
     }
 
     private val refreshTokenError: (User) -> Unit = { user ->
-        val openAppIntent = Intent(this, LaunchActivity::class.java).apply {
-            putExtras(LaunchActivityArgs(shouldLock = false).toBundle())
-            clearStack()
-        }
+        val openAppIntent = getLaunchIntent()
         val pendingIntent: PendingIntent = PendingIntent.getActivity(
             this, 0, openAppIntent,
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
