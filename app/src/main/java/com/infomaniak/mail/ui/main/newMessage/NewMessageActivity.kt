@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.newMessage
 
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.widget.Toast
@@ -31,11 +32,9 @@ import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.databinding.ActivityNewMessageBinding
+import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.ThemedActivity
-import com.infomaniak.mail.utils.createDescriptionDialog
-import com.infomaniak.mail.utils.getAttributeColor
-import com.infomaniak.mail.utils.observeNotNull
-import com.infomaniak.mail.utils.updateNavigationBarColor
+import com.infomaniak.mail.utils.*
 import com.google.android.material.R as RMaterial
 
 class NewMessageActivity : ThemedActivity() {
@@ -52,6 +51,12 @@ class NewMessageActivity : ThemedActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+
+        if (!isAuth()) {
+            finish()
+            return
+        }
+
         handleOnBackPressed()
 
         setupSnackBar()
@@ -60,6 +65,14 @@ class NewMessageActivity : ThemedActivity() {
 
         observeCloseActivity()
         observeInitSuccess()
+    }
+
+    private fun isAuth(): Boolean {
+        if (AccountUtils.currentUserId == -1) {
+            startActivity(Intent(this, LaunchActivity::class.java))
+            return false
+        }
+        return true
     }
 
     private fun handleOnBackPressed() = with(newMessageViewModel) {
