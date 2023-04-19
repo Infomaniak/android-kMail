@@ -174,6 +174,7 @@ class Message : RealmObject {
         date: RealmInstant,
         draftLocalUuid: String?,
     ) {
+        messageId = messageId?.sanitize()
         this.isFullyDownloaded = isFullyDownloaded
         this.messageIds = messageIds
         this.isSpam = isSpam
@@ -212,6 +213,8 @@ class Message : RealmObject {
         return to to cc
     }
 
+    private fun String.sanitize() = replace("'", "")
+
     fun initMessageIds() {
 
         // Encountered formats so far:
@@ -223,7 +226,10 @@ class Message : RealmObject {
         fun String.parseMessagesIds(): List<String> = this
             .removePrefix("<")
             .removeSuffix(">")
+            .sanitize()
             .split(">\\s*<|>?\\s+<?".toRegex())
+
+        messageId = messageId?.sanitize()
 
         messageIds = realmSetOf<String>().apply {
             messageId?.let { addAll(it.parseMessagesIds()) }

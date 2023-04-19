@@ -341,6 +341,9 @@ object MessageController {
         messages.forEach { message ->
             scope.ensureActive()
 
+            message.initMessageIds()
+            message.isSpam = folder.role == FolderRole.SPAM
+
             val existingMessage = folder.messages.firstOrNull { it == message }
             if (existingMessage == null) {
                 folder.messages.add(message)
@@ -348,9 +351,6 @@ object MessageController {
                 SentryDebug.sendAlreadyExistingMessage(folder, existingMessage, message)
                 return@forEach
             }
-
-            message.initMessageIds()
-            message.isSpam = folder.role == FolderRole.SPAM
 
             // TODO: Temporary Realm crash fix (`getThreadsQuery(messageIds: Set<String>)` is broken), put this back when it's fixed.
             // val existingThreads = ThreadController.getThreads(message.messageIds, realm = this).toList()
