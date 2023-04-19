@@ -62,7 +62,7 @@ object LocalStorageUtils {
             } ?: false
         }
 
-        return ApiRepository.downloadAttachment(resource).saveAttachmentTo(cacheFile)
+        return runCatching { ApiRepository.downloadAttachment(resource) }.getOrNull()?.saveAttachmentTo(cacheFile) ?: false
     }
 
     /**
