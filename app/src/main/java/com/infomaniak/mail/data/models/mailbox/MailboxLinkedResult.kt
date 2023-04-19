@@ -26,25 +26,4 @@ class MailboxLinkedResult(
     val mailboxId: Int,
     @SerialName("mail")
     val email: String,
-    @SerialName("mail_idn")
-    val emailIdn: String,
-    @SerialName("mailbox")
-    val mailboxName: String,
-    @SerialName("has_valid_password")
-    val hasValidPassword: Boolean,
-    @SerialName("technical_right")
-    val technicalRight: Boolean,
-    @SerialName("is_limited")
-    val isLimited: Boolean,
-    @SerialName("is_valid")
-    val isMailboxValid: Boolean,
-    @SerialName("is_primary")
-    val isPrimary: Boolean,
-    val permission: String,
-    val permissions: MailboxLinkedPermissions,
-    @SerialName("product_id")
-    val productId: Int,
-    @SerialName("ksuite_customer_name")
-    val kSuiteCustomerName: String?,
-    val type: Int,
 )

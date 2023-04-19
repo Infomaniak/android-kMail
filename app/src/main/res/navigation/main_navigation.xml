@@ -269,7 +269,7 @@
     <fragment
         android:id="@+id/attachMailboxFragment"
         android:name="com.infomaniak.mail.ui.main.user.AttachMailboxFragment"
-        android:label="attachMailboxFragment"
+        android:label="AttachMailboxFragment"
         tools:layout="@layout/fragment_attach_mailbox" />
 
     <fragment

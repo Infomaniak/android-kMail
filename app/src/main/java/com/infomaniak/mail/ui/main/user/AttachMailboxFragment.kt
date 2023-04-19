@@ -24,7 +24,6 @@ import android.view.ViewGroup
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.hideProgress
 import com.infomaniak.lib.core.utils.showProgress
@@ -37,7 +36,7 @@ import com.infomaniak.lib.core.R as RCore
 class AttachMailboxFragment : Fragment() {
 
     private lateinit var binding: FragmentAttachMailboxBinding
-    private val attachMailboxViewModel: AttachMailboxViewModel by viewModels()
+    private val accountViewModel: AccountViewModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentAttachMailboxBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -64,12 +63,14 @@ class AttachMailboxFragment : Fragment() {
     }
 
     private fun attachMailbox() = with(binding) {
-        attachMailboxViewModel.attachNewMailbox(
+        accountViewModel.attachNewMailbox(
             mailInput.text?.trim().toString(),
             passwordInput.text?.trim().toString(),
-        ).observe(viewLifecycleOwner) { apiError ->
-            apiError?.let {
-                if (it.code == ErrorCode.INVALID_CREDENTIALS) {
+        ).observe(viewLifecycleOwner) { apiResponse ->
+            if (apiResponse.isSuccess()) {
+                apiResponse.data?.mailboxId?.let(accountViewModel::switchToNewMailbox)
+            } else {
+                if (apiResponse.error?.code == ErrorCode.INVALID_CREDENTIALS) {
                     mailInputLayout.error = getString(R.string.errorAttachAddressInput)
                     passwordInputLayout.error = getString(R.string.errorInvalidCredentials)
                 } else {
@@ -79,7 +80,7 @@ class AttachMailboxFragment : Fragment() {
                 }
                 passwordInput.text = null
                 attachMailboxButton.hideProgress(R.string.buttonAttachEmailAddress)
-            } ?: findNavController().popBackStack()
+            }
         }
     }
 }

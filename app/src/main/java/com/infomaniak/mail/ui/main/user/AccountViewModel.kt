@@ -18,15 +18,16 @@
 package com.infomaniak.mail.ui.main.user
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
+import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
+import com.infomaniak.mail.data.models.mailbox.MailboxLinkedResult
 import com.infomaniak.mail.utils.AccountUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class AccountViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -40,5 +41,14 @@ class AccountViewModel(application: Application) : AndroidViewModel(application)
         val userId = AccountUtils.currentUserId
         val mailboxes = ApiRepository.getMailboxes(AccountUtils.getHttpClient(userId)).data ?: return@launch
         MailboxController.updateMailboxes(getApplication(), mailboxes, userId)
+    }
+
+    fun attachNewMailbox(address: String, password: String): LiveData<ApiResponse<MailboxLinkedResult>> {
+        return liveData(Dispatchers.IO) { emit(ApiRepository.addNewMailbox(address, password)) }
+    }
+
+    fun switchToNewMailbox(newMailboxId: Int) = runBlocking {
+        updateMailboxes()
+        AccountUtils.switchToMailbox(newMailboxId)
     }
 }
