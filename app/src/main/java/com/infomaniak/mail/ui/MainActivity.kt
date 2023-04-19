@@ -109,7 +109,6 @@ class MainActivity : ThemedActivity() {
         setContentView(binding.root)
         handleOnBackPressed()
 
-        // TODO: Does the NewMessageActivity still crash when there is too much recipients?
         observeNetworkStatus()
         binding.drawerLayout.addDrawerListener(drawerListener)
         registerFirebaseBroadcastReceiver.initFirebaseBroadcastReceiver(this, mainViewModel)

@@ -280,7 +280,7 @@ inline fun <reified T : RealmObject> Realm.update(items: List<RealmObject>) {
     }
 }
 
-// TODO: There is currently no way to insert multiple objects in one call (https://github.com/realm/realm-kotlin/issues/938)
+// There is currently no way to insert multiple objects in one call (https://github.com/realm/realm-kotlin/issues/938)
 fun MutableRealm.copyListToRealm(items: List<RealmObject>, alsoCopyManagedItems: Boolean = true) {
     items.forEach { if (alsoCopyManagedItems || !it.isManaged()) copyToRealm(it, UpdatePolicy.ALL) }
 }
