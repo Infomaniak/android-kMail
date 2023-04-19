@@ -51,6 +51,7 @@ import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.NotificationUtils.cancelNotification
 import com.infomaniak.mail.utils.SharedViewModelUtils.refreshFolders
 import com.infomaniak.mail.workers.DraftsActionsWorker
+import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import com.infomaniak.lib.core.R as RCore
@@ -298,7 +299,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun observeMergedContactsLive() = viewModelScope.launch(Dispatchers.IO) {
         MergedContactController.getMergedContactsAsync().collect { contacts ->
-            mergedContacts.postValue(arrangeMergedContacts(contacts.list))
+            mergedContacts.postValue(arrangeMergedContacts(contacts.list.copyFromRealm()))
         }
     }
 
