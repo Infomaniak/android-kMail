@@ -53,7 +53,6 @@ import com.infomaniak.mail.utils.updateNavigationBarColor
 import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import io.sentry.SentryLevel
-import io.sentry.android.navigation.SentryNavigationListener
 import kotlinx.coroutines.launch
 import java.util.Date
 
@@ -105,8 +104,6 @@ class MainActivity : ThemedActivity() {
         }
     }
 
-    private val sentryNavigationListener = SentryNavigationListener()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -154,8 +151,6 @@ class MainActivity : ThemedActivity() {
         }
 
         if (binding.drawerLayout.isOpen) colorSystemBarsWithMenuDrawer()
-
-        navController.addOnDestinationChangedListener(sentryNavigationListener)
     }
 
     private fun handleOnBackPressed() = with(binding) {
@@ -187,7 +182,6 @@ class MainActivity : ThemedActivity() {
 
     override fun onPause() {
         lastAppClosing = Date()
-        navController.removeOnDestinationChangedListener(sentryNavigationListener)
         super.onPause()
     }
 
@@ -222,7 +216,9 @@ class MainActivity : ThemedActivity() {
     }
 
     private fun setupNavController() {
-        navController.addOnDestinationChangedListener { _, destination, _ -> onDestinationChanged(destination) }
+        navController.addOnDestinationChangedListener { _, destination, arguments ->
+            onDestinationChanged(destination, arguments)
+        }
     }
 
     private fun setupMenuDrawerCallbacks() = with(binding) {
@@ -235,9 +231,9 @@ class MainActivity : ThemedActivity() {
         }
     }
 
-    private fun onDestinationChanged(destination: NavDestination) {
+    private fun onDestinationChanged(destination: NavDestination, arguments: Bundle?) {
 
-        SentryDebug.addNavigationBreadcrumb(destination)
+        SentryDebug.addNavigationBreadcrumb(destination, arguments)
 
         setDrawerLockMode(destination.id == R.id.threadListFragment)
 
