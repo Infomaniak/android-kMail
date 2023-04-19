@@ -29,7 +29,7 @@ interface Correspondent : Parcelable {
 
     val initials: String
 
-    fun isMe(): Boolean = AccountUtils.currentMailboxEmail == this.email
+    fun isMe(): Boolean = AccountUtils.currentMailboxEmail == email
 
     fun shouldDisplayUserAvatar(): Boolean = isMe() && email == AccountUtils.currentUser?.email
 
