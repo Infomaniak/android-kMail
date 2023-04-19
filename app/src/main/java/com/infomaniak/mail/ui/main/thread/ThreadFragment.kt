@@ -59,7 +59,9 @@ import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDial
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.math.absoluteValue
 import kotlin.math.min
+import kotlin.math.roundToInt
 import com.google.android.material.R as RMaterial
 
 class ThreadFragment : Fragment() {
@@ -116,12 +118,16 @@ class ThreadFragment : Fragment() {
 
         val defaultTextColor = context.getColor(R.color.primaryTextColor)
         appBar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
-            val total = appBarLayout.height * COLLAPSE_TITLE_THRESHOLD
-            val removed = appBarLayout.height - total
-            val progress = (((-verticalOffset.toFloat()) - removed).coerceAtLeast(0.0) / total).toFloat() // Between 0 and 1
-            val opacity = (progress * 255).toInt()
 
+            val subjectHeight = appBarLayout.height.toDouble()
+            val impactingHeight = subjectHeight * COLLAPSE_TITLE_THRESHOLD
+            val nonImpactingHeight = subjectHeight - impactingHeight
+
+            val absoluteProgress = verticalOffset.absoluteValue.toDouble() - nonImpactingHeight
+            val relativeProgress = (absoluteProgress / impactingHeight).coerceIn(0.0, 1.0) // Between 0 and 1
+            val opacity = (relativeProgress * 255.0).roundToInt()
             val textColor = ColorUtils.setAlphaComponent(defaultTextColor, opacity)
+
             toolbarSubject.setTextColor(textColor)
         }
 
@@ -351,7 +357,7 @@ class ThreadFragment : Fragment() {
     }
 
     private companion object {
-        const val COLLAPSE_TITLE_THRESHOLD = 0.5
+        const val COLLAPSE_TITLE_THRESHOLD = 0.666
         const val ARCHIVE_INDEX = 2
 
         fun allAttachmentsFileName(subject: String) = "kMail-attachments-$subject.zip"
