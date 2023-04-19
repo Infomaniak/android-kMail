@@ -59,6 +59,9 @@ import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.*
 import com.infomaniak.mail.ui.main.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomDarkMode
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getSetMargin
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.loadCss
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.workers.DraftsActionsWorker
@@ -78,6 +81,10 @@ class NewMessageFragment : Fragment() {
     private lateinit var filePicker: FilePicker
 
     private val attachmentAdapter = AttachmentAdapter(shouldDisplayCloseButton = true, onDelete = ::onDeleteAttachment)
+
+    private val customDarkMode by lazy { requireContext().getCustomDarkMode() }
+    private val setMargin by lazy { requireContext().getSetMargin() }
+    private val customStyle by lazy { requireContext().getCustomStyle() }
 
     private var mailboxes = emptyList<Mailbox>()
     private var selectedMailboxIndex = 0
@@ -308,8 +315,9 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun WebView.loadContent(html: String) = with(HtmlFormatter(html)) {
-        if (context.isNightModeEnabled()) registerCss(context.loadCss(R.raw.custom_dark_mode))
-        registerCss(context.loadCss(R.raw.remove_margin))
+        if (context.isNightModeEnabled()) registerCss(customDarkMode)
+        registerCss(setMargin)
+        registerCss(customStyle)
         loadDataWithBaseURL("", inject(), ClipDescription.MIMETYPE_TEXT_HTML, Utils.UTF_8, "")
     }
 

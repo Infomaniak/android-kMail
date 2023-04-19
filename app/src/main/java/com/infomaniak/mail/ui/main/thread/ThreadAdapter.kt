@@ -40,8 +40,9 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadViewHolder
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.HtmlFormatter.Companion.PRIMARY_COLOR_CODE
-import com.infomaniak.mail.utils.HtmlFormatter.Companion.loadCss
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomDarkMode
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getSetMargin
 import com.infomaniak.mail.utils.UiUtils.getPrettyNameAndEmail
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.TEXT_HTML
@@ -66,15 +67,9 @@ class ThreadAdapter(context: Context) : RecyclerView.Adapter<ThreadViewHolder>()
     var onReplyClicked: ((Message) -> Unit)? = null
     var onMenuClicked: ((Message) -> Unit)? = null
 
-    private val customDarkMode by lazy { context.loadCss(R.raw.custom_dark_mode) }
-    private val removeMargin by lazy { context.loadCss(R.raw.remove_margin) }
-    private val addPadding by lazy { context.loadCss(R.raw.add_padding) }
-    private val customStyle by lazy {
-        context.loadCss(
-            R.raw.custom_style,
-            listOf(PRIMARY_COLOR_CODE to context.getAttributeColor(RMaterial.attr.colorPrimary))
-        )
-    }
+    private val customDarkMode by lazy { context.getCustomDarkMode() }
+    private val setMargin by lazy { context.getSetMargin() }
+    private val customStyle by lazy { context.getCustomStyle() }
 
     override fun updateList(itemList: List<Message>) {
         messages = itemList
@@ -183,12 +178,6 @@ class ThreadAdapter(context: Context) : RecyclerView.Adapter<ThreadViewHolder>()
         settings.loadWithOverviewMode = true
         settings.useWideViewPort = true
 
-        // settings.builtInZoomControls = true
-        // settings.setSupportZoom(true)
-        // settings.displayZoomControls = false
-
-        Log.e("gibran", "About to load styledBody: ${styledBody}")
-
         loadDataWithBaseURL("", styledBody, TEXT_HTML, Utils.UTF_8, "")
     }
 
@@ -196,8 +185,7 @@ class ThreadAdapter(context: Context) : RecyclerView.Adapter<ThreadViewHolder>()
         if (context.isNightModeEnabled() && isThemeTheSameMap[uid] == true) {
             registerCss(customDarkMode, DARK_BACKGROUND_STYLE_ID)
         }
-        registerCss(removeMargin)
-        registerCss(addPadding)
+        registerCss(setMargin)
         registerCss(customStyle)
         registerMetaViewPort()
         inject()

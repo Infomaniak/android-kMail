@@ -19,9 +19,11 @@ package com.infomaniak.mail.utils
 
 import android.content.Context
 import androidx.annotation.RawRes
+import com.infomaniak.mail.R
 import okhttp3.internal.toHexString
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
+import com.google.android.material.R as RMaterial
 
 class HtmlFormatter(private val html: String) {
 
@@ -60,7 +62,7 @@ class HtmlFormatter(private val html: String) {
     }
 
     companion object {
-        const val PRIMARY_COLOR_CODE = "--kmail-primary-color"
+        private const val PRIMARY_COLOR_CODE = "--kmail-primary-color"
 
         fun Context.loadCss(@RawRes cssResId: Int, customColors: List<Pair<String, Int>> = emptyList()): String {
             var css = readRawResource(cssResId)
@@ -68,14 +70,30 @@ class HtmlFormatter(private val html: String) {
             if (customColors.isNotEmpty()) {
                 var header = ":root {\n"
                 customColors.forEach { (variableName, color) ->
-                    val formattedColor = "#" + color.toHexString().substring(2 until 8)
-                    header += "$variableName: $formattedColor;\n"
+                    header += formatCssVariable(variableName, color)
                 }
                 header += "}\n\n"
+
                 css = header + css
             }
 
             return css
         }
+
+        private fun formatCssVariable(variableName: String, color: Int): String {
+            val formattedColor = colorToHexRepresentation(color)
+            return "$variableName: $formattedColor;\n"
+        }
+
+        private fun colorToHexRepresentation(color: Int) = "#" + color.toHexString().substring(2 until 8)
+
+        fun Context.getCustomDarkMode(): String = loadCss(R.raw.custom_dark_mode)
+
+        fun Context.getSetMargin(): String = loadCss(R.raw.set_margin_to_16_dp)
+
+        fun Context.getCustomStyle(): String = loadCss(
+            R.raw.custom_style,
+            listOf(PRIMARY_COLOR_CODE to getAttributeColor(RMaterial.attr.colorPrimary))
+        )
     }
 }
