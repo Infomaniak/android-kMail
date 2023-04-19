@@ -60,7 +60,6 @@ import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.min
-import kotlin.math.roundToInt
 import com.google.android.material.R as RMaterial
 
 class ThreadFragment : Fragment() {
@@ -120,7 +119,7 @@ class ThreadFragment : Fragment() {
             val total = appBarLayout.height * COLLAPSE_TITLE_THRESHOLD
             val removed = appBarLayout.height - total
             val progress = (((-verticalOffset.toFloat()) - removed).coerceAtLeast(0.0) / total).toFloat() // Between 0 and 1
-            val opacity = (progress * 255).roundToInt()
+            val opacity = (progress * 255).toInt()
 
             val textColor = ColorUtils.setAlphaComponent(defaultTextColor, opacity)
             toolbarSubject.setTextColor(textColor)
