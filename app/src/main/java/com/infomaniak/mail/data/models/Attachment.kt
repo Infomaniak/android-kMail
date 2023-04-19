@@ -143,35 +143,4 @@ class Attachment : EmbeddedRealmObject {
         BOOK(R.drawable.ic_file_single_neutral_book),
         GRAPH(R.drawable.ic_file_office_graph),
     }
-
-    // TODO: Use this, and move it elsewhere.
-    // suspend fun fetchAttachment(attachment: Attachment, cacheDir: File) {
-    //
-    //     fun downloadAttachmentData(fileUrl: String, okHttpClient: OkHttpClient): Response {
-    //         val request = Request.Builder().url(fileUrl).headers(HttpUtils.getHeaders(contentType = null)).get().build()
-    //         return okHttpClient.newBuilder().build().newCall(request).execute()
-    //     }
-    //
-    //     fun saveAttachmentData(response: Response, outputFile: File, onFinish: (() -> Unit)) {
-    //         Log.d("TAG", "Save remote data to ${outputFile.path}")
-    //         BufferedInputStream(response.body?.byteStream()).use { input ->
-    //             outputFile.outputStream().use { output ->
-    //                 input.copyTo(output)
-    //                 onFinish()
-    //             }
-    //         }
-    //     }
-    //
-    //     val response = downloadAttachmentData(
-    //         fileUrl = ApiRoutes.resource(attachment.resource),
-    //         okHttpClient = KMailHttpClient.getHttpClient(AccountUtils.currentUserId),
-    //     )
-    //
-    //     val file = File(cacheDir, "${attachment.uuid}_${attachment.name}")
-    //
-    //     saveAttachmentData(response, file) {
-    //         attachment.localUri = file.toURI().toString()
-    //         RealmDatabase.mailboxContent().writeBlocking { copyToRealm(attachment, UpdatePolicy.ALL) }
-    //     }
-    // }
 }

@@ -41,7 +41,6 @@ import com.infomaniak.lib.core.utils.CoilUtils
 import com.infomaniak.lib.core.utils.clearStack
 import com.infomaniak.lib.core.utils.hasPermissions
 import com.infomaniak.lib.login.ApiToken
-import com.infomaniak.mail.MatomoMail.addTrackingCallbackForDebugLog
 import com.infomaniak.mail.MatomoMail.buildTracker
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.ui.LaunchActivity
@@ -79,9 +78,6 @@ class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycleObser
         configureInfomaniakCore()
         initNotificationChannel()
         configureHttpClient()
-
-        // TODO: Remove before going into production
-        addTrackingCallbackForDebugLog()
     }
 
     override fun onStart(owner: LifecycleOwner) {
