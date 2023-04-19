@@ -23,8 +23,11 @@ import com.infomaniak.lib.core.api.ApiRepositoryCore
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.networking.HttpUtils
-import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition
+import com.infomaniak.mail.data.models.AttachmentsToForwardResult
+import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.MoveResult
+import com.infomaniak.mail.data.models.Quotas
 import com.infomaniak.mail.data.models.addressBook.AddressBooksResult
 import com.infomaniak.mail.data.models.correspondent.Contact
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -34,6 +37,8 @@ import com.infomaniak.mail.data.models.draft.SendDraftResult
 import com.infomaniak.mail.data.models.getMessages.GetMessagesByUidsResult
 import com.infomaniak.mail.data.models.getMessages.GetMessagesUidsDeltaResult
 import com.infomaniak.mail.data.models.getMessages.GetMessagesUidsResult
+import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.mailbox.MailboxLinkedResult
 import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.SignaturesResult
@@ -92,9 +97,9 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.mailbox(), GET, okHttpClient = okHttpClient ?: HttpClient.okHttpClient)
     }
 
-    fun addNewMailbox(mailAddress: String, password: String): ApiResponse<Unit> {
+    fun addNewMailbox(mailAddress: String, password: String): ApiResponse<MailboxLinkedResult> {
         return callApi(ApiRoutes.addNewMailbox(), POST, mapOf("mail" to mailAddress, "password" to password))
-	}
+    }
 
     fun getPermissions(mailboxLinkId: Int, mailboxHostingId: Int): ApiResponse<MailboxPermissions> {
         return callApi(ApiRoutes.permissions(mailboxLinkId, mailboxHostingId), GET)

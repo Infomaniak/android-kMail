@@ -37,9 +37,9 @@ import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder.FolderRole
-import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ErrorCode.DRAFT_ALREADY_SCHEDULED_OR_SENT
 import com.infomaniak.mail.utils.ErrorCode.DRAFT_DOES_NOT_EXIST

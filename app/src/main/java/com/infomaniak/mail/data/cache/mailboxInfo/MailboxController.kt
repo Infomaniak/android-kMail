@@ -21,8 +21,8 @@ import android.content.Context
 import android.util.Log
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.AppSettings
-import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.Quotas
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.NotificationUtils.initMailNotificationChannel

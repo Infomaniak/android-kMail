@@ -24,7 +24,7 @@ import com.infomaniak.mail.MatomoMail.SWITCH_MAILBOX_NAME
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.models.Mailbox
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.databinding.ItemSwitchMailboxBinding
 import com.infomaniak.mail.ui.main.menu.SwitchMailboxesAdapter.SwitchMailboxesViewHolder
 import com.infomaniak.mail.utils.AccountUtils
