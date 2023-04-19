@@ -183,9 +183,9 @@ class ThreadAdapter(context: Context) : RecyclerView.Adapter<ThreadViewHolder>()
         settings.loadWithOverviewMode = true
         settings.useWideViewPort = true
 
-        settings.builtInZoomControls = true
-        settings.setSupportZoom(true)
-        settings.displayZoomControls = false
+        // settings.builtInZoomControls = true
+        // settings.setSupportZoom(true)
+        // settings.displayZoomControls = false
 
         Log.e("gibran", "About to load styledBody: ${styledBody}")
 
