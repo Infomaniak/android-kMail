@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -48,6 +47,7 @@ import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.firebase.RegisterFirebaseBroadcastReceiver
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.utils.PermissionUtils
+import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.updateNavigationBarColor
 import io.sentry.Breadcrumb
@@ -230,7 +230,8 @@ class MainActivity : ThemedActivity() {
     }
 
     private fun onDestinationChanged(destination: NavDestination) {
-        destination.addSentryBreadcrumb()
+
+        SentryDebug.addNavigationBreadcrumb(destination)
 
         setDrawerLockMode(destination.id == R.id.threadListFragment)
 
@@ -262,15 +263,6 @@ class MainActivity : ThemedActivity() {
         window.updateNavigationBarColor(getColor(colorRes))
 
         trackDestination(destination)
-    }
-
-    @SuppressLint("RestrictedApi")
-    private fun NavDestination.addSentryBreadcrumb() {
-        Sentry.addBreadcrumb(Breadcrumb().apply {
-            category = "Navigation"
-            message = "Accessed to destination : $displayName"
-            level = SentryLevel.INFO
-        })
     }
 
     fun setDrawerLockMode(isUnlocked: Boolean) {

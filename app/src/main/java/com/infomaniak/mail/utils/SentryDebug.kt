@@ -18,6 +18,7 @@
 package com.infomaniak.mail.utils
 
 import android.util.Log
+import androidx.navigation.NavDestination
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
@@ -30,12 +31,22 @@ import io.sentry.SentryLevel
 
 object SentryDebug {
 
+    fun addNavigationBreadcrumb(destination: NavDestination) {
+        addInfoBreadcrumb("Navigation", "Accessed to destination : ${destination.displayName}")
+    }
+
     fun addUrlBreadcrumb(url: String) {
-        Sentry.addBreadcrumb(Breadcrumb().apply {
-            category = "API"
-            message = url
-            level = SentryLevel.INFO
-        })
+        addInfoBreadcrumb("API", url)
+    }
+
+    private fun addInfoBreadcrumb(category: String, message: String) {
+        Breadcrumb()
+            .apply {
+                this.category = category
+                this.message = message
+                this.level = SentryLevel.INFO
+            }
+            .let(Sentry::addBreadcrumb)
     }
 
     fun sendAlreadyExistingMessage(folder: Folder, existingMessage: Message, newMessage: Message) {
