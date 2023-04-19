@@ -34,7 +34,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListener
@@ -118,16 +118,6 @@ class SearchFragment : Fragment() {
         observeVisibilityModeUpdates()
         observeSearchResults()
         observeHistory()
-    }
-
-    override fun onStop() = with(binding) {
-        searchViewModel.apply {
-            previousSearch = searchBar.searchTextInput.text.toString()
-            previousAttachments = attachments.isChecked
-            previousMutuallyExclusiveChips = mutuallyExclusiveChipGroup.checkedChipId
-        }
-
-        super.onStop()
     }
 
     private fun setupListeners() = with(binding) {
@@ -239,21 +229,30 @@ class SearchFragment : Fragment() {
         }
     }
 
-    private fun setMessagesUi() {
-        binding.mailRecyclerView.apply {
+    private fun setMessagesUi() = with(binding) {
 
-            adapter = threadListAdapter.apply {
-                stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
-                onThreadClicked = { thread ->
-                    with(searchViewModel) { if (!isLengthTooShort(searchQuery)) history.value = searchQuery }
+        mailRecyclerView.adapter = threadListAdapter.apply {
+            stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
+            onThreadClicked = { thread ->
+                with(searchViewModel) {
+
+                    if (!isLengthTooShort(searchQuery)) history.value = searchQuery
+
                     navigateToThread(thread, mainViewModel)
+
+                    previousAttachments = attachments.isChecked
+                    previousMutuallyExclusiveChips = mutuallyExclusiveChipGroup.checkedChipId
+                    previousSearch = searchBar.searchTextInput.text.toString()
                 }
             }
+        }
 
+        mailRecyclerView.apply {
+            disableDragDirection(DirectionFlag.UP)
             disableDragDirection(DirectionFlag.DOWN)
             disableDragDirection(DirectionFlag.LEFT)
             disableDragDirection(DirectionFlag.RIGHT)
-            disableDragDirection(DirectionFlag.UP)
+
             disableSwipeDirection(DirectionFlag.LEFT)
             disableSwipeDirection(DirectionFlag.RIGHT)
 
