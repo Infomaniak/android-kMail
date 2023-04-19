@@ -32,9 +32,7 @@ import com.infomaniak.mail.ui.login.LoginActivity
 import com.infomaniak.mail.ui.login.LoginActivityArgs
 import com.infomaniak.mail.ui.main.thread.ThreadFragmentArgs
 import com.infomaniak.mail.utils.AccountUtils
-import io.sentry.Breadcrumb
-import io.sentry.Sentry
-import io.sentry.SentryLevel
+import com.infomaniak.mail.utils.SentryDebug
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -93,12 +91,7 @@ class LaunchActivity : AppCompatActivity() {
             if (it.userId != AppSettings.DEFAULT_ID && it.mailboxId != AppSettings.DEFAULT_ID) {
                 if (AccountUtils.currentUserId != it.userId) AccountUtils.currentUserId = it.userId
                 if (AccountUtils.currentMailboxId != it.mailboxId) AccountUtils.currentMailboxId = it.mailboxId
-
-                Sentry.addBreadcrumb(Breadcrumb().apply {
-                    category = "Notification"
-                    message = "SyncMessages notification has been clicked"
-                    level = SentryLevel.INFO
-                })
+                SentryDebug.addNotificationBreadcrumb("SyncMessages notification has been clicked")
             }
         }
     }

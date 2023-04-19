@@ -65,6 +65,10 @@ object SentryDebug {
         addInfoBreadcrumb("API", url)
     }
 
+    fun addNotificationBreadcrumb(notification: String) {
+        addInfoBreadcrumb("Notification", notification)
+    }
+
     private fun addInfoBreadcrumb(category: String, message: String? = null, data: Map<String, Any>? = null) {
         Sentry.addBreadcrumb(Breadcrumb().apply {
             this.category = category
