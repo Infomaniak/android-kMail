@@ -22,8 +22,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class SendDraftResult(
-    @SerialName("cancel_resource")
-    val cancelResource: String,
     @SerialName("etop")
     val scheduledDate: String,
 )

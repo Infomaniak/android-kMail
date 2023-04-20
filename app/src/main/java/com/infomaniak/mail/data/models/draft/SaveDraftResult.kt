@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.data.models.draft
 
-import com.infomaniak.mail.data.models.Attachment
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -27,5 +26,4 @@ data class SaveDraftResult(
     val draftRemoteUuid: String,
     @SerialName("uid")
     val messageUid: String,
-    val attachments: List<Attachment>,
 )

@@ -75,9 +75,6 @@ class Draft : RealmObject {
     var forwardedUid: String? = null
 
     var references: String? = null
-    var delay: Int = 0
-    @SerialName("ack_request")
-    var ackRequest: Boolean = false
     @SerialName("st_uuid")
     var swissTransferUuid: String? = null
     //endregion
