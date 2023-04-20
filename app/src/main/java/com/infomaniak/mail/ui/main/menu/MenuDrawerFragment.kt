@@ -141,9 +141,8 @@ class MenuDrawerFragment : MenuFoldersFragment() {
 
         importMails.setOnClickListener {
             trackMenuDrawerEvent("importEmails")
+            requireContext().openUrl(BuildConfig.IMPORT_EMAILS_URL)
             closeDrawer()
-            // TODO: Import mails
-            notYetImplemented()
         }
 
         restoreMails.setOnClickListener {
