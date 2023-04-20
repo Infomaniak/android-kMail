@@ -72,7 +72,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginVertical="@dimen/marginStandardMedium"
-            android:animateLayoutChanges="true"
             android:orientation="vertical">
 
             <com.google.android.material.card.MaterialCardView
