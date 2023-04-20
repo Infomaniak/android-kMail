@@ -62,7 +62,6 @@ import com.infomaniak.mail.databinding.ActivityLoginBinding
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
 import com.infomaniak.mail.utils.getInfomaniakLogin
-import com.infomaniak.mail.utils.notYetImplemented
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -261,10 +260,6 @@ class LoginActivity : AppCompatActivity() {
         startActivity(Intent(this@LoginActivity, NoMailboxActivity::class.java))
         connectButton.hideProgress(R.string.buttonLogin)
         signInButton.isEnabled = true
-    }
-
-    fun notYetImplemented() {
-        notYetImplemented(binding.nextButton)
     }
 
     companion object {
