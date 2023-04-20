@@ -73,8 +73,6 @@ class Message : RealmObject {
     @SerialName("st_uuid")
     var swissTransferUuid: String? = null
     var resource: String = ""
-    @SerialName("download_resource")
-    var downloadResource: String = ""
     @SerialName("is_draft")
     var isDraft: Boolean = false
     @SerialName("draft_resource")
@@ -82,8 +80,6 @@ class Message : RealmObject {
     var body: Body? = null
     @SerialName("has_attachments")
     var hasAttachments: Boolean = false
-    @SerialName("attachments_resources")
-    var attachmentsResource: String? = null
     var attachments: RealmList<Attachment> = realmListOf()
     @SerialName("seen")
     var isSeen: Boolean = false
