@@ -31,6 +31,7 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Priority
 import com.infomaniak.mail.data.models.getMessages.GetMessagesUidsDeltaResult.MessageFlags
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.toRealmInstant
 import com.infomaniak.mail.utils.toShortUid
 import io.realm.kotlin.TypedRealm
@@ -38,6 +39,8 @@ import io.realm.kotlin.ext.*
 import io.realm.kotlin.types.*
 import io.realm.kotlin.types.annotations.Ignore
 import io.realm.kotlin.types.annotations.PrimaryKey
+import io.sentry.Sentry
+import io.sentry.SentryLevel
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -127,10 +130,25 @@ class Message : RealmObject {
 
     val threads by backlinks(Thread::messages)
 
-    val threadsDuplicatedIn by backlinks(Thread::duplicates)
+    private val threadsDuplicatedIn by backlinks(Thread::duplicates)
 
     private val _folders by backlinks(Folder::messages)
-    val folder get() = _folders.single { _folders.count() == 1 || it.id != SEARCH_FOLDER_ID }
+    val folder
+        get() = run {
+            runCatching {
+                _folders.single { _folders.count() == 1 || it.id != SEARCH_FOLDER_ID }
+            }.getOrElse {
+                Sentry.withScope { scope ->
+                    scope.level = SentryLevel.ERROR
+                    scope.setExtra("folders", "${_folders.map { it.name }}")
+                    scope.setExtra("foldersCount", "${_folders.count()}")
+                    scope.setExtra("messageUid", uid)
+                    scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
+                    Sentry.captureMessage("Message has several or 0 parent folders, it should not be possible")
+                }
+                _folders.first()
+            }
+        }
 
     inline val shortUid get() = uid.toShortUid()
     inline val sender get() = from.first()
