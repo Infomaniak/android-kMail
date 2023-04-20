@@ -232,7 +232,7 @@ class Thread : RealmObject {
         FOLDER("folderFilter"),
     }
 
-    companion object {
+    private companion object {
         const val FORMAT_DAY_OF_THE_WEEK = "EEE"
     }
 }
