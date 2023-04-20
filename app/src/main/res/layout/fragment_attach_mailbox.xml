@@ -29,10 +29,8 @@
 
         <TextView
             android:id="@+id/attachMailboxDescription"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/marginStandardMedium"
-            android:layout_marginVertical="@dimen/marginStandard"
+            style="@style/SettingHeader"
+            android:layout_marginVertical="@dimen/marginStandardMedium"
             android:text="@string/attachAddressDescription"
             app:layout_constraintBottom_toTopOf="@id/mailInputLayout"
             app:layout_constraintEnd_toEndOf="parent"
@@ -67,7 +65,6 @@
             android:layout_height="0dp"
             android:layout_marginHorizontal="@dimen/marginStandardMedium"
             android:layout_marginTop="@dimen/marginStandardSmall"
-            android:layout_weight="1"
             android:hint="@string/attachAddressPasswordInputHint"
             app:endIconContentDescription="@string/contentDescriptionButtonShowPassword"
             app:endIconMode="password_toggle"
@@ -88,7 +85,7 @@
         <com.google.android.material.button.MaterialButton
             android:id="@+id/attachMailboxButton"
             style="@style/TextButtonPrimary"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_marginHorizontal="@dimen/marginStandard"
             android:layout_marginBottom="@dimen/marginStandardSmall"
             android:text="@string/buttonAttachEmailAddress"

@@ -101,10 +101,6 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.addNewMailbox(), POST, mapOf("mail" to mailAddress, "password" to password))
     }
 
-    fun getPermissions(mailboxLinkId: Int, mailboxHostingId: Int): ApiResponse<MailboxPermissions> {
-        return callApi(ApiRoutes.permissions(mailboxLinkId, mailboxHostingId), GET)
-    }
-
     fun getFolders(mailboxUuid: String): ApiResponse<List<Folder>> = callApi(ApiRoutes.folders(mailboxUuid), GET)
 
     fun createFolder(mailboxUuid: String, name: String): ApiResponse<Folder> {
@@ -121,6 +117,10 @@ object ApiRepository : ApiRepositoryCore() {
 
     fun getQuotas(mailboxHostingId: Int, mailboxName: String): ApiResponse<Quotas> {
         return callApi(ApiRoutes.quotas(mailboxHostingId, mailboxName), GET)
+    }
+
+    fun getPermissions(mailboxLinkId: Int, mailboxHostingId: Int): ApiResponse<MailboxPermissions> {
+        return callApi(ApiRoutes.permissions(mailboxLinkId, mailboxHostingId), GET)
     }
 
     fun markMessagesAsSeen(mailboxUuid: String, messagesUids: List<String>): ApiResponse<Unit> {

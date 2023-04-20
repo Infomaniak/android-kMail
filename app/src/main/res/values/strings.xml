@@ -58,7 +58,7 @@
     <string name="addUnknownRecipientTitle">Add a recipient</string>
     <string name="appSecurityDescription">Protect access to your app by enabling your phone lock.</string>
     <string name="archiveFolder">Archived</string>
-    <string name="attachAddressDescription">If you already have an Infomaniak email address, connect now.</string>
+    <string name="attachAddressDescription">If you already have an Infomaniak email address, connect now</string>
     <string name="attachAddressInputHint">Email address</string>
     <string name="attachAddressPasswordInputHint">Password</string>
     <string name="attachAddressTitle">Add email address</string>

@@ -21,7 +21,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-class MailboxLinkedResult(
+data class MailboxLinkedResult(
     @SerialName("id")
     val mailboxId: Int,
     @SerialName("mail")
