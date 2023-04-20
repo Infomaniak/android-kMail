@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.utils
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import androidx.navigation.NavController
@@ -36,6 +37,7 @@ object SentryDebug {
 
     private var previousDestinationName: String = ""
 
+    @SuppressLint("RestrictedApi")
     fun addNavigationBreadcrumb(destination: NavDestination, arguments: Bundle?) {
 
         // This function comes from `io.sentry.android.navigation.SentryNavigationListener`
