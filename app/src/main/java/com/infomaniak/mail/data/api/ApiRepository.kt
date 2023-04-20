@@ -34,7 +34,6 @@ import com.infomaniak.mail.data.models.draft.SendDraftResult
 import com.infomaniak.mail.data.models.getMessages.GetMessagesByUidsResult
 import com.infomaniak.mail.data.models.getMessages.GetMessagesUidsDeltaResult
 import com.infomaniak.mail.data.models.getMessages.GetMessagesUidsResult
-import com.infomaniak.mail.data.models.message.DeleteMessageResult
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.SignaturesResult
 import com.infomaniak.mail.data.models.thread.ThreadResult
@@ -144,7 +143,7 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.attachmentToForward(mailboxUuid), POST, body)
     }
 
-    fun deleteMessages(mailboxUuid: String, messageUids: List<String>): ApiResponse<DeleteMessageResult?> {
+    fun deleteMessages(mailboxUuid: String, messageUids: List<String>): ApiResponse<Unit> {
         return callApi(ApiRoutes.deleteMessages(mailboxUuid), POST, mapOf("uids" to messageUids))
     }
 
