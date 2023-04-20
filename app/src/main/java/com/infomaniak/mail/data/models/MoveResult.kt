@@ -22,8 +22,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class MoveResult(
-    @SerialName("moved")
-    val quantity: Int,
     @SerialName("undo_resource")
     val undoResource: String,
 )
