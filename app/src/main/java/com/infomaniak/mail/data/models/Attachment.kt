@@ -39,11 +39,8 @@ import java.io.File
 class Attachment : EmbeddedRealmObject {
 
     var uuid: String = ""
-    @SerialName("part_id")
-    var partId: String = ""
     @SerialName("mime_type")
     var mimeType: String = ""
-    var encoding: String? = null
     var size: Long = 0L
     var name: String = ""
     @SerialName("disposition")
