@@ -142,10 +142,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/marginStandardSmall"
                     android:layout_marginEnd="@dimen/marginStandardSmall"
-                    app:layout_constraintBottom_toBottomOf="@id/expeditorName"
+                    app:layout_constraintBaseline_toBaselineOf="@id/expeditorName"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/expeditorName"
-                    app:layout_constraintTop_toTopOf="@+id/expeditorName"
                     tools:text="9 déc 2021 à 11:00" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
