@@ -41,23 +41,21 @@ object SentryDebug {
     fun addNavigationBreadcrumb(destination: NavDestination, arguments: Bundle?) {
 
         // This function comes from `io.sentry.android.navigation.SentryNavigationListener`
-        fun Bundle?.refined(): Map<String, Any?> {
-            return this?.let { args ->
-                args.keySet()
-                    .filter { it != NavController.KEY_DEEP_LINK_INTENT } // there's a lot of unrelated stuff
-                    .associateWith { args[it] }
-            } ?: emptyMap()
-        }
+        fun Bundle?.refined(): Map<String, Any?> = this?.let { args ->
+            args.keySet()
+                .filter { it != NavController.KEY_DEEP_LINK_INTENT } // there's a lot of unrelated stuff
+                .associateWith { args[it] }
+        } ?: emptyMap()
 
         val name = destination.displayName.substringAfter("${BuildConfig.APPLICATION_ID}:id/")
 
         addInfoBreadcrumb(
             category = "Navigation",
-            data = mutableMapOf<String, Any>().apply {
-                put("1_from", previousDestinationName)
-                put("2_to", name)
-                put("3_args", arguments.refined())
-            },
+            data = mapOf(
+                "1_from" to previousDestinationName,
+                "2_to" to name,
+                "3_args" to arguments.refined(),
+            )
         )
 
         previousDestinationName = name
