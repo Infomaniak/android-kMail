@@ -17,7 +17,12 @@
  */
 package com.infomaniak.mail.utils
 
+import android.annotation.SuppressLint
+import android.os.Bundle
 import android.util.Log
+import androidx.navigation.NavController
+import androidx.navigation.NavDestination
+import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
@@ -30,11 +35,46 @@ import io.sentry.SentryLevel
 
 object SentryDebug {
 
+    private var previousDestinationName: String = ""
+
+    @SuppressLint("RestrictedApi")
+    fun addNavigationBreadcrumb(destination: NavDestination, arguments: Bundle?) {
+
+        // This function comes from `io.sentry.android.navigation.SentryNavigationListener`
+        fun Bundle?.refined(): Map<String, Any?> = this?.let { args ->
+            args.keySet()
+                .filter { it != NavController.KEY_DEEP_LINK_INTENT } // there's a lot of unrelated stuff
+                .associateWith { args[it] }
+        } ?: emptyMap()
+
+        val name = destination.displayName.substringAfter("${BuildConfig.APPLICATION_ID}:id/")
+
+        addInfoBreadcrumb(
+            category = "Navigation",
+            data = mapOf(
+                "1_from" to previousDestinationName,
+                "2_to" to name,
+                "3_args" to arguments.refined(),
+            )
+        )
+
+        previousDestinationName = name
+    }
+
     fun addUrlBreadcrumb(url: String) {
+        addInfoBreadcrumb("API", url)
+    }
+
+    fun addNotificationBreadcrumb(notification: String) {
+        addInfoBreadcrumb("Notification", notification)
+    }
+
+    private fun addInfoBreadcrumb(category: String, message: String? = null, data: Map<String, Any>? = null) {
         Sentry.addBreadcrumb(Breadcrumb().apply {
-            category = "API"
-            message = url
-            level = SentryLevel.INFO
+            this.category = category
+            this.message = message
+            data?.let { it.forEach { (key, value) -> this.data[key] = value } }
+            this.level = SentryLevel.INFO
         })
     }
 

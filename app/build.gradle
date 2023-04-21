@@ -96,6 +96,8 @@ dependencies {
     implementation 'androidx.webkit:webkit:1.6.1'
     implementation 'androidx.work:work-runtime-ktx:2.8.1'
 
+    implementation 'io.sentry:sentry-android-fragment:6.17.0'
+
     androidTestImplementation 'androidx.test:runner:1.5.2'
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'

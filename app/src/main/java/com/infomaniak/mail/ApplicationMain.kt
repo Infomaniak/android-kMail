@@ -53,6 +53,8 @@ import io.sentry.SentryEvent
 import io.sentry.SentryOptions
 import io.sentry.android.core.SentryAndroid
 import io.sentry.android.core.SentryAndroidOptions
+import io.sentry.android.fragment.FragmentLifecycleIntegration
+import io.sentry.android.fragment.FragmentLifecycleState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -113,6 +115,20 @@ class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycleObser
                 // If the application is in debug mode, discard the events
                 if (BuildConfig.DEBUG) null else event
             }
+            options.addIntegration(
+                FragmentLifecycleIntegration(
+                    application = this,
+                    filterFragmentLifecycleBreadcrumbs = setOf(
+                        FragmentLifecycleState.CREATED,
+                        FragmentLifecycleState.STARTED,
+                        FragmentLifecycleState.RESUMED,
+                        FragmentLifecycleState.PAUSED,
+                        FragmentLifecycleState.STOPPED,
+                        FragmentLifecycleState.DESTROYED,
+                    ),
+                    enableAutoFragmentLifecycleTracing = true,
+                )
+            )
         }
     }
 
