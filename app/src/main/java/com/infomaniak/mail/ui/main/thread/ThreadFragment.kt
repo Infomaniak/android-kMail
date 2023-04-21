@@ -119,11 +119,11 @@ class ThreadFragment : Fragment() {
         val defaultTextColor = context.getColor(R.color.primaryTextColor)
         appBar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
 
-            val subjectHeight = appBarLayout.height.toDouble()
+            val subjectHeight = appBarLayout.height
             val impactingHeight = subjectHeight * COLLAPSE_TITLE_THRESHOLD
             val nonImpactingHeight = subjectHeight - impactingHeight
 
-            val absoluteProgress = verticalOffset.absoluteValue.toDouble() - nonImpactingHeight
+            val absoluteProgress = verticalOffset.absoluteValue - nonImpactingHeight
             val relativeProgress = (absoluteProgress / impactingHeight).coerceIn(0.0, 1.0) // Between 0 and 1
             val opacity = (relativeProgress * 255.0).roundToInt()
             val textColor = ColorUtils.setAlphaComponent(defaultTextColor, opacity)
@@ -357,7 +357,7 @@ class ThreadFragment : Fragment() {
     }
 
     private companion object {
-        const val COLLAPSE_TITLE_THRESHOLD = 0.666
+        const val COLLAPSE_TITLE_THRESHOLD = 0.5
         const val ARCHIVE_INDEX = 2
 
         fun allAttachmentsFileName(subject: String) = "kMail-attachments-$subject.zip"
