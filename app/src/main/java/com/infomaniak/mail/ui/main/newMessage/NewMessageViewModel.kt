@@ -39,7 +39,6 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
-import com.infomaniak.mail.data.models.draft.Priority
 import com.infomaniak.mail.ui.main.SnackBarManager
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType
@@ -141,7 +140,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
 
     private fun MutableRealm.createDraft(draftMode: DraftMode, previousMessageUid: String?, recipient: Recipient?): Draft? {
         return Draft().apply {
-            initLocalValues(priority = Priority.NORMAL, mimeType = ClipDescription.MIMETYPE_TEXT_HTML)
+            initLocalValues(mimeType = ClipDescription.MIMETYPE_TEXT_HTML)
             initSignature(realm = this@createDraft)
             when (draftMode) {
                 DraftMode.NEW_MAIL -> recipient?.let { to = realmListOf(it) }

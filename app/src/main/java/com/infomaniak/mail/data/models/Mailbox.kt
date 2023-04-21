@@ -30,42 +30,14 @@ class Mailbox : RealmObject {
     //region API data
     var uuid: String = ""
     var email: String = ""
-    @SerialName("email_idn")
-    var emailIdn: String = ""
     @SerialName("mailbox")
     var mailboxName: String = ""
-    @SerialName("real_mailbox")
-    var realMailbox: String = ""
-    @SerialName("link_id")
-    var linkId: Int = 0
     @SerialName("mailbox_id")
     var mailboxId: Int = -1
     @SerialName("hosting_id")
     var hostingId: Int = 0
-    @SerialName("is_primary")
-    var isPrimary: Boolean = false
-    @SerialName("password_status")
-    var passwordStatus: String = ""
-    @SerialName("is_password_valid")
-    var isPasswordValid: Boolean = false
-    @SerialName("is_valid")
-    var isMailboxValid: Boolean = false
-    @SerialName("is_locked")
-    var isLocked: Boolean = false
-    @SerialName("has_social_and_commercial_filtering")
-    var hasSocialAndCommercialFiltering: Boolean = false
-    @SerialName("show_config_modal")
-    var showConfigModal: Boolean = false
-    @SerialName("force_reset_password")
-    var forceResetPassword: Boolean = false
-    @SerialName("mda_version")
-    var mdaVersion: String = ""
     @SerialName("is_limited")
     var isLimited: Boolean = false
-    @SerialName("is_free")
-    var isFree: Boolean = false
-    @SerialName("daily_limit")
-    var dailyLimit: Int = 0
     //endregion
 
     //region Local data (Transient)

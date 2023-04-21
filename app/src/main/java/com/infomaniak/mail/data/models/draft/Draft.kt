@@ -64,8 +64,6 @@ class Draft : RealmObject {
     @SerialName("identity_id")
     var identityId: String? = null
 
-    @SerialName("priority")
-    private var _priority: String? = null
     @SerialName("action")
     private var _action: String? = null
 
@@ -77,9 +75,6 @@ class Draft : RealmObject {
     var forwardedUid: String? = null
 
     var references: String? = null
-    var delay: Int = 0
-    @SerialName("ack_request")
-    var ackRequest: Boolean = false
     @SerialName("st_uuid")
     var swissTransferUuid: String? = null
     //endregion
@@ -110,15 +105,8 @@ class Draft : RealmObject {
             _action = value?.apiCallValue
         }
 
-    private var priority
-        get() = enumValueOfOrNull<Priority>(_priority)
-        set(value) {
-            _priority = value?.apiCallValue
-        }
-
-    fun initLocalValues(messageUid: String? = null, priority: Priority? = null, mimeType: String? = null) {
+    fun initLocalValues(messageUid: String? = null, mimeType: String? = null) {
         messageUid?.let { this.messageUid = it }
-        priority?.let { this.priority = it }
         mimeType?.let { this.mimeType = it }
     }
 

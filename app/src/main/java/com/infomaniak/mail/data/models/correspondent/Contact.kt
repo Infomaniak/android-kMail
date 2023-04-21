@@ -22,37 +22,12 @@ package com.infomaniak.mail.data.models.correspondent
 import com.infomaniak.mail.data.api.RealmListSerializer
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.RealmList
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 
 @Serializable
 data class Contact(
-    val id: String = "",
-    val uuid: String? = null,
     val name: String = "",
-    @SerialName("firstname")
-    val firstName: String? = null,
-    @SerialName("lastname")
-    val lastName: String? = null,
-    val color: String = "",
-    val other: Boolean = false,
-    // @SerialName("contacted_times")
-    // private val contactedTimes: Map<String?, Int?> = emptyMap(),
     val emails: RealmList<String> = realmListOf(),
-    @SerialName("addressbook_id")
-    val addressBookId: Int? = null,
     val avatar: String? = null,
-    val categories: List<Int>? = null,
-    @SerialName("favorite")
-    val isFavorite: Boolean? = null,
-    val nickname: String? = null,
-    val organization: String? = null,
-) {
-    // fun getContactedTimes(): ContactedTimes = with(contactedTimes) { ContactedTimes(keys.firstOrNull(), values.firstOrNull()) }
-
-    // data class ContactedTimes(
-    //     val email: String?,
-    //     val count: Int?,
-    // )
-}
+)

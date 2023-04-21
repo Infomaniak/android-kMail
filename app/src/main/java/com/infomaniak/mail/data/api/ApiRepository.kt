@@ -34,7 +34,6 @@ import com.infomaniak.mail.data.models.draft.SendDraftResult
 import com.infomaniak.mail.data.models.getMessages.GetMessagesByUidsResult
 import com.infomaniak.mail.data.models.getMessages.GetMessagesUidsDeltaResult
 import com.infomaniak.mail.data.models.getMessages.GetMessagesUidsResult
-import com.infomaniak.mail.data.models.message.DeleteMessageResult
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.SignaturesResult
 import com.infomaniak.mail.data.models.thread.ThreadResult
@@ -102,11 +101,11 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.quotas(mailboxHostingId, mailboxName), GET)
     }
 
-    fun markMessagesAsSeen(mailboxUuid: String, messagesUids: List<String>): ApiResponse<Seen> {
+    fun markMessagesAsSeen(mailboxUuid: String, messagesUids: List<String>): ApiResponse<Unit> {
         return callApi(ApiRoutes.messagesSeen(mailboxUuid), POST, mapOf("uids" to messagesUids))
     }
 
-    fun markMessagesAsUnseen(mailboxUuid: String, messagesUids: List<String>): ApiResponse<Seen> {
+    fun markMessagesAsUnseen(mailboxUuid: String, messagesUids: List<String>): ApiResponse<Unit> {
         return callApi(ApiRoutes.messagesUnseen(mailboxUuid), POST, mapOf("uids" to messagesUids))
     }
 
@@ -144,7 +143,7 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.attachmentToForward(mailboxUuid), POST, body)
     }
 
-    fun deleteMessages(mailboxUuid: String, messageUids: List<String>): ApiResponse<DeleteMessageResult?> {
+    fun deleteMessages(mailboxUuid: String, messageUids: List<String>): ApiResponse<Unit> {
         return callApi(ApiRoutes.deleteMessages(mailboxUuid), POST, mapOf("uids" to messageUids))
     }
 
@@ -158,15 +157,15 @@ object ApiRepository : ApiRepositoryCore() {
 
     fun getDraft(messageDraftResource: String): ApiResponse<Draft> = callApi(ApiRoutes.resource(messageDraftResource), GET)
 
-    fun addToFavorites(mailboxUuid: String, messageUids: List<String>): ApiResponse<StarMessageResult> {
+    fun addToFavorites(mailboxUuid: String, messageUids: List<String>): ApiResponse<Unit> {
         return starMessages(mailboxUuid, messageUids, true)
     }
 
-    fun removeFromFavorites(mailboxUuid: String, messageUids: List<String>): ApiResponse<StarMessageResult> {
+    fun removeFromFavorites(mailboxUuid: String, messageUids: List<String>): ApiResponse<Unit> {
         return starMessages(mailboxUuid, messageUids, false)
     }
 
-    private fun starMessages(mailboxUuid: String, messageIds: List<String>, star: Boolean): ApiResponse<StarMessageResult> {
+    private fun starMessages(mailboxUuid: String, messageIds: List<String>, star: Boolean): ApiResponse<Unit> {
         return callApi(ApiRoutes.starMessages(mailboxUuid, star), POST, mapOf("uids" to messageIds))
     }
 

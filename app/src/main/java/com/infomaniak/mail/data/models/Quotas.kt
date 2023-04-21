@@ -21,7 +21,6 @@ import android.content.Context
 import com.infomaniak.lib.core.utils.FormatterFileSize
 import com.infomaniak.mail.R
 import io.realm.kotlin.types.EmbeddedRealmObject
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.math.ceil
 
@@ -29,8 +28,6 @@ import kotlin.math.ceil
 class Quotas : EmbeddedRealmObject {
 
     var size: Int = 0
-    @SerialName("size_checked_at")
-    var sizeCheckedAt: Long = 0L
 
     fun getText(context: Context): String {
         val usedSize = size.toLong()

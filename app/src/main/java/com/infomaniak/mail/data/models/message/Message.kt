@@ -28,7 +28,6 @@ import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.Recipient
-import com.infomaniak.mail.data.models.draft.Priority
 import com.infomaniak.mail.data.models.getMessages.GetMessagesUidsDeltaResult.MessageFlags
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
@@ -67,8 +66,6 @@ class Message : RealmObject {
     @SerialName("in_reply_to")
     var inReplyTo: String? = null
     var references: String? = null
-    @SerialName("priority")
-    private var _priority: String? = null
     @SerialName("dkim_status")
     private var _dkimStatus: String? = null
     @SerialName("folder_id")
@@ -76,8 +73,6 @@ class Message : RealmObject {
     @SerialName("st_uuid")
     var swissTransferUuid: String? = null
     var resource: String = ""
-    @SerialName("download_resource")
-    var downloadResource: String = ""
     @SerialName("is_draft")
     var isDraft: Boolean = false
     @SerialName("draft_resource")
@@ -85,8 +80,6 @@ class Message : RealmObject {
     var body: Body? = null
     @SerialName("has_attachments")
     var hasAttachments: Boolean = false
-    @SerialName("attachments_resources")
-    var attachmentsResource: String? = null
     var attachments: RealmList<Attachment> = realmListOf()
     @SerialName("seen")
     var isSeen: Boolean = false
@@ -152,12 +145,6 @@ class Message : RealmObject {
 
     inline val shortUid get() = uid.toShortUid()
     inline val sender get() = from.first()
-
-    var priority
-        get() = enumValueOfOrNull<Priority>(_priority)
-        set(value) {
-            _priority = value?.apiCallValue
-        }
 
     val dkimStatus: MessageDKIM get() = enumValueOfOrNull<MessageDKIM>(_dkimStatus) ?: MessageDKIM.VALID
 
