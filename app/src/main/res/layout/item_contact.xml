@@ -37,13 +37,14 @@
         tools:email="thiago@silva.com"
         tools:name="@tools:sample/full_names" />
 
-    <ImageView
+    <View
         android:id="@+id/scrim"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:alpha="0.5"
+        android:background="@color/backgroundColor"
         android:contentDescription="@string/contentDescriptionContactAlreadyUsed"
         android:labelFor="@id/checkMark"
-        android:src="@color/selected_contact_scrim"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
