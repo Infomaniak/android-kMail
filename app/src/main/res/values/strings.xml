@@ -59,8 +59,8 @@
     <string name="appSecurityDescription">Protect access to your app by enabling your phone lock.</string>
     <string name="archiveFolder">Archived</string>
     <string name="attachAddressDescription">If you already have an Infomaniak email address, connect now.</string>
-    <string name="attachAddressInputHint">Email address to add</string>
-    <string name="attachAddressPasswordInputHint">Email address’ password</string>
+    <string name="attachAddressInputHint">Email address</string>
+    <string name="attachAddressPasswordInputHint">Password</string>
     <string name="attachAddressTitle">Add email address</string>
     <string name="attachmentActionCamera">Camera</string>
     <string name="attachmentActionFile">Attach a file</string>
@@ -120,6 +120,7 @@
     <string name="buttonUnselectAll">None</string>
     <string name="buttonValid">Validate</string>
     <string name="ccTitle">Cc:</string>
+    <string name="comingSoon">Coming soon…</string>
     <string name="commercialFolder">Promotions</string>
     <string name="confirmLogoutDescription">Are you sure you want to log out from %s?</string>
     <string name="confirmLogoutTitle">Log out</string>
@@ -175,6 +176,7 @@
     <string name="emptyStateTrashDescription">Move the messages to the trash. They will be permanently deleted after 30 days.</string>
     <string name="emptyStateTrashTitle">Trash is empty</string>
     <string name="errorAttachAddressInput">Only Infomaniak email addresses are supported</string>
+    <string name="errorInvalidCredentials">Invalid email or password</string>
     <string name="errorLoginDescription">The connection failed.</string>
     <string name="errorLoginTitle">Login error</string>
     <string name="errorNewFolderAlreadyExists">A folder with this name already exists</string>

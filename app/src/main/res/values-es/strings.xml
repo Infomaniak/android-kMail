@@ -52,8 +52,8 @@
     <string name="appSecurityDescription">Protege el acceso a tu aplicación activando el bloqueo del teléfono.</string>
     <string name="archiveFolder">Archivado</string>
     <string name="attachAddressDescription">Si ya dispone de una dirección de correo electrónico Infomaniak, conéctese ahora.</string>
-    <string name="attachAddressInputHint">Dirección de correo electrónico que desea añadir</string>
-    <string name="attachAddressPasswordInputHint">Contraseña de la dirección de correo electrónico</string>
+    <string name="attachAddressInputHint">Dirección de correo electrónico</string>
+    <string name="attachAddressPasswordInputHint">Contraseña</string>
     <string name="attachAddressTitle">Añadir dirección de correo electrónico</string>
     <string name="attachmentActionCamera">Cámara</string>
     <string name="attachmentActionFile">Adjuntar un archivo</string>
@@ -113,6 +113,7 @@
     <string name="buttonUnselectAll">Ninguno</string>
     <string name="buttonValid">Validar</string>
     <string name="ccTitle">Cc:</string>
+    <string name="comingSoon">Próximamente…</string>
     <string name="commercialFolder">Promociones</string>
     <string name="confirmLogoutDescription">¿Seguro que quieres desconectarte de %s?</string>
     <string name="confirmLogoutTitle">Cerrar sesión</string>
@@ -168,6 +169,7 @@
     <string name="emptyStateTrashDescription">Mueve los mensajes a la papelera. Se borrarán definitivamente pasados 30 días.</string>
     <string name="emptyStateTrashTitle">La papelera está vacía</string>
     <string name="errorAttachAddressInput">Sólo se admiten las direcciones de correo electrónico Infomaniak</string>
+    <string name="errorInvalidCredentials">Correo electrónico o contraseña no válidos</string>
     <string name="errorLoginDescription">La conexión ha fallado.</string>
     <string name="errorLoginTitle">Error de inicio de sesión</string>
     <string name="errorNewFolderAlreadyExists">Ya existe una carpeta con este nombre</string>

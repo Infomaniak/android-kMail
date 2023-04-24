@@ -52,8 +52,8 @@
     <string name="appSecurityDescription">Proteggete l’accesso alla vostra applicazione attivando il blocco del telefono.</string>
     <string name="archiveFolder">Archiviato</string>
     <string name="attachAddressDescription">Se hai già un indirizzo e-mail Infomaniak, accedi ora.</string>
-    <string name="attachAddressInputHint">Indirizzo e-mail da aggiungere</string>
-    <string name="attachAddressPasswordInputHint">Password per l’indirizzo e-mail</string>
+    <string name="attachAddressInputHint">Indirizzo e-mail</string>
+    <string name="attachAddressPasswordInputHint">Password</string>
     <string name="attachAddressTitle">Aggiungi indirizzo e-mail</string>
     <string name="attachmentActionCamera">Macchina fotografica</string>
     <string name="attachmentActionFile">Allegare un file</string>
@@ -113,6 +113,7 @@
     <string name="buttonUnselectAll">Nessuno</string>
     <string name="buttonValid">Convalidare</string>
     <string name="ccTitle">Cc:</string>
+    <string name="comingSoon">Prossimamente…</string>
     <string name="commercialFolder">Promozioni</string>
     <string name="confirmLogoutDescription">Siete sicuri di volervi disconnettere da %s?</string>
     <string name="confirmLogoutTitle">Disconnettersi</string>
@@ -168,6 +169,7 @@
     <string name="emptyStateTrashDescription">Spostate i messaggi nel cestino. Verranno eliminati definitivamente dopo 30 giorni.</string>
     <string name="emptyStateTrashTitle">Il cestino è vuoto</string>
     <string name="errorAttachAddressInput">Sono supportati solo gli indirizzi e-mail Infomaniak</string>
+    <string name="errorInvalidCredentials">Email o password non valide</string>
     <string name="errorLoginDescription">La connessione non è riuscita.</string>
     <string name="errorLoginTitle">Errore di accesso</string>
     <string name="errorNewFolderAlreadyExists">Esiste già una cartella con questo nome</string>

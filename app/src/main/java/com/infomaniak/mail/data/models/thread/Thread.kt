@@ -194,6 +194,7 @@ class Thread : RealmObject {
 
     fun formatDate(context: Context): String = with(date.toDate()) {
         when {
+            isInTheFuture() -> format(FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR)
             isToday() -> format(FORMAT_DATE_HOUR_MINUTE)
             isYesterday() -> context.getString(R.string.messageDetailsYesterday)
             isSmallerThanDays(6) -> format(FORMAT_DAY_OF_THE_WEEK)
