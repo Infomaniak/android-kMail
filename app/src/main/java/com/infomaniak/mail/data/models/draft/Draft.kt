@@ -77,6 +77,11 @@ class Draft : RealmObject {
     var references: String? = null
     @SerialName("st_uuid")
     var swissTransferUuid: String? = null
+
+    /**
+     * This `delay` should NOT be removed. If we remove it, we won't receive any `etop` from the API when sending an Email.
+     */
+    var delay: Int = 0
     //endregion
 
     //region Local data (Transient)
