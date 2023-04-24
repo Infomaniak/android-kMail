@@ -71,7 +71,7 @@ class ThreadFragment : Fragment() {
     private val mainViewModel: MainViewModel by activityViewModels()
     private val threadViewModel: ThreadViewModel by viewModels()
 
-    private val threadAdapter by lazy { ThreadAdapter(requireContext()) }
+    private val threadAdapter by lazy { ThreadAdapter(requireContext(), binding.messagesList) }
     private val permissionUtils by lazy { PermissionUtils(this) }
 
     private var isFavorite = false

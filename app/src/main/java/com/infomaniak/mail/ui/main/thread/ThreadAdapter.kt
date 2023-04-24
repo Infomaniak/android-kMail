@@ -20,8 +20,11 @@ package com.infomaniak.mail.ui.main.thread
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.ScaleGestureDetector
+import android.view.ViewConfiguration
 import android.view.ViewGroup
 import android.webkit.WebView
+import android.widget.FrameLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
@@ -48,7 +51,8 @@ import org.jsoup.Jsoup
 import java.util.*
 import com.google.android.material.R as RMaterial
 
-class ThreadAdapter(context: Context) : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBinding.OnRealmChanged<Message> {
+class ThreadAdapter(context: Context, private val recyclerView: RecyclerView) : RecyclerView.Adapter<ThreadViewHolder>(),
+    RealmChangesBinding.OnRealmChanged<Message> {
 
     var messages = listOf<Message>()
         private set
@@ -65,6 +69,8 @@ class ThreadAdapter(context: Context) : RecyclerView.Adapter<ThreadViewHolder>()
     var onMenuClicked: ((Message) -> Unit)? = null
 
     private val webViewUtils by lazy { WebViewUtils(context) }
+
+    private val scaledTouchSlop by lazy { ViewConfiguration.get(context).scaledTouchSlop }
 
     override fun updateList(itemList: List<Message>) {
         messages = itemList
@@ -171,13 +177,9 @@ class ThreadAdapter(context: Context) : RecyclerView.Adapter<ThreadViewHolder>()
         styledBody = processMailDisplay(styledBody, uid)
 
         settings.setupThreadWebViewSettings()
+        setupZoomListeners()
 
         loadDataWithBaseURL("", styledBody, TEXT_HTML, Utils.UTF_8, "")
-    }
-
-    private fun WebView.processMailDisplay(styledBody: String, uid: String): String {
-        val isDisplayedInDark = context.isNightModeEnabled() && isThemeTheSameMap[uid] == true
-        return webViewUtils.processHtml(styledBody, isDisplayedInDark)
     }
 
     private fun createHtmlForPlainText(text: String): String {
@@ -185,6 +187,18 @@ class ThreadAdapter(context: Context) : RecyclerView.Adapter<ThreadViewHolder>()
             body().appendElement("pre").text(text).attr("style", "word-wrap: break-word; white-space: pre-wrap;")
             return html()
         }
+    }
+
+    private fun WebView.processMailDisplay(styledBody: String, uid: String): String {
+        val isDisplayedInDark = context.isNightModeEnabled() && isThemeTheSameMap[uid] == true
+        return webViewUtils.processHtml(styledBody, isDisplayedInDark)
+    }
+
+    private fun WebView.setupZoomListeners() {
+        val scaleListener = MessageBodyScaleListener(recyclerView, this, this.parent as FrameLayout)
+        val scaleDetector = ScaleGestureDetector(context, scaleListener)
+        val touchListener = MessageBodyTouchListener(recyclerView, scaleDetector, scaledTouchSlop)
+        setOnTouchListener(touchListener)
     }
 
     private fun ItemMessageBinding.toggleQuoteButtonTheme(isThemeTheSame: Boolean) {
