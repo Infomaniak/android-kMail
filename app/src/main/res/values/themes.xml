@@ -34,6 +34,7 @@
     </style>
 
     <style name="AppThemeBase" parent="Theme.Material3.DynamicColors.DayNight.NoActionBar">
+        <item name="android:adjustViewBounds">true</item>
         <item name="android:colorBackground">@color/backgroundColor</item>
         <item name="android:fontFamily">@font/suisseintl_regular</item>
         <item name="android:includeFontPadding">false</item>
