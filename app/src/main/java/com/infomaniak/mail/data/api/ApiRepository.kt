@@ -80,6 +80,14 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.signatures(mailboxHostingId, mailboxName), GET)
     }
 
+    fun getBackups(mailboxHostingId: Int, mailboxName: String): ApiResponse<BackupResult> {
+        return callApi(ApiRoutes.backups(mailboxHostingId, mailboxName), GET)
+    }
+
+    fun restoreBackup(mailboxHostingId: Int, mailboxName: String, date: String): ApiResponse<Boolean> {
+        return callApi(ApiRoutes.backups(mailboxHostingId, mailboxName), PUT, body = { "date" to date })
+    }
+
     fun getMailboxes(okHttpClient: OkHttpClient? = null): ApiResponse<List<Mailbox>> {
         return callApi(ApiRoutes.mailbox(), GET, okHttpClient = okHttpClient ?: HttpClient.okHttpClient)
     }
