@@ -85,7 +85,7 @@ object ApiRepository : ApiRepositoryCore() {
     }
 
     fun restoreBackup(mailboxHostingId: Int, mailboxName: String, date: String): ApiResponse<Boolean> {
-        return callApi(ApiRoutes.backups(mailboxHostingId, mailboxName), PUT, body = { "date" to date })
+        return callApi(ApiRoutes.backups(mailboxHostingId, mailboxName), PUT, body = mapOf("date" to date))
     }
 
     fun getMailboxes(okHttpClient: OkHttpClient? = null): ApiResponse<List<Mailbox>> {

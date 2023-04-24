@@ -166,18 +166,6 @@
                       </LayoutPositions>
                     </value>
                   </entry>
-                  <entry key="helpFragment">
-                    <value>
-                      <LayoutPositions>
-                        <option name="myPosition">
-                          <Point>
-                            <option name="x" value="1476" />
-                            <option name="y" value="4107" />
-                          </Point>
-                        </option>
-                      </LayoutPositions>
-                    </value>
-                  </entry>
                   <entry key="introFragment">
                     <value>
                       <LayoutPositions>
@@ -352,6 +340,18 @@
                               </value>
                             </entry>
                           </map>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
+                  <entry key="restoreEmailsBottomSheetDialog">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="12" />
+                            <option name="y" value="12" />
+                          </Point>
                         </option>
                       </LayoutPositions>
                     </value>
@@ -636,11 +636,6 @@
                         <option name="myPositions">
                           <map>
                             <entry key="action_threadListFragment_to_accountFragment">
-                              <value>
-                                <LayoutPositions />
-                              </value>
-                            </entry>
-                            <entry key="action_threadListFragment_to_helpFragment">
                               <value>
                                 <LayoutPositions />
                               </value>

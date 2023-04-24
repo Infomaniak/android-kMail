@@ -147,9 +147,7 @@ class MenuDrawerFragment : MenuFoldersFragment() {
 
         restoreMails.setOnClickListener {
             trackMenuDrawerEvent("restoreEmails")
-            closeDrawer()
-            // TODO: Restore mails
-            notYetImplemented()
+            safeNavigate(R.id.restoreEmailsBottomSheetDialog, currentClassName = MenuDrawerFragment::class.java.name)
         }
     }
 
