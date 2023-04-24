@@ -62,7 +62,6 @@ import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomDarkMode
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getSetMargin
-import com.infomaniak.mail.utils.HtmlFormatter.Companion.loadCss
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import com.google.android.material.R as RMaterial
@@ -315,9 +314,15 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun WebView.loadContent(html: String) = with(HtmlFormatter(html)) {
+        settings.apply {
+            useWideViewPort = true
+            loadWithOverviewMode = true
+        }
+
         if (context.isNightModeEnabled()) registerCss(customDarkMode)
         registerCss(setMargin)
         registerCss(customStyle)
+        registerMetaViewPort()
         loadDataWithBaseURL("", inject(), ClipDescription.MIMETYPE_TEXT_HTML, Utils.UTF_8, "")
     }
 

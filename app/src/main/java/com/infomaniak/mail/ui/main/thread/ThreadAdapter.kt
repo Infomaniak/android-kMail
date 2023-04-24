@@ -182,9 +182,8 @@ class ThreadAdapter(context: Context) : RecyclerView.Adapter<ThreadViewHolder>()
     }
 
     private fun WebView.processMailDisplay(styledBody: String, uid: String): String = with(HtmlFormatter(styledBody)) {
-        if (context.isNightModeEnabled() && isThemeTheSameMap[uid] == true) {
-            registerCss(customDarkMode, DARK_BACKGROUND_STYLE_ID)
-        }
+        val isDisplayedInDark = context.isNightModeEnabled() && isThemeTheSameMap[uid] == true
+        if (isDisplayedInDark) registerCss(customDarkMode, DARK_BACKGROUND_STYLE_ID)
         registerCss(setMargin)
         registerCss(customStyle)
         registerMetaViewPort()
