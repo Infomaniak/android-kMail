@@ -146,10 +146,7 @@ class ThreadListAdapter(
     override fun getItemId(position: Int): Long {
         return when (val item = dataSet[position]) {
             is Thread -> item.uid.hashCode().toLong()
-            // We need to add the position to the id, because otherwise a mail whose date is in the future would create
-            // another labeled section (for ex. "next week"), thus having the same hashCode than the first "next week" section
-            // TODO: Add a section label "Future" ?
-            is String -> item.hashCode().toLong() + position
+            is String -> item.hashCode().toLong()
             else -> super.getItemId(position)
         }
     }
@@ -441,7 +438,6 @@ class ThreadListAdapter(
     private companion object {
         const val SWIPE_ANIMATION_THRESHOLD = 0.15f
         val CARD_ELEVATION = 6.toPx().toFloat()
-        const val DATE_BOTTOM_MARGIN_OTHER = 0
 
         const val FULL_MONTH = "MMMM"
         const val MONTH_AND_YEAR = "MMMM yyyy"
@@ -480,6 +476,7 @@ class ThreadListAdapter(
 
         fun Thread.getSectionTitle(context: Context): String = with(date.toDate()) {
             return when {
+                isInTheFuture() -> context.getString(R.string.comingSoon)
                 isToday() -> context.getString(R.string.threadListSectionToday)
                 isYesterday() -> context.getString(R.string.messageDetailsYesterday)
                 isThisWeek() -> context.getString(R.string.threadListSectionThisWeek)

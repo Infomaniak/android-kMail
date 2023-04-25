@@ -52,8 +52,8 @@
     <string name="appSecurityDescription">Protégez l’accès à votre application en activant le verrouillage de votre téléphone.</string>
     <string name="archiveFolder">Archive</string>
     <string name="attachAddressDescription">Vous possédez déjà une adresse mail Infomaniak, connectez-vous dès maintenant.</string>
-    <string name="attachAddressInputHint">Adresse mail à ajouter</string>
-    <string name="attachAddressPasswordInputHint">Mot de passe de l’adresse mail</string>
+    <string name="attachAddressInputHint">Adresse mail</string>
+    <string name="attachAddressPasswordInputHint">Mot de passe</string>
     <string name="attachAddressTitle">Ajoutez une adresse mail</string>
     <string name="attachmentActionCamera">Appareil photo</string>
     <string name="attachmentActionFile">Joindre un fichier</string>
@@ -114,6 +114,7 @@
     <string name="buttonUnselectAll">Aucun</string>
     <string name="buttonValid">Valider</string>
     <string name="ccTitle">Cc :</string>
+    <string name="comingSoon">À venir…</string>
     <string name="commercialFolder">Promotions</string>
     <string name="confirmLogoutDescription">Êtes-vous sûr de vouloir vous déconnecter du compte %s ?</string>
     <string name="confirmLogoutTitle">Me déconnecter</string>
@@ -169,6 +170,7 @@
     <string name="emptyStateTrashDescription">Déplacez les messages dans la corbeille. Ils seront supprimés définitivement au bout de 30 jours.</string>
     <string name="emptyStateTrashTitle">La corbeille est vide</string>
     <string name="errorAttachAddressInput">Seules les adresses mails Infomaniak sont supportées</string>
+    <string name="errorInvalidCredentials">E-mail ou mot de passe invalide</string>
     <string name="errorLoginDescription">La connexion a échoué.</string>
     <string name="errorLoginTitle">Erreur de connexion</string>
     <string name="errorNewFolderAlreadyExists">Un dossier de ce nom existe déjà</string>
