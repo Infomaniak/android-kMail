@@ -116,9 +116,11 @@
             android:id="@+id/reportDisplayProblem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             app:icon="@drawable/ic_feedbacks"
             app:staffOnly="true"
-            app:text="@string/actionReportDisplayProblem" />
+            app:text="@string/actionReportDisplayProblem"
+            tools:visibility="visible" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
