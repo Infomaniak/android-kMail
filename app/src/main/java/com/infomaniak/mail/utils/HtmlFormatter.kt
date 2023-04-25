@@ -89,7 +89,7 @@ class HtmlFormatter(private val html: String) {
 
         fun Context.getCustomDarkMode(): String = loadCss(R.raw.custom_dark_mode)
 
-        fun Context.getSetMargin(): String = loadCss(R.raw.set_margin_to_16_dp)
+        fun Context.getSetMargin(): String = loadCss(R.raw.set_margin_around_mail)
 
         fun Context.getCustomStyle(): String = loadCss(
             R.raw.custom_style,
