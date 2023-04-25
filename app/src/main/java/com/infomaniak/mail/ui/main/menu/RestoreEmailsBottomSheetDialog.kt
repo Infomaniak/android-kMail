@@ -26,13 +26,23 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
+import com.infomaniak.lib.core.utils.FORMAT_DATE_WITH_TIMEZONE
+import com.infomaniak.lib.core.utils.FORMAT_EVENT_DATE
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
+import com.infomaniak.lib.core.utils.format
+import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetRestoreEmailsBinding
+import java.text.SimpleDateFormat
+import java.util.Locale
 import com.infomaniak.lib.core.R as RCore
 
 class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
+
     private lateinit var binding: BottomSheetRestoreEmailsBinding
     private val restoreEmailViewModel: RestoreEmailsViewModel by viewModels()
+    private val autoCompleteTextView by lazy { (binding.datePicker.editText as? MaterialAutoCompleteTextView)!! }
+
+    private lateinit var formattedDates: Map<String, String>
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetRestoreEmailsBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -40,39 +50,47 @@ class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
+        autoCompleteTextView.hasLoaded(false)
 
-        val autoCompleteTextView = (datePicker.editText as? MaterialAutoCompleteTextView) ?: return
-        autoCompleteTextView.setSimpleItems(
-            arrayOf(
-                "20 avril 2023 à 4:30 AM",
-                "19 avril 2023 à 4:30 AM",
-                "12 avril 2023 à 4:30 AM",
-                "10 avril 2023 à 4:30 AM",
-            )
-        )
+        observeBackups()
 
+        datePickerText.doOnTextChanged { text, _, _, _ -> restoreMailsButton.isEnabled = text?.isNotBlank() == true }
+        restoreMailsButton.setOnClickListener { restoreEmails() }
+    }
+
+    private fun MaterialAutoCompleteTextView.hasLoaded(hasLoaded: Boolean) {
+        isEnabled = hasLoaded
+        isClickable = hasLoaded
+        if (hasLoaded) text = null else setText(R.string.loadingText)
+    }
+
+    private fun observeBackups() {
         restoreEmailViewModel.getBackups().observe(viewLifecycleOwner) { apiResponse ->
-            apiResponse?.data?.backups?.let(autoCompleteTextView::setSimpleItems)
-            // TODO better management of api Error
-            if (!apiResponse.isSuccess()) {
-                showSnackbar(RCore.string.anErrorHasOccurred)
-                // findNavController().popBackStack()
-            }
-        }
+            if (apiResponse.isSuccess()) {
+                formattedDates = apiResponse.data!!.backups.associateBy { it.getUserFriendlyDate() }
 
-        datePickerText.doOnTextChanged { text, _, _, _ ->
-            restoreMailsButton.isEnabled = text?.isNotBlank() == true
-        }
-
-        restoreMailsButton.setOnClickListener {
-            restoreEmailViewModel.restoreEmails(autoCompleteTextView.text.toString()).observe(viewLifecycleOwner) { apiResponse ->
-                // TODO better management of api Error
-                if (apiResponse.isSuccess()) {
-                    findNavController().popBackStack()
-                } else {
-                    showSnackbar(RCore.string.anErrorHasOccurred)
+                autoCompleteTextView.apply {
+                    setSimpleItems(formattedDates.keys.toTypedArray())
+                    hasLoaded(true)
                 }
+            } else {
+                showSnackbar(RCore.string.anErrorHasOccurred)
+                findNavController().popBackStack()
             }
         }
+    }
+
+    private fun restoreEmails() {
+        val date = autoCompleteTextView.text.toString()
+
+        restoreEmailViewModel.restoreEmails(formattedDates[date] ?: date).observe(viewLifecycleOwner) { apiResponse ->
+            showSnackbar(if (apiResponse.isSuccess()) R.string.snackbarSuccessfulRestoration else RCore.string.anErrorHasOccurred)
+            findNavController().popBackStack()
+        }
+    }
+
+    private fun String.getUserFriendlyDate(): String {
+        val backupDateFormat = FORMAT_DATE_WITH_TIMEZONE.dropLast(1)
+        return SimpleDateFormat(backupDateFormat, Locale.getDefault()).parse(this)?.format(FORMAT_EVENT_DATE) ?: this
     }
 }
