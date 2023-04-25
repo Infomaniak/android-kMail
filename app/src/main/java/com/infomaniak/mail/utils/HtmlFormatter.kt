@@ -64,7 +64,7 @@ class HtmlFormatter(private val html: String) {
     companion object {
         private const val PRIMARY_COLOR_CODE = "--kmail-primary-color"
 
-        fun Context.loadCss(@RawRes cssResId: Int, customColors: List<Pair<String, Int>> = emptyList()): String {
+        private fun Context.loadCss(@RawRes cssResId: Int, customColors: List<Pair<String, Int>> = emptyList()): String {
             var css = readRawResource(cssResId)
 
             if (customColors.isNotEmpty()) {

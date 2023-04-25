@@ -59,9 +59,6 @@ import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.*
 import com.infomaniak.mail.ui.main.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomDarkMode
-import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
-import com.infomaniak.mail.utils.HtmlFormatter.Companion.getSetMargin
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import com.google.android.material.R as RMaterial
@@ -81,9 +78,7 @@ class NewMessageFragment : Fragment() {
 
     private val attachmentAdapter = AttachmentAdapter(shouldDisplayCloseButton = true, onDelete = ::onDeleteAttachment)
 
-    private val customDarkMode by lazy { requireContext().getCustomDarkMode() }
-    private val setMargin by lazy { requireContext().getSetMargin() }
-    private val customStyle by lazy { requireContext().getCustomStyle() }
+    private val webViewUtils by lazy { WebViewUtils(requireContext()) }
 
     private var mailboxes = emptyList<Mailbox>()
     private var selectedMailboxIndex = 0
@@ -313,17 +308,14 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun WebView.loadContent(html: String) = with(HtmlFormatter(html)) {
+    private fun WebView.loadContent(html: String) {
         settings.apply {
             useWideViewPort = true
             loadWithOverviewMode = true
         }
 
-        if (context.isNightModeEnabled()) registerCss(customDarkMode)
-        registerCss(setMargin)
-        registerCss(customStyle)
-        registerMetaViewPort()
-        loadDataWithBaseURL("", inject(), ClipDescription.MIMETYPE_TEXT_HTML, Utils.UTF_8, "")
+        val processedHtml = webViewUtils.processHtml(html, context.isNightModeEnabled())
+        loadDataWithBaseURL("", processedHtml, ClipDescription.MIMETYPE_TEXT_HTML, Utils.UTF_8, "")
     }
 
     private fun populateViewModelWithExternalMailData() {

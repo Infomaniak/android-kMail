@@ -19,7 +19,6 @@ package com.infomaniak.mail.ui.main.thread
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.webkit.WebView
@@ -40,9 +39,6 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadViewHolder
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomDarkMode
-import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
-import com.infomaniak.mail.utils.HtmlFormatter.Companion.getSetMargin
 import com.infomaniak.mail.utils.UiUtils.getPrettyNameAndEmail
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.TEXT_HTML
@@ -67,9 +63,7 @@ class ThreadAdapter(context: Context) : RecyclerView.Adapter<ThreadViewHolder>()
     var onReplyClicked: ((Message) -> Unit)? = null
     var onMenuClicked: ((Message) -> Unit)? = null
 
-    private val customDarkMode by lazy { context.getCustomDarkMode() }
-    private val setMargin by lazy { context.getSetMargin() }
-    private val customStyle by lazy { context.getCustomStyle() }
+    private val webViewUtils by lazy { WebViewUtils(context) }
 
     override fun updateList(itemList: List<Message>) {
         messages = itemList
@@ -181,13 +175,9 @@ class ThreadAdapter(context: Context) : RecyclerView.Adapter<ThreadViewHolder>()
         loadDataWithBaseURL("", styledBody, TEXT_HTML, Utils.UTF_8, "")
     }
 
-    private fun WebView.processMailDisplay(styledBody: String, uid: String): String = with(HtmlFormatter(styledBody)) {
+    private fun WebView.processMailDisplay(styledBody: String, uid: String): String {
         val isDisplayedInDark = context.isNightModeEnabled() && isThemeTheSameMap[uid] == true
-        if (isDisplayedInDark) registerCss(customDarkMode, DARK_BACKGROUND_STYLE_ID)
-        registerCss(setMargin)
-        registerCss(customStyle)
-        registerMetaViewPort()
-        inject()
+        return webViewUtils.processHtml(styledBody, isDisplayedInDark)
     }
 
     private fun createHtmlForPlainText(text: String): String {
@@ -432,8 +422,6 @@ class ThreadAdapter(context: Context) : RecyclerView.Adapter<ThreadViewHolder>()
         const val FORMAT_EMAIL_DATE_HOUR = "HH:mm"
         const val FORMAT_EMAIL_DATE_SHORT_DATE = "d MMM"
         const val FORMAT_EMAIL_DATE_LONG_DATE = "d MMM yyyy"
-
-        const val DARK_BACKGROUND_STYLE_ID = "dark_background_style"
     }
 
     class ThreadViewHolder(
