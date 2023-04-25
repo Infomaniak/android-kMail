@@ -64,7 +64,8 @@
                 app:layout_constraintEnd_toStartOf="@id/editorAttachment"
                 app:layout_constraintHorizontal_chainStyle="packed"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:visibility="visible" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/editorAttachment"
@@ -84,11 +85,13 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:contentDescription="@string/buttonCamera"
+                android:visibility="gone"
                 app:icon="@drawable/ic_editor_camera"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/editorLink"
                 app:layout_constraintStart_toEndOf="@+id/editorAttachment"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:visibility="visible" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/editorLink"
@@ -101,7 +104,8 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/editorClock"
                 app:layout_constraintStart_toEndOf="@+id/editorCamera"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:visibility="visible" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/editorClock"
@@ -114,7 +118,8 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/editorBold"
                 app:layout_constraintStart_toEndOf="@+id/editorLink"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:visibility="visible" />
 
             <com.infomaniak.mail.ui.main.newMessage.ToggleableTextFormatterItemView
                 android:id="@+id/editorBold"
@@ -194,7 +199,7 @@
                 android:id="@+id/editorActions"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:constraint_referenced_ids="editorAttachment,editorCamera" />
+                app:constraint_referenced_ids="editorAttachment" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
