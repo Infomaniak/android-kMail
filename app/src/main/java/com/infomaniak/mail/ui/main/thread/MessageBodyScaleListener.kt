@@ -25,7 +25,7 @@ import androidx.recyclerview.widget.RecyclerView
 class MessageBodyScaleListener(
     private val webViewScrollView: RecyclerView,
     private val messageBodyWebView: WebView,
-    private val directParent: FrameLayout
+    private val directParent: FrameLayout,
 ) : ScaleGestureDetector.SimpleOnScaleGestureListener() {
 
     override fun onScale(detector: ScaleGestureDetector): Boolean {

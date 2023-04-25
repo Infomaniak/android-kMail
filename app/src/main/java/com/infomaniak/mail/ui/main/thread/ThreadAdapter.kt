@@ -51,7 +51,7 @@ import org.jsoup.Jsoup
 import java.util.*
 import com.google.android.material.R as RMaterial
 
-class ThreadAdapter(context: Context, private val recyclerView: RecyclerView) : RecyclerView.Adapter<ThreadViewHolder>(),
+class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
     RealmChangesBinding.OnRealmChanged<Message> {
 
     var messages = listOf<Message>()
@@ -68,9 +68,15 @@ class ThreadAdapter(context: Context, private val recyclerView: RecyclerView) : 
     var onReplyClicked: ((Message) -> Unit)? = null
     var onMenuClicked: ((Message) -> Unit)? = null
 
-    private val webViewUtils by lazy { WebViewUtils(context) }
+    private lateinit var recyclerView: RecyclerView
+    private val webViewUtils by lazy { WebViewUtils(recyclerView.context) }
 
-    private val scaledTouchSlop by lazy { ViewConfiguration.get(context).scaledTouchSlop }
+    private val scaledTouchSlop by lazy { ViewConfiguration.get(recyclerView.context).scaledTouchSlop }
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        this.recyclerView = recyclerView
+        super.onAttachedToRecyclerView(recyclerView)
+    }
 
     override fun updateList(itemList: List<Message>) {
         messages = itemList

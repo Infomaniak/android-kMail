@@ -27,11 +27,11 @@ import kotlin.math.abs
 class MessageBodyTouchListener(
     private val webViewScrollView: ViewParent,
     private val scaleDetector: ScaleGestureDetector,
-    private val scaledTouchSlop: Int
+    private val scaledTouchSlop: Int,
 ) : View.OnTouchListener {
 
-    private var lastX = 0f
-    private var lastY = 0f
+    private var lastX = 0.0f
+    private var lastY = 0.0f
 
     override fun onTouch(view: View, motionEvent: MotionEvent): Boolean {
         if (view is WebView) {
