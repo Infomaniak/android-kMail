@@ -75,6 +75,7 @@ android {
 }
 
 dependencies {
+    implementation project(path: ':HtmlCleaner')
     implementation project(path: ':Core')
     implementation project(path: ':Core:AppLock')
     implementation project(path: ':Core:BugTracker')
