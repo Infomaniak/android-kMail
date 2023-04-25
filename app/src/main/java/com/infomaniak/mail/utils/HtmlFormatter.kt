@@ -56,9 +56,11 @@ class HtmlFormatter(private val html: String) {
     }
 
     private fun Element.injectMetaViewPort() {
-        if (needsMetaViewport) appendElement("meta")
-            .attr("name", "viewport")
-            .attr("content", "width=device-width")
+        if (needsMetaViewport) {
+            appendElement("meta")
+                .attr("name", "viewport")
+                .attr("content", "width=device-width")
+        }
     }
 
     companion object {
@@ -93,7 +95,7 @@ class HtmlFormatter(private val html: String) {
 
         fun Context.getCustomStyle(): String = loadCss(
             R.raw.custom_style,
-            listOf(PRIMARY_COLOR_CODE to getAttributeColor(RMaterial.attr.colorPrimary))
+            listOf(PRIMARY_COLOR_CODE to getAttributeColor(RMaterial.attr.colorPrimary)),
         )
     }
 }
