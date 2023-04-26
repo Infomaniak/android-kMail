@@ -76,6 +76,7 @@ class MenuDrawerFragment : MenuFoldersFragment() {
         observeCurrentFolder()
         observeFoldersLive()
         observeQuotasLive()
+        observePermissionsLive()
     }
 
     private fun setupListeners() = with(binding) {
@@ -231,6 +232,12 @@ class MenuDrawerFragment : MenuFoldersFragment() {
                 storageText.text = quotas?.getText(context) ?: return@observe
                 storageIndicator.progress = quotas.getProgress()
             }
+        }
+    }
+
+    private fun observePermissionsLive() {
+        mainViewModel.currentPermissionsLive.observe(viewLifecycleOwner) { permissions ->
+            binding.restoreMails.isVisible = permissions?.canRestoreEmails == true
         }
     }
 

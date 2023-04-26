@@ -30,6 +30,7 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.*
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
+import com.infomaniak.mail.data.cache.mailboxInfo.PermissionsController
 import com.infomaniak.mail.data.cache.mailboxInfo.QuotasController
 import com.infomaniak.mail.data.cache.userInfo.AddressBookController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
@@ -106,6 +107,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     val currentQuotasLive = _currentMailboxObjectId.flatMapLatest {
         it?.let(QuotasController::getQuotasAsync) ?: emptyFlow()
+    }.asLiveData(coroutineContext)
+
+    val currentPermissionsLive = _currentMailboxObjectId.flatMapLatest {
+        it?.let(PermissionsController::getPermissionsAsync) ?: emptyFlow()
     }.asLiveData(coroutineContext)
     //endregion
 
