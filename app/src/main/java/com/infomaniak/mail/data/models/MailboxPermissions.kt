@@ -24,6 +24,14 @@ import kotlinx.serialization.Serializable
 @Serializable
 class MailboxPermissions : EmbeddedRealmObject {
 
+    @SerialName("can_manage_filters")
+    var canManageFilters: Boolean = false
+    @SerialName("can_change_password")
+    var canChangePassword: Boolean = false
+    @SerialName("can_manage_signatures")
+    var canManageSignatures: Boolean = false
+    @SerialName("can_configure_mail_folders")
+    var canConfigureMailFolders: Boolean = false
     @SerialName("can_restore_emails")
     var canRestoreEmails: Boolean = false
 }

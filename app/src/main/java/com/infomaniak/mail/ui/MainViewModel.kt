@@ -235,6 +235,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val mailbox = currentMailbox.value!!
             updateMailboxQuotas(mailbox)
 
+            Log.d(TAG, "Force refresh permissions")
+            updateMailboxPermissions(mailbox)
+
             Log.d(TAG, "Force refresh folders")
             updateFolders(mailbox)
         }
@@ -252,6 +255,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 it.quotas = data
             }
         }
+    }
+
+    private fun updateMailboxPermissions(mailbox: Mailbox) {
+        val apiResponse = ApiRepository.getPermissions(mailbox.linkId, mailbox.hostingId)
+
+        if (apiResponse.isSuccess()) MailboxController.updateMailbox(mailbox.objectId) { it.permissions = apiResponse.data }
     }
 
     fun openFolder(folderId: String) = viewModelScope.launch(Dispatchers.IO) {
