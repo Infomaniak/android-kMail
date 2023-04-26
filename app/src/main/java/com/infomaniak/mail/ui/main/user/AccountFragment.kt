@@ -64,6 +64,7 @@ class AccountFragment : Fragment() {
         }
 
         attachNewMailboxButton.setOnClickListener {
+            context.trackAccountEvent("addMailbox")
             safeNavigate(AccountFragmentDirections.actionAccountFragmentToAttachMailboxFragment())
         }
 

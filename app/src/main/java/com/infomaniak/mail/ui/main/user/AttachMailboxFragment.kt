@@ -28,6 +28,7 @@ import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.hideProgress
 import com.infomaniak.lib.core.utils.showKeyboard
 import com.infomaniak.lib.core.utils.showProgress
+import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentAttachMailboxBinding
 import com.infomaniak.mail.utils.ErrorCode
@@ -55,6 +56,7 @@ class AttachMailboxFragment : Fragment() {
             passwordInput.doAfterTextChanged { isEnabled = shouldEnableButton() }
 
             setOnClickListener {
+                context.trackAccountEvent("addMailboxConfirm")
                 showProgress()
                 attachMailbox()
             }
