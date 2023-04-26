@@ -151,7 +151,8 @@ class NewMessageActivity : ThemedActivity() {
 
         fun linkEditor(view: MaterialButton, action: EditorAction) {
             view.setOnClickListener {
-                newMessageViewModel.shouldHandleDraftActionWhenLeaving = false
+                // TODO: Don't forget to add in this `if` all actions that make the app go to background.
+                if (action == EditorAction.ATTACHMENT) newMessageViewModel.shouldHandleDraftActionWhenLeaving = false
                 trackEvent("editorActions", action.matomoValue)
                 newMessageViewModel.editorAction.value = action to null
             }
@@ -159,6 +160,7 @@ class NewMessageActivity : ThemedActivity() {
 
         linkEditor(editorAttachment, EditorAction.ATTACHMENT)
         linkEditor(editorCamera, EditorAction.CAMERA)
+        linkEditor(editorLink, EditorAction.LINK)
         linkEditor(editorClock, EditorAction.CLOCK)
     }
 

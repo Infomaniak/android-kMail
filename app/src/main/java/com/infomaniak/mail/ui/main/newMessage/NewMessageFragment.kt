@@ -436,6 +436,7 @@ class NewMessageFragment : Fragment() {
                     }
                 }
                 EditorAction.CAMERA -> notYetImplemented()
+                EditorAction.LINK -> notYetImplemented()
                 EditorAction.CLOCK -> notYetImplemented()
                 else -> Log.wtf("SelectedText", "Impossible action got triggered: $editorAction")
             }
