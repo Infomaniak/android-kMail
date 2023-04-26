@@ -289,8 +289,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     /**
-     * The boolean return value is used to know if we should keep the
-     * Thread in the RecyclerView, or remove it when the swipe is done.
+     * The boolean return value is used to know if we should keep the Thread in
+     * the RecyclerView (true), or remove it when the swipe is done (false).
      */
     private fun performSwipeActionOnThread(swipeAction: SwipeAction, threadUid: String): Boolean = with(mainViewModel) {
 
@@ -331,11 +331,11 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 toggleThreadSpamStatus(threadUid)
                 false
             }
-            SwipeAction.NONE -> throw IllegalStateException("Cannot swipe on an action which is not set")
-            else -> {
+            SwipeAction.POSTPONE -> {
                 notYetImplemented()
                 true
             }
+            SwipeAction.NONE -> throw IllegalStateException("Cannot swipe on an action which is not set")
         }
 
         return shouldKeepItem
