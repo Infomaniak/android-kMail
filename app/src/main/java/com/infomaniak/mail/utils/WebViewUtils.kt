@@ -18,6 +18,7 @@
 package com.infomaniak.mail.utils
 
 import android.content.Context
+import android.webkit.WebSettings
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomDarkMode
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getSetMargin
@@ -32,10 +33,21 @@ class WebViewUtils(context: Context) {
         registerCss(setMargin)
         registerCss(customStyle)
         registerMetaViewPort()
+        
         return inject()
     }
 
-    private companion object {
-        const val DARK_BACKGROUND_STYLE_ID = "dark_background_style"
+    companion object {
+        private const val DARK_BACKGROUND_STYLE_ID = "dark_background_style"
+
+        fun WebSettings.setupThreadWebViewSettings() {
+            useWideViewPort = true
+            loadWithOverviewMode = true
+        }
+
+        fun WebSettings.setupNewMessageWebViewSettings() {
+            useWideViewPort = true
+            loadWithOverviewMode = true
+        }
     }
 }

@@ -43,6 +43,7 @@ import com.infomaniak.mail.utils.UiUtils.getPrettyNameAndEmail
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.TEXT_HTML
 import com.infomaniak.mail.utils.Utils.TEXT_PLAIN
+import com.infomaniak.mail.utils.WebViewUtils.Companion.setupThreadWebViewSettings
 import org.jsoup.Jsoup
 import java.util.*
 import com.google.android.material.R as RMaterial
@@ -169,8 +170,7 @@ class ThreadAdapter(context: Context) : RecyclerView.Adapter<ThreadViewHolder>()
         var styledBody = if (type == TEXT_PLAIN) createHtmlForPlainText(bodyWebView) else bodyWebView
         styledBody = processMailDisplay(styledBody, uid)
 
-        settings.loadWithOverviewMode = true
-        settings.useWideViewPort = true
+        settings.setupThreadWebViewSettings()
 
         loadDataWithBaseURL("", styledBody, TEXT_HTML, Utils.UTF_8, "")
     }

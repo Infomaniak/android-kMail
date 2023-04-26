@@ -60,6 +60,7 @@ import com.infomaniak.mail.ui.main.newMessage.NewMessageViewModel.ImportationRes
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.Utils
+import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import com.google.android.material.R as RMaterial
 
@@ -309,10 +310,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun WebView.loadContent(html: String) {
-        settings.apply {
-            useWideViewPort = true
-            loadWithOverviewMode = true
-        }
+        settings.setupNewMessageWebViewSettings()
 
         val processedHtml = webViewUtils.processHtml(html, context.isNightModeEnabled())
         loadDataWithBaseURL("", processedHtml, ClipDescription.MIMETYPE_TEXT_HTML, Utils.UTF_8, "")
