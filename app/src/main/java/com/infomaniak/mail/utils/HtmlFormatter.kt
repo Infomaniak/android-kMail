@@ -18,16 +18,20 @@
 package com.infomaniak.mail.utils
 
 import android.content.Context
+import android.content.res.Resources
+import android.util.Log
 import androidx.annotation.RawRes
 import com.infomaniak.html.cleaner.HtmlSanitizer
 import com.infomaniak.mail.R
 import okhttp3.internal.toHexString
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
+import kotlin.math.roundToInt
 import com.google.android.material.R as RMaterial
 
 class HtmlFormatter(private val html: String) {
     private val cssList = mutableListOf<Pair<String, String?>>()
+    private val scripts = mutableListOf<String>()
     private var needsMetaViewport = false
 
     fun registerCss(css: String, styleId: String? = null) {
@@ -38,10 +42,16 @@ class HtmlFormatter(private val html: String) {
         needsMetaViewport = true
     }
 
+    fun registerScript(script: String) {
+        scripts.add(script)
+    }
+
     fun inject(): String = with(HtmlSanitizer.getInstance().sanitize(Jsoup.parse(html))) {
+        outputSettings().prettyPrint(true)
         head().apply {
             injectCss()
             injectMetaViewPort()
+            injectScript()
         }
         html()
     }
@@ -60,6 +70,14 @@ class HtmlFormatter(private val html: String) {
             appendElement("meta")
                 .attr("name", "viewport")
                 .attr("content", "width=device-width")
+        }
+    }
+
+    private fun Element.injectScript() {
+        scripts.forEach { script ->
+            Log.e("gibran", "injectScript - script: ${script}")
+            appendElement("script")
+                .text(script)
         }
     }
 
@@ -82,6 +100,13 @@ class HtmlFormatter(private val html: String) {
             return css
         }
 
+        private fun Context.loadScript(@RawRes scriptResId: Int, customVariablesDeclaration: List<String> = emptyList()): String {
+            var script = readRawResource(scriptResId)
+            customVariablesDeclaration.forEach { variableDeclaration -> script = variableDeclaration + "\n" + script }
+            Log.e("gibran", "loadScript - script: ${script}")
+            return script
+        }
+
         private fun formatCssVariable(variableName: String, color: Int): String {
             val formattedColor = colorToHexRepresentation(color)
             return "$variableName: $formattedColor;\n"
@@ -97,5 +122,15 @@ class HtmlFormatter(private val html: String) {
             R.raw.custom_style,
             listOf(PRIMARY_COLOR_CODE to getAttributeColor(RMaterial.attr.colorPrimary)),
         )
+
+        private fun computeScreenWidthInDp() = with(Resources.getSystem().displayMetrics) {
+            widthPixels / density
+        }.roundToInt()
+
+        fun Context.getResizeScript(): String {
+            val screenWidthInDpi = computeScreenWidthInDp()
+            // TODO : variable name and value
+            return loadScript(R.raw.script, listOf("var WEBVIEW_WIDTH = $screenWidthInDpi;"))
+        }
     }
 }

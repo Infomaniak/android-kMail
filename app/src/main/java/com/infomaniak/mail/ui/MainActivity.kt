@@ -102,6 +102,7 @@ class MainActivity : ThemedActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        WebView.setWebContentsDebuggingEnabled(true)
         super.onCreate(savedInstanceState)
         WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
 

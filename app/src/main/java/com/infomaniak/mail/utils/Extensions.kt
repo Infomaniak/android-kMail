@@ -92,6 +92,9 @@ import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmObject
 import kotlinx.serialization.encodeToString
 import org.jsoup.Jsoup
+import java.io.ByteArrayOutputStream
+import java.io.IOException
+import java.io.InputStream
 import java.util.Calendar
 import java.util.Date
 import java.util.Scanner
@@ -155,7 +158,7 @@ fun Context.formatSubject(subject: String?): String {
     }
 }
 
-fun Context.readRawResource(cssResId: Int): String = Scanner(resources.openRawResource(cssResId)).useDelimiter("\\A").next()
+fun Context.readRawResource(resId: Int): String = Scanner(resources.openRawResource(resId)).useDelimiter("\\A").next()
 
 fun LottieAnimationView.repeatFrame(firstFrame: Int, lastFrame: Int) {
     addAnimatorListener(object : Animator.AnimatorListener {
