@@ -21,5 +21,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class BackupResult(
+    @Suppress("ArrayInDataClass")
     val backups: Array<String>,
 )
