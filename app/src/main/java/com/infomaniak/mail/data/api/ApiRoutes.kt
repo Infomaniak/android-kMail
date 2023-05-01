@@ -17,7 +17,7 @@
  */
 package com.infomaniak.mail.data.api
 
-import com.infomaniak.mail.BuildConfig.INFOMANIAK_API
+import com.infomaniak.mail.BuildConfig.INFOMANIAK_API_V1
 import com.infomaniak.mail.BuildConfig.MAIL_API
 
 object ApiRoutes {
@@ -37,7 +37,7 @@ object ApiRoutes {
     fun permissions(linkId: Int, hostingId: Int) = "${mailbox()}/permissions?user_mailbox_id=$linkId&product_id=$hostingId"
 
     private fun apiMailbox(mailboxHostingId: Int, mailboxName: String): String {
-        return "$INFOMANIAK_API/mail_hostings/$mailboxHostingId/mailboxes/$mailboxName"
+        return "$INFOMANIAK_API_V1/mail_hostings/$mailboxHostingId/mailboxes/$mailboxName"
     }
 
     fun signatures(mailboxHostingId: Int, mailboxName: String) = "${apiMailbox(mailboxHostingId, mailboxName)}/signatures"
