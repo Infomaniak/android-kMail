@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.utils
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.webkit.WebSettings
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomDarkMode
@@ -46,6 +47,9 @@ class WebViewUtils(context: Context) {
         private const val DARK_BACKGROUND_STYLE_ID = "dark_background_style"
 
         fun WebSettings.setupThreadWebViewSettings() {
+            @SuppressLint("SetJavaScriptEnabled")
+            javaScriptEnabled = true
+
             loadWithOverviewMode = true
             useWideViewPort = true
 

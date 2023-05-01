@@ -13,3 +13,12 @@ blockquote blockquote blockquote blockquote {
   padding: 0 !important;
   border: none !important;
 }
+
+table.munged {
+    width: auto !important;
+    table-layout: auto !important;
+}
+td.munged {
+    width: auto !important;
+    white-space: normal !important;
+}

@@ -75,7 +75,6 @@ class HtmlFormatter(private val html: String) {
 
     private fun Element.injectScript() {
         scripts.forEach { script ->
-            Log.e("gibran", "injectScript - script: ${script}")
             appendElement("script")
                 .text(script)
         }
@@ -103,7 +102,6 @@ class HtmlFormatter(private val html: String) {
         private fun Context.loadScript(@RawRes scriptResId: Int, customVariablesDeclaration: List<String> = emptyList()): String {
             var script = readRawResource(scriptResId)
             customVariablesDeclaration.forEach { variableDeclaration -> script = variableDeclaration + "\n" + script }
-            Log.e("gibran", "loadScript - script: ${script}")
             return script
         }
 

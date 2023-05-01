@@ -19,7 +19,6 @@ package com.infomaniak.mail.ui.main.thread
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ScaleGestureDetector
 import android.view.ViewConfiguration
@@ -412,12 +411,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
         }
         menuButton.apply {
             isVisible = isExpanded
-            // setOnClickListener { onMenuClicked?.invoke(message) }
-            setOnClickListener {
-                bodyWebView.settings.javaScriptEnabled = true
-                bodyWebView.loadUrl("javascript:document.querySelectorAll('body')[0].setAttribute('style', \"background: #0F0\")")
-                bodyWebView.loadUrl("javascript:document.querySelectorAll('html')[0].setAttribute('style', \"background: #0F0\")")
-            }
+            setOnClickListener { onMenuClicked?.invoke(message) }
         }
 
         recipient.text = if (isExpanded) getAllRecipientsFormatted(message = this@with) else context.formatSubject(subject)

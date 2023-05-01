@@ -302,7 +302,10 @@ class NewMessageFragment : Fragment() {
         bodyText.setText(draft.uiBody)
 
         draft.uiSignature?.let { html ->
-            signatureWebView.loadContent(html)
+            signatureWebView.apply {
+                loadContent(html)
+                initWebViewClient(emptyList())
+            }
             removeSignature.setOnClickListener {
                 trackNewMessageEvent("deleteSignature")
                 draft.uiSignature = null

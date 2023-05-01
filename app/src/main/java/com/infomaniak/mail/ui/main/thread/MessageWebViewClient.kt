@@ -79,6 +79,12 @@ class MessageWebViewClient(
         return true
     }
 
+    override fun onPageFinished(webView: WebView, url: String?) {
+        // TODO : If is expanded then loadUrl
+        webView.loadUrl("javascript:normalizeAllMessageWidths()")
+        super.onPageFinished(webView, url)
+    }
+
     companion object {
         val TAG = MessageWebViewClient::class.simpleName
 
