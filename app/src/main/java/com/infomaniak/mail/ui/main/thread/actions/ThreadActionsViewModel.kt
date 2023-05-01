@@ -39,7 +39,7 @@ class ThreadActionsViewModel : ViewModel() {
             return@liveData
         }
 
-        val uidToReplyTo = messageUidToReplyTo ?: MessageController.getMessageToReplyTo(thread).uid
+        val uidToReplyTo = messageUidToReplyTo ?: MessageController.getLastMessageToExecuteAction(thread).uid
 
         emit(thread to uidToReplyTo)
     }
