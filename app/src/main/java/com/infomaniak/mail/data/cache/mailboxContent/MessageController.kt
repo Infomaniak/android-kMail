@@ -70,7 +70,7 @@ object MessageController {
         return getMessageQuery(uid, realm).find()
     }
 
-    fun getMessageToReplyTo(thread: Thread): Message = with(thread) {
+    fun getLastMessageToExecuteAction(thread: Thread): Message = with(thread) {
 
         val isNotFromMe = "SUBQUERY(${Message::from.name}, \$recipient, " +
                 "\$recipient.${Recipient::email.name} != '${AccountUtils.currentMailboxEmail}').@count > 0"
@@ -78,6 +78,13 @@ object MessageController {
         return messages.query("$isNotDraft AND $isNotFromMe").find().lastOrNull()
             ?: messages.query(isNotDraft).find().lastOrNull()
             ?: messages.last()
+    }
+
+    fun getLastMessageAndItsDuplicatesToExecuteAction(thread: Thread): List<Message> {
+        return getMessageAndDuplicates(
+            thread = thread,
+            message = getLastMessageToExecuteAction(thread),
+        )
     }
 
     fun getUnseenMessages(thread: Thread): List<Message> {
@@ -96,11 +103,6 @@ object MessageController {
 
     fun getUnscheduledMessages(thread: Thread): List<Message> {
         return getMessagesAndDuplicates(thread, isNotScheduled)
-    }
-
-    fun getLastMessageToExecuteAction(thread: Thread): List<Message> {
-        val message = thread.messages.query(isNotDraft).find().lastOrNull() ?: thread.messages.last()
-        return getMessageAndDuplicates(thread, message)
     }
 
     private fun getMessagesAndDuplicates(thread: Thread, query: String): List<Message> {

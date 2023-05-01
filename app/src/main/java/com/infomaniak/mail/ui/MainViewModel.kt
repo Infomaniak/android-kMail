@@ -564,7 +564,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun getMessagesToMarkAsUnseen(threads: List<Thread>, message: Message?) = when (message) {
-        null -> threads.flatMap(MessageController::getLastMessageToExecuteAction)
+        null -> threads.flatMap(MessageController::getLastMessageAndItsDuplicatesToExecuteAction)
         else -> MessageController.getMessageAndDuplicates(threads.first(), message)
     }
     //endregion
@@ -613,7 +613,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun getMessagesToFavorite(threads: List<Thread>, message: Message?) = when (message) {
-        null -> threads.flatMap(MessageController::getLastMessageToExecuteAction)
+        null -> threads.flatMap(MessageController::getLastMessageAndItsDuplicatesToExecuteAction)
         else -> MessageController.getMessageAndDuplicates(threads.first(), message)
     }
 

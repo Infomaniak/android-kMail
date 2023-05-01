@@ -97,7 +97,7 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
 
     fun clickOnQuickActionBar(threadUid: String, menuId: Int) = viewModelScope.launch(Dispatchers.IO) {
         val thread = ThreadController.getThread(threadUid) ?: return@launch
-        val message = MessageController.getMessageToReplyTo(thread)
+        val message = MessageController.getLastMessageToExecuteAction(thread)
         quickActionBarClicks.postValue(message to menuId)
     }
 }
