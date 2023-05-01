@@ -15,19 +15,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.firebase
+package com.infomaniak.mail.data.models.mailbox
 
-import com.infomaniak.lib.core.api.ApiController.ApiMethod.POST
-import com.infomaniak.lib.core.models.ApiResponse
-import com.infomaniak.mail.BuildConfig.INFOMANIAK_API_V1
-import com.infomaniak.mail.data.api.ApiRepository
-import okhttp3.OkHttpClient
+import io.realm.kotlin.types.EmbeddedRealmObject
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-object FirebaseApiRepository {
+@Serializable
+class MailboxPermissions : EmbeddedRealmObject {
 
-    private const val registerDevice = "$INFOMANIAK_API_V1/devices/register"
-
-    fun registerForNotifications(registrationInfos: RegistrationInfos, okHttpClient: OkHttpClient): ApiResponse<Boolean> {
-        return ApiRepository.callApi(registerDevice, POST, registrationInfos, okHttpClient)
-    }
+    @SerialName("can_manage_filters")
+    var canManageFilters: Boolean = false
+    @SerialName("can_change_password")
+    var canChangePassword: Boolean = false
+    @SerialName("can_manage_signatures")
+    var canManageSignatures: Boolean = false
+    @SerialName("can_configure_mail_folders")
+    var canConfigureMailFolders: Boolean = false
+    @SerialName("can_restore_emails")
+    var canRestoreEmails: Boolean = false
 }

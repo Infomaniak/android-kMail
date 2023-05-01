@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.models
 
 import androidx.core.app.NotificationManagerCompat
+import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
@@ -36,6 +37,8 @@ class Mailbox : RealmObject {
     var mailboxId: Int = -1
     @SerialName("hosting_id")
     var hostingId: Int = 0
+    @SerialName("link_id")
+    var linkId: Int = 0
     @SerialName("is_limited")
     var isLimited: Boolean = false
     //endregion
@@ -50,6 +53,8 @@ class Mailbox : RealmObject {
     var quotas: Quotas? = null
     @Transient
     var inboxUnreadCount: Int = 0
+    @Transient
+    var permissions: MailboxPermissions? = null
     //endregion
 
     inline val channelGroupId get() = "$mailboxId"

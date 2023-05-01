@@ -23,6 +23,7 @@ import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.Quotas
+import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.NotificationUtils.initMailNotificationChannel
 import io.realm.kotlin.MutableRealm
@@ -118,12 +119,12 @@ object MailboxController {
 
         // Get current data
         Log.d(RealmDatabase.TAG, "Mailboxes: Get current data")
-        val localQuotas = getMailboxes(userId).associate { it.objectId to it.quotas }
+        val localQuotasAndPermissions = getMailboxes(userId).associate { it.objectId to (it.quotas to it.permissions) }
 
         val isCurrentMailboxDeleted = defaultRealm.writeBlocking {
 
             Log.d(RealmDatabase.TAG, "Mailboxes: Save new data")
-            upsertMailboxes(localQuotas, remoteMailboxes)
+            upsertMailboxes(localQuotasAndPermissions, remoteMailboxes)
 
             Log.d(RealmDatabase.TAG, "Mailboxes: Delete outdated data")
             return@writeBlocking deleteOutdatedData(remoteMailboxes, userId)
@@ -132,9 +133,15 @@ object MailboxController {
         return isCurrentMailboxDeleted.also { if (it) AccountUtils.reloadApp }
     }
 
-    private fun MutableRealm.upsertMailboxes(localQuotas: Map<String, Quotas?>, remoteMailboxes: List<Mailbox>) {
+    private fun MutableRealm.upsertMailboxes(
+        localQuotasAndPermissions: Map<String, Pair<Quotas?, MailboxPermissions?>>,
+        remoteMailboxes: List<Mailbox>,
+    ) {
         remoteMailboxes.forEach { remoteMailbox ->
-            remoteMailbox.quotas = localQuotas[remoteMailbox.objectId]
+            remoteMailbox.apply {
+                quotas = localQuotasAndPermissions[objectId]?.first
+                permissions = localQuotasAndPermissions[objectId]?.second
+            }
             copyToRealm(remoteMailbox, UpdatePolicy.ALL)
         }
     }
