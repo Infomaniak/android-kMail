@@ -115,6 +115,11 @@ class ThreadFragment : Fragment() {
         mainViewModel.toggleLightThemeForMessage.observe(viewLifecycleOwner, threadAdapter::toggleLightMode)
     }
 
+    override fun onStop() {
+        threadAdapter.clearAlreadyLoadedWebViews()
+        super.onStop()
+    }
+
     private fun setupUi(threadUid: String) = with(binding) {
         toolbar.setNavigationOnClickListener { leaveThread() }
 

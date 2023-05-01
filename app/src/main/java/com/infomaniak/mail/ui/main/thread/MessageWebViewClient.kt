@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.main.thread
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
 import android.webkit.WebResourceRequest
@@ -79,8 +80,18 @@ class MessageWebViewClient(
         return true
     }
 
+    // override fun onPageCommitVisible(webView: WebView, url: String?) {
+    //     webView.loadUrl("javascript:normalizeAllMessageWidths()")
+    //     super.onPageCommitVisible(webView, url)
+    // }
+    //
+    // override fun onPageStarted(webView: WebView, url: String?, favicon: Bitmap?) {
+    //     webView.loadUrl("javascript:normalizeAllMessageWidths()")
+    //     super.onPageStarted(webView, url, favicon)
+    // }
+
     override fun onPageFinished(webView: WebView, url: String?) {
-        // TODO : If is expanded then loadUrl
+        // TODO : Try WebView.postVisualStateCallback
         webView.loadUrl("javascript:normalizeAllMessageWidths()")
         super.onPageFinished(webView, url)
     }

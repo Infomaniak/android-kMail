@@ -298,4 +298,4 @@ function shouldMungeTable(table) {
     return table.hasAttribute("width") || table.style.width;
 }
 
-normalizeAllMessageWidths();
+//normalizeAllMessageWidths();
