@@ -121,12 +121,12 @@ class Draft : RealmObject {
 
     fun initSignature(realm: MutableRealm, addContent: Boolean = true) {
 
-        val defaultSignature = SignatureController.getDefaultSignature(realm)
+        val signature = SignatureController.getSignature(realm)
 
-        identityId = defaultSignature.id.toString()
+        identityId = signature.id.toString()
 
-        if (addContent && defaultSignature.content.isNotEmpty()) {
-            body += """<div class="${MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME}">${defaultSignature.content}</div>"""
+        if (addContent && signature.content.isNotEmpty()) {
+            body += """<div class="${MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME}">${signature.content}</div>"""
         }
     }
 
