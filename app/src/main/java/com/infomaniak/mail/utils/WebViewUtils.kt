@@ -41,8 +41,12 @@ class WebViewUtils(context: Context) {
         private const val DARK_BACKGROUND_STYLE_ID = "dark_background_style"
 
         fun WebSettings.setupThreadWebViewSettings() {
-            useWideViewPort = true
             loadWithOverviewMode = true
+            useWideViewPort = true
+
+            setSupportZoom(true)
+            builtInZoomControls = true
+            displayZoomControls = false
         }
 
         fun WebSettings.setupNewMessageWebViewSettings() {
