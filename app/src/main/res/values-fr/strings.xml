@@ -331,7 +331,7 @@
         <item quantity="other">Expéditeurs blacklistés avec succès</item>
         <item quantity="many">Expéditeurs blacklistés avec succès</item>
     </plurals>
-    <string name="snackbarSuccessfulRestoration">Lancement de la restauration</string>
+    <string name="snackbarRestorationLaunched">Restauration effectuée avec succès</string>
     <plurals name="snackbarThreadDeletedPermanently">
         <item quantity="one">Conversation supprimée</item>
         <item quantity="other">Conversations supprimées</item>

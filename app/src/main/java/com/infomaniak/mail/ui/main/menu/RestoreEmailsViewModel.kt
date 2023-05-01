@@ -29,13 +29,13 @@ import kotlinx.coroutines.Dispatchers
 
 class RestoreEmailsViewModel : ViewModel() {
 
+    private val mailbox by lazy { MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
+
     fun getBackups(): LiveData<ApiResponse<BackupResult>> = liveData(Dispatchers.IO) {
-        val mailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
         emit(ApiRepository.getBackups(mailbox.hostingId, mailbox.mailboxName))
     }
 
     fun restoreEmails(date: String): LiveData<ApiResponse<Boolean>> = liveData(Dispatchers.IO) {
-        val mailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
         emit(ApiRepository.restoreBackup(mailbox.hostingId, mailbox.mailboxName, date))
     }
 }

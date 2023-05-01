@@ -327,7 +327,7 @@
         <item quantity="one">Remitente incluido en la lista negra</item>
         <item quantity="other">Remitentes incluidos con éxito en la lista negra</item>
     </plurals>
-    <string name="snackbarSuccessfulRestoration">Iniciar la restauración</string>
+    <string name="snackbarRestorationLaunched">Restauración finalizada con éxito</string>
     <plurals name="snackbarThreadDeletedPermanently">
         <item quantity="one">Conversación eliminada</item>
         <item quantity="other">Conversaciones eliminadas</item>

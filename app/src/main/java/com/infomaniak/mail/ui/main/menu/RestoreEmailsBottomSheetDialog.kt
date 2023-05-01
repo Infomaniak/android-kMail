@@ -40,8 +40,8 @@ class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
 
     private lateinit var binding: BottomSheetRestoreEmailsBinding
     private val restoreEmailViewModel: RestoreEmailsViewModel by viewModels()
-    private val autoCompleteTextView by lazy { (binding.datePicker.editText as? MaterialAutoCompleteTextView)!! }
 
+    private val autoCompleteTextView by lazy { (binding.datePicker.editText as? MaterialAutoCompleteTextView)!! }
     private lateinit var formattedDates: Map<String, String>
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -84,7 +84,7 @@ class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
         val date = autoCompleteTextView.text.toString()
 
         restoreEmailViewModel.restoreEmails(formattedDates[date] ?: date).observe(viewLifecycleOwner) { apiResponse ->
-            showSnackbar(if (apiResponse.isSuccess()) R.string.snackbarSuccessfulRestoration else RCore.string.anErrorHasOccurred)
+            showSnackbar(if (apiResponse.isSuccess()) R.string.snackbarRestorationLaunched else RCore.string.anErrorHasOccurred)
             findNavController().popBackStack()
         }
     }
