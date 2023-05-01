@@ -138,8 +138,10 @@ object MailboxController {
         remoteMailboxes: List<Mailbox>,
     ) {
         remoteMailboxes.forEach { remoteMailbox ->
-            remoteMailbox.quotas = localQuotasAndPermissions[remoteMailbox.objectId]?.first
-            remoteMailbox.permissions = localQuotasAndPermissions[remoteMailbox.objectId]?.second
+            remoteMailbox.apply {
+                quotas = localQuotasAndPermissions[objectId]?.first
+                permissions = localQuotasAndPermissions[objectId]?.second
+            }
             copyToRealm(remoteMailbox, UpdatePolicy.ALL)
         }
     }

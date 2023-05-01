@@ -258,9 +258,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun updateMailboxPermissions(mailbox: Mailbox) {
-        val apiResponse = ApiRepository.getPermissions(mailbox.linkId, mailbox.hostingId)
-
-        if (apiResponse.isSuccess()) MailboxController.updateMailbox(mailbox.objectId) { it.permissions = apiResponse.data }
+        with(ApiRepository.getPermissions(mailbox.linkId, mailbox.hostingId)) {
+            if (isSuccess()) MailboxController.updateMailbox(mailbox.objectId) {
+                it.permissions = data
+            }
+        }
     }
 
     fun openFolder(folderId: String) = viewModelScope.launch(Dispatchers.IO) {
