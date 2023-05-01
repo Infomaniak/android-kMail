@@ -43,11 +43,12 @@ import com.infomaniak.mail.utils.UiUtils.getPrettyNameAndEmail
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.TEXT_HTML
 import com.infomaniak.mail.utils.Utils.TEXT_PLAIN
+import com.infomaniak.mail.utils.WebViewUtils.Companion.setupThreadWebViewSettings
 import org.jsoup.Jsoup
 import java.util.*
 import com.google.android.material.R as RMaterial
 
-class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBinding.OnRealmChanged<Message> {
+class ThreadAdapter(context: Context) : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBinding.OnRealmChanged<Message> {
 
     var messages = listOf<Message>()
         private set
@@ -62,6 +63,8 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
     var onDownloadAllClicked: ((message: Message) -> Unit)? = null
     var onReplyClicked: ((Message) -> Unit)? = null
     var onMenuClicked: ((Message) -> Unit)? = null
+
+    private val webViewUtils by lazy { WebViewUtils(context) }
 
     override fun updateList(itemList: List<Message>) {
         messages = itemList
@@ -167,17 +170,14 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         var styledBody = if (type == TEXT_PLAIN) createHtmlForPlainText(bodyWebView) else bodyWebView
         styledBody = processMailDisplay(styledBody, uid)
 
+        settings.setupThreadWebViewSettings()
+
         loadDataWithBaseURL("", styledBody, TEXT_HTML, Utils.UTF_8, "")
     }
 
     private fun WebView.processMailDisplay(styledBody: String, uid: String): String {
-        var processedBody = styledBody
-        if (context.isNightModeEnabled() && isThemeTheSameMap[uid] == true) {
-            processedBody = context.injectCssInHtml(R.raw.custom_dark_mode, processedBody, DARK_BACKGROUND_STYLE_ID)
-        }
-        processedBody = context.injectCssInHtml(R.raw.remove_margin, processedBody)
-        processedBody = context.injectCssInHtml(R.raw.add_padding, processedBody)
-        return processedBody
+        val isDisplayedInDark = context.isNightModeEnabled() && isThemeTheSameMap[uid] == true
+        return webViewUtils.processHtml(styledBody, isDisplayedInDark)
     }
 
     private fun createHtmlForPlainText(text: String): String {
@@ -422,8 +422,6 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         const val FORMAT_EMAIL_DATE_HOUR = "HH:mm"
         const val FORMAT_EMAIL_DATE_SHORT_DATE = "d MMM"
         const val FORMAT_EMAIL_DATE_LONG_DATE = "d MMM yyyy"
-
-        const val DARK_BACKGROUND_STYLE_ID = "dark_background_style"
     }
 
     class ThreadViewHolder(

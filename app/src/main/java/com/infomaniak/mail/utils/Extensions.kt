@@ -31,7 +31,10 @@ import android.util.Patterns
 import android.view.View
 import android.view.Window
 import android.webkit.WebView
-import androidx.annotation.*
+import androidx.annotation.AttrRes
+import androidx.annotation.ColorRes
+import androidx.annotation.IdRes
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.NestedScrollView
@@ -169,17 +172,6 @@ fun Context.formatSubject(subject: String?): String {
         getString(R.string.noSubjectTitle)
     } else {
         subject.replace("\n+".toRegex(), " ")
-    }
-}
-
-fun Context.injectCssInHtml(@RawRes cssResId: Int, html: String, styleId: String? = null): String {
-    val css = readRawResource(cssResId)
-    return with(Jsoup.parse(html)) {
-        head().appendElement("style")
-            .attr("type", "text/css")
-            .appendText(css)
-            .also { element -> styleId?.let(element::id) }
-        html()
     }
 }
 

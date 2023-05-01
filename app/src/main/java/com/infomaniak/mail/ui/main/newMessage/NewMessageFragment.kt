@@ -60,6 +60,7 @@ import com.infomaniak.mail.ui.main.newMessage.NewMessageViewModel.ImportationRes
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.Utils
+import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import com.google.android.material.R as RMaterial
 
@@ -77,6 +78,8 @@ class NewMessageFragment : Fragment() {
     private lateinit var filePicker: FilePicker
 
     private val attachmentAdapter = AttachmentAdapter(shouldDisplayCloseButton = true, onDelete = ::onDeleteAttachment)
+
+    private val webViewUtils by lazy { WebViewUtils(requireContext()) }
 
     private var mailboxes = emptyList<Mailbox>()
     private var selectedMailboxIndex = 0
@@ -307,9 +310,10 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun WebView.loadContent(html: String) {
-        var content = if (context.isNightModeEnabled()) context.injectCssInHtml(R.raw.custom_dark_mode, html) else html
-        content = context.injectCssInHtml(R.raw.remove_margin, content)
-        loadDataWithBaseURL("", content, ClipDescription.MIMETYPE_TEXT_HTML, Utils.UTF_8, "")
+        settings.setupNewMessageWebViewSettings()
+
+        val processedHtml = webViewUtils.processHtml(html, context.isNightModeEnabled())
+        loadDataWithBaseURL("", processedHtml, ClipDescription.MIMETYPE_TEXT_HTML, Utils.UTF_8, "")
     }
 
     private fun populateViewModelWithExternalMailData() {

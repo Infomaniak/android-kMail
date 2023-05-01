@@ -1,0 +1,15 @@
+body {
+  overflow-wrap: break-word;
+}
+
+blockquote {
+  padding: 0.2em 1.2em !important;
+  margin: 0 !important;
+  border: 3px solid var(--kmail-primary-color) !important;
+  border-width: 0 0 0 3px !important;
+}
+
+blockquote blockquote blockquote blockquote {
+  padding: 0 !important;
+  border: none !important;
+}
