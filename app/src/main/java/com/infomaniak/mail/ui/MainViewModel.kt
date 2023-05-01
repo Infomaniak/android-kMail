@@ -353,11 +353,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun deleteThreadsOrMessage(
-        threadsUids: List<String> = emptyList(),
+        threadsUids: List<String>,
         message: Message? = null,
     ) = viewModelScope.launch(viewModelScope.handlerIO) {
         val mailbox = currentMailbox.value!!
-        val threads = threadsUids.mapNotNull(ThreadController::getThread)
+        val threads = threadsUids.mapNotNull(ThreadController::getThread).ifEmpty { return@launch }
         var trashId: String? = null
         var undoResource: String? = null
 
@@ -434,12 +434,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //region Move
     fun moveThreadsOrMessageTo(
         destinationFolderId: String,
-        threadsUids: Array<String> = emptyArray(),
+        threadsUids: Array<String>,
         messageUid: String? = null,
     ) = viewModelScope.launch(viewModelScope.handlerIO) {
         val mailbox = currentMailbox.value!!
         val destinationFolder = FolderController.getFolder(destinationFolderId)!!
-        val threads = threadsUids.mapNotNull(ThreadController::getThread)
+        val threads = threadsUids.mapNotNull(ThreadController::getThread).ifEmpty { return@launch }
         val message = messageUid?.let { MessageController.getMessage(it)!! }
 
         val messages = getMessagesToMove(threads, message)
@@ -495,11 +495,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun archiveThreadsOrMessage(
-        threadsUids: List<String> = emptyList(),
+        threadsUids: List<String>,
         message: Message? = null,
     ) = viewModelScope.launch(viewModelScope.handlerIO) {
         val mailbox = currentMailbox.value!!
-        val threads = threadsUids.mapNotNull(ThreadController::getThread)
+        val threads = threadsUids.mapNotNull(ThreadController::getThread).ifEmpty { return@launch }
 
         val isArchived = message?.let { it.folder.role == FolderRole.ARCHIVE } ?: isCurrentFolderRole(FolderRole.ARCHIVE)
 
@@ -533,12 +533,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun toggleThreadsOrMessageSeenStatus(
-        threadsUids: List<String> = emptyList(),
+        threadsUids: List<String>,
         message: Message? = null,
         shouldRead: Boolean = true,
     ) = viewModelScope.launch(viewModelScope.handlerIO) {
         val mailbox = currentMailbox.value!!
-        val threads = threadsUids.mapNotNull(ThreadController::getThread)
+        val threads = threadsUids.mapNotNull(ThreadController::getThread).ifEmpty { return@launch }
 
         val isSeen = when {
             message != null -> message.isSeen
@@ -583,12 +583,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun toggleThreadsOrMessageFavoriteStatus(
-        threadsUids: List<String> = emptyList(),
+        threadsUids: List<String>,
         message: Message? = null,
         shouldFavorite: Boolean = true,
     ) = viewModelScope.launch(viewModelScope.handlerIO) {
         val mailbox = currentMailbox.value!!
-        val threads = threadsUids.mapNotNull(ThreadController::getThread)
+        val threads = threadsUids.mapNotNull(ThreadController::getThread).ifEmpty { return@launch }
 
         val isFavorite = when {
             message != null -> message.isFavorite
@@ -637,12 +637,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun toggleThreadsOrMessageSpamStatus(
-        threadsUids: List<String> = emptyList(),
+        threadsUids: List<String>,
         message: Message? = null,
         displaySnackbar: Boolean = true,
     ) = viewModelScope.launch(viewModelScope.handlerIO) {
         val mailbox = currentMailbox.value!!
-        val threads = threadsUids.mapNotNull(ThreadController::getThread)
+        val threads = threadsUids.mapNotNull(ThreadController::getThread).ifEmpty { return@launch }
 
         val destinationFolderRole = if (isSpam(message)) FolderRole.INBOX else FolderRole.SPAM
         val destinationFolder = FolderController.getFolder(destinationFolderRole)!!
