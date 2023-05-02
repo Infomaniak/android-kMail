@@ -24,6 +24,7 @@ import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getSetMargin
 
 class WebViewUtils(context: Context) {
+
     private val customDarkMode by lazy { context.getCustomDarkMode() }
     private val setMargin by lazy { context.getSetMargin() }
     private val customStyle by lazy { context.getCustomStyle() }
@@ -33,11 +34,11 @@ class WebViewUtils(context: Context) {
         registerCss(setMargin)
         registerCss(customStyle)
         registerMetaViewPort()
-        
-        return inject()
+        return@with inject()
     }
 
     companion object {
+
         private const val DARK_BACKGROUND_STYLE_ID = "dark_background_style"
 
         fun WebSettings.setupThreadWebViewSettings() {
