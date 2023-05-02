@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -52,6 +53,10 @@ class AccountFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         AccountUtils.currentUser?.let { user ->
             avatar.loadAvatar(user)
+            name.apply {
+                isGone = user.displayName.isNullOrBlank()
+                text = user.displayName
+            }
             mail.text = user.email
         }
 
