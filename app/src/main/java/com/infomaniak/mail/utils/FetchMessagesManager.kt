@@ -21,6 +21,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.infomaniak.lib.core.utils.NotificationUtilsCore
 import com.infomaniak.lib.core.utils.clearStack
@@ -64,9 +65,15 @@ class FetchMessagesManager(private val context: Context) {
         Log.d(TAG, "launchWork: ${mailbox.email} has ${newMessagesThreads.count()} new messages")
 
         // Notify all new messages
-        val unReadThreadsCount = ThreadController.getUnreadThreadsCount(folder)
-        newMessagesThreads.forEach { thread ->
-            thread.showNotification(userId, mailbox, unReadThreadsCount, realm, okHttpClient)
+        newMessagesThreads.forEachIndexed { index, thread ->
+            thread.showNotification(
+                userId = userId,
+                mailbox = mailbox,
+                realm = realm,
+                unReadThreadsCount = ThreadController.getUnreadThreadsCount(folder),
+                okHttpClient = okHttpClient,
+                isLastMessage = index == newMessagesThreads.lastIndex,
+            )
         }
 
         realm.close()
@@ -75,9 +82,10 @@ class FetchMessagesManager(private val context: Context) {
     private suspend fun Thread.showNotification(
         userId: Int,
         mailbox: Mailbox,
-        unReadThreadsCount: Int,
         realm: Realm,
+        unReadThreadsCount: Int,
         okHttpClient: OkHttpClient,
+        isLastMessage: Boolean,
     ) {
 
         fun contentIntent(isSummary: Boolean): PendingIntent {
@@ -93,7 +101,10 @@ class FetchMessagesManager(private val context: Context) {
 
         fun showNotification(contentText: String, isSummary: Boolean, title: String = "", description: String? = null) {
             context.showNewMessageNotification(mailbox.channelId, title, description).apply {
-                if (isSummary) setContentTitle(null)
+                if (isSummary) {
+                    setContentTitle(null)
+                    setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
+                }
                 setSubText(mailbox.email)
                 setContentText(contentText)
                 setColorized(true)
@@ -130,12 +141,14 @@ class FetchMessagesManager(private val context: Context) {
         showNotification(subject, false, message.sender.displayedName(context), description)
 
         // Show group summary notification
-        val summaryText = context.resources.getQuantityString(
-            R.plurals.newMessageNotificationSummary,
-            unReadThreadsCount,
-            unReadThreadsCount
-        )
-        showNotification(summaryText, true)
+        if (isLastMessage) {
+            val summaryText = context.resources.getQuantityString(
+                R.plurals.newMessageNotificationSummary,
+                unReadThreadsCount,
+                unReadThreadsCount
+            )
+            showNotification(summaryText, true)
+        }
     }
 
     private fun ApiErrorException.handleApiErrors() {
