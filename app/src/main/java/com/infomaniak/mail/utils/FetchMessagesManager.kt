@@ -65,12 +65,13 @@ class FetchMessagesManager(private val context: Context) {
         Log.d(TAG, "launchWork: ${mailbox.email} has ${newMessagesThreads.count()} new messages")
 
         // Notify all new messages
+        val unReadThreadsCount = ThreadController.getUnreadThreadsCount(folder)
         newMessagesThreads.forEachIndexed { index, thread ->
             thread.showNotification(
                 userId = userId,
                 mailbox = mailbox,
                 realm = realm,
-                unReadThreadsCount = ThreadController.getUnreadThreadsCount(folder),
+                unReadThreadsCount = unReadThreadsCount,
                 okHttpClient = okHttpClient,
                 isLastMessage = index == newMessagesThreads.lastIndex,
             )
