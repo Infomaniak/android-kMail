@@ -30,7 +30,7 @@ object ApiRoutes {
 
     fun contact() = "$MAIL_API/api/pim/contact"
 
-    fun contacts() = "${contact()}/all?with=emails,details,others,contacted_times"
+    fun contacts() = "${contact()}/all?with=emails,details,others,contacted_times&filters=has_email"
 
     fun mailbox() = "$MAIL_API/api/mailbox"
 
