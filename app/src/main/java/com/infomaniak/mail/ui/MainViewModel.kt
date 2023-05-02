@@ -357,7 +357,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         message: Message? = null,
     ) = viewModelScope.launch(viewModelScope.handlerIO) {
         val mailbox = currentMailbox.value!!
-        val threads = threadsUids.mapNotNull(ThreadController::getThread).ifEmpty { return@launch }
+        val threads = getActionThreads(threadsUids).ifEmpty { return@launch }
         var trashId: String? = null
         var undoResource: String? = null
 
@@ -439,7 +439,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     ) = viewModelScope.launch(viewModelScope.handlerIO) {
         val mailbox = currentMailbox.value!!
         val destinationFolder = FolderController.getFolder(destinationFolderId)!!
-        val threads = threadsUids.mapNotNull(ThreadController::getThread).ifEmpty { return@launch }
+        val threads = getActionThreads(threadsUids.toList()).ifEmpty { return@launch }
         val message = messageUid?.let { MessageController.getMessage(it)!! }
 
         val messages = getMessagesToMove(threads, message)
@@ -499,7 +499,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         message: Message? = null,
     ) = viewModelScope.launch(viewModelScope.handlerIO) {
         val mailbox = currentMailbox.value!!
-        val threads = threadsUids.mapNotNull(ThreadController::getThread).ifEmpty { return@launch }
+        val threads = getActionThreads(threadsUids).ifEmpty { return@launch }
 
         val isArchived = message?.let { it.folder.role == FolderRole.ARCHIVE } ?: isCurrentFolderRole(FolderRole.ARCHIVE)
 
@@ -538,7 +538,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         shouldRead: Boolean = true,
     ) = viewModelScope.launch(viewModelScope.handlerIO) {
         val mailbox = currentMailbox.value!!
-        val threads = threadsUids.mapNotNull(ThreadController::getThread).ifEmpty { return@launch }
+        val threads = getActionThreads(threadsUids).ifEmpty { return@launch }
 
         val isSeen = when {
             message != null -> message.isSeen
@@ -588,7 +588,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         shouldFavorite: Boolean = true,
     ) = viewModelScope.launch(viewModelScope.handlerIO) {
         val mailbox = currentMailbox.value!!
-        val threads = threadsUids.mapNotNull(ThreadController::getThread).ifEmpty { return@launch }
+        val threads = getActionThreads(threadsUids).ifEmpty { return@launch }
 
         val isFavorite = when {
             message != null -> message.isFavorite
@@ -642,7 +642,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         displaySnackbar: Boolean = true,
     ) = viewModelScope.launch(viewModelScope.handlerIO) {
         val mailbox = currentMailbox.value!!
-        val threads = threadsUids.mapNotNull(ThreadController::getThread).ifEmpty { return@launch }
+        val threads = getActionThreads(threadsUids).ifEmpty { return@launch }
 
         val destinationFolderRole = if (isSpam(message)) FolderRole.INBOX else FolderRole.SPAM
         val destinationFolder = FolderController.getFolder(destinationFolderRole)!!
@@ -743,6 +743,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         isNewFolderCreated.postValue(true)
     }
     //endregion
+
+    private fun getActionThreads(threadsUids: List<String>): List<Thread> = threadsUids.mapNotNull(ThreadController::getThread)
 
     fun addContact(recipient: Recipient) = viewModelScope.launch(Dispatchers.IO) {
 
