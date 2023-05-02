@@ -200,9 +200,14 @@ class Message : RealmObject {
         return to to cc
     }
 
+    // TODO: Remove this when https://github.com/realm/realm-kotlin/issues/929 is fixed.
     private fun String.sanitize() = replace("'", "")
 
     fun initMessageIds() {
+
+        fun String.ifNotBlank(completion: (String) -> Unit) {
+            if (isNotBlank()) completion(this)
+        }
 
         // Encountered formats so far:
         // `x@x.x`
@@ -219,9 +224,9 @@ class Message : RealmObject {
         messageId = messageId?.sanitize()
 
         messageIds = realmSetOf<String>().apply {
-            messageId?.let { addAll(it.parseMessagesIds()) }
-            references?.let { addAll(it.parseMessagesIds()) }
-            inReplyTo?.let { addAll(it.parseMessagesIds()) }
+            messageId?.ifNotBlank { addAll(it.parseMessagesIds()) }
+            references?.ifNotBlank { addAll(it.parseMessagesIds()) }
+            inReplyTo?.ifNotBlank { addAll(it.parseMessagesIds()) }
         }
     }
 
