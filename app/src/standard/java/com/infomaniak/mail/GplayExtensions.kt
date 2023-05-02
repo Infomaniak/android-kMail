@@ -19,12 +19,12 @@ package com.infomaniak.mail
 
 import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.firebase.messaging.FirebaseMessaging
+import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.firebase.ProcessMessageNotificationsWorker
 import com.infomaniak.mail.firebase.RegisterUserDeviceWorker
@@ -32,18 +32,12 @@ import com.infomaniak.mail.utils.AccountUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-fun FragmentActivity.checkPlayServices() {
-    val apiAvailability = GoogleApiAvailability.getInstance()
-    val errorCode = apiAvailability.isGooglePlayServicesAvailable(this)
-
-    if (errorCode == ConnectionResult.SUCCESS) {
-        checkFirebaseRegistration()
-    } else {
-        if (apiAvailability.isUserResolvableError(errorCode)) {
-            apiAvailability.makeGooglePlayServicesAvailable(this)
-        } else {
-            Toast.makeText(this, R.string.googlePlayServicesAreRequired, Toast.LENGTH_SHORT).show()
-        }
+fun FragmentActivity.checkPlayServices(): Unit = with(GoogleApiAvailability.getInstance()) {
+    val errorCode = isGooglePlayServicesAvailable(this@checkPlayServices)
+    when {
+        errorCode == ConnectionResult.SUCCESS -> checkFirebaseRegistration()
+        isUserResolvableError(errorCode) -> makeGooglePlayServicesAvailable(this@checkPlayServices)
+        else -> showToast(R.string.googlePlayServicesAreRequired)
     }
 }
 

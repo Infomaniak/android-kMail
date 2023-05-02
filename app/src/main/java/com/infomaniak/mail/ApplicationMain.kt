@@ -23,7 +23,6 @@ import android.app.PendingIntent
 import android.content.Intent
 import android.os.Build
 import android.os.StrictMode
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -40,12 +39,14 @@ import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.utils.CoilUtils
 import com.infomaniak.lib.core.utils.clearStack
 import com.infomaniak.lib.core.utils.hasPermissions
+import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.mail.MatomoMail.buildTracker
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.LaunchActivityArgs
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.ErrorCode
 import com.infomaniak.mail.utils.NotificationUtils.initNotificationChannel
 import com.infomaniak.mail.utils.NotificationUtils.showGeneralNotification
 import com.infomaniak.mail.workers.SyncMailboxesWorker
@@ -150,11 +151,14 @@ class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycleObser
     }
 
     private fun configureInfomaniakCore() {
-        InfomaniakCore.init(
-            appVersionCode = BuildConfig.VERSION_CODE,
-            appVersionName = BuildConfig.VERSION_NAME,
-            clientId = BuildConfig.CLIENT_ID,
-        )
+        InfomaniakCore.apply {
+            init(
+                appVersionCode = BuildConfig.VERSION_CODE,
+                appVersionName = BuildConfig.VERSION_NAME,
+                clientId = BuildConfig.CLIENT_ID,
+            )
+            apiErrorCodes = ErrorCode.apiErrorCodes
+        }
     }
 
     private fun configureHttpClient() {
@@ -178,9 +182,7 @@ class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycleObser
                 notificationManagerCompat.notify(UUID.randomUUID().hashCode(), build())
             }
         } else {
-            CoroutineScope(Dispatchers.Main).launch {
-                Toast.makeText(this@ApplicationMain, notificationText, Toast.LENGTH_LONG).show()
-            }
+            CoroutineScope(Dispatchers.Main).launch { showToast(notificationText) }
         }
 
         CoroutineScope(Dispatchers.IO).launch { AccountUtils.removeUser(this@ApplicationMain, user) }

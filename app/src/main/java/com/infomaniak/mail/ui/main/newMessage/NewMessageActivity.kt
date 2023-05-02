@@ -20,12 +20,12 @@ package com.infomaniak.mail.ui.main.newMessage
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.google.android.material.button.MaterialButton
+import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.mail.MatomoMail.ACTION_POSTPONE_NAME
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
@@ -130,8 +130,7 @@ class NewMessageActivity : ThemedActivity() {
     }
 
     private fun displayDraftActionToast(action: DraftAction) {
-        val text = if (action == DraftAction.SAVE) R.string.snackbarDraftSaved else R.string.snackbarEmailSending
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
+        showToast(title = if (action == DraftAction.SAVE) R.string.snackbarDraftSaved else R.string.snackbarEmailSending)
     }
 
     private fun observeCloseActivity() {

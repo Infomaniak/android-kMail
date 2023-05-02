@@ -22,6 +22,7 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.models.ApiResponse
+import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.R
@@ -44,7 +45,6 @@ import com.infomaniak.mail.ui.main.SnackBarManager
 import com.infomaniak.mail.ui.main.SnackBarManager.*
 import com.infomaniak.mail.ui.main.folder.ThreadListViewModel
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.ApiErrorException.ErrorCodes
 import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
@@ -725,12 +725,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             updateFolders(mailbox)
             apiResponse.data?.id
         } else {
-            val snackbarTitle = if (apiResponse.error?.code == ErrorCodes.FOLDER_ALREADY_EXISTS) {
-                R.string.errorNewFolderAlreadyExists
-            } else {
-                RCore.string.anErrorHasOccurred
-            }
-            snackBarManager.postValue(context.getString(snackbarTitle), null)
+            snackBarManager.postValue(context.getString(apiResponse.translateError()), null)
             null
         }
     }

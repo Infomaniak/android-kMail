@@ -26,6 +26,7 @@ import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.networking.HttpUtils
 import com.infomaniak.lib.core.utils.FORMAT_DATE_WITH_TIMEZONE
 import com.infomaniak.lib.core.utils.isNetworkException
+import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.cache.RealmDatabase
@@ -40,8 +41,14 @@ import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.ApiErrorException.ErrorCodes.DRAFT_DOES_NOT_EXIST
-import com.infomaniak.mail.utils.ApiErrorException.ErrorCodes.DRAFT_HAS_TOO_MANY_RECIPIENTS
+import com.infomaniak.mail.utils.ErrorCode.DRAFT_ALREADY_SCHEDULED_OR_SENT
+import com.infomaniak.mail.utils.ErrorCode.DRAFT_DOES_NOT_EXIST
+import com.infomaniak.mail.utils.ErrorCode.DRAFT_HAS_TOO_MANY_RECIPIENTS
+import com.infomaniak.mail.utils.ErrorCode.DRAFT_NEED_AT_LEAST_ONE_RECIPIENT
+import com.infomaniak.mail.utils.ErrorCode.IDENTITY_NOT_FOUND
+import com.infomaniak.mail.utils.ErrorCode.MAILBOX_LOCKED
+import com.infomaniak.mail.utils.ErrorCode.SEND_LIMIT_EXCEEDED
+import com.infomaniak.mail.utils.ErrorCode.SEND_RECIPIENTS_REFUSED
 import com.infomaniak.mail.utils.NotificationUtils.showDraftActionsNotification
 import io.realm.kotlin.MutableRealm
 import io.sentry.Sentry
@@ -120,7 +127,7 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
                 }.onFailure { exception ->
                     when (exception) {
                         is ApiController.NetworkException -> throw exception
-                        is ApiErrorException -> exception.handleApiErrors(realm = this, draft = draft)
+                        is ApiErrorException -> exception.handleApiErrors(draft = draft, realm = this)
                     }
                     exception.printStackTrace()
                     Sentry.captureException(exception)
@@ -138,9 +145,22 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
         return if (isFailure) Result.failure() else Result.success()
     }
 
-    private fun ApiErrorException.handleApiErrors(realm: MutableRealm, draft: Draft) {
+    private fun ApiErrorException.handleApiErrors(draft: Draft, realm: MutableRealm) {
+
         when (errorCode) {
             DRAFT_DOES_NOT_EXIST, DRAFT_HAS_TOO_MANY_RECIPIENTS -> realm.delete(draft)
+        }
+
+        when (errorCode) {
+            MAILBOX_LOCKED,
+            DRAFT_HAS_TOO_MANY_RECIPIENTS,
+            DRAFT_NEED_AT_LEAST_ONE_RECIPIENT,
+            DRAFT_ALREADY_SCHEDULED_OR_SENT,
+            IDENTITY_NOT_FOUND,
+            SEND_RECIPIENTS_REFUSED,
+            SEND_LIMIT_EXCEEDED -> {
+                applicationContext.showToast(ErrorCode.getTranslateRes(errorCode!!))
+            }
         }
     }
 
