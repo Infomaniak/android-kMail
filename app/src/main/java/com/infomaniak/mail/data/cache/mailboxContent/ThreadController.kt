@@ -49,8 +49,9 @@ object ThreadController {
     private inline val defaultRealm get() = RealmDatabase.mailboxContent()
 
     //region Queries
-    private fun getThreadsQuery(realm: TypedRealm): RealmQuery<Thread> {
-        return realm.query()
+    private fun getThreadsQuery(messageIds: Set<String>, realm: TypedRealm): RealmQuery<Thread> {
+        val byMessagesIds = "ANY ${Thread::messagesIds.name} IN {${messageIds.joinToString { "'$it'" }}}"
+        return realm.query(byMessagesIds)
     }
 
     private fun getOrphanThreadsQuery(realm: TypedRealm): RealmQuery<Thread> {
@@ -88,8 +89,8 @@ object ThreadController {
     //endregion
 
     //region Get data
-    fun getThreads(realm: TypedRealm): RealmResults<Thread> {
-        return getThreadsQuery(realm).find()
+    fun getThreads(messageIds: Set<String>, realm: TypedRealm): RealmResults<Thread> {
+        return getThreadsQuery(messageIds, realm).find()
     }
 
     fun getOrphanThreads(realm: TypedRealm): RealmResults<Thread> {
