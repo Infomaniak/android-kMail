@@ -4,14 +4,8 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.serialization'
     id 'kotlin-parcelize'
     id 'androidx.navigation.safeargs.kotlin'
-    // Realm Kotlin PRODUCTION
     id 'io.realm.kotlin'
 }
-
-// Realm Kotlin SNAPSHOT
-// configurations.all { resolutionStrategy.cacheChangingModulesFor 0, 'seconds' } // Don't cache SNAPSHOT (changing) dependencies.
-// Realm Kotlin SNAPSHOT
-// apply plugin: "io.realm.kotlin"
 
 android {
 
@@ -89,16 +83,16 @@ dependencies {
     implementation 'com.ernestoyaquello.dragdropswiperecyclerview:drag-drop-swipe-recyclerview:1.1.1'
     implementation 'com.tbuonomo:dotsindicator:4.3'
 
-    implementation 'org.jsoup:jsoup:1.15.4'
+    implementation 'org.jsoup:jsoup:1.16.1'
 
     implementation 'com.google.android.flexbox:flexbox:3.0.0'
     implementation "androidx.lifecycle:lifecycle-process:$livedata_version"
     implementation 'androidx.webkit:webkit:1.6.1'
     implementation 'androidx.work:work-runtime-ktx:2.8.1'
 
-    implementation 'io.sentry:sentry-android-fragment:6.17.0'
+    implementation 'io.sentry:sentry-android-fragment:6.18.1'
 
     androidTestImplementation 'androidx.test:runner:1.5.2'
     testImplementation 'org.junit.jupiter:junit-jupiter'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.3'
 }
