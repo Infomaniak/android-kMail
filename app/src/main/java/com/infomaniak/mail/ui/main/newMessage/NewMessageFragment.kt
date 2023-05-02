@@ -35,7 +35,6 @@ import android.webkit.WebView
 import android.widget.ArrayAdapter
 import android.widget.ListPopupWindow
 import android.widget.PopupWindow
-import android.widget.Toast
 import androidx.core.net.MailTo
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -148,9 +147,9 @@ class NewMessageFragment : Fragment() {
                 showKeyboardInCorrectView()
                 populateViewModelWithExternalMailData()
                 populateUiWithViewModel()
-            } else {
-                displayOpeningDraftErrorToast()
-                requireActivity().finish()
+            } else requireActivity().apply {
+                showToast(R.string.failToOpenDraft)
+                finish()
             }
         }
     }
@@ -177,10 +176,6 @@ class NewMessageFragment : Fragment() {
             DraftMode.NEW_MAIL,
             DraftMode.FORWARD -> toField.showKeyboardInTextInput()
         }
-    }
-
-    private fun displayOpeningDraftErrorToast() {
-        Toast.makeText(requireActivity(), getString(R.string.failToOpenDraft), Toast.LENGTH_SHORT).show()
     }
 
     private fun setOnFocusChangedListeners() = with(binding) {

@@ -154,7 +154,7 @@ class FetchMessagesManager(private val context: Context) {
 
     private fun ApiErrorException.handleApiErrors() {
         when (errorCode) {
-            ApiErrorException.ErrorCodes.FOLDER_DOES_NOT_EXIST -> Unit
+            ErrorCode.FOLDER_DOES_NOT_EXIST -> Unit
             else -> Sentry.captureException(this)
         }
     }
