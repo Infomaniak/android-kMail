@@ -308,7 +308,7 @@ object MessageController {
                 val page = uids.subList(pageStart, pageEnd)
 
                 val apiResponse = ApiRepository.getMessagesByUids(mailboxUuid, folder.id, page, okHttpClient)
-                if (!apiResponse.isSuccess() && okHttpClient != null) apiResponse.throwErrorAsException()
+                if (!apiResponse.isSuccess()) apiResponse.throwErrorAsException()
                 scope.ensureActive()
                 apiResponse.data?.messages?.let { messages ->
                     realm.writeBlocking {
@@ -502,7 +502,7 @@ object MessageController {
 
     private fun getMessagesUids(mailboxUuid: String, folderId: String, okHttpClient: OkHttpClient? = null): MessagesUids? {
         val apiResponse = ApiRepository.getMessagesUids(mailboxUuid, folderId, okHttpClient)
-        if (!apiResponse.isSuccess() && okHttpClient != null) apiResponse.throwErrorAsException()
+        if (!apiResponse.isSuccess()) apiResponse.throwErrorAsException()
         return apiResponse.data?.let {
             MessagesUids(
                 addedShortUids = it.addedShortUids,
@@ -518,7 +518,7 @@ object MessageController {
         okHttpClient: OkHttpClient? = null,
     ): MessagesUids? {
         val apiResponse = ApiRepository.getMessagesUidsDelta(mailboxUuid, folderId, previousCursor, okHttpClient)
-        if (!apiResponse.isSuccess() && okHttpClient != null) apiResponse.throwErrorAsException()
+        if (!apiResponse.isSuccess()) apiResponse.throwErrorAsException()
         return apiResponse.data?.let {
             MessagesUids(
                 addedShortUids = it.addedShortUids,
