@@ -27,8 +27,12 @@ import io.realm.kotlin.ext.query
 object SignatureController {
 
     //region Get data
-    fun getDefaultSignature(realm: TypedRealm): Signature {
-        return realm.query<Signature>("${Signature::isDefault.name} == true").first().find()!!
+    private fun getDefaultSignature(realm: TypedRealm): Signature? {
+        return realm.query<Signature>("${Signature::isDefault.name} == true").first().find()
+    }
+
+    fun getSignature(realm: TypedRealm): Signature {
+        return getDefaultSignature(realm) ?: realm.query<Signature>().first().find()!!
     }
     //endregion
 
