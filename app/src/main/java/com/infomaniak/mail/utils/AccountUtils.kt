@@ -24,12 +24,16 @@ import androidx.work.WorkManager
 import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.auth.CredentialManager
 import com.infomaniak.lib.core.auth.TokenAuthenticator
+import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.networking.HttpClient
+import com.infomaniak.lib.core.networking.HttpClient.okHttpClient
 import com.infomaniak.lib.core.room.UserDatabase
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.appSettings.AppSettingsController
+import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.AppSettings
 import io.sentry.Sentry
 import kotlinx.coroutines.CoroutineScope
@@ -90,6 +94,20 @@ object AccountUtils : CredentialManager() {
     suspend fun addUser(user: User) {
         currentUser = user
         userDatabase.userDao().insert(user)
+    }
+
+    fun updateUserAndMailboxes(context: Context) = CoroutineScope(Dispatchers.IO).launch {
+        val (userResult, user) = with(ApiRepository.getUserProfile(okHttpClient)) { result to (data ?: return@launch) }
+
+        if (userResult != ApiResponse.Status.ERROR) {
+            with(ApiRepository.getMailboxes(okHttpClient)) {
+                if (result == ApiResponse.Status.ERROR || data.isNullOrEmpty()) {
+                    removeUser(context, user)
+                } else {
+                    MailboxController.updateMailboxes(context, data!!)
+                }
+            }
+        }
     }
 
     private suspend fun requestUser(user: User) {

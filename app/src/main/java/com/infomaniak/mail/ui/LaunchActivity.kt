@@ -27,6 +27,7 @@ import com.infomaniak.lib.applock.Utils.isKeyguardSecure
 import com.infomaniak.mail.MatomoMail.trackUserId
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.ui.login.LoginActivity
 import com.infomaniak.mail.ui.login.LoginActivityArgs
@@ -55,8 +56,17 @@ class LaunchActivity : AppCompatActivity() {
             withContext(Dispatchers.Main) {
                 when {
                     user == null -> loginUser()
-                    navigationArgs?.shouldLock != false && isKeyguardSecure() && localSettings.isAppLocked -> startAppLockActivity()
-                    else -> startApp()
+                    navigationArgs?.shouldLock != false && isKeyguardSecure() && localSettings.isAppLocked -> {
+                        startAppLockActivity()
+                    }
+                    else -> {
+                        // When MailboxController is migrated
+                        if (MailboxController.getMailboxesCount(user.id) == 0L) {
+                            AccountUtils.updateUserAndMailboxes(this@LaunchActivity)
+                        } else {
+                            startApp()
+                        }
+                    }
                 }
             }
         }

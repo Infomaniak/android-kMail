@@ -184,19 +184,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         Log.d(TAG, "Load current mailbox from local")
         val userId = AccountUtils.currentUserId
         val mailboxId = AccountUtils.currentMailboxId
-        if (userId != AppSettings.DEFAULT_ID && mailboxId != AppSettings.DEFAULT_ID) {
+        val mailbox = MailboxController.getMailbox(userId, mailboxId) ?: return
+        selectMailbox(mailbox)
 
-            val mailbox = MailboxController.getMailbox(userId, mailboxId) ?: return
-            selectMailbox(mailbox)
-
-            if (currentFolderId == null) {
-                val folder = FolderController.getFolder(DEFAULT_SELECTED_FOLDER) ?: return
-                selectFolder(folder.id)
-            }
-
-            // Delete search data in case they couldn't be deleted at the end of the previous Search.
-            SearchUtils.deleteRealmSearchData()
+        if (currentFolderId == null) {
+            val folder = FolderController.getFolder(DEFAULT_SELECTED_FOLDER) ?: return
+            selectFolder(folder.id)
         }
+
+        // Delete search data in case they couldn't be deleted at the end of the previous Search.
+        SearchUtils.deleteRealmSearchData()
     }
 
     private suspend fun loadCurrentMailboxFromRemote() {
