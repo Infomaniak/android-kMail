@@ -41,6 +41,7 @@ import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
 import com.infomaniak.lib.core.utils.*
@@ -90,6 +91,8 @@ class NewMessageFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
+
+        SentryDebug.addNavigationBreadcrumb(findNavController().currentDestination!!, newMessageActivityArgs.toBundle())
 
         filePicker = FilePicker(this@NewMessageFragment)
 
