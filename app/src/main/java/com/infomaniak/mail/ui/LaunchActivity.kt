@@ -51,21 +51,21 @@ class LaunchActivity : AppCompatActivity() {
 
         lifecycleScope.launch(Dispatchers.IO) {
             val user = AccountUtils.requestCurrentUser()
-            trackUserId(AccountUtils.currentUserId)
 
             withContext(Dispatchers.Main) {
-                when {
-                    user == null -> loginUser()
-                    navigationArgs?.shouldLock != false && isKeyguardSecure() && localSettings.isAppLocked -> {
-                        startAppLockActivity()
+                if (user == null) {
+                    loginUser()
+                } else {
+                    trackUserId(AccountUtils.currentUserId)
+
+                    // When MailboxController is migrated
+                    if (MailboxController.getMailboxesCount(user.id) == 0L) {
+                        AccountUtils.updateUserAndMailboxes(this@LaunchActivity)
                     }
-                    else -> {
-                        // When MailboxController is migrated
-                        if (MailboxController.getMailboxesCount(user.id) == 0L) {
-                            AccountUtils.updateUserAndMailboxes(this@LaunchActivity)
-                        } else {
-                            startApp()
-                        }
+                    if (navigationArgs?.shouldLock != false && isKeyguardSecure() && localSettings.isAppLocked) {
+                        startAppLockActivity()
+                    } else {
+                        startApp()
                     }
                 }
             }
