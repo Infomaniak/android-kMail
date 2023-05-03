@@ -13,6 +13,7 @@ var gTransformText = {};
 
 // TODO
 //var WEBVIEW_WIDTH = 400;
+//var MESSAGE_SELECTOR = "#kmail-message-content";
 var NORMALIZE_MESSAGE_WIDTHS = true;
 var ENABLE_MUNGE_IMAGES = true;
 var ENABLE_MUNGE_TABLES = true;
@@ -20,7 +21,7 @@ var ENABLE_MUNGE_TABLES = true;
 function normalizeAllMessageWidths() {
     var expandedBodyDivs;
 
-    expandedBodyDivs = document.querySelectorAll("#kmail-message-content");
+    expandedBodyDivs = document.querySelectorAll(MESSAGE_SELECTOR);
     normalizeElementWidths(expandedBodyDivs);
 }
 

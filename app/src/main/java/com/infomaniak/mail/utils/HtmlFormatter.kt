@@ -111,10 +111,24 @@ class HtmlFormatter(private val html: String) {
             return css
         }
 
-        private fun Context.loadScript(@RawRes scriptResId: Int, customVariablesDeclaration: List<String> = emptyList()): String {
+        private fun Context.loadScript(
+            @RawRes scriptResId: Int,
+            customVariablesDeclaration: List<Pair<String, Any>> = emptyList()
+        ): String {
             var script = readRawResource(scriptResId)
-            customVariablesDeclaration.forEach { variableDeclaration -> script = variableDeclaration + "\n" + script }
+            customVariablesDeclaration.forEach { (variableName, value) ->
+                val variableDeclaration = "const $variableName = ${formatValueForJs(value)};"
+                script = variableDeclaration + "\n" + script
+            }
             return script
+        }
+
+        private fun formatValueForJs(value: Any): String {
+            return when (value) {
+                is String -> "'$value'"
+                is Int -> value.toString()
+                else -> throw NotImplementedError()
+            }
         }
 
         private fun formatCssVariable(variableName: String, color: Int): String {
@@ -139,8 +153,11 @@ class HtmlFormatter(private val html: String) {
 
         fun Context.getResizeScript(): String {
             val screenWidthInDpi = computeScreenWidthInDp()
-            // TODO : variable name and value
-            return loadScript(R.raw.script, listOf("var WEBVIEW_WIDTH = $screenWidthInDpi;"))
+            val customVariables = listOf(
+                "WEBVIEW_WIDTH" to screenWidthInDpi,
+                "MESSAGE_SELECTOR" to "#$KMAIL_MESSAGE_ID",
+            )
+            return loadScript(R.raw.script, customVariables)
         }
     }
 }
