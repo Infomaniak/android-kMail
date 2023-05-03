@@ -45,7 +45,6 @@ class SwitchUserFragment : Fragment() {
             if (user.id != AccountUtils.currentUserId) {
                 requireContext().trackAccountEvent("switch")
                 AccountUtils.currentUser = user
-                // TODO: This works, but... The splashscreen blinks.
                 AccountUtils.currentMailboxId = AppSettings.DEFAULT_ID
                 RealmDatabase.close()
                 AccountUtils.reloadApp?.invoke()

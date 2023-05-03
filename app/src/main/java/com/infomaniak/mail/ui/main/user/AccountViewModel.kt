@@ -27,7 +27,6 @@ import com.infomaniak.mail.utils.AccountUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 class AccountViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -37,9 +36,9 @@ class AccountViewModel(application: Application) : AndroidViewModel(application)
         .map { mailboxes -> mailboxes.list.filter { it.userId == AccountUtils.currentUserId } }
         .asLiveData(coroutineContext)
 
-    fun updateMailboxes() = viewModelScope.launch(Dispatchers.IO) {
+    suspend fun updateMailboxes() {
         val userId = AccountUtils.currentUserId
-        val mailboxes = ApiRepository.getMailboxes(AccountUtils.getHttpClient(userId)).data ?: return@launch
+        val mailboxes = ApiRepository.getMailboxes(AccountUtils.getHttpClient(userId)).data ?: return
         MailboxController.updateMailboxes(getApplication(), mailboxes, userId)
     }
 
@@ -50,7 +49,7 @@ class AccountViewModel(application: Application) : AndroidViewModel(application)
         emit(ApiRepository.addNewMailbox(address, password))
     }
 
-    fun switchToNewMailbox(newMailboxId: Int) = runBlocking {
+    fun switchToNewMailbox(newMailboxId: Int) = viewModelScope.launch(Dispatchers.IO) {
         updateMailboxes()
         AccountUtils.switchToMailbox(newMailboxId)
     }

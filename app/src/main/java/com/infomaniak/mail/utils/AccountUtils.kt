@@ -77,13 +77,10 @@ object AccountUtils : CredentialManager() {
 
     var currentMailboxEmail: String? = null
 
-    fun switchToMailbox(mailboxId: Int) {
-        // TODO: This works, but... The splashscreen blinks.
+    suspend fun switchToMailbox(mailboxId: Int) {
         currentMailboxId = mailboxId
-        CoroutineScope(Dispatchers.IO).launch {
-            RealmDatabase.close()
-            reloadApp?.invoke()
-        }
+        RealmDatabase.close()
+        reloadApp?.invoke()
     }
 
     suspend fun requestCurrentUser(): User? {

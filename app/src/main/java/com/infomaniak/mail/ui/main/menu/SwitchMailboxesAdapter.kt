@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.main.menu
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.mail.MatomoMail.SWITCH_MAILBOX_NAME
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
@@ -28,9 +29,12 @@ import com.infomaniak.mail.databinding.ItemSwitchMailboxBinding
 import com.infomaniak.mail.ui.main.menu.SwitchMailboxesAdapter.SwitchMailboxesViewHolder
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.views.MenuDrawerItemView.SelectionStyle
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class SwitchMailboxesAdapter(
     private val isInMenuDrawer: Boolean,
+    private val lifecycleScope: LifecycleCoroutineScope,
     private var mailboxes: List<Mailbox> = emptyList(),
 ) : RecyclerView.Adapter<SwitchMailboxesViewHolder>() {
 
@@ -55,7 +59,10 @@ class SwitchMailboxesAdapter(
                 } else {
                     context.trackAccountEvent(SWITCH_MAILBOX_NAME)
                 }
-                AccountUtils.switchToMailbox(mailbox.mailboxId)
+
+                lifecycleScope.launch(Dispatchers.IO) {
+                    AccountUtils.switchToMailbox(mailbox.mailboxId)
+                }
             }
         }
     }

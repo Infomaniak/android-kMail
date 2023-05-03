@@ -44,13 +44,13 @@ class AccountFragment : Fragment() {
 
     private val logoutAlert by lazy { initLogoutAlert() }
 
-    private var mailboxAdapter = SwitchMailboxesAdapter(isInMenuDrawer = false)
+    private var mailboxAdapter = SwitchMailboxesAdapter(isInMenuDrawer = false, lifecycleScope)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentAccountBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         AccountUtils.currentUser?.let { user ->
             avatar.loadAvatar(user)
             name.apply {
@@ -88,10 +88,8 @@ class AccountFragment : Fragment() {
     }
 
     private fun observeAccountsLive() = with(accountViewModel) {
-
-        updateMailboxes()
-
         observeAccountsLive.observe(viewLifecycleOwner) { mailboxes -> mailboxAdapter.setMailboxes(mailboxes) }
+        lifecycleScope.launch(Dispatchers.IO) { updateMailboxes() }
     }
 
     private fun initLogoutAlert() = createDescriptionDialog(
