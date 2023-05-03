@@ -233,7 +233,7 @@ class MainActivity : ThemedActivity() {
 
     private fun onDestinationChanged(destination: NavDestination, arguments: Bundle?) {
 
-        SentryDebug.addNavigationBreadcrumb(destination, arguments)
+        SentryDebug.addNavigationBreadcrumb(destination.displayName, arguments)
 
         setDrawerLockMode(destination.id == R.id.threadListFragment)
 

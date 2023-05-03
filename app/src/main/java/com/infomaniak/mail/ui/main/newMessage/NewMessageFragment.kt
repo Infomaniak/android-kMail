@@ -92,7 +92,10 @@ class NewMessageFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
-        SentryDebug.addNavigationBreadcrumb(findNavController().currentDestination!!, newMessageActivityArgs.toBundle())
+        SentryDebug.addNavigationBreadcrumb(
+            name = findNavController().currentDestination?.displayName ?: "newMessageFragment",
+            arguments = newMessageActivityArgs.toBundle(),
+        )
 
         filePicker = FilePicker(this@NewMessageFragment)
 
