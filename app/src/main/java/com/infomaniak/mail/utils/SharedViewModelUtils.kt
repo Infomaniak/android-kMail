@@ -58,7 +58,7 @@ object SharedViewModelUtils {
             FolderController.getFolder(folderId)?.let { folder ->
                 fetchFolderMessagesJob?.cancel()
                 fetchFolderMessagesJob = launch(handlerIO) {
-                    MessageController.fetchFolderMessages(scope = this, mailbox, folder, okHttpClient = null)
+                    runCatching { MessageController.fetchFolderMessages(scope = this, mailbox, folder, okHttpClient = null) }
                 }
                 fetchFolderMessagesJob?.join()
             }

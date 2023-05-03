@@ -234,7 +234,7 @@ object ThreadController {
             FolderController.getFolder(folderId, realm)?.let { folder ->
                 fetchFolderMessagesJob?.cancel()
                 fetchFolderMessagesJob = launch {
-                    MessageController.fetchFolderMessages(scope = this, mailbox, folder, okHttpClient, realm)
+                    runCatching { MessageController.fetchFolderMessages(scope = this, mailbox, folder, okHttpClient, realm) }
                 }
                 fetchFolderMessagesJob?.join()
             }
