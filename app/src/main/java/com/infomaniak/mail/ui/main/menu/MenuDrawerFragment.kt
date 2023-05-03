@@ -76,6 +76,7 @@ class MenuDrawerFragment : MenuFoldersFragment() {
         observeCurrentFolder()
         observeFoldersLive()
         observeQuotasLive()
+        observePermissionsLive()
     }
 
     private fun setupListeners() = with(binding) {
@@ -141,16 +142,13 @@ class MenuDrawerFragment : MenuFoldersFragment() {
 
         importMails.setOnClickListener {
             trackMenuDrawerEvent("importEmails")
+            requireContext().openUrl(BuildConfig.IMPORT_EMAILS_URL)
             closeDrawer()
-            // TODO: Import mails
-            notYetImplemented()
         }
 
         restoreMails.setOnClickListener {
             trackMenuDrawerEvent("restoreEmails")
-            closeDrawer()
-            // TODO: Restore mails
-            notYetImplemented()
+            safeNavigate(R.id.restoreEmailsBottomSheetDialog, currentClassName = MenuDrawerFragment::class.java.name)
         }
     }
 
@@ -234,6 +232,12 @@ class MenuDrawerFragment : MenuFoldersFragment() {
                 storageText.text = quotas?.getText(context) ?: return@observe
                 storageIndicator.progress = quotas.getProgress()
             }
+        }
+    }
+
+    private fun observePermissionsLive() {
+        mainViewModel.currentPermissionsLive.observe(viewLifecycleOwner) { permissions ->
+            binding.restoreMails.isVisible = permissions?.canRestoreEmails == true
         }
     }
 
