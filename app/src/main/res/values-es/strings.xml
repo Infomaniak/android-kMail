@@ -170,6 +170,7 @@
     <string name="emptyStateTrashTitle">La papelera está vacía</string>
     <string name="errorAtLeastOneRecipient">Se precisa al menos un destinatario</string>
     <string name="errorAttachAddressInput">Sólo se admiten las direcciones de correo electrónico Infomaniak</string>
+    <string name="errorCorruptAttachment">No se ha podido gestionar el borrador, un archivo adjunto está dañado</string>
     <string name="errorEditScheduledMessage">Imposible modificar un mensaje programado o enviado</string>
     <string name="errorInvalidCredentials">Correo electrónico o contraseña no válidos</string>
     <string name="errorLoginDescription">La conexión ha fallado.</string>

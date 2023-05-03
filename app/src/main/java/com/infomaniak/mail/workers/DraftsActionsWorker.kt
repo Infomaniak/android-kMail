@@ -27,6 +27,7 @@ import com.infomaniak.lib.core.networking.HttpUtils
 import com.infomaniak.lib.core.utils.FORMAT_DATE_WITH_TIMEZONE
 import com.infomaniak.lib.core.utils.isNetworkException
 import com.infomaniak.lib.core.utils.showToast
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.cache.RealmDatabase
@@ -231,7 +232,7 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
 
         var scheduledDate: String? = null
 
-        // TODO: This is a temporary fix to avoid crashes, it should be removed when the issue is fixed.
+        // TODO: Remove this whole `draft.attachments.forEach { … }` when the Attachment issue is fixed.
         draft.attachments.forEach { attachment ->
             if (attachment.uuid.isBlank()) {
                 Sentry.withScope { scope ->
@@ -243,6 +244,7 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
                     scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
                     Sentry.captureMessage("We tried to [${draft.action?.name}] a Draft, but an Attachment didn't have its `uuid`.")
                 }
+                applicationContext.showToast(R.string.errorCorruptAttachment)
                 return scheduledDate
             }
         }

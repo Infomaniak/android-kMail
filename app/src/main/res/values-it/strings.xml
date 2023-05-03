@@ -170,6 +170,7 @@
     <string name="emptyStateTrashTitle">Il cestino è vuoto</string>
     <string name="errorAtLeastOneRecipient">È richiesto almeno un destinatario</string>
     <string name="errorAttachAddressInput">Sono supportati solo gli indirizzi e-mail Infomaniak</string>
+    <string name="errorCorruptAttachment">Impossibile gestire la bozza, un allegato è danneggiato</string>
     <string name="errorEditScheduledMessage">Impossibile modificare un messaggio pianificato o inviato</string>
     <string name="errorInvalidCredentials">Email o password non valide</string>
     <string name="errorLoginDescription">La connessione non è riuscita.</string>
