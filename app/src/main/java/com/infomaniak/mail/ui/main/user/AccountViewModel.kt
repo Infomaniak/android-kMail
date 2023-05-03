@@ -43,8 +43,11 @@ class AccountViewModel(application: Application) : AndroidViewModel(application)
         MailboxController.updateMailboxes(getApplication(), mailboxes, userId)
     }
 
-    fun attachNewMailbox(address: String, password: String): LiveData<ApiResponse<MailboxLinkedResult>> {
-        return liveData(Dispatchers.IO) { emit(ApiRepository.addNewMailbox(address, password)) }
+    fun attachNewMailbox(
+        address: String,
+        password: String,
+    ): LiveData<ApiResponse<MailboxLinkedResult>> = liveData(Dispatchers.IO) {
+        emit(ApiRepository.addNewMailbox(address, password))
     }
 
     fun switchToNewMailbox(newMailboxId: Int) = runBlocking {

@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.hideProgress
 import com.infomaniak.lib.core.utils.showKeyboard
@@ -72,20 +73,25 @@ class AttachMailboxFragment : Fragment() {
             mailInput.text?.trim().toString(),
             passwordInput.text?.trim().toString(),
         ).observe(viewLifecycleOwner) { apiResponse ->
-            if (apiResponse.isSuccess()) {
-                apiResponse.data?.mailboxId?.let(accountViewModel::switchToNewMailbox)
-            } else {
-                if (apiResponse.error?.code == ErrorCode.INVALID_CREDENTIALS) {
+
+            when {
+                apiResponse.isSuccess() -> {
+                    apiResponse.data?.mailboxId?.let(accountViewModel::switchToNewMailbox)
+                    return@observe
+                }
+                apiResponse.error?.code == ErrorCode.INVALID_CREDENTIALS -> {
                     mailInputLayout.error = getString(R.string.errorAttachAddressInput)
-                    passwordInputLayout.error = getString(R.string.errorInvalidCredentials)
-                } else {
+                    passwordInputLayout.error = getString(apiResponse.translateError())
+                }
+                else -> {
                     mailInputLayout.error = null
                     passwordInputLayout.error = null
                     showSnackbar(RCore.string.anErrorHasOccurred, anchor = attachMailboxButton)
                 }
-                passwordInput.text = null
-                attachMailboxButton.hideProgress(R.string.buttonAttachEmailAddress)
             }
+
+            passwordInput.text = null
+            attachMailboxButton.hideProgress(R.string.buttonAttachEmailAddress)
         }
     }
 }
