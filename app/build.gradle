@@ -92,7 +92,7 @@ dependencies {
 
     implementation libs.sentry.android.fragment
 
-    androidTestImplementation libs.runner
+    androidTestImplementation libs.test.runner
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly libs.junit.jupiter.engine
 }
