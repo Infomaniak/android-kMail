@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.newMessage
 
+import android.annotation.SuppressLint
 import android.content.ClipDescription
 import android.content.Intent
 import android.net.Uri
@@ -89,6 +90,8 @@ class NewMessageFragment : Fragment() {
         return FragmentNewMessageBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
+    // This `SuppressLint` seems useless, but it's for the CI. Don't remove it.
+    @SuppressLint("RestrictedApi")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
