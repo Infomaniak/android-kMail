@@ -1,10 +1,10 @@
 plugins {
-    id 'com.android.application'
-    id 'org.jetbrains.kotlin.android'
-    id 'org.jetbrains.kotlin.plugin.serialization'
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.jetbrains.kotlin.serialization)
     id 'kotlin-parcelize'
     id 'androidx.navigation.safeargs.kotlin'
-    id 'io.realm.kotlin'
+    alias(libs.plugins.realm.kotlin)
 }
 
 android {
@@ -75,24 +75,24 @@ dependencies {
     implementation project(path: ':Core:BugTracker')
     implementation project(path: ':Core:Stores')
 
-    implementation "io.realm.kotlin:library-base:$rootProject.ext.realm_kotlin_version"
+    implementation libs.realm.kotlin.base
 
-    standardImplementation 'com.google.firebase:firebase-messaging-ktx:23.1.2'
+    standardImplementation libs.firebase.messaging.ktx
 
-    implementation 'com.airbnb.android:lottie:6.0.0'
-    implementation 'com.ernestoyaquello.dragdropswiperecyclerview:drag-drop-swipe-recyclerview:1.1.1'
-    implementation 'com.tbuonomo:dotsindicator:4.3'
+    implementation libs.lottie
+    implementation libs.dragdropswipe.recyclerview
+    implementation libs.dotsindicator
 
-    implementation 'org.jsoup:jsoup:1.16.1'
+    implementation libs.jsoup
 
-    implementation 'com.google.android.flexbox:flexbox:3.0.0'
-    implementation "androidx.lifecycle:lifecycle-process:$livedata_version"
-    implementation 'androidx.webkit:webkit:1.6.1'
-    implementation 'androidx.work:work-runtime-ktx:2.8.1'
+    implementation libs.flexbox
+    implementation libs.lifecycle.process
+    implementation libs.webkit
+    implementation libs.work.runtime.ktx
 
-    implementation 'io.sentry:sentry-android-fragment:6.18.1'
+    implementation libs.sentry.android.fragment
 
-    androidTestImplementation 'androidx.test:runner:1.5.2'
+    androidTestImplementation libs.runner
     testImplementation 'org.junit.jupiter:junit-jupiter'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.3'
+    testRuntimeOnly libs.junit.jupiter.engine
 }
