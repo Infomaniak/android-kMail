@@ -36,14 +36,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
 import io.sentry.protocol.User as SentryUser
 
 object AccountUtils : CredentialManager() {
 
     override lateinit var userDatabase: UserDatabase
 
-    var reloadApp: (() -> Unit)? = null
+    var reloadApp: (suspend () -> Unit)? = null
 
     fun init(context: Context) {
         userDatabase = UserDatabase.getDatabase(context)
@@ -81,8 +80,10 @@ object AccountUtils : CredentialManager() {
     fun switchToMailbox(mailboxId: Int) {
         // TODO: This works, but... The splashscreen blinks.
         currentMailboxId = mailboxId
-        RealmDatabase.close()
-        reloadApp?.invoke()
+        CoroutineScope(Dispatchers.IO).launch {
+            RealmDatabase.close()
+            reloadApp?.invoke()
+        }
     }
 
     suspend fun requestCurrentUser(): User? {
@@ -92,10 +93,6 @@ object AccountUtils : CredentialManager() {
     suspend fun addUser(user: User) {
         currentUser = user
         userDatabase.userDao().insert(user)
-    }
-
-    fun reloadApp() {
-        CoroutineScope(Dispatchers.Main).launch { reloadApp?.invoke() }
     }
 
     private suspend fun requestUser(user: User) {
@@ -132,7 +129,7 @@ object AccountUtils : CredentialManager() {
 
         if (currentUserId == user.id) {
             if (getAllUsersCount() == 0) resetSettings(context, localSettings)
-            withContext(Dispatchers.Main) { reloadApp?.invoke() }
+            reloadApp?.invoke()
         }
     }
 

@@ -199,7 +199,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private fun loadCurrentMailboxFromRemote() {
+    private suspend fun loadCurrentMailboxFromRemote() {
         Log.d(TAG, "Load current mailbox from remote")
         with(ApiRepository.getMailboxes()) {
             if (isSuccess()) {
