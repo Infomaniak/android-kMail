@@ -3,7 +3,7 @@ plugins {
     alias(libs.plugins.dagger.hilt)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.jetbrains.kotlin.serialization)
-    alias(libs.plugins.ksp)
+    alias(libs.plugins.kapt)
     id 'kotlin-parcelize'
     id 'androidx.navigation.safeargs.kotlin'
     alias(libs.plugins.realm.kotlin)
@@ -93,7 +93,8 @@ dependencies {
     implementation libs.work.runtime.ktx
 
     implementation libs.dagger.hilt
-    ksp libs.dagger.hilt.compiler
+    // TODO: migrate to ksp, actually hilt is not yet supported with ksp
+    kapt libs.dagger.hilt.compiler
 
     implementation libs.sentry.android.fragment
 
