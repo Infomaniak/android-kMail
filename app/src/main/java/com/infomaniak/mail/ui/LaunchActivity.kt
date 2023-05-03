@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SentryDebug
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class LaunchActivity : AppCompatActivity() {
 
@@ -51,10 +52,12 @@ class LaunchActivity : AppCompatActivity() {
             val user = AccountUtils.requestCurrentUser()
             trackUserId(AccountUtils.currentUserId)
 
-            when {
-                user == null -> loginUser()
-                navigationArgs?.shouldLock != false && isKeyguardSecure() && localSettings.isAppLocked -> startAppLockActivity()
-                else -> startApp()
+            withContext(Dispatchers.Main) {
+                when {
+                    user == null -> loginUser()
+                    navigationArgs?.shouldLock != false && isKeyguardSecure() && localSettings.isAppLocked -> startAppLockActivity()
+                    else -> startApp()
+                }
             }
         }
     }
