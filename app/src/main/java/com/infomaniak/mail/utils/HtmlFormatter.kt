@@ -19,7 +19,6 @@ package com.infomaniak.mail.utils
 
 import android.content.Context
 import android.content.res.Resources
-import android.util.Log
 import androidx.annotation.RawRes
 import com.infomaniak.html.cleaner.HtmlSanitizer
 import com.infomaniak.mail.R
@@ -33,6 +32,7 @@ class HtmlFormatter(private val html: String) {
     private val cssList = mutableListOf<Pair<String, String?>>()
     private val scripts = mutableListOf<String>()
     private var needsMetaViewport = false
+    private var needsBodyEncapsulation = false
 
     fun registerCss(css: String, styleId: String? = null) {
         cssList.add(css to styleId)
@@ -46,6 +46,10 @@ class HtmlFormatter(private val html: String) {
         scripts.add(script)
     }
 
+    fun registerBodyEncapsulation() {
+        needsBodyEncapsulation = true
+    }
+
     fun inject(): String = with(HtmlSanitizer.getInstance().sanitize(Jsoup.parse(html))) {
         outputSettings().prettyPrint(true)
         head().apply {
@@ -53,6 +57,7 @@ class HtmlFormatter(private val html: String) {
             injectMetaViewPort()
             injectScript()
         }
+        if (needsBodyEncapsulation) body().encapsulateElementInDiv()
         html()
     }
 
@@ -80,8 +85,15 @@ class HtmlFormatter(private val html: String) {
         }
     }
 
+    private fun Element.encapsulateElementInDiv() {
+        val bodyContent = childNodesCopy()
+        empty()
+        appendElement("div").id(KMAIL_MESSAGE_ID).appendChildren(bodyContent)
+    }
+
     companion object {
         private const val PRIMARY_COLOR_CODE = "--kmail-primary-color"
+        private const val KMAIL_MESSAGE_ID = "kmail-message-content"
 
         private fun Context.loadCss(@RawRes cssResId: Int, customColors: List<Pair<String, Int>> = emptyList()): String {
             var css = readRawResource(cssResId)

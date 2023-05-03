@@ -1,8 +1,9 @@
-body {
-    width: 100%;
-    margin: 0px;
+html {
+    margin: 0;
+    padding: 0;
 }
 
-html {
-    margin: 16px;
+body {
+    margin: 0;
+    padding: 16px;
 }

@@ -39,6 +39,7 @@ class WebViewUtils(context: Context) {
         registerCss(customStyle)
         registerMetaViewPort()
         registerScript(resizeScript)
+        registerBodyEncapsulation()
         return@with inject()
     }
 

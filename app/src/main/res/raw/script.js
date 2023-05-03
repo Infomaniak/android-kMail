@@ -3,6 +3,7 @@
  * to shrink by this much. Expressed as a ratio of:
  * (original width difference : width difference after transforms);
  */
+
 var TRANSFORM_MINIMUM_EFFECTIVE_RATIO = 0.7;
 
 // Don't ship with this on.
@@ -19,7 +20,7 @@ var ENABLE_MUNGE_TABLES = true;
 function normalizeAllMessageWidths() {
     var expandedBodyDivs;
 
-    expandedBodyDivs = document.querySelectorAll("body");
+    expandedBodyDivs = document.querySelectorAll("#kmail-message-content");
     normalizeElementWidths(expandedBodyDivs);
 }
 
