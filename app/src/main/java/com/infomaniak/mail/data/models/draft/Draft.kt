@@ -26,6 +26,7 @@ import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.MessageBodyUtils
 import com.infomaniak.mail.utils.toRealmInstant
 import io.realm.kotlin.MutableRealm
@@ -35,6 +36,8 @@ import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.Ignore
 import io.realm.kotlin.types.annotations.PrimaryKey
+import io.sentry.Sentry
+import io.sentry.SentryLevel
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -132,7 +135,23 @@ class Draft : RealmObject {
 
     fun getJsonRequestBody(): MutableMap<String, JsonElement> {
         return draftJson.encodeToJsonElement(this).jsonObject.toMutableMap().apply {
-            this[Draft::attachments.name] = JsonArray(attachments.map { JsonPrimitive(it.uuid) })
+            // TODO: This is a temporary fix to avoid crashes, it should be removed when the issue is fixed.
+            // TODO: When fixed, replace `attachments.mapNotNull { … }` with `attachments.map { JsonPrimitive(it.uuid) }`.
+            this[Draft::attachments.name] = JsonArray(attachments.mapNotNull {
+                if (it.uuid.isNotBlank()) {
+                    JsonPrimitive(it.uuid)
+                } else {
+                    Sentry.withScope { scope ->
+                        scope.level = SentryLevel.ERROR
+                        scope.setExtra("attachmentUuid", it.uuid)
+                        scope.setExtra("attachmentsCount", "${attachments.count()}")
+                        scope.setExtra("draftUuid", "$remoteUuid")
+                        scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
+                        Sentry.captureMessage("We tried to [${action?.name}] a Draft, but an Attachment didn't have its `uuid`.")
+                    }
+                    null
+                }
+            })
         }
     }
 
