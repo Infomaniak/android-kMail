@@ -20,9 +20,12 @@ package com.infomaniak.mail.data.cache.mailboxContent
 import android.util.Log
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.signature.Signature
+import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.update
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.query
+import io.sentry.Sentry
+import io.sentry.SentryLevel
 
 object SignatureController {
 
@@ -39,6 +42,29 @@ object SignatureController {
     //region Edit data
     fun update(apiSignatures: List<Signature>) {
         Log.d(RealmDatabase.TAG, "Signatures: Save new data")
+
+        val defaultSignaturesCount = apiSignatures.count { it.isDefault }
+        when {
+            apiSignatures.isEmpty() -> Sentry.withScope { scope ->
+                scope.level = SentryLevel.ERROR
+                scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
+                Sentry.captureMessage("This user doesn't have any Signature")
+            }
+            defaultSignaturesCount == 0 -> Sentry.withScope { scope ->
+                scope.level = SentryLevel.ERROR
+                scope.setExtra("signaturesCount", "${apiSignatures.count()}")
+                scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
+                Sentry.captureMessage("This user has Signatures, but no default one")
+            }
+            defaultSignaturesCount > 1 -> Sentry.withScope { scope ->
+                scope.level = SentryLevel.ERROR
+                scope.setExtra("defaultSignaturesCount", "$defaultSignaturesCount")
+                scope.setExtra("totalSignaturesCount", "${apiSignatures.count()}")
+                scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
+                Sentry.captureMessage("This user has several default Signatures")
+            }
+        }
+
         RealmDatabase.mailboxContent().update<Signature>(apiSignatures)
     }
     //endregion
