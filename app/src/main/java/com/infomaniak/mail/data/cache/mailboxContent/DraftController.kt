@@ -140,14 +140,11 @@ object DraftController {
                 forwardedUid = previousMessage.uid
 
                 val mailboxUuid = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!.uuid
-                ApiRepository.attachmentsToForward(mailboxUuid, previousMessage).data?.attachments
-                    ?.map { attachment ->
-                        attachment.apply {
-                            resource = previousMessage.attachments.find { it.name == attachment.name }?.resource
-                        }
-                    }?.let {
-                        attachments += it
+                ApiRepository.attachmentsToForward(mailboxUuid, previousMessage).data?.attachments?.forEach { attachment ->
+                    attachments += attachment.apply {
+                        resource = previousMessage.attachments.find { it.name == name }?.resource
                     }
+                }
 
                 body += context.forwardQuote(previousMessage)
             }
