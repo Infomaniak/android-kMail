@@ -36,9 +36,10 @@ class KMailFirebaseMessagingService : FirebaseMessagingService() {
 
     private val applicationMain by lazy { application as ApplicationMain }
     private val localSettings by lazy { LocalSettings.getInstance(this) }
-    private val notificationManagerCompat by lazy { NotificationManagerCompat.from(this) }
     private val realmMailboxInfo by lazy { RealmDatabase.newMailboxInfoInstance }
 
+    @Inject
+    lateinit var notificationManagerCompat: NotificationManagerCompat
     @Inject
     lateinit var processMessageNotificationsScheduler: ProcessMessageNotificationsWorker.Scheduler
 
