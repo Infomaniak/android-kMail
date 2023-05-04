@@ -27,6 +27,7 @@ import com.infomaniak.lib.core.networking.HttpUtils
 import com.infomaniak.lib.core.utils.FORMAT_DATE_WITH_TIMEZONE
 import com.infomaniak.lib.core.utils.isNetworkException
 import com.infomaniak.lib.core.utils.showToast
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.cache.RealmDatabase
@@ -52,6 +53,7 @@ import com.infomaniak.mail.utils.ErrorCode.SEND_RECIPIENTS_REFUSED
 import com.infomaniak.mail.utils.NotificationUtils.showDraftActionsNotification
 import io.realm.kotlin.MutableRealm
 import io.sentry.Sentry
+import io.sentry.SentryLevel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -229,6 +231,25 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
     private fun executeDraftAction(draft: Draft, mailboxUuid: String, realm: MutableRealm, okHttpClient: OkHttpClient): String? {
 
         var scheduledDate: String? = null
+
+        // TODO: Remove this whole `draft.attachments.forEach { … }` when the Attachment issue is fixed.
+        draft.attachments.forEach { attachment ->
+            if (attachment.uuid.isBlank()) {
+                Sentry.withScope { scope ->
+                    scope.level = SentryLevel.ERROR
+                    scope.setExtra("attachmentUuid", attachment.uuid)
+                    scope.setExtra("attachmentsCount", "${draft.attachments.count()}")
+                    scope.setExtra("attachmentsUuids", "${draft.attachments.map { it.uuid }}")
+                    scope.setExtra("draftUuid", "${draft.remoteUuid}")
+                    scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
+                    Sentry.captureMessage("We tried to [${draft.action?.name}] a Draft, but an Attachment didn't have its `uuid`.")
+                }
+
+                applicationContext.showToast(R.string.errorCorruptAttachment)
+
+                return scheduledDate
+            }
+        }
 
         when (draft.action) {
             DraftAction.SAVE -> with(ApiRepository.saveDraft(mailboxUuid, draft, okHttpClient)) {
