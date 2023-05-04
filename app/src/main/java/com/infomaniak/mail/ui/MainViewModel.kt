@@ -51,13 +51,19 @@ import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.NotificationUtils.cancelNotification
 import com.infomaniak.mail.utils.SharedViewModelUtils.refreshFolders
 import com.infomaniak.mail.workers.DraftsActionsWorker
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import javax.inject.Inject
 import com.infomaniak.lib.core.R as RCore
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class MainViewModel(application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class MainViewModel @Inject constructor(
+    application: Application,
+    private val draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler,
+) : AndroidViewModel(application) {
 
     private inline val context: Context get() = getApplication()
 
@@ -215,7 +221,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             refreshThreads(mailbox, folder.id)
         }
 
-        DraftsActionsWorker.scheduleWork(context)
+        draftsActionsWorkerScheduler.scheduleWork()
     }
 
     fun forceRefreshMailboxesAndFolders() {

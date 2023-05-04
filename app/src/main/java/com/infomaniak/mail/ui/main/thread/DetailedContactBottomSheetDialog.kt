@@ -32,7 +32,9 @@ import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.ui.main.thread.actions.ActionsBottomSheetDialog
 import com.infomaniak.mail.utils.copyRecipientEmailToClipboard
 import com.infomaniak.mail.utils.observeNotNull
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class DetailedContactBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private lateinit var binding: BottomSheetDetailedContactBinding

@@ -50,12 +50,14 @@ import com.infomaniak.mail.utils.PermissionUtils
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.updateNavigationBarColor
+import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.launch
 import java.util.Date
 
+@AndroidEntryPoint
 class MainActivity : ThemedActivity() {
 
     // This binding is not private because it's used in ThreadListFragment (`(activity as? MainActivity)?.binding`)
