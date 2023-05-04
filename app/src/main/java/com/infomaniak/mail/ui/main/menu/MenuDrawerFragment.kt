@@ -229,7 +229,7 @@ class MenuDrawerFragment : MenuFoldersFragment() {
             storageDivider.isVisible = isLimited
 
             if (isLimited) {
-                storageText.text = quotas?.getText(context) ?: return@observe
+                storageText.text = quotas!!.getText(context)
                 storageIndicator.progress = quotas.getProgress()
             }
         }
