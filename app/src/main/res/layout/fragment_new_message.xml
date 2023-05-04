@@ -379,7 +379,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/marginStandardMedium"
-                    android:contentDescription="@string/contentDescriptionButtonDeleteSignature"
+                    android:contentDescription="@string/contentDescriptionButtonDeleteQuote"
                     android:insetLeft="@dimen/marginStandardVerySmall"
                     android:insetTop="@dimen/marginStandardVerySmall"
                     android:insetRight="@dimen/marginStandardVerySmall"
