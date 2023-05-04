@@ -92,9 +92,6 @@ import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmObject
 import kotlinx.serialization.encodeToString
 import org.jsoup.Jsoup
-import java.io.ByteArrayOutputStream
-import java.io.IOException
-import java.io.InputStream
 import java.util.Calendar
 import java.util.Date
 import java.util.Scanner
@@ -188,7 +185,7 @@ fun WebView.initWebViewClient(attachments: List<Attachment>) {
     attachments.forEach {
         if (it.contentId?.isNotBlank() == true) cidDictionary[it.contentId as String] = it
     }
-    webViewClient = MessageWebViewClient(context, cidDictionary)
+    webViewClient = MessageWebViewClient(context, cidDictionary, this)
 }
 //endregion
 

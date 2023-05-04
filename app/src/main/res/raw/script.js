@@ -12,17 +12,18 @@ var DEBUG_DISPLAY_TRANSFORMS = false;
 var gTransformText = {};
 
 // TODO
-//var WEBVIEW_WIDTH = 400;
 //var MESSAGE_SELECTOR = "#kmail-message-content";
 var NORMALIZE_MESSAGE_WIDTHS = true;
 var ENABLE_MUNGE_IMAGES = true;
 var ENABLE_MUNGE_TABLES = true;
 
-function normalizeAllMessageWidths() {
+function normalizeAllMessageWidths(webViewWidth) {
     var expandedBodyDivs;
 
+    console.log("Starting to normalize for width: " + webViewWidth)
+
     expandedBodyDivs = document.querySelectorAll(MESSAGE_SELECTOR);
-    normalizeElementWidths(expandedBodyDivs);
+    normalizeElementWidths(expandedBodyDivs, webViewWidth);
 }
 
 /*
@@ -30,7 +31,7 @@ function normalizeAllMessageWidths() {
  * Narrower elements are zoomed in, and wider elements are zoomed out.
  * This method is idempotent.
  */
-function normalizeElementWidths(elements) {
+function normalizeElementWidths(elements, webViewWidth) {
     var i;
     var el;
     var documentWidth;
@@ -40,7 +41,7 @@ function normalizeElementWidths(elements) {
     var outerZoom;
 
     documentWidth = document.body.offsetWidth;
-    goalWidth = WEBVIEW_WIDTH;
+    goalWidth = webViewWidth;
 
     for (i = 0; i < elements.length; i++) {
         el = elements[i];
