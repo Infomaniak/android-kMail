@@ -40,11 +40,14 @@ import com.infomaniak.mail.utils.NotificationUtils.showNewMessageNotification
 import io.realm.kotlin.Realm
 import io.sentry.Sentry
 import okhttp3.OkHttpClient
+import javax.inject.Inject
 
-class FetchMessagesManager(private val context: Context) {
+class FetchMessagesManager @Inject constructor(
+    private val appContext: Context,
+    private val notificationManagerCompat: NotificationManagerCompat,
+) {
 
-    private val localSettings by lazy { LocalSettings.getInstance(context) }
-    private val notificationManagerCompat by lazy { NotificationManagerCompat.from(context) }
+    private val localSettings by lazy { LocalSettings.getInstance(appContext) }
 
     suspend fun execute(userId: Int, mailbox: Mailbox, mailboxContentRealm: Realm? = null) {
         // Don't launch sync if the mailbox's notifications have been disabled by the user
@@ -90,18 +93,18 @@ class FetchMessagesManager(private val context: Context) {
     ) {
 
         fun contentIntent(isSummary: Boolean): PendingIntent {
-            val intent = Intent(context, LaunchActivity::class.java).clearStack().apply {
+            val intent = Intent(appContext, LaunchActivity::class.java).clearStack().apply {
                 putExtras(LaunchActivityArgs(if (isSummary) null else uid, userId, mailbox.mailboxId).toBundle())
             }
             val requestCode = if (isSummary) mailbox.uuid else uid
             return PendingIntent.getActivity(
-                context, requestCode.hashCode(), intent,
+                appContext, requestCode.hashCode(), intent,
                 NotificationUtilsCore.pendingIntentFlags
             )
         }
 
         fun showNotification(contentText: String, isSummary: Boolean, title: String = "", description: String? = null) {
-            context.showNewMessageNotification(mailbox.channelId, title, description).apply {
+            appContext.showNewMessageNotification(mailbox.channelId, title, description).apply {
                 if (isSummary) {
                     setContentTitle(null)
                     setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
@@ -112,7 +115,7 @@ class FetchMessagesManager(private val context: Context) {
                 setContentIntent(contentIntent(isSummary = isSummary))
                 setGroup(mailbox.notificationGroupKey)
                 setGroupSummary(isSummary)
-                color = localSettings.accentColor.getPrimary(context)
+                color = localSettings.accentColor.getPrimary(appContext)
 
                 val notificationId = if (isSummary) mailbox.notificationGroupId else uid.hashCode()
                 @Suppress("MissingPermission")
@@ -126,7 +129,7 @@ class FetchMessagesManager(private val context: Context) {
 
         if (message.isSeen) return // Ignore if it has already been seen
 
-        val subject = context.formatSubject(message.subject)
+        val subject = appContext.formatSubject(message.subject)
         val preview = if (message.body?.value.isNullOrBlank()) {
             ""
         } else {
@@ -139,11 +142,11 @@ class FetchMessagesManager(private val context: Context) {
         val description = "$subject$formattedPreview"
 
         // Show message notification
-        showNotification(subject, false, message.sender.displayedName(context), description)
+        showNotification(subject, false, message.sender.displayedName(appContext), description)
 
         // Show group summary notification
         if (isLastMessage) {
-            val summaryText = context.resources.getQuantityString(
+            val summaryText = appContext.resources.getQuantityString(
                 R.plurals.newMessageNotificationSummary,
                 unReadThreadsCount,
                 unReadThreadsCount
