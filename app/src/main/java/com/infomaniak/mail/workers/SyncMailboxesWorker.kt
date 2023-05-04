@@ -19,6 +19,7 @@ package com.infomaniak.mail.workers
 
 import android.content.Context
 import android.util.Log
+import androidx.hilt.work.HiltWorker
 import androidx.work.*
 import androidx.work.PeriodicWorkRequest.Companion.MIN_PERIODIC_INTERVAL_MILLIS
 import com.infomaniak.mail.data.cache.RealmDatabase
@@ -32,9 +33,13 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
-class SyncMailboxesWorker(appContext: Context, params: WorkerParameters) : BaseCoroutineWorker(appContext, params) {
+@HiltWorker
+class SyncMailboxesWorker @Inject constructor(
+    appContext: Context,
+    params: WorkerParameters,
+    private val fetchMessagesManager: FetchMessagesManager,
+) : BaseCoroutineWorker(appContext, params) {
 
-    private val fetchMessagesManager by lazy { FetchMessagesManager(appContext) }
     private val mailboxInfoRealm by lazy { RealmDatabase.newMailboxInfoInstance }
 
     override suspend fun launchWork(): Result = withContext(Dispatchers.IO) {

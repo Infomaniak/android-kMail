@@ -76,6 +76,8 @@ open class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycle
     lateinit var syncMailboxesWorkerScheduler: SyncMailboxesWorker.Scheduler
     @Inject
     lateinit var processMessageNotificationsWorkerScheduler: ProcessMessageNotificationsWorker.Scheduler
+    @Inject
+    lateinit var notificationManagerCompat: NotificationManagerCompat
 
     override fun onCreate() {
         super<Application>.onCreate()
@@ -184,7 +186,6 @@ open class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycle
         val notificationText = getString(R.string.refreshTokenError)
 
         if (hasPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS))) {
-            val notificationManagerCompat = NotificationManagerCompat.from(this)
             showGeneralNotification(notificationText).apply {
                 setContentIntent(pendingIntent)
                 @Suppress("MissingPermission")

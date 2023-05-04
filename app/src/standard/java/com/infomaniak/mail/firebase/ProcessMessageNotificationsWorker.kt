@@ -19,6 +19,7 @@ package com.infomaniak.mail.firebase
 
 import android.content.Context
 import android.util.Log
+import androidx.hilt.work.HiltWorker
 import androidx.work.*
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
@@ -29,9 +30,13 @@ import io.sentry.Sentry
 import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject
 
-class ProcessMessageNotificationsWorker(appContext: Context, params: WorkerParameters) : BaseCoroutineWorker(appContext, params) {
+@HiltWorker
+class ProcessMessageNotificationsWorker @Inject constructor(
+    appContext: Context,
+    params: WorkerParameters,
+    private val fetchMessagesManager: FetchMessagesManager,
+) : BaseCoroutineWorker(appContext, params) {
 
-    private val fetchMessagesManager by lazy { FetchMessagesManager(appContext) }
     private val mailboxInfoRealm by lazy { RealmDatabase.newMailboxInfoInstance }
 
     override suspend fun launchWork(): Result = with(Dispatchers.IO) {
