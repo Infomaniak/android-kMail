@@ -318,7 +318,6 @@ object MessageController {
                             impactedThreads.addAll(threads)
                         }
                     }
-                    SentryDebug.sendMissingMessages(page, messages, folder, newCursor)
                 }
 
                 pageStart += pageSize

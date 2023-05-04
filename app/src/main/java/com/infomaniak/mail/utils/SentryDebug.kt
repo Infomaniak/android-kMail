@@ -101,29 +101,6 @@ object SentryDebug {
         Log.d("FolderSingle", "newMessage.messageId: ${newMessage.messageId}")
     }
 
-    fun sendMissingMessages(
-        sentUids: List<String>,
-        receivedMessages: List<Message>,
-        folder: Folder,
-        newCursor: String,
-    ) {
-        if (receivedMessages.count() != sentUids.count()) {
-            val receivedUids = mutableSetOf<String>().apply {
-                receivedMessages.forEach { add(it.shortUid) }
-            }
-            val missingUids = sentUids.filterNot(receivedUids::contains)
-            if (missingUids.isNotEmpty()) {
-                Sentry.withScope { scope ->
-                    scope.level = SentryLevel.ERROR
-                    scope.setExtra("missingMessages", "${missingUids.map { it.toLongUid(folder.id) }}")
-                    scope.setExtra("previousCursor", "${folder.cursor}")
-                    scope.setExtra("newCursor", newCursor)
-                    Sentry.captureMessage("We tried to download some Messages, but they were nowhere to be found.")
-                }
-            }
-        }
-    }
-
     fun sendOrphanMessages(previousCursor: String?, folder: Folder) {
         val orphanMessages = folder.messages.filter { it.isOrphan() }
         if (orphanMessages.isNotEmpty()) {
