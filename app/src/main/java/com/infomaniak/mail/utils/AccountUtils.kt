@@ -26,10 +26,13 @@ import com.infomaniak.lib.core.auth.CredentialManager
 import com.infomaniak.lib.core.auth.TokenAuthenticator
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.networking.HttpClient
+import com.infomaniak.lib.core.networking.HttpClient.okHttpClient
 import com.infomaniak.lib.core.room.UserDatabase
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.appSettings.AppSettingsController
+import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.AppSettings
 import io.sentry.Sentry
 import kotlinx.coroutines.CoroutineScope
@@ -92,15 +95,33 @@ object AccountUtils : CredentialManager() {
         userDatabase.userDao().insert(user)
     }
 
-    private suspend fun requestUser(user: User) {
+    fun updateUserAndMailboxes(context: Context) = CoroutineScope(Dispatchers.IO).launch {
+        val user = ApiRepository.getUserProfile(okHttpClient).data ?: return@launch
+        updateMailboxes(context, user)
+    }
+
+    private suspend fun updateMailboxes(context: Context, user: User) {
+
+        val apiResponse = ApiRepository.getMailboxes(okHttpClient)
+        val mailboxes = apiResponse.data
+
+        when {
+            !apiResponse.isSuccess() -> return
+            mailboxes.isNullOrEmpty() -> removeUser(context, user)
+            else -> {
+                requestUser(user)
+                MailboxController.updateMailboxes(context, mailboxes)
+            }
+        }
+    }
+
+    private suspend fun requestUser(remoteUser: User) {
         TokenAuthenticator.mutex.withLock {
-            if (currentUserId == user.id) {
-                user.apply {
-                    organizations = arrayListOf()
-                    requestCurrentUser()?.let { user ->
-                        setUserToken(user = this, user.apiToken)
-                        currentUser = this
-                    }
+            if (remoteUser.id == currentUserId) {
+                remoteUser.organizations = arrayListOf()
+                requestCurrentUser()?.let { localUser ->
+                    setUserToken(remoteUser, localUser.apiToken)
+                    currentUser = remoteUser
                 }
             }
         }
@@ -119,12 +140,13 @@ object AccountUtils : CredentialManager() {
         }
 
         logoutUserToken()
+
         userDatabase.userDao().delete(user)
         RealmDatabase.removeUserData(context, user.id)
         val localSettings = LocalSettings.getInstance(context)
         localSettings.removeRegisteredFirebaseUser(userId = user.id)
 
-        if (currentUserId == user.id) {
+        if (user.id == currentUserId) {
             if (getAllUsersCount() == 0) resetSettings(context, localSettings)
             reloadApp?.invoke()
         }

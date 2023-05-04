@@ -32,10 +32,7 @@ import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.notifications.SingleQueryChange
-import io.realm.kotlin.query.RealmQuery
-import io.realm.kotlin.query.RealmResults
-import io.realm.kotlin.query.RealmSingleQuery
-import io.realm.kotlin.query.Sort
+import io.realm.kotlin.query.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -59,6 +56,10 @@ object MailboxController {
         return realm.query<Mailbox>(checkHasUserId(userId)).query(checkIsNotInExceptions)
     }
 
+    private fun getMailboxesCountQuery(userId: Int): RealmScalarQuery<Long> {
+        return defaultRealm.query<Mailbox>(checkHasUserId(userId)).count()
+    }
+
     private fun getMailboxQuery(objectId: String, realm: TypedRealm): RealmSingleQuery<Mailbox> {
         return realm.query<Mailbox>("${Mailbox::objectId.name} == '$objectId'").first()
     }
@@ -77,6 +78,8 @@ object MailboxController {
     private fun getMailboxes(userId: Int, exceptionMailboxIds: List<Int>, realm: TypedRealm): RealmResults<Mailbox> {
         return getMailboxesQuery(userId, exceptionMailboxIds, realm).find()
     }
+
+    fun getMailboxesCount(userId: Int): Long = getMailboxesCountQuery(userId).find()
 
     fun getMailboxesAsync(): Flow<ResultsChange<Mailbox>> {
         return getMailboxesQuery().asFlow()
@@ -155,6 +158,7 @@ object MailboxController {
         }
         outdatedMailboxes.forEach { RealmDatabase.deleteMailboxContent(it.mailboxId) }
         delete(outdatedMailboxes)
+
         return isCurrentMailboxDeleted
     }
 
