@@ -244,7 +244,9 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
                     scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
                     Sentry.captureMessage("We tried to [${draft.action?.name}] a Draft, but an Attachment didn't have its `uuid`.")
                 }
+
                 applicationContext.showToast(R.string.errorCorruptAttachment)
+
                 return scheduledDate
             }
         }
