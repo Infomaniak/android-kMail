@@ -51,7 +51,7 @@
     <string name="addUnknownRecipientTitle">Ajoutez un destinataire</string>
     <string name="appSecurityDescription">Protégez l’accès à votre application en activant le verrouillage de votre téléphone.</string>
     <string name="archiveFolder">Archive</string>
-    <string name="attachAddressDescription">Vous possédez déjà une adresse mail Infomaniak, connectez-vous dès maintenant.</string>
+    <string name="attachAddressDescription">Vous possédez déjà une adresse mail Infomaniak, connectez-vous dès maintenant</string>
     <string name="attachAddressInputHint">Adresse mail</string>
     <string name="attachAddressPasswordInputHint">Mot de passe</string>
     <string name="attachAddressTitle">Ajoutez une adresse mail</string>

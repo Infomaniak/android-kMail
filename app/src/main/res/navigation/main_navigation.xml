@@ -255,13 +255,22 @@
 
     <fragment
         android:id="@+id/accountFragment"
-        android:name="com.infomaniak.mail.ui.main.menu.AccountFragment"
+        android:name="com.infomaniak.mail.ui.main.user.AccountFragment"
         android:label="AccountFragment"
         tools:layout="@layout/fragment_account">
         <action
             android:id="@+id/action_accountFragment_to_switchUserFragment"
             app:destination="@id/switchUserFragment" />
+        <action
+            android:id="@+id/action_accountFragment_to_attachMailboxFragment"
+            app:destination="@+id/attachMailboxFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/attachMailboxFragment"
+        android:name="com.infomaniak.mail.ui.main.user.AttachMailboxFragment"
+        android:label="AttachMailboxFragment"
+        tools:layout="@layout/fragment_attach_mailbox" />
 
     <fragment
         android:id="@+id/settingsFragment"

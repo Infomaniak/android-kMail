@@ -51,7 +51,7 @@
     <string name="addUnknownRecipientTitle">Einen Empfänger hinzufügen</string>
     <string name="appSecurityDescription">Schützen Sie den Zugriff auf Ihre App, indem Sie Ihre Telefonsperre aktivieren.</string>
     <string name="archiveFolder">Archiviert</string>
-    <string name="attachAddressDescription">Sie haben bereits eine Infomaniak-Mailadresse, loggen Sie sich jetzt ein.</string>
+    <string name="attachAddressDescription">Sie haben bereits eine Infomaniak-Mailadresse, loggen Sie sich jetzt ein</string>
     <string name="attachAddressInputHint">Mailadresse</string>
     <string name="attachAddressPasswordInputHint">Passwort</string>
     <string name="attachAddressTitle">Mailadresse hinzufügen</string>

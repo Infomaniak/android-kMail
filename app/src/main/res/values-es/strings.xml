@@ -51,7 +51,7 @@
     <string name="addUnknownRecipientTitle">Añadir un destinatario</string>
     <string name="appSecurityDescription">Protege el acceso a tu aplicación activando el bloqueo del teléfono.</string>
     <string name="archiveFolder">Archivado</string>
-    <string name="attachAddressDescription">Si ya dispone de una dirección de correo electrónico Infomaniak, conéctese ahora.</string>
+    <string name="attachAddressDescription">Si ya dispone de una dirección de correo electrónico Infomaniak, conéctese ahora</string>
     <string name="attachAddressInputHint">Dirección de correo electrónico</string>
     <string name="attachAddressPasswordInputHint">Contraseña</string>
     <string name="attachAddressTitle">Añadir dirección de correo electrónico</string>

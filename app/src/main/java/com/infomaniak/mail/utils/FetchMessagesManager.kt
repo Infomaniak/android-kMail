@@ -32,7 +32,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.data.models.Mailbox
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.LaunchActivityArgs

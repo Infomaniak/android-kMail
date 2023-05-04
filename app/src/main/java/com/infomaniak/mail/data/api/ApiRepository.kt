@@ -34,6 +34,8 @@ import com.infomaniak.mail.data.models.draft.SendDraftResult
 import com.infomaniak.mail.data.models.getMessages.GetMessagesByUidsResult
 import com.infomaniak.mail.data.models.getMessages.GetMessagesUidsDeltaResult
 import com.infomaniak.mail.data.models.getMessages.GetMessagesUidsResult
+import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.mailbox.MailboxLinkedResult
 import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.SignaturesResult
@@ -92,8 +94,8 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.mailbox(), GET, okHttpClient = okHttpClient ?: HttpClient.okHttpClient)
     }
 
-    fun getPermissions(mailboxLinkId: Int, mailboxHostingId: Int): ApiResponse<MailboxPermissions> {
-        return callApi(ApiRoutes.permissions(mailboxLinkId, mailboxHostingId), GET)
+    fun addNewMailbox(mailAddress: String, password: String): ApiResponse<MailboxLinkedResult> {
+        return callApi(ApiRoutes.addNewMailbox(), POST, mapOf("mail" to mailAddress, "password" to password))
     }
 
     fun getFolders(mailboxUuid: String): ApiResponse<List<Folder>> = callApi(ApiRoutes.folders(mailboxUuid), GET)
@@ -112,6 +114,10 @@ object ApiRepository : ApiRepositoryCore() {
 
     fun getQuotas(mailboxHostingId: Int, mailboxName: String): ApiResponse<Quotas> {
         return callApi(ApiRoutes.quotas(mailboxHostingId, mailboxName), GET)
+    }
+
+    fun getPermissions(mailboxLinkId: Int, mailboxHostingId: Int): ApiResponse<MailboxPermissions> {
+        return callApi(ApiRoutes.permissions(mailboxLinkId, mailboxHostingId), GET)
     }
 
     fun markMessagesAsSeen(mailboxUuid: String, messagesUids: List<String>): ApiResponse<Unit> {

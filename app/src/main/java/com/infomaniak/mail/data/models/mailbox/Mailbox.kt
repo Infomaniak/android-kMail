@@ -15,10 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models
+package com.infomaniak.mail.data.models.mailbox
 
 import androidx.core.app.NotificationManagerCompat
-import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
+import com.infomaniak.mail.data.models.Quotas
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName

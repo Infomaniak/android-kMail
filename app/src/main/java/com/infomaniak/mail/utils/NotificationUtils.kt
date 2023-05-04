@@ -26,7 +26,7 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.infomaniak.lib.core.utils.NotificationUtilsCore
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.Mailbox
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 
 object NotificationUtils : NotificationUtilsCore() {
 

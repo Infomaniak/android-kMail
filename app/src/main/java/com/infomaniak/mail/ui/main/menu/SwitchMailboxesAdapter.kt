@@ -23,8 +23,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.mail.MatomoMail.SWITCH_MAILBOX_NAME
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
-import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.models.Mailbox
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.databinding.ItemSwitchMailboxBinding
 import com.infomaniak.mail.ui.main.menu.SwitchMailboxesAdapter.SwitchMailboxesViewHolder
 import com.infomaniak.mail.utils.AccountUtils
@@ -56,7 +55,7 @@ class SwitchMailboxesAdapter(
                 } else {
                     context.trackAccountEvent(SWITCH_MAILBOX_NAME)
                 }
-                onMailboxSelected(mailbox)
+                AccountUtils.switchToMailbox(mailbox.mailboxId)
             }
         }
     }
@@ -66,13 +65,6 @@ class SwitchMailboxesAdapter(
     fun setMailboxes(newMailboxes: List<Mailbox>) {
         mailboxes = newMailboxes
         notifyDataSetChanged()
-    }
-
-    private fun onMailboxSelected(mailbox: Mailbox) {
-        // TODO: This works, but... The splashscreen blinks.
-        AccountUtils.currentMailboxId = mailbox.mailboxId
-        RealmDatabase.close()
-        AccountUtils.reloadApp?.invoke()
     }
 
     class SwitchMailboxesViewHolder(val binding: ItemSwitchMailboxBinding) : RecyclerView.ViewHolder(binding.root)
