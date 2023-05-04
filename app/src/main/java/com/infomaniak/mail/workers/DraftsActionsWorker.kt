@@ -63,6 +63,8 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.properties.Delegates
@@ -255,15 +257,10 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
         return scheduledDate
     }
 
-    companion object {
-        private const val TAG = "DraftsActionsWorker"
-        private const val USER_ID_KEY = "userId"
-        private const val MAILBOX_ID_KEY = "mailboxIdKey"
-        // We add this delay because for now, it doesn't always work if we just use the `etop`.
-        private const val REFRESH_DELAY = 2_000L
-        private const val MAX_REFRESH_DELAY = 6_000L
+    @Singleton
+    class Scheduler @Inject constructor(private val workManager: WorkManager) {
 
-        fun scheduleWork(context: Context) {
+        fun scheduleWork() {
 
             if (AccountUtils.currentMailboxId == AppSettings.DEFAULT_ID) return
             if (DraftController.getDraftsWithActionsCount() == 0L) return
@@ -278,12 +275,21 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
                 .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
                 .build()
 
-            WorkManager.getInstance(context).enqueueUniqueWork(TAG, ExistingWorkPolicy.APPEND_OR_REPLACE, workRequest)
+            workManager.enqueueUniqueWork(TAG, ExistingWorkPolicy.APPEND_OR_REPLACE, workRequest)
         }
 
-        fun getCompletedWorkInfosLiveData(context: Context): LiveData<MutableList<WorkInfo>> {
+        fun getCompletedWorkInfosLiveData(): LiveData<MutableList<WorkInfo>> {
             val workQuery = WorkQuery.Builder.fromTags(listOf(TAG)).addStates(listOf(WorkInfo.State.SUCCEEDED)).build()
-            return WorkManager.getInstance(context).getWorkInfosLiveData(workQuery)
+            return workManager.getWorkInfosLiveData(workQuery)
         }
+    }
+
+    companion object {
+        private const val TAG = "DraftsActionsWorker"
+        private const val USER_ID_KEY = "userId"
+        private const val MAILBOX_ID_KEY = "mailboxIdKey"
+        // We add this delay because for now, it doesn't always work if we just use the `etop`.
+        private const val REFRESH_DELAY = 2_000L
+        private const val MAX_REFRESH_DELAY = 6_000L
     }
 }

@@ -72,10 +72,13 @@ import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
 import com.infomaniak.mail.utils.UiUtils.formatUnreadCount
 import com.infomaniak.mail.workers.DraftsActionsWorker
+import dagger.hilt.android.AndroidEntryPoint
 import io.realm.kotlin.ext.isValid
 import java.util.Date
+import javax.inject.Inject
 import com.infomaniak.lib.core.R as RCore
 
+@AndroidEntryPoint
 class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private lateinit var binding: FragmentThreadListBinding
@@ -89,6 +92,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private lateinit var threadListAdapter: ThreadListAdapter
     private var lastUpdatedDate: Date? = null
     private var previousFirstMessageUid: String? = null
+
+    @Inject
+    lateinit var draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler
 
     private val showLoadingTimer: CountDownTimer by lazy {
         Utils.createRefreshTimer { binding.swipeRefreshLayout.isRefreshing = true }
@@ -452,7 +458,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun observerDraftsActionsCompletedWorks() {
         fun observeDraftsActions() {
-            DraftsActionsWorker.getCompletedWorkInfosLiveData(requireContext()).observe(viewLifecycleOwner) {
+            draftsActionsWorkerScheduler.getCompletedWorkInfosLiveData().observe(viewLifecycleOwner) {
                 mainViewModel.currentFolder.value?.let { folder ->
                     if (folder.isValid() && folder.role == FolderRole.DRAFT) mainViewModel.forceRefreshThreads()
                 }

@@ -61,6 +61,7 @@ import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
 import com.infomaniak.mail.workers.DraftsActionsWorker
+import javax.inject.Inject
 import com.google.android.material.R as RMaterial
 
 class NewMessageFragment : Fragment() {
@@ -83,6 +84,9 @@ class NewMessageFragment : Fragment() {
     private var mailboxes = emptyList<Mailbox>()
     private var selectedMailboxIndex = 0
     private var lastFieldToTakeFocus: FieldType? = TO
+
+    @Inject
+    lateinit var draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentNewMessageBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -463,7 +467,7 @@ class NewMessageFragment : Fragment() {
         // TODO: Realm, and we'll lost some Draft data. A quick fix to get rid of the current bugs is
         // TODO: to wait the end of Draft composition before starting DraftsActionsWorker.
         if (shouldHandleDraftActionWhenLeaving) {
-            DraftsActionsWorker.scheduleWork(requireContext())
+            draftsActionsWorkerScheduler.scheduleWork()
         } else {
             shouldHandleDraftActionWhenLeaving = true
         }
