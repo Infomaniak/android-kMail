@@ -29,6 +29,8 @@ import com.infomaniak.mail.utils.FetchMessagesManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+import javax.inject.Singleton
 
 class SyncMailboxesWorker(appContext: Context, params: WorkerParameters) : BaseCoroutineWorker(appContext, params) {
 
@@ -53,15 +55,15 @@ class SyncMailboxesWorker(appContext: Context, params: WorkerParameters) : BaseC
         mailboxInfoRealm.close()
     }
 
-    companion object {
+    @Singleton
+    class Scheduler @Inject constructor(
+        private val appContext: Context,
+        private val workManager: WorkManager,
+    ) {
 
-        /** To support the old services, we do not change the name */
-        private const val TAG = "SyncMessagesWorker"
+        suspend fun scheduleWorkIfNeeded() = withContext(Dispatchers.IO) {
 
-        private const val INITIAL_DELAY = 2L
-
-        suspend fun scheduleWorkIfNeeded(context: Context) = withContext(Dispatchers.IO) {
-            if (context.isGooglePlayServicesNotAvailable() && AccountUtils.getAllUsersCount() > 0) {
+            if (appContext.isGooglePlayServicesNotAvailable() && AccountUtils.getAllUsersCount() > 0) {
                 Log.d(TAG, "Work scheduled")
 
                 val workRequest =
@@ -71,13 +73,22 @@ class SyncMailboxesWorker(appContext: Context, params: WorkerParameters) : BaseC
                         .setInitialDelay(INITIAL_DELAY, TimeUnit.MINUTES)
                         .build()
 
-                WorkManager.getInstance(context).enqueueUniquePeriodicWork(TAG, ExistingPeriodicWorkPolicy.UPDATE, workRequest)
+                workManager.enqueueUniquePeriodicWork(TAG, ExistingPeriodicWorkPolicy.UPDATE, workRequest)
             }
         }
 
-        fun cancelWork(context: Context) {
+        fun cancelWork() {
             Log.d(TAG, "Work cancelled")
-            WorkManager.getInstance(context).cancelUniqueWork(TAG)
+            workManager.cancelUniqueWork(TAG)
         }
+    }
+
+    companion object {
+
+        /** To support the old services, we do not change the name */
+        private const val TAG = "SyncMessagesWorker"
+
+        private const val INITIAL_DELAY = 2L
+
     }
 }

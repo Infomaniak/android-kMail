@@ -73,6 +73,8 @@ open class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycle
         private set
 
     @Inject
+    lateinit var syncMailboxesWorkerScheduler: SyncMailboxesWorker.Scheduler
+    @Inject
     lateinit var processMessageNotificationsWorkerScheduler: ProcessMessageNotificationsWorker.Scheduler
 
     override fun onCreate() {
@@ -92,13 +94,13 @@ open class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycle
 
     override fun onStart(owner: LifecycleOwner) {
         isAppInBackground = false
-        SyncMailboxesWorker.cancelWork(this)
         processMessageNotificationsWorkerScheduler.cancelFirebaseProcessWorks()
+        syncMailboxesWorkerScheduler.cancelWork()
     }
 
     override fun onStop(owner: LifecycleOwner) {
         isAppInBackground = true
-        owner.lifecycleScope.launch { SyncMailboxesWorker.scheduleWorkIfNeeded(this@ApplicationMain) }
+        owner.lifecycleScope.launch { syncMailboxesWorkerScheduler.scheduleWorkIfNeeded() }
     }
 
     private fun configureDebugMode() {
