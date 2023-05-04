@@ -24,4 +24,4 @@ fun FragmentActivity.checkPlayServices() = Unit
 
 fun Context.isGooglePlayServicesNotAvailable(): Boolean = true
 
-fun Context.cancelFirebaseProcessWorks() = Unit
+fun ProcessMessageNotificationsWorker.Scheduler.cancelFirebaseProcessWorks() = Unit

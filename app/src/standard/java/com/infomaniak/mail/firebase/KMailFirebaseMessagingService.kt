@@ -28,13 +28,19 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.utils.AccountUtils
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class KMailFirebaseMessagingService : FirebaseMessagingService() {
 
     private val applicationMain by lazy { application as ApplicationMain }
     private val localSettings by lazy { LocalSettings.getInstance(this) }
     private val notificationManagerCompat by lazy { NotificationManagerCompat.from(this) }
     private val realmMailboxInfo by lazy { RealmDatabase.newMailboxInfoInstance }
+
+    @Inject
+    lateinit var processMessageNotificationsScheduler: ProcessMessageNotificationsWorker.Scheduler
 
     override fun onNewToken(token: String) {
         Log.i(TAG, "onNewToken: new token received")
@@ -78,7 +84,7 @@ class KMailFirebaseMessagingService : FirebaseMessagingService() {
             if (mailbox.notificationsIsDisabled(notificationManagerCompat)) return
         }
 
-        ProcessMessageNotificationsWorker.scheduleWork(this, userId, mailboxId, messageUid)
+        processMessageNotificationsScheduler.scheduleWork(userId, mailboxId, messageUid)
     }
 
     override fun onDestroy() {

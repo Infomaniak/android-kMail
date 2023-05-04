@@ -43,6 +43,7 @@ import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.mail.MatomoMail.buildTracker
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.firebase.ProcessMessageNotificationsWorker
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.LaunchActivityArgs
 import com.infomaniak.mail.utils.AccountUtils
@@ -50,6 +51,7 @@ import com.infomaniak.mail.utils.ErrorCode
 import com.infomaniak.mail.utils.NotificationUtils.initNotificationChannel
 import com.infomaniak.mail.utils.NotificationUtils.showGeneralNotification
 import com.infomaniak.mail.workers.SyncMailboxesWorker
+import dagger.hilt.android.HiltAndroidApp
 import io.sentry.SentryEvent
 import io.sentry.SentryOptions
 import io.sentry.android.core.SentryAndroid
@@ -61,12 +63,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.matomo.sdk.Tracker
 import java.util.UUID
+import javax.inject.Inject
 
-class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycleObserver {
+@HiltAndroidApp
+open class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycleObserver {
 
     val matomoTracker: Tracker by lazy { buildTracker() }
     var isAppInBackground = true
         private set
+
+    @Inject
+    lateinit var processMessageNotificationsWorkerScheduler: ProcessMessageNotificationsWorker.Scheduler
 
     override fun onCreate() {
         super<Application>.onCreate()
@@ -85,8 +92,8 @@ class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycleObser
 
     override fun onStart(owner: LifecycleOwner) {
         isAppInBackground = false
-        cancelFirebaseProcessWorks()
         SyncMailboxesWorker.cancelWork(this)
+        processMessageNotificationsWorkerScheduler.cancelFirebaseProcessWorks()
     }
 
     override fun onStop(owner: LifecycleOwner) {

@@ -27,6 +27,7 @@ import com.infomaniak.mail.utils.FetchMessagesManager
 import com.infomaniak.mail.workers.BaseCoroutineWorker
 import io.sentry.Sentry
 import kotlinx.coroutines.Dispatchers
+import javax.inject.Inject
 
 class ProcessMessageNotificationsWorker(appContext: Context, params: WorkerParameters) : BaseCoroutineWorker(appContext, params) {
 
@@ -60,13 +61,9 @@ class ProcessMessageNotificationsWorker(appContext: Context, params: WorkerParam
         mailboxInfoRealm.close()
     }
 
-    companion object {
-        private const val TAG = "ProcessMessageNotificationsWorker"
-        private const val USER_ID_KEY = "userIdKey"
-        private const val MAILBOX_ID_KEY = "mailboxIdKey"
-        private const val MESSAGE_UID_KEY = "messageUidKey"
+    class Scheduler @Inject constructor(private val workManager: WorkManager) {
 
-        fun scheduleWork(context: Context, userId: Int, mailboxId: Int, messageUid: String) {
+        fun scheduleWork(userId: Int, mailboxId: Int, messageUid: String) {
             Log.i(TAG, "Work scheduled")
 
             val workName = workName(userId, mailboxId)
@@ -77,12 +74,19 @@ class ProcessMessageNotificationsWorker(appContext: Context, params: WorkerParam
                 .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
                 .build()
 
-            WorkManager.getInstance(context).enqueueUniqueWork(workName, ExistingWorkPolicy.APPEND_OR_REPLACE, workRequest)
+            workManager.enqueueUniqueWork(workName, ExistingWorkPolicy.APPEND_OR_REPLACE, workRequest)
         }
 
-        fun cancelWorks(context: Context) {
-            WorkManager.getInstance(context).cancelAllWorkByTag(TAG)
+        fun cancelWorks() {
+            workManager.cancelAllWorkByTag(TAG)
         }
+    }
+
+    companion object {
+        private const val TAG = "ProcessMessageNotificationsWorker"
+        private const val USER_ID_KEY = "userIdKey"
+        private const val MAILBOX_ID_KEY = "mailboxIdKey"
+        private const val MESSAGE_UID_KEY = "messageUidKey"
 
         private fun workName(userId: Int, mailboxId: Int) = "${userId}_$mailboxId"
     }
