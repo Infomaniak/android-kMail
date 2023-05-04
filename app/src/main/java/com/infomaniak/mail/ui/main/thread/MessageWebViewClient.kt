@@ -19,7 +19,6 @@ package com.infomaniak.mail.ui.main.thread
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
 import android.webkit.WebResourceRequest
@@ -92,7 +91,7 @@ class MessageWebViewClient(
 
     override fun onPageFinished(webView: WebView, url: String?) {
         // TODO : Try WebView.postVisualStateCallback
-        webView.loadUrl("javascript:normalizeAllMessageWidths()")
+        webView.loadUrl("javascript:removeAllProperties(); normalizeAllMessageWidths()")
         super.onPageFinished(webView, url)
     }
 

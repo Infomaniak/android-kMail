@@ -159,5 +159,9 @@ class HtmlFormatter(private val html: String) {
             )
             return loadScript(R.raw.script, customVariables)
         }
+
+        fun Context.getFixStyleScript(): String {
+            return loadScript(R.raw.fix_email_style)
+        }
     }
 }
