@@ -92,9 +92,10 @@ dependencies {
     implementation libs.webkit
     implementation libs.work.runtime.ktx
 
-    implementation libs.dagger.hilt
+    implementation libs.hilt.android
+    implementation libs.hilt.work
     // TODO: migrate to ksp, actually hilt is not yet supported with ksp
-    kapt libs.dagger.hilt.compiler
+    kapt libs.hilt.compiler
 
     implementation libs.sentry.android.fragment
 
