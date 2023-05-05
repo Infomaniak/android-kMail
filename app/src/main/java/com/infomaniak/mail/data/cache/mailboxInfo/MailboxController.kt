@@ -43,8 +43,8 @@ object MailboxController {
     //region Queries
     private fun checkHasUserId(userId: Int) = "${Mailbox::userId.name} == '$userId'"
 
-    private fun getMailboxesQuery(): RealmQuery<Mailbox> {
-        return defaultRealm.query<Mailbox>().sort(Mailbox::inboxUnreadCount.name, Sort.DESCENDING)
+    private fun getMailboxesQuery(realm: TypedRealm): RealmQuery<Mailbox> {
+        return realm.query()
     }
 
     private fun getMailboxesQuery(userId: Int, realm: TypedRealm): RealmQuery<Mailbox> {
@@ -71,6 +71,10 @@ object MailboxController {
     //endregion
 
     //region Get data
+    fun getMailboxes(realm: TypedRealm = defaultRealm): RealmResults<Mailbox> {
+        return getMailboxesQuery(realm).find()
+    }
+
     fun getMailboxes(userId: Int, realm: TypedRealm = defaultRealm): RealmResults<Mailbox> {
         return getMailboxesQuery(userId, realm).find()
     }
@@ -81,8 +85,8 @@ object MailboxController {
 
     fun getMailboxesCount(userId: Int): Long = getMailboxesCountQuery(userId).find()
 
-    fun getMailboxesAsync(): Flow<ResultsChange<Mailbox>> {
-        return getMailboxesQuery().asFlow()
+    fun getMailboxesAsync(realm: TypedRealm = defaultRealm): Flow<ResultsChange<Mailbox>> {
+        return getMailboxesQuery(realm).asFlow()
     }
 
     fun getMailboxesAsync(userId: Int): Flow<RealmResults<Mailbox>> {

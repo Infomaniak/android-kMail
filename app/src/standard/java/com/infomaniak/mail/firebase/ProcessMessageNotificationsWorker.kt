@@ -39,9 +39,11 @@ class ProcessMessageNotificationsWorker(appContext: Context, params: WorkerParam
         val mailboxId = inputData.getIntOrNull(MAILBOX_ID_KEY) ?: return@with Result.success()
         val messageUid = inputData.getString(MESSAGE_UID_KEY) ?: return@with Result.success()
         val mailbox = MailboxController.getMailbox(userId, mailboxId, mailboxInfoRealm) ?: run {
+            val mailboxes = MailboxController.getMailboxes(mailboxInfoRealm)
             Sentry.withScope { scope ->
                 scope.setExtra("userId", userId.toString())
                 scope.setExtra("mailboxId", mailboxId.toString())
+                scope.setExtra("mailboxesId", "${mailboxes.map { "mailboxId:[${it.mailboxId}] (userId:[${it.userId}])" }}")
                 scope.setExtra("messageUid", messageUid)
                 Sentry.captureMessage("We should not have received this notification")
             }
