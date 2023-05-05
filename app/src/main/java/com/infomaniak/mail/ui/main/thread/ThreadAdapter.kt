@@ -19,7 +19,6 @@ package com.infomaniak.mail.ui.main.thread
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ScaleGestureDetector
 import android.view.ViewConfiguration
@@ -105,11 +104,13 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
 
         val payload = payloads.firstOrNull()
         if (payload is NotificationType) {
-            if (payload == NotificationType.AVATAR && !message.isDraft) {
-                userAvatar.loadAvatar(message.from.first(), contacts)
-            } else if (payload == NotificationType.TOGGLE_LIGHT_MODE) {
-                isThemeTheSameMap[message.uid] = !isThemeTheSameMap[message.uid]!!
-                holder.toggleBodyAndQuoteTheme(message)
+            when (payload) {
+                NotificationType.AVATAR -> if (!message.isDraft) userAvatar.loadAvatar(message.from.first(), contacts)
+                NotificationType.TOGGLE_LIGHT_MODE -> {
+                    isThemeTheSameMap[message.uid] = !isThemeTheSameMap[message.uid]!!
+                    holder.toggleBodyAndQuoteTheme(message)
+                }
+                NotificationType.RERENDER -> holder.loadBodyAndQuote(message)
             }
         } else {
             super.onBindViewHolder(holder, position, payloads)
@@ -446,9 +447,14 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
         notifyItemChanged(index, NotificationType.TOGGLE_LIGHT_MODE)
     }
 
+    fun rerenderMails() {
+        notifyItemRangeChanged(0, itemCount, NotificationType.RERENDER)
+    }
+
     private enum class NotificationType {
         AVATAR,
         TOGGLE_LIGHT_MODE,
+        RERENDER,
     }
 
     private companion object {

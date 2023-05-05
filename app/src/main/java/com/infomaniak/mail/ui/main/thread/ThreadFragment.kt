@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.main.thread
 
 import android.content.Intent
 import android.content.res.ColorStateList
+import android.content.res.Configuration
 import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
 import android.util.Log
@@ -80,6 +81,11 @@ class ThreadFragment : Fragment() {
 
     // When opening the Thread, we want to scroll to the last Message, but only once.
     private var shouldScrollToBottom = AtomicBoolean(true)
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        threadAdapter.rerenderMails()
+        super.onConfigurationChanged(newConfig)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentThreadBinding.inflate(inflater, container, false).also {
