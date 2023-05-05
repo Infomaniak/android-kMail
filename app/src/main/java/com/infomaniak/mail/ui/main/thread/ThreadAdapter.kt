@@ -59,8 +59,6 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
         private set
     var isExpandedMap = mutableMapOf<String, Boolean>()
     var isThemeTheSameMap = mutableMapOf<String, Boolean>()
-    var loadedBodies = mutableSetOf<String>()
-    var loadedSignatures = mutableSetOf<String>()
     var contacts: Map<String, Map<String, MergedContact>> = emptyMap()
 
     var onContactClicked: ((contact: Recipient) -> Unit)? = null
@@ -147,7 +145,6 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
 
     private fun ThreadViewHolder.loadBodyAndQuote(message: Message) {
         message.body?.let { body ->
-            Log.i("gibran", "loadBodyAndQuote: body is not null", );
             if (splitBody == null) {
                 val (messageBody, messageQuote) = MessageBodyUtils.splitBodyAndQuote(body)
                 splitBody = messageBody
@@ -156,42 +153,20 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
                 message.hasQuote = messageQuote != null
             }
 
-            Log.i("gibran", "loadBodyAndQuote - binding.bodyWebView.isVisible: ${binding.bodyWebView.isVisible}")
-            Log.i("gibran", "loadBodyAndQuote - binding.fullMessageWebView.isVisible: ${binding.fullMessageWebView.isVisible}")
-
             if (binding.bodyWebView.isVisible) {
-                Log.e("gibran", "loadBodyAndQuote: standard webview is visible when binding ui for ${message.uid} with subject: ${message.subject}", );
-                if (message.uid !in loadedBodies) {
-                    Log.e("gibran", "loadBodyAndQuote: standard webview has never been loaded yet for ${message.uid}", );
-                    loadedBodies.add(message.uid)
-                    loadBodyInWebView(message.uid, splitBody!!, body.type)
-                }
-                else {
-                    Log.e("gibran", "loadBodyAndQuote: standard webview has already been loaded for ${message.uid}", );
-                }
+                loadBodyInWebView(message.uid, splitBody!!, body.type)
             } else if (binding.fullMessageWebView.isVisible) {
-                Log.e("gibran", "loadBodyAndQuote: quote webview is visible when binding ui for ${message.uid} with subject: ${message.subject}", );
-                if (message.uid !in loadedSignatures) {
-                    Log.e("gibran", "loadBodyAndQuote: quote webview has never been loaded yet for ${message.uid}", );
-                    loadedSignatures.add(message.uid)
-                    loadQuoteInWebView(message.uid, splitQuote, body.type)
-                } else {
-                    Log.e("gibran", "loadBodyAndQuote: quote webview has already been loaded for ${message.uid}", )
-                }
-            } else {
-
+                loadQuoteInWebView(message.uid, splitQuote, body.type)
             }
         }
     }
 
     private fun ThreadViewHolder.loadBodyInWebView(uid: String, body: String, type: String) = with(binding) {
-        Log.v("gibran", "loadBodyInWebView: LOADING BODY for $uid", );
         bodyWebView.applyWebViewContent(uid, body, type)
     }
 
     private fun ThreadViewHolder.loadQuoteInWebView(uid: String, quote: String?, type: String) = with(binding) {
         if (quote == null) return@with
-        Log.v("gibran", "loadBodyInWebView: LOADING QUOTE for $uid", );
         fullMessageWebView.applyWebViewContent(uid, quote, type)
     }
 
@@ -200,7 +175,6 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
         bodyWebView.isVisible = showStandardWebView
         fullMessageWebView.isVisible = !showStandardWebView
 
-        Log.e("gibran", "toggleWebViews: loadbody and quote because webviews got toggled", );
         loadBodyAndQuote(message)
     }
 
@@ -389,8 +363,6 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
         collapseMessageDetails(message)
         setHeaderState(message, isExpanded)
 
-        Log.e("gibran", "displayExpandedCollapsedMessage: loadbody recomputing collapsed state for ${message.uid}", );
-
         fullMessageWebView.isGone = true
 
         if (message.body?.value == null) {
@@ -402,7 +374,6 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
         }
 
         if (isExpanded) {
-            Log.e("gibran", "displayExpandedCollapsedMessage: loadbody while recomputing collapsed state, we need to load body for ${message.uid}", );
             loadBodyAndQuote(message)
             displayAttachments(message.attachments)
             if (message.hasQuote) quoteButton.text = context.getString(R.string.messageShowQuotedText)
@@ -463,9 +434,6 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
             quoteButton.text = context.getString(textId)
             toggleWebViews(message)
         }
-
-        // Log.e("gibran", "bindMessage: loadbody trying to bind message for ${message.uid}", );
-        // loadBodyAndQuote(message)
     }
 
     fun updateContacts(newContacts: Map<String, Map<String, MergedContact>>) {
@@ -476,11 +444,6 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
     fun toggleLightMode(message: Message) {
         val index = messages.indexOf(message)
         notifyItemChanged(index, NotificationType.TOGGLE_LIGHT_MODE)
-    }
-
-    fun clearAlreadyLoadedWebViews() {
-        loadedBodies.clear()
-        loadedSignatures.clear()
     }
 
     private enum class NotificationType {
