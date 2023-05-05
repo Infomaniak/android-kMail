@@ -1,26 +1,23 @@
 buildscript {
-    ext.gradle_version = '8.0.1'
-    ext.kotlin_version = '1.8.10'
-    ext.navigation_version = '2.5.3'
-    ext.coil_version = '2.3.0' // TODO: Temporary support for kDrive, remove this when it's fixed in :Core
-    ext.livedata_version = '2.6.1' // TODO: Temporary support for kDrive, remove this when it's fixed in :Core
-    ext.serialization_json_version = '1.5.0' // TODO: Temporary support for kDrive, remove this when it's fixed in :Core
-    ext.java_version = JavaVersion.VERSION_17
-    ext.realm_kotlin_version = '1.8.0'
+
+    ext.realmKotlinVersion = '1.8.0'
+
+    project.ext.gradleVersion = '8.0.1'
+    project.ext.kotlinVersion = '1.8.21'
 
     dependencies {
-        classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$navigation_version"
+        classpath "androidx.navigation:navigation-safe-args-gradle-plugin:2.5.3"
         classpath 'com.google.gms:google-services:4.3.15'
     }
 }
 
 plugins {
-    id 'com.android.application' version "$gradle_version" apply false
-    id 'com.android.library' version "$gradle_version" apply false
-    id 'org.jetbrains.kotlin.android' version "$kotlin_version" apply false
-    id 'org.jetbrains.kotlin.plugin.serialization' version "$kotlin_version" apply false
+    id 'com.android.application' version "$gradleVersion" apply false
+    id 'com.android.library' version "$gradleVersion" apply false
+    id 'org.jetbrains.kotlin.android' version "$kotlinVersion" apply false
+    id 'org.jetbrains.kotlin.plugin.serialization' version "$kotlinVersion" apply false
     // Realm Kotlin PRODUCTION
-    id 'io.realm.kotlin' version "$realm_kotlin_version" apply false
+    id 'io.realm.kotlin' version "$realmKotlinVersion" apply false
 }
 
 task clean(type: Delete) { delete rootProject.buildDir }
