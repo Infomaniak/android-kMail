@@ -94,7 +94,11 @@ object MailboxController {
     }
 
     fun getMailbox(userId: Int, mailboxId: Int, realm: TypedRealm = defaultRealm): Mailbox? {
-        return getMailboxQuery(userId, mailboxId, realm).find() ?: getMailboxesQuery(userId, realm).first().find()
+        return getMailboxQuery(userId, mailboxId, realm).find()
+    }
+
+    fun getMailboxWithFallback(userId: Int, mailboxId: Int, realm: TypedRealm = defaultRealm): Mailbox? {
+        return getMailbox(userId, mailboxId, realm) ?: getMailboxesQuery(userId, realm).first().find()
     }
 
     fun getMailboxAsync(objectId: String): Flow<SingleQueryChange<Mailbox>> {
