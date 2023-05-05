@@ -88,7 +88,7 @@ class AccountFragment : Fragment() {
     }
 
     private fun observeAccountsLive() = with(accountViewModel) {
-        observeAccountsLive.observe(viewLifecycleOwner) { mailboxes -> mailboxAdapter.setMailboxes(mailboxes) }
+        observeAccountsLive.observe(viewLifecycleOwner, mailboxAdapter::setMailboxes)
         lifecycleScope.launch(Dispatchers.IO) { updateMailboxes() }
     }
 

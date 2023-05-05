@@ -30,7 +30,6 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
-import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.*
 import kotlinx.coroutines.flow.Flow
@@ -84,10 +83,6 @@ object MailboxController {
     }
 
     fun getMailboxesCount(userId: Int): Long = getMailboxesCountQuery(userId).find()
-
-    fun getMailboxesAsync(realm: TypedRealm = defaultRealm): Flow<ResultsChange<Mailbox>> {
-        return getMailboxesQuery(realm).asFlow()
-    }
 
     fun getMailboxesAsync(userId: Int): Flow<RealmResults<Mailbox>> {
         return getMailboxesQuery(userId, defaultRealm).asFlow().map { it.list }
