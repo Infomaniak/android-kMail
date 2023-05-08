@@ -1,22 +1,17 @@
 buildscript {
 
-    ext.realmVersion = '1.8.0'
-
-    project.ext.gradleVersion = '8.0.1'
-    project.ext.kotlinVersion = '1.8.21'
-
     dependencies {
-        classpath 'androidx.navigation:navigation-safe-args-gradle-plugin:2.5.3'
-        classpath 'com.google.gms:google-services:4.3.15'
+        classpath libs.navigation.safeargs
+        classpath libs.google.services
     }
 }
 
 plugins {
-    id 'com.android.application' version "$gradleVersion" apply false
-    id 'com.android.library' version "$gradleVersion" apply false
-    id 'org.jetbrains.kotlin.android' version "$kotlinVersion" apply false
-    id 'org.jetbrains.kotlin.plugin.serialization' version "$kotlinVersion" apply false
-    id 'io.realm.kotlin' version "$realmVersion" apply false
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.android.library) apply false
+    alias(libs.plugins.jetbrains.kotlin.android) apply false
+    alias(libs.plugins.jetbrains.kotlin.serialization) apply false
+    alias(libs.plugins.realm.kotlin) apply false
 }
 
 task clean(type: Delete) { delete rootProject.buildDir }
