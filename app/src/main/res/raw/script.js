@@ -1,304 +1,297 @@
-/**
- * Only revert transforms that do an imperfect job of shrinking content if they fail
- * to shrink by this much. Expressed as a ratio of:
- * (original width difference : width difference after transforms);
- */
+//const MESSAGE_SELECTOR = "#kmail-message-content";
+const PREFERENCES = {
+    normalizeMessageWidths: true,
+    mungeImages: true,
+    mungeTables: true,
+    minimumEffectiveRatio: 0.7
+};
 
-var TRANSFORM_MINIMUM_EFFECTIVE_RATIO = 0.7;
+// Functions
 
-// Don't ship with this on.
-var DEBUG_DISPLAY_TRANSFORMS = false;
-
-var gTransformText = {};
-
-// TODO
-//var MESSAGE_SELECTOR = "#kmail-message-content";
-var NORMALIZE_MESSAGE_WIDTHS = true;
-var ENABLE_MUNGE_IMAGES = true;
-var ENABLE_MUNGE_TABLES = true;
-
-function normalizeAllMessageWidths(webViewWidth) {
-    var expandedBodyDivs;
-
-    console.log("Starting to normalize for width: " + webViewWidth)
-
-    expandedBodyDivs = document.querySelectorAll(MESSAGE_SELECTOR);
-    normalizeElementWidths(expandedBodyDivs, webViewWidth);
+function normalizeMessageWidth(webViewWidth) {
+    normalizeElementWidths(document.querySelectorAll(MESSAGE_SELECTOR), webViewWidth);
+    return true;
 }
 
-/*
- * Normalizes the width of all elements supplied to the document body's overall width.
+/**
+ * Normalizes the width of elements supplied to the document body's overall width.
  * Narrower elements are zoomed in, and wider elements are zoomed out.
  * This method is idempotent.
+ * @param elements DOM elements to normalize
  */
 function normalizeElementWidths(elements, webViewWidth) {
-    var i;
-    var el;
-    var documentWidth;
-    var goalWidth;
-    var origWidth;
-    var newZoom, oldZoom;
-    var outerZoom;
+    const documentWidth = document.body.offsetWidth;
+    logInfo(`Starts to normalize elements. Document width: ${documentWidth}.`);
 
-    documentWidth = document.body.offsetWidth;
-    goalWidth = webViewWidth;
+    for (const element of elements) {
+        logInfo(`Current element: ${elementDebugName(element)}.`);
 
-    for (i = 0; i < elements.length; i++) {
-        el = elements[i];
-        oldZoom = el.style.zoom;
-        // reset any existing normalization
-        if (oldZoom) {
-            el.style.zoom = 1;
+        // Reset any existing normalization
+        const originalZoom = element.style.zoom;
+        if (originalZoom) {
+            element.style.zoom = 1;
+            logInfo(`Initial zoom reset to 1. Old zoom: ${originalZoom}.`);
         }
-        origWidth = el.style.width;
-        el.style.width = goalWidth + "px";
-        transformContent(el, goalWidth, el.scrollWidth);
-        newZoom = documentWidth / el.scrollWidth;
-        if (NORMALIZE_MESSAGE_WIDTHS) {
-            outerZoom = 1;
-            el.style.zoom = newZoom / outerZoom;
+
+        const originalWidth = element.style.width;
+        element.style.width = `${webViewWidth}px`;
+        transformContent(element, webViewWidth, element.scrollWidth);
+
+        if (PREFERENCES.normalizeMessageWidths) {
+            const newZoom = documentWidth / element.scrollWidth;
+            logInfo(`Zoom updated: documentWidth / element.scrollWidth -> ${documentWidth} / ${element.scrollWidth} = ${newZoom}.`);
+            element.style.zoom = newZoom;
         }
-        el.style.width = origWidth;
+
+        element.style.width = originalWidth;
+
+        if (document.documentElement.scrollWidth > document.documentElement.clientWidth) {
+            logInfo(`After zooming the mail it can still scroll: found clientWidth / scrollWidth -> ${document.documentElement.clientWidth} / ${document.documentElement.scrollWidth}`);
+
+        }
     }
 }
 
-function transformContent(el, docWidth, elWidth) {
-    var nodes;
-    var i, len;
-    var newWidth = elWidth;
-    var touched;
-    // the format of entries in this array is:
-    // entry := [ undoFunction, undoFunctionThis, undoFunctionParamArray ]
-    var actionLog = [];
-    var done = false;
-    var msgId;
-    var transformText;
-    var existingText;
-    var textElement;
-    var start;
-    var beforeWidth;
-    var tmpActionLog = [];
-    if (elWidth <= docWidth) {
+/**
+ * Transform the content of a DOM element to munge its children if they are too wide
+ * @param element DOM element to inspect
+ * @param documentWidth Width of the overall document
+ * @param elementWidth Element width before any action is done
+ */
+function transformContent(element, documentWidth, elementWidth) {
+    if (elementWidth <= documentWidth) {
+        logInfo(`Element doesn't need to be transformed. Current size: ${elementWidth}, DocumentWidth: ${documentWidth}.`);
         return;
     }
+    logInfo(`Element will be transformed.`);
 
-    start = Date.now();
-
-    if (el.parentElement.classList.contains("mail-message")) {
-        msgId = el.parentElement.id;
-        transformText = "[origW=" + elWidth + "/" + docWidth;
-    }
+    let newWidth = elementWidth;
+    let isTransformationDone = false;
+    /** Format of entries : { function: fn, object: object, arguments: [list of arguments] } */
+    let actionsLog = [];
 
     // Try munging all divs or textareas with inline styles where the width
-    // is wider than docWidth, and change it to be a max-width.
-    touched = false;
-    nodes = ENABLE_MUNGE_TABLES ? el.querySelectorAll("div[style], textarea[style]") : [];
-    touched = transformBlockElements(nodes, docWidth, actionLog);
-    if (touched) {
-        newWidth = el.scrollWidth;
-        console.log("ran div-width munger on el=" + el + " oldW=" + elWidth + " newW=" + newWidth
-            + " docW=" + docWidth);
-        if (msgId) {
-            transformText += " DIV:newW=" + newWidth;
-        }
-        if (newWidth <= docWidth) {
-            done = true;
+    // is wider than `documentWidth`, and change it to be a max-width.
+    if (PREFERENCES.normalizeMessageWidths) {
+        const nodes = element.querySelectorAll('div[style], textarea[style]');
+        const areNodesTransformed = transformBlockElements(nodes, documentWidth, actionsLog);
+        if (areNodesTransformed) {
+            newWidth = element.scrollWidth;
+            logTransformation('munge div[style] and textarea[style]', element, elementWidth, newWidth, documentWidth);
+            if (newWidth <= documentWidth) {
+                isTransformationDone = true;
+                logInfo('Munging div[style] and textarea[style] is enough.');
+            }
         }
     }
 
-    if (!done) {
+    if (!isTransformationDone && PREFERENCES.mungeImages) {
         // OK, that wasn't enough. Find images with widths and override their widths.
-        nodes = ENABLE_MUNGE_IMAGES ? el.querySelectorAll("img") : [];
-        touched = transformImages(nodes, docWidth, actionLog);
-        if (touched) {
-            newWidth = el.scrollWidth;
-            console.log("ran img munger on el=" + el + " oldW=" + elWidth + " newW=" + newWidth
-                + " docW=" + docWidth);
-            if (msgId) {
-                transformText += " IMG:newW=" + newWidth;
-            }
-            if (newWidth <= docWidth) {
-                done = true;
+        const images = element.querySelectorAll('img');
+        const areImagesTransformed = transformImages(images, documentWidth, actionsLog);
+        if (areImagesTransformed) {
+            newWidth = element.scrollWidth;
+            logTransformation('munge img', element, elementWidth, newWidth, documentWidth);
+            if (newWidth <= documentWidth) {
+                isTransformationDone = true;
+                logInfo('Munging img is enough.');
             }
         }
     }
 
-    if (!done) {
+    if (!isTransformationDone && PREFERENCES.mungeTables) {
         // OK, that wasn't enough. Find tables with widths and override their widths.
         // Also ensure that any use of 'table-layout: fixed' is negated, since using
         // that with 'width: auto' causes erratic table width.
-        nodes = ENABLE_MUNGE_TABLES ? el.querySelectorAll("table") : [];
-        touched = addClassToElements(nodes, shouldMungeTable, "munged",
-            actionLog);
-        if (touched) {
-            newWidth = el.scrollWidth;
-            console.log("ran table munger on el=" + el + " oldW=" + elWidth + " newW=" + newWidth
-                + " docW=" + docWidth);
-            if (msgId) {
-                transformText += " TABLE:newW=" + newWidth;
-            }
-            if (newWidth <= docWidth) {
-                done = true;
+        const tables = element.querySelectorAll('table');
+        const areTablesTransformed = addClassToElements(tables, shouldMungeTable, 'munged', actionsLog);
+        if (areTablesTransformed) {
+            newWidth = element.scrollWidth;
+            logTransformation('munge table', element, elementWidth, newWidth, documentWidth);
+            if (newWidth <= documentWidth) {
+                isTransformationDone = true;
+                logInfo('Munging table is enough.');
             }
         }
     }
 
-    if (!done) {
+    if (!isTransformationDone && PREFERENCES.mungeTables) {
         // OK, that wasn't enough. Try munging all <td> to override any width and nowrap set.
-        beforeWidth = newWidth;
-        nodes = ENABLE_MUNGE_TABLES ? el.querySelectorAll("td") : [];
-        touched = addClassToElements(nodes, null /* mungeAll */, "munged",
-            tmpActionLog);
-        if (touched) {
-            newWidth = el.scrollWidth;
-            console.log("ran td munger on el=" + el + " oldW=" + elWidth + " newW=" + newWidth
-                + " docW=" + docWidth);
-            if (msgId) {
-                transformText += " TD:newW=" + newWidth;
-            }
-            if (newWidth <= docWidth) {
-                done = true;
-            } else if (newWidth == beforeWidth) {
-                // this transform did not improve things, and it is somewhat risky.
-                // back it out, since it's the last transform and we gained nothing.
-                undoActions(tmpActionLog);
+        const beforeTransformationWidth = newWidth;
+        const tds = element.querySelectorAll('td');
+        const tmpActionsLog = [];
+        const areTdsTransformed = addClassToElements(tds, null, 'munged', tmpActionsLog);
+        if (areTdsTransformed) {
+            newWidth = element.scrollWidth;
+            logTransformation('munge td', element, elementWidth, newWidth, documentWidth);
+
+            if (newWidth <= documentWidth) {
+                isTransformationDone = true;
+                logInfo('Munging td is enough.');
+            } else if (newWidth === beforeTransformationWidth) {
+                // This transform did not improve things, and it is somewhat risky.
+                // Back it out, since it's the last transform and we gained nothing.
+                undoActions(tmpActionsLog);
+                logInfo('Munging td did not improve things, we undo these actions.');
             } else {
-                // the transform WAS effective (although not 100%)
-                // copy the temporary action log entries over as normal
-                for (i = 0, len = tmpActionLog.length; i < len; i++) {
-                    actionLog.push(tmpActionLog[i]);
-                }
+                // The transform WAS effective (although not 100%).
+                // Copy the temporary action log entries over as normal.
+                actionsLog.push(...tmpActionsLog);
+                logInfo('Munging td is not enough but is effective.');
             }
         }
     }
 
     // If the transformations shrank the width significantly enough, leave them in place.
     // We figure that in those cases, the benefits outweight the risk of rendering artifacts.
-    if (!done && (elWidth - newWidth) / (elWidth - docWidth) >
-            TRANSFORM_MINIMUM_EFFECTIVE_RATIO) {
-        console.log("transform(s) deemed effective enough");
-        done = true;
+    const transformationRatio = (elementWidth - newWidth) / (elementWidth - documentWidth);
+    if (!isTransformationDone && transformationRatio > PREFERENCES.minimumEffectiveRatio) {
+        logInfo('Transforms deemed effective enough.');
+        isTransformationDone = true;
     }
 
-    if (done) {
-        if (msgId) {
-            transformText += "]";
-            existingText = gTransformText[msgId];
-            if (!existingText) {
-                transformText = "Message transforms: " + transformText;
-            } else {
-                transformText = existingText + " " + transformText;
-            }
-            gTransformText[msgId] = transformText;
-            window.mail.onMessageTransform(msgId, transformText);
-            if (DEBUG_DISPLAY_TRANSFORMS) {
-                textElement = el.firstChild;
-                if (!textElement.classList || !textElement.classList.contains("transform-text")) {
-                    textElement = document.createElement("div");
-                    textElement.classList.add("transform-text");
-                    textElement.style.fontSize = "10px";
-                    textElement.style.color = "#ccc";
-                    el.insertBefore(textElement, el.firstChild);
-                }
-                textElement.innerHTML = transformText + "<br>";
-            }
+    if (!isTransformationDone) {
+        // Reverse all changes if the width is STILL not narrow enough.
+        // (except the width->maxWidth change, which is not particularly destructive)
+        undoActions(actionsLog);
+        if (actionsLog.length > 0) {
+            logInfo(`All mungers failed, we will reverse ${actionsLog.length} changes.`);
+        } else {
+            logInfo(`No mungers applied, width is still too wide.`);
         }
-        console.log("munger(s) succeeded, elapsed time=" + (Date.now() - start));
         return;
     }
 
-    // reverse all changes if the width is STILL not narrow enough
-    // (except the width->maxWidth change, which is not particularly destructive)
-    undoActions(actionLog);
-    if (actionLog.length > 0) {
-        console.log("all mungers failed, changes reversed. elapsed time=" + (Date.now() - start));
-    }
+    logInfo(`Mungers succeeded. We did ${actionsLog.length} changes.`);
 }
 
-function undoActions(actionLog) {
-    for (i = 0, len = actionLog.length; i < len; i++) {
-        actionLog[i][0].apply(actionLog[i][1], actionLog[i][2]);
+/**
+ * Transform blocks : a div or a textarea
+ * @param nodes Array of blocks to inspect
+ * @param documentWidth Width of the overall document
+ * @param actionsLog Array with all the actions performed
+ * @returns true if any modification is performed
+ */
+function transformBlockElements(nodes, documentWidth, actionsLog) {
+    let elementsAreModified = false;
+    for (const node of nodes) {
+        const widthString = node.style.width || node.style.minWidth;
+        const index = widthString ? widthString.indexOf('px') : -1;
+        if (index >= 0 && widthString.slice(0, index) > documentWidth) {
+            saveStyleProperty(node, 'width', actionsLog);
+            saveStyleProperty(node, 'minWidth', actionsLog);
+            saveStyleProperty(node, 'maxWidth', actionsLog);
+
+            node.style.width = '100%';
+            node.style.minWidth = '';
+            node.style.maxWidth = widthString;
+
+            elementsAreModified = true;
+        }
     }
+
+    return elementsAreModified;
 }
 
-function addClassToElements(nodes, conditionFn, classToAdd, actionLog) {
-    var i, len;
-    var node;
-    var added = false;
-    for (i = 0, len = nodes.length; i < len; i++) {
-        node = nodes[i];
-        if (!conditionFn || conditionFn(node)) {
-            if (node.classList.contains(classToAdd)) {
-                continue;
-            }
+/**
+ * Transform images
+ * @param images Array of images to inspect
+ * @param documentWidth Width of the overall document
+ * @param actionsLog Array with all the actions performed
+ * @returns true if any modification is performed
+ */
+function transformImages(images, documentWidth, actionsLog) {
+    let imagesAreModified = false;
+    for (const image of images) {
+        if (image.offsetWidth > documentWidth) {
+            saveStyleProperty(image, 'width', actionsLog);
+            saveStyleProperty(image, 'maxWidth', actionsLog);
+            saveStyleProperty(image, 'height', actionsLog);
+
+            image.style.width = '100%';
+            image.style.maxWidth = `${documentWidth}px`;
+            image.style.height = 'auto';
+
+            imagesAreModified = true;
+        }
+    }
+
+    return imagesAreModified;
+}
+
+/**
+ * Add a class to a DOM element if a condition is fulfilled
+ * @param nodes Array of elements to inspect
+ * @param conditionFunction Function allowing to test a condition with respect to an element. If it is null, the condition is considered true.
+ * @param classToAdd Class to be added
+ * @param actionsLog Array with all the actions performed
+ * @returns true if the class was added to at least one element
+ */
+function addClassToElements(nodes, conditionFunction, classToAdd, actionsLog) {
+    let classAdded = false;
+    for (const node of nodes) {
+        if (!conditionFunction || conditionFunction(node)) {
+            if (node.classList.contains(classToAdd)) { continue; }
             node.classList.add(classToAdd);
-            added = true;
-            actionLog.push([node.classList.remove, node.classList, [classToAdd]]);
+            classAdded = true;
+            actionsLog.push({ function: node.classList.remove, object: node.classList, arguments: [classToAdd] });
         }
     }
-    return added;
+    return classAdded;
 }
 
-function transformBlockElements(nodes, docWidth, actionLog) {
-    var i, len;
-    var node;
-    var wStr;
-    var index;
-    var touched = false;
-
-    for (i = 0, len = nodes.length; i < len; i++) {
-        node = nodes[i];
-        wStr = node.style.width || node.style.minWidth;
-        index = wStr ? wStr.indexOf("px") : -1;
-        if (index >= 0 && wStr.slice(0, index) > docWidth) {
-            saveStyleProperty(node, "width", actionLog);
-            saveStyleProperty(node, "minWidth", actionLog);
-            saveStyleProperty(node, "maxWidth", actionLog);
-            node.style.width = "100%";
-            node.style.minWidth = "";
-            node.style.maxWidth = wStr;
-            touched = true;
-        }
-    }
-    return touched;
-}
-
-function transformImages(nodes, docWidth, actionLog) {
-    var i, len;
-    var node;
-    var w, h;
-    var touched = false;
-
-    for (i = 0, len = nodes.length; i < len; i++) {
-        node = nodes[i];
-        w = node.offsetWidth;
-        h = node.offsetHeight;
-        // shrink w/h proportionally if the img is wider than available width
-        if (w > docWidth) {
-            saveStyleProperty(node, "maxWidth", actionLog);
-            saveStyleProperty(node, "width", actionLog);
-            saveStyleProperty(node, "height", actionLog);
-            node.style.maxWidth = docWidth + "px";
-            node.style.width = "100%";
-            node.style.height = "auto";
-            touched = true;
-        }
-    }
-    return touched;
-}
-
-function saveStyleProperty(node, property, actionLog) {
-    var savedName = "data-" + property;
+/**
+ * Save a CSS property and its value as a ´data-´ property
+ * @param node DOM element for which the property will be saved
+ * @param property Name of the property to save
+ * @param actionsLog Array with all the actions performed
+ */
+function saveStyleProperty(node, property, actionsLog) {
+    const savedName = `data-${property}`;
     node.setAttribute(savedName, node.style[property]);
-    actionLog.push([undoSetProperty, node, [property, savedName]]);
+    actionsLog.push({ function: undoSetProperty, object: node, arguments: [property, savedName] });
 }
 
+/**
+ * Undo a previously changed property
+ * @param property Property to undo
+ * @param savedProperty Saved property
+ */
 function undoSetProperty(property, savedProperty) {
-    this.style[property] = savedProperty ? this.getAttribute(savedProperty) : "";
+    this.style[property] = savedProperty ? this.getAttribute(savedProperty) : '';
 }
 
+/**
+ * Undo previous actions
+ * @param actionsLog Previous actions done
+ */
+function undoActions(actionsLog) {
+    for (const action of actionsLog) {
+        action['function'].apply(action['object'], action['arguments']);
+    }
+}
+
+/**
+ * Checks if a table should be munged
+ * @param table Table HTML object
+ * @returns true if the object has a width as an attribute or in its style
+ */
 function shouldMungeTable(table) {
-    return table.hasAttribute("width") || table.style.width;
+    return table.hasAttribute('width') || table.style.width;
 }
 
-//normalizeAllMessageWidths();
+// Logger
+
+function logInfo(text) {
+    console.info(`[MUNGER_LOG] ${text}`);
+}
+
+function logTransformation(action, element, elementWidth, newWidth, documentWidth) {
+    logInfo(`Ran ${action} on ${elementDebugName(element)}. OldWidth=${elementWidth}, NewWidth=${newWidth}, DocWidth=${documentWidth}.`);
+}
+
+function elementDebugName(element) {
+    const id = element.id !== '' ? ` #${element.id}` : '';
+    const classes = element.classList.length != 0 ? ` (classes: ${element.classList.value})` : '';
+    return `<${element.tagName}${id}${classes}>`;
+}

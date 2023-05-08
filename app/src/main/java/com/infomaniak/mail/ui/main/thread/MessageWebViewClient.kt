@@ -93,7 +93,7 @@ class MessageWebViewClient(
 
     override fun onPageFinished(webView: WebView, url: String?) {
         // TODO : Try WebView.postVisualStateCallback
-        webView.loadUrl("javascript:removeAllProperties(); normalizeAllMessageWidths(${webView.width.toDp()})")
+        webView.loadUrl("javascript:removeAllProperties(); normalizeMessageWidth(${webView.width.toDp()})")
         super.onPageFinished(webView, url)
     }
 
