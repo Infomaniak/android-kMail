@@ -1,8 +1,5 @@
 buildscript {
 
-    project.ext.gradleVersion = libs.versions.androidGradlePlugin.get()
-    project.ext.kotlinVersion = libs.versions.kotlin.get()
-
     dependencies {
         classpath libs.navigation.safeargs
         classpath libs.google.services
