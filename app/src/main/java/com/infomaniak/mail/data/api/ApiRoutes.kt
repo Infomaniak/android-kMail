@@ -17,12 +17,11 @@
  */
 package com.infomaniak.mail.data.api
 
-import com.infomaniak.mail.BuildConfig.INFOMANIAK_API_V1
-import com.infomaniak.mail.BuildConfig.MAIL_API
+import com.infomaniak.mail.BuildConfig.*
 
 object ApiRoutes {
 
-    private const val MAX_NUMBER_OF_MESSAGES_TO_FETCH: Int = 500
+    const val PAGE_SIZE: Int = 25
 
     fun resource(resource: String) = "$MAIL_API$resource"
 
@@ -96,8 +95,11 @@ object ApiRoutes {
         return "${message(mailboxUuid, folderId, shortUid)}/blacklist"
     }
 
-    fun getMessagesUids(mailboxUuid: String, folderId: String): String {
-        return "${getMessages(mailboxUuid, folderId)}/messages_uids?messages=${MAX_NUMBER_OF_MESSAGES_TO_FETCH}"
+    fun getMessagesUids(mailboxUuid: String, folderId: String, messageUidOffset: String?): String {
+        val endpoint = "${getMessages(mailboxUuid, folderId)}/messages-uids"
+        val messages = "?messages=${PAGE_SIZE}"
+        val offset = messageUidOffset?.let { "&uid_offset=$it" } ?: ""
+        return "${endpoint}${messages}${offset}"
     }
 
     fun getMessagesUidsDelta(mailboxUuid: String, folderId: String, cursor: String): String {
@@ -109,6 +111,6 @@ object ApiRoutes {
     }
 
     private fun getMessages(mailboxUuid: String, folderId: String): String {
-        return "$MAIL_API/api/mail/${mailboxUuid}/folder/${folderId}/mobile"
+        return "$MAIL_API_PREPROD/api/mail/${mailboxUuid}/folder/${folderId}/mobile"
     }
 }

@@ -110,6 +110,8 @@ class Message : RealmObject {
     var draftLocalUuid: String? = null
     @Transient
     var isFromSearch: Boolean = false
+    @Transient
+    var shortUidAsInt: Int = 0
     //endregion
 
     //region UI data (Ignore & Transient)
