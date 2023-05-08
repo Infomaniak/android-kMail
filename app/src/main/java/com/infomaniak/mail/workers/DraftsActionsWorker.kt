@@ -26,7 +26,6 @@ import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.networking.HttpUtils
 import com.infomaniak.lib.core.utils.FORMAT_DATE_WITH_TIMEZONE
 import com.infomaniak.lib.core.utils.isNetworkException
-import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRoutes
@@ -95,7 +94,7 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
         mailbox = MailboxController.getMailbox(userId, mailboxId, mailboxInfoRealm) ?: return@withContext Result.failure()
         okHttpClient = AccountUtils.getHttpClient(userId)
 
-        handleDraftsActions()
+        return@withContext handleDraftsActions()
     }
 
     override fun onFinish() {
@@ -113,6 +112,7 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
     private suspend fun handleDraftsActions(): Result {
 
         val scheduledDates = mutableListOf<String>()
+        val errorMessageResIds = mutableListOf<Int>()
 
         val isFailure = mailboxContentRealm.writeBlocking {
 
@@ -123,13 +123,25 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
             var hasRemoteException = false
 
             drafts.reversed().forEach { draft ->
+
                 runCatching {
                     draft.uploadAttachments(realm = this)
-                    executeDraftAction(draft, mailbox.uuid, realm = this, okHttpClient)?.also(scheduledDates::add)
+                    executeDraftAction(
+                        draft,
+                        mailbox.uuid,
+                        realm = this,
+                        okHttpClient,
+                    ).also { (scheduledDate, errorMessageResId) ->
+                        scheduledDate?.let(scheduledDates::add)
+                        errorMessageResId?.let(errorMessageResIds::add)
+                    }
+
                 }.onFailure { exception ->
                     when (exception) {
                         is ApiController.NetworkException -> throw exception
-                        is ApiErrorException -> exception.handleApiErrors(draft = draft, realm = this)
+                        is ApiErrorException -> {
+                            exception.handleApiErrors(draft = draft, realm = this)?.also(errorMessageResIds::add)
+                        }
                     }
                     exception.printStackTrace()
                     Sentry.captureException(exception)
@@ -144,25 +156,26 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
 
         SentryDebug.sendOrphanDrafts(mailboxContentRealm)
 
-        return if (isFailure) Result.failure() else Result.success()
+        val outputData = workDataOf(ERROR_MESSAGE_RESID_KEY to errorMessageResIds.toIntArray())
+
+        return if (isFailure) Result.failure(outputData) else Result.success(outputData)
     }
 
-    private fun ApiErrorException.handleApiErrors(draft: Draft, realm: MutableRealm) {
+    private fun ApiErrorException.handleApiErrors(draft: Draft, realm: MutableRealm): Int? {
 
         when (errorCode) {
             DRAFT_DOES_NOT_EXIST, DRAFT_HAS_TOO_MANY_RECIPIENTS -> realm.delete(draft)
         }
 
-        when (errorCode) {
+        return when (errorCode) {
             MAILBOX_LOCKED,
             DRAFT_HAS_TOO_MANY_RECIPIENTS,
             DRAFT_NEED_AT_LEAST_ONE_RECIPIENT,
             DRAFT_ALREADY_SCHEDULED_OR_SENT,
             IDENTITY_NOT_FOUND,
             SEND_RECIPIENTS_REFUSED,
-            SEND_LIMIT_EXCEEDED -> {
-                applicationContext.showToast(ErrorCode.getTranslateRes(errorCode!!))
-            }
+            SEND_LIMIT_EXCEEDED -> ErrorCode.getTranslateRes(errorCode!!)
+            else -> null
         }
     }
 
@@ -228,13 +241,19 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
         }
     }
 
-    private fun executeDraftAction(draft: Draft, mailboxUuid: String, realm: MutableRealm, okHttpClient: OkHttpClient): String? {
+    private fun executeDraftAction(
+        draft: Draft,
+        mailboxUuid: String,
+        realm: MutableRealm,
+        okHttpClient: OkHttpClient,
+    ): Pair<String?, Int?> {
 
         var scheduledDate: String? = null
 
         // TODO: Remove this whole `draft.attachments.forEach { … }` when the Attachment issue is fixed.
         draft.attachments.forEach { attachment ->
             if (attachment.uuid.isBlank()) {
+
                 Sentry.withScope { scope ->
                     scope.level = SentryLevel.ERROR
                     scope.setExtra("attachmentUuid", attachment.uuid)
@@ -245,9 +264,7 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
                     Sentry.captureMessage("We tried to [${draft.action?.name}] a Draft, but an Attachment didn't have its `uuid`.")
                 }
 
-                applicationContext.showToast(R.string.errorCorruptAttachment)
-
-                return scheduledDate
+                return scheduledDate to R.string.errorCorruptAttachment
             }
         }
 
@@ -273,13 +290,14 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
             else -> Unit
         }
 
-        return scheduledDate
+        return scheduledDate to null
     }
 
     companion object {
         private const val TAG = "DraftsActionsWorker"
         private const val USER_ID_KEY = "userId"
         private const val MAILBOX_ID_KEY = "mailboxIdKey"
+        const val ERROR_MESSAGE_RESID_KEY = "errorMessageResIdKey"
         // We add this delay because for now, it doesn't always work if we just use the `etop`.
         private const val REFRESH_DELAY = 2_000L
         private const val MAX_REFRESH_DELAY = 6_000L
