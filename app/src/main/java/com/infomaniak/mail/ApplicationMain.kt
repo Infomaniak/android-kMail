@@ -61,6 +61,7 @@ import io.sentry.android.fragment.FragmentLifecycleState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.matomo.sdk.Tracker
 import java.util.UUID
 import javax.inject.Inject
@@ -153,7 +154,7 @@ open class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycle
     }
 
     private fun configureAppReloading() {
-        AccountUtils.reloadApp = { startActivity(getLaunchIntent()) }
+        AccountUtils.reloadApp = { withContext(Dispatchers.Main) { startActivity(getLaunchIntent()) } }
     }
 
     private fun getLaunchIntent() = Intent(this, LaunchActivity::class.java).apply {

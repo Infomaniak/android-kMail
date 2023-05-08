@@ -17,11 +17,9 @@
  */
 package com.infomaniak.mail.utils
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import androidx.navigation.NavController
-import androidx.navigation.NavDestination
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
@@ -37,8 +35,7 @@ object SentryDebug {
 
     private var previousDestinationName: String = ""
 
-    @SuppressLint("RestrictedApi")
-    fun addNavigationBreadcrumb(destination: NavDestination, arguments: Bundle?) {
+    fun addNavigationBreadcrumb(name: String, arguments: Bundle?) {
 
         // This function comes from `io.sentry.android.navigation.SentryNavigationListener`
         fun Bundle?.refined(): Map<String, Any?> = this?.let { args ->
@@ -47,18 +44,18 @@ object SentryDebug {
                 .associateWith { args[it] }
         } ?: emptyMap()
 
-        val name = destination.displayName.substringAfter("${BuildConfig.APPLICATION_ID}:id/")
+        val newDestinationName = name.substringAfter("${BuildConfig.APPLICATION_ID}:id/")
 
         addInfoBreadcrumb(
             category = "Navigation",
             data = mapOf(
                 "1_from" to previousDestinationName,
-                "2_to" to name,
+                "2_to" to newDestinationName,
                 "3_args" to arguments.refined(),
-            )
+            ),
         )
 
-        previousDestinationName = name
+        previousDestinationName = newDestinationName
     }
 
     fun addUrlBreadcrumb(url: String) {
@@ -67,6 +64,10 @@ object SentryDebug {
 
     fun addNotificationBreadcrumb(notification: String) {
         addInfoBreadcrumb("Notification", notification)
+    }
+
+    fun addThreadsAlgoBreadcrumb(message: String, data: Map<String, Any>) {
+        addInfoBreadcrumb("ThreadsAlgo", message, data)
     }
 
     private fun addInfoBreadcrumb(category: String, message: String? = null, data: Map<String, Any>? = null) {

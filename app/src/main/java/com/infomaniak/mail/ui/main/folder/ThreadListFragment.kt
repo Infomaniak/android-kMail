@@ -459,6 +459,13 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun observerDraftsActionsCompletedWorks() {
         fun observeDraftsActions() {
             draftsActionsWorkerScheduler.getCompletedWorkInfosLiveData().observe(viewLifecycleOwner) {
+
+                it.forEach { workInfo ->
+                    workInfo.outputData
+                        .getIntArray(DraftsActionsWorker.ERROR_MESSAGE_RESID_KEY)
+                        ?.forEach(requireContext()::showToast)
+                }
+
                 mainViewModel.currentFolder.value?.let { folder ->
                     if (folder.isValid() && folder.role == FolderRole.DRAFT) mainViewModel.forceRefreshThreads()
                 }

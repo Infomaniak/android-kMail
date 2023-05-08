@@ -51,7 +51,7 @@
     <string name="addUnknownRecipientTitle">Ajoutez un destinataire</string>
     <string name="appSecurityDescription">Protégez l’accès à votre application en activant le verrouillage de votre téléphone.</string>
     <string name="archiveFolder">Archive</string>
-    <string name="attachAddressDescription">Vous possédez déjà une adresse mail Infomaniak, connectez-vous dès maintenant.</string>
+    <string name="attachAddressDescription">Vous possédez déjà une adresse mail Infomaniak, connectez-vous dès maintenant</string>
     <string name="attachAddressInputHint">Adresse mail</string>
     <string name="attachAddressPasswordInputHint">Mot de passe</string>
     <string name="attachAddressTitle">Ajoutez une adresse mail</string>
@@ -171,6 +171,7 @@
     <string name="emptyStateTrashTitle">La corbeille est vide</string>
     <string name="errorAtLeastOneRecipient">Il faut au minimum un destinataire</string>
     <string name="errorAttachAddressInput">Seules les adresses mails Infomaniak sont supportées</string>
+    <string name="errorCorruptAttachment">Échec du traitement du brouillon, une pièce jointe est corrompue</string>
     <string name="errorEditScheduledMessage">Impossible de modifier un message planifié ou envoyé</string>
     <string name="errorInvalidCredentials">E-mail ou mot de passe invalide</string>
     <string name="errorLoginDescription">La connexion a échoué.</string>
@@ -331,7 +332,7 @@
         <item quantity="other">Expéditeurs blacklistés avec succès</item>
         <item quantity="many">Expéditeurs blacklistés avec succès</item>
     </plurals>
-    <string name="snackbarSuccessfulRestoration">Restauration effectuée avec succès</string>
+    <string name="snackbarRestorationLaunched">Restauration effectuée avec succès</string>
     <plurals name="snackbarThreadDeletedPermanently">
         <item quantity="one">Conversation supprimée</item>
         <item quantity="other">Conversations supprimées</item>

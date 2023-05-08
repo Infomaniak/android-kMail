@@ -51,7 +51,7 @@
     <string name="addUnknownRecipientTitle">Añadir un destinatario</string>
     <string name="appSecurityDescription">Protege el acceso a tu aplicación activando el bloqueo del teléfono.</string>
     <string name="archiveFolder">Archivado</string>
-    <string name="attachAddressDescription">Si ya dispone de una dirección de correo electrónico Infomaniak, conéctese ahora.</string>
+    <string name="attachAddressDescription">Si ya dispone de una dirección de correo electrónico Infomaniak, conéctese ahora</string>
     <string name="attachAddressInputHint">Dirección de correo electrónico</string>
     <string name="attachAddressPasswordInputHint">Contraseña</string>
     <string name="attachAddressTitle">Añadir dirección de correo electrónico</string>
@@ -170,6 +170,7 @@
     <string name="emptyStateTrashTitle">La papelera está vacía</string>
     <string name="errorAtLeastOneRecipient">Se precisa al menos un destinatario</string>
     <string name="errorAttachAddressInput">Sólo se admiten las direcciones de correo electrónico Infomaniak</string>
+    <string name="errorCorruptAttachment">No se ha podido gestionar el borrador, un archivo adjunto está dañado</string>
     <string name="errorEditScheduledMessage">Imposible modificar un mensaje programado o enviado</string>
     <string name="errorInvalidCredentials">Correo electrónico o contraseña no válidos</string>
     <string name="errorLoginDescription">La conexión ha fallado.</string>
@@ -327,7 +328,7 @@
         <item quantity="one">Remitente incluido en la lista negra</item>
         <item quantity="other">Remitentes incluidos con éxito en la lista negra</item>
     </plurals>
-    <string name="snackbarSuccessfulRestoration">Restauración finalizada con éxito</string>
+    <string name="snackbarRestorationLaunched">Restauración finalizada con éxito</string>
     <plurals name="snackbarThreadDeletedPermanently">
         <item quantity="one">Conversación eliminada</item>
         <item quantity="other">Conversaciones eliminadas</item>

@@ -21,28 +21,27 @@ import android.content.Context
 import com.infomaniak.lib.core.utils.FormatterFileSize
 import com.infomaniak.mail.R
 import io.realm.kotlin.types.EmbeddedRealmObject
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.math.ceil
 
 @Serializable
 class Quotas : EmbeddedRealmObject {
 
-    var size: Int = 0
+    @SerialName("size")
+    private var _size: Int = 0
+
+    private val size: Int
+        get() = _size * FormatterFileSize.KIBI_BYTE
 
     fun getText(context: Context): String {
-        val usedSize = size.toLong()
-
-        val formattedUsedSize = FormatterFileSize.formatShortFileSize(context, usedSize)
+        val formattedUsedSize = FormatterFileSize.formatShortFileSize(context, size.toLong())
         val formattedMaxSize = FormatterFileSize.formatShortFileSize(context, QUOTAS_MAX_SIZE)
 
         return context.getString(R.string.menuDrawerMailboxStorage, formattedUsedSize, formattedMaxSize)
     }
 
-    fun getProgress(): Int {
-        val usedSize = size.toLong()
-
-        return ceil(100.0f * usedSize.toFloat() / QUOTAS_MAX_SIZE.toFloat()).toInt()
-    }
+    fun getProgress(): Int = ceil(100.0f * size.toFloat() / QUOTAS_MAX_SIZE.toFloat()).toInt()
 
     companion object {
         private const val QUOTAS_MAX_SIZE = 21_474_836_480L // TODO: Get this value from API?

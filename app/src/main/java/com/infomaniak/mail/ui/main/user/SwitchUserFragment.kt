@@ -34,7 +34,6 @@ import com.infomaniak.mail.ui.login.LoginActivity
 import com.infomaniak.mail.utils.AccountUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class SwitchUserFragment : Fragment() {
 
@@ -46,10 +45,9 @@ class SwitchUserFragment : Fragment() {
             if (user.id != AccountUtils.currentUserId) {
                 requireContext().trackAccountEvent("switch")
                 AccountUtils.currentUser = user
-                // TODO: This works, but... The splashscreen blinks.
                 AccountUtils.currentMailboxId = AppSettings.DEFAULT_ID
                 RealmDatabase.close()
-                withContext(Dispatchers.Main) { AccountUtils.reloadApp?.invoke() }
+                AccountUtils.reloadApp?.invoke()
             }
         }
     }

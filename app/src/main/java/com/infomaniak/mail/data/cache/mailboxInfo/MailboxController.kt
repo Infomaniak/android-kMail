@@ -21,8 +21,8 @@ import android.content.Context
 import android.util.Log
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.AppSettings
-import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.Quotas
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.NotificationUtils.initMailNotificationChannel
@@ -30,12 +30,8 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
-import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.notifications.SingleQueryChange
-import io.realm.kotlin.query.RealmQuery
-import io.realm.kotlin.query.RealmResults
-import io.realm.kotlin.query.RealmSingleQuery
-import io.realm.kotlin.query.Sort
+import io.realm.kotlin.query.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -46,8 +42,8 @@ object MailboxController {
     //region Queries
     private fun checkHasUserId(userId: Int) = "${Mailbox::userId.name} == '$userId'"
 
-    private fun getMailboxesQuery(): RealmQuery<Mailbox> {
-        return defaultRealm.query<Mailbox>().sort(Mailbox::inboxUnreadCount.name, Sort.DESCENDING)
+    private fun getMailboxesQuery(realm: TypedRealm): RealmQuery<Mailbox> {
+        return realm.query()
     }
 
     private fun getMailboxesQuery(userId: Int, realm: TypedRealm): RealmQuery<Mailbox> {
@@ -57,6 +53,10 @@ object MailboxController {
     private fun getMailboxesQuery(userId: Int, exceptionMailboxIds: List<Int>, realm: TypedRealm): RealmQuery<Mailbox> {
         val checkIsNotInExceptions = "NOT ${Mailbox::mailboxId.name} IN {${exceptionMailboxIds.joinToString { "'$it'" }}}"
         return realm.query<Mailbox>(checkHasUserId(userId)).query(checkIsNotInExceptions)
+    }
+
+    private fun getMailboxesCountQuery(userId: Int): RealmScalarQuery<Long> {
+        return defaultRealm.query<Mailbox>(checkHasUserId(userId)).count()
     }
 
     private fun getMailboxQuery(objectId: String, realm: TypedRealm): RealmSingleQuery<Mailbox> {
@@ -70,6 +70,10 @@ object MailboxController {
     //endregion
 
     //region Get data
+    fun getMailboxes(realm: TypedRealm = defaultRealm): RealmResults<Mailbox> {
+        return getMailboxesQuery(realm).find()
+    }
+
     fun getMailboxes(userId: Int, realm: TypedRealm = defaultRealm): RealmResults<Mailbox> {
         return getMailboxesQuery(userId, realm).find()
     }
@@ -78,9 +82,7 @@ object MailboxController {
         return getMailboxesQuery(userId, exceptionMailboxIds, realm).find()
     }
 
-    fun getMailboxesAsync(): Flow<ResultsChange<Mailbox>> {
-        return getMailboxesQuery().asFlow()
-    }
+    fun getMailboxesCount(userId: Int): Long = getMailboxesCountQuery(userId).find()
 
     fun getMailboxesAsync(userId: Int): Flow<RealmResults<Mailbox>> {
         return getMailboxesQuery(userId, defaultRealm).asFlow().map { it.list }
@@ -91,7 +93,11 @@ object MailboxController {
     }
 
     fun getMailbox(userId: Int, mailboxId: Int, realm: TypedRealm = defaultRealm): Mailbox? {
-        return getMailboxQuery(userId, mailboxId, realm).find() ?: getMailboxesQuery(userId, realm).first().find()
+        return getMailboxQuery(userId, mailboxId, realm).find()
+    }
+
+    fun getMailboxWithFallback(userId: Int, mailboxId: Int, realm: TypedRealm = defaultRealm): Mailbox? {
+        return getMailbox(userId, mailboxId, realm) ?: getMailboxesQuery(userId, realm).first().find()
     }
 
     fun getMailboxAsync(objectId: String): Flow<SingleQueryChange<Mailbox>> {
@@ -100,7 +106,7 @@ object MailboxController {
     //endregion
 
     //region Edit data
-    fun updateMailboxes(context: Context, mailboxes: List<Mailbox>, userId: Int = AccountUtils.currentUserId): Boolean {
+    suspend fun updateMailboxes(context: Context, mailboxes: List<Mailbox>, userId: Int = AccountUtils.currentUserId): Boolean {
 
         context.initMailNotificationChannel(mailboxes)
 
@@ -115,7 +121,7 @@ object MailboxController {
         return update(remoteMailboxes, userId)
     }
 
-    private fun update(remoteMailboxes: List<Mailbox>, userId: Int): Boolean {
+    private suspend fun update(remoteMailboxes: List<Mailbox>, userId: Int): Boolean {
 
         // Get current data
         Log.d(RealmDatabase.TAG, "Mailboxes: Get current data")
@@ -130,7 +136,7 @@ object MailboxController {
             return@writeBlocking deleteOutdatedData(remoteMailboxes, userId)
         }
 
-        return isCurrentMailboxDeleted.also { if (it) AccountUtils.reloadApp }
+        return isCurrentMailboxDeleted.also { if (it) AccountUtils.reloadApp?.invoke() }
     }
 
     private fun MutableRealm.upsertMailboxes(
@@ -155,6 +161,7 @@ object MailboxController {
         }
         outdatedMailboxes.forEach { RealmDatabase.deleteMailboxContent(it.mailboxId) }
         delete(outdatedMailboxes)
+
         return isCurrentMailboxDeleted
     }
 

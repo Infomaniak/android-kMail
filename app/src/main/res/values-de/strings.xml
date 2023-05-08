@@ -51,7 +51,7 @@
     <string name="addUnknownRecipientTitle">Einen Empfänger hinzufügen</string>
     <string name="appSecurityDescription">Schützen Sie den Zugriff auf Ihre App, indem Sie Ihre Telefonsperre aktivieren.</string>
     <string name="archiveFolder">Archiviert</string>
-    <string name="attachAddressDescription">Sie haben bereits eine Infomaniak-Mailadresse, loggen Sie sich jetzt ein.</string>
+    <string name="attachAddressDescription">Sie haben bereits eine Infomaniak-Mailadresse, loggen Sie sich jetzt ein</string>
     <string name="attachAddressInputHint">Mailadresse</string>
     <string name="attachAddressPasswordInputHint">Passwort</string>
     <string name="attachAddressTitle">Mailadresse hinzufügen</string>
@@ -170,6 +170,7 @@
     <string name="emptyStateTrashTitle">Der Papierkorb ist leer</string>
     <string name="errorAtLeastOneRecipient">Es ist mindestens ein Empfänger erforderlich</string>
     <string name="errorAttachAddressInput">Nur Infomaniak-Mailadressen werden unterstützt</string>
+    <string name="errorCorruptAttachment">Der Entwurf konnte nicht bearbeitet werden, ein Anhang ist beschädigt</string>
     <string name="errorEditScheduledMessage">Geplante oder versendete Nachrichten können nicht geändert werden</string>
     <string name="errorInvalidCredentials">E-Mail oder Passwort ungültig</string>
     <string name="errorLoginDescription">Die Verbindung ist fehlgeschlagen.</string>
@@ -327,7 +328,7 @@
         <item quantity="one">Absender erfolgreich auf die schwarze Liste gesetzt</item>
         <item quantity="other">Erfolgreich auf die schwarze Liste gesetzte Absender</item>
     </plurals>
-    <string name="snackbarSuccessfulRestoration">Wiederherstellung erfolgreich abgeschlossen</string>
+    <string name="snackbarRestorationLaunched">Wiederherstellung erfolgreich abgeschlossen</string>
     <plurals name="snackbarThreadDeletedPermanently">
         <item quantity="one">Konversation gelöscht</item>
         <item quantity="other">Konversationen gelöscht</item>
