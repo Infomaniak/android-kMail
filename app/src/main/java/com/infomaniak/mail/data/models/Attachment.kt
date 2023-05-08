@@ -47,6 +47,8 @@ class Attachment : EmbeddedRealmObject {
     private var _disposition: String? = null
     @SerialName("content_id")
     var contentId: String? = null
+    @SerialName("original_content_id")
+    var originalContentId: String? = null
     var resource: String? = null
     @SerialName("drive_url")
     var driveUrl: String? = null
