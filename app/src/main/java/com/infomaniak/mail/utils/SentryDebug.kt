@@ -52,7 +52,7 @@ object SentryDebug {
                 "1_from" to previousDestinationName,
                 "2_to" to newDestinationName,
                 "3_args" to arguments.refined(),
-            )
+            ),
         )
 
         previousDestinationName = newDestinationName
@@ -64,6 +64,10 @@ object SentryDebug {
 
     fun addNotificationBreadcrumb(notification: String) {
         addInfoBreadcrumb("Notification", notification)
+    }
+
+    fun addThreadsAlgoBreadcrumb(message: String, data: Map<String, Any>) {
+        addInfoBreadcrumb("ThreadsAlgo", message, data)
     }
 
     private fun addInfoBreadcrumb(category: String, message: String? = null, data: Map<String, Any>? = null) {

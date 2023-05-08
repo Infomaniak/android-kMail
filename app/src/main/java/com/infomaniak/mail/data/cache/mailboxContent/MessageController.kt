@@ -244,10 +244,9 @@ object MessageController {
         realm: Realm,
     ): List<Thread> = with(messagesUids) {
 
-        Log.i(
-            "API",
-            "Added: ${addedShortUids.count()} | Deleted: ${deletedUids.count()} | Updated: ${updatedMessages.count()} | ${folder.name}",
-        )
+        val logMessage =
+            "Added: ${addedShortUids.count()} | Deleted: ${deletedUids.count()} | Updated: ${updatedMessages.count()}"
+        Log.i("API", "$logMessage | ${folder.name}")
 
         val impactedFoldersIds = mutableSetOf<String>().apply {
             realm.writeBlocking {
@@ -263,6 +262,8 @@ object MessageController {
             mailboxUuid = mailbox.uuid,
             newCursor = cursor,
             okHttpClient = okHttpClient,
+            logMessage = logMessage,
+            messagesUids = messagesUids,
             realm = realm,
         )
 
@@ -292,6 +293,8 @@ object MessageController {
         mailboxUuid: String,
         newCursor: String,
         okHttpClient: OkHttpClient?,
+        logMessage: String,
+        messagesUids: MessagesUids,
         realm: Realm,
     ): List<Thread> {
         val impactedThreads = mutableSetOf<Thread>()
@@ -318,6 +321,16 @@ object MessageController {
                             impactedThreads.addAll(threads)
                         }
                     }
+                    SentryDebug.addThreadsAlgoBreadcrumb(
+                        message = logMessage,
+                        data = mapOf(
+                            "1_folderName" to folder.name,
+                            "2_folderId" to folder.id,
+                            "3_added" to messagesUids.addedShortUids,
+                            "4_deleted" to messagesUids.deletedUids.map { it.toShortUid() },
+                            "5_updated" to messagesUids.updatedMessages.map { it.shortUid },
+                        ),
+                    )
                     SentryDebug.sendMissingMessages(page, messages, folder, newCursor)
                 }
 
