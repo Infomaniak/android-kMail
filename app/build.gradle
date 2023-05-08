@@ -78,7 +78,7 @@ dependencies {
     implementation project(path: ':Core:BugTracker')
     implementation project(path: ':Core:Stores')
 
-    implementation "io.realm.kotlin:library-base:$rootProject.ext.realmKotlinVersion"
+    implementation "io.realm.kotlin:library-base:$rootProject.ext.realmVersion"
 
     standardImplementation 'com.google.firebase:firebase-messaging-ktx:23.1.2'
 
