@@ -25,15 +25,13 @@ import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.mailbox.MailboxLinkedResult
 import com.infomaniak.mail.utils.AccountUtils
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class AccountViewModel(application: Application) : AndroidViewModel(application) {
 
     private val coroutineContext = viewModelScope.coroutineContext + Dispatchers.IO
 
-    val observeAccountsLive = MailboxController.getMailboxesAsync()
-        .map { mailboxes -> mailboxes.list.filter { it.userId == AccountUtils.currentUserId } }
+    val observeAccountsLive = MailboxController.getMailboxesAsync(AccountUtils.currentUserId)
         .asLiveData(coroutineContext)
 
     suspend fun updateMailboxes() {
