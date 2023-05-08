@@ -67,7 +67,7 @@ import java.util.UUID
 import javax.inject.Inject
 
 @HiltAndroidApp
-open class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycleObserver {
+class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycleObserver {
 
     val matomoTracker: Tracker by lazy { buildTracker() }
     var isAppInBackground = true

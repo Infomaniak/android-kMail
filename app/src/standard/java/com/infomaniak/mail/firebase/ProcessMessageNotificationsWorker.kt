@@ -29,6 +29,7 @@ import com.infomaniak.mail.workers.BaseCoroutineWorker
 import io.sentry.Sentry
 import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject
+import javax.inject.Singleton
 
 @HiltWorker
 class ProcessMessageNotificationsWorker @Inject constructor(
@@ -68,6 +69,7 @@ class ProcessMessageNotificationsWorker @Inject constructor(
         mailboxInfoRealm.close()
     }
 
+    @Singleton
     class Scheduler @Inject constructor(private val workManager: WorkManager) {
 
         fun scheduleWork(userId: Int, mailboxId: Int, messageUid: String) {
