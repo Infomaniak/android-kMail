@@ -49,12 +49,14 @@ android {
         }
     }
 
+    def javaVersion = JavaVersion.VERSION_17
+
     compileOptions {
-        sourceCompatibility rootProject.ext.java_version
-        targetCompatibility rootProject.ext.java_version
+        sourceCompatibility javaVersion
+        targetCompatibility javaVersion
     }
 
-    kotlinOptions { jvmTarget = rootProject.ext.java_version }
+    kotlinOptions { jvmTarget = javaVersion }
 
     buildFeatures { viewBinding true }
 
@@ -76,7 +78,7 @@ dependencies {
     implementation project(path: ':Core:BugTracker')
     implementation project(path: ':Core:Stores')
 
-    implementation "io.realm.kotlin:library-base:$rootProject.ext.realm_kotlin_version"
+    implementation "io.realm.kotlin:library-base:$rootProject.ext.realmVersion"
 
     standardImplementation 'com.google.firebase:firebase-messaging-ktx:23.1.2'
 
@@ -87,7 +89,7 @@ dependencies {
     implementation 'org.jsoup:jsoup:1.16.1'
 
     implementation 'com.google.android.flexbox:flexbox:3.0.0'
-    implementation "androidx.lifecycle:lifecycle-process:$livedata_version"
+    implementation "androidx.lifecycle:lifecycle-process:2.6.1"
     implementation 'androidx.webkit:webkit:1.6.1'
     implementation 'androidx.work:work-runtime-ktx:2.8.1'
 
