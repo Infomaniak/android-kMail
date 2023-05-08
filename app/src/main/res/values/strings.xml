@@ -58,7 +58,7 @@
     <string name="addUnknownRecipientTitle">Add a recipient</string>
     <string name="appSecurityDescription">Protect access to your app by enabling your phone lock.</string>
     <string name="archiveFolder">Archived</string>
-    <string name="attachAddressDescription">If you already have an Infomaniak email address, connect now.</string>
+    <string name="attachAddressDescription">If you already have an Infomaniak email address, connect now</string>
     <string name="attachAddressInputHint">Email address</string>
     <string name="attachAddressPasswordInputHint">Password</string>
     <string name="attachAddressTitle">Add email address</string>
@@ -177,6 +177,7 @@
     <string name="emptyStateTrashTitle">Trash is empty</string>
     <string name="errorAtLeastOneRecipient">At least one recipient is required</string>
     <string name="errorAttachAddressInput">Only Infomaniak email addresses are supported</string>
+    <string name="errorCorruptAttachment">Failed to handle draft, an attachment is corrupted</string>
     <string name="errorEditScheduledMessage">Scheduled or sent messages cannot be edited</string>
     <string name="errorInvalidCredentials">Invalid email or password</string>
     <string name="errorLoginDescription">The connection failed.</string>
@@ -334,7 +335,7 @@
         <item quantity="one">Sender successfully blacklisted</item>
         <item quantity="other">Senders successfully blacklisted</item>
     </plurals>
-    <string name="snackbarSuccessfulRestoration">Restoration successfully completed</string>
+    <string name="snackbarRestorationLaunched">Restoration successfully completed</string>
     <plurals name="snackbarThreadDeletedPermanently">
         <item quantity="one">Conversation deleted</item>
         <item quantity="other">Conversations deleted</item>

@@ -30,6 +30,7 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.*
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
+import com.infomaniak.mail.data.cache.mailboxInfo.PermissionsController
 import com.infomaniak.mail.data.cache.mailboxInfo.QuotasController
 import com.infomaniak.mail.data.cache.userInfo.AddressBookController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
@@ -37,6 +38,7 @@ import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.SelectedThread
 import com.infomaniak.mail.data.models.thread.Thread
@@ -106,6 +108,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     val currentQuotasLive = _currentMailboxObjectId.flatMapLatest {
         it?.let(QuotasController::getQuotasAsync) ?: emptyFlow()
+    }.asLiveData(coroutineContext)
+
+    val currentPermissionsLive = _currentMailboxObjectId.flatMapLatest {
+        it?.let(PermissionsController::getPermissionsAsync) ?: emptyFlow()
     }.asLiveData(coroutineContext)
     //endregion
 
@@ -178,28 +184,28 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         Log.d(TAG, "Load current mailbox from local")
         val userId = AccountUtils.currentUserId
         val mailboxId = AccountUtils.currentMailboxId
-        if (userId != AppSettings.DEFAULT_ID && mailboxId != AppSettings.DEFAULT_ID) {
+        val mailbox = MailboxController.getMailboxWithFallback(userId, mailboxId) ?: return
+        selectMailbox(mailbox)
 
-            val mailbox = MailboxController.getMailbox(userId, mailboxId) ?: return
-            selectMailbox(mailbox)
-
-            if (currentFolderId == null) {
-                val folder = FolderController.getFolder(DEFAULT_SELECTED_FOLDER) ?: return
-                selectFolder(folder.id)
-            }
-
-            // Delete search data in case they couldn't be deleted at the end of the previous Search.
-            SearchUtils.deleteRealmSearchData()
+        if (currentFolderId == null) {
+            val folder = FolderController.getFolder(DEFAULT_SELECTED_FOLDER) ?: return
+            selectFolder(folder.id)
         }
+
+        // Delete search data in case they couldn't be deleted at the end of the previous Search.
+        SearchUtils.deleteRealmSearchData()
     }
 
-    private fun loadCurrentMailboxFromRemote() {
+    private suspend fun loadCurrentMailboxFromRemote() {
         Log.d(TAG, "Load current mailbox from remote")
         with(ApiRepository.getMailboxes()) {
             if (isSuccess()) {
                 val isCurrentMailboxDeleted = MailboxController.updateMailboxes(context, data!!)
                 if (isCurrentMailboxDeleted) return
-                MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)?.let(::openMailbox)
+                MailboxController.getMailboxWithFallback(
+                    userId = AccountUtils.currentUserId,
+                    mailboxId = AccountUtils.currentMailboxId,
+                )?.let(::openMailbox)
             }
         }
     }

@@ -133,7 +133,7 @@ class Message : RealmObject {
             }.getOrElse {
                 Sentry.withScope { scope ->
                     scope.level = SentryLevel.ERROR
-                    scope.setExtra("folders", "${_folders.map { it.name }}")
+                    scope.setExtra("folders", "${_folders.map { "name:[${it.name}] (id:[${it.id}])" }}")
                     scope.setExtra("foldersCount", "${_folders.count()}")
                     scope.setExtra("messageUid", uid)
                     scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())

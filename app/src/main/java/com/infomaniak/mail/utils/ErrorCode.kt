@@ -28,7 +28,11 @@ object ErrorCode {
     const val VALIDATION_FAILED = "validation_failed"
 
     // Global
+    const val INVALID_CREDENTIALS = "invalid_credentials"
+
+    // Mailbox
     const val MAILBOX_LOCKED = "mailbox_locked"
+    const val ERROR_WHILE_LINKING_MAILBOX = "error_while_linking_mailbox"
 
     // Folder
     const val FOLDER_ALREADY_EXISTS = "folder__destination_already_exists"
@@ -51,7 +55,9 @@ object ErrorCode {
     val apiErrorCodes = listOf(
         // ApiErrorCode(ACCESS_DENIED, R.string.),
         // ApiErrorCode(VALIDATION_FAILED, R.string.),
+        ApiErrorCode(INVALID_CREDENTIALS, R.string.errorInvalidCredentials),
         ApiErrorCode(MAILBOX_LOCKED, R.string.errorMailboxLocked),
+        // ApiErrorCode(ERROR_WHILE_LINKING_MAILBOX, R.string.),
         ApiErrorCode(FOLDER_ALREADY_EXISTS, R.string.errorNewFolderAlreadyExists),
         // ApiErrorCode(FOLDER_DOES_NOT_EXIST, R.string.),
         // ApiErrorCode(DRAFT_DOES_NOT_EXIST, R.string.),

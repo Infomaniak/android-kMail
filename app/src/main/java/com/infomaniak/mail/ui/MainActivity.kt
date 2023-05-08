@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -231,9 +232,11 @@ class MainActivity : ThemedActivity() {
         }
     }
 
+    // This `SuppressLint` seems useless, but it's for the CI. Don't remove it.
+    @SuppressLint("RestrictedApi")
     private fun onDestinationChanged(destination: NavDestination, arguments: Bundle?) {
 
-        SentryDebug.addNavigationBreadcrumb(destination, arguments)
+        SentryDebug.addNavigationBreadcrumb(destination.displayName, arguments)
 
         setDrawerLockMode(destination.id == R.id.threadListFragment)
 

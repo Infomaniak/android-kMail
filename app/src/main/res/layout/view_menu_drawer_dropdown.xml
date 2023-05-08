@@ -24,7 +24,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginStart="@dimen/marginStandardMedium"
-        android:layout_marginEnd="@dimen/marginStandardSmall"
         android:gravity="center_vertical"
         android:paddingEnd="@dimen/marginStandardVerySmall"
         tools:ignore="RtlSymmetry">
@@ -33,7 +32,7 @@
             android:id="@+id/expandCustomFolderButton"
             android:layout_width="@dimen/chevronSize"
             android:layout_height="@dimen/chevronSize"
-            android:layout_marginEnd="@dimen/marginStandardVerySmall"
+            android:layout_marginEnd="@dimen/alternativeMargin"
             android:contentDescription="@string/contentDescriptionButtonExpandCustomFolders"
             android:src="@drawable/ic_chevron_down"
             app:layout_constraintBottom_toBottomOf="parent"
