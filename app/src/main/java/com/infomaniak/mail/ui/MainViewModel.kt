@@ -184,7 +184,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         Log.d(TAG, "Load current mailbox from local")
         val userId = AccountUtils.currentUserId
         val mailboxId = AccountUtils.currentMailboxId
-        val mailbox = MailboxController.getMailbox(userId, mailboxId) ?: return
+        val mailbox = MailboxController.getMailboxWithFallback(userId, mailboxId) ?: return
         selectMailbox(mailbox)
 
         if (currentFolderId == null) {
@@ -202,7 +202,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             if (isSuccess()) {
                 val isCurrentMailboxDeleted = MailboxController.updateMailboxes(context, data!!)
                 if (isCurrentMailboxDeleted) return
-                MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)?.let(::openMailbox)
+                MailboxController.getMailboxWithFallback(
+                    userId = AccountUtils.currentUserId,
+                    mailboxId = AccountUtils.currentMailboxId,
+                )?.let(::openMailbox)
             }
         }
     }
