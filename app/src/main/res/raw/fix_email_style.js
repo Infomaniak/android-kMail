@@ -21,17 +21,21 @@ function removeCSSProperty(properties) {
     // Remove properties from style tag
     for (let i = 0; i < document.styleSheets.length; i++) {
         const styleSheet = document.styleSheets[i];
-        for (let j = 0; j < styleSheet.cssRules.length; j++) {
-            for (const property of properties) {
-                if (!styleSheet.cssRules[j].style) { continue; }
+        try {
+            for (let j = 0; j < styleSheet.cssRules.length; j++) {
+                for (const property of properties) {
+                        if (!styleSheet.cssRules[j].style) { continue; }
 
-                if (property.values.length === 0 || property.values.includes(styleSheet.cssRules[j].style[property.name].toLowerCase().trim())) {
-                    const removedValue = styleSheet.cssRules[j].style?.removeProperty(property.name);
-                    if (removedValue) {
-                        console.info(`[FIX_EMAIL_STYLE] Remove property ${property.name} from style tag.`);
-                    }
+                        if (property.values.length === 0 || property.values.includes(styleSheet.cssRules[j].style[property.name].toLowerCase().trim())) {
+                            const removedValue = styleSheet.cssRules[j].style?.removeProperty(property.name);
+                            if (removedValue) {
+                                console.info(`[FIX_EMAIL_STYLE] Remove property ${property.name} from style tag.`);
+                            }
+                        }
                 }
             }
+        } catch (exception) {
+            // The stylesheet cannot be modified
         }
     }
 }
