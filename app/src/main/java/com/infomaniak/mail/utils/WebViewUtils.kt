@@ -53,6 +53,9 @@ class WebViewUtils(context: Context) {
             @SuppressLint("SetJavaScriptEnabled")
             javaScriptEnabled = true
 
+            loadWithOverviewMode = true
+            useWideViewPort = true
+
             setSupportZoom(true)
             builtInZoomControls = true
             displayZoomControls = false
@@ -61,6 +64,9 @@ class WebViewUtils(context: Context) {
         fun WebSettings.setupNewMessageWebViewSettings() {
             @SuppressLint("SetJavaScriptEnabled")
             javaScriptEnabled = true
+
+            loadWithOverviewMode = true
+            useWideViewPort = true
         }
     }
 }
