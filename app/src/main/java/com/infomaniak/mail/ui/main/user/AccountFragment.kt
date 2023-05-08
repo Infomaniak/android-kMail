@@ -15,29 +15,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.menu
+package com.infomaniak.mail.ui.main.user
 
-import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.infomaniak.lib.core.utils.context
-import com.infomaniak.lib.core.views.DividerItemDecorator
+import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentAccountBinding
-import com.infomaniak.mail.ui.main.user.AccountViewModel
+import com.infomaniak.mail.ui.main.menu.SwitchMailboxesAdapter
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.animatedNavigation
 import com.infomaniak.mail.utils.createDescriptionDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import com.infomaniak.lib.core.R as RCore
 
 class AccountFragment : Fragment() {
 
@@ -46,15 +44,19 @@ class AccountFragment : Fragment() {
 
     private val logoutAlert by lazy { initLogoutAlert() }
 
-    private var mailboxAdapter = SwitchMailboxesAdapter(isInMenuDrawer = false)
+    private var mailboxAdapter = SwitchMailboxesAdapter(isInMenuDrawer = false, lifecycleScope)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentAccountBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         AccountUtils.currentUser?.let { user ->
             avatar.loadAvatar(user)
+            name.apply {
+                isGone = user.displayName.isNullOrBlank()
+                text = user.displayName
+            }
             mail.text = user.email
         }
 
@@ -62,8 +64,10 @@ class AccountFragment : Fragment() {
             animatedNavigation(AccountFragmentDirections.actionAccountFragmentToSwitchUserFragment())
         }
 
-        // TODO: Attach an address tunnel
-        // attachNewMailboxButton.setOnClickListener { }
+        attachNewMailboxButton.setOnClickListener {
+            context.trackAccountEvent("addMailbox")
+            safeNavigate(AccountFragmentDirections.actionAccountFragmentToAttachMailboxFragment())
+        }
 
         disconnectAccountButton.setOnClickListener {
             context.trackAccountEvent("logOut")
@@ -72,10 +76,6 @@ class AccountFragment : Fragment() {
 
         mailboxesRecyclerView.apply {
             adapter = mailboxAdapter
-            ResourcesCompat.getDrawable(resources, R.drawable.divider, null)?.let {
-                val paddingHorizontal = resources.getDimensionPixelSize(RCore.dimen.marginStandardMedium)
-                addItemDecoration(DividerItemDecorator(InsetDrawable(it, paddingHorizontal, 0, paddingHorizontal, 0)))
-            }
             isFocusable = false
         }
 
@@ -88,10 +88,8 @@ class AccountFragment : Fragment() {
     }
 
     private fun observeAccountsLive() = with(accountViewModel) {
-
-        updateMailboxes()
-
-        observeAccountsLive.observe(viewLifecycleOwner) { mailboxes -> mailboxAdapter.setMailboxes(mailboxes) }
+        observeAccountsLive.observe(viewLifecycleOwner, mailboxAdapter::setMailboxes)
+        lifecycleScope.launch(Dispatchers.IO) { updateMailboxes() }
     }
 
     private fun initLogoutAlert() = createDescriptionDialog(

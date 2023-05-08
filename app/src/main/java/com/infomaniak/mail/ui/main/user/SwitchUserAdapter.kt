@@ -33,7 +33,7 @@ import io.sentry.SentryLevel
 @SuppressLint("NotifyDataSetChanged")
 class SwitchUserAdapter(
     val currentUserId: Int,
-    val onChangingUserAccount: ((User) -> Unit)
+    val onChangingUserAccount: ((User) -> Unit),
 ) : RecyclerView.Adapter<SwitchUserAccountViewHolder>() {
 
     private var accounts: List<User> = emptyList()

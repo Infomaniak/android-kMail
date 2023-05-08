@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ import com.infomaniak.lib.applock.Utils.isKeyguardSecure
 import com.infomaniak.mail.MatomoMail.trackUserId
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.ui.login.LoginActivity
 import com.infomaniak.mail.ui.login.LoginActivityArgs
@@ -35,6 +36,7 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SentryDebug
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class LaunchActivity : AppCompatActivity() {
 
@@ -49,12 +51,23 @@ class LaunchActivity : AppCompatActivity() {
 
         lifecycleScope.launch(Dispatchers.IO) {
             val user = AccountUtils.requestCurrentUser()
-            trackUserId(AccountUtils.currentUserId)
 
-            when {
-                user == null -> loginUser()
-                navigationArgs?.shouldLock != false && isKeyguardSecure() && localSettings.isAppLocked -> startAppLockActivity()
-                else -> startApp()
+            withContext(Dispatchers.Main) {
+                if (user == null) {
+                    loginUser()
+                } else {
+                    trackUserId(AccountUtils.currentUserId)
+
+                    // When MailboxController is migrated
+                    if (MailboxController.getMailboxesCount(user.id) == 0L) {
+                        AccountUtils.updateUserAndMailboxes(this@LaunchActivity)
+                    }
+                    if (navigationArgs?.shouldLock != false && isKeyguardSecure() && localSettings.isAppLocked) {
+                        startAppLockActivity()
+                    } else {
+                        startApp()
+                    }
+                }
             }
         }
     }

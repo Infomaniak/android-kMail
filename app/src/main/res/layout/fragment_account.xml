@@ -21,7 +21,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:title="@string/titleMyAccount"
-    tools:context=".ui.main.menu.AccountFragment">
+    tools:context=".ui.main.user.AccountFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -42,8 +42,8 @@
                     android:id="@+id/avatar"
                     android:layout_width="110dp"
                     android:layout_height="110dp"
-                    android:layout_marginTop="42dp"
-                    app:layout_constraintBottom_toTopOf="@id/mail"
+                    android:layout_marginTop="32dp"
+                    app:layout_constraintBottom_toTopOf="@id/name"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -51,15 +51,27 @@
                     tools:src="@tools:sample/avatars[2]" />
 
                 <TextView
-                    android:id="@+id/mail"
+                    android:id="@+id/name"
                     style="@style/H2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/marginStandard"
-                    app:layout_constraintBottom_toTopOf="@id/changeAccountButton"
+                    android:layout_marginTop="@dimen/marginStandardMedium"
+                    app:layout_constraintBottom_toTopOf="@id/mail"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/avatar"
+                    tools:text="@tools:sample/full_names" />
+
+                <TextView
+                    android:id="@+id/mail"
+                    style="@style/BodySmall.Secondary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/marginStandardVerySmall"
+                    app:layout_constraintBottom_toTopOf="@id/changeAccountButton"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/name"
                     tools:text="myriam.rais@infomaniak.com" />
 
                 <com.google.android.material.button.MaterialButton
@@ -75,23 +87,23 @@
 
                 <TextView
                     android:id="@+id/associatedEmailAddresses"
-                    style="@style/SettingHeader"
+                    style="@style/BodySmall.Secondary"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/marginStandardMedium"
                     android:layout_marginTop="@dimen/marginStandardMedium"
-                    android:paddingBottom="@dimen/marginStandardMedium"
                     android:text="@string/buttonAccountAssociatedEmailAddresses"
+                    app:layout_constraintBottom_toTopOf="@id/mailboxesRecyclerView"
                     app:layout_constraintEnd_toStartOf="@id/attachNewMailboxButton"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/changeAccountButton" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/attachNewMailboxButton"
-                    style="@style/IconButtonSmall"
-                    android:layout_marginHorizontal="@dimen/marginStandardSmall"
+                    style="@style/IconButton"
                     android:contentDescription="@string/buttonAddEmailAddress"
-                    android:visibility="gone"
                     app:icon="@drawable/ic_add_circle"
+                    app:iconSize="@dimen/marginStandardMedium"
                     app:iconTint="?attr/colorPrimary"
                     app:layout_constraintBottom_toBottomOf="@+id/associatedEmailAddresses"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -102,6 +114,7 @@
                     android:id="@+id/mailboxesRecyclerView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/marginStandardMedium"
                     android:overScrollMode="never"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     app:layout_constraintEnd_toEndOf="parent"

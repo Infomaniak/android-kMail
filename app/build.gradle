@@ -27,6 +27,7 @@ android {
         buildConfigField 'String', 'CREATE_ACCOUNT_URL', '"https://welcome.infomaniak.com/signup/ikmail?app=true"'
         buildConfigField 'String', 'CREATE_ACCOUNT_SUCCESS_HOST', '"mail.infomaniak.com"'
         buildConfigField 'String', 'CREATE_ACCOUNT_CANCEL_HOST', '"welcome.infomaniak.com"'
+        buildConfigField 'String', 'IMPORT_EMAILS_URL', '"https://import-email.infomaniak.com"'
         buildConfigField 'String', 'INFOMANIAK_API_V1', '"https://api.infomaniak.com/1"'
         buildConfigField 'String', 'MAIL_API', '"https://mail.infomaniak.com"'
         // buildConfigField 'String', 'MAIL_API_PREPROD', '"https://mail.preprod.dev.infomaniak.ch"'
@@ -48,12 +49,14 @@ android {
         }
     }
 
+    def javaVersion = JavaVersion.VERSION_17
+
     compileOptions {
-        sourceCompatibility rootProject.ext.java_version
-        targetCompatibility rootProject.ext.java_version
+        sourceCompatibility javaVersion
+        targetCompatibility javaVersion
     }
 
-    kotlinOptions { jvmTarget = rootProject.ext.java_version }
+    kotlinOptions { jvmTarget = javaVersion }
 
     buildFeatures { viewBinding true }
 
