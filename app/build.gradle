@@ -1,7 +1,9 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.dagger.hilt)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.jetbrains.kotlin.serialization)
+    alias(libs.plugins.kapt)
     id 'kotlin-parcelize'
     id 'androidx.navigation.safeargs.kotlin'
     alias(libs.plugins.realm.kotlin)
@@ -92,6 +94,13 @@ dependencies {
     implementation libs.lifecycle.process
     implementation libs.webkit
     implementation libs.work.runtime.ktx
+
+    implementation libs.hilt.android
+    implementation libs.hilt.work
+    // TODO: Migrate to KSP, actually Hilt is not yet supported with KSP
+    // https://kotlinlang.org/docs/ksp-overview.html#supported-libraries
+    // https://github.com/google/dagger/issues/2349
+    kapt libs.hilt.compiler
 
     implementation libs.sentry.android.fragment
 

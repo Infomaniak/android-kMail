@@ -43,6 +43,7 @@ import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.mail.MatomoMail.buildTracker
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.firebase.ProcessMessageNotificationsWorker
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.LaunchActivityArgs
 import com.infomaniak.mail.utils.AccountUtils
@@ -50,6 +51,7 @@ import com.infomaniak.mail.utils.ErrorCode
 import com.infomaniak.mail.utils.NotificationUtils.initNotificationChannel
 import com.infomaniak.mail.utils.NotificationUtils.showGeneralNotification
 import com.infomaniak.mail.workers.SyncMailboxesWorker
+import dagger.hilt.android.HiltAndroidApp
 import io.sentry.SentryEvent
 import io.sentry.SentryOptions
 import io.sentry.android.core.SentryAndroid
@@ -62,12 +64,21 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.matomo.sdk.Tracker
 import java.util.UUID
+import javax.inject.Inject
 
+@HiltAndroidApp
 class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycleObserver {
 
     val matomoTracker: Tracker by lazy { buildTracker() }
     var isAppInBackground = true
         private set
+
+    @Inject
+    lateinit var syncMailboxesWorkerScheduler: SyncMailboxesWorker.Scheduler
+    @Inject
+    lateinit var processMessageNotificationsWorkerScheduler: ProcessMessageNotificationsWorker.Scheduler
+    @Inject
+    lateinit var notificationManagerCompat: NotificationManagerCompat
 
     override fun onCreate() {
         super<Application>.onCreate()
@@ -86,13 +97,13 @@ class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycleObser
 
     override fun onStart(owner: LifecycleOwner) {
         isAppInBackground = false
-        cancelFirebaseProcessWorks()
-        SyncMailboxesWorker.cancelWork(this)
+        processMessageNotificationsWorkerScheduler.cancelFirebaseProcessWorks()
+        syncMailboxesWorkerScheduler.cancelWork()
     }
 
     override fun onStop(owner: LifecycleOwner) {
         isAppInBackground = true
-        owner.lifecycleScope.launch { SyncMailboxesWorker.scheduleWorkIfNeeded(this@ApplicationMain) }
+        owner.lifecycleScope.launch { syncMailboxesWorkerScheduler.scheduleWorkIfNeeded() }
     }
 
     private fun configureDebugMode() {
@@ -176,7 +187,6 @@ class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycleObser
         val notificationText = getString(R.string.refreshTokenError)
 
         if (hasPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS))) {
-            val notificationManagerCompat = NotificationManagerCompat.from(this)
             showGeneralNotification(notificationText).apply {
                 setContentIntent(pendingIntent)
                 @Suppress("MissingPermission")

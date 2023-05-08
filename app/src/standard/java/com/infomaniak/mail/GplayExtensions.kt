@@ -45,8 +45,8 @@ fun Context.isGooglePlayServicesNotAvailable(): Boolean = with(GoogleApiAvailabi
     return isGooglePlayServicesAvailable(this@isGooglePlayServicesNotAvailable) != ConnectionResult.SUCCESS
 }
 
-fun Context.cancelFirebaseProcessWorks() {
-    ProcessMessageNotificationsWorker.cancelWorks(this)
+fun ProcessMessageNotificationsWorker.Scheduler.cancelFirebaseProcessWorks() {
+    cancelWorks()
 }
 
 private fun FragmentActivity.checkFirebaseRegistration() {

@@ -58,12 +58,14 @@ import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialog
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.absoluteValue
 import kotlin.math.min
 import kotlin.math.roundToInt
 import com.google.android.material.R as RMaterial
 
+@AndroidEntryPoint
 class ThreadFragment : Fragment() {
 
     private lateinit var binding: FragmentThreadBinding

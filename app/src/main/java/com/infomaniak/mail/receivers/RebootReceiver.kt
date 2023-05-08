@@ -22,16 +22,23 @@ import android.content.Context
 import android.content.Intent
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.workers.SyncMailboxesWorker
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class RebootReceiver : BroadcastReceiver() {
+
+    @Inject
+    lateinit var syncMailboxesWorkerScheduler: SyncMailboxesWorker.Scheduler
+
     override fun onReceive(context: Context, intent: Intent?) {
         CoroutineScope(Dispatchers.IO).launch {
             val appNotStarted = AccountUtils.currentUser == null
             if (intent?.action == Intent.ACTION_BOOT_COMPLETED && appNotStarted) {
-                SyncMailboxesWorker.scheduleWorkIfNeeded(context)
+                syncMailboxesWorkerScheduler.scheduleWorkIfNeeded()
             }
         }
     }

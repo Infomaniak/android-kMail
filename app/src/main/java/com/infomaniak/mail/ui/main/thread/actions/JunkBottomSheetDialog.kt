@@ -30,7 +30,9 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.BottomSheetJunkBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.createDescriptionDialog
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private lateinit var binding: BottomSheetJunkBinding

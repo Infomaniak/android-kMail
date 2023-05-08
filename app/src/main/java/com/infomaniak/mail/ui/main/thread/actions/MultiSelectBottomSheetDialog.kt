@@ -37,7 +37,9 @@ import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection.Companion.getReadIconAndShortText
 import com.infomaniak.mail.utils.animatedNavigation
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private lateinit var binding: BottomSheetMultiSelectBinding

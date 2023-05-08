@@ -5,8 +5,11 @@ dragdropswipeRecyclerview = "1.1.1"
 firebaseMessagingKtx = "23.1.2"
 flexbox = "3.0.0"
 googleServices = "4.3.15"
+hiltAndroid = "2.44"
+hiltAndroidx = "1.0.0"
 jsoup = "1.15.4"
 junitJupiterEngine = "5.9.2"
+kapt = "1.8.21"
 kotlin = "1.8.10"
 lifecycleProcess = "2.6.1"
 lottie = "6.0.0"
@@ -23,6 +26,9 @@ dragdropswipe-recyclerview = { module = "com.ernestoyaquello.dragdropswiperecycl
 firebase-messaging-ktx = { module = "com.google.firebase:firebase-messaging-ktx", version.ref = "firebaseMessagingKtx" }
 flexbox = { module = "com.google.android.flexbox:flexbox", version.ref = "flexbox" }
 google-services = { module = "com.google.gms:google-services", version.ref = "googleServices" }
+hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
+hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hiltAndroid" }
+hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "hiltAndroidx" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "lifecycleProcess" }
 lottie = { module = "com.airbnb.android:lottie", version.ref = "lottie" }
@@ -38,6 +44,8 @@ test-runner = { module = "androidx.test:runner", version.ref = "testRunner" }
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
+dagger-hilt = { id = "com.google.dagger.hilt.android", version.ref = "hiltAndroid" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 jetbrains-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kapt" }
 realm-kotlin = { id = "io.realm.kotlin", version.ref = "realmKotlin" }
