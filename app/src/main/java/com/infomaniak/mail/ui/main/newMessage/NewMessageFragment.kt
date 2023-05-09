@@ -63,9 +63,11 @@ import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
 import com.infomaniak.mail.workers.DraftsActionsWorker
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import com.google.android.material.R as RMaterial
 
+@AndroidEntryPoint
 class NewMessageFragment : Fragment() {
 
     private lateinit var binding: FragmentNewMessageBinding
