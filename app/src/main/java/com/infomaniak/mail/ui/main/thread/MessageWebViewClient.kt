@@ -36,7 +36,7 @@ import com.infomaniak.mail.utils.Utils
 class MessageWebViewClient(
     private val context: Context,
     private val cidDictionary: MutableMap<String, Attachment>,
-    private val webView: WebView
+    private val messageUid: String,
 ) : WebViewClient() {
 
     override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
@@ -93,7 +93,7 @@ class MessageWebViewClient(
 
     override fun onPageFinished(webView: WebView, url: String?) {
         // TODO : Try WebView.postVisualStateCallback
-        webView.loadUrl("javascript:removeAllProperties(); normalizeMessageWidth(${webView.width.toDp()})")
+        webView.loadUrl("javascript:removeAllProperties(); normalizeMessageWidth(${webView.width.toDp()}, '$messageUid')")
         super.onPageFinished(webView, url)
     }
 

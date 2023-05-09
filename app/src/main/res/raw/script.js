@@ -1,4 +1,4 @@
-//const MESSAGE_SELECTOR = "#kmail-message-content";
+// MESSAGE_SELECTOR = "#kmail-message-content";
 const PREFERENCES = {
     normalizeMessageWidths: true,
     mungeImages: true,
@@ -8,8 +8,18 @@ const PREFERENCES = {
 
 // Functions
 
-function normalizeMessageWidth(webViewWidth) {
-    normalizeElementWidths(document.querySelectorAll(MESSAGE_SELECTOR), webViewWidth);
+/**
+ * Normalize the width of the mail displayed
+ * @param webViewWidth Width of the webview
+ * @param messageUid Id the mail displayed
+ */
+function normalizeMessageWidth(webViewWidth, messageUid) {
+    // We want to report any thrown error that our script may encounter
+    try {
+        normalizeElementWidths(document.querySelectorAll(MESSAGE_SELECTOR), webViewWidth, messageUid);
+    } catch (error) {
+        reportError(error, messageUid);
+    }
     return true;
 }
 
@@ -18,8 +28,10 @@ function normalizeMessageWidth(webViewWidth) {
  * Narrower elements are zoomed in, and wider elements are zoomed out.
  * This method is idempotent.
  * @param elements DOM elements to normalize
+ * @param webViewWidth Width of the webview
+ * @param messageUid Id the mail displayed
  */
-function normalizeElementWidths(elements, webViewWidth) {
+function normalizeElementWidths(elements, webViewWidth, messageUid) {
     const documentWidth = document.body.offsetWidth;
     logInfo(`Starts to normalize elements. Document width: ${documentWidth}.`);
 
@@ -47,7 +59,7 @@ function normalizeElementWidths(elements, webViewWidth) {
 
         if (document.documentElement.scrollWidth > document.documentElement.clientWidth) {
             logInfo(`After zooming the mail it can still scroll: found clientWidth / scrollWidth -> ${document.documentElement.clientWidth} / ${document.documentElement.scrollWidth}`);
-
+            reportOverScroll(document.documentElement.clientWidth, document.documentElement.scrollWidth, messageUid);
         }
     }
 }

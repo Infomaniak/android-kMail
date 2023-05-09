@@ -19,10 +19,13 @@ package com.infomaniak.mail.utils
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
+import android.webkit.JavascriptInterface
 import android.webkit.WebSettings
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomDarkMode
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getFixStyleScript
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getJsBridgeScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getResizeScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getSetMargin
 
@@ -34,6 +37,7 @@ class WebViewUtils(context: Context) {
 
     private val resizeScript by lazy { context.getResizeScript() }
     private val fixStyleScript by lazy { context.getFixStyleScript() }
+    private val jsBridgeScript by lazy { context.getJsBridgeScript() }
 
     fun processHtmlForDisplay(html: String, isDisplayedInDarkMode: Boolean): String = with(HtmlFormatter(html)) {
         if (isDisplayedInDarkMode) registerCss(customDarkMode, DARK_BACKGROUND_STYLE_ID)
@@ -42,12 +46,32 @@ class WebViewUtils(context: Context) {
         registerMetaViewPort()
         registerScript(resizeScript)
         registerScript(fixStyleScript)
+        registerScript(jsBridgeScript)
         registerBodyEncapsulation()
         return@with inject()
     }
 
+    class JavascriptBridge {
+        @JavascriptInterface
+        fun reportOverScroll(clientWidth: Int, scrollWidth: Int, messageUid: String) {
+            Log.e("gibran", "reportOverScroll - clientWidth: ${clientWidth}")
+            Log.e("gibran", "reportOverScroll - scrollWidth: ${scrollWidth}")
+            Log.e("gibran", "reportOverScroll - messageUid: ${messageUid}")
+            SentryDebug.sendOverScrolledMessage(clientWidth, scrollWidth, messageUid)
+        }
+
+        @JavascriptInterface
+        fun reportError(errorName: String, errorMessage: String, messageUid: String) {
+            Log.e("gibran", "reportError - errorName: ${errorName}")
+            Log.e("gibran", "reportError - errorMessage: ${errorMessage}")
+            Log.e("gibran", "reportOverScroll - messageUid: ${messageUid}")
+            SentryDebug.sendJavaScriptError(errorName, errorMessage, messageUid)
+        }
+    }
+
     companion object {
         private const val DARK_BACKGROUND_STYLE_ID = "dark_background_style"
+        val jsBridge = JavascriptBridge()
 
         fun WebSettings.setupThreadWebViewSettings() {
             @SuppressLint("SetJavaScriptEnabled")

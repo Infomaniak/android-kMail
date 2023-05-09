@@ -252,7 +252,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
 
         setDetailedFieldsVisibility(message)
 
-        initWebViewClientIfNeeded(message.attachments)
+        initWebViewClientIfNeeded(message)
 
         handleHeaderClick(message)
         handleExpandDetailsClick(message)
@@ -490,10 +490,10 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
             }
         }
 
-        fun initWebViewClientIfNeeded(attachments: List<Attachment>) = with(binding) {
+        fun initWebViewClientIfNeeded(message: Message) = with(binding) {
             if (doesWebViewNeedInit) {
-                bodyWebView.initWebViewClient(attachments)
-                fullMessageWebView.initWebViewClient(attachments)
+                bodyWebView.initWebViewClient(message.attachments, message.uid)
+                fullMessageWebView.initWebViewClient(message.attachments, message.uid)
                 doesWebViewNeedInit = false
             }
         }

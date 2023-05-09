@@ -82,6 +82,7 @@ import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.ui.main.thread.MessageWebViewClient
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragmentArgs
+import com.infomaniak.mail.utils.WebViewUtils.Companion.jsBridge
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
@@ -180,12 +181,13 @@ fun LottieAnimationView.changePathColor(illuColors: IlluColors) {
     }
 }
 
-fun WebView.initWebViewClient(attachments: List<Attachment>) {
+fun WebView.initWebViewClient(attachments: List<Attachment>, messageUid: String) {
     val cidDictionary = mutableMapOf<String, Attachment>()
     attachments.forEach {
         if (it.contentId?.isNotBlank() == true) cidDictionary[it.contentId as String] = it
     }
-    webViewClient = MessageWebViewClient(context, cidDictionary, this)
+    webViewClient = MessageWebViewClient(context, cidDictionary, messageUid)
+    addJavascriptInterface(jsBridge, "kmail")
 }
 //endregion
 

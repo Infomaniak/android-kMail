@@ -162,5 +162,9 @@ class HtmlFormatter(private val html: String) {
         fun Context.getFixStyleScript(): String {
             return loadScript(R.raw.fix_email_style)
         }
+
+        fun Context.getJsBridgeScript(): String {
+            return loadScript(R.raw.javascript_bridge)
+        }
     }
 }

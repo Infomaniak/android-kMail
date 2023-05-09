@@ -19,3 +19,8 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Keep names that are used from javascript
+#-keepclasseswithmembers class com.infomaniak.mail.utils.WebViewUtils$JavascriptBridge {
+#  public <methods>;
+#}

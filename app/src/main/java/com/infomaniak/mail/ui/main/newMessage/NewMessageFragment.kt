@@ -304,7 +304,7 @@ class NewMessageFragment : Fragment() {
         draft.uiSignature?.let { html ->
             signatureWebView.apply {
                 loadContent(html)
-                initWebViewClient(emptyList())
+                initWebViewClient(emptyList(), "SIGNATURE-${draft.messageUid}")
             }
             removeSignature.setOnClickListener {
                 trackNewMessageEvent("deleteSignature")
@@ -317,7 +317,7 @@ class NewMessageFragment : Fragment() {
         draft.uiQuote?.let { html ->
             quoteWebView.apply {
                 loadContent(html)
-                initWebViewClient(draft.attachments)
+                initWebViewClient(draft.attachments, "QUOTE-${draft.messageUid}")
             }
             removeQuote.setOnClickListener {
                 trackNewMessageEvent("deleteQuote")
