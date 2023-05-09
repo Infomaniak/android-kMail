@@ -16,4 +16,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = 'kMail'
-include ':app', ':HtmlCleaner', ':Core', ':Core:AppLock', ':Core:BugTracker', ':Core:Stores'
+include ':app', ':Core', ':Core:AppLock', ':Core:BugTracker', ':Core:Stores', ':HtmlCleaner'

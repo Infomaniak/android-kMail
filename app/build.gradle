@@ -75,11 +75,11 @@ android {
 }
 
 dependencies {
-    implementation project(path: ':HtmlCleaner')
     implementation project(path: ':Core')
     implementation project(path: ':Core:AppLock')
     implementation project(path: ':Core:BugTracker')
     implementation project(path: ':Core:Stores')
+    implementation project(path: ':HtmlCleaner')
 
     implementation libs.realm.kotlin.base
 
