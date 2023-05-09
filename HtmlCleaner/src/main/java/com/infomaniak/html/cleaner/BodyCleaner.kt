@@ -30,53 +30,63 @@ internal class BodyCleaner {
 
     init {
         val allowList = Safelist.relaxed()
-            .addTags("font", "hr", "ins", "del", "center", "map", "area", "title", "tt", "kbd", "samp", "var", "button")
-            .addAttributes("font", "color", "face", "size")
+            .addTags("area", "button", "center", "del", "font", "hr", "ins", "kbd", "map", "samp", "title", "tt", "var")
+            .addAttributes(":all", "class", "dir", "id", "style")
+            .addAttributes("a", "name")
+            // Allow all URI schemes in links. Removing all protocols makes the list of protocols empty which means allow all protocols
+            .removeProtocols("a", "href", "ftp", "http", "https", "mailto")
+            .addAttributes("area", "alt", "coords", "href", "shape")
+            .addProtocols("area", "href", "http", "https")
             .addAttributes(
                 "body",
-                "id",
-                "class",
-                "dir",
-                "lang",
-                "style",
                 "alink",
                 "background",
                 "bgcolor",
+                "class",
+                "dir",
+                "id",
+                "lang",
                 "link",
+                "style",
                 "text",
-                "vlink"
+                "vlink",
             )
-            .addAttributes("a", "name")
             .addAttributes("div", "align")
+            .addAttributes("font", "color", "face", "size")
+            .addAttributes("img", "usemap")
+            .addProtocols("img", "src", "cid", "data", "http", "https")
+            .addAttributes("map", "name")
+            .addAttributes("table", "align", "background", "bgcolor", "border", "cellpadding", "cellspacing", "width")
             .addAttributes(
-                "table",
+                "td",
                 "align",
                 "background",
                 "bgcolor",
-                "border",
-                "cellpadding",
-                "cellspacing",
-                "width",
+                "colspan",
+                "headers",
+                "height",
+                "nowrap",
+                "rowspan",
+                "scope",
+                "valign",
+                "width"
             )
-            .addAttributes("tr", "align", "background", "bgcolor", "valign")
             .addAttributes(
                 "th",
-                "align", "background", "bgcolor", "colspan", "headers", "height", "nowrap", "rowspan", "scope",
-                "sorted", "valign", "width",
+                "align",
+                "background",
+                "bgcolor",
+                "colspan",
+                "headers",
+                "height",
+                "nowrap",
+                "rowspan",
+                "scope",
+                "sorted",
+                "valign",
+                "width"
             )
-            .addAttributes(
-                "td",
-                "align", "background", "bgcolor", "colspan", "headers", "height", "nowrap", "rowspan", "scope",
-                "valign", "width",
-            )
-            .addAttributes("map", "name")
-            .addAttributes("area", "shape", "coords", "href", "alt")
-            .addProtocols("area", "href", "http", "https")
-            .addAttributes("img", "usemap")
-            .addAttributes(":all", "class", "style", "id", "dir")
-            .addProtocols("img", "src", "http", "https", "cid", "data")
-            // Allow all URI schemes in links. Removing all protocols makes the list of protocols empty which means allow all protocols
-            .removeProtocols("a", "href", "ftp", "http", "https", "mailto")
+            .addAttributes("tr", "align", "background", "bgcolor", "valign")
 
         cleaner = Cleaner(allowList)
     }
