@@ -30,27 +30,14 @@ internal class BodyCleaner {
 
     init {
         val allowList = Safelist.relaxed()
-            .addTags("area", "button", "center", "del", "font", "hr", "ins", "kbd", "map", "samp", "title", "tt", "var")
+            .addTags("area", "button", "center", "del", "font", "hr", "ins", "kbd", "map", "samp", "style", "title", "tt", "var")
             .addAttributes(":all", "class", "dir", "id", "style")
             .addAttributes("a", "name")
             // Allow all URI schemes in links. Removing all protocols makes the list of protocols empty which means allow all protocols
             .removeProtocols("a", "href", "ftp", "http", "https", "mailto")
             .addAttributes("area", "alt", "coords", "href", "shape")
             .addProtocols("area", "href", "http", "https")
-            .addAttributes(
-                "body",
-                "alink",
-                "background",
-                "bgcolor",
-                "class",
-                "dir",
-                "id",
-                "lang",
-                "link",
-                "style",
-                "text",
-                "vlink",
-            )
+            .addAttributes("body", "alink", "background", "bgcolor", "lang", "link", "text", "vlink")
             .addAttributes("div", "align")
             .addAttributes("font", "color", "face", "size")
             .addAttributes("img", "usemap")
