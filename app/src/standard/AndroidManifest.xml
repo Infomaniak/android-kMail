@@ -18,7 +18,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <application tools:ignore="MissingApplicationIcon">
+    <application
+        android:name=".StandardApplicationMain"
+        tools:ignore="MissingApplicationIcon"
+        tools:replace="android:name">
 
         <service
             android:name=".firebase.KMailFirebaseMessagingService"

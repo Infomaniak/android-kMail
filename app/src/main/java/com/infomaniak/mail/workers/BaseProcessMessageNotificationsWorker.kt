@@ -15,11 +15,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail
+package com.infomaniak.mail.workers
 
 import android.content.Context
-import androidx.fragment.app.FragmentActivity
+import androidx.work.WorkManager
+import androidx.work.WorkerParameters
 
-fun FragmentActivity.checkPlayServices() = Unit
+abstract class BaseProcessMessageNotificationsWorker(
+    appContext: Context,
+    params: WorkerParameters,
+) : BaseCoroutineWorker(appContext, params) {
 
-fun Context.isGooglePlayServicesNotAvailable(): Boolean = true
+    companion object {
+        const val TAG = "ProcessMessageNotificationsWorker"
+
+        fun cancelWorks(workManager: WorkManager) {
+            workManager.cancelAllWorkByTag(TAG)
+        }
+    }
+}

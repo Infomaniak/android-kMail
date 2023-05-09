@@ -17,9 +17,14 @@
  */
 package com.infomaniak.mail
 
-import android.content.Context
-import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.LifecycleOwner
+import com.infomaniak.mail.workers.BaseProcessMessageNotificationsWorker
 
-fun FragmentActivity.checkPlayServices() = Unit
+class StandardApplicationMain : ApplicationMain() {
 
-fun Context.isGooglePlayServicesNotAvailable(): Boolean = true
+    override fun onStart(owner: LifecycleOwner) {
+        super.onStart(owner)
+        BaseProcessMessageNotificationsWorker.cancelWorks(workManager)
+    }
+}
+

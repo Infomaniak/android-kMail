@@ -25,7 +25,7 @@ import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.utils.FetchMessagesManager
-import com.infomaniak.mail.workers.BaseCoroutineWorker
+import com.infomaniak.mail.workers.BaseProcessMessageNotificationsWorker
 import io.sentry.Sentry
 import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject
@@ -36,7 +36,7 @@ class ProcessMessageNotificationsWorker @Inject constructor(
     appContext: Context,
     params: WorkerParameters,
     private val fetchMessagesManager: FetchMessagesManager,
-) : BaseCoroutineWorker(appContext, params) {
+) : BaseProcessMessageNotificationsWorker(appContext, params) {
 
     private val mailboxInfoRealm by lazy { RealmDatabase.newMailboxInfoInstance }
 
@@ -86,13 +86,9 @@ class ProcessMessageNotificationsWorker @Inject constructor(
             workManager.enqueueUniqueWork(workName, ExistingWorkPolicy.APPEND_OR_REPLACE, workRequest)
         }
 
-        fun cancelWorks() {
-            workManager.cancelAllWorkByTag(TAG)
-        }
     }
 
     companion object {
-        private const val TAG = "ProcessMessageNotificationsWorker"
         private const val USER_ID_KEY = "userIdKey"
         private const val MAILBOX_ID_KEY = "mailboxIdKey"
         private const val MESSAGE_UID_KEY = "messageUidKey"

@@ -35,8 +35,10 @@ import com.infomaniak.mail.databinding.ActivityNewMessageBinding
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.ThemedActivity
 import com.infomaniak.mail.utils.*
+import dagger.hilt.android.AndroidEntryPoint
 import com.google.android.material.R as RMaterial
 
+@AndroidEntryPoint
 class NewMessageActivity : ThemedActivity() {
 
     private val binding by lazy { ActivityNewMessageBinding.inflate(layoutInflater) }
