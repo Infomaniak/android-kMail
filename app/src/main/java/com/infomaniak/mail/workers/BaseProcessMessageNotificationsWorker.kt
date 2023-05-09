@@ -23,7 +23,7 @@ import androidx.work.WorkerParameters
 
 abstract class BaseProcessMessageNotificationsWorker(
     appContext: Context,
-    params: WorkerParameters
+    params: WorkerParameters,
 ) : BaseCoroutineWorker(appContext, params) {
 
     companion object {
