@@ -256,32 +256,20 @@ object MessageController {
         var previousOffsetUid: String? = null
 
         run repeatBlock@{
-            repeat(NUMBER_OF_OLD_MESSAGES_TO_FETCH / ApiRoutes.PAGE_SIZE) {
+            repeat((NUMBER_OF_OLD_MESSAGES_TO_FETCH - folder.messages.count()) / ApiRoutes.PAGE_SIZE) {
 
-                val uidOffset = getOldestMessage(folder.id, realm)?.shortUid.also { offsetUid ->
-                    if (offsetUid == null || offsetUid == previousOffsetUid || offsetUid.toInt() <= 1) return@repeatBlock
-                    previousOffsetUid = offsetUid
-                }
-
-                val olderUids = getMessagesUids(
-                    mailbox.uuid,
-                    folder.id,
-                    okHttpClient,
-                    uidOffset,
-                ).also { uids ->
-                    if (uids == null || uids.addedShortUids.isEmpty()) return@repeatBlock
-                }
-                scope.ensureActive()
-
-                impactedCurrentFolderThreads += realm.handleMessagesUids(
-                    scope,
-                    olderUids!!,
+                val (newOffsetUid, shouldStop, threads) = getOneBatchOfOldMessages(
                     folder,
                     mailbox,
+                    scope,
                     okHttpClient,
-                    shouldUpdateCursor = false,
+                    previousOffsetUid,
+                    realm,
                 )
-                scope.ensureActive()
+
+                if (shouldStop) return@repeatBlock
+                previousOffsetUid = newOffsetUid
+                impactedCurrentFolderThreads += threads
             }
         }
 
@@ -290,6 +278,44 @@ object MessageController {
         }
 
         return impactedCurrentFolderThreads
+    }
+
+    fun getOneBatchOfOldMessages(
+        folder: Folder,
+        mailbox: Mailbox,
+        scope: CoroutineScope,
+        okHttpClient: OkHttpClient? = null,
+        previousOffsetUid: String? = null,
+        realm: Realm = defaultRealm,
+    ): Triple<String?, Boolean, List<Thread>> {
+
+        val shouldStop = Triple(null, true, emptyList<Thread>())
+
+        val offsetUid = getOldestMessage(folder.id, realm)?.shortUid.also {
+            if (it == null || it == previousOffsetUid || it.toInt() <= 1) return shouldStop
+        }
+
+        val olderUids = getMessagesUids(
+            mailbox.uuid,
+            folder.id,
+            okHttpClient,
+            offsetUid,
+        ).also { uids ->
+            if (uids == null || uids.addedShortUids.isEmpty()) return shouldStop
+        }
+        scope.ensureActive()
+
+        val impactedCurrentFolderThreads = realm.handleMessagesUids(
+            scope,
+            olderUids!!,
+            folder,
+            mailbox,
+            okHttpClient,
+            shouldUpdateCursor = false,
+        )
+        scope.ensureActive()
+
+        return Triple(offsetUid, false, impactedCurrentFolderThreads)
     }
 
     private fun Realm.handleMessagesUids(
@@ -579,9 +605,9 @@ object MessageController {
         mailboxUuid: String,
         folderId: String,
         okHttpClient: OkHttpClient?,
-        messageUidOffset: String? = null,
+        offsetUid: String? = null,
     ): MessagesUids? {
-        val apiResponse = ApiRepository.getMessagesUids(mailboxUuid, folderId, messageUidOffset, okHttpClient)
+        val apiResponse = ApiRepository.getMessagesUids(mailboxUuid, folderId, offsetUid, okHttpClient)
         if (!apiResponse.isSuccess()) apiResponse.throwErrorAsException()
         return apiResponse.data?.let {
             MessagesUids(

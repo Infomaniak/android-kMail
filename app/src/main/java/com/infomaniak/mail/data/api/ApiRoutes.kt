@@ -95,10 +95,10 @@ object ApiRoutes {
         return "${message(mailboxUuid, folderId, shortUid)}/blacklist"
     }
 
-    fun getMessagesUids(mailboxUuid: String, folderId: String, messageUidOffset: String?): String {
+    fun getMessagesUids(mailboxUuid: String, folderId: String, offsetUid: String?): String {
         val endpoint = "${getMessages(mailboxUuid, folderId)}/messages-uids"
         val messages = "?messages=${PAGE_SIZE}"
-        val offset = messageUidOffset?.let { "&uid_offset=$it" } ?: ""
+        val offset = offsetUid?.let { "&uid_offset=$it" } ?: ""
         return "${endpoint}${messages}${offset}"
     }
 

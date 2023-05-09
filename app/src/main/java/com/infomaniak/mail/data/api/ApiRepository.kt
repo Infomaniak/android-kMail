@@ -189,11 +189,11 @@ object ApiRepository : ApiRepositoryCore() {
     fun getMessagesUids(
         mailboxUuid: String,
         folderId: String,
-        messageUidOffset: String?,
+        offsetUid: String?,
         okHttpClient: OkHttpClient?,
     ): ApiResponse<GetMessagesUidsResult> {
         return callApi(
-            url = ApiRoutes.getMessagesUids(mailboxUuid, folderId, messageUidOffset),
+            url = ApiRoutes.getMessagesUids(mailboxUuid, folderId, offsetUid),
             method = GET,
             okHttpClient = okHttpClient ?: HttpClient.okHttpClient,
         )

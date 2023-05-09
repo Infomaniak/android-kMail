@@ -51,6 +51,7 @@ import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.NotificationUtils.cancelNotification
+import com.infomaniak.mail.utils.SharedViewModelUtils.fetchFolderMessagesJob
 import com.infomaniak.mail.utils.SharedViewModelUtils.refreshFolders
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -306,6 +307,20 @@ class MainViewModel @Inject constructor(
             Log.d(TAG, "Force refresh threads")
             refreshThreads()
         }
+    }
+
+    fun getOneBatchOfOldMessages() = viewModelScope.launch(Dispatchers.IO) {
+        fetchFolderMessagesJob?.cancel()
+        fetchFolderMessagesJob = launch {
+            runCatching {
+                MessageController.getOneBatchOfOldMessages(
+                    folder = currentFolder.value!!,
+                    mailbox = currentMailbox.value!!,
+                    scope = this,
+                )
+            }
+        }
+        fetchFolderMessagesJob?.join()
     }
 
     private fun updateAddressBooks() {

@@ -94,6 +94,7 @@
     <string name="buttonHyperlink">Aggiungere un collegamento ipertestuale</string>
     <string name="buttonImportEmails">Importazione di e-mail</string>
     <string name="buttonItalic">Corsivo</string>
+    <string name="buttonLoadMore">Carica di più</string>
     <string name="buttonLogInDifferentAccount">Accedere con un altro account</string>
     <string name="buttonLogin">Accesso</string>
     <string name="buttonMore">Di più</string>
@@ -127,6 +128,7 @@
     <string name="contentDescriptionButtonDelete">Cancellare %s</string>
     <string name="contentDescriptionButtonDeleteDraft">Cancellare la bozza</string>
     <string name="contentDescriptionButtonDeleteHistory">Cancellare la voce della cronologia</string>
+    <string name="contentDescriptionButtonDeleteQuote">Eliminare i messaggi citati</string>
     <string name="contentDescriptionButtonDeleteSignature">Cancellare la firma</string>
     <string name="contentDescriptionButtonExpandAccountSelection">Ampliare la selezione dei conti</string>
     <string name="contentDescriptionButtonExpandCustomFolders">Espandere le cartelle personalizzate</string>
@@ -324,11 +326,11 @@
     <string name="snackbarMessageMoved">Messaggio spostato a %s</string>
     <string name="snackbarMoveCancelled">Spostamento annullato</string>
     <string name="snackbarReportPhishingConfirmation">Segnalato con successo</string>
+    <string name="snackbarRestorationLaunched">Avvio del restauro</string>
     <plurals name="snackbarSenderBlacklisted">
         <item quantity="one">Mittente inserito nella lista nera con successo</item>
         <item quantity="other">Mittenti inseriti nella lista nera con successo</item>
     </plurals>
-    <string name="snackbarRestorationLaunched">Restauro completato con successo</string>
     <plurals name="snackbarThreadDeletedPermanently">
         <item quantity="one">Conversazione cancellata</item>
         <item quantity="other">Conversazioni eliminate</item>
