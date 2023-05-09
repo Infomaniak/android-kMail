@@ -29,6 +29,7 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import androidx.work.WorkManager
 import coil.ImageLoader
 import coil.ImageLoaderFactory
 import com.facebook.stetho.Stetho
@@ -43,7 +44,6 @@ import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.mail.MatomoMail.buildTracker
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.firebase.ProcessMessageNotificationsWorker
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.LaunchActivityArgs
 import com.infomaniak.mail.utils.AccountUtils
@@ -67,7 +67,7 @@ import java.util.UUID
 import javax.inject.Inject
 
 @HiltAndroidApp
-class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycleObserver {
+open class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycleObserver {
 
     val matomoTracker: Tracker by lazy { buildTracker() }
     var isAppInBackground = true
@@ -75,10 +75,12 @@ class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycleObser
 
     @Inject
     lateinit var syncMailboxesWorkerScheduler: SyncMailboxesWorker.Scheduler
-    @Inject
-    lateinit var processMessageNotificationsWorkerScheduler: ProcessMessageNotificationsWorker.Scheduler
+
     @Inject
     lateinit var notificationManagerCompat: NotificationManagerCompat
+
+    @Inject
+    lateinit var workManager: WorkManager // Only used in the standard flavor
 
     override fun onCreate() {
         super<Application>.onCreate()
@@ -97,7 +99,6 @@ class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycleObser
 
     override fun onStart(owner: LifecycleOwner) {
         isAppInBackground = false
-        processMessageNotificationsWorkerScheduler.cancelFirebaseProcessWorks()
         syncMailboxesWorkerScheduler.cancelWork()
     }
 
