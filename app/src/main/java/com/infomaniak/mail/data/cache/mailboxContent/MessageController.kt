@@ -237,7 +237,7 @@ object MessageController {
 
         impactedCurrentFolderThreads += realm.handleMessagesUids(scope, uids, folder, mailbox, okHttpClient, previousCursor)
 
-        if (previousCursor == null) {
+        if (folder.shouldGetHistory) {
             impactedCurrentFolderThreads += fetchPreviousMessages(folder, realm, mailbox, okHttpClient, scope)
         }
 
@@ -283,6 +283,10 @@ object MessageController {
                 )
                 scope.ensureActive()
             }
+        }
+
+        FolderController.updateFolder(folder.id, realm) {
+            it.shouldGetHistory = false
         }
 
         return impactedCurrentFolderThreads

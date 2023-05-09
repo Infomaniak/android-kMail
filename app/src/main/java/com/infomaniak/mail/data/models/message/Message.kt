@@ -111,7 +111,7 @@ class Message : RealmObject {
     @Transient
     var isFromSearch: Boolean = false
     @Transient
-    var shortUidAsInt: Int = 0
+    var shortUidAsInt: Int = -1
     //endregion
 
     //region UI data (Ignore & Transient)
@@ -169,6 +169,7 @@ class Message : RealmObject {
         this.isSpam = isSpam
         this.date = date
         draftLocalUuid?.let { this.draftLocalUuid = it }
+        shortUidAsInt = shortUid.toInt()
     }
 
     private inline fun <reified T : TypedRealmObject> RealmList<T>.detachedFromRealm(depth: UInt = UInt.MIN_VALUE): List<T> {

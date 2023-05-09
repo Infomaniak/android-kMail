@@ -66,6 +66,8 @@ class Folder : RealmObject {
     var threads: RealmList<Thread> = realmListOf()
     @Transient
     var messages: RealmList<Message> = realmListOf()
+    @Transient
+    var shouldGetHistory: Boolean = true
     // TODO: Remove this before going into production
     @Transient
     @Suppress("PropertyName")
