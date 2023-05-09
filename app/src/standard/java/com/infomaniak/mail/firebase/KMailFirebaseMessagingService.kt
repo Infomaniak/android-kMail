@@ -55,6 +55,8 @@ class KMailFirebaseMessagingService : FirebaseMessagingService() {
     override fun onMessageReceived(message: RemoteMessage) {
         Log.i(TAG, "onMessageReceived: ${message.data}")
 
+        if (AccountUtils.currentUserId == -1) return
+
         val userId = message.data["user_id"]?.toInt() ?: return
         val mailboxId = message.data["mailbox_id"]?.toInt() ?: return
         val messageUid = message.data["message_uid"] ?: return
