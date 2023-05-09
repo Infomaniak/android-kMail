@@ -224,11 +224,7 @@ class Thread : RealmObject {
         return message.preview
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is Thread || uid != other.uid) return false
-        return true
-    }
+    override fun equals(other: Any?) = other === this || (other is Thread && other.uid == uid)
 
     override fun hashCode(): Int = uid.hashCode()
 
