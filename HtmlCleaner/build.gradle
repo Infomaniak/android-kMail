@@ -1,8 +1,3 @@
-// plugins {
-//     // id(ThunderbirdPlugins.Library.jvm)
-//     alias(libs.plugins.android.lint)
-// }
-
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
@@ -30,5 +25,5 @@ android {
 }
 
 dependencies {
-    api 'org.jsoup:jsoup:1.15.4'
+    api libs.jsoup
 }

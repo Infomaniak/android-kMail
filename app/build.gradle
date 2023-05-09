@@ -89,8 +89,6 @@ dependencies {
     implementation libs.dragdropswipe.recyclerview
     implementation libs.dotsindicator
 
-    implementation libs.jsoup
-
     implementation libs.flexbox
     implementation libs.lifecycle.process
     implementation libs.webkit
