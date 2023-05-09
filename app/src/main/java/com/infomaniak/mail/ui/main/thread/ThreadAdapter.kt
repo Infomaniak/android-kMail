@@ -47,6 +47,7 @@ import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.TEXT_HTML
 import com.infomaniak.mail.utils.Utils.TEXT_PLAIN
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupThreadWebViewSettings
+import com.infomaniak.mail.utils.WebViewUtils.Companion.toggleWebViewTheme
 import org.jsoup.Jsoup
 import java.util.*
 import com.google.android.material.R as RMaterial
@@ -138,10 +139,11 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
         if (isThemeTheSameMap[message.uid] == null) isThemeTheSameMap[message.uid] = true
     }
 
-    private fun ThreadViewHolder.toggleBodyAndQuoteTheme(message: Message) {
-        loadBodyInWebView(message.uid, splitBody!!, message.body!!.type)
-        loadQuoteInWebView(message.uid, splitQuote, message.body!!.type)
-        if (binding.context.isNightModeEnabled()) binding.toggleQuoteButtonTheme(isThemeTheSameMap[message.uid]!!)
+    private fun ThreadViewHolder.toggleBodyAndQuoteTheme(message: Message) = with(binding) {
+        val isThemeTheSame = isThemeTheSameMap[message.uid]!!
+        bodyWebView.toggleWebViewTheme(isThemeTheSame)
+        fullMessageWebView.toggleWebViewTheme(isThemeTheSame)
+        toggleQuoteButtonTheme(isThemeTheSame)
     }
 
     private fun ThreadViewHolder.loadBodyAndQuote(message: Message) {

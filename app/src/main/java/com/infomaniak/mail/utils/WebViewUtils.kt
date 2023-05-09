@@ -21,6 +21,10 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.webkit.JavascriptInterface
 import android.webkit.WebSettings
+import android.webkit.WebView
+import androidx.webkit.WebSettingsCompat
+import androidx.webkit.WebViewFeature
+import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomDarkMode
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getFixStyleScript
@@ -102,6 +106,31 @@ class WebViewUtils(context: Context) {
 
             loadWithOverviewMode = true
             useWideViewPort = true
+        }
+
+        fun WebView.toggleWebViewTheme(isThemeTheSame: Boolean) {
+            if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
+                WebSettingsCompat.setAlgorithmicDarkeningAllowed(settings, isThemeTheSame)
+            }
+
+            if (isThemeTheSame) addBackgroundJs() else removeBackgroundJs()
+        }
+
+        private fun WebView.addBackgroundJs() {
+            val css = context.readRawResource(R.raw.custom_dark_mode)
+            evaluateJavascript(
+                """ var style = document.createElement('style')
+                document.head.appendChild(style)
+                style.id = "$DARK_BACKGROUND_STYLE_ID"
+                style.innerHTML = `$css`
+            """.trimIndent(),
+                null,
+            )
+        }
+
+        private fun WebView.removeBackgroundJs() {
+            val removeBackgroundStyleScript = "document.getElementById(\"$DARK_BACKGROUND_STYLE_ID\").remove()"
+            evaluateJavascript(removeBackgroundStyleScript, null)
         }
     }
 }
