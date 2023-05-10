@@ -81,18 +81,7 @@ class MessageWebViewClient(
         return true
     }
 
-    // override fun onPageCommitVisible(webView: WebView, url: String?) {
-    //     webView.loadUrl("javascript:normalizeAllMessageWidths()")
-    //     super.onPageCommitVisible(webView, url)
-    // }
-    //
-    // override fun onPageStarted(webView: WebView, url: String?, favicon: Bitmap?) {
-    //     webView.loadUrl("javascript:normalizeAllMessageWidths()")
-    //     super.onPageStarted(webView, url, favicon)
-    // }
-
     override fun onPageFinished(webView: WebView, url: String?) {
-        // TODO : Try WebView.postVisualStateCallback
         webView.loadUrl("javascript:removeAllProperties(); normalizeMessageWidth(${webView.width.toDp()}, '$messageUid')")
         super.onPageFinished(webView, url)
     }

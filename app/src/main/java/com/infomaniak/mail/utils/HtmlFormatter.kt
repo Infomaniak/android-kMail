@@ -147,11 +147,6 @@ class HtmlFormatter(private val html: String) {
             listOf(PRIMARY_COLOR_CODE to getAttributeColor(RMaterial.attr.colorPrimary)),
         )
 
-        // TODO : Remove
-        private fun computeScreenWidthInDp() = with(Resources.getSystem().displayMetrics) {
-            widthPixels / density
-        }.roundToInt()
-
         fun Context.getResizeScript(): String {
             val customVariables = listOf(
                 "MESSAGE_SELECTOR" to "#$KMAIL_MESSAGE_ID",
