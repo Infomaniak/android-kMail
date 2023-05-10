@@ -1,3 +1,21 @@
+/*
+ * Infomaniak kMail - Android
+ * Copyright (C) 2023 Infomaniak Network SA
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 // MESSAGE_SELECTOR = "#kmail-message-content";
 const PREFERENCES = {
     normalizeMessageWidths: true,
@@ -11,7 +29,7 @@ const PREFERENCES = {
 /**
  * Normalize the width of the mail displayed
  * @param webViewWidth Width of the webview
- * @param messageUid Id the mail displayed
+ * @param messageUid Id of the displayed mail
  */
 function normalizeMessageWidth(webViewWidth, messageUid) {
     // We want to report any thrown error that our script may encounter
@@ -29,11 +47,11 @@ function normalizeMessageWidth(webViewWidth, messageUid) {
  * This method is idempotent.
  * @param elements DOM elements to normalize
  * @param webViewWidth Width of the webview
- * @param messageUid Id the mail displayed
+ * @param messageUid Id of the displayed mail
  */
 function normalizeElementWidths(elements, webViewWidth, messageUid) {
     const documentWidth = document.body.offsetWidth;
-    logInfo(`Starts to normalize elements. Document width: ${documentWidth}.`);
+    logInfo(`Starts to normalize elements. Document width: ${documentWidth}. WebView width: ${webViewWidth}.`);
 
     for (const element of elements) {
         logInfo(`Current element: ${elementDebugName(element)}.`);
