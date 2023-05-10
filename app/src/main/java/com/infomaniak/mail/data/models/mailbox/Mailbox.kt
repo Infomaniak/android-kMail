@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.models.mailbox
 
 import androidx.core.app.NotificationManagerCompat
+import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Quotas
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
@@ -34,7 +35,7 @@ class Mailbox : RealmObject {
     @SerialName("mailbox")
     var mailboxName: String = ""
     @SerialName("mailbox_id")
-    var mailboxId: Int = -1
+    var mailboxId: Int = AppSettings.DEFAULT_ID
     @SerialName("hosting_id")
     var hostingId: Int = 0
     @SerialName("link_id")
@@ -48,7 +49,7 @@ class Mailbox : RealmObject {
     @PrimaryKey
     var objectId: String = ""
     @Transient
-    var userId: Int = -1
+    var userId: Int = AppSettings.DEFAULT_ID
     @Transient
     var quotas: Quotas? = null
     @Transient
