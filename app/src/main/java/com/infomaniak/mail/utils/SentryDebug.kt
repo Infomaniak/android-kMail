@@ -185,12 +185,13 @@ object SentryDebug {
         }
     }
 
-    fun sendJavaScriptError(errorName: String, errorMessage: String, messageUid: String) {
+    fun sendJavaScriptError(errorName: String, errorMessage: String, errorStack: String, messageUid: String) {
         Sentry.withScope { scope ->
             scope.level = SentryLevel.ERROR
             scope.setTag("messageUid", messageUid)
             scope.setExtra("errorName", errorName)
             scope.setExtra("errorMessage", errorMessage)
+            scope.setExtra("errorStack", errorStack)
             Sentry.captureMessage("JavaScript returned an error when displaying an email.")
         }
     }

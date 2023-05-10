@@ -19,7 +19,6 @@ package com.infomaniak.mail.utils
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import android.webkit.JavascriptInterface
 import android.webkit.WebSettings
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomDarkMode
@@ -54,18 +53,30 @@ class WebViewUtils(context: Context) {
     class JavascriptBridge {
         @JavascriptInterface
         fun reportOverScroll(clientWidth: Int, scrollWidth: Int, messageUid: String) {
-            Log.e("gibran", "reportOverScroll - clientWidth: ${clientWidth}")
-            Log.e("gibran", "reportOverScroll - scrollWidth: ${scrollWidth}")
-            Log.e("gibran", "reportOverScroll - messageUid: ${messageUid}")
             SentryDebug.sendOverScrolledMessage(clientWidth, scrollWidth, messageUid)
         }
 
         @JavascriptInterface
-        fun reportError(errorName: String, errorMessage: String, messageUid: String) {
-            Log.e("gibran", "reportError - errorName: ${errorName}")
-            Log.e("gibran", "reportError - errorMessage: ${errorMessage}")
-            Log.e("gibran", "reportOverScroll - messageUid: ${messageUid}")
-            SentryDebug.sendJavaScriptError(errorName, errorMessage, messageUid)
+        fun reportError(
+            errorName: String,
+            errorMessage: String,
+            errorStack: String,
+            scriptFirstLine: String,
+            messageUid: String
+        ) {
+            val correctErrorStack = fixStackTraceLineNumber(errorStack, scriptFirstLine)
+            SentryDebug.sendJavaScriptError(errorName, errorMessage, correctErrorStack, messageUid)
+        }
+
+        private fun fixStackTraceLineNumber(errorStack: String, scriptFirstLine: String): String {
+            var correctErrorStack = errorStack
+            val matches = "about:blank:([0-9]+):".toRegex().findAll(correctErrorStack)
+            matches.forEach { match ->
+                val lineNumber = match.groupValues[1]
+                val newLineNumber = lineNumber.toInt() - scriptFirstLine.toInt() + 1
+                correctErrorStack = correctErrorStack.replace(match.groupValues[0], "about:blank:$newLineNumber:")
+            }
+            return correctErrorStack
         }
     }
 

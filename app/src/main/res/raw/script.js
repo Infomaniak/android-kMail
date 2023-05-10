@@ -1,3 +1,5 @@
+const scriptFirstLine = new Error().stack.match(/(:[\d]+)/)[0].replace(':','') // Android only
+
 /*
  * Infomaniak kMail - Android
  * Copyright (C) 2023 Infomaniak Network SA
@@ -36,7 +38,7 @@ function normalizeMessageWidth(webViewWidth, messageUid) {
     try {
         normalizeElementWidths(document.querySelectorAll(MESSAGE_SELECTOR), webViewWidth, messageUid);
     } catch (error) {
-        reportError(error, messageUid);
+        reportError(error, scriptFirstLine, messageUid); // Android only has a `scriptFirstLine` argument
     }
     return true;
 }
