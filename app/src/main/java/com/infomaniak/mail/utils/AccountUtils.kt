@@ -21,6 +21,7 @@ import android.app.NotificationManager
 import android.content.Context
 import android.util.Log
 import androidx.work.WorkManager
+import com.google.firebase.messaging.FirebaseMessaging
 import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.auth.CredentialManager
 import com.infomaniak.lib.core.auth.TokenAuthenticator
@@ -147,7 +148,10 @@ object AccountUtils : CredentialManager() {
         localSettings.removeRegisteredFirebaseUser(userId = user.id)
 
         if (user.id == currentUserId) {
-            if (getAllUsersCount() == 0) resetSettings(context, localSettings)
+            if (getAllUsersCount() == 0) {
+                resetSettings(context, localSettings)
+                FirebaseMessaging.getInstance().deleteToken()
+            }
             reloadApp?.invoke()
         }
     }
