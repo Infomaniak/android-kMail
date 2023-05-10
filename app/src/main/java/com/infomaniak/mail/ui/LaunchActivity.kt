@@ -34,6 +34,7 @@ import com.infomaniak.mail.ui.login.LoginActivityArgs
 import com.infomaniak.mail.ui.main.thread.ThreadFragmentArgs
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SentryDebug
+import com.infomaniak.mail.utils.resetLastAppClosing
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -90,6 +91,7 @@ class LaunchActivity : AppCompatActivity() {
             destinationClass = MainActivity::class.java,
             primaryColor = localSettings.accentColor.getPrimary(this)
         )
+        application.resetLastAppClosing()
     }
 
     private fun loginUser() {

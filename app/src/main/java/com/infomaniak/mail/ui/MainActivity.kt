@@ -32,8 +32,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
-import com.infomaniak.lib.applock.LockActivity
-import com.infomaniak.lib.applock.Utils.isKeyguardSecure
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.networking.LiveDataNetworkStatus
 import com.infomaniak.lib.stores.checkUpdateIsAvailable
@@ -43,7 +41,6 @@ import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.checkPlayServices
-import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.firebase.RegisterFirebaseBroadcastReceiver
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
@@ -56,7 +53,6 @@ import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.launch
-import java.util.Date
 
 @AndroidEntryPoint
 class MainActivity : ThemedActivity() {
@@ -65,7 +61,6 @@ class MainActivity : ThemedActivity() {
     val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private val mainViewModel: MainViewModel by viewModels()
 
-    private val localSettings by lazy { LocalSettings.getInstance(this) }
     private val permissionUtils by lazy { PermissionUtils(this).also(::registerMainPermissions) }
 
     private val backgroundColor: Int by lazy { getColor(R.color.backgroundColor) }
@@ -76,8 +71,6 @@ class MainActivity : ThemedActivity() {
     private val navController by lazy {
         (supportFragmentManager.findFragmentById(R.id.hostFragment) as NavHostFragment).navController
     }
-
-    private var lastAppClosing = Date()
 
     private val drawerListener = object : DrawerLayout.DrawerListener {
 
@@ -149,10 +142,6 @@ class MainActivity : ThemedActivity() {
         super.onResume()
         checkPlayServices()
 
-        if (isKeyguardSecure() && localSettings.isAppLocked) {
-            LockActivity.lockAfterTimeout(lastAppClosing, this, this::class.java, localSettings.accentColor.getPrimary(this))
-        }
-
         if (binding.drawerLayout.isOpen) colorSystemBarsWithMenuDrawer()
     }
 
@@ -181,11 +170,6 @@ class MainActivity : ThemedActivity() {
                 else -> popBack()
             }
         }
-    }
-
-    override fun onPause() {
-        lastAppClosing = Date()
-        super.onPause()
     }
 
     override fun onDestroy() {
