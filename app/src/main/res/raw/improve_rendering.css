@@ -1,0 +1,18 @@
+body {
+    overflow-wrap: break-word;
+}
+
+pre {
+    word-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+table.munged {
+    width: auto !important;
+    table-layout: auto !important;
+}
+
+td.munged {
+    width: auto !important;
+    white-space: normal !important;
+}

@@ -18,14 +18,12 @@
 package com.infomaniak.mail.utils
 
 import android.content.Context
-import android.content.res.Resources
 import androidx.annotation.RawRes
 import com.infomaniak.html.cleaner.HtmlSanitizer
 import com.infomaniak.mail.R
 import okhttp3.internal.toHexString
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
-import kotlin.math.roundToInt
 import com.google.android.material.R as RMaterial
 
 class HtmlFormatter(private val html: String) {
@@ -140,19 +138,17 @@ class HtmlFormatter(private val html: String) {
 
         fun Context.getCustomDarkMode(): String = loadCss(R.raw.custom_dark_mode)
 
-        fun Context.getSetMargin(): String = loadCss(R.raw.set_margin_around_mail)
+        fun Context.getImproveRenderingStyle(): String = loadCss(R.raw.improve_rendering)
 
         fun Context.getCustomStyle(): String = loadCss(
-            R.raw.custom_style,
+            R.raw.style,
             listOf(PRIMARY_COLOR_CODE to getAttributeColor(RMaterial.attr.colorPrimary)),
         )
 
-        fun Context.getResizeScript(): String {
-            val customVariables = listOf(
-                "MESSAGE_SELECTOR" to "#$KMAIL_MESSAGE_ID",
-            )
-            return loadScript(R.raw.script, customVariables)
-        }
+        fun Context.getResizeScript(): String = loadScript(
+            R.raw.munge_email,
+            listOf("MESSAGE_SELECTOR" to "#$KMAIL_MESSAGE_ID")
+        )
 
         fun Context.getFixStyleScript(): String {
             return loadScript(R.raw.fix_email_style)

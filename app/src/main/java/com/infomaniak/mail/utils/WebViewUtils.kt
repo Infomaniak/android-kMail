@@ -24,14 +24,14 @@ import android.webkit.WebSettings
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomDarkMode
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getFixStyleScript
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getImproveRenderingStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getJsBridgeScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getResizeScript
-import com.infomaniak.mail.utils.HtmlFormatter.Companion.getSetMargin
 
 class WebViewUtils(context: Context) {
 
     private val customDarkMode by lazy { context.getCustomDarkMode() }
-    private val setMargin by lazy { context.getSetMargin() }
+    private val improveRenderingStyle by lazy { context.getImproveRenderingStyle() }
     private val customStyle by lazy { context.getCustomStyle() }
 
     private val resizeScript by lazy { context.getResizeScript() }
@@ -40,7 +40,7 @@ class WebViewUtils(context: Context) {
 
     fun processHtmlForDisplay(html: String, isDisplayedInDarkMode: Boolean): String = with(HtmlFormatter(html)) {
         if (isDisplayedInDarkMode) registerCss(customDarkMode, DARK_BACKGROUND_STYLE_ID)
-        registerCss(setMargin)
+        registerCss(improveRenderingStyle)
         registerCss(customStyle)
         registerMetaViewPort()
         registerScript(resizeScript)

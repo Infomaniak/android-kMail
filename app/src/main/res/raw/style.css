@@ -1,9 +1,11 @@
-body {
-    overflow-wrap: break-word;
+html {
+    margin: 0;
+    padding: 0;
 }
 
-pre {
-    word-wrap: break-word; white-space: pre-wrap;
+body {
+    margin: 16px;
+    padding: 0;
 }
 
 blockquote {
@@ -16,14 +18,4 @@ blockquote {
 blockquote blockquote blockquote blockquote {
     padding: 0 !important;
     border: none !important;
-}
-
-table.munged {
-    width: auto !important;
-    table-layout: auto !important;
-}
-
-td.munged {
-    width: auto !important;
-    white-space: normal !important;
 }
