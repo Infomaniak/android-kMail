@@ -68,6 +68,8 @@ class Folder : RealmObject {
     var messages: RealmList<Message> = realmListOf()
     @Transient
     var shouldGetHistory: Boolean = true
+    @Transient
+    var isHistoryComplete: Boolean = false
     // TODO: Remove this before going into production
     @Transient
     @Suppress("PropertyName")
