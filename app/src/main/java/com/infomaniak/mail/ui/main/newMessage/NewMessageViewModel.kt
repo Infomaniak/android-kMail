@@ -24,6 +24,7 @@ import android.net.Uri
 import androidx.core.net.toUri
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.utils.SingleLiveEvent
+import com.infomaniak.lib.core.utils.getFileNameAndSize
 import com.infomaniak.lib.core.utils.guessMimeType
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.MatomoMail.trackSendingDraftEvent
@@ -321,7 +322,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     private fun importAttachment(uri: Uri, availableSpace: Long): Pair<Attachment?, Boolean>? {
-        val (fileName, fileSize) = uri.getFileNameAndSize(context) ?: return null
+        val (fileName, fileSize) = context.getFileNameAndSize(uri) ?: return null
         if (fileSize > availableSpace) return null to true
 
         return LocalStorageUtils.saveUploadAttachment(context, uri, fileName, draft.localUuid)
