@@ -21,12 +21,14 @@ import android.content.Intent
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.infomaniak.mail.ApplicationMain
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
+import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.utils.AccountUtils
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -54,6 +56,11 @@ class KMailFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onMessageReceived(message: RemoteMessage) {
         Log.i(TAG, "onMessageReceived: ${message.data}")
+
+        if (AccountUtils.currentUserId == AppSettings.DEFAULT_ID) {
+            FirebaseMessaging.getInstance().deleteToken()
+            return
+        }
 
         val userId = message.data["user_id"]?.toInt() ?: return
         val mailboxId = message.data["mailbox_id"]?.toInt() ?: return

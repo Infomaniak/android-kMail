@@ -30,6 +30,7 @@ import com.infomaniak.mail.MatomoMail.ACTION_POSTPONE_NAME
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.databinding.ActivityNewMessageBinding
 import com.infomaniak.mail.ui.LaunchActivity
@@ -70,7 +71,7 @@ class NewMessageActivity : ThemedActivity() {
     }
 
     private fun isAuth(): Boolean {
-        if (AccountUtils.currentUserId == -1) {
+        if (AccountUtils.currentUserId == AppSettings.DEFAULT_ID) {
             startActivity(Intent(this, LaunchActivity::class.java))
             return false
         }
