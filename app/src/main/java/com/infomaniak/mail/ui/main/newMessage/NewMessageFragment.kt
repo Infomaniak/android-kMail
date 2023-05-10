@@ -45,10 +45,13 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
+import com.infomaniak.lib.applock.LockActivity
+import com.infomaniak.lib.applock.Utils.isKeyguardSecure
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition.INLINE
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -88,6 +91,8 @@ class NewMessageFragment : Fragment() {
     private var mailboxes = emptyList<Mailbox>()
     private var selectedMailboxIndex = 0
     private var lastFieldToTakeFocus: FieldType? = TO
+
+    private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
 
     @Inject
     lateinit var draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler
@@ -160,6 +165,7 @@ class NewMessageFragment : Fragment() {
             if (isSuccess) {
                 hideLoader()
                 showKeyboardInCorrectView()
+                lockIfExternalMailDataStartedApp()
                 populateViewModelWithExternalMailData()
                 populateUiWithViewModel()
             } else requireActivity().apply {
@@ -331,6 +337,18 @@ class NewMessageFragment : Fragment() {
             Intent.ACTION_SEND -> handleSingleSendIntent()
             Intent.ACTION_SEND_MULTIPLE -> handleMultipleSendIntent()
             Intent.ACTION_VIEW, Intent.ACTION_SENDTO -> handleMailTo()
+        }
+    }
+
+    private fun lockIfExternalMailDataStartedApp() {
+        val shouldLock = !(requireActivity() as NewMessageActivity).hasLocked
+        if (shouldLock && requireContext().isKeyguardSecure() && localSettings.isAppLocked) {
+            LockActivity.startAppLockActivity(
+                context = requireContext(),
+                destinationClass = NewMessageActivity::class.java,
+                primaryColor = localSettings.accentColor.getPrimary(requireContext()),
+                shouldStartActivity = false,
+            )
         }
     }
 

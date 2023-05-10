@@ -20,6 +20,7 @@ package com.infomaniak.mail.utils
 import android.animation.Animator
 import android.animation.ValueAnimator
 import android.app.Activity
+import android.app.Application
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -60,6 +61,7 @@ import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.login.InfomaniakLogin
+import com.infomaniak.mail.ApplicationMain
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.OPEN_FROM_DRAFT_NAME
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
@@ -493,4 +495,8 @@ private fun Context.changeToolbarColorOnScroll(
             otherUpdates?.invoke(color)
         }
     }
+}
+
+fun Application.resetLastAppClosing() {
+    (this as ApplicationMain).lastAppClosing = null
 }

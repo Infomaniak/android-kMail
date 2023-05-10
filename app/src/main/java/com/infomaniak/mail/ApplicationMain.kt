@@ -63,6 +63,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.matomo.sdk.Tracker
+import java.util.Date
 import java.util.UUID
 import javax.inject.Inject
 
@@ -72,6 +73,8 @@ open class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycle
     val matomoTracker: Tracker by lazy { buildTracker() }
     var isAppInBackground = true
         private set
+
+    var lastAppClosing: Date? = null
 
     @Inject
     lateinit var syncMailboxesWorkerScheduler: SyncMailboxesWorker.Scheduler
@@ -103,6 +106,7 @@ open class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycle
     }
 
     override fun onStop(owner: LifecycleOwner) {
+        lastAppClosing = Date()
         isAppInBackground = true
         owner.lifecycleScope.launch { syncMailboxesWorkerScheduler.scheduleWorkIfNeeded() }
     }
