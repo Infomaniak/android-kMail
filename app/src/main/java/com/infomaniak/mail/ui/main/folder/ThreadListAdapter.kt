@@ -81,6 +81,7 @@ class ThreadListAdapter(
 
     private var swipingIsAuthorized: Boolean = true
     private var displaySeeAllButton = false // TODO: Manage this for intelligent mailbox
+    private var isLoadMoreDisplayed = false
 
     var onThreadClicked: ((thread: Thread) -> Unit)? = null
     var onFlushClicked: ((dialogTitle: String) -> Unit)? = null
@@ -411,13 +412,7 @@ class ThreadListAdapter(
     override fun createDiffUtil(oldList: List<Any>, newList: List<Any>): DragDropSwipeDiffCallback<Any>? = null
 
     override fun updateList(itemList: List<Thread>) {
-        dataSet = formatList(
-            itemList,
-            recyclerView.context,
-            folderRole,
-            threadDensity,
-            shouldAddLoadMoreButton = onLoadMoreClicked != null,
-        )
+        dataSet = formatList(itemList, recyclerView.context, folderRole, threadDensity, isLoadMoreDisplayed)
     }
 
     fun updateContacts(newContacts: Map<String, Map<String, MergedContact>>) {
@@ -431,6 +426,21 @@ class ThreadListAdapter(
 
     fun updateSelection() {
         notifyItemRangeChanged(0, itemCount, NotificationType.SELECTED_STATE)
+    }
+
+    fun updateLoadMore(isHistoryComplete: Boolean) {
+
+        isLoadMoreDisplayed = !isHistoryComplete
+
+        if (isHistoryComplete) {
+            if (dataSet.isNotEmpty() && dataSet.last() is Unit) {
+                dataSet = dataSet.toMutableList().apply { removeIf { it is Unit } }
+            }
+        } else {
+            if (dataSet.isEmpty() || dataSet.last() !is Unit) {
+                dataSet = dataSet.toMutableList().apply { add(Unit) }
+            }
+        }
     }
 
     private enum class DisplayType(val layout: Int) {
@@ -460,7 +470,7 @@ class ThreadListAdapter(
             context: Context,
             folderRole: FolderRole?,
             threadDensity: ThreadDensity,
-            shouldAddLoadMoreButton: Boolean,
+            isLoadMoreDisplayed: Boolean,
         ) = mutableListOf<Any>().apply {
 
             if ((folderRole == FolderRole.TRASH || folderRole == FolderRole.SPAM) && threads.isNotEmpty()) {
@@ -484,7 +494,7 @@ class ThreadListAdapter(
                 }
             }
 
-            if (shouldAddLoadMoreButton) add(Unit)
+            if (isLoadMoreDisplayed) add(Unit)
         }
 
         fun Thread.getSectionTitle(context: Context): String = with(date.toDate()) {

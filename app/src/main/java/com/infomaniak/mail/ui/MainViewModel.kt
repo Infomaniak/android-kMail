@@ -51,7 +51,6 @@ import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.NotificationUtils.cancelNotification
-import com.infomaniak.mail.utils.SharedViewModelUtils.fetchFolderMessagesJob
 import com.infomaniak.mail.utils.SharedViewModelUtils.refreshFolders
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -71,7 +70,7 @@ class MainViewModel @Inject constructor(
     private inline val context: Context get() = getApplication()
 
     val isInternetAvailable = SingleLiveEvent<Boolean>()
-    val isDownloadingChanges = MutableLiveData(false)
+    val isDownloadingChanges: MutableLiveData<Pair<Boolean, Boolean?>> = MutableLiveData(false to null)
     val isNewFolderCreated = SingleLiveEvent<Boolean>()
 
     // Explanation of this Map : Map<Email, Map<Name, MergedContact>>
@@ -309,9 +308,10 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun getOneBatchOfOldMessages() = viewModelScope.launch(Dispatchers.IO) {
-        fetchFolderMessagesJob?.cancel()
-        fetchFolderMessagesJob = launch {
+    fun getOneBatchOfOldMessages() {
+        refreshThreadsJob?.cancel()
+        refreshThreadsJob = viewModelScope.launch(Dispatchers.IO) {
+            isDownloadingChanges.postValue(true to null)
             runCatching {
                 MessageController.getOneBatchOfOldMessages(
                     folder = currentFolder.value!!,
@@ -319,8 +319,8 @@ class MainViewModel @Inject constructor(
                     scope = this,
                 )
             }
+            isDownloadingChanges.postValue(false to FolderController.getFolder(currentFolderId!!)?.isHistoryComplete)
         }
-        fetchFolderMessagesJob?.join()
     }
 
     private fun updateAddressBooks() {
@@ -360,9 +360,9 @@ class MainViewModel @Inject constructor(
         if (mailbox == null || folderId == null) return@launch
 
         FolderController.getFolder(folderId)?.let { folder ->
-            isDownloadingChanges.postValue(true)
+            isDownloadingChanges.postValue(true to null)
             runCatching { MessageController.fetchCurrentFolderMessages(mailbox, folder) }
-            isDownloadingChanges.postValue(false)
+            isDownloadingChanges.postValue(false to FolderController.getFolder(folderId)?.isHistoryComplete)
         }
     }
 

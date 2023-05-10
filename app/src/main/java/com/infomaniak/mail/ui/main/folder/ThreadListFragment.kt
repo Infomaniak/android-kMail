@@ -398,8 +398,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             }
             waitingBeforeNotifyAdapter = isRecoveringFinished
             afterUpdateAdapter = { threads ->
-                if (firstMessageHasChanged(threads)) scrollToTop()
-
+                if (firstThreadHasChanged(threads)) scrollToTop()
                 if (mainViewModel.currentFilter.value == ThreadFilter.UNSEEN && threads.isEmpty()) {
                     mainViewModel.currentFilter.value = ThreadFilter.ALL
                 }
@@ -408,12 +407,13 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun observeDownloadState() {
-        mainViewModel.isDownloadingChanges.observe(viewLifecycleOwner) { isDownloading ->
+        mainViewModel.isDownloadingChanges.observe(viewLifecycleOwner) { (isDownloading, isHistoryComplete) ->
             if (isDownloading) {
                 showLoadingTimer.start()
             } else {
                 showLoadingTimer.cancel()
                 binding.swipeRefreshLayout.isRefreshing = false
+                isHistoryComplete?.let(threadListAdapter::updateLoadMore)
             }
         }
     }
