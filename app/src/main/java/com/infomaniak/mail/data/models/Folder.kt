@@ -28,6 +28,7 @@ import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.utils.Utils
 import io.realm.kotlin.ext.backlinks
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.RealmInstant
@@ -66,6 +67,10 @@ class Folder : RealmObject {
     var threads: RealmList<Thread> = realmListOf()
     @Transient
     var messages: RealmList<Message> = realmListOf()
+    @Transient
+    var remainingOldMessagesToFetch: Int = Utils.NUMBER_OF_OLD_MESSAGES_TO_FETCH
+    @Transient
+    var isHistoryComplete: Boolean = false
     // TODO: Remove this before going into production
     @Transient
     @Suppress("PropertyName")
@@ -84,12 +89,16 @@ class Folder : RealmObject {
         unreadCount: Int,
         threads: RealmList<Thread>,
         messages: RealmList<Message>,
+        remainingOldMessagesToFetch: Int,
+        isHistoryComplete: Boolean,
     ) {
         this.lastUpdatedAt = lastUpdatedAt
         this.cursor = cursor
         this.unreadCount = unreadCount
         this.threads.addAll(threads)
         this.messages.addAll(messages)
+        this.remainingOldMessagesToFetch = remainingOldMessagesToFetch
+        this.isHistoryComplete = isHistoryComplete
     }
 
     fun getLocalizedName(context: Context): String {

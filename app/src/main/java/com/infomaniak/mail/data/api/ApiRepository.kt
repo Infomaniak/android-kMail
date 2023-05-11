@@ -186,9 +186,14 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.starMessages(mailboxUuid, star), POST, mapOf("uids" to messageIds))
     }
 
-    fun getMessagesUids(mailboxUuid: String, folderId: String, okHttpClient: OkHttpClient?): ApiResponse<GetMessagesUidsResult> {
+    fun getMessagesUids(
+        mailboxUuid: String,
+        folderId: String,
+        offsetUid: String?,
+        okHttpClient: OkHttpClient?,
+    ): ApiResponse<GetMessagesUidsResult> {
         return callApi(
-            url = ApiRoutes.getMessagesUids(mailboxUuid, folderId),
+            url = ApiRoutes.getMessagesUids(mailboxUuid, folderId, offsetUid),
             method = GET,
             okHttpClient = okHttpClient ?: HttpClient.okHttpClient,
         )

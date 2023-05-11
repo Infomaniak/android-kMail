@@ -95,8 +95,11 @@ object ApiRoutes {
         return "${message(mailboxUuid, folderId, shortUid)}/blacklist"
     }
 
-    fun getMessagesUids(mailboxUuid: String, folderId: String): String {
-        return "${getMessages(mailboxUuid, folderId)}/messages_uids?messages=${Utils.NUMBER_OF_OLD_MESSAGES_TO_FETCH}"
+    fun getMessagesUids(mailboxUuid: String, folderId: String, offsetUid: String?): String {
+        val endpoint = "${getMessages(mailboxUuid, folderId)}/messages-uids"
+        val messages = "?messages=${Utils.PAGE_SIZE}"
+        val offset = offsetUid?.let { "&uid_offset=$it" } ?: ""
+        return "${endpoint}${messages}${offset}"
     }
 
     fun getMessagesUidsDelta(mailboxUuid: String, folderId: String, cursor: String): String {
