@@ -328,7 +328,7 @@ class NewMessageFragment : Fragment() {
     private fun WebView.loadContent(html: String) {
         settings.setupNewMessageWebViewSettings()
 
-        val processedHtml = webViewUtils.processHtml(html, context.isNightModeEnabled())
+        val processedHtml = webViewUtils.processHtmlForDisplay(html, context.isNightModeEnabled())
         loadDataWithBaseURL("", processedHtml, ClipDescription.MIMETYPE_TEXT_HTML, Utils.UTF_8, "")
     }
 

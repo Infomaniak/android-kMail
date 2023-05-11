@@ -197,7 +197,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
 
     private fun WebView.processMailDisplay(styledBody: String, uid: String): String {
         val isDisplayedInDark = context.isNightModeEnabled() && isThemeTheSameMap[uid] == true
-        return webViewUtils.processHtml(styledBody, isDisplayedInDark)
+        return webViewUtils.processHtmlForDisplay(styledBody, isDisplayedInDark)
     }
 
     private fun WebView.setupZoomListeners() {

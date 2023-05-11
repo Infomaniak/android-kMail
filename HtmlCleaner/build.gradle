@@ -1,0 +1,29 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+android {
+    namespace 'com.infomaniak.html.cleaner'
+    compileSdk rootProject.ext.compileSdk
+
+    defaultConfig {
+        minSdk rootProject.ext.minSdk
+        targetSdk rootProject.ext.targetSdk
+    }
+
+    compileOptions {
+        sourceCompatibility rootProject.ext.javaVersion
+        targetCompatibility rootProject.ext.javaVersion
+    }
+
+    kotlinOptions { jvmTarget = rootProject.ext.javaVersion }
+
+    flavorDimensions 'distribution'
+    productFlavors {
+        standard
+        fdroid
+    }
+}
+
+dependencies {
+    api libs.jsoup
+}

@@ -22,6 +22,7 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.webkit.WebView
 import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.annotation.FloatRange
@@ -102,6 +103,8 @@ class MainActivity : ThemedActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
+
         setContentView(binding.root)
         handleOnBackPressed()
 

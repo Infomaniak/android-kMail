@@ -29,7 +29,7 @@ class WebViewUtils(context: Context) {
     private val setMargin by lazy { context.getSetMargin() }
     private val customStyle by lazy { context.getCustomStyle() }
 
-    fun processHtml(html: String, isDisplayedInDarkMode: Boolean): String = with(HtmlFormatter(html)) {
+    fun processHtmlForDisplay(html: String, isDisplayedInDarkMode: Boolean): String = with(HtmlFormatter(html)) {
         if (isDisplayedInDarkMode) registerCss(customDarkMode, DARK_BACKGROUND_STYLE_ID)
         registerCss(setMargin)
         registerCss(customStyle)

@@ -19,6 +19,7 @@ package com.infomaniak.mail.utils
 
 import android.content.Context
 import androidx.annotation.RawRes
+import com.infomaniak.html.cleaner.HtmlSanitizer
 import com.infomaniak.mail.R
 import okhttp3.internal.toHexString
 import org.jsoup.Jsoup
@@ -26,7 +27,6 @@ import org.jsoup.nodes.Element
 import com.google.android.material.R as RMaterial
 
 class HtmlFormatter(private val html: String) {
-
     private val cssList = mutableListOf<Pair<String, String?>>()
     private var needsMetaViewport = false
 
@@ -38,7 +38,7 @@ class HtmlFormatter(private val html: String) {
         needsMetaViewport = true
     }
 
-    fun inject(): String = with(Jsoup.parse(html)) {
+    fun inject(): String = with(HtmlSanitizer.getInstance().sanitize(Jsoup.parse(html))) {
         head().apply {
             injectCss()
             injectMetaViewPort()
