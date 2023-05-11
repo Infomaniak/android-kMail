@@ -20,6 +20,12 @@ package com.infomaniak.mail
 import android.content.Context
 import androidx.fragment.app.FragmentActivity
 
-fun FragmentActivity.checkPlayServices() = Unit
+object GplayUtils {
 
-fun Context.isGooglePlayServicesNotAvailable(): Boolean = true
+    fun FragmentActivity.checkPlayServices() = Unit
+
+    fun Context.isGooglePlayServicesNotAvailable(): Boolean = true
+
+    fun deleteFirebaseToken() = Unit
+
+}

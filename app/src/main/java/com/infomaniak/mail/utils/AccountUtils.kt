@@ -21,7 +21,6 @@ import android.app.NotificationManager
 import android.content.Context
 import android.util.Log
 import androidx.work.WorkManager
-import com.google.firebase.messaging.FirebaseMessaging
 import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.auth.CredentialManager
 import com.infomaniak.lib.core.auth.TokenAuthenticator
@@ -29,6 +28,7 @@ import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.networking.HttpClient.okHttpClient
 import com.infomaniak.lib.core.room.UserDatabase
+import com.infomaniak.mail.GplayUtils
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
@@ -150,7 +150,7 @@ object AccountUtils : CredentialManager() {
         if (user.id == currentUserId) {
             if (getAllUsersCount() == 0) {
                 resetSettings(context, localSettings)
-                FirebaseMessaging.getInstance().deleteToken()
+                GplayUtils.deleteFirebaseToken()
             }
             reloadApp?.invoke()
         }

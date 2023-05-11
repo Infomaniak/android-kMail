@@ -21,10 +21,10 @@ import android.content.Intent
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.infomaniak.mail.ApplicationMain
+import com.infomaniak.mail.GplayUtils
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
@@ -58,7 +58,7 @@ class KMailFirebaseMessagingService : FirebaseMessagingService() {
         Log.i(TAG, "onMessageReceived: ${message.data}")
 
         if (AccountUtils.currentUserId == AppSettings.DEFAULT_ID) {
-            FirebaseMessaging.getInstance().deleteToken()
+            GplayUtils.deleteFirebaseToken()
             return
         }
 
