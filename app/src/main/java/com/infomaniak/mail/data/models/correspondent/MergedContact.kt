@@ -21,6 +21,7 @@ import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.Ignore
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Transient
 
 @Parcelize
 @Suppress("PROPERTY_WONT_BE_SERIALIZED")
@@ -30,6 +31,11 @@ class MergedContact : RealmObject, Correspondent {
     override var email: String = ""
     override var name: String = ""
     var avatar: String? = null
+
+    // TODO: Remove this before going into production
+    @Transient
+    @Suppress("PropertyName")
+    var _forceClearAllDatabasesBecauseWeRemoveMergedContactWithoutEmail: String = "fake_variable_to_automatically_clean_Realm_DB"
 
     @delegate:Ignore
     override val initials by lazy { computeInitials() }
