@@ -235,7 +235,14 @@ object MessageController {
         } ?: return emptyList()
         scope.ensureActive()
 
-        impactedCurrentFolderThreads += realm.handleMessagesUids(scope, uids, folder, mailbox, okHttpClient, previousCursor)
+        impactedCurrentFolderThreads += realm.handleMessagesUids(scope, uids, folder, mailbox, okHttpClient).also {
+            realm.writeBlocking {
+                findLatest(folder)?.let {
+                    SentryDebug.sendOrphanMessages(previousCursor, folder = it)
+                    SentryDebug.sendOrphanThreads(previousCursor, folder = it, realm = this)
+                }
+            }
+        }
 
         if (folder.remainingOldMessagesToFetch > 0) {
             impactedCurrentFolderThreads += fetchOldMessages(folder, realm, mailbox, okHttpClient, scope)
@@ -326,31 +333,19 @@ object MessageController {
         folder: Folder,
         mailbox: Mailbox,
         okHttpClient: OkHttpClient?,
-        previousCursor: String? = null,
         shouldUpdateCursor: Boolean = true,
-    ): List<Thread> {
-        return writeBlocking {
-            handleMessagesUids(scope, uids, folder, mailbox, okHttpClient, shouldUpdateCursor).also {
-                findLatest(folder)?.let {
-                    SentryDebug.sendOrphanMessages(previousCursor, folder = it)
-                    SentryDebug.sendOrphanThreads(previousCursor, folder = it, realm = this)
-                }
-            }
-        }
-    }
-
-    private fun MutableRealm.handleMessagesUids(
-        scope: CoroutineScope,
-        uids: MessagesUids,
-        folder: Folder,
-        mailbox: Mailbox,
-        okHttpClient: OkHttpClient?,
-        shouldUpdateCursor: Boolean,
     ): List<Thread> {
 
         val logMessage =
             "Added: ${uids.addedShortUids.count()} | Deleted: ${uids.deletedUids.count()} | Updated: ${uids.updatedMessages.count()}"
         Log.i("API", "$logMessage | ${folder.name}")
+
+        val impactedFoldersIds = writeBlocking {
+            mutableSetOf<String>().apply {
+                addAll(handleDeletedUids(scope, uids.deletedUids))
+                addAll(handleUpdatedUids(scope, uids.updatedMessages, folder.id))
+            }
+        }
 
         val impactedThreads = if (uids.addedShortUids.isEmpty()) {
             emptyList()
@@ -365,28 +360,26 @@ object MessageController {
             )
         }
 
-        val impactedFoldersIds = mutableSetOf<String>().apply {
-            addAll(handleDeletedUids(scope, uids.deletedUids))
-            addAll(handleUpdatedUids(scope, uids.updatedMessages, folder.id))
+        return writeBlocking {
+
+            val impactedCurrentFolderThreads = impactedThreads.filter { it.folderId == folder.id }
+            impactedFoldersIds += impactedThreads.map { it.folderId } + folder.id
+
+            impactedFoldersIds.forEach { folderId ->
+                FolderController.refreshUnreadCount(folderId, mailbox.objectId, realm = this)
+            }
+            scope.ensureActive()
+
+            FolderController.getFolder(folder.id, realm = this)?.let {
+                it.lastUpdatedAt = Date().toRealmInstant()
+                if (shouldUpdateCursor) it.cursor = uids.cursor
+            }
+
+            return@writeBlocking impactedCurrentFolderThreads
         }
-
-        val impactedCurrentFolderThreads = impactedThreads.filter { it.folderId == folder.id }
-        impactedFoldersIds += impactedThreads.map { it.folderId } + folder.id
-
-        impactedFoldersIds.forEach { folderId ->
-            FolderController.refreshUnreadCount(folderId, mailbox.objectId, realm = this)
-        }
-        scope.ensureActive()
-
-        findLatest(folder)?.let {
-            it.lastUpdatedAt = Date().toRealmInstant()
-            if (shouldUpdateCursor) it.cursor = uids.cursor
-        }
-
-        return impactedCurrentFolderThreads
     }
 
-    private fun MutableRealm.handleAddedUids(
+    private fun Realm.handleAddedUids(
         scope: CoroutineScope,
         messagesUids: MessagesUids,
         folder: Folder,
@@ -413,10 +406,12 @@ object MessageController {
 
             apiResponse.data?.messages?.let { messages ->
 
-                findLatest(folder)?.let { latestFolder ->
-                    val threads = createMultiMessagesThreads(scope, messages, latestFolder)
-                    Log.d("Realm", "Saved Messages: ${latestFolder.name} | ${latestFolder.messages.count()}")
-                    impactedThreads.addAll(threads)
+                writeBlocking {
+                    findLatest(folder)?.let { latestFolder ->
+                        val threads = createMultiMessagesThreads(scope, messages, latestFolder)
+                        Log.d("Realm", "Saved Messages: ${latestFolder.name} | ${latestFolder.messages.count()}")
+                        impactedThreads.addAll(threads)
+                    }
                 }
 
                 SentryDebug.addThreadsAlgoBreadcrumb(
