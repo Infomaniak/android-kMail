@@ -110,7 +110,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
                     isThemeTheSameMap[message.uid] = !isThemeTheSameMap[message.uid]!!
                     holder.toggleBodyAndQuoteTheme(message)
                 }
-                NotificationType.RERENDER -> holder.loadBodyAndQuote(message)
+                NotificationType.RERENDER -> holder.loadBodyAndQuote(message) // TODO : Try to undo js script and recall the method to fix rendering
             }
         } else {
             super.onBindViewHolder(holder, position, payloads)
@@ -127,7 +127,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
 
         displayExpandedCollapsedMessage(message, shouldTrack = false)
 
-        bindMessage(message)
+        bindQuoteButton(message)
     }
 
     private fun initMapForNewMessage(message: Message, position: Int) {
@@ -429,7 +429,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
         return listOf(*to.toTypedArray(), *cc.toTypedArray(), *bcc.toTypedArray()).joinToString { it.displayedName(context) }
     }
 
-    private fun ThreadViewHolder.bindMessage(message: Message) = with(binding) {
+    private fun ThreadViewHolder.bindQuoteButton(message: Message) = with(binding) {
         quoteButton.setOnClickListener {
             val textId = if (fullMessageWebView.isVisible) R.string.messageShowQuotedText else R.string.messageHideQuotedText
             quoteButton.text = context.getString(textId)
@@ -492,8 +492,8 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
 
         fun initWebViewClientIfNeeded(message: Message) = with(binding) {
             if (doesWebViewNeedInit) {
-                bodyWebView.initWebViewClient(message.attachments, message.uid)
-                fullMessageWebView.initWebViewClient(message.attachments, message.uid)
+                bodyWebView.initWebViewClientAndBridge(message.attachments, message.uid)
+                fullMessageWebView.initWebViewClientAndBridge(message.attachments, message.uid)
                 doesWebViewNeedInit = false
             }
         }

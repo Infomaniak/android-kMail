@@ -30,10 +30,7 @@ import android.util.Patterns
 import android.view.View
 import android.view.Window
 import android.webkit.WebView
-import androidx.annotation.AttrRes
-import androidx.annotation.ColorRes
-import androidx.annotation.IdRes
-import androidx.annotation.StringRes
+import androidx.annotation.*
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.NestedScrollView
@@ -156,7 +153,7 @@ fun Context.formatSubject(subject: String?): String {
     }
 }
 
-fun Context.readRawResource(resId: Int): String = Scanner(resources.openRawResource(resId)).useDelimiter("\\A").next()
+fun Context.readRawResource(@RawRes resId: Int): String = Scanner(resources.openRawResource(resId)).useDelimiter("\\A").next()
 
 fun LottieAnimationView.repeatFrame(firstFrame: Int, lastFrame: Int) {
     addAnimatorListener(object : Animator.AnimatorListener {
@@ -181,7 +178,7 @@ fun LottieAnimationView.changePathColor(illuColors: IlluColors) {
     }
 }
 
-fun WebView.initWebViewClient(attachments: List<Attachment>, messageUid: String) {
+fun WebView.initWebViewClientAndBridge(attachments: List<Attachment>, messageUid: String) {
     val cidDictionary = mutableMapOf<String, Attachment>()
     attachments.forEach {
         if (it.contentId?.isNotBlank() == true) cidDictionary[it.contentId as String] = it

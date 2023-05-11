@@ -181,7 +181,7 @@ object SentryDebug {
             scope.setTag("messageUid", messageUid)
             scope.setExtra("clientWidth", "$clientWidth")
             scope.setExtra("scrollWidth", "$scrollWidth")
-            Sentry.captureMessage("After zooming the mail it can still scroll.")
+            Sentry.captureMessage("When resizing the mail with js, after zooming, it can still scroll.")
         }
     }
 

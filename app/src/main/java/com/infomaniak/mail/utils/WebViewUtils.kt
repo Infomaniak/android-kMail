@@ -82,7 +82,7 @@ class WebViewUtils(context: Context) {
 
     companion object {
         private const val DARK_BACKGROUND_STYLE_ID = "dark_background_style"
-        val jsBridge = JavascriptBridge()
+        val jsBridge = JavascriptBridge() // TODO : Avoid excessive memory consumption with injection
 
         fun WebSettings.setupThreadWebViewSettings() {
             @SuppressLint("SetJavaScriptEnabled")
