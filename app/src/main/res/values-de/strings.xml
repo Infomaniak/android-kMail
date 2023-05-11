@@ -127,6 +127,7 @@
     <string name="contentDescriptionButtonDelete">%s löschen</string>
     <string name="contentDescriptionButtonDeleteDraft">Entwurf löschen</string>
     <string name="contentDescriptionButtonDeleteHistory">Historieneintrag löschen</string>
+    <string name="contentDescriptionButtonDeleteQuote">Zitierte Nachrichten löschen</string>
     <string name="contentDescriptionButtonDeleteSignature">Unterschrift löschen</string>
     <string name="contentDescriptionButtonExpandAccountSelection">Kontoauswahl erweitern</string>
     <string name="contentDescriptionButtonExpandCustomFolders">Erweitern von benutzerdefinierten Ordnern</string>
@@ -324,11 +325,11 @@
     <string name="snackbarMessageMoved">Nachricht an %s verschoben</string>
     <string name="snackbarMoveCancelled">Umzug abgesagt</string>
     <string name="snackbarReportPhishingConfirmation">Erfolgreich gemeldet</string>
+    <string name="snackbarRestorationLaunched">Starten der Wiederherstellung</string>
     <plurals name="snackbarSenderBlacklisted">
         <item quantity="one">Absender erfolgreich auf die schwarze Liste gesetzt</item>
         <item quantity="other">Erfolgreich auf die schwarze Liste gesetzte Absender</item>
     </plurals>
-    <string name="snackbarRestorationLaunched">Wiederherstellung erfolgreich abgeschlossen</string>
     <plurals name="snackbarThreadDeletedPermanently">
         <item quantity="one">Konversation gelöscht</item>
         <item quantity="other">Konversationen gelöscht</item>
