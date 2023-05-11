@@ -32,4 +32,16 @@ class HtmlSanitizer {
         headCleaner.clean(dirtyDocument, cleanedDocument)
         return cleanedDocument
     }
+
+    companion object {
+        @Volatile
+        private var INSTANCE: HtmlSanitizer? = null
+
+        fun getInstance(): HtmlSanitizer {
+            return INSTANCE ?: synchronized(this) {
+                INSTANCE?.let { return it }
+                HtmlSanitizer().also { INSTANCE = it }
+            }
+        }
+    }
 }

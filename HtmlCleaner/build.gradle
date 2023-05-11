@@ -3,11 +3,11 @@ apply plugin: 'kotlin-android'
 
 android {
     namespace 'com.infomaniak.html.cleaner'
-    compileSdk rootProject.ext.coreTargetSdk
+    compileSdk rootProject.ext.compileSdk
 
     defaultConfig {
-        minSdk rootProject.ext.coreMinSdk
-        targetSdk rootProject.ext.coreTargetSdk
+        minSdk rootProject.ext.minSdk
+        targetSdk rootProject.ext.targetSdk
     }
 
     compileOptions {

@@ -38,7 +38,7 @@ class HtmlFormatter(private val html: String) {
         needsMetaViewport = true
     }
 
-    fun inject(): String = with(htmlSanitizer.sanitize(Jsoup.parse(html))) {
+    fun inject(): String = with(HtmlSanitizer.getInstance().sanitize(Jsoup.parse(html))) {
         head().apply {
             injectCss()
             injectMetaViewPort()
@@ -65,8 +65,6 @@ class HtmlFormatter(private val html: String) {
 
     companion object {
         private const val PRIMARY_COLOR_CODE = "--kmail-primary-color"
-
-        private val htmlSanitizer = HtmlSanitizer()
 
         private fun Context.loadCss(@RawRes cssResId: Int, customColors: List<Pair<String, Int>> = emptyList()): String {
             var css = readRawResource(cssResId)
