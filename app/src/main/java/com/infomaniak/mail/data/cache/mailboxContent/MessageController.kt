@@ -301,7 +301,7 @@ object MessageController {
         if (shortUids.isNotEmpty()) {
 
             var pageStart = 0
-            val pageSize = ApiRepository.PER_PAGE
+            val pageSize = Utils.PAGE_SIZE
             val uids = getUniquesUidsWithNewestFirst(folder, shortUids)
 
             while (pageStart < uids.count()) {
