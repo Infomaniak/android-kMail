@@ -54,6 +54,8 @@
 
     <color name="yellow_light">#FFC10A</color>
     <color name="yellow_dark">#FFDF9E</color>
+    <color name="mango_light">#FF9802</color>
+    <color name="mango_dark">#FFC166</color>
     <color name="orange_light">#FF8500</color>
     <color name="orange_dark">#FFAA4C</color>
     <color name="coral_light">#EF5803</color>
@@ -72,12 +74,21 @@
     <color name="azur_dark">#A3DAFF</color>
     <color name="tropical_light">#00BCD4</color>
     <color name="tropical_dark">#86DEEA</color>
+    <color name="grey_blue_light">#607D8B</color>
+    <color name="grey_blue_dark">#A5B7C0</color>
     <color name="app_blue_light">#85A2B6</color>
     <color name="app_blue_dark">#AFC2CF</color>
     <color name="mauve_light">#BA68C8</color>
     <color name="mauve_dark">#CC8FD6</color>
+    <color name="violet_light">#9C26B0</color>
+    <color name="violet_dark">#CD68DE</color>
     <color name="prince_light">#673AB7</color>
     <color name="prince_dark">#956DDD</color>
+
+    <color name="calendar_light">#36D0EB</color>
+    <color name="calendar_dark">#A2E9F6</color>
+    <color name="contacts_light">#9D66E1</color>
+    <color name="contacts_dark">#C8AAEE</color>
 
     <!-- Backgrounds -->
     <color name="searchBarBackgroundColor">@color/polar_bear</color>
@@ -134,6 +145,23 @@
     <color name="swipeQuickActionMenu">@color/app_blue_light</color>
     <color name="swipeInbox">@color/shark</color>
     <color name="swipeNone">@color/shark</color>
+
+    <!-- File types -->
+    <color name="file_media">@color/tropical_light</color>
+    <color name="file_audio">@color/file_media</color>
+    <color name="file_image">@color/file_media</color>
+    <color name="file_video">@color/file_media</color>
+
+    <color name="file_zip">@color/grey_blue_light</color>
+    <color name="file_calendar">@color/calendar_light</color>
+    <color name="file_code">@color/prince_light</color>
+    <color name="file_font">@color/violet_light</color>
+    <color name="file_pdf">@color/coral_light</color>
+    <color name="file_points">@color/mango_light</color>
+    <color name="file_sheet">@color/grass_light</color>
+    <color name="file_text">@color/jean_light</color>
+    <color name="file_vcard">@color/contacts_light</color>
+    <color name="file_unknown">@color/app_blue_light</color>
 
     <!-- Onboarding illustration colors -->
     <array name="pinkColors">

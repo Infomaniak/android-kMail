@@ -22,11 +22,11 @@ import android.content.Intent
 import androidx.annotation.DrawableRes
 import androidx.core.content.FileProvider
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
-import com.infomaniak.lib.core.utils.contains
 import com.infomaniak.lib.core.utils.guessMimeType
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.AttachmentMimeTypeUtils
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.Utils.MIMETYPE_UNKNOWN
 import io.realm.kotlin.types.EmbeddedRealmObject
@@ -72,16 +72,7 @@ class Attachment : EmbeddedRealmObject {
         this.uploadLocalUri = uri
     }
 
-    fun getFileTypeFromMimeType(): AttachmentType = when (safeMimeType) {
-        in Regex("application/(zip|rar|x-tar|.*compressed|.*archive)") -> AttachmentType.ARCHIVE
-        in Regex("audio/") -> AttachmentType.AUDIO
-        in Regex("image/") -> AttachmentType.IMAGE
-        in Regex("/pdf") -> AttachmentType.PDF
-        in Regex("spreadsheet|excel|comma-separated-values") -> AttachmentType.SPREADSHEET
-        in Regex("document|text/plain|msword") -> AttachmentType.TEXT
-        in Regex("video/") -> AttachmentType.VIDEO
-        else -> AttachmentType.UNKNOWN
-    }
+    fun getFileTypeFromMimeType(): AttachmentType = AttachmentMimeTypeUtils.getFileTypeFromMimeType(safeMimeType)
 
     fun hasUsableCache(
         context: Context, cacheFile: File? = null,
@@ -132,14 +123,16 @@ class Attachment : EmbeddedRealmObject {
     enum class AttachmentType(@DrawableRes val icon: Int) {
         ARCHIVE(R.drawable.ic_file_zip),
         AUDIO(R.drawable.ic_file_audio),
+        CALENDAR(R.drawable.ic_file_calendar),
+        CODE(R.drawable.ic_file_code),
+        FONT(R.drawable.ic_file_font),
         IMAGE(R.drawable.ic_file_image),
         PDF(R.drawable.ic_file_pdf),
+        POINTS(R.drawable.ic_file_office_graph),
         SPREADSHEET(R.drawable.ic_file_office_sheet),
         TEXT(R.drawable.ic_file_text),
+        VCARD(R.drawable.ic_file_vcard),
         VIDEO(R.drawable.ic_file_video),
         UNKNOWN(R.drawable.ic_file_unknown),
-
-        BOOK(R.drawable.ic_file_single_neutral_book),
-        GRAPH(R.drawable.ic_file_office_graph),
     }
 }

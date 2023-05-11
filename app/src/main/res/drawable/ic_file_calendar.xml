@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<!--
   ~ Infomaniak kMail - Android
   ~ Copyright (C) 2023 Infomaniak Network SA
   ~
@@ -18,13 +18,11 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"
-    android:tint="@color/file_unknown"
+    android:tint="@color/file_calendar"
     android:viewportWidth="24"
     android:viewportHeight="24">
     <path
-        android:pathData="M21.207,4.5C21.395,4.687 21.5,4.942 21.5,5.207V22.5C21.5,22.765 21.395,23.02 21.207,23.207C21.02,23.395 20.765,23.5 20.5,23.5H3.5C3.235,23.5 2.98,23.395 2.793,23.207C2.605,23.02 2.5,22.765 2.5,22.5V1.5C2.5,1.235 2.605,0.98 2.793,0.793C2.98,0.605 3.235,0.5 3.5,0.5H16.793C17.058,0.5 17.313,0.605 17.5,0.793L21.207,4.5Z"
-        android:strokeWidth="1"
-        android:strokeColor="#9F9F9F"
-        android:strokeLineCap="round"
-        android:strokeLineJoin="round" />
+        android:fillColor="#000000"
+        android:fillType="evenOdd"
+        android:pathData="M7.002,2.417C7.002,2.187 6.816,2 6.586,2C6.355,2 6.169,2.187 6.169,2.417V3.667H3.252C2.562,3.667 2.002,4.226 2.002,4.917V20.75C2.002,21.44 2.562,22 3.252,22H20.752C21.443,22 22.002,21.44 22.002,20.75V4.917C22.002,4.226 21.443,3.667 20.752,3.667H17.836V2.417C17.836,2.187 17.649,2 17.419,2C17.189,2 17.002,2.187 17.002,2.417V3.667H7.002V2.417ZM21.169,7.833V4.917C21.169,4.687 20.982,4.5 20.752,4.5H17.836V6.583C17.836,6.813 17.649,7 17.419,7C17.189,7 17.002,6.813 17.002,6.583V4.5H7.002V6.583C7.002,6.813 6.816,7 6.586,7C6.355,7 6.169,6.813 6.169,6.583V4.5H3.252C3.022,4.5 2.836,4.687 2.836,4.917V7.833H21.169ZM2.836,8.667H21.169V20.75C21.169,20.98 20.982,21.167 20.752,21.167H3.252C3.022,21.167 2.836,20.98 2.836,20.75V8.667Z" />
 </vector>
