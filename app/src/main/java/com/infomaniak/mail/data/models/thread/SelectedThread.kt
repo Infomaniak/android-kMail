@@ -26,6 +26,7 @@ data class SelectedThread private constructor(
 
     constructor(thread: Thread) : this(thread.uid, thread.isFavorite, thread.unseenMessagesCount)
 
-    override fun equals(other: Any?): Boolean = other is SelectedThread && uid == other.uid
+    override fun equals(other: Any?) = other === this || (other is SelectedThread && other.uid == uid)
+
     override fun hashCode(): Int = uid.hashCode()
 }

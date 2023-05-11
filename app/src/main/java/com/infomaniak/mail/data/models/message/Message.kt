@@ -249,11 +249,7 @@ class Message : RealmObject {
 
     fun isOrphan(): Boolean = threads.isEmpty() && threadsDuplicatedIn.isEmpty()
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is Message || uid != other.uid) return false
-        return true
-    }
+    override fun equals(other: Any?) = other === this || (other is Message && other.uid == uid)
 
     override fun hashCode(): Int = uid.hashCode()
 }
