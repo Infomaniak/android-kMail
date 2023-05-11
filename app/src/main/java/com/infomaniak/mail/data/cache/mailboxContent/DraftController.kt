@@ -24,6 +24,7 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.fetchIncompleteMessages
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
+import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
@@ -146,7 +147,7 @@ object DraftController {
                     }
                 }
 
-                body += context.forwardQuote(previousMessage)
+                body += context.forwardQuote(previousMessage, attachments)
             }
             DraftMode.NEW_MAIL -> Unit
         }
@@ -165,7 +166,7 @@ object DraftController {
             document.select(CID_IMAGE_CSS_QUERY).forEach { element ->
                 val cid = element.attr(SRC_ATTRIBUTE).removePrefix(CID_PROTOCOL)
                 attachmentsMap[cid]?.let { name ->
-                    element.replaceWith(TextNode("<${name}>"))
+                    element.replaceWith(TextNode("<$name>"))
                 }
             }
             return@let document.outerHtml()
@@ -181,7 +182,7 @@ object DraftController {
         """.trimIndent()
     }
 
-    private fun Context.forwardQuote(message: Message): String {
+    private fun Context.forwardQuote(message: Message, attachmentsToForward: List<Attachment>): String {
 
         val messageForwardHeader = getString(R.string.messageForwardHeader)
         val fromTitle = getString(R.string.fromTitle)
@@ -189,7 +190,24 @@ object DraftController {
         val subjectTitle = getString(R.string.subjectTitle)
         val toTitle = getString(R.string.toTitle)
         val ccTitle = getString(R.string.ccTitle)
-        val previousBody = message.body?.value ?: ""
+
+        val previousBody = message.body?.value?.let(Jsoup::parse)?.let { document ->
+            val attachmentsMap = message.attachments.associate { oldAttachment ->
+                oldAttachment.contentId to attachmentsToForward.find { it.originalContentId == oldAttachment.contentId }?.contentId
+            }
+
+            document.select(CID_IMAGE_CSS_QUERY).forEach { element ->
+                element.attr(SRC_ATTRIBUTE).apply {
+                    val cid = removePrefix(CID_PROTOCOL)
+
+                    attachmentsMap[cid]?.let { newContentId ->
+                        element.attr(SRC_ATTRIBUTE, "$CID_PROTOCOL$newContentId")
+                    }
+                }
+            }
+
+            return@let document.outerHtml()
+        } ?: ""
 
         val ccList = if (message.cc.isNotEmpty()) {
             "<div>$ccTitle ${message.cc.joinToString { it.quotedDisplay() }}<br></div>"

@@ -183,10 +183,7 @@ fun LottieAnimationView.changePathColor(illuColors: IlluColors) {
 fun WebView.initWebViewClient(attachments: List<Attachment>) {
     val cidDictionary = mutableMapOf<String, Attachment>()
     attachments.forEach {
-        when {
-            it.originalContentId?.isNotBlank() == true -> cidDictionary[it.originalContentId as String] = it
-            it.contentId?.isNotBlank() == true -> cidDictionary[it.contentId as String] = it
-        }
+        if (it.contentId?.isNotBlank() == true) cidDictionary[it.contentId as String] = it
     }
     webViewClient = MessageWebViewClient(context, cidDictionary)
 }
