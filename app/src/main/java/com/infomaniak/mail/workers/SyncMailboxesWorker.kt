@@ -22,9 +22,9 @@ import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.*
 import androidx.work.PeriodicWorkRequest.Companion.MIN_PERIODIC_INTERVAL_MILLIS
+import com.infomaniak.mail.GplayUtils.isGooglePlayServicesNotAvailable
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
-import com.infomaniak.mail.isGooglePlayServicesNotAvailable
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.FetchMessagesManager
 import kotlinx.coroutines.Dispatchers
