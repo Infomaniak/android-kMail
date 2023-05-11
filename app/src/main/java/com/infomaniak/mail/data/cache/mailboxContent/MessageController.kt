@@ -217,7 +217,7 @@ object MessageController {
         return@withContext job.await()
     }
 
-    fun fetchFolderMessages(
+    suspend fun fetchFolderMessages(
         scope: CoroutineScope,
         mailbox: Mailbox,
         folder: Folder,
@@ -251,7 +251,7 @@ object MessageController {
         return impactedCurrentFolderThreads.toList()
     }
 
-    private fun fetchOldMessages(
+    private suspend fun fetchOldMessages(
         folder: Folder,
         realm: Realm,
         mailbox: Mailbox,
@@ -271,7 +271,7 @@ object MessageController {
         return impactedCurrentFolderThreads
     }
 
-    private fun getOneBatchOfOldMessages(
+    private suspend fun getOneBatchOfOldMessages(
         folder: Folder,
         mailbox: Mailbox,
         scope: CoroutineScope,
@@ -327,7 +327,7 @@ object MessageController {
         return newCount to impactedCurrentFolderThreads
     }
 
-    private fun Realm.handleMessagesUids(
+    private suspend fun Realm.handleMessagesUids(
         scope: CoroutineScope,
         uids: MessagesUids,
         folder: Folder,
@@ -379,7 +379,7 @@ object MessageController {
         }
     }
 
-    private fun Realm.handleAddedUids(
+    private suspend fun Realm.handleAddedUids(
         scope: CoroutineScope,
         messagesUids: MessagesUids,
         folder: Folder,
@@ -400,7 +400,9 @@ object MessageController {
             val pageEnd = min(pageStart + pageSize, uids.count())
             val page = uids.subList(pageStart, pageEnd)
 
+            val before = System.currentTimeMillis()
             val apiResponse = ApiRepository.getMessagesByUids(mailboxUuid, folder.id, page, okHttpClient)
+            val after = System.currentTimeMillis()
             if (!apiResponse.isSuccess()) apiResponse.throwErrorAsException()
             scope.ensureActive()
 
@@ -412,6 +414,12 @@ object MessageController {
                         Log.d("Realm", "Saved Messages: ${latestFolder.name} | ${latestFolder.messages.count()}")
                         impactedThreads.addAll(threads)
                     }
+                }
+
+                val delay = Utils.MAX_DELAY_BETWEEN_API_CALLS - (after - before)
+                if (delay > 0L) {
+                    delay(delay)
+                    scope.ensureActive()
                 }
 
                 SentryDebug.addThreadsAlgoBreadcrumb(

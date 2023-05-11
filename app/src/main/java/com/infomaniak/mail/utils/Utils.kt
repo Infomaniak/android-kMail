@@ -31,4 +31,5 @@ object Utils {
     /** Beware: the API refuses a PAGE_SIZE bigger than 200. */
     const val PAGE_SIZE: Int = 50
     const val FIRST_MESSAGE_UID = "1"
+    const val MAX_DELAY_BETWEEN_API_CALLS = 500L
 }
