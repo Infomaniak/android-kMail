@@ -42,6 +42,8 @@ import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
+import org.jsoup.nodes.Element
 import org.jsoup.nodes.TextNode
 
 object DraftController {
@@ -161,14 +163,15 @@ object DraftController {
         val from = message.fromName(context = this)
         val messageReplyHeader = getString(R.string.messageReplyHeader, date, from)
 
-        val previousBody = message.body?.value?.let(Jsoup::parse)?.let { document ->
+        val previousBody = getHtmlDocument(message)?.let { document ->
             val attachmentsMap = message.attachments.associate { it.contentId to it.name }
-            document.select(CID_IMAGE_CSS_QUERY).forEach { element ->
-                val cid = element.attr(SRC_ATTRIBUTE).removePrefix(CID_PROTOCOL)
-                attachmentsMap[cid]?.let { name ->
-                    element.replaceWith(TextNode("<$name>"))
+
+            document.doOnHTMLImage { imageElement ->
+                attachmentsMap[getCid(imageElement)]?.let { name ->
+                    imageElement.replaceWith(TextNode("<$name>"))
                 }
             }
+
             return@let document.outerHtml()
         } ?: ""
 
@@ -191,18 +194,16 @@ object DraftController {
         val toTitle = getString(R.string.toTitle)
         val ccTitle = getString(R.string.ccTitle)
 
-        val previousBody = message.body?.value?.let(Jsoup::parse)?.let { document ->
+        val previousBody = getHtmlDocument(message)?.let { document ->
             val attachmentsMap = message.attachments.associate { oldAttachment ->
-                oldAttachment.contentId to attachmentsToForward.find { it.originalContentId == oldAttachment.contentId }?.contentId
+                val newAttachment = attachmentsToForward.find { it.originalContentId == oldAttachment.contentId }
+
+                oldAttachment.contentId to newAttachment?.contentId
             }
 
-            document.select(CID_IMAGE_CSS_QUERY).forEach { element ->
-                element.attr(SRC_ATTRIBUTE).apply {
-                    val cid = removePrefix(CID_PROTOCOL)
-
-                    attachmentsMap[cid]?.let { newContentId ->
-                        element.attr(SRC_ATTRIBUTE, "$CID_PROTOCOL$newContentId")
-                    }
+            document.doOnHTMLImage { imageElement ->
+                attachmentsMap[getCid(imageElement)]?.let { newContentId ->
+                    imageElement.attr(SRC_ATTRIBUTE, "$CID_PROTOCOL$newContentId")
                 }
             }
 
@@ -228,6 +229,14 @@ object DraftController {
             $previousBody
             </div>
         """.trimIndent()
+    }
+
+    private fun getHtmlDocument(message: Message) = message.body?.value?.let(Jsoup::parse)
+
+    private fun getCid(imageElement: Element) = imageElement.attr(SRC_ATTRIBUTE).removePrefix(CID_PROTOCOL)
+
+    private fun Document.doOnHTMLImage(actionOnImage: (Element) -> Unit) {
+        select(CID_IMAGE_CSS_QUERY).forEach { imageElement -> actionOnImage(imageElement) }
     }
 
     private fun Message.fromName(context: Context): String {
