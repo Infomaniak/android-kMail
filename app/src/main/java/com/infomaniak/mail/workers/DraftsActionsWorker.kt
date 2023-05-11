@@ -326,7 +326,7 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
         private const val TAG = "DraftsActionsWorker"
         private const val USER_ID_KEY = "userId"
         private const val MAILBOX_ID_KEY = "mailboxIdKey"
-		const val ERROR_MESSAGE_RESID_KEY = "errorMessageResIdKey"
+        const val ERROR_MESSAGE_RESID_KEY = "errorMessageResIdKey"
         // We add this delay because for now, it doesn't always work if we just use the `etop`.
         private const val REFRESH_DELAY = 2_000L
         private const val MAX_REFRESH_DELAY = 6_000L

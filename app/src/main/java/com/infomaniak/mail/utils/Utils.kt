@@ -26,4 +26,8 @@ object Utils {
     const val TEXT_PLAIN: String = "text/plain"
     /** The MIME type for data whose type is otherwise unknown. */
     const val MIMETYPE_UNKNOWN = "application/octet-stream"
+
+    const val NUMBER_OF_OLD_MESSAGES_TO_FETCH = 500
+    /** Beware: the API refuses a PAGE_SIZE bigger than 200. */
+    const val PAGE_SIZE: Int = 50
 }

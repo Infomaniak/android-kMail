@@ -43,7 +43,7 @@ class Recipient : EmbeddedRealmObject, Correspondent {
 
     override fun toString(): String = "($email -> $name)"
 
-    override fun equals(other: Any?): Boolean = other is Recipient && other.email == email && other.name == name
+    override fun equals(other: Any?) = other === this || (other is Recipient && other.email == email && other.name == name)
 
     override fun hashCode(): Int {
         var result = email.hashCode()

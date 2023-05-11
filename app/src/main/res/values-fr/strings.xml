@@ -128,6 +128,7 @@
     <string name="contentDescriptionButtonDelete">Supprimer %s</string>
     <string name="contentDescriptionButtonDeleteDraft">Supprimer le brouillon</string>
     <string name="contentDescriptionButtonDeleteHistory">Supprimer l’entrée de l’historique</string>
+    <string name="contentDescriptionButtonDeleteQuote">Supprimer les messages cités</string>
     <string name="contentDescriptionButtonDeleteSignature">Supprimer la signature</string>
     <string name="contentDescriptionButtonExpandAccountSelection">Déplier la sélection de compte</string>
     <string name="contentDescriptionButtonExpandCustomFolders">Déplier les dossiers personnalisés</string>
@@ -327,12 +328,12 @@
     <string name="snackbarMessageMoved">Message déplacé vers %s</string>
     <string name="snackbarMoveCancelled">Déplacement annulé</string>
     <string name="snackbarReportPhishingConfirmation">Signalement effectué avec succès</string>
+    <string name="snackbarRestorationLaunched">Lancement de la restauration</string>
     <plurals name="snackbarSenderBlacklisted">
         <item quantity="one">Expéditeur blacklisté avec succès</item>
         <item quantity="other">Expéditeurs blacklistés avec succès</item>
         <item quantity="many">Expéditeurs blacklistés avec succès</item>
     </plurals>
-    <string name="snackbarRestorationLaunched">Restauration effectuée avec succès</string>
     <plurals name="snackbarThreadDeletedPermanently">
         <item quantity="one">Conversation supprimée</item>
         <item quantity="other">Conversations supprimées</item>

@@ -134,6 +134,7 @@
     <string name="contentDescriptionButtonDelete">Delete %s</string>
     <string name="contentDescriptionButtonDeleteDraft">Delete draft</string>
     <string name="contentDescriptionButtonDeleteHistory">Delete history entry</string>
+    <string name="contentDescriptionButtonDeleteQuote">Delete quoted messages</string>
     <string name="contentDescriptionButtonDeleteSignature">Delete signature</string>
     <string name="contentDescriptionButtonExpandAccountSelection">Expand account selection</string>
     <string name="contentDescriptionButtonExpandCustomFolders">Expand custom folders</string>
@@ -331,11 +332,11 @@
     <string name="snackbarMessageMoved">Message moved to %s</string>
     <string name="snackbarMoveCancelled">Move cancelled</string>
     <string name="snackbarReportPhishingConfirmation">Successfully reported</string>
+    <string name="snackbarRestorationLaunched">Launching the restoration</string>
     <plurals name="snackbarSenderBlacklisted">
         <item quantity="one">Sender successfully blacklisted</item>
         <item quantity="other">Senders successfully blacklisted</item>
     </plurals>
-    <string name="snackbarRestorationLaunched">Restoration successfully completed</string>
     <plurals name="snackbarThreadDeletedPermanently">
         <item quantity="one">Conversation deleted</item>
         <item quantity="other">Conversations deleted</item>

@@ -49,8 +49,6 @@ import okhttp3.Response
 
 object ApiRepository : ApiRepositoryCore() {
 
-    const val PER_PAGE = 50
-
     inline fun <reified T> callApi(
         url: String,
         method: ApiController.ApiMethod,
