@@ -91,7 +91,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private lateinit var threadListAdapter: ThreadListAdapter
     private var lastUpdatedDate: Date? = null
-    private var previousFirstMessageUid: String? = null
+    private var previousFirstThreadUid: String? = null
 
     @Inject
     lateinit var draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler
@@ -205,8 +205,11 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
 
         threadListAdapter.apply {
+
             stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
+
             onThreadClicked = { thread -> navigateToThread(thread, mainViewModel) }
+
             onFlushClicked = { dialogTitle ->
 
                 val trackerName = when {
@@ -248,7 +251,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         searchButton.setOnClickListener {
             safeNavigate(
-                ThreadListFragmentDirections.actionThreadListFragmentToSearchFragment(dummyFolderId = mainViewModel.currentFolderId!!)
+                ThreadListFragmentDirections.actionThreadListFragmentToSearchFragment(
+                    dummyFolderId = mainViewModel.currentFolderId!!,
+                )
             )
         }
 
@@ -397,7 +402,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             }
             waitingBeforeNotifyAdapter = isRecoveringFinished
             afterUpdateAdapter = { threads ->
-                if (firstMessageHasChanged(threads)) scrollToTop()
+                if (firstThreadHasChanged(threads)) scrollToTop()
 
                 if (mainViewModel.currentFilter.value == ThreadFilter.UNSEEN && threads.isEmpty()) {
                     mainViewModel.currentFilter.value = ThreadFilter.ALL
@@ -538,10 +543,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun firstMessageHasChanged(threads: List<Thread>): Boolean {
-        val firstMessageCustomUid = "${threads.firstOrNull()?.uid}_${AccountUtils.currentMailboxId}"
-        return (firstMessageCustomUid != previousFirstMessageUid).also {
-            previousFirstMessageUid = firstMessageCustomUid
+    private fun firstThreadHasChanged(threads: List<Thread>): Boolean {
+        val firstThreadCustomUid = "${threads.firstOrNull()?.uid}_${AccountUtils.currentMailboxId}"
+        return (firstThreadCustomUid != previousFirstThreadUid).also {
+            previousFirstThreadUid = firstThreadCustomUid
         }
     }
 
