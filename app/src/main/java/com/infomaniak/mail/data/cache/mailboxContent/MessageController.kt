@@ -416,6 +416,11 @@ object MessageController {
                     }
                 }
 
+                /**
+                 * Realm really doesn't like to be written on too frequently.
+                 * So we want to be sure that we don't write twice in less than 500 ms.
+                 * Appreciable side effect: it will also reduce the stress on the API.
+                 */
                 val delay = Utils.MAX_DELAY_BETWEEN_API_CALLS - (after - before)
                 if (delay > 0L) {
                     delay(delay)
