@@ -1,4 +1,4 @@
-const scriptFirstLine = new Error().stack.match(/(:[\d]+)/)[0].replace(':','') // Android only
+const scriptFirstLine = new RegExp(/:([\d]+)/).exec(Error().stack)[1] // Android only
 
 /*
  * Infomaniak kMail - Android
