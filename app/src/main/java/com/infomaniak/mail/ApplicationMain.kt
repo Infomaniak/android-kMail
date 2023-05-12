@@ -25,10 +25,12 @@ import android.os.Build
 import android.os.StrictMode
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.NotificationManagerCompat
+import androidx.hilt.work.HiltWorkerFactory
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import androidx.work.Configuration
 import androidx.work.WorkManager
 import coil.ImageLoader
 import coil.ImageLoaderFactory
@@ -68,13 +70,16 @@ import java.util.UUID
 import javax.inject.Inject
 
 @HiltAndroidApp
-open class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycleObserver {
+open class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycleObserver, Configuration.Provider {
 
     val matomoTracker: Tracker by lazy { buildTracker() }
     var isAppInBackground = true
         private set
 
     var lastAppClosing: Date? = null
+
+    @Inject
+    lateinit var workerFactory: HiltWorkerFactory
 
     @Inject
     lateinit var syncMailboxesWorkerScheduler: SyncMailboxesWorker.Scheduler
@@ -92,6 +97,12 @@ open class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycle
     @Inject
     @MainDispatcher
     lateinit var mainDispatcher: CoroutineDispatcher
+
+    override fun getWorkManagerConfiguration(): Configuration {
+        return Configuration.Builder()
+            .setWorkerFactory(workerFactory)
+            .build()
+    }
 
     override fun onCreate() {
         super<Application>.onCreate()

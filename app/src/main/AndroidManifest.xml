@@ -58,6 +58,18 @@
             android:name="io.sentry.dsn"
             android:value="https://4b2bbd041f5046ac84563d7e2af13b7b@sentry-mobile.infomaniak.com/4" />
 
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <!--Disable default WorkManagerInitializer for use Hilt injection -->
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
+        </provider>
+
         <activity
             android:name=".ui.LaunchActivity"
             android:configChanges="orientation|screenSize"
