@@ -29,9 +29,10 @@ import com.infomaniak.mail.workers.BaseCoroutineWorker
 import io.sentry.Sentry
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 @HiltWorker
-class RegisterUserDeviceWorker(
+class RegisterUserDeviceWorker @Inject constructor(
     appContext: Context,
     params: WorkerParameters,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
