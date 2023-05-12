@@ -16,7 +16,6 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
@@ -28,7 +27,6 @@
         android:layout_height="0dp"
         android:visibility="gone" />
 
-    <!-- TODO: Icon -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/loadMoreButton"
         style="@style/TextButton"
@@ -36,9 +34,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_margin="@dimen/marginStandardMedium"
-        android:text="@string/buttonLoadMore"
-        app:icon="@drawable/ic_update_logo"
-        app:iconPadding="@dimen/marginStandardSmall"
-        app:iconSize="@dimen/marginStandardMedium" />
+        android:text="@string/buttonLoadMore" />
 
 </LinearLayout>
