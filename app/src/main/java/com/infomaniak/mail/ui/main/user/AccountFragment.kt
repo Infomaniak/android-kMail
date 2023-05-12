@@ -30,13 +30,17 @@ import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentAccountBinding
+import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.menu.SwitchMailboxesAdapter
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.animatedNavigation
 import com.infomaniak.mail.utils.createDescriptionDialog
-import kotlinx.coroutines.Dispatchers
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class AccountFragment : Fragment() {
 
     private lateinit var binding: FragmentAccountBinding
@@ -45,6 +49,10 @@ class AccountFragment : Fragment() {
     private val logoutAlert by lazy { initLogoutAlert() }
 
     private var mailboxAdapter = SwitchMailboxesAdapter(isInMenuDrawer = false, lifecycleScope)
+
+    @Inject
+    @IoDispatcher
+    lateinit var ioDispatcher: CoroutineDispatcher
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentAccountBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -82,14 +90,14 @@ class AccountFragment : Fragment() {
         observeAccountsLive()
     }
 
-    private fun removeCurrentUser() = lifecycleScope.launch(Dispatchers.IO) {
+    private fun removeCurrentUser() = lifecycleScope.launch(ioDispatcher) {
         requireContext().trackAccountEvent("logOutConfirm")
         AccountUtils.removeUser(requireContext(), AccountUtils.currentUser!!)
     }
 
     private fun observeAccountsLive() = with(accountViewModel) {
         observeAccountsLive.observe(viewLifecycleOwner, mailboxAdapter::setMailboxes)
-        lifecycleScope.launch(Dispatchers.IO) { updateMailboxes() }
+        lifecycleScope.launch(ioDispatcher) { updateMailboxes() }
     }
 
     private fun initLogoutAlert() = createDescriptionDialog(

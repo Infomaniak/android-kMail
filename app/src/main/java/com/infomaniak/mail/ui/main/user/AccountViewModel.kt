@@ -23,13 +23,20 @@ import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.mailbox.MailboxLinkedResult
+import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
-import kotlinx.coroutines.Dispatchers
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class AccountViewModel(application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class AccountViewModel @Inject constructor(
+    application: Application,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+) : AndroidViewModel(application) {
 
-    private val coroutineContext = viewModelScope.coroutineContext + Dispatchers.IO
+    private val coroutineContext = viewModelScope.coroutineContext + ioDispatcher
 
     val observeAccountsLive = MailboxController.getMailboxesAsync(AccountUtils.currentUserId)
         .asLiveData(coroutineContext)
@@ -43,11 +50,11 @@ class AccountViewModel(application: Application) : AndroidViewModel(application)
     fun attachNewMailbox(
         address: String,
         password: String,
-    ): LiveData<ApiResponse<MailboxLinkedResult>> = liveData(Dispatchers.IO) {
+    ): LiveData<ApiResponse<MailboxLinkedResult>> = liveData(ioDispatcher) {
         emit(ApiRepository.addNewMailbox(address, password))
     }
 
-    fun switchToNewMailbox(newMailboxId: Int) = viewModelScope.launch(Dispatchers.IO) {
+    fun switchToNewMailbox(newMailboxId: Int) = viewModelScope.launch(ioDispatcher) {
         updateMailboxes()
         AccountUtils.switchToMailbox(newMailboxId)
     }
