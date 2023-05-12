@@ -310,7 +310,7 @@ object MessageController {
             shouldUpdateCursor = false,
         ).also {
             with(olderUids.addedShortUids) {
-                if (count() < Utils.PAGE_SIZE || contains(Utils.FIRST_MESSAGE_UID)) {
+                if (count() < Utils.PAGE_SIZE) {
                     saveCompletedHistory()
                     return 0 to it
                 }
