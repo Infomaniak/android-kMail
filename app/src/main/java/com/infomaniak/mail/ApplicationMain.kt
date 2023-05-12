@@ -44,6 +44,8 @@ import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.mail.MatomoMail.buildTracker
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.LaunchActivityArgs
 import com.infomaniak.mail.utils.AccountUtils
@@ -58,10 +60,7 @@ import io.sentry.android.core.SentryAndroid
 import io.sentry.android.core.SentryAndroidOptions
 import io.sentry.android.fragment.FragmentLifecycleIntegration
 import io.sentry.android.fragment.FragmentLifecycleState
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import org.matomo.sdk.Tracker
 import java.util.Date
 import java.util.UUID
@@ -84,6 +83,14 @@ open class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycle
 
     @Inject
     lateinit var workManager: WorkManager // Only used in the standard flavor
+
+    @Inject
+    @IoDispatcher
+    lateinit var ioDispatcher: CoroutineDispatcher
+
+    @Inject
+    @MainDispatcher
+    lateinit var mainDispatcher: CoroutineDispatcher
 
     override fun onCreate() {
         super<Application>.onCreate()
@@ -159,7 +166,7 @@ open class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycle
     }
 
     private fun configureAppReloading() {
-        AccountUtils.reloadApp = { withContext(Dispatchers.Main) { startActivity(getLaunchIntent()) } }
+        AccountUtils.reloadApp = { withContext(mainDispatcher) { startActivity(getLaunchIntent()) } }
     }
 
     private fun getLaunchIntent() = Intent(this, LaunchActivity::class.java).apply {
@@ -198,10 +205,10 @@ open class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycle
                 notificationManagerCompat.notify(UUID.randomUUID().hashCode(), build())
             }
         } else {
-            CoroutineScope(Dispatchers.Main).launch { showToast(notificationText) }
+            CoroutineScope(mainDispatcher).launch { showToast(notificationText) }
         }
 
-        CoroutineScope(Dispatchers.IO).launch { AccountUtils.removeUser(this@ApplicationMain, user) }
+        CoroutineScope(ioDispatcher).launch { AccountUtils.removeUser(this@ApplicationMain, user) }
     }
 
     private fun tokenInterceptorListener() = object : TokenInterceptorListener {
