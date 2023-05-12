@@ -21,12 +21,18 @@ import android.text.format.DateUtils
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
+import com.infomaniak.mail.di.IoDispatcher
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ThreadListViewModel : ViewModel() {
+@HiltViewModel
+class ThreadListViewModel @Inject constructor(
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+) : ViewModel() {
 
     private var updatedAtJob: Job? = null
 
@@ -38,7 +44,7 @@ class ThreadListViewModel : ViewModel() {
 
     fun startUpdatedAtJob() {
         updatedAtJob?.cancel()
-        updatedAtJob = viewModelScope.launch(Dispatchers.IO) {
+        updatedAtJob = viewModelScope.launch(ioDispatcher) {
             while (true) {
                 delay(DateUtils.MINUTE_IN_MILLIS)
                 updatedAtTrigger.postValue(Unit)
