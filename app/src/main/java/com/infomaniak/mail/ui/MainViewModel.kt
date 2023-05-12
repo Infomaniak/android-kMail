@@ -43,6 +43,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.SelectedThread
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
+import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.SnackBarManager
 import com.infomaniak.mail.ui.main.SnackBarManager.*
 import com.infomaniak.mail.ui.main.folder.ThreadListViewModel
@@ -65,6 +66,7 @@ import com.infomaniak.lib.core.R as RCore
 class MainViewModel @Inject constructor(
     application: Application,
     private val draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
     private inline val context: Context get() = getApplication()
@@ -95,7 +97,7 @@ class MainViewModel @Inject constructor(
 
     val toggleLightThemeForMessage = SingleLiveEvent<Message>()
 
-    private val coroutineContext = viewModelScope.coroutineContext + Dispatchers.IO
+    private val coroutineContext = viewModelScope.coroutineContext + ioDispatcher
     private var refreshThreadsJob: Job? = null
     private var refreshMailboxesAndFoldersJob: Job? = null
 
@@ -106,7 +108,7 @@ class MainViewModel @Inject constructor(
 
     val currentMailbox = _currentMailboxObjectId.mapLatest {
         it?.let(MailboxController::getMailbox)
-    }.asLiveData(Dispatchers.IO)
+    }.asLiveData(ioDispatcher)
 
     val currentFoldersLive = _currentMailboxObjectId.flatMapLatest {
         it?.let { FolderController.getRootsFoldersAsync().map { results -> results.list.getMenuFolders() } } ?: emptyFlow()
@@ -174,13 +176,13 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun updateUserInfo() = viewModelScope.launch(Dispatchers.IO) {
+    fun updateUserInfo() = viewModelScope.launch(ioDispatcher) {
         Log.d(TAG, "Update user info")
         updateAddressBooks()
         updateContacts()
     }
 
-    fun loadCurrentMailbox() = liveData(Dispatchers.IO) {
+    fun loadCurrentMailbox() = liveData(ioDispatcher) {
         loadCurrentMailboxFromLocal()
         loadCurrentMailboxFromRemote()
         emit(null)
@@ -279,7 +281,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun openFolder(folderId: String) = viewModelScope.launch(viewModelScope.handlerIO) {
+    fun openFolder(folderId: String) = viewModelScope.launch(ioDispatcher) {
         if (folderId == currentFolderId) return@launch
 
         if (currentFilter.value != ThreadFilter.ALL) currentFilter.postValue(ThreadFilter.ALL)
@@ -288,7 +290,7 @@ class MainViewModel @Inject constructor(
         refreshThreads(folderId = folderId)
     }
 
-    fun flushFolder() = viewModelScope.launch(Dispatchers.IO) {
+    fun flushFolder() = viewModelScope.launch(ioDispatcher) {
 
         val isSuccess = ApiRepository.flushFolder(
             mailboxUuid = currentMailbox.value?.uuid ?: return@launch,
@@ -304,7 +306,7 @@ class MainViewModel @Inject constructor(
 
     fun forceRefreshThreads() {
         refreshThreadsJob?.cancel()
-        refreshThreadsJob = viewModelScope.launch(viewModelScope.handlerIO) {
+        refreshThreadsJob = viewModelScope.launch(ioDispatcher) {
             Log.d(TAG, "Force refresh threads")
             refreshThreads()
         }
@@ -337,13 +339,13 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun observeMergedContactsLive() = viewModelScope.launch(Dispatchers.IO) {
+    fun observeMergedContactsLive() = viewModelScope.launch(ioDispatcher) {
         MergedContactController.getMergedContactsAsync().collect { contacts ->
             mergedContacts.postValue(arrangeMergedContacts(contacts.list.copyFromRealm()))
         }
     }
 
-    private fun updateSignatures(mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
+    private fun updateSignatures(mailbox: Mailbox) = viewModelScope.launch(ioDispatcher) {
         ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName).data?.signatures?.let(SignatureController::update)
     }
 
@@ -693,7 +695,7 @@ class MainViewModel @Inject constructor(
     //endregion
 
     //region Phishing
-    fun reportPhishing(threadUid: String, message: Message) = viewModelScope.launch(Dispatchers.IO) {
+    fun reportPhishing(threadUid: String, message: Message) = viewModelScope.launch(ioDispatcher) {
         val mailboxUuid = currentMailbox.value?.uuid!!
 
         val apiResponse = ApiRepository.reportPhishing(mailboxUuid, message.folderId, message.shortUid)
@@ -710,7 +712,7 @@ class MainViewModel @Inject constructor(
     //endregion
 
     //region BlockUser
-    fun blockUser(message: Message) = viewModelScope.launch(Dispatchers.IO) {
+    fun blockUser(message: Message) = viewModelScope.launch(ioDispatcher) {
         val mailboxUuid = currentMailbox.value?.uuid!!
 
         val apiResponse = ApiRepository.blockUser(mailboxUuid, message.folderId, message.shortUid)
@@ -756,9 +758,9 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun createNewFolder(name: String) = viewModelScope.launch(Dispatchers.IO) { createNewFolderSync(name) }
+    fun createNewFolder(name: String) = viewModelScope.launch(ioDispatcher) { createNewFolderSync(name) }
 
-    fun moveToNewFolder(name: String, threadsUids: Array<String>, messageUid: String?) = viewModelScope.launch(Dispatchers.IO) {
+    fun moveToNewFolder(name: String, threadsUids: Array<String>, messageUid: String?) = viewModelScope.launch(ioDispatcher) {
         val newFolderId = createNewFolderSync(name) ?: return@launch
         moveThreadsOrMessageTo(newFolderId, threadsUids, messageUid)
         isNewFolderCreated.postValue(true)
@@ -767,7 +769,7 @@ class MainViewModel @Inject constructor(
 
     private fun getActionThreads(threadsUids: List<String>): List<Thread> = threadsUids.mapNotNull(ThreadController::getThread)
 
-    fun addContact(recipient: Recipient) = viewModelScope.launch(Dispatchers.IO) {
+    fun addContact(recipient: Recipient) = viewModelScope.launch(ioDispatcher) {
 
         val isSuccess = ApiRepository.addContact(AddressBookController.getDefaultAddressBook().id, recipient).isSuccess()
 
