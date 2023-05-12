@@ -189,7 +189,7 @@ object ApiRepository : ApiRepositoryCore() {
     fun getMessagesUids(
         mailboxUuid: String,
         folderId: String,
-        offsetUid: String?,
+        offsetUid: Int?,
         okHttpClient: OkHttpClient?,
     ): ApiResponse<GetMessagesUidsResult> {
         return callApi(
@@ -215,11 +215,11 @@ object ApiRepository : ApiRepositoryCore() {
     fun getMessagesByUids(
         mailboxUuid: String,
         folderId: String,
-        messagesUids: List<String>,
+        uids: List<Int>,
         okHttpClient: OkHttpClient?,
     ): ApiResponse<GetMessagesByUidsResult> {
         return callApi(
-            url = ApiRoutes.getMessagesByUids(mailboxUuid, folderId, messagesUids),
+            url = ApiRoutes.getMessagesByUids(mailboxUuid, folderId, uids),
             method = GET,
             okHttpClient = okHttpClient ?: HttpClient.okHttpClient,
         )
@@ -229,11 +229,11 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(url = ApiRoutes.resource(undoResources), method = POST)
     }
 
-    fun reportPhishing(mailboxUuid: String, folderId: String, shortUid: String): ApiResponse<Boolean> {
+    fun reportPhishing(mailboxUuid: String, folderId: String, shortUid: Int): ApiResponse<Boolean> {
         return callApi(ApiRoutes.reportPhishing(mailboxUuid, folderId, shortUid), POST, mapOf("type" to "phishing"))
     }
 
-    fun blockUser(mailboxUuid: String, folderId: String, shortUid: String): ApiResponse<Boolean> {
+    fun blockUser(mailboxUuid: String, folderId: String, shortUid: Int): ApiResponse<Boolean> {
         return callApi(ApiRoutes.blockUser(mailboxUuid, folderId, shortUid), POST)
     }
 

@@ -23,7 +23,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class GetMessagesUidsResult(
     @SerialName("messages_uids")
-    val addedShortUids: List<String>,
+    val addedShortUids: List<Int>,
     @SerialName("signature")
     val cursor: String,
 )

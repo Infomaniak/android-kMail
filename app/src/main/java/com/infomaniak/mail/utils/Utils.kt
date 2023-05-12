@@ -30,6 +30,6 @@ object Utils {
     const val NUMBER_OF_OLD_MESSAGES_TO_FETCH = 500
     /** Beware: the API refuses a PAGE_SIZE bigger than 200. */
     const val PAGE_SIZE: Int = 50
-    const val FIRST_MESSAGE_UID = "1"
+    const val FIRST_MESSAGE_UID = 1
     const val MAX_DELAY_BETWEEN_API_CALLS = 500L
 }

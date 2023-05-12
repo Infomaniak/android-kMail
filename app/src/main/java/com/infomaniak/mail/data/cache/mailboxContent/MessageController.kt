@@ -58,7 +58,7 @@ object MessageController {
     //region Queries
     private fun getOldestMessageQuery(folderId: String, realm: TypedRealm): RealmSingleQuery<Message> {
         val byFolderId = "${Message::folderId.name} == '$folderId'"
-        return realm.query<Message>(byFolderId).sort(Message::shortUidAsInt.name).first()
+        return realm.query<Message>(byFolderId).sort(Message::shortUid.name).first()
     }
 
     private fun getMessageQuery(uid: String, realm: TypedRealm): RealmSingleQuery<Message> {
@@ -428,7 +428,7 @@ object MessageController {
                         "1_folderName" to folder.name,
                         "2_folderId" to folder.id,
                         "3_added" to shortUids,
-                        "4_deleted" to messagesUids.deletedUids.map { it.toShortUid() },
+                        "4_deleted" to messagesUids.deletedUids.map { "${it.toShortUid()}" },
                         "5_updated" to messagesUids.updatedMessages.map { it.shortUid },
                     ),
                 )
@@ -457,7 +457,7 @@ object MessageController {
             message.apply {
                 initMessageIds()
                 isSpam = folder.role == FolderRole.SPAM
-                shortUidAsInt = shortUid.toInt()
+                shortUid = uid.toShortUid()
             }
 
             val existingMessage = folder.messages.firstOrNull { it == message }
@@ -621,7 +621,7 @@ object MessageController {
         mailboxUuid: String,
         folderId: String,
         okHttpClient: OkHttpClient?,
-        offsetUid: String? = null,
+        offsetUid: Int? = null,
     ): MessagesUids? {
         val apiResponse = ApiRepository.getMessagesUids(mailboxUuid, folderId, offsetUid, okHttpClient)
         if (!apiResponse.isSuccess()) apiResponse.throwErrorAsException()
@@ -651,13 +651,13 @@ object MessageController {
         }
     }
 
-    private fun getOnlyNewUids(folder: Folder, remoteUids: List<String>): List<String> {
+    private fun getOnlyNewUids(folder: Folder, remoteUids: List<Int>): List<Int> {
         val localUids = folder.messages.map { it.shortUid }.toSet()
         return remoteUids.subtract(localUids).toList()
     }
 
     data class MessagesUids(
-        var addedShortUids: List<String> = emptyList(),
+        var addedShortUids: List<Int> = emptyList(),
         var deletedUids: List<String> = emptyList(),
         var updatedMessages: List<MessageFlags> = emptyList(),
         var cursor: String,

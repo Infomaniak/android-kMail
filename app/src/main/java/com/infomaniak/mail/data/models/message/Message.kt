@@ -111,7 +111,7 @@ class Message : RealmObject {
     @Transient
     var isFromSearch: Boolean = false
     @Transient
-    var shortUidAsInt: Int = -1
+    var shortUid: Int = -1
     //endregion
 
     //region UI data (Ignore & Transient)
@@ -145,7 +145,6 @@ class Message : RealmObject {
             }
         }
 
-    inline val shortUid get() = uid.toShortUid()
     inline val sender get() = from.first()
 
     val dkimStatus: MessageDKIM get() = enumValueOfOrNull<MessageDKIM>(_dkimStatus) ?: MessageDKIM.VALID
@@ -169,7 +168,7 @@ class Message : RealmObject {
         this.isSpam = isSpam
         this.date = date
         draftLocalUuid?.let { this.draftLocalUuid = it }
-        shortUidAsInt = shortUid.toInt()
+        shortUid = uid.toShortUid()
     }
 
     private inline fun <reified T : TypedRealmObject> RealmList<T>.detachedFromRealm(depth: UInt = UInt.MIN_VALUE): List<T> {
