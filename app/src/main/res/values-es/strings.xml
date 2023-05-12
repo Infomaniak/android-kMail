@@ -94,6 +94,7 @@
     <string name="buttonHyperlink">Añadir un hipervínculo</string>
     <string name="buttonImportEmails">Importar correos electrónicos</string>
     <string name="buttonItalic">Cursiva</string>
+    <string name="buttonLoadMore">Cargar más</string>
     <string name="buttonLogInDifferentAccount">Conectarse con otra cuenta</string>
     <string name="buttonLogin">Inicio de sesión</string>
     <string name="buttonMore">Más</string>

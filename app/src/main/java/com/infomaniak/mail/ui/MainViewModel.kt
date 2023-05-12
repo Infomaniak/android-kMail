@@ -310,6 +310,21 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    fun getOneBatchOfOldMessages() {
+        refreshThreadsJob?.cancel()
+        refreshThreadsJob = viewModelScope.launch(viewModelScope.handlerIO) {
+            isDownloadingChanges.postValue(true)
+            runCatching {
+                MessageController.getOneBatchOfOldMessages(
+                    folder = currentFolder.value!!,
+                    mailbox = currentMailbox.value!!,
+                    scope = this,
+                )
+            }
+            isDownloadingChanges.postValue(false)
+        }
+    }
+
     private fun updateAddressBooks() {
         ApiRepository.getAddressBooks().data?.addressBooks?.let(AddressBookController::update)
     }

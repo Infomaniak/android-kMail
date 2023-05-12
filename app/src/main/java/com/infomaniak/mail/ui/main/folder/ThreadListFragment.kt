@@ -230,6 +230,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                     },
                 ).show()
             }
+
+            onLoadMoreClicked = { mainViewModel.getOneBatchOfOldMessages() }
         }
     }
 
