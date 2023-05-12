@@ -44,6 +44,7 @@ import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.mail.MatomoMail.buildTracker
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.api.UrlTraceInterceptor
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.LaunchActivityArgs
 import com.infomaniak.mail.utils.AccountUtils
@@ -180,7 +181,10 @@ open class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycle
 
     private fun configureHttpClient() {
         AccountUtils.onRefreshTokenError = refreshTokenError
-        HttpClient.init(tokenInterceptorListener())
+        HttpClient.apply {
+            init(tokenInterceptorListener())
+            customInterceptor = listOf(UrlTraceInterceptor())
+        }
     }
 
     private val refreshTokenError: (User) -> Unit = { user ->

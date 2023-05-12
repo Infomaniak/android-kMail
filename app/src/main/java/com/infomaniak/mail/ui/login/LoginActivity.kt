@@ -186,7 +186,7 @@ class LoginActivity : AppCompatActivity() {
 
     private fun authenticateUser(authCode: String) = lifecycleScope.launch(Dispatchers.IO) {
         infomaniakLogin.getToken(
-            okHttpClient = HttpClient.okHttpClientNoInterceptor,
+            okHttpClient = HttpClient.okHttpClientNoTokenInterceptor,
             code = authCode,
             onSuccess = {
                 lifecycleScope.launch(Dispatchers.IO) {
@@ -270,7 +270,7 @@ class LoginActivity : AppCompatActivity() {
 
             return if (AccountUtils.getUserById(apiToken.userId) == null) {
                 InfomaniakCore.bearerToken = apiToken.accessToken
-                val userProfileResponse = ApiRepository.getUserProfile(HttpClient.okHttpClientNoInterceptor)
+                val userProfileResponse = ApiRepository.getUserProfile(HttpClient.okHttpClientNoTokenInterceptor)
 
                 if (userProfileResponse.result == ApiResponse.Status.ERROR) {
                     userProfileResponse
@@ -281,7 +281,7 @@ class LoginActivity : AppCompatActivity() {
                     }
 
                     user?.let {
-                        val apiResponse = ApiRepository.getMailboxes(HttpClient.okHttpClientNoInterceptor)
+                        val apiResponse = ApiRepository.getMailboxes(HttpClient.okHttpClientNoTokenInterceptor)
                         when {
                             !apiResponse.isSuccess() -> apiResponse
                             apiResponse.data?.isEmpty() == true -> {
