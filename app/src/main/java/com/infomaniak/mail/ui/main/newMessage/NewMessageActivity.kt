@@ -20,12 +20,14 @@ package com.infomaniak.mail.ui.main.newMessage
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.webkit.WebView
 import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.lib.core.utils.showToast
+import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.ACTION_POSTPONE_NAME
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
@@ -53,6 +55,8 @@ class NewMessageActivity : ThemedActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
+
         setContentView(binding.root)
 
         if (!isAuth()) {

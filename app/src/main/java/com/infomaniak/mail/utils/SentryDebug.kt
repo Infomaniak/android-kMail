@@ -174,4 +174,25 @@ object SentryDebug {
             }
         }
     }
+
+    fun sendOverScrolledMessage(clientWidth: Int, scrollWidth: Int, messageUid: String) {
+        Sentry.withScope { scope ->
+            scope.level = SentryLevel.ERROR
+            scope.setTag("messageUid", messageUid)
+            scope.setExtra("clientWidth", "$clientWidth")
+            scope.setExtra("scrollWidth", "$scrollWidth")
+            Sentry.captureMessage("When resizing the mail with js, after zooming, it can still scroll.")
+        }
+    }
+
+    fun sendJavaScriptError(errorName: String, errorMessage: String, errorStack: String, messageUid: String) {
+        Sentry.withScope { scope ->
+            scope.level = SentryLevel.ERROR
+            scope.setTag("messageUid", messageUid)
+            scope.setExtra("errorName", errorName)
+            scope.setExtra("errorMessage", errorMessage)
+            scope.setExtra("errorStack", errorStack)
+            Sentry.captureMessage("JavaScript returned an error when displaying an email.")
+        }
+    }
 }

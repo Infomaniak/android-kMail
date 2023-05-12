@@ -17,31 +17,77 @@
  */
 package com.infomaniak.mail.utils
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.webkit.JavascriptInterface
 import android.webkit.WebSettings
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomDarkMode
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
-import com.infomaniak.mail.utils.HtmlFormatter.Companion.getSetMargin
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getFixStyleScript
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getImproveRenderingStyle
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getJsBridgeScript
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getResizeScript
 
 class WebViewUtils(context: Context) {
 
     private val customDarkMode by lazy { context.getCustomDarkMode() }
-    private val setMargin by lazy { context.getSetMargin() }
+    private val improveRenderingStyle by lazy { context.getImproveRenderingStyle() }
     private val customStyle by lazy { context.getCustomStyle() }
+
+    private val resizeScript by lazy { context.getResizeScript() }
+    private val fixStyleScript by lazy { context.getFixStyleScript() }
+    private val jsBridgeScript by lazy { context.getJsBridgeScript() }
 
     fun processHtmlForDisplay(html: String, isDisplayedInDarkMode: Boolean): String = with(HtmlFormatter(html)) {
         if (isDisplayedInDarkMode) registerCss(customDarkMode, DARK_BACKGROUND_STYLE_ID)
-        registerCss(setMargin)
+        registerCss(improveRenderingStyle)
         registerCss(customStyle)
         registerMetaViewPort()
+        registerScript(resizeScript)
+        registerScript(fixStyleScript)
+        registerScript(jsBridgeScript)
+        registerBodyEncapsulation()
         return@with inject()
     }
 
-    companion object {
+    class JavascriptBridge {
+        @JavascriptInterface
+        fun reportOverScroll(clientWidth: Int, scrollWidth: Int, messageUid: String) {
+            SentryDebug.sendOverScrolledMessage(clientWidth, scrollWidth, messageUid)
+        }
 
+        @JavascriptInterface
+        fun reportError(
+            errorName: String,
+            errorMessage: String,
+            errorStack: String,
+            scriptFirstLine: String,
+            messageUid: String
+        ) {
+            val correctErrorStack = fixStackTraceLineNumber(errorStack, scriptFirstLine)
+            SentryDebug.sendJavaScriptError(errorName, errorMessage, correctErrorStack, messageUid)
+        }
+
+        private fun fixStackTraceLineNumber(errorStack: String, scriptFirstLine: String): String {
+            var correctErrorStack = errorStack
+            val matches = "about:blank:([0-9]+):".toRegex().findAll(correctErrorStack)
+            matches.forEach { match ->
+                val lineNumber = match.groupValues[1]
+                val newLineNumber = lineNumber.toInt() - scriptFirstLine.toInt() + 1
+                correctErrorStack = correctErrorStack.replace(match.groupValues[0], "about:blank:$newLineNumber:")
+            }
+            return correctErrorStack
+        }
+    }
+
+    companion object {
         private const val DARK_BACKGROUND_STYLE_ID = "dark_background_style"
+        val jsBridge = JavascriptBridge() // TODO : Avoid excessive memory consumption with injection
 
         fun WebSettings.setupThreadWebViewSettings() {
+            @SuppressLint("SetJavaScriptEnabled")
+            javaScriptEnabled = true
+
             loadWithOverviewMode = true
             useWideViewPort = true
 
@@ -51,8 +97,11 @@ class WebViewUtils(context: Context) {
         }
 
         fun WebSettings.setupNewMessageWebViewSettings() {
-            useWideViewPort = true
+            @SuppressLint("SetJavaScriptEnabled")
+            javaScriptEnabled = true
+
             loadWithOverviewMode = true
+            useWideViewPort = true
         }
     }
 }

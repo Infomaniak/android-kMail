@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.main.newMessage
 import android.annotation.SuppressLint
 import android.content.ClipDescription
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
@@ -131,6 +132,17 @@ class NewMessageFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         newMessageViewModel.updateDraftInLocalIfRemoteHasChanged()
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        // TODO : Try to undo js script and recall the method to fix rendering
+        newMessageViewModel.draft.uiSignature?.let { html ->
+            binding.signatureWebView.loadContent(html)
+        }
+        newMessageViewModel.draft.uiQuote?.let { html ->
+            binding.quoteWebView.loadContent(html)
+        }
+        super.onConfigurationChanged(newConfig)
     }
 
     private fun initUi() = with(binding) {
@@ -302,7 +314,10 @@ class NewMessageFragment : Fragment() {
         bodyText.setText(draft.uiBody)
 
         draft.uiSignature?.let { html ->
-            signatureWebView.loadContent(html)
+            signatureWebView.apply {
+                loadContent(html)
+                initWebViewClientAndBridge(emptyList(), "SIGNATURE-${draft.messageUid}")
+            }
             removeSignature.setOnClickListener {
                 trackNewMessageEvent("deleteSignature")
                 draft.uiSignature = null
@@ -314,7 +329,7 @@ class NewMessageFragment : Fragment() {
         draft.uiQuote?.let { html ->
             quoteWebView.apply {
                 loadContent(html)
-                initWebViewClient(draft.attachments)
+                initWebViewClientAndBridge(draft.attachments, "QUOTE-${draft.messageUid}")
             }
             removeQuote.setOnClickListener {
                 trackNewMessageEvent("deleteQuote")

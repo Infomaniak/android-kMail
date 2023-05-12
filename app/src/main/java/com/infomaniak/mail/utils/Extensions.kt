@@ -30,10 +30,7 @@ import android.util.Patterns
 import android.view.View
 import android.view.Window
 import android.webkit.WebView
-import androidx.annotation.AttrRes
-import androidx.annotation.ColorRes
-import androidx.annotation.IdRes
-import androidx.annotation.StringRes
+import androidx.annotation.*
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.NestedScrollView
@@ -82,6 +79,7 @@ import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.ui.main.thread.MessageWebViewClient
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragmentArgs
+import com.infomaniak.mail.utils.WebViewUtils.Companion.jsBridge
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
@@ -155,7 +153,7 @@ fun Context.formatSubject(subject: String?): String {
     }
 }
 
-fun Context.readRawResource(cssResId: Int): String = Scanner(resources.openRawResource(cssResId)).useDelimiter("\\A").next()
+fun Context.readRawResource(@RawRes resId: Int): String = Scanner(resources.openRawResource(resId)).useDelimiter("\\A").next()
 
 fun LottieAnimationView.repeatFrame(firstFrame: Int, lastFrame: Int) {
     addAnimatorListener(object : Animator.AnimatorListener {
@@ -180,12 +178,13 @@ fun LottieAnimationView.changePathColor(illuColors: IlluColors) {
     }
 }
 
-fun WebView.initWebViewClient(attachments: List<Attachment>) {
+fun WebView.initWebViewClientAndBridge(attachments: List<Attachment>, messageUid: String) {
     val cidDictionary = mutableMapOf<String, Attachment>()
     attachments.forEach {
         if (it.contentId?.isNotBlank() == true) cidDictionary[it.contentId as String] = it
     }
-    webViewClient = MessageWebViewClient(context, cidDictionary)
+    webViewClient = MessageWebViewClient(context, cidDictionary, messageUid)
+    addJavascriptInterface(jsBridge, "kmail")
 }
 //endregion
 

@@ -26,6 +26,7 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.infomaniak.lib.core.utils.showToast
+import com.infomaniak.lib.core.utils.toDp
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.models.Attachment
@@ -34,7 +35,8 @@ import com.infomaniak.mail.utils.Utils
 
 class MessageWebViewClient(
     private val context: Context,
-    private val cidDictionary: MutableMap<String, Attachment>
+    private val cidDictionary: MutableMap<String, Attachment>,
+    private val messageUid: String,
 ) : WebViewClient() {
 
     override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
@@ -77,6 +79,11 @@ class MessageWebViewClient(
             }
         }
         return true
+    }
+
+    override fun onPageFinished(webView: WebView, url: String?) {
+        webView.loadUrl("javascript:removeAllProperties(); normalizeMessageWidth(${webView.width.toDp()}, '$messageUid')")
+        super.onPageFinished(webView, url)
     }
 
     companion object {

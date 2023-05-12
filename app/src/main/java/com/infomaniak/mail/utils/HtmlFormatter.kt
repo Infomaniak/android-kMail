@@ -28,7 +28,9 @@ import com.google.android.material.R as RMaterial
 
 class HtmlFormatter(private val html: String) {
     private val cssList = mutableListOf<Pair<String, String?>>()
+    private val scripts = mutableListOf<String>()
     private var needsMetaViewport = false
+    private var needsBodyEncapsulation = false
 
     fun registerCss(css: String, styleId: String? = null) {
         cssList.add(css to styleId)
@@ -38,11 +40,22 @@ class HtmlFormatter(private val html: String) {
         needsMetaViewport = true
     }
 
+    fun registerScript(script: String) {
+        scripts.add(script)
+    }
+
+    fun registerBodyEncapsulation() {
+        needsBodyEncapsulation = true
+    }
+
     fun inject(): String = with(HtmlSanitizer.getInstance().sanitize(Jsoup.parse(html))) {
+        outputSettings().prettyPrint(true)
         head().apply {
             injectCss()
             injectMetaViewPort()
+            injectScript()
         }
+        if (needsBodyEncapsulation) body().encapsulateElementInDiv()
         html()
     }
 
@@ -63,8 +76,22 @@ class HtmlFormatter(private val html: String) {
         }
     }
 
+    private fun Element.injectScript() {
+        scripts.forEach { script ->
+            appendElement("script")
+                .text(script)
+        }
+    }
+
+    private fun Element.encapsulateElementInDiv() {
+        val bodyContent = childNodesCopy()
+        empty()
+        appendElement("div").id(KMAIL_MESSAGE_ID).appendChildren(bodyContent)
+    }
+
     companion object {
         private const val PRIMARY_COLOR_CODE = "--kmail-primary-color"
+        private const val KMAIL_MESSAGE_ID = "kmail-message-content"
 
         private fun Context.loadCss(@RawRes cssResId: Int, customColors: List<Pair<String, Int>> = emptyList()): String {
             var css = readRawResource(cssResId)
@@ -82,6 +109,26 @@ class HtmlFormatter(private val html: String) {
             return css
         }
 
+        private fun Context.loadScript(
+            @RawRes scriptResId: Int,
+            customVariablesDeclaration: List<Pair<String, Any>> = emptyList()
+        ): String {
+            var script = readRawResource(scriptResId)
+            customVariablesDeclaration.forEach { (variableName, value) ->
+                val variableDeclaration = "const $variableName = ${formatValueForJs(value)};"
+                script = variableDeclaration + "\n" + script
+            }
+            return script
+        }
+
+        private fun formatValueForJs(value: Any): String {
+            return when (value) {
+                is String -> "'$value'"
+                is Int -> value.toString()
+                else -> throw NotImplementedError()
+            }
+        }
+
         private fun formatCssVariable(variableName: String, color: Int): String {
             val formattedColor = colorToHexRepresentation(color)
             return "$variableName: $formattedColor;\n"
@@ -91,11 +138,24 @@ class HtmlFormatter(private val html: String) {
 
         fun Context.getCustomDarkMode(): String = loadCss(R.raw.custom_dark_mode)
 
-        fun Context.getSetMargin(): String = loadCss(R.raw.set_margin_around_mail)
+        fun Context.getImproveRenderingStyle(): String = loadCss(R.raw.improve_rendering)
 
         fun Context.getCustomStyle(): String = loadCss(
-            R.raw.custom_style,
+            R.raw.style,
             listOf(PRIMARY_COLOR_CODE to getAttributeColor(RMaterial.attr.colorPrimary)),
         )
+
+        fun Context.getResizeScript(): String = loadScript(
+            R.raw.munge_email,
+            listOf("MESSAGE_SELECTOR" to "#$KMAIL_MESSAGE_ID")
+        )
+
+        fun Context.getFixStyleScript(): String {
+            return loadScript(R.raw.fix_email_style)
+        }
+
+        fun Context.getJsBridgeScript(): String {
+            return loadScript(R.raw.javascript_bridge)
+        }
     }
 }
