@@ -339,13 +339,13 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
     private fun ThreadViewHolder.bindAttachment(message: Message) = with(binding) {
         val attachments = message.attachments
         val fileSize = formatAttachmentFileSize(attachments)
-        attachmentsSizeText.text = context.resources.getQuantityString(
+        attachmentLayout.attachmentsSizeText.text = context.resources.getQuantityString(
             R.plurals.attachmentQuantity,
             attachments.size,
             attachments.size,
         ) + " ($fileSize)"
         attachmentAdapter.setAttachments(attachments)
-        attachmentsDownloadAllButton.setOnClickListener { onDownloadAllClicked?.invoke(message) }
+        attachmentLayout.attachmentsDownloadAllButton.setOnClickListener { onDownloadAllClicked?.invoke(message) }
     }
 
     private fun ItemMessageBinding.formatAttachmentFileSize(attachments: List<Attachment>): String {
@@ -393,13 +393,11 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
     }
 
     private fun ItemMessageBinding.hideAttachments() {
-        attachmentsGroup.isGone = true
-        attachmentsRecyclerView.isGone = true
+        attachmentLayout.root.isGone = true
     }
 
     private fun ItemMessageBinding.showAttachments() {
-        attachmentsGroup.isVisible = true
-        attachmentsRecyclerView.isVisible = true
+        attachmentLayout.root.isVisible = true
     }
 
     private fun ItemMessageBinding.collapseMessageDetails(message: Message) {
@@ -488,7 +486,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
                 toRecyclerView.adapter = toAdapter
                 ccRecyclerView.adapter = ccAdapter
                 bccRecyclerView.adapter = bccAdapter
-                attachmentsRecyclerView.adapter = attachmentAdapter
+                attachmentLayout.attachmentsRecyclerView.adapter = attachmentAdapter
             }
         }
 

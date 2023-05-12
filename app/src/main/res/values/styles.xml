@@ -166,6 +166,19 @@
         <item name="android:fontFamily">@font/suisseintl_medium</item>
     </style>
 
+    <style name="TextButtonTertiary" parent="TextButtonSecondary">
+        <item name="android:fontFamily">@font/suisseintl_regular</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="android:paddingEnd">@dimen/marginStandardMedium</item>
+        <item name="android:paddingStart">@dimen/marginStandardMedium</item>
+        <item name="android:paddingTop">@dimen/marginStandardVerySmall</item>
+        <item name="android:paddingBottom">@dimen/marginStandardVerySmall</item>
+        <item name="android:textColor">@color/blueMail</item>
+        <item name="android:textSize">12sp</item>
+        <item name="cornerRadius">@dimen/smallCornerRadius</item>
+        <item name="rippleColor">@color/ripple_color_blue_mail</item>
+    </style>
+
     <style name="IconButtonSmall" parent="Widget.Material3.Button.TextButton">
         <item name="android:insetBottom">0dp</item>
         <item name="android:insetLeft">0dp</item>

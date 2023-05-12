@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak kMail - Android
+  ~ Copyright (C) 2023 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/icon"
+        android:layout_width="@dimen/mediumIconSize"
+        android:layout_height="@dimen/mediumIconSize"
+        android:layout_marginStart="@dimen/marginStandardMedium"
+        android:importantForAccessibility="no"
+        app:layout_constraintBottom_toBottomOf="@id/description"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/description"
+        app:tint="@color/iconColor"
+        tools:src="@drawable/ic_message_alert_distant_images" />
+
+    <TextView
+        android:id="@+id/description"
+        style="@style/Label.Secondary"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/alternativeMargin"
+        android:layout_marginTop="@dimen/marginStandardSmall"
+        android:layout_marginEnd="@dimen/marginStandardMedium"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/icon"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Pour votre sécurité nous avons bloqué certains contenus de votre message." />
+
+    <com.google.android.flexbox.FlexboxLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="-16dp"
+        android:layout_marginTop="@dimen/marginStandardVerySmall"
+        android:gravity="center_vertical"
+        app:alignItems="center"
+        app:flexDirection="row"
+        app:flexWrap="wrap"
+        app:justifyContent="flex_start"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/description"
+        app:layout_constraintTop_toBottomOf="@id/description">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/action1"
+            style="@style/TextButtonTertiary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Afficher le contenu" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/divider"
+            android:layout_width="1dp"
+            android:layout_height="12sp"
+            android:layout_marginVertical="@dimen/alternativeMargin"
+            android:visibility="gone"
+            app:dividerColor="@color/separatorColor"
+            tools:visibility="visible" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/action2"
+            style="@style/TextButtonTertiary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            tools:text="Toujours afficher pour cet expéditeur"
+            tools:visibility="visible" />
+
+    </com.google.android.flexbox.FlexboxLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

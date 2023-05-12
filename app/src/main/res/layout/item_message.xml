@@ -168,6 +168,7 @@
                 style="@style/IconButton"
                 android:contentDescription="@string/contentDescriptionOpenMailActions"
                 app:icon="@drawable/ic_param_dots" />
+
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
@@ -178,7 +179,7 @@
         android:paddingBottom="@dimen/marginStandardMedium"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/messageHeader">
+        app:layout_constraintTop_toBottomOf="@+id/messageHeader">
 
         <TextView
             android:id="@+id/fromPrefix"
@@ -343,54 +344,57 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/attachmentsRecyclerView"
+    <com.google.android.material.divider.MaterialDivider
+        android:id="@+id/alertsTopDivider"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:clipToPadding="false"
-        android:orientation="horizontal"
-        android:paddingHorizontal="@dimen/alternativeMargin"
-        android:paddingBottom="@dimen/marginStandardMedium"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        android:layout_height="1dp"
+        app:dividerColor="@color/separatorColor"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/messageDetails"
-        app:layout_goneMarginTop="@dimen/marginStandardSmall"
-        tools:listitem="@layout/item_attachment" />
+        app:layout_constraintTop_toBottomOf="@id/messageDetails" />
 
-    <ImageView
-        android:id="@+id/attachmentsIcon"
-        android:layout_width="@dimen/mediumIconSize"
-        android:layout_height="@dimen/mediumIconSize"
-        android:layout_marginStart="@dimen/marginStandardMedium"
-        android:importantForAccessibility="no"
-        android:src="@drawable/ic_attachment"
-        app:layout_constraintBottom_toBottomOf="@id/attachmentsSizeText"
+    <LinearLayout
+        android:id="@+id/alerts"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:divider="@drawable/divider"
+        android:orientation="vertical"
+        android:showDividers="middle"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/attachmentsSizeText"
-        app:tint="@color/iconColor" />
+        app:layout_constraintTop_toBottomOf="@id/alertsTopDivider">
 
-    <TextView
-        android:id="@+id/attachmentsSizeText"
-        style="@style/BodySmall.Secondary"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
-        app:layout_constraintEnd_toStartOf="@id/attachmentsDownloadAllButton"
-        app:layout_constraintStart_toEndOf="@id/attachmentsIcon"
-        app:layout_constraintTop_toBottomOf="@id/attachmentsRecyclerView"
-        tools:text="4 pièces jointes (3 MB)" />
+        <com.infomaniak.mail.ui.main.thread.MessageAlertView
+            android:id="@+id/distantImagesAlert"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/marginStandardMedium"
+            app:action1="Afficher le contenu"
+            app:action2="Toujours afficher pour cet expéditeur"
+            app:description="Pour votre sécurité nous avons bloqué certains contenus de votre message."
+            app:icon="@drawable/ic_message_alert_distant_images" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/attachmentsDownloadAllButton"
-        style="@style/TextButton"
-        android:layout_width="wrap_content"
+    </LinearLayout>
+
+    <com.google.android.material.divider.MaterialDivider
+        android:id="@+id/alertsBottomDivider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        app:dividerColor="@color/separatorColor"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/alerts" />
+
+    <include
+        android:id="@+id/attachmentLayout"
+        layout="@layout/layout_attachments"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="0dp"
-        android:text="@string/buttonDownloadAll"
-        app:layout_constraintBottom_toBottomOf="@id/attachmentsSizeText"
-        app:layout_constraintStart_toEndOf="@id/attachmentsSizeText"
-        app:layout_constraintTop_toTopOf="@id/attachmentsSizeText" />
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/alertsBottomDivider"
+        app:layout_goneMarginTop="0dp" />
 
     <LinearLayout
         android:id="@+id/messageLoader"
@@ -401,7 +405,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/attachmentsDownloadAllButton">
+        app:layout_constraintTop_toBottomOf="@id/attachmentLayout">
 
         <com.infomaniak.lib.core.views.LoaderTextView
             style="@style/Label"
@@ -451,7 +455,7 @@
         app:layout_constraintBottom_toTopOf="@id/quoteButtonFrameLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/attachmentsDownloadAllButton">
+        app:layout_constraintTop_toBottomOf="@id/attachmentLayout">
 
         <WebView
             android:id="@+id/bodyWebView"
@@ -465,6 +469,7 @@
             android:layout_height="wrap_content"
             android:scrollbars="horizontal"
             android:visibility="gone" />
+
     </FrameLayout>
 
     <FrameLayout
@@ -491,14 +496,15 @@
             android:minHeight="0dp"
             android:padding="@dimen/marginStandardVerySmall"
             android:text="@string/messageShowQuotedText" />
+
     </FrameLayout>
 
     <androidx.constraintlayout.widget.Group
-        android:id="@+id/attachmentsGroup"
-        android:layout_width="match_parent"
+        android:id="@+id/alertsGroup"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        app:constraint_referenced_ids="attachmentsIcon,attachmentsSizeText,attachmentsDownloadAllButton"
+        app:constraint_referenced_ids="alertsBottomDivider,alerts,alertsTopDivider"
         tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
