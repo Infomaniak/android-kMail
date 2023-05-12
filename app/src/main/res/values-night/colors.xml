@@ -83,6 +83,20 @@
     <color name="swipeInbox">@color/shark</color>
     <color name="swipeNone">@color/elephant</color>
 
+    <!-- File types -->
+    <color name="file_media">@color/tropical_dark</color>
+
+    <color name="file_zip">@color/grey_blue_dark</color>
+    <color name="file_calendar">@color/calendar_dark</color>
+    <color name="file_code">@color/prince_dark</color>
+    <color name="file_font">@color/violet_dark</color>
+    <color name="file_pdf">@color/coral_dark</color>
+    <color name="file_points">@color/mango_dark</color>
+    <color name="file_sheet">@color/grass_dark</color>
+    <color name="file_text">@color/jean_dark</color>
+    <color name="file_vcard">@color/contacts_dark</color>
+    <color name="file_unknown">@color/app_blue_dark</color>
+
     <!-- Onboarding illustration colors -->
     <array name="pinkColors">
         <item name="pinkColor1">#D0759F</item>
