@@ -101,6 +101,7 @@
     <string name="buttonHyperlink">Add a hyperlink</string>
     <string name="buttonImportEmails">Import emails</string>
     <string name="buttonItalic">Italic</string>
+    <string name="buttonLoadMore">Load more</string>
     <string name="buttonLogInDifferentAccount">Log in with another account</string>
     <string name="buttonLogin">Login</string>
     <string name="buttonMore">More</string>

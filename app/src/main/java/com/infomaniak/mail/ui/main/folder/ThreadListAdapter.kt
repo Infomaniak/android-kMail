@@ -51,10 +51,7 @@ import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.thread.SelectedThread
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.databinding.CardviewThreadItemBinding
-import com.infomaniak.mail.databinding.ItemThreadDateSeparatorBinding
-import com.infomaniak.mail.databinding.ItemThreadFlushFolderButtonBinding
-import com.infomaniak.mail.databinding.ItemThreadSeeAllButtonBinding
+import com.infomaniak.mail.databinding.*
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter.ThreadViewHolder
 import com.infomaniak.mail.utils.*
 import kotlin.math.abs
@@ -87,6 +84,7 @@ class ThreadListAdapter(
 
     var onThreadClicked: ((thread: Thread) -> Unit)? = null
     var onFlushClicked: ((dialogTitle: String) -> Unit)? = null
+    var onLoadMoreClicked: (() -> Unit)? = null
 
     init {
         setHasStableIds(true)
@@ -102,6 +100,7 @@ class ThreadListAdapter(
         val binding = when (viewType) {
             R.layout.item_thread_date_separator -> ItemThreadDateSeparatorBinding.inflate(layoutInflater, parent, false)
             R.layout.item_thread_flush_folder_button -> ItemThreadFlushFolderButtonBinding.inflate(layoutInflater, parent, false)
+            R.layout.item_thread_load_more_button -> ItemThreadLoadMoreButtonBinding.inflate(layoutInflater, parent, false)
             R.layout.item_thread_see_all_button -> ItemThreadSeeAllButtonBinding.inflate(layoutInflater, parent, false)
             else -> CardviewThreadItemBinding.inflate(layoutInflater, parent, false)
         }
@@ -129,6 +128,7 @@ class ThreadListAdapter(
             DisplayType.THREAD.layout -> (this as CardviewThreadItemBinding).displayThread(item as Thread)
             DisplayType.DATE_SEPARATOR.layout -> (this as ItemThreadDateSeparatorBinding).displayDateSeparator(item as String)
             DisplayType.FLUSH_FOLDER_BUTTON.layout -> (this as ItemThreadFlushFolderButtonBinding).displayFlushFolderButton(item as FolderRole)
+            DisplayType.LOAD_MORE_BUTTON.layout -> (this as ItemThreadLoadMoreButtonBinding).displayLoadMoreButton()
             DisplayType.SEE_ALL_BUTTON.layout -> (this as ItemThreadSeeAllButtonBinding).displaySeeAllButton(item)
         }
     }
@@ -138,6 +138,7 @@ class ThreadListAdapter(
         return when {
             item is String -> DisplayType.DATE_SEPARATOR.layout
             item is FolderRole -> DisplayType.FLUSH_FOLDER_BUTTON.layout
+            item is Unit -> DisplayType.LOAD_MORE_BUTTON.layout
             displaySeeAllButton -> DisplayType.SEE_ALL_BUTTON.layout
             else -> DisplayType.THREAD.layout
         }
@@ -297,6 +298,10 @@ class ThreadListAdapter(
         }
     }
 
+    private fun ItemThreadLoadMoreButtonBinding.displayLoadMoreButton() {
+        loadMoreButton.setOnClickListener { onLoadMoreClicked?.invoke() }
+    }
+
     private fun ItemThreadSeeAllButtonBinding.displaySeeAllButton(item: Any) {
         // TODO: Implement when we have intelligent mailbox
         // val threadsNumber = itemsList.size - NUMBER_OF_DISPLAYED_MAILS_OF_FOLDER
@@ -394,6 +399,7 @@ class ThreadListAdapter(
         return when (getItemViewType(position)) {
             DisplayType.THREAD.layout -> (viewHolder.binding as CardviewThreadItemBinding).goneHandle
             DisplayType.FLUSH_FOLDER_BUTTON.layout -> (viewHolder.binding as ItemThreadFlushFolderButtonBinding).goneHandle
+            DisplayType.LOAD_MORE_BUTTON.layout -> (viewHolder.binding as ItemThreadLoadMoreButtonBinding).goneHandle
             else -> null
         }
     }
@@ -425,6 +431,7 @@ class ThreadListAdapter(
         THREAD(R.layout.cardview_thread_item),
         DATE_SEPARATOR(R.layout.item_thread_date_separator),
         FLUSH_FOLDER_BUTTON(R.layout.item_thread_flush_folder_button),
+        LOAD_MORE_BUTTON(R.layout.item_thread_load_more_button),
         SEE_ALL_BUTTON(R.layout.item_thread_see_all_button),
     }
 
@@ -447,31 +454,31 @@ class ThreadListAdapter(
             context: Context,
             folderRole: FolderRole?,
             threadDensity: ThreadDensity,
-        ): MutableList<Any> {
-
-            val formattedList = mutableListOf<Any>()
+        ) = mutableListOf<Any>().apply {
 
             if ((folderRole == FolderRole.TRASH || folderRole == FolderRole.SPAM) && threads.isNotEmpty()) {
-                formattedList.add(folderRole)
+                add(folderRole)
             }
 
-            if (threadDensity == COMPACT) return formattedList.apply { addAll(threads) }
-
-            var previousSectionTitle = ""
-
-            threads.forEach { thread ->
-                val sectionTitle = thread.getSectionTitle(context)
-                when {
-                    sectionTitle != previousSectionTitle -> {
-                        formattedList.add(sectionTitle)
-                        previousSectionTitle = sectionTitle
+            if (threadDensity == COMPACT) {
+                addAll(threads)
+            } else {
+                var previousSectionTitle = ""
+                threads.forEach { thread ->
+                    val sectionTitle = thread.getSectionTitle(context)
+                    when {
+                        sectionTitle != previousSectionTitle -> {
+                            add(sectionTitle)
+                            previousSectionTitle = sectionTitle
+                        }
+                        // displaySeeAllButton -> formattedList.add(folder.threadCount - 3) // TODO: Handle Intelligent Mailbox
                     }
-                    // displaySeeAllButton -> formattedList.add(folder.threadCount - 3) // TODO: Handle Intelligent Mailbox
+                    add(thread)
                 }
-                formattedList.add(thread)
             }
 
-            return formattedList
+            // Add "Load more" button
+            add(Unit)
         }
 
         fun Thread.getSectionTitle(context: Context): String = with(date.toDate()) {
