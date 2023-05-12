@@ -36,14 +36,18 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.databinding.FragmentIntroBinding
+import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.login.IlluColors.changeIllustrationColors
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
 import com.infomaniak.mail.utils.enumValueFrom
 import com.infomaniak.mail.utils.repeatFrame
-import kotlinx.coroutines.Dispatchers
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class IntroFragment : Fragment() {
 
     private lateinit var binding: FragmentIntroBinding
@@ -51,6 +55,10 @@ class IntroFragment : Fragment() {
     private val introViewModel: IntroViewModel by activityViewModels()
 
     private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
+
+    @Inject
+    @IoDispatcher
+    lateinit var ioDispatcher: CoroutineDispatcher
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentIntroBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -126,7 +134,7 @@ class IntroFragment : Fragment() {
     }
 
     private fun triggerUiUpdateWhenAnimationEnd(newAccentColor: AccentColor, oldAccentColor: AccentColor) {
-        lifecycleScope.launch(Dispatchers.IO) {
+        lifecycleScope.launch(ioDispatcher) {
             val duration = resources.getInteger(R.integer.loginLayoutAnimationDuration).toLong()
             delay(duration)
             introViewModel.updatedAccentColor.postValue(newAccentColor to oldAccentColor)

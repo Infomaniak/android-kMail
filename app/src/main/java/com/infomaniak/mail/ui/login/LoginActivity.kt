@@ -59,14 +59,19 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.databinding.ActivityLoginBinding
+import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
 import com.infomaniak.mail.utils.getInfomaniakLogin
-import kotlinx.coroutines.Dispatchers
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 import com.infomaniak.lib.core.R as RCore
 
+@AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
 
     private val binding by lazy { ActivityLoginBinding.inflate(layoutInflater) }
@@ -74,6 +79,14 @@ class LoginActivity : AppCompatActivity() {
     private val introViewModel: IntroViewModel by viewModels()
 
     private lateinit var infomaniakLogin: InfomaniakLogin
+
+    @Inject
+    @IoDispatcher
+    lateinit var ioDispatcher: CoroutineDispatcher
+
+    @Inject
+    @MainDispatcher
+    lateinit var mainDispatcher: CoroutineDispatcher
 
     private val webViewLoginResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         with(result) {
@@ -184,25 +197,25 @@ class LoginActivity : AppCompatActivity() {
         animateSecondaryColorElements(newAccentColor, oldAccentColor)
     }
 
-    private fun authenticateUser(authCode: String) = lifecycleScope.launch(Dispatchers.IO) {
+    private fun authenticateUser(authCode: String) = lifecycleScope.launch(ioDispatcher) {
         infomaniakLogin.getToken(
             okHttpClient = HttpClient.okHttpClientNoInterceptor,
             code = authCode,
             onSuccess = {
-                lifecycleScope.launch(Dispatchers.IO) {
+                lifecycleScope.launch(ioDispatcher) {
                     when (val user = authenticateUser(this@LoginActivity, it)) {
                         is User -> {
                             trackAccountEvent("loggedIn")
                             AccountUtils.reloadApp?.invoke()
                         }
-                        is ApiResponse<*> -> withContext(Dispatchers.Main) {
+                        is ApiResponse<*> -> withContext(mainDispatcher) {
                             if (user.error?.code == NO_MAILBOX_ERROR_CODE) {
                                 launchNoMailboxActivity()
                             } else {
                                 showError(getString(user.translatedError))
                             }
                         }
-                        else -> withContext(Dispatchers.Main) { showError(getString(RCore.string.anErrorHasOccurred)) }
+                        else -> withContext(mainDispatcher) { showError(getString(RCore.string.anErrorHasOccurred)) }
                     }
                 }
             },
