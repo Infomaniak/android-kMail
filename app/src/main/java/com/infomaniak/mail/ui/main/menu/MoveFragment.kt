@@ -30,7 +30,9 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.FragmentMoveBinding
 import com.infomaniak.mail.utils.createInputDialog
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MoveFragment : MenuFoldersFragment() {
 
     private lateinit var binding: FragmentMoveBinding
