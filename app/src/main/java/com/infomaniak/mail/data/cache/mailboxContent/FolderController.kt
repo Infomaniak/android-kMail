@@ -118,6 +118,10 @@ object FolderController {
     //endregion
 
     //region Edit data
+    fun updateFolder(id: String, realm: Realm = defaultRealm, onUpdate: (folder: Folder) -> Unit) {
+        realm.writeBlocking { getFolder(id, realm = this)?.let(onUpdate) }
+    }
+
     fun update(remoteFolders: List<Folder>, realm: Realm) {
         realm.writeBlocking {
 
@@ -157,6 +161,8 @@ object FolderController {
                     localFolder.unreadCount,
                     localFolder.threads,
                     localFolder.messages,
+                    localFolder.remainingOldMessagesToFetch,
+                    localFolder.isHistoryComplete,
                 )
             }
 

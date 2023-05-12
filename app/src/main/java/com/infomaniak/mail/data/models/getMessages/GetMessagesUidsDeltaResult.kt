@@ -25,7 +25,7 @@ data class GetMessagesUidsDeltaResult(
     @SerialName("deleted")
     val deletedShortUids: List<String>,
     @SerialName("added")
-    val addedShortUids: List<String>,
+    val addedShortUids: List<Int>,
     @SerialName("updated")
     val updatedMessages: List<MessageFlags>,
     @SerialName("signature")

@@ -57,7 +57,7 @@ object ApiRoutes {
 
     private fun messages(mailboxUuid: String) = "$MAIL_API/api/mail/$mailboxUuid/message"
 
-    private fun message(mailboxUuid: String, folderId: String, shortUid: String): String {
+    private fun message(mailboxUuid: String, folderId: String, shortUid: Int): String {
         return "${folder(mailboxUuid, folderId)}/message/$shortUid"
     }
 
@@ -77,7 +77,7 @@ object ApiRoutes {
 
     fun createAttachment(mailboxUuid: String) = "${draft(mailboxUuid)}/attachment"
 
-    fun downloadAttachments(mailboxUuid: String, folderId: String, shortUid: String): String {
+    fun downloadAttachments(mailboxUuid: String, folderId: String, shortUid: Int): String {
         return "${message(mailboxUuid, folderId, shortUid)}/attachmentsArchive"
     }
 
@@ -87,24 +87,27 @@ object ApiRoutes {
         return "${folder(mailboxUuid, folderId)}/message?thread=on&offset=0&$filters"
     }
 
-    fun reportPhishing(mailboxUuid: String, folderId: String, shortUid: String): String {
+    fun reportPhishing(mailboxUuid: String, folderId: String, shortUid: Int): String {
         return "${message(mailboxUuid, folderId, shortUid)}/report"
     }
 
-    fun blockUser(mailboxUuid: String, folderId: String, shortUid: String): String {
+    fun blockUser(mailboxUuid: String, folderId: String, shortUid: Int): String {
         return "${message(mailboxUuid, folderId, shortUid)}/blacklist"
     }
 
-    fun getMessagesUids(mailboxUuid: String, folderId: String): String {
-        return "${getMessages(mailboxUuid, folderId)}/messages_uids?messages=${Utils.NUMBER_OF_OLD_MESSAGES_TO_FETCH}"
+    fun getMessagesUids(mailboxUuid: String, folderId: String, offsetUid: Int?): String {
+        val endpoint = "${getMessages(mailboxUuid, folderId)}/messages-uids"
+        val messages = "?messages=${Utils.PAGE_SIZE}"
+        val offset = offsetUid?.let { "&uid_offset=$it" } ?: ""
+        return "${endpoint}${messages}${offset}"
     }
 
     fun getMessagesUidsDelta(mailboxUuid: String, folderId: String, cursor: String): String {
         return "${getMessages(mailboxUuid, folderId)}/activities?signature=${cursor}"
     }
 
-    fun getMessagesByUids(mailboxUuid: String, folderId: String, messagesUids: List<String>): String {
-        return "${getMessages(mailboxUuid, folderId)}/messages?uids=${messagesUids.joinToString(",")}"
+    fun getMessagesByUids(mailboxUuid: String, folderId: String, uids: List<Int>): String {
+        return "${getMessages(mailboxUuid, folderId)}/messages?uids=${uids.joinToString(",")}"
     }
 
     private fun getMessages(mailboxUuid: String, folderId: String): String {

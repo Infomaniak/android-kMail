@@ -224,6 +224,10 @@ class Thread : RealmObject {
         return message.preview
     }
 
+    override fun equals(other: Any?) = other === this || (other is Thread && other.uid == uid)
+
+    override fun hashCode(): Int = uid.hashCode()
+
     enum class ThreadFilter(val matomoValue: String) {
         ALL("folderFilter"),
         SEEN("readFilter"),

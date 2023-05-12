@@ -240,7 +240,7 @@ inline fun <reified T> ApiResponse<T>.throwErrorAsException() {
 
 fun String.toLongUid(folderId: String) = "${this}@${folderId}"
 
-fun String.toShortUid(): String = substringBefore('@')
+fun String.toShortUid(): Int = substringBefore('@').toInt()
 //endregion
 
 //region Realm
