@@ -21,12 +21,18 @@ import androidx.lifecycle.*
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.thread.Thread
-import kotlinx.coroutines.Dispatchers
+import com.infomaniak.mail.di.IoDispatcher
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.mapNotNull
+import javax.inject.Inject
 
-class ThreadActionsViewModel : ViewModel() {
+@HiltViewModel
+class ThreadActionsViewModel @Inject constructor(
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+) : ViewModel() {
 
-    private val coroutineContext = viewModelScope.coroutineContext + Dispatchers.IO
+    private val coroutineContext = viewModelScope.coroutineContext + ioDispatcher
 
     fun threadLive(threadUid: String): LiveData<Thread> {
         return ThreadController.getThreadAsync(threadUid).mapNotNull { it.obj }.asLiveData(coroutineContext)
