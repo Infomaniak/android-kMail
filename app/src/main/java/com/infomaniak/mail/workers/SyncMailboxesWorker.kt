@@ -28,6 +28,8 @@ import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.FetchMessagesManager
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
@@ -35,9 +37,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @HiltWorker
-class SyncMailboxesWorker @Inject constructor(
-    appContext: Context,
-    params: WorkerParameters,
+class SyncMailboxesWorker @AssistedInject constructor(
+    @Assisted appContext: Context,
+    @Assisted params: WorkerParameters,
     private val fetchMessagesManager: FetchMessagesManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : BaseCoroutineWorker(appContext, params) {

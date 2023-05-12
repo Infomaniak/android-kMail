@@ -27,15 +27,17 @@ import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.FetchMessagesManager
 import com.infomaniak.mail.workers.BaseProcessMessageNotificationsWorker
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import io.sentry.Sentry
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @HiltWorker
-class ProcessMessageNotificationsWorker @Inject constructor(
-    appContext: Context,
-    params: WorkerParameters,
+class ProcessMessageNotificationsWorker @AssistedInject constructor(
+    @Assisted appContext: Context,
+    @Assisted params: WorkerParameters,
     private val fetchMessagesManager: FetchMessagesManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : BaseProcessMessageNotificationsWorker(appContext, params) {

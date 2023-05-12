@@ -26,15 +26,16 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.throwErrorAsException
 import com.infomaniak.mail.workers.BaseCoroutineWorker
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import io.sentry.Sentry
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 @HiltWorker
-class RegisterUserDeviceWorker @Inject constructor(
-    appContext: Context,
-    params: WorkerParameters,
+class RegisterUserDeviceWorker @AssistedInject constructor(
+    @Assisted appContext: Context,
+    @Assisted params: WorkerParameters,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : BaseCoroutineWorker(appContext, params) {
 
