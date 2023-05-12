@@ -30,7 +30,9 @@ import com.infomaniak.lib.core.R
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.setBackNavigationResult
 import com.infomaniak.mail.databinding.DialogDownloadProgressBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class DownloadAttachmentProgressDialog : DialogFragment() {
 
     private val binding by lazy { DialogDownloadProgressBinding.inflate(layoutInflater) }
