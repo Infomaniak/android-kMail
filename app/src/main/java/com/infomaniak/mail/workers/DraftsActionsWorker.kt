@@ -52,6 +52,8 @@ import com.infomaniak.mail.utils.ErrorCode.MAILBOX_LOCKED
 import com.infomaniak.mail.utils.ErrorCode.SEND_LIMIT_EXCEEDED
 import com.infomaniak.mail.utils.ErrorCode.SEND_RECIPIENTS_REFUSED
 import com.infomaniak.mail.utils.NotificationUtils.showDraftActionsNotification
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import io.realm.kotlin.MutableRealm
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -73,9 +75,9 @@ import kotlin.math.min
 import kotlin.properties.Delegates
 
 @HiltWorker
-class DraftsActionsWorker(
-    appContext: Context,
-    params: WorkerParameters,
+class DraftsActionsWorker @AssistedInject constructor(
+    @Assisted appContext: Context,
+    @Assisted params: WorkerParameters,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : BaseCoroutineWorker(appContext, params) {
 
