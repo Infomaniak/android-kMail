@@ -31,23 +31,30 @@ import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SharedViewModelUtils
 import com.infomaniak.mail.utils.getUids
 import com.infomaniak.mail.utils.handlerIO
-import kotlinx.coroutines.Dispatchers
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 import kotlin.collections.set
 
-class ThreadViewModel(application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class ThreadViewModel @Inject constructor(
+    application: Application,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+) : AndroidViewModel(application) {
 
     private inline val context: Context get() = getApplication()
 
     val quickActionBarClicks = SingleLiveEvent<Pair<Message, Int>>()
 
-    private val coroutineContext = viewModelScope.coroutineContext + Dispatchers.IO
+    private val coroutineContext = viewModelScope.coroutineContext + ioDispatcher
     private var fetchMessagesJob: Job? = null
 
     private val mailbox by lazy { MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
@@ -83,7 +90,7 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
 
     fun fetchIncompleteMessages(messages: List<Message>) {
         fetchMessagesJob?.cancel()
-        fetchMessagesJob = viewModelScope.launch(Dispatchers.IO) {
+        fetchMessagesJob = viewModelScope.launch(ioDispatcher) {
             ThreadController.fetchIncompleteMessages(messages, mailbox)
         }
     }
@@ -95,7 +102,7 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
         if (isSuccess) runCatching { MessageController.fetchCurrentFolderMessages(mailbox, message.folder) }
     }
 
-    fun clickOnQuickActionBar(threadUid: String, menuId: Int) = viewModelScope.launch(Dispatchers.IO) {
+    fun clickOnQuickActionBar(threadUid: String, menuId: Int) = viewModelScope.launch(ioDispatcher) {
         val thread = ThreadController.getThread(threadUid) ?: return@launch
         val message = MessageController.getLastMessageToExecuteAction(thread)
         quickActionBarClicks.postValue(message to menuId)
