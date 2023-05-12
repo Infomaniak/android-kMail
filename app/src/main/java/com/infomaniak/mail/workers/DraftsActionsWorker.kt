@@ -273,7 +273,7 @@ class DraftsActionsWorker(
                     Sentry.captureMessage("We tried to [${draft.action?.name}] a Draft, but an Attachment didn't have its `uuid`.")
                 }
 
-                return scheduledDate to R.string.errorCorruptAttachment
+                return null to R.string.errorCorruptAttachment
             }
         }
 
