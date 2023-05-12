@@ -133,7 +133,7 @@ object AccountUtils : CredentialManager() {
         fun logoutUserToken() {
             CoroutineScope(Dispatchers.IO).launch {
                 context.getInfomaniakLogin().deleteToken(
-                    okHttpClient = HttpClient.okHttpClientNoInterceptor,
+                    okHttpClient = HttpClient.okHttpClientNoTokenInterceptor,
                     token = user.apiToken,
                     onError = { Log.e("DeleteTokenError", "API response error: $it") },
                 )

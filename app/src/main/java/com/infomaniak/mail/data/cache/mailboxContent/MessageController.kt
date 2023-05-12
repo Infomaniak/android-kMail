@@ -271,7 +271,7 @@ object MessageController {
         return impactedCurrentFolderThreads
     }
 
-    private suspend fun getOneBatchOfOldMessages(
+    suspend fun getOneBatchOfOldMessages(
         folder: Folder,
         mailbox: Mailbox,
         scope: CoroutineScope,

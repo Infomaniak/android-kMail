@@ -226,7 +226,9 @@ class MainViewModel @Inject constructor(
         (currentFolderId?.let(FolderController::getFolder)
             ?: FolderController.getFolder(DEFAULT_SELECTED_FOLDER))?.let { folder ->
             selectFolder(folder.id)
-            refreshThreads(mailbox, folder.id)
+            viewModelScope.launch(viewModelScope.handlerIO) {
+                refreshThreads(mailbox, folder.id)
+            }
         }
 
         draftsActionsWorkerScheduler.scheduleWork()
@@ -279,7 +281,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun openFolder(folderId: String) = viewModelScope.launch(ioDispatcher) {
+    fun openFolder(folderId: String) = viewModelScope.launch(viewModelScope.handlerIO) {
         if (folderId == currentFolderId) return@launch
 
         if (currentFilter.value != ThreadFilter.ALL) currentFilter.postValue(ThreadFilter.ALL)
@@ -304,9 +306,24 @@ class MainViewModel @Inject constructor(
 
     fun forceRefreshThreads() {
         refreshThreadsJob?.cancel()
-        refreshThreadsJob = viewModelScope.launch(ioDispatcher) {
+        refreshThreadsJob = viewModelScope.launch(viewModelScope.handlerIO) {
             Log.d(TAG, "Force refresh threads")
             refreshThreads()
+        }
+    }
+
+    fun getOneBatchOfOldMessages() {
+        refreshThreadsJob?.cancel()
+        refreshThreadsJob = viewModelScope.launch(viewModelScope.handlerIO) {
+            isDownloadingChanges.postValue(true)
+            runCatching {
+                MessageController.getOneBatchOfOldMessages(
+                    folder = currentFolder.value!!,
+                    mailbox = currentMailbox.value!!,
+                    scope = this,
+                )
+            }
+            isDownloadingChanges.postValue(false)
         }
     }
 
@@ -339,12 +356,9 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun refreshThreads(
-        mailbox: Mailbox? = currentMailbox.value,
-        folderId: String? = currentFolderId,
-    ) = viewModelScope.launch(viewModelScope.handlerIO) {
+    private suspend fun refreshThreads(mailbox: Mailbox? = currentMailbox.value, folderId: String? = currentFolderId) {
 
-        if (mailbox == null || folderId == null) return@launch
+        if (mailbox == null || folderId == null) return
 
         FolderController.getFolder(folderId)?.let { folder ->
             isDownloadingChanges.postValue(true)

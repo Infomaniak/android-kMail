@@ -58,8 +58,14 @@ object SentryDebug {
         previousDestinationName = newDestinationName
     }
 
-    fun addUrlBreadcrumb(url: String) {
-        addInfoBreadcrumb("API", url)
+    fun addUrlBreadcrumb(url: String, requestContextId: String) {
+        addInfoBreadcrumb(
+            category = "API",
+            data = mapOf(
+                "url" to url,
+                "requestContextId" to requestContextId,
+            ),
+        )
     }
 
     fun addNotificationBreadcrumb(notification: String) {
