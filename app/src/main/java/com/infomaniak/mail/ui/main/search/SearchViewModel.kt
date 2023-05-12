@@ -32,15 +32,22 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.data.models.thread.ThreadResult
+import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.search.SearchFragment.VisibilityMode
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SearchUtils
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.sentry.Sentry
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
-class SearchViewModel(application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class SearchViewModel @Inject constructor(
+    application: Application,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+) : AndroidViewModel(application) {
 
     private inline val context: Context get() = getApplication()
 
@@ -55,7 +62,7 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
     val visibilityMode = MutableLiveData(VisibilityMode.RECENT_SEARCHES)
     val history = SingleLiveEvent<String>()
 
-    private val coroutineContext = viewModelScope.coroutineContext + Dispatchers.IO
+    private val coroutineContext = viewModelScope.coroutineContext + ioDispatcher
 
     /** It is simply used as a default value for the API */
     private lateinit var dummyFolderId: String
