@@ -178,13 +178,27 @@ fun LottieAnimationView.changePathColor(illuColors: IlluColors) {
     }
 }
 
-fun WebView.initWebViewClientAndBridge(attachments: List<Attachment>, messageUid: String) {
+fun WebView.initWebViewClientAndBridge(
+    attachments: List<Attachment>,
+    messageUid: String,
+    shouldLoadDistantResources: Boolean,
+    onBlockedResourcesDetected: () -> Unit
+): MessageWebViewClient {
     val cidDictionary = mutableMapOf<String, Attachment>()
     attachments.forEach {
         if (it.contentId?.isNotBlank() == true) cidDictionary[it.contentId as String] = it
     }
-    webViewClient = MessageWebViewClient(context, cidDictionary, messageUid)
+    val messageWebViewClient = MessageWebViewClient(
+        context,
+        cidDictionary,
+        messageUid,
+        shouldLoadDistantResources,
+        onBlockedResourcesDetected
+    )
+    webViewClient = messageWebViewClient
     addJavascriptInterface(jsBridge, "kmail")
+
+    return messageWebViewClient
 }
 //endregion
 

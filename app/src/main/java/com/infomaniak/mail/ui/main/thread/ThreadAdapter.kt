@@ -19,12 +19,14 @@ package com.infomaniak.mail.ui.main.thread
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ScaleGestureDetector
 import android.view.ViewConfiguration
 import android.view.ViewGroup
 import android.webkit.WebView
 import android.widget.FrameLayout
+import androidx.core.view.children
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
@@ -48,6 +50,9 @@ import com.infomaniak.mail.utils.Utils.TEXT_HTML
 import com.infomaniak.mail.utils.Utils.TEXT_PLAIN
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupThreadWebViewSettings
 import com.infomaniak.mail.utils.WebViewUtils.Companion.toggleWebViewTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.jsoup.Jsoup
 import java.util.*
 import com.google.android.material.R as RMaterial
@@ -259,6 +264,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
         handleHeaderClick(message)
         handleExpandDetailsClick(message)
         bindRecipientDetails(message, messageDate)
+        bindAlerts()
     }
 
     private fun Context.mailFormattedDate(date: Date): CharSequence = with(date) {
@@ -334,6 +340,34 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
 
         detailedMessageDate.text = context.mostDetailedDate(messageDate)
     }
+
+    private fun ThreadViewHolder.bindAlerts() = with(binding) {
+        distantImagesAlert.onAction1() {
+            bodyWebViewClient.unblockDistantResources()
+            fullMessageWebViewClient.unblockDistantResources()
+
+            if (bodyWebView.isVisible)
+                bodyWebView.apply {
+                    reload()
+                    invalidate()
+                }
+            else {
+                fullMessageWebView.apply {
+                    reload()
+                    invalidate()
+                }
+            }
+
+            distantImagesAlert.isGone = true
+            hideAlertGroupIfNoneDisplayed()
+        }
+    }
+
+    private fun ItemMessageBinding.hideAlertGroupIfNoneDisplayed() {
+        alertsGroup.isVisible = areOneOrMoreAlertsVisible()
+    }
+
+    private fun ItemMessageBinding.areOneOrMoreAlertsVisible() = alerts.children.any { it.isVisible }
 
     @SuppressLint("SetTextI18n")
     private fun ThreadViewHolder.bindAttachment(message: Message) = with(binding) {
@@ -446,6 +480,10 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
         val attachmentAdapter = AttachmentAdapter { onAttachmentClicked?.invoke(it) }
 
         private var doesWebViewNeedInit = true
+        private var _bodyWebViewClient: MessageWebViewClient? = null
+        private var _fullMessageWebViewClient: MessageWebViewClient? = null
+        val bodyWebViewClient get() = _bodyWebViewClient!!
+        val fullMessageWebViewClient get() = _fullMessageWebViewClient!!
 
         var splitBody: String? = null
         var splitQuote: String? = null
@@ -460,11 +498,33 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
             }
         }
 
+        private fun promptUserForDistantImages(binding: ItemMessageBinding) = with(binding) {
+            Log.e("gibran", "promptUserForDistantImages: got requested to show distant images", );
+            Log.e("gibran", "promptUserForDistantImages - distantImagesAlert.isVisible: ${distantImagesAlert.isVisible}")
+            if (distantImagesAlert.isGone) CoroutineScope(Dispatchers.Main).launch {
+                Log.e("gibran", "promptUserForDistantImages: showing distant image alert");
+                alertsGroup.isVisible = true
+                distantImagesAlert.isVisible = true
+            }
+        }
+
         fun initWebViewClientIfNeeded(message: Message) = with(binding) {
-            if (doesWebViewNeedInit) {
-                bodyWebView.initWebViewClientAndBridge(message.attachments, message.uid)
-                fullMessageWebView.initWebViewClientAndBridge(message.attachments, message.uid)
-                doesWebViewNeedInit = false
+            if (_bodyWebViewClient == null) {
+                _bodyWebViewClient = bodyWebView.initWebViewClientAndBridge(
+                    message.attachments,
+                    message.uid,
+                    false,
+                ) {
+                    promptUserForDistantImages(binding)
+                }
+                _fullMessageWebViewClient = fullMessageWebView.initWebViewClientAndBridge(
+                    message.attachments,
+                    message.uid,
+                    false,
+                ) {
+                    promptUserForDistantImages(binding)
+                }
+                // doesWebViewNeedInit = false
             }
         }
     }

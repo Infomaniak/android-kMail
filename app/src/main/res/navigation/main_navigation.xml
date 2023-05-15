@@ -101,6 +101,11 @@
             app:argType="com.infomaniak.mail.data.models.correspondent.Recipient"
             app:nullable="true" />
 
+        <argument
+            android:name="shouldLoadDistantResources"
+            android:defaultValue="false"
+            app:argType="boolean" />
+
     </activity>
 
     <fragment

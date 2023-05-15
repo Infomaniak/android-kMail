@@ -32,17 +32,24 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.Utils
+import java.io.ByteArrayInputStream
 
 class MessageWebViewClient(
     private val context: Context,
     private val cidDictionary: MutableMap<String, Attachment>,
     private val messageUid: String,
+    private var shouldLoadDistantResources: Boolean,
+    private val onBlockedResourcesDetected: () -> Unit,
 ) : WebViewClient() {
 
-    override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
+    // var blockedResourceCount = 0
+    private val emptyResource by lazy { WebResourceResponse("text/plain", "utf-8", ByteArrayInputStream(ByteArray(0))) }
 
-        if (request?.url?.scheme == CID_SCHEME) {
-            val cid = request.url.schemeSpecificPart
+    override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
+        Log.e("gibran", "shouldInterceptRequest - request?.url: ${request?.url}")
+        
+        if (request?.url?.scheme.equals(CID_SCHEME, ignoreCase = true)) {
+            val cid = request!!.url.schemeSpecificPart
             cidDictionary[cid]?.let { attachment ->
                 val cacheFile = attachment.getCacheFile(context)
 
@@ -64,7 +71,15 @@ class MessageWebViewClient(
             }
         }
 
-        return super.shouldInterceptRequest(view, request)
+        Log.e("gibran", "shouldInterceptRequest: not a CID", );
+        return if (shouldLoadDistantResources || request?.url?.scheme.equals(DATA_SCHEME, ignoreCase = true)) {
+            Log.e("gibran", "shouldInterceptRequest: loading resource normally or data: detected", );
+            super.shouldInterceptRequest(view, request)
+        } else {
+            Log.e("gibran", "shouldInterceptRequest: blocking resource", );
+            onBlockedResourcesDetected()
+            emptyResource
+        }
     }
 
     override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
@@ -86,9 +101,14 @@ class MessageWebViewClient(
         super.onPageFinished(webView, url)
     }
 
+    fun unblockDistantResources() {
+        shouldLoadDistantResources = true
+    }
+
     companion object {
         val TAG = MessageWebViewClient::class.simpleName
 
         const val CID_SCHEME = "cid"
+        const val DATA_SCHEME = "data"
     }
 }
