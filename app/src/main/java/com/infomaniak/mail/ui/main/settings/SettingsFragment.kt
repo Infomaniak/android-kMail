@@ -32,7 +32,6 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentSettingsBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.animatedNavigation
-import com.infomaniak.mail.utils.notYetImplemented
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -44,13 +43,12 @@ class SettingsFragment : Fragment() {
     private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
 
     private val mailboxesAdapter = SettingsMailboxesAdapter { selectedMailbox ->
-        notYetImplemented()
-        // animatedNavigation(
-        //     SettingsFragmentDirections.actionSettingsToMailboxSettings(
-        //         selectedMailbox.objectId,
-        //         selectedMailbox.email,
-        //     )
-        // )
+        animatedNavigation(
+            SettingsFragmentDirections.actionSettingsToMailboxSettings(
+                selectedMailbox.objectId,
+                selectedMailbox.email,
+            )
+        )
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {

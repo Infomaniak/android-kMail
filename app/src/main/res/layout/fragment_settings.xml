@@ -38,15 +38,13 @@
 
             <TextView
                 style="@style/SettingHeader"
-                android:text="@string/settingsSectionEmailAddresses"
-                android:visibility="gone" />
+                android:text="@string/settingsSectionEmailAddresses" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/mailboxesList"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:overScrollMode="never"
-                android:visibility="gone"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:itemCount="3"
                 tools:listitem="@layout/item_settings_mailbox" />
