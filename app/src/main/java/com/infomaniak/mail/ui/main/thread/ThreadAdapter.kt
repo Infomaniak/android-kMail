@@ -346,6 +346,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
         ) + " ($fileSize)"
         attachmentAdapter.setAttachments(attachments)
         attachmentLayout.attachmentsDownloadAllButton.setOnClickListener { onDownloadAllClicked?.invoke(message) }
+        attachmentLayout.root.isVisible = message.attachments.isNotEmpty()
     }
 
     private fun ItemMessageBinding.formatAttachmentFileSize(attachments: List<Attachment>): String {
@@ -363,47 +364,10 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
 
         if (shouldTrack) context.trackMessageEvent("openMessage", isExpanded)
 
-        collapseMessageDetails(message)
         setHeaderState(message, isExpanded)
-
-        fullMessageWebView.isGone = true
-
-        if (message.body?.value == null) {
-            messageLoader.isVisible = isExpanded
-            bodyWebView.isGone = true
-        } else {
-            messageLoader.isGone = true
-            bodyWebView.isVisible = isExpanded
-        }
-
-        if (isExpanded) {
-            loadBodyAndQuote(message)
-            displayAttachments(message.attachments)
-            if (message.hasQuote) quoteButton.text = context.getString(R.string.messageShowQuotedText)
-            quoteButtonFrameLayout.isVisible = message.hasQuote
-        } else {
-            hideAttachments()
-            quoteButtonFrameLayout.isGone = true
-        }
-    }
-
-    @SuppressLint("SetTextI18n")
-    private fun ItemMessageBinding.displayAttachments(attachments: List<Attachment>) {
-        if (attachments.isEmpty()) hideAttachments() else showAttachments()
-    }
-
-    private fun ItemMessageBinding.hideAttachments() {
-        attachmentLayout.root.isGone = true
-    }
-
-    private fun ItemMessageBinding.showAttachments() {
-        attachmentLayout.root.isVisible = true
-    }
-
-    private fun ItemMessageBinding.collapseMessageDetails(message: Message) {
-        message.detailsAreExpanded = false
-        messageDetails.isGone = true
-        recipientChevron.rotation = 0.0f
+        content.isVisible = isExpanded
+        messageLoader.isVisible = message.body?.value == null
+        if (isExpanded) loadBodyAndQuote(message)
     }
 
     private fun ItemMessageBinding.setHeaderState(message: Message, isExpanded: Boolean) = with(message) {
@@ -430,11 +394,17 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
     }
 
     private fun ThreadViewHolder.bindQuoteButton(message: Message) = with(binding) {
-        quoteButton.setOnClickListener {
-            val textId = if (fullMessageWebView.isVisible) R.string.messageShowQuotedText else R.string.messageHideQuotedText
-            quoteButton.text = context.getString(textId)
-            toggleWebViews(message)
+        quoteButton.apply {
+            setOnClickListener {
+                val textId = if (fullMessageWebView.isVisible) R.string.messageShowQuotedText else R.string.messageHideQuotedText
+                quoteButton.text = context.getString(textId)
+                toggleWebViews(message)
+            }
+
+            text = context.getString(R.string.messageShowQuotedText)
         }
+
+        quoteButtonFrameLayout.isVisible = message.hasQuote
     }
 
     fun updateContacts(newContacts: Map<String, Map<String, MergedContact>>) {

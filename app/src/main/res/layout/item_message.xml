@@ -15,11 +15,12 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/messageHeader"
@@ -173,338 +174,351 @@
     </com.google.android.material.card.MaterialCardView>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/messageDetails"
+        android:id="@+id/content"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="@dimen/marginStandardMedium"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/messageHeader">
+        android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/fromPrefix"
-            style="@style/BodySmall.Secondary"
-            android:layout_width="wrap_content"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/messageDetails"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/marginStandardMedium"
-            android:text="@string/fromTitle"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/fromRecyclerView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/marginStandardSmall"
-            android:paddingStart="@dimen/marginStandardVerySmall"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/prefixBarrier"
-            app:layout_constraintTop_toTopOf="@id/fromPrefix"
-            tools:ignore="RtlSymmetry"
-            tools:itemCount="2"
-            tools:listitem="@layout/item_detailed_contact" />
-
-        <TextView
-            android:id="@+id/toPrefix"
-            style="@style/BodySmall.Secondary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/marginStandardMedium"
-            android:layout_marginTop="@dimen/marginStandardSmall"
-            android:text="@string/toTitle"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/fromRecyclerView" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/toRecyclerView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/marginStandardSmall"
-            android:paddingStart="@dimen/marginStandardVerySmall"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/prefixBarrier"
-            app:layout_constraintTop_toTopOf="@id/toPrefix"
-            tools:ignore="RtlSymmetry"
-            tools:itemCount="3"
-            tools:listitem="@layout/item_detailed_contact" />
-
-        <TextView
-            android:id="@+id/ccPrefix"
-            style="@style/BodySmall.Secondary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/marginStandardMedium"
-            android:layout_marginTop="@dimen/marginStandardSmall"
-            android:text="@string/ccTitle"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/toRecyclerView" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/ccRecyclerView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/marginStandardSmall"
-            android:paddingStart="@dimen/marginStandardVerySmall"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/prefixBarrier"
-            app:layout_constraintTop_toTopOf="@id/ccPrefix"
-            tools:ignore="RtlSymmetry"
-            tools:itemCount="2"
-            tools:listitem="@layout/item_detailed_contact" />
-
-        <TextView
-            android:id="@+id/bccPrefix"
-            style="@style/BodySmall.Secondary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/marginStandardMedium"
-            android:layout_marginTop="@dimen/marginStandardSmall"
-            android:text="@string/bccTitle"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/ccRecyclerView" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/bccRecyclerView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/marginStandardSmall"
-            android:paddingStart="@dimen/marginStandardVerySmall"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/prefixBarrier"
-            app:layout_constraintTop_toTopOf="@id/bccPrefix"
-            tools:ignore="RtlSymmetry"
-            tools:itemCount="1"
-            tools:listitem="@layout/item_detailed_contact" />
-
-        <ImageView
-            android:id="@+id/detailedMessagePrefix"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:layout_marginStart="@dimen/marginStandardMedium"
-            android:layout_marginTop="@dimen/marginStandardSmall"
-            android:contentDescription="@string/dateTitle"
-            android:src="@drawable/ic_calendar"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/bccRecyclerView"
-            app:tint="@color/iconColor" />
-
-        <TextView
-            android:id="@+id/detailedMessageDate"
-            style="@style/BodySmall.Secondary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/marginStandardMedium"
-            app:layout_constraintBottom_toBottomOf="@id/detailedMessagePrefix"
-            app:layout_constraintStart_toEndOf="@id/prefixBarrier"
-            app:layout_constraintTop_toTopOf="@id/detailedMessagePrefix"
-            tools:text="10 juin 2022, 16:36" />
-
-        <androidx.constraintlayout.widget.Barrier
-            android:id="@+id/prefixBarrier"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:barrierDirection="right"
-            app:constraint_referenced_ids="fromPrefix,toPrefix,ccPrefix,bccPrefix,detailedMessagePrefix" />
-
-        <androidx.constraintlayout.widget.Group
-            android:id="@+id/fromGroup"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/marginStandardMedium"
             android:visibility="gone"
-            app:constraint_referenced_ids="fromPrefix,fromRecyclerView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible">
+
+            <TextView
+                android:id="@+id/fromPrefix"
+                style="@style/BodySmall.Secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/marginStandardMedium"
+                android:text="@string/fromTitle"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/fromRecyclerView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/marginStandardSmall"
+                android:paddingStart="@dimen/marginStandardVerySmall"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/prefixBarrier"
+                app:layout_constraintTop_toTopOf="@id/fromPrefix"
+                tools:ignore="RtlSymmetry"
+                tools:itemCount="2"
+                tools:listitem="@layout/item_detailed_contact" />
+
+            <TextView
+                android:id="@+id/toPrefix"
+                style="@style/BodySmall.Secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/marginStandardMedium"
+                android:layout_marginTop="@dimen/marginStandardSmall"
+                android:text="@string/toTitle"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/fromRecyclerView" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/toRecyclerView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/marginStandardSmall"
+                android:paddingStart="@dimen/marginStandardVerySmall"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/prefixBarrier"
+                app:layout_constraintTop_toTopOf="@id/toPrefix"
+                tools:ignore="RtlSymmetry"
+                tools:itemCount="3"
+                tools:listitem="@layout/item_detailed_contact" />
+
+            <TextView
+                android:id="@+id/ccPrefix"
+                style="@style/BodySmall.Secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/marginStandardMedium"
+                android:layout_marginTop="@dimen/marginStandardSmall"
+                android:text="@string/ccTitle"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/toRecyclerView" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/ccRecyclerView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/marginStandardSmall"
+                android:paddingStart="@dimen/marginStandardVerySmall"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/prefixBarrier"
+                app:layout_constraintTop_toTopOf="@id/ccPrefix"
+                tools:ignore="RtlSymmetry"
+                tools:itemCount="2"
+                tools:listitem="@layout/item_detailed_contact" />
+
+            <TextView
+                android:id="@+id/bccPrefix"
+                style="@style/BodySmall.Secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/marginStandardMedium"
+                android:layout_marginTop="@dimen/marginStandardSmall"
+                android:text="@string/bccTitle"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/ccRecyclerView" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/bccRecyclerView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/marginStandardSmall"
+                android:paddingStart="@dimen/marginStandardVerySmall"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/prefixBarrier"
+                app:layout_constraintTop_toTopOf="@id/bccPrefix"
+                tools:ignore="RtlSymmetry"
+                tools:itemCount="1"
+                tools:listitem="@layout/item_detailed_contact" />
+
+            <ImageView
+                android:id="@+id/detailedMessagePrefix"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_marginStart="@dimen/marginStandardMedium"
+                android:layout_marginTop="@dimen/marginStandardSmall"
+                android:contentDescription="@string/dateTitle"
+                android:src="@drawable/ic_calendar"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/bccRecyclerView"
+                app:tint="@color/iconColor" />
+
+            <TextView
+                android:id="@+id/detailedMessageDate"
+                style="@style/BodySmall.Secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                app:layout_constraintBottom_toBottomOf="@id/detailedMessagePrefix"
+                app:layout_constraintStart_toEndOf="@id/prefixBarrier"
+                app:layout_constraintTop_toTopOf="@id/detailedMessagePrefix"
+                tools:text="10 juin 2022, 16:36" />
+
+            <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/prefixBarrier"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:barrierDirection="right"
+                app:constraint_referenced_ids="fromPrefix,toPrefix,ccPrefix,bccPrefix,detailedMessagePrefix" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/fromGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:constraint_referenced_ids="fromPrefix,fromRecyclerView"
+                tools:visibility="visible" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/toGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:constraint_referenced_ids="toPrefix,toRecyclerView"
+                tools:visibility="visible" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/ccGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:constraint_referenced_ids="ccPrefix,ccRecyclerView"
+                tools:visibility="visible" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/bccGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:constraint_referenced_ids="bccPrefix,bccRecyclerView"
+                tools:visibility="visible" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/alertsTopDivider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            app:dividerColor="@color/separatorColor"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/messageDetails" />
+
+        <LinearLayout
+            android:id="@+id/alerts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:divider="@drawable/divider"
+            android:orientation="vertical"
+            android:showDividers="middle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/alertsTopDivider">
+
+            <com.infomaniak.mail.ui.main.thread.MessageAlertView
+                android:id="@+id/distantImagesAlert"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                android:visibility="gone"
+                app:action1="Afficher le contenu"
+                app:action2="Toujours afficher pour cet expéditeur"
+                app:description="Pour votre sécurité nous avons bloqué certains contenus de votre message."
+                app:icon="@drawable/ic_message_alert_distant_images"
+                tools:visibility="visible" />
+
+        </LinearLayout>
+
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/alertsBottomDivider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            app:dividerColor="@color/separatorColor"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/alerts" />
+
+        <include
+            android:id="@+id/attachmentLayout"
+            layout="@layout/layout_attachments"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/alertsBottomDivider"
+            app:layout_goneMarginTop="0dp"
             tools:visibility="visible" />
 
-        <androidx.constraintlayout.widget.Group
-            android:id="@+id/toGroup"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/messageLoader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/attachmentLayout">
+
+            <com.infomaniak.lib.core.views.LoaderTextView
+                style="@style/Label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                android:layout_marginBottom="@dimen/marginStandardVerySmall"
+                android:maxWidth="900dp" />
+
+            <com.infomaniak.lib.core.views.LoaderTextView
+                style="@style/Label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                android:layout_marginBottom="@dimen/marginStandardVerySmall"
+                android:maxWidth="900dp" />
+
+            <com.infomaniak.lib.core.views.LoaderTextView
+                style="@style/Label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                android:layout_marginBottom="@dimen/marginStandardVerySmall"
+                android:maxWidth="900dp" />
+
+            <com.infomaniak.lib.core.views.LoaderTextView
+                style="@style/Label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                android:layout_marginBottom="@dimen/marginStandardVerySmall"
+                android:maxWidth="900dp" />
+
+            <com.infomaniak.lib.core.views.LoaderTextView
+                style="@style/Label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                android:layout_marginBottom="@dimen/marginStandardVerySmall"
+                android:maxWidth="200dp" />
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/webViewsFrameLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintBottom_toTopOf="@id/quoteButtonFrameLayout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/attachmentLayout">
+
+            <WebView
+                android:id="@+id/bodyWebView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="horizontal" />
+
+            <WebView
+                android:id="@+id/fullMessageWebView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="horizontal"
+                android:visibility="gone" />
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/quoteButtonFrameLayout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:visibility="gone"
-            app:constraint_referenced_ids="toPrefix,toRecyclerView"
-            tools:visibility="visible" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/webViewsFrameLayout"
+            tools:visibility="visible">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/quoteButton"
+                style="@style/TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/marginStandardSmall"
+                android:insetLeft="@dimen/alternativeMargin"
+                android:insetTop="@dimen/marginStandardVerySmall"
+                android:insetRight="@dimen/alternativeMargin"
+                android:insetBottom="@dimen/marginStandardVerySmall"
+                android:minHeight="0dp"
+                android:padding="@dimen/marginStandardVerySmall"
+                android:text="@string/messageShowQuotedText" />
+
+        </FrameLayout>
 
         <androidx.constraintlayout.widget.Group
-            android:id="@+id/ccGroup"
+            android:id="@+id/alertsGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="gone"
-            app:constraint_referenced_ids="ccPrefix,ccRecyclerView"
-            tools:visibility="visible" />
-
-        <androidx.constraintlayout.widget.Group
-            android:id="@+id/bccGroup"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:constraint_referenced_ids="bccPrefix,bccRecyclerView"
+            app:constraint_referenced_ids="alertsBottomDivider,alerts,alertsTopDivider"
             tools:visibility="visible" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <com.google.android.material.divider.MaterialDivider
-        android:id="@+id/alertsTopDivider"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        app:dividerColor="@color/separatorColor"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/messageDetails" />
-
-    <LinearLayout
-        android:id="@+id/alerts"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:divider="@drawable/divider"
-        android:orientation="vertical"
-        android:showDividers="middle"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/alertsTopDivider">
-
-        <com.infomaniak.mail.ui.main.thread.MessageAlertView
-            android:id="@+id/distantImagesAlert"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/marginStandardMedium"
-            app:action1="Afficher le contenu"
-            app:action2="Toujours afficher pour cet expéditeur"
-            app:description="Pour votre sécurité nous avons bloqué certains contenus de votre message."
-            app:icon="@drawable/ic_message_alert_distant_images" />
-
-    </LinearLayout>
-
-    <com.google.android.material.divider.MaterialDivider
-        android:id="@+id/alertsBottomDivider"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        app:dividerColor="@color/separatorColor"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/alerts" />
-
-    <include
-        android:id="@+id/attachmentLayout"
-        layout="@layout/layout_attachments"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/alertsBottomDivider"
-        app:layout_goneMarginTop="0dp" />
-
-    <LinearLayout
-        android:id="@+id/messageLoader"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/attachmentLayout">
-
-        <com.infomaniak.lib.core.views.LoaderTextView
-            style="@style/Label"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/marginStandardMedium"
-            android:layout_marginBottom="@dimen/marginStandardVerySmall"
-            android:maxWidth="900dp" />
-
-        <com.infomaniak.lib.core.views.LoaderTextView
-            style="@style/Label"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/marginStandardMedium"
-            android:layout_marginBottom="@dimen/marginStandardVerySmall"
-            android:maxWidth="900dp" />
-
-        <com.infomaniak.lib.core.views.LoaderTextView
-            style="@style/Label"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/marginStandardMedium"
-            android:layout_marginBottom="@dimen/marginStandardVerySmall"
-            android:maxWidth="900dp" />
-
-        <com.infomaniak.lib.core.views.LoaderTextView
-            style="@style/Label"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/marginStandardMedium"
-            android:layout_marginBottom="@dimen/marginStandardVerySmall"
-            android:maxWidth="900dp" />
-
-        <com.infomaniak.lib.core.views.LoaderTextView
-            style="@style/Label"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/marginStandardMedium"
-            android:layout_marginBottom="@dimen/marginStandardVerySmall"
-            android:maxWidth="200dp" />
-    </LinearLayout>
-
-    <FrameLayout
-        android:id="@+id/webViewsFrameLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintBottom_toTopOf="@id/quoteButtonFrameLayout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/attachmentLayout">
-
-        <WebView
-            android:id="@+id/bodyWebView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:scrollbars="horizontal" />
-
-        <WebView
-            android:id="@+id/fullMessageWebView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:scrollbars="horizontal"
-            android:visibility="gone" />
-
-    </FrameLayout>
-
-    <FrameLayout
-        android:id="@+id/quoteButtonFrameLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/webViewsFrameLayout"
-        tools:visibility="visible">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/quoteButton"
-            style="@style/TextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/marginStandardSmall"
-            android:insetLeft="@dimen/alternativeMargin"
-            android:insetTop="@dimen/marginStandardVerySmall"
-            android:insetRight="@dimen/alternativeMargin"
-            android:insetBottom="@dimen/marginStandardVerySmall"
-            android:minHeight="0dp"
-            android:padding="@dimen/marginStandardVerySmall"
-            android:text="@string/messageShowQuotedText" />
-
-    </FrameLayout>
-
-    <androidx.constraintlayout.widget.Group
-        android:id="@+id/alertsGroup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:constraint_referenced_ids="alertsBottomDivider,alerts,alertsTopDivider"
-        tools:visibility="visible" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>
