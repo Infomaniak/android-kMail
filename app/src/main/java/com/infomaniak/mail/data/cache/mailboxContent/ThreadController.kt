@@ -104,7 +104,7 @@ class ThreadController @Inject constructor(
                 remoteMessage.body = localMessage?.body?.copyFromRealm()
 
                 remoteThread.messagesIds += remoteMessage.messageIds
-                searchFolder.messages.add(remoteMessage)
+                if (!searchFolder.messages.contains(remoteMessage)) searchFolder.messages.add(remoteMessage)
             }
         }
 
