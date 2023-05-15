@@ -92,8 +92,12 @@ class Attachment : EmbeddedRealmObject {
         userId: Int = AccountUtils.currentUserId,
         mailboxId: Int = AccountUtils.currentMailboxId,
     ): File {
-        val cacheFolder = LocalStorageUtils.getAttachmentsCacheDir(context, uuid, userId, mailboxId)
+        val cacheFolder = LocalStorageUtils.getAttachmentsCacheDir(context, extractPathFromResource(), userId, mailboxId)
         return File(cacheFolder, name)
+    }
+
+    private fun extractPathFromResource(): String {
+        return resource?.substringAfter("folder/")?.replace(Regex("(message|attachment)/"), "") ?: ""
     }
 
     fun getUploadLocalFile(
