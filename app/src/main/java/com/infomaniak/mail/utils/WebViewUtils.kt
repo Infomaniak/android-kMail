@@ -111,17 +111,13 @@ class WebViewUtils(context: Context) {
 
         fun WebView.toggleWebViewTheme(isThemeTheSame: Boolean) {
             if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
-                Log.e("gibran", "toggleWebViewTheme - allowing algorithmic darkening: ${isThemeTheSame}")
                 WebSettingsCompat.setAlgorithmicDarkeningAllowed(settings, isThemeTheSame)
             }
 
-            Log.e("gibran", "toggleWebViewTheme: toggling dark/light mode for the mail", );
-            Log.e("gibran", "toggleWebViewTheme - isThemeTheSame: ${isThemeTheSame}")
             if (isThemeTheSame) addBackgroundJs() else removeBackgroundJs()
         }
 
         private fun WebView.addBackgroundJs() {
-            Log.e("gibran", "addBackgroundJs: displaying as dark and adding black bg", );
             val css = context.readRawResource(R.raw.custom_dark_mode)
             evaluateJavascript(
                 """ var style = document.createElement('style')
@@ -134,7 +130,6 @@ class WebViewUtils(context: Context) {
         }
 
         private fun WebView.removeBackgroundJs() {
-            Log.e("gibran", "removeBackgroundJs: displaying as light and removing dark bg", );
             val removeBackgroundStyleScript = "document.getElementById(\"$DARK_BACKGROUND_STYLE_ID\").remove()"
             evaluateJavascript(removeBackgroundStyleScript, null)
         }

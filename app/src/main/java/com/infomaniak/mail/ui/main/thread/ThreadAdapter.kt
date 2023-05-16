@@ -19,7 +19,6 @@ package com.infomaniak.mail.ui.main.thread
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ScaleGestureDetector
 import android.view.ViewConfiguration
@@ -517,10 +516,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
         }
 
         private fun promptUserForDistantImages(binding: ItemMessageBinding) = with(binding) {
-            Log.e("gibran", "promptUserForDistantImages: got requested to show distant images");
-            Log.e("gibran", "promptUserForDistantImages - distantImagesAlert.isVisible: ${distantImagesAlert.isVisible}")
             if (distantImagesAlert.isGone) CoroutineScope(Dispatchers.Main).launch {
-                Log.e("gibran", "promptUserForDistantImages: showing distant image alert");
                 alertsGroup.isVisible = true
                 distantImagesAlert.isVisible = true
             }

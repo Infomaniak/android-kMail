@@ -46,18 +46,14 @@ class MessageWebViewClient(
     private val emptyResource by lazy { WebResourceResponse("text/plain", "utf-8", ByteArrayInputStream(ByteArray(0))) }
 
     override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
-        Log.e("gibran", "shouldInterceptRequest - request?.url: ${request?.url}")
-        
         if (request?.url?.scheme.equals(CID_SCHEME, ignoreCase = true)) {
             val cid = request!!.url.schemeSpecificPart
             cidDictionary[cid]?.let { attachment ->
                 val cacheFile = attachment.getCacheFile(context)
 
                 val data = if (attachment.hasUsableCache(context, cacheFile)) {
-                    Log.d(TAG, "shouldInterceptRequest: load ${attachment.name} from local")
                     cacheFile.inputStream()
                 } else {
-                    Log.d(TAG, "shouldInterceptRequest: load ${attachment.name} from remote")
                     runCatching {
                         val resource = attachment.resource ?: return super.shouldInterceptRequest(view, request)
                         ApiRepository.downloadAttachment(resource)
@@ -71,12 +67,9 @@ class MessageWebViewClient(
             }
         }
 
-        Log.e("gibran", "shouldInterceptRequest: not a CID", );
         return if (shouldLoadDistantResources || request?.url?.scheme.equals(DATA_SCHEME, ignoreCase = true)) {
-            Log.e("gibran", "shouldInterceptRequest: loading resource normally or data: detected", );
             super.shouldInterceptRequest(view, request)
         } else {
-            Log.e("gibran", "shouldInterceptRequest: blocking resource", );
             onBlockedResourcesDetected()
             emptyResource
         }
