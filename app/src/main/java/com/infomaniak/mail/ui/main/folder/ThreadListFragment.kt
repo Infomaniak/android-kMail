@@ -465,7 +465,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun observerDraftsActionsCompletedWorks() {
         fun observeDraftsActions() {
-            draftsActionsWorkerScheduler.getCompletedWorkInfosLiveData().observe(viewLifecycleOwner) {
+            draftsActionsWorkerScheduler.getCompletedWorkInfoLiveData().observe(viewLifecycleOwner) {
 
                 it.forEach { workInfo ->
                     workInfo.outputData

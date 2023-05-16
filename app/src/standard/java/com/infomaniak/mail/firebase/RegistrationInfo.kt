@@ -21,7 +21,7 @@ import android.content.ContentResolver
 import android.content.Context
 import android.provider.Settings
 
-class RegistrationInfos private constructor(
+class RegistrationInfo private constructor(
     private val token: String,
     private val name: String,
     private val os: String = OS_NAME,
