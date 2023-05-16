@@ -56,8 +56,8 @@ import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.login.InfomaniakLogin
-import com.infomaniak.mail.ApplicationMain
 import com.infomaniak.mail.BuildConfig
+import com.infomaniak.mail.MainApplication
 import com.infomaniak.mail.MatomoMail.OPEN_FROM_DRAFT_NAME
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
@@ -475,5 +475,5 @@ private fun Context.changeToolbarColorOnScroll(
 }
 
 fun Application.resetLastAppClosing() {
-    (this as ApplicationMain).lastAppClosing = null
+    (this as MainApplication).lastAppClosing = null
 }

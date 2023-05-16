@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.infomaniak.lib.applock.LockActivity
 import com.infomaniak.lib.applock.Utils.isKeyguardSecure
-import com.infomaniak.mail.ApplicationMain
+import com.infomaniak.mail.MainApplication
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.utils.AccountUtils
@@ -54,7 +54,7 @@ open class ThemedActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        val lastAppClosing = (application as ApplicationMain).lastAppClosing
+        val lastAppClosing = (application as MainApplication).lastAppClosing
 
         if (lastAppClosing != null && isKeyguardSecure() && localSettings.isAppLocked) {
             LockActivity.lockAfterTimeout(
