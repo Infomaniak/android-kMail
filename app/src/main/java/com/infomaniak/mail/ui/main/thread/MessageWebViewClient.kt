@@ -20,7 +20,6 @@ package com.infomaniak.mail.ui.main.thread
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.util.Log
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
@@ -67,7 +66,11 @@ class MessageWebViewClient(
             }
         }
 
-        return if (shouldLoadDistantResources || request?.url?.scheme.equals(DATA_SCHEME, ignoreCase = true)) {
+        val shouldLoadResource = shouldLoadDistantResources
+                || request?.url?.scheme.equals(DATA_SCHEME, ignoreCase = true)
+                || trustedUrls.any { it.find(request?.url.toString()) != null }
+
+        return if (shouldLoadResource) {
             super.shouldInterceptRequest(view, request)
         } else {
             onBlockedResourcesDetected()
@@ -103,5 +106,15 @@ class MessageWebViewClient(
 
         const val CID_SCHEME = "cid"
         const val DATA_SCHEME = "data"
+
+        val trustedUrls = listOf(
+            "https://.*?.infomaniak.com".toRegex(),
+            "https://.*?.storage.infomaniak.com".toRegex(),
+            "https://storage-master.infomaniak.ch".toRegex(),
+            "http://infomaniak.statslive.info".toRegex(),
+            "https://static.infomaniak.ch".toRegex(),
+        )
+
     }
+
 }
