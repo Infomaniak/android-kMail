@@ -63,6 +63,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
 
     var messages = listOf<Message>()
         private set
+    private val manuallyAllowedMessageUids = mutableSetOf<String>()
     var isExpandedMap = mutableMapOf<String, Boolean>()
     var isThemeTheSameMap = mutableMapOf<String, Boolean>()
     var contacts: Map<String, Map<String, MergedContact>> = emptyMap()
@@ -127,6 +128,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
     override fun onBindViewHolder(holder: ThreadViewHolder, position: Int) = with(holder) {
         val message = messages[position]
 
+        // TODO : Redebloquer le webclient pour charger les images
         initMapForNewMessage(message, position)
 
         bindHeader(message)
@@ -265,7 +267,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
         handleHeaderClick(message)
         handleExpandDetailsClick(message)
         bindRecipientDetails(message, messageDate)
-        bindAlerts()
+        bindAlerts(message.uid)
     }
 
     private fun Context.mailFormattedDate(date: Date): CharSequence = with(date) {
@@ -342,25 +344,31 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
         detailedMessageDate.text = context.mostDetailedDate(messageDate)
     }
 
-    private fun ThreadViewHolder.bindAlerts() = with(binding) {
+    private fun ThreadViewHolder.bindAlerts(messageUid: String) = with(binding) {
         distantImagesAlert.onAction1() {
             bodyWebViewClient.unblockDistantResources()
             fullMessageWebViewClient.unblockDistantResources()
 
-            if (bodyWebView.isVisible)
-                bodyWebView.apply {
-                    reload()
-                    invalidate()
-                }
-            else {
-                fullMessageWebView.apply {
-                    reload()
-                    invalidate()
-                }
-            }
+            manuallyAllowedMessageUids.add(messageUid)
+
+            reloadVisibleWebView()
 
             distantImagesAlert.isGone = true
             hideAlertGroupIfNoneDisplayed()
+        }
+    }
+
+    private fun ItemMessageBinding.reloadVisibleWebView() {
+        if (bodyWebView.isVisible)
+            bodyWebView.apply {
+                reload()
+                invalidate() // TODO : Necessary ?
+            }
+        else {
+            fullMessageWebView.apply {
+                reload()
+                invalidate() // TODO : Necessary ?
+            }
         }
     }
 
@@ -456,6 +464,8 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
         notifyItemRangeChanged(0, itemCount, NotificationType.RERENDER)
     }
 
+    fun isMessageUidManuallyAllowed(messageUid: String) = manuallyAllowedMessageUids.contains(messageUid)
+
     private enum class NotificationType {
         AVATAR,
         TOGGLE_LIGHT_MODE,
@@ -502,7 +512,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
         }
 
         private fun promptUserForDistantImages(binding: ItemMessageBinding) = with(binding) {
-            Log.e("gibran", "promptUserForDistantImages: got requested to show distant images", );
+            Log.e("gibran", "promptUserForDistantImages: got requested to show distant images");
             Log.e("gibran", "promptUserForDistantImages - distantImagesAlert.isVisible: ${distantImagesAlert.isVisible}")
             if (distantImagesAlert.isGone) CoroutineScope(Dispatchers.Main).launch {
                 Log.e("gibran", "promptUserForDistantImages: showing distant image alert");

@@ -68,17 +68,32 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 //region Main actions
                 override fun onReply() {
                     trackBottomSheetMessageActionsEvent(ACTION_REPLY_NAME)
-                    safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUid, currentClassName)
+                    safeNavigateToNewMessageActivity(
+                        draftMode = DraftMode.REPLY,
+                        messageUid = messageUid,
+                        currentClassName = currentClassName,
+                        shouldLoadDistantResources = navigationArgs.shouldLoadDistantResources
+                    )
                 }
 
                 override fun onReplyAll() {
                     trackBottomSheetMessageActionsEvent(ACTION_REPLY_ALL_NAME)
-                    safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUid, currentClassName)
+                    safeNavigateToNewMessageActivity(
+                        draftMode = DraftMode.REPLY_ALL,
+                        messageUid = messageUid,
+                        currentClassName = currentClassName,
+                        shouldLoadDistantResources = navigationArgs.shouldLoadDistantResources
+                    )
                 }
 
                 override fun onForward() {
                     trackBottomSheetMessageActionsEvent(ACTION_FORWARD_NAME)
-                    safeNavigateToNewMessageActivity(DraftMode.FORWARD, messageUid, currentClassName)
+                    safeNavigateToNewMessageActivity(
+                        draftMode = DraftMode.FORWARD,
+                        messageUid = messageUid,
+                        currentClassName = currentClassName,
+                        shouldLoadDistantResources = navigationArgs.shouldLoadDistantResources
+                    )
                 }
 
                 override fun onDelete() {

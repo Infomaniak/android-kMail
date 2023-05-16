@@ -101,6 +101,7 @@
             app:argType="com.infomaniak.mail.data.models.correspondent.Recipient"
             app:nullable="true" />
 
+        <!--TODO : Remove defaultValue-->
         <argument
             android:name="shouldLoadDistantResources"
             android:defaultValue="false"
@@ -207,6 +208,9 @@
         <argument
             android:name="isThemeTheSame"
             app:argType="boolean" />
+        <argument
+            android:name="shouldLoadDistantResources"
+            app:argType="boolean" />
         <action
             android:id="@+id/action_messageActionsBottomSheet_to_newMessageActivity"
             app:destination="@id/newMessageActivity" />
@@ -225,6 +229,9 @@
             android:defaultValue="@null"
             app:argType="string"
             app:nullable="true" />
+        <argument
+            android:name="shouldLoadDistantResources"
+            app:argType="boolean" />
         <action
             android:id="@+id/action_threadActionsBottomSheet_to_newMessageActivity"
             app:destination="@id/newMessageActivity" />
@@ -238,6 +245,9 @@
         <argument
             android:name="messageUid"
             app:argType="string" />
+        <argument
+            android:name="shouldLoadDistantResources"
+            app:argType="boolean" />
         <action
             android:id="@+id/action_replyBottomSheetDialog_to_newMessageActivity"
             app:destination="@id/newMessageActivity" />

@@ -333,7 +333,12 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 false
             }
             SwipeAction.QUICKACTIONS_MENU -> {
-                safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(threadUid))
+                safeNavigate(
+                    ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(
+                        threadUid = threadUid,
+                        shouldLoadDistantResources = false,
+                    )
+                )
                 true
             }
             SwipeAction.READ_UNREAD -> {
