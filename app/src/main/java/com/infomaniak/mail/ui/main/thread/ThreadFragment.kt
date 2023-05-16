@@ -87,6 +87,21 @@ class ThreadFragment : Fragment() {
     // When opening the Thread, we want to scroll to the last Message, but only once.
     private var shouldScrollToBottom = AtomicBoolean(true)
 
+    override fun onPause() {
+        Log.e("gibran", "onPause: ", );
+        super.onPause()
+    }
+
+    override fun onStop() {
+        Log.e("gibran", "onStop: ", );
+        super.onStop()
+    }
+
+    override fun onDestroy() {
+        Log.e("gibran", "onDestroy: ", );
+        super.onDestroy()
+    }
+
     override fun onConfigurationChanged(newConfig: Configuration) {
         threadAdapter.rerenderMails() // TODO : Try to undo js script and recall the method to fix rendering
         super.onConfigurationChanged(newConfig)

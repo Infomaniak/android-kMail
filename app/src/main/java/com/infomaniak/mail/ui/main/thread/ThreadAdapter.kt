@@ -128,7 +128,6 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
     override fun onBindViewHolder(holder: ThreadViewHolder, position: Int) = with(holder) {
         val message = messages[position]
 
-        // TODO : Redebloquer le webclient pour charger les images
         initMapForNewMessage(message, position)
 
         bindHeader(message)
@@ -136,7 +135,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
 
         displayExpandedCollapsedMessage(message, shouldTrack = false)
 
-        bindQuoteButton(message)
+        bindContent(message)
     }
 
     private fun initMapForNewMessage(message: Message, position: Int) {
@@ -261,8 +260,6 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
         }
 
         setDetailedFieldsVisibility(message)
-
-        initWebViewClientIfNeeded(message)
 
         handleHeaderClick(message)
         handleExpandDetailsClick(message)
@@ -436,7 +433,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
         return listOf(*to.toTypedArray(), *cc.toTypedArray(), *bcc.toTypedArray()).joinToString { it.displayedName(context) }
     }
 
-    private fun ThreadViewHolder.bindQuoteButton(message: Message) = with(binding) {
+    private fun ThreadViewHolder.bindContent(message: Message) = with(binding) {
         quoteButton.apply {
             setOnClickListener {
                 val textId = if (fullMessageWebView.isVisible) R.string.messageShowQuotedText else R.string.messageHideQuotedText
@@ -448,6 +445,14 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
         }
 
         quoteButtonFrameLayout.isVisible = message.hasQuote
+
+        initWebViewClientIfNeeded(message)
+
+        // If the view holder got recreated while the fragment is not destroyed, keep the user's choice effective
+        if (isMessageUidManuallyAllowed(message.uid)) {
+            bodyWebViewClient.unblockDistantResources()
+            fullMessageWebViewClient.unblockDistantResources()
+        }
     }
 
     fun updateContacts(newContacts: Map<String, Map<String, MergedContact>>) {
