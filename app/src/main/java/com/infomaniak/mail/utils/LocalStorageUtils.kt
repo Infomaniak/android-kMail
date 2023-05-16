@@ -38,10 +38,11 @@ object LocalStorageUtils {
 
     fun getAttachmentsCacheDir(
         context: Context,
+        attachmentPath: String,
         userId: Int = AccountUtils.currentUserId,
         mailboxId: Int = AccountUtils.currentMailboxId,
     ): File {
-        return generateRootDir(context.attachmentsCacheRootDir, userId, mailboxId)
+        return File(generateRootDir(context.attachmentsCacheRootDir, userId, mailboxId), attachmentPath)
     }
 
     fun getAttachmentsUploadDir(
