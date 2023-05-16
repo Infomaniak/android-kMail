@@ -26,6 +26,7 @@ import androidx.navigation.fragment.navArgs
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentMailboxSettingsBinding
 import com.infomaniak.mail.ui.main.settings.ItemSettingView
+import com.infomaniak.mail.utils.animatedNavigation
 import com.infomaniak.mail.utils.notYetImplemented
 
 class MailboxSettingsFragment : Fragment() {
@@ -54,7 +55,9 @@ class MailboxSettingsFragment : Fragment() {
     }
 
     private fun setupListeners() = with(binding) {
-        settingsMailboxGeneralSignature.setOnClickListener { notYetImplemented() }
+        settingsMailboxGeneralSignature.setOnClickListener {
+            animatedNavigation(MailboxSettingsFragmentDirections.actionMailboxSettingsToSignatureSetting())
+        }
         settingsMailboxGeneralAutoreply.setOnClickListener { notYetImplemented() }
         settingsMailboxGeneralFolders.setOnClickListener { notYetImplemented() }
         settingsMailboxGeneralNotifications.setOnClickListener { notYetImplemented() }
