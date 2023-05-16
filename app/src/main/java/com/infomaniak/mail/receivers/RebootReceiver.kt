@@ -20,11 +20,12 @@ package com.infomaniak.mail.receivers
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.workers.SyncMailboxesWorker
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -34,8 +35,12 @@ class RebootReceiver : BroadcastReceiver() {
     @Inject
     lateinit var syncMailboxesWorkerScheduler: SyncMailboxesWorker.Scheduler
 
+    @Inject
+    @IoDispatcher
+    lateinit var ioDispatcher: CoroutineDispatcher
+
     override fun onReceive(context: Context, intent: Intent?) {
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(ioDispatcher).launch {
             val appNotStarted = AccountUtils.currentUser == null
             if (intent?.action == Intent.ACTION_BOOT_COMPLETED && appNotStarted) {
                 syncMailboxesWorkerScheduler.scheduleWorkIfNeeded()

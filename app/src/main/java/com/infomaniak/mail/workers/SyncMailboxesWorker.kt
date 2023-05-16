@@ -25,24 +25,28 @@ import androidx.work.PeriodicWorkRequest.Companion.MIN_PERIODIC_INTERVAL_MILLIS
 import com.infomaniak.mail.GplayUtils.isGooglePlayServicesNotAvailable
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
+import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.FetchMessagesManager
-import kotlinx.coroutines.Dispatchers
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @HiltWorker
-class SyncMailboxesWorker @Inject constructor(
-    appContext: Context,
-    params: WorkerParameters,
+class SyncMailboxesWorker @AssistedInject constructor(
+    @Assisted appContext: Context,
+    @Assisted params: WorkerParameters,
     private val fetchMessagesManager: FetchMessagesManager,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : BaseCoroutineWorker(appContext, params) {
 
     private val mailboxInfoRealm by lazy { RealmDatabase.newMailboxInfoInstance }
 
-    override suspend fun launchWork(): Result = withContext(Dispatchers.IO) {
+    override suspend fun launchWork(): Result = withContext(ioDispatcher) {
         Log.d(TAG, "Work launched")
 
         AccountUtils.getAllUsersSync().forEach { user ->
@@ -64,9 +68,10 @@ class SyncMailboxesWorker @Inject constructor(
     class Scheduler @Inject constructor(
         private val appContext: Context,
         private val workManager: WorkManager,
+        @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     ) {
 
-        suspend fun scheduleWorkIfNeeded() = withContext(Dispatchers.IO) {
+        suspend fun scheduleWorkIfNeeded() = withContext(ioDispatcher) {
 
             if (appContext.isGooglePlayServicesNotAvailable() && AccountUtils.getAllUsersCount() > 0) {
                 Log.d(TAG, "Work scheduled")

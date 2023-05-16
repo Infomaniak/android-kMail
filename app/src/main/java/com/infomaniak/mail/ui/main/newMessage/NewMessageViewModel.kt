@@ -40,25 +40,34 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
+import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.main.SnackBarManager
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.realmListOf
 import kotlinx.coroutines.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import javax.inject.Inject
 
-class NewMessageViewModel(application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class NewMessageViewModel @Inject constructor(
+    application: Application,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
+) : AndroidViewModel(application) {
 
     private inline val context: Context get() = getApplication()
 
     var draft: Draft = Draft()
 
-    private val coroutineContext = viewModelScope.coroutineContext + Dispatchers.IO
+    private val coroutineContext = viewModelScope.coroutineContext + ioDispatcher
     private var autoSaveJob: Job? = null
 
     var isAutoCompletionOpened = false
@@ -96,7 +105,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
         emit(mailboxes to currentMailboxIndex)
     }
 
-    fun initDraftAndViewModel(navigationArgs: NewMessageActivityArgs): LiveData<Boolean> = liveData(Dispatchers.IO) {
+    fun initDraftAndViewModel(navigationArgs: NewMessageActivityArgs): LiveData<Boolean> = liveData(ioDispatcher) {
         with(navigationArgs) {
             val isSuccess = RealmDatabase.mailboxContent().writeBlocking {
                 draft = if (draftExists) {
@@ -203,7 +212,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
         )
     }
 
-    fun updateDraftInLocalIfRemoteHasChanged() = viewModelScope.launch(Dispatchers.IO) {
+    fun updateDraftInLocalIfRemoteHasChanged() = viewModelScope.launch(ioDispatcher) {
         if (draft.remoteUuid == null) {
             DraftController.getDraft(draft.localUuid)?.let { localDraft ->
                 draft.remoteUuid = localDraft.remoteUuid
@@ -256,19 +265,19 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
 
     fun saveDraftDebouncing() {
         autoSaveJob?.cancel()
-        autoSaveJob = viewModelScope.launch(Dispatchers.IO) {
+        autoSaveJob = viewModelScope.launch(ioDispatcher) {
             delay(DELAY_BEFORE_AUTO_SAVING_DRAFT)
             saveDraftToLocal(DraftAction.SAVE)
         }
     }
 
-    fun saveToLocalAndFinish(action: DraftAction, displayToast: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
+    fun saveToLocalAndFinish(action: DraftAction, displayToast: () -> Unit) = viewModelScope.launch(ioDispatcher) {
         autoSaveJob?.cancel()
 
         if (shouldExecuteAction(action)) {
             context.trackSendingDraftEvent(action, draft)
             saveDraftToLocal(action)
-            withContext(Dispatchers.Main) { displayToast() }
+            withContext(mainDispatcher) { displayToast() }
         } else if (isNewMessage) {
             RealmDatabase.mailboxContent().writeBlocking {
                 DraftController.getDraft(draft.localUuid, realm = this)?.let(::delete)
@@ -295,7 +304,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
         isSendingAllowed.postValue(draft.to.isNotEmpty() || draft.cc.isNotEmpty() || draft.bcc.isNotEmpty())
     }
 
-    fun importAttachments(uris: List<Uri>) = viewModelScope.launch(Dispatchers.IO) {
+    fun importAttachments(uris: List<Uri>) = viewModelScope.launch(ioDispatcher) {
 
         val newAttachments = mutableListOf<Attachment>()
         var attachmentsSize = draft.attachments.sumOf { it.size }

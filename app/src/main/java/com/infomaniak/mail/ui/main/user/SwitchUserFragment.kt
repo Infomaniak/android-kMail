@@ -30,18 +30,26 @@ import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.databinding.FragmentSwitchUserBinding
+import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.login.LoginActivity
 import com.infomaniak.mail.utils.AccountUtils
-import kotlinx.coroutines.Dispatchers
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class SwitchUserFragment : Fragment() {
 
     private lateinit var binding: FragmentSwitchUserBinding
     private val switchUserViewModel: SwitchUserViewModel by viewModels()
 
+    @Inject
+    @IoDispatcher
+    lateinit var ioDispatcher: CoroutineDispatcher
+
     private val accountsAdapter = SwitchUserAdapter(AccountUtils.currentUserId) { user ->
-        lifecycleScope.launch(Dispatchers.IO) {
+        lifecycleScope.launch(ioDispatcher) {
             if (user.id != AccountUtils.currentUserId) {
                 requireContext().trackAccountEvent("switch")
                 AccountUtils.currentUser = user

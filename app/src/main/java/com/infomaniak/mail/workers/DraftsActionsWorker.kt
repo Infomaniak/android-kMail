@@ -19,6 +19,7 @@ package com.infomaniak.mail.workers
 
 import android.content.Context
 import android.util.Log
+import androidx.hilt.work.HiltWorker
 import androidx.lifecycle.LiveData
 import androidx.work.*
 import com.infomaniak.lib.core.api.ApiController
@@ -40,6 +41,7 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ErrorCode.DRAFT_ALREADY_SCHEDULED_OR_SENT
 import com.infomaniak.mail.utils.ErrorCode.DRAFT_DOES_NOT_EXIST
@@ -50,10 +52,12 @@ import com.infomaniak.mail.utils.ErrorCode.MAILBOX_LOCKED
 import com.infomaniak.mail.utils.ErrorCode.SEND_LIMIT_EXCEEDED
 import com.infomaniak.mail.utils.ErrorCode.SEND_RECIPIENTS_REFUSED
 import com.infomaniak.mail.utils.NotificationUtils.showDraftActionsNotification
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import io.realm.kotlin.MutableRealm
 import io.sentry.Sentry
 import io.sentry.SentryLevel
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
@@ -70,7 +74,12 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.properties.Delegates
 
-class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseCoroutineWorker(appContext, params) {
+@HiltWorker
+class DraftsActionsWorker @AssistedInject constructor(
+    @Assisted appContext: Context,
+    @Assisted params: WorkerParameters,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+) : BaseCoroutineWorker(appContext, params) {
 
     private val mailboxContentRealm by lazy { RealmDatabase.newMailboxContentInstance }
     private val mailboxInfoRealm by lazy { RealmDatabase.newMailboxInfoInstance }
@@ -83,7 +92,7 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
 
     private val dateFormatWithTimezone by lazy { SimpleDateFormat(FORMAT_DATE_WITH_TIMEZONE, Locale.ROOT) }
 
-    override suspend fun launchWork(): Result = withContext(Dispatchers.IO) {
+    override suspend fun launchWork(): Result = withContext(ioDispatcher) {
         Log.d(TAG, "Work started")
 
         if (DraftController.getDraftsWithActionsCount(mailboxContentRealm) == 0L) return@withContext Result.success()
@@ -266,7 +275,7 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
                     Sentry.captureMessage("We tried to [${draft.action?.name}] a Draft, but an Attachment didn't have its `uuid`.")
                 }
 
-                return scheduledDate to R.string.errorCorruptAttachment
+                return null to R.string.errorCorruptAttachment
             }
         }
 

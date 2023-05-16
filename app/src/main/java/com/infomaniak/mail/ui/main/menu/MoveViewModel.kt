@@ -22,11 +22,17 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
-import kotlinx.coroutines.Dispatchers
+import com.infomaniak.mail.di.IoDispatcher
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
+import javax.inject.Inject
 
-class MoveViewModel : ViewModel() {
+@HiltViewModel
+class MoveViewModel @Inject constructor(
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+) : ViewModel() {
 
-    private val coroutineContext = viewModelScope.coroutineContext + Dispatchers.IO
+    private val coroutineContext = viewModelScope.coroutineContext + ioDispatcher
 
     fun getFolderIdByMessage(messageUid: String) = liveData(coroutineContext) {
         emit(MessageController.getMessage(messageUid)!!.folderId)

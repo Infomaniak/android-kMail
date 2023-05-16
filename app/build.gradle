@@ -99,6 +99,7 @@ dependencies {
     // https://kotlinlang.org/docs/ksp-overview.html#supported-libraries
     // https://github.com/google/dagger/issues/2349
     kapt libs.hilt.compiler
+    kapt libs.hilt.compiler.androidx
 
     implementation libs.sentry.android.fragment
 

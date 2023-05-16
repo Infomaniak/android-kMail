@@ -19,20 +19,29 @@ package com.infomaniak.mail.firebase
 
 import android.content.Context
 import android.util.Log
+import androidx.hilt.work.HiltWorker
 import androidx.work.*
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.throwErrorAsException
 import com.infomaniak.mail.workers.BaseCoroutineWorker
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import io.sentry.Sentry
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
-class RegisterUserDeviceWorker(appContext: Context, params: WorkerParameters) : BaseCoroutineWorker(appContext, params) {
+@HiltWorker
+class RegisterUserDeviceWorker @AssistedInject constructor(
+    @Assisted appContext: Context,
+    @Assisted params: WorkerParameters,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+) : BaseCoroutineWorker(appContext, params) {
 
     private val localSettings by lazy { LocalSettings.getInstance(appContext) }
 
-    override suspend fun launchWork(): Result = withContext(Dispatchers.IO) {
+    override suspend fun launchWork(): Result = withContext(ioDispatcher) {
 
         Log.i(TAG, "Work started")
 
@@ -65,6 +74,7 @@ class RegisterUserDeviceWorker(appContext: Context, params: WorkerParameters) : 
     companion object {
         private const val TAG = "RegisterUserDeviceWorker"
 
+        // TODO: (Hilt) - Need refactor
         fun scheduleWork(context: Context) {
             Log.i(TAG, "work scheduled")
 

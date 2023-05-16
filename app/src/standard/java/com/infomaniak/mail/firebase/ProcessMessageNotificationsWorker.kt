@@ -24,23 +24,27 @@ import androidx.work.*
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
+import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.FetchMessagesManager
 import com.infomaniak.mail.workers.BaseProcessMessageNotificationsWorker
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import io.sentry.Sentry
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @HiltWorker
-class ProcessMessageNotificationsWorker @Inject constructor(
-    appContext: Context,
-    params: WorkerParameters,
+class ProcessMessageNotificationsWorker @AssistedInject constructor(
+    @Assisted appContext: Context,
+    @Assisted params: WorkerParameters,
     private val fetchMessagesManager: FetchMessagesManager,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : BaseProcessMessageNotificationsWorker(appContext, params) {
 
     private val mailboxInfoRealm by lazy { RealmDatabase.newMailboxInfoInstance }
 
-    override suspend fun launchWork(): Result = with(Dispatchers.IO) {
+    override suspend fun launchWork(): Result = with(ioDispatcher) {
         Log.i(TAG, "Work started")
         val userId = inputData.getIntOrNull(USER_ID_KEY) ?: return@with Result.success()
         val mailboxId = inputData.getIntOrNull(MAILBOX_ID_KEY) ?: return@with Result.success()

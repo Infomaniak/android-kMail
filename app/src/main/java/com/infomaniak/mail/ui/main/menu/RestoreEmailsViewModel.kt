@@ -24,18 +24,24 @@ import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.BackupResult
+import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
-import kotlinx.coroutines.Dispatchers
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
+import javax.inject.Inject
 
-class RestoreEmailsViewModel : ViewModel() {
+@HiltViewModel
+class RestoreEmailsViewModel @Inject constructor(
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+) : ViewModel() {
 
     private val mailbox by lazy { MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
 
-    fun getBackups(): LiveData<ApiResponse<BackupResult>> = liveData(Dispatchers.IO) {
+    fun getBackups(): LiveData<ApiResponse<BackupResult>> = liveData(ioDispatcher) {
         emit(ApiRepository.getBackups(mailbox.hostingId, mailbox.mailboxName))
     }
 
-    fun restoreEmails(date: String): LiveData<ApiResponse<Boolean>> = liveData(Dispatchers.IO) {
+    fun restoreEmails(date: String): LiveData<ApiResponse<Boolean>> = liveData(ioDispatcher) {
         emit(ApiRepository.restoreBackup(mailbox.hostingId, mailbox.mailboxName, date))
     }
 }

@@ -32,10 +32,12 @@ import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.format
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetRestoreEmailsBinding
+import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.Locale
 import com.infomaniak.lib.core.R as RCore
 
+@AndroidEntryPoint
 class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
 
     private lateinit var binding: BottomSheetRestoreEmailsBinding

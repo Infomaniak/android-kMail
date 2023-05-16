@@ -29,6 +29,7 @@ import com.infomaniak.mail.databinding.ItemSwitchMailboxBinding
 import com.infomaniak.mail.ui.main.menu.SwitchMailboxesAdapter.SwitchMailboxesViewHolder
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.views.MenuDrawerItemView.SelectionStyle
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -36,6 +37,7 @@ class SwitchMailboxesAdapter(
     private val isInMenuDrawer: Boolean,
     private val lifecycleScope: LifecycleCoroutineScope,
     private var mailboxes: List<Mailbox> = emptyList(),
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO, // TODO: Inject with hilt
 ) : RecyclerView.Adapter<SwitchMailboxesViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SwitchMailboxesViewHolder {
@@ -60,7 +62,7 @@ class SwitchMailboxesAdapter(
                     context.trackAccountEvent(SWITCH_MAILBOX_NAME)
                 }
 
-                lifecycleScope.launch(Dispatchers.IO) {
+                lifecycleScope.launch(ioDispatcher) {
                     AccountUtils.switchToMailbox(mailbox.mailboxId)
                 }
             }

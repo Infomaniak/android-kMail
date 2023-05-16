@@ -25,10 +25,12 @@ import android.os.Build
 import android.os.StrictMode
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.NotificationManagerCompat
+import androidx.hilt.work.HiltWorkerFactory
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import androidx.work.Configuration
 import androidx.work.WorkManager
 import coil.ImageLoader
 import coil.ImageLoaderFactory
@@ -45,6 +47,8 @@ import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.mail.MatomoMail.buildTracker
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.UrlTraceInterceptor
+import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.LaunchActivityArgs
 import com.infomaniak.mail.utils.AccountUtils
@@ -59,23 +63,23 @@ import io.sentry.android.core.SentryAndroid
 import io.sentry.android.core.SentryAndroidOptions
 import io.sentry.android.fragment.FragmentLifecycleIntegration
 import io.sentry.android.fragment.FragmentLifecycleState
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import org.matomo.sdk.Tracker
 import java.util.Date
 import java.util.UUID
 import javax.inject.Inject
 
 @HiltAndroidApp
-open class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycleObserver {
+open class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycleObserver, Configuration.Provider {
 
     val matomoTracker: Tracker by lazy { buildTracker() }
     var isAppInBackground = true
         private set
 
     var lastAppClosing: Date? = null
+
+    @Inject
+    lateinit var workerFactory: HiltWorkerFactory
 
     @Inject
     lateinit var syncMailboxesWorkerScheduler: SyncMailboxesWorker.Scheduler
@@ -85,6 +89,20 @@ open class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycle
 
     @Inject
     lateinit var workManager: WorkManager // Only used in the standard flavor
+
+    @Inject
+    @IoDispatcher
+    lateinit var ioDispatcher: CoroutineDispatcher
+
+    @Inject
+    @MainDispatcher
+    lateinit var mainDispatcher: CoroutineDispatcher
+
+    override fun getWorkManagerConfiguration(): Configuration {
+        return Configuration.Builder()
+            .setWorkerFactory(workerFactory)
+            .build()
+    }
 
     override fun onCreate() {
         super<Application>.onCreate()
@@ -160,7 +178,7 @@ open class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycle
     }
 
     private fun configureAppReloading() {
-        AccountUtils.reloadApp = { withContext(Dispatchers.Main) { startActivity(getLaunchIntent()) } }
+        AccountUtils.reloadApp = { withContext(mainDispatcher) { startActivity(getLaunchIntent()) } }
     }
 
     private fun getLaunchIntent() = Intent(this, LaunchActivity::class.java).apply {
@@ -202,10 +220,10 @@ open class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycle
                 notificationManagerCompat.notify(UUID.randomUUID().hashCode(), build())
             }
         } else {
-            CoroutineScope(Dispatchers.Main).launch { showToast(notificationText) }
+            CoroutineScope(mainDispatcher).launch { showToast(notificationText) }
         }
 
-        CoroutineScope(Dispatchers.IO).launch { AccountUtils.removeUser(this@ApplicationMain, user) }
+        CoroutineScope(ioDispatcher).launch { AccountUtils.removeUser(this@ApplicationMain, user) }
     }
 
     private fun tokenInterceptorListener() = object : TokenInterceptorListener {

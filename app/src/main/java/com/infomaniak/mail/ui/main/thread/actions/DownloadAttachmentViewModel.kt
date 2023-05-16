@@ -26,10 +26,17 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.cache.mailboxContent.AttachmentController
 import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.LocalStorageUtils
-import kotlinx.coroutines.Dispatchers
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
+import javax.inject.Inject
 
-class DownloadAttachmentViewModel(application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class DownloadAttachmentViewModel @Inject constructor(
+    application: Application,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+) : AndroidViewModel(application) {
 
     private inline val context: Context get() = getApplication()
 
@@ -39,7 +46,7 @@ class DownloadAttachmentViewModel(application: Application) : AndroidViewModel(a
     private var attachment: Attachment? = null
 
     fun downloadAttachment(resource: String): LiveData<Intent?> {
-        return liveData(viewModelScope.coroutineContext + Dispatchers.IO) {
+        return liveData(viewModelScope.coroutineContext + ioDispatcher) {
             val attachment = AttachmentController.getAttachment(resource).also { attachment = it }
             val attachmentFile = attachment.getCacheFile(context)
 
