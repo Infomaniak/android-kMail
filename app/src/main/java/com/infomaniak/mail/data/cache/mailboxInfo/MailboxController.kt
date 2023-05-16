@@ -31,7 +31,10 @@ import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.notifications.SingleQueryChange
-import io.realm.kotlin.query.*
+import io.realm.kotlin.query.RealmQuery
+import io.realm.kotlin.query.RealmResults
+import io.realm.kotlin.query.RealmScalarQuery
+import io.realm.kotlin.query.RealmSingleQuery
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -42,21 +45,28 @@ object MailboxController {
     //region Queries
     private fun checkHasUserId(userId: Int) = "${Mailbox::userId.name} == '$userId'"
 
-    private fun getMailboxesQuery(realm: TypedRealm): RealmQuery<Mailbox> {
-        return realm.query()
-    }
+    private fun getMailboxesQuery(
+        userId: Int? = null,
+        exceptionMailboxIds: List<Int> = emptyList(),
+        realm: TypedRealm = defaultRealm,
+    ): RealmQuery<Mailbox> {
 
-    private fun getMailboxesQuery(userId: Int, realm: TypedRealm): RealmQuery<Mailbox> {
-        return realm.query<Mailbox>(checkHasUserId(userId)).sort(Mailbox::inboxUnreadCount.name, Sort.DESCENDING)
-    }
+        val query = if (userId == null) {
+            realm.query()
+        } else {
+            realm.query<Mailbox>(checkHasUserId(userId))
+        }
 
-    private fun getMailboxesQuery(userId: Int, exceptionMailboxIds: List<Int>, realm: TypedRealm): RealmQuery<Mailbox> {
-        val checkIsNotInExceptions = "NOT ${Mailbox::mailboxId.name} IN {${exceptionMailboxIds.joinToString { "'$it'" }}}"
-        return realm.query<Mailbox>(checkHasUserId(userId)).query(checkIsNotInExceptions)
+        return if (exceptionMailboxIds.isEmpty()) {
+            query
+        } else {
+            val checkIsNotInExceptions = "NOT ${Mailbox::mailboxId.name} IN {${exceptionMailboxIds.joinToString { "'$it'" }}}"
+            query.query(checkIsNotInExceptions)
+        }
     }
 
     private fun getMailboxesCountQuery(userId: Int): RealmScalarQuery<Long> {
-        return defaultRealm.query<Mailbox>(checkHasUserId(userId)).count()
+        return getMailboxesQuery(userId).count()
     }
 
     private fun getMailboxQuery(objectId: String, realm: TypedRealm): RealmSingleQuery<Mailbox> {
@@ -70,22 +80,18 @@ object MailboxController {
     //endregion
 
     //region Get data
-    fun getMailboxes(realm: TypedRealm = defaultRealm): RealmResults<Mailbox> {
-        return getMailboxesQuery(realm).find()
-    }
-
-    fun getMailboxes(userId: Int, realm: TypedRealm = defaultRealm): RealmResults<Mailbox> {
-        return getMailboxesQuery(userId, realm).find()
-    }
-
-    private fun getMailboxes(userId: Int, exceptionMailboxIds: List<Int>, realm: TypedRealm): RealmResults<Mailbox> {
+    fun getMailboxes(
+        userId: Int? = null,
+        exceptionMailboxIds: List<Int> = emptyList(),
+        realm: TypedRealm = defaultRealm,
+    ): RealmResults<Mailbox> {
         return getMailboxesQuery(userId, exceptionMailboxIds, realm).find()
     }
 
     fun getMailboxesCount(userId: Int): Long = getMailboxesCountQuery(userId).find()
 
-    fun getMailboxesAsync(userId: Int): Flow<RealmResults<Mailbox>> {
-        return getMailboxesQuery(userId, defaultRealm).asFlow().map { it.list }
+    fun getMailboxesAsync(userId: Int, exceptionMailboxIds: List<Int> = emptyList()): Flow<RealmResults<Mailbox>> {
+        return getMailboxesQuery(userId, exceptionMailboxIds).asFlow().map { it.list }
     }
 
     fun getMailbox(objectId: String, realm: TypedRealm = defaultRealm): Mailbox? {
@@ -97,7 +103,7 @@ object MailboxController {
     }
 
     fun getMailboxWithFallback(userId: Int, mailboxId: Int, realm: TypedRealm = defaultRealm): Mailbox? {
-        return getMailbox(userId, mailboxId, realm) ?: getMailboxesQuery(userId, realm).first().find()
+        return getMailbox(userId, mailboxId, realm) ?: getMailboxesQuery(userId, realm = realm).first().find()
     }
 
     fun getMailboxAsync(objectId: String): Flow<SingleQueryChange<Mailbox>> {

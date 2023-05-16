@@ -50,7 +50,7 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
         val mailboxId = inputData.getIntOrNull(MAILBOX_ID_KEY) ?: return@with Result.success()
         val messageUid = inputData.getString(MESSAGE_UID_KEY) ?: return@with Result.success()
         val mailbox = MailboxController.getMailbox(userId, mailboxId, mailboxInfoRealm) ?: run {
-            val mailboxes = MailboxController.getMailboxes(mailboxInfoRealm)
+            val mailboxes = MailboxController.getMailboxes(realm = mailboxInfoRealm)
             Sentry.withScope { scope ->
                 scope.setExtra("userId", userId.toString())
                 scope.setExtra("mailboxId", mailboxId.toString())

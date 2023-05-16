@@ -26,6 +26,7 @@ import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -43,12 +44,16 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.utils.*
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
 
+@AndroidEntryPoint
 class MenuDrawerFragment : MenuFoldersFragment() {
 
     private lateinit var binding: FragmentMenuDrawerBinding
+    private val menuDrawerViewModel: MenuDrawerViewModel by viewModels()
+
     private val createFolderDialog by lazy { initNewFolderDialog() }
 
     override val isInMenuDrawer: Boolean = true
@@ -182,13 +187,11 @@ class MenuDrawerFragment : MenuFoldersFragment() {
     }
 
     private fun observeMailboxesLive() = with(binding) {
-        mainViewModel.mailboxesLive.observe(viewLifecycleOwner) { mailboxes ->
+        menuDrawerViewModel.otherMailboxesLive.observe(viewLifecycleOwner) { mailboxes ->
 
-            val sortedMailboxes = mailboxes.filterNot { it.mailboxId == AccountUtils.currentMailboxId }
+            addressAdapter.setMailboxes(mailboxes)
 
-            addressAdapter.setMailboxes(sortedMailboxes)
-
-            val hasMoreThanOneMailbox = sortedMailboxes.isNotEmpty()
+            val hasMoreThanOneMailbox = mailboxes.isNotEmpty()
 
             mailboxSwitcher.apply {
                 isClickable = hasMoreThanOneMailbox

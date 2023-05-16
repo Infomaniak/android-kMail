@@ -95,13 +95,8 @@ class NewMessageViewModel @Inject constructor(
     }
 
     val mailboxes = liveData(coroutineContext) {
-
         val mailboxes = MailboxController.getMailboxes(AccountUtils.currentUserId)
-
-        val currentMailboxIndex = mailboxes.indexOfFirst {
-            it.userId == AccountUtils.currentUserId && it.mailboxId == AccountUtils.currentMailboxId
-        }
-
+        val currentMailboxIndex = mailboxes.indexOfFirst { it.mailboxId == AccountUtils.currentMailboxId }
         emit(mailboxes to currentMailboxIndex)
     }
 
