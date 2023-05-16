@@ -22,11 +22,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import com.infomaniak.mail.databinding.FragmentSignatureSettingBinding
+import com.infomaniak.mail.ui.MainViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class SignatureSettingFragment : Fragment() {
 
     private lateinit var binding: FragmentSignatureSettingBinding
+
+    private val mainViewModel: MainViewModel by activityViewModels()
+    private val signatureSettingViewModel: SignatureSettingViewModel by viewModels()
 
     private val signatureAdapter = SignatureSettingAdapter { }
 
@@ -38,5 +46,12 @@ class SignatureSettingFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.signatureList.adapter = signatureAdapter
+        observeSignatures()
+    }
+
+    private fun observeSignatures() {
+        signatureSettingViewModel.signaturesLive.observe(viewLifecycleOwner) { signatures ->
+            signatureAdapter.setSignatures(signatures)
+        }
     }
 }

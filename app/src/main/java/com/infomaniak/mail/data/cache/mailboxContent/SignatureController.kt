@@ -24,8 +24,13 @@ import com.infomaniak.mail.utils.update
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.query
+import io.realm.kotlin.query.RealmResults
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 object SignatureController {
+
+    private inline val defaultRealm get() = RealmDatabase.mailboxContent()
 
     //region Get data
     private fun getDefaultSignature(realm: TypedRealm): Signature? {
@@ -35,6 +40,8 @@ object SignatureController {
     fun getSignature(realm: TypedRealm): Signature {
         return getDefaultSignature(realm) ?: realm.query<Signature>().first().find()!!
     }
+
+    fun getSignaturesLive(): Flow<RealmResults<Signature>> = defaultRealm.query<Signature>().find().asFlow().map { it.list }
     //endregion
 
     //region Edit data

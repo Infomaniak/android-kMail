@@ -262,6 +262,15 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    fun updateSignatures(mailboxObjectId: String) = viewModelScope.launch(ioDispatcher) {
+        val mailbox = MailboxController.getMailbox(mailboxObjectId)
+
+        RealmDatabase.mailboxContent().writeBlocking {
+            mailbox?.let { SharedViewModelUtils.updateSignatures(mailbox, this, context) }
+                ?: snackBarManager.postValue(context.getString(com.infomaniak.lib.core.R.string.anErrorHasOccurred))
+        }
+    }
+
     private fun selectMailbox(mailbox: Mailbox): MailboxErrorCode? {
 
         fun displayToast(@StringRes title: Int) = viewModelScope.launch(Dispatchers.Main) {
