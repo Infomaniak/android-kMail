@@ -36,6 +36,7 @@ import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.views.ViewHolder
 import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Attachment.*
 import com.infomaniak.mail.data.models.correspondent.MergedContact
@@ -488,6 +489,8 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
         var splitBody: String? = null
         var splitQuote: String? = null
 
+        private val localSettings by lazy { LocalSettings.getInstance(binding.context) }
+
         init {
             with(binding) {
                 fromRecyclerView.adapter = fromAdapter
@@ -513,18 +516,17 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
                 _bodyWebViewClient = bodyWebView.initWebViewClientAndBridge(
                     message.attachments,
                     message.uid,
-                    false,
+                    localSettings.externalContent == LocalSettings.ExternalContent.ALWAYS,
                 ) {
                     promptUserForDistantImages(binding)
                 }
                 _fullMessageWebViewClient = fullMessageWebView.initWebViewClientAndBridge(
                     message.attachments,
                     message.uid,
-                    false,
+                    localSettings.externalContent == LocalSettings.ExternalContent.ALWAYS,
                 ) {
                     promptUserForDistantImages(binding)
                 }
-                // doesWebViewNeedInit = false
             }
         }
     }

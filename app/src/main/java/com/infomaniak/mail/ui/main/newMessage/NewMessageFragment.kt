@@ -313,13 +313,15 @@ class NewMessageFragment : Fragment() {
 
         bodyText.setText(draft.uiBody)
 
+        val alwaysShowExternalContent = localSettings.externalContent == LocalSettings.ExternalContent.ALWAYS
+
         draft.uiSignature?.let { html ->
             signatureWebView.apply {
                 loadContent(html)
                 initWebViewClientAndBridge(
                     emptyList(),
                     "SIGNATURE-${draft.messageUid}",
-                    newMessageActivityArgs.shouldLoadDistantResources,
+                    alwaysShowExternalContent || newMessageActivityArgs.shouldLoadDistantResources,
                     {},
                 )
             }
@@ -337,7 +339,7 @@ class NewMessageFragment : Fragment() {
                 initWebViewClientAndBridge(
                     draft.attachments,
                     "QUOTE-${draft.messageUid}",
-                    newMessageActivityArgs.shouldLoadDistantResources,
+                    alwaysShowExternalContent || newMessageActivityArgs.shouldLoadDistantResources,
                     {},
                 )
             }

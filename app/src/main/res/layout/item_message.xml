@@ -379,7 +379,6 @@
                 android:layout_marginHorizontal="@dimen/marginStandardMedium"
                 android:visibility="gone"
                 app:action1="Afficher le contenu"
-                app:action2="Toujours afficher pour cet expéditeur"
                 app:description="Pour votre sécurité nous avons bloqué certains contenus de votre message."
                 app:icon="@drawable/ic_message_alert_distant_images"
                 tools:visibility="visible" />
