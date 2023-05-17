@@ -130,11 +130,11 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
         initMapForNewMessage(message, position)
 
         bindHeader(message)
+        bindAlerts(message.uid)
         bindAttachment(message)
-
-        displayExpandedCollapsedMessage(message, shouldTrack = false)
-
         bindContent(message)
+
+        onExpandOrCollapseMessage(message, shouldTrack = false)
     }
 
     private fun initMapForNewMessage(message: Message, position: Int) {
@@ -263,7 +263,6 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
         handleHeaderClick(message)
         handleExpandDetailsClick(message)
         bindRecipientDetails(message, messageDate)
-        bindAlerts(message.uid)
     }
 
     private fun Context.mailFormattedDate(date: Date): CharSequence = with(date) {
@@ -302,13 +301,13 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
         messageHeader.setOnClickListener {
             if (isExpandedMap[message.uid] == true) {
                 isExpandedMap[message.uid] = false
-                displayExpandedCollapsedMessage(message)
+                onExpandOrCollapseMessage(message)
             } else {
                 if (message.isDraft) {
                     onDraftClicked?.invoke(message)
                 } else {
                     isExpandedMap[message.uid] = true
-                    displayExpandedCollapsedMessage(message)
+                    onExpandOrCollapseMessage(message)
                 }
             }
         }
@@ -355,17 +354,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
     }
 
     private fun ItemMessageBinding.reloadVisibleWebView() {
-        if (bodyWebView.isVisible)
-            bodyWebView.apply {
-                reload()
-                invalidate() // TODO : Necessary ?
-            }
-        else {
-            fullMessageWebView.apply {
-                reload()
-                invalidate() // TODO : Necessary ?
-            }
-        }
+        if (bodyWebView.isVisible) bodyWebView.reload() else fullMessageWebView.reload()
     }
 
     private fun ItemMessageBinding.hideAlertGroupIfNoneDisplayed() {
@@ -398,14 +387,37 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
         return FormatterFileSize.formatShortFileSize(context, totalAttachmentsFileSizeInBytes)
     }
 
-    private fun ThreadViewHolder.displayExpandedCollapsedMessage(message: Message, shouldTrack: Boolean = true) = with(binding) {
+    private fun ThreadViewHolder.bindContent(message: Message) = with(binding) {
+        quoteButton.apply {
+            setOnClickListener {
+                val textId = if (fullMessageWebView.isVisible) R.string.messageShowQuotedText else R.string.messageHideQuotedText
+                quoteButton.text = context.getString(textId)
+                toggleWebViews(message)
+            }
+
+            text = context.getString(R.string.messageShowQuotedText)
+        }
+
+        quoteButtonFrameLayout.isVisible = message.hasQuote
+
+        messageLoader.isVisible = message.body?.value == null
+
+        initWebViewClientIfNeeded(message)
+
+        // If the view holder got recreated while the fragment is not destroyed, keep the user's choice effective
+        if (isMessageUidManuallyAllowed(message.uid)) {
+            bodyWebViewClient.unblockDistantResources()
+            fullMessageWebViewClient.unblockDistantResources()
+        }
+    }
+
+    private fun ThreadViewHolder.onExpandOrCollapseMessage(message: Message, shouldTrack: Boolean = true) = with(binding) {
         val isExpanded = isExpandedMap[message.uid]!!
 
         if (shouldTrack) context.trackMessageEvent("openMessage", isExpanded)
 
         setHeaderState(message, isExpanded)
         content.isVisible = isExpanded
-        messageLoader.isVisible = message.body?.value == null
         if (isExpanded) loadBodyAndQuote(message)
     }
 
@@ -430,28 +442,6 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
 
     private fun ItemMessageBinding.getAllRecipientsFormatted(message: Message): String = with(message) {
         return listOf(*to.toTypedArray(), *cc.toTypedArray(), *bcc.toTypedArray()).joinToString { it.displayedName(context) }
-    }
-
-    private fun ThreadViewHolder.bindContent(message: Message) = with(binding) {
-        quoteButton.apply {
-            setOnClickListener {
-                val textId = if (fullMessageWebView.isVisible) R.string.messageShowQuotedText else R.string.messageHideQuotedText
-                quoteButton.text = context.getString(textId)
-                toggleWebViews(message)
-            }
-
-            text = context.getString(R.string.messageShowQuotedText)
-        }
-
-        quoteButtonFrameLayout.isVisible = message.hasQuote
-
-        initWebViewClientIfNeeded(message)
-
-        // If the view holder got recreated while the fragment is not destroyed, keep the user's choice effective
-        if (isMessageUidManuallyAllowed(message.uid)) {
-            bodyWebViewClient.unblockDistantResources()
-            fullMessageWebViewClient.unblockDistantResources()
-        }
     }
 
     fun updateContacts(newContacts: Map<String, Map<String, MergedContact>>) {
