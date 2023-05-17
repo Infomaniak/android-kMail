@@ -358,6 +358,11 @@ class MainViewModel @Inject constructor(
             data == null -> Sentry.withScope { scope ->
                 scope.level = SentryLevel.ERROR
                 scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
+                scope.setExtra("apiResponse", apiResponse.toString())
+                scope.setExtra("status", apiResponse.result.name)
+                scope.setExtra("errorCode", "${apiResponse.error?.code}")
+                scope.setExtra("errorDescription", "${apiResponse.error?.description}")
+                scope.setExtra("errorTranslated", context.getString(apiResponse.translateError()))
                 Sentry.captureMessage("Signature: The call to get Signatures returned a `null` data")
             }
             signatures?.isEmpty() == true -> Sentry.withScope { scope ->
