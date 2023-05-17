@@ -28,6 +28,7 @@ import androidx.navigation.fragment.navArgs
 import com.infomaniak.mail.databinding.FragmentSignatureSettingBinding
 import com.infomaniak.mail.ui.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import io.realm.kotlin.ext.copyFromRealm
 
 @AndroidEntryPoint
 class SignatureSettingFragment : Fragment() {
@@ -38,7 +39,12 @@ class SignatureSettingFragment : Fragment() {
     private val mainViewModel: MainViewModel by activityViewModels()
     private val signatureSettingViewModel: SignatureSettingViewModel by viewModels()
 
-    private val signatureAdapter = SignatureSettingAdapter { }
+    private val signatureAdapter = SignatureSettingAdapter { signature ->
+        with(navigationArgs) {
+            val newDefaultSignature = signature.copyFromRealm(UInt.MIN_VALUE).apply { isDefault = true }
+            signatureSettingViewModel.setDefaultSignature(mailboxHostingId, mailboxName, newDefaultSignature)
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentSignatureSettingBinding.inflate(inflater, container, false).also { binding = it }.root

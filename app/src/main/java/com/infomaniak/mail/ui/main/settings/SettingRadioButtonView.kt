@@ -39,6 +39,8 @@ class SettingRadioButtonView @JvmOverloads constructor(
 
     private val binding by lazy { ViewSettingRadioButtonBinding.inflate(LayoutInflater.from(context), this, true) }
 
+    private var onClickListener: (() -> Unit)? = null
+
     override var associatedValue: String? = null
 
     init {
@@ -56,7 +58,9 @@ class SettingRadioButtonView @JvmOverloads constructor(
                 text.text = textString
                 checkMark.setColorFilter(checkMarkColor)
 
-                root.setOnClickListener { (parent as? OnCheckListener)?.onChecked(this@SettingRadioButtonView.id) }
+                root.setOnClickListener {
+                    onClickListener?.invoke() ?: (parent as? OnCheckListener)?.onChecked(this@SettingRadioButtonView.id)
+                }
             }
         }
     }
@@ -82,5 +86,9 @@ class SettingRadioButtonView @JvmOverloads constructor(
             isVisible = iconDrawable != null
             setImageDrawable(iconDrawable)
         }
+    }
+
+    fun setOnClickListener(listener: (() -> Unit)?) {
+        onClickListener = listener
     }
 }

@@ -30,4 +30,10 @@ class Signature : RealmObject {
     @SerialName("is_default")
     var isDefault: Boolean = false
     var content: String = ""
+
+    // These are required for the update call, do not delete them
+    @SerialName("reply_to_id")
+    var replyToId: Int = 0
+    @SerialName("sender_id")
+    var senderId: Int = 0
 }
