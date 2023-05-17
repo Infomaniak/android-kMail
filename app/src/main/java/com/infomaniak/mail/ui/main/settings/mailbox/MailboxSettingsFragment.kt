@@ -56,7 +56,9 @@ class MailboxSettingsFragment : Fragment() {
 
     private fun setupListeners() = with(binding) {
         settingsMailboxGeneralSignature.setOnClickListener {
-            animatedNavigation(MailboxSettingsFragmentDirections.actionMailboxSettingsToSignatureSetting())
+            animatedNavigation(
+                MailboxSettingsFragmentDirections.actionMailboxSettingsToSignatureSetting(navigationArgs.mailboxObjectId)
+            )
         }
         settingsMailboxGeneralAutoreply.setOnClickListener { notYetImplemented() }
         settingsMailboxGeneralFolders.setOnClickListener { notYetImplemented() }

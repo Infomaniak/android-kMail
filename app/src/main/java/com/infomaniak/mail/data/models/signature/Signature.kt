@@ -26,6 +26,7 @@ import kotlinx.serialization.Serializable
 class Signature : RealmObject {
     @PrimaryKey
     var id: Int = 0
+    var name: String = ""
     @SerialName("is_default")
     var isDefault: Boolean = false
     var content: String = ""
