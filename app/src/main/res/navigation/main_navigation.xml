@@ -354,7 +354,13 @@
             android:name="mailboxObjectId"
             app:argType="string" />
         <argument
+            android:name="mailboxHostingId"
+            app:argType="integer" />
+        <argument
             android:name="mailboxName"
+            app:argType="string" />
+        <argument
+            android:name="mailboxEmail"
             app:argType="string" />
         <action
             android:id="@+id/action_mailboxSettings_to_signatureSetting"
@@ -374,6 +380,12 @@
         tools:layout="@layout/fragment_signature_setting">
         <argument
             android:name="mailboxObjectId"
+            app:argType="string" />
+        <argument
+            android:name="mailboxHostingId"
+            app:argType="integer" />
+        <argument
+            android:name="mailboxName"
             app:argType="string" />
     </fragment>
 

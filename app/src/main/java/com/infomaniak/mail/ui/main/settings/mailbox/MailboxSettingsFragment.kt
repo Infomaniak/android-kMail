@@ -40,7 +40,7 @@ class MailboxSettingsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.root.setTitle(navigationArgs.mailboxName)
+        binding.root.setTitle(navigationArgs.mailboxEmail)
         setSubtitlesInitialState()
         setupListeners()
     }
@@ -57,7 +57,11 @@ class MailboxSettingsFragment : Fragment() {
     private fun setupListeners() = with(binding) {
         settingsMailboxGeneralSignature.setOnClickListener {
             animatedNavigation(
-                MailboxSettingsFragmentDirections.actionMailboxSettingsToSignatureSetting(navigationArgs.mailboxObjectId)
+                MailboxSettingsFragmentDirections.actionMailboxSettingsToSignatureSetting(
+                    navigationArgs.mailboxObjectId,
+                    navigationArgs.mailboxHostingId,
+                    navigationArgs.mailboxName,
+                )
             )
         }
         settingsMailboxGeneralAutoreply.setOnClickListener { notYetImplemented() }
