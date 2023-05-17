@@ -78,7 +78,7 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.signatures(mailboxHostingId, mailboxName), GET)
     }
 
-    fun setDefaultSignature(mailboxHostingId: Int, mailboxName: String, signature: Signature): ApiResponse<Unit> {
+    fun setDefaultSignature(mailboxHostingId: Int, mailboxName: String, signature: Signature): ApiResponse<Boolean> {
         return callApi(ApiRoutes.signature(mailboxHostingId, mailboxName, signature.id), PUT, Json.encodeToString(signature))
     }
 

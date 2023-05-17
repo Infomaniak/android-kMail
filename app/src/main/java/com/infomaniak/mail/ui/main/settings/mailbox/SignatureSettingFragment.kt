@@ -25,10 +25,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.databinding.FragmentSignatureSettingBinding
 import com.infomaniak.mail.ui.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import io.realm.kotlin.ext.copyFromRealm
+import com.infomaniak.lib.core.R as RCore
 
 @AndroidEntryPoint
 class SignatureSettingFragment : Fragment() {
@@ -40,9 +42,14 @@ class SignatureSettingFragment : Fragment() {
     private val signatureSettingViewModel: SignatureSettingViewModel by viewModels()
 
     private val signatureAdapter = SignatureSettingAdapter { signature ->
-        with(navigationArgs) {
-            val newDefaultSignature = signature.copyFromRealm(UInt.MIN_VALUE).apply { isDefault = true }
-            signatureSettingViewModel.setDefaultSignature(mailboxHostingId, mailboxName, newDefaultSignature)
+        val newDefaultSignature = signature.copyFromRealm(UInt.MIN_VALUE).apply { isDefault = true }
+
+        signatureSettingViewModel.setDefaultSignature(
+            navigationArgs.mailboxHostingId,
+            navigationArgs.mailboxName,
+            newDefaultSignature,
+        ).observe(viewLifecycleOwner) { isSuccess ->
+            if (!isSuccess) showSnackbar(RCore.string.anErrorHasOccurred)
         }
     }
 

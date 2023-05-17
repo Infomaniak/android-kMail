@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.main.settings.mailbox
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
+import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
@@ -26,7 +27,6 @@ import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.di.IoDispatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -38,9 +38,8 @@ class SignatureSettingViewModel @Inject constructor(
 
     val signaturesLive = SignatureController.getSignaturesLive().asLiveData(coroutineContext)
 
-    fun setDefaultSignature(mailboxHostingId: Int, mailboxName: String, signature: Signature) {
-        viewModelScope.launch(ioDispatcher) {
-            ApiRepository.setDefaultSignature(mailboxHostingId, mailboxName, signature)
-        }
+    fun setDefaultSignature(mailboxHostingId: Int, mailboxName: String, signature: Signature) = liveData(ioDispatcher) {
+        val apiResponse = ApiRepository.setDefaultSignature(mailboxHostingId, mailboxName, signature)
+        emit(apiResponse.isSuccess())
     }
 }
