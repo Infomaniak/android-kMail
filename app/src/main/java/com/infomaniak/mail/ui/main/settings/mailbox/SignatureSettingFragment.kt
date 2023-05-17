@@ -49,7 +49,11 @@ class SignatureSettingFragment : Fragment() {
             navigationArgs.mailboxName,
             newDefaultSignature,
         ).observe(viewLifecycleOwner) { isSuccess ->
-            if (!isSuccess) showSnackbar(RCore.string.anErrorHasOccurred)
+            if (isSuccess) {
+                mainViewModel.updateSignatures(navigationArgs.mailboxObjectId)
+            } else {
+                showSnackbar(RCore.string.anErrorHasOccurred)
+            }
         }
     }
 
