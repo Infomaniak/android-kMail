@@ -45,7 +45,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/icon"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Pour votre sécurité nous avons bloqué certains contenus de votre message." />
+        tools:text="@string/alertBlockedImagesDescription" />
 
     <com.google.android.flexbox.FlexboxLayout
         android:layout_width="0dp"
@@ -66,7 +66,7 @@
             style="@style/TextButtonTertiary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            tools:text="Afficher le contenu" />
+            tools:text="@string/alertBlockedImagesDisplayContent" />
 
         <com.google.android.material.divider.MaterialDivider
             android:id="@+id/divider"

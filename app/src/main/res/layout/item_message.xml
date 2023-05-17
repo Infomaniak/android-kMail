@@ -378,8 +378,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/marginStandardMedium"
                 android:visibility="gone"
-                app:action1="Afficher le contenu"
-                app:description="Pour votre sécurité nous avons bloqué certains contenus de votre message."
+                app:action1="@string/alertBlockedImagesDisplayContent"
+                app:description="@string/alertBlockedImagesDescription"
                 app:icon="@drawable/ic_message_alert_distant_images"
                 tools:visibility="visible" />
 
