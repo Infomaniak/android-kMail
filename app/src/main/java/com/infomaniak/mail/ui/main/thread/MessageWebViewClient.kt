@@ -38,16 +38,15 @@ class MessageWebViewClient(
     private val cidDictionary: MutableMap<String, Attachment>,
     private val messageUid: String,
     private var shouldLoadDistantResources: Boolean,
-    private val onBlockedResourcesDetected: () -> Unit,
+    private val onBlockedResourcesDetected: (() -> Unit)? = null
 ) : WebViewClient() {
 
-    // var blockedResourceCount = 0
     private val emptyResource by lazy { WebResourceResponse("text/plain", "utf-8", ByteArrayInputStream(ByteArray(0))) }
 
     override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
         if (request?.url?.scheme.equals(CID_SCHEME, ignoreCase = true)) {
             val cid = request!!.url.schemeSpecificPart
-            cidDictionary[cid]?.let { attachment ->
+            return cidDictionary[cid]?.let { attachment ->
                 val cacheFile = attachment.getCacheFile(context)
 
                 val data = if (attachment.hasUsableCache(context, cacheFile)) {
@@ -62,8 +61,8 @@ class MessageWebViewClient(
                     }
                 }
 
-                return WebResourceResponse(attachment.mimeType, Utils.UTF_8, data)
-            }
+                WebResourceResponse(attachment.mimeType, Utils.UTF_8, data)
+            } ?: emptyResource
         }
 
         val shouldLoadResource = shouldLoadDistantResources
@@ -73,7 +72,7 @@ class MessageWebViewClient(
         return if (shouldLoadResource) {
             super.shouldInterceptRequest(view, request)
         } else {
-            onBlockedResourcesDetected()
+            onBlockedResourcesDetected?.invoke()
             emptyResource
         }
     }

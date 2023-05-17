@@ -40,6 +40,7 @@ import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Attachment.*
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadViewHolder
@@ -154,14 +155,6 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
 
     private fun ThreadViewHolder.loadBodyAndQuote(message: Message) {
         message.body?.let { body ->
-            if (splitBody == null) {
-                val (messageBody, messageQuote) = MessageBodyUtils.splitBodyAndQuote(body)
-                splitBody = messageBody
-                splitQuote = messageQuote
-
-                message.hasQuote = messageQuote != null
-            }
-
             if (binding.bodyWebView.isVisible) {
                 loadBodyInWebView(message.uid, splitBody!!, body.type)
             } else if (binding.fullMessageWebView.isVisible) {
@@ -387,10 +380,30 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
         return FormatterFileSize.formatShortFileSize(context, totalAttachmentsFileSizeInBytes)
     }
 
-    private fun ThreadViewHolder.bindContent(message: Message) = with(binding) {
+    private fun ThreadViewHolder.bindContent(message: Message) {
+        message.body?.let { body ->
+            bindBody(body, message)
+        } ?: run {
+            binding.bindShimmer()
+        }
+    }
+
+    private fun ThreadViewHolder.bindBody(body: Body, message: Message) = with(binding) {
+        if (splitBody == null) {
+            val (messageBody, messageQuote) = MessageBodyUtils.splitBodyAndQuote(body)
+            splitBody = messageBody
+            splitQuote = messageQuote
+
+            message.hasQuote = messageQuote != null
+        }
+
         quoteButton.apply {
             setOnClickListener {
-                val textId = if (fullMessageWebView.isVisible) R.string.messageShowQuotedText else R.string.messageHideQuotedText
+                val textId = if (fullMessageWebView.isVisible) {
+                    R.string.messageShowQuotedText
+                } else {
+                    R.string.messageHideQuotedText
+                }
                 quoteButton.text = context.getString(textId)
                 toggleWebViews(message)
             }
@@ -400,8 +413,6 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
 
         quoteButtonFrameLayout.isVisible = message.hasQuote
 
-        messageLoader.isVisible = message.body?.value == null
-
         initWebViewClientIfNeeded(message)
 
         // If the view holder got recreated while the fragment is not destroyed, keep the user's choice effective
@@ -409,6 +420,10 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
             bodyWebViewClient.unblockDistantResources()
             fullMessageWebViewClient.unblockDistantResources()
         }
+    }
+
+    private fun ItemMessageBinding.bindShimmer() {
+        messageLoader.isVisible = true
     }
 
     private fun ThreadViewHolder.onExpandOrCollapseMessage(message: Message, shouldTrack: Boolean = true) = with(binding) {

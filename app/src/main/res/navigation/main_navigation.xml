@@ -101,7 +101,6 @@
             app:argType="com.infomaniak.mail.data.models.correspondent.Recipient"
             app:nullable="true" />
 
-        <!--TODO : Remove defaultValue-->
         <argument
             android:name="shouldLoadDistantResources"
             android:defaultValue="false"

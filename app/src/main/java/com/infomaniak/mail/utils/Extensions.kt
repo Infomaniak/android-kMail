@@ -182,7 +182,7 @@ fun WebView.initWebViewClientAndBridge(
     attachments: List<Attachment>,
     messageUid: String,
     shouldLoadDistantResources: Boolean,
-    onBlockedResourcesDetected: () -> Unit
+    onBlockedResourcesDetected: (() -> Unit)? = null,
 ): MessageWebViewClient {
     val cidDictionary = mutableMapOf<String, Attachment>()
     attachments.forEach {

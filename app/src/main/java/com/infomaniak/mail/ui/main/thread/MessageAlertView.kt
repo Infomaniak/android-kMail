@@ -51,7 +51,7 @@ class MessageAlertView @JvmOverloads constructor(
         }
     }
 
-    fun onAction1(listener: OnClickListener) {
+    fun  onAction1(listener: OnClickListener) {
         binding.action1.setOnClickListener(listener)
     }
 

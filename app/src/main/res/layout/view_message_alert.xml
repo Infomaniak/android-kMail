@@ -63,7 +63,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/action1"
-            style="@style/TextButtonTertiary"
+            style="@style/TextButtonAlerts"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:text="@string/alertBlockedImagesDisplayContent" />
@@ -79,7 +79,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/action2"
-            style="@style/TextButtonTertiary"
+            style="@style/TextButtonAlerts"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="gone"
