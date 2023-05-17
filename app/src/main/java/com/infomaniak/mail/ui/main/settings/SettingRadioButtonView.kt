@@ -65,12 +65,14 @@ class SettingRadioButtonView @JvmOverloads constructor(
         }
     }
 
-    override fun check() {
-        binding.checkMark.isVisible = true
+    override fun check() = with(binding) {
+        enable(false)
+        checkMark.isVisible = true
     }
 
-    override fun uncheck() {
-        binding.checkMark.isGone = true
+    override fun uncheck() = with(binding) {
+        enable(true)
+        checkMark.isGone = true
     }
 
     fun setText(newText: String) {
@@ -90,5 +92,12 @@ class SettingRadioButtonView @JvmOverloads constructor(
 
     fun setOnClickListener(listener: (() -> Unit)?) {
         onClickListener = listener
+    }
+
+    fun enable(mustEnable: Boolean) {
+        binding.root.apply {
+            isClickable = mustEnable
+            isEnabled = mustEnable
+        }
     }
 }
