@@ -18,7 +18,10 @@
 package com.infomaniak.mail.ui.main.user
 
 import android.app.Application
-import androidx.lifecycle.*
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.liveData
+import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
@@ -35,11 +38,6 @@ class AccountViewModel @Inject constructor(
     application: Application,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
-
-    private val coroutineContext = viewModelScope.coroutineContext + ioDispatcher
-
-    val observeAccountsLive = MailboxController.getMailboxesAsync(AccountUtils.currentUserId)
-        .asLiveData(coroutineContext)
 
     suspend fun updateMailboxes() {
         val userId = AccountUtils.currentUserId
