@@ -129,7 +129,7 @@ class MainViewModel @Inject constructor(
 
     val currentFolder = _currentFolderId.mapLatest {
         it?.let(FolderController::getFolder)
-    }.asLiveData(coroutineContext)
+    }.asLiveData(ioDispatcher)
 
     val currentFolderLive = _currentFolderId.flatMapLatest {
         it?.let(FolderController::getFolderAsync) ?: emptyFlow()
@@ -339,7 +339,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun observeMergedContactsLive() = viewModelScope.launch(ioDispatcher) {
+    fun observeMergedContactsLive() = viewModelScope.launch(coroutineContext) {
         MergedContactController.getMergedContactsAsync().collect { contacts ->
             mergedContacts.postValue(arrangeMergedContacts(contacts.list.copyFromRealm()))
         }
@@ -783,13 +783,13 @@ class MainViewModel @Inject constructor(
         snackBarManager.postValue(context.getString(snackbarTitle))
     }
 
-    fun getMessage(messageUid: String) = liveData(coroutineContext) {
+    fun getMessage(messageUid: String) = liveData(ioDispatcher) {
         emit(MessageController.getMessage(messageUid)!!)
     }
 
     private fun isSpam(message: Message?) = message?.isSpam ?: isCurrentFolderRole(FolderRole.SPAM)
 
-    fun navigateToSelectedDraft(message: Message) = liveData(coroutineContext) {
+    fun navigateToSelectedDraft(message: Message) = liveData(ioDispatcher) {
         val localUuid = DraftController.getDraftByMessageUid(message.uid)?.localUuid
         emit(ThreadListViewModel.SelectedDraft(localUuid, message.draftResource, message.uid))
     }

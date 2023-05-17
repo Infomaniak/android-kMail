@@ -70,7 +70,7 @@ import java.util.UUID
 import javax.inject.Inject
 
 @HiltAndroidApp
-open class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycleObserver, Configuration.Provider {
+open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycleObserver, Configuration.Provider {
 
     val matomoTracker: Tracker by lazy { buildTracker() }
     var isAppInBackground = true
@@ -223,7 +223,7 @@ open class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycle
             CoroutineScope(mainDispatcher).launch { showToast(notificationText) }
         }
 
-        CoroutineScope(ioDispatcher).launch { AccountUtils.removeUser(this@ApplicationMain, user) }
+        CoroutineScope(ioDispatcher).launch { AccountUtils.removeUser(this@MainApplication, user) }
     }
 
     private fun tokenInterceptorListener() = object : TokenInterceptorListener {

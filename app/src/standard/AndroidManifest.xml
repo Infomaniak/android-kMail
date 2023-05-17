@@ -19,7 +19,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application
-        android:name=".StandardApplicationMain"
+        android:name=".StandardMainApplication"
         tools:ignore="MissingApplicationIcon"
         tools:replace="android:name">
 

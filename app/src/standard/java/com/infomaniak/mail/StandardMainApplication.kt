@@ -20,11 +20,10 @@ package com.infomaniak.mail
 import androidx.lifecycle.LifecycleOwner
 import com.infomaniak.mail.workers.BaseProcessMessageNotificationsWorker
 
-class StandardApplicationMain : ApplicationMain() {
+class StandardMainApplication : MainApplication() {
 
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
         BaseProcessMessageNotificationsWorker.cancelWorks(workManager)
     }
 }
-
