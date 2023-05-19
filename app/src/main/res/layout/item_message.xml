@@ -472,12 +472,14 @@
                 android:id="@+id/bodyWebView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:focusableInTouchMode="false"
                 android:scrollbars="horizontal" />
 
             <WebView
                 android:id="@+id/fullMessageWebView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:focusableInTouchMode="false"
                 android:scrollbars="horizontal"
                 android:visibility="gone" />
 
