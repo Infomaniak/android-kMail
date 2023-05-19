@@ -109,20 +109,21 @@ class ThreadAdapter(
     }
 
     override fun onBindViewHolder(holder: ThreadViewHolder, position: Int, payloads: MutableList<Any>) = with(holder.binding) {
+        val payload = payloads.firstOrNull()
+        if (payload !is NotificationType) {
+            super.onBindViewHolder(holder, position, payloads)
+            return
+        }
+
         val message = messages[position]
 
-        val payload = payloads.firstOrNull()
-        if (payload is NotificationType) {
-            when (payload) {
-                NotificationType.AVATAR -> if (!message.isDraft) userAvatar.loadAvatar(message.from.first(), contacts)
-                NotificationType.TOGGLE_LIGHT_MODE -> {
-                    isThemeTheSameMap[message.uid] = !isThemeTheSameMap[message.uid]!!
-                    holder.toggleBodyAndQuoteTheme(message)
-                }
-                NotificationType.RERENDER -> holder.loadBodyAndQuote(message) // TODO : Try to undo js script and recall the method to fix rendering
+        when (payload) {
+            NotificationType.AVATAR -> if (!message.isDraft) userAvatar.loadAvatar(message.from.first(), contacts)
+            NotificationType.TOGGLE_LIGHT_MODE -> {
+                isThemeTheSameMap[message.uid] = !isThemeTheSameMap[message.uid]!!
+                holder.toggleBodyAndQuoteTheme(message)
             }
-        } else {
-            super.onBindViewHolder(holder, position, payloads)
+            NotificationType.RERENDER -> if (bodyWebView.isVisible) bodyWebView.reload() else fullMessageWebView.reload()
         }
     }
 

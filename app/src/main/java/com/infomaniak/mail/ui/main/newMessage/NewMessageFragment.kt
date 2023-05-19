@@ -135,12 +135,11 @@ class NewMessageFragment : Fragment() {
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
-        // TODO : Try to undo js script and recall the method to fix rendering
-        newMessageViewModel.draft.uiSignature?.let { html ->
-            binding.signatureWebView.loadContent(html)
+        newMessageViewModel.draft.uiSignature?.let { _ ->
+            binding.signatureWebView.reload()
         }
-        newMessageViewModel.draft.uiQuote?.let { html ->
-            binding.quoteWebView.loadContent(html)
+        newMessageViewModel.draft.uiQuote?.let { _ ->
+            binding.quoteWebView.reload()
         }
         super.onConfigurationChanged(newConfig)
     }
