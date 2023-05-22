@@ -468,6 +468,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/attachmentLayout">
 
+            <!-- `focusableInTouchMode` is set to false to prevent the webview from automatically scrolling a small amount for no
+            reason when long pressing it -->
             <WebView
                 android:id="@+id/bodyWebView"
                 android:layout_width="match_parent"
@@ -475,6 +477,8 @@
                 android:focusableInTouchMode="false"
                 android:scrollbars="horizontal" />
 
+            <!-- `focusableInTouchMode` is set to false to prevent the webview from automatically scrolling a small amount for no
+            reason when long pressing it -->
             <WebView
                 android:id="@+id/fullMessageWebView"
                 android:layout_width="match_parent"
