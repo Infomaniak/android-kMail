@@ -79,8 +79,9 @@ class ThreadFragment : Fragment() {
         LocalSettings.getInstance(requireContext()).externalContent == LocalSettings.ExternalContent.ALWAYS
     }
 
-    private val threadAdapter by lazy { ThreadAdapter() }
+    private val threadAdapter by lazy { ThreadAdapter(shouldLoadDistantResources()) }
     private val permissionUtils by lazy { PermissionUtils(this) }
+    private val isNotInSpam by lazy { mainViewModel.currentFolder.value?.role != FolderRole.SPAM }
 
     private var isFavorite = false
 
@@ -193,24 +194,26 @@ class ThreadFragment : Fragment() {
                     safeNavigateToNewMessageActivity(
                         draftMode = DraftMode.FORWARD,
                         messageUid = lastMessageToReplyTo.uid,
-                        shouldLoadDistantResources = shouldLoadDistantResourcesForMessageUid(lastMessageToReplyTo.uid),
+                        shouldLoadDistantResources = shouldLoadDistantResources(lastMessageToReplyTo.uid),
                     )
                 }
                 R.id.quickActionMenu -> safeNavigate(
                     ThreadFragmentDirections.actionThreadFragmentToThreadActionsBottomSheetDialog(
                         threadUid = navigationArgs.threadUid,
                         messageUidToReplyTo = lastMessageToReplyTo.uid,
-                        shouldLoadDistantResources = shouldLoadDistantResourcesForMessageUid(lastMessageToReplyTo.uid),
+                        shouldLoadDistantResources = shouldLoadDistantResources(lastMessageToReplyTo.uid),
                     )
                 )
             }
         }
     }
 
-    private fun shouldLoadDistantResourcesForMessageUid(messageUid: String): Boolean {
+    private fun shouldLoadDistantResources(messageUid: String): Boolean {
         val isMessageSpecificallyAllowed = threadAdapter.isMessageUidManuallyAllowed(messageUid)
-        return alwaysShowExternalContent || isMessageSpecificallyAllowed
+        return (isMessageSpecificallyAllowed && isNotInSpam) || shouldLoadDistantResources()
     }
+
+    private fun shouldLoadDistantResources(): Boolean = alwaysShowExternalContent && isNotInSpam
 
     private fun observeOpenAttachment() {
         getBackNavigationResult<Intent>(DownloadAttachmentProgressDialog.OPEN_WITH, ::startActivity)
@@ -270,7 +273,7 @@ class ThreadFragment : Fragment() {
                         isFavorite = message.isFavorite,
                         isSeen = message.isSeen,
                         isThemeTheSame = threadAdapter.isThemeTheSameMap[message.uid]!!,
-                        shouldLoadDistantResources = shouldLoadDistantResourcesForMessageUid(message.uid),
+                        shouldLoadDistantResources = shouldLoadDistantResources(message.uid),
                     )
                 )
             }
@@ -307,13 +310,13 @@ class ThreadFragment : Fragment() {
             safeNavigateToNewMessageActivity(
                 draftMode = DraftMode.REPLY,
                 messageUid = message.uid,
-                shouldLoadDistantResources = shouldLoadDistantResourcesForMessageUid(message.uid),
+                shouldLoadDistantResources = shouldLoadDistantResources(message.uid),
             )
         } else {
             safeNavigate(
                 ThreadFragmentDirections.actionThreadFragmentToReplyBottomSheetDialog(
                     messageUid = message.uid,
-                    shouldLoadDistantResources = shouldLoadDistantResourcesForMessageUid(message.uid),
+                    shouldLoadDistantResources = shouldLoadDistantResources(message.uid),
                 )
             )
         }

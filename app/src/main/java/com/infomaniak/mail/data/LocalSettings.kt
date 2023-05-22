@@ -287,7 +287,7 @@ class LocalSettings private constructor(context: Context) {
         private val INITIAL_SWIPE_ACTION = SwipeAction.TUTORIAL
         val DEFAULT_SWIPE_ACTION_RIGHT = SwipeAction.READ_UNREAD
         val DEFAULT_SWIPE_ACTION_LEFT = SwipeAction.DELETE
-        private val DEFAULT_EXTERNAL_CONTENT = ExternalContent.ASK_ME
+        private val DEFAULT_EXTERNAL_CONTENT = ExternalContent.ALWAYS
         private const val DEFAULT_RECENT_SEARCHES = "[]"
         //endregion
 
