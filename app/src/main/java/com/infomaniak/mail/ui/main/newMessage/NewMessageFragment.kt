@@ -205,10 +205,18 @@ class NewMessageFragment : Fragment() {
     private fun showKeyboardInCorrectView() = with(binding) {
         when (newMessageActivityArgs.draftMode) {
             DraftMode.REPLY,
-            DraftMode.REPLY_ALL -> bodyText.showKeyboard()
-            DraftMode.NEW_MAIL,
-            DraftMode.FORWARD -> toField.showKeyboardInTextInput()
+            DraftMode.REPLY_ALL -> focusBodyField()
+            DraftMode.NEW_MAIL -> if (newMessageActivityArgs.recipient == null) focusToField() else focusBodyField()
+            DraftMode.FORWARD -> focusToField()
         }
+    }
+
+    private fun FragmentNewMessageBinding.focusBodyField() {
+        bodyText.showKeyboard()
+    }
+
+    private fun FragmentNewMessageBinding.focusToField() {
+        toField.showKeyboardInTextInput()
     }
 
     private fun setOnFocusChangedListeners() = with(binding) {
@@ -313,10 +321,16 @@ class NewMessageFragment : Fragment() {
 
         bodyText.setText(draft.uiBody)
 
+        val alwaysShowExternalContent = localSettings.externalContent == LocalSettings.ExternalContent.ALWAYS
+
         draft.uiSignature?.let { html ->
             signatureWebView.apply {
                 loadContent(html)
-                initWebViewClientAndBridge(emptyList(), "SIGNATURE-${draft.messageUid}")
+                initWebViewClientAndBridge(
+                    attachments = emptyList(),
+                    messageUid = "SIGNATURE-${draft.messageUid}",
+                    shouldLoadDistantResources = true,
+                )
             }
             removeSignature.setOnClickListener {
                 trackNewMessageEvent("deleteSignature")
@@ -329,7 +343,11 @@ class NewMessageFragment : Fragment() {
         draft.uiQuote?.let { html ->
             quoteWebView.apply {
                 loadContent(html)
-                initWebViewClientAndBridge(draft.attachments, "QUOTE-${draft.messageUid}")
+                initWebViewClientAndBridge(
+                    attachments = draft.attachments,
+                    messageUid = "QUOTE-${draft.messageUid}",
+                    shouldLoadDistantResources = alwaysShowExternalContent || newMessageActivityArgs.shouldLoadDistantResources,
+                )
             }
             removeQuote.setOnClickListener {
                 trackNewMessageEvent("deleteQuote")

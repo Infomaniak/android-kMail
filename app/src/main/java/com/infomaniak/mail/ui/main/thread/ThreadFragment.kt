@@ -48,6 +48,7 @@ import com.infomaniak.mail.MatomoMail.trackMessageActionsEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.MatomoMail.trackThreadActionsEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder.FolderRole
@@ -73,6 +74,10 @@ class ThreadFragment : Fragment() {
     private val navigationArgs: ThreadFragmentArgs by navArgs()
     private val mainViewModel: MainViewModel by activityViewModels()
     private val threadViewModel: ThreadViewModel by viewModels()
+
+    private val alwaysShowExternalContent by lazy {
+        LocalSettings.getInstance(requireContext()).externalContent == LocalSettings.ExternalContent.ALWAYS
+    }
 
     private val threadAdapter by lazy { ThreadAdapter() }
     private val permissionUtils by lazy { PermissionUtils(this) }
@@ -184,15 +189,27 @@ class ThreadFragment : Fragment() {
         threadViewModel.quickActionBarClicks.observe(viewLifecycleOwner) { (lastMessageToReplyTo, menuId) ->
             when (menuId) {
                 R.id.quickActionReply -> replyTo(lastMessageToReplyTo)
-                R.id.quickActionForward -> safeNavigateToNewMessageActivity(DraftMode.FORWARD, lastMessageToReplyTo.uid)
+                R.id.quickActionForward -> {
+                    safeNavigateToNewMessageActivity(
+                        draftMode = DraftMode.FORWARD,
+                        messageUid = lastMessageToReplyTo.uid,
+                        shouldLoadDistantResources = shouldLoadDistantResourcesForMessageUid(lastMessageToReplyTo.uid),
+                    )
+                }
                 R.id.quickActionMenu -> safeNavigate(
                     ThreadFragmentDirections.actionThreadFragmentToThreadActionsBottomSheetDialog(
                         threadUid = navigationArgs.threadUid,
                         messageUidToReplyTo = lastMessageToReplyTo.uid,
+                        shouldLoadDistantResources = shouldLoadDistantResourcesForMessageUid(lastMessageToReplyTo.uid),
                     )
                 )
             }
         }
+    }
+
+    private fun shouldLoadDistantResourcesForMessageUid(messageUid: String): Boolean {
+        val isMessageSpecificallyAllowed = threadAdapter.isMessageUidManuallyAllowed(messageUid)
+        return alwaysShowExternalContent || isMessageSpecificallyAllowed
     }
 
     private fun observeOpenAttachment() {
@@ -253,6 +270,7 @@ class ThreadFragment : Fragment() {
                         isFavorite = message.isFavorite,
                         isSeen = message.isSeen,
                         isThemeTheSame = threadAdapter.isThemeTheSameMap[message.uid]!!,
+                        shouldLoadDistantResources = shouldLoadDistantResourcesForMessageUid(message.uid),
                     )
                 )
             }
@@ -286,9 +304,18 @@ class ThreadFragment : Fragment() {
 
     private fun replyTo(message: Message) {
         if (message.getRecipientsForReplyTo(true).second.isEmpty()) {
-            safeNavigateToNewMessageActivity(DraftMode.REPLY, message.uid)
+            safeNavigateToNewMessageActivity(
+                draftMode = DraftMode.REPLY,
+                messageUid = message.uid,
+                shouldLoadDistantResources = shouldLoadDistantResourcesForMessageUid(message.uid),
+            )
         } else {
-            safeNavigate(ThreadFragmentDirections.actionThreadFragmentToReplyBottomSheetDialog(messageUid = message.uid))
+            safeNavigate(
+                ThreadFragmentDirections.actionThreadFragmentToReplyBottomSheetDialog(
+                    messageUid = message.uid,
+                    shouldLoadDistantResources = shouldLoadDistantResourcesForMessageUid(message.uid),
+                )
+            )
         }
     }
 

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak kMail - Android
+  ~ Copyright (C) 2023 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/attachmentsRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/alternativeMargin"
+        android:paddingBottom="@dimen/marginStandardMedium"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_goneMarginTop="@dimen/marginStandardSmall"
+        tools:listitem="@layout/item_attachment" />
+
+    <ImageView
+        android:id="@+id/attachmentsIcon"
+        android:layout_width="@dimen/mediumIconSize"
+        android:layout_height="@dimen/mediumIconSize"
+        android:layout_marginStart="@dimen/marginStandardMedium"
+        android:importantForAccessibility="no"
+        android:src="@drawable/ic_attachment"
+        app:layout_constraintBottom_toBottomOf="@id/attachmentsSizeText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/attachmentsSizeText"
+        app:tint="@color/iconColor" />
+
+    <TextView
+        android:id="@+id/attachmentsSizeText"
+        style="@style/BodySmall.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
+        app:layout_constraintEnd_toStartOf="@id/attachmentsDownloadAllButton"
+        app:layout_constraintStart_toEndOf="@id/attachmentsIcon"
+        app:layout_constraintTop_toBottomOf="@id/attachmentsRecyclerView"
+        tools:text="4 pièces jointes (3 MB)" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/attachmentsDownloadAllButton"
+        style="@style/TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minHeight="0dp"
+        android:text="@string/buttonDownloadAll"
+        app:layout_constraintBottom_toBottomOf="@id/attachmentsSizeText"
+        app:layout_constraintStart_toEndOf="@id/attachmentsSizeText"
+        app:layout_constraintTop_toTopOf="@id/attachmentsSizeText" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

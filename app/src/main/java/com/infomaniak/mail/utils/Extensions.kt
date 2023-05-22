@@ -79,7 +79,6 @@ import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.ui.main.thread.MessageWebViewClient
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragmentArgs
-import com.infomaniak.mail.utils.WebViewUtils.Companion.jsBridge
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
@@ -178,13 +177,30 @@ fun LottieAnimationView.changePathColor(illuColors: IlluColors) {
     }
 }
 
-fun WebView.initWebViewClientAndBridge(attachments: List<Attachment>, messageUid: String) {
-    val cidDictionary = mutableMapOf<String, Attachment>()
-    attachments.forEach {
-        if (it.contentId?.isNotBlank() == true) cidDictionary[it.contentId as String] = it
+fun WebView.initWebViewClientAndBridge(
+    attachments: List<Attachment>,
+    messageUid: String,
+    shouldLoadDistantResources: Boolean,
+    onBlockedResourcesDetected: (() -> Unit)? = null,
+): MessageWebViewClient {
+
+    addJavascriptInterface(WebViewUtils.jsBridge, "kmail")
+
+    val cidDictionary = mutableMapOf<String, Attachment>().apply {
+        attachments.forEach {
+            if (it.contentId?.isNotBlank() == true) this[it.contentId as String] = it
+        }
     }
-    webViewClient = MessageWebViewClient(context, cidDictionary, messageUid)
-    addJavascriptInterface(jsBridge, "kmail")
+
+    return MessageWebViewClient(
+        context,
+        cidDictionary,
+        messageUid,
+        shouldLoadDistantResources,
+        onBlockedResourcesDetected,
+    ).also {
+        webViewClient = it
+    }
 }
 //endregion
 
@@ -205,10 +221,20 @@ fun getAnimatedNavOptions() = NavOptions
     .setPopExitAnim(R.anim.fragment_swipe_pop_exit)
     .build()
 
-fun Fragment.safeNavigateToNewMessageActivity(draftMode: DraftMode, messageUid: String, currentClassName: String? = null) {
+fun Fragment.safeNavigateToNewMessageActivity(
+    draftMode: DraftMode,
+    messageUid: String,
+    currentClassName: String? = null,
+    shouldLoadDistantResources: Boolean = false,
+) {
     safeNavigate(
         resId = R.id.newMessageActivity,
-        args = NewMessageActivityArgs(draftExists = false, draftMode = draftMode, previousMessageUid = messageUid).toBundle(),
+        args = NewMessageActivityArgs(
+            draftExists = false,
+            draftMode = draftMode,
+            previousMessageUid = messageUid,
+            shouldLoadDistantResources = shouldLoadDistantResources,
+        ).toBundle(),
         currentClassName = currentClassName,
     )
 }

@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,10 +45,14 @@ open class ReplyBottomSheetDialog : ActionsBottomSheetDialog() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.mainActions.setClosingOnClickListener { id: Int ->
-            when (id) {
-                R.id.actionReply -> safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUid, currentClassName)
-                R.id.actionReplyAll -> safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUid, currentClassName)
-            }
+            val replyMode = if (id == R.id.actionReplyAll) DraftMode.REPLY_ALL else DraftMode.REPLY
+
+            safeNavigateToNewMessageActivity(
+                draftMode = replyMode,
+                messageUid = messageUid,
+                currentClassName = currentClassName,
+                shouldLoadDistantResources = navigationArgs.shouldLoadDistantResources,
+            )
 
             trackEvent("replyBottomSheet", if (id == R.id.actionReply) ACTION_REPLY_NAME else ACTION_REPLY_ALL_NAME)
         }

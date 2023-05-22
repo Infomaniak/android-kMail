@@ -123,7 +123,6 @@
                 android:id="@+id/settingsExternalContent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
                 app:itemAction="chevron"
                 app:title="@string/settingsExternalContentTitle"
                 tools:subtitle="@string/settingsOptionAskMe" />
