@@ -35,7 +35,6 @@ import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.views.ViewHolder
 import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Attachment.*
 import com.infomaniak.mail.data.models.correspondent.MergedContact
@@ -58,7 +57,9 @@ import org.jsoup.Jsoup
 import java.util.*
 import com.google.android.material.R as RMaterial
 
-class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBinding.OnRealmChanged<Message> {
+class ThreadAdapter(
+    private val shouldLoadDistantResources: Boolean
+) : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBinding.OnRealmChanged<Message> {
 
     var messages = listOf<Message>()
         private set
@@ -94,6 +95,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ThreadViewHolder {
         return ThreadViewHolder(
             ItemMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+            shouldLoadDistantResources,
             onContactClicked,
             onAttachmentClicked,
         )
@@ -488,6 +490,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
 
     class ThreadViewHolder(
         val binding: ItemMessageBinding,
+        private val shouldLoadDistantResources: Boolean,
         onContactClicked: ((contact: Recipient) -> Unit)?,
         onAttachmentClicked: ((attachment: Attachment) -> Unit)?,
     ) : ViewHolder(binding.root) {
@@ -505,8 +508,6 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
 
         var splitBody: String? = null
         var splitQuote: String? = null
-
-        private val localSettings by lazy { LocalSettings.getInstance(binding.context) }
 
         init {
             with(binding) {
@@ -528,13 +529,13 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
                 _bodyWebViewClient = binding.bodyWebView.initWebViewClientAndBridge(
                     attachments = message.attachments,
                     messageUid = message.uid,
-                    shouldLoadDistantResources = localSettings.externalContent == LocalSettings.ExternalContent.ALWAYS,
+                    shouldLoadDistantResources = shouldLoadDistantResources,
                     onBlockedResourcesDetected = ::promptUserForDistantImages,
                 )
                 _fullMessageWebViewClient = binding.fullMessageWebView.initWebViewClientAndBridge(
                     attachments = message.attachments,
                     messageUid = message.uid,
-                    shouldLoadDistantResources = localSettings.externalContent == LocalSettings.ExternalContent.ALWAYS,
+                    shouldLoadDistantResources = shouldLoadDistantResources,
                     onBlockedResourcesDetected = ::promptUserForDistantImages,
                 )
             }

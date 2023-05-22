@@ -79,8 +79,9 @@ class ThreadFragment : Fragment() {
         LocalSettings.getInstance(requireContext()).externalContent == LocalSettings.ExternalContent.ALWAYS
     }
 
-    private val threadAdapter by lazy { ThreadAdapter() }
+    private val threadAdapter by lazy { ThreadAdapter(shouldLoadDistantResourcesForMessageUid(null)) }
     private val permissionUtils by lazy { PermissionUtils(this) }
+    private val isNotInSpam by lazy { mainViewModel.currentFolder.value?.role != FolderRole.SPAM }
 
     private var isFavorite = false
 
@@ -207,9 +208,9 @@ class ThreadFragment : Fragment() {
         }
     }
 
-    private fun shouldLoadDistantResourcesForMessageUid(messageUid: String): Boolean {
-        val isMessageSpecificallyAllowed = threadAdapter.isMessageUidManuallyAllowed(messageUid)
-        return alwaysShowExternalContent || isMessageSpecificallyAllowed
+    private fun shouldLoadDistantResourcesForMessageUid(messageUid: String?): Boolean {
+        val isMessageSpecificallyAllowed = messageUid?.let(threadAdapter::isMessageUidManuallyAllowed) ?: false
+        return isNotInSpam && (alwaysShowExternalContent || isMessageSpecificallyAllowed)
     }
 
     private fun observeOpenAttachment() {
