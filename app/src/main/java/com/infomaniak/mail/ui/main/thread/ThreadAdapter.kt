@@ -58,7 +58,7 @@ import java.util.*
 import com.google.android.material.R as RMaterial
 
 class ThreadAdapter(
-    private val shouldLoadDistantResources: Boolean
+    private val shouldLoadDistantResources: Boolean,
 ) : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBinding.OnRealmChanged<Message> {
 
     var messages = listOf<Message>()
