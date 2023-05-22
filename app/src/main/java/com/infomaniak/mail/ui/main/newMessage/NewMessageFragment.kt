@@ -205,10 +205,18 @@ class NewMessageFragment : Fragment() {
     private fun showKeyboardInCorrectView() = with(binding) {
         when (newMessageActivityArgs.draftMode) {
             DraftMode.REPLY,
-            DraftMode.REPLY_ALL -> bodyText.showKeyboard()
-            DraftMode.NEW_MAIL,
-            DraftMode.FORWARD -> toField.showKeyboardInTextInput()
+            DraftMode.REPLY_ALL -> focusBodyField()
+            DraftMode.NEW_MAIL -> if (newMessageActivityArgs.recipient == null) focusToField() else focusBodyField()
+            DraftMode.FORWARD -> focusToField()
         }
+    }
+
+    private fun FragmentNewMessageBinding.focusBodyField() {
+        bodyText.showKeyboard()
+    }
+
+    private fun FragmentNewMessageBinding.focusToField() {
+        toField.showKeyboardInTextInput()
     }
 
     private fun setOnFocusChangedListeners() = with(binding) {
