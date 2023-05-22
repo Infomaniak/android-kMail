@@ -58,8 +58,7 @@ import org.jsoup.Jsoup
 import java.util.*
 import com.google.android.material.R as RMaterial
 
-class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
-    RealmChangesBinding.OnRealmChanged<Message> {
+class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBinding.OnRealmChanged<Message> {
 
     var messages = listOf<Message>()
         private set
@@ -333,7 +332,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
     }
 
     private fun ThreadViewHolder.bindAlerts(messageUid: String) = with(binding) {
-        distantImagesAlert.onAction1() {
+        distantImagesAlert.onAction1 {
             bodyWebViewClient.unblockDistantResources()
             fullMessageWebViewClient.unblockDistantResources()
 
@@ -499,7 +498,6 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
         val bccAdapter = DetailedRecipientAdapter(onContactClicked)
         val attachmentAdapter = AttachmentAdapter { onAttachmentClicked?.invoke(it) }
 
-        private var doesWebViewNeedInit = true
         private var _bodyWebViewClient: MessageWebViewClient? = null
         private var _fullMessageWebViewClient: MessageWebViewClient? = null
         val bodyWebViewClient get() = _bodyWebViewClient!!
@@ -520,28 +518,33 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
             }
         }
 
-        private fun promptUserForDistantImages(binding: ItemMessageBinding) = with(binding) {
-            if (distantImagesAlert.isGone) CoroutineScope(Dispatchers.Main).launch {
-                alertsGroup.isVisible = true
-                distantImagesAlert.isVisible = true
+        fun initWebViewClientIfNeeded(message: Message) {
+
+            fun promptUserForDistantImages() {
+                binding.promptUserForDistantImages()
+            }
+
+            if (_bodyWebViewClient == null) {
+                _bodyWebViewClient = binding.bodyWebView.initWebViewClientAndBridge(
+                    attachments = message.attachments,
+                    messageUid = message.uid,
+                    shouldLoadDistantResources = localSettings.externalContent == LocalSettings.ExternalContent.ALWAYS,
+                    onBlockedResourcesDetected = ::promptUserForDistantImages,
+                )
+                _fullMessageWebViewClient = binding.fullMessageWebView.initWebViewClientAndBridge(
+                    attachments = message.attachments,
+                    messageUid = message.uid,
+                    shouldLoadDistantResources = localSettings.externalContent == LocalSettings.ExternalContent.ALWAYS,
+                    onBlockedResourcesDetected = ::promptUserForDistantImages,
+                )
             }
         }
 
-        fun initWebViewClientIfNeeded(message: Message) = with(binding) {
-            if (_bodyWebViewClient == null) {
-                _bodyWebViewClient = bodyWebView.initWebViewClientAndBridge(
-                    message.attachments,
-                    message.uid,
-                    localSettings.externalContent == LocalSettings.ExternalContent.ALWAYS,
-                ) {
-                    promptUserForDistantImages(binding)
-                }
-                _fullMessageWebViewClient = fullMessageWebView.initWebViewClientAndBridge(
-                    message.attachments,
-                    message.uid,
-                    localSettings.externalContent == LocalSettings.ExternalContent.ALWAYS,
-                ) {
-                    promptUserForDistantImages(binding)
+        private fun ItemMessageBinding.promptUserForDistantImages() {
+            if (distantImagesAlert.isGone) {
+                CoroutineScope(Dispatchers.Main).launch {
+                    alertsGroup.isVisible = true
+                    distantImagesAlert.isVisible = true
                 }
             }
         }
