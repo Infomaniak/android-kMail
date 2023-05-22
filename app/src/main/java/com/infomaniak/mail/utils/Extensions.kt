@@ -79,7 +79,6 @@ import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.ui.main.thread.MessageWebViewClient
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragmentArgs
-import com.infomaniak.mail.utils.WebViewUtils.Companion.jsBridge
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
@@ -184,21 +183,24 @@ fun WebView.initWebViewClientAndBridge(
     shouldLoadDistantResources: Boolean,
     onBlockedResourcesDetected: (() -> Unit)? = null,
 ): MessageWebViewClient {
-    val cidDictionary = mutableMapOf<String, Attachment>()
-    attachments.forEach {
-        if (it.contentId?.isNotBlank() == true) cidDictionary[it.contentId as String] = it
+
+    addJavascriptInterface(WebViewUtils.jsBridge, "kmail")
+
+    val cidDictionary = mutableMapOf<String, Attachment>().apply {
+        attachments.forEach {
+            if (it.contentId?.isNotBlank() == true) this[it.contentId as String] = it
+        }
     }
-    val messageWebViewClient = MessageWebViewClient(
+
+    return MessageWebViewClient(
         context,
         cidDictionary,
         messageUid,
         shouldLoadDistantResources,
-        onBlockedResourcesDetected
-    )
-    webViewClient = messageWebViewClient
-    addJavascriptInterface(jsBridge, "kmail")
-
-    return messageWebViewClient
+        onBlockedResourcesDetected,
+    ).also {
+        webViewClient = it
+    }
 }
 //endregion
 
