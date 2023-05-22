@@ -327,9 +327,9 @@ class NewMessageFragment : Fragment() {
             signatureWebView.apply {
                 loadContent(html)
                 initWebViewClientAndBridge(
-                    emptyList(),
-                    "SIGNATURE-${draft.messageUid}",
-                    alwaysShowExternalContent || newMessageActivityArgs.shouldLoadDistantResources,
+                    attachments = emptyList(),
+                    messageUid = "SIGNATURE-${draft.messageUid}",
+                    shouldLoadDistantResources = true,
                 )
             }
             removeSignature.setOnClickListener {
@@ -344,9 +344,9 @@ class NewMessageFragment : Fragment() {
             quoteWebView.apply {
                 loadContent(html)
                 initWebViewClientAndBridge(
-                    draft.attachments,
-                    "QUOTE-${draft.messageUid}",
-                    alwaysShowExternalContent || newMessageActivityArgs.shouldLoadDistantResources,
+                    attachments = draft.attachments,
+                    messageUid = "QUOTE-${draft.messageUid}",
+                    shouldLoadDistantResources = alwaysShowExternalContent || newMessageActivityArgs.shouldLoadDistantResources,
                 )
             }
             removeQuote.setOnClickListener {
