@@ -58,9 +58,14 @@
         android:label="NewMessageActivity"
         tools:layout="@layout/activity_new_message">
 
-        <!-- Region Current draft status -->
+        <!-- Region Status -->
         <argument
             android:name="draftExists"
+            android:defaultValue="false"
+            app:argType="boolean" />
+
+        <argument
+            android:name="shouldLoadDistantResources"
             android:defaultValue="false"
             app:argType="boolean" />
         <!-- Endregion -->
@@ -93,19 +98,12 @@
             android:defaultValue="@null"
             app:argType="string"
             app:nullable="true" />
-        <!-- Endregion -->
-
         <argument
             android:name="recipient"
             android:defaultValue="@null"
             app:argType="com.infomaniak.mail.data.models.correspondent.Recipient"
             app:nullable="true" />
-
-        <argument
-            android:name="shouldLoadDistantResources"
-            android:defaultValue="false"
-            app:argType="boolean" />
-
+        <!-- Endregion -->
     </activity>
 
     <fragment
