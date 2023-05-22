@@ -307,13 +307,13 @@ class ThreadFragment : Fragment() {
             safeNavigateToNewMessageActivity(
                 draftMode = DraftMode.REPLY,
                 messageUid = message.uid,
-                shouldLoadDistantResources = shouldLoadDistantResourcesForMessageUid(message.uid)
+                shouldLoadDistantResources = shouldLoadDistantResourcesForMessageUid(message.uid),
             )
         } else {
             safeNavigate(
                 ThreadFragmentDirections.actionThreadFragmentToReplyBottomSheetDialog(
                     messageUid = message.uid,
-                    shouldLoadDistantResources = shouldLoadDistantResourcesForMessageUid(message.uid)
+                    shouldLoadDistantResources = shouldLoadDistantResourcesForMessageUid(message.uid),
                 )
             )
         }

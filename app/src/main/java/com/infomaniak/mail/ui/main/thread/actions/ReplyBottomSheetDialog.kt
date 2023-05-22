@@ -51,7 +51,7 @@ open class ReplyBottomSheetDialog : ActionsBottomSheetDialog() {
                 draftMode = replyMode,
                 messageUid = messageUid,
                 currentClassName = currentClassName,
-                shouldLoadDistantResources = navigationArgs.shouldLoadDistantResources
+                shouldLoadDistantResources = navigationArgs.shouldLoadDistantResources,
             )
 
             trackEvent("replyBottomSheet", if (id == R.id.actionReply) ACTION_REPLY_NAME else ACTION_REPLY_ALL_NAME)

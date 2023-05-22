@@ -72,7 +72,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                         draftMode = DraftMode.REPLY,
                         messageUid = messageUid,
                         currentClassName = currentClassName,
-                        shouldLoadDistantResources = navigationArgs.shouldLoadDistantResources
+                        shouldLoadDistantResources = navigationArgs.shouldLoadDistantResources,
                     )
                 }
 
@@ -82,7 +82,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                         draftMode = DraftMode.REPLY_ALL,
                         messageUid = messageUid,
                         currentClassName = currentClassName,
-                        shouldLoadDistantResources = navigationArgs.shouldLoadDistantResources
+                        shouldLoadDistantResources = navigationArgs.shouldLoadDistantResources,
                     )
                 }
 
@@ -92,7 +92,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                         draftMode = DraftMode.FORWARD,
                         messageUid = messageUid,
                         currentClassName = currentClassName,
-                        shouldLoadDistantResources = navigationArgs.shouldLoadDistantResources
+                        shouldLoadDistantResources = navigationArgs.shouldLoadDistantResources,
                     )
                 }
 

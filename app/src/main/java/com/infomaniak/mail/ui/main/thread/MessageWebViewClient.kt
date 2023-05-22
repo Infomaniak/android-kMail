@@ -38,7 +38,7 @@ class MessageWebViewClient(
     private val cidDictionary: MutableMap<String, Attachment>,
     private val messageUid: String,
     private var shouldLoadDistantResources: Boolean,
-    private val onBlockedResourcesDetected: (() -> Unit)? = null
+    private val onBlockedResourcesDetected: (() -> Unit)? = null,
 ) : WebViewClient() {
 
     private val emptyResource by lazy { WebResourceResponse("text/plain", "utf-8", ByteArrayInputStream(ByteArray(0))) }
@@ -113,7 +113,5 @@ class MessageWebViewClient(
             "http://infomaniak.statslive.info".toRegex(),
             "https://static.infomaniak.ch".toRegex(),
         )
-
     }
-
 }
