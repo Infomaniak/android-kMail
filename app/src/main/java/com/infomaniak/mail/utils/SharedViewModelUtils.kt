@@ -20,7 +20,8 @@ package com.infomaniak.mail.utils
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
-import com.infomaniak.mail.data.cache.mailboxContent.MessageController.RefreshMode
+import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
+import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
@@ -47,7 +48,7 @@ object SharedViewModelUtils {
 
         foldersIds.forEach { folderId ->
             FolderController.getFolder(folderId)?.let { folder ->
-                MessageController.refreshThreads(RefreshMode.NEW_MESSAGES, mailbox, folder)
+                RefreshController.refreshThreads(RefreshMode.NEW_MESSAGES, mailbox, folder)
             }
         }
     }

@@ -29,7 +29,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.*
-import com.infomaniak.mail.data.cache.mailboxContent.MessageController.RefreshMode
+import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.mailboxInfo.PermissionsController
 import com.infomaniak.mail.data.cache.mailboxInfo.QuotasController
@@ -317,7 +317,7 @@ class MainViewModel @Inject constructor(
         if (isDownloadingChanges.value == true) return@launch
 
         isDownloadingChanges.postValue(true)
-        MessageController.refreshThreads(RefreshMode.ONE_BATCH_OF_OLD_MESSAGES, currentMailbox.value!!, currentFolder.value!!)
+        RefreshController.refreshThreads(RefreshMode.ONE_BATCH_OF_OLD_MESSAGES, currentMailbox.value!!, currentFolder.value!!)
         isDownloadingChanges.postValue(false)
     }
 
@@ -393,7 +393,7 @@ class MainViewModel @Inject constructor(
 
         FolderController.getFolder(folderId)?.let { folder ->
             isDownloadingChanges.postValue(true)
-            MessageController.refreshThreads(RefreshMode.NEW_MESSAGES_WITH_ROLE, mailbox, folder)
+            RefreshController.refreshThreads(RefreshMode.NEW_MESSAGES_WITH_ROLE, mailbox, folder)
             isDownloadingChanges.postValue(false)
         }
     }

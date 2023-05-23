@@ -29,8 +29,8 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
-import com.infomaniak.mail.data.cache.mailboxContent.MessageController
-import com.infomaniak.mail.data.cache.mailboxContent.MessageController.RefreshMode
+import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
+import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.mailbox.Mailbox
@@ -59,7 +59,7 @@ class FetchMessagesManager @Inject constructor(
         val okHttpClient = AccountUtils.getHttpClient(userId)
 
         // Update local with remote
-        val newMessagesThreads = MessageController.refreshThreads(
+        val newMessagesThreads = RefreshController.refreshThreads(
             refreshMode = RefreshMode.NEW_MESSAGES_WITH_ROLE,
             mailbox = mailbox,
             folder = folder,
