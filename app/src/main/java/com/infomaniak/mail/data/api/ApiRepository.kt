@@ -168,6 +168,10 @@ object ApiRepository : ApiRepositoryCore() {
         )
     }
 
+    fun deleteDraft(mailboxUuid: String, remoteDraftUuid: String): ApiResponse<Unit> {
+        return callApi(ApiRoutes.draft(mailboxUuid, remoteDraftUuid), DELETE)
+    }
+
     fun getDraft(messageDraftResource: String): ApiResponse<Draft> = callApi(ApiRoutes.resource(messageDraftResource), GET)
 
     fun addToFavorites(mailboxUuid: String, messageUids: List<String>): ApiResponse<Unit> {

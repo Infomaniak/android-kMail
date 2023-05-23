@@ -498,6 +498,11 @@ class MainViewModel @Inject constructor(
         null -> threads.flatMap(MessageController::getUnscheduledMessages)
         else -> MessageController.getMessageAndDuplicates(threads.first(), message)
     }
+
+    fun deleteDraft(remoteDraftUuid: String) = viewModelScope.launch(viewModelScope.handlerIO) {
+        // TODO : Can it be another mailbox than currentMailbox.value!!.uuid ?
+        ApiRepository.deleteDraft(currentMailbox.value!!.uuid, remoteDraftUuid)
+    }
     //endregion
 
     //region Move

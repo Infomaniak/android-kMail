@@ -133,6 +133,7 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         val scheduledDates = mutableListOf<String>()
         val errorMessageResIds = mutableListOf<Int>()
+        val savedDraftUuids = mutableListOf<String>()
 
         val isFailure = mailboxContentRealm.writeBlocking {
 
@@ -151,9 +152,10 @@ class DraftsActionsWorker @AssistedInject constructor(
                         mailbox.uuid,
                         realm = this,
                         okHttpClient,
-                    ).also { (scheduledDate, errorMessageResId) ->
+                    ).also { (scheduledDate, errorMessageResId, savedDraftUuid) ->
                         scheduledDate?.let(scheduledDates::add)
                         errorMessageResId?.let(errorMessageResIds::add)
+                        savedDraftUuid?.let(savedDraftUuids::add)
                     }
 
                 }.onFailure { exception ->
@@ -176,7 +178,10 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         SentryDebug.sendOrphanDrafts(mailboxContentRealm)
 
-        val outputData = workDataOf(ERROR_MESSAGE_RESID_KEY to errorMessageResIds.toIntArray())
+        val outputData = workDataOf(
+            ERROR_MESSAGE_RESID_KEY to errorMessageResIds.toIntArray(),
+            SAVED_DRAFT_UUID_KEY to if (savedDraftUuids.count() == 1) savedDraftUuids.single() else null
+        )
 
         return if (isFailure) Result.failure(outputData) else Result.success(outputData)
     }
@@ -267,14 +272,21 @@ class DraftsActionsWorker @AssistedInject constructor(
         }
     }
 
+    data class DraftActionResult(
+        val scheduledDate: String?,
+        val errorMessageResId: Int?,
+        val savedDraftUuid: String?,
+    )
+
     private fun executeDraftAction(
         draft: Draft,
         mailboxUuid: String,
         realm: MutableRealm,
         okHttpClient: OkHttpClient,
-    ): Pair<String?, Int?> {
+    ): DraftActionResult {
 
         var scheduledDate: String? = null
+        var savedDraftUuid: String? = null
 
         // TODO: Remove this whole `draft.attachments.forEach { … }` when the Attachment issue is fixed.
         draft.attachments.forEach { attachment ->
@@ -290,7 +302,7 @@ class DraftsActionsWorker @AssistedInject constructor(
                     Sentry.captureMessage("We tried to [${draft.action?.name}] a Draft, but an Attachment didn't have its `uuid`.")
                 }
 
-                return null to R.string.errorCorruptAttachment
+                return DraftActionResult(null, R.string.errorCorruptAttachment, null)
             }
         }
 
@@ -303,6 +315,7 @@ class DraftsActionsWorker @AssistedInject constructor(
                     draft.messageUid = data?.messageUid
                     draft.action = null
                     scheduledDate = dateFormatWithTimezone.format(Date())
+                    savedDraftUuid = data?.draftRemoteUuid
                 }
             }
             DraftAction.SEND -> with(ApiRepository.sendDraft(mailboxUuid, draft, okHttpClient)) {
@@ -316,7 +329,7 @@ class DraftsActionsWorker @AssistedInject constructor(
             else -> Unit
         }
 
-        return scheduledDate to null
+        return DraftActionResult(scheduledDate, null, savedDraftUuid)
     }
 
     @Singleton
@@ -366,6 +379,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         private const val DRAFT_LOCAL_UUID_KEY = "draftLocalUuidKey"
         const val DRAFT_ACTION_KEY = "draftActionKey"
         const val ERROR_MESSAGE_RESID_KEY = "errorMessageResIdKey"
+        const val SAVED_DRAFT_UUID_KEY = "savedDraftUidKey"
         // We add this delay because for now, it doesn't always work if we just use the `etop`.
         private const val REFRESH_DELAY = 2_000L
         private const val MAX_REFRESH_DELAY = 6_000L

@@ -282,6 +282,12 @@ class MainActivity : ThemedActivity() {
         }
     }
 
+    fun showSavedDraftSnackBar(remoteDraftUuid: String) {
+        mainViewModel.snackBarManager.postValue(getString(R.string.snackbarDraftSaved), null, R.string.actionDelete) {
+            mainViewModel.deleteDraft(remoteDraftUuid)
+        }
+    }
+
     private companion object {
         const val FULLY_SLID = 1.0f
     }

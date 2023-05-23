@@ -76,6 +76,7 @@ import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
 import io.realm.kotlin.ext.isValid
 import java.util.Date
+import java.util.UUID
 import javax.inject.Inject
 import com.infomaniak.lib.core.R as RCore
 
@@ -479,14 +480,22 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         mainViewModel.mergedContacts.observeNotNull(viewLifecycleOwner, threadListAdapter::updateContacts)
     }
 
+    // TODO : Why listen from thread list fragment instead of listening directly in MainActivity ?
     private fun observerDraftsActionsCompletedWorks() {
         fun observeDraftsActions() {
+            val treatedWorkInfoUuids = mutableSetOf<UUID>()
+
             draftsActionsWorkerScheduler.getCompletedWorkInfoLiveData().observe(viewLifecycleOwner) {
 
-                it.forEach { workInfo ->
+                for (workInfo in it) {
+                    if (!treatedWorkInfoUuids.add(workInfo.id)) continue
+
                     workInfo.outputData
                         .getIntArray(DraftsActionsWorker.ERROR_MESSAGE_RESID_KEY)
                         ?.forEach(requireContext()::showToast)
+
+                    val remoteDraftUuid = workInfo.outputData.getString(DraftsActionsWorker.SAVED_DRAFT_UUID_KEY)
+                    remoteDraftUuid?.let(::showSavedDraftSnackBar)
                 }
 
                 mainViewModel.currentFolder.value?.let { folder ->
@@ -497,6 +506,13 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         WorkManager.getInstance(requireContext()).pruneWork().state.observe(viewLifecycleOwner) {
             if (it is State.FAILURE || it is State.SUCCESS) observeDraftsActions()
+        }
+    }
+
+    private fun showSavedDraftSnackBar(remoteDraftUuid: String) {
+        mainViewModel.snackBarManager.postValue(getString(R.string.snackbarDraftSaved), null, R.string.actionDelete) {
+            // TODO : Use `deleteMessage()` instead to avoid duplicated the logic ?
+            mainViewModel.deleteDraft(remoteDraftUuid)
         }
     }
 
