@@ -34,6 +34,7 @@ import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Attachment
@@ -202,7 +203,13 @@ class DraftsActionsWorker @AssistedInject constructor(
             if (times.isNotEmpty()) delay += max(times.maxOf { it } - timeNow, 0L)
             delay(min(delay, MAX_REFRESH_DELAY))
 
-            MessageController.fetchCurrentFolderMessages(mailbox, folder, okHttpClient, mailboxContentRealm)
+            MessageController.refreshThreads(
+                refreshMode = RefreshMode.NEW_MESSAGES_WITH_ROLE,
+                mailbox = mailbox,
+                folder = folder,
+                okHttpClient = okHttpClient,
+                realm = mailboxContentRealm,
+            )
         }
     }
 

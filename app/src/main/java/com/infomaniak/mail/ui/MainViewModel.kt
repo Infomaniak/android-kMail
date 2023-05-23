@@ -29,6 +29,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.*
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.mailboxInfo.PermissionsController
 import com.infomaniak.mail.data.cache.mailboxInfo.QuotasController
@@ -100,7 +101,6 @@ class MainViewModel @Inject constructor(
     val toggleLightThemeForMessage = SingleLiveEvent<Message>()
 
     private val coroutineContext = viewModelScope.coroutineContext + ioDispatcher
-    private var refreshThreadsJob: Job? = null
     private var refreshMailboxesAndFoldersJob: Job? = null
 
     val mailboxesLive = MailboxController.getMailboxesAsync(AccountUtils.currentUserId).asLiveData(coroutineContext)
@@ -306,27 +306,19 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun forceRefreshThreads() {
-        refreshThreadsJob?.cancel()
-        refreshThreadsJob = viewModelScope.launch(ioDispatcher) {
-            Log.d(TAG, "Force refresh threads")
-            refreshThreads()
-        }
+    fun forceRefreshThreads() = viewModelScope.launch(ioDispatcher) {
+        if (isDownloadingChanges.value == true) return@launch
+        Log.d(TAG, "Force refresh threads")
+        refreshThreads()
     }
 
-    fun getOneBatchOfOldMessages() {
-        refreshThreadsJob?.cancel()
-        refreshThreadsJob = viewModelScope.launch(viewModelScope.handlerIO) {
-            isDownloadingChanges.postValue(true)
-            runCatching {
-                MessageController.getOneBatchOfOldMessages(
-                    folder = currentFolder.value!!,
-                    mailbox = currentMailbox.value!!,
-                    scope = this,
-                )
-            }
-            isDownloadingChanges.postValue(false)
-        }
+    fun getOneBatchOfOldMessages() = viewModelScope.launch(ioDispatcher) {
+
+        if (isDownloadingChanges.value == true) return@launch
+
+        isDownloadingChanges.postValue(true)
+        MessageController.refreshThreads(RefreshMode.ONE_BATCH_OF_OLD_MESSAGES, currentMailbox.value!!, currentFolder.value!!)
+        isDownloadingChanges.postValue(false)
     }
 
     private fun updateAddressBooks() {
@@ -401,7 +393,7 @@ class MainViewModel @Inject constructor(
 
         FolderController.getFolder(folderId)?.let { folder ->
             isDownloadingChanges.postValue(true)
-            runCatching { MessageController.fetchCurrentFolderMessages(mailbox, folder) }
+            MessageController.refreshThreads(RefreshMode.NEW_MESSAGES_WITH_ROLE, mailbox, folder)
             isDownloadingChanges.postValue(false)
         }
     }
