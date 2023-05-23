@@ -62,44 +62,61 @@ object RefreshController {
         folder: Folder,
         okHttpClient: OkHttpClient? = null,
         realm: Realm = defaultRealm,
+        started: (() -> Unit)? = null,
+        stopped: (() -> Unit)? = null,
     ): List<Thread>? = withContext(Dispatchers.IO) {
 
-        return@withContext runCatching {
+        val returnValue = runCatching {
 
             refreshThreadsJob?.cancel()
-            val job = async {
 
-                return@async when (refreshMode) {
-                    NEW_MESSAGES_WITH_ROLE -> {
-                        realm.fetchNewMessagesForRoleFolder(scope = this, mailbox, folder, okHttpClient)
-                    }
-                    NEW_MESSAGES -> {
-                        realm.fetchNewMessages(scope = this, mailbox, folder, okHttpClient)
-                    }
-                    OLD_MESSAGES -> {
-                        realm.fetchOldMessages(scope = this, mailbox, folder, okHttpClient)
-                    }
-                    ONE_BATCH_OF_OLD_MESSAGES -> {
-                        realm.fetchOneBatchOfOldMessages(scope = this, mailbox, folder, okHttpClient)
-                        emptyList()
-                    }
-                }
+            val job = async {
+                started?.invoke()
+                return@async realm.fetchMessages(refreshMode, scope = this, mailbox, folder, okHttpClient)
             }
 
             refreshThreadsJob = job
             return@runCatching job.await()
 
         }.getOrElse {
+            if (it !is CancellationException) stopped?.invoke()
             if (it is ApiErrorException) it.handleApiErrors()
-
             return@getOrElse null
         }
+
+        if (returnValue != null) stopped?.invoke()
+
+        return@withContext returnValue
     }
 
     private fun ApiErrorException.handleApiErrors() {
         when (errorCode) {
             ErrorCode.FOLDER_DOES_NOT_EXIST -> Unit
             else -> Sentry.captureException(this)
+        }
+    }
+
+    private suspend fun Realm.fetchMessages(
+        refreshMode: RefreshMode,
+        scope: CoroutineScope,
+        mailbox: Mailbox,
+        folder: Folder,
+        okHttpClient: OkHttpClient?
+    ): List<Thread> {
+        return when (refreshMode) {
+            NEW_MESSAGES_WITH_ROLE -> {
+                fetchNewMessagesForRoleFolder(scope, mailbox, folder, okHttpClient)
+            }
+            NEW_MESSAGES -> {
+                fetchNewMessages(scope, mailbox, folder, okHttpClient)
+            }
+            OLD_MESSAGES -> {
+                fetchOldMessages(scope, mailbox, folder, okHttpClient)
+            }
+            ONE_BATCH_OF_OLD_MESSAGES -> {
+                fetchOneBatchOfOldMessages(scope, mailbox, folder, okHttpClient)
+                emptyList()
+            }
         }
     }
 

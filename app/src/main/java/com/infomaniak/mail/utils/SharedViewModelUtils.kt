@@ -28,7 +28,13 @@ import com.infomaniak.mail.data.models.thread.Thread
 
 object SharedViewModelUtils {
 
-    suspend fun markAsSeen(mailbox: Mailbox, threads: List<Thread>, message: Message? = null) {
+    suspend fun markAsSeen(
+        mailbox: Mailbox,
+        threads: List<Thread>,
+        message: Message? = null,
+        started: (() -> Unit)? = null,
+        stopped: (() -> Unit)? = null,
+    ) {
 
         val messages = when (message) {
             null -> threads.flatMap(MessageController::getUnseenMessages)
@@ -37,10 +43,23 @@ object SharedViewModelUtils {
 
         val isSuccess = ApiRepository.markMessagesAsSeen(mailbox.uuid, messages.getUids()).isSuccess()
 
-        if (isSuccess) refreshFolders(mailbox, messages.getFoldersIds())
+        if (isSuccess) {
+            refreshFolders(
+                mailbox = mailbox,
+                messagesFoldersIds = messages.getFoldersIds(),
+                started = started,
+                stopped = stopped,
+            )
+        }
     }
 
-    suspend fun refreshFolders(mailbox: Mailbox, messagesFoldersIds: List<String>, destinationFolderId: String? = null) {
+    suspend fun refreshFolders(
+        mailbox: Mailbox,
+        messagesFoldersIds: List<String>,
+        destinationFolderId: String? = null,
+        started: (() -> Unit)? = null,
+        stopped: (() -> Unit)? = null,
+    ) {
 
         // We always want to refresh the `destinationFolder` last, to avoid any blink on the UI.
         val foldersIds = messagesFoldersIds.toMutableSet()
@@ -48,7 +67,13 @@ object SharedViewModelUtils {
 
         foldersIds.forEach { folderId ->
             FolderController.getFolder(folderId)?.let { folder ->
-                RefreshController.refreshThreads(RefreshMode.NEW_MESSAGES, mailbox, folder)
+                RefreshController.refreshThreads(
+                    refreshMode = RefreshMode.NEW_MESSAGES,
+                    mailbox = mailbox,
+                    folder = folder,
+                    started = started,
+                    stopped = stopped,
+                )
             }
         }
     }
