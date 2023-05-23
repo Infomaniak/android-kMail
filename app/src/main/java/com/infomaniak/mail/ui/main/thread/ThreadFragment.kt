@@ -89,7 +89,7 @@ class ThreadFragment : Fragment() {
     private var shouldScrollToBottom = AtomicBoolean(true)
 
     override fun onConfigurationChanged(newConfig: Configuration) {
-        threadAdapter.rerenderMails() // TODO : Try to undo js script and recall the method to fix rendering
+        threadAdapter.rerenderMails()
         super.onConfigurationChanged(newConfig)
     }
 
