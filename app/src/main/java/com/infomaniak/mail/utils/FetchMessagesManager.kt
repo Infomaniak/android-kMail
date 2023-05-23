@@ -30,6 +30,7 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.mailbox.Mailbox
@@ -38,7 +39,6 @@ import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.LaunchActivityArgs
 import com.infomaniak.mail.utils.NotificationUtils.showNewMessageNotification
 import io.realm.kotlin.Realm
-import io.sentry.Sentry
 import okhttp3.OkHttpClient
 import javax.inject.Inject
 
@@ -59,12 +59,14 @@ class FetchMessagesManager @Inject constructor(
         val okHttpClient = AccountUtils.getHttpClient(userId)
 
         // Update local with remote
-        val newMessagesThreads = runCatching {
-            MessageController.fetchCurrentFolderMessages(mailbox, folder, okHttpClient, realm)
-        }.getOrElse {
-            if (it is ApiErrorException) it.handleApiErrors() else throw it
-            return
-        }
+        val newMessagesThreads = MessageController.refreshThreads(
+            refreshMode = RefreshMode.NEW_MESSAGES_WITH_ROLE,
+            mailbox = mailbox,
+            folder = folder,
+            okHttpClient = okHttpClient,
+            realm = realm,
+        ) ?: return
+
         Log.d(TAG, "launchWork: ${mailbox.email} has ${newMessagesThreads.count()} new messages")
 
         // Notify all new messages
@@ -152,13 +154,6 @@ class FetchMessagesManager @Inject constructor(
                 unReadThreadsCount
             )
             showNotification(summaryText, true)
-        }
-    }
-
-    private fun ApiErrorException.handleApiErrors() {
-        when (errorCode) {
-            ErrorCode.FOLDER_DOES_NOT_EXIST -> Unit
-            else -> Sentry.captureException(this)
         }
     }
 

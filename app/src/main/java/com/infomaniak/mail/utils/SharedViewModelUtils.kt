@@ -20,17 +20,12 @@ package com.infomaniak.mail.utils
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController.RefreshMode
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 object SharedViewModelUtils {
-
-    var fetchFolderMessagesJob: Job? = null
 
     suspend fun markAsSeen(mailbox: Mailbox, threads: List<Thread>, message: Message? = null) {
 
@@ -44,11 +39,7 @@ object SharedViewModelUtils {
         if (isSuccess) refreshFolders(mailbox, messages.getFoldersIds())
     }
 
-    suspend fun refreshFolders(
-        mailbox: Mailbox,
-        messagesFoldersIds: List<String>,
-        destinationFolderId: String? = null,
-    ) = withContext(Dispatchers.IO) {
+    suspend fun refreshFolders(mailbox: Mailbox, messagesFoldersIds: List<String>, destinationFolderId: String? = null) {
 
         // We always want to refresh the `destinationFolder` last, to avoid any blink on the UI.
         val foldersIds = messagesFoldersIds.toMutableSet()
@@ -56,11 +47,7 @@ object SharedViewModelUtils {
 
         foldersIds.forEach { folderId ->
             FolderController.getFolder(folderId)?.let { folder ->
-                fetchFolderMessagesJob?.cancel()
-                fetchFolderMessagesJob = launch(handlerIO) {
-                    runCatching { MessageController.fetchFolderMessages(scope = this, mailbox, folder, okHttpClient = null) }
-                }
-                fetchFolderMessagesJob?.join()
+                MessageController.refreshThreads(RefreshMode.NEW_MESSAGES, mailbox, folder)
             }
         }
     }

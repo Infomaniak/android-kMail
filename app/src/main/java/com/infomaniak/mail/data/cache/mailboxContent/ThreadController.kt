@@ -19,13 +19,13 @@ package com.infomaniak.mail.data.cache.mailboxContent
 
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController.RefreshMode
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.utils.SearchUtils.convertToSearchThreads
-import com.infomaniak.mail.utils.SharedViewModelUtils.fetchFolderMessagesJob
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
@@ -40,7 +40,6 @@ import io.realm.kotlin.query.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 
@@ -232,11 +231,7 @@ object ThreadController {
     ) = withContext(Dispatchers.IO) {
         failedFoldersIds.forEach { folderId ->
             FolderController.getFolder(folderId, realm)?.let { folder ->
-                fetchFolderMessagesJob?.cancel()
-                fetchFolderMessagesJob = launch {
-                    runCatching { MessageController.fetchFolderMessages(scope = this, mailbox, folder, okHttpClient, realm) }
-                }
-                fetchFolderMessagesJob?.join()
+                MessageController.refreshThreads(RefreshMode.NEW_MESSAGES, mailbox, folder, okHttpClient, realm)
             }
         }
     }
