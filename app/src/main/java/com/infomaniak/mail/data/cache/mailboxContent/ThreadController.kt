@@ -19,7 +19,7 @@ package com.infomaniak.mail.data.cache.mailboxContent
 
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.cache.mailboxContent.MessageController.RefreshMode
+import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
@@ -231,7 +231,7 @@ object ThreadController {
     ) = withContext(Dispatchers.IO) {
         failedFoldersIds.forEach { folderId ->
             FolderController.getFolder(folderId, realm)?.let { folder ->
-                MessageController.refreshThreads(RefreshMode.NEW_MESSAGES, mailbox, folder, okHttpClient, realm)
+                RefreshController.refreshThreads(RefreshMode.NEW_MESSAGES, mailbox, folder, okHttpClient, realm)
             }
         }
     }
