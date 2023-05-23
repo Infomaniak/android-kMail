@@ -75,7 +75,8 @@ class MainViewModel @Inject constructor(
     private inline val context: Context get() = getApplication()
 
     val isInternetAvailable = SingleLiveEvent<Boolean>()
-    val isDownloadingChanges = MutableLiveData(false)
+    // First boolean is the download status, second boolean is the Folder's `isHistoryComplete`
+    val isDownloadingChanges: MutableLiveData<Pair<Boolean, Boolean?>> = MutableLiveData(false to null)
     val isNewFolderCreated = SingleLiveEvent<Boolean>()
 
     // Explanation of this Map : Map<Email, Map<Name, MergedContact>>
@@ -307,14 +308,14 @@ class MainViewModel @Inject constructor(
     }
 
     fun forceRefreshThreads() = viewModelScope.launch(ioDispatcher) {
-        if (isDownloadingChanges.value == true) return@launch
+        if (isDownloadingChanges.value?.first == true) return@launch
         Log.d(TAG, "Force refresh threads")
         refreshThreads()
     }
 
     fun getOneBatchOfOldMessages() = viewModelScope.launch(ioDispatcher) {
 
-        if (isDownloadingChanges.value == true) return@launch
+        if (isDownloadingChanges.value?.first == true) return@launch
 
         RefreshController.refreshThreads(
             refreshMode = RefreshMode.ONE_BATCH_OF_OLD_MESSAGES,
@@ -820,11 +821,11 @@ class MainViewModel @Inject constructor(
     //endregion
 
     private fun startedDownload() {
-        isDownloadingChanges.postValue(true)
+        isDownloadingChanges.postValue(true to null)
     }
 
     private fun stoppedDownload() {
-        isDownloadingChanges.postValue(false)
+        isDownloadingChanges.postValue(false to FolderController.getFolder(currentFolderId!!)?.isHistoryComplete)
     }
 
     private fun getActionThreads(threadsUids: List<String>): List<Thread> = threadsUids.mapNotNull(ThreadController::getThread)

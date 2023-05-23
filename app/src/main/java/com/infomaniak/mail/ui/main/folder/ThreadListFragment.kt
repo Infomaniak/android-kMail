@@ -420,14 +420,17 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun observeDownloadState() {
-        mainViewModel.isDownloadingChanges.distinctUntilChanged().observe(viewLifecycleOwner) { isDownloading ->
-            if (isDownloading) {
-                showLoadingTimer.start()
-            } else {
-                showLoadingTimer.cancel()
-                binding.swipeRefreshLayout.isRefreshing = false
+        mainViewModel.isDownloadingChanges
+            .distinctUntilChanged()
+            .observe(viewLifecycleOwner) { (isDownloading, isHistoryComplete) ->
+                if (isDownloading) {
+                    showLoadingTimer.start()
+                } else {
+                    showLoadingTimer.cancel()
+                    binding.swipeRefreshLayout.isRefreshing = false
+                    isHistoryComplete?.let(threadListAdapter::updateLoadMore)
+                }
             }
-        }
     }
 
     private fun observeFilter() {
