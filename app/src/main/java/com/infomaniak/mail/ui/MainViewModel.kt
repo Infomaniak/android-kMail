@@ -75,7 +75,7 @@ class MainViewModel @Inject constructor(
     private inline val context: Context get() = getApplication()
 
     val isInternetAvailable = SingleLiveEvent<Boolean>()
-    // First boolean is the download status, second boolean is the Folder's `isHistoryComplete`
+    // First boolean is the download status, second boolean is if the LoadMore button should be displayed
     val isDownloadingChanges: MutableLiveData<Pair<Boolean, Boolean?>> = MutableLiveData(false to null)
     val isNewFolderCreated = SingleLiveEvent<Boolean>()
 
@@ -825,7 +825,12 @@ class MainViewModel @Inject constructor(
     }
 
     private fun stoppedDownload() {
-        isDownloadingChanges.postValue(false to FolderController.getFolder(currentFolderId!!)?.isHistoryComplete)
+
+        val shouldDisplayLoadMore = currentFolderId?.let(FolderController::getFolder)
+            ?.let { it.cursor != null && !it.isHistoryComplete }
+            ?: false
+
+        isDownloadingChanges.postValue(false to shouldDisplayLoadMore)
     }
 
     private fun getActionThreads(threadsUids: List<String>): List<Thread> = threadsUids.mapNotNull(ThreadController::getThread)

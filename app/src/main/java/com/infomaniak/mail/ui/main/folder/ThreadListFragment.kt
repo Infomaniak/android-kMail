@@ -422,13 +422,13 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun observeDownloadState() {
         mainViewModel.isDownloadingChanges
             .distinctUntilChanged()
-            .observe(viewLifecycleOwner) { (isDownloading, isHistoryComplete) ->
+            .observe(viewLifecycleOwner) { (isDownloading, shouldDisplayLoadMore) ->
                 if (isDownloading) {
                     showLoadingTimer.start()
                 } else {
                     showLoadingTimer.cancel()
                     binding.swipeRefreshLayout.isRefreshing = false
-                    isHistoryComplete?.let(threadListAdapter::updateLoadMore)
+                    shouldDisplayLoadMore?.let(threadListAdapter::updateLoadMore)
                 }
             }
     }

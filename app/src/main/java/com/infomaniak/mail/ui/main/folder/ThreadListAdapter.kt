@@ -428,17 +428,17 @@ class ThreadListAdapter(
         notifyItemRangeChanged(0, itemCount, NotificationType.SELECTED_STATE)
     }
 
-    fun updateLoadMore(isHistoryComplete: Boolean) {
+    fun updateLoadMore(shouldDisplayLoadMore: Boolean) {
 
-        isLoadMoreDisplayed = !isHistoryComplete
+        isLoadMoreDisplayed = shouldDisplayLoadMore
 
-        if (isHistoryComplete) {
-            if (dataSet.isNotEmpty() && dataSet.last() is Unit) {
-                dataSet = dataSet.toMutableList().apply { removeIf { it is Unit } }
-            }
-        } else {
+        if (shouldDisplayLoadMore) {
             if (dataSet.isEmpty() || dataSet.last() !is Unit) {
                 dataSet = dataSet.toMutableList().apply { add(Unit) }
+            }
+        } else {
+            if (dataSet.isNotEmpty() && dataSet.last() is Unit) {
+                dataSet = dataSet.toMutableList().apply { removeIf { it is Unit } }
             }
         }
     }
