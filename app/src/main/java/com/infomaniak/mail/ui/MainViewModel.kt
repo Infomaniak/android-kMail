@@ -316,9 +316,13 @@ class MainViewModel @Inject constructor(
 
         if (isDownloadingChanges.value == true) return@launch
 
-        isDownloadingChanges.postValue(true)
-        RefreshController.refreshThreads(RefreshMode.ONE_BATCH_OF_OLD_MESSAGES, currentMailbox.value!!, currentFolder.value!!)
-        isDownloadingChanges.postValue(false)
+        RefreshController.refreshThreads(
+            refreshMode = RefreshMode.ONE_BATCH_OF_OLD_MESSAGES,
+            mailbox = currentMailbox.value!!,
+            folder = currentFolder.value!!,
+            started = ::startedDownload,
+            stopped = ::stoppedDownload,
+        )
     }
 
     private fun updateAddressBooks() {
@@ -392,9 +396,13 @@ class MainViewModel @Inject constructor(
         if (mailbox == null || folderId == null) return
 
         FolderController.getFolder(folderId)?.let { folder ->
-            isDownloadingChanges.postValue(true)
-            RefreshController.refreshThreads(RefreshMode.NEW_MESSAGES_WITH_ROLE, mailbox, folder)
-            isDownloadingChanges.postValue(false)
+            RefreshController.refreshThreads(
+                refreshMode = RefreshMode.NEW_MESSAGES_WITH_ROLE,
+                mailbox = mailbox,
+                folder = folder,
+                started = ::startedDownload,
+                stopped = ::stoppedDownload,
+            )
         }
     }
 
@@ -436,7 +444,9 @@ class MainViewModel @Inject constructor(
             apiResponse.isSuccess()
         }
 
-        if (isSuccess) refreshFolders(mailbox, messages.getFoldersIds(exception = trashId), trashId)
+        if (isSuccess) {
+            refreshFolders(mailbox, messages.getFoldersIds(exception = trashId), trashId, ::startedDownload, ::stoppedDownload)
+        }
 
         val undoDestinationId = message?.folderId ?: threads.first().folderId
         val undoFoldersIds = (messages.getFoldersIds(exception = undoDestinationId) + trashId).filterNotNull()
@@ -506,7 +516,13 @@ class MainViewModel @Inject constructor(
         val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
 
         if (apiResponse.isSuccess()) {
-            refreshFolders(mailbox, messages.getFoldersIds(exception = destinationFolder.id), destinationFolder.id)
+            refreshFolders(
+                mailbox = mailbox,
+                messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id),
+                destinationFolderId = destinationFolder.id,
+                started = ::startedDownload,
+                stopped = ::stoppedDownload,
+            )
         }
 
         showMoveSnackbar(threads, message, messages, apiResponse, destinationFolder)
@@ -571,7 +587,7 @@ class MainViewModel @Inject constructor(
 
         if (apiResponse.isSuccess()) {
             val messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id)
-            refreshFolders(mailbox, messagesFoldersIds, destinationFolder.id)
+            refreshFolders(mailbox, messagesFoldersIds, destinationFolder.id, ::startedDownload, ::stoppedDownload)
         }
 
         showMoveSnackbar(threads, message, messages, apiResponse, destinationFolder)
@@ -608,7 +624,7 @@ class MainViewModel @Inject constructor(
         if (isSeen) {
             markAsUnseen(mailbox, threads, message)
         } else {
-            SharedViewModelUtils.markAsSeen(mailbox, threads, message)
+            SharedViewModelUtils.markAsSeen(mailbox, threads, message, ::startedDownload, ::stoppedDownload)
         }
     }
 
@@ -619,7 +635,7 @@ class MainViewModel @Inject constructor(
     ) = viewModelScope.launch(viewModelScope.handlerIO) {
         val messages = getMessagesToMarkAsUnseen(threads, message)
         val isSuccess = ApiRepository.markMessagesAsUnseen(mailbox.uuid, messages.getUids()).isSuccess()
-        if (isSuccess) refreshFolders(mailbox, messages.getFoldersIds())
+        if (isSuccess) refreshFolders(mailbox, messages.getFoldersIds(), started = ::startedDownload, stopped = ::stoppedDownload)
     }
 
     private fun getMessagesToMarkAsUnseen(threads: List<Thread>, message: Message?) = when (message) {
@@ -668,7 +684,7 @@ class MainViewModel @Inject constructor(
             ApiRepository.addToFavorites(mailbox.uuid, uids).isSuccess()
         }
 
-        if (isSuccess) refreshFolders(mailbox, messages.getFoldersIds())
+        if (isSuccess) refreshFolders(mailbox, messages.getFoldersIds(), started = ::startedDownload, stopped = ::stoppedDownload)
     }
 
     private fun getMessagesToFavorite(threads: List<Thread>, message: Message?) = when (message) {
@@ -711,7 +727,13 @@ class MainViewModel @Inject constructor(
         val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
 
         if (apiResponse.isSuccess()) {
-            refreshFolders(mailbox, messages.getFoldersIds(exception = destinationFolder.id), destinationFolder.id)
+            refreshFolders(
+                mailbox = mailbox,
+                messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id),
+                destinationFolderId = destinationFolder.id,
+                started = ::startedDownload,
+                stopped = ::stoppedDownload,
+            )
         }
 
         if (displaySnackbar) {
@@ -764,7 +786,7 @@ class MainViewModel @Inject constructor(
         val (resource, foldersIds, destinationFolderId) = undoData
 
         val snackbarTitle = if (ApiRepository.undoAction(resource).data == true) {
-            refreshFolders(mailbox, foldersIds, destinationFolderId)
+            refreshFolders(mailbox, foldersIds, destinationFolderId, ::startedDownload, ::stoppedDownload)
             R.string.snackbarMoveCancelled
         } else {
             RCore.string.anErrorHasOccurred
@@ -772,7 +794,6 @@ class MainViewModel @Inject constructor(
 
         snackBarManager.postValue(context.getString(snackbarTitle))
     }
-
     //endregion
 
     //region New Folder
@@ -797,6 +818,14 @@ class MainViewModel @Inject constructor(
         isNewFolderCreated.postValue(true)
     }
     //endregion
+
+    private fun startedDownload() {
+        isDownloadingChanges.postValue(true)
+    }
+
+    private fun stoppedDownload() {
+        isDownloadingChanges.postValue(false)
+    }
 
     private fun getActionThreads(threadsUids: List<String>): List<Thread> = threadsUids.mapNotNull(ThreadController::getThread)
 
