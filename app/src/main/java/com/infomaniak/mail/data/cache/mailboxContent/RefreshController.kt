@@ -51,7 +51,7 @@ object RefreshController {
     enum class RefreshMode {
         NEW_MESSAGES_WITH_ROLE,
         NEW_MESSAGES,
-        OLD_MESSAGES,
+        // OLD_MESSAGES, /* Unused for now */
         ONE_BATCH_OF_OLD_MESSAGES,
     }
 
@@ -104,15 +104,9 @@ object RefreshController {
         okHttpClient: OkHttpClient?
     ): List<Thread> {
         return when (refreshMode) {
-            NEW_MESSAGES_WITH_ROLE -> {
-                fetchNewMessagesForRoleFolder(scope, mailbox, folder, okHttpClient)
-            }
-            NEW_MESSAGES -> {
-                fetchNewMessages(scope, mailbox, folder, okHttpClient)
-            }
-            OLD_MESSAGES -> {
-                fetchOldMessages(scope, mailbox, folder, okHttpClient)
-            }
+            NEW_MESSAGES_WITH_ROLE -> fetchNewMessagesForRoleFolder(scope, mailbox, folder, okHttpClient)
+            NEW_MESSAGES -> fetchNewMessages(scope, mailbox, folder, okHttpClient)
+            // OLD_MESSAGES -> fetchOldMessages(scope, mailbox, folder, okHttpClient) /* Unused for now */
             ONE_BATCH_OF_OLD_MESSAGES -> {
                 fetchOneBatchOfOldMessages(scope, mailbox, folder, okHttpClient)
                 emptyList()
