@@ -320,6 +320,7 @@
     <string name="snackbarDisplayProblemReported">Anzeigeproblem gemeldet</string>
     <string name="snackbarDraftDeleted">Entwurf gelöscht</string>
     <string name="snackbarDraftSaved">Entwurf gespeichert</string>
+    <string name="snackbarDraftSaving">Speichern des Entwurfs</string>
     <string name="snackbarEmailCopiedToClipboard">E-Mail Adresse in die Zwischenablage kopiert</string>
     <string name="snackbarEmailSending">E-Mail-Versand im Gange</string>
     <string name="snackbarEmailSent">E-Mail gesendet</string>

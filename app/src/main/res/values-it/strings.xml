@@ -320,6 +320,7 @@
     <string name="snackbarDisplayProblemReported">Problema di visualizzazione segnalato</string>
     <string name="snackbarDraftDeleted">Bozza cancellata</string>
     <string name="snackbarDraftSaved">Bozza salvata</string>
+    <string name="snackbarDraftSaving">Salvataggio della bozza</string>
     <string name="snackbarEmailCopiedToClipboard">Indirizzo e-mail copiato negli appunti</string>
     <string name="snackbarEmailSending">Invio di e-mail in corso</string>
     <string name="snackbarEmailSent">Email inviata</string>

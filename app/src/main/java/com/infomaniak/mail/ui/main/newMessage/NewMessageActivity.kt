@@ -137,7 +137,14 @@ class NewMessageActivity : ThemedActivity() {
     }
 
     private fun displayDraftActionToast(action: DraftAction) {
-        showToast(title = if (action == DraftAction.SAVE) R.string.snackbarDraftSaved else R.string.snackbarEmailSending)
+        if (isTaskRoot) {
+            showToast(title = if (action == DraftAction.SAVE) R.string.snackbarDraftSaved else R.string.snackbarEmailSending)
+        }
+        else {
+            // TODO : Custom field to separate from api ?
+            val resultIntent = Intent().putExtra("draftAction", action.apiCallValue)
+            setResult(RESULT_OK, resultIntent)
+        }
     }
 
     private fun observeCloseActivity() {

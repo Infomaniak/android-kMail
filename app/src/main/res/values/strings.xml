@@ -327,6 +327,7 @@
     <string name="snackbarDisplayProblemReported">Display problem reported</string>
     <string name="snackbarDraftDeleted">Draft deleted</string>
     <string name="snackbarDraftSaved">Draft saved</string>
+    <string name="snackbarDraftSaving">Saving draft</string>
     <string name="snackbarEmailCopiedToClipboard">Email address copied to the clipboard</string>
     <string name="snackbarEmailSending">Email sending in progress</string>
     <string name="snackbarEmailSent">Email sent</string>

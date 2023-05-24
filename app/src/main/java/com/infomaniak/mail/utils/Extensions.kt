@@ -70,6 +70,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.DialogDescriptionBinding
 import com.infomaniak.mail.databinding.DialogInputBinding
+import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.login.IlluColors.IlluColors
 import com.infomaniak.mail.ui.main.folder.DateSeparatorItemDecoration
@@ -227,16 +228,22 @@ fun Fragment.safeNavigateToNewMessageActivity(
     currentClassName: String? = null,
     shouldLoadDistantResources: Boolean = false,
 ) {
-    safeNavigate(
-        resId = R.id.newMessageActivity,
-        args = NewMessageActivityArgs(
+    (activity as MainActivity).navigateToNewMessageActivity(
+        NewMessageActivityArgs(
             draftExists = false,
-            draftMode = draftMode,
-            previousMessageUid = messageUid,
             shouldLoadDistantResources = shouldLoadDistantResources,
-        ).toBundle(),
-        currentClassName = currentClassName,
+        ).toBundle()
     )
+    // safeNavigate(
+    //     resId = R.id.newMessageActivity,
+    //     args = NewMessageActivityArgs(
+    //         draftExists = false,
+    //         draftMode = draftMode,
+    //         previousMessageUid = messageUid,
+    //         shouldLoadDistantResources = shouldLoadDistantResources,
+    //     ).toBundle(),
+    //     currentClassName = currentClassName,
+    // )
 }
 
 fun Fragment.navigateToThread(thread: Thread, mainViewModel: MainViewModel) {

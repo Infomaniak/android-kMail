@@ -268,7 +268,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         newMessageFab.setOnClickListener {
             trackNewMessageEvent("openFromFab")
-            safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToNewMessageActivity())
+            // safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToNewMessageActivity())
+            (activity as MainActivity).navigateToNewMessageActivity()
         }
 
         threadsList.scrollListener = object : OnListScrollListener {
@@ -383,9 +384,12 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun setupUnreadCountChip() = with(binding) {
         unreadCountChip.apply {
             setOnClickListener {
-                trackThreadListEvent("unreadFilter")
-                isCloseIconVisible = isChecked
-                mainViewModel.currentFilter.value = if (isChecked) ThreadFilter.UNSEEN else ThreadFilter.ALL
+                mainViewModel.snackBarManager.setValue("Salut la snackbar", customBehaviour = {
+                    mainViewModel.snackBarManager.setValue("Salutation annulée")
+                })
+                // trackThreadListEvent("unreadFilter")
+                // isCloseIconVisible = isChecked
+                // mainViewModel.currentFilter.value = if (isChecked) ThreadFilter.UNSEEN else ThreadFilter.ALL
             }
         }
     }
