@@ -25,7 +25,6 @@ import android.util.Log
 import android.view.View
 import android.webkit.WebView
 import androidx.activity.addCallback
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
 import androidx.annotation.FloatRange
@@ -38,6 +37,7 @@ import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.networking.LiveDataNetworkStatus
+import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.lib.stores.checkUpdateIsAvailable
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.GplayUtils.checkPlayServices
@@ -53,11 +53,14 @@ import com.infomaniak.mail.utils.PermissionUtils
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.updateNavigationBarColor
+import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.launch
+import java.util.UUID
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ThemedActivity() {
@@ -82,6 +85,9 @@ class MainActivity : ThemedActivity() {
     private val navController by lazy {
         (supportFragmentManager.findFragmentById(R.id.hostFragment) as NavHostFragment).navController
     }
+
+    @Inject
+    lateinit var draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler
 
     private val drawerListener = object : DrawerLayout.DrawerListener {
 
@@ -119,6 +125,7 @@ class MainActivity : ThemedActivity() {
         handleOnBackPressed()
 
         observeNetworkStatus()
+        observeDraftWorker()
         binding.drawerLayout.addDrawerListener(drawerListener)
         registerFirebaseBroadcastReceiver.initFirebaseBroadcastReceiver(this, mainViewModel)
 
@@ -134,6 +141,29 @@ class MainActivity : ThemedActivity() {
         mainViewModel.observeMergedContactsLive()
 
         permissionUtils.requestMainPermissionsIfNeeded()
+    }
+
+    private fun observeDraftWorker() {
+        val treatedWorkInfoUuids = mutableSetOf<UUID>()
+
+        draftsActionsWorkerScheduler.getCompletedWorkInfoLiveData().observe(this) {
+            for (workInfo in it) {
+                if (!treatedWorkInfoUuids.add(workInfo.id)) continue
+
+                workInfo.outputData
+                    .getIntArray(DraftsActionsWorker.ERROR_MESSAGE_RESID_KEY)
+                    ?.forEach(this::showToast)
+
+                val remoteDraftUuid = workInfo.outputData.getString(DraftsActionsWorker.SAVED_DRAFT_UUID_KEY)
+                remoteDraftUuid?.let(::showSavedDraftSnackBar)
+            }
+        }
+    }
+
+    private fun showSavedDraftSnackBar(remoteDraftUuid: String) {
+        mainViewModel.snackBarManager.postValue(getString(R.string.snackbarDraftSaved), null, R.string.actionDelete) {
+            mainViewModel.deleteDraft(remoteDraftUuid)
+        }
     }
 
     private fun loadCurrentMailbox() {
