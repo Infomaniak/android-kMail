@@ -66,27 +66,26 @@ object RefreshController {
         stopped: (() -> Unit)? = null,
     ): List<Thread>? = withContext(Dispatchers.IO) {
 
-        val returnValue = runCatching {
+        refreshThreadsJob?.cancel()
 
-            refreshThreadsJob?.cancel()
+        val job = async {
 
-            val job = async {
+            return@async runCatching {
                 started?.invoke()
-                return@async realm.fetchMessages(refreshMode, scope = this, mailbox, folder, okHttpClient)
+                return@runCatching realm.fetchMessages(refreshMode, scope = this, mailbox, folder, okHttpClient)
+            }.getOrElse {
+                // It failed, but not because we cancelled it. Something bad happened, so we call the `stopped` callback.
+                if (it !is CancellationException) stopped?.invoke()
+                if (it is ApiErrorException) it.handleApiErrors()
+                return@getOrElse null
             }
-
-            refreshThreadsJob = job
-            return@runCatching job.await()
-
-        }.getOrElse {
-            if (it !is CancellationException) stopped?.invoke()
-            if (it is ApiErrorException) it.handleApiErrors()
-            return@getOrElse null
         }
 
-        if (returnValue != null) stopped?.invoke()
+        refreshThreadsJob = job
 
-        return@withContext returnValue
+        return@withContext job.await().also {
+            if (it != null) stopped?.invoke()
+        }
     }
 
     private fun ApiErrorException.handleApiErrors() {
