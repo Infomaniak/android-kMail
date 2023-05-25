@@ -90,7 +90,7 @@ class NewMessageActivity : ThemedActivity() {
     }
 
     private fun setupSnackBar() {
-        newMessageViewModel.snackBarManager.setup(this)
+        newMessageViewModel.snackBarManager.setup(binding.root, this)
     }
 
     private fun setupSendButton() = with(binding) {

@@ -246,7 +246,7 @@ class MainActivity : ThemedActivity() {
             else -> null
         }
 
-        mainViewModel.snackBarManager.setup(this, ::getAnchor) {
+        mainViewModel.snackBarManager.setup(binding.root, this, ::getAnchor) {
             trackEvent("snackbar", "undo")
             mainViewModel.undoAction(it)
         }
