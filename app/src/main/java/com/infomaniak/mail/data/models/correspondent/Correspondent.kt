@@ -42,14 +42,15 @@ interface Correspondent : Parcelable {
             val first = firstName.removeControlAndPunctuation().ifBlank { firstName }.first()
             val last = lastName.removeControlAndPunctuation().firstOrEmpty()
 
-            "$first$last".uppercase()
+            return@runCatching "$first$last".uppercase()
         }.getOrElse { exception ->
             Sentry.withScope { scope ->
                 scope.setExtra("email", email)
                 scope.setExtra("name", name)
                 Sentry.captureException(exception)
             }
-            ""
+
+            return@getOrElse ""
         }
     }
 
