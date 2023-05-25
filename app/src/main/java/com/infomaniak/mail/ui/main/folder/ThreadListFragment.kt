@@ -63,6 +63,7 @@ import com.infomaniak.mail.data.LocalSettings.SwipeAction
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity.COMPACT
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.thread.SelectedThread
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
@@ -268,8 +269,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         newMessageFab.setOnClickListener {
             trackNewMessageEvent("openFromFab")
-            // safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToNewMessageActivity())
-            (activity as MainActivity).navigateToNewMessageActivity()
+            safeNavigateToNewMessageActivity()
         }
 
         threadsList.scrollListener = object : OnListScrollListener {

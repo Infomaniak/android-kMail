@@ -57,6 +57,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialog
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
@@ -234,13 +235,13 @@ class ThreadFragment : Fragment() {
             }
             onDraftClicked = { message ->
                 trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
-                safeNavigate(
-                    ThreadFragmentDirections.actionThreadFragmentToNewMessageActivity(
+                safeNavigateToNewMessageActivity(
+                    NewMessageActivityArgs(
                         draftExists = true,
                         draftLocalUuid = message.draftLocalUuid,
                         draftResource = message.draftResource,
                         messageUid = message.uid,
-                    )
+                    ).toBundle()
                 )
             }
             onDeleteDraftClicked = { message ->
