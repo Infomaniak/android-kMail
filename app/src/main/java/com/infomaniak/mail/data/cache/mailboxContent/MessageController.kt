@@ -41,9 +41,9 @@ object MessageController {
     private val isNotScheduled = "${Message::isScheduled.name} == false"
 
     //region Queries
-    private fun getOldestMessageQuery(folderId: String, realm: TypedRealm): RealmSingleQuery<Message> {
+    private fun getOldestOrNewestMessageQuery(folderId: String, sort: Sort, realm: TypedRealm): RealmSingleQuery<Message> {
         val byFolderId = "${Message::folderId.name} == '$folderId'"
-        return realm.query<Message>(byFolderId).sort(Message::shortUid.name).first()
+        return realm.query<Message>(byFolderId).sort(Message::shortUid.name, sort).first()
     }
 
     private fun getMessageQuery(uid: String, realm: TypedRealm): RealmSingleQuery<Message> {
@@ -54,7 +54,11 @@ object MessageController {
 
     //region Get data
     fun getOldestMessage(folderId: String, realm: TypedRealm = defaultRealm): Message? {
-        return getOldestMessageQuery(folderId, realm).find()
+        return getOldestOrNewestMessageQuery(folderId, Sort.ASCENDING, realm).find()
+    }
+
+    fun getNewestMessage(folderId: String, realm: TypedRealm = defaultRealm): Message? {
+        return getOldestOrNewestMessageQuery(folderId, Sort.DESCENDING, realm).find()
     }
 
     fun getSortedMessages(threadUid: String): RealmQuery<Message>? {
