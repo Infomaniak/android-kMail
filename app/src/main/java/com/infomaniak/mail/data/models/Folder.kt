@@ -39,6 +39,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.UseSerializers
+import kotlin.math.max
 
 @Serializable
 class Folder : RealmObject {
@@ -67,8 +68,10 @@ class Folder : RealmObject {
     var threads: RealmList<Thread> = realmListOf()
     @Transient
     var messages: RealmList<Message> = realmListOf()
+    // We start by downloading 1 page when 1st opening a Folder, before trying to download old Messages.
+    // So when trying to get old Messages, we need to fetch 1 less page. Hence this computation.
     @Transient
-    var remainingOldMessagesToFetch: Int = Utils.NUMBER_OF_OLD_MESSAGES_TO_FETCH
+    var remainingOldMessagesToFetch: Int = max(Utils.NUMBER_OF_OLD_MESSAGES_TO_FETCH - Utils.PAGE_SIZE, 0)
     @Transient
     var isHistoryComplete: Boolean = false
     // TODO: Remove this before going into production

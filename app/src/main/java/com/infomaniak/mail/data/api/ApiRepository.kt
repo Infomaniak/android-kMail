@@ -23,7 +23,7 @@ import com.infomaniak.lib.core.api.ApiRepositoryCore
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.networking.HttpUtils
-import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.NewMessagesDirection
+import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.PaginationInfo
 import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition
 import com.infomaniak.mail.data.models.addressBook.AddressBooksResult
@@ -190,12 +190,11 @@ object ApiRepository : ApiRepositoryCore() {
     fun getMessagesUids(
         mailboxUuid: String,
         folderId: String,
-        offsetUid: Int?,
-        direction: NewMessagesDirection?,
         okHttpClient: OkHttpClient?,
+        info: PaginationInfo?,
     ): ApiResponse<NewMessagesResult> {
         return callApi(
-            url = ApiRoutes.getMessagesUids(mailboxUuid, folderId, offsetUid, direction),
+            url = ApiRoutes.getMessagesUids(mailboxUuid, folderId, info),
             method = GET,
             okHttpClient = okHttpClient ?: HttpClient.okHttpClient,
         )
