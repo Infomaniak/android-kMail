@@ -65,8 +65,8 @@
 
         <ImageView
             android:id="@+id/chevron"
-            android:layout_width="@dimen/chevronSize"
-            android:layout_height="@dimen/chevronSize"
+            android:layout_width="@dimen/chevronSizeSettings"
+            android:layout_height="@dimen/chevronSizeSettings"
             android:importantForAccessibility="no"
             android:src="@drawable/ic_chevron_right"
             android:visibility="gone"
