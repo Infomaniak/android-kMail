@@ -300,7 +300,10 @@ class ThreadListAdapter(
     }
 
     private fun ItemThreadLoadMoreButtonBinding.displayLoadMoreButton() {
-        loadMoreButton.setOnClickListener { onLoadMoreClicked?.invoke() }
+        loadMoreButton.setOnClickListener {
+            if (dataSet.last() is Unit) dataSet = dataSet.toMutableList().apply { removeIf { it is Unit } }
+            onLoadMoreClicked?.invoke()
+        }
     }
 
     private fun ItemThreadSeeAllButtonBinding.displaySeeAllButton(item: Any) {
@@ -433,11 +436,11 @@ class ThreadListAdapter(
         isLoadMoreDisplayed = shouldDisplayLoadMore
 
         if (shouldDisplayLoadMore) {
-            if (dataSet.isEmpty() || dataSet.last() !is Unit) {
+            if (dataSet.lastOrNull() !is Unit) {
                 dataSet = dataSet.toMutableList().apply { add(Unit) }
             }
         } else {
-            if (dataSet.isNotEmpty() && dataSet.last() is Unit) {
+            if (dataSet.lastOrNull() is Unit) {
                 dataSet = dataSet.toMutableList().apply { removeIf { it is Unit } }
             }
         }
