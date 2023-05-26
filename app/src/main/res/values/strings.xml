@@ -182,6 +182,7 @@
     <string name="errorAtLeastOneRecipient">At least one recipient is required</string>
     <string name="errorAttachAddressInput">Only Infomaniak email addresses are supported</string>
     <string name="errorCorruptAttachment">Failed to handle draft, an attachment is corrupted</string>
+    <string name="errorDraftNotFound">Draft cannot be found</string>
     <string name="errorEditScheduledMessage">Scheduled or sent messages cannot be edited</string>
     <string name="errorInvalidCredentials">Invalid email or password</string>
     <string name="errorLoginDescription">The connection failed.</string>

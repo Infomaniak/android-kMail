@@ -60,7 +60,7 @@ object ErrorCode {
         // ApiErrorCode(ERROR_WHILE_LINKING_MAILBOX, R.string.),
         ApiErrorCode(FOLDER_ALREADY_EXISTS, R.string.errorNewFolderAlreadyExists),
         // ApiErrorCode(FOLDER_DOES_NOT_EXIST, R.string.),
-        // ApiErrorCode(DRAFT_DOES_NOT_EXIST, R.string.),
+        ApiErrorCode(DRAFT_DOES_NOT_EXIST, R.string.errorDraftNotFound),
         // ApiErrorCode(DRAFT_MESSAGE_NOT_FOUND, R.string.),
         ApiErrorCode(DRAFT_HAS_TOO_MANY_RECIPIENTS, R.string.errorTooManyRecipients),
         ApiErrorCode(DRAFT_NEED_AT_LEAST_ONE_RECIPIENT, R.string.errorAtLeastOneRecipient),
