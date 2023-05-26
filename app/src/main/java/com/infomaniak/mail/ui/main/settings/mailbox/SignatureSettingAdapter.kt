@@ -26,6 +26,7 @@ import com.infomaniak.mail.databinding.ItemSettingsSignatureBinding
 import com.infomaniak.mail.ui.main.settings.mailbox.SignatureSettingAdapter.SettingsSignatureViewHolder
 
 class SignatureSettingAdapter(
+    private val canManageSignature: Boolean,
     private val onSignatureSelected: (Signature) -> Unit,
 ) : RecyclerView.Adapter<SettingsSignatureViewHolder>() {
 
@@ -42,6 +43,7 @@ class SignatureSettingAdapter(
         setText(signature.name)
         if (signature.isDefault) check() else uncheck()
         setOnClickListener { onSignatureSelected(signature) }
+        enable(canManageSignature)
     }
 
     override fun getItemCount(): Int = signatures.count()

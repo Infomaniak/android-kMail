@@ -44,9 +44,7 @@ class SettingsFragment : Fragment() {
 
     private val mailboxesAdapter = SettingsMailboxesAdapter { selectedMailbox ->
         with(selectedMailbox) {
-            animatedNavigation(
-                SettingsFragmentDirections.actionSettingsToMailboxSettings(objectId, hostingId, mailboxName, email)
-            )
+            animatedNavigation(SettingsFragmentDirections.actionSettingsToMailboxSettings(objectId, email))
         }
     }
 

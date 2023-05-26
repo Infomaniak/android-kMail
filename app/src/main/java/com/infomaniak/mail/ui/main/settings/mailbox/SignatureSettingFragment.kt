@@ -26,6 +26,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
+import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.databinding.FragmentSignatureSettingBinding
 import com.infomaniak.mail.ui.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -41,21 +43,7 @@ class SignatureSettingFragment : Fragment() {
     private val mainViewModel: MainViewModel by activityViewModels()
     private val signatureSettingViewModel: SignatureSettingViewModel by viewModels()
 
-    private val signatureAdapter = SignatureSettingAdapter { signature ->
-        val newDefaultSignature = signature.copyFromRealm(UInt.MIN_VALUE).apply { isDefault = true }
-
-        signatureSettingViewModel.setDefaultSignature(
-            navigationArgs.mailboxHostingId,
-            navigationArgs.mailboxName,
-            newDefaultSignature,
-        ).observe(viewLifecycleOwner) { isSuccess ->
-            if (isSuccess) {
-                mainViewModel.updateSignatures(navigationArgs.mailboxObjectId)
-            } else {
-                showSnackbar(RCore.string.anErrorHasOccurred)
-            }
-        }
-    }
+    private lateinit var signatureAdapter: SignatureSettingAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentSignatureSettingBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -64,14 +52,29 @@ class SignatureSettingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.signatureList.adapter = signatureAdapter
-        mainViewModel.updateSignatures(navigationArgs.mailboxObjectId)
-        observeSignatures()
+        signatureSettingViewModel.init(navigationArgs.mailboxObjectId).observe(viewLifecycleOwner) { mailbox ->
+            setupAdapter(mailbox)
+            mainViewModel.updateSignatures(mailbox)
+            observeSignatures()
+        }
+    }
+
+    private fun setupAdapter(mailbox: Mailbox) {
+        binding.signatureList.adapter = SignatureSettingAdapter(
+            canManageSignature = mailbox.permissions?.canManageSignatures ?: false,
+            onSignatureSelected = ::onSignatureClicked
+        ).also { signatureAdapter = it }
     }
 
     private fun observeSignatures() {
-        signatureSettingViewModel.signaturesLive.observe(viewLifecycleOwner) { signatures ->
-            signatureAdapter.setSignatures(signatures)
+        signatureSettingViewModel.signaturesLive.observe(viewLifecycleOwner, signatureAdapter::setSignatures)
+    }
+
+    private fun onSignatureClicked(signature: Signature) = with(signatureSettingViewModel) {
+        val newDefaultSignature = signature.copyFromRealm(UInt.MIN_VALUE).apply { isDefault = true }
+
+        setDefaultSignature(newDefaultSignature).observe(viewLifecycleOwner) { isSuccess ->
+            if (isSuccess) mainViewModel.updateSignatures(mailbox) else showSnackbar(RCore.string.anErrorHasOccurred)
         }
     }
 }

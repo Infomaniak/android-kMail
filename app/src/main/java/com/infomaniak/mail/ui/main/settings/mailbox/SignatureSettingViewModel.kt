@@ -17,15 +17,15 @@
  */
 package com.infomaniak.mail.ui.main.settings.mailbox
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.liveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
+import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.di.IoDispatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.realm.kotlin.query.RealmResults
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
 
@@ -36,10 +36,21 @@ class SignatureSettingViewModel @Inject constructor(
 
     private val coroutineContext = viewModelScope.coroutineContext + ioDispatcher
 
-    val signaturesLive = SignatureController.getSignaturesLive().asLiveData(coroutineContext)
+    lateinit var signaturesLive: LiveData<RealmResults<Signature>>
+        private set
 
-    fun setDefaultSignature(mailboxHostingId: Int, mailboxName: String, signature: Signature) = liveData(ioDispatcher) {
-        val apiResponse = ApiRepository.setDefaultSignature(mailboxHostingId, mailboxName, signature)
+    lateinit var mailbox: Mailbox
+        private set
+
+    fun init(mailboxObjectId: String) = liveData(ioDispatcher) {
+        mailbox = MailboxController.getMailbox(mailboxObjectId)!!
+        signaturesLive = SignatureController.getSignaturesLive(mailbox.mailboxId).asLiveData(coroutineContext)
+
+        emit(mailbox)
+    }
+
+    fun setDefaultSignature(signature: Signature) = liveData(ioDispatcher) {
+        val apiResponse = ApiRepository.setDefaultSignature(mailbox.hostingId, mailbox.mailboxName, signature)
         emit(apiResponse.isSuccess())
     }
 }
