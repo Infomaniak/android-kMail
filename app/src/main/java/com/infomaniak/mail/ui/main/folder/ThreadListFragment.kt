@@ -382,12 +382,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun setupUnreadCountChip() = with(binding) {
         unreadCountChip.apply {
             setOnClickListener {
-                mainViewModel.snackBarManager.setValue("Salut la snackbar", customBehaviour = {
-                    mainViewModel.snackBarManager.setValue("Salutation annulée")
-                })
-                // trackThreadListEvent("unreadFilter")
-                // isCloseIconVisible = isChecked
-                // mainViewModel.currentFilter.value = if (isChecked) ThreadFilter.UNSEEN else ThreadFilter.ALL
+                trackThreadListEvent("unreadFilter")
+                isCloseIconVisible = isChecked
+                mainViewModel.currentFilter.value = if (isChecked) ThreadFilter.UNSEEN else ThreadFilter.ALL
             }
         }
     }

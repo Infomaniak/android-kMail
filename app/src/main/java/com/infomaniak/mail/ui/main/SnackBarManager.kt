@@ -17,13 +17,11 @@
  */
 package com.infomaniak.mail.ui.main
 
-import android.util.Log
 import android.view.View
 import androidx.annotation.StringRes
 import androidx.fragment.app.FragmentActivity
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
-import kotlinx.coroutines.delay
 import com.infomaniak.lib.core.R as RCore
 
 class SnackBarManager {
@@ -44,18 +42,15 @@ class SnackBarManager {
 
             val buttonTitle = buttonTitleRes ?: RCore.string.buttonCancel
 
-            Log.e("gibran", "Showing snackbar with - title: ${title}")
             activity.showSnackbar(title, getAnchor?.invoke(), buttonTitle, onActionClicked = action)
         }
     }
 
     fun setValue(title: String, undoData: UndoData? = null, buttonTitle: Int? = null, customBehaviour: (() -> Unit)? = null) {
-        Log.e("gibran", "setValue: ", );
         snackBarFeedback.value = SnackBarData(title, undoData, buttonTitle, customBehaviour)
     }
 
     fun postValue(title: String, undoData: UndoData? = null, buttonTitle: Int? = null, customBehaviour: (() -> Unit)? = null) {
-        Log.e("gibran", "postValue: ", );
         snackBarFeedback.postValue(SnackBarData(title, undoData, buttonTitle, customBehaviour))
     }
 

@@ -178,10 +178,15 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         SentryDebug.sendOrphanDrafts(mailboxContentRealm)
 
+        val (draftUid, mailboxUuid) = if (savedDraftUuids.count() == 1) {
+            savedDraftUuids.single() to mailbox.uuid
+        } else {
+            null to null
+        }
         val outputData = workDataOf(
             ERROR_MESSAGE_RESID_KEY to errorMessageResIds.toIntArray(),
-            SAVED_DRAFT_UUID_KEY to if (savedDraftUuids.count() == 1) savedDraftUuids.single() else null,
-            ASSOCIATED_MAILBOX_UUID_KEY to mailbox.uuid,
+            SAVED_DRAFT_UUID_KEY to draftUid,
+            ASSOCIATED_MAILBOX_UUID_KEY to mailboxUuid,
         )
 
         return if (isFailure) Result.failure(outputData) else Result.success(outputData)

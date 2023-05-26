@@ -38,6 +38,7 @@ import com.infomaniak.mail.databinding.ActivityNewMessageBinding
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.ThemedActivity
 import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.Utils.DRAFT_ACTION_KEY
 import dagger.hilt.android.AndroidEntryPoint
 import com.google.android.material.R as RMaterial
 
@@ -139,10 +140,9 @@ class NewMessageActivity : ThemedActivity() {
     private fun displayDraftActionToast(action: DraftAction) {
         if (isTaskRoot) {
             showToast(title = if (action == DraftAction.SAVE) R.string.snackbarDraftSaved else R.string.snackbarEmailSending)
-        }
-        else {
+        } else {
             // TODO : Custom field to separate from api ?
-            val resultIntent = Intent().putExtra("draftAction", action.apiCallValue)
+            val resultIntent = Intent().putExtra(DRAFT_ACTION_KEY, action.apiCallValue)
             setResult(RESULT_OK, resultIntent)
         }
     }

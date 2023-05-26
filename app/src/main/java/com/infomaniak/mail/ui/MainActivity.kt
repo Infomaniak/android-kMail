@@ -52,6 +52,7 @@ import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity
 import com.infomaniak.mail.utils.PermissionUtils
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.UiUtils
+import com.infomaniak.mail.utils.Utils.DRAFT_ACTION_KEY
 import com.infomaniak.mail.utils.updateNavigationBarColor
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
@@ -75,9 +76,10 @@ class MainActivity : ThemedActivity() {
     private val backgroundHeaderColor: Int by lazy { getColor(R.color.backgroundHeaderColor) }
     private val menuDrawerBackgroundColor: Int by lazy { getColor(R.color.menuDrawerBackgroundColor) }
     private val registerFirebaseBroadcastReceiver by lazy { RegisterFirebaseBroadcastReceiver() }
+
     private val newMessageActivityResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
-        // TODO : Const for "draftAction" and find best way to send "save" as value
-        if (result.data?.getStringExtra("draftAction") == "save") {
+        // TODO : Find best way to send "save" as value
+        if (result.data?.getStringExtra(DRAFT_ACTION_KEY) == "save") {
             mainViewModel.snackBarManager.postValue(getString(R.string.snackbarDraftSaving))
         }
     }
@@ -125,7 +127,7 @@ class MainActivity : ThemedActivity() {
         handleOnBackPressed()
 
         observeNetworkStatus()
-        observeDraftWorker()
+        observeDraftWorkerResults()
         binding.drawerLayout.addDrawerListener(drawerListener)
         registerFirebaseBroadcastReceiver.initFirebaseBroadcastReceiver(this, mainViewModel)
 
@@ -143,7 +145,7 @@ class MainActivity : ThemedActivity() {
         permissionUtils.requestMainPermissionsIfNeeded()
     }
 
-    private fun observeDraftWorker() {
+    private fun observeDraftWorkerResults() {
         val treatedWorkInfoUuids = mutableSetOf<UUID>()
 
         draftsActionsWorkerScheduler.getCompletedWorkInfoLiveData().observe(this) {
@@ -161,14 +163,10 @@ class MainActivity : ThemedActivity() {
         }
     }
 
-    private fun showSavedDraftSnackBar(remoteDraftUuid: String, associatedMailboxUuid: String) = with(mainViewModel) {
-        val (buttonTitle, onDeleteClicked) = if (currentMailbox.value!!.uuid == associatedMailboxUuid) {
-            R.string.actionDelete to { deleteDraft(remoteDraftUuid) }
-        } else {
-            null to null
+    private fun showSavedDraftSnackBar(remoteDraftUuid: String, associatedMailboxUuid: String) {
+        mainViewModel.snackBarManager.postValue(getString(R.string.snackbarDraftSaved), null, R.string.actionDelete) {
+            mainViewModel.deleteDraft(associatedMailboxUuid, remoteDraftUuid)
         }
-
-        snackBarManager.postValue(getString(R.string.snackbarDraftSaved), null, buttonTitle, onDeleteClicked)
     }
 
     private fun loadCurrentMailbox() {

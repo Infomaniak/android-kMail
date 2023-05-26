@@ -499,11 +499,12 @@ class MainViewModel @Inject constructor(
         else -> MessageController.getMessageAndDuplicates(threads.first(), message)
     }
 
-    fun deleteDraft(remoteDraftUuid: String) {
+    fun deleteDraft(targetMailboxUuid: String, remoteDraftUuid: String) {
         viewModelScope.launch(viewModelScope.handlerIO) {
             val mailbox = currentMailbox.value!!
-            val apiResponse = ApiRepository.deleteDraft(mailbox.uuid, remoteDraftUuid)
-            if (apiResponse.isSuccess()) {
+            val apiResponse = ApiRepository.deleteDraft(targetMailboxUuid, remoteDraftUuid)
+
+            if (apiResponse.isSuccess() && mailbox.uuid == targetMailboxUuid) {
                 val draftFolderId = FolderController.getFolder(FolderRole.DRAFT)!!.id
                 refreshFolders(mailbox, listOf(draftFolderId))
             }
