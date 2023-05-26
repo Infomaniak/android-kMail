@@ -61,7 +61,6 @@ import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.decodeFromString
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -204,7 +203,7 @@ class DraftsActionsWorker @AssistedInject constructor(
             delay(min(delay, MAX_REFRESH_DELAY))
 
             RefreshController.refreshThreads(
-                refreshMode = RefreshMode.NEW_MESSAGES_WITH_ROLE,
+                refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
                 mailbox = mailbox,
                 folder = folder,
                 okHttpClient = okHttpClient,

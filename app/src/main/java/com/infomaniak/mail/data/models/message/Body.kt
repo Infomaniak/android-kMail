@@ -31,12 +31,11 @@ class Body : EmbeddedRealmObject {
     var value: String = ""
     var type: String = ""
     // TODO: Realm doesn't allow us to do that for now:
-    // TODO: | Caused by: io.realm.kotlin.internal.interop.RealmCoreLogicException: [18]: Schema validation failed due to the following errors:
-    // TODO: | - Cycles containing embedded objects are not currently supported: 'Body.subBody.body'
-    // TODO: | - Cycles containing embedded objects are not currently supported: 'SubBody.body.subBody'
+    //  | Caused by: io.realm.kotlin.internal.interop.RealmCoreLogicException: [18]: Schema validation failed due to the following errors:
+    //  | - Cycles containing embedded objects are not currently supported: 'Body.subBody.body'
+    //  | - Cycles containing embedded objects are not currently supported: 'SubBody.body.subBody'
     // var subBody: RealmList<SubBody> = realmListOf()
-    // TODO: In the meantime, we store the `subBody` as a JSON String, and
-    // TODO: we'll have to manually deserialize it when we want to use it.
+    // TODO: In the meantime, we store the `subBody` as a JSON String, and we'll have to manually deserialize it when we want to use it.
     @Serializable(JsonAsStringSerializer::class)
     var subBody: String? = null
 }

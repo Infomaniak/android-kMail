@@ -68,7 +68,7 @@ object SharedViewModelUtils {
         foldersIds.forEach { folderId ->
             FolderController.getFolder(folderId)?.let { folder ->
                 RefreshController.refreshThreads(
-                    refreshMode = RefreshMode.NEW_MESSAGES,
+                    refreshMode = RefreshMode.REFRESH_FOLDER,
                     mailbox = mailbox,
                     folder = folder,
                     started = started,

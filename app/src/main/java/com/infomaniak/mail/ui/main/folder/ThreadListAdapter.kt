@@ -58,8 +58,7 @@ import kotlin.math.abs
 import com.google.android.material.R as RMaterial
 import com.infomaniak.lib.core.R as RCore
 
-// TODO: Do we want to extract features from LoaderAdapter (in Core) and put them here?
-// TODO: Same for all adapters in the app?
+// TODO: Do we want to extract features from LoaderAdapter (in Core) and put them here? Same for all adapters in the app?
 class ThreadListAdapter(
     context: Context,
     private val threadDensity: ThreadDensity,

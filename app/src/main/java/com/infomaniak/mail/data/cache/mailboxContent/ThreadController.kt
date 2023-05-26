@@ -231,7 +231,7 @@ object ThreadController {
     ) = withContext(Dispatchers.IO) {
         failedFoldersIds.forEach { folderId ->
             FolderController.getFolder(folderId, realm)?.let { folder ->
-                RefreshController.refreshThreads(RefreshMode.NEW_MESSAGES, mailbox, folder, okHttpClient, realm)
+                RefreshController.refreshThreads(RefreshMode.REFRESH_FOLDER, mailbox, folder, okHttpClient, realm)
             }
         }
     }

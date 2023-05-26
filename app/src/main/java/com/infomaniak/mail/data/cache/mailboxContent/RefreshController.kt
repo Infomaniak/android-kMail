@@ -25,7 +25,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMo
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.upsertThread
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
-import com.infomaniak.mail.data.models.getMessages.GetMessagesUidsDeltaResult.MessageFlags
+import com.infomaniak.mail.data.models.getMessages.ActivitiesResult.MessageFlags
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
@@ -49,10 +49,10 @@ object RefreshController {
     private var refreshThreadsJob: Job? = null
 
     enum class RefreshMode {
-        NEW_MESSAGES_WITH_ROLE,
-        NEW_MESSAGES,
+        REFRESH_FOLDER,
+        REFRESH_FOLDER_WITH_ROLE,
         // OLD_MESSAGES, /* Unused for now */
-        ONE_BATCH_OF_OLD_MESSAGES,
+        ONE_PAGE_OF_OLD_MESSAGES,
     }
 
     //region Fetch Messages
@@ -103,10 +103,10 @@ object RefreshController {
         okHttpClient: OkHttpClient?
     ): List<Thread> {
         return when (refreshMode) {
-            NEW_MESSAGES_WITH_ROLE -> fetchNewMessagesForRoleFolder(scope, mailbox, folder, okHttpClient)
-            NEW_MESSAGES -> fetchNewMessages(scope, mailbox, folder, okHttpClient)
+            REFRESH_FOLDER_WITH_ROLE -> fetchNewMessagesForRoleFolder(scope, mailbox, folder, okHttpClient)
+            REFRESH_FOLDER -> fetchNewMessages(scope, mailbox, folder, okHttpClient)
             // OLD_MESSAGES -> fetchOldMessages(scope, mailbox, folder, okHttpClient) /* Unused for now */
-            ONE_BATCH_OF_OLD_MESSAGES -> {
+            ONE_PAGE_OF_OLD_MESSAGES -> {
                 fetchOneBatchOfOldMessages(scope, mailbox, folder, okHttpClient)
                 emptyList()
             }
