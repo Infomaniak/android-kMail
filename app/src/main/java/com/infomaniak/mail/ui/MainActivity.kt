@@ -28,6 +28,7 @@ import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
 import androidx.annotation.FloatRange
+import androidx.core.os.bundleOf
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Lifecycle.State
 import androidx.lifecycle.distinctUntilChanged
@@ -45,6 +46,7 @@ import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.firebase.RegisterFirebaseBroadcastReceiver
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
@@ -52,7 +54,6 @@ import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity
 import com.infomaniak.mail.utils.PermissionUtils
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.UiUtils
-import com.infomaniak.mail.utils.Utils.DRAFT_ACTION_KEY
 import com.infomaniak.mail.utils.updateNavigationBarColor
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
@@ -78,8 +79,8 @@ class MainActivity : ThemedActivity() {
     private val registerFirebaseBroadcastReceiver by lazy { RegisterFirebaseBroadcastReceiver() }
 
     private val newMessageActivityResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
-        // TODO : Find best way to send "save" as value
-        if (result.data?.getStringExtra(DRAFT_ACTION_KEY) == "save") {
+        val draftAction = MainActivityArgs.fromBundle(result.data?.extras ?: bundleOf()).draftAction
+        if (draftAction == Draft.DraftAction.SAVE) {
             mainViewModel.snackBarManager.postValue(getString(R.string.snackbarDraftSaving))
         }
     }
