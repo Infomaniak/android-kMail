@@ -42,7 +42,6 @@ import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
 import java.util.Date
 import kotlin.math.max
-import kotlin.math.min
 
 object RefreshController {
 
@@ -344,66 +343,53 @@ object RefreshController {
     ): Set<Thread> {
 
         val impactedThreads = mutableSetOf<Thread>()
-        val shortUids = newMessages.addedShortUids
-        val uids = getOnlyNewUids(folder, shortUids)
-        var pageStart = 0
-        val pageSize = Utils.PAGE_SIZE
+        val uids = getOnlyNewUids(folder, newMessages.addedShortUids).ifEmpty { return emptySet() }
 
-        // TODO: This loop is now useless, we always have only 1 page.
-        while (pageStart < uids.count()) {
-            scope.ensureActive()
+        val before = System.currentTimeMillis()
+        val apiResponse = ApiRepository.getMessagesByUids(mailbox.uuid, folder.id, uids, okHttpClient)
+        val after = System.currentTimeMillis()
+        if (!apiResponse.isSuccess()) apiResponse.throwErrorAsException()
+        scope.ensureActive()
 
-            val pageEnd = min(pageStart + pageSize, uids.count())
-            val page = uids.subList(pageStart, pageEnd)
+        apiResponse.data?.messages?.let { messages ->
 
-            val before = System.currentTimeMillis()
-            val apiResponse = ApiRepository.getMessagesByUids(mailbox.uuid, folder.id, page, okHttpClient)
-            val after = System.currentTimeMillis()
-            if (!apiResponse.isSuccess()) apiResponse.throwErrorAsException()
-            scope.ensureActive()
+            writeBlocking {
+                findLatest(folder)?.let { latestFolder ->
+                    val threads = createMultiMessagesThreads(scope, latestFolder, messages)
+                    Log.d("Realm", "Saved Messages: ${latestFolder.name} | ${latestFolder.messages.count()}")
 
-            apiResponse.data?.messages?.let { messages ->
-
-                writeBlocking {
-                    findLatest(folder)?.let { latestFolder ->
-                        val threads = createMultiMessagesThreads(scope, latestFolder, messages)
-                        Log.d("Realm", "Saved Messages: ${latestFolder.name} | ${latestFolder.messages.count()}")
-
-                        val impactedFoldersIds = (threads.map { it.folderId }.toSet()) + folder.id
-                        impactedFoldersIds.forEach { folderId ->
-                            FolderController.refreshUnreadCount(folderId, mailbox.objectId, realm = this)
-                        }
-
-                        impactedThreads.addAll(threads)
+                    val impactedFoldersIds = (threads.map { it.folderId }.toSet()) + folder.id
+                    impactedFoldersIds.forEach { folderId ->
+                        FolderController.refreshUnreadCount(folderId, mailbox.objectId, realm = this)
                     }
+
+                    impactedThreads.addAll(threads)
                 }
-
-                /**
-                 * Realm really doesn't like to be written on too frequently.
-                 * So we want to be sure that we don't write twice in less than 500 ms.
-                 * Appreciable side effect: it will also reduce the stress on the API.
-                 */
-                val delay = Utils.MAX_DELAY_BETWEEN_API_CALLS - (after - before)
-                if (delay > 0L) {
-                    delay(delay)
-                    scope.ensureActive()
-                }
-
-                SentryDebug.addThreadsAlgoBreadcrumb(
-                    message = logMessage,
-                    data = mapOf(
-                        "1_folderName" to folder.name,
-                        "2_folderId" to folder.id,
-                        "3_added" to shortUids,
-                        // "4_deleted" to newMessages.deletedUids.map { "${it.toShortUid()}" },
-                        // "5_updated" to newMessages.updatedMessages.map { it.shortUid },
-                    ),
-                )
-
-                SentryDebug.sendMissingMessages(page, messages, folder, newMessages.cursor)
             }
 
-            pageStart += pageSize
+            /**
+             * Realm really doesn't like to be written on too frequently.
+             * So we want to be sure that we don't write twice in less than 500 ms.
+             * Appreciable side effect: it will also reduce the stress on the API.
+             */
+            val delay = Utils.MAX_DELAY_BETWEEN_API_CALLS - (after - before)
+            if (delay > 0L) {
+                delay(delay)
+                scope.ensureActive()
+            }
+
+            SentryDebug.addThreadsAlgoBreadcrumb(
+                message = logMessage,
+                data = mapOf(
+                    "1_folderName" to folder.name,
+                    "2_folderId" to folder.id,
+                    "3_added" to newMessages.addedShortUids,
+                    // "4_deleted" to newMessages.deletedUids.map { "${it.toShortUid()}" },
+                    // "5_updated" to newMessages.updatedMessages.map { it.shortUid },
+                ),
+            )
+
+            SentryDebug.sendMissingMessages(uids, messages, folder, newMessages.cursor)
         }
 
         return impactedThreads.filter { it.folderId == folder.id }.toSet()
