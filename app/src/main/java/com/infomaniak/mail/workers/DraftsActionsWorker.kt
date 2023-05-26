@@ -180,7 +180,8 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         val outputData = workDataOf(
             ERROR_MESSAGE_RESID_KEY to errorMessageResIds.toIntArray(),
-            SAVED_DRAFT_UUID_KEY to if (savedDraftUuids.count() == 1) savedDraftUuids.single() else null
+            SAVED_DRAFT_UUID_KEY to if (savedDraftUuids.count() == 1) savedDraftUuids.single() else null,
+            ASSOCIATED_MAILBOX_UUID_KEY to mailbox.uuid,
         )
 
         return if (isFailure) Result.failure(outputData) else Result.success(outputData)
@@ -380,6 +381,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         const val DRAFT_ACTION_KEY = "draftActionKey"
         const val ERROR_MESSAGE_RESID_KEY = "errorMessageResIdKey"
         const val SAVED_DRAFT_UUID_KEY = "savedDraftUidKey"
+        const val ASSOCIATED_MAILBOX_UUID_KEY = "associatedMailboxUuidKey"
         // We add this delay because for now, it doesn't always work if we just use the `etop`.
         private const val REFRESH_DELAY = 2_000L
         private const val MAX_REFRESH_DELAY = 6_000L

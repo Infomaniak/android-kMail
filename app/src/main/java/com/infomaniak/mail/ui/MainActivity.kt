@@ -155,15 +155,20 @@ class MainActivity : ThemedActivity() {
                     ?.forEach(this::showToast)
 
                 val remoteDraftUuid = workInfo.outputData.getString(DraftsActionsWorker.SAVED_DRAFT_UUID_KEY)
-                remoteDraftUuid?.let(::showSavedDraftSnackBar)
+                val associatedMailboxUuid = workInfo.outputData.getString(DraftsActionsWorker.ASSOCIATED_MAILBOX_UUID_KEY)
+                remoteDraftUuid?.let { draftUuid -> showSavedDraftSnackBar(draftUuid, associatedMailboxUuid!!) }
             }
         }
     }
 
-    private fun showSavedDraftSnackBar(remoteDraftUuid: String) {
-        mainViewModel.snackBarManager.postValue(getString(R.string.snackbarDraftSaved), null, R.string.actionDelete) {
-            mainViewModel.deleteDraft(remoteDraftUuid)
+    private fun showSavedDraftSnackBar(remoteDraftUuid: String, associatedMailboxUuid: String) = with(mainViewModel) {
+        val (buttonTitle, onDeleteClicked) = if (currentMailbox.value!!.uuid == associatedMailboxUuid) {
+            R.string.actionDelete to { deleteDraft(remoteDraftUuid) }
+        } else {
+            null to null
         }
+
+        snackBarManager.postValue(getString(R.string.snackbarDraftSaved), null, buttonTitle, onDeleteClicked)
     }
 
     private fun loadCurrentMailbox() {
