@@ -41,8 +41,8 @@
                 android:id="@+id/listDensityButtonsGroup"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/marginStandard"
-                android:layout_marginBottom="@dimen/marginStandardMedium"
+                android:layout_marginTop="@dimen/alternativeMargin"
+                android:layout_marginBottom="@dimen/marginStandardVerySmall"
                 android:paddingHorizontal="@dimen/marginStandardMedium"
                 app:checkedButton="@id/listDensityButtonNormal"
                 app:selectionRequired="true"
@@ -70,7 +70,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginHorizontal="@dimen/marginStandardMedium"
-                android:layout_marginBottom="30dp"
+                android:layout_marginVertical="@dimen/marginStandardMedium"
                 app:cardElevation="2dp"
                 app:strokeWidth="0dp">
 
