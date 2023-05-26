@@ -81,6 +81,7 @@ class ThreadListAdapter(
 
     private var swipingIsAuthorized: Boolean = true
     private var displaySeeAllButton = false // TODO: Manage this for intelligent mailbox
+    private var isLoadMoreDisplayed = false
 
     var onThreadClicked: ((thread: Thread) -> Unit)? = null
     var onFlushClicked: ((dialogTitle: String) -> Unit)? = null
@@ -299,7 +300,10 @@ class ThreadListAdapter(
     }
 
     private fun ItemThreadLoadMoreButtonBinding.displayLoadMoreButton() {
-        loadMoreButton.setOnClickListener { onLoadMoreClicked?.invoke() }
+        loadMoreButton.setOnClickListener {
+            if (dataSet.last() is Unit) dataSet = dataSet.toMutableList().apply { removeIf { it is Unit } }
+            onLoadMoreClicked?.invoke()
+        }
     }
 
     private fun ItemThreadSeeAllButtonBinding.displaySeeAllButton(item: Any) {
@@ -411,7 +415,7 @@ class ThreadListAdapter(
     override fun createDiffUtil(oldList: List<Any>, newList: List<Any>): DragDropSwipeDiffCallback<Any>? = null
 
     override fun updateList(itemList: List<Thread>) {
-        dataSet = formatList(itemList, recyclerView.context, folderRole, threadDensity)
+        dataSet = formatList(itemList, recyclerView.context, folderRole, threadDensity, isLoadMoreDisplayed)
     }
 
     fun updateContacts(newContacts: Map<String, Map<String, MergedContact>>) {
@@ -425,6 +429,21 @@ class ThreadListAdapter(
 
     fun updateSelection() {
         notifyItemRangeChanged(0, itemCount, NotificationType.SELECTED_STATE)
+    }
+
+    fun updateLoadMore(shouldDisplayLoadMore: Boolean) {
+
+        isLoadMoreDisplayed = shouldDisplayLoadMore
+
+        if (shouldDisplayLoadMore) {
+            if (dataSet.lastOrNull() !is Unit) {
+                dataSet = dataSet.toMutableList().apply { add(Unit) }
+            }
+        } else {
+            if (dataSet.lastOrNull() is Unit) {
+                dataSet = dataSet.toMutableList().apply { removeIf { it is Unit } }
+            }
+        }
     }
 
     private enum class DisplayType(val layout: Int) {
@@ -454,6 +473,7 @@ class ThreadListAdapter(
             context: Context,
             folderRole: FolderRole?,
             threadDensity: ThreadDensity,
+            isLoadMoreDisplayed: Boolean,
         ) = mutableListOf<Any>().apply {
 
             if ((folderRole == FolderRole.TRASH || folderRole == FolderRole.SPAM) && threads.isNotEmpty()) {
@@ -478,7 +498,7 @@ class ThreadListAdapter(
             }
 
             // Add "Load more" button
-            add(Unit)
+            if (isLoadMoreDisplayed) add(Unit)
         }
 
         fun Thread.getSectionTitle(context: Context): String = with(date.toDate()) {

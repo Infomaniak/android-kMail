@@ -167,6 +167,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     override fun onRefresh() {
+        if (mainViewModel.isDownloadingChanges.value?.first == true) return
         mainViewModel.forceRefreshThreads()
     }
 
@@ -420,14 +421,17 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun observeDownloadState() {
-        mainViewModel.isDownloadingChanges.distinctUntilChanged().observe(viewLifecycleOwner) { isDownloading ->
-            if (isDownloading) {
-                showLoadingTimer.start()
-            } else {
-                showLoadingTimer.cancel()
-                binding.swipeRefreshLayout.isRefreshing = false
+        mainViewModel.isDownloadingChanges
+            .distinctUntilChanged()
+            .observe(viewLifecycleOwner) { (isDownloading, shouldDisplayLoadMore) ->
+                if (isDownloading) {
+                    showLoadingTimer.start()
+                } else {
+                    showLoadingTimer.cancel()
+                    binding.swipeRefreshLayout.isRefreshing = false
+                    shouldDisplayLoadMore?.let(threadListAdapter::updateLoadMore)
+                }
             }
-        }
     }
 
     private fun observeFilter() {
@@ -443,9 +447,15 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun observeCurrentFolder() {
         mainViewModel.currentFolder.observeNotNull(viewLifecycleOwner) { folder ->
+
             lastUpdatedDate = null
+
             displayFolderName(folder)
-            threadListAdapter.updateFolderRole(folder.role)
+
+            threadListAdapter.apply {
+                updateFolderRole(folder.role)
+                updateLoadMore(shouldDisplayLoadMore = false)
+            }
         }
     }
 
