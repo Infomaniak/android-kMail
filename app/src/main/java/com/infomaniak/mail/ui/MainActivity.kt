@@ -81,7 +81,7 @@ class MainActivity : ThemedActivity() {
     private val newMessageActivityResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         val draftAction = MainActivityArgs.fromBundle(result.data?.extras ?: bundleOf()).draftAction
         if (draftAction == Draft.DraftAction.SAVE) {
-            mainViewModel.snackBarManager.postValue(getString(R.string.snackbarDraftSaving))
+            mainViewModel.snackBarManager.setValue(getString(R.string.snackbarDraftSaving))
         }
     }
 
@@ -165,7 +165,7 @@ class MainActivity : ThemedActivity() {
     }
 
     private fun showSavedDraftSnackBar(remoteDraftUuid: String, associatedMailboxUuid: String) {
-        mainViewModel.snackBarManager.postValue(getString(R.string.snackbarDraftSaved), null, R.string.actionDelete) {
+        mainViewModel.snackBarManager.setValue(getString(R.string.snackbarDraftSaved), null, R.string.actionDelete) {
             mainViewModel.deleteDraft(associatedMailboxUuid, remoteDraftUuid)
         }
     }
