@@ -19,7 +19,6 @@ package com.infomaniak.mail.ui.main.thread
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
@@ -29,6 +28,7 @@ import com.infomaniak.lib.core.utils.toDp
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.Utils
 import java.io.ByteArrayInputStream
@@ -43,9 +43,11 @@ class MessageWebViewClient(
 
     private val emptyResource by lazy { WebResourceResponse("text/plain", "utf-8", ByteArrayInputStream(ByteArray(0))) }
 
-    override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
-        if (request?.url?.scheme.equals(CID_SCHEME, ignoreCase = true)) {
-            val cid = request!!.url.schemeSpecificPart
+    override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
+        val url = request.url
+
+        if (url?.scheme.equals(CID_SCHEME, ignoreCase = true)) {
+            val cid = url.schemeSpecificPart
             return cidDictionary[cid]?.let { attachment ->
                 val cacheFile = attachment.getCacheFile(context)
 
@@ -66,8 +68,8 @@ class MessageWebViewClient(
         }
 
         val shouldLoadResource = shouldLoadDistantResources
-                || request?.url?.scheme.equals(DATA_SCHEME, ignoreCase = true)
-                || trustedUrls.any { it.find(request?.url.toString()) != null }
+                || url?.scheme.equals(DATA_SCHEME, ignoreCase = true)
+                || trustedUrls.any { it.find(url.toString()) != null }
 
         return if (shouldLoadResource) {
             super.shouldInterceptRequest(view, request)
@@ -77,13 +79,20 @@ class MessageWebViewClient(
         }
     }
 
-    override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-        request?.url?.let {
-            val intent = Intent(Intent.ACTION_VIEW).apply {
-                data = Uri.parse(it.toString())
+    override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
+        request.url?.let {
+
+            if (it.scheme == "mailto") {
+                Intent(Intent.ACTION_SENDTO, it, context, NewMessageActivity::class.java).apply {
+                    context.startActivity(this)
+                }
+                return true
             }
+
             runCatching {
-                context.startActivity(intent)
+                Intent(Intent.ACTION_VIEW, it).apply {
+                    context.startActivity(this)
+                }
             }.onFailure {
                 context.showToast(R.string.webViewCantHandleAction)
             }
