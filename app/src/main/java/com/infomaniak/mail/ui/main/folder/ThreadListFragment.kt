@@ -446,9 +446,15 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun observeCurrentFolder() {
         mainViewModel.currentFolder.observeNotNull(viewLifecycleOwner) { folder ->
+
             lastUpdatedDate = null
+
             displayFolderName(folder)
-            threadListAdapter.updateFolderRole(folder.role)
+
+            threadListAdapter.apply {
+                updateFolderRole(folder.role)
+                updateLoadMore(shouldDisplayLoadMore = false)
+            }
         }
     }
 
