@@ -20,13 +20,11 @@ package com.infomaniak.mail.data.cache.mailboxContent
 import android.util.Log
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.signature.Signature
-import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.update
+import io.realm.kotlin.Realm
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.query
-import io.realm.kotlin.query.RealmResults
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 object SignatureController {
@@ -42,27 +40,13 @@ object SignatureController {
         return getDefaultSignature(realm) ?: realm.query<Signature>().first().find()!!
     }
 
-    fun getSignaturesLive(mailboxId: Int): Flow<RealmResults<Signature>> {
-        val realm = if (mailboxId == AccountUtils.currentMailboxId) {
-            defaultRealm
-        } else {
-            RealmDatabase.newMailboxContentInstance(AccountUtils.currentUserId, mailboxId)
-        }
-
-        return realm.query<Signature>().find().asFlow().map { it.list }
-    }
+    fun getSignaturesLive(realm: TypedRealm = defaultRealm) = realm.query<Signature>().find().asFlow().map { it.list }
     //endregion
 
     //region Edit data
-    fun update(apiSignatures: List<Signature>, mailboxId: Int) {
+    fun update(apiSignatures: List<Signature>, customRealm: Realm?) {
         Log.d(RealmDatabase.TAG, "Signatures: Save new data")
-        val realm = if (mailboxId == AccountUtils.currentMailboxId) {
-            defaultRealm
-        } else {
-            RealmDatabase.newMailboxContentInstance(AccountUtils.currentUserId, mailboxId)
-        }
-
-        realm.update<Signature>(apiSignatures)
+        (customRealm ?: defaultRealm).update<Signature>(apiSignatures)
     }
 
     fun update(apiSignatures: List<Signature>, realm: MutableRealm) {

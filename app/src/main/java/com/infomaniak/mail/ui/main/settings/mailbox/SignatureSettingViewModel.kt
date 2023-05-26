@@ -19,12 +19,15 @@ package com.infomaniak.mail.ui.main.settings.mailbox
 
 import androidx.lifecycle.*
 import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.utils.AccountUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.realm.kotlin.Realm
 import io.realm.kotlin.query.RealmResults
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
@@ -42,9 +45,12 @@ class SignatureSettingViewModel @Inject constructor(
     lateinit var mailbox: Mailbox
         private set
 
+    var customRealm: Realm? = null
+
     fun init(mailboxObjectId: String) = liveData(ioDispatcher) {
         mailbox = MailboxController.getMailbox(mailboxObjectId)!!
-        signaturesLive = SignatureController.getSignaturesLive(mailbox.mailboxId).asLiveData(coroutineContext)
+        customRealm = RealmDatabase.newMailboxContentInstance(AccountUtils.currentUserId, mailbox.mailboxId)
+        signaturesLive = SignatureController.getSignaturesLive(customRealm!!).asLiveData(coroutineContext)
 
         emit(mailbox)
     }
@@ -52,5 +58,10 @@ class SignatureSettingViewModel @Inject constructor(
     fun setDefaultSignature(signature: Signature) = liveData(ioDispatcher) {
         val apiResponse = ApiRepository.setDefaultSignature(mailbox.hostingId, mailbox.mailboxName, signature)
         emit(apiResponse.isSuccess())
+    }
+
+    override fun onCleared() {
+        customRealm?.close()
+        super.onCleared()
     }
 }

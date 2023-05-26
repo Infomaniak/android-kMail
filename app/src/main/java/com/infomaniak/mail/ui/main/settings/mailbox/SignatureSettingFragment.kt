@@ -54,7 +54,7 @@ class SignatureSettingFragment : Fragment() {
 
         signatureSettingViewModel.init(navigationArgs.mailboxObjectId).observe(viewLifecycleOwner) { mailbox ->
             setupAdapter(mailbox)
-            mainViewModel.updateSignatures(mailbox)
+            mainViewModel.updateSignatures(mailbox, signatureSettingViewModel.customRealm)
             observeSignatures()
         }
     }
@@ -74,7 +74,7 @@ class SignatureSettingFragment : Fragment() {
         val newDefaultSignature = signature.copyFromRealm(UInt.MIN_VALUE).apply { isDefault = true }
 
         setDefaultSignature(newDefaultSignature).observe(viewLifecycleOwner) { isSuccess ->
-            if (isSuccess) mainViewModel.updateSignatures(mailbox) else showSnackbar(RCore.string.anErrorHasOccurred)
+            if (isSuccess) mainViewModel.updateSignatures(mailbox, customRealm) else showSnackbar(RCore.string.anErrorHasOccurred)
         }
     }
 }
