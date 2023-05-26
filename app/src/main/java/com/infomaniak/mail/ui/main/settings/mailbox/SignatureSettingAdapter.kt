@@ -38,7 +38,7 @@ class SignatureSettingAdapter(
         )
     }
 
-    override fun onBindViewHolder(holder: SettingsSignatureViewHolder, position: Int) = with(holder.binding.root) {
+    override fun onBindViewHolder(holder: SettingsSignatureViewHolder, position: Int): Unit = with(holder.binding.root) {
         val signature = signatures[position]
         setText(signature.name)
         if (signature.isDefault) check() else uncheck()

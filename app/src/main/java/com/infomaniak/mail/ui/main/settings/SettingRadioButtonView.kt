@@ -94,10 +94,8 @@ class SettingRadioButtonView @JvmOverloads constructor(
         onClickListener = listener
     }
 
-    fun enable(mustEnable: Boolean) {
-        binding.root.apply {
-            isClickable = mustEnable
-            isEnabled = mustEnable
-        }
+    fun enable(mustEnable: Boolean) = binding.root.apply {
+        isClickable = mustEnable
+        isEnabled = mustEnable
     }
 }
