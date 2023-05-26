@@ -167,6 +167,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     override fun onRefresh() {
+        if (mainViewModel.isDownloadingChanges.value?.first == true) return
         mainViewModel.forceRefreshThreads()
     }
 

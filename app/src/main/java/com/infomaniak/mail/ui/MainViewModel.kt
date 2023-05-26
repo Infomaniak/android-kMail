@@ -308,7 +308,6 @@ class MainViewModel @Inject constructor(
     }
 
     fun forceRefreshThreads() = viewModelScope.launch(ioDispatcher) {
-        if (isDownloadingChanges.value?.first == true) return@launch
         Log.d(TAG, "Force refresh threads")
         refreshThreads()
     }
