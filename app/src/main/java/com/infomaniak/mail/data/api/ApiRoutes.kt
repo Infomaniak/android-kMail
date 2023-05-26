@@ -17,7 +17,8 @@
  */
 package com.infomaniak.mail.data.api
 
-import com.infomaniak.mail.BuildConfig.*
+import com.infomaniak.mail.BuildConfig.INFOMANIAK_API_V1
+import com.infomaniak.mail.BuildConfig.MAIL_API
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.PaginationInfo
 import com.infomaniak.mail.utils.Utils
 
@@ -99,8 +100,7 @@ object ApiRoutes {
         val endpoint = "${getMessages(mailboxUuid, folderId)}/messages-uids"
         val messages = "?messages=${Utils.PAGE_SIZE}"
         val offset = info?.offsetUid?.let { "&uid_offset=$it" } ?: ""
-        val direction = if (info?.direction == "asc") "&order=${info.direction}" else ""
-        // val direction = info?.direction?.let { "&direction=$it" } ?: ""
+        val direction = info?.direction?.let { "&direction=$it" } ?: ""
         return "${endpoint}${messages}${offset}${direction}"
     }
 
@@ -113,6 +113,6 @@ object ApiRoutes {
     }
 
     private fun getMessages(mailboxUuid: String, folderId: String): String {
-        return "$MAIL_API_PREPROD/api/mail/${mailboxUuid}/folder/${folderId}/mobile"
+        return "$MAIL_API/api/mail/${mailboxUuid}/folder/${folderId}/mobile"
     }
 }
