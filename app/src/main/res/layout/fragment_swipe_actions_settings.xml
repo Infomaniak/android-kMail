@@ -36,7 +36,6 @@
 
             <TextView
                 style="@style/SettingHeader"
-                android:layout_marginTop="@dimen/marginStandardMedium"
                 android:text="@string/settingsSwipeDescription" />
 
             <LinearLayout
@@ -61,13 +60,10 @@
                     android:id="@+id/swipeRightIllustration"
                     layout="@layout/swipe_right_illustration"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/marginStandardMedium" />
+                    android:layout_height="wrap_content" />
             </LinearLayout>
 
-            <com.google.android.material.divider.MaterialDivider
-                style="@style/SettingSeparator"
-                android:layout_marginVertical="0dp" />
+            <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
 
             <LinearLayout
                 android:id="@+id/swipeLeftCardview"
@@ -91,8 +87,7 @@
                     android:id="@+id/swipeLeftIllustration"
                     layout="@layout/swipe_left_illustration"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/marginStandardMedium" />
+                    android:layout_height="wrap_content" />
             </LinearLayout>
 
         </LinearLayout>

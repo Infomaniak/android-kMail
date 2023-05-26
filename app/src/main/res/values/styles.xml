@@ -385,10 +385,6 @@
 
     <style name="SettingSeparator">
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginBottom">@dimen/marginStandardSmall</item>
-        <item name="android:layout_marginEnd">@dimen/marginStandardSmall</item>
-        <item name="android:layout_marginStart">@dimen/marginStandardSmall</item>
-        <item name="android:layout_marginTop">@dimen/marginStandardSmall</item>
         <item name="android:layout_width">match_parent</item>
         <item name="dividerColor">@color/separatorColor</item>
     </style>
@@ -397,7 +393,7 @@
         <item name="android:gravity">center_vertical</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_width">match_parent</item>
-        <item name="android:paddingBottom">@dimen/marginStandardVerySmall</item>
+        <item name="android:paddingBottom">@dimen/marginStandardSmall</item>
         <item name="android:paddingEnd">@dimen/marginStandardMedium</item>
         <item name="android:paddingStart">@dimen/marginStandardMedium</item>
         <item name="android:paddingTop">@dimen/marginStandardMedium</item>
