@@ -34,7 +34,6 @@ import com.infomaniak.mail.MatomoMail.ACTION_MOVE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_POSTPONE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_SPAM_NAME
 import com.infomaniak.mail.R
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import com.google.android.material.R as RMaterial
 

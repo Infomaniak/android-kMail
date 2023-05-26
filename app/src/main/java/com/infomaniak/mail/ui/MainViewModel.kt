@@ -312,12 +312,12 @@ class MainViewModel @Inject constructor(
         refreshThreads()
     }
 
-    fun getOneBatchOfOldMessages() = viewModelScope.launch(ioDispatcher) {
+    fun getOnePageOfOldMessages() = viewModelScope.launch(ioDispatcher) {
 
         if (isDownloadingChanges.value?.first == true) return@launch
 
         RefreshController.refreshThreads(
-            refreshMode = RefreshMode.ONE_BATCH_OF_OLD_MESSAGES,
+            refreshMode = RefreshMode.ONE_PAGE_OF_OLD_MESSAGES,
             mailbox = currentMailbox.value!!,
             folder = currentFolder.value!!,
             started = ::startedDownload,
@@ -397,7 +397,7 @@ class MainViewModel @Inject constructor(
 
         FolderController.getFolder(folderId)?.let { folder ->
             RefreshController.refreshThreads(
-                refreshMode = RefreshMode.NEW_MESSAGES_WITH_ROLE,
+                refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
                 mailbox = mailbox,
                 folder = folder,
                 started = ::startedDownload,

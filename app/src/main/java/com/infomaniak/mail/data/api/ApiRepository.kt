@@ -32,8 +32,8 @@ import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.SaveDraftResult
 import com.infomaniak.mail.data.models.draft.SendDraftResult
 import com.infomaniak.mail.data.models.getMessages.GetMessagesByUidsResult
-import com.infomaniak.mail.data.models.getMessages.GetMessagesUidsDeltaResult
-import com.infomaniak.mail.data.models.getMessages.GetMessagesUidsResult
+import com.infomaniak.mail.data.models.getMessages.ActivitiesResult
+import com.infomaniak.mail.data.models.getMessages.NewMessagesResult
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.mailbox.MailboxLinkedResult
 import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
@@ -187,7 +187,7 @@ object ApiRepository : ApiRepositoryCore() {
         folderId: String,
         offsetUid: Int?,
         okHttpClient: OkHttpClient?,
-    ): ApiResponse<GetMessagesUidsResult> {
+    ): ApiResponse<NewMessagesResult> {
         return callApi(
             url = ApiRoutes.getMessagesUids(mailboxUuid, folderId, offsetUid),
             method = GET,
@@ -200,7 +200,7 @@ object ApiRepository : ApiRepositoryCore() {
         folderId: String,
         cursor: String,
         okHttpClient: OkHttpClient?,
-    ): ApiResponse<GetMessagesUidsDeltaResult> {
+    ): ApiResponse<ActivitiesResult> {
         return callApi(
             url = ApiRoutes.getMessagesUidsDelta(mailboxUuid, folderId, cursor),
             method = GET,
