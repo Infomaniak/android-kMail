@@ -127,7 +127,7 @@ class FetchMessagesManager @Inject constructor(
 
         ThreadController.fetchIncompleteMessages(messages, mailbox, okHttpClient, realm)
 
-        val message = ThreadController.getThread(uid, realm)?.messages?.last() ?: return
+        val message = ThreadController.getThread(uid, realm)?.messages?.lastOrNull() ?: return
 
         if (message.isSeen) return // Ignore if it has already been seen
 
