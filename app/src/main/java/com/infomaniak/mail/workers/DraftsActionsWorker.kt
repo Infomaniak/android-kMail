@@ -344,10 +344,19 @@ class DraftsActionsWorker @AssistedInject constructor(
             workManager.enqueueUniqueWork(TAG, ExistingWorkPolicy.APPEND_OR_REPLACE, workRequest)
         }
 
+        fun getRunningWorkInfoLiveData(): LiveData<MutableList<WorkInfo>> {
+            return getWorkInfoLiveData(listOf(WorkInfo.State.RUNNING))
+        }
+
         fun getCompletedWorkInfoLiveData(): LiveData<MutableList<WorkInfo>> {
-            val workQuery = WorkQuery.Builder.fromTags(listOf(TAG)).addStates(listOf(WorkInfo.State.SUCCEEDED)).build()
+            return getWorkInfoLiveData(listOf(WorkInfo.State.SUCCEEDED))
+        }
+
+        private fun getWorkInfoLiveData(states: List<WorkInfo.State>): LiveData<MutableList<WorkInfo>> {
+            val workQuery = WorkQuery.Builder.fromTags(listOf(TAG)).addStates(states).build()
             return workManager.getWorkInfosLiveData(workQuery)
         }
+
     }
 
     companion object {
