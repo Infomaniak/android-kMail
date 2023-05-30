@@ -105,6 +105,8 @@ class DraftsActionsWorker @AssistedInject constructor(
         mailbox = MailboxController.getMailbox(userId, mailboxId, mailboxInfoRealm) ?: return@withContext Result.failure()
         okHttpClient = AccountUtils.getHttpClient(userId)
 
+        notifyNewDraftDetected()
+
         return@withContext handleDraftsActions()
     }
 
@@ -117,6 +119,13 @@ class DraftsActionsWorker @AssistedInject constructor(
     override suspend fun getForegroundInfo(): ForegroundInfo {
         return applicationContext.showDraftActionsNotification().run {
             ForegroundInfo(NotificationUtils.DRAFT_ACTIONS_ID, build())
+        }
+    }
+
+    private suspend fun notifyNewDraftDetected() {
+        inputData.getString(DRAFT_LOCAL_UUID_KEY)?.let { localUuid ->
+            val draft = DraftController.getDraft(localUuid) ?: return@let
+            setProgress(workDataOf(DRAFT_ACTION_KEY to draft.action?.name))
         }
     }
 
@@ -313,14 +322,18 @@ class DraftsActionsWorker @AssistedInject constructor(
     @Singleton
     class Scheduler @Inject constructor(private val workManager: WorkManager) {
 
-        fun scheduleWork() {
+        fun scheduleWork(draftLocalUuid: String? = null) {
 
             if (AccountUtils.currentMailboxId == AppSettings.DEFAULT_ID) return
             if (DraftController.getDraftsWithActionsCount() == 0L) return
 
             Log.d(TAG, "Work scheduled")
 
-            val workData = workDataOf(USER_ID_KEY to AccountUtils.currentUserId, MAILBOX_ID_KEY to AccountUtils.currentMailboxId)
+            val workData = workDataOf(
+                USER_ID_KEY to AccountUtils.currentUserId,
+                MAILBOX_ID_KEY to AccountUtils.currentMailboxId,
+                DRAFT_LOCAL_UUID_KEY to draftLocalUuid
+            )
             val workRequest = OneTimeWorkRequestBuilder<DraftsActionsWorker>()
                 .addTag(TAG)
                 .setInputData(workData)
@@ -341,6 +354,8 @@ class DraftsActionsWorker @AssistedInject constructor(
         private const val TAG = "DraftsActionsWorker"
         private const val USER_ID_KEY = "userId"
         private const val MAILBOX_ID_KEY = "mailboxIdKey"
+        private const val DRAFT_LOCAL_UUID_KEY = "draftLocalUuidKey"
+        const val DRAFT_ACTION_KEY = "draftActionKey"
         const val ERROR_MESSAGE_RESID_KEY = "errorMessageResIdKey"
         // We add this delay because for now, it doesn't always work if we just use the `etop`.
         private const val REFRESH_DELAY = 2_000L
