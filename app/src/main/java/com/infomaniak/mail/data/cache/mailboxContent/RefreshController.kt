@@ -49,22 +49,6 @@ object RefreshController {
 
     private var refreshThreadsJob: Job? = null
 
-    enum class RefreshMode {
-        REFRESH_FOLDER, /* Fetch activities, and also get old Messages until `NUMBER_OF_OLD_MESSAGES_TO_FETCH` is reached */
-        REFRESH_FOLDER_WITH_ROLE, /* Same as `NEW_MESSAGES`, but also check if other Folders need to be updated (Inbox, Sent, Draft, etc…) */
-        ONE_PAGE_OF_OLD_MESSAGES, /* Get 1 page of old Messages */
-    }
-
-    private enum class Direction(val apiCallValue: String) {
-        IN_THE_PAST("previous"), /* To get more pages of old Messages */
-        TO_THE_FUTURE("following"), /* To get more pages of new Messages */
-    }
-
-    data class PaginationInfo(
-        val offsetUid: Int,
-        val direction: String,
-    )
-
     //region Fetch Messages
     suspend fun refreshThreads(
         refreshMode: RefreshMode,
@@ -74,13 +58,10 @@ object RefreshController {
         realm: Realm = defaultRealm,
         started: (() -> Unit)? = null,
         stopped: (() -> Unit)? = null,
-    ): Set<Thread>? = withContext(Dispatchers.IO) {
+    ): Set<Thread>? {
 
-        refreshThreadsJob?.cancel()
-
-        val job = async {
-
-            return@async runCatching {
+        suspend fun refreshWithRunCatching() = withContext(Dispatchers.IO + refreshThreadsJob!!) {
+            return@withContext runCatching {
                 started?.invoke()
                 return@runCatching realm.handleRefreshMode(refreshMode, scope = this, mailbox, folder, okHttpClient)
             }.getOrElse {
@@ -91,9 +72,10 @@ object RefreshController {
             }
         }
 
-        refreshThreadsJob = job
+        refreshThreadsJob?.cancel()
+        refreshThreadsJob = Job()
 
-        return@withContext job.await().also {
+        return refreshWithRunCatching().also {
             if (it != null) stopped?.invoke()
         }
     }
@@ -250,38 +232,33 @@ object RefreshController {
             PaginationInfo(offsetUid, direction.apiCallValue)
         }
 
-        val newMessages = getMessagesUids(mailbox.uuid, folder.id, okHttpClient, info)
+        val newMessages = getMessagesUids(mailbox.uuid, folder.id, okHttpClient, info)!!
         scope.ensureActive()
 
-        val uids = newMessages?.addedShortUids?.let { getOnlyNewUids(folder, it) }
-        val uidsCount = uids?.count() ?: -1
+        impactedThreads += handleAddedUids(scope, mailbox, folder, okHttpClient, newMessages.addedShortUids, newMessages.cursor)
 
-        // `count >= 0` and not `count > 0`, because if we get an empty page, we need to update the Folder to end the algorithm.
-        if (uids != null && uidsCount >= 0) {
+        val uidsCount = newMessages.addedShortUids.count()
 
-            impactedThreads += handleAddedUids(scope, mailbox, folder, okHttpClient, uids, newMessages.cursor)
+        FolderController.updateFolder(folder.id, realm = this) {
 
-            FolderController.updateFolder(folder.id, realm = this) {
-
-                when (direction) {
-                    Direction.IN_THE_PAST -> {
-                        if (uidsCount < Utils.PAGE_SIZE) {
-                            it.theEndIsReached()
-                        } else {
-                            it.remainingOldMessagesToFetch = max(it.remainingOldMessagesToFetch - uidsCount, 0)
-                        }
-                    }
-
-                    Direction.TO_THE_FUTURE -> {
-                        it.lastUpdatedAt = Date().toRealmInstant()
-
-                        // If it's the 1st opening, and we didn't even get 1 full page, it means we already reached the end.
-                        if (folder.cursor == null && newMessages.addedShortUids.count() < Utils.PAGE_SIZE) it.theEndIsReached()
+            when (direction) {
+                Direction.IN_THE_PAST -> {
+                    if (uidsCount < Utils.PAGE_SIZE) {
+                        it.theEndIsReached()
+                    } else {
+                        it.remainingOldMessagesToFetch = max(it.remainingOldMessagesToFetch - uidsCount, 0)
                     }
                 }
 
-                if (shouldUpdateCursor) it.cursor = newMessages.cursor
+                Direction.TO_THE_FUTURE -> {
+                    it.lastUpdatedAt = Date().toRealmInstant()
+
+                    // If it's the 1st opening, and we didn't even get 1 full page, it means we already reached the end.
+                    if (folder.cursor == null && uidsCount < Utils.PAGE_SIZE) it.theEndIsReached()
+                }
             }
+
+            if (shouldUpdateCursor) it.cursor = newMessages.cursor
         }
 
         writeBlocking {
@@ -621,9 +598,19 @@ object RefreshController {
         }
     }
 
-    private fun getOnlyNewUids(folder: Folder, remoteUids: List<Int>): List<Int> {
-        val localUids = folder.messages.map { it.shortUid }.toSet()
-        return remoteUids.subtract(localUids).toList()
+    enum class RefreshMode {
+        REFRESH_FOLDER, /* Fetch activities, and also get old Messages until `NUMBER_OF_OLD_MESSAGES_TO_FETCH` is reached */
+        REFRESH_FOLDER_WITH_ROLE, /* Same as `NEW_MESSAGES`, but also check if other Folders need to be updated (Inbox, Sent, Draft, etc…) */
+        ONE_PAGE_OF_OLD_MESSAGES, /* Get 1 page of old Messages */
     }
-    //endregion
+
+    private enum class Direction(val apiCallValue: String) {
+        IN_THE_PAST("previous"), /* To get more pages of old Messages */
+        TO_THE_FUTURE("following"), /* To get more pages of new Messages */
+    }
+
+    data class PaginationInfo(
+        val offsetUid: Int,
+        val direction: String,
+    )
 }
