@@ -19,13 +19,11 @@ package com.infomaniak.mail.ui
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.webkit.WebView
 import androidx.activity.addCallback
-import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
 import androidx.annotation.FloatRange
 import androidx.drawerlayout.widget.DrawerLayout
@@ -49,7 +47,6 @@ import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.firebase.RegisterFirebaseBroadcastReceiver
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
-import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity
 import com.infomaniak.mail.utils.PermissionUtils
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.UiUtils
@@ -76,15 +73,6 @@ class MainActivity : ThemedActivity() {
     private val backgroundHeaderColor: Int by lazy { getColor(R.color.backgroundHeaderColor) }
     private val menuDrawerBackgroundColor: Int by lazy { getColor(R.color.menuDrawerBackgroundColor) }
     private val registerFirebaseBroadcastReceiver by lazy { RegisterFirebaseBroadcastReceiver() }
-
-    private val newMessageActivityResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
-        result.data?.extras?.let {
-            val draftAction = MainActivityArgs.fromBundle(it).draftAction
-            if (draftAction == Draft.DraftAction.SAVE) {
-                mainViewModel.snackBarManager.setValue(getString(R.string.snackbarDraftSaving))
-            }
-        }
-    }
 
     private val navController by lazy {
         (supportFragmentManager.findFragmentById(R.id.hostFragment) as NavHostFragment).navController
@@ -149,6 +137,14 @@ class MainActivity : ThemedActivity() {
 
     private fun observeDraftWorkerResults() {
         val treatedWorkInfoUuids = mutableSetOf<UUID>()
+
+        draftsActionsWorkerScheduler.getRunningWorkInfoLiveData().observe(this) {
+            for (workInfo in it) {
+                if (workInfo.progress.getString(DraftsActionsWorker.DRAFT_ACTION_KEY) == Draft.DraftAction.SAVE.name) {
+                    mainViewModel.snackBarManager.setValue(getString(R.string.snackbarDraftSaving))
+                }
+            }
+        }
 
         draftsActionsWorkerScheduler.getCompletedWorkInfoLiveData().observe(this) {
             for (workInfo in it) {
@@ -325,12 +321,6 @@ class MainActivity : ThemedActivity() {
                 if (updateIsAvailable) navController.navigate(R.id.updateAvailableBottomSheetDialog)
             }
         }
-    }
-
-    fun navigateToNewMessageActivity(args: Bundle? = null) {
-        val intent = Intent(this, NewMessageActivity::class.java)
-        args?.let(intent::putExtras)
-        newMessageActivityResultLauncher.launch(intent)
     }
 
     private companion object {

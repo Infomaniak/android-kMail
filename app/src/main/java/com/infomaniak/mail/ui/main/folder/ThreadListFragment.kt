@@ -267,7 +267,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         newMessageFab.setOnClickListener {
             trackNewMessageEvent("openFromFab")
-            safeNavigateToNewMessageActivity()
+            safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToNewMessageActivity())
         }
 
         threadsList.scrollListener = object : OnListScrollListener {
@@ -479,7 +479,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         mainViewModel.mergedContacts.observeNotNull(viewLifecycleOwner, threadListAdapter::updateContacts)
     }
 
-    // TODO : Why listen from thread list fragment instead of listening directly in MainActivity ?
     private fun observerDraftsActionsCompletedWorks() {
         fun observeDraftsActions() {
             draftsActionsWorkerScheduler.getCompletedWorkInfoLiveData().observe(viewLifecycleOwner) {
