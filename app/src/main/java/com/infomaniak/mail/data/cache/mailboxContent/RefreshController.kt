@@ -259,8 +259,7 @@ object RefreshController {
         // `count >= 0` and not `count > 0`, because if we get an empty page, we need to update the Folder to end the algorithm.
         if (uids != null && uidsCount >= 0) {
 
-            val logMessage = "Added: $uidsCount"
-            impactedThreads += handleAddedUids(scope, mailbox, folder, okHttpClient, uids, newMessages.cursor, logMessage)
+            impactedThreads += handleAddedUids(scope, mailbox, folder, okHttpClient, uids, newMessages.cursor)
 
             FolderController.updateFolder(folder.id, realm = this) {
 
@@ -306,10 +305,23 @@ object RefreshController {
         val activities = getMessagesUidsDelta(mailbox.uuid, folder.id, okHttpClient, previousCursor) ?: return emptySet()
         scope.ensureActive()
 
+        val logMessage = "Deleted: ${activities.deletedShortUids.count()} | Updated: ${activities.updatedMessages.count()}"
+        Log.i("API", "$logMessage | ${folder.name}")
+
         writeBlocking {
             val impactedFoldersIds = mutableSetOf<String>().apply {
                 addAll(handleDeletedUids(scope, activities.deletedShortUids, folder.id))
                 addAll(handleUpdatedUids(scope, activities.updatedMessages, folder.id))
+
+                SentryDebug.addThreadsAlgoBreadcrumb(
+                    message = logMessage,
+                    data = mapOf(
+                        "1_folderName" to folder.name,
+                        "2_folderId" to folder.id,
+                        "4_deleted" to activities.deletedShortUids.map { it },
+                        "5_updated" to activities.updatedMessages.map { it.shortUid },
+                    ),
+                )
             }
 
             impactedFoldersIds.forEach { folderId ->
@@ -339,12 +351,14 @@ object RefreshController {
         okHttpClient: OkHttpClient?,
         uids: List<Int>,
         cursor: String,
-        logMessage: String,
     ): Set<Thread> {
 
         if (uids.isEmpty()) return emptySet()
 
         val impactedThreads = mutableSetOf<Thread>()
+
+        val logMessage = "Added: ${uids.count()}"
+        Log.i("API", "$logMessage | ${folder.name}")
 
         val before = System.currentTimeMillis()
         val apiResponse = ApiRepository.getMessagesByUids(mailbox.uuid, folder.id, uids, okHttpClient)
@@ -385,8 +399,6 @@ object RefreshController {
                     "1_folderName" to folder.name,
                     "2_folderId" to folder.id,
                     "3_added" to uids,
-                    // "4_deleted" to newMessages.deletedUids.map { "${it.toShortUid()}" },
-                    // "5_updated" to newMessages.updatedMessages.map { it.shortUid },
                 ),
             )
 
