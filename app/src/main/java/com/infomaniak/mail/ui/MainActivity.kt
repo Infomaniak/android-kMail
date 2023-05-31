@@ -28,7 +28,6 @@ import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
 import androidx.annotation.FloatRange
-import androidx.core.os.bundleOf
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Lifecycle.State
 import androidx.lifecycle.distinctUntilChanged
@@ -79,9 +78,11 @@ class MainActivity : ThemedActivity() {
     private val registerFirebaseBroadcastReceiver by lazy { RegisterFirebaseBroadcastReceiver() }
 
     private val newMessageActivityResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
-        val draftAction = MainActivityArgs.fromBundle(result.data?.extras ?: bundleOf()).draftAction
-        if (draftAction == Draft.DraftAction.SAVE) {
-            mainViewModel.snackBarManager.setValue(getString(R.string.snackbarDraftSaving))
+        result.data?.extras?.let {
+            val draftAction = MainActivityArgs.fromBundle(it).draftAction
+            if (draftAction == Draft.DraftAction.SAVE) {
+                mainViewModel.snackBarManager.setValue(getString(R.string.snackbarDraftSaving))
+            }
         }
     }
 
