@@ -67,6 +67,8 @@
 
     <!-- CardView -->
     <color name="cardViewStrokeColor">@color/orca</color>
+    <color name="threadCountBorderRead">@color/shark</color>
+    <color name="threadCountBorderUnread">@color/rabbit</color>
 
     <!-- Progressbar -->
     <color name="progressbarTrackColor">@color/orca</color>
