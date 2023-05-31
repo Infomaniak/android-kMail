@@ -29,6 +29,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
@@ -125,7 +126,7 @@ class FetchMessagesManager @Inject constructor(
 
         ThreadController.fetchIncompleteMessages(messages, mailbox, okHttpClient, realm)
 
-        val message = ThreadController.getThread(uid, realm)?.messages?.lastOrNull() ?: return
+        val message = MessageController.getThreadLastMessageInFolder(uid, realm) ?: return
 
         if (message.isSeen) return // Ignore if it has already been seen
 
