@@ -56,8 +56,8 @@ object RefreshController {
     }
 
     private enum class Direction(val apiCallValue: String) {
-        IN_THE_PAST("previous"), /* To get more old Messages */
-        TO_THE_FUTURE("following"), /* To get more new Messages */
+        IN_THE_PAST("previous"), /* To get more pages of old Messages */
+        TO_THE_FUTURE("following"), /* To get more pages of new Messages */
     }
 
     data class PaginationInfo(
