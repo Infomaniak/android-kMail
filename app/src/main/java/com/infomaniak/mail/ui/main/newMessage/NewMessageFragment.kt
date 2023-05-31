@@ -529,7 +529,7 @@ class NewMessageFragment : Fragment() {
         //  Realm, and we'll lost some Draft data. A quick fix to get rid of the current bugs is
         //  to wait the end of Draft composition before starting DraftsActionsWorker.
         if (shouldHandleDraftActionWhenLeaving) {
-            draftsActionsWorkerScheduler.scheduleWork()
+            draftsActionsWorkerScheduler.scheduleWork(draftLocalUuid = newMessageViewModel.draft.localUuid)
         } else {
             shouldHandleDraftActionWhenLeaving = true
         }
