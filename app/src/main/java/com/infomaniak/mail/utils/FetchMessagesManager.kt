@@ -32,7 +32,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
-import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.LaunchActivity
@@ -50,15 +50,16 @@ class FetchMessagesManager @Inject constructor(
     private val localSettings by lazy { LocalSettings.getInstance(appContext) }
 
     suspend fun execute(userId: Int, mailbox: Mailbox, mailboxContentRealm: Realm? = null) {
+
         // Don't launch sync if the mailbox's notifications have been disabled by the user
         if (mailbox.notificationsIsDisabled(notificationManagerCompat)) return
 
         val realm = mailboxContentRealm ?: RealmDatabase.newMailboxContentInstance(userId, mailbox.mailboxId)
-        val folder = FolderController.getFolder(Folder.FolderRole.INBOX, realm) ?: return
+        val folder = FolderController.getFolder(FolderRole.INBOX, realm) ?: return
         if (folder.cursor == null) return
         val okHttpClient = AccountUtils.getHttpClient(userId)
 
-        // Update local with remote
+        // Update Local with Remote
         val newMessagesThreads = RefreshController.refreshThreads(
             refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
             mailbox = mailbox,
@@ -67,9 +68,9 @@ class FetchMessagesManager @Inject constructor(
             realm = realm,
         ) ?: return
 
-        Log.d(TAG, "launchWork: ${mailbox.email} has ${newMessagesThreads.count()} new messages")
+        Log.d(TAG, "launchWork: ${mailbox.email} has ${newMessagesThreads.count()} Threads with new Messages")
 
-        // Notify all new messages
+        // Notify Threads with new Messages
         val unReadThreadsCount = ThreadController.getUnreadThreadsCount(folder)
         newMessagesThreads.forEachIndexed { index, thread ->
             thread.showNotification(
@@ -99,10 +100,7 @@ class FetchMessagesManager @Inject constructor(
                 putExtras(LaunchActivityArgs(if (isSummary) null else uid, userId, mailbox.mailboxId).toBundle())
             }
             val requestCode = if (isSummary) mailbox.uuid else uid
-            return PendingIntent.getActivity(
-                appContext, requestCode.hashCode(), intent,
-                NotificationUtilsCore.pendingIntentFlags
-            )
+            return PendingIntent.getActivity(appContext, requestCode.hashCode(), intent, NotificationUtilsCore.pendingIntentFlags)
         }
 
         fun showNotification(contentText: String, isSummary: Boolean, title: String = "", description: String? = null) {
