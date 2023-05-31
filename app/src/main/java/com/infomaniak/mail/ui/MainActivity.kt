@@ -166,7 +166,10 @@ class MainActivity : ThemedActivity() {
             title = getString(R.string.snackbarDraftSaved),
             undoData = null,
             buttonTitle = R.string.actionDelete,
-            customBehaviour = { mainViewModel.deleteDraft(associatedMailboxUuid, remoteDraftUuid) },
+            customBehaviour = {
+                trackEvent("snackbar", "deleteDraft")
+                mainViewModel.deleteDraft(associatedMailboxUuid, remoteDraftUuid)
+            },
         )
     }
 
