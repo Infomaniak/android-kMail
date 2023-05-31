@@ -53,8 +53,8 @@ object MessageBodyUtils {
     fun splitBodyAndQuote(initialBody: Body): MessageBodyQuote {
         if (initialBody.type == TEXT_PLAIN) return MessageBodyQuote(initialBody.value)
         // Heuristic to give up on mail too large for "perfect" preprocessing.
-        // 5 Meg looks like a fine threshold
-        if (initialBody.value.toByteArray().size > 5_000_000) return MessageBodyQuote(initialBody.value)
+        // 1 Meg looks like a fine threshold
+        if (initialBody.value.toByteArray().size > 1_000_000) return MessageBodyQuote(initialBody.value)
 
         // The original parsed html document in full
         val originalHtmlDocument = Jsoup.parse(initialBody.value)
