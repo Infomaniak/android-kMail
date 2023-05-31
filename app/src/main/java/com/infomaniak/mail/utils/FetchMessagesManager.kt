@@ -40,6 +40,8 @@ import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.LaunchActivityArgs
 import com.infomaniak.mail.utils.NotificationUtils.showNewMessageNotification
 import io.realm.kotlin.Realm
+import io.sentry.Sentry
+import io.sentry.SentryLevel
 import okhttp3.OkHttpClient
 import javax.inject.Inject
 
@@ -126,7 +128,21 @@ class FetchMessagesManager @Inject constructor(
 
         ThreadController.fetchIncompleteMessages(messages, mailbox, okHttpClient, realm)
 
-        val message = MessageController.getThreadLastMessageInFolder(uid, realm) ?: return
+        val message = MessageController.getThreadLastMessageInFolder(uid, realm)
+        if (message == null) {
+            val thread = ThreadController.getThread(uid, realm)
+            Sentry.withScope { scope ->
+                scope.level = SentryLevel.ERROR
+                scope.setExtra("email", "[${AccountUtils.currentMailboxEmail}]")
+                scope.setExtra("does Thread still exist ?", "[${thread != null}]")
+                scope.setExtra("folderName", "[${thread?.folder?.name}]")
+                scope.setExtra("threadUid", "[${thread?.uid}]")
+                scope.setExtra("messagesCount", "[${thread?.messages?.count()}]")
+                scope.setExtra("messagesFolder", "[${thread?.messages?.map { "${it.folder.name} (${it.folderId})" }}]")
+                Sentry.captureMessage("We are supposed to display a Notification, but we couldn't find the Message in the Thread.")
+            }
+            return
+        }
 
         if (message.isSeen) return // Ignore if it has already been seen
 
