@@ -82,6 +82,11 @@ object MessageController {
         )
     }
 
+    fun getThreadLastMessageInFolder(threadUid: String, realm: TypedRealm = defaultRealm): Message? {
+        val thread = ThreadController.getThread(threadUid, realm)
+        return thread?.messages?.query("${Message::folderId.name} == '${thread.folderId}'")?.find()?.lastOrNull()
+    }
+
     fun getUnseenMessages(thread: Thread): List<Message> {
         return getMessagesAndDuplicates(thread, "${Message::isSeen.name} == false")
     }
