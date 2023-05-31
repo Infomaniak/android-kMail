@@ -88,6 +88,7 @@ class DraftsActionsWorker @AssistedInject constructor(
     private var mailboxId: Int = AppSettings.DEFAULT_ID
     private lateinit var mailbox: Mailbox
     private var userId: Int by Delegates.notNull()
+    private var draftLocalUuid: String? = null
     private lateinit var userApiToken: String
 
     private val dateFormatWithTimezone by lazy { SimpleDateFormat(FORMAT_DATE_WITH_TIMEZONE, Locale.ROOT) }
@@ -100,6 +101,7 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         userId = inputData.getIntOrNull(USER_ID_KEY) ?: return@withContext Result.failure()
         mailboxId = inputData.getIntOrNull(MAILBOX_ID_KEY) ?: return@withContext Result.failure()
+        draftLocalUuid = inputData.getString(DRAFT_LOCAL_UUID_KEY)
 
         userApiToken = AccountUtils.getUserById(userId)?.apiToken?.accessToken ?: return@withContext Result.failure()
         mailbox = MailboxController.getMailbox(userId, mailboxId, mailboxInfoRealm) ?: return@withContext Result.failure()
@@ -123,7 +125,7 @@ class DraftsActionsWorker @AssistedInject constructor(
     }
 
     private suspend fun notifyNewDraftDetected() {
-        inputData.getString(DRAFT_LOCAL_UUID_KEY)?.let { localUuid ->
+        draftLocalUuid?.let { localUuid ->
             val draft = DraftController.getDraft(localUuid) ?: return@let
             setProgress(workDataOf(DRAFT_ACTION_KEY to draft.action?.name))
         }
@@ -133,7 +135,7 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         val scheduledDates = mutableListOf<String>()
         val errorMessageResIds = mutableListOf<Int>()
-        val savedDraftUuids = mutableListOf<String>()
+        var remoteUuidOfTrackedDraft: String? = null
 
         val isFailure = mailboxContentRealm.writeBlocking {
 
@@ -155,7 +157,9 @@ class DraftsActionsWorker @AssistedInject constructor(
                     ).also { (scheduledDate, errorMessageResId, savedDraftUuid) ->
                         scheduledDate?.let(scheduledDates::add)
                         errorMessageResId?.let(errorMessageResIds::add)
-                        savedDraftUuid?.let(savedDraftUuids::add)
+                        savedDraftUuid?.let { remoteUuid ->
+                            if (draftLocalUuid == draft.localUuid) remoteUuidOfTrackedDraft = remoteUuid
+                        }
                     }
 
                 }.onFailure { exception ->
@@ -178,8 +182,8 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         SentryDebug.sendOrphanDrafts(mailboxContentRealm)
 
-        val (draftUid, mailboxUuid) = if (savedDraftUuids.count() == 1) {
-            savedDraftUuids.single() to mailbox.uuid
+        val (draftUid, mailboxUuid) = if (draftLocalUuid != null && remoteUuidOfTrackedDraft != null) {
+            remoteUuidOfTrackedDraft to mailbox.uuid
         } else {
             null to null
         }
@@ -351,7 +355,7 @@ class DraftsActionsWorker @AssistedInject constructor(
             val workData = workDataOf(
                 USER_ID_KEY to AccountUtils.currentUserId,
                 MAILBOX_ID_KEY to AccountUtils.currentMailboxId,
-                DRAFT_LOCAL_UUID_KEY to draftLocalUuid
+                DRAFT_LOCAL_UUID_KEY to draftLocalUuid,
             )
             val workRequest = OneTimeWorkRequestBuilder<DraftsActionsWorker>()
                 .addTag(TAG)
