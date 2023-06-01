@@ -43,7 +43,8 @@ object MessageController {
     //region Queries
     private fun getOldestOrNewestMessageQuery(folderId: String, sort: Sort, realm: TypedRealm): RealmSingleQuery<Message> {
         val byFolderId = "${Message::folderId.name} == '$folderId'"
-        return realm.query<Message>(byFolderId).sort(Message::shortUid.name, sort).first()
+        val isNotFromSearch = "${Message::isFromSearch.name} == false"
+        return realm.query<Message>("$byFolderId AND $isNotFromSearch").sort(Message::shortUid.name, sort).first()
     }
 
     private fun getMessageQuery(uid: String, realm: TypedRealm): RealmSingleQuery<Message> {
