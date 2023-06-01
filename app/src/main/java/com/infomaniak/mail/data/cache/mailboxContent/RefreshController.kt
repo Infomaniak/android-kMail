@@ -80,13 +80,6 @@ object RefreshController {
         }
     }
 
-    private fun ApiErrorException.handleApiErrors() {
-        when (errorCode) {
-            ErrorCode.FOLDER_DOES_NOT_EXIST -> Unit
-            else -> Sentry.captureException(this)
-        }
-    }
-
     private suspend fun Realm.handleRefreshMode(
         refreshMode: RefreshMode,
         scope: CoroutineScope,
@@ -233,11 +226,10 @@ object RefreshController {
         }
 
         val newMessages = getMessagesUids(mailbox.uuid, folder.id, okHttpClient, info)!!
+        val uidsCount = newMessages.addedShortUids.count()
         scope.ensureActive()
 
         impactedThreads += handleAddedUids(scope, mailbox, folder, okHttpClient, newMessages.addedShortUids, newMessages.cursor)
-
-        val uidsCount = newMessages.addedShortUids.count()
 
         FolderController.updateFolder(folder.id, realm = this) {
 
@@ -261,12 +253,7 @@ object RefreshController {
             if (shouldUpdateCursor) it.cursor = newMessages.cursor
         }
 
-        writeBlocking {
-            findLatest(folder)?.let {
-                SentryDebug.sendOrphanMessages(null, folder = it)
-                SentryDebug.sendOrphanThreads(null, folder = it, realm = this)
-            }
-        }
+        sendSentryOrphans(folder)
 
         return uidsCount to impactedThreads
     }
@@ -289,16 +276,7 @@ object RefreshController {
             val impactedFoldersIds = mutableSetOf<String>().apply {
                 addAll(handleDeletedUids(scope, activities.deletedShortUids, folder.id))
                 addAll(handleUpdatedUids(scope, activities.updatedMessages, folder.id))
-
-                SentryDebug.addThreadsAlgoBreadcrumb(
-                    message = logMessage,
-                    data = mapOf(
-                        "1_folderName" to folder.name,
-                        "2_folderId" to folder.id,
-                        "4_deleted" to activities.deletedShortUids.map { it },
-                        "5_updated" to activities.updatedMessages.map { it.shortUid },
-                    ),
-                )
+                addSentryBreadcrumbsForActivities(logMessage, folder, activities)
             }
 
             impactedFoldersIds.forEach { folderId ->
@@ -309,12 +287,9 @@ object RefreshController {
                 it.lastUpdatedAt = Date().toRealmInstant()
                 it.cursor = activities.cursor
             }
-
-            findLatest(folder)?.let {
-                SentryDebug.sendOrphanMessages(previousCursor, folder = it)
-                SentryDebug.sendOrphanThreads(previousCursor, folder = it, realm = this)
-            }
         }
+
+        sendSentryOrphans(folder, previousCursor)
 
         return fetchAllNewPages(scope, mailbox, folder, okHttpClient)
     }
@@ -370,16 +345,7 @@ object RefreshController {
                 scope.ensureActive()
             }
 
-            SentryDebug.addThreadsAlgoBreadcrumb(
-                message = logMessage,
-                data = mapOf(
-                    "1_folderName" to folder.name,
-                    "2_folderId" to folder.id,
-                    "3_added" to uids,
-                ),
-            )
-
-            SentryDebug.sendMissingMessages(uids, messages, folder, cursor)
+            handleSentryForAddedUids(logMessage, folder, uids, messages, cursor)
         }
 
         return impactedThreads
@@ -574,6 +540,7 @@ object RefreshController {
     }
     //endregion
 
+    //region API calls
     private fun getMessagesUids(
         mailboxUuid: String,
         folderId: String,
@@ -597,6 +564,56 @@ object RefreshController {
             return@with data
         }
     }
+    //endregion
+
+    //region Handle errors
+    private fun ApiErrorException.handleApiErrors() {
+        when (errorCode) {
+            ErrorCode.FOLDER_DOES_NOT_EXIST -> Unit
+            else -> Sentry.captureException(this)
+        }
+    }
+
+    private fun Realm.sendSentryOrphans(folder: Folder, previousCursor: String? = null) {
+        writeBlocking {
+            findLatest(folder)?.let {
+                SentryDebug.sendOrphanMessages(previousCursor, folder = it)
+                SentryDebug.sendOrphanThreads(previousCursor, folder = it, realm = this)
+            }
+        }
+    }
+
+    private fun addSentryBreadcrumbsForActivities(logMessage: String, folder: Folder, activities: ActivitiesResult) {
+        SentryDebug.addThreadsAlgoBreadcrumb(
+            message = logMessage,
+            data = mapOf(
+                "1_folderName" to folder.name,
+                "2_folderId" to folder.id,
+                "4_deleted" to activities.deletedShortUids.map { it },
+                "5_updated" to activities.updatedMessages.map { it.shortUid },
+            ),
+        )
+    }
+
+    private fun handleSentryForAddedUids(
+        logMessage: String,
+        folder: Folder,
+        uids: List<Int>,
+        messages: List<Message>,
+        cursor: String,
+    ) {
+        SentryDebug.addThreadsAlgoBreadcrumb(
+            message = logMessage,
+            data = mapOf(
+                "1_folderName" to folder.name,
+                "2_folderId" to folder.id,
+                "3_added" to uids,
+            ),
+        )
+
+        SentryDebug.sendMissingMessages(uids, messages, folder, cursor)
+    }
+    //endregion
 
     enum class RefreshMode {
         REFRESH_FOLDER, /* Fetch activities, and also get old Messages until `NUMBER_OF_OLD_MESSAGES_TO_FETCH` is reached */
