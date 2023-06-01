@@ -196,13 +196,13 @@ object RefreshController {
     ): Set<Thread> {
 
         val impactedThreads = mutableSetOf<Thread>()
-        var isTheFutureCaughtUp = false
+        var futureIsStillAhead = true
 
-        while (!isTheFutureCaughtUp) {
+        while (futureIsStillAhead) {
             scope.ensureActive()
 
             val (uidsCount, threads) = fetchOneNewPage(scope, mailbox, folder, okHttpClient)
-            isTheFutureCaughtUp = uidsCount < Utils.PAGE_SIZE
+            futureIsStillAhead = uidsCount >= Utils.PAGE_SIZE
             impactedThreads += threads
         }
 
