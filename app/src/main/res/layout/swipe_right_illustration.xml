@@ -26,8 +26,6 @@
         android:layout_width="match_parent"
         android:layout_height="88dp"
         android:layout_marginHorizontal="@dimen/marginStandardMedium"
-        android:layout_marginTop="@dimen/marginStandardSmall"
-        android:layout_marginBottom="@dimen/marginStandardMedium"
         app:cardBackgroundColor="@color/progressbarTrackColor"
         app:cardCornerRadius="@dimen/radius"
         app:cardElevation="3dp"

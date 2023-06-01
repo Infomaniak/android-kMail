@@ -60,7 +60,9 @@
                     android:id="@+id/swipeRightIllustration"
                     layout="@layout/swipe_right_illustration"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/marginStandardMedium" />
+
             </LinearLayout>
 
             <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
@@ -87,9 +89,10 @@
                     android:id="@+id/swipeLeftIllustration"
                     layout="@layout/swipe_left_illustration"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/marginStandardMedium" />
 
+            </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </com.infomaniak.mail.ui.main.menu.SimpleSettingView>
