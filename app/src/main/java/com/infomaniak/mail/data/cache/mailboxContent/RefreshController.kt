@@ -58,12 +58,12 @@ object RefreshController {
         realm: Realm = defaultRealm,
         started: (() -> Unit)? = null,
         stopped: (() -> Unit)? = null,
-    ): Set<Thread>? {
+    ): List<Thread>? {
 
         suspend fun refreshWithRunCatching() = withContext(Dispatchers.IO + refreshThreadsJob!!) {
             return@withContext runCatching {
                 started?.invoke()
-                return@runCatching realm.handleRefreshMode(refreshMode, scope = this, mailbox, folder, okHttpClient)
+                return@runCatching realm.handleRefreshMode(refreshMode, scope = this, mailbox, folder, okHttpClient).toList()
             }.getOrElse {
                 // It failed, but not because we cancelled it. Something bad happened, so we call the `stopped` callback.
                 if (it !is CancellationException) stopped?.invoke()
@@ -347,15 +347,15 @@ object RefreshController {
 
             writeBlocking {
                 findLatest(folder)?.let { latestFolder ->
-                    val threads = createMultiMessagesThreads(scope, latestFolder, messages)
+                    val allImpactedThreads = createMultiMessagesThreads(scope, latestFolder, messages)
                     Log.d("Realm", "Saved Messages: ${latestFolder.name} | ${latestFolder.messages.count()}")
 
-                    val impactedFoldersIds = (threads.map { it.folderId }.toSet()) + folder.id
+                    val impactedFoldersIds = (allImpactedThreads.map { it.folderId }.toSet()) + folder.id
                     impactedFoldersIds.forEach { folderId ->
                         FolderController.refreshUnreadCount(folderId, mailbox.objectId, realm = this)
                     }
 
-                    impactedThreads.addAll(threads)
+                    impactedThreads += allImpactedThreads.filter { it.folderId == folder.id }
                 }
             }
 
@@ -382,7 +382,7 @@ object RefreshController {
             SentryDebug.sendMissingMessages(uids, messages, folder, cursor)
         }
 
-        return impactedThreads.filter { it.folderId == folder.id }.toSet()
+        return impactedThreads
     }
     //endregion
 
@@ -467,7 +467,7 @@ object RefreshController {
         scope: CoroutineScope,
         folder: Folder,
         messages: List<Message>,
-    ): List<Thread> {
+    ): Set<Thread> {
 
         val idsOfFoldersWithIncompleteThreads = FolderController.getIdsOfFoldersWithIncompleteThreads(realm = this)
         val threadsToUpsert = mutableMapOf<String, Thread>()
@@ -519,16 +519,16 @@ object RefreshController {
             }
         }
 
-        val impactedThreads = mutableListOf<Thread>()
+        val allImpactedThreads = mutableSetOf<Thread>()
         threadsToUpsert.forEach { (_, thread) ->
             scope.ensureActive()
 
             thread.recomputeThread(realm = this)
             upsertThread(thread)
-            impactedThreads.add(if (thread.isManaged()) thread.copyFromRealm(1u) else thread)
+            allImpactedThreads.add(if (thread.isManaged()) thread.copyFromRealm(1u) else thread)
         }
 
-        return impactedThreads
+        return allImpactedThreads
     }
 
     private fun TypedRealm.createNewThreadIfRequired(
