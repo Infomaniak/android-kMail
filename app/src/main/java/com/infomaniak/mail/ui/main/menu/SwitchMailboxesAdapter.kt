@@ -19,11 +19,14 @@ package com.infomaniak.mail.ui.main.menu
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.RecyclerView
+import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.mail.MatomoMail.SWITCH_MAILBOX_NAME
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.databinding.ItemSwitchMailboxBinding
 import com.infomaniak.mail.ui.main.menu.SwitchMailboxesAdapter.SwitchMailboxesViewHolder
@@ -48,6 +51,8 @@ class SwitchMailboxesAdapter(
         val mailbox = mailboxes[position]
         val isCurrentMailbox = mailbox.mailboxId == AccountUtils.currentMailboxId
 
+        isPasswordOutdated = !mailbox.isPasswordValid
+
         text = mailbox.email
 
         if (isInMenuDrawer) badge = mailbox.inboxUnreadCount else itemStyle = SelectionStyle.ACCOUNT
@@ -65,6 +70,11 @@ class SwitchMailboxesAdapter(
                 lifecycleScope.launch(ioDispatcher) {
                     AccountUtils.switchToMailbox(mailbox.mailboxId)
                 }
+            }
+
+            setOnOutdatedPasswordClickListener {
+                // TODO: Instead of this Toast, display a popup asking for correct password (we are currently waiting for the UX).
+                context.showToast(R.string.frelatedMailbox, Toast.LENGTH_LONG)
             }
         }
     }

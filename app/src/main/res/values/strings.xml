@@ -196,6 +196,7 @@
     <string name="errorTooManyRecipients">Too many recipients</string>
     <string name="failToOpenDraft">Failed to open draft</string>
     <string name="favoritesFolder">Favorites</string>
+    <string name="frelatedMailbox">Invalid password. Can only be updated on the webmail for now.</string>
     <string name="fromTitle">From:</string>
     <string name="googlePlayServicesAreRequired">Google Play Services are required</string>
     <string name="inboxFolder">Inbox</string>

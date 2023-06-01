@@ -59,7 +59,6 @@ class MenuDrawerItemView @JvmOverloads constructor(
             }
         }
 
-
     var icon: Drawable? = null
         set(value) {
             field = value
@@ -152,7 +151,7 @@ class MenuDrawerItemView @JvmOverloads constructor(
         }
     }
 
-    fun setOutdatedPasswordClickListener(callback: () -> Unit) {
+    fun setOnOutdatedPasswordClickListener(callback: () -> Unit) {
         outdatedPasswordListener = callback
     }
 
