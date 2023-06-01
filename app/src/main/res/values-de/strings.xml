@@ -153,6 +153,7 @@
     <string name="contentDescriptionOpenMailActions">Mail-Aktionen öffnen</string>
     <string name="contentDescriptionSelectedItem">Ausgewählte</string>
     <string name="contentDescriptionUserAvatar">Benutzer-Avatar</string>
+    <string name="contentDescriptionWarningIcon">Warnung</string>
     <string name="createFolderName">Name des Ordners</string>
     <string name="createFolderNoParent">Keine</string>
     <string name="createFolderParent">Übergeordneter Ordner</string>

@@ -154,6 +154,7 @@
     <string name="contentDescriptionOpenMailActions">Ouvrir les actions du message</string>
     <string name="contentDescriptionSelectedItem">Sélectionné</string>
     <string name="contentDescriptionUserAvatar">Avatar de l’utilisateur</string>
+    <string name="contentDescriptionWarningIcon">Attention</string>
     <string name="createFolderName">Nom du dossier</string>
     <string name="createFolderNoParent">Aucun</string>
     <string name="createFolderParent">Dossier parent</string>

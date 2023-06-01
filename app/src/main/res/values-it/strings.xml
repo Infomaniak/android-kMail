@@ -153,6 +153,7 @@
     <string name="contentDescriptionOpenMailActions">Azioni di apertura dei messaggi</string>
     <string name="contentDescriptionSelectedItem">Selezionato</string>
     <string name="contentDescriptionUserAvatar">Avatar utente</string>
+    <string name="contentDescriptionWarningIcon">Avviso</string>
     <string name="createFolderName">Nome della cartella</string>
     <string name="createFolderNoParent">Nessuno</string>
     <string name="createFolderParent">Cartella dei genitori</string>
