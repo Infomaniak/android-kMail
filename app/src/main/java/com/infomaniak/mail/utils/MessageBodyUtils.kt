@@ -30,7 +30,8 @@ object MessageBodyUtils {
     const val INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME = "ik_mail_quote"
     const val INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME = "forwardContentMessage"
 
-    private const val blockquote = "blockquote"
+    private const val BLOCKQUOTE = "blockquote"
+    private const val QUOTE_DETECTION_SIZE_LIMIT = 1_000_000 // 1 Meg looks like a fine threshold
 
     private val quoteDescriptors = arrayOf(
         "#divRplyFwdMsg", // Outlook
@@ -51,10 +52,11 @@ object MessageBodyUtils {
     )
 
     fun splitBodyAndQuote(initialBody: Body): MessageBodyQuote {
+
         if (initialBody.type == TEXT_PLAIN) return MessageBodyQuote(initialBody.value)
+
         // Heuristic to give up on mail too large for "perfect" preprocessing.
-        // 1 Meg looks like a fine threshold
-        if (initialBody.value.toByteArray().size > 1_000_000) return MessageBodyQuote(initialBody.value)
+        if (initialBody.value.toByteArray().size > QUOTE_DETECTION_SIZE_LIMIT) return MessageBodyQuote(initialBody.value)
 
         // The original parsed html document in full
         val originalHtmlDocument = Jsoup.parse(initialBody.value)
@@ -65,7 +67,7 @@ object MessageBodyUtils {
         val blockquoteElement = findAndRemoveLastParentBlockquote(htmlDocumentWithoutQuote)
         // Find the first known parent quote in the html and delete all known quotes descriptor
         val currentQuoteDescriptor = findFirstKnownParentQuoteDescriptor(htmlDocumentWithoutQuote).ifEmpty {
-            if (blockquoteElement == null) "" else blockquote
+            if (blockquoteElement == null) "" else BLOCKQUOTE
         }
 
         val (body, quote) = splitBodyAndQuote(originalHtmlDocument, currentQuoteDescriptor, blockquoteElement)
@@ -74,7 +76,7 @@ object MessageBodyUtils {
 
     private fun findAndRemoveLastParentBlockquote(htmlDocumentWithoutQuote: Document): Element? {
         fun Document.selectLastParentBlockquote(): Element? {
-            return selectFirst("$blockquote:not($blockquote $blockquote):last-of-type")
+            return selectFirst("$BLOCKQUOTE:not($BLOCKQUOTE $BLOCKQUOTE):last-of-type")
         }
 
         return htmlDocumentWithoutQuote.selectLastParentBlockquote()?.also { it.remove() }
@@ -99,7 +101,7 @@ object MessageBodyUtils {
         blockquoteElement: Element?,
     ): Pair<String, String?> {
         return when {
-            currentQuoteDescriptor == blockquote -> {
+            currentQuoteDescriptor == BLOCKQUOTE -> {
                 for (quotedContentElement in htmlDocumentWithQuote.select(currentQuoteDescriptor)) {
                     if (quotedContentElement.toString() == blockquoteElement.toString()) {
                         quotedContentElement.remove()
