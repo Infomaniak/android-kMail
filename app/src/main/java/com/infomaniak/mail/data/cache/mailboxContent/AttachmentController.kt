@@ -42,7 +42,7 @@ object AttachmentController {
     //region Edit data
     fun updateSize(resource: String, newSize: Long) {
         defaultRealm.writeBlocking {
-            getAttachment(resource, this).size = newSize
+            getAttachment(resource, realm = this).size = newSize
         }
     }
     //endregion

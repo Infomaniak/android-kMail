@@ -34,8 +34,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
-            android:orientation="vertical"
-            android:paddingTop="@dimen/marginStandardSmall">
+            android:orientation="vertical">
 
             <TextView
                 style="@style/SettingHeader"
@@ -123,7 +122,6 @@
                 android:id="@+id/settingsExternalContent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
                 app:itemAction="chevron"
                 app:title="@string/settingsExternalContentTitle"
                 tools:subtitle="@string/settingsOptionAskMe" />

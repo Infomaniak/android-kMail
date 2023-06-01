@@ -49,6 +49,8 @@
     <string name="addUnknownRecipientAlreadyUsed">L’e-mail è già utilizzata</string>
     <string name="addUnknownRecipientInvalidEmail">L’e-mail non è valida</string>
     <string name="addUnknownRecipientTitle">Aggiungere un destinatario</string>
+    <string name="alertBlockedImagesDescription">Per la vostra sicurezza abbiamo bloccato alcuni contenuti del vostro messaggio.</string>
+    <string name="alertBlockedImagesDisplayContent">Visualizza il contenuto</string>
     <string name="appSecurityDescription">Proteggete l’accesso alla vostra applicazione attivando il blocco del telefono.</string>
     <string name="archiveFolder">Archiviato</string>
     <string name="attachAddressDescription">Se hai già un indirizzo e-mail Infomaniak, accedi ora</string>

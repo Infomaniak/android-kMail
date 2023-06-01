@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.infomaniak.lib.core.utils.context
@@ -31,6 +32,7 @@ import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentAccountBinding
 import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.menu.SwitchMailboxesAdapter
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.animatedNavigation
@@ -44,6 +46,7 @@ import javax.inject.Inject
 class AccountFragment : Fragment() {
 
     private lateinit var binding: FragmentAccountBinding
+    private val mainViewModel: MainViewModel by activityViewModels()
     private val accountViewModel: AccountViewModel by viewModels()
 
     private val logoutAlert by lazy { initLogoutAlert() }
@@ -95,9 +98,9 @@ class AccountFragment : Fragment() {
         AccountUtils.removeUser(requireContext(), AccountUtils.currentUser!!)
     }
 
-    private fun observeAccountsLive() = with(accountViewModel) {
-        observeAccountsLive.observe(viewLifecycleOwner, mailboxAdapter::setMailboxes)
-        lifecycleScope.launch(ioDispatcher) { updateMailboxes() }
+    private fun observeAccountsLive() {
+        mainViewModel.mailboxesLive.observe(viewLifecycleOwner, mailboxAdapter::setMailboxes)
+        lifecycleScope.launch(ioDispatcher) { accountViewModel.updateMailboxes() }
     }
 
     private fun initLogoutAlert() = createDescriptionDialog(

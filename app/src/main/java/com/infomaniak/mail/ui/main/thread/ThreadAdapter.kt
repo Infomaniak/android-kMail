@@ -25,6 +25,7 @@ import android.view.ViewConfiguration
 import android.view.ViewGroup
 import android.webkit.WebView
 import android.widget.FrameLayout
+import androidx.core.view.children
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
@@ -38,6 +39,7 @@ import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Attachment.*
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadViewHolder
@@ -48,15 +50,20 @@ import com.infomaniak.mail.utils.Utils.TEXT_HTML
 import com.infomaniak.mail.utils.Utils.TEXT_PLAIN
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupThreadWebViewSettings
 import com.infomaniak.mail.utils.WebViewUtils.Companion.toggleWebViewTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.jsoup.Jsoup
 import java.util.*
 import com.google.android.material.R as RMaterial
 
-class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
-    RealmChangesBinding.OnRealmChanged<Message> {
+class ThreadAdapter(
+    private val shouldLoadDistantResources: Boolean,
+) : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBinding.OnRealmChanged<Message> {
 
     var messages = listOf<Message>()
         private set
+    private val manuallyAllowedMessageUids = mutableSetOf<String>()
     var isExpandedMap = mutableMapOf<String, Boolean>()
     var isThemeTheSameMap = mutableMapOf<String, Boolean>()
     var contacts: Map<String, Map<String, MergedContact>> = emptyMap()
@@ -88,6 +95,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ThreadViewHolder {
         return ThreadViewHolder(
             ItemMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+            shouldLoadDistantResources,
             onContactClicked,
             onAttachmentClicked,
         )
@@ -101,20 +109,21 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
     }
 
     override fun onBindViewHolder(holder: ThreadViewHolder, position: Int, payloads: MutableList<Any>) = with(holder.binding) {
+        val payload = payloads.firstOrNull()
+        if (payload !is NotificationType) {
+            super.onBindViewHolder(holder, position, payloads)
+            return
+        }
+
         val message = messages[position]
 
-        val payload = payloads.firstOrNull()
-        if (payload is NotificationType) {
-            when (payload) {
-                NotificationType.AVATAR -> if (!message.isDraft) userAvatar.loadAvatar(message.from.first(), contacts)
-                NotificationType.TOGGLE_LIGHT_MODE -> {
-                    isThemeTheSameMap[message.uid] = !isThemeTheSameMap[message.uid]!!
-                    holder.toggleBodyAndQuoteTheme(message)
-                }
-                NotificationType.RERENDER -> holder.loadBodyAndQuote(message) // TODO : Try to undo js script and recall the method to fix rendering
+        when (payload) {
+            NotificationType.AVATAR -> if (!message.isDraft) userAvatar.loadAvatar(message.from.first(), contacts)
+            NotificationType.TOGGLE_LIGHT_MODE -> {
+                isThemeTheSameMap[message.uid] = !isThemeTheSameMap[message.uid]!!
+                holder.toggleBodyAndQuoteTheme(message)
             }
-        } else {
-            super.onBindViewHolder(holder, position, payloads)
+            NotificationType.RERENDER -> if (bodyWebView.isVisible) bodyWebView.reload() else fullMessageWebView.reload()
         }
     }
 
@@ -124,11 +133,11 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
         initMapForNewMessage(message, position)
 
         bindHeader(message)
+        bindAlerts(message.uid)
         bindAttachment(message)
+        bindContent(message)
 
-        displayExpandedCollapsedMessage(message, shouldTrack = false)
-
-        bindQuoteButton(message)
+        onExpandOrCollapseMessage(message, shouldTrack = false)
     }
 
     private fun initMapForNewMessage(message: Message, position: Int) {
@@ -148,14 +157,6 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
 
     private fun ThreadViewHolder.loadBodyAndQuote(message: Message) {
         message.body?.let { body ->
-            if (splitBody == null) {
-                val (messageBody, messageQuote) = MessageBodyUtils.splitBodyAndQuote(body)
-                splitBody = messageBody
-                splitQuote = messageQuote
-
-                message.hasQuote = messageQuote != null
-            }
-
             if (binding.bodyWebView.isVisible) {
                 loadBodyInWebView(message.uid, splitBody!!, body.type)
             } else if (binding.fullMessageWebView.isVisible) {
@@ -254,8 +255,6 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
 
         setDetailedFieldsVisibility(message)
 
-        initWebViewClientIfNeeded(message)
-
         handleHeaderClick(message)
         handleExpandDetailsClick(message)
         bindRecipientDetails(message, messageDate)
@@ -297,13 +296,13 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
         messageHeader.setOnClickListener {
             if (isExpandedMap[message.uid] == true) {
                 isExpandedMap[message.uid] = false
-                displayExpandedCollapsedMessage(message)
+                onExpandOrCollapseMessage(message)
             } else {
                 if (message.isDraft) {
                     onDraftClicked?.invoke(message)
                 } else {
                     isExpandedMap[message.uid] = true
-                    displayExpandedCollapsedMessage(message)
+                    onExpandOrCollapseMessage(message)
                 }
             }
         }
@@ -335,17 +334,42 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
         detailedMessageDate.text = context.mostDetailedDate(messageDate)
     }
 
+    private fun ThreadViewHolder.bindAlerts(messageUid: String) = with(binding) {
+        distantImagesAlert.onAction1 {
+            bodyWebViewClient.unblockDistantResources()
+            fullMessageWebViewClient.unblockDistantResources()
+
+            manuallyAllowedMessageUids.add(messageUid)
+
+            reloadVisibleWebView()
+
+            distantImagesAlert.isGone = true
+            hideAlertGroupIfNoneDisplayed()
+        }
+    }
+
+    private fun ItemMessageBinding.reloadVisibleWebView() {
+        if (bodyWebView.isVisible) bodyWebView.reload() else fullMessageWebView.reload()
+    }
+
+    private fun ItemMessageBinding.hideAlertGroupIfNoneDisplayed() {
+        alertsGroup.isVisible = areOneOrMoreAlertsVisible()
+    }
+
+    private fun ItemMessageBinding.areOneOrMoreAlertsVisible() = alerts.children.any { it.isVisible }
+
     @SuppressLint("SetTextI18n")
     private fun ThreadViewHolder.bindAttachment(message: Message) = with(binding) {
         val attachments = message.attachments
         val fileSize = formatAttachmentFileSize(attachments)
-        attachmentsSizeText.text = context.resources.getQuantityString(
+        attachmentLayout.attachmentsSizeText.text = context.resources.getQuantityString(
             R.plurals.attachmentQuantity,
             attachments.size,
             attachments.size,
         ) + " ($fileSize)"
         attachmentAdapter.setAttachments(attachments)
-        attachmentsDownloadAllButton.setOnClickListener { onDownloadAllClicked?.invoke(message) }
+        attachmentLayout.attachmentsDownloadAllButton.setOnClickListener { onDownloadAllClicked?.invoke(message) }
+        attachmentLayout.root.isVisible = message.attachments.isNotEmpty()
     }
 
     private fun ItemMessageBinding.formatAttachmentFileSize(attachments: List<Attachment>): String {
@@ -358,54 +382,60 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
         return FormatterFileSize.formatShortFileSize(context, totalAttachmentsFileSizeInBytes)
     }
 
-    private fun ThreadViewHolder.displayExpandedCollapsedMessage(message: Message, shouldTrack: Boolean = true) = with(binding) {
+    private fun ThreadViewHolder.bindContent(message: Message) {
+        message.body?.let { body ->
+            bindBody(body, message)
+        } ?: run {
+            binding.bindShimmer()
+        }
+    }
+
+    private fun ThreadViewHolder.bindBody(body: Body, message: Message) = with(binding) {
+        if (splitBody == null) {
+            val (messageBody, messageQuote) = MessageBodyUtils.splitBodyAndQuote(body)
+            splitBody = messageBody
+            splitQuote = messageQuote
+
+            message.hasQuote = messageQuote != null
+        }
+
+        quoteButton.apply {
+            setOnClickListener {
+                val textId = if (fullMessageWebView.isVisible) {
+                    R.string.messageShowQuotedText
+                } else {
+                    R.string.messageHideQuotedText
+                }
+                quoteButton.text = context.getString(textId)
+                toggleWebViews(message)
+            }
+
+            text = context.getString(R.string.messageShowQuotedText)
+        }
+
+        quoteButtonFrameLayout.isVisible = message.hasQuote
+
+        initWebViewClientIfNeeded(message)
+
+        // If the view holder got recreated while the fragment is not destroyed, keep the user's choice effective
+        if (isMessageUidManuallyAllowed(message.uid)) {
+            bodyWebViewClient.unblockDistantResources()
+            fullMessageWebViewClient.unblockDistantResources()
+        }
+    }
+
+    private fun ItemMessageBinding.bindShimmer() {
+        messageLoader.isVisible = true
+    }
+
+    private fun ThreadViewHolder.onExpandOrCollapseMessage(message: Message, shouldTrack: Boolean = true) = with(binding) {
         val isExpanded = isExpandedMap[message.uid]!!
 
         if (shouldTrack) context.trackMessageEvent("openMessage", isExpanded)
 
-        collapseMessageDetails(message)
         setHeaderState(message, isExpanded)
-
-        fullMessageWebView.isGone = true
-
-        if (message.body?.value == null) {
-            messageLoader.isVisible = isExpanded
-            bodyWebView.isGone = true
-        } else {
-            messageLoader.isGone = true
-            bodyWebView.isVisible = isExpanded
-        }
-
-        if (isExpanded) {
-            loadBodyAndQuote(message)
-            displayAttachments(message.attachments)
-            if (message.hasQuote) quoteButton.text = context.getString(R.string.messageShowQuotedText)
-            quoteButtonFrameLayout.isVisible = message.hasQuote
-        } else {
-            hideAttachments()
-            quoteButtonFrameLayout.isGone = true
-        }
-    }
-
-    @SuppressLint("SetTextI18n")
-    private fun ItemMessageBinding.displayAttachments(attachments: List<Attachment>) {
-        if (attachments.isEmpty()) hideAttachments() else showAttachments()
-    }
-
-    private fun ItemMessageBinding.hideAttachments() {
-        attachmentsGroup.isGone = true
-        attachmentsRecyclerView.isGone = true
-    }
-
-    private fun ItemMessageBinding.showAttachments() {
-        attachmentsGroup.isVisible = true
-        attachmentsRecyclerView.isVisible = true
-    }
-
-    private fun ItemMessageBinding.collapseMessageDetails(message: Message) {
-        message.detailsAreExpanded = false
-        messageDetails.isGone = true
-        recipientChevron.rotation = 0.0f
+        content.isVisible = isExpanded
+        if (isExpanded) loadBodyAndQuote(message)
     }
 
     private fun ItemMessageBinding.setHeaderState(message: Message, isExpanded: Boolean) = with(message) {
@@ -431,14 +461,6 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
         return listOf(*to.toTypedArray(), *cc.toTypedArray(), *bcc.toTypedArray()).joinToString { it.displayedName(context) }
     }
 
-    private fun ThreadViewHolder.bindQuoteButton(message: Message) = with(binding) {
-        quoteButton.setOnClickListener {
-            val textId = if (fullMessageWebView.isVisible) R.string.messageShowQuotedText else R.string.messageHideQuotedText
-            quoteButton.text = context.getString(textId)
-            toggleWebViews(message)
-        }
-    }
-
     fun updateContacts(newContacts: Map<String, Map<String, MergedContact>>) {
         contacts = newContacts
         notifyItemRangeChanged(0, itemCount, NotificationType.AVATAR)
@@ -452,6 +474,8 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
     fun rerenderMails() {
         notifyItemRangeChanged(0, itemCount, NotificationType.RERENDER)
     }
+
+    fun isMessageUidManuallyAllowed(messageUid: String) = manuallyAllowedMessageUids.contains(messageUid)
 
     private enum class NotificationType {
         AVATAR,
@@ -467,6 +491,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
 
     class ThreadViewHolder(
         val binding: ItemMessageBinding,
+        private val shouldLoadDistantResources: Boolean,
         onContactClicked: ((contact: Recipient) -> Unit)?,
         onAttachmentClicked: ((attachment: Attachment) -> Unit)?,
     ) : ViewHolder(binding.root) {
@@ -477,7 +502,10 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
         val bccAdapter = DetailedRecipientAdapter(onContactClicked)
         val attachmentAdapter = AttachmentAdapter { onAttachmentClicked?.invoke(it) }
 
-        private var doesWebViewNeedInit = true
+        private var _bodyWebViewClient: MessageWebViewClient? = null
+        private var _fullMessageWebViewClient: MessageWebViewClient? = null
+        val bodyWebViewClient get() = _bodyWebViewClient!!
+        val fullMessageWebViewClient get() = _fullMessageWebViewClient!!
 
         var splitBody: String? = null
         var splitQuote: String? = null
@@ -488,15 +516,38 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(),
                 toRecyclerView.adapter = toAdapter
                 ccRecyclerView.adapter = ccAdapter
                 bccRecyclerView.adapter = bccAdapter
-                attachmentsRecyclerView.adapter = attachmentAdapter
+                attachmentLayout.attachmentsRecyclerView.adapter = attachmentAdapter
             }
         }
 
-        fun initWebViewClientIfNeeded(message: Message) = with(binding) {
-            if (doesWebViewNeedInit) {
-                bodyWebView.initWebViewClientAndBridge(message.attachments, message.uid)
-                fullMessageWebView.initWebViewClientAndBridge(message.attachments, message.uid)
-                doesWebViewNeedInit = false
+        fun initWebViewClientIfNeeded(message: Message) {
+
+            fun promptUserForDistantImages() {
+                binding.promptUserForDistantImages()
+            }
+
+            if (_bodyWebViewClient == null) {
+                _bodyWebViewClient = binding.bodyWebView.initWebViewClientAndBridge(
+                    attachments = message.attachments,
+                    messageUid = message.uid,
+                    shouldLoadDistantResources = shouldLoadDistantResources,
+                    onBlockedResourcesDetected = ::promptUserForDistantImages,
+                )
+                _fullMessageWebViewClient = binding.fullMessageWebView.initWebViewClientAndBridge(
+                    attachments = message.attachments,
+                    messageUid = message.uid,
+                    shouldLoadDistantResources = shouldLoadDistantResources,
+                    onBlockedResourcesDetected = ::promptUserForDistantImages,
+                )
+            }
+        }
+
+        private fun ItemMessageBinding.promptUserForDistantImages() {
+            if (distantImagesAlert.isGone) {
+                CoroutineScope(Dispatchers.Main).launch {
+                    alertsGroup.isVisible = true
+                    distantImagesAlert.isVisible = true
+                }
             }
         }
     }

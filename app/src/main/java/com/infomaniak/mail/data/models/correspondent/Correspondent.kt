@@ -22,6 +22,7 @@ import android.os.Parcelable
 import com.infomaniak.lib.core.utils.firstOrEmpty
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.AccountUtils
+import io.sentry.Sentry
 
 interface Correspondent : Parcelable {
     var email: String
@@ -36,11 +37,21 @@ interface Correspondent : Parcelable {
     fun getNameOrEmail(): String = name.ifBlank { email }
 
     fun computeInitials(): String {
-        val (firstName, lastName) = computeFirstAndLastName()
-        val first = firstName.removeControlAndPunctuation().ifBlank { firstName }.first()
-        val last = lastName.removeControlAndPunctuation().firstOrEmpty()
+        return runCatching {
+            val (firstName, lastName) = computeFirstAndLastName()
+            val first = firstName.removeControlAndPunctuation().ifBlank { firstName }.first()
+            val last = lastName.removeControlAndPunctuation().firstOrEmpty()
 
-        return "$first$last".uppercase()
+            return@runCatching "$first$last".uppercase()
+        }.getOrElse { exception ->
+            Sentry.withScope { scope ->
+                scope.setExtra("email", email)
+                scope.setExtra("name", name)
+                Sentry.captureException(exception)
+            }
+
+            return@getOrElse ""
+        }
     }
 
     fun computeFirstAndLastName(): Pair<String, String> {

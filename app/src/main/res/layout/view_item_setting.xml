@@ -22,15 +22,14 @@
     android:background="?selectableItemBackground"
     android:baselineAligned="false"
     android:gravity="center"
-    android:paddingHorizontal="@dimen/marginStandardMedium"
-    android:paddingVertical="@dimen/alternativeMargin"
+    android:padding="@dimen/marginStandardMedium"
     tools:layout_height="wrap_content">
 
     <ImageView
         android:id="@+id/icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="2dp"
+        android:layout_marginEnd="@dimen/marginStandardMedium"
         android:importantForAccessibility="no"
         android:visibility="gone"
         tools:src="@drawable/ic_swipe_left_long" />
@@ -38,7 +37,6 @@
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/marginStandardSmall"
         android:layout_weight="1"
         android:gravity="center_vertical"
         android:orientation="vertical">
@@ -61,12 +59,13 @@
 
     <FrameLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/marginStandardMedium">
 
         <ImageView
             android:id="@+id/chevron"
-            android:layout_width="@dimen/chevronSize"
-            android:layout_height="@dimen/chevronSize"
+            android:layout_width="@dimen/chevronSizeSettings"
+            android:layout_height="@dimen/chevronSizeSettings"
             android:importantForAccessibility="no"
             android:src="@drawable/ic_chevron_right"
             android:visibility="gone"
@@ -76,7 +75,6 @@
             android:id="@+id/toggle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/marginStandardVerySmall"
             android:minHeight="0dp"
             android:visibility="gone" />
 

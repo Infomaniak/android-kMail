@@ -38,7 +38,7 @@
     </queries>
 
     <application
-        android:name=".ApplicationMain"
+        android:name=".MainApplication"
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="false"
@@ -63,7 +63,7 @@
             android:authorities="${applicationId}.androidx-startup"
             android:exported="false"
             tools:node="merge">
-            <!--Disable default WorkManagerInitializer for use Hilt injection -->
+            <!-- Disable default WorkManagerInitializer to use Hilt injection -->
             <meta-data
                 android:name="androidx.work.WorkManagerInitializer"
                 android:value="androidx.startup"

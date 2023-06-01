@@ -30,7 +30,7 @@ import org.matomo.sdk.Tracker
 
 object MatomoMail : MatomoCore {
 
-    override val Context.tracker: Tracker get() = (this as ApplicationMain).matomoTracker
+    override val Context.tracker: Tracker get() = (this as MainApplication).matomoTracker
     override val siteId = 9
 
     // region Tracker category

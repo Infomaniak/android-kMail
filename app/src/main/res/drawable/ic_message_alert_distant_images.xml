@@ -1,0 +1,27 @@
+<!--
+  ~ Infomaniak kMail - Android
+  ~ Copyright (C) 2023 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="16dp"
+    android:height="16dp"
+    android:viewportWidth="16"
+    android:viewportHeight="16">
+    <path
+        android:fillColor="#666666"
+        android:fillType="evenOdd"
+        android:pathData="M6.484,6.157C6.769,6.442 7.231,6.442 7.515,6.157L13.165,0.507C13.244,0.43 13.271,0.314 13.236,0.209C13.173,0.018 12.993,0 12.833,0H1.167C1.006,0 0.826,0.018 0.767,0.209C0.732,0.314 0.76,0.429 0.837,0.507L6.484,6.157ZM11.667,6.667C12.396,6.665 13.066,7.069 13.405,7.715L13.685,8.248C13.72,8.317 13.797,8.353 13.872,8.335C13.948,8.317 14,8.249 14,8.172V1.167C14,1.123 13.974,1.085 13.933,1.069C13.894,1.053 13.848,1.061 13.817,1.091L8.133,6.776C7.507,7.401 6.493,7.401 5.867,6.776L0.181,1.091C0.151,1.061 0.105,1.051 0.065,1.068C0.026,1.085 -0,1.124 0,1.167V8.167C-0,8.476 0.123,8.773 0.342,8.992C0.561,9.211 0.858,9.334 1.167,9.333H8.978C9.04,9.333 9.097,9.299 9.125,9.244L9.925,7.716C10.265,7.069 10.936,6.665 11.667,6.667ZM11.667,7.667C12.025,7.667 12.354,7.865 12.521,8.181L15.891,14.603C16.046,14.9 16.034,15.256 15.86,15.542C15.683,15.826 15.372,15.999 15.037,16H8.297C7.962,15.999 7.652,15.826 7.475,15.543C7.301,15.257 7.289,14.9 7.443,14.603L10.813,8.181C10.981,7.865 11.309,7.667 11.667,7.667ZM12.167,10.667C12.167,10.391 11.943,10.167 11.667,10.167C11.391,10.167 11.167,10.391 11.167,10.667V12.667C11.167,12.943 11.391,13.167 11.667,13.167C11.943,13.167 12.167,12.943 12.167,12.667V10.667ZM11.667,14.833C11.299,14.833 11,14.535 11,14.167C11,13.799 11.299,13.5 11.667,13.5C12.035,13.5 12.333,13.799 12.333,14.167C12.333,14.535 12.035,14.833 11.667,14.833Z" />
+</vector>

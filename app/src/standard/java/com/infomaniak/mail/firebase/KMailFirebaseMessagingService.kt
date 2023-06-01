@@ -23,8 +23,8 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import com.infomaniak.mail.ApplicationMain
 import com.infomaniak.mail.GplayUtils
+import com.infomaniak.mail.MainApplication
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
@@ -36,7 +36,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class KMailFirebaseMessagingService : FirebaseMessagingService() {
 
-    private val applicationMain by lazy { application as ApplicationMain }
+    private val mainApplication by lazy { application as MainApplication }
     private val localSettings by lazy { LocalSettings.getInstance(this) }
     private val realmMailboxInfo by lazy { RealmDatabase.newMailboxInfoInstance }
 
@@ -70,7 +70,7 @@ class KMailFirebaseMessagingService : FirebaseMessagingService() {
         Log.d(TAG, "KMailFirebaseMessagingService>onMessageReceived: mailboxId=$mailboxId")
         Log.d(TAG, "KMailFirebaseMessagingService>onMessageReceived: messageUid=$messageUid")
 
-        if (applicationMain.isAppInBackground) {
+        if (mainApplication.isAppInBackground) {
             processMessageInBackground(userId, mailboxId, messageUid)
         } else {
             processMessageInForeground(userId, mailboxId)

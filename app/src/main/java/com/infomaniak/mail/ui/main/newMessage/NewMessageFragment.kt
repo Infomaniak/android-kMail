@@ -135,12 +135,11 @@ class NewMessageFragment : Fragment() {
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
-        // TODO : Try to undo js script and recall the method to fix rendering
-        newMessageViewModel.draft.uiSignature?.let { html ->
-            binding.signatureWebView.loadContent(html)
+        newMessageViewModel.draft.uiSignature?.let { _ ->
+            binding.signatureWebView.reload()
         }
-        newMessageViewModel.draft.uiQuote?.let { html ->
-            binding.quoteWebView.loadContent(html)
+        newMessageViewModel.draft.uiQuote?.let { _ ->
+            binding.quoteWebView.reload()
         }
         super.onConfigurationChanged(newConfig)
     }
@@ -205,10 +204,18 @@ class NewMessageFragment : Fragment() {
     private fun showKeyboardInCorrectView() = with(binding) {
         when (newMessageActivityArgs.draftMode) {
             DraftMode.REPLY,
-            DraftMode.REPLY_ALL -> bodyText.showKeyboard()
-            DraftMode.NEW_MAIL,
-            DraftMode.FORWARD -> toField.showKeyboardInTextInput()
+            DraftMode.REPLY_ALL -> focusBodyField()
+            DraftMode.NEW_MAIL -> if (newMessageActivityArgs.recipient == null) focusToField() else focusBodyField()
+            DraftMode.FORWARD -> focusToField()
         }
+    }
+
+    private fun FragmentNewMessageBinding.focusBodyField() {
+        bodyText.showKeyboard()
+    }
+
+    private fun FragmentNewMessageBinding.focusToField() {
+        toField.showKeyboardInTextInput()
     }
 
     private fun setOnFocusChangedListeners() = with(binding) {
@@ -313,10 +320,16 @@ class NewMessageFragment : Fragment() {
 
         bodyText.setText(draft.uiBody)
 
+        val alwaysShowExternalContent = localSettings.externalContent == LocalSettings.ExternalContent.ALWAYS
+
         draft.uiSignature?.let { html ->
             signatureWebView.apply {
                 loadContent(html)
-                initWebViewClientAndBridge(emptyList(), "SIGNATURE-${draft.messageUid}")
+                initWebViewClientAndBridge(
+                    attachments = emptyList(),
+                    messageUid = "SIGNATURE-${draft.messageUid}",
+                    shouldLoadDistantResources = true,
+                )
             }
             removeSignature.setOnClickListener {
                 trackNewMessageEvent("deleteSignature")
@@ -329,7 +342,11 @@ class NewMessageFragment : Fragment() {
         draft.uiQuote?.let { html ->
             quoteWebView.apply {
                 loadContent(html)
-                initWebViewClientAndBridge(draft.attachments, "QUOTE-${draft.messageUid}")
+                initWebViewClientAndBridge(
+                    attachments = draft.attachments,
+                    messageUid = "QUOTE-${draft.messageUid}",
+                    shouldLoadDistantResources = alwaysShowExternalContent || newMessageActivityArgs.shouldLoadDistantResources,
+                )
             }
             removeQuote.setOnClickListener {
                 trackNewMessageEvent("deleteQuote")
@@ -506,12 +523,13 @@ class NewMessageFragment : Fragment() {
 
     override fun onStop() = with(newMessageViewModel) {
 
-        // TODO: Currently, we don't handle the possibility to leave the App during Draft composition.
-        // TODO: If it happens and we do anything in Realm about that, it will desynchronize the UI &
-        // TODO: Realm, and we'll lost some Draft data. A quick fix to get rid of the current bugs is
-        // TODO: to wait the end of Draft composition before starting DraftsActionsWorker.
+        // TODO:
+        //  Currently, we don't handle the possibility to leave the App during Draft composition.
+        //  If it happens and we do anything in Realm about that, it will desynchronize the UI &
+        //  Realm, and we'll lost some Draft data. A quick fix to get rid of the current bugs is
+        //  to wait the end of Draft composition before starting DraftsActionsWorker.
         if (shouldHandleDraftActionWhenLeaving) {
-            draftsActionsWorkerScheduler.scheduleWork()
+            draftsActionsWorkerScheduler.scheduleWork(draftLocalUuid = newMessageViewModel.draft.localUuid)
         } else {
             shouldHandleDraftActionWhenLeaving = true
         }

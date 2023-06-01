@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,6 @@ import com.infomaniak.mail.data.LocalSettings.ExternalContent
 import com.infomaniak.mail.data.LocalSettings.ExternalContent.ALWAYS
 import com.infomaniak.mail.data.LocalSettings.ExternalContent.ASK_ME
 import com.infomaniak.mail.databinding.FragmentExternalContentSettingBinding
-import com.infomaniak.mail.utils.notYetImplemented
 
 class ExternalContentSettingFragment : Fragment() {
 
@@ -51,7 +50,6 @@ class ExternalContentSettingFragment : Fragment() {
         check(localSettings.externalContent)
 
         onItemCheckedListener { _, _, externalContent ->
-            notYetImplemented()
             localSettings.externalContent = externalContent as ExternalContent
         }
     }

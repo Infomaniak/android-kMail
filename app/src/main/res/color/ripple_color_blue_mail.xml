@@ -1,6 +1,6 @@
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak kMail - Android
-  ~ Copyright (C) 2022-2023 Infomaniak Network SA
+  ~ Copyright (C) 2023 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -15,16 +15,6 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="16dp"
-    android:height="16dp"
-    android:tint="@color/iconColor"
-    android:viewportWidth="16"
-    android:viewportHeight="16">
-    <path
-        android:pathData="M4,1L11.338,7.67C11.386,7.714 11.424,7.765 11.449,7.821C11.475,7.878 11.488,7.939 11.488,8C11.488,8.061 11.475,8.122 11.449,8.179C11.424,8.235 11.386,8.286 11.338,8.33L4,15"
-        android:strokeWidth="2"
-        android:strokeColor="#9F9F9F"
-        android:strokeLineCap="round"
-        android:strokeLineJoin="round" />
-</vector>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:alpha="0.12" android:color="@color/blueMail" />
+</selector>

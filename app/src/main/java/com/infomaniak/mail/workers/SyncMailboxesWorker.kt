@@ -50,7 +50,7 @@ class SyncMailboxesWorker @AssistedInject constructor(
         Log.d(TAG, "Work launched")
 
         AccountUtils.getAllUsersSync().forEach { user ->
-            MailboxController.getMailboxes(user.id, mailboxInfoRealm).forEach { mailbox ->
+            MailboxController.getMailboxes(user.id, realm = mailboxInfoRealm).forEach { mailbox ->
                 fetchMessagesManager.execute(user.id, mailbox)
             }
         }

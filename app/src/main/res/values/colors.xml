@@ -130,6 +130,8 @@
 
     <!-- CardView -->
     <color name="cardViewStrokeColor">@color/mouse</color>
+    <color name="threadCountBorderRead">@color/mouse</color>
+    <color name="threadCountBorderUnread">@color/orca</color>
 
     <!-- Progressbar -->
     <color name="progressbarTrackColor">@color/mouse</color>

@@ -49,6 +49,8 @@
     <string name="addUnknownRecipientAlreadyUsed">L’adresse mail est déjà utilisée</string>
     <string name="addUnknownRecipientInvalidEmail">L’adresse mail n’est pas valide</string>
     <string name="addUnknownRecipientTitle">Ajoutez un destinataire</string>
+    <string name="alertBlockedImagesDescription">Pour votre sécurité nous avons bloqué certains contenus de votre message.</string>
+    <string name="alertBlockedImagesDisplayContent">Afficher le contenu</string>
     <string name="appSecurityDescription">Protégez l’accès à votre application en activant le verrouillage de votre téléphone.</string>
     <string name="archiveFolder">Archive</string>
     <string name="attachAddressDescription">Vous possédez déjà une adresse mail Infomaniak, connectez-vous dès maintenant</string>

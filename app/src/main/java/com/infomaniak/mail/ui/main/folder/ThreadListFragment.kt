@@ -33,6 +33,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.distinctUntilChanged
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
@@ -166,6 +167,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     override fun onRefresh() {
+        if (mainViewModel.isDownloadingChanges.value?.first == true) return
         mainViewModel.forceRefreshThreads()
     }
 
@@ -231,7 +233,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 ).show()
             }
 
-            onLoadMoreClicked = { mainViewModel.getOneBatchOfOldMessages() }
+            onLoadMoreClicked = { mainViewModel.getOnePageOfOldMessages() }
         }
     }
 
@@ -333,7 +335,12 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 false
             }
             SwipeAction.QUICKACTIONS_MENU -> {
-                safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(threadUid))
+                safeNavigate(
+                    ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(
+                        threadUid = threadUid,
+                        shouldLoadDistantResources = false,
+                    )
+                )
                 true
             }
             SwipeAction.READ_UNREAD -> {
@@ -414,14 +421,17 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun observeDownloadState() {
-        mainViewModel.isDownloadingChanges.observe(viewLifecycleOwner) { isDownloading ->
-            if (isDownloading) {
-                showLoadingTimer.start()
-            } else {
-                showLoadingTimer.cancel()
-                binding.swipeRefreshLayout.isRefreshing = false
+        mainViewModel.isDownloadingChanges
+            .distinctUntilChanged()
+            .observe(viewLifecycleOwner) { (isDownloading, shouldDisplayLoadMore) ->
+                if (isDownloading) {
+                    showLoadingTimer.start()
+                } else {
+                    showLoadingTimer.cancel()
+                    binding.swipeRefreshLayout.isRefreshing = false
+                    shouldDisplayLoadMore?.let(threadListAdapter::updateLoadMore)
+                }
             }
-        }
     }
 
     private fun observeFilter() {
@@ -437,9 +447,15 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun observeCurrentFolder() {
         mainViewModel.currentFolder.observeNotNull(viewLifecycleOwner) { folder ->
+
             lastUpdatedDate = null
+
             displayFolderName(folder)
-            threadListAdapter.updateFolderRole(folder.role)
+
+            threadListAdapter.apply {
+                updateFolderRole(folder.role)
+                updateLoadMore(shouldDisplayLoadMore = false)
+            }
         }
     }
 
@@ -465,7 +481,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun observerDraftsActionsCompletedWorks() {
         fun observeDraftsActions() {
-            draftsActionsWorkerScheduler.getCompletedWorkInfosLiveData().observe(viewLifecycleOwner) {
+            draftsActionsWorkerScheduler.getCompletedWorkInfoLiveData().observe(viewLifecycleOwner) {
 
                 it.forEach { workInfo ->
                     workInfo.outputData

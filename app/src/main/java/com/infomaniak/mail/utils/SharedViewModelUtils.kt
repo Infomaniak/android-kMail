@@ -20,19 +20,21 @@ package com.infomaniak.mail.utils
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
+import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
+import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 object SharedViewModelUtils {
 
-    var fetchFolderMessagesJob: Job? = null
-
-    suspend fun markAsSeen(mailbox: Mailbox, threads: List<Thread>, message: Message? = null) {
+    suspend fun markAsSeen(
+        mailbox: Mailbox,
+        threads: List<Thread>,
+        message: Message? = null,
+        started: (() -> Unit)? = null,
+        stopped: (() -> Unit)? = null,
+    ) {
 
         val messages = when (message) {
             null -> threads.flatMap(MessageController::getUnseenMessages)
@@ -41,14 +43,23 @@ object SharedViewModelUtils {
 
         val isSuccess = ApiRepository.markMessagesAsSeen(mailbox.uuid, messages.getUids()).isSuccess()
 
-        if (isSuccess) refreshFolders(mailbox, messages.getFoldersIds())
+        if (isSuccess) {
+            refreshFolders(
+                mailbox = mailbox,
+                messagesFoldersIds = messages.getFoldersIds(),
+                started = started,
+                stopped = stopped,
+            )
+        }
     }
 
     suspend fun refreshFolders(
         mailbox: Mailbox,
         messagesFoldersIds: List<String>,
         destinationFolderId: String? = null,
-    ) = withContext(Dispatchers.IO) {
+        started: (() -> Unit)? = null,
+        stopped: (() -> Unit)? = null,
+    ) {
 
         // We always want to refresh the `destinationFolder` last, to avoid any blink on the UI.
         val foldersIds = messagesFoldersIds.toMutableSet()
@@ -56,11 +67,13 @@ object SharedViewModelUtils {
 
         foldersIds.forEach { folderId ->
             FolderController.getFolder(folderId)?.let { folder ->
-                fetchFolderMessagesJob?.cancel()
-                fetchFolderMessagesJob = launch(handlerIO) {
-                    runCatching { MessageController.fetchFolderMessages(scope = this, mailbox, folder, okHttpClient = null) }
-                }
-                fetchFolderMessagesJob?.join()
+                RefreshController.refreshThreads(
+                    refreshMode = RefreshMode.REFRESH_FOLDER,
+                    mailbox = mailbox,
+                    folder = folder,
+                    started = started,
+                    stopped = stopped,
+                )
             }
         }
     }

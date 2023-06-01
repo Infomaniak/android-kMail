@@ -22,6 +22,7 @@
     <dimen name="attachmentChipMaxSize">160dp</dimen>
     <dimen name="alternativeMargin">12dp</dimen>
     <dimen name="chevronSize">12dp</dimen>
+    <dimen name="chevronSizeSettings">16dp</dimen>
     <dimen name="iconButtonSize">32dp</dimen>
     <dimen name="iconImageSize">20dp</dimen>
     <dimen name="noMailTextViewSize">300dp</dimen>

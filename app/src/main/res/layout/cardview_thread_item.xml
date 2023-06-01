@@ -181,6 +181,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/marginStandardSmall"
                     android:visibility="gone"
+                    app:cardBackgroundColor="@color/backgroundColor"
                     app:cardCornerRadius="2dp"
                     app:layout_constraintBottom_toBottomOf="@id/expeditor"
                     app:layout_constraintEnd_toStartOf="@id/mailDate"

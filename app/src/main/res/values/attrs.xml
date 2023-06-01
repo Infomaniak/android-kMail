@@ -84,8 +84,6 @@
     <declare-styleable name="SettingRadioGroupView">
         <!-- The id of the view that's selected by default. Ex: @id/myRadioButton -->
         <attr name="defaultCheckedId" format="reference" />
-        <!-- Defaults to false. If false, displays the classic divider used everywhere in Settings between items -->
-        <attr name="ignoreDividers" format="boolean" />
     </declare-styleable>
 
     <declare-styleable name="SimpleSettingView">
@@ -125,5 +123,12 @@
         <attr name="email" format="string" />
         <attr name="padding" />
         <attr name="processNameAndEmail" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="MessageAlertView">
+        <attr name="action1" format="string" />
+        <attr name="action2" format="string" />
+        <attr name="description" />
+        <attr name="icon" />
     </declare-styleable>
 </resources>

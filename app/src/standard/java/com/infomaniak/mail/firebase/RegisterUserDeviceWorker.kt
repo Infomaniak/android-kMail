@@ -50,8 +50,8 @@ class RegisterUserDeviceWorker @AssistedInject constructor(
         AccountUtils.getAllUsersSync().forEach { user ->
             if (localSettings.firebaseRegisteredUsers.contains(user.id.toString())) return@forEach
             val okHttpClient = AccountUtils.getHttpClient(user.id)
-            val registrationInfos = RegistrationInfos(applicationContext, firebaseToken)
-            val apiResponse = FirebaseApiRepository.registerForNotifications(registrationInfos, okHttpClient)
+            val registrationInfo = RegistrationInfo(applicationContext, firebaseToken)
+            val apiResponse = FirebaseApiRepository.registerForNotifications(registrationInfo, okHttpClient)
 
             if (apiResponse.isSuccess()) {
                 Log.i(TAG, "launchWork: ${user.id} has been registered")

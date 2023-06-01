@@ -36,11 +36,6 @@ class AccountViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
-    private val coroutineContext = viewModelScope.coroutineContext + ioDispatcher
-
-    val observeAccountsLive = MailboxController.getMailboxesAsync(AccountUtils.currentUserId)
-        .asLiveData(coroutineContext)
-
     suspend fun updateMailboxes() {
         val userId = AccountUtils.currentUserId
         val mailboxes = ApiRepository.getMailboxes(AccountUtils.getHttpClient(userId)).data ?: return

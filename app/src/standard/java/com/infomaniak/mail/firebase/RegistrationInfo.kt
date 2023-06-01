@@ -17,17 +17,25 @@
  */
 package com.infomaniak.mail.firebase
 
-import com.infomaniak.lib.core.api.ApiController.ApiMethod.POST
-import com.infomaniak.lib.core.models.ApiResponse
-import com.infomaniak.mail.BuildConfig.INFOMANIAK_API_V1
-import com.infomaniak.mail.data.api.ApiRepository
-import okhttp3.OkHttpClient
+import android.content.ContentResolver
+import android.content.Context
+import android.provider.Settings
 
-object FirebaseApiRepository {
+class RegistrationInfo private constructor(
+    private val token: String,
+    private val name: String,
+    private val os: String = OS_NAME,
+    private val model: String = DEVICE_MODEL,
+) {
 
-    private const val registerDevice = "$INFOMANIAK_API_V1/devices/register"
+    constructor(context: Context, token: String) : this(token = token, name = getDeviceName(context.contentResolver))
 
-    fun registerForNotifications(registrationInfo: RegistrationInfo, okHttpClient: OkHttpClient): ApiResponse<Boolean> {
-        return ApiRepository.callApi(registerDevice, POST, registrationInfo, okHttpClient)
+    private companion object {
+        const val OS_NAME = "android"
+        val DEVICE_MODEL: String = android.os.Build.MODEL
+
+        fun getDeviceName(contentResolver: ContentResolver): String {
+            return Settings.Global.getString(contentResolver, "device_name")
+        }
     }
 }

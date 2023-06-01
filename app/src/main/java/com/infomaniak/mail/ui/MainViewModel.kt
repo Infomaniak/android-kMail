@@ -29,6 +29,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.*
+import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.mailboxInfo.PermissionsController
 import com.infomaniak.mail.data.cache.mailboxInfo.QuotasController
@@ -56,6 +57,8 @@ import com.infomaniak.mail.utils.SharedViewModelUtils.refreshFolders
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.ext.copyFromRealm
+import io.sentry.Sentry
+import io.sentry.SentryLevel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
@@ -72,7 +75,8 @@ class MainViewModel @Inject constructor(
     private inline val context: Context get() = getApplication()
 
     val isInternetAvailable = SingleLiveEvent<Boolean>()
-    val isDownloadingChanges = MutableLiveData(false)
+    // First boolean is the download status, second boolean is if the LoadMore button should be displayed
+    val isDownloadingChanges: MutableLiveData<Pair<Boolean, Boolean?>> = MutableLiveData(false to null)
     val isNewFolderCreated = SingleLiveEvent<Boolean>()
 
     // Explanation of this Map : Map<Email, Map<Name, MergedContact>>
@@ -98,7 +102,6 @@ class MainViewModel @Inject constructor(
     val toggleLightThemeForMessage = SingleLiveEvent<Message>()
 
     private val coroutineContext = viewModelScope.coroutineContext + ioDispatcher
-    private var refreshThreadsJob: Job? = null
     private var refreshMailboxesAndFoldersJob: Job? = null
 
     val mailboxesLive = MailboxController.getMailboxesAsync(AccountUtils.currentUserId).asLiveData(coroutineContext)
@@ -129,7 +132,7 @@ class MainViewModel @Inject constructor(
 
     val currentFolder = _currentFolderId.mapLatest {
         it?.let(FolderController::getFolder)
-    }.asLiveData(coroutineContext)
+    }.asLiveData(ioDispatcher)
 
     val currentFolderLive = _currentFolderId.flatMapLatest {
         it?.let(FolderController::getFolderAsync) ?: emptyFlow()
@@ -281,7 +284,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun openFolder(folderId: String) = viewModelScope.launch(viewModelScope.handlerIO) {
+    fun openFolder(folderId: String) = viewModelScope.launch(ioDispatcher) {
         if (folderId == currentFolderId) return@launch
 
         if (currentFilter.value != ThreadFilter.ALL) currentFilter.postValue(ThreadFilter.ALL)
@@ -304,27 +307,22 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun forceRefreshThreads() {
-        refreshThreadsJob?.cancel()
-        refreshThreadsJob = viewModelScope.launch(viewModelScope.handlerIO) {
-            Log.d(TAG, "Force refresh threads")
-            refreshThreads()
-        }
+    fun forceRefreshThreads() = viewModelScope.launch(ioDispatcher) {
+        Log.d(TAG, "Force refresh threads")
+        refreshThreads()
     }
 
-    fun getOneBatchOfOldMessages() {
-        refreshThreadsJob?.cancel()
-        refreshThreadsJob = viewModelScope.launch(viewModelScope.handlerIO) {
-            isDownloadingChanges.postValue(true)
-            runCatching {
-                MessageController.getOneBatchOfOldMessages(
-                    folder = currentFolder.value!!,
-                    mailbox = currentMailbox.value!!,
-                    scope = this,
-                )
-            }
-            isDownloadingChanges.postValue(false)
-        }
+    fun getOnePageOfOldMessages() = viewModelScope.launch(ioDispatcher) {
+
+        if (isDownloadingChanges.value?.first == true) return@launch
+
+        RefreshController.refreshThreads(
+            refreshMode = RefreshMode.ONE_PAGE_OF_OLD_MESSAGES,
+            mailbox = currentMailbox.value!!,
+            folder = currentFolder.value!!,
+            started = ::startedDownload,
+            stopped = ::stoppedDownload,
+        )
     }
 
     private fun updateAddressBooks() {
@@ -339,14 +337,51 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun observeMergedContactsLive() = viewModelScope.launch(ioDispatcher) {
+    fun observeMergedContactsLive() = viewModelScope.launch(coroutineContext) {
         MergedContactController.getMergedContactsAsync().collect { contacts ->
             mergedContacts.postValue(arrangeMergedContacts(contacts.list.copyFromRealm()))
         }
     }
 
     private fun updateSignatures(mailbox: Mailbox) = viewModelScope.launch(ioDispatcher) {
-        ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName).data?.signatures?.let(SignatureController::update)
+
+        val apiResponse = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName)
+        val data = apiResponse.data
+        val signatures = data?.signatures
+
+        val defaultSignaturesCount = signatures?.count { it.isDefault } ?: -1
+        when {
+            data == null -> Sentry.withScope { scope ->
+                scope.level = SentryLevel.ERROR
+                scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
+                scope.setExtra("apiResponse", apiResponse.toString())
+                scope.setExtra("status", apiResponse.result.name)
+                scope.setExtra("errorCode", "${apiResponse.error?.code}")
+                scope.setExtra("errorDescription", "${apiResponse.error?.description}")
+                scope.setExtra("errorTranslated", context.getString(apiResponse.translateError()))
+                Sentry.captureMessage("Signature: The call to get Signatures returned a `null` data")
+            }
+            signatures?.isEmpty() == true -> Sentry.withScope { scope ->
+                scope.level = SentryLevel.ERROR
+                scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
+                Sentry.captureMessage("Signature: This user doesn't have any Signature")
+            }
+            defaultSignaturesCount == 0 -> Sentry.withScope { scope ->
+                scope.level = SentryLevel.ERROR
+                scope.setExtra("signaturesCount", "${signatures?.count()}")
+                scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
+                Sentry.captureMessage("Signature: This user has Signatures, but no default one")
+            }
+            defaultSignaturesCount > 1 -> Sentry.withScope { scope ->
+                scope.level = SentryLevel.ERROR
+                scope.setExtra("defaultSignaturesCount", "$defaultSignaturesCount")
+                scope.setExtra("totalSignaturesCount", "${signatures?.count()}")
+                scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
+                Sentry.captureMessage("Signature: This user has several default Signatures")
+            }
+        }
+
+        signatures?.let(SignatureController::update)
     }
 
     private fun updateFolders(mailbox: Mailbox) {
@@ -361,9 +396,13 @@ class MainViewModel @Inject constructor(
         if (mailbox == null || folderId == null) return
 
         FolderController.getFolder(folderId)?.let { folder ->
-            isDownloadingChanges.postValue(true)
-            runCatching { MessageController.fetchCurrentFolderMessages(mailbox, folder) }
-            isDownloadingChanges.postValue(false)
+            RefreshController.refreshThreads(
+                refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
+                mailbox = mailbox,
+                folder = folder,
+                started = ::startedDownload,
+                stopped = ::stoppedDownload,
+            )
         }
     }
 
@@ -405,7 +444,9 @@ class MainViewModel @Inject constructor(
             apiResponse.isSuccess()
         }
 
-        if (isSuccess) refreshFolders(mailbox, messages.getFoldersIds(exception = trashId), trashId)
+        if (isSuccess) {
+            refreshFolders(mailbox, messages.getFoldersIds(exception = trashId), trashId, ::startedDownload, ::stoppedDownload)
+        }
 
         val undoDestinationId = message?.folderId ?: threads.first().folderId
         val undoFoldersIds = (messages.getFoldersIds(exception = undoDestinationId) + trashId).filterNotNull()
@@ -475,7 +516,13 @@ class MainViewModel @Inject constructor(
         val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
 
         if (apiResponse.isSuccess()) {
-            refreshFolders(mailbox, messages.getFoldersIds(exception = destinationFolder.id), destinationFolder.id)
+            refreshFolders(
+                mailbox = mailbox,
+                messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id),
+                destinationFolderId = destinationFolder.id,
+                started = ::startedDownload,
+                stopped = ::stoppedDownload,
+            )
         }
 
         showMoveSnackbar(threads, message, messages, apiResponse, destinationFolder)
@@ -540,7 +587,7 @@ class MainViewModel @Inject constructor(
 
         if (apiResponse.isSuccess()) {
             val messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id)
-            refreshFolders(mailbox, messagesFoldersIds, destinationFolder.id)
+            refreshFolders(mailbox, messagesFoldersIds, destinationFolder.id, ::startedDownload, ::stoppedDownload)
         }
 
         showMoveSnackbar(threads, message, messages, apiResponse, destinationFolder)
@@ -577,7 +624,7 @@ class MainViewModel @Inject constructor(
         if (isSeen) {
             markAsUnseen(mailbox, threads, message)
         } else {
-            SharedViewModelUtils.markAsSeen(mailbox, threads, message)
+            SharedViewModelUtils.markAsSeen(mailbox, threads, message, ::startedDownload, ::stoppedDownload)
         }
     }
 
@@ -588,7 +635,7 @@ class MainViewModel @Inject constructor(
     ) = viewModelScope.launch(viewModelScope.handlerIO) {
         val messages = getMessagesToMarkAsUnseen(threads, message)
         val isSuccess = ApiRepository.markMessagesAsUnseen(mailbox.uuid, messages.getUids()).isSuccess()
-        if (isSuccess) refreshFolders(mailbox, messages.getFoldersIds())
+        if (isSuccess) refreshFolders(mailbox, messages.getFoldersIds(), started = ::startedDownload, stopped = ::stoppedDownload)
     }
 
     private fun getMessagesToMarkAsUnseen(threads: List<Thread>, message: Message?) = when (message) {
@@ -637,7 +684,7 @@ class MainViewModel @Inject constructor(
             ApiRepository.addToFavorites(mailbox.uuid, uids).isSuccess()
         }
 
-        if (isSuccess) refreshFolders(mailbox, messages.getFoldersIds())
+        if (isSuccess) refreshFolders(mailbox, messages.getFoldersIds(), started = ::startedDownload, stopped = ::stoppedDownload)
     }
 
     private fun getMessagesToFavorite(threads: List<Thread>, message: Message?) = when (message) {
@@ -680,7 +727,13 @@ class MainViewModel @Inject constructor(
         val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
 
         if (apiResponse.isSuccess()) {
-            refreshFolders(mailbox, messages.getFoldersIds(exception = destinationFolder.id), destinationFolder.id)
+            refreshFolders(
+                mailbox = mailbox,
+                messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id),
+                destinationFolderId = destinationFolder.id,
+                started = ::startedDownload,
+                stopped = ::stoppedDownload,
+            )
         }
 
         if (displaySnackbar) {
@@ -733,7 +786,7 @@ class MainViewModel @Inject constructor(
         val (resource, foldersIds, destinationFolderId) = undoData
 
         val snackbarTitle = if (ApiRepository.undoAction(resource).data == true) {
-            refreshFolders(mailbox, foldersIds, destinationFolderId)
+            refreshFolders(mailbox, foldersIds, destinationFolderId, ::startedDownload, ::stoppedDownload)
             R.string.snackbarMoveCancelled
         } else {
             RCore.string.anErrorHasOccurred
@@ -741,7 +794,6 @@ class MainViewModel @Inject constructor(
 
         snackBarManager.postValue(context.getString(snackbarTitle))
     }
-
     //endregion
 
     //region New Folder
@@ -767,6 +819,19 @@ class MainViewModel @Inject constructor(
     }
     //endregion
 
+    private fun startedDownload() {
+        isDownloadingChanges.postValue(true to null)
+    }
+
+    private fun stoppedDownload() {
+
+        val shouldDisplayLoadMore = currentFolderId?.let(FolderController::getFolder)
+            ?.let { it.cursor != null && !it.isHistoryComplete }
+            ?: false
+
+        isDownloadingChanges.postValue(false to shouldDisplayLoadMore)
+    }
+
     private fun getActionThreads(threadsUids: List<String>): List<Thread> = threadsUids.mapNotNull(ThreadController::getThread)
 
     fun addContact(recipient: Recipient) = viewModelScope.launch(ioDispatcher) {
@@ -783,13 +848,13 @@ class MainViewModel @Inject constructor(
         snackBarManager.postValue(context.getString(snackbarTitle))
     }
 
-    fun getMessage(messageUid: String) = liveData(coroutineContext) {
+    fun getMessage(messageUid: String) = liveData(ioDispatcher) {
         emit(MessageController.getMessage(messageUid)!!)
     }
 
     private fun isSpam(message: Message?) = message?.isSpam ?: isCurrentFolderRole(FolderRole.SPAM)
 
-    fun navigateToSelectedDraft(message: Message) = liveData(coroutineContext) {
+    fun navigateToSelectedDraft(message: Message) = liveData(ioDispatcher) {
         val localUuid = DraftController.getDraftByMessageUid(message.uid)?.localUuid
         emit(ThreadListViewModel.SelectedDraft(localUuid, message.draftResource, message.uid))
     }

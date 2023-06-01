@@ -30,8 +30,10 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
+import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
+import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
-import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.LaunchActivity
@@ -39,6 +41,7 @@ import com.infomaniak.mail.ui.LaunchActivityArgs
 import com.infomaniak.mail.utils.NotificationUtils.showNewMessageNotification
 import io.realm.kotlin.Realm
 import io.sentry.Sentry
+import io.sentry.SentryLevel
 import okhttp3.OkHttpClient
 import javax.inject.Inject
 
@@ -50,24 +53,27 @@ class FetchMessagesManager @Inject constructor(
     private val localSettings by lazy { LocalSettings.getInstance(appContext) }
 
     suspend fun execute(userId: Int, mailbox: Mailbox, mailboxContentRealm: Realm? = null) {
+
         // Don't launch sync if the mailbox's notifications have been disabled by the user
         if (mailbox.notificationsIsDisabled(notificationManagerCompat)) return
 
         val realm = mailboxContentRealm ?: RealmDatabase.newMailboxContentInstance(userId, mailbox.mailboxId)
-        val folder = FolderController.getFolder(Folder.FolderRole.INBOX, realm) ?: return
+        val folder = FolderController.getFolder(FolderRole.INBOX, realm) ?: return
         if (folder.cursor == null) return
         val okHttpClient = AccountUtils.getHttpClient(userId)
 
-        // Update local with remote
-        val newMessagesThreads = runCatching {
-            MessageController.fetchCurrentFolderMessages(mailbox, folder, okHttpClient, realm)
-        }.getOrElse {
-            if (it is ApiErrorException) it.handleApiErrors() else throw it
-            return
-        }
-        Log.d(TAG, "launchWork: ${mailbox.email} has ${newMessagesThreads.count()} new messages")
+        // Update Local with Remote
+        val newMessagesThreads = RefreshController.refreshThreads(
+            refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
+            mailbox = mailbox,
+            folder = folder,
+            okHttpClient = okHttpClient,
+            realm = realm,
+        ) ?: return
 
-        // Notify all new messages
+        Log.d(TAG, "launchWork: ${mailbox.email} has ${newMessagesThreads.count()} Threads with new Messages")
+
+        // Notify Threads with new Messages
         val unReadThreadsCount = ThreadController.getUnreadThreadsCount(folder)
         newMessagesThreads.forEachIndexed { index, thread ->
             thread.showNotification(
@@ -97,10 +103,7 @@ class FetchMessagesManager @Inject constructor(
                 putExtras(LaunchActivityArgs(if (isSummary) null else uid, userId, mailbox.mailboxId).toBundle())
             }
             val requestCode = if (isSummary) mailbox.uuid else uid
-            return PendingIntent.getActivity(
-                appContext, requestCode.hashCode(), intent,
-                NotificationUtilsCore.pendingIntentFlags
-            )
+            return PendingIntent.getActivity(appContext, requestCode.hashCode(), intent, NotificationUtilsCore.pendingIntentFlags)
         }
 
         fun showNotification(contentText: String, isSummary: Boolean, title: String = "", description: String? = null) {
@@ -125,7 +128,21 @@ class FetchMessagesManager @Inject constructor(
 
         ThreadController.fetchIncompleteMessages(messages, mailbox, okHttpClient, realm)
 
-        val message = ThreadController.getThread(uid, realm)?.messages?.last() ?: return
+        val message = MessageController.getThreadLastMessageInFolder(uid, realm)
+        if (message == null) {
+            val thread = ThreadController.getThread(uid, realm)
+            Sentry.withScope { scope ->
+                scope.level = SentryLevel.ERROR
+                scope.setExtra("email", "[${AccountUtils.currentMailboxEmail}]")
+                scope.setExtra("does Thread still exist ?", "[${thread != null}]")
+                scope.setExtra("folderName", "[${thread?.folder?.name}]")
+                scope.setExtra("threadUid", "[${thread?.uid}]")
+                scope.setExtra("messagesCount", "[${thread?.messages?.count()}]")
+                scope.setExtra("messagesFolder", "[${thread?.messages?.map { "${it.folder.name} (${it.folderId})" }}]")
+                Sentry.captureMessage("We are supposed to display a Notification, but we couldn't find the Message in the Thread.")
+            }
+            return
+        }
 
         if (message.isSeen) return // Ignore if it has already been seen
 
@@ -152,13 +169,6 @@ class FetchMessagesManager @Inject constructor(
                 unReadThreadsCount
             )
             showNotification(summaryText, true)
-        }
-    }
-
-    private fun ApiErrorException.handleApiErrors() {
-        when (errorCode) {
-            ErrorCode.FOLDER_DOES_NOT_EXIST -> Unit
-            else -> Sentry.captureException(this)
         }
     }
 

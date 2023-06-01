@@ -23,7 +23,7 @@
     android:background="?selectableItemBackground"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:paddingHorizontal="@dimen/marginStandard">
+    android:padding="@dimen/marginStandardMedium">
 
     <ImageView
         android:id="@+id/icon"
@@ -37,7 +37,6 @@
         android:id="@+id/text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginVertical="@dimen/marginStandardMedium"
         android:layout_weight="1"
         tools:text="Simple messages" />
 

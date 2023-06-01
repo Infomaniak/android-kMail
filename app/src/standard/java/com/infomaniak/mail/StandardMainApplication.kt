@@ -15,27 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.firebase
+package com.infomaniak.mail
 
-import android.content.ContentResolver
-import android.content.Context
-import android.provider.Settings
+import androidx.lifecycle.LifecycleOwner
+import com.infomaniak.mail.workers.BaseProcessMessageNotificationsWorker
 
-class RegistrationInfos private constructor(
-    private val token: String,
-    private val name: String,
-    private val os: String = OS_NAME,
-    private val model: String = DEVICE_MODEL,
-) {
+class StandardMainApplication : MainApplication() {
 
-    constructor(context: Context, token: String) : this(token = token, name = getDeviceName(context.contentResolver))
-
-    private companion object {
-        const val OS_NAME = "android"
-        val DEVICE_MODEL: String = android.os.Build.MODEL
-
-        fun getDeviceName(contentResolver: ContentResolver): String {
-            return Settings.Global.getString(contentResolver, "device_name")
-        }
+    override fun onStart(owner: LifecycleOwner) {
+        super.onStart(owner)
+        BaseProcessMessageNotificationsWorker.cancelWorks(workManager)
     }
 }

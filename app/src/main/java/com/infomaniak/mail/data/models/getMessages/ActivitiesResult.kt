@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,9 +21,29 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class GetMessagesUidsResult(
-    @SerialName("messages_uids")
+data class ActivitiesResult(
+    @SerialName("deleted")
+    val deletedShortUids: List<String>,
+    @SerialName("added")
     val addedShortUids: List<Int>,
+    @SerialName("updated")
+    val updatedMessages: List<MessageFlags>,
     @SerialName("signature")
     val cursor: String,
-)
+) {
+    @Serializable
+    data class MessageFlags(
+        @SerialName("uid")
+        val shortUid: String,
+        @SerialName("answered")
+        val isAnswered: Boolean,
+        @SerialName("flagged")
+        val isFavorite: Boolean,
+        @SerialName("forwarded")
+        val isForwarded: Boolean,
+        @SerialName("scheduled")
+        val isScheduled: Boolean,
+        @SerialName("seen")
+        val isSeen: Boolean,
+    )
+}
