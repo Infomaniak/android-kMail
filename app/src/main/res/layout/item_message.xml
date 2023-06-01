@@ -376,7 +376,6 @@
                 android:id="@+id/distantImagesAlert"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/marginStandardMedium"
                 android:visibility="gone"
                 app:action1="@string/alertBlockedImagesDisplayContent"
                 app:description="@string/alertBlockedImagesDescription"
