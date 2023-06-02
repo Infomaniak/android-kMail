@@ -39,10 +39,23 @@ class SnackBarManager {
             } else {
                 customBehaviour
             }
+            val safeAction = getSafeAction(action)
 
             val buttonTitle = buttonTitleRes ?: RCore.string.buttonCancel
 
-            activity.showSnackbar(title, getAnchor?.invoke(), buttonTitle, onActionClicked = action)
+            activity.showSnackbar(title, getAnchor?.invoke(), buttonTitle, onActionClicked = safeAction)
+        }
+    }
+
+    private fun getSafeAction(action: (() -> Unit)?): (() -> Unit)? {
+        return action?.let {
+            var neverClicked = true
+            {
+                if (neverClicked) {
+                    neverClicked = false
+                    action()
+                }
+            }
         }
     }
 
