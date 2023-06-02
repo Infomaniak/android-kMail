@@ -48,7 +48,7 @@ class MenuDrawerItemView @JvmOverloads constructor(
     private val regular by lazy { ResourcesCompat.getFont(context, RCore.font.suisseintl_regular) }
     private val medium by lazy { ResourcesCompat.getFont(context, RCore.font.suisseintl_medium) }
 
-    private var outdatedPasswordListener: (() -> Unit)? = null
+    private var outdatedPasswordClickListener: (() -> Unit)? = null
 
     var badge: Int = 0
         set(value) {
@@ -147,12 +147,12 @@ class MenuDrawerItemView @JvmOverloads constructor(
 
     override fun setOnClickListener(onClickListener: OnClickListener?) {
         binding.root.setOnClickListener {
-            if (isPasswordOutdated) outdatedPasswordListener?.invoke() else onClickListener?.onClick(it)
+            if (isPasswordOutdated) outdatedPasswordClickListener?.invoke() else onClickListener?.onClick(it)
         }
     }
 
     fun setOnOutdatedPasswordClickListener(callback: () -> Unit) {
-        outdatedPasswordListener = callback
+        outdatedPasswordClickListener = callback
     }
 
     enum class SelectionStyle {
