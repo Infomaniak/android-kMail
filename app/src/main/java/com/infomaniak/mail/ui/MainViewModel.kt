@@ -498,6 +498,23 @@ class MainViewModel @Inject constructor(
         null -> threads.flatMap(MessageController::getUnscheduledMessages)
         else -> MessageController.getMessageAndDuplicates(threads.first(), message)
     }
+
+    fun deleteDraft(targetMailboxUuid: String, remoteDraftUuid: String) = viewModelScope.launch(viewModelScope.handlerIO) {
+        val mailbox = currentMailbox.value!!
+        val apiResponse = ApiRepository.deleteDraft(targetMailboxUuid, remoteDraftUuid)
+
+        if (apiResponse.isSuccess() && mailbox.uuid == targetMailboxUuid) {
+            val draftFolderId = FolderController.getFolder(FolderRole.DRAFT)!!.id
+            refreshFolders(mailbox, listOf(draftFolderId))
+        }
+
+        showDraftDeletedSnackBar(apiResponse)
+    }
+
+    private fun showDraftDeletedSnackBar(apiResponse: ApiResponse<Unit>) {
+        val titleRes = if (apiResponse.isSuccess()) R.string.snackbarDraftDeleted else apiResponse.translateError()
+        snackBarManager.postValue(context.getString(titleRes))
+    }
     //endregion
 
     //region Move

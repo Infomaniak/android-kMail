@@ -35,6 +35,7 @@ import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.networking.LiveDataNetworkStatus
+import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.lib.stores.checkUpdateIsAvailable
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.GplayUtils.checkPlayServices
@@ -42,6 +43,7 @@ import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.draft.Draft.*
 import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.firebase.RegisterFirebaseBroadcastReceiver
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
@@ -49,11 +51,14 @@ import com.infomaniak.mail.utils.PermissionUtils
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.updateNavigationBarColor
+import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.launch
+import java.util.UUID
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ThemedActivity() {
@@ -72,6 +77,9 @@ class MainActivity : ThemedActivity() {
     private val navController by lazy {
         (supportFragmentManager.findFragmentById(R.id.hostFragment) as NavHostFragment).navController
     }
+
+    @Inject
+    lateinit var draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler
 
     private val drawerListener = object : DrawerLayout.DrawerListener {
 
@@ -109,6 +117,7 @@ class MainActivity : ThemedActivity() {
         handleOnBackPressed()
 
         observeNetworkStatus()
+        observeDraftWorkerResults()
         binding.drawerLayout.addDrawerListener(drawerListener)
         registerFirebaseBroadcastReceiver.initFirebaseBroadcastReceiver(this, mainViewModel)
 
@@ -124,6 +133,41 @@ class MainActivity : ThemedActivity() {
         mainViewModel.observeMergedContactsLive()
 
         permissionUtils.requestMainPermissionsIfNeeded()
+    }
+
+    private fun observeDraftWorkerResults() {
+        val treatedWorkInfoUuids = mutableSetOf<UUID>()
+
+        draftsActionsWorkerScheduler.getRunningWorkInfoLiveData().observe(this) {
+            it.forEach { workInfo ->
+                if (workInfo.progress.getString(DraftsActionsWorker.DRAFT_ACTION_KEY) == DraftAction.SAVE.name) {
+                    mainViewModel.snackBarManager.setValue(getString(R.string.snackbarDraftSaving))
+                }
+            }
+        }
+
+        draftsActionsWorkerScheduler.getCompletedWorkInfoLiveData().observe(this) {
+            for (workInfo in it) {
+                if (!treatedWorkInfoUuids.add(workInfo.id)) continue
+
+                workInfo.outputData
+                    .getIntArray(DraftsActionsWorker.ERROR_MESSAGE_RESID_KEY)
+                    ?.forEach(::showToast)
+
+                val remoteDraftUuid = workInfo.outputData.getString(DraftsActionsWorker.SAVED_DRAFT_UUID_KEY)
+                val associatedMailboxUuid = workInfo.outputData.getString(DraftsActionsWorker.ASSOCIATED_MAILBOX_UUID_KEY)
+                remoteDraftUuid?.let { draftUuid -> showSavedDraftSnackBar(draftUuid, associatedMailboxUuid!!) }
+            }
+        }
+    }
+
+    private fun showSavedDraftSnackBar(remoteDraftUuid: String, associatedMailboxUuid: String) {
+        mainViewModel.snackBarManager.setValue(
+            title = getString(R.string.snackbarDraftSaved),
+            undoData = null,
+            buttonTitle = R.string.actionDelete,
+            customBehaviour = { mainViewModel.deleteDraft(associatedMailboxUuid, remoteDraftUuid) },
+        )
     }
 
     private fun loadCurrentMailbox() {

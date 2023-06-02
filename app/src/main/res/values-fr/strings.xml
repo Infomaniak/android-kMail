@@ -176,6 +176,7 @@
     <string name="errorAtLeastOneRecipient">Il faut au minimum un destinataire</string>
     <string name="errorAttachAddressInput">Seules les adresses mails Infomaniak sont supportées</string>
     <string name="errorCorruptAttachment">Échec du traitement du brouillon, une pièce jointe est corrompue</string>
+    <string name="errorDraftNotFound">Brouillon introuvable</string>
     <string name="errorEditScheduledMessage">Impossible de modifier un message planifié ou envoyé</string>
     <string name="errorInvalidCredentials">E-mail ou mot de passe invalide</string>
     <string name="errorLoginDescription">La connexion a échoué.</string>
@@ -323,6 +324,7 @@
     <string name="snackbarDisplayProblemReported">Problème d’affichage signalé</string>
     <string name="snackbarDraftDeleted">Brouillon supprimé</string>
     <string name="snackbarDraftSaved">Brouillon enregistré</string>
+    <string name="snackbarDraftSaving">Enregistrement du brouillon</string>
     <string name="snackbarEmailCopiedToClipboard">Adresse mail copiée dans le presse-papiers</string>
     <string name="snackbarEmailSending">E-mail en cours d’envoi</string>
     <string name="snackbarEmailSent">E-mail envoyé</string>

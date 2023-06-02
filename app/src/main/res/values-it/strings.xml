@@ -175,6 +175,7 @@
     <string name="errorAtLeastOneRecipient">È richiesto almeno un destinatario</string>
     <string name="errorAttachAddressInput">Sono supportati solo gli indirizzi e-mail Infomaniak</string>
     <string name="errorCorruptAttachment">Impossibile gestire la bozza, un allegato è danneggiato</string>
+    <string name="errorDraftNotFound">Bozza non trovata</string>
     <string name="errorEditScheduledMessage">Impossibile modificare un messaggio pianificato o inviato</string>
     <string name="errorInvalidCredentials">Email o password non valide</string>
     <string name="errorLoginDescription">La connessione non è riuscita.</string>
@@ -320,6 +321,7 @@
     <string name="snackbarDisplayProblemReported">Problema di visualizzazione segnalato</string>
     <string name="snackbarDraftDeleted">Bozza cancellata</string>
     <string name="snackbarDraftSaved">Bozza salvata</string>
+    <string name="snackbarDraftSaving">Salvataggio della bozza</string>
     <string name="snackbarEmailCopiedToClipboard">Indirizzo e-mail copiato negli appunti</string>
     <string name="snackbarEmailSending">Invio di e-mail in corso</string>
     <string name="snackbarEmailSent">Email inviata</string>
