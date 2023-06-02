@@ -309,6 +309,8 @@
     <string name="settingsSendAcknowledgement">Request an acknowledgement of receipt for every email sent</string>
     <string name="settingsSendIncludeOriginalMessage">Include the original message in the reply</string>
     <string name="settingsSendTitle">Send</string>
+    <string name="settingsSignatureDescription">Select a default signature</string>
+    <string name="settingsSignatureTitle">Signatures</string>
     <string name="settingsSwipeActionNone">None</string>
     <string name="settingsSwipeActionQuickActionsMenu">Quick actions menu</string>
     <string name="settingsSwipeActionReadUnread">Read / unread</string>

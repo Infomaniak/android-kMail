@@ -305,6 +305,8 @@
     <string name="settingsSendAcknowledgement">Demander un accusé de réception pour chaque message envoyé</string>
     <string name="settingsSendIncludeOriginalMessage">Inclure le message original dans la réponse</string>
     <string name="settingsSendTitle">Envoi</string>
+    <string name="settingsSignatureDescription">Sélectionner une signature par défaut</string>
+    <string name="settingsSignatureTitle">Signatures</string>
     <string name="settingsSwipeActionNone">Aucune</string>
     <string name="settingsSwipeActionQuickActionsMenu">Menu d’actions rapides</string>
     <string name="settingsSwipeActionReadUnread">Lu / non lu</string>

@@ -302,6 +302,8 @@
     <string name="settingsSendAcknowledgement">Solicite un acuse de recibo por cada correo electrónico enviado</string>
     <string name="settingsSendIncludeOriginalMessage">Incluir el mensaje original en la respuesta</string>
     <string name="settingsSendTitle">Enviar</string>
+    <string name="settingsSignatureDescription">Seleccione una firma por defecto</string>
+    <string name="settingsSignatureTitle">Firmas</string>
     <string name="settingsSwipeActionNone">Ninguno</string>
     <string name="settingsSwipeActionQuickActionsMenu">Menú de acciones rápidas</string>
     <string name="settingsSwipeActionReadUnread">Leído / no leído</string>

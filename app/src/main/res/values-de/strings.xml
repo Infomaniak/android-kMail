@@ -302,6 +302,8 @@
     <string name="settingsSendAcknowledgement">Verlangen Sie eine Empfangsbestätigung für jede gesendete E-Mail</string>
     <string name="settingsSendIncludeOriginalMessage">Fügen Sie die ursprüngliche Nachricht in die Antwort ein</string>
     <string name="settingsSendTitle">Senden Sie</string>
+    <string name="settingsSignatureDescription">Wählen Sie eine Standardsignatur</string>
+    <string name="settingsSignatureTitle">Unterschriften</string>
     <string name="settingsSwipeActionNone">Keine</string>
     <string name="settingsSwipeActionQuickActionsMenu">Menü Schnelle Aktionen</string>
     <string name="settingsSwipeActionReadUnread">Gelesen / ungelesen</string>
