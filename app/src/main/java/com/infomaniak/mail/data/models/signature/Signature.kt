@@ -31,9 +31,8 @@ class Signature : RealmObject {
     var isDefault: Boolean = false
     var content: String = ""
 
-    // These are required for the update call, do not delete them
     @SerialName("reply_to_id")
-    var replyToId: Int = 0
+    var replyToId: Int = 0 /* Required for the update call, do not delete */
     @SerialName("sender_id")
-    var senderId: Int = 0
+    var senderId: Int = 0 /* Required for the update call, do not delete */
 }
