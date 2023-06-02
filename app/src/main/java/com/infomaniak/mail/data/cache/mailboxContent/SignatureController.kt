@@ -25,28 +25,43 @@ import io.realm.kotlin.Realm
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.query
+import io.realm.kotlin.query.RealmQuery
+import io.realm.kotlin.query.RealmResults
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 object SignatureController {
 
     private inline val defaultRealm get() = RealmDatabase.mailboxContent()
 
+    //region Queries
+    private fun getDefaultSignatureQuery(realm: TypedRealm): RealmQuery<Signature> {
+        return realm.query("${Signature::isDefault.name} == true")
+    }
+
+    private fun getAllSignaturesQuery(realm: TypedRealm): RealmQuery<Signature> {
+        return realm.query()
+    }
+    //endregion
+
     //region Get data
     private fun getDefaultSignature(realm: TypedRealm): Signature? {
-        return realm.query<Signature>("${Signature::isDefault.name} == true").first().find()
+        return getDefaultSignatureQuery(realm).first().find()
     }
 
     fun getSignature(realm: TypedRealm): Signature {
-        return getDefaultSignature(realm) ?: realm.query<Signature>().first().find()!!
+        return getDefaultSignature(realm) ?: getAllSignaturesQuery(realm).first().find()!!
     }
 
-    fun getSignaturesLive(realm: TypedRealm = defaultRealm) = realm.query<Signature>().find().asFlow().map { it.list }
+    fun getSignaturesLive(realm: TypedRealm): Flow<RealmResults<Signature>> {
+        return getAllSignaturesQuery(realm).find().asFlow().map { it.list }
+    }
     //endregion
 
     //region Edit data
-    fun update(apiSignatures: List<Signature>, customRealm: Realm?) {
+    fun update(apiSignatures: List<Signature>, realm: Realm?) {
         Log.d(RealmDatabase.TAG, "Signatures: Save new data")
-        (customRealm ?: defaultRealm).update<Signature>(apiSignatures)
+        (realm ?: defaultRealm).update<Signature>(apiSignatures)
     }
 
     fun update(apiSignatures: List<Signature>, realm: MutableRealm) {
