@@ -28,7 +28,9 @@ class SnackBarManager {
 
     private val snackBarFeedback = SingleLiveEvent<SnackBarData>()
 
+    // Give a CoordinatorLayout to `view` in order to support swipe to dismiss
     fun setup(
+        view: View,
         activity: FragmentActivity,
         getAnchor: (() -> View?)? = null,
         onUndoData: ((data: UndoData) -> Unit)? = null,
@@ -43,7 +45,7 @@ class SnackBarManager {
 
             val buttonTitle = buttonTitleRes ?: RCore.string.buttonCancel
 
-            activity.showSnackbar(title, getAnchor?.invoke(), buttonTitle, onActionClicked = safeAction)
+            showSnackbar(view, title, getAnchor?.invoke(), buttonTitle, onActionClicked = safeAction)
         }
     }
 

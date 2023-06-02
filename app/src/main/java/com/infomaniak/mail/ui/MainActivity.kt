@@ -246,10 +246,15 @@ class MainActivity : ThemedActivity() {
             else -> null
         }
 
-        mainViewModel.snackBarManager.setup(this, ::getAnchor) {
-            trackEvent("snackbar", "undo")
-            mainViewModel.undoAction(it)
-        }
+        mainViewModel.snackBarManager.setup(
+            view = binding.root,
+            activity = this,
+            getAnchor = ::getAnchor,
+            onUndoData = {
+                trackEvent("snackbar", "undo")
+                mainViewModel.undoAction(it)
+            },
+        )
     }
 
     private fun setupNavController() {
