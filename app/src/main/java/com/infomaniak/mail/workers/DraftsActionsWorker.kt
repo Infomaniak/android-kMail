@@ -182,10 +182,10 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         SentryDebug.sendOrphanDrafts(mailboxContentRealm)
 
-        val (draftUid, mailboxUuid) = if (draftLocalUuid != null && remoteUuidOfTrackedDraft != null) {
-            remoteUuidOfTrackedDraft to mailbox.uuid
-        } else {
+        val (draftUid, mailboxUuid) = if (draftLocalUuid == null || remoteUuidOfTrackedDraft == null) {
             null to null
+        } else {
+            remoteUuidOfTrackedDraft to mailbox.uuid
         }
         val outputData = workDataOf(
             ERROR_MESSAGE_RESID_KEY to errorMessageResIds.toIntArray(),
@@ -312,7 +312,11 @@ class DraftsActionsWorker @AssistedInject constructor(
                     Sentry.captureMessage("We tried to [${draft.action?.name}] a Draft, but an Attachment didn't have its `uuid`.")
                 }
 
-                return DraftActionResult(null, R.string.errorCorruptAttachment, null)
+                return DraftActionResult(
+                    scheduledDate = null,
+                    errorMessageResId = R.string.errorCorruptAttachment,
+                    savedDraftUuid = null,
+                )
             }
         }
 
@@ -339,7 +343,11 @@ class DraftsActionsWorker @AssistedInject constructor(
             else -> Unit
         }
 
-        return DraftActionResult(scheduledDate, null, savedDraftUuid)
+        return DraftActionResult(
+            scheduledDate = scheduledDate,
+            errorMessageResId = null,
+            savedDraftUuid = savedDraftUuid,
+        )
     }
 
     @Singleton

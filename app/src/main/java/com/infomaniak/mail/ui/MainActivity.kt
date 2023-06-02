@@ -43,7 +43,7 @@ import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.draft.Draft
+import com.infomaniak.mail.data.models.draft.Draft.*
 import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.firebase.RegisterFirebaseBroadcastReceiver
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
@@ -139,8 +139,8 @@ class MainActivity : ThemedActivity() {
         val treatedWorkInfoUuids = mutableSetOf<UUID>()
 
         draftsActionsWorkerScheduler.getRunningWorkInfoLiveData().observe(this) {
-            for (workInfo in it) {
-                if (workInfo.progress.getString(DraftsActionsWorker.DRAFT_ACTION_KEY) == Draft.DraftAction.SAVE.name) {
+            it.forEach { workInfo ->
+                if (workInfo.progress.getString(DraftsActionsWorker.DRAFT_ACTION_KEY) == DraftAction.SAVE.name) {
                     mainViewModel.snackBarManager.setValue(getString(R.string.snackbarDraftSaving))
                 }
             }
@@ -152,7 +152,7 @@ class MainActivity : ThemedActivity() {
 
                 workInfo.outputData
                     .getIntArray(DraftsActionsWorker.ERROR_MESSAGE_RESID_KEY)
-                    ?.forEach(this::showToast)
+                    ?.forEach(::showToast)
 
                 val remoteDraftUuid = workInfo.outputData.getString(DraftsActionsWorker.SAVED_DRAFT_UUID_KEY)
                 val associatedMailboxUuid = workInfo.outputData.getString(DraftsActionsWorker.ASSOCIATED_MAILBOX_UUID_KEY)
@@ -162,9 +162,12 @@ class MainActivity : ThemedActivity() {
     }
 
     private fun showSavedDraftSnackBar(remoteDraftUuid: String, associatedMailboxUuid: String) {
-        mainViewModel.snackBarManager.setValue(getString(R.string.snackbarDraftSaved), null, R.string.actionDelete) {
-            mainViewModel.deleteDraft(associatedMailboxUuid, remoteDraftUuid)
-        }
+        mainViewModel.snackBarManager.setValue(
+            title = getString(R.string.snackbarDraftSaved),
+            undoData = null,
+            buttonTitle = R.string.actionDelete,
+            customBehaviour = { mainViewModel.deleteDraft(associatedMailboxUuid, remoteDraftUuid) },
+        )
     }
 
     private fun loadCurrentMailbox() {
