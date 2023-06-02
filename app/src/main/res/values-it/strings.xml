@@ -48,7 +48,7 @@
     <string name="actionViewInLight">Vista in tema chiaro</string>
     <string name="addUnknownRecipientAlreadyUsed">L’e-mail è già utilizzata</string>
     <string name="addUnknownRecipientInvalidEmail">L’e-mail non è valida</string>
-    <string name="addUnknownRecipientTitle">Aggiungere un destinatario</string>
+    <string name="addUnknownRecipientTitle">Aggiungi un destinatario</string>
     <string name="alertBlockedImagesDescription">Per la vostra sicurezza abbiamo bloccato alcuni contenuti del vostro messaggio.</string>
     <string name="alertBlockedImagesDisplayContent">Visualizza il contenuto</string>
     <string name="appSecurityDescription">Proteggete l’accesso alla vostra applicazione attivando il blocco del telefono.</string>
@@ -67,14 +67,14 @@
         <item quantity="other">%d allegati</item>
     </plurals>
     <string name="bccTitle">Bcc:</string>
-    <string name="buttonAccept">Accettare</string>
+    <string name="buttonAccept">Accetta</string>
     <string name="buttonAccountAssociatedEmailAddresses">Indirizzi e-mail associati a questo account</string>
     <string name="buttonAccountDelete">Cancellare l’account</string>
     <string name="buttonAccountDisconnect">Disconnettere l’account</string>
     <string name="buttonAccountSwitch">Modifica del conto</string>
     <string name="buttonAddAccount">Aggiungere un account</string>
     <string name="buttonAddEmailAddress">Aggiungere un indirizzo e-mail</string>
-    <string name="buttonAttachEmailAddress">Aggiungere l’indirizzo e-mail</string>
+    <string name="buttonAttachEmailAddress">Aggiungi l’indirizzo e-mail</string>
     <string name="buttonAttachment">Aggiungere un allegato</string>
     <string name="buttonAvailableSoon">Disponibile a breve</string>
     <string name="buttonBold">In grassetto</string>
@@ -82,7 +82,7 @@
     <string name="buttonCamera">Scattare una foto</string>
     <string name="buttonCancel">Annullamento</string>
     <string name="buttonClose">Chiudere</string>
-    <string name="buttonConfirm">Confermare</string>
+    <string name="buttonConfirm">Conferma</string>
     <string name="buttonConfirmRestoreEmails">Ripristino</string>
     <string name="buttonContinue">Continua</string>
     <string name="buttonCreate">Creare</string>
@@ -118,7 +118,7 @@
     <string name="ccTitle">Cc:</string>
     <string name="comingSoon">Prossimamente…</string>
     <string name="commercialFolder">Promozioni</string>
-    <string name="confirmLogoutDescription">Siete sicuri di volervi disconnettere da %s?</string>
+    <string name="confirmLogoutDescription">Sei sicuro di volerti disconnettere da %s?</string>
     <string name="confirmLogoutTitle">Disconnettersi</string>
     <string name="contactActionAddToContacts">Aggiungi ai contatti</string>
     <string name="contactActionCopyEmailAddress">Copiare l’indirizzo e-mail</string>
@@ -127,11 +127,11 @@
     <string name="contactsSearch">Contatti</string>
     <string name="contentDescriptionAccountSelection">Conto selezionato</string>
     <string name="contentDescriptionButtonBack">Indietro</string>
-    <string name="contentDescriptionButtonDelete">Cancellare %s</string>
+    <string name="contentDescriptionButtonDelete">Cancella %s</string>
     <string name="contentDescriptionButtonDeleteDraft">Cancellare la bozza</string>
-    <string name="contentDescriptionButtonDeleteHistory">Cancellare la voce della cronologia</string>
+    <string name="contentDescriptionButtonDeleteHistory">Cancella la voce della cronologia</string>
     <string name="contentDescriptionButtonDeleteQuote">Eliminare i messaggi citati</string>
-    <string name="contentDescriptionButtonDeleteSignature">Cancellare la firma</string>
+    <string name="contentDescriptionButtonDeleteSignature">Cancella la firma</string>
     <string name="contentDescriptionButtonExpandAccountSelection">Ampliare la selezione dei conti</string>
     <string name="contentDescriptionButtonExpandCustomFolders">Espandere le cartelle personalizzate</string>
     <string name="contentDescriptionButtonExpandHeader">Espandi intestazione</string>
@@ -139,11 +139,11 @@
     <string name="contentDescriptionButtonFilterSearch">Filtro di ricerca</string>
     <string name="contentDescriptionButtonMenu">Menu</string>
     <string name="contentDescriptionButtonNext">Avanti</string>
-    <string name="contentDescriptionButtonOpenSystemSettings">Aprire le impostazioni di notifica del sistema</string>
+    <string name="contentDescriptionButtonOpenSystemSettings">Apri le impostazioni di notifica del sistema</string>
     <string name="contentDescriptionButtonSettings">Impostazioni</string>
     <string name="contentDescriptionButtonShowPassword">Mostra password</string>
     <string name="contentDescriptionContactAlreadyUsed">Contatto già utilizzato come destinatario</string>
-    <string name="contentDescriptionDownloadIndicator">Scaricare</string>
+    <string name="contentDescriptionDownloadIndicator">Scarica</string>
     <string name="contentDescriptionIconAttachments">Dispone di allegati</string>
     <string name="contentDescriptionIconCalendar">Ha un evento di calendario</string>
     <string name="contentDescriptionIconFavorite">È il preferito</string>
@@ -153,6 +153,7 @@
     <string name="contentDescriptionOpenMailActions">Azioni di apertura dei messaggi</string>
     <string name="contentDescriptionSelectedItem">Selezionato</string>
     <string name="contentDescriptionUserAvatar">Avatar utente</string>
+    <string name="contentDescriptionWarningIcon">Avviso</string>
     <string name="createFolderName">Nome della cartella</string>
     <string name="createFolderNoParent">Nessuno</string>
     <string name="createFolderParent">Cartella dei genitori</string>
@@ -188,6 +189,7 @@
     <string name="errorTooManyRecipients">Troppi destinatari</string>
     <string name="failToOpenDraft">Impossibile aprire la bozza</string>
     <string name="favoritesFolder">Preferiti</string>
+    <string name="frelatedMailbox">Password non valida. Per ora può essere aggiornata solo sulla webmail.</string>
     <string name="fromTitle">Da:</string>
     <string name="googlePlayServicesAreRequired">I servizi Google Play sono necessari</string>
     <string name="inboxFolder">Posta in arrivo</string>
@@ -197,10 +199,10 @@
     <string name="messageDetailsDateAt">%1$s alle %2$s</string>
     <string name="messageDetailsYesterday">Ieri</string>
     <string name="messageForwardHeader">Messaggio inoltrato</string>
-    <string name="messageHideQuotedText">Nascondere la conversazione</string>
+    <string name="messageHideQuotedText">Nascondi la conversazione</string>
     <string name="messageIsDraftOption">Bozza</string>
     <string name="messageReplyHeader">Il %1$s, %2$s ha scritto:</string>
-    <string name="messageShowQuotedText">Visualizzare la conversazione</string>
+    <string name="messageShowQuotedText">Visualizza la conversazione</string>
     <string name="moreStorageText1">La casella di posta elettronica è piena e non è possibile ricevere altri messaggi 🥲</string>
     <string name="moreStorageText2">Presto potrete sbloccare i limiti del vostro indirizzo e-mail ik.me (limite di archiviazione, invio, inoltro, …).</string>
     <string name="moreStorageTitle">La vostra scatola è piena? Ottieni più spazio!</string>
@@ -210,7 +212,7 @@
         <item quantity="other">%d selezionati</item>
     </plurals>
     <string name="newFolderDialogHint">Nome della cartella</string>
-    <string name="newFolderDialogMovePositiveButton">Creare e spostare</string>
+    <string name="newFolderDialogMovePositiveButton">Crea e sposta</string>
     <string name="newFolderDialogTitle">Nuova cartella</string>
     <plurals name="newMessageNotificationSummary">
         <item quantity="one">%d nuovo messaggio</item>
@@ -242,7 +244,7 @@
     <string name="reportDisplayProblemDescription">Accettate di condividere i vostri dati con i nostri sviluppatori in modo che possano aiutarvi a risolvere il vostro problema?</string>
     <string name="reportDisplayProblemTitle">Segnalare un problema di visualizzazione</string>
     <string name="reportPhishingDescription">Se il messaggio tenta di rubare informazioni sensibili (password, dati bancari, ecc.) e/o si spaccia per un’identità riconosciuta, si tratta di phishing.\n\nSegnalandolo a noi, accelererete l’individuazione di messaggi pericolosi per tutti i nostri utenti.\n\nLa segnalazione sarà inviata al nostro team di sicurezza per l’analisi e l’intervento. L’e-mail verrà inoltre spostata automaticamente nella cartella spam.</string>
-    <string name="reportPhishingTitle">Segnalare un tentativo di phishing</string>
+    <string name="reportPhishingTitle">Segnala un tentativo di phishing</string>
     <string name="restoreEmailsBackupDate">Data di backup</string>
     <string name="restoreEmailsText">Tutte le e-mail torneranno nella vostra casella di posta.</string>
     <string name="restoreEmailsTitle">Ripristino delle e-mail</string>
@@ -300,6 +302,8 @@
     <string name="settingsSendAcknowledgement">Richiedete una conferma di ricezione per ogni e-mail inviata.</string>
     <string name="settingsSendIncludeOriginalMessage">Includere il messaggio originale nella risposta</string>
     <string name="settingsSendTitle">Inviare</string>
+    <string name="settingsSignatureDescription">Selezionare una firma predefinita</string>
+    <string name="settingsSignatureTitle">Firme</string>
     <string name="settingsSwipeActionNone">Nessuno</string>
     <string name="settingsSwipeActionQuickActionsMenu">Menu Azioni rapide</string>
     <string name="settingsSwipeActionReadUnread">Letto / non letto</string>
@@ -337,7 +341,7 @@
     </plurals>
     <plurals name="snackbarThreadDeletedPermanently">
         <item quantity="one">Conversazione cancellata</item>
-        <item quantity="other">Conversazioni eliminate</item>
+        <item quantity="other">Conversazioni cancellate</item>
     </plurals>
     <plurals name="snackbarThreadMoved">
         <item quantity="one">Conversazione spostata in %s</item>
@@ -351,13 +355,13 @@
         <item quantity="other">Siete sicuri di voler eliminare questi messaggi in modo permanente?</item>
     </plurals>
     <plurals name="threadListDeletionConfirmationAlertTitle">
-        <item quantity="one">Cancellare %d messaggio</item>
-        <item quantity="other">Cancellare %d messaggi</item>
+        <item quantity="one">Cancella %d messaggio</item>
+        <item quantity="other">Cancella %d messaggi</item>
     </plurals>
     <string name="threadListEmptyDraftButton">Bozze vuote</string>
     <string name="threadListEmptyFolderAlertDescription">Siete sicuri di voler eliminare definitivamente tutti i messaggi in questa cartella?</string>
     <string name="threadListEmptySpamButton">Spam vuoto</string>
-    <string name="threadListEmptyTrashButton">Svuotare la spazzatura</string>
+    <string name="threadListEmptyTrashButton">Svuota il cestino</string>
     <string name="threadListHeaderLastUpdate">Aggiornato %s</string>
     <string name="threadListHeaderLastUpdateNow">ora</string>
     <plurals name="threadListHeaderUnreadCount">

@@ -153,6 +153,7 @@
     <string name="contentDescriptionOpenMailActions">Mail-Aktionen öffnen</string>
     <string name="contentDescriptionSelectedItem">Ausgewählte</string>
     <string name="contentDescriptionUserAvatar">Benutzer-Avatar</string>
+    <string name="contentDescriptionWarningIcon">Warnung</string>
     <string name="createFolderName">Name des Ordners</string>
     <string name="createFolderNoParent">Keine</string>
     <string name="createFolderParent">Übergeordneter Ordner</string>
@@ -188,6 +189,7 @@
     <string name="errorTooManyRecipients">Zu viele Empfänger</string>
     <string name="failToOpenDraft">Öffnen des Entwurfs fehlgeschlagen</string>
     <string name="favoritesFolder">Favoriten</string>
+    <string name="frelatedMailbox">Ungültiges Passwort. Kann vorerst nur über das Webmail aktualisiert werden.</string>
     <string name="fromTitle">Von:</string>
     <string name="googlePlayServicesAreRequired">Google Play Services sind erforderlich</string>
     <string name="inboxFolder">Posteingang</string>
@@ -300,6 +302,8 @@
     <string name="settingsSendAcknowledgement">Verlangen Sie eine Empfangsbestätigung für jede gesendete E-Mail</string>
     <string name="settingsSendIncludeOriginalMessage">Fügen Sie die ursprüngliche Nachricht in die Antwort ein</string>
     <string name="settingsSendTitle">Senden Sie</string>
+    <string name="settingsSignatureDescription">Wählen Sie eine Standardsignatur</string>
+    <string name="settingsSignatureTitle">Unterschriften</string>
     <string name="settingsSwipeActionNone">Keine</string>
     <string name="settingsSwipeActionQuickActionsMenu">Menü Schnelle Aktionen</string>
     <string name="settingsSwipeActionReadUnread">Gelesen / ungelesen</string>

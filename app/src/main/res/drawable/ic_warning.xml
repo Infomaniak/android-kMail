@@ -1,0 +1,27 @@
+<!--
+  ~ Infomaniak kMail - Android
+  ~ Copyright (C) 2023 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#000000"
+        android:fillType="evenOdd"
+        android:pathData="M2.31,24H21.791C22.192,24 22.594,23.9 22.895,23.7C23.197,23.5 23.498,23.199 23.699,22.899C23.9,22.598 24,22.198 24,21.798C24,21.397 24,20.997 23.799,20.697L14.259,1.376C14.059,0.976 13.757,0.676 13.356,0.375C12.552,-0.125 11.448,-0.125 10.644,0.375C10.243,0.576 9.941,0.976 9.741,1.376L0.201,20.697C0.1,20.997 0,21.397 0,21.798C0,22.198 0.1,22.598 0.402,22.899C0.603,23.199 0.904,23.5 1.205,23.7C1.506,23.9 1.908,24 2.31,24ZM11.375,18.19C11.56,18.066 11.778,18 12,18C12.298,18 12.585,18.118 12.795,18.33C13.007,18.541 13.125,18.827 13.125,19.125C13.125,19.347 13.059,19.565 12.935,19.75C12.812,19.935 12.636,20.079 12.431,20.164C12.225,20.25 11.999,20.272 11.781,20.228C11.562,20.185 11.362,20.078 11.205,19.92C11.047,19.763 10.94,19.563 10.897,19.344C10.853,19.126 10.875,18.9 10.961,18.694C11.046,18.489 11.19,18.313 11.375,18.19ZM12.75,8.25C12.75,7.836 12.414,7.5 12,7.5C11.586,7.5 11.25,7.836 11.25,8.25V15.75C11.25,16.164 11.586,16.5 12,16.5C12.414,16.5 12.75,16.164 12.75,15.75V8.25Z" />
+</vector>

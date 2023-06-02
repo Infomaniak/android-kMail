@@ -153,6 +153,7 @@
     <string name="contentDescriptionOpenMailActions">Acciones de mensajes abiertos</string>
     <string name="contentDescriptionSelectedItem">Selección</string>
     <string name="contentDescriptionUserAvatar">Avatar de usuario</string>
+    <string name="contentDescriptionWarningIcon">Advertencia</string>
     <string name="createFolderName">Nombre de la carpeta</string>
     <string name="createFolderNoParent">Ninguno</string>
     <string name="createFolderParent">Carpeta principal</string>
@@ -188,6 +189,7 @@
     <string name="errorTooManyRecipients">Demasiados destinatarios</string>
     <string name="failToOpenDraft">No se ha podido abrir el borrador</string>
     <string name="favoritesFolder">Favoritos</string>
+    <string name="frelatedMailbox">Contraseña no válida. Por ahora sólo se puede actualizar en el webmail.</string>
     <string name="fromTitle">De:</string>
     <string name="googlePlayServicesAreRequired">Se requieren los servicios de Google Play</string>
     <string name="inboxFolder">Bandeja de entrada</string>
@@ -300,6 +302,8 @@
     <string name="settingsSendAcknowledgement">Solicite un acuse de recibo por cada correo electrónico enviado</string>
     <string name="settingsSendIncludeOriginalMessage">Incluir el mensaje original en la respuesta</string>
     <string name="settingsSendTitle">Enviar</string>
+    <string name="settingsSignatureDescription">Seleccione una firma por defecto</string>
+    <string name="settingsSignatureTitle">Firmas</string>
     <string name="settingsSwipeActionNone">Ninguno</string>
     <string name="settingsSwipeActionQuickActionsMenu">Menú de acciones rápidas</string>
     <string name="settingsSwipeActionReadUnread">Leído / no leído</string>

@@ -154,6 +154,7 @@
     <string name="contentDescriptionOpenMailActions">Ouvrir les actions du message</string>
     <string name="contentDescriptionSelectedItem">Sélectionné</string>
     <string name="contentDescriptionUserAvatar">Avatar de l’utilisateur</string>
+    <string name="contentDescriptionWarningIcon">Attention</string>
     <string name="createFolderName">Nom du dossier</string>
     <string name="createFolderNoParent">Aucun</string>
     <string name="createFolderParent">Dossier parent</string>
@@ -189,6 +190,7 @@
     <string name="errorTooManyRecipients">Trop de destinataires</string>
     <string name="failToOpenDraft">Échec de l’ouverture du brouillon</string>
     <string name="favoritesFolder">Favoris</string>
+    <string name="frelatedMailbox">Mot de passe invalide. Ne peut être mis à jour que sur le webmail pour l’instant.</string>
     <string name="fromTitle">De :</string>
     <string name="googlePlayServicesAreRequired">Les Google Play Services sont requis</string>
     <string name="inboxFolder">Boîte de réception</string>
@@ -303,6 +305,8 @@
     <string name="settingsSendAcknowledgement">Demander un accusé de réception pour chaque message envoyé</string>
     <string name="settingsSendIncludeOriginalMessage">Inclure le message original dans la réponse</string>
     <string name="settingsSendTitle">Envoi</string>
+    <string name="settingsSignatureDescription">Sélectionner une signature par défaut</string>
+    <string name="settingsSignatureTitle">Signatures</string>
     <string name="settingsSwipeActionNone">Aucune</string>
     <string name="settingsSwipeActionQuickActionsMenu">Menu d’actions rapides</string>
     <string name="settingsSwipeActionReadUnread">Lu / non lu</string>

@@ -48,11 +48,13 @@ class MenuDrawerItemView @JvmOverloads constructor(
     private val regular by lazy { ResourcesCompat.getFont(context, RCore.font.suisseintl_regular) }
     private val medium by lazy { ResourcesCompat.getFont(context, RCore.font.suisseintl_medium) }
 
+    private var outdatedPasswordListener: (() -> Unit)? = null
+
     var badge: Int = 0
         set(value) {
             field = value
             binding.itemBadge.apply {
-                isVisible = value > 0
+                isVisible = shouldDisplayBadge()
                 text = formatUnreadCount(value)
             }
         }
@@ -101,6 +103,19 @@ class MenuDrawerItemView @JvmOverloads constructor(
             binding.itemName.typeface = if (fontFamily == TextWeight.MEDIUM) medium else regular
         }
 
+    var isPasswordOutdated = false
+        set(isOutdated) {
+            field = isOutdated
+
+            binding.apply {
+                warning.isVisible = isOutdated
+                checkmark.isVisible = shouldDisplayCheckmark()
+                itemBadge.isVisible = shouldDisplayBadge()
+            }
+        }
+
+    private var isInSelectedState = false
+
     init {
         attrs?.getAttributes(context, R.styleable.MenuDrawerItemView) {
             badge = getInteger(R.styleable.MenuDrawerItemView_badge, badge)
@@ -113,6 +128,7 @@ class MenuDrawerItemView @JvmOverloads constructor(
     }
 
     fun setSelectedState(isSelected: Boolean) = with(binding) {
+        isInSelectedState = isSelected
         val (color, textAppearance) = if (isSelected && itemStyle == SelectionStyle.MENU_DRAWER) {
             context.getAttributeColor(RMaterial.attr.colorPrimaryContainer) to R.style.BodyMedium_Accent
         } else {
@@ -122,11 +138,21 @@ class MenuDrawerItemView @JvmOverloads constructor(
         root.setCardBackgroundColor(color)
         itemName.setTextAppearance(textAppearance)
 
-        checkmark.isVisible = isSelected && itemStyle != SelectionStyle.MENU_DRAWER
+        checkmark.isVisible = shouldDisplayCheckmark()
     }
 
+    private fun shouldDisplayCheckmark() = !isPasswordOutdated && isInSelectedState && itemStyle != SelectionStyle.MENU_DRAWER
+
+    private fun shouldDisplayBadge() = !isPasswordOutdated && badge > 0
+
     override fun setOnClickListener(onClickListener: OnClickListener?) {
-        binding.root.setOnClickListener(onClickListener)
+        binding.root.setOnClickListener {
+            if (isPasswordOutdated) outdatedPasswordListener?.invoke() else onClickListener?.onClick(it)
+        }
+    }
+
+    fun setOnOutdatedPasswordClickListener(callback: () -> Unit) {
+        outdatedPasswordListener = callback
     }
 
     enum class SelectionStyle {
