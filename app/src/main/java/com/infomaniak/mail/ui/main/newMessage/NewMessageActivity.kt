@@ -36,7 +36,6 @@ import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.databinding.ActivityNewMessageBinding
 import com.infomaniak.mail.ui.LaunchActivity
-import com.infomaniak.mail.ui.MainActivityArgs
 import com.infomaniak.mail.ui.ThemedActivity
 import com.infomaniak.mail.utils.*
 import dagger.hilt.android.AndroidEntryPoint
@@ -140,9 +139,6 @@ class NewMessageActivity : ThemedActivity() {
     private fun displayDraftActionToast(action: DraftAction) {
         if (isTaskRoot) {
             showToast(title = if (action == DraftAction.SAVE) R.string.snackbarDraftSaved else R.string.snackbarEmailSending)
-        } else {
-            val resultIntent = Intent().putExtras(MainActivityArgs(action).toBundle())
-            setResult(RESULT_OK, resultIntent)
         }
     }
 
