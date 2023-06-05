@@ -59,6 +59,7 @@ import javax.inject.Inject
 @HiltViewModel
 class NewMessageViewModel @Inject constructor(
     application: Application,
+    private val mergedContactController: MergedContactController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
@@ -90,7 +91,7 @@ class NewMessageViewModel @Inject constructor(
     private var isNewMessage = false
 
     val mergedContacts = liveData(coroutineContext) {
-        val list = MergedContactController.getMergedContacts(sorted = true).copyFromRealm()
+        val list = mergedContactController.getMergedContacts(sorted = true).copyFromRealm()
         emit(list to arrangeMergedContacts(list))
     }
 

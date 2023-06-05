@@ -70,6 +70,7 @@ class MainViewModel @Inject constructor(
     application: Application,
     private val addressBookController: AddressBookController,
     private val draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler,
+    private val mergedContactController: MergedContactController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
@@ -334,12 +335,12 @@ class MainViewModel @Inject constructor(
         ApiRepository.getContacts().data?.let { apiContacts ->
             val phoneMergedContacts = getPhoneContacts(context)
             mergeApiContactsIntoPhoneContacts(apiContacts, phoneMergedContacts)
-            MergedContactController.update(phoneMergedContacts.values.toList())
+            mergedContactController.update(phoneMergedContacts.values.toList())
         }
     }
 
     fun observeMergedContactsLive() = viewModelScope.launch(coroutineContext) {
-        MergedContactController.getMergedContactsAsync().collect { contacts ->
+        mergedContactController.getMergedContactsAsync().collect { contacts ->
             mergedContacts.postValue(arrangeMergedContacts(contacts.list.copyFromRealm()))
         }
     }
