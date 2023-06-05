@@ -138,7 +138,7 @@ class NewMessageActivity : ThemedActivity() {
 
     private fun displayDraftActionToast(action: DraftAction) {
         if (isTaskRoot) {
-            showToast(title = if (action == DraftAction.SAVE) R.string.snackbarDraftSaved else R.string.snackbarEmailSending)
+            showToast(title = if (action == DraftAction.SAVE) R.string.snackbarDraftSaving else R.string.snackbarEmailSending)
         }
     }
 
