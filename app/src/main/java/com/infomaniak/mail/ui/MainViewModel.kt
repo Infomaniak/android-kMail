@@ -68,6 +68,7 @@ import com.infomaniak.lib.core.R as RCore
 @HiltViewModel
 class MainViewModel @Inject constructor(
     application: Application,
+    private val addressBookController: AddressBookController,
     private val draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
@@ -326,7 +327,7 @@ class MainViewModel @Inject constructor(
     }
 
     private fun updateAddressBooks() {
-        ApiRepository.getAddressBooks().data?.addressBooks?.let(AddressBookController::update)
+        ApiRepository.getAddressBooks().data?.addressBooks?.let(addressBookController::update)
     }
 
     private fun updateContacts() {
@@ -836,7 +837,7 @@ class MainViewModel @Inject constructor(
 
     fun addContact(recipient: Recipient) = viewModelScope.launch(ioDispatcher) {
 
-        val isSuccess = ApiRepository.addContact(AddressBookController.getDefaultAddressBook().id, recipient).isSuccess()
+        val isSuccess = ApiRepository.addContact(addressBookController.getDefaultAddressBook().id, recipient).isSuccess()
 
         val snackbarTitle = if (isSuccess) {
             updateUserInfo()
