@@ -20,18 +20,21 @@ package com.infomaniak.mail.data.cache.userInfo
 import android.util.Log
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.correspondent.MergedContact
+import com.infomaniak.mail.di.UserInfoRealm
 import com.infomaniak.mail.utils.update
+import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
-object MergedContactController {
+class MergedContactController @Inject constructor(@UserInfoRealm private val userInfoRealm: Realm) {
 
     //region Queries
     private fun getMergedContactsQuery(sorted: Boolean = false): RealmQuery<MergedContact> {
-        return RealmDatabase.userInfo().query<MergedContact>().apply {
+        return userInfoRealm.query<MergedContact>().apply {
             if (sorted) sort(MergedContact::name.name)
         }
     }
@@ -50,7 +53,7 @@ object MergedContactController {
     //region Edit data
     fun update(mergedContacts: List<MergedContact>) {
         Log.d(RealmDatabase.TAG, "MergedContacts: Save new data")
-        RealmDatabase.userInfo().update<MergedContact>(mergedContacts)
+        userInfoRealm.update<MergedContact>(mergedContacts)
     }
     //endregion
 }
