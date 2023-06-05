@@ -71,6 +71,7 @@ class MainViewModel @Inject constructor(
     private val addressBookController: AddressBookController,
     private val draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler,
     private val mergedContactController: MergedContactController,
+    private val searchUtils: SearchUtils,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
@@ -206,7 +207,7 @@ class MainViewModel @Inject constructor(
         }
 
         // Delete search data in case they couldn't be deleted at the end of the previous Search.
-        SearchUtils.deleteRealmSearchData()
+        searchUtils.deleteRealmSearchData()
     }
 
     private suspend fun loadCurrentMailboxFromRemote() {

@@ -46,6 +46,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     application: Application,
+    private val searchUtils: SearchUtils,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
@@ -140,14 +141,14 @@ class SearchViewModel @Inject constructor(
 
     override fun onCleared() {
         CoroutineScope(coroutineContext).launch {
-            SearchUtils.deleteRealmSearchData()
+            searchUtils.deleteRealmSearchData()
             Log.i(TAG, "SearchViewModel>onCleared: called")
         }
         super.onCleared()
     }
 
     private fun ThreadFilter.select() {
-        _selectedFilters.value = SearchUtils.selectFilter(filter = this, selectedFilters)
+        _selectedFilters.value = searchUtils.selectFilter(filter = this, selectedFilters)
     }
 
     private fun ThreadFilter.unselect() {
@@ -179,7 +180,7 @@ class SearchViewModel @Inject constructor(
 
         val newFilters = if (folder == null) filters else (filters + ThreadFilter.FOLDER)
 
-        if (isLastPage && resourcePrevious.isNullOrBlank()) SearchUtils.deleteRealmSearchData()
+        if (isLastPage && resourcePrevious.isNullOrBlank()) searchUtils.deleteRealmSearchData()
         if (newFilters.isEmpty() && query.isNullOrBlank()) {
             visibilityMode.postValue(VisibilityMode.RECENT_SEARCHES)
             return@flow
@@ -189,7 +190,7 @@ class SearchViewModel @Inject constructor(
 
         val currentMailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
         val folderId = folder?.id ?: dummyFolderId
-        val searchFilters = SearchUtils.searchFilters(query, newFilters)
+        val searchFilters = searchUtils.searchFilters(query, newFilters)
         val apiResponse = ApiRepository.searchThreads(currentMailbox.uuid, folderId, searchFilters, resourceNext)
 
         if (apiResponse.isSuccess()) with(apiResponse) {

@@ -25,7 +25,7 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
-import com.infomaniak.mail.utils.SearchUtils.convertToSearchThreads
+import com.infomaniak.mail.utils.SearchUtils.Companion.convertToSearchThreads
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm

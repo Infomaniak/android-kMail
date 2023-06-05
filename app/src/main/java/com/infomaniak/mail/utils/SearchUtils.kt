@@ -18,20 +18,26 @@
 package com.infomaniak.mail.utils
 
 import android.util.Log
-import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
+import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.di.MailboxContentRealm
+import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.toRealmList
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object SearchUtils {
-
-    val TAG = SearchUtils::class.simpleName
+@Singleton
+class SearchUtils @Inject constructor(
+    @MailboxContentRealm private val mailboxContentRealm: Realm,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+) {
 
     fun searchFilters(query: String?, filters: Set<ThreadFilter>): String {
         val filtersQuery = StringBuilder("severywhere=${if (filters.contains(ThreadFilter.FOLDER)) "0" else "1"}")
@@ -63,23 +69,27 @@ object SearchUtils {
         }
     }
 
-    fun List<Message>.convertToSearchThreads(): List<Thread> {
-        return map { message ->
-            message.toThread().apply {
-                uid = "search-${message.uid}"
-                messages = listOf(message).toRealmList()
-                isFromSearch = true
-                recomputeThread()
-            }
-        }
-    }
-
-    suspend fun deleteRealmSearchData() = withContext(Dispatchers.IO) {
-        RealmDatabase.mailboxContent().writeBlocking {
+    suspend fun deleteRealmSearchData() = withContext(ioDispatcher) {
+        mailboxContentRealm.writeBlocking {
             Log.i(TAG, "SearchUtils>deleteRealmSearchData: remove old search data")
             MessageController.deleteSearchMessages(this)
             ThreadController.deleteSearchThreads(this)
             FolderController.deleteSearchData(this)
+        }
+    }
+
+    companion object {
+        private val TAG = SearchUtils::class.simpleName
+
+        fun List<Message>.convertToSearchThreads(): List<Thread> {
+            return map { message ->
+                message.toThread().apply {
+                    uid = "search-${message.uid}"
+                    messages = listOf(message).toRealmList()
+                    isFromSearch = true
+                    recomputeThread()
+                }
+            }
         }
     }
 }
