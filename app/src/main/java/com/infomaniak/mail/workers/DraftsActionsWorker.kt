@@ -138,13 +138,13 @@ class DraftsActionsWorker @AssistedInject constructor(
         var remoteUuidOfTrackedDraft: String? = null
         var trackedDraftAction: DraftAction? = null
 
-        val isFailure = mailboxContentRealm.writeBlocking {
+        val isSuccess = mailboxContentRealm.writeBlocking {
 
             val drafts = DraftController.getDraftsWithActions(realm = this).ifEmpty { return@writeBlocking false }
 
             Log.d(TAG, "handleDraftsActions: ${drafts.count()} drafts to handle")
 
-            var hasRemoteException = false
+            var notHasRemoteException = true
 
             drafts.reversed().forEach { draft ->
                 val currentDraftLocalUuid = draft.localUuid
@@ -177,11 +177,11 @@ class DraftsActionsWorker @AssistedInject constructor(
                     }
                     exception.printStackTrace()
                     Sentry.captureException(exception)
-                    hasRemoteException = true
+                    notHasRemoteException = false
                 }
             }
 
-            return@writeBlocking hasRemoteException
+            return@writeBlocking notHasRemoteException
         }
 
         if (scheduledDates.isNotEmpty()) updateFolderAfterDelay(scheduledDates)
@@ -201,7 +201,7 @@ class DraftsActionsWorker @AssistedInject constructor(
             RESULT_DRAFT_ACTION_KEY to draftAction?.name,
         )
 
-        return if (draftLocalUuid == null && isFailure) Result.failure(outputData) else Result.success(outputData)
+        return if (isSuccess || draftLocalUuid != null) Result.success(outputData) else Result.failure(outputData)
     }
 
     private fun ApiErrorException.handleApiErrors(draft: Draft, realm: MutableRealm): Int? {
