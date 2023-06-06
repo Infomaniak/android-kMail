@@ -36,6 +36,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.work.Data
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.networking.LiveDataNetworkStatus
+import com.infomaniak.lib.core.utils.Utils.toEnumOrThrow
 import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.lib.stores.checkUpdateIsAvailable
 import com.infomaniak.mail.BuildConfig
@@ -141,10 +142,9 @@ class MainActivity : ThemedActivity() {
         draftsActionsWorkerScheduler.getRunningWorkInfoLiveData().observe(this) {
             it.forEach { workInfo ->
                 workInfo.progress.getString(DraftsActionsWorker.PROGRESS_DRAFT_ACTION_KEY)?.let { draftAction ->
-                    val snackbarTitleResource = when (draftAction) {
-                        DraftAction.SAVE.name -> R.string.snackbarDraftSaving
-                        DraftAction.SEND.name -> R.string.snackbarEmailSending
-                        else -> throw IllegalStateException("Unsupported draft action: $draftAction")
+                    val snackbarTitleResource = when (draftAction.toEnumOrThrow<DraftAction>()) {
+                        DraftAction.SAVE -> R.string.snackbarDraftSaving
+                        DraftAction.SEND -> R.string.snackbarEmailSending
                     }
                     mainViewModel.snackBarManager.setValue(getString(snackbarTitleResource))
                 }
@@ -166,14 +166,14 @@ class MainActivity : ThemedActivity() {
         getIntArray(DraftsActionsWorker.ERROR_MESSAGE_RESID_KEY)?.forEach(::showToast)
 
         getString(DraftsActionsWorker.RESULT_DRAFT_ACTION_KEY)?.let { draftAction ->
-            when (draftAction) {
-                DraftAction.SAVE.name -> {
+            when (draftAction.toEnumOrThrow<DraftAction>()) {
+                DraftAction.SAVE -> {
                     showSavedDraftSnackBar(
                         remoteDraftUuid = getString(DraftsActionsWorker.DRAFT_UUID_KEY)!!,
                         associatedMailboxUuid = getString(DraftsActionsWorker.ASSOCIATED_MAILBOX_UUID_KEY)!!,
                     )
                 }
-                DraftAction.SEND.name -> {
+                DraftAction.SEND -> {
                     showSentDraftSnackBar()
                 }
             }
