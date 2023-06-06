@@ -31,7 +31,9 @@
         android:background="@color/newMessageBackgroundColor"
         app:contentInsetEnd="@dimen/marginStandardSmall"
         app:navigationContentDescription="@string/buttonClose"
-        app:navigationIcon="@drawable/ic_close_big" />
+        app:navigationIcon="@drawable/ic_close_big"
+        app:title="@string/buttonNewMessage"
+        app:titleCentered="true" />
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/compositionNestedScrollView"
