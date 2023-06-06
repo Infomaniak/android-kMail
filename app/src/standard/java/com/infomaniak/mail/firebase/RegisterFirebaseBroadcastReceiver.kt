@@ -37,7 +37,7 @@ class RegisterFirebaseBroadcastReceiver : DefaultLifecycleObserver, IRegisterFir
     private val firebaseBroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (mainViewModel?.currentFolder?.value?.role == Folder.FolderRole.INBOX) {
-                mainViewModel?.forceRefreshThreads()
+                mainViewModel?.forceRefreshThreads(showSwipeRefreshLayout = false)
             }
         }
     }
