@@ -185,63 +185,31 @@ class MainViewModel @Inject constructor(
         updateContacts()
     }
 
-    fun loadCurrentMailbox() = liveData(ioCoroutineContext) {
-        loadCurrentMailboxFromLocal()
-        loadCurrentMailboxFromRemote()
+    fun loadCurrentMailboxFromLocal() = liveData(ioCoroutineContext) {
+        Log.d(TAG, "Load current mailbox from local")
+
+        MailboxController.getMailboxWithFallback(
+            userId = AccountUtils.currentUserId,
+            mailboxId = AccountUtils.currentMailboxId,
+        )?.let { mailbox ->
+            selectMailbox(mailbox)
+
+            if (currentFolderId == null) {
+                FolderController.getFolder(DEFAULT_SELECTED_FOLDER)?.let { folder ->
+                    selectFolder(folder.id)
+                }
+            }
+        }
+
         emit(null)
     }
 
-    private suspend fun loadCurrentMailboxFromLocal() {
-        Log.d(TAG, "Load current mailbox from local")
-        val userId = AccountUtils.currentUserId
-        val mailboxId = AccountUtils.currentMailboxId
-        val mailbox = MailboxController.getMailboxWithFallback(userId, mailboxId) ?: return
-        selectMailbox(mailbox)
-
-        if (currentFolderId == null) {
-            val folder = FolderController.getFolder(DEFAULT_SELECTED_FOLDER) ?: return
-            selectFolder(folder.id)
-        }
-
-        // Delete search data in case they couldn't be deleted at the end of the previous Search.
-        SearchUtils.deleteRealmSearchData()
-    }
-
-    private suspend fun loadCurrentMailboxFromRemote() {
-        Log.d(TAG, "Load current mailbox from remote")
-        with(ApiRepository.getMailboxes()) {
-            if (isSuccess()) {
-                val isCurrentMailboxDeleted = MailboxController.updateMailboxes(context, data!!)
-                if (isCurrentMailboxDeleted) return
-                MailboxController.getMailboxWithFallback(
-                    userId = AccountUtils.currentUserId,
-                    mailboxId = AccountUtils.currentMailboxId,
-                )?.let(::openMailbox)
-            }
-        }
-    }
-
-    private fun openMailbox(mailbox: Mailbox) {
-        selectMailbox(mailbox)
-        updateFolders(mailbox)
-
-        (currentFolderId?.let(FolderController::getFolder)
-            ?: FolderController.getFolder(DEFAULT_SELECTED_FOLDER))?.let { folder ->
-            selectFolder(folder.id)
-            viewModelScope.launch(ioCoroutineContext) {
-                refreshThreads(mailbox, folder.id)
-            }
-        }
-
-        draftsActionsWorkerScheduler.scheduleWork()
-    }
-
-    fun forceRefreshMailboxesAndFolders() {
+    fun refreshMailboxesFromRemote() {
 
         refreshMailboxesAndFoldersJob?.cancel()
         refreshMailboxesAndFoldersJob = viewModelScope.launch(ioCoroutineContext) {
 
-            Log.d(TAG, "Force refresh mailboxes")
+            Log.d(TAG, "Refresh mailboxes from remote")
             with(ApiRepository.getMailboxes()) {
                 if (isSuccess()) {
                     val isCurrentMailboxDeleted = MailboxController.updateMailboxes(context, data!!)
@@ -255,6 +223,19 @@ class MainViewModel @Inject constructor(
             updateQuotas(mailbox)
             updatePermissions(mailbox)
             updateFolders(mailbox)
+
+            (currentFolderId?.let(FolderController::getFolder) ?: FolderController.getFolder(DEFAULT_SELECTED_FOLDER))
+                ?.let { folder ->
+                    selectFolder(folder.id)
+                    viewModelScope.launch(ioCoroutineContext) {
+                        refreshThreads(mailbox, folder.id)
+                    }
+                }
+
+            // Delete Search data in case they couldn't be deleted at the end of the previous Search.
+            SearchUtils.deleteRealmSearchData()
+
+            draftsActionsWorkerScheduler.scheduleWork()
         }
     }
 
