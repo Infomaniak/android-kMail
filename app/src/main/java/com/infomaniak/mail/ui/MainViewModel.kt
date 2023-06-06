@@ -307,9 +307,9 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun forceRefreshThreads() = viewModelScope.launch(ioDispatcher) {
+    fun forceRefreshThreads(showSwipeRefreshLayout: Boolean = true) = viewModelScope.launch(ioDispatcher) {
         Log.d(TAG, "Force refresh threads")
-        refreshThreads()
+        refreshThreads(showSwipeRefreshLayout = showSwipeRefreshLayout)
     }
 
     fun getOnePageOfOldMessages() = viewModelScope.launch(ioDispatcher) {
@@ -391,19 +391,27 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private suspend fun refreshThreads(mailbox: Mailbox? = currentMailbox.value, folderId: String? = currentFolderId) {
-
+    private suspend fun refreshThreads(
+        mailbox: Mailbox? = currentMailbox.value,
+        folderId: String? = currentFolderId,
+        showSwipeRefreshLayout: Boolean = true,
+    ) {
         if (mailbox == null || folderId == null) return
+        val folder = FolderController.getFolder(folderId) ?: return
 
-        FolderController.getFolder(folderId)?.let { folder ->
-            RefreshController.refreshThreads(
-                refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
-                mailbox = mailbox,
-                folder = folder,
-                started = ::startedDownload,
-                stopped = ::stoppedDownload,
-            )
+        val (started, stopped) = if (showSwipeRefreshLayout) {
+            ::startedDownload to ::stoppedDownload
+        } else {
+            null to null
         }
+
+        RefreshController.refreshThreads(
+            refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
+            mailbox = mailbox,
+            folder = folder,
+            started = started,
+            stopped = stopped,
+        )
     }
 
     //region Delete
