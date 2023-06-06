@@ -92,7 +92,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private lateinit var threadListAdapter: ThreadListAdapter
     private var lastUpdatedDate: Date? = null
-    private var previousFirstThreadUid: String? = null
 
     @Inject
     lateinit var draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler
@@ -411,8 +410,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             }
             waitingBeforeNotifyAdapter = isRecoveringFinished
             afterUpdateAdapter = { threads ->
-                if (firstThreadHasChanged(threads)) scrollToTop()
-
                 if (mainViewModel.currentFilter.value == ThreadFilter.UNSEEN && threads.isEmpty()) {
                     mainViewModel.currentFilter.value = ThreadFilter.ALL
                 }
@@ -456,6 +453,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 updateFolderRole(folder.role)
                 updateLoadMore(shouldDisplayLoadMore = false)
             }
+
+            scrollToTop()
         }
     }
 
@@ -551,13 +550,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             title = getString(emptyState.titleId)
             description = getString(emptyState.descriptionId)
             isVisible = true
-        }
-    }
-
-    private fun firstThreadHasChanged(threads: List<Thread>): Boolean {
-        val firstThreadCustomUid = "${threads.firstOrNull()?.uid}_${AccountUtils.currentMailboxId}"
-        return (firstThreadCustomUid != previousFirstThreadUid).also {
-            previousFirstThreadUid = firstThreadCustomUid
         }
     }
 
