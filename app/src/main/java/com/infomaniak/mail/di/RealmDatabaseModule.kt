@@ -31,7 +31,7 @@ object RealmDatabaseModule {
     @Provides
     @Singleton
     @AppSettingsRealm
-    fun providesAppSettingsRealm() = RealmDatabase.appSettings()
+    fun providesAppSettingsRealm() = RealmDatabase.appSettings() // TODO: Waiting for AccountUtils injection
 
     @Provides
     @UserInfoRealm
@@ -40,7 +40,7 @@ object RealmDatabaseModule {
     @Provides
     @Singleton
     @MailboxInfoRealm
-    fun providesMailboxInfoRealm() = RealmDatabase.mailboxInfo()
+    fun providesMailboxInfoRealm() = RealmDatabase.mailboxInfo() // TODO: Waiting for AccountUtils injection
 
     @Provides
     @MailboxContentRealm
