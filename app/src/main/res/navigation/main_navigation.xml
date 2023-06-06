@@ -448,11 +448,7 @@
         android:id="@+id/mainActivity"
         android:name="com.infomaniak.mail.ui.MainActivity"
         android:label="MainActivity"
-        tools:layout="@layout/activity_main">
-        <argument
-            android:name="draftAction"
-            app:argType="com.infomaniak.mail.data.models.draft.Draft$DraftAction" />
-    </activity>
+        tools:layout="@layout/activity_main" />
 
     <activity
         android:id="@+id/loginActivity"
