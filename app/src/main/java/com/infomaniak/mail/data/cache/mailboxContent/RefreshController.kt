@@ -60,16 +60,16 @@ object RefreshController {
         stopped: (() -> Unit)? = null,
     ): List<Thread>? {
 
-        suspend fun refreshWithRunCatching() = withContext(Dispatchers.IO + refreshThreadsJob!!) {
-            return@withContext runCatching {
+        suspend fun refreshWithRunCatching() = runCatching {
+            return@runCatching withContext(Dispatchers.IO + refreshThreadsJob!!) {
                 started?.invoke()
-                return@runCatching realm.handleRefreshMode(refreshMode, scope = this, mailbox, folder, okHttpClient).toList()
-            }.getOrElse {
-                // It failed, but not because we cancelled it. Something bad happened, so we call the `stopped` callback.
-                if (it !is CancellationException) stopped?.invoke()
-                if (it is ApiErrorException) it.handleApiErrors()
-                return@getOrElse null
+                return@withContext realm.handleRefreshMode(refreshMode, scope = this, mailbox, folder, okHttpClient).toList()
             }
+        }.getOrElse {
+            // It failed, but not because we cancelled it. Something bad happened, so we call the `stopped` callback.
+            if (it !is CancellationException) stopped?.invoke()
+            if (it is ApiErrorException) it.handleApiErrors()
+            return@getOrElse null
         }
 
         refreshThreadsJob?.cancel()
