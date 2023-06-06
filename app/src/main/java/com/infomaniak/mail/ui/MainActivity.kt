@@ -49,10 +49,7 @@ import com.infomaniak.mail.data.models.draft.Draft.*
 import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.firebase.RegisterFirebaseBroadcastReceiver
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
-import com.infomaniak.mail.utils.PermissionUtils
-import com.infomaniak.mail.utils.SentryDebug
-import com.infomaniak.mail.utils.UiUtils
-import com.infomaniak.mail.utils.updateNavigationBarColor
+import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Breadcrumb
@@ -138,25 +135,26 @@ class MainActivity : ThemedActivity() {
     }
 
     private fun observeDraftWorkerResults() {
-
-        draftsActionsWorkerScheduler.getRunningWorkInfoLiveData().observe(this) {
-            it.forEach { workInfo ->
-                workInfo.progress.getString(DraftsActionsWorker.PROGRESS_DRAFT_ACTION_KEY)?.let { draftAction ->
-                    val snackbarTitleResource = when (draftAction.toEnumOrThrow<DraftAction>()) {
-                        DraftAction.SAVE -> R.string.snackbarDraftSaving
-                        DraftAction.SEND -> R.string.snackbarEmailSending
+        WorkerUtils.flushWorkersBefore(this, this) {
+            draftsActionsWorkerScheduler.getRunningWorkInfoLiveData().observe(this) {
+                it.forEach { workInfo ->
+                    workInfo.progress.getString(DraftsActionsWorker.PROGRESS_DRAFT_ACTION_KEY)?.let { draftAction ->
+                        val snackbarTitleResource = when (draftAction.toEnumOrThrow<DraftAction>()) {
+                            DraftAction.SAVE -> R.string.snackbarDraftSaving
+                            DraftAction.SEND -> R.string.snackbarEmailSending
+                        }
+                        mainViewModel.snackBarManager.setValue(getString(snackbarTitleResource))
                     }
-                    mainViewModel.snackBarManager.setValue(getString(snackbarTitleResource))
                 }
             }
-        }
 
-        val treatedWorkInfoUuids = mutableSetOf<UUID>()
+            val treatedWorkInfoUuids = mutableSetOf<UUID>()
 
-        draftsActionsWorkerScheduler.getCompletedWorkInfoLiveData().observe(this) {
-            for (workInfo in it) {
-                if (!treatedWorkInfoUuids.add(workInfo.id)) continue
-                workInfo.outputData.displayCompletedDraftWorkerResults()
+            draftsActionsWorkerScheduler.getCompletedWorkInfoLiveData().observe(this) {
+                for (workInfo in it) {
+                    if (!treatedWorkInfoUuids.add(workInfo.id)) continue
+                    workInfo.outputData.displayCompletedDraftWorkerResults()
+                }
             }
         }
     }
