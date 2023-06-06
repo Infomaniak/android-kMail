@@ -33,6 +33,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
+import androidx.work.Data
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.networking.LiveDataNetworkStatus
 import com.infomaniak.lib.core.utils.showToast
@@ -136,7 +137,6 @@ class MainActivity : ThemedActivity() {
     }
 
     private fun observeDraftWorkerResults() {
-        val treatedWorkInfoUuids = mutableSetOf<UUID>()
 
         draftsActionsWorkerScheduler.getRunningWorkInfoLiveData().observe(this) {
             it.forEach { workInfo ->
@@ -151,23 +151,30 @@ class MainActivity : ThemedActivity() {
             }
         }
 
+        val treatedWorkInfoUuids = mutableSetOf<UUID>()
+
         draftsActionsWorkerScheduler.getCompletedWorkInfoLiveData().observe(this) {
             for (workInfo in it) {
                 if (!treatedWorkInfoUuids.add(workInfo.id)) continue
+                workInfo.outputData.displayCompletedDraftWorkerResults()
+            }
+        }
+    }
 
-                workInfo.outputData
-                    .getIntArray(DraftsActionsWorker.ERROR_MESSAGE_RESID_KEY)
-                    ?.forEach(::showToast)
+    private fun Data.displayCompletedDraftWorkerResults() {
 
-                val remoteDraftUuid = workInfo.outputData.getString(DraftsActionsWorker.DRAFT_UUID_KEY)
-                val associatedMailboxUuid = workInfo.outputData.getString(DraftsActionsWorker.ASSOCIATED_MAILBOX_UUID_KEY)
-                val draftAction = workInfo.outputData.getString(DraftsActionsWorker.RESULT_DRAFT_ACTION_KEY)
-                draftAction?.let {
-                    if (draftAction == DraftAction.SAVE.name) {
-                        showSavedDraftSnackBar(remoteDraftUuid!!, associatedMailboxUuid!!)
-                    } else {
-                        showSentDraftSnackBar()
-                    }
+        getIntArray(DraftsActionsWorker.ERROR_MESSAGE_RESID_KEY)?.forEach(::showToast)
+
+        getString(DraftsActionsWorker.RESULT_DRAFT_ACTION_KEY)?.let { draftAction ->
+            when (draftAction) {
+                DraftAction.SAVE.name -> {
+                    showSavedDraftSnackBar(
+                        remoteDraftUuid = getString(DraftsActionsWorker.DRAFT_UUID_KEY)!!,
+                        associatedMailboxUuid = getString(DraftsActionsWorker.ASSOCIATED_MAILBOX_UUID_KEY)!!,
+                    )
+                }
+                DraftAction.SEND.name -> {
+                    showSentDraftSnackBar()
                 }
             }
         }
