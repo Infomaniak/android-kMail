@@ -384,18 +384,12 @@ class DraftsActionsWorker @AssistedInject constructor(
         }
 
         fun getRunningWorkInfoLiveData(): LiveData<MutableList<WorkInfo>> {
-            return getWorkInfoLiveData(listOf(WorkInfo.State.RUNNING))
+            return WorkerUtils.getWorkInfoLiveData(TAG, workManager, listOf(WorkInfo.State.RUNNING))
         }
 
         fun getCompletedWorkInfoLiveData(): LiveData<MutableList<WorkInfo>> {
-            return getWorkInfoLiveData(listOf(WorkInfo.State.SUCCEEDED))
+            return WorkerUtils.getWorkInfoLiveData(TAG, workManager, listOf(WorkInfo.State.SUCCEEDED))
         }
-
-        private fun getWorkInfoLiveData(states: List<WorkInfo.State>): LiveData<MutableList<WorkInfo>> {
-            val workQuery = WorkQuery.Builder.fromTags(listOf(TAG)).addStates(states).build()
-            return workManager.getWorkInfosLiveData(workQuery)
-        }
-
     }
 
     companion object {
