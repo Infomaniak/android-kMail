@@ -399,7 +399,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         private const val DRAFT_LOCAL_UUID_KEY = "draftLocalUuidKey"
         const val PROGRESS_DRAFT_ACTION_KEY = "progressDraftActionKey"
         const val ERROR_MESSAGE_RESID_KEY = "errorMessageResIdKey"
-        const val DRAFT_UUID_KEY = "draftUidKey"
+        const val DRAFT_UUID_KEY = "draftUuidKey"
         const val ASSOCIATED_MAILBOX_UUID_KEY = "associatedMailboxUuidKey"
         const val RESULT_DRAFT_ACTION_KEY = "resultDraftActionKey"
         // We add this delay because for now, it doesn't always work if we just use the `etop`.
