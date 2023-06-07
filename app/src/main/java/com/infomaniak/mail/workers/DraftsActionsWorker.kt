@@ -61,6 +61,7 @@ import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.SerializationException
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -341,7 +342,7 @@ class DraftsActionsWorker @AssistedInject constructor(
                 }
             }
             DraftAction.SEND -> with(ApiRepository.sendDraft(mailboxUuid, draft, okHttpClient)) {
-                if (isSuccess()) {
+                if (isSuccess() || error?.exception is SerializationException) {
                     scheduledDate = data?.scheduledDate
                     realm.delete(draft)
                 } else {
