@@ -26,6 +26,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.ColorUtils
 import androidx.fragment.app.Fragment
@@ -86,7 +87,7 @@ class ThreadFragment : Fragment() {
     private var isFavorite = false
 
     // When opening the Thread, we want to scroll to the last Message, but only once.
-    private var shouldScrollToBottom = AtomicBoolean(true)
+    private var isFirstVisit = AtomicBoolean(true)
 
     // TODO: Remove this when Realm doesn't broadcast twice when deleting a Thread anymore.
     private var isFirstTimeLeaving = AtomicBoolean(true)
@@ -336,12 +337,28 @@ class ThreadFragment : Fragment() {
             .apply {
                 beforeUpdateAdapter = ::onMessagesUpdate
                 afterUpdateAdapter = {
-                    if (shouldScrollToBottom.compareAndSet(true, false)) {
-                        val indexToScroll = threadAdapter.messages.indexOfFirst { threadAdapter.isExpandedMap[it.uid] == true }
-                        binding.messagesList.scrollToPosition(indexToScroll)
-                    }
+                    val shouldScrollToFirstUnseenMessage = isFirstVisit.compareAndSet(true, false) && it.count() > 1
+
+                    if (shouldScrollToFirstUnseenMessage) onRecyclerViewLaidOut(::scrollToFirstUnseenMessage)
                 }
             }
+    }
+
+    private fun onRecyclerViewLaidOut(callback: () -> Unit) = with(binding) {
+        messagesList.viewTreeObserver.addOnGlobalLayoutListener(
+            object : ViewTreeObserver.OnGlobalLayoutListener {
+                override fun onGlobalLayout() {
+                    callback()
+                    messagesList.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                }
+            }
+        )
+    }
+
+    private fun scrollToFirstUnseenMessage() = with(binding) {
+        val indexToScroll = threadAdapter.messages.indexOfFirst { threadAdapter.isExpandedMap[it.uid] == true }
+        val targetChild = messagesList.getChildAt(indexToScroll)
+        messagesListNestedScrollView.scrollY = targetChild.top
     }
 
     private fun observeContacts() {
