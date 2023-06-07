@@ -313,6 +313,8 @@ class NewMessageFragment : Fragment() {
         ccField.initRecipients(draft.cc)
         bccField.initRecipients(draft.bcc)
 
+        newMessageViewModel.updateIsSendingAllowed()
+
         subjectTextField.setText(draft.subject)
 
         attachmentAdapter.addAll(draft.attachments.filterNot { it.disposition == INLINE })
