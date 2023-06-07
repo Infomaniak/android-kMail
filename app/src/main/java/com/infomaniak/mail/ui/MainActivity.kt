@@ -33,8 +33,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
+import androidx.work.Data
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.networking.LiveDataNetworkStatus
+import com.infomaniak.lib.core.utils.Utils.toEnumOrThrow
 import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.lib.stores.checkUpdateIsAvailable
 import com.infomaniak.mail.BuildConfig
@@ -47,10 +49,7 @@ import com.infomaniak.mail.data.models.draft.Draft.*
 import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.firebase.RegisterFirebaseBroadcastReceiver
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
-import com.infomaniak.mail.utils.PermissionUtils
-import com.infomaniak.mail.utils.SentryDebug
-import com.infomaniak.mail.utils.UiUtils
-import com.infomaniak.mail.utils.updateNavigationBarColor
+import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Breadcrumb
@@ -136,27 +135,45 @@ class MainActivity : ThemedActivity() {
     }
 
     private fun observeDraftWorkerResults() {
-        val treatedWorkInfoUuids = mutableSetOf<UUID>()
+        WorkerUtils.flushWorkersBefore(this, this) {
+            draftsActionsWorkerScheduler.getRunningWorkInfoLiveData().observe(this) {
+                it.forEach { workInfo ->
+                    workInfo.progress.getString(DraftsActionsWorker.PROGRESS_DRAFT_ACTION_KEY)?.let { draftAction ->
+                        val snackbarTitleResource = when (draftAction.toEnumOrThrow<DraftAction>()) {
+                            DraftAction.SAVE -> R.string.snackbarDraftSaving
+                            DraftAction.SEND -> R.string.snackbarEmailSending
+                        }
+                        mainViewModel.snackBarManager.setValue(getString(snackbarTitleResource))
+                    }
+                }
+            }
 
-        draftsActionsWorkerScheduler.getRunningWorkInfoLiveData().observe(this) {
-            it.forEach { workInfo ->
-                if (workInfo.progress.getString(DraftsActionsWorker.DRAFT_ACTION_KEY) == DraftAction.SAVE.name) {
-                    mainViewModel.snackBarManager.setValue(getString(R.string.snackbarDraftSaving))
+            val treatedWorkInfoUuids = mutableSetOf<UUID>()
+
+            draftsActionsWorkerScheduler.getCompletedWorkInfoLiveData().observe(this) {
+                for (workInfo in it) {
+                    if (!treatedWorkInfoUuids.add(workInfo.id)) continue
+                    workInfo.outputData.displayCompletedDraftWorkerResults()
                 }
             }
         }
+    }
 
-        draftsActionsWorkerScheduler.getCompletedWorkInfoLiveData().observe(this) {
-            for (workInfo in it) {
-                if (!treatedWorkInfoUuids.add(workInfo.id)) continue
+    private fun Data.displayCompletedDraftWorkerResults() {
 
-                workInfo.outputData
-                    .getIntArray(DraftsActionsWorker.ERROR_MESSAGE_RESID_KEY)
-                    ?.forEach(::showToast)
+        getIntArray(DraftsActionsWorker.ERROR_MESSAGE_RESID_KEY)?.forEach(::showToast)
 
-                val remoteDraftUuid = workInfo.outputData.getString(DraftsActionsWorker.SAVED_DRAFT_UUID_KEY)
-                val associatedMailboxUuid = workInfo.outputData.getString(DraftsActionsWorker.ASSOCIATED_MAILBOX_UUID_KEY)
-                remoteDraftUuid?.let { draftUuid -> showSavedDraftSnackBar(draftUuid, associatedMailboxUuid!!) }
+        getString(DraftsActionsWorker.RESULT_DRAFT_ACTION_KEY)?.let { draftAction ->
+            when (draftAction.toEnumOrThrow<DraftAction>()) {
+                DraftAction.SAVE -> {
+                    showSavedDraftSnackBar(
+                        remoteDraftUuid = getString(DraftsActionsWorker.DRAFT_UUID_KEY)!!,
+                        associatedMailboxUuid = getString(DraftsActionsWorker.ASSOCIATED_MAILBOX_UUID_KEY)!!,
+                    )
+                }
+                DraftAction.SEND -> {
+                    showSentDraftSnackBar()
+                }
             }
         }
     }
@@ -171,6 +188,10 @@ class MainActivity : ThemedActivity() {
                 mainViewModel.deleteDraft(associatedMailboxUuid, remoteDraftUuid)
             },
         )
+    }
+
+    private fun showSentDraftSnackBar() {
+        mainViewModel.snackBarManager.setValue(getString(R.string.snackbarEmailSent))
     }
 
     private fun loadCurrentMailbox() {
