@@ -19,6 +19,7 @@ package com.infomaniak.mail.data.api
 
 import com.infomaniak.mail.BuildConfig.INFOMANIAK_API_V1
 import com.infomaniak.mail.BuildConfig.MAIL_API
+import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.PaginationInfo
 import com.infomaniak.mail.utils.Utils
 
 object ApiRoutes {
@@ -95,11 +96,12 @@ object ApiRoutes {
         return "${message(mailboxUuid, folderId, shortUid)}/blacklist"
     }
 
-    fun getMessagesUids(mailboxUuid: String, folderId: String, offsetUid: Int?): String {
+    fun getMessagesUids(mailboxUuid: String, folderId: String, info: PaginationInfo?): String {
         val endpoint = "${getMessages(mailboxUuid, folderId)}/messages-uids"
         val messages = "?messages=${Utils.PAGE_SIZE}"
-        val offset = offsetUid?.let { "&uid_offset=$it" } ?: ""
-        return "${endpoint}${messages}${offset}"
+        val offset = info?.offsetUid?.let { "&uid_offset=$it" } ?: ""
+        val direction = info?.direction?.let { "&direction=$it" } ?: ""
+        return "${endpoint}${messages}${offset}${direction}"
     }
 
     fun getMessagesUidsDelta(mailboxUuid: String, folderId: String, cursor: String): String {

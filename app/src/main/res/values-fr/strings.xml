@@ -154,6 +154,7 @@
     <string name="contentDescriptionOpenMailActions">Ouvrir les actions du message</string>
     <string name="contentDescriptionSelectedItem">Sélectionné</string>
     <string name="contentDescriptionUserAvatar">Avatar de l’utilisateur</string>
+    <string name="contentDescriptionWarningIcon">Attention</string>
     <string name="createFolderName">Nom du dossier</string>
     <string name="createFolderNoParent">Aucun</string>
     <string name="createFolderParent">Dossier parent</string>
@@ -176,6 +177,7 @@
     <string name="errorAtLeastOneRecipient">Il faut au minimum un destinataire</string>
     <string name="errorAttachAddressInput">Seules les adresses mails Infomaniak sont supportées</string>
     <string name="errorCorruptAttachment">Échec du traitement du brouillon, une pièce jointe est corrompue</string>
+    <string name="errorDraftNotFound">Brouillon introuvable</string>
     <string name="errorEditScheduledMessage">Impossible de modifier un message planifié ou envoyé</string>
     <string name="errorInvalidCredentials">E-mail ou mot de passe invalide</string>
     <string name="errorLoginDescription">La connexion a échoué.</string>
@@ -188,6 +190,7 @@
     <string name="errorTooManyRecipients">Trop de destinataires</string>
     <string name="failToOpenDraft">Échec de l’ouverture du brouillon</string>
     <string name="favoritesFolder">Favoris</string>
+    <string name="frelatedMailbox">Mot de passe invalide. Ne peut être mis à jour que sur le webmail pour l’instant.</string>
     <string name="fromTitle">De :</string>
     <string name="googlePlayServicesAreRequired">Les Google Play Services sont requis</string>
     <string name="inboxFolder">Boîte de réception</string>
@@ -302,6 +305,8 @@
     <string name="settingsSendAcknowledgement">Demander un accusé de réception pour chaque message envoyé</string>
     <string name="settingsSendIncludeOriginalMessage">Inclure le message original dans la réponse</string>
     <string name="settingsSendTitle">Envoi</string>
+    <string name="settingsSignatureDescription">Sélectionner une signature par défaut</string>
+    <string name="settingsSignatureTitle">Signatures</string>
     <string name="settingsSwipeActionNone">Aucune</string>
     <string name="settingsSwipeActionQuickActionsMenu">Menu d’actions rapides</string>
     <string name="settingsSwipeActionReadUnread">Lu / non lu</string>
@@ -323,6 +328,7 @@
     <string name="snackbarDisplayProblemReported">Problème d’affichage signalé</string>
     <string name="snackbarDraftDeleted">Brouillon supprimé</string>
     <string name="snackbarDraftSaved">Brouillon enregistré</string>
+    <string name="snackbarDraftSaving">Enregistrement du brouillon</string>
     <string name="snackbarEmailCopiedToClipboard">Adresse mail copiée dans le presse-papiers</string>
     <string name="snackbarEmailSending">E-mail en cours d’envoi</string>
     <string name="snackbarEmailSent">E-mail envoyé</string>

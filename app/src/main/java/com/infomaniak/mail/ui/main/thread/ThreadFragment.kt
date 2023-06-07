@@ -88,6 +88,9 @@ class ThreadFragment : Fragment() {
     // When opening the Thread, we want to scroll to the last Message, but only once.
     private var shouldScrollToBottom = AtomicBoolean(true)
 
+    // TODO: Remove this when Realm doesn't broadcast twice when deleting a Thread anymore.
+    private var isFirstTimeLeaving = AtomicBoolean(true)
+
     override fun onConfigurationChanged(newConfig: Configuration) {
         threadAdapter.rerenderMails()
         super.onConfigurationChanged(newConfig)
@@ -386,7 +389,12 @@ class ThreadFragment : Fragment() {
     }
 
     private fun leaveThread() {
-        findNavController().popBackStack()
+        // TODO: Realm broadcasts twice when the Thread is deleted.
+        //  We don't know why.
+        //  While it's not fixed, we do this quickfix of checking if we already left:
+        if (isFirstTimeLeaving.compareAndSet(true, false)) {
+            findNavController().popBackStack()
+        }
     }
 
     enum class HeaderState {

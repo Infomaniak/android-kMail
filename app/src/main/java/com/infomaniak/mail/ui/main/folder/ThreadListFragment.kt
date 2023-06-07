@@ -38,8 +38,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import androidx.work.Operation.State
-import androidx.work.WorkManager
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.VERTICAL_LIST_WITH_VERTICAL_DRAGGING
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnItemSwipeListener
@@ -92,7 +90,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private lateinit var threadListAdapter: ThreadListAdapter
     private var lastUpdatedDate: Date? = null
-    private var previousFirstThreadUid: String? = null
 
     @Inject
     lateinit var draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler
@@ -411,8 +408,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             }
             waitingBeforeNotifyAdapter = isRecoveringFinished
             afterUpdateAdapter = { threads ->
-                if (firstThreadHasChanged(threads)) scrollToTop()
-
                 if (mainViewModel.currentFilter.value == ThreadFilter.UNSEEN && threads.isEmpty()) {
                     mainViewModel.currentFilter.value = ThreadFilter.ALL
                 }
@@ -456,6 +451,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 updateFolderRole(folder.role)
                 updateLoadMore(shouldDisplayLoadMore = false)
             }
+
+            scrollToTop()
         }
     }
 
@@ -482,22 +479,13 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun observerDraftsActionsCompletedWorks() {
         fun observeDraftsActions() {
             draftsActionsWorkerScheduler.getCompletedWorkInfoLiveData().observe(viewLifecycleOwner) {
-
-                it.forEach { workInfo ->
-                    workInfo.outputData
-                        .getIntArray(DraftsActionsWorker.ERROR_MESSAGE_RESID_KEY)
-                        ?.forEach(requireContext()::showToast)
-                }
-
                 mainViewModel.currentFolder.value?.let { folder ->
                     if (folder.isValid() && folder.role == FolderRole.DRAFT) mainViewModel.forceRefreshThreads()
                 }
             }
         }
 
-        WorkManager.getInstance(requireContext()).pruneWork().state.observe(viewLifecycleOwner) {
-            if (it is State.FAILURE || it is State.SUCCESS) observeDraftsActions()
-        }
+        WorkerUtils.flushWorkersBefore(requireContext(), viewLifecycleOwner, ::observeDraftsActions)
     }
 
     private fun checkLastUpdateDay() {
@@ -558,13 +546,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             title = getString(emptyState.titleId)
             description = getString(emptyState.descriptionId)
             isVisible = true
-        }
-    }
-
-    private fun firstThreadHasChanged(threads: List<Thread>): Boolean {
-        val firstThreadCustomUid = "${threads.firstOrNull()?.uid}_${AccountUtils.currentMailboxId}"
-        return (firstThreadCustomUid != previousFirstThreadUid).also {
-            previousFirstThreadUid = firstThreadCustomUid
         }
     }
 

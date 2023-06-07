@@ -310,9 +310,9 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun forceRefreshThreads() = viewModelScope.launch(ioDispatcher) {
+    fun forceRefreshThreads(showSwipeRefreshLayout: Boolean = true) = viewModelScope.launch(ioDispatcher) {
         Log.d(TAG, "Force refresh threads")
-        refreshThreads()
+        refreshThreads(showSwipeRefreshLayout = showSwipeRefreshLayout)
     }
 
     fun getOnePageOfOldMessages() = viewModelScope.launch(ioDispatcher) {
@@ -394,19 +394,27 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private suspend fun refreshThreads(mailbox: Mailbox? = currentMailbox.value, folderId: String? = currentFolderId) {
-
+    private suspend fun refreshThreads(
+        mailbox: Mailbox? = currentMailbox.value,
+        folderId: String? = currentFolderId,
+        showSwipeRefreshLayout: Boolean = true,
+    ) {
         if (mailbox == null || folderId == null) return
+        val folder = FolderController.getFolder(folderId) ?: return
 
-        FolderController.getFolder(folderId)?.let { folder ->
-            RefreshController.refreshThreads(
-                refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
-                mailbox = mailbox,
-                folder = folder,
-                started = ::startedDownload,
-                stopped = ::stoppedDownload,
-            )
+        val (started, stopped) = if (showSwipeRefreshLayout) {
+            ::startedDownload to ::stoppedDownload
+        } else {
+            null to null
         }
+
+        RefreshController.refreshThreads(
+            refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
+            mailbox = mailbox,
+            folder = folder,
+            started = started,
+            stopped = stopped,
+        )
     }
 
     //region Delete
@@ -500,6 +508,23 @@ class MainViewModel @Inject constructor(
     private fun getMessagesToDelete(threads: List<Thread>, message: Message?) = when (message) {
         null -> threads.flatMap(MessageController::getUnscheduledMessages)
         else -> MessageController.getMessageAndDuplicates(threads.first(), message)
+    }
+
+    fun deleteDraft(targetMailboxUuid: String, remoteDraftUuid: String) = viewModelScope.launch(viewModelScope.handlerIO) {
+        val mailbox = currentMailbox.value!!
+        val apiResponse = ApiRepository.deleteDraft(targetMailboxUuid, remoteDraftUuid)
+
+        if (apiResponse.isSuccess() && mailbox.uuid == targetMailboxUuid) {
+            val draftFolderId = FolderController.getFolder(FolderRole.DRAFT)!!.id
+            refreshFolders(mailbox, listOf(draftFolderId))
+        }
+
+        showDraftDeletedSnackBar(apiResponse)
+    }
+
+    private fun showDraftDeletedSnackBar(apiResponse: ApiResponse<Unit>) {
+        val titleRes = if (apiResponse.isSuccess()) R.string.snackbarDraftDeleted else apiResponse.translateError()
+        snackBarManager.postValue(context.getString(titleRes))
     }
     //endregion
 

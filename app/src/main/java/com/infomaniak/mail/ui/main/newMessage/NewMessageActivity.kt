@@ -89,7 +89,7 @@ class NewMessageActivity : ThemedActivity() {
     }
 
     private fun setupSnackBar() {
-        newMessageViewModel.snackBarManager.setup(this)
+        newMessageViewModel.snackBarManager.setup(view = binding.root, activity = this)
     }
 
     private fun setupSendButton() = with(binding) {
@@ -137,7 +137,9 @@ class NewMessageActivity : ThemedActivity() {
     }
 
     private fun displayDraftActionToast(action: DraftAction) {
-        showToast(title = if (action == DraftAction.SAVE) R.string.snackbarDraftSaved else R.string.snackbarEmailSending)
+        if (isTaskRoot) {
+            showToast(title = if (action == DraftAction.SAVE) R.string.snackbarDraftSaving else R.string.snackbarEmailSending)
+        }
     }
 
     private fun observeCloseActivity() {

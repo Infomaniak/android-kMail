@@ -462,6 +462,7 @@
             android:id="@+id/webViewsFrameLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:minHeight="100dp"
             app:layout_constraintBottom_toTopOf="@id/quoteButtonFrameLayout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

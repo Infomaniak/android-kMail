@@ -18,35 +18,63 @@
 package com.infomaniak.mail.ui.main
 
 import android.view.View
+import androidx.annotation.StringRes
 import androidx.fragment.app.FragmentActivity
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
+import com.infomaniak.lib.core.R as RCore
 
 class SnackBarManager {
 
-    private val snackBarFeedback = SingleLiveEvent<Pair<String, UndoData?>>()
+    private val snackBarFeedback = SingleLiveEvent<SnackBarData>()
 
+    // Give a CoordinatorLayout to `view` in order to support swipe to dismiss
     fun setup(
+        view: View,
         activity: FragmentActivity,
         getAnchor: (() -> View?)? = null,
-        onActionClicked: ((data: UndoData) -> Unit)? = null,
+        onUndoData: ((data: UndoData) -> Unit)? = null,
     ) {
-        snackBarFeedback.observe(activity) { (title, undoData) ->
-            activity.showSnackbar(
-                title,
-                getAnchor?.invoke(),
-                onActionClicked = undoData?.let { data -> { onActionClicked?.invoke(data) } },
-            )
+        snackBarFeedback.observe(activity) { (title, undoData, buttonTitleRes, customBehaviour) ->
+            val action: (() -> Unit)? = if (undoData != null) {
+                { onUndoData?.invoke(undoData) }
+            } else {
+                customBehaviour
+            }
+            val safeAction = getSafeAction(action)
+
+            val buttonTitle = buttonTitleRes ?: RCore.string.buttonCancel
+
+            showSnackbar(view, title, getAnchor?.invoke(), buttonTitle, onActionClicked = safeAction)
         }
     }
 
-    fun setValue(title: String, undoData: UndoData? = null) {
-        snackBarFeedback.value = title to undoData
+    private fun getSafeAction(action: (() -> Unit)?): (() -> Unit)? {
+        return action?.let {
+            var neverClicked = true
+            {
+                if (neverClicked) {
+                    neverClicked = false
+                    action()
+                }
+            }
+        }
     }
 
-    fun postValue(title: String, undoData: UndoData? = null) {
-        snackBarFeedback.postValue(title to undoData)
+    fun setValue(title: String, undoData: UndoData? = null, buttonTitle: Int? = null, customBehaviour: (() -> Unit)? = null) {
+        snackBarFeedback.value = SnackBarData(title, undoData, buttonTitle, customBehaviour)
     }
+
+    fun postValue(title: String, undoData: UndoData? = null, buttonTitle: Int? = null, customBehaviour: (() -> Unit)? = null) {
+        snackBarFeedback.postValue(SnackBarData(title, undoData, buttonTitle, customBehaviour))
+    }
+
+    private data class SnackBarData(
+        val title: String,
+        val undoData: UndoData?,
+        @StringRes val buttonTitle: Int?,
+        val customBehaviour: (() -> Unit)?,
+    )
 
     data class UndoData(
         val resource: String,

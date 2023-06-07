@@ -46,12 +46,43 @@
             app:text="@string/actionViewInLight"
             tools:visibility="visible" />
 
+        <!-- TODO: Display this when Postpone/Snooze action will be done (v2) -->
         <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
-            android:id="@+id/archive"
+            android:id="@+id/postpone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:icon="@drawable/ic_archive_folder"
-            app:text="@string/actionArchive" />
+            android:visibility="gone"
+            app:icon="@drawable/ic_alarm_clock"
+            app:text="@string/actionPostpone"
+            tools:visibility="visible" />
+
+        <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
+            android:id="@+id/move"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:icon="@drawable/ic_email_action_move"
+            app:text="@string/actionMove" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
+                android:id="@+id/spam"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:icon="@drawable/ic_spam"
+                app:text="@string/actionSpam" />
+
+            <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
+                android:id="@+id/reportJunk"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_report_junk"
+                app:text="@string/actionReportJunk" />
+
+        </FrameLayout>
 
         <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
             android:id="@+id/markAsReadUnread"
@@ -61,20 +92,11 @@
             app:text="@string/actionMarkAsUnread" />
 
         <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
-            android:id="@+id/move"
+            android:id="@+id/archive"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:icon="@drawable/ic_email_action_move"
-            app:text="@string/actionMove" />
-
-        <!-- TODO: Display this when Postpone/Snooze action will be done (v2) -->
-        <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
-            android:id="@+id/postpone"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:icon="@drawable/ic_alarm_clock"
-            app:text="@string/actionPostpone" />
+            app:icon="@drawable/ic_archive_folder"
+            app:text="@string/actionArchive" />
 
         <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
             android:id="@+id/favorite"
@@ -82,26 +104,6 @@
             android:layout_height="wrap_content"
             app:icon="@drawable/ic_star"
             app:text="@string/actionStar" />
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
-                android:id="@+id/reportJunk"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:icon="@drawable/ic_report_junk"
-                app:text="@string/actionReportJunk" />
-
-            <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
-                android:id="@+id/spam"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                app:icon="@drawable/ic_spam"
-                app:text="@string/actionSpam" />
-        </FrameLayout>
 
         <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
             android:id="@+id/print"

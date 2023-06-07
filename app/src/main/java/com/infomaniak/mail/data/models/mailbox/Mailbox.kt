@@ -42,6 +42,8 @@ class Mailbox : RealmObject {
     var linkId: Int = 0
     @SerialName("is_limited")
     var isLimited: Boolean = false
+    @SerialName("is_password_valid")
+    var isPasswordValid: Boolean = true
     //endregion
 
     //region Local data (Transient)

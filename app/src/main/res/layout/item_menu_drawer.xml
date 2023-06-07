@@ -66,6 +66,15 @@
                 android:visibility="gone"
                 app:tint="?android:attr/colorPrimary" />
 
+            <ImageView
+                android:id="@+id/warning"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/mediumIconSize"
+                android:contentDescription="@string/contentDescriptionWarningIcon"
+                android:src="@drawable/ic_warning"
+                android:visibility="gone"
+                app:tint="@color/orangeWarning" />
+
         </FrameLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
