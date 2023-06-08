@@ -401,6 +401,10 @@ class DraftsActionsWorker @AssistedInject constructor(
         fun getCompletedWorkInfoLiveData(): LiveData<MutableList<WorkInfo>> {
             return WorkerUtils.getWorkInfoLiveData(TAG, workManager, listOf(WorkInfo.State.SUCCEEDED))
         }
+
+        fun getFailedWorkInfoLiveData(): LiveData<MutableList<WorkInfo>> {
+            return WorkerUtils.getWorkInfoLiveData(TAG, workManager, listOf(WorkInfo.State.FAILED))
+        }
     }
 
     companion object {
