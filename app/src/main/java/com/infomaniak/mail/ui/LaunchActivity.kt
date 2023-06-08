@@ -24,6 +24,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDeepLinkBuilder
 import com.infomaniak.lib.applock.LockActivity
 import com.infomaniak.lib.applock.Utils.isKeyguardSecure
+import com.infomaniak.mail.MainApplication.Companion.firstLaunchTime
 import com.infomaniak.mail.MatomoMail.trackUserId
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -36,7 +37,7 @@ import com.infomaniak.mail.ui.login.LoginActivityArgs
 import com.infomaniak.mail.ui.main.thread.ThreadFragmentArgs
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SentryDebug
-import com.infomaniak.mail.utils.resetLastAppClosing
+import com.infomaniak.mail.utils.getMainApplication
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -76,7 +77,7 @@ class LaunchActivity : AppCompatActivity() {
                     if (MailboxController.getMailboxesCount(user.id) == 0L) {
                         AccountUtils.updateUserAndMailboxes(this@LaunchActivity)
                     }
-                    if (navigationArgs?.shouldLock != false && isKeyguardSecure() && localSettings.isAppLocked) {
+                    if (localSettings.isAppLocked && isKeyguardSecure() && getMainApplication().lastAppClosingTime == firstLaunchTime) {
                         startAppLockActivity()
                     } else {
                         startApp()
@@ -104,7 +105,7 @@ class LaunchActivity : AppCompatActivity() {
             destinationClass = MainActivity::class.java,
             primaryColor = localSettings.accentColor.getPrimary(this)
         )
-        application.resetLastAppClosing()
+        getMainApplication().resetLastAppClosing()
     }
 
     private fun loginUser() {
