@@ -90,6 +90,7 @@ class NewMessageFragment : Fragment() {
     private var mailboxes = emptyList<Mailbox>()
     private var selectedMailboxIndex = 0
     private var lastFieldToTakeFocus: FieldType? = TO
+    var recordedAction: DraftAction = DraftAction.SAVE
 
     private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
 
@@ -509,37 +510,24 @@ class NewMessageFragment : Fragment() {
     }
 
     override fun onStop() = with(newMessageViewModel) {
-
         // TODO:
         //  Currently, we don't handle the possibility to leave the App during Draft composition.
         //  If it happens and we do anything in Realm about that, it will desynchronize the UI &
         //  Realm, and we'll lost some Draft data. A quick fix to get rid of the current bugs is
         //  to wait the end of Draft composition before starting DraftsActionsWorker.
-        if (shouldHandleDraftActionWhenLeaving) {
-            showDraftFeedbackToUser()
-            draftsActionsWorkerScheduler.scheduleWork(draftLocalUuid = newMessageViewModel.draft.localUuid)
+        if (shouldExecuteDraftActionWhenStopping) {
+            val isFinishing = requireActivity().isFinishing
+            val isTaskRoot = requireActivity().isTaskRoot
+            executeDraftActionWhenStopping(recordedAction, isFinishing, isTaskRoot, ::startWorker)
         } else {
-            shouldHandleDraftActionWhenLeaving = true
+            shouldExecuteDraftActionWhenStopping = true
         }
 
         super.onStop()
     }
 
-    private fun showDraftFeedbackToUser() = with(requireActivity()) {
-        when (newMessageViewModel.draft.action) {
-            DraftAction.SAVE -> {
-                if (isFinishing) {
-                    if (isTaskRoot) showToast(R.string.snackbarDraftSaving)
-                } else {
-                    // TODO : Only show if draft was modified since last save. Else we don't need to save it again
-                    showToast(R.string.snackbarDraftSaving)
-                }
-            }
-            DraftAction.SEND -> {
-                if (isTaskRoot) showToast(R.string.snackbarEmailSending)
-            }
-            null -> Unit
-        }
+    private fun startWorker() {
+        draftsActionsWorkerScheduler.scheduleWork(draftLocalUuid = newMessageViewModel.draft.localUuid)
     }
 
     fun closeAutoCompletion() = with(binding) {

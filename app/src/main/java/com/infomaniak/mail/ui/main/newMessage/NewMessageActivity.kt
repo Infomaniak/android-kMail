@@ -69,7 +69,7 @@ class NewMessageActivity : ThemedActivity() {
         setupSendButton()
         setupSystemBars()
 
-        observeCloseActivity()
+        // observeCloseActivity()
         observeInitSuccess()
     }
 
@@ -83,7 +83,12 @@ class NewMessageActivity : ThemedActivity() {
 
     private fun handleOnBackPressed() = with(newMessageViewModel) {
         onBackPressedDispatcher.addCallback(this@NewMessageActivity) {
-            if (isAutoCompletionOpened) newMessageFragment.closeAutoCompletion() else saveDraftLocallyAndFinish(DraftAction.SAVE)
+            if (isAutoCompletionOpened) {
+                newMessageFragment.closeAutoCompletion()
+            } else {
+                finish()
+                // saveDraftLocallyAndFinish(DraftAction.SAVE)
+            }
         }
     }
 
@@ -102,7 +107,9 @@ class NewMessageActivity : ThemedActivity() {
     private fun tryToSendEmail() {
 
         fun sendEmail() {
-            saveDraftLocallyAndFinish(DraftAction.SEND)
+            newMessageFragment.recordedAction = DraftAction.SEND
+            finish()
+            // saveDraftLocallyAndFinish(DraftAction.SEND)
         }
 
         if (newMessageViewModel.draft.subject.isNullOrBlank()) {
@@ -129,13 +136,13 @@ class NewMessageActivity : ThemedActivity() {
         }
     }
 
-    private fun saveDraftLocallyAndFinish(action: DraftAction) {
-        newMessageViewModel.saveToLocalAndFinish(action)
-    }
+    // private fun saveDraftLocallyAndFinish(action: DraftAction) {
+    //     newMessageViewModel.saveToLocalAndFinish(action)
+    // }
 
-    private fun observeCloseActivity() {
-        newMessageViewModel.shouldCloseActivity.observeNotNull(this) { if (isTaskRoot) finishAndRemoveTask() else finish() }
-    }
+    // private fun observeCloseActivity() {
+    //     newMessageViewModel.shouldCloseActivity.observeNotNull(this) { if (isTaskRoot) finishAndRemoveTask() else finish() }
+    // }
 
     private fun observeInitSuccess() {
         newMessageViewModel.isInitSuccess.observe(this) { isSuccess ->
@@ -151,7 +158,7 @@ class NewMessageActivity : ThemedActivity() {
         fun linkEditor(view: MaterialButton, action: EditorAction) {
             view.setOnClickListener {
                 // TODO: Don't forget to add in this `if` all actions that make the app go to background.
-                if (action == EditorAction.ATTACHMENT) newMessageViewModel.shouldHandleDraftActionWhenLeaving = false
+                if (action == EditorAction.ATTACHMENT) newMessageViewModel.shouldExecuteDraftActionWhenStopping = false
                 trackEvent("editorActions", action.matomoValue)
                 newMessageViewModel.editorAction.value = action to null
             }
