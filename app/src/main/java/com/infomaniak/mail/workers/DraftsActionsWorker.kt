@@ -138,6 +138,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         val errorMessageResIds = mutableListOf<Int>()
         var remoteUuidOfTrackedDraft: String? = null
         var trackedDraftAction: DraftAction? = null
+        var isTrackedDraftSuccess = false
 
         val isSuccess = mailboxContentRealm.writeBlocking {
 
@@ -158,15 +159,17 @@ class DraftsActionsWorker @AssistedInject constructor(
                         mailbox.uuid,
                         realm = this,
                         okHttpClient,
-                    ).also { (scheduledDate, errorMessageResId, savedDraftUuid) ->
-                        scheduledDate?.let {
+                    ).also { (scheduledDate, errorMessageResId, savedDraftUuid, isSuccess) ->
+                        if (isSuccess) {
                             if (draftLocalUuid == currentDraftLocalUuid) {
                                 trackedDraftAction = currentDraftAction
                                 remoteUuidOfTrackedDraft = savedDraftUuid
+                                isTrackedDraftSuccess = true
                             }
-                            scheduledDates.add(it)
+                            scheduledDates.add(scheduledDate!!)
+                        } else {
+                            errorMessageResIds.add(errorMessageResId!!)
                         }
-                        errorMessageResId?.let(errorMessageResIds::add)
                     }
 
                 }.onFailure { exception ->
@@ -195,14 +198,17 @@ class DraftsActionsWorker @AssistedInject constructor(
             Triple(remoteUuidOfTrackedDraft, mailbox.uuid, trackedDraftAction)
         }
 
-        val outputData = workDataOf(
-            ERROR_MESSAGE_RESID_KEY to errorMessageResIds.toIntArray(),
-            DRAFT_UUID_KEY to draftUid,
-            ASSOCIATED_MAILBOX_UUID_KEY to mailboxUuid,
-            RESULT_DRAFT_ACTION_KEY to draftAction?.name,
-        )
-
-        return if (isSuccess || draftLocalUuid != null) Result.success(outputData) else Result.failure(outputData)
+        return if (isSuccess || isTrackedDraftSuccess) {
+            val outputData = workDataOf(
+                DRAFT_UUID_KEY to draftUid,
+                ASSOCIATED_MAILBOX_UUID_KEY to mailboxUuid,
+                RESULT_DRAFT_ACTION_KEY to draftAction?.name,
+            )
+            Result.success(outputData)
+        } else {
+            val outputData = workDataOf(ERROR_MESSAGE_RESID_KEY to errorMessageResIds.toIntArray())
+            Result.failure(outputData)
+        }
     }
 
     private fun ApiErrorException.handleApiErrors(draft: Draft, realm: MutableRealm): Int? {
@@ -295,6 +301,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         val scheduledDate: String?,
         val errorMessageResId: Int?,
         val savedDraftUuid: String?,
+        val isSuccess: Boolean,
     )
 
     private fun executeDraftAction(
@@ -325,6 +332,7 @@ class DraftsActionsWorker @AssistedInject constructor(
                     scheduledDate = null,
                     errorMessageResId = R.string.errorCorruptAttachment,
                     savedDraftUuid = null,
+                    isSuccess = false
                 )
             }
         }
@@ -366,6 +374,7 @@ class DraftsActionsWorker @AssistedInject constructor(
             scheduledDate = scheduledDate,
             errorMessageResId = null,
             savedDraftUuid = savedDraftUuid,
+            isSuccess = true
         )
     }
 
