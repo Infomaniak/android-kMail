@@ -383,6 +383,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 trackThreadListEvent("unreadFilter")
                 isCloseIconVisible = isChecked
                 mainViewModel.currentFilter.value = if (isChecked) ThreadFilter.UNSEEN else ThreadFilter.ALL
+                threadListAdapter.updateLoadMore(shouldDisplayLoadMore = !isChecked)
             }
         }
     }
@@ -427,7 +428,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 } else {
                     showLoadingTimer.cancel()
                     binding.swipeRefreshLayout.isRefreshing = false
-                    shouldDisplayLoadMore?.let(threadListAdapter::updateLoadMore)
+                    if (mainViewModel.currentFilter.value == ThreadFilter.ALL) {
+                        shouldDisplayLoadMore?.let(threadListAdapter::updateLoadMore)
+                    }
                 }
             }
     }
