@@ -342,11 +342,21 @@ class DraftsActionsWorker @AssistedInject constructor(
                 }
             }
             DraftAction.SEND -> with(ApiRepository.sendDraft(mailboxUuid, draft, okHttpClient)) {
-                if (isSuccess() || error?.exception is SerializationException) {
-                    scheduledDate = data?.scheduledDate
-                    realm.delete(draft)
-                } else {
-                    throwErrorAsException()
+                when {
+                    isSuccess() -> {
+                        scheduledDate = data?.scheduledDate
+                        realm.delete(draft)
+                    }
+                    error?.exception is SerializationException -> {
+                        realm.delete(draft)
+                        Sentry.withScope { scope ->
+                            scope.level = SentryLevel.ERROR
+                            Sentry.captureMessage("Return JSON for SendDraft API call was modified")
+                        }
+                    }
+                    else -> {
+                        throwErrorAsException()
+                    }
                 }
             }
             else -> Unit
