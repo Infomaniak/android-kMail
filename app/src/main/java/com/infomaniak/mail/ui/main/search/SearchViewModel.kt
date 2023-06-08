@@ -94,9 +94,6 @@ class SearchViewModel @Inject constructor(
         }.debounce(SEARCH_DEBOUNCE_DURATION)
     }
 
-    var previousAttachments: Boolean? = null
-    var previousMutuallyExclusiveChips: Int? = null
-    var previousSearch: String? = null
 
     fun init(dummyFolderId: String) {
         this.dummyFolderId = dummyFolderId

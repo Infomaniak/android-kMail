@@ -179,10 +179,6 @@ class SearchFragment : Fragment() {
 
     private fun setAttachmentsUi() = with(searchViewModel) {
         binding.attachments.setOnCheckedChangeListener { _, isChecked ->
-            if (previousAttachments != null) {
-                previousAttachments = null
-                return@setOnCheckedChangeListener
-            }
 
             setFilter(ThreadFilter.ATTACHMENTS, isChecked)
         }
@@ -190,10 +186,6 @@ class SearchFragment : Fragment() {
 
     private fun setMutuallyExclusiveChipGroupUi() = with(searchViewModel) {
         binding.mutuallyExclusiveChipGroup.setOnCheckedStateChangeListener { chipGroup, _ ->
-            if (previousMutuallyExclusiveChips != null) {
-                previousMutuallyExclusiveChips = null
-                return@setOnCheckedStateChangeListener
-            }
 
             when (chipGroup.checkedChipId) {
                 R.id.read -> setFilter(ThreadFilter.SEEN)
@@ -214,10 +206,6 @@ class SearchFragment : Fragment() {
             showKeyboard()
 
             doOnTextChanged { text, _, _, _ ->
-                if (searchViewModel.previousSearch != null) {
-                    searchViewModel.previousSearch = null
-                    return@doOnTextChanged
-                }
                 searchViewModel.searchQuery(text.toString())
             }
 
@@ -242,9 +230,6 @@ class SearchFragment : Fragment() {
 
                     navigateToThread(thread, mainViewModel)
 
-                    previousAttachments = attachments.isChecked
-                    previousMutuallyExclusiveChips = mutuallyExclusiveChipGroup.checkedChipId
-                    previousSearch = searchBar.searchTextInput.text.toString()
                 }
             }
         }
