@@ -178,13 +178,13 @@ class SearchFragment : Fragment() {
     }
 
     private fun setAttachmentsUi() = with(searchViewModel) {
-        binding.attachments.setOnCheckedChangeListener { _, _ ->
+        binding.attachments.setOnCheckedChangeListener { _, isChecked ->
             if (previousAttachments != null) {
                 previousAttachments = null
                 return@setOnCheckedChangeListener
             }
 
-            toggleFilter(ThreadFilter.ATTACHMENTS)
+            setFilter(ThreadFilter.ATTACHMENTS, isChecked)
         }
     }
 
@@ -196,9 +196,9 @@ class SearchFragment : Fragment() {
             }
 
             when (chipGroup.checkedChipId) {
-                R.id.read -> toggleFilter(ThreadFilter.SEEN)
-                R.id.unread -> toggleFilter(ThreadFilter.UNSEEN)
-                R.id.favorites -> toggleFilter(ThreadFilter.STARRED)
+                R.id.read -> setFilter(ThreadFilter.SEEN)
+                R.id.unread -> setFilter(ThreadFilter.UNSEEN)
+                R.id.favorites -> setFilter(ThreadFilter.STARRED)
                 else -> unselectMutuallyExclusiveFilters()
             }
         }
