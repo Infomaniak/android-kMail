@@ -140,7 +140,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         var trackedDraftAction: DraftAction? = null
         var isTrackedDraftSuccess = false
 
-        val isSuccess = mailboxContentRealm.writeBlocking {
+        val isAllDraftSucceeded = mailboxContentRealm.writeBlocking {
 
             val drafts = DraftController.getDraftsWithActions(realm = this).ifEmpty { return@writeBlocking false }
 
@@ -198,7 +198,7 @@ class DraftsActionsWorker @AssistedInject constructor(
             Triple(remoteUuidOfTrackedDraft, mailbox.uuid, trackedDraftAction)
         }
 
-        return if (isSuccess || isTrackedDraftSuccess) {
+        return if (isAllDraftSucceeded || isTrackedDraftSuccess) {
             val outputData = workDataOf(
                 DRAFT_UUID_KEY to draftUid,
                 ASSOCIATED_MAILBOX_UUID_KEY to mailboxUuid,
