@@ -156,13 +156,16 @@ class MainActivity : ThemedActivity() {
                     workInfo.outputData.displayCompletedDraftWorkerResults()
                 }
             }
+
+            draftsActionsWorkerScheduler.getFailedWorkInfoLiveData().observe(this) {
+                it.forEach { workInfo ->
+                    workInfo.outputData.getIntArray(DraftsActionsWorker.ERROR_MESSAGE_RESID_KEY)?.forEach(::showToast)
+                }
+            }
         }
     }
 
     private fun Data.displayCompletedDraftWorkerResults() {
-
-        getIntArray(DraftsActionsWorker.ERROR_MESSAGE_RESID_KEY)?.forEach(::showToast)
-
         getString(DraftsActionsWorker.RESULT_DRAFT_ACTION_KEY)?.let { draftAction ->
             when (draftAction.toEnumOrThrow<DraftAction>()) {
                 DraftAction.SAVE -> {
