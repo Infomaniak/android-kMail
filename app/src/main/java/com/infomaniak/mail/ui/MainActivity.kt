@@ -151,14 +151,17 @@ class MainActivity : ThemedActivity() {
             val treatedWorkInfoUuids = mutableSetOf<UUID>()
 
             draftsActionsWorkerScheduler.getCompletedWorkInfoLiveData().observe(this) {
-                for (workInfo in it) {
-                    if (!treatedWorkInfoUuids.add(workInfo.id)) continue
+                it.forEach { workInfo ->
+                    if (!treatedWorkInfoUuids.add(workInfo.id)) return@forEach
                     workInfo.outputData.displayCompletedDraftWorkerResults()
                 }
             }
 
+            val treatedFailedWorkInfoUuids = mutableSetOf<UUID>()
+
             draftsActionsWorkerScheduler.getFailedWorkInfoLiveData().observe(this) {
                 it.forEach { workInfo ->
+                    if (!treatedFailedWorkInfoUuids.add(workInfo.id)) return@forEach
                     workInfo.outputData.getIntArray(DraftsActionsWorker.ERROR_MESSAGE_RESID_KEY)?.forEach(::showToast)
                 }
             }
