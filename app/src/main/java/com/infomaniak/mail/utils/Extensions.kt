@@ -20,7 +20,6 @@ package com.infomaniak.mail.utils
 import android.animation.Animator
 import android.animation.ValueAnimator
 import android.app.Activity
-import android.app.Application
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -500,6 +499,4 @@ private fun Context.changeToolbarColorOnScroll(
     }
 }
 
-fun Application.resetLastAppClosing() {
-    (this as MainApplication).lastAppClosing = null
-}
+fun Activity.getMainApplication() = (application as MainApplication)

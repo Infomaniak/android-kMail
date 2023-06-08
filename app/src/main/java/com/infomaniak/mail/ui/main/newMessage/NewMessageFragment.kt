@@ -46,8 +46,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
-import com.infomaniak.lib.applock.LockActivity
-import com.infomaniak.lib.applock.Utils.isKeyguardSecure
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
@@ -176,7 +174,6 @@ class NewMessageFragment : Fragment() {
             if (isSuccess) {
                 hideLoader()
                 showKeyboardInCorrectView()
-                lockIfExternalMailDataStartedApp()
                 populateViewModelWithExternalMailData()
                 populateUiWithViewModel()
             } else requireActivity().apply {
@@ -371,18 +368,6 @@ class NewMessageFragment : Fragment() {
             Intent.ACTION_SEND -> handleSingleSendIntent()
             Intent.ACTION_SEND_MULTIPLE -> handleMultipleSendIntent()
             Intent.ACTION_VIEW, Intent.ACTION_SENDTO -> handleMailTo()
-        }
-    }
-
-    private fun lockIfExternalMailDataStartedApp() {
-        val shouldLock = !(requireActivity() as NewMessageActivity).hasLocked
-        if (shouldLock && requireContext().isKeyguardSecure() && localSettings.isAppLocked) {
-            LockActivity.startAppLockActivity(
-                context = requireContext(),
-                destinationClass = NewMessageActivity::class.java,
-                primaryColor = localSettings.accentColor.getPrimary(requireContext()),
-                shouldStartActivity = false,
-            )
         }
     }
 

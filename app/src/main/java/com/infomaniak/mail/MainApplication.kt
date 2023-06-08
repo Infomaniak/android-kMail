@@ -50,7 +50,6 @@ import com.infomaniak.mail.data.api.UrlTraceInterceptor
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.LaunchActivity
-import com.infomaniak.mail.ui.LaunchActivityArgs
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ErrorCode
 import com.infomaniak.mail.utils.NotificationUtils.initNotificationChannel
@@ -75,8 +74,8 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
     val matomoTracker: Tracker by lazy { buildTracker() }
     var isAppInBackground = true
         private set
-
-    var lastAppClosing: Date? = null
+    var lastAppClosingTime: Long? = firstLaunchTime
+        private set
 
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
@@ -125,7 +124,7 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
     }
 
     override fun onStop(owner: LifecycleOwner) {
-        lastAppClosing = Date()
+        lastAppClosingTime = Date().time
         isAppInBackground = true
         owner.lifecycleScope.launch { syncMailboxesWorkerScheduler.scheduleWorkIfNeeded() }
     }
@@ -182,7 +181,6 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
     }
 
     private fun getLaunchIntent() = Intent(this, LaunchActivity::class.java).apply {
-        putExtras(LaunchActivityArgs(shouldLock = false).toBundle())
         clearStack()
     }
 
@@ -239,4 +237,12 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
     }
 
     override fun newImageLoader(): ImageLoader = CoilUtils.newImageLoader(applicationContext, tokenInterceptorListener())
+
+    fun resetLastAppClosing() {
+        lastAppClosingTime = null
+    }
+
+    companion object {
+        const val firstLaunchTime = 0L
+    }
 }

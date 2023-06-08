@@ -21,20 +21,16 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.infomaniak.lib.applock.LockActivity
 import com.infomaniak.lib.applock.Utils.isKeyguardSecure
-import com.infomaniak.mail.MainApplication
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.resetLastAppClosing
+import com.infomaniak.mail.utils.getMainApplication
 import io.sentry.Sentry
 import kotlinx.coroutines.runBlocking
 
 open class ThemedActivity : AppCompatActivity() {
 
     protected val localSettings by lazy { LocalSettings.getInstance(this) }
-
-    var hasLocked = false
-        private set
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(LocalSettings.getInstance(this).accentColor.theme)
@@ -54,17 +50,17 @@ open class ThemedActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        val lastAppClosing = (application as MainApplication).lastAppClosing
+        if (localSettings.isAppLocked && isKeyguardSecure()) with(getMainApplication()) {
+            lastAppClosingTime?.let {
+                LockActivity.lockAfterTimeout(
+                    context = this,
+                    destinationClass = this::class.java,
+                    lastAppClosingTime = it,
+                    primaryColor = localSettings.accentColor.getPrimary(this),
+                )
+            }
 
-        if (lastAppClosing != null && isKeyguardSecure() && localSettings.isAppLocked) {
-            LockActivity.lockAfterTimeout(
-                lastAppClosing = lastAppClosing,
-                context = this,
-                destinationClass = this::class.java,
-                primaryColor = localSettings.accentColor.getPrimary(this),
-            )
-            application.resetLastAppClosing()
-            hasLocked = true
+            resetLastAppClosing()
         }
     }
 }
