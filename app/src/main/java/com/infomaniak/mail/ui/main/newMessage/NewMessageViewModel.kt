@@ -281,6 +281,7 @@ class NewMessageViewModel @Inject constructor(
             saveDraftToLocal(action)
             showDraftToastToUser(action, isFinishing, isTaskRoot)
             startWorkerCallback()
+            if (action == DraftAction.SAVE && !isFinishing) saveDraftSnapshot()
         } else if (isNewMessage) {
             removeNewBlankDraftFromRealm()
         }
