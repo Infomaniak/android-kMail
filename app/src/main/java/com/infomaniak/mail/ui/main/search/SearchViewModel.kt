@@ -74,7 +74,7 @@ class SearchViewModel @Inject constructor(
     val searchResults: LiveData<List<Thread>> = observeSearchAndFilters()
         .flatMapLatest { (queryData, filters, folder) ->
             val (query, saveInHistory) = queryData
-            fetchThreads(
+            searchThreads(
                 query = if (isLengthTooShort(query)) null else query,
                 saveInHistory,
                 filters,
@@ -157,12 +157,33 @@ class SearchViewModel @Inject constructor(
 
     fun isLengthTooShort(query: String?) = query == null || query.length < MIN_SEARCH_QUERY
 
-    private fun fetchThreads(
+    private fun searchThreads(
         query: String?,
         saveInHistory: Boolean,
         filters: Set<ThreadFilter>,
         folder: Folder?,
     ): Flow<List<Thread>> = flow {
+        initThreads(folder, filters, query)?.let { newFilters ->
+            fetchThreads(folder, newFilters, query)
+            emitThreads(saveInHistory, newFilters, query)
+        }
+    }
+
+    private suspend fun initThreads(folder: Folder?, filters: Set<ThreadFilter>, query: String?): Set<ThreadFilter>? {
+
+        val newFilters = if (folder == null) filters else (filters + ThreadFilter.FOLDER)
+
+        if (isLastPage && resourcePrevious.isNullOrBlank()) SearchUtils.deleteRealmSearchData()
+
+        return if (newFilters.isEmpty() && query.isNullOrBlank()) {
+            visibilityMode.postValue(VisibilityMode.RECENT_SEARCHES)
+            null
+        } else {
+            newFilters
+        }
+    }
+
+    private suspend fun fetchThreads(folder: Folder?, newFilters: Set<ThreadFilter>, query: String?) {
 
         suspend fun ApiResponse<ThreadResult>.initSearchFolderThreads() {
             runCatching {
@@ -171,14 +192,6 @@ class SearchViewModel @Inject constructor(
                 exception.printStackTrace()
                 Sentry.captureException(exception)
             }
-        }
-
-        val newFilters = if (folder == null) filters else (filters + ThreadFilter.FOLDER)
-
-        if (isLastPage && resourcePrevious.isNullOrBlank()) SearchUtils.deleteRealmSearchData()
-        if (newFilters.isEmpty() && query.isNullOrBlank()) {
-            visibilityMode.postValue(VisibilityMode.RECENT_SEARCHES)
-            return@flow
         }
 
         visibilityMode.postValue(VisibilityMode.LOADING)
@@ -195,7 +208,13 @@ class SearchViewModel @Inject constructor(
         } else if (isLastPage) {
             ThreadController.saveThreads(searchMessages = MessageController.searchMessages(query, newFilters, folderId))
         }
+    }
 
+    private suspend fun FlowCollector<List<Thread>>.emitThreads(
+        saveInHistory: Boolean,
+        newFilters: Set<ThreadFilter>,
+        query: String?,
+    ) {
         emitAll(ThreadController.getSearchThreadsAsync().mapLatest {
             if (saveInHistory) query?.let(history::postValue)
 
