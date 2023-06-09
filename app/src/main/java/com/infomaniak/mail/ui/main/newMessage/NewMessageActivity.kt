@@ -143,7 +143,7 @@ class NewMessageActivity : ThemedActivity() {
     }
 
     private fun observeCloseActivity() {
-        newMessageViewModel.shouldCloseActivity.observeNotNull(this) { if (it) finish() }
+        newMessageViewModel.shouldCloseActivity.observeNotNull(this) { if (isTaskRoot) finishAndRemoveTask() else finish() }
     }
 
     private fun observeInitSuccess() {
