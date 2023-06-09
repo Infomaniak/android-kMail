@@ -122,7 +122,6 @@ class NewMessageViewModel @Inject constructor(
             if (isSuccess) {
                 splitSignatureAndQuoteFromBody()
                 saveDraftSnapshot()
-                updateIsSendingAllowed()
                 if (draft.cc.isNotEmpty() || draft.bcc.isNotEmpty()) {
                     otherFieldsAreAllEmpty.postValue(false)
                     initializeFieldsAsOpen.postValue(true)
@@ -296,7 +295,7 @@ class NewMessageViewModel @Inject constructor(
 
     private fun shouldExecuteAction(action: DraftAction) = action == DraftAction.SEND || snapshot?.hasChanges() == true
 
-    private fun updateIsSendingAllowed() {
+    fun updateIsSendingAllowed() {
         isSendingAllowed.postValue(draft.to.isNotEmpty() || draft.cc.isNotEmpty() || draft.bcc.isNotEmpty())
     }
 

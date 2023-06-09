@@ -438,10 +438,6 @@
             android:name="mailboxId"
             android:defaultValue="-1"
             app:argType="integer" />
-        <argument
-            android:name="shouldLock"
-            android:defaultValue="true"
-            app:argType="boolean" />
     </activity>
 
     <activity

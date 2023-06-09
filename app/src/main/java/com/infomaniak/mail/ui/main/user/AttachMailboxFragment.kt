@@ -34,8 +34,10 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentAttachMailboxBinding
 import com.infomaniak.mail.utils.ErrorCode
 import com.infomaniak.mail.utils.isEmail
+import dagger.hilt.android.AndroidEntryPoint
 import com.infomaniak.lib.core.R as RCore
 
+@AndroidEntryPoint
 class AttachMailboxFragment : Fragment() {
 
     private lateinit var binding: FragmentAttachMailboxBinding

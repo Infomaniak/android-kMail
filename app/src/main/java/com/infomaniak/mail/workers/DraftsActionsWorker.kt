@@ -61,6 +61,7 @@ import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.SerializationException
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -137,8 +138,9 @@ class DraftsActionsWorker @AssistedInject constructor(
         val errorMessageResIds = mutableListOf<Int>()
         var remoteUuidOfTrackedDraft: String? = null
         var trackedDraftAction: DraftAction? = null
+        var isTrackedDraftSuccess = false
 
-        val isSuccess = mailboxContentRealm.writeBlocking {
+        val haveAllDraftSucceeded = mailboxContentRealm.writeBlocking {
 
             val drafts = DraftController.getDraftsWithActions(realm = this).ifEmpty { return@writeBlocking false }
 
@@ -157,15 +159,17 @@ class DraftsActionsWorker @AssistedInject constructor(
                         mailbox.uuid,
                         realm = this,
                         okHttpClient,
-                    ).also { (scheduledDate, errorMessageResId, savedDraftUuid) ->
-                        scheduledDate?.let {
+                    ).also { (scheduledDate, errorMessageResId, savedDraftUuid, isSuccess) ->
+                        if (isSuccess) {
                             if (draftLocalUuid == currentDraftLocalUuid) {
                                 trackedDraftAction = currentDraftAction
                                 remoteUuidOfTrackedDraft = savedDraftUuid
+                                isTrackedDraftSuccess = true
                             }
-                            scheduledDates.add(it)
+                            scheduledDates.add(scheduledDate!!)
+                        } else {
+                            errorMessageResIds.add(errorMessageResId!!)
                         }
-                        errorMessageResId?.let(errorMessageResIds::add)
                     }
 
                 }.onFailure { exception ->
@@ -194,14 +198,17 @@ class DraftsActionsWorker @AssistedInject constructor(
             Triple(remoteUuidOfTrackedDraft, mailbox.uuid, trackedDraftAction)
         }
 
-        val outputData = workDataOf(
-            ERROR_MESSAGE_RESID_KEY to errorMessageResIds.toIntArray(),
-            DRAFT_UUID_KEY to draftUid,
-            ASSOCIATED_MAILBOX_UUID_KEY to mailboxUuid,
-            RESULT_DRAFT_ACTION_KEY to draftAction?.name,
-        )
-
-        return if (isSuccess || draftLocalUuid != null) Result.success(outputData) else Result.failure(outputData)
+        return if (haveAllDraftSucceeded || isTrackedDraftSuccess) {
+            val outputData = workDataOf(
+                DRAFT_UUID_KEY to draftUid,
+                ASSOCIATED_MAILBOX_UUID_KEY to mailboxUuid,
+                RESULT_DRAFT_ACTION_KEY to draftAction?.name,
+            )
+            Result.success(outputData)
+        } else {
+            val outputData = workDataOf(ERROR_MESSAGE_RESID_KEY to errorMessageResIds.toIntArray())
+            Result.failure(outputData)
+        }
     }
 
     private fun ApiErrorException.handleApiErrors(draft: Draft, realm: MutableRealm): Int? {
@@ -294,6 +301,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         val scheduledDate: String?,
         val errorMessageResId: Int?,
         val savedDraftUuid: String?,
+        val isSuccess: Boolean,
     )
 
     private fun executeDraftAction(
@@ -324,6 +332,7 @@ class DraftsActionsWorker @AssistedInject constructor(
                     scheduledDate = null,
                     errorMessageResId = R.string.errorCorruptAttachment,
                     savedDraftUuid = null,
+                    isSuccess = false
                 )
             }
         }
@@ -341,11 +350,21 @@ class DraftsActionsWorker @AssistedInject constructor(
                 }
             }
             DraftAction.SEND -> with(ApiRepository.sendDraft(mailboxUuid, draft, okHttpClient)) {
-                if (isSuccess()) {
-                    scheduledDate = data?.scheduledDate
-                    realm.delete(draft)
-                } else {
-                    throwErrorAsException()
+                when {
+                    isSuccess() -> {
+                        scheduledDate = data?.scheduledDate
+                        realm.delete(draft)
+                    }
+                    error?.exception is SerializationException -> {
+                        realm.delete(draft)
+                        Sentry.withScope { scope ->
+                            scope.level = SentryLevel.ERROR
+                            Sentry.captureMessage("Return JSON for SendDraft API call was modified")
+                        }
+                    }
+                    else -> {
+                        throwErrorAsException()
+                    }
                 }
             }
             else -> Unit
@@ -355,6 +374,7 @@ class DraftsActionsWorker @AssistedInject constructor(
             scheduledDate = scheduledDate,
             errorMessageResId = null,
             savedDraftUuid = savedDraftUuid,
+            isSuccess = true
         )
     }
 
@@ -389,6 +409,10 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         fun getCompletedWorkInfoLiveData(): LiveData<MutableList<WorkInfo>> {
             return WorkerUtils.getWorkInfoLiveData(TAG, workManager, listOf(WorkInfo.State.SUCCEEDED))
+        }
+
+        fun getFailedWorkInfoLiveData(): LiveData<MutableList<WorkInfo>> {
+            return WorkerUtils.getWorkInfoLiveData(TAG, workManager, listOf(WorkInfo.State.FAILED))
         }
     }
 
