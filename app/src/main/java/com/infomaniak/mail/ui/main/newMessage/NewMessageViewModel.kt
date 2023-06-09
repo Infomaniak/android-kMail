@@ -81,7 +81,6 @@ class NewMessageViewModel @Inject constructor(
     // Boolean: For toggleable actions, `false` if the formatting has been removed and `true` if the formatting has been applied.
     val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
     val isInitSuccess = SingleLiveEvent<Boolean>()
-    // val shouldCloseActivity = SingleLiveEvent<Boolean>()
     val importedAttachments = MutableLiveData<Pair<MutableList<Attachment>, ImportationResult>>()
     val isSendingAllowed = MutableLiveData(false)
 
@@ -260,7 +259,7 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    // In case the app crashes, the battery dies or any other unexpected situation, we save every modifications locally in realm
+    // In case the app crashes, the battery dies or any other unexpected situation, we always save every modifications of the draft in realm
     fun saveDraftDebouncing() {
         autoSaveJob?.cancel()
         autoSaveJob = viewModelScope.launch(ioDispatcher) {
@@ -274,7 +273,7 @@ class NewMessageViewModel @Inject constructor(
         isFinishing: Boolean,
         isTaskRoot: Boolean,
         startWorkerCallback: () -> Unit,
-    ) = globalCoroutineScope.launch(ioDispatcher) { // in mainViewModel
+    ) = globalCoroutineScope.launch(ioDispatcher) {
         autoSaveJob?.cancel()
 
         if (shouldExecuteAction(action)) {
@@ -312,21 +311,6 @@ class NewMessageViewModel @Inject constructor(
             DraftController.getDraft(draft.localUuid, realm = this)?.let(::delete)
         }
     }
-
-// fun saveToLocalAndFinish(action: DraftAction) = viewModelScope.launch(ioDispatcher) {
-//     autoSaveJob?.cancel()
-//
-//     if (shouldExecuteAction(action)) {
-//         context.trackSendingDraftEvent(action, draft)
-//         saveDraftToLocal(action)
-//     } else if (isNewMessage) {
-//         RealmDatabase.mailboxContent().writeBlocking {
-//             DraftController.getDraft(draft.localUuid, realm = this)?.let(::delete)
-//         }
-//     }
-//
-//     // shouldCloseActivity.postValue(true)
-// }
 
     private fun saveDraftToLocal(action: DraftAction) {
 

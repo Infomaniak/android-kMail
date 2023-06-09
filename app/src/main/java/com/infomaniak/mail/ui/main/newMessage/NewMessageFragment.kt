@@ -510,6 +510,7 @@ class NewMessageFragment : Fragment() {
     }
 
     override fun onStop() = with(newMessageViewModel) {
+
         // TODO:
         //  Currently, we don't handle the possibility to leave the App during Draft composition.
         //  If it happens and we do anything in Realm about that, it will desynchronize the UI &
@@ -518,9 +519,9 @@ class NewMessageFragment : Fragment() {
         if (shouldExecuteDraftActionWhenStopping) {
             val isFinishing = requireActivity().isFinishing
             val isTaskRoot = requireActivity().isTaskRoot
-            val shouldTargetDraftForSnackBar = isFinishing && !isTaskRoot
+            val shouldTrackDraftForSnackBar = isFinishing && !isTaskRoot
             executeDraftActionWhenStopping(recordedAction, isFinishing, isTaskRoot) {
-                startWorker(shouldTargetDraftForSnackBar)
+                startWorker(shouldTrackDraftForSnackBar)
             }
         } else {
             shouldExecuteDraftActionWhenStopping = true
@@ -529,8 +530,8 @@ class NewMessageFragment : Fragment() {
         super.onStop()
     }
 
-    private fun startWorker(shouldTargetDraftForSnackBar: Boolean) {
-        val draftLocalUuid = if (shouldTargetDraftForSnackBar) newMessageViewModel.draft.localUuid else null
+    private fun startWorker(shouldTrackDraftForSnackBar: Boolean) {
+        val draftLocalUuid = if (shouldTrackDraftForSnackBar) newMessageViewModel.draft.localUuid else null
         draftsActionsWorkerScheduler.scheduleWork(draftLocalUuid)
     }
 

@@ -36,7 +36,10 @@ import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.databinding.ActivityNewMessageBinding
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.ThemedActivity
-import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.createDescriptionDialog
+import com.infomaniak.mail.utils.getAttributeColor
+import com.infomaniak.mail.utils.updateNavigationBarColor
 import dagger.hilt.android.AndroidEntryPoint
 import com.google.android.material.R as RMaterial
 
@@ -69,7 +72,6 @@ class NewMessageActivity : ThemedActivity() {
         setupSendButton()
         setupSystemBars()
 
-        // observeCloseActivity()
         observeInitSuccess()
     }
 
@@ -83,12 +85,7 @@ class NewMessageActivity : ThemedActivity() {
 
     private fun handleOnBackPressed() = with(newMessageViewModel) {
         onBackPressedDispatcher.addCallback(this@NewMessageActivity) {
-            if (isAutoCompletionOpened) {
-                newMessageFragment.closeAutoCompletion()
-            } else {
-                finish()
-                // saveDraftLocallyAndFinish(DraftAction.SAVE)
-            }
+            if (isAutoCompletionOpened) newMessageFragment.closeAutoCompletion() else finish()
         }
     }
 
@@ -109,7 +106,6 @@ class NewMessageActivity : ThemedActivity() {
         fun sendEmail() {
             newMessageFragment.recordedAction = DraftAction.SEND
             finish()
-            // saveDraftLocallyAndFinish(DraftAction.SEND)
         }
 
         if (newMessageViewModel.draft.subject.isNullOrBlank()) {
@@ -135,14 +131,6 @@ class NewMessageActivity : ThemedActivity() {
             updateNavigationBarColor(backgroundColor)
         }
     }
-
-    // private fun saveDraftLocallyAndFinish(action: DraftAction) {
-    //     newMessageViewModel.saveToLocalAndFinish(action)
-    // }
-
-    // private fun observeCloseActivity() {
-    //     newMessageViewModel.shouldCloseActivity.observeNotNull(this) { if (isTaskRoot) finishAndRemoveTask() else finish() }
-    // }
 
     private fun observeInitSuccess() {
         newMessageViewModel.isInitSuccess.observe(this) { isSuccess ->
