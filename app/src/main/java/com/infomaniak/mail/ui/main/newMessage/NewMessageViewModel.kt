@@ -78,7 +78,7 @@ class NewMessageViewModel @Inject constructor(
     // Boolean: For toggleable actions, `false` if the formatting has been removed and `true` if the formatting has been applied.
     val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
     val isInitSuccess = SingleLiveEvent<Boolean>()
-    val shouldCloseActivity = SingleLiveEvent<Boolean?>()
+    val shouldCloseActivity = SingleLiveEvent<Boolean>()
     val importedAttachments = MutableLiveData<Pair<MutableList<Attachment>, ImportationResult>>()
     val isSendingAllowed = MutableLiveData(false)
 
