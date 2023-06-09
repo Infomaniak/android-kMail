@@ -339,15 +339,14 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         when (draft.action) {
             DraftAction.SAVE -> with(ApiRepository.saveDraft(mailboxUuid, draft, okHttpClient)) {
-                if (data == null) {
-                    throwErrorAsException()
-                } else {
-                    draft.remoteUuid = data?.draftRemoteUuid
-                    draft.messageUid = data?.messageUid
+                data?.let { data ->
+                    draft.remoteUuid = data.draftRemoteUuid
+                    draft.messageUid = data.messageUid
                     draft.action = null
                     scheduledDate = dateFormatWithTimezone.format(Date())
-                    savedDraftUuid = data?.draftRemoteUuid
-                }
+                    savedDraftUuid = data.draftRemoteUuid
+                    realm.delete(draft)
+                } ?: throwErrorAsException()
             }
             DraftAction.SEND -> with(ApiRepository.sendDraft(mailboxUuid, draft, okHttpClient)) {
                 when {
