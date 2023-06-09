@@ -518,7 +518,10 @@ class NewMessageFragment : Fragment() {
         if (shouldExecuteDraftActionWhenStopping) {
             val isFinishing = requireActivity().isFinishing
             val isTaskRoot = requireActivity().isTaskRoot
-            executeDraftActionWhenStopping(recordedAction, isFinishing, isTaskRoot, ::startWorker)
+            val shouldTargetDraftForSnackBar = isFinishing && !isTaskRoot
+            executeDraftActionWhenStopping(recordedAction, isFinishing, isTaskRoot) {
+                startWorker(shouldTargetDraftForSnackBar)
+            }
         } else {
             shouldExecuteDraftActionWhenStopping = true
         }
@@ -526,8 +529,9 @@ class NewMessageFragment : Fragment() {
         super.onStop()
     }
 
-    private fun startWorker() {
-        draftsActionsWorkerScheduler.scheduleWork(draftLocalUuid = newMessageViewModel.draft.localUuid)
+    private fun startWorker(shouldTargetDraftForSnackBar: Boolean) {
+        val draftLocalUuid = if (shouldTargetDraftForSnackBar) newMessageViewModel.draft.localUuid else null
+        draftsActionsWorkerScheduler.scheduleWork(draftLocalUuid)
     }
 
     fun closeAutoCompletion() = with(binding) {
