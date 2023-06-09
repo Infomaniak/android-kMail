@@ -260,6 +260,7 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
+    // In case the app crashes, the battery dies or any other unexpected situation, we save every modifications locally in realm
     fun saveDraftDebouncing() {
         autoSaveJob?.cancel()
         autoSaveJob = viewModelScope.launch(ioDispatcher) {
@@ -411,7 +412,7 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private companion object {
-        const val DELAY_BEFORE_AUTO_SAVING_DRAFT = 3_000L
+        const val DELAY_BEFORE_AUTO_SAVING_DRAFT = 1_000L
         const val FILE_SIZE_25_MB = 25L * 1_024L * 1_024L
     }
 }
