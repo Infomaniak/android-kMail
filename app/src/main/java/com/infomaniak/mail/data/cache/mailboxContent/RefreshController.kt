@@ -216,6 +216,11 @@ object RefreshController {
             isHistoryComplete = true
         }
 
+        fun Folder.resetHistoryInfo() {
+            remainingOldMessagesToFetch = Folder.DEFAULT_REMAINING_OLD_MESSAGES_TO_FETCH
+            isHistoryComplete = Folder.DEFAULT_IS_HISTORY_COMPLETE
+        }
+
         val impactedThreads = mutableSetOf<Thread>()
 
         val info = when (direction) {
@@ -244,6 +249,12 @@ object RefreshController {
 
                 Direction.TO_THE_FUTURE -> {
                     it.lastUpdatedAt = Date().toRealmInstant()
+
+                    // If we try to get new Messages, but `info` is null, it's either because :
+                    // - it's the 1st opening of this Folder (in the case, everything's fine)
+                    // - or that the Folder has been emptied.
+                    // If this happens, we need to reset the history info, so we'll be able to get all Messages again.
+                    if (info == null) it.resetHistoryInfo()
 
                     // If it's the 1st opening, and we didn't even get 1 full page, it means we already reached the end.
                     if (folder.cursor == null && uidsCount < Utils.PAGE_SIZE) it.theEndIsReached()
