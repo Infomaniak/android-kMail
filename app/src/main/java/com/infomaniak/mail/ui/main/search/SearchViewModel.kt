@@ -94,9 +94,6 @@ class SearchViewModel @Inject constructor(
         }.debounce(SEARCH_DEBOUNCE_DURATION)
     }
 
-    var previousAttachments: Boolean? = null
-    var previousMutuallyExclusiveChips: Int? = null
-    var previousSearch: String? = null
 
     fun init(dummyFolderId: String) {
         this.dummyFolderId = dummyFolderId
@@ -116,13 +113,13 @@ class SearchViewModel @Inject constructor(
         _selectedFolder.value = folder
     }
 
-    fun toggleFilter(filter: ThreadFilter) {
+    fun setFilter(filter: ThreadFilter, isEnabled: Boolean = true) {
         resetPagination()
-        if (selectedFilters.contains(filter)) {
-            filter.unselect()
-        } else {
+        if (isEnabled) {
             context.trackSearchEvent(filter.matomoValue)
             filter.select()
+        } else {
+            filter.unselect()
         }
     }
 
