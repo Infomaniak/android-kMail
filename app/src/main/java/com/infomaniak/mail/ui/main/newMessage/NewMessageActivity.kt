@@ -32,7 +32,6 @@ import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.AppSettings
-import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.databinding.ActivityNewMessageBinding
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.ThemedActivity
@@ -104,7 +103,7 @@ class NewMessageActivity : ThemedActivity() {
     private fun tryToSendEmail() {
 
         fun sendEmail() {
-            newMessageFragment.recordedAction = DraftAction.SEND
+            newMessageFragment.shouldSendInsteadOfSave = true
             finish()
         }
 

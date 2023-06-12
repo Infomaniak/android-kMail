@@ -90,7 +90,7 @@ class NewMessageFragment : Fragment() {
     private var mailboxes = emptyList<Mailbox>()
     private var selectedMailboxIndex = 0
     private var lastFieldToTakeFocus: FieldType? = TO
-    var recordedAction: DraftAction = DraftAction.SAVE
+    var shouldSendInsteadOfSave: Boolean = false
 
     private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
 
@@ -520,7 +520,8 @@ class NewMessageFragment : Fragment() {
             val isFinishing = requireActivity().isFinishing
             val isTaskRoot = requireActivity().isTaskRoot
             val shouldTrackDraftForSnackBar = isFinishing && !isTaskRoot
-            executeDraftActionWhenStopping(recordedAction, isFinishing, isTaskRoot) {
+            val action = if (shouldSendInsteadOfSave) DraftAction.SEND else DraftAction.SAVE
+            executeDraftActionWhenStopping(action, isFinishing, isTaskRoot) {
                 startWorker(shouldTrackDraftForSnackBar)
             }
         } else {
