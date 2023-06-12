@@ -251,7 +251,7 @@ object RefreshController {
                     it.lastUpdatedAt = Date().toRealmInstant()
 
                     // If we try to get new Messages, but `info` is null, it's either because :
-                    // - it's the 1st opening of this Folder (in the case, everything's fine)
+                    // - it's the 1st opening of this Folder (in this case, everything's fine)
                     // - or that the Folder has been emptied.
                     // If this happens, we need to reset the history info, so we'll be able to get all Messages again.
                     if (info == null) it.resetHistoryInfo()
