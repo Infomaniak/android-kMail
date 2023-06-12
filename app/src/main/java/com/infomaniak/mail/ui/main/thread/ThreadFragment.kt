@@ -62,6 +62,8 @@ import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDial
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
 import dagger.hilt.android.AndroidEntryPoint
+import io.sentry.Sentry
+import io.sentry.SentryLevel
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.absoluteValue
 import kotlin.math.min
@@ -338,7 +340,6 @@ class ThreadFragment : Fragment() {
                 beforeUpdateAdapter = ::onMessagesUpdate
                 afterUpdateAdapter = {
                     val shouldScrollToFirstUnseenMessage = isFirstVisit.compareAndSet(true, false) && it.count() > 1
-
                     if (shouldScrollToFirstUnseenMessage) onRecyclerViewLaidOut(::scrollToFirstUnseenMessage)
                 }
             }
@@ -357,8 +358,31 @@ class ThreadFragment : Fragment() {
 
     private fun scrollToFirstUnseenMessage() = with(binding) {
         val indexToScroll = threadAdapter.messages.indexOfFirst { threadAdapter.isExpandedMap[it.uid] == true }
-        val targetChild = messagesList.getChildAt(indexToScroll)
-        messagesListNestedScrollView.scrollY = targetChild.top
+
+        // If no message is expanded (e.g. the last message of the thread is a draft) we want to automatically scroll to the very
+        // bottom.
+        if (indexToScroll == -1) {
+            scrollToBottom()
+        } else {
+            val targetChild = messagesList.getChildAt(indexToScroll)
+            if (targetChild == null) {
+                Sentry.withScope { scope ->
+                    scope.level = SentryLevel.WARNING
+                    scope.setExtra("indexToScroll", indexToScroll.toString())
+                    scope.setExtra("messageCount", threadAdapter.messages.count().toString())
+                    scope.setExtra("isExpandedMap", threadAdapter.isExpandedMap.toString())
+                    scope.setExtra("isLastMessageDraft", threadAdapter.messages.lastOrNull()?.isDraft.toString())
+                    Sentry.captureMessage("Target child for scroll in ThreadFragment is null. Fallback to scrolling to bottom")
+                }
+                scrollToBottom()
+            } else {
+                messagesListNestedScrollView.scrollY = targetChild.top
+            }
+        }
+    }
+
+    private fun scrollToBottom() = with(binding) {
+        messagesListNestedScrollView.scrollY = messagesListNestedScrollView.maxScrollAmount
     }
 
     private fun observeContacts() {
