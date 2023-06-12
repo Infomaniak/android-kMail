@@ -84,8 +84,12 @@ class NewMessageActivity : ThemedActivity() {
 
     private fun handleOnBackPressed() = with(newMessageViewModel) {
         onBackPressedDispatcher.addCallback(this@NewMessageActivity) {
-            if (isAutoCompletionOpened) newMessageFragment.closeAutoCompletion() else finish()
+            if (isAutoCompletionOpened) newMessageFragment.closeAutoCompletion() else finishAppAndRemoveTaskIfNeeded()
         }
+    }
+
+    private fun finishAppAndRemoveTaskIfNeeded() {
+        if (isTaskRoot) finishAndRemoveTask() else finish()
     }
 
     private fun setupSnackBar() {
@@ -104,7 +108,7 @@ class NewMessageActivity : ThemedActivity() {
 
         fun sendEmail() {
             newMessageFragment.shouldSendInsteadOfSave = true
-            finish()
+            finishAppAndRemoveTaskIfNeeded()
         }
 
         if (newMessageViewModel.draft.subject.isNullOrBlank()) {
