@@ -26,8 +26,10 @@ import androidx.lifecycle.*
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.lib.core.utils.getFileNameAndSize
 import com.infomaniak.lib.core.utils.guessMimeType
+import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.MatomoMail.trackSendingDraftEvent
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
@@ -51,10 +53,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.realmListOf
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import javax.inject.Inject
@@ -62,6 +61,7 @@ import javax.inject.Inject
 @HiltViewModel
 class NewMessageViewModel @Inject constructor(
     application: Application,
+    private val globalCoroutineScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
@@ -81,12 +81,11 @@ class NewMessageViewModel @Inject constructor(
     // Boolean: For toggleable actions, `false` if the formatting has been removed and `true` if the formatting has been applied.
     val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
     val isInitSuccess = SingleLiveEvent<Boolean>()
-    val shouldCloseActivity = SingleLiveEvent<Boolean>()
     val importedAttachments = MutableLiveData<Pair<MutableList<Attachment>, ImportationResult>>()
     val isSendingAllowed = MutableLiveData(false)
 
     val snackBarManager by lazy { SnackBarManager() }
-    var shouldHandleDraftActionWhenLeaving = true
+    var shouldExecuteDraftActionWhenStopping = true
 
     private var snapshot: DraftSnapshot? = null
 
@@ -260,6 +259,7 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
+    // In case the app crashes, the battery dies or any other unexpected situation, we always save every modifications of the draft in realm
     fun saveDraftDebouncing() {
         autoSaveJob?.cancel()
         autoSaveJob = viewModelScope.launch(ioDispatcher) {
@@ -268,19 +268,51 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    fun saveToLocalAndFinish(action: DraftAction) = viewModelScope.launch(ioDispatcher) {
+    fun executeDraftActionWhenStopping(
+        action: DraftAction,
+        isFinishing: Boolean,
+        isTaskRoot: Boolean,
+        startWorkerCallback: () -> Unit,
+    ) = globalCoroutineScope.launch(ioDispatcher) {
         autoSaveJob?.cancel()
 
         if (shouldExecuteAction(action)) {
             context.trackSendingDraftEvent(action, draft)
             saveDraftToLocal(action)
+            showDraftToastToUser(action, isFinishing, isTaskRoot)
+            startWorkerCallback()
+            if (action == DraftAction.SAVE && !isFinishing) {
+                isNewMessage = false
+                saveDraftSnapshot()
+            }
         } else if (isNewMessage) {
-            RealmDatabase.mailboxContent().writeBlocking {
-                DraftController.getDraft(draft.localUuid, realm = this)?.let(::delete)
+            removeDraftFromRealm()
+        }
+    }
+
+    private suspend fun showDraftToastToUser(
+        action: DraftAction,
+        isFinishing: Boolean,
+        isTaskRoot: Boolean,
+    ) = withContext(mainDispatcher) {
+        when (action) {
+            DraftAction.SAVE -> {
+                if (isFinishing) {
+                    if (isTaskRoot) context.showToast(R.string.snackbarDraftSaving)
+                } else {
+                    context.showToast(R.string.snackbarDraftSaving)
+                }
+            }
+            DraftAction.SEND -> {
+                if (isTaskRoot) context.showToast(R.string.snackbarEmailSending)
             }
         }
+    }
 
-        shouldCloseActivity.postValue(true)
+    private fun removeDraftFromRealm() {
+        RealmDatabase.mailboxContent().writeBlocking {
+            DraftController.getDraft(draft.localUuid, realm = this)?.let(::delete)
+        }
     }
 
     private fun saveDraftToLocal(action: DraftAction) {
@@ -367,7 +399,7 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private companion object {
-        const val DELAY_BEFORE_AUTO_SAVING_DRAFT = 3_000L
+        const val DELAY_BEFORE_AUTO_SAVING_DRAFT = 1_000L
         const val FILE_SIZE_25_MB = 25L * 1_024L * 1_024L
     }
 }

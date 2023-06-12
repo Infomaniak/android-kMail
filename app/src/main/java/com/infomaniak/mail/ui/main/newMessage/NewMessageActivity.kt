@@ -32,11 +32,13 @@ import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.AppSettings
-import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.databinding.ActivityNewMessageBinding
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.ThemedActivity
-import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.createDescriptionDialog
+import com.infomaniak.mail.utils.getAttributeColor
+import com.infomaniak.mail.utils.updateNavigationBarColor
 import dagger.hilt.android.AndroidEntryPoint
 import com.google.android.material.R as RMaterial
 
@@ -69,7 +71,6 @@ class NewMessageActivity : ThemedActivity() {
         setupSendButton()
         setupSystemBars()
 
-        observeCloseActivity()
         observeInitSuccess()
     }
 
@@ -83,8 +84,12 @@ class NewMessageActivity : ThemedActivity() {
 
     private fun handleOnBackPressed() = with(newMessageViewModel) {
         onBackPressedDispatcher.addCallback(this@NewMessageActivity) {
-            if (isAutoCompletionOpened) newMessageFragment.closeAutoCompletion() else saveDraftLocallyAndFinish(DraftAction.SAVE)
+            if (isAutoCompletionOpened) newMessageFragment.closeAutoCompletion() else finishAppAndRemoveTaskIfNeeded()
         }
+    }
+
+    private fun finishAppAndRemoveTaskIfNeeded() {
+        if (isTaskRoot) finishAndRemoveTask() else finish()
     }
 
     private fun setupSnackBar() {
@@ -102,7 +107,8 @@ class NewMessageActivity : ThemedActivity() {
     private fun tryToSendEmail() {
 
         fun sendEmail() {
-            saveDraftLocallyAndFinish(DraftAction.SEND)
+            newMessageFragment.shouldSendInsteadOfSave = true
+            finishAppAndRemoveTaskIfNeeded()
         }
 
         if (newMessageViewModel.draft.subject.isNullOrBlank()) {
@@ -129,14 +135,6 @@ class NewMessageActivity : ThemedActivity() {
         }
     }
 
-    private fun saveDraftLocallyAndFinish(action: DraftAction) {
-        newMessageViewModel.saveToLocalAndFinish(action)
-    }
-
-    private fun observeCloseActivity() {
-        newMessageViewModel.shouldCloseActivity.observeNotNull(this) { if (isTaskRoot) finishAndRemoveTask() else finish() }
-    }
-
     private fun observeInitSuccess() {
         newMessageViewModel.isInitSuccess.observe(this) { isSuccess ->
             if (isSuccess) {
@@ -151,7 +149,7 @@ class NewMessageActivity : ThemedActivity() {
         fun linkEditor(view: MaterialButton, action: EditorAction) {
             view.setOnClickListener {
                 // TODO: Don't forget to add in this `if` all actions that make the app go to background.
-                if (action == EditorAction.ATTACHMENT) newMessageViewModel.shouldHandleDraftActionWhenLeaving = false
+                if (action == EditorAction.ATTACHMENT) newMessageViewModel.shouldExecuteDraftActionWhenStopping = false
                 trackEvent("editorActions", action.matomoValue)
                 newMessageViewModel.editorAction.value = action to null
             }
