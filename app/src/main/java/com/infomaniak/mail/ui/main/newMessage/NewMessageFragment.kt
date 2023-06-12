@@ -378,7 +378,7 @@ class NewMessageFragment : Fragment() {
     private fun handleMailTo() = with(newMessageViewModel) {
         fun String.splitToRecipientList() = split(",").mapNotNull {
             val email = it.trim()
-            if (it.isBlank()) null else Recipient().initLocalValues(email, email)
+            if (email.isNotBlank() && email.isEmail()) Recipient().initLocalValues(email, email) else null
         }
 
         val intent = requireActivity().intent
