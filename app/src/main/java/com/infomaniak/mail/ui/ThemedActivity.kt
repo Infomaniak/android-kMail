@@ -53,7 +53,7 @@ open class ThemedActivity : AppCompatActivity() {
         if (localSettings.isAppLocked && isKeyguardSecure()) with(getMainApplication()) {
             lastAppClosingTime?.let {
                 LockActivity.lockAfterTimeout(
-                    context = this,
+                    context = this@ThemedActivity,
                     destinationClass = this::class.java,
                     lastAppClosingTime = it,
                     primaryColor = localSettings.accentColor.getPrimary(this),
