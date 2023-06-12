@@ -54,7 +54,7 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition.INLINE
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
-import com.infomaniak.mail.data.models.draft.Draft.DraftMode
+import com.infomaniak.mail.data.models.draft.Draft.*
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
@@ -516,12 +516,30 @@ class NewMessageFragment : Fragment() {
         //  Realm, and we'll lost some Draft data. A quick fix to get rid of the current bugs is
         //  to wait the end of Draft composition before starting DraftsActionsWorker.
         if (shouldHandleDraftActionWhenLeaving) {
+            showDraftFeedbackToUser()
             draftsActionsWorkerScheduler.scheduleWork(draftLocalUuid = newMessageViewModel.draft.localUuid)
         } else {
             shouldHandleDraftActionWhenLeaving = true
         }
 
         super.onStop()
+    }
+
+    private fun showDraftFeedbackToUser() = with(requireActivity()) {
+        when (newMessageViewModel.draft.action) {
+            DraftAction.SAVE -> {
+                if (isFinishing) {
+                    if (isTaskRoot) showToast(R.string.snackbarDraftSaving)
+                } else {
+                    // TODO : Only show if draft was modified since last save. Else we don't need to save it again
+                    showToast(R.string.snackbarDraftSaving)
+                }
+            }
+            DraftAction.SEND -> {
+                if (isTaskRoot) showToast(R.string.snackbarEmailSending)
+            }
+            null -> Unit
+        }
     }
 
     fun closeAutoCompletion() = with(binding) {

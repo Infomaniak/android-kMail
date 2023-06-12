@@ -26,7 +26,6 @@ import androidx.activity.viewModels
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.google.android.material.button.MaterialButton
-import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.ACTION_POSTPONE_NAME
 import com.infomaniak.mail.MatomoMail.trackEvent
@@ -84,7 +83,7 @@ class NewMessageActivity : ThemedActivity() {
 
     private fun handleOnBackPressed() = with(newMessageViewModel) {
         onBackPressedDispatcher.addCallback(this@NewMessageActivity) {
-            if (isAutoCompletionOpened) newMessageFragment.closeAutoCompletion() else saveDraftAndShowToast(DraftAction.SAVE)
+            if (isAutoCompletionOpened) newMessageFragment.closeAutoCompletion() else saveDraftLocallyAndFinish(DraftAction.SAVE)
         }
     }
 
@@ -103,7 +102,7 @@ class NewMessageActivity : ThemedActivity() {
     private fun tryToSendEmail() {
 
         fun sendEmail() {
-            saveDraftAndShowToast(DraftAction.SEND)
+            saveDraftLocallyAndFinish(DraftAction.SEND)
         }
 
         if (newMessageViewModel.draft.subject.isNullOrBlank()) {
@@ -130,16 +129,8 @@ class NewMessageActivity : ThemedActivity() {
         }
     }
 
-    private fun saveDraftAndShowToast(action: DraftAction) {
-        newMessageViewModel.saveToLocalAndFinish(action) {
-            displayDraftActionToast(action)
-        }
-    }
-
-    private fun displayDraftActionToast(action: DraftAction) {
-        if (isTaskRoot) {
-            showToast(title = if (action == DraftAction.SAVE) R.string.snackbarDraftSaving else R.string.snackbarEmailSending)
-        }
+    private fun saveDraftLocallyAndFinish(action: DraftAction) {
+        newMessageViewModel.saveToLocalAndFinish(action)
     }
 
     private fun observeCloseActivity() {

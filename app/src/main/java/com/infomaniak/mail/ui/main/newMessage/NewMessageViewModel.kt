@@ -51,7 +51,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.realmListOf
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import javax.inject.Inject
@@ -265,13 +268,12 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    fun saveToLocalAndFinish(action: DraftAction, displayToast: () -> Unit) = viewModelScope.launch(ioDispatcher) {
+    fun saveToLocalAndFinish(action: DraftAction) = viewModelScope.launch(ioDispatcher) {
         autoSaveJob?.cancel()
 
         if (shouldExecuteAction(action)) {
             context.trackSendingDraftEvent(action, draft)
             saveDraftToLocal(action)
-            withContext(mainDispatcher) { displayToast() }
         } else if (isNewMessage) {
             RealmDatabase.mailboxContent().writeBlocking {
                 DraftController.getDraft(draft.localUuid, realm = this)?.let(::delete)
