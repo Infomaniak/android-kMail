@@ -376,9 +376,9 @@ class NewMessageFragment : Fragment() {
      * Get [Intent.ACTION_VIEW] data with [MailTo] and [Intent.ACTION_SENDTO] with [Intent]
      */
     private fun handleMailTo() = with(newMessageViewModel) {
-        fun String.splitToRecipientList() = split(",").map {
+        fun String.splitToRecipientList() = split(",").mapNotNull {
             val email = it.trim()
-            Recipient().initLocalValues(email, email)
+            if (email.isNotBlank() && email.isEmail()) Recipient().initLocalValues(email, email) else null
         }
 
         val intent = requireActivity().intent
