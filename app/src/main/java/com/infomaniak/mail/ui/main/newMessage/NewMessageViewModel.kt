@@ -281,9 +281,12 @@ class NewMessageViewModel @Inject constructor(
             saveDraftToLocal(action)
             showDraftToastToUser(action, isFinishing, isTaskRoot)
             startWorkerCallback()
-            if (action == DraftAction.SAVE && !isFinishing) saveDraftSnapshot()
+            if (action == DraftAction.SAVE && !isFinishing) {
+                isNewMessage = false
+                saveDraftSnapshot()
+            }
         } else if (isNewMessage) {
-            removeNewBlankDraftFromRealm()
+            removeDraftFromRealm()
         }
     }
 
@@ -306,7 +309,7 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    private fun removeNewBlankDraftFromRealm() {
+    private fun removeDraftFromRealm() {
         RealmDatabase.mailboxContent().writeBlocking {
             DraftController.getDraft(draft.localUuid, realm = this)?.let(::delete)
         }
