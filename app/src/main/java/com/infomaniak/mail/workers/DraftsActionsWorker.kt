@@ -345,7 +345,6 @@ class DraftsActionsWorker @AssistedInject constructor(
                     draft.action = null
                     scheduledDate = dateFormatWithTimezone.format(Date())
                     savedDraftUuid = data.draftRemoteUuid
-                    realm.delete(draft)
                 } ?: throwErrorAsException()
             }
             DraftAction.SEND -> with(ApiRepository.sendDraft(mailboxUuid, draft, okHttpClient)) {
