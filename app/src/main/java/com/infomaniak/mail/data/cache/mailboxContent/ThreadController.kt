@@ -204,10 +204,10 @@ object ThreadController {
                             }
 
                             remoteMessage.initLocalValues(
-                                isFullyDownloaded = true,
-                                messageIds = localMessage.messageIds,
-                                isSpam = localMessage.isSpam,
                                 date = localMessage.date,
+                                isFullyDownloaded = true,
+                                isSpam = localMessage.isSpam,
+                                messageIds = localMessage.messageIds,
                                 draftLocalUuid = draftLocalUuid,
                             )
 
