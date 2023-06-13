@@ -110,7 +110,6 @@ object AttachmentMimeTypeUtils {
         "application/xml"
     )
 
-
     private val fontMatches = mimeTypeSetOf(
         "font/",
         "application/vnd.afpc.foca-codedfont",

@@ -93,7 +93,6 @@ class SearchViewModel @Inject constructor(
         }.debounce(SEARCH_DEBOUNCE_DURATION)
     }
 
-
     fun init(dummyFolderId: String) {
         this.dummyFolderId = dummyFolderId
     }
