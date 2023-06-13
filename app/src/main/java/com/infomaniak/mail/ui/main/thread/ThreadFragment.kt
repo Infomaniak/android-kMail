@@ -203,13 +203,19 @@ class ThreadFragment : Fragment() {
                         shouldLoadDistantResources = shouldLoadDistantResources(lastMessageToReplyTo.uid),
                     )
                 }
-                R.id.quickActionMenu -> safeNavigate(
-                    ThreadFragmentDirections.actionThreadFragmentToThreadActionsBottomSheetDialog(
-                        threadUid = navigationArgs.threadUid,
-                        messageUidToReplyTo = lastMessageToReplyTo.uid,
-                        shouldLoadDistantResources = shouldLoadDistantResources(lastMessageToReplyTo.uid),
-                    )
-                )
+                R.id.quickActionMenu -> {
+                    if (threadAdapter.messages.count() == 1) {
+                        threadAdapter.messages.single().navigateToActionBottomsheet()
+                    } else {
+                        safeNavigate(
+                            ThreadFragmentDirections.actionThreadFragmentToThreadActionsBottomSheetDialog(
+                                threadUid = navigationArgs.threadUid,
+                                messageUidToReplyTo = lastMessageToReplyTo.uid,
+                                shouldLoadDistantResources = shouldLoadDistantResources(lastMessageToReplyTo.uid),
+                            )
+                        )
+                    }
+                }
             }
         }
     }
@@ -271,19 +277,21 @@ class ThreadFragment : Fragment() {
                 trackMessageActionsEvent(ACTION_REPLY_NAME)
                 replyTo(message)
             }
-            onMenuClicked = { message ->
-                safeNavigate(
-                    ThreadFragmentDirections.actionThreadFragmentToMessageActionBottomSheetDialog(
-                        messageUid = message.uid,
-                        threadUid = navigationArgs.threadUid,
-                        isFavorite = message.isFavorite,
-                        isSeen = message.isSeen,
-                        isThemeTheSame = threadAdapter.isThemeTheSameMap[message.uid]!!,
-                        shouldLoadDistantResources = shouldLoadDistantResources(message.uid),
-                    )
-                )
-            }
+            onMenuClicked = { message -> message.navigateToActionBottomsheet() }
         }
+    }
+
+    private fun Message.navigateToActionBottomsheet() {
+        safeNavigate(
+            ThreadFragmentDirections.actionThreadFragmentToMessageActionBottomSheetDialog(
+                messageUid = uid,
+                threadUid = navigationArgs.threadUid,
+                isFavorite = isFavorite,
+                isSeen = isSeen,
+                isThemeTheSame = threadAdapter.isThemeTheSameMap[uid]!!,
+                shouldLoadDistantResources = shouldLoadDistantResources(uid),
+            )
+        )
     }
 
     private fun scheduleDownloadManager(downloadUrl: String, filename: String) {
