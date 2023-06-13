@@ -178,27 +178,19 @@ class SearchFragment : Fragment() {
     }
 
     private fun setAttachmentsUi() = with(searchViewModel) {
-        binding.attachments.setOnCheckedChangeListener { _, _ ->
-            if (previousAttachments != null) {
-                previousAttachments = null
-                return@setOnCheckedChangeListener
-            }
+        binding.attachments.setOnCheckedChangeListener { _, isChecked ->
 
-            toggleFilter(ThreadFilter.ATTACHMENTS)
+            setFilter(ThreadFilter.ATTACHMENTS, isChecked)
         }
     }
 
     private fun setMutuallyExclusiveChipGroupUi() = with(searchViewModel) {
         binding.mutuallyExclusiveChipGroup.setOnCheckedStateChangeListener { chipGroup, _ ->
-            if (previousMutuallyExclusiveChips != null) {
-                previousMutuallyExclusiveChips = null
-                return@setOnCheckedStateChangeListener
-            }
 
             when (chipGroup.checkedChipId) {
-                R.id.read -> toggleFilter(ThreadFilter.SEEN)
-                R.id.unread -> toggleFilter(ThreadFilter.UNSEEN)
-                R.id.favorites -> toggleFilter(ThreadFilter.STARRED)
+                R.id.read -> setFilter(ThreadFilter.SEEN)
+                R.id.unread -> setFilter(ThreadFilter.UNSEEN)
+                R.id.favorites -> setFilter(ThreadFilter.STARRED)
                 else -> unselectMutuallyExclusiveFilters()
             }
         }
@@ -214,10 +206,6 @@ class SearchFragment : Fragment() {
             showKeyboard()
 
             doOnTextChanged { text, _, _, _ ->
-                if (searchViewModel.previousSearch != null) {
-                    searchViewModel.previousSearch = null
-                    return@doOnTextChanged
-                }
                 searchViewModel.searchQuery(text.toString())
             }
 
@@ -242,9 +230,6 @@ class SearchFragment : Fragment() {
 
                     navigateToThread(thread, mainViewModel)
 
-                    previousAttachments = attachments.isChecked
-                    previousMutuallyExclusiveChips = mutuallyExclusiveChipGroup.checkedChipId
-                    previousSearch = searchBar.searchTextInput.text.toString()
                 }
             }
         }
@@ -265,11 +250,12 @@ class SearchFragment : Fragment() {
 
     private fun DragDropSwipeRecyclerView.setPagination() = with(binding) {
         scrollListener = object : OnListScrollListener {
+
             override fun onListScrollStateChanged(scrollState: ScrollState) = Unit
 
             override fun onListScrolled(
                 scrollDirection: ScrollDirection,
-                distance: Int
+                distance: Int,
             ) = with(mailRecyclerView.layoutManager!!) {
                 if (scrollDirection == ScrollDirection.DOWN) {
                     val visibleItemCount = childCount

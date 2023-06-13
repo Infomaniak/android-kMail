@@ -54,7 +54,7 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition.INLINE
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
-import com.infomaniak.mail.data.models.draft.Draft.DraftMode
+import com.infomaniak.mail.data.models.draft.Draft.*
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
@@ -90,6 +90,7 @@ class NewMessageFragment : Fragment() {
     private var mailboxes = emptyList<Mailbox>()
     private var selectedMailboxIndex = 0
     private var lastFieldToTakeFocus: FieldType? = TO
+    var shouldSendInsteadOfSave: Boolean = false
 
     private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
 
@@ -376,9 +377,9 @@ class NewMessageFragment : Fragment() {
      * Get [Intent.ACTION_VIEW] data with [MailTo] and [Intent.ACTION_SENDTO] with [Intent]
      */
     private fun handleMailTo() = with(newMessageViewModel) {
-        fun String.splitToRecipientList() = split(",").map {
+        fun String.splitToRecipientList() = split(",").mapNotNull {
             val email = it.trim()
-            Recipient().initLocalValues(email, email)
+            if (email.isEmail()) Recipient().initLocalValues(email, email) else null
         }
 
         val intent = requireActivity().intent
@@ -515,13 +516,24 @@ class NewMessageFragment : Fragment() {
         //  If it happens and we do anything in Realm about that, it will desynchronize the UI &
         //  Realm, and we'll lost some Draft data. A quick fix to get rid of the current bugs is
         //  to wait the end of Draft composition before starting DraftsActionsWorker.
-        if (shouldHandleDraftActionWhenLeaving) {
-            draftsActionsWorkerScheduler.scheduleWork(draftLocalUuid = newMessageViewModel.draft.localUuid)
+        if (shouldExecuteDraftActionWhenStopping) {
+            val isFinishing = requireActivity().isFinishing
+            val isTaskRoot = requireActivity().isTaskRoot
+            val shouldTrackDraftForSnackBar = isFinishing && !isTaskRoot
+            val action = if (shouldSendInsteadOfSave) DraftAction.SEND else DraftAction.SAVE
+            executeDraftActionWhenStopping(action, isFinishing, isTaskRoot) {
+                startWorker(shouldTrackDraftForSnackBar)
+            }
         } else {
-            shouldHandleDraftActionWhenLeaving = true
+            shouldExecuteDraftActionWhenStopping = true
         }
 
         super.onStop()
+    }
+
+    private fun startWorker(shouldTrackDraftForSnackBar: Boolean) {
+        val draftLocalUuid = if (shouldTrackDraftForSnackBar) newMessageViewModel.draft.localUuid else null
+        draftsActionsWorkerScheduler.scheduleWork(draftLocalUuid)
     }
 
     fun closeAutoCompletion() = with(binding) {

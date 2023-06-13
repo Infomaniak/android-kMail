@@ -69,14 +69,13 @@ class SearchViewModel @Inject constructor(
     private lateinit var dummyFolderId: String
 
     private var resourceNext: String? = null
-    private var resourcePrevious: String? = null
-
+    private var isFirstPage: Boolean = true
     private val isLastPage get() = resourceNext.isNullOrBlank()
 
     val searchResults: LiveData<List<Thread>> = observeSearchAndFilters()
         .flatMapLatest { (queryData, filters, folder) ->
             val (query, saveInHistory) = queryData
-            fetchThreads(
+            searchThreads(
                 query = if (isLengthTooShort(query)) null else query,
                 saveInHistory,
                 filters,
@@ -94,10 +93,6 @@ class SearchViewModel @Inject constructor(
             Triple(queryData, filters, folder)
         }.debounce(SEARCH_DEBOUNCE_DURATION)
     }
-
-    var previousAttachments: Boolean? = null
-    var previousMutuallyExclusiveChips: Int? = null
-    var previousSearch: String? = null
 
     fun init(dummyFolderId: String) {
         this.dummyFolderId = dummyFolderId
@@ -117,13 +112,13 @@ class SearchViewModel @Inject constructor(
         _selectedFolder.value = folder
     }
 
-    fun toggleFilter(filter: ThreadFilter) {
+    fun setFilter(filter: ThreadFilter, isEnabled: Boolean = true) {
         resetPagination()
-        if (selectedFilters.contains(filter)) {
-            filter.unselect()
-        } else {
+        if (isEnabled) {
             context.trackSearchEvent(filter.matomoValue)
             filter.select()
+        } else {
+            filter.unselect()
         }
     }
 
@@ -139,14 +134,6 @@ class SearchViewModel @Inject constructor(
         searchQuery(searchQuery, resetPagination = false)
     }
 
-    override fun onCleared() {
-        CoroutineScope(coroutineContext).launch {
-            searchUtils.deleteRealmSearchData()
-            Log.i(TAG, "SearchViewModel>onCleared: called")
-        }
-        super.onCleared()
-    }
-
     private fun ThreadFilter.select() {
         _selectedFilters.value = searchUtils.selectFilter(filter = this, selectedFilters)
     }
@@ -157,33 +144,54 @@ class SearchViewModel @Inject constructor(
 
     private fun resetPagination() {
         resourceNext = null
-        resourcePrevious = null
+        isFirstPage = true
+    }
+
+    override fun onCleared() {
+        CoroutineScope(coroutineContext).launch {
+            SearchUtils.deleteRealmSearchData()
+            Log.i(TAG, "SearchViewModel>onCleared: called")
+        }
+        super.onCleared()
     }
 
     fun isLengthTooShort(query: String?) = query == null || query.length < MIN_SEARCH_QUERY
 
-    private fun fetchThreads(
+    private fun searchThreads(
         query: String?,
         saveInHistory: Boolean,
         filters: Set<ThreadFilter>,
         folder: Folder?,
     ): Flow<List<Thread>> = flow {
+        getReadyForNewSearch(folder, filters, query)?.let { newFilters ->
+            fetchThreads(folder, newFilters, query)
+            emitThreads(saveInHistory, newFilters, query)
+        }
+    }
+
+    private suspend fun getReadyForNewSearch(folder: Folder?, filters: Set<ThreadFilter>, query: String?): Set<ThreadFilter>? {
+
+        val newFilters = if (folder == null) filters else (filters + ThreadFilter.FOLDER)
+
+        if (isFirstPage && isLastPage) SearchUtils.deleteRealmSearchData()
+
+        return if (newFilters.isEmpty() && query.isNullOrBlank()) {
+            visibilityMode.postValue(VisibilityMode.RECENT_SEARCHES)
+            null
+        } else {
+            newFilters
+        }
+    }
+
+    private suspend fun fetchThreads(folder: Folder?, newFilters: Set<ThreadFilter>, query: String?) {
 
         suspend fun ApiResponse<ThreadResult>.initSearchFolderThreads() {
             runCatching {
-                this.data?.threads?.let { ThreadController.initAndGetSearchFolderThreads(it) }
+                data?.threads?.let { ThreadController.initAndGetSearchFolderThreads(it) }
             }.getOrElse { exception ->
                 exception.printStackTrace()
                 Sentry.captureException(exception)
             }
-        }
-
-        val newFilters = if (folder == null) filters else (filters + ThreadFilter.FOLDER)
-
-        if (isLastPage && resourcePrevious.isNullOrBlank()) searchUtils.deleteRealmSearchData()
-        if (newFilters.isEmpty() && query.isNullOrBlank()) {
-            visibilityMode.postValue(VisibilityMode.RECENT_SEARCHES)
-            return@flow
         }
 
         visibilityMode.postValue(VisibilityMode.LOADING)
@@ -196,13 +204,20 @@ class SearchViewModel @Inject constructor(
         if (apiResponse.isSuccess()) with(apiResponse) {
             initSearchFolderThreads()
             resourceNext = data?.resourceNext
-            resourcePrevious = data?.resourcePrevious
+            isFirstPage = data?.resourcePrevious == null
         } else if (isLastPage) {
             ThreadController.saveThreads(searchMessages = MessageController.searchMessages(query, newFilters, folderId))
         }
+    }
 
+    private suspend fun FlowCollector<List<Thread>>.emitThreads(
+        saveInHistory: Boolean,
+        newFilters: Set<ThreadFilter>,
+        query: String?,
+    ) {
         emitAll(ThreadController.getSearchThreadsAsync().mapLatest {
             if (saveInHistory) query?.let(history::postValue)
+
             it.list.also { threads ->
                 val resultsVisibilityMode = when {
                     newFilters.isEmpty() && isLengthTooShort(searchQuery) -> VisibilityMode.RECENT_SEARCHES
