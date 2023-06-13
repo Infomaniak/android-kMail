@@ -40,7 +40,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.sentry.Sentry
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import java.util.UUID
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
@@ -55,7 +54,7 @@ class SearchViewModel @Inject constructor(
     private val _searchQuery = MutableLiveData("" to false)
     private val _selectedFilters = MutableStateFlow(emptySet<ThreadFilter>())
     private val _selectedFolder = MutableStateFlow<Folder?>(null)
-    private val _onPaginationTrigger = MutableStateFlow<UUID?>(null)
+    private val _onPaginationTrigger = MutableLiveData(Unit)
     /** Beware when using this variable because there might be side effects due to concurrency */
     private var shouldPaginate: Boolean = false
 
@@ -94,7 +93,7 @@ class SearchViewModel @Inject constructor(
             _searchQuery.asFlow(),
             _selectedFilters,
             _selectedFolder,
-            _onPaginationTrigger,
+            _onPaginationTrigger.asFlow(),
         ) { queryData, filters, folder, _ ->
             NewSearchInfo(queryData, filters, folder, shouldPaginate)
         }.debounce(SEARCH_DEBOUNCE_DURATION)
@@ -138,7 +137,7 @@ class SearchViewModel @Inject constructor(
     fun nextPage() {
         if (isLastPage) return
         shouldPaginate = true
-        _onPaginationTrigger.value = UUID.randomUUID()
+        _onPaginationTrigger.value = Unit
     }
 
     private fun ThreadFilter.select() {
