@@ -161,12 +161,14 @@ class Message : RealmObject {
         isSpam: Boolean,
         messageIds: RealmSet<String>,
         draftLocalUuid: String?,
+        isFromSearch: Boolean,
     ) {
         this.date = date
         this.isFullyDownloaded = isFullyDownloaded
         this.isSpam = isSpam
         this.messageIds = messageIds
         draftLocalUuid?.let { this.draftLocalUuid = it }
+        this.isFromSearch = isFromSearch
         messageId = messageId?.sanitize()
         shortUid = uid.toShortUid()
     }
