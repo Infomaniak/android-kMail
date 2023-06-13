@@ -250,11 +250,12 @@ class SearchFragment : Fragment() {
 
     private fun DragDropSwipeRecyclerView.setPagination() = with(binding) {
         scrollListener = object : OnListScrollListener {
+
             override fun onListScrollStateChanged(scrollState: ScrollState) = Unit
 
             override fun onListScrolled(
                 scrollDirection: ScrollDirection,
-                distance: Int
+                distance: Int,
             ) = with(mailRecyclerView.layoutManager!!) {
                 if (scrollDirection == ScrollDirection.DOWN) {
                     val visibleItemCount = childCount
