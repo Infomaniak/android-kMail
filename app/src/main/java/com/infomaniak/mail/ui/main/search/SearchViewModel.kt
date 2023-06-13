@@ -163,13 +163,13 @@ class SearchViewModel @Inject constructor(
         filters: Set<ThreadFilter>,
         folder: Folder?,
     ): Flow<List<Thread>> = flow {
-        initThreads(folder, filters, query)?.let { newFilters ->
+        getReadyForNewSearch(folder, filters, query)?.let { newFilters ->
             fetchThreads(folder, newFilters, query)
             emitThreads(saveInHistory, newFilters, query)
         }
     }
 
-    private suspend fun initThreads(folder: Folder?, filters: Set<ThreadFilter>, query: String?): Set<ThreadFilter>? {
+    private suspend fun getReadyForNewSearch(folder: Folder?, filters: Set<ThreadFilter>, query: String?): Set<ThreadFilter>? {
 
         val newFilters = if (folder == null) filters else (filters + ThreadFilter.FOLDER)
 
