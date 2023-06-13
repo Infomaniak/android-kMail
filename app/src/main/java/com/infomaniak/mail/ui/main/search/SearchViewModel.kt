@@ -68,7 +68,7 @@ class SearchViewModel @Inject constructor(
     private lateinit var dummyFolderId: String
 
     private var resourceNext: String? = null
-    private var resourcePrevious: String? = null
+    private var isFirstPage: Boolean = true
     private val isLastPage get() = resourceNext.isNullOrBlank()
 
     val searchResults: LiveData<List<Thread>> = observeSearchAndFilters()
@@ -144,7 +144,7 @@ class SearchViewModel @Inject constructor(
 
     private fun resetPagination() {
         resourceNext = null
-        resourcePrevious = null
+        isFirstPage = true
     }
 
     override fun onCleared() {
@@ -173,7 +173,7 @@ class SearchViewModel @Inject constructor(
 
         val newFilters = if (folder == null) filters else (filters + ThreadFilter.FOLDER)
 
-        if (isLastPage && resourcePrevious.isNullOrBlank()) SearchUtils.deleteRealmSearchData()
+        if (isFirstPage && isLastPage) SearchUtils.deleteRealmSearchData()
 
         return if (newFilters.isEmpty() && query.isNullOrBlank()) {
             visibilityMode.postValue(VisibilityMode.RECENT_SEARCHES)
@@ -204,7 +204,7 @@ class SearchViewModel @Inject constructor(
         if (apiResponse.isSuccess()) with(apiResponse) {
             initSearchFolderThreads()
             resourceNext = data?.resourceNext
-            resourcePrevious = data?.resourcePrevious
+            isFirstPage = data?.resourcePrevious == null
         } else if (isLastPage) {
             ThreadController.saveThreads(searchMessages = MessageController.searchMessages(query, newFilters, folderId))
         }
