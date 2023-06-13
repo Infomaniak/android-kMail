@@ -209,6 +209,7 @@ object ThreadController {
                                 isSpam = localMessage.isSpam,
                                 messageIds = localMessage.messageIds,
                                 draftLocalUuid = draftLocalUuid,
+                                isFromSearch = localMessage.isFromSearch,
                             )
 
                             MessageController.upsertMessage(remoteMessage, realm = this@fetchIncompleteMessages)
