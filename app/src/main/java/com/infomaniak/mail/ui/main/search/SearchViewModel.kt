@@ -69,7 +69,6 @@ class SearchViewModel @Inject constructor(
 
     private var resourceNext: String? = null
     private var resourcePrevious: String? = null
-
     private val isLastPage get() = resourceNext.isNullOrBlank()
 
     val searchResults: LiveData<List<Thread>> = observeSearchAndFilters()
@@ -135,14 +134,6 @@ class SearchViewModel @Inject constructor(
         searchQuery(searchQuery, resetPagination = false)
     }
 
-    override fun onCleared() {
-        CoroutineScope(coroutineContext).launch {
-            SearchUtils.deleteRealmSearchData()
-            Log.i(TAG, "SearchViewModel>onCleared: called")
-        }
-        super.onCleared()
-    }
-
     private fun ThreadFilter.select() {
         _selectedFilters.value = SearchUtils.selectFilter(filter = this, selectedFilters)
     }
@@ -156,6 +147,14 @@ class SearchViewModel @Inject constructor(
         resourcePrevious = null
     }
 
+    override fun onCleared() {
+        CoroutineScope(coroutineContext).launch {
+            SearchUtils.deleteRealmSearchData()
+            Log.i(TAG, "SearchViewModel>onCleared: called")
+        }
+        super.onCleared()
+    }
+
     fun isLengthTooShort(query: String?) = query == null || query.length < MIN_SEARCH_QUERY
 
     private fun fetchThreads(
@@ -167,7 +166,7 @@ class SearchViewModel @Inject constructor(
 
         suspend fun ApiResponse<ThreadResult>.initSearchFolderThreads() {
             runCatching {
-                this.data?.threads?.let { ThreadController.initAndGetSearchFolderThreads(it) }
+                data?.threads?.let { ThreadController.initAndGetSearchFolderThreads(it) }
             }.getOrElse { exception ->
                 exception.printStackTrace()
                 Sentry.captureException(exception)
@@ -199,6 +198,7 @@ class SearchViewModel @Inject constructor(
 
         emitAll(ThreadController.getSearchThreadsAsync().mapLatest {
             if (saveInHistory) query?.let(history::postValue)
+
             it.list.also { threads ->
                 val resultsVisibilityMode = when {
                     newFilters.isEmpty() && isLengthTooShort(searchQuery) -> VisibilityMode.RECENT_SEARCHES

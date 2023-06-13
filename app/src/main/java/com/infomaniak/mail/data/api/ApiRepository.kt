@@ -239,11 +239,14 @@ object ApiRepository : ApiRepositoryCore() {
     }
 
     fun searchThreads(mailboxUuid: String, folderId: String, filters: String, resource: String?): ApiResponse<ThreadResult> {
-        return if (resource.isNullOrBlank()) {
-            callApi(ApiRoutes.search(mailboxUuid, folderId, filters), GET)
+
+        val url = if (resource.isNullOrBlank()) {
+            ApiRoutes.search(mailboxUuid, folderId, filters)
         } else {
-            callApi("${ApiRoutes.resource(resource)}&$filters", GET)
+            "${ApiRoutes.resource(resource)}&$filters"
         }
+
+        return callApi(url, GET)
     }
 
     fun flushFolder(mailboxUuid: String, folderId: String): ApiResponse<Boolean> {
