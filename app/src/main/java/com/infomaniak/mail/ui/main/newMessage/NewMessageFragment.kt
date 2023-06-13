@@ -377,9 +377,21 @@ class NewMessageFragment : Fragment() {
      * Get [Intent.ACTION_VIEW] data with [MailTo] and [Intent.ACTION_SENDTO] with [Intent]
      */
     private fun handleMailTo() = with(newMessageViewModel) {
-        fun String.splitToRecipientList() = split(",").mapNotNull {
+
+        /**
+         * Mailto grammar accept 'name_of_recipient<email>' for recipients
+         */
+        fun parseEmailWithName(recipient: String): Recipient? {
+            val nameAndEmail = Regex("(.+)<(.+)>").find(recipient)?.let { matchResult ->
+                matchResult.groupValues[1] to matchResult.groupValues[2]
+            }
+
+            return nameAndEmail?.let { (name, email) -> if (email.isEmail()) Recipient().initLocalValues(email, name) else null }
+        }
+
+        fun String.splitToRecipientList() = split(",", ";").mapNotNull {
             val email = it.trim()
-            if (email.isEmail()) Recipient().initLocalValues(email, email) else null
+            if (email.isEmail()) Recipient().initLocalValues(email, email) else parseEmailWithName(email)
         }
 
         val intent = requireActivity().intent
