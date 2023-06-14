@@ -248,7 +248,7 @@ class ThreadFragment : Fragment() {
                 trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
                 safeNavigate(
                     ThreadFragmentDirections.actionThreadFragmentToNewMessageActivity(
-                        draftExists = true,
+                        arrivedFromExistingDraft = true,
                         draftLocalUuid = message.draftLocalUuid,
                         draftResource = message.draftResource,
                         messageUid = message.uid,

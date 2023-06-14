@@ -60,7 +60,7 @@
 
         <!-- Region Status -->
         <argument
-            android:name="draftExists"
+            android:name="arrivedFromExistingDraft"
             android:defaultValue="false"
             app:argType="boolean" />
 

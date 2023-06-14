@@ -86,6 +86,7 @@ class NewMessageViewModel @Inject constructor(
 
     val snackBarManager by lazy { SnackBarManager() }
     var shouldExecuteDraftActionWhenStopping = true
+    var activityRecreated: Boolean = false
 
     private var snapshot: DraftSnapshot? = null
 
@@ -102,36 +103,43 @@ class NewMessageViewModel @Inject constructor(
         emit(mailboxes to currentMailboxIndex)
     }
 
-    fun initDraftAndViewModel(navigationArgs: NewMessageActivityArgs): LiveData<Boolean> = liveData(ioDispatcher) {
-        with(navigationArgs) {
-            val isSuccess = RealmDatabase.mailboxContent().writeBlocking {
-                draft = if (draftExists) {
-                    getLatestDraft(draftLocalUuid, realm = this)
-                        ?: fetchDraft(draftResource!!, messageUid!!)
-                        ?: run { return@writeBlocking false }
-                } else {
-                    isNewMessage = true
-                    createDraft(draftMode, previousMessageUid, recipient)
-                        ?: run { return@writeBlocking false }
-                }
-
-                if (draft.identityId.isNullOrBlank()) draft.addMissingSignatureData(realm = this)
-
-                return@writeBlocking true
+    fun initDraftAndViewModel(
+        draftExists: Boolean,
+        draftLocalUuid: String?,
+        draftResource: String?,
+        messageUid: String?,
+        draftMode: DraftMode,
+        previousMessageUid: String?,
+        recipient: Recipient?,
+    ): LiveData<Boolean> = liveData(ioDispatcher) {
+        val isSuccess = RealmDatabase.mailboxContent().writeBlocking {
+            draft = if (draftExists) {
+                val uuid = draftLocalUuid ?: draft.localUuid
+                getLatestDraft(uuid, realm = this)
+                    ?: fetchDraft(draftResource!!, messageUid!!)
+                    ?: run { return@writeBlocking false }
+            } else {
+                isNewMessage = true
+                createDraft(draftMode, previousMessageUid, recipient)
+                    ?: run { return@writeBlocking false }
             }
 
-            if (isSuccess) {
-                splitSignatureAndQuoteFromBody()
-                saveDraftSnapshot()
-                if (draft.cc.isNotEmpty() || draft.bcc.isNotEmpty()) {
-                    otherFieldsAreAllEmpty.postValue(false)
-                    initializeFieldsAsOpen.postValue(true)
-                }
-            }
+            if (draft.identityId.isNullOrBlank()) draft.addMissingSignatureData(realm = this)
 
-            emit(isSuccess)
-            isInitSuccess.postValue(isSuccess)
+            return@writeBlocking true
         }
+
+        if (isSuccess) {
+            splitSignatureAndQuoteFromBody()
+            saveDraftSnapshot()
+            if (draft.cc.isNotEmpty() || draft.bcc.isNotEmpty()) {
+                otherFieldsAreAllEmpty.postValue(false)
+                initializeFieldsAsOpen.postValue(true)
+            }
+        }
+
+        emit(isSuccess)
+        isInitSuccess.postValue(isSuccess)
     }
 
     private fun getLatestDraft(draftLocalUuid: String?, realm: MutableRealm): Draft? {

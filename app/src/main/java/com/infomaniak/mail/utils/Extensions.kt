@@ -229,7 +229,7 @@ fun Fragment.safeNavigateToNewMessageActivity(
     safeNavigate(
         resId = R.id.newMessageActivity,
         args = NewMessageActivityArgs(
-            draftExists = false,
+            arrivedFromExistingDraft = false,
             draftMode = draftMode,
             previousMessageUid = messageUid,
             shouldLoadDistantResources = shouldLoadDistantResources,
@@ -245,7 +245,7 @@ fun Fragment.navigateToThread(thread: Thread, mainViewModel: MainViewModel) {
             safeNavigate(
                 R.id.newMessageActivity,
                 NewMessageActivityArgs(
-                    draftExists = true,
+                    arrivedFromExistingDraft = true,
                     draftLocalUuid = it.draftLocalUuid,
                     draftResource = it.draftResource,
                     messageUid = it.messageUid,

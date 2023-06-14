@@ -128,6 +128,8 @@ class NewMessageFragment : Fragment() {
         observeNewAttachments()
         observeCcAndBccVisibility()
         observeDraftWorkerResults()
+
+        newMessageViewModel.activityRecreated = true
     }
 
     override fun onStart() {
@@ -171,9 +173,18 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun initDraftAndViewModel() {
+    private fun initDraftAndViewModel() = with(newMessageActivityArgs) {
+        val draftExists = arrivedFromExistingDraft || newMessageViewModel.activityRecreated
 
-        newMessageViewModel.initDraftAndViewModel(newMessageActivityArgs).observe(viewLifecycleOwner) { isSuccess ->
+        newMessageViewModel.initDraftAndViewModel(
+            draftExists,
+            draftLocalUuid,
+            draftResource,
+            messageUid,
+            draftMode,
+            previousMessageUid,
+            recipient,
+        ).observe(viewLifecycleOwner) { isSuccess ->
             if (isSuccess) {
                 hideLoader()
                 showKeyboardInCorrectView()
