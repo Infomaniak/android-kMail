@@ -146,7 +146,7 @@ class DraftsActionsWorker @AssistedInject constructor(
 
             Log.d(TAG, "handleDraftsActions: ${drafts.count()} drafts to handle")
 
-            var notHasRemoteException = true
+            var hasNoRemoteException = true
 
             drafts.reversed().forEach { draft ->
                 val currentDraftLocalUuid = draft.localUuid
@@ -181,18 +181,18 @@ class DraftsActionsWorker @AssistedInject constructor(
                     }
                     exception.printStackTrace()
                     Sentry.captureException(exception)
-                    notHasRemoteException = false
+                    hasNoRemoteException = false
                 }
             }
 
-            return@writeBlocking notHasRemoteException
+            return@writeBlocking hasNoRemoteException
         }
 
         if (scheduledDates.isNotEmpty()) updateFolderAfterDelay(scheduledDates)
 
         SentryDebug.sendOrphanDrafts(mailboxContentRealm)
 
-        val (draftUid, mailboxUuid, draftAction) = if (draftLocalUuid == null) {
+        val (draftUuid, mailboxUuid, draftAction) = if (draftLocalUuid == null) {
             Triple(null, null, null)
         } else {
             Triple(remoteUuidOfTrackedDraft, mailbox.uuid, trackedDraftAction)
@@ -200,7 +200,7 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         return if (haveAllDraftSucceeded || isTrackedDraftSuccess) {
             val outputData = workDataOf(
-                DRAFT_UUID_KEY to draftUid,
+                DRAFT_UUID_KEY to draftUuid,
                 ASSOCIATED_MAILBOX_UUID_KEY to mailboxUuid,
                 RESULT_DRAFT_ACTION_KEY to draftAction?.name,
             )
@@ -284,9 +284,10 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         val apiResponse = ApiController.json.decodeFromString<ApiResponse<Attachment>>(response.body?.string() ?: "")
         if (apiResponse.isSuccess() && apiResponse.data != null) {
+            //TODO See with Sirambd if this basic block of instruction can crash because of worker cancellation or anything
+            updateLocalAttachment(localDraftUuid, apiResponse.data!!, realm)
             attachmentFile.delete()
             LocalStorageUtils.deleteAttachmentsUploadsDirIfEmpty(applicationContext, localDraftUuid, userId, mailbox.mailboxId)
-            updateLocalAttachment(localDraftUuid, apiResponse.data!!, realm)
         }
     }
 
@@ -411,6 +412,10 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         fun getFailedWorkInfoLiveData(): LiveData<MutableList<WorkInfo>> {
             return WorkerUtils.getWorkInfoLiveData(TAG, workManager, listOf(WorkInfo.State.FAILED))
+        }
+
+        fun getCompletedAndFailedInfoLiveData(): LiveData<MutableList<WorkInfo>> {
+            return WorkerUtils.getWorkInfoLiveData(TAG, workManager, listOf(WorkInfo.State.SUCCEEDED, WorkInfo.State.FAILED))
         }
     }
 
