@@ -127,14 +127,22 @@ object ThreadController {
     suspend fun initAndGetSearchFolderThreads(remoteThreads: List<Thread>): List<Thread> = withContext(Dispatchers.IO) {
 
         fun MutableRealm.keepOldMessagesAndAddToSearchFolder(remoteThread: Thread, searchFolder: Folder) {
+
             remoteThread.messages.forEachIndexed { index: Int, remoteMessage: Message ->
+
                 val message = MessageController.getMessage(remoteMessage.uid, realm = this)?.let { localMessage ->
+                    // TODO: This is wrong, it will drop updated data.
+                    //  If the Message has changed (read, favorite, etc…), it will drop
+                    //  the current status and use the old one that was stored in Realm.
+                    //  We shouldn't do that.
+                    //  Maybe instead should we directly update Realm with the Search result data ?
                     remoteThread.messages[index] = localMessage.copyFromRealm()
                     return@let localMessage
                 } ?: run {
                     remoteMessage.isFromSearch = true
                     return@run remoteMessage
                 }
+
                 searchFolder.messages.add(message)
             }
         }
