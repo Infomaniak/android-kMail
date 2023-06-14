@@ -51,7 +51,6 @@ import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition.INLINE
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -67,7 +66,6 @@ import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
-import io.realm.kotlin.ext.copyFromRealm
 import java.util.UUID
 import javax.inject.Inject
 import com.google.android.material.R as RMaterial
@@ -560,14 +558,10 @@ class NewMessageFragment : Fragment() {
             draftsActionsWorkerScheduler.getCompletedAndFailedInfoLiveData().observe(viewLifecycleOwner) {
                 it.forEach { workInfo ->
                     if (!treatedWorkInfoUuids.add(workInfo.id)) return@forEach
-                    synchronizeViewModelDraftFromRealm()
+                    newMessageViewModel.synchronizeViewModelDraftFromRealm()
                 }
             }
         }
-    }
-
-    private fun synchronizeViewModelDraftFromRealm() = with(newMessageViewModel) {
-        DraftController.getDraft(draft.localUuid)?.let { draft = it.copyFromRealm() }
     }
 
     fun closeAutoCompletion() = with(binding) {

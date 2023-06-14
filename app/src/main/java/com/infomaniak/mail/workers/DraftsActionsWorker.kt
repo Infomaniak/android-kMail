@@ -192,7 +192,7 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         SentryDebug.sendOrphanDrafts(mailboxContentRealm)
 
-        val (draftUuid, mailboxUuid, draftAction) = if (draftLocalUuid == null) {
+        val (remoteDraftUuid, mailboxUuid, draftAction) = if (draftLocalUuid == null) {
             Triple(null, null, null)
         } else {
             Triple(remoteUuidOfTrackedDraft, mailbox.uuid, trackedDraftAction)
@@ -200,7 +200,7 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         return if (haveAllDraftSucceeded || isTrackedDraftSuccess) {
             val outputData = workDataOf(
-                DRAFT_UUID_KEY to draftUuid,
+                REMOTE_DRAFT_UUID_KEY to remoteDraftUuid,
                 ASSOCIATED_MAILBOX_UUID_KEY to mailboxUuid,
                 RESULT_DRAFT_ACTION_KEY to draftAction?.name,
             )
@@ -426,7 +426,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         private const val DRAFT_LOCAL_UUID_KEY = "draftLocalUuidKey"
         const val PROGRESS_DRAFT_ACTION_KEY = "progressDraftActionKey"
         const val ERROR_MESSAGE_RESID_KEY = "errorMessageResIdKey"
-        const val DRAFT_UUID_KEY = "draftUuidKey"
+        const val REMOTE_DRAFT_UUID_KEY = "remoteDraftUuidKey"
         const val ASSOCIATED_MAILBOX_UUID_KEY = "associatedMailboxUuidKey"
         const val RESULT_DRAFT_ACTION_KEY = "resultDraftActionKey"
         // We add this delay because for now, it doesn't always work if we just use the `etop`.
