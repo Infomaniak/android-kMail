@@ -197,7 +197,7 @@ class SearchViewModel @Inject constructor(
 
         val currentMailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
         val folderId = folder?.id ?: dummyFolderId
-        val searchFilters = SearchUtils.searchFilters(query, newFilters)
+        val searchFilters = SearchUtils.searchFilters(query, newFilters, resourceNext)
         val apiResponse = ApiRepository.searchThreads(currentMailbox.uuid, folderId, searchFilters, resourceNext)
 
         if (apiResponse.isSuccess()) with(apiResponse) {

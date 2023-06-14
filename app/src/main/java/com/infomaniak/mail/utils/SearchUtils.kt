@@ -33,19 +33,23 @@ object SearchUtils {
 
     val TAG = SearchUtils::class.simpleName
 
-    fun searchFilters(query: String?, filters: Set<ThreadFilter>): String {
+    fun searchFilters(query: String?, filters: Set<ThreadFilter>, resource: String?): String {
+
         val filtersQuery = StringBuilder("severywhere=${if (filters.contains(ThreadFilter.FOLDER)) "0" else "1"}")
+
         if (query?.isNotBlank() == true) filtersQuery.append("&scontains=$query")
 
         with(filters) {
             if (contains(ThreadFilter.ATTACHMENTS)) filtersQuery.append("&sattachments=yes")
-            when {
+
+            if (resource == null) when {
                 contains(ThreadFilter.SEEN) -> filtersQuery.append("&filters=seen")
                 contains(ThreadFilter.UNSEEN) -> filtersQuery.append("&filters=unseen")
                 contains(ThreadFilter.STARRED) -> filtersQuery.append("&filters=starred")
                 else -> Unit
             }
         }
+
         return filtersQuery.toString()
     }
 
