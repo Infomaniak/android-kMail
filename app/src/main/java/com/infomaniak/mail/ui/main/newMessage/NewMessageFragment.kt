@@ -112,6 +112,8 @@ class NewMessageFragment : Fragment() {
             arguments = newMessageActivityArgs.toBundle(),
         )
 
+        updateCreationStatus()
+
         filePicker = FilePicker(this@NewMessageFragment)
 
         initUi()
@@ -128,8 +130,6 @@ class NewMessageFragment : Fragment() {
         observeNewAttachments()
         observeCcAndBccVisibility()
         observeDraftWorkerResults()
-
-        newMessageViewModel.activityRecreated = true
     }
 
     override fun onStart() {
@@ -145,6 +145,12 @@ class NewMessageFragment : Fragment() {
             binding.quoteWebView.reload()
         }
         super.onConfigurationChanged(newConfig)
+    }
+
+    private fun updateCreationStatus() = with(newMessageViewModel) {
+        activityCreationStatus.next()?.let {
+            activityCreationStatus = it
+        }
     }
 
     private fun initUi() = with(binding) {
@@ -174,7 +180,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun initDraftAndViewModel() = with(newMessageActivityArgs) {
-        val draftExists = arrivedFromExistingDraft || newMessageViewModel.activityRecreated
+        val draftExists = arrivedFromExistingDraft || newMessageViewModel.activityCreationStatus == CreationStatus.RECREATED
 
         newMessageViewModel.initDraftAndViewModel(
             draftExists,
@@ -597,5 +603,19 @@ class NewMessageFragment : Fragment() {
         TO,
         CC,
         BCC,
+    }
+
+    enum class CreationStatus {
+        NOT_YET_CREATED,
+        CREATED,
+        RECREATED;
+
+        fun next(): CreationStatus? {
+            return when (this) {
+                NOT_YET_CREATED -> CREATED
+                CREATED -> RECREATED
+                RECREATED -> null
+            }
+        }
     }
 }

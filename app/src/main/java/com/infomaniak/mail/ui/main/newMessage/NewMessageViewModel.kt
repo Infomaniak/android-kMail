@@ -46,6 +46,7 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.main.SnackBarManager
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
+import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.CreationStatus
 import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
@@ -86,7 +87,7 @@ class NewMessageViewModel @Inject constructor(
 
     val snackBarManager by lazy { SnackBarManager() }
     var shouldExecuteDraftActionWhenStopping = true
-    var activityRecreated: Boolean = false
+    var activityCreationStatus = CreationStatus.NOT_YET_CREATED
 
     private var snapshot: DraftSnapshot? = null
 
