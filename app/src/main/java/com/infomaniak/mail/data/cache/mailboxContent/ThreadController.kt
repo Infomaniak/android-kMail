@@ -127,9 +127,9 @@ object ThreadController {
 
         fun MutableRealm.keepOldMessagesAndAddToSearchFolder(remoteThread: Thread, searchFolder: Folder) {
 
-            remoteThread.messages.forEachIndexed { index: Int, remoteMessage: Message ->
+            remoteThread.messages.forEach { remoteMessage: Message ->
 
-                val message = MessageController.getMessage(remoteMessage.uid, realm = this)?.let { localMessage ->
+                MessageController.getMessage(remoteMessage.uid, realm = this)?.let { localMessage ->
                     remoteMessage.initLocalValues(
                         date = localMessage.date,
                         isFullyDownloaded = localMessage.isFullyDownloaded,
@@ -138,14 +138,11 @@ object ThreadController {
                         draftLocalUuid = localMessage.draftLocalUuid,
                         isFromSearch = localMessage.isFromSearch,
                     )
-                    remoteThread.messages[index] = remoteMessage
-                    return@let remoteMessage
                 } ?: run {
                     remoteMessage.isFromSearch = true
-                    return@run remoteMessage
                 }
 
-                searchFolder.messages.add(message)
+                searchFolder.messages.add(remoteMessage)
             }
         }
 
