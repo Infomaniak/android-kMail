@@ -30,7 +30,6 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
-import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
@@ -127,15 +126,23 @@ object ThreadController {
     suspend fun initAndGetSearchFolderThreads(remoteThreads: List<Thread>): List<Thread> = withContext(Dispatchers.IO) {
 
         fun MutableRealm.keepOldMessagesAndAddToSearchFolder(remoteThread: Thread, searchFolder: Folder) {
-            remoteThread.messages.forEachIndexed { index: Int, remoteMessage: Message ->
-                val message = MessageController.getMessage(remoteMessage.uid, realm = this)?.let { localMessage ->
-                    remoteThread.messages[index] = localMessage.copyFromRealm()
-                    return@let localMessage
+
+            remoteThread.messages.forEach { remoteMessage: Message ->
+
+                MessageController.getMessage(remoteMessage.uid, realm = this)?.let { localMessage ->
+                    remoteMessage.initLocalValues(
+                        date = localMessage.date,
+                        isFullyDownloaded = localMessage.isFullyDownloaded,
+                        isSpam = localMessage.isSpam,
+                        messageIds = localMessage.messageIds,
+                        draftLocalUuid = localMessage.draftLocalUuid,
+                        isFromSearch = localMessage.isFromSearch,
+                    )
                 } ?: run {
                     remoteMessage.isFromSearch = true
-                    return@run remoteMessage
                 }
-                searchFolder.messages.add(message)
+
+                searchFolder.messages.add(remoteMessage)
             }
         }
 
