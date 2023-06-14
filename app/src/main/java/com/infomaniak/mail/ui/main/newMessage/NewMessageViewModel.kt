@@ -315,6 +315,10 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
+    fun synchronizeViewModelDraftFromRealm() = viewModelScope.launch(ioDispatcher) {
+        DraftController.getDraft(draft.localUuid)?.let { draft = it.copyFromRealm() }
+    }
+
     private fun saveDraftToLocal(action: DraftAction) {
 
         draft.body = draft.uiBody.textToHtml() + (draft.uiSignature ?: "") + (draft.uiQuote ?: "")

@@ -74,7 +74,7 @@ object ApiRoutes {
 
     fun draft(mailboxUuid: String) = "$MAIL_API/api/mail/$mailboxUuid/draft"
 
-    fun draft(mailboxUuid: String, draftRemoteUuid: String) = "${draft(mailboxUuid)}/$draftRemoteUuid"
+    fun draft(mailboxUuid: String, remoteDraftUuid: String) = "${draft(mailboxUuid)}/$remoteDraftUuid"
 
     fun createAttachment(mailboxUuid: String) = "${draft(mailboxUuid)}/attachment"
 

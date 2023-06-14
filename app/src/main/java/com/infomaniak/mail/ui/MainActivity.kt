@@ -173,7 +173,7 @@ class MainActivity : ThemedActivity() {
             when (draftAction.toEnumOrThrow<DraftAction>()) {
                 DraftAction.SAVE -> {
                     showSavedDraftSnackBar(
-                        remoteDraftUuid = getString(DraftsActionsWorker.DRAFT_UUID_KEY)!!,
+                        remoteDraftUuid = getString(DraftsActionsWorker.REMOTE_DRAFT_UUID_KEY)!!,
                         associatedMailboxUuid = getString(DraftsActionsWorker.ASSOCIATED_MAILBOX_UUID_KEY)!!,
                     )
                 }

@@ -66,6 +66,7 @@ import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.UUID
 import javax.inject.Inject
 import com.google.android.material.R as RMaterial
 
@@ -126,6 +127,7 @@ class NewMessageFragment : Fragment() {
         observeEditorActions()
         observeNewAttachments()
         observeCcAndBccVisibility()
+        observeDraftWorkerResults()
     }
 
     override fun onStart() {
@@ -546,6 +548,20 @@ class NewMessageFragment : Fragment() {
     private fun startWorker(shouldTrackDraftForSnackBar: Boolean) {
         val draftLocalUuid = if (shouldTrackDraftForSnackBar) newMessageViewModel.draft.localUuid else null
         draftsActionsWorkerScheduler.scheduleWork(draftLocalUuid)
+    }
+
+    private fun observeDraftWorkerResults() {
+        WorkerUtils.flushWorkersBefore(requireContext(), viewLifecycleOwner) {
+
+            val treatedWorkInfoUuids = mutableSetOf<UUID>()
+
+            draftsActionsWorkerScheduler.getCompletedAndFailedInfoLiveData().observe(viewLifecycleOwner) {
+                it.forEach { workInfo ->
+                    if (!treatedWorkInfoUuids.add(workInfo.id)) return@forEach
+                    newMessageViewModel.synchronizeViewModelDraftFromRealm()
+                }
+            }
+        }
     }
 
     fun closeAutoCompletion() = with(binding) {
