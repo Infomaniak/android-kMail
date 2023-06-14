@@ -30,7 +30,6 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
-import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
@@ -131,13 +130,16 @@ object ThreadController {
             remoteThread.messages.forEachIndexed { index: Int, remoteMessage: Message ->
 
                 val message = MessageController.getMessage(remoteMessage.uid, realm = this)?.let { localMessage ->
-                    // TODO: This is wrong, it will drop updated data.
-                    //  If the Message has changed (read, favorite, etc…), it will drop
-                    //  the current status and use the old one that was stored in Realm.
-                    //  We shouldn't do that.
-                    //  Maybe instead should we directly update Realm with the Search result data ?
-                    remoteThread.messages[index] = localMessage.copyFromRealm()
-                    return@let localMessage
+                    remoteMessage.initLocalValues(
+                        date = localMessage.date,
+                        isFullyDownloaded = localMessage.isFullyDownloaded,
+                        isSpam = localMessage.isSpam,
+                        messageIds = localMessage.messageIds,
+                        draftLocalUuid = localMessage.draftLocalUuid,
+                        isFromSearch = localMessage.isFromSearch,
+                    )
+                    remoteThread.messages[index] = remoteMessage
+                    return@let remoteMessage
                 } ?: run {
                     remoteMessage.isFromSearch = true
                     return@run remoteMessage
