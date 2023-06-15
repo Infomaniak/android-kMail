@@ -46,6 +46,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     application: Application,
+    private val globalCoroutineScope: CoroutineScope,
     private val searchUtils: SearchUtils,
     private val messageController: MessageController,
     private val threadController: ThreadController,
@@ -161,7 +162,7 @@ class SearchViewModel @Inject constructor(
     }
 
     override fun onCleared() {
-        CoroutineScope(coroutineContext).launch {
+        globalCoroutineScope.launch(coroutineContext) {
             searchUtils.deleteRealmSearchData()
             Log.i(TAG, "SearchViewModel>onCleared: called")
         }

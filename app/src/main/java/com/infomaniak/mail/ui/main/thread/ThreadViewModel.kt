@@ -49,6 +49,7 @@ import kotlin.collections.set
 @HiltViewModel
 class ThreadViewModel @Inject constructor(
     application: Application,
+    private val sharedViewModelUtils: SharedViewModelUtils,
     private val messageController: MessageController,
     private val refreshController: RefreshController,
     private val threadController: ThreadController,
@@ -90,7 +91,7 @@ class ThreadViewModel @Inject constructor(
 
         emit(Triple(thread, isExpandedMap, isThemeTheSameMap))
 
-        if (thread.unseenMessagesCount > 0) SharedViewModelUtils.markAsSeen(mailbox, listOf(thread))
+        if (thread.unseenMessagesCount > 0) sharedViewModelUtils.markAsSeen(mailbox, listOf(thread))
     }
 
     fun fetchIncompleteMessages(messages: List<Message>) {
