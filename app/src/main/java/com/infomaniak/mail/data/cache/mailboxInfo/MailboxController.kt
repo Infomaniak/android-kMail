@@ -112,19 +112,29 @@ object MailboxController {
     //endregion
 
     //region Edit data
-    suspend fun updateMailboxes(context: Context, mailboxes: List<Mailbox>, userId: Int = AccountUtils.currentUserId): Boolean {
+    suspend fun updateMailboxes(
+        context: Context,
+        remoteMailboxes: List<Mailbox>,
+        userId: Int = AccountUtils.currentUserId,
+    ): Boolean {
 
-        context.initMailNotificationChannel(mailboxes)
+        context.initMailNotificationChannel(remoteMailboxes)
 
-        val remoteMailboxes = defaultRealm.writeBlocking {
-            mailboxes.map {
-                val mailboxObjectId = it.createObjectId(userId)
-                val inboxUnreadCount = getMailbox(mailboxObjectId, realm = this)?.inboxUnreadCount ?: 0
-                it.initLocalValues(userId, inboxUnreadCount)
+        val mailboxes = defaultRealm.writeBlocking {
+            return@writeBlocking remoteMailboxes.map { remoteMailbox ->
+                remoteMailbox.also {
+                    val localMailbox = getMailbox(userId, remoteMailbox.mailboxId, realm = this)
+                    it.initLocalValues(
+                        userId = userId,
+                        quotas = localMailbox?.quotas,
+                        inboxUnreadCount = localMailbox?.inboxUnreadCount ?: 0,
+                        permissions = localMailbox?.permissions,
+                    )
+                }
             }
         }
 
-        return update(remoteMailboxes, userId)
+        return update(mailboxes, userId)
     }
 
     private suspend fun update(remoteMailboxes: List<Mailbox>, userId: Int): Boolean {
