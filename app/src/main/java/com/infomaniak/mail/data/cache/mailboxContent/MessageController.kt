@@ -17,14 +17,15 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
-import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
+import com.infomaniak.mail.di.MailboxContentRealm
 import com.infomaniak.mail.utils.AccountUtils
 import io.realm.kotlin.MutableRealm
+import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.copyFromRealm
@@ -32,42 +33,18 @@ import io.realm.kotlin.ext.query
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmSingleQuery
 import io.realm.kotlin.query.Sort
+import javax.inject.Inject
 
-object MessageController {
-
-    private inline val defaultRealm get() = RealmDatabase.mailboxContent()
-
-    private val isNotDraft = "${Message::isDraft.name} == false"
-    private val isNotScheduled = "${Message::isScheduled.name} == false"
-
-    //region Queries
-    private fun getOldestOrNewestMessageQuery(folderId: String, sort: Sort, realm: TypedRealm): RealmSingleQuery<Message> {
-        val byFolderId = "${Message::folderId.name} == '$folderId'"
-        val isNotFromSearch = "${Message::isFromSearch.name} == false"
-        return realm.query<Message>("$byFolderId AND $isNotFromSearch").sort(Message::shortUid.name, sort).first()
-    }
-
-    private fun getMessageQuery(uid: String, realm: TypedRealm): RealmSingleQuery<Message> {
-        val byUid = "${Message::uid.name} == '$uid'"
-        return realm.query<Message>(byUid).first()
-    }
-    //endregion
-
-    //region Get data
-    fun getOldestMessage(folderId: String, realm: TypedRealm = defaultRealm): Message? {
-        return getOldestOrNewestMessageQuery(folderId, Sort.ASCENDING, realm).find()
-    }
-
-    fun getNewestMessage(folderId: String, realm: TypedRealm = defaultRealm): Message? {
-        return getOldestOrNewestMessageQuery(folderId, Sort.DESCENDING, realm).find()
-    }
+class MessageController @Inject constructor(@MailboxContentRealm private val mailboxContentRealm: Realm) {
 
     fun getSortedMessages(threadUid: String): RealmQuery<Message>? {
-        return ThreadController.getThread(threadUid)?.messages?.query()?.sort(Message::date.name, Sort.ASCENDING)
+        return ThreadController.getThread(threadUid, mailboxContentRealm)
+            ?.messages?.query()
+            ?.sort(Message::date.name, Sort.ASCENDING)
     }
 
-    fun getMessage(uid: String, realm: TypedRealm = defaultRealm): Message? {
-        return getMessageQuery(uid, realm).find()
+    fun getMessage(uid: String): Message? {
+        return getMessage(uid, mailboxContentRealm)
     }
 
     fun getLastMessageToExecuteAction(thread: Thread): Message = with(thread) {
@@ -87,7 +64,7 @@ object MessageController {
         )
     }
 
-    fun getThreadLastMessageInFolder(threadUid: String, realm: TypedRealm = defaultRealm): Message? {
+    fun getThreadLastMessageInFolder(threadUid: String, realm: TypedRealm = mailboxContentRealm): Message? {
         val thread = ThreadController.getThread(threadUid, realm)
         return thread?.messages?.query("${Message::folderId.name} == '${thread.folderId}'")?.find()?.lastOrNull()
     }
@@ -145,38 +122,68 @@ object MessageController {
             queriesList.add("($containsSubject OR $containsPreview OR $containsBody)")
         }
 
-        return defaultRealm.writeBlocking {
+        return mailboxContentRealm.writeBlocking {
             query<Message>(queriesList.joinToString(" AND ") { it }).find().copyFromRealm()
         }
     }
     //endregion
 
     //region Edit data
-    fun upsertMessage(message: Message, realm: MutableRealm) {
-        realm.copyToRealm(message, UpdatePolicy.ALL)
-    }
-
-    fun MutableRealm.deleteMessages(messages: List<Message>) {
-        messages.reversed().forEach { message ->
-            deleteMessage(message)
-        }
-    }
-
-    fun MutableRealm.deleteMessage(message: Message) {
-
-        DraftController.getDraftByMessageUid(message.uid, realm = this)?.let { draft ->
-            if (draft.action == null) {
-                delete(draft)
-            } else {
-                draft.remoteUuid = null
-            }
-        }
-
-        delete(message)
-    }
-
     fun deleteSearchMessages(realm: MutableRealm) = with(realm) {
         delete(query<Message>("${Message::isFromSearch.name} == true").find())
     }
     //endregion
+
+    companion object {
+        private val isNotDraft = "${Message::isDraft.name} == false"
+        private val isNotScheduled = "${Message::isScheduled.name} == false"
+
+        //region Queries
+        private fun getOldestOrNewestMessageQuery(folderId: String, sort: Sort, realm: TypedRealm): RealmSingleQuery<Message> {
+            val byFolderId = "${Message::folderId.name} == '$folderId'"
+            val isNotFromSearch = "${Message::isFromSearch.name} == false"
+            return realm.query<Message>("$byFolderId AND $isNotFromSearch").sort(Message::shortUid.name, sort).first()
+        }
+
+        private fun getMessageQuery(uid: String, realm: TypedRealm): RealmSingleQuery<Message> {
+            val byUid = "${Message::uid.name} == '$uid'"
+            return realm.query<Message>(byUid).first()
+        }
+        //endregion
+
+        fun getMessage(uid: String, realm: TypedRealm): Message? {
+            return getMessageQuery(uid, realm).find()
+        }
+
+        fun getOldestMessage(folderId: String, realm: TypedRealm): Message? {
+            return getOldestOrNewestMessageQuery(folderId, Sort.ASCENDING, realm).find()
+        }
+
+        fun getNewestMessage(folderId: String, realm: TypedRealm): Message? {
+            return getOldestOrNewestMessageQuery(folderId, Sort.DESCENDING, realm).find()
+        }
+
+        fun upsertMessage(message: Message, realm: MutableRealm) {
+            realm.copyToRealm(message, UpdatePolicy.ALL)
+        }
+
+        fun deleteMessage(mutableRealm: MutableRealm, message: Message) {
+
+            DraftController.getDraftByMessageUid(message.uid, realm = mutableRealm)?.let { draft ->
+                if (draft.action == null) {
+                    mutableRealm.delete(draft)
+                } else {
+                    draft.remoteUuid = null
+                }
+            }
+
+            mutableRealm.delete(message)
+        }
+
+        fun deleteMessages(mutableRealm: MutableRealm, messages: List<Message>) {
+            messages.reversed().forEach { message ->
+                deleteMessage(mutableRealm, message)
+            }
+        }
+    }
 }
