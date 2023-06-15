@@ -310,7 +310,7 @@ class MainActivity : ThemedActivity() {
 
         when (destination.id) {
             R.id.junkBottomSheetDialog,
-            R.id.messageActionBottomSheetDialog,
+            R.id.messageActionsBottomSheetDialog,
             R.id.replyBottomSheetDialog,
             R.id.detailedContactBottomSheetDialog,
             R.id.threadFragment,
@@ -323,7 +323,7 @@ class MainActivity : ThemedActivity() {
 
         val colorRes = when (destination.id) {
             R.id.threadFragment -> R.color.elevatedBackground
-            R.id.messageActionBottomSheetDialog,
+            R.id.messageActionsBottomSheetDialog,
             R.id.replyBottomSheetDialog,
             R.id.detailedContactBottomSheetDialog,
             R.id.threadActionsBottomSheetDialog -> R.color.backgroundColorSecondary

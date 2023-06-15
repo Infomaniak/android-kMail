@@ -61,6 +61,7 @@ import com.infomaniak.mail.data.LocalSettings.SwipeAction
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity.COMPACT
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.SelectedThread
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
@@ -285,7 +286,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                     else -> throw IllegalStateException("Only SwipeDirection.LEFT_TO_RIGHT and SwipeDirection.RIGHT_TO_LEFT can be triggered")
                 }
 
-                val shouldKeepItem = performSwipeActionOnThread(swipeAction, item.uid)
+                val singleMessage = if (item.isOnlyOneMessage) item.messages.single() else null
+                val shouldKeepItem = performSwipeActionOnThread(swipeAction, item.uid, singleMessage)
 
                 threadListAdapter.apply {
                     blockOtherSwipes()
@@ -305,7 +307,11 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
      * The boolean return value is used to know if we should keep the Thread in
      * the RecyclerView (true), or remove it when the swipe is done (false).
      */
-    private fun performSwipeActionOnThread(swipeAction: SwipeAction, threadUid: String): Boolean = with(mainViewModel) {
+    private fun performSwipeActionOnThread(
+        swipeAction: SwipeAction,
+        threadUid: String,
+        singleMessage: Message?,
+    ): Boolean = with(mainViewModel) {
 
         trackEvent("swipeActions", swipeAction.matomoValue, TrackerAction.DRAG)
 
@@ -333,7 +339,18 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 false
             }
             SwipeAction.QUICKACTIONS_MENU -> {
-                safeNavigate(
+                singleMessage?.let { message ->
+                    safeNavigate(
+                        ThreadListFragmentDirections.actionThreadListFragmentToMessageActionsBottomSheetDialog(
+                            messageUid = message.uid,
+                            threadUid = threadUid,
+                            isFavorite = message.isFavorite,
+                            isSeen = message.isSeen,
+                            isThemeTheSame = true,
+                            shouldLoadDistantResources = false,
+                        )
+                    )
+                } ?: safeNavigate(
                     ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(
                         threadUid = threadUid,
                         shouldLoadDistantResources = false,

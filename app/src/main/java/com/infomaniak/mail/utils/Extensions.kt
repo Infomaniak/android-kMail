@@ -239,7 +239,7 @@ fun Fragment.safeNavigateToNewMessageActivity(
 }
 
 fun Fragment.navigateToThread(thread: Thread, mainViewModel: MainViewModel) {
-    if (thread.isOnlyOneDraft()) { // Directly go to NewMessage screen
+    if (thread.isOnlyOneDraft) { // Directly go to NewMessage screen
         trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
         mainViewModel.navigateToSelectedDraft(thread.messages.first()).observe(viewLifecycleOwner) {
             safeNavigate(
