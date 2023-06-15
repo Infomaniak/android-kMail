@@ -223,14 +223,14 @@ object RefreshController {
 
         val impactedThreads = mutableSetOf<Thread>()
 
-        val info = when (direction) {
+        val paginationInfo = when (direction) {
             Direction.IN_THE_PAST -> MessageController.getOldestMessage(folder.id, realm = this)
             Direction.TO_THE_FUTURE -> MessageController.getNewestMessage(folder.id, realm = this)
         }?.shortUid?.let { offsetUid ->
             PaginationInfo(offsetUid, direction.apiCallValue)
         }
 
-        val newMessages = getMessagesUids(mailbox.uuid, folder.id, okHttpClient, info)!!
+        val newMessages = getMessagesUids(mailbox.uuid, folder.id, okHttpClient, paginationInfo)!!
         val uidsCount = newMessages.addedShortUids.count()
         scope.ensureActive()
 
@@ -250,11 +250,11 @@ object RefreshController {
                 Direction.TO_THE_FUTURE -> {
                     it.lastUpdatedAt = Date().toRealmInstant()
 
-                    // If we try to get new Messages, but `info` is null, it's either because :
+                    // If we try to get new Messages, but `paginationInfo` is null, it's either because :
                     // - it's the 1st opening of this Folder (in this case, everything's fine)
                     // - or that the Folder has been emptied.
                     // If this happens, we need to reset the history info, so we'll be able to get all Messages again.
-                    if (info == null) it.resetHistoryInfo()
+                    if (paginationInfo == null) it.resetHistoryInfo()
 
                     // If it's the 1st opening, and we didn't even get 1 full page, it means we already reached the end.
                     if (folder.cursor == null && uidsCount < Utils.PAGE_SIZE) it.theEndIsReached()
