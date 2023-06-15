@@ -112,6 +112,8 @@ class NewMessageFragment : Fragment() {
             arguments = newMessageActivityArgs.toBundle(),
         )
 
+        updateCreationStatus()
+
         filePicker = FilePicker(this@NewMessageFragment)
 
         initUi()
@@ -145,6 +147,12 @@ class NewMessageFragment : Fragment() {
         super.onConfigurationChanged(newConfig)
     }
 
+    private fun updateCreationStatus() = with(newMessageViewModel) {
+        activityCreationStatus.next()?.let {
+            activityCreationStatus = it
+        }
+    }
+
     private fun initUi() = with(binding) {
         toolbar.setNavigationOnClickListener { activity?.onBackPressedDispatcher?.onBackPressed() }
         changeToolbarColorOnScroll(toolbar, compositionNestedScrollView)
@@ -171,9 +179,18 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun initDraftAndViewModel() {
+    private fun initDraftAndViewModel() = with(newMessageActivityArgs) {
+        val draftExists = arrivedFromExistingDraft || newMessageViewModel.activityCreationStatus == CreationStatus.RECREATED
 
-        newMessageViewModel.initDraftAndViewModel(newMessageActivityArgs).observe(viewLifecycleOwner) { isSuccess ->
+        newMessageViewModel.initDraftAndViewModel(
+            draftExists,
+            draftLocalUuid,
+            draftResource,
+            messageUid,
+            draftMode,
+            previousMessageUid,
+            recipient,
+        ).observe(viewLifecycleOwner) { isSuccess ->
             if (isSuccess) {
                 hideLoader()
                 showKeyboardInCorrectView()
@@ -586,5 +603,19 @@ class NewMessageFragment : Fragment() {
         TO,
         CC,
         BCC,
+    }
+
+    enum class CreationStatus {
+        NOT_YET_CREATED,
+        CREATED,
+        RECREATED;
+
+        fun next(): CreationStatus? {
+            return when (this) {
+                NOT_YET_CREATED -> CREATED
+                CREATED -> RECREATED
+                RECREATED -> null
+            }
+        }
     }
 }
