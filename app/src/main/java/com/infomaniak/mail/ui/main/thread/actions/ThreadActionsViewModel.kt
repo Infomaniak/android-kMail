@@ -30,18 +30,19 @@ import javax.inject.Inject
 @HiltViewModel
 class ThreadActionsViewModel @Inject constructor(
     private val messageController: MessageController,
+    private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     private val coroutineContext = viewModelScope.coroutineContext + ioDispatcher
 
     fun threadLive(threadUid: String): LiveData<Thread> {
-        return ThreadController.getThreadAsync(threadUid).mapNotNull { it.obj }.asLiveData(coroutineContext)
+        return threadController.getThreadAsync(threadUid).mapNotNull { it.obj }.asLiveData(coroutineContext)
     }
 
     fun getThreadAndMessageUidToReplyTo(threadUid: String, messageUidToReplyTo: String?) = liveData(coroutineContext) {
 
-        val thread = ThreadController.getThread(threadUid) ?: run {
+        val thread = threadController.getThread(threadUid) ?: run {
             emit(null)
             return@liveData
         }

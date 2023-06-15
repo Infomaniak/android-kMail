@@ -48,6 +48,7 @@ class SearchViewModel @Inject constructor(
     application: Application,
     private val searchUtils: SearchUtils,
     private val messageController: MessageController,
+    private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
@@ -205,7 +206,7 @@ class SearchViewModel @Inject constructor(
 
         suspend fun ApiResponse<ThreadResult>.initSearchFolderThreads() {
             runCatching {
-                data?.threads?.let { ThreadController.initAndGetSearchFolderThreads(it) }
+                data?.threads?.let { threadController.initAndGetSearchFolderThreads(it) }
             }.getOrElse { exception ->
                 exception.printStackTrace()
                 Sentry.captureException(exception)
@@ -234,7 +235,7 @@ class SearchViewModel @Inject constructor(
         newFilters: Set<ThreadFilter>,
         query: String?,
     ) {
-        emitAll(ThreadController.getSearchThreadsAsync().mapLatest {
+        emitAll(threadController.getSearchThreadsAsync().mapLatest {
             if (saveInHistory) query?.let(history::postValue)
 
             it.list.also { threads ->

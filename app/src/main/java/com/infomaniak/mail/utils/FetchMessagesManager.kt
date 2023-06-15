@@ -49,6 +49,7 @@ class FetchMessagesManager @Inject constructor(
     private val appContext: Context,
     private val messageController: MessageController,
     private val notificationManagerCompat: NotificationManagerCompat,
+    private val threadController: ThreadController,
 ) {
 
     private val localSettings by lazy { LocalSettings.getInstance(appContext) }
@@ -127,7 +128,7 @@ class FetchMessagesManager @Inject constructor(
             }
         }
 
-        ThreadController.fetchIncompleteMessages(messages, mailbox, okHttpClient, realm)
+        threadController.fetchIncompleteMessages(messages, mailbox, okHttpClient, realm)
 
         val message = messageController.getThreadLastMessageInFolder(uid, realm)
         if (message == null) {

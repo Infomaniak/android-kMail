@@ -73,6 +73,7 @@ class MainViewModel @Inject constructor(
     private val mergedContactController: MergedContactController,
     private val messageController: MessageController,
     private val searchUtils: SearchUtils,
+    private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
@@ -145,7 +146,7 @@ class MainViewModel @Inject constructor(
     val currentFilter = SingleLiveEvent(ThreadFilter.ALL)
 
     val currentThreadsLive = observeFolderAndFilter().flatMapLatest { (folder, filter) ->
-        folder?.let { ThreadController.getThreadsAsync(it, filter) } ?: emptyFlow()
+        folder?.let { threadController.getThreadsAsync(it, filter) } ?: emptyFlow()
     }.asLiveData(coroutineContext)
 
     private fun observeFolderAndFilter() = MediatorLiveData<Pair<Folder?, ThreadFilter>>().apply {
@@ -861,7 +862,7 @@ class MainViewModel @Inject constructor(
         isDownloadingChanges.postValue(false to shouldDisplayLoadMore)
     }
 
-    private fun getActionThreads(threadsUids: List<String>): List<Thread> = threadsUids.mapNotNull(ThreadController::getThread)
+    private fun getActionThreads(threadsUids: List<String>): List<Thread> = threadsUids.mapNotNull(threadController::getThread)
 
     fun addContact(recipient: Recipient) = viewModelScope.launch(ioDispatcher) {
 

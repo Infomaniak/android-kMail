@@ -30,6 +30,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MoveViewModel @Inject constructor(
     private val messageController: MessageController,
+    private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -40,6 +41,6 @@ class MoveViewModel @Inject constructor(
     }
 
     fun getFolderIdByThread(threadUid: String) = liveData(coroutineContext) {
-        emit(ThreadController.getThread(threadUid)!!.folderId)
+        emit(threadController.getThread(threadUid)!!.folderId)
     }
 }

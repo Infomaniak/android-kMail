@@ -50,6 +50,7 @@ import kotlin.collections.set
 class ThreadViewModel @Inject constructor(
     application: Application,
     private val messageController: MessageController,
+    private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
@@ -63,7 +64,7 @@ class ThreadViewModel @Inject constructor(
     private val mailbox by lazy { MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
 
     fun threadLive(threadUid: String) = liveData(coroutineContext) {
-        emitSource(ThreadController.getThreadAsync(threadUid).map { it.obj }.asLiveData())
+        emitSource(threadController.getThreadAsync(threadUid).map { it.obj }.asLiveData())
     }
 
     fun messagesLive(threadUid: String) = liveData(coroutineContext) {
@@ -72,7 +73,7 @@ class ThreadViewModel @Inject constructor(
 
     fun openThread(threadUid: String) = liveData(coroutineContext) {
 
-        val thread = ThreadController.getThread(threadUid) ?: run {
+        val thread = threadController.getThread(threadUid) ?: run {
             emit(null)
             return@liveData
         }
@@ -94,19 +95,19 @@ class ThreadViewModel @Inject constructor(
     fun fetchIncompleteMessages(messages: List<Message>) {
         fetchMessagesJob?.cancel()
         fetchMessagesJob = viewModelScope.launch(ioDispatcher) {
-            ThreadController.fetchIncompleteMessages(messages, mailbox)
+            threadController.fetchIncompleteMessages(messages, mailbox)
         }
     }
 
     fun deleteDraft(message: Message, threadUid: String, mailbox: Mailbox) = viewModelScope.launch(viewModelScope.handlerIO) {
-        val thread = ThreadController.getThread(threadUid) ?: return@launch
+        val thread = threadController.getThread(threadUid) ?: return@launch
         val messages = messageController.getMessageAndDuplicates(thread, message)
         val isSuccess = ApiRepository.deleteMessages(mailbox.uuid, messages.getUids()).isSuccess()
         if (isSuccess) RefreshController.refreshThreads(RefreshMode.REFRESH_FOLDER_WITH_ROLE, mailbox, message.folder)
     }
 
     fun clickOnQuickActionBar(threadUid: String, menuId: Int) = viewModelScope.launch(ioDispatcher) {
-        val thread = ThreadController.getThread(threadUid) ?: return@launch
+        val thread = threadController.getThread(threadUid) ?: return@launch
         val message = messageController.getLastMessageToExecuteAction(thread)
         quickActionBarClicks.postValue(message to menuId)
     }
