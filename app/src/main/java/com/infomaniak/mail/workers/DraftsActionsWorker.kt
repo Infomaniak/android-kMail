@@ -79,6 +79,7 @@ class DraftsActionsWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted params: WorkerParameters,
     private val draftController: DraftController,
+    private val refreshController: RefreshController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : BaseCoroutineWorker(appContext, params) {
 
@@ -231,7 +232,7 @@ class DraftsActionsWorker @AssistedInject constructor(
 
     private suspend fun updateFolderAfterDelay(scheduledDates: MutableList<String>) {
 
-        val folder = FolderController.getFolder(FolderRole.DRAFT, realm = mailboxContentRealm)
+        val folder = FolderController.getFolder(FolderRole.DRAFT, mailboxContentRealm)
 
         if (folder?.cursor != null) {
 
@@ -241,7 +242,7 @@ class DraftsActionsWorker @AssistedInject constructor(
             if (times.isNotEmpty()) delay += max(times.maxOf { it } - timeNow, 0L)
             delay(min(delay, MAX_REFRESH_DELAY))
 
-            RefreshController.refreshThreads(
+            refreshController.refreshThreads(
                 refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
                 mailbox = mailbox,
                 folder = folder,

@@ -50,6 +50,7 @@ import kotlin.collections.set
 class ThreadViewModel @Inject constructor(
     application: Application,
     private val messageController: MessageController,
+    private val refreshController: RefreshController,
     private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
@@ -103,7 +104,7 @@ class ThreadViewModel @Inject constructor(
         val thread = threadController.getThread(threadUid) ?: return@launch
         val messages = messageController.getMessageAndDuplicates(thread, message)
         val isSuccess = ApiRepository.deleteMessages(mailbox.uuid, messages.getUids()).isSuccess()
-        if (isSuccess) RefreshController.refreshThreads(RefreshMode.REFRESH_FOLDER_WITH_ROLE, mailbox, message.folder)
+        if (isSuccess) refreshController.refreshThreads(RefreshMode.REFRESH_FOLDER_WITH_ROLE, mailbox, message.folder)
     }
 
     fun clickOnQuickActionBar(threadUid: String, menuId: Int) = viewModelScope.launch(ioDispatcher) {

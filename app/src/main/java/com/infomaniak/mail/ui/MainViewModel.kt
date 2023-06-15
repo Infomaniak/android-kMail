@@ -53,7 +53,6 @@ import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.NotificationUtils.cancelNotification
-import com.infomaniak.mail.utils.SharedViewModelUtils.refreshFolders
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.ext.copyFromRealm
@@ -73,6 +72,7 @@ class MainViewModel @Inject constructor(
     private val draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler,
     private val mergedContactController: MergedContactController,
     private val messageController: MessageController,
+    private val refreshController: RefreshController,
     private val searchUtils: SearchUtils,
     private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -322,7 +322,7 @@ class MainViewModel @Inject constructor(
 
         if (isDownloadingChanges.value?.first == true) return@launch
 
-        RefreshController.refreshThreads(
+        refreshController.refreshThreads(
             refreshMode = RefreshMode.ONE_PAGE_OF_OLD_MESSAGES,
             mailbox = currentMailbox.value!!,
             folder = currentFolder.value!!,
@@ -411,7 +411,7 @@ class MainViewModel @Inject constructor(
             null to null
         }
 
-        RefreshController.refreshThreads(
+        refreshController.refreshThreads(
             refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
             mailbox = mailbox,
             folder = folder,

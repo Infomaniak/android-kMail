@@ -49,6 +49,7 @@ class FetchMessagesManager @Inject constructor(
     private val appContext: Context,
     private val messageController: MessageController,
     private val notificationManagerCompat: NotificationManagerCompat,
+    private val refreshController: RefreshController,
     private val threadController: ThreadController,
 ) {
 
@@ -65,7 +66,7 @@ class FetchMessagesManager @Inject constructor(
         val okHttpClient = AccountUtils.getHttpClient(userId)
 
         // Update Local with Remote
-        val newMessagesThreads = RefreshController.refreshThreads(
+        val newMessagesThreads = refreshController.refreshThreads(
             refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
             mailbox = mailbox,
             folder = folder,
