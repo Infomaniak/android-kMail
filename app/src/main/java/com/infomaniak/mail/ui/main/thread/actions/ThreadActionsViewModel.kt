@@ -29,6 +29,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ThreadActionsViewModel @Inject constructor(
+    private val messageController: MessageController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -45,7 +46,7 @@ class ThreadActionsViewModel @Inject constructor(
             return@liveData
         }
 
-        val uidToReplyTo = messageUidToReplyTo ?: MessageController.getLastMessageToExecuteAction(thread).uid
+        val uidToReplyTo = messageUidToReplyTo ?: messageController.getLastMessageToExecuteAction(thread).uid
 
         emit(thread to uidToReplyTo)
     }

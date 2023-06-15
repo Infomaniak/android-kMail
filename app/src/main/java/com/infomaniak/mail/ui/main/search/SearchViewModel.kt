@@ -47,6 +47,7 @@ import javax.inject.Inject
 class SearchViewModel @Inject constructor(
     application: Application,
     private val searchUtils: SearchUtils,
+    private val messageController: MessageController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
@@ -224,7 +225,7 @@ class SearchViewModel @Inject constructor(
             resourceNext = data?.resourceNext
             isFirstPage = data?.resourcePrevious == null
         } else if (isLastPage) {
-            ThreadController.saveThreads(searchMessages = MessageController.searchMessages(query, newFilters, folderId))
+            threadController.saveThreads(searchMessages = messageController.searchMessages(query, newFilters, folderId))
         }
     }
 

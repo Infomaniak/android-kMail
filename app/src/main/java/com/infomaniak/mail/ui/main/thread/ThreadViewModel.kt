@@ -49,6 +49,7 @@ import kotlin.collections.set
 @HiltViewModel
 class ThreadViewModel @Inject constructor(
     application: Application,
+    private val messageController: MessageController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
@@ -66,7 +67,7 @@ class ThreadViewModel @Inject constructor(
     }
 
     fun messagesLive(threadUid: String) = liveData(coroutineContext) {
-        MessageController.getSortedMessages(threadUid)?.asFlow()?.asLiveData()?.let { emitSource(it) }
+        messageController.getSortedMessages(threadUid)?.asFlow()?.asLiveData()?.let { emitSource(it) }
     }
 
     fun openThread(threadUid: String) = liveData(coroutineContext) {
@@ -99,14 +100,14 @@ class ThreadViewModel @Inject constructor(
 
     fun deleteDraft(message: Message, threadUid: String, mailbox: Mailbox) = viewModelScope.launch(viewModelScope.handlerIO) {
         val thread = ThreadController.getThread(threadUid) ?: return@launch
-        val messages = MessageController.getMessageAndDuplicates(thread, message)
+        val messages = messageController.getMessageAndDuplicates(thread, message)
         val isSuccess = ApiRepository.deleteMessages(mailbox.uuid, messages.getUids()).isSuccess()
         if (isSuccess) RefreshController.refreshThreads(RefreshMode.REFRESH_FOLDER_WITH_ROLE, mailbox, message.folder)
     }
 
     fun clickOnQuickActionBar(threadUid: String, menuId: Int) = viewModelScope.launch(ioDispatcher) {
         val thread = ThreadController.getThread(threadUid) ?: return@launch
-        val message = MessageController.getLastMessageToExecuteAction(thread)
+        val message = messageController.getLastMessageToExecuteAction(thread)
         quickActionBarClicks.postValue(message to menuId)
     }
 }

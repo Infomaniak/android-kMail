@@ -71,6 +71,7 @@ class MainViewModel @Inject constructor(
     private val addressBookController: AddressBookController,
     private val draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler,
     private val mergedContactController: MergedContactController,
+    private val messageController: MessageController,
     private val searchUtils: SearchUtils,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
