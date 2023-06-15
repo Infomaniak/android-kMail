@@ -19,10 +19,7 @@ package com.infomaniak.mail.data.cache.mailboxContent
 
 import android.util.Log
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.cache.mailboxContent.MessageController.deleteMessage
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode.*
-import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.upsertThread
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.getMessages.ActivitiesResult
@@ -31,6 +28,7 @@ import com.infomaniak.mail.data.models.getMessages.NewMessagesResult
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.di.MailboxContentRealm
 import com.infomaniak.mail.utils.*
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
@@ -41,11 +39,10 @@ import io.sentry.Sentry
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
 import java.util.Date
+import javax.inject.Inject
 import kotlin.math.max
 
-object RefreshController {
-
-    private inline val defaultRealm get() = RealmDatabase.mailboxContent()
+class RefreshController @Inject constructor(@MailboxContentRealm private val mailboxContentRealm: Realm) {
 
     private var refreshThreadsJob: Job? = null
 
@@ -55,7 +52,7 @@ object RefreshController {
         mailbox: Mailbox,
         folder: Folder,
         okHttpClient: OkHttpClient? = null,
-        realm: Realm = defaultRealm,
+        realm: Realm = mailboxContentRealm,
         started: (() -> Unit)? = null,
         stopped: (() -> Unit)? = null,
     ): List<Thread>? {
@@ -114,7 +111,7 @@ object RefreshController {
         }.forEach { role ->
             scope.ensureActive()
 
-            FolderController.getFolder(role)?.let {
+            FolderController.getFolder(role, mailboxContentRealm)?.let {
                 refresh(scope, mailbox, it, okHttpClient)
             }
         }
@@ -395,7 +392,7 @@ object RefreshController {
                 impactedFolders.add(threadFolderId)
             }
 
-            deleteMessage(message)
+            MessageController.deleteMessage(this, message)
         }
 
         threads.forEach {
@@ -469,7 +466,7 @@ object RefreshController {
             val existingThreads = ThreadController.getThreads(message.messageIds, realm = this).toList()
 
             createNewThreadIfRequired(scope, existingThreads, message, idsOfFoldersWithIncompleteThreads)?.let { newThread ->
-                upsertThread(newThread).also {
+                ThreadController.upsertThread(this, newThread).also {
                     folder.threads.add(it)
                     threadsToUpsert[it.uid] = it
                 }
@@ -488,11 +485,11 @@ object RefreshController {
 
                     if (!thread.messages.contains(existingMessage)) {
                         thread.messagesIds += existingMessage.messageIds
-                        thread.addMessageWithConditions(existingMessage, realm = this)
+                        thread.addMessageWithConditions(this, existingMessage)
                     }
                 }
 
-                threadsToUpsert[thread.uid] = upsertThread(thread)
+                threadsToUpsert[thread.uid] = ThreadController.upsertThread(this, thread)
             }
         }
 
@@ -501,7 +498,7 @@ object RefreshController {
             scope.ensureActive()
 
             thread.recomputeThread(realm = this)
-            upsertThread(thread)
+            ThreadController.upsertThread(this, thread)
             allImpactedThreads.add(if (thread.isManaged()) thread.copyFromRealm(1u) else thread)
         }
 
@@ -546,8 +543,14 @@ object RefreshController {
         existingThread.messages.forEach { message ->
             scope.ensureActive()
 
-            newThread.addMessageWithConditions(message, realm = this)
+            newThread.addMessageWithConditions(this, message)
         }
+    }
+
+    private fun Thread.addMessageWithConditions(realm: TypedRealm, message: Message) {
+        val trashFolderId = FolderController.getFolder(FolderRole.TRASH, realm)?.id
+        val folderRole = FolderController.getFolder(folderId, realm)?.role
+        addMessageWithConditions(message, folderRole, trashFolderId)
     }
     //endregion
 
