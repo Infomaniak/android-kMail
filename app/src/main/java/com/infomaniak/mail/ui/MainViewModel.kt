@@ -204,7 +204,7 @@ class MainViewModel @Inject constructor(
             runCatching {
                 selectMailbox(mailbox)
             }.onFailure {
-                if (it.message == PASSWORD_INVALID_MAILBOX_ERROR) switchToPasswordValidMailbox()
+                if (it.message == PASSWORD_INVALID_MAILBOX_ERROR_CODE) switchToPasswordValidMailbox()
                 return@liveData
             }
 
@@ -225,7 +225,7 @@ class MainViewModel @Inject constructor(
             context.showToast(R.string.frelatedMailbox, Toast.LENGTH_LONG)
         }
 
-        throw IllegalStateException(PASSWORD_INVALID_MAILBOX_ERROR)
+        throw IllegalStateException(PASSWORD_INVALID_MAILBOX_ERROR_CODE)
     }
 
     private fun switchToPasswordValidMailbox() = viewModelScope.launch(ioCoroutineContext) {
@@ -937,12 +937,15 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private companion object {
-        val TAG: String = MainViewModel::class.java.simpleName
-        val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
-        const val PASSWORD_INVALID_MAILBOX_ERROR = "password_invalid_mailbox_error"
-        // We add this delay because for now, it doesn't always work if we just use the `etop`.
-        const val REFRESH_DELAY = 2_000L
-        const val MAX_REFRESH_DELAY = 6_000L
+    companion object {
+        private val TAG: String = MainViewModel::class.java.simpleName
+
+        private val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
+
+        // We add this delay because it doesn't always work if we just use the `etop`.
+        private const val REFRESH_DELAY = 2_000L
+        private const val MAX_REFRESH_DELAY = 6_000L
+
+        const val PASSWORD_INVALID_MAILBOX_ERROR_CODE = "password_invalid_mailbox_error_code"
     }
 }

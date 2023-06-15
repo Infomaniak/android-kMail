@@ -51,6 +51,7 @@
     <string name="addUnknownRecipientTitle">Einen Empfänger hinzufügen</string>
     <string name="alertBlockedImagesDescription">Bestimmte Inhalte Ihrer Nachricht wurden zu Ihrer Sicherheit blockiert.</string>
     <string name="alertBlockedImagesDisplayContent">Inhalt anzeigen</string>
+    <string name="allMailboxesAreFrelated">Keine gültige Mailbox gefunden. Kann im Moment nur im Webmail behoben werden.</string>
     <string name="appSecurityDescription">Schützen Sie den Zugriff auf Ihre App, indem Sie Ihre Telefonsperre aktivieren.</string>
     <string name="archiveFolder">Archiviert</string>
     <string name="attachAddressDescription">Sie haben bereits eine Infomaniak-Mailadresse, loggen Sie sich jetzt ein</string>

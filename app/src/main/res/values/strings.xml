@@ -58,6 +58,7 @@
     <string name="addUnknownRecipientTitle">Add a recipient</string>
     <string name="alertBlockedImagesDescription">For your safety certain contents have been blocked from your message.</string>
     <string name="alertBlockedImagesDisplayContent">Display content</string>
+    <string name="allMailboxesAreFrelated">No valid mailbox found. Can only be fixed on the webmail for now.</string>
     <string name="appSecurityDescription">Protect access to your app by enabling your phone lock.</string>
     <string name="archiveFolder">Archived</string>
     <string name="attachAddressDescription">If you already have an Infomaniak email address, connect now</string>

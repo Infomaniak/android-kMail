@@ -61,6 +61,7 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.databinding.ActivityLoginBinding
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
+import com.infomaniak.mail.ui.MainViewModel.Companion.PASSWORD_INVALID_MAILBOX_ERROR_CODE
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
 import com.infomaniak.mail.utils.getInfomaniakLogin
@@ -215,6 +216,10 @@ class LoginActivity : AppCompatActivity() {
             is ApiResponse<*> -> withContext(mainDispatcher) {
                 when (user.error?.code) {
                     NO_MAILBOX_ERROR_CODE -> launchNoMailboxActivity()
+                    PASSWORD_INVALID_MAILBOX_ERROR_CODE -> {
+                        // TODO: Instead of this snackbar, display screen explaining all Mailboxes' passwords are invalid.
+                        showError(getString(R.string.allMailboxesAreFrelated))
+                    }
                     else -> showError(getString(user.translatedError))
                 }
             }
@@ -302,7 +307,7 @@ class LoginActivity : AppCompatActivity() {
                 apiResponse.data?.isEmpty() == true -> {
                     ApiResponse<List<Mailbox>>(
                         result = ApiResponse.Status.ERROR,
-                        error = ApiError(code = NO_MAILBOX_ERROR_CODE),
+                        error = ApiError(NO_MAILBOX_ERROR_CODE),
                     )
                 }
                 else -> {
@@ -310,7 +315,15 @@ class LoginActivity : AppCompatActivity() {
                         context.trackUserInfo("nbMailboxes", mailboxes.count())
                         AccountUtils.addUser(user)
                         MailboxController.updateMailboxes(context, mailboxes)
-                        return@let user
+
+                        return@let if (mailboxes.none { it.isPasswordValid }) {
+                            ApiResponse<List<Mailbox>>(
+                                result = ApiResponse.Status.ERROR,
+                                error = ApiError(PASSWORD_INVALID_MAILBOX_ERROR_CODE),
+                            )
+                        } else {
+                            user
+                        }
                     } ?: run {
                         getErrorResponse(RCore.string.serverError)
                     }

@@ -51,6 +51,7 @@
     <string name="addUnknownRecipientTitle">Ajoutez un destinataire</string>
     <string name="alertBlockedImagesDescription">Pour votre sécurité nous avons bloqué certains contenus de votre message.</string>
     <string name="alertBlockedImagesDisplayContent">Afficher le contenu</string>
+    <string name="allMailboxesAreFrelated">Aucune boîte valide n’a été trouvée. Ne peut être corrigé que sur le webmail pour l’instant.</string>
     <string name="appSecurityDescription">Protégez l’accès à votre application en activant le verrouillage de votre téléphone.</string>
     <string name="archiveFolder">Archive</string>
     <string name="attachAddressDescription">Vous possédez déjà une adresse mail Infomaniak, connectez-vous dès maintenant</string>
@@ -204,9 +205,9 @@
     <string name="messageIsDraftOption">Brouillon</string>
     <string name="messageReplyHeader">Le %1$s, %2$s a écrit :</string>
     <string name="messageShowQuotedText">Afficher la conversation</string>
-    <string name="moreStorageText1">Votre boite est pleine et vous ne pouvez plus recevoir de nouveaux messages 🥲</string>
+    <string name="moreStorageText1">Votre boîte est pleine et vous ne pouvez plus recevoir de nouveaux messages 🥲</string>
     <string name="moreStorageText2">Vous pourrez prochainement débloquer les limites de votre adresse mail ik.me (stockage limite, envoi, redirection, …)</string>
-    <string name="moreStorageTitle">Votre boite est pleine ? Obtenez plus de stockage !</string>
+    <string name="moreStorageTitle">Votre boîte est pleine ? Obtenez plus de stockage !</string>
     <string name="moveTitle">Dans quel dossier souhaitez-vous déplacer votre e-mail ?</string>
     <plurals name="multipleSelectionCount">
         <item quantity="one">%d sélectionné</item>
@@ -278,7 +279,7 @@
     <string name="settingsInboxAlias">Alias</string>
     <string name="settingsInboxRedirect">Redirections</string>
     <string name="settingsInboxRules">Règles</string>
-    <string name="settingsInboxType">Type de boite de réception</string>
+    <string name="settingsInboxType">Type de boîte de réception</string>
     <string name="settingsMailboxGeneralAutoreply">Répondeur</string>
     <string name="settingsMailboxGeneralFolders">Paramètres des dossiers</string>
     <string name="settingsMailboxGeneralNotifications">Notifications</string>
