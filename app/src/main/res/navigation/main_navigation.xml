@@ -45,6 +45,9 @@
             android:id="@+id/action_threadListFragment_to_threadActionsBottomSheetDialog"
             app:destination="@id/threadActionsBottomSheetDialog" />
         <action
+            android:id="@+id/action_threadListFragment_to_messageActionsBottomSheetDialog"
+            app:destination="@id/messageActionsBottomSheetDialog" />
+        <action
             android:id="@+id/action_threadListFragment_to_moveFragment"
             app:destination="@id/moveFragment" />
         <action
@@ -132,7 +135,7 @@
             app:argType="string" />
         <action
             android:id="@+id/action_threadFragment_to_messageActionBottomSheetDialog"
-            app:destination="@id/messageActionBottomSheetDialog" />
+            app:destination="@id/messageActionsBottomSheetDialog" />
         <action
             android:id="@+id/action_threadFragment_to_newMessageActivity"
             app:destination="@id/newMessageActivity" />
@@ -186,9 +189,9 @@
     </dialog>
 
     <dialog
-        android:id="@+id/messageActionBottomSheetDialog"
+        android:id="@+id/messageActionsBottomSheetDialog"
         android:name="com.infomaniak.mail.ui.main.thread.actions.MessageActionsBottomSheetDialog"
-        android:label="MessageActionBottomSheetDialog"
+        android:label="MessageActionsBottomSheetDialog"
         tools:layout="@layout/bottom_sheet_actions_menu">
         <argument
             android:name="messageUid"

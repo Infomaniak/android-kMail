@@ -101,6 +101,10 @@ class Thread : RealmObject {
             }
         }
 
+    val isOnlyOneMessage get() = messages.count() == 1
+
+    val isOnlyOneDraft get() = isOnlyOneMessage && hasDrafts
+
     fun addFirstMessage(message: Message) {
         messagesIds += message.messageIds
         messages.add(message)
@@ -202,8 +206,6 @@ class Thread : RealmObject {
             else -> format(FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR)
         }
     }
-
-    fun isOnlyOneDraft(): Boolean = hasDrafts && messages.count() == 1
 
     fun computeAvatarRecipient(): Recipient? {
         val message = messages.lastOrNull { it.folder.role != FolderRole.SENT } ?: messages.last()
