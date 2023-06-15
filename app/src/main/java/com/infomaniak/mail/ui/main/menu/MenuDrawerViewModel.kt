@@ -23,6 +23,7 @@ import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
@@ -32,10 +33,10 @@ class MenuDrawerViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
-    private val coroutineContext = viewModelScope.coroutineContext + ioDispatcher
+    private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
     val otherMailboxesLive = MailboxController.getMailboxesAsync(
         userId = AccountUtils.currentUserId,
         exceptionMailboxIds = listOf(AccountUtils.currentMailboxId),
-    ).asLiveData(coroutineContext)
+    ).asLiveData(ioCoroutineContext)
 }

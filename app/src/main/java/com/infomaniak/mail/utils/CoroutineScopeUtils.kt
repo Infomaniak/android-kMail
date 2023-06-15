@@ -19,9 +19,7 @@ package com.infomaniak.mail.utils
 
 import io.sentry.Sentry
 import kotlinx.coroutines.*
-
-inline val CoroutineScope.handlerIO get() = handler + Dispatchers.IO
-inline val Job.handlerIO get() = handler + Dispatchers.IO
+import kotlin.coroutines.CoroutineContext
 
 inline val CoroutineScope.handler
     get() = CoroutineExceptionHandler { _, exception ->
@@ -34,3 +32,5 @@ inline val Job.handler
         if (isActive) Sentry.captureException(exception)
         exception.printStackTrace()
     }
+
+fun CoroutineScope.coroutineContext(dispatcher: CoroutineDispatcher): CoroutineContext = coroutineContext + handler + dispatcher

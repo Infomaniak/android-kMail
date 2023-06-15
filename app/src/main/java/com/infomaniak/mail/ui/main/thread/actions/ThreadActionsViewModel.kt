@@ -22,6 +22,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.mapNotNull
@@ -32,13 +33,13 @@ class ThreadActionsViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
-    private val coroutineContext = viewModelScope.coroutineContext + ioDispatcher
+    private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
     fun threadLive(threadUid: String): LiveData<Thread> {
-        return ThreadController.getThreadAsync(threadUid).mapNotNull { it.obj }.asLiveData(coroutineContext)
+        return ThreadController.getThreadAsync(threadUid).mapNotNull { it.obj }.asLiveData(ioCoroutineContext)
     }
 
-    fun getThreadAndMessageUidToReplyTo(threadUid: String, messageUidToReplyTo: String?) = liveData(coroutineContext) {
+    fun getThreadAndMessageUidToReplyTo(threadUid: String, messageUidToReplyTo: String?) = liveData(ioCoroutineContext) {
 
         val thread = ThreadController.getThread(threadUid) ?: run {
             emit(null)

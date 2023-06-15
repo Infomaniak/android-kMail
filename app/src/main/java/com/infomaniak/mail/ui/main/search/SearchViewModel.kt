@@ -36,6 +36,7 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.search.SearchFragment.VisibilityMode
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SearchUtils
+import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.sentry.Sentry
 import kotlinx.coroutines.*
@@ -50,6 +51,8 @@ class SearchViewModel @Inject constructor(
 ) : AndroidViewModel(application) {
 
     private inline val context: Context get() = getApplication()
+
+    private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
     private val _searchQuery = MutableLiveData("" to false)
     val searchQuery: String get() = _searchQuery.value!!.first
@@ -66,8 +69,6 @@ class SearchViewModel @Inject constructor(
 
     val visibilityMode = MutableLiveData(VisibilityMode.RECENT_SEARCHES)
     val history = SingleLiveEvent<String>()
-
-    private val coroutineContext = viewModelScope.coroutineContext + ioDispatcher
 
     /** It's simply used as a default value for the API. */
     private lateinit var dummyFolderId: String
@@ -88,7 +89,7 @@ class SearchViewModel @Inject constructor(
                 folder,
             )
         }
-        .asLiveData(coroutineContext)
+        .asLiveData(ioCoroutineContext)
 
     private fun observeSearchAndFilters(): Flow<NewSearchInfo> {
         return combine(
@@ -160,7 +161,7 @@ class SearchViewModel @Inject constructor(
     }
 
     override fun onCleared() {
-        CoroutineScope(coroutineContext).launch {
+        CoroutineScope(ioDispatcher).launch {
             SearchUtils.deleteRealmSearchData()
             Log.i(TAG, "SearchViewModel>onCleared: called")
         }

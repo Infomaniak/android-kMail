@@ -19,15 +19,14 @@ package com.infomaniak.mail.ui.main.thread.actions
 
 import android.app.Application
 import android.content.Context
-import android.content.Intent
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.cache.mailboxContent.AttachmentController
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.LocalStorageUtils
+import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
@@ -40,28 +39,28 @@ class DownloadAttachmentViewModel @Inject constructor(
 
     private inline val context: Context get() = getApplication()
 
+    private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
+
     /**
      * We keep the Attachment, in case the ViewModel is destroyed before it finishes downloading
      */
     private var attachment: Attachment? = null
 
-    fun downloadAttachment(resource: String): LiveData<Intent?> {
-        return liveData(viewModelScope.coroutineContext + ioDispatcher) {
-            val attachment = AttachmentController.getAttachment(resource).also { attachment = it }
-            val attachmentFile = attachment.getCacheFile(context)
+    fun downloadAttachment(resource: String) = liveData(ioCoroutineContext) {
+        val attachment = AttachmentController.getAttachment(resource).also { attachment = it }
+        val attachmentFile = attachment.getCacheFile(context)
 
-            if (attachment.hasUsableCache(context, attachmentFile)) {
-                emit(attachment.openWithIntent(context))
-                this@DownloadAttachmentViewModel.attachment = null
-                return@liveData
-            }
+        if (attachment.hasUsableCache(context, attachmentFile)) {
+            emit(attachment.openWithIntent(context))
+            this@DownloadAttachmentViewModel.attachment = null
+            return@liveData
+        }
 
-            if (LocalStorageUtils.saveAttachmentToCache(resource, attachmentFile)) {
-                emit(attachment.openWithIntent(context))
-                this@DownloadAttachmentViewModel.attachment = null
-            } else {
-                emit(null)
-            }
+        if (LocalStorageUtils.saveAttachmentToCache(resource, attachmentFile)) {
+            emit(attachment.openWithIntent(context))
+            this@DownloadAttachmentViewModel.attachment = null
+        } else {
+            emit(null)
         }
     }
 
