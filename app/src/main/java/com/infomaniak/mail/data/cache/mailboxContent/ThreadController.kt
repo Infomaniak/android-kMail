@@ -18,13 +18,14 @@
 package com.infomaniak.mail.data.cache.mailboxContent
 
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
+import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.di.MailboxContentRealm
 import com.infomaniak.mail.utils.SearchUtils.Companion.convertToSearchThreads
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
@@ -36,83 +37,34 @@ import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.*
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
+import javax.inject.Inject
 
-object ThreadController {
-
-    private inline val defaultRealm get() = RealmDatabase.mailboxContent()
-
-    //region Queries
-    private fun getThreadsQuery(messageIds: Set<String>, realm: TypedRealm): RealmQuery<Thread> {
-        val byMessagesIds = "ANY ${Thread::messagesIds.name} IN {${messageIds.joinToString { "'$it'" }}}"
-        return realm.query(byMessagesIds)
-    }
-
-    private fun getOrphanThreadsQuery(realm: TypedRealm): RealmQuery<Thread> {
-        return realm.query("${Thread::folderId.name} == ''")
-    }
-
-    private fun getUnreadThreadsCountQuery(folder: Folder): RealmScalarQuery<Long> {
-        val unseen = "${Thread::unseenMessagesCount.name} > 0"
-        return folder.threads.query(unseen).count()
-    }
-
-    private fun getThreadsQuery(folder: Folder, filter: ThreadFilter = ThreadFilter.ALL): RealmQuery<Thread> {
-
-        val notFromSearch = "${Thread::isFromSearch.name} == false"
-        val realmQuery = folder.threads.query(notFromSearch).sort(Thread::date.name, Sort.DESCENDING)
-
-        return if (filter == ThreadFilter.ALL) {
-            realmQuery
-        } else {
-            val withFilter = when (filter) {
-                ThreadFilter.SEEN -> "${Thread::unseenMessagesCount.name} == 0"
-                ThreadFilter.UNSEEN -> "${Thread::unseenMessagesCount.name} > 0"
-                ThreadFilter.STARRED -> "${Thread::isFavorite.name} == true"
-                ThreadFilter.ATTACHMENTS -> "${Thread::hasAttachments.name} == true"
-                ThreadFilter.FOLDER -> TODO()
-                else -> throw IllegalStateException("`${ThreadFilter::class.simpleName}` cannot be `${ThreadFilter.ALL.name}` here.")
-            }
-            realmQuery.query(withFilter)
-        }
-    }
-
-    private fun getThreadQuery(uid: String, realm: TypedRealm): RealmSingleQuery<Thread> {
-        return realm.query<Thread>("${Thread::uid.name} == '$uid'").first()
-    }
-    //endregion
+class ThreadController @Inject constructor(
+    @MailboxContentRealm private val mailboxContentRealm: Realm,
+    private val refreshController: RefreshController,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+) {
 
     //region Get data
-    fun getThreads(messageIds: Set<String>, realm: TypedRealm): RealmResults<Thread> {
-        return getThreadsQuery(messageIds, realm).find()
-    }
-
-    fun getOrphanThreads(realm: TypedRealm): RealmResults<Thread> {
-        return getOrphanThreadsQuery(realm).find()
-    }
-
-    fun getUnreadThreadsCount(folder: Folder): Int {
-        return getUnreadThreadsCountQuery(folder).find().toInt()
-    }
-
     fun getThreadsAsync(folder: Folder, filter: ThreadFilter = ThreadFilter.ALL): Flow<ResultsChange<Thread>> {
         return getThreadsQuery(folder, filter).asFlow()
     }
 
     fun getSearchThreadsAsync(): Flow<ResultsChange<Thread>> {
-        return defaultRealm.query<Thread>("${Thread::isFromSearch.name} == true").asFlow()
+        return mailboxContentRealm.query<Thread>("${Thread::isFromSearch.name} == true").asFlow()
     }
 
-    fun getThread(uid: String, realm: TypedRealm = defaultRealm): Thread? {
-        return getThreadQuery(uid, realm).find()
+    fun getThread(uid: String): Thread? {
+        return Companion.getThread(uid, mailboxContentRealm)
     }
 
     fun getThreadAsync(uid: String): Flow<SingleQueryChange<Thread>> {
-        return getThreadQuery(uid, defaultRealm).asFlow()
+        return getThreadQuery(uid, mailboxContentRealm).asFlow()
     }
 
     /**
@@ -123,7 +75,7 @@ object ThreadController {
      * @param remoteThreads The list of API Threads that need to be treated
      * @return a list of search Threads
      */
-    suspend fun initAndGetSearchFolderThreads(remoteThreads: List<Thread>): List<Thread> = withContext(Dispatchers.IO) {
+    suspend fun initAndGetSearchFolderThreads(remoteThreads: List<Thread>): List<Thread> = withContext(ioDispatcher) {
 
         fun MutableRealm.keepOldMessagesAndAddToSearchFolder(remoteThread: Thread, searchFolder: Folder) {
 
@@ -154,7 +106,7 @@ object ThreadController {
             }
         }
 
-        return@withContext defaultRealm.writeBlocking {
+        return@withContext mailboxContentRealm.writeBlocking {
             val searchFolder = FolderController.getOrCreateSearchFolder(this)
             remoteThreads.map { remoteThread ->
                 ensureActive()
@@ -173,8 +125,6 @@ object ThreadController {
     //endregion
 
     //region Edit data
-    fun MutableRealm.upsertThread(thread: Thread): Thread = copyToRealm(thread, UpdatePolicy.ALL)
-
     fun deleteSearchThreads(realm: MutableRealm) = with(realm) {
         delete(query<Thread>("${Thread::isFromSearch.name} == true").find())
     }
@@ -183,52 +133,10 @@ object ThreadController {
         messages: List<Message>,
         mailbox: Mailbox,
         okHttpClient: OkHttpClient? = null,
-        realm: Realm = defaultRealm,
+        realm: Realm = mailboxContentRealm,
     ) {
-        val failedFoldersIds = realm.writeBlocking { fetchIncompleteMessages(messages, okHttpClient) }
+        val failedFoldersIds = realm.writeBlocking { fetchIncompleteMessages(this, messages, okHttpClient) }
         updateFailedFolders(failedFoldersIds, mailbox, okHttpClient, realm)
-    }
-
-    fun MutableRealm.fetchIncompleteMessages(messages: List<Message>, okHttpClient: OkHttpClient? = null): Set<String> {
-
-        val failedFoldersIds = mutableSetOf<String>()
-
-        messages.forEach { localMessage ->
-            if (!localMessage.isFullyDownloaded) {
-                with(ApiRepository.getMessage(localMessage.resource, okHttpClient)) {
-                    if (isSuccess()) {
-                        data?.also { remoteMessage ->
-
-                            // If we've already got this Message's Draft beforehand, we need to save
-                            // its `draftLocalUuid`, otherwise we'll lose the link between them.
-                            val draftLocalUuid = if (remoteMessage.isDraft) {
-                                DraftController.getDraftByMessageUid(
-                                    remoteMessage.uid,
-                                    realm = this@fetchIncompleteMessages,
-                                )?.localUuid
-                            } else {
-                                null
-                            }
-
-                            remoteMessage.initLocalValues(
-                                date = localMessage.date,
-                                isFullyDownloaded = true,
-                                isSpam = localMessage.isSpam,
-                                messageIds = localMessage.messageIds,
-                                draftLocalUuid = draftLocalUuid,
-                                isFromSearch = localMessage.isFromSearch,
-                            )
-
-                            MessageController.upsertMessage(remoteMessage, realm = this@fetchIncompleteMessages)
-                        }
-                    } else {
-                        failedFoldersIds.add(localMessage.folderId)
-                    }
-                }
-            }
-        }
-
-        return failedFoldersIds
     }
 
     private suspend fun updateFailedFolders(
@@ -236,16 +144,16 @@ object ThreadController {
         mailbox: Mailbox,
         okHttpClient: OkHttpClient?,
         realm: Realm,
-    ) = withContext(Dispatchers.IO) {
+    ) = withContext(ioDispatcher) {
         failedFoldersIds.forEach { folderId ->
             FolderController.getFolder(folderId, realm)?.let { folder ->
-                RefreshController.refreshThreads(RefreshMode.REFRESH_FOLDER, mailbox, folder, okHttpClient, realm)
+                refreshController.refreshThreads(RefreshMode.REFRESH_FOLDER, mailbox, folder, okHttpClient, realm)
             }
         }
     }
 
     fun saveThreads(searchMessages: List<Message>) {
-        defaultRealm.writeBlocking {
+        mailboxContentRealm.writeBlocking {
             FolderController.getOrCreateSearchFolder(this).apply {
                 messages = searchMessages.toRealmList()
                 threads = searchMessages.convertToSearchThreads().toRealmList()
@@ -253,4 +161,111 @@ object ThreadController {
         }
     }
     //endregion
+
+    companion object {
+
+        //region Queries
+        private fun getThreadsQuery(messageIds: Set<String>, realm: TypedRealm): RealmQuery<Thread> {
+            val byMessagesIds = "ANY ${Thread::messagesIds.name} IN {${messageIds.joinToString { "'$it'" }}}"
+            return realm.query(byMessagesIds)
+        }
+
+        private fun getOrphanThreadsQuery(realm: TypedRealm): RealmQuery<Thread> {
+            return realm.query("${Thread::folderId.name} == ''")
+        }
+
+        private fun getUnreadThreadsCountQuery(folder: Folder): RealmScalarQuery<Long> {
+            val unseen = "${Thread::unseenMessagesCount.name} > 0"
+            return folder.threads.query(unseen).count()
+        }
+
+        private fun getThreadsQuery(folder: Folder, filter: ThreadFilter = ThreadFilter.ALL): RealmQuery<Thread> {
+
+            val notFromSearch = "${Thread::isFromSearch.name} == false"
+            val realmQuery = folder.threads.query(notFromSearch).sort(Thread::date.name, Sort.DESCENDING)
+
+            return if (filter == ThreadFilter.ALL) {
+                realmQuery
+            } else {
+                val withFilter = when (filter) {
+                    ThreadFilter.SEEN -> "${Thread::unseenMessagesCount.name} == 0"
+                    ThreadFilter.UNSEEN -> "${Thread::unseenMessagesCount.name} > 0"
+                    ThreadFilter.STARRED -> "${Thread::isFavorite.name} == true"
+                    ThreadFilter.ATTACHMENTS -> "${Thread::hasAttachments.name} == true"
+                    ThreadFilter.FOLDER -> TODO()
+                    else -> throw IllegalStateException("`${ThreadFilter::class.simpleName}` cannot be `${ThreadFilter.ALL.name}` here.")
+                }
+                realmQuery.query(withFilter)
+            }
+        }
+
+        private fun getThreadQuery(uid: String, realm: TypedRealm): RealmSingleQuery<Thread> {
+            return realm.query<Thread>("${Thread::uid.name} == '$uid'").first()
+        }
+        //endregion
+
+        fun getThread(uid: String, realm: TypedRealm): Thread? {
+            return getThreadQuery(uid, realm).find()
+        }
+
+        fun getThreads(messageIds: Set<String>, realm: TypedRealm): RealmResults<Thread> {
+            return getThreadsQuery(messageIds, realm).find()
+        }
+
+        fun getUnreadThreadsCount(folder: Folder): Int {
+            return getUnreadThreadsCountQuery(folder).find().toInt()
+        }
+
+        fun getOrphanThreads(realm: TypedRealm): RealmResults<Thread> {
+            return getOrphanThreadsQuery(realm).find()
+        }
+
+        fun upsertThread(mutableRealm: MutableRealm, thread: Thread): Thread = mutableRealm.copyToRealm(thread, UpdatePolicy.ALL)
+
+        fun fetchIncompleteMessages(
+            mutableRealm: MutableRealm,
+            messages: List<Message>,
+            okHttpClient: OkHttpClient? = null,
+        ): Set<String> {
+
+            val failedFoldersIds = mutableSetOf<String>()
+
+            messages.forEach { localMessage ->
+                if (!localMessage.isFullyDownloaded) {
+                    with(ApiRepository.getMessage(localMessage.resource, okHttpClient)) {
+                        if (isSuccess()) {
+                            data?.also { remoteMessage ->
+
+                                // If we've already got this Message's Draft beforehand, we need to save
+                                // its `draftLocalUuid`, otherwise we'll lose the link between them.
+                                val draftLocalUuid = if (remoteMessage.isDraft) {
+                                    DraftController.getDraftByMessageUid(
+                                        remoteMessage.uid,
+                                        realm = mutableRealm,
+                                    )?.localUuid
+                                } else {
+                                    null
+                                }
+
+                                remoteMessage.initLocalValues(
+                                    date = localMessage.date,
+                                    isFullyDownloaded = true,
+                                    isSpam = localMessage.isSpam,
+                                    messageIds = localMessage.messageIds,
+                                    draftLocalUuid = draftLocalUuid,
+                                    isFromSearch = localMessage.isFromSearch,
+                                )
+
+                                MessageController.upsertMessage(remoteMessage, realm = mutableRealm)
+                            }
+                        } else {
+                            failedFoldersIds.add(localMessage.folderId)
+                        }
+                    }
+                }
+            }
+
+            return failedFoldersIds
+        }
+    }
 }
