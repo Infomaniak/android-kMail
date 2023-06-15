@@ -69,6 +69,7 @@ import com.infomaniak.lib.core.R as RCore
 class MainViewModel @Inject constructor(
     application: Application,
     private val addressBookController: AddressBookController,
+    private val draftController: DraftController,
     private val draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler,
     private val mergedContactController: MergedContactController,
     private val messageController: MessageController,
@@ -885,7 +886,7 @@ class MainViewModel @Inject constructor(
     private fun isSpam(message: Message?) = message?.isSpam ?: isCurrentFolderRole(FolderRole.SPAM)
 
     fun navigateToSelectedDraft(message: Message) = liveData(ioDispatcher) {
-        val localUuid = DraftController.getDraftByMessageUid(message.uid)?.localUuid
+        val localUuid = draftController.getDraftByMessageUid(message.uid)?.localUuid
         emit(ThreadListViewModel.SelectedDraft(localUuid, message.draftResource, message.uid))
     }
 
