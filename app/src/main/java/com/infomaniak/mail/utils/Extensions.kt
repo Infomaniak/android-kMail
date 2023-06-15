@@ -229,7 +229,7 @@ fun Fragment.safeNavigateToNewMessageActivity(
     safeNavigate(
         resId = R.id.newMessageActivity,
         args = NewMessageActivityArgs(
-            draftExists = false,
+            arrivedFromExistingDraft = false,
             draftMode = draftMode,
             previousMessageUid = messageUid,
             shouldLoadDistantResources = shouldLoadDistantResources,
@@ -239,13 +239,13 @@ fun Fragment.safeNavigateToNewMessageActivity(
 }
 
 fun Fragment.navigateToThread(thread: Thread, mainViewModel: MainViewModel) {
-    if (thread.isOnlyOneDraft()) { // Directly go to NewMessage screen
+    if (thread.isOnlyOneDraft) { // Directly go to NewMessage screen
         trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
         mainViewModel.navigateToSelectedDraft(thread.messages.first()).observe(viewLifecycleOwner) {
             safeNavigate(
                 R.id.newMessageActivity,
                 NewMessageActivityArgs(
-                    draftExists = true,
+                    arrivedFromExistingDraft = true,
                     draftLocalUuid = it.draftLocalUuid,
                     draftResource = it.draftResource,
                     messageUid = it.messageUid,

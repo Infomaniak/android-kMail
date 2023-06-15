@@ -66,6 +66,7 @@ import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.UUID
 import javax.inject.Inject
 import com.google.android.material.R as RMaterial
 
@@ -111,6 +112,8 @@ class NewMessageFragment : Fragment() {
             arguments = newMessageActivityArgs.toBundle(),
         )
 
+        updateCreationStatus()
+
         filePicker = FilePicker(this@NewMessageFragment)
 
         initUi()
@@ -126,6 +129,7 @@ class NewMessageFragment : Fragment() {
         observeEditorActions()
         observeNewAttachments()
         observeCcAndBccVisibility()
+        observeDraftWorkerResults()
     }
 
     override fun onStart() {
@@ -141,6 +145,12 @@ class NewMessageFragment : Fragment() {
             binding.quoteWebView.reload()
         }
         super.onConfigurationChanged(newConfig)
+    }
+
+    private fun updateCreationStatus() = with(newMessageViewModel) {
+        activityCreationStatus.next()?.let {
+            activityCreationStatus = it
+        }
     }
 
     private fun initUi() = with(binding) {
@@ -169,9 +179,18 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun initDraftAndViewModel() {
+    private fun initDraftAndViewModel() = with(newMessageActivityArgs) {
+        val draftExists = arrivedFromExistingDraft || newMessageViewModel.activityCreationStatus == CreationStatus.RECREATED
 
-        newMessageViewModel.initDraftAndViewModel(newMessageActivityArgs).observe(viewLifecycleOwner) { isSuccess ->
+        newMessageViewModel.initDraftAndViewModel(
+            draftExists,
+            draftLocalUuid,
+            draftResource,
+            messageUid,
+            draftMode,
+            previousMessageUid,
+            recipient,
+        ).observe(viewLifecycleOwner) { isSuccess ->
             if (isSuccess) {
                 hideLoader()
                 showKeyboardInCorrectView()
@@ -377,9 +396,21 @@ class NewMessageFragment : Fragment() {
      * Get [Intent.ACTION_VIEW] data with [MailTo] and [Intent.ACTION_SENDTO] with [Intent]
      */
     private fun handleMailTo() = with(newMessageViewModel) {
-        fun String.splitToRecipientList() = split(",").mapNotNull {
+
+        /**
+         * Mailto grammar accept 'name_of_recipient<email>' for recipients
+         */
+        fun parseEmailWithName(recipient: String): Recipient? {
+            val nameAndEmail = Regex("(.+)<(.+)>").find(recipient)?.let { matchResult ->
+                matchResult.groupValues[1] to matchResult.groupValues[2]
+            }
+
+            return nameAndEmail?.let { (name, email) -> if (email.isEmail()) Recipient().initLocalValues(email, name) else null }
+        }
+
+        fun String.splitToRecipientList() = split(",", ";").mapNotNull {
             val email = it.trim()
-            if (email.isEmail()) Recipient().initLocalValues(email, email) else null
+            if (email.isEmail()) Recipient().initLocalValues(email, email) else parseEmailWithName(email)
         }
 
         val intent = requireActivity().intent
@@ -536,6 +567,20 @@ class NewMessageFragment : Fragment() {
         draftsActionsWorkerScheduler.scheduleWork(draftLocalUuid)
     }
 
+    private fun observeDraftWorkerResults() {
+        WorkerUtils.flushWorkersBefore(requireContext(), viewLifecycleOwner) {
+
+            val treatedWorkInfoUuids = mutableSetOf<UUID>()
+
+            draftsActionsWorkerScheduler.getCompletedAndFailedInfoLiveData().observe(viewLifecycleOwner) {
+                it.forEach { workInfo ->
+                    if (!treatedWorkInfoUuids.add(workInfo.id)) return@forEach
+                    newMessageViewModel.synchronizeViewModelDraftFromRealm()
+                }
+            }
+        }
+    }
+
     fun closeAutoCompletion() = with(binding) {
         toField.clearField()
         ccField.clearField()
@@ -558,5 +603,19 @@ class NewMessageFragment : Fragment() {
         TO,
         CC,
         BCC,
+    }
+
+    enum class CreationStatus {
+        NOT_YET_CREATED,
+        CREATED,
+        RECREATED;
+
+        fun next(): CreationStatus? {
+            return when (this) {
+                NOT_YET_CREATED -> CREATED
+                CREATED -> RECREATED
+                RECREATED -> null
+            }
+        }
     }
 }

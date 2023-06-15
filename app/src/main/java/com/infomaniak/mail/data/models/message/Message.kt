@@ -156,18 +156,20 @@ class Message : RealmObject {
     }
 
     fun initLocalValues(
-        isFullyDownloaded: Boolean,
-        messageIds: RealmSet<String>,
-        isSpam: Boolean,
         date: RealmInstant,
+        isFullyDownloaded: Boolean,
+        isSpam: Boolean,
+        messageIds: RealmSet<String>,
         draftLocalUuid: String?,
+        isFromSearch: Boolean,
     ) {
-        messageId = messageId?.sanitize()
-        this.isFullyDownloaded = isFullyDownloaded
-        this.messageIds = messageIds
-        this.isSpam = isSpam
         this.date = date
+        this.isFullyDownloaded = isFullyDownloaded
+        this.isSpam = isSpam
+        this.messageIds = messageIds
         draftLocalUuid?.let { this.draftLocalUuid = it }
+        this.isFromSearch = isFromSearch
+        messageId = messageId?.sanitize()
         shortUid = uid.toShortUid()
     }
 

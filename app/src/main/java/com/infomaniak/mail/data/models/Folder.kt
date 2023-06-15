@@ -71,13 +71,13 @@ class Folder : RealmObject {
     // We start by downloading 1 page when 1st opening a Folder, before trying to download old Messages.
     // So when trying to get old Messages, we need to fetch 1 less page. Hence this computation.
     @Transient
-    var remainingOldMessagesToFetch: Int = max(Utils.NUMBER_OF_OLD_MESSAGES_TO_FETCH - Utils.PAGE_SIZE, 0)
+    var remainingOldMessagesToFetch: Int = DEFAULT_REMAINING_OLD_MESSAGES_TO_FETCH
     @Transient
-    var isHistoryComplete: Boolean = false
+    var isHistoryComplete: Boolean = DEFAULT_IS_HISTORY_COMPLETE
     // TODO: Remove this before going into production
     @Transient
     @Suppress("PropertyName")
-    var _forceClearAllDatabasesBecauseWeTryToFixOrphans: String = "fake_variable_used_to_automatically_clean_Realm_DB"
+    var _forceClearAllDatabasesBecauseWeTryToFixSomeSentries: String = "fake_variable_used_to_automatically_clean_Realm_DB"
     //endregion
 
     private val _parents by backlinks(Folder::children)
@@ -132,5 +132,8 @@ class Folder : RealmObject {
     companion object {
         val rolePropertyName = Folder::_role.name
         val parentsPropertyName = Folder::_parents.name
+
+        val DEFAULT_REMAINING_OLD_MESSAGES_TO_FETCH = max(Utils.NUMBER_OF_OLD_MESSAGES_TO_FETCH - Utils.PAGE_SIZE, 0)
+        const val DEFAULT_IS_HISTORY_COMPLETE = false
     }
 }

@@ -46,6 +46,7 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.main.SnackBarManager
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
+import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.CreationStatus
 import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
@@ -87,6 +88,7 @@ class NewMessageViewModel @Inject constructor(
 
     val snackBarManager by lazy { SnackBarManager() }
     var shouldExecuteDraftActionWhenStopping = true
+    var activityCreationStatus = CreationStatus.NOT_YET_CREATED
 
     private var snapshot: DraftSnapshot? = null
 
@@ -103,36 +105,43 @@ class NewMessageViewModel @Inject constructor(
         emit(mailboxes to currentMailboxIndex)
     }
 
-    fun initDraftAndViewModel(navigationArgs: NewMessageActivityArgs): LiveData<Boolean> = liveData(ioDispatcher) {
-        with(navigationArgs) {
-            val isSuccess = RealmDatabase.mailboxContent().writeBlocking {
-                draft = if (draftExists) {
-                    getLatestDraft(draftLocalUuid, realm = this)
-                        ?: fetchDraft(draftResource!!, messageUid!!)
-                        ?: run { return@writeBlocking false }
-                } else {
-                    isNewMessage = true
-                    createDraft(draftMode, previousMessageUid, recipient)
-                        ?: run { return@writeBlocking false }
-                }
-
-                if (draft.identityId.isNullOrBlank()) draft.addMissingSignatureData(realm = this)
-
-                return@writeBlocking true
+    fun initDraftAndViewModel(
+        draftExists: Boolean,
+        draftLocalUuid: String?,
+        draftResource: String?,
+        messageUid: String?,
+        draftMode: DraftMode,
+        previousMessageUid: String?,
+        recipient: Recipient?,
+    ): LiveData<Boolean> = liveData(ioDispatcher) {
+        val isSuccess = RealmDatabase.mailboxContent().writeBlocking {
+            draft = if (draftExists) {
+                val uuid = draftLocalUuid ?: draft.localUuid
+                getLatestDraft(uuid, realm = this)
+                    ?: fetchDraft(draftResource!!, messageUid!!)
+                    ?: run { return@writeBlocking false }
+            } else {
+                isNewMessage = true
+                createDraft(draftMode, previousMessageUid, recipient)
+                    ?: run { return@writeBlocking false }
             }
 
-            if (isSuccess) {
-                splitSignatureAndQuoteFromBody()
-                saveDraftSnapshot()
-                if (draft.cc.isNotEmpty() || draft.bcc.isNotEmpty()) {
-                    otherFieldsAreAllEmpty.postValue(false)
-                    initializeFieldsAsOpen.postValue(true)
-                }
-            }
+            if (draft.identityId.isNullOrBlank()) draft.addMissingSignatureData(realm = this)
 
-            emit(isSuccess)
-            isInitSuccess.postValue(isSuccess)
+            return@writeBlocking true
         }
+
+        if (isSuccess) {
+            splitSignatureAndQuoteFromBody()
+            saveDraftSnapshot()
+            if (draft.cc.isNotEmpty() || draft.bcc.isNotEmpty()) {
+                otherFieldsAreAllEmpty.postValue(false)
+                initializeFieldsAsOpen.postValue(true)
+            }
+        }
+
+        emit(isSuccess)
+        isInitSuccess.postValue(isSuccess)
     }
 
     private fun getLatestDraft(draftLocalUuid: String?, realm: MutableRealm): Draft? {
@@ -314,6 +323,10 @@ class NewMessageViewModel @Inject constructor(
         RealmDatabase.mailboxContent().writeBlocking {
             DraftController.getDraft(draft.localUuid, realm = this)?.let(::delete)
         }
+    }
+
+    fun synchronizeViewModelDraftFromRealm() = viewModelScope.launch(ioDispatcher) {
+        DraftController.getDraft(draft.localUuid)?.let { draft = it.copyFromRealm() }
     }
 
     private fun saveDraftToLocal(action: DraftAction) {
