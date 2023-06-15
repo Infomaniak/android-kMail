@@ -25,9 +25,13 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMo
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
+import javax.inject.Inject
 
-object SharedViewModelUtils {
+class SharedViewModelUtils @Inject constructor(
+    private val folderController: FolderController,
     private val messageController: MessageController,
+    private val refreshController: RefreshController,
+) {
 
     suspend fun markAsSeen(
         mailbox: Mailbox,
@@ -67,8 +71,8 @@ object SharedViewModelUtils {
         destinationFolderId?.let(foldersIds::add)
 
         foldersIds.forEach { folderId ->
-            FolderController.getFolder(folderId)?.let { folder ->
-                RefreshController.refreshThreads(
+            folderController.getFolder(folderId)?.let { folder ->
+                refreshController.refreshThreads(
                     refreshMode = RefreshMode.REFRESH_FOLDER,
                     mailbox = mailbox,
                     folder = folder,
