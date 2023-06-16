@@ -474,6 +474,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 updateFolderRole(folder.role)
                 updateLoadMore(shouldDisplayLoadMore = false)
             }
+
+            binding.newMessageFab.extend()
         }
     }
 
