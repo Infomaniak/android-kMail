@@ -65,17 +65,14 @@ class Mailbox : RealmObject {
     inline val notificationGroupId get() = uuid.hashCode()
     inline val notificationGroupKey get() = uuid
 
-    fun createObjectId(userId: Int): String {
-        return "${userId}_${this.mailboxId}"
-    }
+    private fun createObjectId(userId: Int): String = "${userId}_${this.mailboxId}"
 
-    fun initLocalValues(userId: Int, inboxUnreadCount: Int): Mailbox {
-
+    fun initLocalValues(userId: Int, quotas: Quotas?, inboxUnreadCount: Int, permissions: MailboxPermissions?) {
         this.objectId = createObjectId(userId)
         this.userId = userId
+        this.quotas = quotas
         this.inboxUnreadCount = inboxUnreadCount
-
-        return this
+        this.permissions = permissions
     }
 
     fun notificationsIsDisabled(notificationManagerCompat: NotificationManagerCompat): Boolean = with(notificationManagerCompat) {
