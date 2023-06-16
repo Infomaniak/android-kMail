@@ -56,22 +56,24 @@ class SearchViewModel @Inject constructor(
     private inline val context: Context get() = getApplication()
 
     private val _searchQuery = MutableLiveData("" to false)
-    private val _selectedFilters = MutableStateFlow(emptySet<ThreadFilter>())
-    private val _selectedFolder = MutableStateFlow<Folder?>(null)
-    private val _onPaginationTrigger = MutableLiveData(Unit)
-    /** Beware when using this variable because there might be side effects due to concurrency */
-    private var shouldPaginate: Boolean = false
-
     val searchQuery: String get() = _searchQuery.value!!.first
+
+    private val _selectedFilters = MutableStateFlow(emptySet<ThreadFilter>())
     private inline val selectedFilters get() = _selectedFilters.value.toMutableSet()
+
+    private val _selectedFolder = MutableStateFlow<Folder?>(null)
     val selectedFolder: Folder? get() = _selectedFolder.value
+
+    /** `_onPaginationTrigger` & `shouldPaginate` are closely related. Modifying one will impact the other. Beware. */
+    private val _onPaginationTrigger = MutableLiveData(Unit)
+    private var shouldPaginate: Boolean = false
 
     val visibilityMode = MutableLiveData(VisibilityMode.RECENT_SEARCHES)
     val history = SingleLiveEvent<String>()
 
     private val coroutineContext = viewModelScope.coroutineContext + ioDispatcher
 
-    /** It is simply used as a default value for the API */
+    /** It's simply used as a default value for the API. */
     private lateinit var dummyFolderId: String
 
     private var resourceNext: String? = null
