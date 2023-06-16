@@ -248,13 +248,16 @@ class RefreshController @Inject constructor(@MailboxContentRealm private val mai
                     it.lastUpdatedAt = Date().toRealmInstant()
 
                     // If we try to get new Messages, but `paginationInfo` is null, it's either because :
-                    // - it's the 1st opening of this Folder (in this case, everything's fine)
+                    // - it's the 1st opening of this Folder,
                     // - or that the Folder has been emptied.
-                    // If this happens, we need to reset the history info, so we'll be able to get all Messages again.
-                    if (paginationInfo == null) it.resetHistoryInfo()
+                    if (paginationInfo == null) {
 
-                    // If it's the 1st opening, and we didn't even get 1 full page, it means we already reached the end.
-                    if (folder.cursor == null && uidsCount < Utils.PAGE_SIZE) it.theEndIsReached()
+                        // If the Folder has been emptied, we need to reset history info, so we'll be able to get all Messages again.
+                        it.resetHistoryInfo()
+
+                        // If we didn't even get 1 full page, it means we already reached the end.
+                        if (uidsCount < Utils.PAGE_SIZE) it.theEndIsReached()
+                    }
                 }
             }
 
