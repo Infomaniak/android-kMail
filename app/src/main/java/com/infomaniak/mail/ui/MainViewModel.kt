@@ -78,6 +78,7 @@ class MainViewModel @Inject constructor(
     private val refreshController: RefreshController,
     private val searchUtils: SearchUtils,
     private val sharedViewModelUtils: SharedViewModelUtils,
+    private val signatureController: SignatureController,
     private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
@@ -392,7 +393,7 @@ class MainViewModel @Inject constructor(
             }
         }
 
-        signatures?.let(SignatureController::update)
+        signatures?.let(signatureController::update)
     }
 
     private fun updateFolders(mailbox: Mailbox) {
