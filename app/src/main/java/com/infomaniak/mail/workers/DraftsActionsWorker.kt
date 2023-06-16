@@ -284,7 +284,6 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         val apiResponse = ApiController.json.decodeFromString<ApiResponse<Attachment>>(response.body?.string() ?: "")
         if (apiResponse.isSuccess() && apiResponse.data != null) {
-            //TODO See with Sirambd if this basic block of instruction can crash because of worker cancellation or anything
             updateLocalAttachment(localDraftUuid, apiResponse.data!!, realm)
             attachmentFile.delete()
             LocalStorageUtils.deleteAttachmentsUploadsDirIfEmpty(applicationContext, localDraftUuid, userId, mailbox.mailboxId)
