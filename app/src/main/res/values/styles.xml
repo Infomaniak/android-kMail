@@ -386,6 +386,8 @@
     <style name="SettingSeparator">
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_marginEnd">@dimen/settingsSeparatorHorizontalPadding</item>
+        <item name="android:layout_marginStart">@dimen/settingsSeparatorHorizontalPadding</item>
         <item name="dividerColor">@color/separatorColor</item>
     </style>
 
