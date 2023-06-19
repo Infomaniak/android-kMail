@@ -22,6 +22,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
 import androidx.annotation.IdRes
+import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.mail.R
@@ -36,6 +37,7 @@ class SettingRadioGroupView @JvmOverloads constructor(
     private var checkedId: Int = View.NO_ID
     private var checkedValue: String? = null
     private var onItemCheckedListener: ((Int, String?, Enum<*>?) -> Unit)? = null
+    private var shouldAddDividers = true
 
     private var bijectionTable: Map<Int, Enum<*>> = emptyMap()
 
@@ -45,6 +47,14 @@ class SettingRadioGroupView @JvmOverloads constructor(
         attrs?.getAttributes(context, R.styleable.SettingRadioGroupView) {
             checkedId = getResourceId(R.styleable.SettingRadioGroupView_defaultCheckedId, View.NO_ID)
             check(checkedId)
+
+            shouldAddDividers = !getBoolean(R.styleable.SettingRadioGroupView_ignoreDividers, false)
+        }
+
+        if (shouldAddDividers) {
+            showDividers = SHOW_DIVIDER_MIDDLE
+            dividerPadding = resources.getDimension(R.dimen.settingsSeparatorHorizontalPadding).toInt()
+            dividerDrawable = ContextCompat.getDrawable(context, R.drawable.divider)
         }
     }
 

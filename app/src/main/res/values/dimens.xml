@@ -41,6 +41,9 @@
 
     <dimen name="menuDrawerItemViewHeight">48dp</dimen>
 
+    <!-- Settings -->
+    <dimen name="settingsSeparatorHorizontalPadding">16dp</dimen>
+
     <!-- Other -->
 
     <dimen name="roundCornerRadius">100dp</dimen>
