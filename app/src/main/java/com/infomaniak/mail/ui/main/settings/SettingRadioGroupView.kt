@@ -26,7 +26,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.mail.R
-import com.infomaniak.lib.core.R as RCore
 
 class SettingRadioGroupView @JvmOverloads constructor(
     context: Context,
@@ -54,7 +53,7 @@ class SettingRadioGroupView @JvmOverloads constructor(
 
         if (shouldAddDividers) {
             showDividers = SHOW_DIVIDER_MIDDLE
-            dividerPadding = resources.getDimension(RCore.dimen.marginStandardSmall).toInt()
+            dividerPadding = resources.getDimension(R.dimen.settingsSeparatorHorizontalPadding).toInt()
             dividerDrawable = ContextCompat.getDrawable(context, R.drawable.divider)
         }
     }
