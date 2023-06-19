@@ -44,14 +44,6 @@ import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.ErrorCode.DRAFT_ALREADY_SCHEDULED_OR_SENT
-import com.infomaniak.mail.utils.ErrorCode.DRAFT_DOES_NOT_EXIST
-import com.infomaniak.mail.utils.ErrorCode.DRAFT_HAS_TOO_MANY_RECIPIENTS
-import com.infomaniak.mail.utils.ErrorCode.DRAFT_NEED_AT_LEAST_ONE_RECIPIENT
-import com.infomaniak.mail.utils.ErrorCode.IDENTITY_NOT_FOUND
-import com.infomaniak.mail.utils.ErrorCode.MAILBOX_LOCKED
-import com.infomaniak.mail.utils.ErrorCode.SEND_LIMIT_EXCEEDED
-import com.infomaniak.mail.utils.ErrorCode.SEND_RECIPIENTS_REFUSED
 import com.infomaniak.mail.utils.NotificationUtils.showDraftActionsNotification
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -135,12 +127,12 @@ class DraftsActionsWorker @AssistedInject constructor(
     private suspend fun handleDraftsActions(): Result {
 
         val scheduledDates = mutableListOf<String>()
-        val errorMessageResIds = mutableListOf<Int>()
+        var trackedDraftErrorMessageResId: Int? = null
         var remoteUuidOfTrackedDraft: String? = null
         var trackedDraftAction: DraftAction? = null
         var isTrackedDraftSuccess = false
 
-        val haveAllDraftSucceeded = mailboxContentRealm.writeBlocking {
+        mailboxContentRealm.writeBlocking {
 
             val drafts = DraftController.getDraftsWithActions(realm = this).ifEmpty { return@writeBlocking false }
 
@@ -149,8 +141,8 @@ class DraftsActionsWorker @AssistedInject constructor(
             var hasNoRemoteException = true
 
             drafts.reversed().forEach { draft ->
-                val currentDraftLocalUuid = draft.localUuid
                 val currentDraftAction = draft.action
+                val isTargetDraft = draftLocalUuid == draft.localUuid
 
                 runCatching {
                     draft.uploadAttachments(realm = this)
@@ -161,14 +153,14 @@ class DraftsActionsWorker @AssistedInject constructor(
                         okHttpClient,
                     ).also { (scheduledDate, errorMessageResId, savedDraftUuid, isSuccess) ->
                         if (isSuccess) {
-                            if (draftLocalUuid == currentDraftLocalUuid) {
+                            if (isTargetDraft) {
                                 trackedDraftAction = currentDraftAction
                                 remoteUuidOfTrackedDraft = savedDraftUuid
                                 isTrackedDraftSuccess = true
                             }
                             scheduledDates.add(scheduledDate!!)
-                        } else {
-                            errorMessageResIds.add(errorMessageResId!!)
+                        } else if (isTargetDraft) {
+                            trackedDraftErrorMessageResId = errorMessageResId!!
                         }
                     }
 
@@ -176,7 +168,9 @@ class DraftsActionsWorker @AssistedInject constructor(
                     when (exception) {
                         is ApiController.NetworkException -> throw exception
                         is ApiErrorException -> {
-                            exception.handleApiErrors(draft = draft, realm = this)?.also(errorMessageResIds::add)
+                            exception.handleApiErrors(draft = draft, realm = this)?.also {
+                                if (isTargetDraft) trackedDraftErrorMessageResId = it
+                            }
                         }
                     }
                     exception.printStackTrace()
@@ -198,7 +192,7 @@ class DraftsActionsWorker @AssistedInject constructor(
             Triple(remoteUuidOfTrackedDraft, mailbox.uuid, trackedDraftAction)
         }
 
-        return if (haveAllDraftSucceeded || isTrackedDraftSuccess) {
+        return if (isTrackedDraftSuccess) {
             val outputData = workDataOf(
                 REMOTE_DRAFT_UUID_KEY to remoteDraftUuid,
                 ASSOCIATED_MAILBOX_UUID_KEY to mailboxUuid,
@@ -206,27 +200,14 @@ class DraftsActionsWorker @AssistedInject constructor(
             )
             Result.success(outputData)
         } else {
-            val outputData = workDataOf(ERROR_MESSAGE_RESID_KEY to errorMessageResIds.toIntArray())
+            val outputData = workDataOf(ERROR_MESSAGE_RESID_KEY to trackedDraftErrorMessageResId)
             Result.failure(outputData)
         }
     }
 
     private fun ApiErrorException.handleApiErrors(draft: Draft, realm: MutableRealm): Int? {
-
-        when (errorCode) {
-            DRAFT_DOES_NOT_EXIST, DRAFT_HAS_TOO_MANY_RECIPIENTS -> realm.delete(draft)
-        }
-
-        return when (errorCode) {
-            MAILBOX_LOCKED,
-            DRAFT_HAS_TOO_MANY_RECIPIENTS,
-            DRAFT_NEED_AT_LEAST_ONE_RECIPIENT,
-            DRAFT_ALREADY_SCHEDULED_OR_SENT,
-            IDENTITY_NOT_FOUND,
-            SEND_RECIPIENTS_REFUSED,
-            SEND_LIMIT_EXCEEDED -> ErrorCode.getTranslateRes(errorCode!!)
-            else -> null
-        }
+        realm.delete(draft)
+        return ErrorCode.getTranslateResForDrafts(errorCode)
     }
 
     private suspend fun updateFolderAfterDelay(scheduledDates: MutableList<String>) {
