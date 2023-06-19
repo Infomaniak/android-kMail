@@ -18,6 +18,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
     android:orientation="vertical">
 
     <!-- This needs to be passed as the handle used for dragging cards around in the DragDropSwipeRecyclerview library -->
@@ -32,8 +33,6 @@
         style="@style/TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_margin="@dimen/marginStandardMedium"
         android:text="@string/buttonLoadMore" />
 
 </LinearLayout>
