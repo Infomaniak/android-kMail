@@ -227,19 +227,21 @@ class MainViewModel @Inject constructor(
                 }
             }
 
-            val mailbox = currentMailbox.value!!
+            currentMailbox.value?.let { mailbox ->
 
-            updateQuotas(mailbox)
-            updatePermissions(mailbox)
-            updateFolders(mailbox)
+                updateQuotas(mailbox)
+                updatePermissions(mailbox)
+                updateFolders(mailbox)
 
-            (currentFolderId?.let(FolderController::getFolder) ?: FolderController.getFolder(DEFAULT_SELECTED_FOLDER))
-                ?.let { folder ->
-                    selectFolder(folder.id)
-                    viewModelScope.launch(ioCoroutineContext) {
-                        refreshThreads(mailbox, folder.id)
+                (currentFolderId?.let(FolderController::getFolder) ?: FolderController.getFolder(DEFAULT_SELECTED_FOLDER))
+                    ?.let { folder ->
+                        selectFolder(folder.id)
+                        viewModelScope.launch(ioCoroutineContext) {
+                            refreshThreads(mailbox, folder.id)
+                        }
                     }
-                }
+
+            }
 
             // Delete Search data in case they couldn't be deleted at the end of the previous Search.
             SearchUtils.deleteRealmSearchData()
