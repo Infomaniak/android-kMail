@@ -130,9 +130,9 @@ class DraftsActionsWorker @AssistedInject constructor(
         var trackedDraftErrorMessageResId: Int? = null
         var remoteUuidOfTrackedDraft: String? = null
         var trackedDraftAction: DraftAction? = null
-        var isTrackedDraftSuccess = false
+        var isTrackedDraftSuccess: Boolean? = null
 
-        mailboxContentRealm.writeBlocking {
+        val haveAllDraftSucceeded = mailboxContentRealm.writeBlocking {
 
             val drafts = DraftController.getDraftsWithActions(realm = this).ifEmpty { return@writeBlocking false }
 
@@ -161,6 +161,7 @@ class DraftsActionsWorker @AssistedInject constructor(
                             scheduledDates.add(scheduledDate!!)
                         } else if (isTargetDraft) {
                             trackedDraftErrorMessageResId = errorMessageResId!!
+                            isTrackedDraftSuccess = false
                         }
                     }
 
@@ -192,7 +193,7 @@ class DraftsActionsWorker @AssistedInject constructor(
             Triple(remoteUuidOfTrackedDraft, mailbox.uuid, trackedDraftAction)
         }
 
-        return if (isTrackedDraftSuccess) {
+        return if (haveAllDraftSucceeded || isTrackedDraftSuccess == true) {
             val outputData = workDataOf(
                 REMOTE_DRAFT_UUID_KEY to remoteDraftUuid,
                 ASSOCIATED_MAILBOX_UUID_KEY to mailboxUuid,
