@@ -113,7 +113,7 @@ class DraftsActionsWorker @AssistedInject constructor(
     private suspend fun notifyNewDraftDetected() {
         draftLocalUuid?.let { localUuid ->
             val draft = DraftController.getDraft(localUuid) ?: return@let
-            setProgress(workDataOf(PROGRESS_DRAFT_ACTION_KEY to draft.action?.name))
+            if (draft.action == DraftAction.SEND) setProgress(workDataOf(PROGRESS_DRAFT_ACTION_KEY to DraftAction.SEND.name))
         }
     }
 

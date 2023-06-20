@@ -138,11 +138,9 @@ class MainActivity : ThemedActivity() {
             draftsActionsWorkerScheduler.getRunningWorkInfoLiveData().observe(this) {
                 it.forEach { workInfo ->
                     workInfo.progress.getString(DraftsActionsWorker.PROGRESS_DRAFT_ACTION_KEY)?.let { draftAction ->
-                        val snackbarTitleResource = when (draftAction.toEnumOrThrow<DraftAction>()) {
-                            DraftAction.SAVE -> R.string.snackbarDraftSaving
-                            DraftAction.SEND -> R.string.snackbarEmailSending
+                        if (draftAction.toEnumOrThrow<DraftAction>() == DraftAction.SEND) {
+                            mainViewModel.snackBarManager.setValue(getString(R.string.snackbarEmailSending))
                         }
-                        mainViewModel.snackBarManager.setValue(getString(snackbarTitleResource))
                     }
                 }
             }
