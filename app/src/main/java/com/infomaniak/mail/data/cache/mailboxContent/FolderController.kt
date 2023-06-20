@@ -93,7 +93,7 @@ class FolderController @Inject constructor(@MailboxContentRealm private val mail
     }
 
     private fun MutableRealm.deleteLocalFolder(folder: Folder) {
-        MessageController.deleteMessages(this, folder.messages)
+        MessageController.deleteMessages(realm = this, folder.messages)
         if (folder.threads.isNotEmpty()) delete(folder.threads)
         delete(folder)
     }

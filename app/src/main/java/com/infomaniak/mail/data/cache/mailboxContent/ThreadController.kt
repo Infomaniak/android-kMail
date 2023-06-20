@@ -107,7 +107,7 @@ class ThreadController @Inject constructor(
         }
 
         return@withContext mailboxContentRealm.writeBlocking {
-            val searchFolder = FolderController.getOrCreateSearchFolder(this)
+            val searchFolder = FolderController.getOrCreateSearchFolder(realm = this)
             remoteThreads.map { remoteThread ->
                 ensureActive()
                 val remoteMessage = remoteThread.messages.first()
@@ -135,7 +135,7 @@ class ThreadController @Inject constructor(
         okHttpClient: OkHttpClient? = null,
         realm: Realm = mailboxContentRealm,
     ) {
-        val failedFoldersIds = realm.writeBlocking { fetchIncompleteMessages(this, messages, okHttpClient) }
+        val failedFoldersIds = realm.writeBlocking { fetchIncompleteMessages(realm = this, messages, okHttpClient) }
         updateFailedFolders(failedFoldersIds, mailbox, okHttpClient, realm)
     }
 
@@ -154,7 +154,7 @@ class ThreadController @Inject constructor(
 
     fun saveThreads(searchMessages: List<Message>) {
         mailboxContentRealm.writeBlocking {
-            FolderController.getOrCreateSearchFolder(this).apply {
+            FolderController.getOrCreateSearchFolder(realm = this).apply {
                 messages = searchMessages.toRealmList()
                 threads = searchMessages.convertToSearchThreads().toRealmList()
             }
@@ -220,10 +220,10 @@ class ThreadController @Inject constructor(
             return getOrphanThreadsQuery(realm).find()
         }
 
-        fun upsertThread(mutableRealm: MutableRealm, thread: Thread): Thread = mutableRealm.copyToRealm(thread, UpdatePolicy.ALL)
+        fun upsertThread(realm: MutableRealm, thread: Thread): Thread = realm.copyToRealm(thread, UpdatePolicy.ALL)
 
         fun fetchIncompleteMessages(
-            mutableRealm: MutableRealm,
+            realm: MutableRealm,
             messages: List<Message>,
             okHttpClient: OkHttpClient? = null,
         ): Set<String> {
@@ -239,10 +239,7 @@ class ThreadController @Inject constructor(
                                 // If we've already got this Message's Draft beforehand, we need to save
                                 // its `draftLocalUuid`, otherwise we'll lose the link between them.
                                 val draftLocalUuid = if (remoteMessage.isDraft) {
-                                    DraftController.getDraftByMessageUid(
-                                        remoteMessage.uid,
-                                        realm = mutableRealm,
-                                    )?.localUuid
+                                    DraftController.getDraftByMessageUid(remoteMessage.uid, realm)?.localUuid
                                 } else {
                                     null
                                 }
@@ -256,7 +253,7 @@ class ThreadController @Inject constructor(
                                     isFromSearch = localMessage.isFromSearch,
                                 )
 
-                                MessageController.upsertMessage(remoteMessage, realm = mutableRealm)
+                                MessageController.upsertMessage(remoteMessage, realm)
                             }
                         } else {
                             failedFoldersIds.add(localMessage.folderId)

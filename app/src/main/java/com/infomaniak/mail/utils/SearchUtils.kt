@@ -79,9 +79,9 @@ class SearchUtils @Inject constructor(
     suspend fun deleteRealmSearchData() = withContext(ioDispatcher) {
         mailboxContentRealm.writeBlocking {
             Log.i(TAG, "SearchUtils>deleteRealmSearchData: remove old search data")
-            messageController.deleteSearchMessages(this)
-            threadController.deleteSearchThreads(this)
-            folderController.deleteSearchData(this)
+            messageController.deleteSearchMessages(realm = this)
+            threadController.deleteSearchThreads(realm = this)
+            folderController.deleteSearchData(realm = this)
         }
     }
 

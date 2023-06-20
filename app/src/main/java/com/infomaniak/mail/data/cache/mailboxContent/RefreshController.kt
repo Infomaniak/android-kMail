@@ -395,7 +395,7 @@ class RefreshController @Inject constructor(@MailboxContentRealm private val mai
                 impactedFolders.add(threadFolderId)
             }
 
-            MessageController.deleteMessage(this, message)
+            MessageController.deleteMessage(realm = this, message)
         }
 
         threads.forEach {
@@ -469,7 +469,7 @@ class RefreshController @Inject constructor(@MailboxContentRealm private val mai
             val existingThreads = ThreadController.getThreads(message.messageIds, realm = this).toList()
 
             createNewThreadIfRequired(scope, existingThreads, message, idsOfFoldersWithIncompleteThreads)?.let { newThread ->
-                ThreadController.upsertThread(this, newThread).also {
+                ThreadController.upsertThread(realm = this, newThread).also {
                     folder.threads.add(it)
                     threadsToUpsert[it.uid] = it
                 }
@@ -488,11 +488,11 @@ class RefreshController @Inject constructor(@MailboxContentRealm private val mai
 
                     if (!thread.messages.contains(existingMessage)) {
                         thread.messagesIds += existingMessage.messageIds
-                        thread.addMessageWithConditions(this, existingMessage)
+                        thread.addMessageWithConditions(realm = this, existingMessage)
                     }
                 }
 
-                threadsToUpsert[thread.uid] = ThreadController.upsertThread(this, thread)
+                threadsToUpsert[thread.uid] = ThreadController.upsertThread(realm = this, thread)
             }
         }
 
@@ -501,7 +501,7 @@ class RefreshController @Inject constructor(@MailboxContentRealm private val mai
             scope.ensureActive()
 
             thread.recomputeThread(realm = this)
-            ThreadController.upsertThread(this, thread)
+            ThreadController.upsertThread(realm = this, thread)
             allImpactedThreads.add(if (thread.isManaged()) thread.copyFromRealm(1u) else thread)
         }
 
@@ -546,7 +546,7 @@ class RefreshController @Inject constructor(@MailboxContentRealm private val mai
         existingThread.messages.forEach { message ->
             scope.ensureActive()
 
-            newThread.addMessageWithConditions(this, message)
+            newThread.addMessageWithConditions(realm = this, message)
         }
     }
 
