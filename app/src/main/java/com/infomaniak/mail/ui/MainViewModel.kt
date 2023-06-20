@@ -21,6 +21,7 @@ import android.app.Application
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
@@ -169,7 +170,12 @@ class MainViewModel @Inject constructor(
 
     private fun selectMailbox(mailbox: Mailbox) {
 
-        if (!mailbox.isPasswordValid) handlePasswordInvalidMailbox()
+        if (!mailbox.isPasswordValid) {
+            // TODO: Instead of this Toast & Exception, display a popup asking for correct password (we are currently waiting for the UX).
+            displayToastAndThrow(R.string.frelatedMailbox, PASSWORD_INVALID_MAILBOX_ERROR_CODE)
+        }
+
+        if (mailbox.isLocked) displayToastAndThrow(R.string.lockedMailboxTitle, ALL_MAILBOXES_LOCKED_ERROR_CODE)
 
         if (mailbox.objectId != _currentMailboxObjectId.value) {
             Log.d(TAG, "Select mailbox: ${mailbox.email}")
@@ -204,7 +210,9 @@ class MainViewModel @Inject constructor(
             runCatching {
                 selectMailbox(mailbox)
             }.onFailure {
-                if (it.message == PASSWORD_INVALID_MAILBOX_ERROR_CODE) switchToPasswordValidMailbox()
+                if (it.message == PASSWORD_INVALID_MAILBOX_ERROR_CODE || it.message == ALL_MAILBOXES_LOCKED_ERROR_CODE) {
+                    switchToValidMailbox()
+                }
                 return@liveData
             }
 
@@ -219,17 +227,17 @@ class MainViewModel @Inject constructor(
     }
 
     // TODO: Instead of this Toast & Exception, display a popup asking for correct password (we are currently waiting for the UX).
-    private fun handlePasswordInvalidMailbox() {
+    private fun displayToastAndThrow(@StringRes title: Int, errorCode: String) {
 
         viewModelScope.launch(Dispatchers.Main) {
-            context.showToast(R.string.frelatedMailbox, Toast.LENGTH_LONG)
+            context.showToast(title, Toast.LENGTH_LONG)
         }
 
-        throw IllegalStateException(PASSWORD_INVALID_MAILBOX_ERROR_CODE)
+        throw IllegalStateException(errorCode)
     }
 
-    private fun switchToPasswordValidMailbox() = viewModelScope.launch(ioCoroutineContext) {
-        MailboxController.getFirstPasswordValidMailbox(AccountUtils.currentUserId)?.let {
+    private fun switchToValidMailbox() = viewModelScope.launch(ioCoroutineContext) {
+        MailboxController.getFirstValidMailbox(AccountUtils.currentUserId)?.let {
             AccountUtils.switchToMailbox(it.mailboxId)
         } ?: run {
             AccountUtils.removeUser(context, AccountUtils.currentUser!!)
@@ -947,5 +955,6 @@ class MainViewModel @Inject constructor(
         private const val MAX_REFRESH_DELAY = 6_000L
 
         const val PASSWORD_INVALID_MAILBOX_ERROR_CODE = "password_invalid_mailbox_error_code"
+        const val ALL_MAILBOXES_LOCKED_ERROR_CODE = "all_mailboxes_locked_error_code"
     }
 }
