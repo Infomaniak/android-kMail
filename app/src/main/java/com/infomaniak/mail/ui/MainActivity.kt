@@ -201,10 +201,10 @@ class MainActivity : ThemedActivity() {
     }
 
     private fun loadCurrentMailbox() {
-        mainViewModel.loadCurrentMailbox().observe(this) {
+        mainViewModel.loadCurrentMailboxFromLocal().observe(this) {
             lifecycleScope.launch {
                 repeatOnLifecycle(State.STARTED) {
-                    mainViewModel.forceRefreshMailboxesAndFolders()
+                    mainViewModel.refreshMailboxesFromRemote()
                 }
             }
         }

@@ -422,7 +422,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             recyclerView = binding.threadsList
             beforeUpdateAdapter = { threads ->
                 currentThreadsCount = threads.count()
-                Log.i("UI", "Received $currentThreadsCount threads")
+                Log.i("UI", "Received threads: $currentThreadsCount | (${mainViewModel.currentFolder.value?.name})")
                 updateThreadsVisibility()
             }
             waitingBeforeNotifyAdapter = isRecoveringFinished
@@ -482,7 +482,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun observeCurrentFolderLive() = with(threadListViewModel) {
         mainViewModel.currentFolderLive.observe(viewLifecycleOwner) { folder ->
             currentFolderCursor = folder.cursor
-            Log.i("UI", "Received cursor: $currentFolderCursor")
+            Log.i("UI", "Received cursor: $currentFolderCursor | (${folder.name})")
             updateThreadsVisibility()
             updateUnreadCount(folder.unreadCount)
             checkLastUpdateDay()
@@ -500,6 +500,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun observerDraftsActionsCompletedWorks() {
+
         fun observeDraftsActions() {
             draftsActionsWorkerScheduler.getCompletedWorkInfoLiveData().observe(viewLifecycleOwner) {
                 mainViewModel.currentFolder.value?.let { folder ->

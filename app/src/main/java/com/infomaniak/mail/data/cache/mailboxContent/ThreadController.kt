@@ -31,6 +31,7 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
+import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
@@ -79,22 +80,24 @@ class ThreadController @Inject constructor(
 
         fun MutableRealm.keepOldMessagesAndAddToSearchFolder(remoteThread: Thread, searchFolder: Folder) {
 
-            remoteThread.messages.forEach { remoteMessage: Message ->
+            remoteThread.messages.forEachIndexed { index, remoteMessage: Message ->
 
-                MessageController.getMessage(remoteMessage.uid, realm = this)?.let { localMessage ->
-                    remoteMessage.initLocalValues(
-                        date = localMessage.date,
-                        isFullyDownloaded = localMessage.isFullyDownloaded,
-                        isSpam = localMessage.isSpam,
-                        messageIds = localMessage.messageIds,
-                        draftLocalUuid = localMessage.draftLocalUuid,
-                        isFromSearch = localMessage.isFromSearch,
-                    )
+                val message = MessageController.getMessage(remoteMessage.uid, realm = this)?.let { localMessage ->
+                    localMessage.copyFromRealm().apply {
+                        isAnswered = remoteMessage.isAnswered
+                        isFavorite = remoteMessage.isFavorite
+                        isForwarded = remoteMessage.isForwarded
+                        isScheduled = remoteMessage.isScheduled
+                        isSeen = remoteMessage.isSeen
+                        remoteThread.messages[index] = this
+                    }
                 } ?: run {
-                    remoteMessage.isFromSearch = true
+                    remoteMessage.apply {
+                        isFromSearch = true
+                    }
                 }
 
-                searchFolder.messages.add(remoteMessage)
+                searchFolder.messages.add(message)
             }
         }
 

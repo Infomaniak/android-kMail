@@ -72,10 +72,10 @@ class NewMessageViewModel @Inject constructor(
 
     private inline val context: Context get() = getApplication()
 
-    var draft: Draft = Draft()
-
-    private val coroutineContext = viewModelScope.coroutineContext + ioDispatcher
+    private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
     private var autoSaveJob: Job? = null
+
+    var draft: Draft = Draft()
 
     var isAutoCompletionOpened = false
     var isEditorExpanded = false
@@ -96,12 +96,12 @@ class NewMessageViewModel @Inject constructor(
 
     private var isNewMessage = false
 
-    val mergedContacts = liveData(coroutineContext) {
+    val mergedContacts = liveData(ioCoroutineContext) {
         val list = mergedContactController.getMergedContacts(sorted = true).copyFromRealm()
         emit(list to arrangeMergedContacts(list))
     }
 
-    val mailboxes = liveData(coroutineContext) {
+    val mailboxes = liveData(ioCoroutineContext) {
         val mailboxes = MailboxController.getMailboxes(AccountUtils.currentUserId)
         val currentMailboxIndex = mailboxes.indexOfFirst { it.mailboxId == AccountUtils.currentMailboxId }
         emit(mailboxes to currentMailboxIndex)
@@ -115,7 +115,7 @@ class NewMessageViewModel @Inject constructor(
         draftMode: DraftMode,
         previousMessageUid: String?,
         recipient: Recipient?,
-    ): LiveData<Boolean> = liveData(ioDispatcher) {
+    ): LiveData<Boolean> = liveData(ioCoroutineContext) {
         val isSuccess = mailboxContentRealm.writeBlocking {
             draft = if (draftExists) {
                 val uuid = draftLocalUuid ?: draft.localUuid
@@ -226,7 +226,7 @@ class NewMessageViewModel @Inject constructor(
         )
     }
 
-    fun updateDraftInLocalIfRemoteHasChanged() = viewModelScope.launch(ioDispatcher) {
+    fun updateDraftInLocalIfRemoteHasChanged() = viewModelScope.launch(ioCoroutineContext) {
         if (draft.remoteUuid == null) {
             draftController.getDraft(draft.localUuid)?.let { localDraft ->
                 draft.remoteUuid = localDraft.remoteUuid
@@ -280,7 +280,7 @@ class NewMessageViewModel @Inject constructor(
     // In case the app crashes, the battery dies or any other unexpected situation, we always save every modifications of the draft in realm
     fun saveDraftDebouncing() {
         autoSaveJob?.cancel()
-        autoSaveJob = viewModelScope.launch(ioDispatcher) {
+        autoSaveJob = viewModelScope.launch(ioCoroutineContext) {
             delay(DELAY_BEFORE_AUTO_SAVING_DRAFT)
             saveDraftToLocal(DraftAction.SAVE)
         }
@@ -333,7 +333,7 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    fun synchronizeViewModelDraftFromRealm() = viewModelScope.launch(ioDispatcher) {
+    fun synchronizeViewModelDraftFromRealm() = viewModelScope.launch(ioCoroutineContext) {
         draftController.getDraft(draft.localUuid)?.let { draft = it.copyFromRealm() }
     }
 
@@ -354,7 +354,7 @@ class NewMessageViewModel @Inject constructor(
         isSendingAllowed.postValue(draft.to.isNotEmpty() || draft.cc.isNotEmpty() || draft.bcc.isNotEmpty())
     }
 
-    fun importAttachments(uris: List<Uri>) = viewModelScope.launch(ioDispatcher) {
+    fun importAttachments(uris: List<Uri>) = viewModelScope.launch(ioCoroutineContext) {
 
         val newAttachments = mutableListOf<Attachment>()
         var attachmentsSize = draft.attachments.sumOf { it.size }
