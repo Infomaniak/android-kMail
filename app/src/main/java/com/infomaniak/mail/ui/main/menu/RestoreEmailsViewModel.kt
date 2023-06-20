@@ -20,12 +20,14 @@ package com.infomaniak.mail.ui.main.menu
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
+import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.BackupResult
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
@@ -35,13 +37,15 @@ class RestoreEmailsViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
+    private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
+
     private val mailbox by lazy { MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
 
-    fun getBackups(): LiveData<ApiResponse<BackupResult>> = liveData(ioDispatcher) {
+    fun getBackups(): LiveData<ApiResponse<BackupResult>> = liveData(ioCoroutineContext) {
         emit(ApiRepository.getBackups(mailbox.hostingId, mailbox.mailboxName))
     }
 
-    fun restoreEmails(date: String): LiveData<ApiResponse<Boolean>> = liveData(ioDispatcher) {
+    fun restoreEmails(date: String): LiveData<ApiResponse<Boolean>> = liveData(ioCoroutineContext) {
         emit(ApiRepository.restoreBackup(mailbox.hostingId, mailbox.mailboxName, date))
     }
 }

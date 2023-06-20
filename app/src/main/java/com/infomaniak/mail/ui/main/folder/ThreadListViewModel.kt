@@ -22,6 +22,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
@@ -34,6 +35,7 @@ class ThreadListViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
+    private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
     private var updatedAtJob: Job? = null
 
     val isRecoveringFinished = MutableLiveData(true)
@@ -44,7 +46,7 @@ class ThreadListViewModel @Inject constructor(
 
     fun startUpdatedAtJob() {
         updatedAtJob?.cancel()
-        updatedAtJob = viewModelScope.launch(ioDispatcher) {
+        updatedAtJob = viewModelScope.launch(ioCoroutineContext) {
             while (true) {
                 delay(DateUtils.MINUTE_IN_MILLIS)
                 updatedAtTrigger.postValue(Unit)
