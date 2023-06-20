@@ -152,7 +152,11 @@ class MainActivity : ThemedActivity() {
             draftsActionsWorkerScheduler.getCompletedWorkInfoLiveData().observe(this) {
                 it.forEach { workInfo ->
                     if (!treatedWorkInfoUuids.add(workInfo.id)) return@forEach
-                    workInfo.outputData.displayCompletedDraftWorkerResults()
+
+                    workInfo.outputData.apply {
+                        refreshDraftFolderIfNeeded()
+                        displayCompletedDraftWorkerResults()
+                    }
                 }
             }
 
@@ -161,8 +165,12 @@ class MainActivity : ThemedActivity() {
             draftsActionsWorkerScheduler.getFailedWorkInfoLiveData().observe(this) {
                 it.forEach { workInfo ->
                     if (!treatedFailedWorkInfoUuids.add(workInfo.id)) return@forEach
-                    val errorRes = workInfo.outputData.getInt(DraftsActionsWorker.ERROR_MESSAGE_RESID_KEY, 0)
-                    if (errorRes > 0) mainViewModel.snackBarManager.setValue(getString(errorRes))
+
+                    workInfo.outputData.apply {
+                        refreshDraftFolderIfNeeded()
+                        val errorRes = getInt(DraftsActionsWorker.ERROR_MESSAGE_RESID_KEY, 0)
+                        if (errorRes > 0) mainViewModel.snackBarManager.setValue(getString(errorRes))
+                    }
                 }
             }
         }
@@ -181,6 +189,12 @@ class MainActivity : ThemedActivity() {
                     showSentDraftSnackBar()
                 }
             }
+        }
+    }
+
+    private fun Data.refreshDraftFolderIfNeeded() {
+        getLong(DraftsActionsWorker.BIGGEST_SCHEDULED_DATE_KEY, 0).takeIf { it > 0 }?.let { scheduledDate ->
+            mainViewModel.refreshDraftFolderWhenDraftArrives(scheduledDate)
         }
     }
 

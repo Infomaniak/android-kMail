@@ -32,13 +32,9 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
-import com.infomaniak.mail.data.cache.mailboxContent.FolderController
-import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
-import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Attachment
-import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.mailbox.Mailbox
@@ -51,7 +47,6 @@ import io.realm.kotlin.MutableRealm
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerializationException
 import okhttp3.MediaType.Companion.toMediaType
@@ -63,8 +58,6 @@ import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.math.max
-import kotlin.math.min
 import kotlin.properties.Delegates
 
 @HiltWorker
@@ -124,7 +117,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         }
     }
 
-    private suspend fun handleDraftsActions(): Result {
+    private fun handleDraftsActions(): Result {
 
         val scheduledDates = mutableListOf<String>()
         var trackedDraftErrorMessageResId: Int? = null
@@ -183,7 +176,7 @@ class DraftsActionsWorker @AssistedInject constructor(
             return@writeBlocking hasNoRemoteException
         }
 
-        if (scheduledDates.isNotEmpty()) updateFolderAfterDelay(scheduledDates)
+        val biggestScheduledDate = scheduledDates.mapNotNull { dateFormatWithTimezone.parse(it)?.time }.maxOrNull()
 
         SentryDebug.sendOrphanDrafts(mailboxContentRealm)
 
@@ -192,10 +185,14 @@ class DraftsActionsWorker @AssistedInject constructor(
                 REMOTE_DRAFT_UUID_KEY to draftLocalUuid?.let { remoteUuidOfTrackedDraft },
                 ASSOCIATED_MAILBOX_UUID_KEY to draftLocalUuid?.let { mailbox.uuid },
                 RESULT_DRAFT_ACTION_KEY to draftLocalUuid?.let { trackedDraftAction?.name },
+                BIGGEST_SCHEDULED_DATE_KEY to biggestScheduledDate,
             )
             Result.success(outputData)
         } else {
-            val outputData = workDataOf(ERROR_MESSAGE_RESID_KEY to trackedDraftErrorMessageResId)
+            val outputData = workDataOf(
+                ERROR_MESSAGE_RESID_KEY to trackedDraftErrorMessageResId,
+                BIGGEST_SCHEDULED_DATE_KEY to biggestScheduledDate,
+            )
             Result.failure(outputData)
         }
     }
@@ -203,28 +200,6 @@ class DraftsActionsWorker @AssistedInject constructor(
     private fun ApiErrorException.handleApiErrors(draft: Draft, realm: MutableRealm): Int? {
         realm.delete(draft)
         return ErrorCode.getTranslateResForDrafts(errorCode)
-    }
-
-    private suspend fun updateFolderAfterDelay(scheduledDates: MutableList<String>) {
-
-        val folder = FolderController.getFolder(FolderRole.DRAFT, realm = mailboxContentRealm)
-
-        if (folder?.cursor != null) {
-
-            val timeNow = Date().time
-            val times = scheduledDates.mapNotNull { dateFormatWithTimezone.parse(it)?.time }
-            var delay = REFRESH_DELAY
-            if (times.isNotEmpty()) delay += max(times.maxOf { it } - timeNow, 0L)
-            delay(min(delay, MAX_REFRESH_DELAY))
-
-            RefreshController.refreshThreads(
-                refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
-                mailbox = mailbox,
-                folder = folder,
-                okHttpClient = okHttpClient,
-                realm = mailboxContentRealm,
-            )
-        }
     }
 
     private fun Draft.uploadAttachments(realm: MutableRealm): Result {
@@ -404,8 +379,6 @@ class DraftsActionsWorker @AssistedInject constructor(
         const val REMOTE_DRAFT_UUID_KEY = "remoteDraftUuidKey"
         const val ASSOCIATED_MAILBOX_UUID_KEY = "associatedMailboxUuidKey"
         const val RESULT_DRAFT_ACTION_KEY = "resultDraftActionKey"
-        // We add this delay because for now, it doesn't always work if we just use the `etop`.
-        private const val REFRESH_DELAY = 2_000L
-        private const val MAX_REFRESH_DELAY = 6_000L
+        const val BIGGEST_SCHEDULED_DATE_KEY = "biggestScheduledDateKey"
     }
 }
