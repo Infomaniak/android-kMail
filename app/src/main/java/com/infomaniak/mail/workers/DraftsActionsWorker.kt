@@ -17,8 +17,10 @@
  */
 package com.infomaniak.mail.workers
 
+import android.Manifest
 import android.content.Context
 import android.util.Log
+import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
 import androidx.lifecycle.LiveData
 import androidx.work.*
@@ -26,6 +28,7 @@ import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.networking.HttpUtils
 import com.infomaniak.lib.core.utils.FORMAT_DATE_WITH_TIMEZONE
+import com.infomaniak.lib.core.utils.hasPermissions
 import com.infomaniak.lib.core.utils.isNetworkException
 import com.infomaniak.mail.MainApplication
 import com.infomaniak.mail.R
@@ -42,6 +45,7 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.NotificationUtils.showDraftActionsNotification
+import com.infomaniak.mail.utils.NotificationUtils.showDraftErrorNotification
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import io.realm.kotlin.MutableRealm
@@ -57,6 +61,7 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.properties.Delegates
@@ -66,6 +71,7 @@ class DraftsActionsWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted params: WorkerParameters,
     private val mainApplication: MainApplication,
+    private val notificationManagerCompat: NotificationManagerCompat,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : BaseCoroutineWorker(appContext, params) {
 
@@ -78,6 +84,7 @@ class DraftsActionsWorker @AssistedInject constructor(
     private var userId: Int by Delegates.notNull()
     private var draftLocalUuid: String? = null
     private lateinit var userApiToken: String
+    private var isSnackBarFeedbackNeeded: Boolean = false
 
     private val dateFormatWithTimezone by lazy { SimpleDateFormat(FORMAT_DATE_WITH_TIMEZONE, Locale.ROOT) }
 
@@ -94,6 +101,8 @@ class DraftsActionsWorker @AssistedInject constructor(
         userApiToken = AccountUtils.getUserById(userId)?.apiToken?.accessToken ?: return@withContext Result.failure()
         mailbox = MailboxController.getMailbox(userId, mailboxId, mailboxInfoRealm) ?: return@withContext Result.failure()
         okHttpClient = AccountUtils.getHttpClient(userId)
+
+        isSnackBarFeedbackNeeded = !mainApplication.isAppInBackground
 
         notifyNewDraftDetected()
 
@@ -115,7 +124,7 @@ class DraftsActionsWorker @AssistedInject constructor(
     private suspend fun notifyNewDraftDetected() {
         draftLocalUuid?.let { localUuid ->
             val draft = DraftController.getDraft(localUuid) ?: return@let
-            if (draft.action == DraftAction.SEND) setProgress(workDataOf(PROGRESS_DRAFT_ACTION_KEY to DraftAction.SEND.name))
+            if (draft.action == DraftAction.SEND && isSnackBarFeedbackNeeded) setProgress(workDataOf(PROGRESS_DRAFT_ACTION_KEY to DraftAction.SEND.name))
         }
     }
 
@@ -136,8 +145,8 @@ class DraftsActionsWorker @AssistedInject constructor(
             var hasNoRemoteException = true
 
             drafts.reversed().forEach { draft ->
-                val currentDraftAction = draft.action
                 val isTargetDraft = draftLocalUuid == draft.localUuid
+                if (isTargetDraft) trackedDraftAction = draft.action
 
                 runCatching {
                     draft.uploadAttachments(realm = this)
@@ -149,7 +158,6 @@ class DraftsActionsWorker @AssistedInject constructor(
                     ).also { (scheduledDate, errorMessageResId, savedDraftUuid, isSuccess) ->
                         if (isSuccess) {
                             if (isTargetDraft) {
-                                trackedDraftAction = currentDraftAction
                                 remoteUuidOfTrackedDraft = savedDraftUuid
                                 isTrackedDraftSuccess = true
                             }
@@ -165,7 +173,10 @@ class DraftsActionsWorker @AssistedInject constructor(
                         is ApiController.NetworkException -> throw exception
                         is ApiErrorException -> {
                             exception.handleApiErrors(draft = draft, realm = this)?.also {
-                                if (isTargetDraft) trackedDraftErrorMessageResId = it
+                                if (isTargetDraft) {
+                                    trackedDraftErrorMessageResId = it
+                                    isTrackedDraftSuccess = false
+                                }
                             }
                         }
                     }
@@ -182,21 +193,32 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         SentryDebug.sendOrphanDrafts(mailboxContentRealm)
 
+        if (mainApplication.isAppInBackground && isTrackedDraftSuccess == false) {
+            if (applicationContext.hasPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS))) {
+                applicationContext.showDraftErrorNotification(trackedDraftErrorMessageResId!!, trackedDraftAction!!).apply {
+                    @Suppress("MissingPermission")
+                    notificationManagerCompat.notify(UUID.randomUUID().hashCode(), build())
+                }
+            } else {
+                // TODO : ??
+            }
+        }
+
         return if (haveAllDraftSucceeded || isTrackedDraftSuccess == true) {
-            val outputData = workDataOf(
+            val outputData = if (isSnackBarFeedbackNeeded) workDataOf(
                 REMOTE_DRAFT_UUID_KEY to draftLocalUuid?.let { remoteUuidOfTrackedDraft },
                 ASSOCIATED_MAILBOX_UUID_KEY to draftLocalUuid?.let { mailbox.uuid },
                 RESULT_DRAFT_ACTION_KEY to draftLocalUuid?.let { trackedDraftAction?.name },
                 BIGGEST_SCHEDULED_DATE_KEY to biggestScheduledDate,
                 RESULT_USER_ID_KEY to userId,
-            )
+            ) else Data.EMPTY
             Result.success(outputData)
         } else {
-            val outputData = workDataOf(
+            val outputData = if (isSnackBarFeedbackNeeded) workDataOf(
                 ERROR_MESSAGE_RESID_KEY to trackedDraftErrorMessageResId,
                 BIGGEST_SCHEDULED_DATE_KEY to biggestScheduledDate,
                 RESULT_USER_ID_KEY to userId,
-            )
+            ) else Data.EMPTY
             Result.failure(outputData)
         }
     }

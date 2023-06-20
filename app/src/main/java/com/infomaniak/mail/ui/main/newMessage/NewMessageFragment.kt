@@ -550,10 +550,9 @@ class NewMessageFragment : Fragment() {
         if (shouldExecuteDraftActionWhenStopping) {
             val isFinishing = requireActivity().isFinishing
             val isTaskRoot = requireActivity().isTaskRoot
-            val shouldTrackDraftForSnackBar = isFinishing && !isTaskRoot
             val action = if (shouldSendInsteadOfSave) DraftAction.SEND else DraftAction.SAVE
             executeDraftActionWhenStopping(action, isFinishing, isTaskRoot) {
-                startWorker(shouldTrackDraftForSnackBar)
+                startWorker()
             }
         } else {
             shouldExecuteDraftActionWhenStopping = true
@@ -562,9 +561,8 @@ class NewMessageFragment : Fragment() {
         super.onStop()
     }
 
-    private fun startWorker(shouldTrackDraftForSnackBar: Boolean) {
-        val draftLocalUuid = if (shouldTrackDraftForSnackBar) newMessageViewModel.draft.localUuid else null
-        draftsActionsWorkerScheduler.scheduleWork(draftLocalUuid)
+    private fun startWorker() {
+        draftsActionsWorkerScheduler.scheduleWork(newMessageViewModel.draft.localUuid)
     }
 
     private fun observeDraftWorkerResults() {
