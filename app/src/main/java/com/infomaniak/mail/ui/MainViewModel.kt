@@ -20,10 +20,12 @@ package com.infomaniak.mail.ui
 import android.app.Application
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.lib.core.utils.SingleLiveEvent
+import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
@@ -165,7 +167,10 @@ class MainViewModel @Inject constructor(
     fun isCurrentFolderRole(role: FolderRole) = currentFolder.value?.role == role
     //endregion
 
-    private fun selectMailbox(mailbox: Mailbox) {
+    private suspend fun selectMailbox(mailbox: Mailbox) {
+
+        if (!mailbox.isPasswordValid) handlePasswordInvalidMailbox()
+
         if (mailbox.objectId != _currentMailboxObjectId.value) {
             Log.d(TAG, "Select mailbox: ${mailbox.email}")
             if (mailbox.mailboxId != AccountUtils.currentMailboxId) AccountUtils.currentMailboxId = mailbox.mailboxId
@@ -195,7 +200,13 @@ class MainViewModel @Inject constructor(
             userId = AccountUtils.currentUserId,
             mailboxId = AccountUtils.currentMailboxId,
         )?.let { mailbox ->
-            selectMailbox(mailbox)
+
+            runCatching {
+                selectMailbox(mailbox)
+            }.onFailure {
+                if (it.message == PASSWORD_INVALID_MAILBOX_ERROR) switchToPasswordValidMailbox()
+                return@liveData
+            }
 
             if (currentFolderId == null) {
                 FolderController.getFolder(DEFAULT_SELECTED_FOLDER)?.let { folder ->
@@ -205,6 +216,30 @@ class MainViewModel @Inject constructor(
         }
 
         emit(null)
+    }
+
+    // TODO: Instead of this Toast & Exception, display a popup asking for correct password (we are currently waiting for the UX).
+    private suspend fun handlePasswordInvalidMailbox() {
+
+        withContext(Dispatchers.Main) {
+            context.showToast(R.string.frelatedMailbox, Toast.LENGTH_LONG)
+        }
+
+        throw IllegalStateException(PASSWORD_INVALID_MAILBOX_ERROR)
+    }
+
+    private fun switchToPasswordValidMailbox() = viewModelScope.launch(ioCoroutineContext) {
+        MailboxController.getFirstPasswordValidMailbox(AccountUtils.currentUserId)?.let {
+            AccountUtils.switchToMailbox(it.mailboxId)
+        } ?: run {
+            AccountUtils.removeUser(context, AccountUtils.currentUser!!)
+        }
+    }
+
+    fun dismissCurrentMailboxNotifications() = viewModelScope.launch(ioCoroutineContext) {
+        currentMailbox.value?.let {
+            context.cancelNotification(it.notificationGroupId)
+        }
     }
 
     fun refreshMailboxesFromRemote() {
@@ -239,12 +274,6 @@ class MainViewModel @Inject constructor(
             SearchUtils.deleteRealmSearchData()
 
             draftsActionsWorkerScheduler.scheduleWork()
-        }
-    }
-
-    fun dismissCurrentMailboxNotifications() = viewModelScope.launch(ioCoroutineContext) {
-        currentMailbox.value?.let {
-            context.cancelNotification(it.notificationGroupId)
         }
     }
 
@@ -911,6 +940,7 @@ class MainViewModel @Inject constructor(
     private companion object {
         val TAG: String = MainViewModel::class.java.simpleName
         val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
+        const val PASSWORD_INVALID_MAILBOX_ERROR = "password_invalid_mailbox_error"
         // We add this delay because for now, it doesn't always work if we just use the `etop`.
         const val REFRESH_DELAY = 2_000L
         const val MAX_REFRESH_DELAY = 6_000L
