@@ -167,7 +167,7 @@ class MessageController @Inject constructor(@MailboxContentRealm private val mai
             realm.copyToRealm(message, UpdatePolicy.ALL)
         }
 
-        fun deleteMessage(realm: MutableRealm, message: Message) {
+        fun deleteMessage(message: Message, realm: MutableRealm) {
 
             DraftController.getDraftByMessageUid(message.uid, realm)?.let { draft ->
                 if (draft.action == null) {
@@ -180,9 +180,9 @@ class MessageController @Inject constructor(@MailboxContentRealm private val mai
             realm.delete(message)
         }
 
-        fun deleteMessages(realm: MutableRealm, messages: List<Message>) {
+        fun deleteMessages(messages: List<Message>, realm: MutableRealm) {
             messages.reversed().forEach { message ->
-                deleteMessage(realm, message)
+                deleteMessage(message, realm)
             }
         }
     }

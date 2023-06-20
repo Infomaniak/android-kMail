@@ -93,7 +93,7 @@ class FolderController @Inject constructor(@MailboxContentRealm private val mail
     }
 
     private fun MutableRealm.deleteLocalFolder(folder: Folder) {
-        MessageController.deleteMessages(realm = this, folder.messages)
+        MessageController.deleteMessages(folder.messages, realm = this)
         if (folder.threads.isNotEmpty()) delete(folder.threads)
         delete(folder)
     }
@@ -152,8 +152,8 @@ class FolderController @Inject constructor(@MailboxContentRealm private val mail
             return getFolderQuery(Folder::id.name, id, realm).find()
         }
 
-        fun getFolder(role: FolderRole, mailboxContentRealm: TypedRealm): Folder? {
-            return getFolderQuery(Folder.rolePropertyName, role.name, mailboxContentRealm).find()
+        fun getFolder(role: FolderRole, realm: TypedRealm): Folder? {
+            return getFolderQuery(Folder.rolePropertyName, role.name, realm).find()
         }
 
         fun getOrCreateSearchFolder(realm: MutableRealm): Folder {

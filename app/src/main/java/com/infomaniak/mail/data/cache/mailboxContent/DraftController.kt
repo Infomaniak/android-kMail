@@ -86,7 +86,7 @@ class DraftController @Inject constructor(@MailboxContentRealm private val mailb
         val previousMessage = if (message.isFullyDownloaded) {
             message
         } else {
-            isSuccess = ThreadController.fetchIncompleteMessages(realm, listOf(message)).isEmpty()
+            isSuccess = ThreadController.fetchIncompleteMessages(listOf(message), realm).isEmpty()
             MessageController.getMessage(message.uid, realm)!!
         }
 

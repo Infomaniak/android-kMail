@@ -396,7 +396,7 @@ class RefreshController @Inject constructor(@MailboxContentRealm private val mai
                 impactedFolders.add(threadFolderId)
             }
 
-            MessageController.deleteMessage(realm = this, message)
+            MessageController.deleteMessage(message, realm = this)
         }
 
         threads.forEach {
@@ -489,7 +489,7 @@ class RefreshController @Inject constructor(@MailboxContentRealm private val mai
 
                     if (!thread.messages.contains(existingMessage)) {
                         thread.messagesIds += existingMessage.messageIds
-                        thread.addMessageWithConditions(realm = this, existingMessage)
+                        thread.addMessageWithConditions(existingMessage, realm = this)
                     }
                 }
 
@@ -547,11 +547,11 @@ class RefreshController @Inject constructor(@MailboxContentRealm private val mai
         existingThread.messages.forEach { message ->
             scope.ensureActive()
 
-            newThread.addMessageWithConditions(realm = this, message)
+            newThread.addMessageWithConditions(message, realm = this)
         }
     }
 
-    private fun Thread.addMessageWithConditions(realm: TypedRealm, message: Message) {
+    private fun Thread.addMessageWithConditions(message: Message, realm: TypedRealm) {
         val trashFolderId = FolderController.getFolder(FolderRole.TRASH, realm)?.id
         val folderRole = FolderController.getFolder(folderId, realm)?.role
         addMessageWithConditions(message, folderRole, trashFolderId)

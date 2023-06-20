@@ -61,7 +61,7 @@ class ThreadController @Inject constructor(
     }
 
     fun getThread(uid: String): Thread? {
-        return Companion.getThread(uid, mailboxContentRealm)
+        return getThread(uid, mailboxContentRealm)
     }
 
     fun getThreadAsync(uid: String): Flow<SingleQueryChange<Thread>> {
@@ -138,7 +138,7 @@ class ThreadController @Inject constructor(
         okHttpClient: OkHttpClient? = null,
         realm: Realm = mailboxContentRealm,
     ) {
-        val failedFoldersIds = realm.writeBlocking { fetchIncompleteMessages(realm = this, messages, okHttpClient) }
+        val failedFoldersIds = realm.writeBlocking { fetchIncompleteMessages(messages, realm = this, okHttpClient) }
         updateFailedFolders(failedFoldersIds, mailbox, okHttpClient, realm)
     }
 
@@ -226,8 +226,8 @@ class ThreadController @Inject constructor(
         fun upsertThread(realm: MutableRealm, thread: Thread): Thread = realm.copyToRealm(thread, UpdatePolicy.ALL)
 
         fun fetchIncompleteMessages(
-            realm: MutableRealm,
             messages: List<Message>,
+            realm: MutableRealm,
             okHttpClient: OkHttpClient? = null,
         ): Set<String> {
 
