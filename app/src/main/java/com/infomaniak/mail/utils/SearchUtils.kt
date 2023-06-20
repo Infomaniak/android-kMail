@@ -80,7 +80,7 @@ object SearchUtils {
 
     suspend fun deleteRealmSearchData() = withContext(Dispatchers.IO) {
         RealmDatabase.mailboxContent().writeBlocking {
-            Log.i(TAG, "SearchUtils>deleteRealmSearchData: remove old search data")
+            Log.i(TAG, "SearchUtils>deleteRealmSearchData: Remove old search data")
             MessageController.deleteSearchMessages(this)
             ThreadController.deleteSearchThreads(this)
             FolderController.deleteSearchData(this)
