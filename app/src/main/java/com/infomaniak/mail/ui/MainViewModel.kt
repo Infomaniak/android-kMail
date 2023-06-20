@@ -223,7 +223,6 @@ class MainViewModel @Inject constructor(
 
     private fun openMailbox(mailbox: Mailbox) {
         selectMailbox(mailbox)
-        updateSignatures(mailbox)
         updateFolders(mailbox)
 
         (currentFolderId?.let(FolderController::getFolder)
@@ -252,6 +251,7 @@ class MainViewModel @Inject constructor(
 
             val mailbox = currentMailbox.value!!
 
+            updateSignatures(mailbox)
             updateQuotas(mailbox)
             updatePermissions(mailbox)
             updateFolders(mailbox)
