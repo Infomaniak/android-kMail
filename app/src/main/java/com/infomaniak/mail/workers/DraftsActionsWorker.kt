@@ -186,12 +186,14 @@ class DraftsActionsWorker @AssistedInject constructor(
                 ASSOCIATED_MAILBOX_UUID_KEY to draftLocalUuid?.let { mailbox.uuid },
                 RESULT_DRAFT_ACTION_KEY to draftLocalUuid?.let { trackedDraftAction?.name },
                 BIGGEST_SCHEDULED_DATE_KEY to biggestScheduledDate,
+                RESULT_USER_ID_KEY to userId,
             )
             Result.success(outputData)
         } else {
             val outputData = workDataOf(
                 ERROR_MESSAGE_RESID_KEY to trackedDraftErrorMessageResId,
                 BIGGEST_SCHEDULED_DATE_KEY to biggestScheduledDate,
+                RESULT_USER_ID_KEY to userId,
             )
             Result.failure(outputData)
         }
@@ -380,5 +382,6 @@ class DraftsActionsWorker @AssistedInject constructor(
         const val ASSOCIATED_MAILBOX_UUID_KEY = "associatedMailboxUuidKey"
         const val RESULT_DRAFT_ACTION_KEY = "resultDraftActionKey"
         const val BIGGEST_SCHEDULED_DATE_KEY = "biggestScheduledDateKey"
+        const val RESULT_USER_ID_KEY = "resultUserIdKey"
     }
 }

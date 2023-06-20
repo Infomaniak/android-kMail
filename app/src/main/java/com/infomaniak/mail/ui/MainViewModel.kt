@@ -903,7 +903,6 @@ class MainViewModel @Inject constructor(
                 refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
                 mailbox = currentMailbox.value!!,
                 folder = folder,
-                okHttpClient = AccountUtils.getHttpClient(AccountUtils.currentUserId), // TODO : DO WE WANT TO GET THIS HTTP CLIENT OR IS THE DEFAULT ONE GOOD ENOUGH ?
                 realm = RealmDatabase.mailboxContent(),
             )
         }

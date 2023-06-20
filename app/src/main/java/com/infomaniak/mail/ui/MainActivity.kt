@@ -191,6 +191,9 @@ class MainActivity : ThemedActivity() {
     }
 
     private fun Data.refreshDraftFolderIfNeeded() {
+        val userId = getInt(DraftsActionsWorker.RESULT_USER_ID_KEY, 0)
+        if (userId != AccountUtils.currentUserId) return
+
         getLong(DraftsActionsWorker.BIGGEST_SCHEDULED_DATE_KEY, 0).takeIf { it > 0 }?.let { scheduledDate ->
             mainViewModel.refreshDraftFolderWhenDraftArrives(scheduledDate)
         }
