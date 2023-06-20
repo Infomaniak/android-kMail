@@ -187,17 +187,11 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         SentryDebug.sendOrphanDrafts(mailboxContentRealm)
 
-        val (remoteDraftUuid, mailboxUuid, draftAction) = if (draftLocalUuid == null) {
-            Triple(null, null, null)
-        } else {
-            Triple(remoteUuidOfTrackedDraft, mailbox.uuid, trackedDraftAction)
-        }
-
         return if (haveAllDraftSucceeded || isTrackedDraftSuccess == true) {
             val outputData = workDataOf(
-                REMOTE_DRAFT_UUID_KEY to remoteDraftUuid,
-                ASSOCIATED_MAILBOX_UUID_KEY to mailboxUuid,
-                RESULT_DRAFT_ACTION_KEY to draftAction?.name,
+                REMOTE_DRAFT_UUID_KEY to draftLocalUuid?.let { remoteUuidOfTrackedDraft },
+                ASSOCIATED_MAILBOX_UUID_KEY to draftLocalUuid?.let { mailbox.uuid },
+                RESULT_DRAFT_ACTION_KEY to draftLocalUuid?.let { trackedDraftAction?.name },
             )
             Result.success(outputData)
         } else {
@@ -314,7 +308,7 @@ class DraftsActionsWorker @AssistedInject constructor(
                     scheduledDate = null,
                     errorMessageResId = R.string.errorCorruptAttachment,
                     savedDraftUuid = null,
-                    isSuccess = false
+                    isSuccess = false,
                 )
             }
         }
@@ -354,7 +348,7 @@ class DraftsActionsWorker @AssistedInject constructor(
             scheduledDate = scheduledDate,
             errorMessageResId = null,
             savedDraftUuid = savedDraftUuid,
-            isSuccess = true
+            isSuccess = true,
         )
     }
 
