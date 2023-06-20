@@ -87,6 +87,7 @@ object RefreshController {
         folder: Folder,
         okHttpClient: OkHttpClient?,
     ): Set<Thread> {
+        Log.i("API", "Refresh threads with mode: $refreshMode | (${folder.name})")
         return when (refreshMode) {
             REFRESH_FOLDER_WITH_ROLE -> refreshWithRoleConsideration(scope, mailbox, folder, okHttpClient)
             REFRESH_FOLDER -> refresh(scope, mailbox, folder, okHttpClient)
@@ -284,7 +285,7 @@ object RefreshController {
         scope.ensureActive()
 
         val logMessage = "Deleted: ${activities.deletedShortUids.count()} | Updated: ${activities.updatedMessages.count()}"
-        Log.i("API", "$logMessage | ${folder.name}")
+        Log.d("API", "$logMessage | ${folder.name}")
 
         writeBlocking {
             val impactedFoldersIds = mutableSetOf<String>().apply {
@@ -319,12 +320,12 @@ object RefreshController {
         cursor: String,
     ): Set<Thread> {
 
+        val logMessage = "Added: ${uids.count()}"
+        Log.d("API", "$logMessage | ${folder.name}")
+
         if (uids.isEmpty()) return emptySet()
 
         val impactedThreads = mutableSetOf<Thread>()
-
-        val logMessage = "Added: ${uids.count()}"
-        Log.i("API", "$logMessage | ${folder.name}")
 
         val before = System.currentTimeMillis()
         val apiResponse = ApiRepository.getMessagesByUids(mailbox.uuid, folder.id, uids, okHttpClient)

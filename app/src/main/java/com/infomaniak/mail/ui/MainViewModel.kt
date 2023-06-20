@@ -250,14 +250,10 @@ class MainViewModel @Inject constructor(
                 }
             }
 
-            Log.d(TAG, "Force refresh quotas")
             val mailbox = currentMailbox.value!!
-            updateMailboxQuotas(mailbox)
 
-            Log.d(TAG, "Force refresh permissions")
-            updateMailboxPermissions(mailbox)
-
-            Log.d(TAG, "Force refresh folders")
+            updateQuotas(mailbox)
+            updatePermissions(mailbox)
             updateFolders(mailbox)
         }
     }
@@ -268,7 +264,50 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun updateMailboxQuotas(mailbox: Mailbox) {
+    private fun updateSignatures(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
+        Log.d(TAG, "Force refresh Signatures")
+
+        val apiResponse = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName)
+        val data = apiResponse.data
+        val signatures = data?.signatures
+
+        val defaultSignaturesCount = signatures?.count { it.isDefault } ?: -1
+        when {
+            data == null -> Sentry.withScope { scope ->
+                scope.level = SentryLevel.ERROR
+                scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
+                scope.setExtra("apiResponse", apiResponse.toString())
+                scope.setExtra("status", apiResponse.result.name)
+                scope.setExtra("errorCode", "${apiResponse.error?.code}")
+                scope.setExtra("errorDescription", "${apiResponse.error?.description}")
+                scope.setExtra("errorTranslated", context.getString(apiResponse.translateError()))
+                Sentry.captureMessage("Signature: The call to get Signatures returned a `null` data")
+            }
+            signatures?.isEmpty() == true -> Sentry.withScope { scope ->
+                scope.level = SentryLevel.ERROR
+                scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
+                Sentry.captureMessage("Signature: This user doesn't have any Signature")
+            }
+            defaultSignaturesCount == 0 -> Sentry.withScope { scope ->
+                scope.level = SentryLevel.ERROR
+                scope.setExtra("signaturesCount", "${signatures?.count()}")
+                scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
+                Sentry.captureMessage("Signature: This user has Signatures, but no default one")
+            }
+            defaultSignaturesCount > 1 -> Sentry.withScope { scope ->
+                scope.level = SentryLevel.ERROR
+                scope.setExtra("defaultSignaturesCount", "$defaultSignaturesCount")
+                scope.setExtra("totalSignaturesCount", "${signatures?.count()}")
+                scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
+                Sentry.captureMessage("Signature: This user has several default Signatures")
+            }
+        }
+
+        signatures?.let(SignatureController::update)
+    }
+
+    private fun updateQuotas(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
+        Log.d(TAG, "Force refresh Quotas")
         if (mailbox.isLimited) with(ApiRepository.getQuotas(mailbox.hostingId, mailbox.mailboxName)) {
             if (isSuccess()) MailboxController.updateMailbox(mailbox.objectId) {
                 it.quotas = data
@@ -276,11 +315,20 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun updateMailboxPermissions(mailbox: Mailbox) {
+    private fun updatePermissions(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
+        Log.d(TAG, "Force refresh Permissions")
         with(ApiRepository.getPermissions(mailbox.linkId, mailbox.hostingId)) {
             if (isSuccess()) MailboxController.updateMailbox(mailbox.objectId) {
                 it.permissions = data
             }
+        }
+    }
+
+    private fun updateFolders(mailbox: Mailbox) {
+        Log.d(TAG, "Force refresh Folders")
+        val currentRealm = RealmDatabase.mailboxContent()
+        ApiRepository.getFolders(mailbox.uuid).data?.let { folders ->
+            if (!currentRealm.isClosed()) FolderController.update(folders, currentRealm)
         }
     }
 
@@ -340,54 +388,6 @@ class MainViewModel @Inject constructor(
     fun observeMergedContactsLive() = viewModelScope.launch(ioCoroutineContext) {
         MergedContactController.getMergedContactsAsync().collect { contacts ->
             mergedContacts.postValue(arrangeMergedContacts(contacts.list.copyFromRealm()))
-        }
-    }
-
-    private fun updateSignatures(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
-
-        val apiResponse = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName)
-        val data = apiResponse.data
-        val signatures = data?.signatures
-
-        val defaultSignaturesCount = signatures?.count { it.isDefault } ?: -1
-        when {
-            data == null -> Sentry.withScope { scope ->
-                scope.level = SentryLevel.ERROR
-                scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
-                scope.setExtra("apiResponse", apiResponse.toString())
-                scope.setExtra("status", apiResponse.result.name)
-                scope.setExtra("errorCode", "${apiResponse.error?.code}")
-                scope.setExtra("errorDescription", "${apiResponse.error?.description}")
-                scope.setExtra("errorTranslated", context.getString(apiResponse.translateError()))
-                Sentry.captureMessage("Signature: The call to get Signatures returned a `null` data")
-            }
-            signatures?.isEmpty() == true -> Sentry.withScope { scope ->
-                scope.level = SentryLevel.ERROR
-                scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
-                Sentry.captureMessage("Signature: This user doesn't have any Signature")
-            }
-            defaultSignaturesCount == 0 -> Sentry.withScope { scope ->
-                scope.level = SentryLevel.ERROR
-                scope.setExtra("signaturesCount", "${signatures?.count()}")
-                scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
-                Sentry.captureMessage("Signature: This user has Signatures, but no default one")
-            }
-            defaultSignaturesCount > 1 -> Sentry.withScope { scope ->
-                scope.level = SentryLevel.ERROR
-                scope.setExtra("defaultSignaturesCount", "$defaultSignaturesCount")
-                scope.setExtra("totalSignaturesCount", "${signatures?.count()}")
-                scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
-                Sentry.captureMessage("Signature: This user has several default Signatures")
-            }
-        }
-
-        signatures?.let(SignatureController::update)
-    }
-
-    private fun updateFolders(mailbox: Mailbox) {
-        val currentRealm = RealmDatabase.mailboxContent()
-        ApiRepository.getFolders(mailbox.uuid).data?.let { folders ->
-            if (!currentRealm.isClosed()) FolderController.update(folders, currentRealm)
         }
     }
 
