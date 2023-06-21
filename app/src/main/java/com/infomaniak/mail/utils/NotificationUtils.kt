@@ -23,9 +23,11 @@ import android.app.NotificationChannelGroup
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
+import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import com.infomaniak.lib.core.utils.NotificationUtilsCore
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 
 object NotificationUtils : NotificationUtilsCore() {
@@ -116,5 +118,16 @@ object NotificationUtils : NotificationUtilsCore() {
         return buildNotification(channelId, DEFAULT_SMALL_ICON, title, description).apply {
             setCategory(Notification.CATEGORY_EMAIL)
         }
+    }
+
+    fun Context.showDraftErrorNotification(
+        @StringRes errorMessageRes: Int,
+        action: DraftAction,
+    ): NotificationCompat.Builder {
+        val title = getString(
+            if (action == DraftAction.SEND) R.string.notificationTitleCouldNotSendDraft else R.string.notificationTitleCouldNotSaveDraft
+        )
+        val explanation = getString(errorMessageRes)
+        return showGeneralNotification(title, explanation)
     }
 }

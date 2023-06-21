@@ -17,9 +17,11 @@
  */
 package com.infomaniak.mail.di
 
+import android.app.Application
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.WorkManager
+import com.infomaniak.mail.MainApplication
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -35,6 +37,9 @@ object ApplicationModule {
 
     @Provides
     fun providesApplicationContext(@ApplicationContext context: Context) = context
+
+    @Provides
+    fun providesMainApplication(application: Application) = application as MainApplication
 
     @Singleton
     @Provides
