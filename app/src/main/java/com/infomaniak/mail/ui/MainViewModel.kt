@@ -61,7 +61,10 @@ import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import java.util.Date
 import javax.inject.Inject
+import kotlin.math.max
+import kotlin.math.min
 import com.infomaniak.lib.core.R as RCore
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -924,8 +927,29 @@ class MainViewModel @Inject constructor(
         selectedThreadsLiveData.value = selectedThreads
     }
 
+    fun refreshDraftFolderWhenDraftArrives(scheduledDate: Long) = viewModelScope.launch(ioCoroutineContext) {
+        val folder = folderController.getFolder(FolderRole.DRAFT)
+
+        if (folder?.cursor != null) {
+
+            val timeNow = Date().time
+            val delay = REFRESH_DELAY + max(scheduledDate - timeNow, 0L)
+            delay(min(delay, MAX_REFRESH_DELAY))
+
+            refreshController.refreshThreads(
+                refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
+                mailbox = currentMailbox.value!!,
+                folder = folder,
+                realm = mailboxContentRealm,
+            )
+        }
+    }
+
     private companion object {
         val TAG: String = MainViewModel::class.java.simpleName
         val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
+        // We add this delay because for now, it doesn't always work if we just use the `etop`.
+        const val REFRESH_DELAY = 2_000L
+        const val MAX_REFRESH_DELAY = 6_000L
     }
 }

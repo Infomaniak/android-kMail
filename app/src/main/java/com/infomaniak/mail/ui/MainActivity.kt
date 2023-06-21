@@ -37,7 +37,6 @@ import androidx.work.Data
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.networking.LiveDataNetworkStatus
 import com.infomaniak.lib.core.utils.Utils.toEnumOrThrow
-import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.lib.stores.checkUpdateIsAvailable
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.GplayUtils.checkPlayServices
@@ -139,11 +138,9 @@ class MainActivity : ThemedActivity() {
             draftsActionsWorkerScheduler.getRunningWorkInfoLiveData().observe(this) {
                 it.forEach { workInfo ->
                     workInfo.progress.getString(DraftsActionsWorker.PROGRESS_DRAFT_ACTION_KEY)?.let { draftAction ->
-                        val snackbarTitleResource = when (draftAction.toEnumOrThrow<DraftAction>()) {
-                            DraftAction.SAVE -> R.string.snackbarDraftSaving
-                            DraftAction.SEND -> R.string.snackbarEmailSending
+                        if (draftAction.toEnumOrThrow<DraftAction>() == DraftAction.SEND) {
+                            mainViewModel.snackBarManager.setValue(getString(R.string.snackbarEmailSending))
                         }
-                        mainViewModel.snackBarManager.setValue(getString(snackbarTitleResource))
                     }
                 }
             }
@@ -153,7 +150,11 @@ class MainActivity : ThemedActivity() {
             draftsActionsWorkerScheduler.getCompletedWorkInfoLiveData().observe(this) {
                 it.forEach { workInfo ->
                     if (!treatedWorkInfoUuids.add(workInfo.id)) return@forEach
-                    workInfo.outputData.displayCompletedDraftWorkerResults()
+
+                    with(workInfo.outputData) {
+                        refreshDraftFolderIfNeeded()
+                        displayCompletedDraftWorkerResults()
+                    }
                 }
             }
 
@@ -162,7 +163,12 @@ class MainActivity : ThemedActivity() {
             draftsActionsWorkerScheduler.getFailedWorkInfoLiveData().observe(this) {
                 it.forEach { workInfo ->
                     if (!treatedFailedWorkInfoUuids.add(workInfo.id)) return@forEach
-                    workInfo.outputData.getIntArray(DraftsActionsWorker.ERROR_MESSAGE_RESID_KEY)?.forEach(::showToast)
+
+                    with(workInfo.outputData) {
+                        refreshDraftFolderIfNeeded()
+                        val errorRes = getInt(DraftsActionsWorker.ERROR_MESSAGE_RESID_KEY, 0)
+                        if (errorRes > 0) mainViewModel.snackBarManager.setValue(getString(errorRes))
+                    }
                 }
             }
         }
@@ -181,6 +187,15 @@ class MainActivity : ThemedActivity() {
                     showSentDraftSnackBar()
                 }
             }
+        }
+    }
+
+    private fun Data.refreshDraftFolderIfNeeded() {
+        val userId = getInt(DraftsActionsWorker.RESULT_USER_ID_KEY, 0)
+        if (userId != AccountUtils.currentUserId) return
+
+        getLong(DraftsActionsWorker.BIGGEST_SCHEDULED_DATE_KEY, 0).takeIf { it > 0 }?.let { scheduledDate ->
+            mainViewModel.refreshDraftFolderWhenDraftArrives(scheduledDate)
         }
     }
 
