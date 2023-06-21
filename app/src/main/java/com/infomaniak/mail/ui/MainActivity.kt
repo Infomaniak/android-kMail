@@ -151,7 +151,7 @@ class MainActivity : ThemedActivity() {
                 it.forEach { workInfo ->
                     if (!treatedWorkInfoUuids.add(workInfo.id)) return@forEach
 
-                    workInfo.outputData.apply {
+                    with(workInfo.outputData) {
                         refreshDraftFolderIfNeeded()
                         displayCompletedDraftWorkerResults()
                     }
@@ -164,7 +164,7 @@ class MainActivity : ThemedActivity() {
                 it.forEach { workInfo ->
                     if (!treatedFailedWorkInfoUuids.add(workInfo.id)) return@forEach
 
-                    workInfo.outputData.apply {
+                    with(workInfo.outputData) {
                         refreshDraftFolderIfNeeded()
                         val errorRes = getInt(DraftsActionsWorker.ERROR_MESSAGE_RESID_KEY, 0)
                         if (errorRes > 0) mainViewModel.snackBarManager.setValue(getString(errorRes))

@@ -890,7 +890,7 @@ class MainViewModel @Inject constructor(
         selectedThreadsLiveData.value = selectedThreads
     }
 
-    fun refreshDraftFolderWhenDraftArrives(scheduledDate: Long) = viewModelScope.launch(ioDispatcher) {
+    fun refreshDraftFolderWhenDraftArrives(scheduledDate: Long) = viewModelScope.launch(ioCoroutineContext) {
         val folder = FolderController.getFolder(FolderRole.DRAFT)
 
         if (folder?.cursor != null) {
@@ -912,7 +912,7 @@ class MainViewModel @Inject constructor(
         val TAG: String = MainViewModel::class.java.simpleName
         val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
         // We add this delay because for now, it doesn't always work if we just use the `etop`.
-        private const val REFRESH_DELAY = 2_000L
-        private const val MAX_REFRESH_DELAY = 6_000L
+        const val REFRESH_DELAY = 2_000L
+        const val MAX_REFRESH_DELAY = 6_000L
     }
 }
