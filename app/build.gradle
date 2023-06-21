@@ -61,7 +61,7 @@ android {
 
     buildFeatures { viewBinding true }
 
-    flavorDimensions 'distribution'
+    flavorDimensions += 'distribution'
 
     productFlavors {
         standard {
