@@ -51,7 +51,6 @@
     <string name="addUnknownRecipientTitle">Aggiungi un destinatario</string>
     <string name="alertBlockedImagesDescription">Per la vostra sicurezza abbiamo bloccato alcuni contenuti del vostro messaggio.</string>
     <string name="alertBlockedImagesDisplayContent">Visualizza il contenuto</string>
-    <string name="allMailboxesAreFrelated">Non è stata trovata una casella di posta elettronica valida. Per ora può essere risolto solo con la webmail.</string>
     <string name="appSecurityDescription">Proteggete l’accesso alla vostra applicazione attivando il blocco del telefono.</string>
     <string name="archiveFolder">Archiviato</string>
     <string name="attachAddressDescription">Se hai già un indirizzo e-mail Infomaniak, accedi ora</string>
@@ -195,6 +194,7 @@
     <string name="googlePlayServicesAreRequired">I servizi Google Play sono necessari</string>
     <string name="inboxFolder">Posta in arrivo</string>
     <string name="loadingText">Caricamento…</string>
+    <string name="lockedMailboxTitle">L’accesso al vostro indirizzo e-mail è attualmente bloccato.\n\nSi prega di contattare l’amministratore.</string>
     <string name="menuDrawerAdvancedActions">Azioni avanzate</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s usato</string>
     <string name="messageDetailsDateAt">%1$s alle %2$s</string>
@@ -228,6 +228,7 @@
     <string name="noNetwork">Nessun segnale</string>
     <string name="noSubjectTitle">(senza soggetto)</string>
     <string name="noUpdatedAt">Mai aggiornato</string>
+    <string name="noValidMailboxTitle">Non è stata trovata una casella di posta elettronica valida. Per ora può essere risolto solo con la webmail.</string>
     <string name="notificationGeneralChannelName">Notifiche generali</string>
     <string name="notificationNewMessagesChannelName">Nuove e-mail</string>
     <string name="notificationSyncDraftChannelName">Salvataggio delle bozze</string>

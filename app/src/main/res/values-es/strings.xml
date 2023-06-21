@@ -51,7 +51,6 @@
     <string name="addUnknownRecipientTitle">Añadir un destinatario</string>
     <string name="alertBlockedImagesDescription">Para su seguridad hemos bloqueado ciertos contenidos en su mensaje.</string>
     <string name="alertBlockedImagesDisplayContent">Mostrar el contenido</string>
-    <string name="allMailboxesAreFrelated">No se ha encontrado ningún buzón válido. Por ahora sólo se puede arreglar en el webmail.</string>
     <string name="appSecurityDescription">Protege el acceso a tu aplicación activando el bloqueo del teléfono.</string>
     <string name="archiveFolder">Archivado</string>
     <string name="attachAddressDescription">Si ya dispone de una dirección de correo electrónico Infomaniak, conéctese ahora</string>
@@ -195,6 +194,7 @@
     <string name="googlePlayServicesAreRequired">Se requieren los servicios de Google Play</string>
     <string name="inboxFolder">Bandeja de entrada</string>
     <string name="loadingText">Cargando…</string>
+    <string name="lockedMailboxTitle">El acceso a su dirección de correo electrónico está bloqueado.\n\nPóngase en contacto con su administrador.</string>
     <string name="menuDrawerAdvancedActions">Acciones avanzadas</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s usado</string>
     <string name="messageDetailsDateAt">%1$s a las %2$s</string>
@@ -228,6 +228,7 @@
     <string name="noNetwork">No hay señal</string>
     <string name="noSubjectTitle">(sin asunto)</string>
     <string name="noUpdatedAt">Nunca actualizado</string>
+    <string name="noValidMailboxTitle">No se ha encontrado ningún buzón válido. Por ahora sólo se puede arreglar en el webmail.</string>
     <string name="notificationGeneralChannelName">Notificaciones generales</string>
     <string name="notificationNewMessagesChannelName">Nuevos correos electrónicos</string>
     <string name="notificationSyncDraftChannelName">Guardar borradores</string>
