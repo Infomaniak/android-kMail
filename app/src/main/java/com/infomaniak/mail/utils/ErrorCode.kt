@@ -70,7 +70,7 @@ object ErrorCode {
         ApiErrorCode(SEND_LIMIT_EXCEEDED, R.string.errorSendLimitExceeded),
     )
 
-    val ignoredErrorCodesForDrafts = setOf(
+    private val ignoredErrorCodesForDrafts = setOf(
         DRAFT_ALREADY_SCHEDULED_OR_SENT,
     )
 
