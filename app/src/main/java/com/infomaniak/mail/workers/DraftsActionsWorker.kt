@@ -139,7 +139,6 @@ class DraftsActionsWorker @AssistedInject constructor(
         val haveAllDraftSucceeded = mailboxContentRealm.writeBlocking {
 
             val drafts = DraftController.getDraftsWithActions(realm = this).ifEmpty { return@writeBlocking false }
-
             Log.d(TAG, "handleDraftsActions: ${drafts.count()} drafts to handle")
 
             var hasNoRemoteException = true
@@ -189,10 +188,30 @@ class DraftsActionsWorker @AssistedInject constructor(
             return@writeBlocking hasNoRemoteException
         }
 
-        val biggestScheduledDate = scheduledDates.mapNotNull { dateFormatWithTimezone.parse(it)?.time }.maxOrNull()
-
         SentryDebug.sendOrphanDrafts(mailboxContentRealm)
 
+        showDraftErrorNotification(isTrackedDraftSuccess, trackedDraftErrorMessageResId, trackedDraftAction)
+
+        return computeResult(
+            scheduledDates,
+            haveAllDraftSucceeded,
+            isTrackedDraftSuccess,
+            remoteUuidOfTrackedDraft,
+            trackedDraftAction,
+            trackedDraftErrorMessageResId,
+        )
+    }
+
+    private fun ApiErrorException.handleApiErrors(draft: Draft, realm: MutableRealm): Int? {
+        realm.delete(draft)
+        return ErrorCode.getTranslateResForDrafts(errorCode)
+    }
+
+    private fun showDraftErrorNotification(
+        isTrackedDraftSuccess: Boolean?,
+        trackedDraftErrorMessageResId: Int?,
+        trackedDraftAction: DraftAction?,
+    ) {
         val needsToShowErrorNotification = mainApplication.isAppInBackground && isTrackedDraftSuccess == false
         if (needsToShowErrorNotification) {
             applicationContext.showDraftErrorNotification(trackedDraftErrorMessageResId!!, trackedDraftAction!!).apply {
@@ -200,6 +219,18 @@ class DraftsActionsWorker @AssistedInject constructor(
                 notificationManagerCompat.notify(UUID.randomUUID().hashCode(), build())
             }
         }
+    }
+
+    private fun computeResult(
+        scheduledDates: MutableList<String>,
+        haveAllDraftSucceeded: Boolean,
+        isTrackedDraftSuccess: Boolean?,
+        remoteUuidOfTrackedDraft: String?,
+        trackedDraftAction: DraftAction?,
+        trackedDraftErrorMessageResId: Int?,
+    ): Result {
+
+        val biggestScheduledDate = scheduledDates.mapNotNull { dateFormatWithTimezone.parse(it)?.time }.maxOrNull()
 
         return if (haveAllDraftSucceeded || isTrackedDraftSuccess == true) {
             val outputData = if (isSnackBarFeedbackNeeded) {
@@ -226,11 +257,6 @@ class DraftsActionsWorker @AssistedInject constructor(
             }
             Result.failure(outputData)
         }
-    }
-
-    private fun ApiErrorException.handleApiErrors(draft: Draft, realm: MutableRealm): Int? {
-        realm.delete(draft)
-        return ErrorCode.getTranslateResForDrafts(errorCode)
     }
 
     private fun Draft.uploadAttachments(realm: MutableRealm): Result {
