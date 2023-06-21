@@ -122,7 +122,9 @@ class DraftsActionsWorker @AssistedInject constructor(
     private suspend fun notifyNewDraftDetected() {
         draftLocalUuid?.let { localUuid ->
             val draft = DraftController.getDraft(localUuid) ?: return@let
-            if (draft.action == DraftAction.SEND && isSnackBarFeedbackNeeded) setProgress(workDataOf(PROGRESS_DRAFT_ACTION_KEY to DraftAction.SEND.name))
+            if (draft.action == DraftAction.SEND && isSnackBarFeedbackNeeded) {
+                setProgress(workDataOf(PROGRESS_DRAFT_ACTION_KEY to DraftAction.SEND.name))
+            }
         }
     }
 
@@ -200,20 +202,28 @@ class DraftsActionsWorker @AssistedInject constructor(
         }
 
         return if (haveAllDraftSucceeded || isTrackedDraftSuccess == true) {
-            val outputData = if (isSnackBarFeedbackNeeded) workDataOf(
-                REMOTE_DRAFT_UUID_KEY to draftLocalUuid?.let { remoteUuidOfTrackedDraft },
-                ASSOCIATED_MAILBOX_UUID_KEY to draftLocalUuid?.let { mailbox.uuid },
-                RESULT_DRAFT_ACTION_KEY to draftLocalUuid?.let { trackedDraftAction?.name },
-                BIGGEST_SCHEDULED_DATE_KEY to biggestScheduledDate,
-                RESULT_USER_ID_KEY to userId,
-            ) else Data.EMPTY
+            val outputData = if (isSnackBarFeedbackNeeded) {
+                workDataOf(
+                    REMOTE_DRAFT_UUID_KEY to draftLocalUuid?.let { remoteUuidOfTrackedDraft },
+                    ASSOCIATED_MAILBOX_UUID_KEY to draftLocalUuid?.let { mailbox.uuid },
+                    RESULT_DRAFT_ACTION_KEY to draftLocalUuid?.let { trackedDraftAction?.name },
+                    BIGGEST_SCHEDULED_DATE_KEY to biggestScheduledDate,
+                    RESULT_USER_ID_KEY to userId,
+                )
+            } else {
+                Data.EMPTY
+            }
             Result.success(outputData)
         } else {
-            val outputData = if (isSnackBarFeedbackNeeded) workDataOf(
-                ERROR_MESSAGE_RESID_KEY to trackedDraftErrorMessageResId,
-                BIGGEST_SCHEDULED_DATE_KEY to biggestScheduledDate,
-                RESULT_USER_ID_KEY to userId,
-            ) else Data.EMPTY
+            val outputData = if (isSnackBarFeedbackNeeded) {
+                workDataOf(
+                    ERROR_MESSAGE_RESID_KEY to trackedDraftErrorMessageResId,
+                    BIGGEST_SCHEDULED_DATE_KEY to biggestScheduledDate,
+                    RESULT_USER_ID_KEY to userId,
+                )
+            } else {
+                Data.EMPTY
+            }
             Result.failure(outputData)
         }
     }
