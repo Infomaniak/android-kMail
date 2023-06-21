@@ -57,6 +57,7 @@ import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.NotificationUtils.cancelNotification
 import com.infomaniak.mail.utils.SharedViewModelUtils.refreshFolders
+import com.infomaniak.mail.utils.Utils.MailboxErrorCode
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.ext.copyFromRealm
@@ -168,11 +169,17 @@ class MainViewModel @Inject constructor(
     fun isCurrentFolderRole(role: FolderRole) = currentFolder.value?.role == role
     //endregion
 
-    private fun selectMailbox(mailbox: Mailbox) {
+    private fun selectMailbox(mailbox: Mailbox): MailboxErrorCode? {
 
         // TODO: Instead of this Toast & Exception, display a popup asking for correct password (we are currently waiting for the UX).
-        if (!mailbox.isPasswordValid) displayToastAndThrow(R.string.frelatedMailbox, PASSWORD_INVALID_MAILBOX_ERROR_CODE)
-        if (mailbox.isLocked) displayToastAndThrow(R.string.lockedMailboxTitle, ALL_MAILBOXES_LOCKED_ERROR_CODE)
+        if (!mailbox.isPasswordValid) {
+            displayToast(R.string.frelatedMailbox)
+            return MailboxErrorCode.INVALID_PASSWORD_MAILBOX
+        }
+        if (mailbox.isLocked) {
+            displayToast(R.string.lockedMailboxTitle)
+            return MailboxErrorCode.LOCKED_MAILBOX
+        }
 
         if (mailbox.objectId != _currentMailboxObjectId.value) {
             Log.d(TAG, "Select mailbox: ${mailbox.email}")
@@ -181,6 +188,8 @@ class MainViewModel @Inject constructor(
             _currentMailboxObjectId.value = mailbox.objectId
             _currentFolderId.value = null
         }
+
+        return null
     }
 
     private fun selectFolder(folderId: String) {
@@ -188,6 +197,10 @@ class MainViewModel @Inject constructor(
             Log.d(TAG, "Select folder: $folderId")
             _currentFolderId.value = folderId
         }
+    }
+
+    private fun displayToast(@StringRes title: Int) = viewModelScope.launch(Dispatchers.Main) {
+        context.showToast(title, Toast.LENGTH_LONG)
     }
 
     fun updateUserInfo() = viewModelScope.launch(ioCoroutineContext) {
@@ -204,12 +217,11 @@ class MainViewModel @Inject constructor(
             mailboxId = AccountUtils.currentMailboxId,
         )?.let { mailbox ->
 
-            runCatching {
-                selectMailbox(mailbox)
-            }.onFailure {
-                when (it.message) {
-                    PASSWORD_INVALID_MAILBOX_ERROR_CODE,
-                    ALL_MAILBOXES_LOCKED_ERROR_CODE -> switchToValidMailbox()
+            selectMailbox(mailbox)?.let { errorCode ->
+                when (errorCode) {
+                    MailboxErrorCode.INVALID_PASSWORD_MAILBOX,
+                    MailboxErrorCode.LOCKED_MAILBOX -> switchToValidMailbox()
+                    else -> Unit
                 }
                 return@liveData
             }
@@ -222,11 +234,6 @@ class MainViewModel @Inject constructor(
         }
 
         emit(null)
-    }
-
-    private fun displayToastAndThrow(@StringRes title: Int, errorCode: String) {
-        viewModelScope.launch(Dispatchers.Main) { context.showToast(title, Toast.LENGTH_LONG) }
-        throw IllegalStateException(errorCode)
     }
 
     private fun switchToValidMailbox() = viewModelScope.launch(ioCoroutineContext) {
@@ -938,16 +945,13 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    companion object {
-        private val TAG: String = MainViewModel::class.java.simpleName
+    private companion object {
+        val TAG: String = MainViewModel::class.java.simpleName
 
-        private val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
+        val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
 
         // We add this delay because it doesn't always work if we just use the `etop`.
-        private const val REFRESH_DELAY = 2_000L
-        private const val MAX_REFRESH_DELAY = 6_000L
-
-        const val PASSWORD_INVALID_MAILBOX_ERROR_CODE = "password_invalid_mailbox_error_code"
-        const val ALL_MAILBOXES_LOCKED_ERROR_CODE = "all_mailboxes_locked_error_code"
+        const val REFRESH_DELAY = 2_000L
+        const val MAX_REFRESH_DELAY = 6_000L
     }
 }

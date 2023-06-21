@@ -31,4 +31,10 @@ object Utils {
     /** Beware: the API refuses a PAGE_SIZE bigger than 200. */
     const val PAGE_SIZE: Int = 50
     const val MAX_DELAY_BETWEEN_API_CALLS = 500L
+
+    enum class MailboxErrorCode {
+        NO_MAILBOX,
+        INVALID_PASSWORD_MAILBOX,
+        LOCKED_MAILBOX,
+    }
 }

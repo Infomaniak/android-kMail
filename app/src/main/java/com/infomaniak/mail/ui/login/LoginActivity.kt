@@ -36,7 +36,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.infomaniak.lib.core.InfomaniakCore
-import com.infomaniak.lib.core.models.ApiError
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.networking.HttpClient
@@ -57,14 +56,12 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
-import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.databinding.ActivityLoginBinding
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
-import com.infomaniak.mail.ui.MainViewModel.Companion.ALL_MAILBOXES_LOCKED_ERROR_CODE
-import com.infomaniak.mail.ui.MainViewModel.Companion.PASSWORD_INVALID_MAILBOX_ERROR_CODE
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
+import com.infomaniak.mail.utils.Utils.MailboxErrorCode
 import com.infomaniak.mail.utils.getInfomaniakLogin
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
@@ -209,21 +206,21 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun onAuthenticateUserSuccess(apiToken: ApiToken) = lifecycleScope.launch(ioDispatcher) {
-        when (val user = authenticateUser(this@LoginActivity, apiToken)) {
+        when (val returnValue = authenticateUser(this@LoginActivity, apiToken)) {
             is User -> {
                 trackAccountEvent("loggedIn")
                 AccountUtils.reloadApp?.invoke()
             }
-            is ApiResponse<*> -> withContext(mainDispatcher) {
-                when (user.error?.code) {
-                    NO_MAILBOX_ERROR_CODE -> launchNoMailboxActivity()
-                    PASSWORD_INVALID_MAILBOX_ERROR_CODE, ALL_MAILBOXES_LOCKED_ERROR_CODE -> {
+            is MailboxErrorCode -> withContext(mainDispatcher) {
+                when (returnValue) {
+                    MailboxErrorCode.NO_MAILBOX -> launchNoMailboxActivity()
+                    MailboxErrorCode.INVALID_PASSWORD_MAILBOX, MailboxErrorCode.LOCKED_MAILBOX -> {
                         // TODO: Instead of this snackbar, display the right screens for each error
                         showError(getString(R.string.noValidMailboxTitle))
                     }
-                    else -> showError(getString(user.translatedError))
                 }
             }
+            is ApiResponse<*> -> withContext(mainDispatcher) { showError(getString(returnValue.translatedError)) }
             else -> withContext(mainDispatcher) { showError(getString(RCore.string.anErrorHasOccurred)) }
         }
     }
@@ -284,8 +281,6 @@ class LoginActivity : AppCompatActivity() {
 
     companion object {
 
-        private const val NO_MAILBOX_ERROR_CODE = "no_mailbox"
-
         suspend fun authenticateUser(context: Context, apiToken: ApiToken): Any {
 
             if (AccountUtils.getUserById(apiToken.userId) != null) return getErrorResponse(RCore.string.errorUserAlreadyPresent)
@@ -305,12 +300,7 @@ class LoginActivity : AppCompatActivity() {
 
             return when {
                 !apiResponse.isSuccess() -> apiResponse
-                apiResponse.data?.isEmpty() == true -> {
-                    ApiResponse<List<Mailbox>>(
-                        result = ApiResponse.Status.ERROR,
-                        error = ApiError(NO_MAILBOX_ERROR_CODE),
-                    )
-                }
+                apiResponse.data?.isEmpty() == true -> MailboxErrorCode.NO_MAILBOX
                 else -> {
                     apiResponse.data?.let { mailboxes ->
                         context.trackUserInfo("nbMailboxes", mailboxes.count())
@@ -318,18 +308,8 @@ class LoginActivity : AppCompatActivity() {
                         MailboxController.updateMailboxes(context, mailboxes)
 
                         return@let when {
-                            mailboxes.none { it.isPasswordValid } -> {
-                                ApiResponse<List<Mailbox>>(
-                                    result = ApiResponse.Status.ERROR,
-                                    error = ApiError(PASSWORD_INVALID_MAILBOX_ERROR_CODE),
-                                )
-                            }
-                            mailboxes.all { it.isLocked } -> {
-                                ApiResponse<List<Mailbox>>(
-                                    result = ApiResponse.Status.ERROR,
-                                    error = ApiError(ALL_MAILBOXES_LOCKED_ERROR_CODE),
-                                )
-                            }
+                            mailboxes.none { it.isPasswordValid } -> MailboxErrorCode.INVALID_PASSWORD_MAILBOX
+                            mailboxes.all { it.isLocked } -> MailboxErrorCode.LOCKED_MAILBOX
                             else -> user
                         }
                     } ?: run {
