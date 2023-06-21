@@ -27,7 +27,7 @@ import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import com.infomaniak.lib.core.utils.NotificationUtilsCore
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.draft.Draft
+import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 
 object NotificationUtils : NotificationUtilsCore() {
@@ -122,9 +122,11 @@ object NotificationUtils : NotificationUtilsCore() {
 
     fun Context.showDraftErrorNotification(
         @StringRes errorMessageRes: Int,
-        action: Draft.DraftAction,
+        action: DraftAction,
     ): NotificationCompat.Builder {
-        val title = if (action == Draft.DraftAction.SEND) "Le mail n'a pas pu être envoyé" else "Le brouillon n'a pas pu être sauvegardé"
+        val title = getString(
+            if (action == DraftAction.SEND) R.string.notificationTitleCouldNotSendDraft else R.string.notificationTitleCouldNotSaveDraft
+        )
         val explanation = getString(errorMessageRes)
         return showGeneralNotification(title, explanation)
     }

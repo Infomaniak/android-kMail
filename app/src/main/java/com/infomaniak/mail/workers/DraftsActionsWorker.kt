@@ -199,8 +199,6 @@ class DraftsActionsWorker @AssistedInject constructor(
                     @Suppress("MissingPermission")
                     notificationManagerCompat.notify(UUID.randomUUID().hashCode(), build())
                 }
-            } else {
-                // TODO : ??
             }
         }
 
