@@ -255,12 +255,11 @@ object RefreshController {
                     // - it's the 1st opening of this Folder,
                     // - or that the Folder has been emptied.
                     if (paginationInfo == null) {
-
-                        // If the Folder has been emptied, we need to reset history info, so we'll be able to get all Messages again.
-                        it.resetHistoryInfo()
-
-                        // If we didn't even get 1 full page, it means we already reached the end.
-                        if (uidsCount < Utils.PAGE_SIZE) it.theEndIsReached()
+                        if (uidsCount < Utils.PAGE_SIZE) {
+                            it.theEndIsReached() // If we didn't even get 1 full page, it means we already reached the end.
+                        } else {
+                            it.resetHistoryInfo() // If the Folder has been emptied, and the end isn't reached yet, we need to reset history info, so we'll be able to get all Messages again.
+                        }
                     }
                 }
             }
