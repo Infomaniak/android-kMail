@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.workers
 
-import android.Manifest
 import android.content.Context
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
@@ -28,7 +27,6 @@ import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.networking.HttpUtils
 import com.infomaniak.lib.core.utils.FORMAT_DATE_WITH_TIMEZONE
-import com.infomaniak.lib.core.utils.hasPermissions
 import com.infomaniak.lib.core.utils.isNetworkException
 import com.infomaniak.mail.MainApplication
 import com.infomaniak.mail.R
@@ -193,12 +191,11 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         SentryDebug.sendOrphanDrafts(mailboxContentRealm)
 
-        if (mainApplication.isAppInBackground && isTrackedDraftSuccess == false) {
-            if (applicationContext.hasPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS))) {
-                applicationContext.showDraftErrorNotification(trackedDraftErrorMessageResId!!, trackedDraftAction!!).apply {
-                    @Suppress("MissingPermission")
-                    notificationManagerCompat.notify(UUID.randomUUID().hashCode(), build())
-                }
+        val needsToShowErrorNotification = mainApplication.isAppInBackground && isTrackedDraftSuccess == false
+        if (needsToShowErrorNotification) {
+            applicationContext.showDraftErrorNotification(trackedDraftErrorMessageResId!!, trackedDraftAction!!).apply {
+                @Suppress("MissingPermission")
+                notificationManagerCompat.notify(UUID.randomUUID().hashCode(), build())
             }
         }
 
