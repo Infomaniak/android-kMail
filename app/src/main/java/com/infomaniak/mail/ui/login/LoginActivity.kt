@@ -201,33 +201,34 @@ class LoginActivity : AppCompatActivity() {
         infomaniakLogin.getToken(
             okHttpClient = HttpClient.okHttpClientNoTokenInterceptor,
             code = authCode,
-            onSuccess = {
-                lifecycleScope.launch(ioDispatcher) {
-                    when (val user = authenticateUser(this@LoginActivity, it)) {
-                        is User -> {
-                            trackAccountEvent("loggedIn")
-                            AccountUtils.reloadApp?.invoke()
-                        }
-                        is ApiResponse<*> -> withContext(mainDispatcher) {
-                            if (user.error?.code == NO_MAILBOX_ERROR_CODE) {
-                                launchNoMailboxActivity()
-                            } else {
-                                showError(getString(user.translatedError))
-                            }
-                        }
-                        else -> withContext(mainDispatcher) { showError(getString(RCore.string.anErrorHasOccurred)) }
-                    }
-                }
-            },
-            onError = {
-                val error = when (it) {
-                    ErrorStatus.SERVER -> RCore.string.serverError
-                    ErrorStatus.CONNECTION -> RCore.string.connectionError
-                    else -> RCore.string.anErrorHasOccurred
-                }
-                showError(getString(error))
-            },
+            onSuccess = ::onAuthenticateUserSuccess,
+            onError = ::onAuthenticateUserError,
         )
+    }
+
+    private fun onAuthenticateUserSuccess(apiToken: ApiToken) = lifecycleScope.launch(ioDispatcher) {
+        when (val user = authenticateUser(this@LoginActivity, apiToken)) {
+            is User -> {
+                trackAccountEvent("loggedIn")
+                AccountUtils.reloadApp?.invoke()
+            }
+            is ApiResponse<*> -> withContext(mainDispatcher) {
+                when (user.error?.code) {
+                    NO_MAILBOX_ERROR_CODE -> launchNoMailboxActivity()
+                    else -> showError(getString(user.translatedError))
+                }
+            }
+            else -> withContext(mainDispatcher) { showError(getString(RCore.string.anErrorHasOccurred)) }
+        }
+    }
+
+    private fun onAuthenticateUserError(errorStatus: ErrorStatus) {
+        val errorResId = when (errorStatus) {
+            ErrorStatus.SERVER -> RCore.string.serverError
+            ErrorStatus.CONNECTION -> RCore.string.connectionError
+            else -> RCore.string.anErrorHasOccurred
+        }
+        showError(getString(errorResId))
     }
 
     private fun showError(error: String) {
@@ -281,44 +282,39 @@ class LoginActivity : AppCompatActivity() {
 
         suspend fun authenticateUser(context: Context, apiToken: ApiToken): Any {
 
-            return if (AccountUtils.getUserById(apiToken.userId) == null) {
-                InfomaniakCore.bearerToken = apiToken.accessToken
-                val userProfileResponse = ApiRepository.getUserProfile(HttpClient.okHttpClientNoTokenInterceptor)
+            if (AccountUtils.getUserById(apiToken.userId) != null) return getErrorResponse(RCore.string.errorUserAlreadyPresent)
 
-                if (userProfileResponse.result == ApiResponse.Status.ERROR) {
-                    userProfileResponse
-                } else {
-                    val user = userProfileResponse.data?.apply {
-                        this.apiToken = apiToken
-                        this.organizations = arrayListOf()
-                    }
+            InfomaniakCore.bearerToken = apiToken.accessToken
+            val userProfileResponse = ApiRepository.getUserProfile(HttpClient.okHttpClientNoTokenInterceptor)
 
-                    user?.let {
-                        val apiResponse = ApiRepository.getMailboxes(HttpClient.okHttpClientNoTokenInterceptor)
-                        when {
-                            !apiResponse.isSuccess() -> apiResponse
-                            apiResponse.data?.isEmpty() == true -> {
-                                ApiResponse<List<Mailbox>>(
-                                    result = ApiResponse.Status.ERROR,
-                                    error = ApiError(code = NO_MAILBOX_ERROR_CODE),
-                                )
-                            }
-                            else -> {
-                                apiResponse.data?.let { mailboxes ->
-                                    context.trackUserInfo("nbMailboxes", mailboxes.count())
-                                    AccountUtils.addUser(it)
-                                    MailboxController.updateMailboxes(context, mailboxes)
+            if (userProfileResponse.result == ApiResponse.Status.ERROR) return userProfileResponse
+            if (userProfileResponse.data == null) return getErrorResponse(RCore.string.anErrorHasOccurred)
 
-                                    it
-                                } ?: run {
-                                    getErrorResponse(RCore.string.serverError)
-                                }
-                            }
-                        }
-                    } ?: getErrorResponse(RCore.string.anErrorHasOccurred)
+            val user = userProfileResponse.data!!.apply {
+                this.apiToken = apiToken
+                this.organizations = arrayListOf()
+            }
+
+            val apiResponse = ApiRepository.getMailboxes(HttpClient.okHttpClientNoTokenInterceptor)
+
+            return when {
+                !apiResponse.isSuccess() -> apiResponse
+                apiResponse.data?.isEmpty() == true -> {
+                    ApiResponse<List<Mailbox>>(
+                        result = ApiResponse.Status.ERROR,
+                        error = ApiError(code = NO_MAILBOX_ERROR_CODE),
+                    )
                 }
-            } else {
-                getErrorResponse(RCore.string.errorUserAlreadyPresent)
+                else -> {
+                    apiResponse.data?.let { mailboxes ->
+                        context.trackUserInfo("nbMailboxes", mailboxes.count())
+                        AccountUtils.addUser(user)
+                        MailboxController.updateMailboxes(context, mailboxes)
+                        return@let user
+                    } ?: run {
+                        getErrorResponse(RCore.string.serverError)
+                    }
+                }
             }
         }
 
