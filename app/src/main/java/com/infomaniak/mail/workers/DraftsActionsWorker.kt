@@ -47,6 +47,7 @@ import com.infomaniak.mail.utils.NotificationUtils.buildDraftErrorNotification
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import io.realm.kotlin.MutableRealm
+import io.realm.kotlin.Realm
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -129,63 +130,66 @@ class DraftsActionsWorker @AssistedInject constructor(
 
     private fun handleDraftsActions(): Result {
 
+        // List containing the callback function to update/delete drafts in Realm
+        // We keep these Realm changes in a List to execute them all in a unique Realm transaction at the end of the worker
+        val realmActionsOnDraft = mutableListOf<(MutableRealm) -> Unit>()
         val scheduledDates = mutableListOf<String>()
         var trackedDraftErrorMessageResId: Int? = null
         var remoteUuidOfTrackedDraft: String? = null
         var trackedDraftAction: DraftAction? = null
         var isTrackedDraftSuccess: Boolean? = null
 
-        val haveAllDraftSucceeded = mailboxContentRealm.writeBlocking {
+        val drafts = DraftController.getDraftsWithActions(mailboxContentRealm)
+        Log.d(TAG, "handleDraftsActions: ${drafts.count()} drafts to handle")
+        if (drafts.isEmpty()) return Result.failure()
 
-            val drafts = DraftController.getDraftsWithActions(realm = this).ifEmpty { return@writeBlocking false }
-            Log.d(TAG, "handleDraftsActions: ${drafts.count()} drafts to handle")
+        var haveAllDraftsSucceeded = true
 
-            var hasNoRemoteException = true
+        drafts.reversed().forEach { draft ->
+            val isTargetDraft = draftLocalUuid == draft.localUuid
+            if (isTargetDraft) trackedDraftAction = draft.action
 
-            drafts.reversed().forEach { draft ->
-                val isTargetDraft = draftLocalUuid == draft.localUuid
-                if (isTargetDraft) trackedDraftAction = draft.action
-
-                runCatching {
-                    draft.uploadAttachments(realm = this)
-                    executeDraftAction(
-                        draft,
-                        mailbox.uuid,
-                        realm = this,
-                        okHttpClient,
-                    ).also { (scheduledDate, errorMessageResId, savedDraftUuid, isSuccess) ->
-                        if (isSuccess) {
-                            if (isTargetDraft) {
-                                remoteUuidOfTrackedDraft = savedDraftUuid
-                                isTrackedDraftSuccess = true
-                            }
-                            scheduledDates.add(scheduledDate!!)
-                        } else if (isTargetDraft) {
-                            trackedDraftErrorMessageResId = errorMessageResId!!
-                            isTrackedDraftSuccess = false
+            runCatching {
+                draft.uploadAttachments()
+                executeDraftAction(
+                    draft = draft,
+                    mailboxUuid = mailbox.uuid,
+                    okHttpClient = okHttpClient,
+                ).also { (realmActionOnDraft, scheduledDate, errorMessageResId, savedDraftUuid, isSuccess) ->
+                    if (isSuccess) {
+                        if (isTargetDraft) {
+                            remoteUuidOfTrackedDraft = savedDraftUuid
+                            isTrackedDraftSuccess = true
                         }
+                        scheduledDates.add(scheduledDate!!)
+                        realmActionOnDraft?.let(realmActionsOnDraft::add)
+                    } else if (isTargetDraft) {
+                        trackedDraftErrorMessageResId = errorMessageResId!!
+                        isTrackedDraftSuccess = false
                     }
-
-                }.onFailure { exception ->
-                    when (exception) {
-                        is ApiController.NetworkException -> throw exception
-                        is ApiErrorException -> {
-                            exception.handleApiErrors(draft = draft, realm = this)?.also {
-                                if (isTargetDraft) {
-                                    trackedDraftErrorMessageResId = it
-                                    isTrackedDraftSuccess = false
-                                }
-                            }
-                        }
-                    }
-                    exception.printStackTrace()
-                    Sentry.captureException(exception)
-                    hasNoRemoteException = false
                 }
+            }.onFailure { exception ->
+                when (exception) {
+                    is ApiController.NetworkException -> {
+                        mailboxContentRealm.executeRealmCallbacks(realmActionsOnDraft)
+                        throw exception
+                    }
+                    is ApiErrorException -> {
+                        exception.handleApiErrors(draft)?.also {
+                            if (isTargetDraft) {
+                                trackedDraftErrorMessageResId = it
+                                isTrackedDraftSuccess = false
+                            }
+                        }
+                    }
+                }
+                exception.printStackTrace()
+                Sentry.captureException(exception)
+                haveAllDraftsSucceeded = false
             }
-
-            return@writeBlocking hasNoRemoteException
         }
+
+        mailboxContentRealm.executeRealmCallbacks(realmActionsOnDraft)
 
         SentryDebug.sendOrphanDrafts(mailboxContentRealm)
 
@@ -193,7 +197,7 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         return computeResult(
             scheduledDates,
-            haveAllDraftSucceeded,
+            haveAllDraftsSucceeded,
             isTrackedDraftSuccess,
             remoteUuidOfTrackedDraft,
             trackedDraftAction,
@@ -201,9 +205,15 @@ class DraftsActionsWorker @AssistedInject constructor(
         )
     }
 
-    private fun ApiErrorException.handleApiErrors(draft: Draft, realm: MutableRealm): Int? {
-        realm.delete(draft)
-        return ErrorCode.getTranslateResForDrafts(errorCode)
+    private fun Realm.executeRealmCallbacks(realmActionsOnDraft: List<(MutableRealm) -> Unit>) {
+        writeBlocking {
+            realmActionsOnDraft.forEach { realmAction -> realmAction(this) }
+        }
+    }
+
+    private fun ApiErrorException.handleApiErrors(draft: Draft): Int? = mailboxContentRealm.writeBlocking {
+        findLatest(draft)?.let(::delete)
+        return@writeBlocking ErrorCode.getTranslateResForDrafts(errorCode)
     }
 
     private fun showDraftErrorNotification(
@@ -221,7 +231,7 @@ class DraftsActionsWorker @AssistedInject constructor(
 
     private fun computeResult(
         scheduledDates: MutableList<String>,
-        haveAllDraftSucceeded: Boolean,
+        haveAllDraftsSucceeded: Boolean,
         isTrackedDraftSuccess: Boolean?,
         remoteUuidOfTrackedDraft: String?,
         trackedDraftAction: DraftAction?,
@@ -230,7 +240,7 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         val biggestScheduledDate = scheduledDates.mapNotNull { dateFormatWithTimezone.parse(it)?.time }.maxOrNull()
 
-        return if (haveAllDraftSucceeded || isTrackedDraftSuccess == true) {
+        return if (haveAllDraftsSucceeded || isTrackedDraftSuccess == true) {
             val outputData = if (isSnackBarFeedbackNeeded) {
                 workDataOf(
                     REMOTE_DRAFT_UUID_KEY to draftLocalUuid?.let { remoteUuidOfTrackedDraft },
@@ -257,15 +267,16 @@ class DraftsActionsWorker @AssistedInject constructor(
         }
     }
 
-    private fun Draft.uploadAttachments(realm: MutableRealm): Result {
+    private fun Draft.uploadAttachments(): Result {
         getNotUploadedAttachments(draft = this).forEach { attachment ->
             runCatching {
-                attachment.startUpload(localUuid, realm)
+                attachment.startUpload(localUuid)
             }.onFailure { exception ->
                 if ((exception as Exception).isNetworkException()) throw ApiController.NetworkException()
                 throw exception
             }
         }
+
         return Result.success()
     }
 
@@ -273,7 +284,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         return draft.attachments.filter { attachment -> attachment.uploadLocalUri != null }
     }
 
-    private fun Attachment.startUpload(localDraftUuid: String, realm: MutableRealm) {
+    private fun Attachment.startUpload(localDraftUuid: String) {
         val attachmentFile = getUploadLocalFile(applicationContext, localDraftUuid).also { if (!it.exists()) return }
         val headers = HttpUtils.getHeaders(contentType = null).newBuilder()
             .set("Authorization", "Bearer $userApiToken")
@@ -290,33 +301,32 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         val apiResponse = ApiController.json.decodeFromString<ApiResponse<Attachment>>(response.body?.string() ?: "")
         if (apiResponse.isSuccess() && apiResponse.data != null) {
-            updateLocalAttachment(localDraftUuid, apiResponse.data!!, realm)
+            updateLocalAttachment(localDraftUuid, apiResponse.data!!)
             attachmentFile.delete()
             LocalStorageUtils.deleteAttachmentsUploadsDirIfEmpty(applicationContext, localDraftUuid, userId, mailbox.mailboxId)
         }
     }
 
-    private fun Attachment.updateLocalAttachment(localDraftUuid: String, remoteAttachment: Attachment, realm: MutableRealm) {
-        DraftController.updateDraft(localDraftUuid, realm) { draft ->
-            realm.delete(draft.attachments.first { localAttachment -> localAttachment.uploadLocalUri == uploadLocalUri })
-            draft.attachments.add(remoteAttachment)
+    private fun Attachment.updateLocalAttachment(localDraftUuid: String, remoteAttachment: Attachment) {
+        mailboxContentRealm.writeBlocking {
+            DraftController.updateDraft(localDraftUuid, realm = this) { draft ->
+                delete(draft.attachments.first { localAttachment -> localAttachment.uploadLocalUri == uploadLocalUri })
+                draft.attachments.add(remoteAttachment)
+            }
         }
     }
 
     data class DraftActionResult(
+        val realmActionOnDraft: ((MutableRealm) -> Unit)?,
         val scheduledDate: String?,
         val errorMessageResId: Int?,
         val savedDraftUuid: String?,
         val isSuccess: Boolean,
     )
 
-    private fun executeDraftAction(
-        draft: Draft,
-        mailboxUuid: String,
-        realm: MutableRealm,
-        okHttpClient: OkHttpClient,
-    ): DraftActionResult {
+    private fun executeDraftAction(draft: Draft, mailboxUuid: String, okHttpClient: OkHttpClient): DraftActionResult {
 
+        var realmActionOnDraft: ((MutableRealm) -> Unit)? = null
         var scheduledDate: String? = null
         var savedDraftUuid: String? = null
 
@@ -335,6 +345,7 @@ class DraftsActionsWorker @AssistedInject constructor(
                 }
 
                 return DraftActionResult(
+                    realmActionOnDraft = null,
                     scheduledDate = null,
                     errorMessageResId = R.string.errorCorruptAttachment,
                     savedDraftUuid = null,
@@ -346,9 +357,13 @@ class DraftsActionsWorker @AssistedInject constructor(
         when (draft.action) {
             DraftAction.SAVE -> with(ApiRepository.saveDraft(mailboxUuid, draft, okHttpClient)) {
                 data?.let { data ->
-                    draft.remoteUuid = data.draftRemoteUuid
-                    draft.messageUid = data.messageUid
-                    draft.action = null
+                    realmActionOnDraft = { realm ->
+                        realm.findLatest(draft)?.apply {
+                            remoteUuid = data.draftRemoteUuid
+                            messageUid = data.messageUid
+                            action = null
+                        }
+                    }
                     scheduledDate = dateFormatWithTimezone.format(Date())
                     savedDraftUuid = data.draftRemoteUuid
                 } ?: throwErrorAsException()
@@ -357,29 +372,32 @@ class DraftsActionsWorker @AssistedInject constructor(
                 when {
                     isSuccess() -> {
                         scheduledDate = data?.scheduledDate
-                        realm.delete(draft)
+                        realmActionOnDraft = deleteDraftCallback(draft)
                     }
                     error?.exception is SerializationException -> {
-                        realm.delete(draft)
+                        realmActionOnDraft = deleteDraftCallback(draft)
                         Sentry.withScope { scope ->
                             scope.level = SentryLevel.ERROR
                             Sentry.captureMessage("Return JSON for SendDraft API call was modified")
                         }
                     }
-                    else -> {
-                        throwErrorAsException()
-                    }
+                    else -> throwErrorAsException()
                 }
             }
             else -> Unit
         }
 
         return DraftActionResult(
+            realmActionOnDraft = realmActionOnDraft,
             scheduledDate = scheduledDate,
             errorMessageResId = null,
             savedDraftUuid = savedDraftUuid,
             isSuccess = true,
         )
+    }
+
+    private fun deleteDraftCallback(draft: Draft): (MutableRealm) -> Unit {
+        return { realm -> realm.findLatest(draft)?.let(realm::delete) }
     }
 
     @Singleton
