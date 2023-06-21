@@ -42,8 +42,8 @@ import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.NotificationUtils.showDraftActionsNotification
-import com.infomaniak.mail.utils.NotificationUtils.showDraftErrorNotification
+import com.infomaniak.mail.utils.NotificationUtils.buildDraftActionsNotification
+import com.infomaniak.mail.utils.NotificationUtils.buildDraftErrorNotification
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import io.realm.kotlin.MutableRealm
@@ -114,9 +114,8 @@ class DraftsActionsWorker @AssistedInject constructor(
     }
 
     override suspend fun getForegroundInfo(): ForegroundInfo {
-        return applicationContext.showDraftActionsNotification().run {
-            ForegroundInfo(NotificationUtils.DRAFT_ACTIONS_ID, build())
-        }
+        val builder = applicationContext.buildDraftActionsNotification()
+        return ForegroundInfo(NotificationUtils.DRAFT_ACTIONS_ID, builder.build())
     }
 
     private suspend fun notifyNewDraftDetected() {
@@ -139,7 +138,6 @@ class DraftsActionsWorker @AssistedInject constructor(
         val haveAllDraftSucceeded = mailboxContentRealm.writeBlocking {
 
             val drafts = DraftController.getDraftsWithActions(realm = this).ifEmpty { return@writeBlocking false }
-
             Log.d(TAG, "handleDraftsActions: ${drafts.count()} drafts to handle")
 
             var hasNoRemoteException = true
@@ -189,17 +187,48 @@ class DraftsActionsWorker @AssistedInject constructor(
             return@writeBlocking hasNoRemoteException
         }
 
-        val biggestScheduledDate = scheduledDates.mapNotNull { dateFormatWithTimezone.parse(it)?.time }.maxOrNull()
-
         SentryDebug.sendOrphanDrafts(mailboxContentRealm)
 
+        showDraftErrorNotification(isTrackedDraftSuccess, trackedDraftErrorMessageResId, trackedDraftAction)
+
+        return computeResult(
+            scheduledDates,
+            haveAllDraftSucceeded,
+            isTrackedDraftSuccess,
+            remoteUuidOfTrackedDraft,
+            trackedDraftAction,
+            trackedDraftErrorMessageResId,
+        )
+    }
+
+    private fun ApiErrorException.handleApiErrors(draft: Draft, realm: MutableRealm): Int? {
+        realm.delete(draft)
+        return ErrorCode.getTranslateResForDrafts(errorCode)
+    }
+
+    private fun showDraftErrorNotification(
+        isTrackedDraftSuccess: Boolean?,
+        trackedDraftErrorMessageResId: Int?,
+        trackedDraftAction: DraftAction?,
+    ) {
         val needsToShowErrorNotification = mainApplication.isAppInBackground && isTrackedDraftSuccess == false
         if (needsToShowErrorNotification) {
-            applicationContext.showDraftErrorNotification(trackedDraftErrorMessageResId!!, trackedDraftAction!!).apply {
-                @Suppress("MissingPermission")
-                notificationManagerCompat.notify(UUID.randomUUID().hashCode(), build())
-            }
+            val builder = applicationContext.buildDraftErrorNotification(trackedDraftErrorMessageResId!!, trackedDraftAction!!)
+            @Suppress("MissingPermission")
+            notificationManagerCompat.notify(UUID.randomUUID().hashCode(), builder.build())
         }
+    }
+
+    private fun computeResult(
+        scheduledDates: MutableList<String>,
+        haveAllDraftSucceeded: Boolean,
+        isTrackedDraftSuccess: Boolean?,
+        remoteUuidOfTrackedDraft: String?,
+        trackedDraftAction: DraftAction?,
+        trackedDraftErrorMessageResId: Int?,
+    ): Result {
+
+        val biggestScheduledDate = scheduledDates.mapNotNull { dateFormatWithTimezone.parse(it)?.time }.maxOrNull()
 
         return if (haveAllDraftSucceeded || isTrackedDraftSuccess == true) {
             val outputData = if (isSnackBarFeedbackNeeded) {
@@ -226,11 +255,6 @@ class DraftsActionsWorker @AssistedInject constructor(
             }
             Result.failure(outputData)
         }
-    }
-
-    private fun ApiErrorException.handleApiErrors(draft: Draft, realm: MutableRealm): Int? {
-        realm.delete(draft)
-        return ErrorCode.getTranslateResForDrafts(errorCode)
     }
 
     private fun Draft.uploadAttachments(realm: MutableRealm): Result {

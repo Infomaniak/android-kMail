@@ -38,7 +38,7 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.LaunchActivityArgs
-import com.infomaniak.mail.utils.NotificationUtils.showNewMessageNotification
+import com.infomaniak.mail.utils.NotificationUtils.buildNewMessageNotification
 import io.realm.kotlin.Realm
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -107,7 +107,7 @@ class FetchMessagesManager @Inject constructor(
         }
 
         fun showNotification(contentText: String, isSummary: Boolean, title: String = "", description: String? = null) {
-            appContext.showNewMessageNotification(mailbox.channelId, title, description).apply {
+            appContext.buildNewMessageNotification(mailbox.channelId, title, description).apply {
                 if (isSummary) {
                     setContentTitle(null)
                     setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)

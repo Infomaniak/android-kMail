@@ -93,41 +93,32 @@ object NotificationUtils : NotificationUtilsCore() {
         }
     }
 
-    fun Context.showGeneralNotification(
-        title: String,
-        description: String? = null,
-    ): NotificationCompat.Builder {
+    fun Context.buildGeneralNotification(title: String, description: String? = null): NotificationCompat.Builder {
         return buildNotification(
             channelId = getString(R.string.notification_channel_id_general),
             icon = DEFAULT_SMALL_ICON,
             title = title,
-            description = description
+            description = description,
         )
     }
 
-    fun Context.showDraftActionsNotification(): NotificationCompat.Builder {
+    fun Context.buildNewMessageNotification(channelId: String, title: String, description: String?): NotificationCompat.Builder {
+        return buildNotification(channelId, DEFAULT_SMALL_ICON, title, description)
+            .setCategory(Notification.CATEGORY_EMAIL)
+    }
+
+    fun Context.buildDraftActionsNotification(): NotificationCompat.Builder {
         val channelId = getString(R.string.notification_channel_id_draft_service)
-        return NotificationCompat.Builder(this, channelId).apply {
-            setContentTitle(getString(R.string.notificationSyncDraftChannelName))
-            setSmallIcon(DEFAULT_SMALL_ICON)
-            setProgress(100, 0, true)
-        }
+        return NotificationCompat.Builder(this, channelId)
+            .setContentTitle(getString(R.string.notificationSyncDraftChannelName))
+            .setSmallIcon(DEFAULT_SMALL_ICON)
+            .setProgress(100, 0, true)
     }
 
-    fun Context.showNewMessageNotification(channelId: String, title: String, description: String?): NotificationCompat.Builder {
-        return buildNotification(channelId, DEFAULT_SMALL_ICON, title, description).apply {
-            setCategory(Notification.CATEGORY_EMAIL)
-        }
-    }
-
-    fun Context.showDraftErrorNotification(
-        @StringRes errorMessageRes: Int,
-        action: DraftAction,
-    ): NotificationCompat.Builder {
-        val title = getString(
-            if (action == DraftAction.SEND) R.string.notificationTitleCouldNotSendDraft else R.string.notificationTitleCouldNotSaveDraft
+    fun Context.buildDraftErrorNotification(@StringRes errorMessageRes: Int, action: DraftAction): NotificationCompat.Builder {
+        return buildGeneralNotification(
+            title = getString(if (action == DraftAction.SEND) R.string.notificationTitleCouldNotSendDraft else R.string.notificationTitleCouldNotSaveDraft),
+            description = getString(errorMessageRes),
         )
-        val explanation = getString(errorMessageRes)
-        return showGeneralNotification(title, explanation)
     }
 }
