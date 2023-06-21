@@ -223,7 +223,7 @@ class ThreadController @Inject constructor(
             return getOrphanThreadsQuery(realm).find()
         }
 
-        fun upsertThread(realm: MutableRealm, thread: Thread): Thread = realm.copyToRealm(thread, UpdatePolicy.ALL)
+        fun upsertThread(thread: Thread, realm: MutableRealm): Thread = realm.copyToRealm(thread, UpdatePolicy.ALL)
 
         fun fetchIncompleteMessages(
             messages: List<Message>,

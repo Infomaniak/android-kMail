@@ -470,7 +470,7 @@ class RefreshController @Inject constructor(@MailboxContentRealm private val mai
             val existingThreads = ThreadController.getThreads(message.messageIds, realm = this).toList()
 
             createNewThreadIfRequired(scope, existingThreads, message, idsOfFoldersWithIncompleteThreads)?.let { newThread ->
-                ThreadController.upsertThread(realm = this, newThread).also {
+                ThreadController.upsertThread(newThread, realm = this).also {
                     folder.threads.add(it)
                     threadsToUpsert[it.uid] = it
                 }
@@ -493,7 +493,7 @@ class RefreshController @Inject constructor(@MailboxContentRealm private val mai
                     }
                 }
 
-                threadsToUpsert[thread.uid] = ThreadController.upsertThread(realm = this, thread)
+                threadsToUpsert[thread.uid] = ThreadController.upsertThread(thread, realm = this)
             }
         }
 
@@ -502,7 +502,7 @@ class RefreshController @Inject constructor(@MailboxContentRealm private val mai
             scope.ensureActive()
 
             thread.recomputeThread(realm = this)
-            ThreadController.upsertThread(realm = this, thread)
+            ThreadController.upsertThread(thread, realm = this)
             allImpactedThreads.add(if (thread.isManaged()) thread.copyFromRealm(1u) else thread)
         }
 
