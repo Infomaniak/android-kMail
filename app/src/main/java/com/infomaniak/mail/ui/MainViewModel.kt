@@ -167,7 +167,7 @@ class MainViewModel @Inject constructor(
     fun isCurrentFolderRole(role: FolderRole) = currentFolder.value?.role == role
     //endregion
 
-    private suspend fun selectMailbox(mailbox: Mailbox) {
+    private fun selectMailbox(mailbox: Mailbox) {
 
         if (!mailbox.isPasswordValid) handlePasswordInvalidMailbox()
 
@@ -219,9 +219,9 @@ class MainViewModel @Inject constructor(
     }
 
     // TODO: Instead of this Toast & Exception, display a popup asking for correct password (we are currently waiting for the UX).
-    private suspend fun handlePasswordInvalidMailbox() {
+    private fun handlePasswordInvalidMailbox() {
 
-        withContext(Dispatchers.Main) {
+        viewModelScope.launch(Dispatchers.Main) {
             context.showToast(R.string.frelatedMailbox, Toast.LENGTH_LONG)
         }
 
