@@ -42,8 +42,8 @@ import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.NotificationUtils.showDraftActionsNotification
-import com.infomaniak.mail.utils.NotificationUtils.showDraftErrorNotification
+import com.infomaniak.mail.utils.NotificationUtils.buildDraftActionsNotification
+import com.infomaniak.mail.utils.NotificationUtils.buildDraftErrorNotification
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import io.realm.kotlin.MutableRealm
@@ -114,9 +114,8 @@ class DraftsActionsWorker @AssistedInject constructor(
     }
 
     override suspend fun getForegroundInfo(): ForegroundInfo {
-        return applicationContext.showDraftActionsNotification().run {
-            ForegroundInfo(NotificationUtils.DRAFT_ACTIONS_ID, build())
-        }
+        val builder = applicationContext.buildDraftActionsNotification()
+        return ForegroundInfo(NotificationUtils.DRAFT_ACTIONS_ID, builder.build())
     }
 
     private suspend fun notifyNewDraftDetected() {
@@ -214,10 +213,9 @@ class DraftsActionsWorker @AssistedInject constructor(
     ) {
         val needsToShowErrorNotification = mainApplication.isAppInBackground && isTrackedDraftSuccess == false
         if (needsToShowErrorNotification) {
-            applicationContext.showDraftErrorNotification(trackedDraftErrorMessageResId!!, trackedDraftAction!!).apply {
-                @Suppress("MissingPermission")
-                notificationManagerCompat.notify(UUID.randomUUID().hashCode(), build())
-            }
+            val builder = applicationContext.buildDraftErrorNotification(trackedDraftErrorMessageResId!!, trackedDraftAction!!)
+            @Suppress("MissingPermission")
+            notificationManagerCompat.notify(UUID.randomUUID().hashCode(), builder.build())
         }
     }
 

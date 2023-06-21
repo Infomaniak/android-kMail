@@ -52,8 +52,8 @@ import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ErrorCode
+import com.infomaniak.mail.utils.NotificationUtils.buildGeneralNotification
 import com.infomaniak.mail.utils.NotificationUtils.initNotificationChannel
-import com.infomaniak.mail.utils.NotificationUtils.showGeneralNotification
 import com.infomaniak.mail.workers.SyncMailboxesWorker
 import dagger.hilt.android.HiltAndroidApp
 import io.sentry.SentryEvent
@@ -212,11 +212,9 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
         val notificationText = getString(R.string.refreshTokenError)
 
         if (hasPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS))) {
-            showGeneralNotification(notificationText).apply {
-                setContentIntent(pendingIntent)
-                @Suppress("MissingPermission")
-                notificationManagerCompat.notify(UUID.randomUUID().hashCode(), build())
-            }
+            val builder = buildGeneralNotification(notificationText).setContentIntent(pendingIntent)
+            @Suppress("MissingPermission")
+            notificationManagerCompat.notify(UUID.randomUUID().hashCode(), builder.build())
         } else {
             CoroutineScope(mainDispatcher).launch { showToast(notificationText) }
         }
