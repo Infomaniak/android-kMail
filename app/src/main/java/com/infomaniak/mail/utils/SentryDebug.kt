@@ -169,7 +169,7 @@ object SentryDebug {
                     "orphanDrafts", "${
                         orphanDrafts.map {
                             if (it.messageUid == null) {
-                                "${Draft::date.name}: [${it.date}] | ${Draft::subject.name}: [${it.subject}]"
+                                "${Draft::subject.name}: [${it.subject}]"
                             } else {
                                 "${Draft::messageUid.name}: ${it.messageUid}"
                             }

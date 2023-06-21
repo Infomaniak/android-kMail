@@ -27,10 +27,8 @@ import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.utils.MessageBodyUtils
-import com.infomaniak.mail.utils.toRealmInstant
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.realmListOf
-import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.Ignore
@@ -48,8 +46,6 @@ class Draft : RealmObject {
     //region API data
     @SerialName("uuid")
     var remoteUuid: String? = null
-
-    var date: RealmInstant = Date().toRealmInstant()
 
     var to: RealmList<Recipient> = realmListOf()
     var cc: RealmList<Recipient> = realmListOf()
