@@ -401,9 +401,7 @@ class NewMessageFragment : Fragment() {
          * Mailto grammar accept 'name_of_recipient<email>' for recipients
          */
         fun parseEmailWithName(recipient: String): Recipient? {
-            val nameAndEmail = Regex("(.+)<(.+)>").find(recipient)?.let { matchResult ->
-                matchResult.groupValues[1] to matchResult.groupValues[2]
-            }
+            val nameAndEmail = Regex("(.+)<(.+)>").find(recipient)?.destructured
 
             return nameAndEmail?.let { (name, email) -> if (email.isEmail()) Recipient().initLocalValues(email, name) else null }
         }
