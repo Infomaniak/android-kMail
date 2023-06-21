@@ -19,13 +19,14 @@ package com.infomaniak.mail.utils
 
 import com.infomaniak.lib.core.utils.ApiErrorCode
 import com.infomaniak.mail.R
+import com.infomaniak.lib.core.R as RCore
 
 @Suppress("MemberVisibilityCanBePrivate")
 object ErrorCode {
 
     // TODO
     const val ACCESS_DENIED = "access_denied"
-    const val VALIDATION_FAILED = "validation_failed"
+    const val VALIDATION_FAILED = "validation_failed" // Do not translate, we don't want to show this to the user
 
     // Global
     const val INVALID_CREDENTIALS = "invalid_credentials"
@@ -54,21 +55,30 @@ object ErrorCode {
 
     val apiErrorCodes = listOf(
         // ApiErrorCode(ACCESS_DENIED, R.string.),
-        // ApiErrorCode(VALIDATION_FAILED, R.string.),
         ApiErrorCode(INVALID_CREDENTIALS, R.string.errorInvalidCredentials),
         ApiErrorCode(MAILBOX_LOCKED, R.string.errorMailboxLocked),
         // ApiErrorCode(ERROR_WHILE_LINKING_MAILBOX, R.string.),
         ApiErrorCode(FOLDER_ALREADY_EXISTS, R.string.errorNewFolderAlreadyExists),
         // ApiErrorCode(FOLDER_DOES_NOT_EXIST, R.string.),
-        ApiErrorCode(DRAFT_DOES_NOT_EXIST, R.string.errorDraftNotFound),
-        // ApiErrorCode(DRAFT_MESSAGE_NOT_FOUND, R.string.),
-        ApiErrorCode(DRAFT_HAS_TOO_MANY_RECIPIENTS, R.string.errorTooManyRecipients),
-        ApiErrorCode(DRAFT_NEED_AT_LEAST_ONE_RECIPIENT, R.string.errorAtLeastOneRecipient),
+        ApiErrorCode(DRAFT_DOES_NOT_EXIST, R.string.errorDraftNotFound), // Should we show this technical info to the user ?
+        // ApiErrorCode(DRAFT_MESSAGE_NOT_FOUND, R.string.), // Should we show this technical info to the user ?
+        ApiErrorCode(DRAFT_HAS_TOO_MANY_RECIPIENTS, R.string.errorTooManyRecipients), // Useless until we handle local drafts
+        ApiErrorCode(DRAFT_NEED_AT_LEAST_ONE_RECIPIENT, R.string.errorAtLeastOneRecipient), // Useless until local drafts
         ApiErrorCode(DRAFT_ALREADY_SCHEDULED_OR_SENT, R.string.errorEditScheduledMessage),
-        // ApiErrorCode(IDENTITY_NOT_FOUND, R.string.),
-        ApiErrorCode(SEND_RECIPIENTS_REFUSED, R.string.errorRefusedRecipients),
+        // ApiErrorCode(IDENTITY_NOT_FOUND, R.string.), // Useless until we handle local drafts
+        ApiErrorCode(SEND_RECIPIENTS_REFUSED, R.string.errorRefusedRecipients), // Useless until we handle local drafts
         ApiErrorCode(SEND_LIMIT_EXCEEDED, R.string.errorSendLimitExceeded),
     )
 
-    fun getTranslateRes(code: String) = apiErrorCodes.first { it.code == code }.translateRes
+    private val ignoredErrorCodesForDrafts = setOf(
+        DRAFT_ALREADY_SCHEDULED_OR_SENT,
+    )
+
+    fun getTranslateResForDrafts(code: String?): Int? {
+        return if (ignoredErrorCodesForDrafts.contains(code)) {
+            null
+        } else {
+            apiErrorCodes.firstOrNull { it.code == code }?.translateRes ?: RCore.string.anErrorHasOccurred
+        }
+    }
 }

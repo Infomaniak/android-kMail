@@ -37,7 +37,6 @@ import androidx.work.Data
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.networking.LiveDataNetworkStatus
 import com.infomaniak.lib.core.utils.Utils.toEnumOrThrow
-import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.lib.stores.checkUpdateIsAvailable
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.GplayUtils.checkPlayServices
@@ -162,7 +161,8 @@ class MainActivity : ThemedActivity() {
             draftsActionsWorkerScheduler.getFailedWorkInfoLiveData().observe(this) {
                 it.forEach { workInfo ->
                     if (!treatedFailedWorkInfoUuids.add(workInfo.id)) return@forEach
-                    workInfo.outputData.getIntArray(DraftsActionsWorker.ERROR_MESSAGE_RESID_KEY)?.forEach(::showToast)
+                    val errorRes = workInfo.outputData.getInt(DraftsActionsWorker.ERROR_MESSAGE_RESID_KEY, 0)
+                    if (errorRes > 0) mainViewModel.snackBarManager.setValue(getString(errorRes))
                 }
             }
         }
