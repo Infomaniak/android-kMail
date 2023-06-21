@@ -170,11 +170,8 @@ class MainViewModel @Inject constructor(
 
     private fun selectMailbox(mailbox: Mailbox) {
 
-        if (!mailbox.isPasswordValid) {
-            // TODO: Instead of this Toast & Exception, display a popup asking for correct password (we are currently waiting for the UX).
-            displayToastAndThrow(R.string.frelatedMailbox, PASSWORD_INVALID_MAILBOX_ERROR_CODE)
-        }
-
+        // TODO: Instead of this Toast & Exception, display a popup asking for correct password (we are currently waiting for the UX).
+        if (!mailbox.isPasswordValid) displayToastAndThrow(R.string.frelatedMailbox, PASSWORD_INVALID_MAILBOX_ERROR_CODE)
         if (mailbox.isLocked) displayToastAndThrow(R.string.lockedMailboxTitle, ALL_MAILBOXES_LOCKED_ERROR_CODE)
 
         if (mailbox.objectId != _currentMailboxObjectId.value) {
@@ -210,8 +207,9 @@ class MainViewModel @Inject constructor(
             runCatching {
                 selectMailbox(mailbox)
             }.onFailure {
-                if (it.message == PASSWORD_INVALID_MAILBOX_ERROR_CODE || it.message == ALL_MAILBOXES_LOCKED_ERROR_CODE) {
-                    switchToValidMailbox()
+                when (it.message) {
+                    PASSWORD_INVALID_MAILBOX_ERROR_CODE,
+                    ALL_MAILBOXES_LOCKED_ERROR_CODE -> switchToValidMailbox()
                 }
                 return@liveData
             }
@@ -226,13 +224,8 @@ class MainViewModel @Inject constructor(
         emit(null)
     }
 
-    // TODO: Instead of this Toast & Exception, display a popup asking for correct password (we are currently waiting for the UX).
     private fun displayToastAndThrow(@StringRes title: Int, errorCode: String) {
-
-        viewModelScope.launch(Dispatchers.Main) {
-            context.showToast(title, Toast.LENGTH_LONG)
-        }
-
+        viewModelScope.launch(Dispatchers.Main) { context.showToast(title, Toast.LENGTH_LONG) }
         throw IllegalStateException(errorCode)
     }
 
