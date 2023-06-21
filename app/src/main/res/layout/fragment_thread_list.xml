@@ -49,7 +49,7 @@
                     app:contentInsetEnd="0dp"
                     app:navigationContentDescription="@string/contentDescriptionButtonMenu"
                     app:navigationIcon="@drawable/ic_burger"
-                    tools:title="Boite de réception"
+                    tools:title="Boîte de réception"
                     tools:visibility="gone">
 
                     <LinearLayout
