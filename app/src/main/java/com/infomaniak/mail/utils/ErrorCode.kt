@@ -24,28 +24,30 @@ import com.infomaniak.lib.core.R as RCore
 @Suppress("MemberVisibilityCanBePrivate")
 object ErrorCode {
 
+    //region Global
+    const val INVALID_CREDENTIALS = "invalid_credentials"
+
     // Untranslated (Do not translate, we don't want to show this to the user)
     const val IDENTITY_NOT_FOUND = "identity__not_found"
     const val MESSAGE_NOT_FOUND = "mail__message_not_found"
     const val MESSAGE_ATTACHMENT_NOT_FOUND = "mail__message_attachment_not_found"
     const val VALIDATION_FAILED = "validation_failed"
+    //endregion
 
-
-    // Global
-    const val INVALID_CREDENTIALS = "invalid_credentials"
-
-    // Mailbox
+    //region Mailbox
     const val MAILBOX_LOCKED = "mailbox_locked"
     const val ERROR_WHILE_LINKING_MAILBOX = "error_while_linking_mailbox"
+    //endregion
 
-    // Folder
+    //region Folder
     const val FOLDER_ALREADY_EXISTS = "folder__destination_already_exists"
     const val FOLDER_DOES_NOT_EXIST = "folder__not_exists"
     const val FOLDER_NAME_TOO_LONG = "folder__name_too_long"
     const val FOLDER_UNABLE_TO_CREATE = "folder__unable_to_create"
     const val FOLDER_UNABLE_TO_FLUSH = "folder__unable_to_flush"
+    //endregion
 
-    // Draft
+    //region Draft
     const val DRAFT_ATTACHMENT_NOT_FOUND = "draft__attachment_not_found"
     const val DRAFT_DOES_NOT_EXIST = "draft__not_found"
     const val DRAFT_MESSAGE_NOT_FOUND = "draft__message_not_found"
@@ -58,13 +60,15 @@ object ErrorCode {
     const val DRAFT_CANNOT_CANCEL_NON_SCHEDULED_MESSAGE = "draft__cannot_cancel_non_scheduled_message"
     const val DRAFT_CANNOT_FORWARD_MORE_THAN_ONE_MESSAGE_INLINE = "draft__cannot_forward_more_than_one_message_inline"
     const val DRAFT_CANNOT_MOVE_SCHEDULED_MESSAGE = "draft__cannot_move_scheduled_message"
+    //endregion
 
-    // Send
+    //region Send
     const val SEND_FROM_REFUSED = "send__server_refused_from"
     const val SEND_RECIPIENTS_REFUSED = "send__server_refused_all_recipients"
     const val SEND_LIMIT_EXCEEDED = "send__server_rate_limit_exceeded"
+    //endregion
 
-    // Attachments
+    //region Attachments
     const val ATTACHMENT_NOT_VALID = "attachment__not_valid"
     const val ATTACHMENT_NOT_FOUND = "attachment__not_found"
 
@@ -74,10 +78,11 @@ object ErrorCode {
     const val ATTACHMENT_UPLOAD_CONTENT_ID_NOT_VALID = "attachment__content_id_not_valid"
     const val ATTACHMENT_ADD_FROM_DRIVE_FAIL = "attachment__add_attachment_from_drive_fail"
     const val ATTACHMENT_STORE_TO_DRIVE_FAIL = "attachment__store_to_drive_fail"
+    //endregion
 
-    // Action
+    //region Action
     const val MOVE_DESTINATION_NOT_FOUND = "mail__move_destination_folder_not_found"
-
+    //endregion
 
     val apiErrorCodes = listOf(
 
