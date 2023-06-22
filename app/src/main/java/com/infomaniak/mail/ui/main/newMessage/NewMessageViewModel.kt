@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.newMessage
 
+import android.accounts.NetworkErrorException
 import android.app.Application
 import android.content.ClipDescription
 import android.content.Context
@@ -119,18 +120,24 @@ class NewMessageViewModel @Inject constructor(
 
         val isSuccess = RealmDatabase.mailboxContent().writeBlocking {
 
-            draft = if (draftExists) {
-                val uuid = draftLocalUuid ?: draft.localUuid
-                getLatestDraft(uuid, realm = this)
-                    ?: fetchDraft(draftResource!!, messageUid!!)
-                    ?: run { return@writeBlocking false }
-            } else {
-                isNewMessage = true
-                createDraft(draftMode, previousMessageUid, recipient, mailbox, context)
-                    ?: run { return@writeBlocking false }
-            }
+            runCatching {
+                draft = if (draftExists) {
+                    val uuid = draftLocalUuid ?: draft.localUuid
+                    getLatestDraft(uuid, realm = this)
+                        ?: fetchDraft(draftResource!!, messageUid!!)
+                        ?: run { return@writeBlocking false }
+                } else {
+                    isNewMessage = true
+                    createDraft(draftMode, previousMessageUid, recipient, mailbox, context)
+                        ?: run { return@writeBlocking false }
+                }
 
-            if (draft.identityId.isNullOrBlank()) draft.addMissingSignatureData(mailbox, realm = this, context = context)
+                if (draft.identityId.isNullOrBlank()) draft.addMissingSignatureData(mailbox, realm = this, context = context)
+            }.onFailure {
+                when (it) {
+                    is NetworkErrorException -> return@writeBlocking false
+                }
+            }
 
             return@writeBlocking true
         }
