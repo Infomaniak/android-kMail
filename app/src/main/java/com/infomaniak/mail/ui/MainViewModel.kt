@@ -169,40 +169,6 @@ class MainViewModel @Inject constructor(
     fun isCurrentFolderRole(role: FolderRole) = currentFolder.value?.role == role
     //endregion
 
-    private fun selectMailbox(mailbox: Mailbox): MailboxErrorCode? {
-
-        // TODO: Instead of this Toast & Exception, display a popup asking for correct password (we are currently waiting for the UX).
-        if (!mailbox.isPasswordValid) {
-            displayToast(R.string.frelatedMailbox)
-            return MailboxErrorCode.INVALID_PASSWORD_MAILBOX
-        }
-        if (mailbox.isLocked) {
-            displayToast(R.string.lockedMailboxTitle)
-            return MailboxErrorCode.LOCKED_MAILBOX
-        }
-
-        if (mailbox.objectId != _currentMailboxObjectId.value) {
-            Log.d(TAG, "Select mailbox: ${mailbox.email}")
-            if (mailbox.mailboxId != AccountUtils.currentMailboxId) AccountUtils.currentMailboxId = mailbox.mailboxId
-            AccountUtils.currentMailboxEmail = mailbox.email
-            _currentMailboxObjectId.value = mailbox.objectId
-            _currentFolderId.value = null
-        }
-
-        return null
-    }
-
-    private fun selectFolder(folderId: String) {
-        if (folderId != currentFolderId) {
-            Log.d(TAG, "Select folder: $folderId")
-            _currentFolderId.value = folderId
-        }
-    }
-
-    private fun displayToast(@StringRes title: Int) = viewModelScope.launch(Dispatchers.Main) {
-        context.showToast(title, Toast.LENGTH_LONG)
-    }
-
     fun updateUserInfo() = viewModelScope.launch(ioCoroutineContext) {
         Log.d(TAG, "Update user info")
         updateAddressBooks()
@@ -282,6 +248,40 @@ class MainViewModel @Inject constructor(
             SearchUtils.deleteRealmSearchData()
 
             draftsActionsWorkerScheduler.scheduleWork()
+        }
+    }
+
+    private fun selectMailbox(mailbox: Mailbox): MailboxErrorCode? {
+
+        fun displayToast(@StringRes title: Int) = viewModelScope.launch(Dispatchers.Main) {
+            context.showToast(title, Toast.LENGTH_LONG)
+        }
+
+        // TODO: Instead of this Toast & Exception, display a popup asking for correct password (we are currently waiting for the UX).
+        if (!mailbox.isPasswordValid) {
+            displayToast(R.string.frelatedMailbox)
+            return MailboxErrorCode.INVALID_PASSWORD_MAILBOX
+        }
+        if (mailbox.isLocked) {
+            displayToast(R.string.lockedMailboxTitle)
+            return MailboxErrorCode.LOCKED_MAILBOX
+        }
+
+        if (mailbox.objectId != _currentMailboxObjectId.value) {
+            Log.d(TAG, "Select mailbox: ${mailbox.email}")
+            if (mailbox.mailboxId != AccountUtils.currentMailboxId) AccountUtils.currentMailboxId = mailbox.mailboxId
+            AccountUtils.currentMailboxEmail = mailbox.email
+            _currentMailboxObjectId.value = mailbox.objectId
+            _currentFolderId.value = null
+        }
+
+        return null
+    }
+
+    private fun selectFolder(folderId: String) {
+        if (folderId != currentFolderId) {
+            Log.d(TAG, "Select folder: $folderId")
+            _currentFolderId.value = folderId
         }
     }
 
