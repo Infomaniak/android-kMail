@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.utils
 
-import android.accounts.NetworkErrorException
 import android.content.Context
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.mail.data.api.ApiRepository
@@ -123,7 +122,7 @@ object SharedViewModelUtils {
             if (isSuccess()) {
                 SignatureController.update(data?.signatures ?: emptyList(), realm)
             } else {
-                throw NetworkErrorException()
+                throwErrorAsException()
             }
         }
     }

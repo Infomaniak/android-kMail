@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.main.newMessage
 
-import android.accounts.NetworkErrorException
 import android.app.Application
 import android.content.ClipDescription
 import android.content.Context
@@ -134,9 +133,7 @@ class NewMessageViewModel @Inject constructor(
 
                 if (draft.identityId.isNullOrBlank()) draft.addMissingSignatureData(mailbox, realm = this, context = context)
             }.onFailure {
-                when (it) {
-                    is NetworkErrorException -> return@writeBlocking false
-                }
+                return@writeBlocking false
             }
 
             return@writeBlocking true
