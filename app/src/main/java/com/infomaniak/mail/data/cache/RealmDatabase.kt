@@ -94,6 +94,8 @@ object RealmDatabase {
     fun close() {
         closeMailboxContent()
         closeUserInfo()
+        _appSettings = null // TODO: To be removed when the injection is done
+        _mailboxInfo = null // TODO: To be removed when the injection is done
     }
 
     fun closeUserInfo() {
