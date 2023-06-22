@@ -52,6 +52,7 @@ class SwitchMailboxesAdapter(
         val isCurrentMailbox = mailbox.mailboxId == AccountUtils.currentMailboxId
 
         isPasswordOutdated = !mailbox.isPasswordValid
+        isMailboxLocked = mailbox.isLocked
 
         text = mailbox.email
 
@@ -76,6 +77,8 @@ class SwitchMailboxesAdapter(
                 // TODO: Instead of this Toast, display a popup asking for correct password (we are currently waiting for the UX).
                 context.showToast(R.string.frelatedMailbox, Toast.LENGTH_LONG)
             }
+
+            setOnLockedMailboxClickListener { context.showToast(R.string.errorMailboxLocked, Toast.LENGTH_LONG) }
         }
     }
 
