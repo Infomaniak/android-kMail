@@ -81,6 +81,7 @@ import com.infomaniak.mail.ui.main.thread.ThreadFragmentArgs
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
+import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.query.Sort
@@ -321,7 +322,7 @@ fun List<Folder>.formatFoldersListWithAllChildren(): List<Folder> {
     ): List<Folder> {
 
         val firstFolder = inputList.removeFirst()
-        outputList.add(firstFolder)
+        outputList.add(firstFolder.copyFromRealm(1u))
         inputList.addAll(0, firstFolder.children.query().sort(Folder::name.name, Sort.ASCENDING).find())
 
         return if (inputList.isEmpty()) outputList else formatFolderWithAllChildren(inputList, outputList)
