@@ -180,8 +180,10 @@
     <string name="emptyStateSearchTitle">No results</string>
     <string name="emptyStateTrashDescription">Move the messages to the trash. They will be permanently deleted after 30 days.</string>
     <string name="emptyStateTrashTitle">Trash is empty</string>
+    <string name="errorAlreadyLinkedMailbox">This email address is already linked to your account</string>
     <string name="errorAtLeastOneRecipient">At least one recipient is required</string>
     <string name="errorAttachAddressInput">Only Infomaniak email addresses are supported</string>
+    <string name="errorAttachmentNotFound">Attachment cannot be found</string>
     <string name="errorCorruptAttachment">Failed to handle draft, an attachment is corrupted</string>
     <string name="errorDraftNotFound">Draft cannot be found</string>
     <string name="errorEditScheduledMessage">Scheduled or sent messages cannot be edited</string>
@@ -190,6 +192,7 @@
     <string name="errorLoginDescription">The connection failed.</string>
     <string name="errorLoginTitle">Login error</string>
     <string name="errorMailboxLocked">This mailbox is locked</string>
+    <string name="errorMoveDestinationNotFound">The destination folder does not exist</string>
     <string name="errorNewFolderAlreadyExists">The folder already exists</string>
     <string name="errorNewFolderNameTooLong">The folder name should not exceed 255 characters</string>
     <string name="errorRefusedRecipients">The server is refusing all recipients</string>

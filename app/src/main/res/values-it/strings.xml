@@ -173,8 +173,10 @@
     <string name="emptyStateSearchTitle">Nessun risultato</string>
     <string name="emptyStateTrashDescription">Spostate i messaggi nel cestino. Verranno eliminati definitivamente dopo 30 giorni.</string>
     <string name="emptyStateTrashTitle">Il cestino è vuoto</string>
+    <string name="errorAlreadyLinkedMailbox">Questo indirizzo e-mail è già collegato al vostro account</string>
     <string name="errorAtLeastOneRecipient">È richiesto almeno un destinatario</string>
     <string name="errorAttachAddressInput">Sono supportati solo gli indirizzi e-mail Infomaniak</string>
+    <string name="errorAttachmentNotFound">Allegato non trovato</string>
     <string name="errorCorruptAttachment">Impossibile gestire la bozza, un allegato è danneggiato</string>
     <string name="errorDraftNotFound">Bozza non trovata</string>
     <string name="errorEditScheduledMessage">Impossibile modificare un messaggio pianificato o inviato</string>
@@ -183,6 +185,7 @@
     <string name="errorLoginDescription">La connessione non è riuscita.</string>
     <string name="errorLoginTitle">Errore di accesso</string>
     <string name="errorMailboxLocked">Questa casella di posta è bloccata</string>
+    <string name="errorMoveDestinationNotFound">La cartella di destinazione è inesistente</string>
     <string name="errorNewFolderAlreadyExists">La cartella è già esistente</string>
     <string name="errorNewFolderNameTooLong">Il nome della cartella non deve superare i 255 caratteri</string>
     <string name="errorRefusedRecipients">Il server respinge tutti i destinatari</string>

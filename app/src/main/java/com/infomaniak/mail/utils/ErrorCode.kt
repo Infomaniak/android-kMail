@@ -24,7 +24,12 @@ import com.infomaniak.lib.core.R as RCore
 @Suppress("MemberVisibilityCanBePrivate")
 object ErrorCode {
 
-    const val VALIDATION_FAILED = "validation_failed" // Do not translate, we don't want to show this to the user
+    // Untranslated (Do not translate, we don't want to show this to the user)
+    const val IDENTITY_NOT_FOUND = "identity__not_found"
+    const val MESSAGE_NOT_FOUND = "mail__message_not_found"
+    const val MESSAGE_ATTACHMENT_NOT_FOUND = "mail__message_attachment_not_found"
+    const val VALIDATION_FAILED = "validation_failed"
+
 
     // Global
     const val INVALID_CREDENTIALS = "invalid_credentials"
@@ -41,18 +46,28 @@ object ErrorCode {
     const val FOLDER_UNABLE_TO_FLUSH = "folder__unable_to_flush"
 
     // Draft
+    const val DRAFT_ATTACHMENT_NOT_FOUND = "draft__attachment_not_found"
     const val DRAFT_DOES_NOT_EXIST = "draft__not_found"
     const val DRAFT_MESSAGE_NOT_FOUND = "draft__message_not_found"
     const val DRAFT_HAS_TOO_MANY_RECIPIENTS = "draft__to_many_recipients"
+    const val DRAFT_MAX_ATTACHMENTS_SIZE_REACHED = "draft__max_attachments_size_reached"
     const val DRAFT_NEED_AT_LEAST_ONE_RECIPIENT = "draft__need_at_least_one_recipient_to_be_sent"
     const val DRAFT_ALREADY_SCHEDULED_OR_SENT = "draft__cannot_modify_scheduled_or_already_sent_message"
 
-    // Identity
-    const val IDENTITY_NOT_FOUND = "identity__not_found"
+    // Untranslated (Do not translate, we don't want to show this to the user)
+    const val DRAFT_CANNOT_CANCEL_NON_SCHEDULED_MESSAGE = "draft__cannot_cancel_non_scheduled_message"
+    const val DRAFT_CANNOT_FORWARD_MORE_THAN_ONE_MESSAGE_INLINE = "draft__cannot_forward_more_than_one_message_inline"
+    const val DRAFT_CANNOT_MOVE_SCHEDULED_MESSAGE = "draft__cannot_move_scheduled_message"
 
     // Send
     const val SEND_RECIPIENTS_REFUSED = "send__server_refused_all_recipients"
     const val SEND_LIMIT_EXCEEDED = "send__server_rate_limit_exceeded"
+
+    // Action
+    const val MOVE_DESTINATION_NOT_FOUND = "mail__move_destination_folder_not_found"
+    const val MOVE_FAILURE = "mail__unable_to_move_emails" // TODO
+    const val UNDO_MOVE_FAILURE = "mail__unable_to_undo_move_action" // TODO
+
 
     val apiErrorCodes = listOf(
 
@@ -62,11 +77,14 @@ object ErrorCode {
 
         // Mailbox
         ApiErrorCode(MAILBOX_LOCKED, R.string.errorMailboxLocked),
+        ApiErrorCode(ERROR_WHILE_LINKING_MAILBOX, R.string.errorAlreadyLinkedMailbox),
 
         // Drafts
+        ApiErrorCode(DRAFT_ATTACHMENT_NOT_FOUND, R.string.errorAttachmentNotFound), // Should we show this technical info ?
         ApiErrorCode(DRAFT_DOES_NOT_EXIST, R.string.errorDraftNotFound), // Should we show this technical info to the user ?
         ApiErrorCode(DRAFT_MESSAGE_NOT_FOUND, R.string.errorDraftNotFound), // Should we show this technical info to the user ?
         ApiErrorCode(DRAFT_HAS_TOO_MANY_RECIPIENTS, R.string.errorTooManyRecipients), // Useless until we handle local drafts
+        ApiErrorCode(DRAFT_MAX_ATTACHMENTS_SIZE_REACHED, R.string.attachmentFileLimitReached),
         ApiErrorCode(DRAFT_NEED_AT_LEAST_ONE_RECIPIENT, R.string.errorAtLeastOneRecipient), // Useless until local drafts
         ApiErrorCode(DRAFT_ALREADY_SCHEDULED_OR_SENT, R.string.errorEditScheduledMessage),
 
@@ -82,7 +100,11 @@ object ErrorCode {
         ApiErrorCode(FOLDER_UNABLE_TO_CREATE, R.string.errorUnableToCreateFolder),
         ApiErrorCode(FOLDER_UNABLE_TO_FLUSH, R.string.errorUnableToFlushFolder),
 
-        )
+        // Action
+        ApiErrorCode(MOVE_DESTINATION_NOT_FOUND, R.string.errorMoveDestinationNotFound),
+        // ApiErrorCode(MOVE_FAILURE, R.string.), TODO See if translation needed
+        // ApiErrorCode(UNDO_MOVE_FAILURE, R.string.), TODO See if translation needed
+    )
 
     private val ignoredErrorCodesForDrafts = setOf(
         DRAFT_ALREADY_SCHEDULED_OR_SENT,

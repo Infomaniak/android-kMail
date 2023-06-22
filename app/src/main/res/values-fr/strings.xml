@@ -174,8 +174,10 @@
     <string name="emptyStateSearchTitle">Aucun résultat</string>
     <string name="emptyStateTrashDescription">Déplacez les messages dans la corbeille. Ils seront supprimés définitivement au bout de 30 jours.</string>
     <string name="emptyStateTrashTitle">La corbeille est vide</string>
+    <string name="errorAlreadyLinkedMailbox">Cette adresse mail est déjà liée à votre compte</string>
     <string name="errorAtLeastOneRecipient">Il faut au minimum un destinataire</string>
     <string name="errorAttachAddressInput">Seules les adresses mail Infomaniak sont supportées</string>
+    <string name="errorAttachmentNotFound">Pièce jointe introuvable</string>
     <string name="errorCorruptAttachment">Échec du traitement du brouillon, une pièce jointe est corrompue</string>
     <string name="errorDraftNotFound">Brouillon introuvable</string>
     <string name="errorEditScheduledMessage">Impossible de modifier un message planifié ou envoyé</string>
@@ -184,6 +186,7 @@
     <string name="errorLoginDescription">La connexion a échoué.</string>
     <string name="errorLoginTitle">Erreur de connexion</string>
     <string name="errorMailboxLocked">Cette mailbox est bloquée</string>
+    <string name="errorMoveDestinationNotFound">Le dossier de destination n’existe pas</string>
     <string name="errorNewFolderAlreadyExists">Le dossier existe déjà</string>
     <string name="errorNewFolderNameTooLong">Le nom du dossier ne doit pas dépasser 255 caractères</string>
     <string name="errorRefusedRecipients">Le serveur refuse tous les destinataires</string>
