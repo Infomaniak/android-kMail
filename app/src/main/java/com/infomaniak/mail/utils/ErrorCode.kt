@@ -24,50 +24,102 @@ import com.infomaniak.lib.core.R as RCore
 @Suppress("MemberVisibilityCanBePrivate")
 object ErrorCode {
 
-    // TODO
-    const val ACCESS_DENIED = "access_denied"
-    const val VALIDATION_FAILED = "validation_failed" // Do not translate, we don't want to show this to the user
-
-    // Global
+    //region Global
     const val INVALID_CREDENTIALS = "invalid_credentials"
 
-    // Mailbox
+    // Untranslated (Do not translate, we don't want to show this to the user)
+    const val IDENTITY_NOT_FOUND = "identity__not_found"
+    const val MESSAGE_NOT_FOUND = "mail__message_not_found"
+    const val MESSAGE_ATTACHMENT_NOT_FOUND = "mail__message_attachment_not_found"
+    const val VALIDATION_FAILED = "validation_failed"
+    //endregion
+
+    //region Mailbox
     const val MAILBOX_LOCKED = "mailbox_locked"
     const val ERROR_WHILE_LINKING_MAILBOX = "error_while_linking_mailbox"
+    //endregion
 
-    // Folder
+    //region Folder
     const val FOLDER_ALREADY_EXISTS = "folder__destination_already_exists"
     const val FOLDER_DOES_NOT_EXIST = "folder__not_exists"
+    const val FOLDER_NAME_TOO_LONG = "folder__name_too_long"
+    const val FOLDER_UNABLE_TO_CREATE = "folder__unable_to_create"
+    const val FOLDER_UNABLE_TO_FLUSH = "folder__unable_to_flush"
+    //endregion
 
-    // Draft
+    //region Draft
+    const val DRAFT_ATTACHMENT_NOT_FOUND = "draft__attachment_not_found"
     const val DRAFT_DOES_NOT_EXIST = "draft__not_found"
     const val DRAFT_MESSAGE_NOT_FOUND = "draft__message_not_found"
     const val DRAFT_HAS_TOO_MANY_RECIPIENTS = "draft__to_many_recipients"
+    const val DRAFT_MAX_ATTACHMENTS_SIZE_REACHED = "draft__max_attachments_size_reached"
     const val DRAFT_NEED_AT_LEAST_ONE_RECIPIENT = "draft__need_at_least_one_recipient_to_be_sent"
     const val DRAFT_ALREADY_SCHEDULED_OR_SENT = "draft__cannot_modify_scheduled_or_already_sent_message"
 
-    // Identity
-    const val IDENTITY_NOT_FOUND = "identity__not_found"
+    // Untranslated (Do not translate, we don't want to show this to the user)
+    const val DRAFT_CANNOT_CANCEL_NON_SCHEDULED_MESSAGE = "draft__cannot_cancel_non_scheduled_message"
+    const val DRAFT_CANNOT_FORWARD_MORE_THAN_ONE_MESSAGE_INLINE = "draft__cannot_forward_more_than_one_message_inline"
+    const val DRAFT_CANNOT_MOVE_SCHEDULED_MESSAGE = "draft__cannot_move_scheduled_message"
+    //endregion
 
-    // Send
+    //region Send
+    const val SEND_FROM_REFUSED = "send__server_refused_from"
     const val SEND_RECIPIENTS_REFUSED = "send__server_refused_all_recipients"
     const val SEND_LIMIT_EXCEEDED = "send__server_rate_limit_exceeded"
+    //endregion
+
+    //region Attachments
+    const val ATTACHMENT_NOT_VALID = "attachment__not_valid"
+    const val ATTACHMENT_NOT_FOUND = "attachment__not_found"
+
+    // Untranslated (Do not translate, we don't want to show this to the user)
+    const val ATTACHMENT_MISSING_FILENAME_MIME = "attachment__missing_filename_or_mimetype"
+    const val ATTACHMENT_UPLOAD_INCORRECT = "attachment__incorrect_disposition"
+    const val ATTACHMENT_UPLOAD_CONTENT_ID_NOT_VALID = "attachment__content_id_not_valid"
+    const val ATTACHMENT_ADD_FROM_DRIVE_FAIL = "attachment__add_attachment_from_drive_fail"
+    const val ATTACHMENT_STORE_TO_DRIVE_FAIL = "attachment__store_to_drive_fail"
+    //endregion
+
+    //region Action
+    const val MOVE_DESTINATION_NOT_FOUND = "mail__move_destination_folder_not_found"
+    //endregion
 
     val apiErrorCodes = listOf(
-        // ApiErrorCode(ACCESS_DENIED, R.string.),
+
+        // Global
         ApiErrorCode(INVALID_CREDENTIALS, R.string.errorInvalidCredentials),
+
+        // Mailbox
         ApiErrorCode(MAILBOX_LOCKED, R.string.errorMailboxLocked),
-        // ApiErrorCode(ERROR_WHILE_LINKING_MAILBOX, R.string.),
+        ApiErrorCode(ERROR_WHILE_LINKING_MAILBOX, R.string.errorAlreadyLinkedMailbox),
+
+        // Folder
         ApiErrorCode(FOLDER_ALREADY_EXISTS, R.string.errorNewFolderAlreadyExists),
-        // ApiErrorCode(FOLDER_DOES_NOT_EXIST, R.string.),
+        ApiErrorCode(FOLDER_DOES_NOT_EXIST, R.string.errorFolderDoesNotExist),
+        ApiErrorCode(FOLDER_NAME_TOO_LONG, R.string.errorNewFolderNameTooLong),
+        ApiErrorCode(FOLDER_UNABLE_TO_CREATE, R.string.errorUnableToCreateFolder),
+        ApiErrorCode(FOLDER_UNABLE_TO_FLUSH, R.string.errorUnableToFlushFolder),
+
+        // Drafts
+        ApiErrorCode(DRAFT_ATTACHMENT_NOT_FOUND, R.string.errorAttachmentNotFound), // Should we show this technical info ?
         ApiErrorCode(DRAFT_DOES_NOT_EXIST, R.string.errorDraftNotFound), // Should we show this technical info to the user ?
-        // ApiErrorCode(DRAFT_MESSAGE_NOT_FOUND, R.string.), // Should we show this technical info to the user ?
+        ApiErrorCode(DRAFT_MESSAGE_NOT_FOUND, R.string.errorDraftNotFound), // Should we show this technical info to the user ?
         ApiErrorCode(DRAFT_HAS_TOO_MANY_RECIPIENTS, R.string.errorTooManyRecipients), // Useless until we handle local drafts
+        ApiErrorCode(DRAFT_MAX_ATTACHMENTS_SIZE_REACHED, R.string.attachmentFileLimitReached),
         ApiErrorCode(DRAFT_NEED_AT_LEAST_ONE_RECIPIENT, R.string.errorAtLeastOneRecipient), // Useless until local drafts
         ApiErrorCode(DRAFT_ALREADY_SCHEDULED_OR_SENT, R.string.errorEditScheduledMessage),
-        // ApiErrorCode(IDENTITY_NOT_FOUND, R.string.), // Useless until we handle local drafts
+
+        // Send
+        ApiErrorCode(SEND_FROM_REFUSED, R.string.errorRefusedSender), // Useless until we handle local drafts
         ApiErrorCode(SEND_RECIPIENTS_REFUSED, R.string.errorRefusedRecipients), // Useless until we handle local drafts
         ApiErrorCode(SEND_LIMIT_EXCEEDED, R.string.errorSendLimitExceeded),
+
+        // Attachments
+        ApiErrorCode(ATTACHMENT_NOT_VALID, R.string.errorInvalidAttachment),
+        ApiErrorCode(ATTACHMENT_NOT_FOUND, R.string.errorAttachmentNotFound),
+
+        // Action
+        ApiErrorCode(MOVE_DESTINATION_NOT_FOUND, R.string.errorMoveDestinationNotFound),
     )
 
     private val ignoredErrorCodesForDrafts = setOf(
