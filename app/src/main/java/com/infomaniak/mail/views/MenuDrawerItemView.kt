@@ -49,6 +49,7 @@ class MenuDrawerItemView @JvmOverloads constructor(
     private val medium by lazy { ResourcesCompat.getFont(context, RCore.font.suisseintl_medium) }
 
     private var outdatedPasswordClickListener: (() -> Unit)? = null
+    private var lockedMailboxClickListener: (() -> Unit)? = null
 
     var badge: Int = 0
         set(value) {
@@ -106,12 +107,13 @@ class MenuDrawerItemView @JvmOverloads constructor(
     var isPasswordOutdated = false
         set(isOutdated) {
             field = isOutdated
+            computeWarningVisibility()
+        }
 
-            binding.apply {
-                warning.isVisible = isOutdated
-                checkmark.isVisible = shouldDisplayCheckmark()
-                itemBadge.isVisible = shouldDisplayBadge()
-            }
+    var isMailboxLocked = false
+        set(isLocked) {
+            field = isLocked
+            computeWarningVisibility()
         }
 
     private var isInSelectedState = false
@@ -141,18 +143,34 @@ class MenuDrawerItemView @JvmOverloads constructor(
         checkmark.isVisible = shouldDisplayCheckmark()
     }
 
-    private fun shouldDisplayCheckmark() = !isPasswordOutdated && isInSelectedState && itemStyle != SelectionStyle.MENU_DRAWER
+    private fun shouldDisplayWarning() = isPasswordOutdated || isMailboxLocked
 
-    private fun shouldDisplayBadge() = !isPasswordOutdated && badge > 0
+    private fun shouldDisplayCheckmark() = !shouldDisplayWarning() && isInSelectedState && itemStyle != SelectionStyle.MENU_DRAWER
+
+    private fun shouldDisplayBadge() = !shouldDisplayWarning() && badge > 0
+
+    private fun computeWarningVisibility() = binding.apply {
+        warning.isVisible = shouldDisplayWarning()
+        checkmark.isVisible = shouldDisplayCheckmark()
+        itemBadge.isVisible = shouldDisplayBadge()
+    }
 
     override fun setOnClickListener(onClickListener: OnClickListener?) {
         binding.root.setOnClickListener {
-            if (isPasswordOutdated) outdatedPasswordClickListener?.invoke() else onClickListener?.onClick(it)
+            when {
+                isPasswordOutdated -> outdatedPasswordClickListener?.invoke()
+                isMailboxLocked -> lockedMailboxClickListener?.invoke()
+                else -> onClickListener?.onClick(it)
+            }
         }
     }
 
     fun setOnOutdatedPasswordClickListener(callback: () -> Unit) {
         outdatedPasswordClickListener = callback
+    }
+
+    fun setOnLockedMailboxClickListener(callback: () -> Unit) {
+        lockedMailboxClickListener = callback
     }
 
     enum class SelectionStyle {
