@@ -41,6 +41,7 @@ import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListen
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollDirection
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollState
 import com.infomaniak.lib.core.utils.Utils
+import com.infomaniak.lib.core.utils.hideKeyboard
 import com.infomaniak.lib.core.utils.showKeyboard
 import com.infomaniak.mail.MatomoMail.trackSearchEvent
 import com.infomaniak.mail.R
@@ -213,8 +214,9 @@ class SearchFragment : Fragment() {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH && !text.isNullOrBlank()) {
                     trackSearchEvent("validateSearch")
                     searchViewModel.searchQuery(text.toString(), saveInHistory = true)
+                    hideKeyboard()
                 }
-                true // Keep keyboard open
+                true // Action got consumed
             }
         }
     }
