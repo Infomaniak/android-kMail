@@ -42,6 +42,7 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.main.SnackBarManager
@@ -113,7 +114,11 @@ class NewMessageViewModel @Inject constructor(
         previousMessageUid: String?,
         recipient: Recipient?,
     ): LiveData<Boolean> = liveData(ioCoroutineContext) {
+
+        val mailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
+
         val isSuccess = RealmDatabase.mailboxContent().writeBlocking {
+
             draft = if (draftExists) {
                 val uuid = draftLocalUuid ?: draft.localUuid
                 getLatestDraft(uuid, realm = this)
@@ -121,11 +126,11 @@ class NewMessageViewModel @Inject constructor(
                     ?: run { return@writeBlocking false }
             } else {
                 isNewMessage = true
-                createDraft(draftMode, previousMessageUid, recipient)
+                createDraft(draftMode, previousMessageUid, recipient, mailbox, context)
                     ?: run { return@writeBlocking false }
             }
 
-            if (draft.identityId.isNullOrBlank()) draft.addMissingSignatureData(realm = this)
+            if (draft.identityId.isNullOrBlank()) draft.addMissingSignatureData(mailbox, realm = this, context = context)
 
             return@writeBlocking true
         }
@@ -153,10 +158,16 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    private fun MutableRealm.createDraft(draftMode: DraftMode, previousMessageUid: String?, recipient: Recipient?): Draft? {
+    private fun MutableRealm.createDraft(
+        draftMode: DraftMode,
+        previousMessageUid: String?,
+        recipient: Recipient?,
+        mailbox: Mailbox,
+        context: Context,
+    ): Draft? {
         return Draft().apply {
             initLocalValues(mimeType = ClipDescription.MIMETYPE_TEXT_HTML)
-            initSignature(realm = this@createDraft)
+            initSignature(mailbox, realm = this@createDraft, context = context)
             when (draftMode) {
                 DraftMode.NEW_MAIL -> recipient?.let { to = realmListOf(it) }
                 DraftMode.REPLY, DraftMode.REPLY_ALL, DraftMode.FORWARD -> {

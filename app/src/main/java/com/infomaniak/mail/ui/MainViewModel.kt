@@ -61,8 +61,6 @@ import com.infomaniak.mail.utils.Utils.MailboxErrorCode
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.ext.copyFromRealm
-import io.sentry.Sentry
-import io.sentry.SentryLevel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.util.Date
@@ -231,7 +229,6 @@ class MainViewModel @Inject constructor(
 
             val mailbox = currentMailbox.value!!
 
-            updateSignatures(mailbox)
             updateQuotas(mailbox)
             updatePermissions(mailbox)
             updateFolders(mailbox)
@@ -283,48 +280,6 @@ class MainViewModel @Inject constructor(
             Log.d(TAG, "Select folder: $folderId")
             _currentFolderId.value = folderId
         }
-    }
-
-    private fun updateSignatures(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
-        Log.d(TAG, "Force refresh Signatures")
-
-        val apiResponse = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName)
-        val data = apiResponse.data
-        val signatures = data?.signatures
-
-        val defaultSignaturesCount = signatures?.count { it.isDefault } ?: -1
-        when {
-            data == null -> Sentry.withScope { scope ->
-                scope.level = SentryLevel.ERROR
-                scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
-                scope.setExtra("apiResponse", apiResponse.toString())
-                scope.setExtra("status", apiResponse.result.name)
-                scope.setExtra("errorCode", "${apiResponse.error?.code}")
-                scope.setExtra("errorDescription", "${apiResponse.error?.description}")
-                scope.setExtra("errorTranslated", context.getString(apiResponse.translateError()))
-                Sentry.captureMessage("Signature: The call to get Signatures returned a `null` data")
-            }
-            signatures?.isEmpty() == true -> Sentry.withScope { scope ->
-                scope.level = SentryLevel.ERROR
-                scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
-                Sentry.captureMessage("Signature: This user doesn't have any Signature")
-            }
-            defaultSignaturesCount == 0 -> Sentry.withScope { scope ->
-                scope.level = SentryLevel.ERROR
-                scope.setExtra("signaturesCount", "${signatures?.count()}")
-                scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
-                Sentry.captureMessage("Signature: This user has Signatures, but no default one")
-            }
-            defaultSignaturesCount > 1 -> Sentry.withScope { scope ->
-                scope.level = SentryLevel.ERROR
-                scope.setExtra("defaultSignaturesCount", "$defaultSignaturesCount")
-                scope.setExtra("totalSignaturesCount", "${signatures?.count()}")
-                scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
-                Sentry.captureMessage("Signature: This user has several default Signatures")
-            }
-        }
-
-        signatures?.let(SignatureController::update)
     }
 
     private fun updateQuotas(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
