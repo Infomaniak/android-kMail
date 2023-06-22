@@ -48,7 +48,7 @@
     <string name="actionViewInLight">Voir en thème clair</string>
     <string name="addUnknownRecipientAlreadyUsed">L’adresse mail est déjà utilisée</string>
     <string name="addUnknownRecipientInvalidEmail">L’adresse mail n’est pas valide</string>
-    <string name="addUnknownRecipientTitle">Ajoutez un destinataire</string>
+    <string name="addUnknownRecipientTitle">Ajouter un destinataire</string>
     <string name="alertBlockedImagesDescription">Pour votre sécurité nous avons bloqué certains contenus de votre message.</string>
     <string name="alertBlockedImagesDisplayContent">Afficher le contenu</string>
     <string name="appSecurityDescription">Protégez l’accès à votre application en activant le verrouillage de votre téléphone.</string>
@@ -175,7 +175,7 @@
     <string name="emptyStateTrashDescription">Déplacez les messages dans la corbeille. Ils seront supprimés définitivement au bout de 30 jours.</string>
     <string name="emptyStateTrashTitle">La corbeille est vide</string>
     <string name="errorAtLeastOneRecipient">Il faut au minimum un destinataire</string>
-    <string name="errorAttachAddressInput">Seules les adresses mails Infomaniak sont supportées</string>
+    <string name="errorAttachAddressInput">Seules les adresses mail Infomaniak sont supportées</string>
     <string name="errorCorruptAttachment">Échec du traitement du brouillon, une pièce jointe est corrompue</string>
     <string name="errorDraftNotFound">Brouillon introuvable</string>
     <string name="errorEditScheduledMessage">Impossible de modifier un message planifié ou envoyé</string>
@@ -195,6 +195,7 @@
     <string name="googlePlayServicesAreRequired">Les Google Play Services sont requis</string>
     <string name="inboxFolder">Boîte de réception</string>
     <string name="loadingText">Chargement…</string>
+    <string name="lockedMailboxTitle">L’accès à votre adresse mail est actuellement bloqué.\n\nNous vous invitons a contacter votre administrateur.</string>
     <string name="menuDrawerAdvancedActions">Actions avancées</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s utilisés</string>
     <string name="messageDetailsDateAt">%1$s à %2$s</string>
@@ -204,9 +205,9 @@
     <string name="messageIsDraftOption">Brouillon</string>
     <string name="messageReplyHeader">Le %1$s, %2$s a écrit :</string>
     <string name="messageShowQuotedText">Afficher la conversation</string>
-    <string name="moreStorageText1">Votre boite est pleine et vous ne pouvez plus recevoir de nouveaux messages 🥲</string>
+    <string name="moreStorageText1">Votre boîte est pleine et vous ne pouvez plus recevoir de nouveaux messages 🥲</string>
     <string name="moreStorageText2">Vous pourrez prochainement débloquer les limites de votre adresse mail ik.me (stockage limite, envoi, redirection, …)</string>
-    <string name="moreStorageTitle">Votre boite est pleine ? Obtenez plus de stockage !</string>
+    <string name="moreStorageTitle">Votre boîte est pleine ? Obtenez plus de stockage !</string>
     <string name="moveTitle">Dans quel dossier souhaitez-vous déplacer votre e-mail ?</string>
     <plurals name="multipleSelectionCount">
         <item quantity="one">%d sélectionné</item>
@@ -230,6 +231,7 @@
     <string name="noNetwork">Pas de signal</string>
     <string name="noSubjectTitle">(aucun sujet)</string>
     <string name="noUpdatedAt">Jamais mis à jour</string>
+    <string name="noValidMailboxTitle">Aucune boîte valide n’a été trouvée. Ne peut être corrigé que sur le webmail pour l’instant.</string>
     <string name="notificationGeneralChannelName">Notification générales</string>
     <string name="notificationNewMessagesChannelName">Nouveaux e-mails</string>
     <string name="notificationSyncDraftChannelName">Sauvegarde des brouillons</string>
@@ -278,7 +280,7 @@
     <string name="settingsInboxAlias">Alias</string>
     <string name="settingsInboxRedirect">Redirections</string>
     <string name="settingsInboxRules">Règles</string>
-    <string name="settingsInboxType">Type de boite de réception</string>
+    <string name="settingsInboxType">Type de boîte de réception</string>
     <string name="settingsMailboxGeneralAutoreply">Répondeur</string>
     <string name="settingsMailboxGeneralFolders">Paramètres des dossiers</string>
     <string name="settingsMailboxGeneralNotifications">Notifications</string>

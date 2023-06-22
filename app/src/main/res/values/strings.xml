@@ -201,6 +201,7 @@
     <string name="googlePlayServicesAreRequired">Google Play Services are required</string>
     <string name="inboxFolder">Inbox</string>
     <string name="loadingText">Loading…</string>
+    <string name="lockedMailboxTitle">Access to your mailbox is currently blocked.\n\nPlease contact your administrator.</string>
     <string name="menuDrawerAdvancedActions">Advanced actions</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s used</string>
     <string name="messageDetailsDateAt">%1$s at %2$s</string>
@@ -234,6 +235,7 @@
     <string name="noNetwork">No signal</string>
     <string name="noSubjectTitle">(no subject)</string>
     <string name="noUpdatedAt">Never updated</string>
+    <string name="noValidMailboxTitle">No valid mailbox found. Can only be fixed on the webmail for now.</string>
     <string name="notificationGeneralChannelName">General notifications</string>
     <string name="notificationNewMessagesChannelName">New emails</string>
     <string name="notificationSyncDraftChannelName">Saving drafts</string>

@@ -65,6 +65,13 @@ object MailboxController {
         }
     }
 
+    private fun getValidMailboxesQuery(userId: Int, realm: TypedRealm): RealmQuery<Mailbox> {
+        val isPasswordValid = "${Mailbox::isPasswordValid.name} == true"
+        val isNotLocked = "${Mailbox::isLocked.name} == false"
+
+        return realm.query("${checkHasUserId(userId)} AND $isPasswordValid AND $isNotLocked")
+    }
+
     private fun getMailboxesCountQuery(userId: Int): RealmScalarQuery<Long> {
         return getMailboxesQuery(userId).count()
     }
@@ -104,6 +111,10 @@ object MailboxController {
 
     fun getMailboxWithFallback(userId: Int, mailboxId: Int, realm: TypedRealm = defaultRealm): Mailbox? {
         return getMailbox(userId, mailboxId, realm) ?: getMailboxesQuery(userId, realm = realm).first().find()
+    }
+
+    fun getFirstValidMailbox(userId: Int, realm: TypedRealm = defaultRealm): Mailbox? {
+        return getValidMailboxesQuery(userId, realm).first().find()
     }
 
     fun getMailboxAsync(objectId: String): Flow<SingleQueryChange<Mailbox>> {

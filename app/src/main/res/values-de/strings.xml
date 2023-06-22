@@ -194,6 +194,7 @@
     <string name="googlePlayServicesAreRequired">Google Play Services sind erforderlich</string>
     <string name="inboxFolder">Posteingang</string>
     <string name="loadingText">Laden…</string>
+    <string name="lockedMailboxTitle">Der Zugriff auf Ihre E-Mail-Adresse ist derzeit gesperrt.\n\nBitte wenden Sie sich an Ihren Administrator.</string>
     <string name="menuDrawerAdvancedActions">Erweiterte Aktionen</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s verwendet</string>
     <string name="messageDetailsDateAt">%1$s um %2$s</string>
@@ -227,6 +228,7 @@
     <string name="noNetwork">Kein Signal</string>
     <string name="noSubjectTitle">(ohne Betreff)</string>
     <string name="noUpdatedAt">Nie aktualisiert</string>
+    <string name="noValidMailboxTitle">Keine gültige Mailbox gefunden. Kann im Moment nur im Webmail behoben werden.</string>
     <string name="notificationGeneralChannelName">Allgemeine Benachrichtigungen</string>
     <string name="notificationNewMessagesChannelName">Neue Emails</string>
     <string name="notificationSyncDraftChannelName">Speichern von Entwürfen</string>

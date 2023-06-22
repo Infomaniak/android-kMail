@@ -20,10 +20,13 @@ package com.infomaniak.mail.ui
 import android.app.Application
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.lib.core.utils.SingleLiveEvent
+import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
@@ -53,6 +56,7 @@ import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.NotificationUtils.cancelNotification
+import com.infomaniak.mail.utils.Utils.MailboxErrorCode
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.Realm
@@ -176,8 +180,18 @@ class MainViewModel @Inject constructor(
     fun isCurrentFolderRole(role: FolderRole) = currentFolder.value?.role == role
     //endregion
 
-    private fun selectMailbox(mailbox: Mailbox) {
-        viewModelScope.launch() { }
+    private fun selectMailbox(mailbox: Mailbox): MailboxErrorCode? {
+
+        // TODO: Instead of this Toast & Exception, display a popup asking for correct password (we are currently waiting for the UX).
+        if (!mailbox.isPasswordValid) {
+            displayToast(R.string.frelatedMailbox)
+            return MailboxErrorCode.INVALID_PASSWORD_MAILBOX
+        }
+        if (mailbox.isLocked) {
+            displayToast(R.string.lockedMailboxTitle)
+            return MailboxErrorCode.LOCKED_MAILBOX
+        }
+
         if (mailbox.objectId != _currentMailboxObjectId.value) {
             Log.d(TAG, "Select mailbox: ${mailbox.email}")
             if (mailbox.mailboxId != AccountUtils.currentMailboxId) AccountUtils.currentMailboxId = mailbox.mailboxId
@@ -185,6 +199,8 @@ class MainViewModel @Inject constructor(
             _currentMailboxObjectId.value = mailbox.objectId
             _currentFolderId.value = null
         }
+
+        return null
     }
 
     private fun selectFolder(folderId: String) {
@@ -192,6 +208,10 @@ class MainViewModel @Inject constructor(
             Log.d(TAG, "Select folder: $folderId")
             _currentFolderId.value = folderId
         }
+    }
+
+    private fun displayToast(@StringRes title: Int) = viewModelScope.launch(Dispatchers.Main) {
+        context.showToast(title, Toast.LENGTH_LONG)
     }
 
     fun updateUserInfo() = viewModelScope.launch(ioCoroutineContext) {
@@ -207,7 +227,15 @@ class MainViewModel @Inject constructor(
             userId = AccountUtils.currentUserId,
             mailboxId = AccountUtils.currentMailboxId,
         )?.let { mailbox ->
-            selectMailbox(mailbox)
+
+            selectMailbox(mailbox)?.let { errorCode ->
+                when (errorCode) {
+                    MailboxErrorCode.INVALID_PASSWORD_MAILBOX,
+                    MailboxErrorCode.LOCKED_MAILBOX -> switchToValidMailbox()
+                    else -> Unit
+                }
+                return@liveData
+            }
 
             if (currentFolderId == null) {
                 folderController.getFolder(DEFAULT_SELECTED_FOLDER)?.let { folder ->
@@ -217,6 +245,20 @@ class MainViewModel @Inject constructor(
         }
 
         emit(null)
+    }
+
+    private fun switchToValidMailbox() = viewModelScope.launch(ioCoroutineContext) {
+        MailboxController.getFirstValidMailbox(AccountUtils.currentUserId)?.let {
+            AccountUtils.switchToMailbox(it.mailboxId)
+        } ?: run {
+            AccountUtils.removeUser(context, AccountUtils.currentUser!!)
+        }
+    }
+
+    fun dismissCurrentMailboxNotifications() = viewModelScope.launch(ioCoroutineContext) {
+        currentMailbox.value?.let {
+            context.cancelNotification(it.notificationGroupId)
+        }
     }
 
     fun refreshMailboxesFromRemote() {
@@ -251,12 +293,6 @@ class MainViewModel @Inject constructor(
             searchUtils.deleteRealmSearchData()
 
             draftsActionsWorkerScheduler.scheduleWork()
-        }
-    }
-
-    fun dismissCurrentMailboxNotifications() = viewModelScope.launch(ioCoroutineContext) {
-        currentMailbox.value?.let {
-            context.cancelNotification(it.notificationGroupId)
         }
     }
 
@@ -947,8 +983,10 @@ class MainViewModel @Inject constructor(
 
     private companion object {
         val TAG: String = MainViewModel::class.java.simpleName
+
         val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
-        // We add this delay because for now, it doesn't always work if we just use the `etop`.
+
+        // We add this delay because it doesn't always work if we just use the `etop`.
         const val REFRESH_DELAY = 2_000L
         const val MAX_REFRESH_DELAY = 6_000L
     }
