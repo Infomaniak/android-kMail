@@ -24,8 +24,6 @@ import com.infomaniak.lib.core.R as RCore
 @Suppress("MemberVisibilityCanBePrivate")
 object ErrorCode {
 
-    // TODO
-    const val ACCESS_DENIED = "access_denied"
     const val VALIDATION_FAILED = "validation_failed" // Do not translate, we don't want to show this to the user
 
     // Global
@@ -38,6 +36,9 @@ object ErrorCode {
     // Folder
     const val FOLDER_ALREADY_EXISTS = "folder__destination_already_exists"
     const val FOLDER_DOES_NOT_EXIST = "folder__not_exists"
+    const val FOLDER_NAME_TOO_LONG = "folder__name_too_long"
+    const val FOLDER_UNABLE_TO_CREATE = "folder__unable_to_create"
+    const val FOLDER_UNABLE_TO_FLUSH = "folder__unable_to_flush"
 
     // Draft
     const val DRAFT_DOES_NOT_EXIST = "draft__not_found"
@@ -54,21 +55,34 @@ object ErrorCode {
     const val SEND_LIMIT_EXCEEDED = "send__server_rate_limit_exceeded"
 
     val apiErrorCodes = listOf(
-        // ApiErrorCode(ACCESS_DENIED, R.string.),
+
+        // Global
         ApiErrorCode(INVALID_CREDENTIALS, R.string.errorInvalidCredentials),
+        // ApiErrorCode(IDENTITY_NOT_FOUND, R.string.), // Useless until we handle local drafts
+
+        // Mailbox
         ApiErrorCode(MAILBOX_LOCKED, R.string.errorMailboxLocked),
-        // ApiErrorCode(ERROR_WHILE_LINKING_MAILBOX, R.string.),
-        ApiErrorCode(FOLDER_ALREADY_EXISTS, R.string.errorNewFolderAlreadyExists),
-        // ApiErrorCode(FOLDER_DOES_NOT_EXIST, R.string.),
+
+        // Drafts
         ApiErrorCode(DRAFT_DOES_NOT_EXIST, R.string.errorDraftNotFound), // Should we show this technical info to the user ?
-        // ApiErrorCode(DRAFT_MESSAGE_NOT_FOUND, R.string.), // Should we show this technical info to the user ?
+        ApiErrorCode(DRAFT_MESSAGE_NOT_FOUND, R.string.errorDraftNotFound), // Should we show this technical info to the user ?
         ApiErrorCode(DRAFT_HAS_TOO_MANY_RECIPIENTS, R.string.errorTooManyRecipients), // Useless until we handle local drafts
         ApiErrorCode(DRAFT_NEED_AT_LEAST_ONE_RECIPIENT, R.string.errorAtLeastOneRecipient), // Useless until local drafts
         ApiErrorCode(DRAFT_ALREADY_SCHEDULED_OR_SENT, R.string.errorEditScheduledMessage),
-        // ApiErrorCode(IDENTITY_NOT_FOUND, R.string.), // Useless until we handle local drafts
+
+
+        // Send
         ApiErrorCode(SEND_RECIPIENTS_REFUSED, R.string.errorRefusedRecipients), // Useless until we handle local drafts
         ApiErrorCode(SEND_LIMIT_EXCEEDED, R.string.errorSendLimitExceeded),
-    )
+
+        // Folder
+        ApiErrorCode(FOLDER_ALREADY_EXISTS, R.string.errorNewFolderAlreadyExists),
+        ApiErrorCode(FOLDER_DOES_NOT_EXIST, R.string.errorFolderDoesNotExist),
+        ApiErrorCode(FOLDER_NAME_TOO_LONG, R.string.errorNewFolderNameTooLong),
+        ApiErrorCode(FOLDER_UNABLE_TO_CREATE, R.string.errorUnableToCreateFolder),
+        ApiErrorCode(FOLDER_UNABLE_TO_FLUSH, R.string.errorUnableToFlushFolder),
+
+        )
 
     private val ignoredErrorCodesForDrafts = setOf(
         DRAFT_ALREADY_SCHEDULED_OR_SENT,

@@ -178,6 +178,7 @@
     <string name="errorCorruptAttachment">Der Entwurf konnte nicht bearbeitet werden, ein Anhang ist beschädigt</string>
     <string name="errorDraftNotFound">Entwurf unauffindbar</string>
     <string name="errorEditScheduledMessage">Geplante oder versendete Nachrichten können nicht geändert werden</string>
+    <string name="errorFolderDoesNotExist">Der Ordner besteht nicht</string>
     <string name="errorInvalidCredentials">E-Mail oder Passwort ungültig</string>
     <string name="errorLoginDescription">Die Verbindung ist fehlgeschlagen.</string>
     <string name="errorLoginTitle">Login-Fehler</string>
@@ -187,6 +188,8 @@
     <string name="errorRefusedRecipients">Der Server lehnt alle Empfänger ab</string>
     <string name="errorSendLimitExceeded">Versandlimit erreicht</string>
     <string name="errorTooManyRecipients">Zu viele Empfänger</string>
+    <string name="errorUnableToCreateFolder">Ordner kann nicht erstellt werden</string>
+    <string name="errorUnableToFlushFolder">Der Ordner kann nicht geleert werden</string>
     <string name="failToOpenDraft">Öffnen des Entwurfs fehlgeschlagen</string>
     <string name="favoritesFolder">Favoriten</string>
     <string name="frelatedMailbox">Ungültiges Passwort. Kann vorerst nur über das Webmail aktualisiert werden.</string>

@@ -178,6 +178,7 @@
     <string name="errorCorruptAttachment">Impossibile gestire la bozza, un allegato è danneggiato</string>
     <string name="errorDraftNotFound">Bozza non trovata</string>
     <string name="errorEditScheduledMessage">Impossibile modificare un messaggio pianificato o inviato</string>
+    <string name="errorFolderDoesNotExist">La cartella è inesistente</string>
     <string name="errorInvalidCredentials">Email o password non valide</string>
     <string name="errorLoginDescription">La connessione non è riuscita.</string>
     <string name="errorLoginTitle">Errore di accesso</string>
@@ -187,6 +188,8 @@
     <string name="errorRefusedRecipients">Il server respinge tutti i destinatari</string>
     <string name="errorSendLimitExceeded">Limite d’invio raggiunto</string>
     <string name="errorTooManyRecipients">Troppi destinatari</string>
+    <string name="errorUnableToCreateFolder">Impossibile creare la cartella</string>
+    <string name="errorUnableToFlushFolder">Impossibile svuotare la cartella</string>
     <string name="failToOpenDraft">Impossibile aprire la bozza</string>
     <string name="favoritesFolder">Preferiti</string>
     <string name="frelatedMailbox">Password non valida. Per ora può essere aggiornata solo sulla webmail.</string>
