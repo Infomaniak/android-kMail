@@ -88,8 +88,8 @@ class SearchFragment : Fragment() {
                 trackSearchEvent("fromHistory")
                 with(binding.searchBar.searchTextInput) {
                     setText(it)
-                    requestFocus()
                     setSelection(it.count())
+                    hideKeyboard()
                 }
             },
             onSearchQueryDeleted = { history ->
@@ -227,11 +227,8 @@ class SearchFragment : Fragment() {
             stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
             onThreadClicked = { thread ->
                 with(searchViewModel) {
-
                     if (!isLengthTooShort(searchQuery)) history.value = searchQuery
-
                     navigateToThread(thread, mainViewModel)
-
                 }
             }
         }
