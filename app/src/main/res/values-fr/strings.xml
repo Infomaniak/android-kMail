@@ -182,6 +182,7 @@
     <string name="errorDraftNotFound">Brouillon introuvable</string>
     <string name="errorEditScheduledMessage">Impossible de modifier un message planifié ou envoyé</string>
     <string name="errorFolderDoesNotExist">Le dossier n’existe pas</string>
+    <string name="errorInvalidAttachment">Pièce jointe non valide</string>
     <string name="errorInvalidCredentials">E-mail ou mot de passe invalide</string>
     <string name="errorLoginDescription">La connexion a échoué.</string>
     <string name="errorLoginTitle">Erreur de connexion</string>
@@ -190,6 +191,7 @@
     <string name="errorNewFolderAlreadyExists">Le dossier existe déjà</string>
     <string name="errorNewFolderNameTooLong">Le nom du dossier ne doit pas dépasser 255 caractères</string>
     <string name="errorRefusedRecipients">Le serveur refuse tous les destinataires</string>
+    <string name="errorRefusedSender">Le serveur refuse l’expéditeur</string>
     <string name="errorSendLimitExceeded">Limite d’envoi atteinte</string>
     <string name="errorTooManyRecipients">Trop de destinataires</string>
     <string name="errorUnableToCreateFolder">Impossible de créer le dossier</string>

@@ -188,6 +188,7 @@
     <string name="errorDraftNotFound">Draft cannot be found</string>
     <string name="errorEditScheduledMessage">Scheduled or sent messages cannot be edited</string>
     <string name="errorFolderDoesNotExist">The folder does not exist</string>
+    <string name="errorInvalidAttachment">Invalid attachment</string>
     <string name="errorInvalidCredentials">Invalid email or password</string>
     <string name="errorLoginDescription">The connection failed.</string>
     <string name="errorLoginTitle">Login error</string>
@@ -196,6 +197,7 @@
     <string name="errorNewFolderAlreadyExists">The folder already exists</string>
     <string name="errorNewFolderNameTooLong">The folder name should not exceed 255 characters</string>
     <string name="errorRefusedRecipients">The server is refusing all recipients</string>
+    <string name="errorRefusedSender">The server is refusing the sender</string>
     <string name="errorSendLimitExceeded">Sending limit reached</string>
     <string name="errorTooManyRecipients">Too many recipients</string>
     <string name="errorUnableToCreateFolder">Unable to create the folder</string>

@@ -181,6 +181,7 @@
     <string name="errorDraftNotFound">No se puede encontrar el borrador</string>
     <string name="errorEditScheduledMessage">Imposible modificar un mensaje programado o enviado</string>
     <string name="errorFolderDoesNotExist">La carpeta no existe</string>
+    <string name="errorInvalidAttachment">El adjunto no es válido</string>
     <string name="errorInvalidCredentials">Correo electrónico o contraseña no válidos</string>
     <string name="errorLoginDescription">La conexión ha fallado.</string>
     <string name="errorLoginTitle">Error de inicio de sesión</string>
@@ -189,6 +190,7 @@
     <string name="errorNewFolderAlreadyExists">La carpeta ya existe</string>
     <string name="errorNewFolderNameTooLong">El nombre de la carpeta no debe superar los 255 caracteres</string>
     <string name="errorRefusedRecipients">El servidor rechaza todos los destinatarios</string>
+    <string name="errorRefusedSender">El servidor rechaza el remitente</string>
     <string name="errorSendLimitExceeded">Límite de envío alcanzado</string>
     <string name="errorTooManyRecipients">Demasiados destinatarios</string>
     <string name="errorUnableToCreateFolder">No se puede crear la carpeta</string>

@@ -60,24 +60,40 @@ object ErrorCode {
     const val DRAFT_CANNOT_MOVE_SCHEDULED_MESSAGE = "draft__cannot_move_scheduled_message"
 
     // Send
+    const val SEND_FROM_REFUSED = "send__server_refused_from"
     const val SEND_RECIPIENTS_REFUSED = "send__server_refused_all_recipients"
     const val SEND_LIMIT_EXCEEDED = "send__server_rate_limit_exceeded"
 
+    // Attachments
+    const val ATTACHMENT_NOT_VALID = "attachment__not_valid"
+    const val ATTACHMENT_NOT_FOUND = "attachment__not_found"
+
+    // Untranslated (Do not translate, we don't want to show this to the user)
+    const val ATTACHMENT_MISSING_FILENAME_MIME = "attachment__missing_filename_or_mimetype"
+    const val ATTACHMENT_UPLOAD_INCORRECT = "attachment__incorrect_disposition"
+    const val ATTACHMENT_UPLOAD_CONTENT_ID_NOT_VALID = "attachment__content_id_not_valid"
+    const val ATTACHMENT_ADD_FROM_DRIVE_FAIL = "attachment__add_attachment_from_drive_fail"
+    const val ATTACHMENT_STORE_TO_DRIVE_FAIL = "attachment__store_to_drive_fail"
+
     // Action
     const val MOVE_DESTINATION_NOT_FOUND = "mail__move_destination_folder_not_found"
-    const val MOVE_FAILURE = "mail__unable_to_move_emails" // TODO
-    const val UNDO_MOVE_FAILURE = "mail__unable_to_undo_move_action" // TODO
 
 
     val apiErrorCodes = listOf(
 
         // Global
         ApiErrorCode(INVALID_CREDENTIALS, R.string.errorInvalidCredentials),
-        // ApiErrorCode(IDENTITY_NOT_FOUND, R.string.), // Useless until we handle local drafts
 
         // Mailbox
         ApiErrorCode(MAILBOX_LOCKED, R.string.errorMailboxLocked),
         ApiErrorCode(ERROR_WHILE_LINKING_MAILBOX, R.string.errorAlreadyLinkedMailbox),
+
+        // Folder
+        ApiErrorCode(FOLDER_ALREADY_EXISTS, R.string.errorNewFolderAlreadyExists),
+        ApiErrorCode(FOLDER_DOES_NOT_EXIST, R.string.errorFolderDoesNotExist),
+        ApiErrorCode(FOLDER_NAME_TOO_LONG, R.string.errorNewFolderNameTooLong),
+        ApiErrorCode(FOLDER_UNABLE_TO_CREATE, R.string.errorUnableToCreateFolder),
+        ApiErrorCode(FOLDER_UNABLE_TO_FLUSH, R.string.errorUnableToFlushFolder),
 
         // Drafts
         ApiErrorCode(DRAFT_ATTACHMENT_NOT_FOUND, R.string.errorAttachmentNotFound), // Should we show this technical info ?
@@ -88,22 +104,17 @@ object ErrorCode {
         ApiErrorCode(DRAFT_NEED_AT_LEAST_ONE_RECIPIENT, R.string.errorAtLeastOneRecipient), // Useless until local drafts
         ApiErrorCode(DRAFT_ALREADY_SCHEDULED_OR_SENT, R.string.errorEditScheduledMessage),
 
-
         // Send
+        ApiErrorCode(SEND_FROM_REFUSED, R.string.errorRefusedSender), // Useless until we handle local drafts
         ApiErrorCode(SEND_RECIPIENTS_REFUSED, R.string.errorRefusedRecipients), // Useless until we handle local drafts
         ApiErrorCode(SEND_LIMIT_EXCEEDED, R.string.errorSendLimitExceeded),
 
-        // Folder
-        ApiErrorCode(FOLDER_ALREADY_EXISTS, R.string.errorNewFolderAlreadyExists),
-        ApiErrorCode(FOLDER_DOES_NOT_EXIST, R.string.errorFolderDoesNotExist),
-        ApiErrorCode(FOLDER_NAME_TOO_LONG, R.string.errorNewFolderNameTooLong),
-        ApiErrorCode(FOLDER_UNABLE_TO_CREATE, R.string.errorUnableToCreateFolder),
-        ApiErrorCode(FOLDER_UNABLE_TO_FLUSH, R.string.errorUnableToFlushFolder),
+        // Attachments
+        ApiErrorCode(ATTACHMENT_NOT_VALID, R.string.errorInvalidAttachment),
+        ApiErrorCode(ATTACHMENT_NOT_FOUND, R.string.errorAttachmentNotFound),
 
         // Action
         ApiErrorCode(MOVE_DESTINATION_NOT_FOUND, R.string.errorMoveDestinationNotFound),
-        // ApiErrorCode(MOVE_FAILURE, R.string.), TODO See if translation needed
-        // ApiErrorCode(UNDO_MOVE_FAILURE, R.string.), TODO See if translation needed
     )
 
     private val ignoredErrorCodesForDrafts = setOf(
