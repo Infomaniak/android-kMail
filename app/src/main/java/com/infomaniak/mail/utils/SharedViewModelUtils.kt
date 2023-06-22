@@ -87,8 +87,6 @@ object SharedViewModelUtils {
     fun updateSignatures(mailbox: Mailbox, realm: MutableRealm, context: Context) {
         with(ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName)) {
 
-            if (isSuccess()) SignatureController.update(data?.signatures ?: emptyList(), realm)
-
             val defaultSignaturesCount = data?.signatures?.count { it.isDefault } ?: -1
             when {
                 data == null -> Sentry.withScope { scope ->
@@ -119,6 +117,12 @@ object SharedViewModelUtils {
                     scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
                     Sentry.captureMessage("Signature: This user has several default Signatures")
                 }
+            }
+
+            if (isSuccess()) {
+                SignatureController.update(data?.signatures ?: emptyList(), realm)
+            } else {
+                throwErrorAsException()
             }
         }
     }
