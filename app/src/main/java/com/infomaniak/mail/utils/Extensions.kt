@@ -270,10 +270,12 @@ fun String.toShortUid(): Int = substringBefore('@').toInt()
 
 //region Realm
 inline fun <reified T : RealmObject> Realm.update(items: List<RealmObject>) {
-    writeBlocking {
-        delete(query<T>())
-        copyListToRealm(items)
-    }
+    writeBlocking { update<T>(items) }
+}
+
+inline fun <reified T : RealmObject> MutableRealm.update(items: List<RealmObject>) {
+    delete(query<T>())
+    copyListToRealm(items)
 }
 
 // There is currently no way to insert multiple objects in one call (https://github.com/realm/realm-kotlin/issues/938)
