@@ -20,3 +20,7 @@ blockquote blockquote blockquote blockquote {
     padding: 0 !important;
     border: none !important;
 }
+
+a:link, a:visited, a:hover, a:active {
+    color: var(--kmail-primary-color);
+}
