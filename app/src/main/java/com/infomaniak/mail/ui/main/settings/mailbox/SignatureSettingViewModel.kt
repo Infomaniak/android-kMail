@@ -17,6 +17,8 @@
  */
 package com.infomaniak.mail.ui.main.settings.mailbox
 
+import android.app.Application
+import android.content.Context
 import androidx.lifecycle.*
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
@@ -26,16 +28,22 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.SharedViewModelUtils
+import com.infomaniak.mail.utils.throwErrorAsException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.Realm
 import io.realm.kotlin.query.RealmResults
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SignatureSettingViewModel @Inject constructor(
+    application: Application,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-) : ViewModel() {
+) : AndroidViewModel(application) {
+
+    private inline val context: Context get() = getApplication()
 
     private val coroutineContext = viewModelScope.coroutineContext + ioDispatcher
 
@@ -55,9 +63,13 @@ class SignatureSettingViewModel @Inject constructor(
         emit(mailbox)
     }
 
-    fun setDefaultSignature(signature: Signature) = liveData(ioDispatcher) {
+    fun setDefaultSignature(signature: Signature) = viewModelScope.launch(ioDispatcher) {
         val apiResponse = ApiRepository.setDefaultSignature(mailbox.hostingId, mailbox.mailboxName, signature)
-        emit(apiResponse.isSuccess())
+        if (apiResponse.isSuccess()) updateSignatures() else apiResponse.throwErrorAsException()
+    }
+
+    fun updateSignatures() = viewModelScope.launch(ioDispatcher) {
+        customRealm!!.writeBlocking { SharedViewModelUtils.updateSignatures(mailbox, this, context) }
     }
 
     override fun onCleared() {

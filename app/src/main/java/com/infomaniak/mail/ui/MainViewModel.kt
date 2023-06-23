@@ -58,7 +58,6 @@ import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.NotificationUtils.cancelNotification
 import com.infomaniak.mail.utils.Utils.MailboxErrorCode
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -259,15 +258,6 @@ class MainViewModel @Inject constructor(
 
             // Delete Search data in case they couldn't be deleted at the end of the previous Search.
             searchUtils.deleteRealmSearchData()
-        }
-    }
-
-    fun updateSignatures(mailboxObjectId: String) = viewModelScope.launch(ioDispatcher) {
-        val mailbox = MailboxController.getMailbox(mailboxObjectId)
-
-        RealmDatabase.mailboxContent().writeBlocking {
-            mailbox?.let { SharedViewModelUtils.updateSignatures(mailbox, this, context) }
-                ?: snackBarManager.postValue(context.getString(com.infomaniak.lib.core.R.string.anErrorHasOccurred))
         }
     }
 

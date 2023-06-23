@@ -49,12 +49,16 @@ class SignatureSettingFragment : Fragment() {
         return FragmentSignatureSettingBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(signatureSettingViewModel) {
         super.onViewCreated(view, savedInstanceState)
 
-        signatureSettingViewModel.init(navigationArgs.mailboxObjectId).observe(viewLifecycleOwner) { mailbox ->
+        init(navigationArgs.mailboxObjectId).observe(viewLifecycleOwner) { mailbox ->
             setupAdapter(mailbox)
-            mainViewModel.updateSignatures(mailbox, signatureSettingViewModel.customRealm)
+            runCatching {
+                updateSignatures()
+            }.onFailure {
+                showSnackbar(RCore.string.anErrorHasOccurred)
+            }
             observeSignatures()
         }
     }
@@ -73,8 +77,10 @@ class SignatureSettingFragment : Fragment() {
     private fun onSignatureClicked(signature: Signature) = with(signatureSettingViewModel) {
         val newDefaultSignature = signature.copyFromRealm(UInt.MIN_VALUE).apply { isDefault = true }
 
-        setDefaultSignature(newDefaultSignature).observe(viewLifecycleOwner) { isSuccess ->
-            if (isSuccess) mainViewModel.updateSignatures(mailbox, customRealm) else showSnackbar(RCore.string.anErrorHasOccurred)
+        runCatching {
+            setDefaultSignature(newDefaultSignature)
+        }.onFailure {
+            showSnackbar(RCore.string.anErrorHasOccurred)
         }
     }
 }

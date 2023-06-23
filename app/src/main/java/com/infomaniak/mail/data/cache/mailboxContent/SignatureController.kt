@@ -21,7 +21,6 @@ import android.util.Log
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.utils.update
-import io.realm.kotlin.Realm
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.query
@@ -31,8 +30,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 object SignatureController {
-
-    private inline val defaultRealm get() = RealmDatabase.mailboxContent()
 
     //region Queries
     private fun getDefaultSignatureQuery(realm: TypedRealm): RealmQuery<Signature> {
@@ -59,11 +56,6 @@ object SignatureController {
     //endregion
 
     //region Edit data
-    fun update(apiSignatures: List<Signature>, realm: Realm?) {
-        Log.d(RealmDatabase.TAG, "Signatures: Save new data")
-        (realm ?: defaultRealm).update<Signature>(apiSignatures)
-    }
-
     fun update(apiSignatures: List<Signature>, realm: MutableRealm) {
         Log.d(RealmDatabase.TAG, "Signatures: Save new data")
         realm.update<Signature>(apiSignatures)
