@@ -54,6 +54,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import io.sentry.SentryLevel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.UUID
 import javax.inject.Inject
@@ -217,12 +219,29 @@ class MainActivity : ThemedActivity() {
 
     private fun loadCurrentMailbox() {
         mainViewModel.loadCurrentMailboxFromLocal().observe(this) {
+
             lifecycleScope.launch {
                 repeatOnLifecycle(State.STARTED) {
                     mainViewModel.refreshMailboxesFromRemote()
                 }
             }
+
+            scheduleDraftActionsWorkWithDelay()
         }
+    }
+
+    /**
+     * We want to scheduleWork after a delay in the off chance where we came back from NewMessageActivity while an Activity
+     * recreation got triggered.
+     *
+     * We need to give time to the NewMessageActivity to save the last state of the draft in realm and then scheduleWork on its
+     * own. Not waiting would scheduleWork before NewMessageActivity has time to write to realm and schedule its own worker. This
+     * would result in an attempt to save any temporary draft saved to realm because of saveDraftDebouncing() effectively sending
+     * a second unwanted draft.
+     */
+    private fun scheduleDraftActionsWorkWithDelay() = lifecycleScope.launch(Dispatchers.IO) {
+        delay(1_000L)
+        draftsActionsWorkerScheduler.scheduleWork()
     }
 
     override fun onStart() {

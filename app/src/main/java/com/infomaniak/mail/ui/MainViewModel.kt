@@ -243,8 +243,6 @@ class MainViewModel @Inject constructor(
 
             // Delete Search data in case they couldn't be deleted at the end of the previous Search.
             SearchUtils.deleteRealmSearchData()
-
-            draftsActionsWorkerScheduler.scheduleWork()
         }
     }
 
