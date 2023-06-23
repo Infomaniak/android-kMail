@@ -113,10 +113,7 @@ class Folder : RealmObject {
         return role?.folderIconRes ?: if (isFavorite) R.drawable.ic_folder_star else R.drawable.ic_folder
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        return other is Folder && id == other.id
-    }
+    override fun equals(other: Any?) = other === this || (other is Folder && other.id == id)
 
     override fun hashCode(): Int = id.hashCode()
 
