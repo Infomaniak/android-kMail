@@ -22,14 +22,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.databinding.FragmentSignatureSettingBinding
-import com.infomaniak.mail.ui.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import io.realm.kotlin.ext.copyFromRealm
 import com.infomaniak.lib.core.R as RCore
@@ -40,7 +38,6 @@ class SignatureSettingFragment : Fragment() {
     private lateinit var binding: FragmentSignatureSettingBinding
 
     private val navigationArgs: SignatureSettingFragmentArgs by navArgs()
-    private val mainViewModel: MainViewModel by activityViewModels()
     private val signatureSettingViewModel: SignatureSettingViewModel by viewModels()
 
     private lateinit var signatureAdapter: SignatureSettingAdapter
@@ -66,7 +63,7 @@ class SignatureSettingFragment : Fragment() {
     private fun setupAdapter(mailbox: Mailbox) {
         binding.signatureList.adapter = SignatureSettingAdapter(
             canManageSignature = mailbox.permissions?.canManageSignatures ?: false,
-            onSignatureSelected = ::onSignatureClicked
+            onSignatureSelected = ::onSignatureClicked,
         ).also { signatureAdapter = it }
     }
 

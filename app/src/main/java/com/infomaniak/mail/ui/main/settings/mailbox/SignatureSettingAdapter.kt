@@ -43,7 +43,7 @@ class SignatureSettingAdapter(
         setText(signature.name)
         if (signature.isDefault) check() else uncheck()
         setOnClickListener { onSignatureSelected(signature) }
-        enable(canManageSignature)
+        isEnabled = canManageSignature
     }
 
     override fun getItemCount(): Int = signatures.count()

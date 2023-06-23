@@ -66,12 +66,12 @@ class SettingRadioButtonView @JvmOverloads constructor(
     }
 
     override fun check() = with(binding) {
-        enable(false)
+        root.isEnabled = false
         checkMark.isVisible = true
     }
 
     override fun uncheck() = with(binding) {
-        enable(true)
+        root.isEnabled = true
         checkMark.isGone = true
     }
 
@@ -92,9 +92,5 @@ class SettingRadioButtonView @JvmOverloads constructor(
 
     override fun setOnClickListener(listener: OnClickListener?) {
         onClickListener = listener
-    }
-
-    fun enable(mustEnable: Boolean) = binding.root.apply {
-        isEnabled = mustEnable
     }
 }
