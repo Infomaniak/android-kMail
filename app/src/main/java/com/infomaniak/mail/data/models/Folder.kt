@@ -113,6 +113,10 @@ class Folder : RealmObject {
         return role?.folderIconRes ?: if (isFavorite) R.drawable.ic_folder_star else R.drawable.ic_folder
     }
 
+    override fun equals(other: Any?) = other === this || (other is Folder && other.id == id)
+
+    override fun hashCode(): Int = id.hashCode()
+
     enum class FolderRole(
         @StringRes val folderNameRes: Int,
         @DrawableRes val folderIconRes: Int,

@@ -81,6 +81,7 @@ import com.infomaniak.mail.ui.main.thread.ThreadFragmentArgs
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
+import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.query.Sort
@@ -270,10 +271,12 @@ fun String.toShortUid(): Int = substringBefore('@').toInt()
 
 //region Realm
 inline fun <reified T : RealmObject> Realm.update(items: List<RealmObject>) {
-    writeBlocking {
-        delete(query<T>())
-        copyListToRealm(items)
-    }
+    writeBlocking { update<T>(items) }
+}
+
+inline fun <reified T : RealmObject> MutableRealm.update(items: List<RealmObject>) {
+    delete(query<T>())
+    copyListToRealm(items)
 }
 
 // There is currently no way to insert multiple objects in one call (https://github.com/realm/realm-kotlin/issues/938)
@@ -319,7 +322,7 @@ fun List<Folder>.formatFoldersListWithAllChildren(): List<Folder> {
     ): List<Folder> {
 
         val firstFolder = inputList.removeFirst()
-        outputList.add(firstFolder)
+        outputList.add(firstFolder.copyFromRealm(1u))
         inputList.addAll(0, firstFolder.children.query().sort(Folder::name.name, Sort.ASCENDING).find())
 
         return if (inputList.isEmpty()) outputList else formatFolderWithAllChildren(inputList, outputList)

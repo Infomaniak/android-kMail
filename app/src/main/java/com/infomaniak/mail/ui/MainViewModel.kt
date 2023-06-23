@@ -57,12 +57,9 @@ import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.NotificationUtils.cancelNotification
 import com.infomaniak.mail.utils.Utils.MailboxErrorCode
-import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.copyFromRealm
-import io.sentry.Sentry
-import io.sentry.SentryLevel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.util.Date
@@ -77,7 +74,6 @@ class MainViewModel @Inject constructor(
     application: Application,
     private val addressBookController: AddressBookController,
     private val draftController: DraftController,
-    private val draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler,
     private val folderController: FolderController,
     @MailboxContentRealm private val mailboxContentRealm: Realm,
     private val mergedContactController: MergedContactController,
@@ -85,7 +81,6 @@ class MainViewModel @Inject constructor(
     private val refreshController: RefreshController,
     private val searchUtils: SearchUtils,
     private val sharedViewModelUtils: SharedViewModelUtils,
-    private val signatureController: SignatureController,
     private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
@@ -180,40 +175,6 @@ class MainViewModel @Inject constructor(
     fun isCurrentFolderRole(role: FolderRole) = currentFolder.value?.role == role
     //endregion
 
-    private fun selectMailbox(mailbox: Mailbox): MailboxErrorCode? {
-
-        // TODO: Instead of this Toast & Exception, display a popup asking for correct password (we are currently waiting for the UX).
-        if (!mailbox.isPasswordValid) {
-            displayToast(R.string.frelatedMailbox)
-            return MailboxErrorCode.INVALID_PASSWORD_MAILBOX
-        }
-        if (mailbox.isLocked) {
-            displayToast(R.string.lockedMailboxTitle)
-            return MailboxErrorCode.LOCKED_MAILBOX
-        }
-
-        if (mailbox.objectId != _currentMailboxObjectId.value) {
-            Log.d(TAG, "Select mailbox: ${mailbox.email}")
-            if (mailbox.mailboxId != AccountUtils.currentMailboxId) AccountUtils.currentMailboxId = mailbox.mailboxId
-            AccountUtils.currentMailboxEmail = mailbox.email
-            _currentMailboxObjectId.value = mailbox.objectId
-            _currentFolderId.value = null
-        }
-
-        return null
-    }
-
-    private fun selectFolder(folderId: String) {
-        if (folderId != currentFolderId) {
-            Log.d(TAG, "Select folder: $folderId")
-            _currentFolderId.value = folderId
-        }
-    }
-
-    private fun displayToast(@StringRes title: Int) = viewModelScope.launch(Dispatchers.Main) {
-        context.showToast(title, Toast.LENGTH_LONG)
-    }
-
     fun updateUserInfo() = viewModelScope.launch(ioCoroutineContext) {
         Log.d(TAG, "Update user info")
         updateAddressBooks()
@@ -276,7 +237,6 @@ class MainViewModel @Inject constructor(
 
             val mailbox = currentMailbox.value!!
 
-            updateSignatures(mailbox)
             updateQuotas(mailbox)
             updatePermissions(mailbox)
             updateFolders(mailbox)
@@ -291,51 +251,41 @@ class MainViewModel @Inject constructor(
 
             // Delete Search data in case they couldn't be deleted at the end of the previous Search.
             searchUtils.deleteRealmSearchData()
-
-            draftsActionsWorkerScheduler.scheduleWork()
         }
     }
 
-    private fun updateSignatures(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
-        Log.d(TAG, "Force refresh Signatures")
+    private fun selectMailbox(mailbox: Mailbox): MailboxErrorCode? {
 
-        val apiResponse = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName)
-        val data = apiResponse.data
-        val signatures = data?.signatures
-
-        val defaultSignaturesCount = signatures?.count { it.isDefault } ?: -1
-        when {
-            data == null -> Sentry.withScope { scope ->
-                scope.level = SentryLevel.ERROR
-                scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
-                scope.setExtra("apiResponse", apiResponse.toString())
-                scope.setExtra("status", apiResponse.result.name)
-                scope.setExtra("errorCode", "${apiResponse.error?.code}")
-                scope.setExtra("errorDescription", "${apiResponse.error?.description}")
-                scope.setExtra("errorTranslated", context.getString(apiResponse.translateError()))
-                Sentry.captureMessage("Signature: The call to get Signatures returned a `null` data")
-            }
-            signatures?.isEmpty() == true -> Sentry.withScope { scope ->
-                scope.level = SentryLevel.ERROR
-                scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
-                Sentry.captureMessage("Signature: This user doesn't have any Signature")
-            }
-            defaultSignaturesCount == 0 -> Sentry.withScope { scope ->
-                scope.level = SentryLevel.ERROR
-                scope.setExtra("signaturesCount", "${signatures?.count()}")
-                scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
-                Sentry.captureMessage("Signature: This user has Signatures, but no default one")
-            }
-            defaultSignaturesCount > 1 -> Sentry.withScope { scope ->
-                scope.level = SentryLevel.ERROR
-                scope.setExtra("defaultSignaturesCount", "$defaultSignaturesCount")
-                scope.setExtra("totalSignaturesCount", "${signatures?.count()}")
-                scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
-                Sentry.captureMessage("Signature: This user has several default Signatures")
-            }
+        fun displayToast(@StringRes title: Int) = viewModelScope.launch(Dispatchers.Main) {
+            context.showToast(title, Toast.LENGTH_LONG)
         }
 
-        signatures?.let(signatureController::update)
+        // TODO: Instead of this Toast & Exception, display a popup asking for correct password (we are currently waiting for the UX).
+        if (!mailbox.isPasswordValid) {
+            displayToast(R.string.frelatedMailbox)
+            return MailboxErrorCode.INVALID_PASSWORD_MAILBOX
+        }
+        if (mailbox.isLocked) {
+            displayToast(R.string.lockedMailboxTitle)
+            return MailboxErrorCode.LOCKED_MAILBOX
+        }
+
+        if (mailbox.objectId != _currentMailboxObjectId.value) {
+            Log.d(TAG, "Select mailbox: ${mailbox.email}")
+            if (mailbox.mailboxId != AccountUtils.currentMailboxId) AccountUtils.currentMailboxId = mailbox.mailboxId
+            AccountUtils.currentMailboxEmail = mailbox.email
+            _currentMailboxObjectId.value = mailbox.objectId
+            _currentFolderId.value = null
+        }
+
+        return null
+    }
+
+    private fun selectFolder(folderId: String) {
+        if (folderId != currentFolderId) {
+            Log.d(TAG, "Select folder: $folderId")
+            _currentFolderId.value = folderId
+        }
     }
 
     private fun updateQuotas(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {

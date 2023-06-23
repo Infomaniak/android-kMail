@@ -20,31 +20,27 @@ package com.infomaniak.mail.data.cache.mailboxContent
 import android.util.Log
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.signature.Signature
-import com.infomaniak.mail.di.MailboxContentRealm
 import com.infomaniak.mail.utils.update
-import io.realm.kotlin.Realm
+import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.query
-import javax.inject.Inject
 
-class SignatureController @Inject constructor(@MailboxContentRealm private val mailboxContentRealm: Realm) {
+object SignatureController {
 
-    //region Edit data
-    fun update(apiSignatures: List<Signature>) {
-        Log.d(RealmDatabase.TAG, "Signatures: Save new data")
-        mailboxContentRealm.update<Signature>(apiSignatures)
+    //region Get data
+    private fun getDefaultSignature(realm: TypedRealm): Signature? {
+        return realm.query<Signature>("${Signature::isDefault.name} == true").first().find()
+    }
+
+    fun getSignature(realm: TypedRealm): Signature {
+        return getDefaultSignature(realm) ?: realm.query<Signature>().first().find()!!
     }
     //endregion
 
-    companion object {
-        //region Get data
-        private fun getDefaultSignature(realm: TypedRealm): Signature? {
-            return realm.query<Signature>("${Signature::isDefault.name} == true").first().find()
-        }
-
-        fun getSignature(realm: TypedRealm): Signature {
-            return getDefaultSignature(realm) ?: realm.query<Signature>().first().find()!!
-        }
-        //endregion
+    //region Edit data
+    fun update(apiSignatures: List<Signature>, realm: MutableRealm) {
+        Log.d(RealmDatabase.TAG, "Signatures: Save new data")
+        realm.update<Signature>(apiSignatures)
     }
+    //endregion
 }
