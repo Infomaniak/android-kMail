@@ -108,9 +108,7 @@ class Thread : RealmObject {
         messages.add(message)
     }
 
-    fun addMessageWithConditions(newMessage: Message, folderRole: FolderRole?, trashFolderId: String?) {
-
-        val isInTrash = newMessage.isInTrash(trashFolderId)
+    fun addMessageWithConditions(newMessage: Message, folderRole: FolderRole?, isInTrash: Boolean) {
 
         val shouldAddMessage = when (folderRole) {
             FolderRole.DRAFT -> newMessage.isDraft // In Draft folder: only add draft Messages.

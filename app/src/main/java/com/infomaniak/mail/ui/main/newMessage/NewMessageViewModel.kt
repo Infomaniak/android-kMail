@@ -186,7 +186,7 @@ class NewMessageViewModel @Inject constructor(
                                 draftMode = draftMode,
                                 message = message,
                                 context = context,
-                                realm = this@createDraft
+                                realm = this@createDraft,
                             )
                             if (!isSuccess) return null
                         }

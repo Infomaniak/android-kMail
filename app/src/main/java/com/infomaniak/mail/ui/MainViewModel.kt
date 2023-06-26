@@ -439,7 +439,7 @@ class MainViewModel @Inject constructor(
                 messagesFoldersIds = messages.getFoldersIds(exception = trashId),
                 destinationFolderId = trashId,
                 started = ::startedDownload,
-                stopped = ::stoppedDownload
+                stopped = ::stoppedDownload,
             )
         }
 
@@ -604,7 +604,7 @@ class MainViewModel @Inject constructor(
                 messagesFoldersIds = messagesFoldersIds,
                 destinationFolderId = destinationFolder.id,
                 started = ::startedDownload,
-                stopped = ::stoppedDownload
+                stopped = ::stoppedDownload,
             )
         }
 
@@ -658,7 +658,7 @@ class MainViewModel @Inject constructor(
                 mailbox = mailbox,
                 messagesFoldersIds = messages.getFoldersIds(),
                 started = ::startedDownload,
-                stopped = ::stoppedDownload
+                stopped = ::stoppedDownload,
             )
         }
     }
@@ -714,7 +714,7 @@ class MainViewModel @Inject constructor(
                 mailbox = mailbox,
                 messagesFoldersIds = messages.getFoldersIds(),
                 started = ::startedDownload,
-                stopped = ::stoppedDownload
+                stopped = ::stoppedDownload,
             )
         }
     }
