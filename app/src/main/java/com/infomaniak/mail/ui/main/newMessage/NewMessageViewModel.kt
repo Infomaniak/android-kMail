@@ -127,9 +127,13 @@ class NewMessageViewModel @Inject constructor(
                     val uuid = draftLocalUuid ?: draft.localUuid
                     getLatestDraft(uuid, realm = this) ?: run {
                         if (isRecreated && (draftResource == null || messageUid == null)) {
-                            // We arrive here if : 1. It's a new draft, 2. There's no data, 3. We recreated the activity
-                            // In this case, we do not have data in realm, nor from the API,
-                            // hence draftResource and MessageUid null, so we need to create a new draft
+                            // We arrive here if :
+                            //    1. the user created a new Draft,
+                            //    2. didn't write anything in it,
+                            //    3. then recreated the activity.
+                            // In this case, we do not have any data in Realm nor from the API,
+                            // hence the null `draftResource` & `messageUid`,
+                            // so we need to create a new Draft.
                             createDraft(draftMode, previousMessageUid, recipient, mailbox, context)
                         } else {
                             fetchDraft(draftResource!!, messageUid!!)
