@@ -56,6 +56,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.databinding.ActivityLoginBinding
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
@@ -214,8 +215,10 @@ class LoginActivity : AppCompatActivity() {
             is MailboxErrorCode -> withContext(mainDispatcher) {
                 when (returnValue) {
                     MailboxErrorCode.NO_MAILBOX -> launchNoMailboxActivity()
-                    MailboxErrorCode.INVALID_PASSWORD_MAILBOX, MailboxErrorCode.LOCKED_MAILBOX -> {
-                        // TODO: Instead of this snackbar, display the right screens for each error
+                    MailboxErrorCode.NO_VALID_MAILBOX,
+                    MailboxErrorCode.INVALID_PASSWORD_MAILBOX,
+                    MailboxErrorCode.LOCKED_MAILBOX -> {
+                        // TODO: Instead of this snackbar, display the right screen for each error
                         showError(getString(R.string.noValidMailboxTitle))
                     }
                 }
@@ -283,6 +286,15 @@ class LoginActivity : AppCompatActivity() {
 
         suspend fun authenticateUser(context: Context, apiToken: ApiToken): Any {
 
+            fun List<Mailbox>.computeErrorCode(): MailboxErrorCode? {
+                return when {
+                    none { it.isPasswordValid } -> MailboxErrorCode.INVALID_PASSWORD_MAILBOX
+                    all { it.isLocked } -> MailboxErrorCode.LOCKED_MAILBOX
+                    all { !it.isPasswordValid && it.isLocked } -> MailboxErrorCode.NO_VALID_MAILBOX
+                    else -> null
+                }
+            }
+
             if (AccountUtils.getUserById(apiToken.userId) != null) return getErrorResponse(RCore.string.errorUserAlreadyPresent)
 
             InfomaniakCore.bearerToken = apiToken.accessToken
@@ -307,11 +319,7 @@ class LoginActivity : AppCompatActivity() {
                         AccountUtils.addUser(user)
                         MailboxController.updateMailboxes(context, mailboxes)
 
-                        return@let when {
-                            mailboxes.none { it.isPasswordValid } -> MailboxErrorCode.INVALID_PASSWORD_MAILBOX
-                            mailboxes.all { it.isLocked } -> MailboxErrorCode.LOCKED_MAILBOX
-                            else -> user
-                        }
+                        return@let mailboxes.computeErrorCode() ?: user
                     } ?: run {
                         getErrorResponse(RCore.string.serverError)
                     }
