@@ -180,10 +180,8 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun initDraftAndViewModel() = with(newMessageActivityArgs) {
-        val draftExists = arrivedFromExistingDraft || newMessageViewModel.activityCreationStatus == CreationStatus.RECREATED
-
         newMessageViewModel.initDraftAndViewModel(
-            draftExists,
+            arrivedFromExistingDraft,
             draftLocalUuid,
             draftResource,
             messageUid,

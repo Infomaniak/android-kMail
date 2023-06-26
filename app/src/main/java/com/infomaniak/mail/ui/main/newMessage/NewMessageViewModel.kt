@@ -106,7 +106,7 @@ class NewMessageViewModel @Inject constructor(
     }
 
     fun initDraftAndViewModel(
-        draftExists: Boolean,
+        arrivedFromExistingDraft: Boolean,
         draftLocalUuid: String?,
         draftResource: String?,
         messageUid: String?,
@@ -120,15 +120,28 @@ class NewMessageViewModel @Inject constructor(
         val isSuccess = RealmDatabase.mailboxContent().writeBlocking {
 
             runCatching {
+                val isRecreated = activityCreationStatus == CreationStatus.RECREATED
+                val draftExists = arrivedFromExistingDraft || isRecreated
+
                 draft = if (draftExists) {
                     val uuid = draftLocalUuid ?: draft.localUuid
-                    getLatestDraft(uuid, realm = this)
-                        ?: fetchDraft(draftResource!!, messageUid!!)
-                        ?: run { return@writeBlocking false }
+                    getLatestDraft(uuid, realm = this) ?: run {
+                        if (isRecreated && (draftResource == null || messageUid == null)) {
+                            // We arrive here if :
+                            //    1. the user created a new Draft,
+                            //    2. didn't write anything in it,
+                            //    3. then recreated the activity.
+                            // In this case, we do not have any data in Realm nor from the API,
+                            // hence the null `draftResource` & `messageUid`,
+                            // so we need to create a new Draft.
+                            createDraft(draftMode, previousMessageUid, recipient, mailbox, context)
+                        } else {
+                            fetchDraft(draftResource!!, messageUid!!)
+                        } ?: return@writeBlocking false
+                    }
                 } else {
                     isNewMessage = true
-                    createDraft(draftMode, previousMessageUid, recipient, mailbox, context)
-                        ?: run { return@writeBlocking false }
+                    createDraft(draftMode, previousMessageUid, recipient, mailbox, context) ?: return@writeBlocking false
                 }
 
                 if (draft.identityId.isNullOrBlank()) draft.addMissingSignatureData(mailbox, realm = this, context = context)
