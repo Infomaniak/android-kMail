@@ -39,12 +39,9 @@ import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.networking.HttpClient
+import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.Utils.lockOrientationForSmallScreens
-import com.infomaniak.lib.core.utils.context
-import com.infomaniak.lib.core.utils.hideProgress
-import com.infomaniak.lib.core.utils.initProgress
-import com.infomaniak.lib.core.utils.showProgress
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.lib.login.InfomaniakLogin.ErrorStatus
@@ -276,10 +273,8 @@ class LoginActivity : AppCompatActivity() {
         (getChildAt(0) as? RecyclerView)?.overScrollMode = View.OVER_SCROLL_NEVER
     }
 
-    private fun launchNoMailboxActivity() = with(binding) {
-        startActivity(Intent(this@LoginActivity, NoMailboxActivity::class.java))
-        connectButton.hideProgress(R.string.buttonLogin)
-        signInButton.isEnabled = true
+    private fun launchNoMailboxActivity() {
+        startActivity(Intent(this@LoginActivity, NoMailboxActivity::class.java).clearStack())
     }
 
     companion object {
