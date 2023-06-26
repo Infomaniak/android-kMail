@@ -252,8 +252,8 @@ class MainViewModel @Inject constructor(
             context.showToast(title, Toast.LENGTH_LONG)
         }
 
-        // TODO: Instead of this Toast & Exception, display a popup asking for correct password (we are currently waiting for the UX).
         if (!mailbox.isPasswordValid) {
+            // TODO: Instead of this Toast & Exception, display a popup asking for correct password (we are currently waiting for the UX).
             displayToast(R.string.frelatedMailbox)
             return MailboxErrorCode.INVALID_PASSWORD_MAILBOX
         }
