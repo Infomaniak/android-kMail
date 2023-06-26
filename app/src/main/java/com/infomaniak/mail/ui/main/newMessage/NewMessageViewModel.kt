@@ -106,7 +106,7 @@ class NewMessageViewModel @Inject constructor(
     }
 
     fun initDraftAndViewModel(
-        draftExists: Boolean,
+        arrivedFromExistingDraft: Boolean,
         draftLocalUuid: String?,
         draftResource: String?,
         messageUid: String?,
@@ -120,15 +120,18 @@ class NewMessageViewModel @Inject constructor(
         val isSuccess = RealmDatabase.mailboxContent().writeBlocking {
 
             runCatching {
-                draft = if (draftExists) {
+                draft = if (arrivedFromExistingDraft || activityCreationStatus == CreationStatus.RECREATED) {
                     val uuid = draftLocalUuid ?: draft.localUuid
-                    getLatestDraft(uuid, realm = this)
-                        ?: fetchDraft(draftResource!!, messageUid!!)
-                        ?: run { return@writeBlocking false }
+                    getLatestDraft(uuid, realm = this) ?: run {
+                        if (draftResource == null || messageUid == null) {
+                            createDraft(draftMode, previousMessageUid, recipient, mailbox, context)
+                        } else {
+                            fetchDraft(draftResource, messageUid)
+                        } ?: return@writeBlocking false
+                    }
                 } else {
                     isNewMessage = true
-                    createDraft(draftMode, previousMessageUid, recipient, mailbox, context)
-                        ?: run { return@writeBlocking false }
+                    createDraft(draftMode, previousMessageUid, recipient, mailbox, context) ?: return@writeBlocking false
                 }
 
                 if (draft.identityId.isNullOrBlank()) draft.addMissingSignatureData(mailbox, realm = this, context = context)
