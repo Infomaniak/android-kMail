@@ -21,19 +21,19 @@ import android.content.Context
 import com.infomaniak.lib.core.utils.contains
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.fetchIncompleteMessages
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.di.MailboxContentRealm
 import com.infomaniak.mail.ui.main.thread.MessageWebViewClient.Companion.CID_SCHEME
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.MessageBodyUtils
 import com.infomaniak.mail.utils.toDate
 import io.realm.kotlin.MutableRealm
+import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
@@ -45,57 +45,25 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.TextNode
+import javax.inject.Inject
 
-object DraftController {
-
-    private inline val defaultRealm get() = RealmDatabase.mailboxContent()
-
-    private const val PREFIX_REPLY = "Re: "
-    private const val PREFIX_FORWARD = "Fw: "
-    private const val REGEX_REPLY = "(re|ref|aw|rif|r):"
-    private const val REGEX_FORWARD = "(fw|fwd|rv|wg|tr|i):"
-
-    private const val CID_PROTOCOL = "$CID_SCHEME:"
-    private const val SRC_ATTRIBUTE = "src"
-    private const val CID_IMAGE_CSS_QUERY = "img[$SRC_ATTRIBUTE^='$CID_PROTOCOL']"
-
-    //region Queries
-    private fun getDraftsQuery(query: String? = null, realm: TypedRealm): RealmQuery<Draft> = with(realm) {
-        return@with query?.let(::query) ?: query()
-    }
-
-    private fun getOrphanDraftsQuery(realm: TypedRealm): RealmQuery<Draft> {
-        return realm.query("${Draft::remoteUuid.name} == nil AND ${Draft.actionPropertyName} == nil")
-    }
-
-    private fun getDraftQuery(key: String, value: String, realm: TypedRealm): RealmSingleQuery<Draft> {
-        return realm.query<Draft>("$key == '$value'").first()
-    }
-
-    private fun getDraftsWithActionsQuery(realm: TypedRealm): RealmQuery<Draft> {
-        return getDraftsQuery("${Draft.actionPropertyName} != nil", realm)
-    }
-    //endregion
+class DraftController @Inject constructor(@MailboxContentRealm private val mailboxContentRealm: Realm) {
 
     //region Get data
-    fun getOrphanDrafts(realm: TypedRealm): RealmResults<Draft> {
-        return getOrphanDraftsQuery(realm).find()
-    }
-
     fun getDraftsWithActions(realm: TypedRealm): RealmResults<Draft> {
         return getDraftsWithActionsQuery(realm).find()
     }
 
-    fun getDraftsWithActionsCount(realm: TypedRealm = defaultRealm): Long {
+    fun getDraftsWithActionsCount(realm: TypedRealm = mailboxContentRealm): Long {
         return getDraftsWithActionsQuery(realm).count().find()
     }
 
-    fun getDraft(localUuid: String, realm: TypedRealm = defaultRealm): Draft? {
+    fun getDraft(localUuid: String, realm: TypedRealm = mailboxContentRealm): Draft? {
         return getDraftQuery(Draft::localUuid.name, localUuid, realm).find()
     }
 
-    fun getDraftByMessageUid(messageUid: String, realm: TypedRealm = defaultRealm): Draft? {
-        return getDraftQuery(Draft::messageUid.name, messageUid, realm).find()
+    fun getDraftByMessageUid(messageUid: String): Draft? {
+        return getDraftByMessageUid(messageUid, mailboxContentRealm)
     }
     //endregion
 
@@ -106,50 +74,50 @@ object DraftController {
 
     fun updateDraft(localUuid: String, realm: MutableRealm? = null, onUpdate: (draft: Draft) -> Unit) {
         val block: (MutableRealm) -> Unit = { getDraft(localUuid, realm = it)?.let(onUpdate) }
-        realm?.let(block) ?: defaultRealm.writeBlocking(block)
+        realm?.let(block) ?: mailboxContentRealm.writeBlocking(block)
     }
     //endregion
 
     //region Open Draft
-    fun Draft.setPreviousMessage(draftMode: DraftMode, message: Message, context: Context, realm: MutableRealm): Boolean {
+    fun setPreviousMessage(draft: Draft, draftMode: DraftMode, message: Message, context: Context, realm: MutableRealm): Boolean {
 
         var isSuccess = true
 
         val previousMessage = if (message.isFullyDownloaded) {
             message
         } else {
-            isSuccess = realm.fetchIncompleteMessages(listOf(message)).isEmpty()
+            isSuccess = ThreadController.fetchIncompleteMessages(listOf(message), realm).isEmpty()
             MessageController.getMessage(message.uid, realm)!!
         }
 
-        inReplyTo = previousMessage.messageId
+        draft.inReplyTo = previousMessage.messageId
 
         val previousReferences = if (previousMessage.references == null) "" else "${previousMessage.references} "
-        references = "${previousReferences}${previousMessage.messageId}"
+        draft.references = "${previousReferences}${previousMessage.messageId}"
 
-        subject = formatSubject(draftMode, previousMessage.subject ?: "")
+        draft.subject = formatSubject(draftMode, previousMessage.subject ?: "")
 
         when (draftMode) {
             DraftMode.REPLY, DraftMode.REPLY_ALL -> {
-                inReplyToUid = previousMessage.uid
+                draft.inReplyToUid = previousMessage.uid
 
                 val (toList, ccList) = previousMessage.getRecipientsForReplyTo(draftMode == DraftMode.REPLY_ALL)
-                to = toList.toRealmList()
-                cc = ccList.toRealmList()
+                draft.to = toList.toRealmList()
+                draft.cc = ccList.toRealmList()
 
-                body += context.replyQuote(previousMessage)
+                draft.body += context.replyQuote(previousMessage)
             }
             DraftMode.FORWARD -> {
-                forwardedUid = previousMessage.uid
+                draft.forwardedUid = previousMessage.uid
 
                 val mailboxUuid = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!.uuid
                 ApiRepository.attachmentsToForward(mailboxUuid, previousMessage).data?.attachments?.forEach { attachment ->
-                    attachments += attachment.apply {
+                    draft.attachments += attachment.apply {
                         resource = previousMessage.attachments.find { it.name == name }?.resource
                     }
                 }
 
-                body += context.forwardQuote(previousMessage, attachments)
+                draft.body += context.forwardQuote(previousMessage, draft.attachments)
             }
             DraftMode.NEW_MAIL -> Unit
         }
@@ -261,4 +229,41 @@ object DraftController {
         return prefix + subject
     }
     //endregion
+
+    companion object {
+        private const val PREFIX_REPLY = "Re: "
+        private const val PREFIX_FORWARD = "Fw: "
+        private const val REGEX_REPLY = "(re|ref|aw|rif|r):"
+        private const val REGEX_FORWARD = "(fw|fwd|rv|wg|tr|i):"
+
+        private const val CID_PROTOCOL = "$CID_SCHEME:"
+        private const val SRC_ATTRIBUTE = "src"
+        private const val CID_IMAGE_CSS_QUERY = "img[$SRC_ATTRIBUTE^='$CID_PROTOCOL']"
+
+        //region Queries
+        private fun getDraftsQuery(query: String? = null, realm: TypedRealm): RealmQuery<Draft> = with(realm) {
+            return@with query?.let(::query) ?: query()
+        }
+
+        private fun getOrphanDraftsQuery(realm: TypedRealm): RealmQuery<Draft> {
+            return realm.query("${Draft::remoteUuid.name} == nil AND ${Draft.actionPropertyName} == nil")
+        }
+
+        private fun getDraftQuery(key: String, value: String, realm: TypedRealm): RealmSingleQuery<Draft> {
+            return realm.query<Draft>("$key == '$value'").first()
+        }
+
+        private fun getDraftsWithActionsQuery(realm: TypedRealm): RealmQuery<Draft> {
+            return getDraftsQuery("${Draft.actionPropertyName} != nil", realm)
+        }
+        //endregion
+
+        fun getOrphanDrafts(realm: TypedRealm): RealmResults<Draft> {
+            return getOrphanDraftsQuery(realm).find()
+        }
+
+        fun getDraftByMessageUid(messageUid: String, realm: TypedRealm): Draft? {
+            return getDraftQuery(Draft::messageUid.name, messageUid, realm).find()
+        }
+    }
 }

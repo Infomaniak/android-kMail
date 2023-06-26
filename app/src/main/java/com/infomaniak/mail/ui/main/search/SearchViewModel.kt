@@ -47,6 +47,10 @@ import javax.inject.Inject
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     application: Application,
+    private val globalCoroutineScope: CoroutineScope,
+    private val searchUtils: SearchUtils,
+    private val messageController: MessageController,
+    private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
@@ -144,7 +148,7 @@ class SearchViewModel @Inject constructor(
     }
 
     private fun ThreadFilter.select() {
-        _selectedFilters.value = SearchUtils.selectFilter(filter = this, selectedFilters)
+        _selectedFilters.value = searchUtils.selectFilter(filter = this, selectedFilters)
     }
 
     private fun ThreadFilter.unselect() {
@@ -161,8 +165,8 @@ class SearchViewModel @Inject constructor(
     }
 
     override fun onCleared() {
-        CoroutineScope(ioDispatcher).launch {
-            SearchUtils.deleteRealmSearchData()
+        globalCoroutineScope.launch(ioDispatcher) {
+            searchUtils.deleteRealmSearchData()
             Log.i(TAG, "SearchViewModel>onCleared: called")
         }
         super.onCleared()
@@ -187,7 +191,7 @@ class SearchViewModel @Inject constructor(
 
         val newFilters = if (folder == null) filters else (filters + ThreadFilter.FOLDER)
 
-        if (isFirstPage && isLastPage) SearchUtils.deleteRealmSearchData()
+        if (isFirstPage && isLastPage) searchUtils.deleteRealmSearchData()
 
         return if (newFilters.isEmpty() && query.isNullOrBlank()) {
             visibilityMode.postValue(VisibilityMode.RECENT_SEARCHES)
@@ -206,7 +210,7 @@ class SearchViewModel @Inject constructor(
 
         suspend fun ApiResponse<ThreadResult>.initSearchFolderThreads() {
             runCatching {
-                data?.threads?.let { ThreadController.initAndGetSearchFolderThreads(it) }
+                data?.threads?.let { threadController.initAndGetSearchFolderThreads(it) }
             }.getOrElse { exception ->
                 exception.printStackTrace()
                 Sentry.captureException(exception)
@@ -218,7 +222,7 @@ class SearchViewModel @Inject constructor(
         val currentMailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
         val folderId = folder?.id ?: dummyFolderId
         val resource = if (shouldGetNextPage) resourceNext else null
-        val searchFilters = SearchUtils.searchFilters(query, newFilters, resource)
+        val searchFilters = searchUtils.searchFilters(query, newFilters, resource)
         val apiResponse = ApiRepository.searchThreads(currentMailbox.uuid, folderId, searchFilters, resource)
 
         if (apiResponse.isSuccess()) with(apiResponse) {
@@ -226,7 +230,7 @@ class SearchViewModel @Inject constructor(
             resourceNext = data?.resourceNext
             isFirstPage = data?.resourcePrevious == null
         } else if (isLastPage) {
-            ThreadController.saveThreads(searchMessages = MessageController.searchMessages(query, newFilters, folderId))
+            threadController.saveThreads(searchMessages = messageController.searchMessages(query, newFilters, folderId))
         }
     }
 
@@ -235,7 +239,7 @@ class SearchViewModel @Inject constructor(
         newFilters: Set<ThreadFilter>,
         query: String?,
     ) {
-        emitAll(ThreadController.getSearchThreadsAsync().mapLatest {
+        emitAll(threadController.getSearchThreadsAsync().mapLatest {
             if (saveInHistory) query?.let(history::postValue)
 
             it.list.also { threads ->

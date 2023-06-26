@@ -34,6 +34,7 @@ import javax.inject.Inject
 @HiltViewModel
 class DownloadAttachmentViewModel @Inject constructor(
     application: Application,
+    private val attachmentController: AttachmentController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
@@ -47,7 +48,7 @@ class DownloadAttachmentViewModel @Inject constructor(
     private var attachment: Attachment? = null
 
     fun downloadAttachment(resource: String) = liveData(ioCoroutineContext) {
-        val attachment = AttachmentController.getAttachment(resource).also { attachment = it }
+        val attachment = attachmentController.getAttachment(resource).also { attachment = it }
         val attachmentFile = attachment.getCacheFile(context)
 
         if (attachment.hasUsableCache(context, attachmentFile)) {

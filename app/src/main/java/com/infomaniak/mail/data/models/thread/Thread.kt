@@ -24,7 +24,6 @@ import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
-import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -35,7 +34,6 @@ import com.infomaniak.mail.utils.toDate
 import com.infomaniak.mail.utils.toRealmInstant
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
-import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.*
 import io.realm.kotlin.internal.getRealm
 import io.realm.kotlin.types.RealmInstant
@@ -110,10 +108,7 @@ class Thread : RealmObject {
         messages.add(message)
     }
 
-    fun addMessageWithConditions(newMessage: Message, realm: TypedRealm) {
-
-        val folderRole = FolderController.getFolder(folderId, realm)?.role
-        val isInTrash = newMessage.isInTrash(realm)
+    fun addMessageWithConditions(newMessage: Message, folderRole: FolderRole?, isInTrash: Boolean) {
 
         val shouldAddMessage = when (folderRole) {
             FolderRole.DRAFT -> newMessage.isDraft // In Draft folder: only add draft Messages.

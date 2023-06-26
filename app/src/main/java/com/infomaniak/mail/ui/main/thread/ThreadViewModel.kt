@@ -49,6 +49,10 @@ import kotlin.collections.set
 @HiltViewModel
 class ThreadViewModel @Inject constructor(
     application: Application,
+    private val sharedViewModelUtils: SharedViewModelUtils,
+    private val messageController: MessageController,
+    private val refreshController: RefreshController,
+    private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
@@ -62,16 +66,16 @@ class ThreadViewModel @Inject constructor(
     private val mailbox by lazy { MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
 
     fun threadLive(threadUid: String) = liveData(ioCoroutineContext) {
-        emitSource(ThreadController.getThreadAsync(threadUid).map { it.obj }.asLiveData())
+        emitSource(threadController.getThreadAsync(threadUid).map { it.obj }.asLiveData())
     }
 
     fun messagesLive(threadUid: String) = liveData(ioCoroutineContext) {
-        MessageController.getSortedMessages(threadUid)?.asFlow()?.asLiveData()?.let { emitSource(it) }
+        messageController.getSortedMessages(threadUid)?.asFlow()?.asLiveData()?.let { emitSource(it) }
     }
 
     fun openThread(threadUid: String) = liveData(ioCoroutineContext) {
 
-        val thread = ThreadController.getThread(threadUid) ?: run {
+        val thread = threadController.getThread(threadUid) ?: run {
             emit(null)
             return@liveData
         }
@@ -87,26 +91,26 @@ class ThreadViewModel @Inject constructor(
 
         emit(Triple(thread, isExpandedMap, isThemeTheSameMap))
 
-        if (thread.unseenMessagesCount > 0) SharedViewModelUtils.markAsSeen(mailbox, listOf(thread))
+        if (thread.unseenMessagesCount > 0) sharedViewModelUtils.markAsSeen(mailbox, listOf(thread))
     }
 
     fun fetchIncompleteMessages(messages: List<Message>) {
         fetchMessagesJob?.cancel()
         fetchMessagesJob = viewModelScope.launch(ioCoroutineContext) {
-            ThreadController.fetchIncompleteMessages(messages, mailbox)
+            threadController.fetchIncompleteMessages(messages, mailbox)
         }
     }
 
     fun deleteDraft(message: Message, threadUid: String, mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
-        val thread = ThreadController.getThread(threadUid) ?: return@launch
-        val messages = MessageController.getMessageAndDuplicates(thread, message)
+        val thread = threadController.getThread(threadUid) ?: return@launch
+        val messages = messageController.getMessageAndDuplicates(thread, message)
         val isSuccess = ApiRepository.deleteMessages(mailbox.uuid, messages.getUids()).isSuccess()
-        if (isSuccess) RefreshController.refreshThreads(RefreshMode.REFRESH_FOLDER_WITH_ROLE, mailbox, message.folder)
+        if (isSuccess) refreshController.refreshThreads(RefreshMode.REFRESH_FOLDER_WITH_ROLE, mailbox, message.folder)
     }
 
     fun clickOnQuickActionBar(threadUid: String, menuId: Int) = viewModelScope.launch(ioCoroutineContext) {
-        val thread = ThreadController.getThread(threadUid) ?: return@launch
-        val message = MessageController.getLastMessageToExecuteAction(thread)
+        val thread = threadController.getThread(threadUid) ?: return@launch
+        val message = messageController.getLastMessageToExecuteAction(thread)
         quickActionBarClicks.postValue(message to menuId)
     }
 }

@@ -47,7 +47,10 @@ import javax.inject.Inject
 
 class FetchMessagesManager @Inject constructor(
     private val appContext: Context,
+    private val messageController: MessageController,
     private val notificationManagerCompat: NotificationManagerCompat,
+    private val refreshController: RefreshController,
+    private val threadController: ThreadController,
 ) {
 
     private val localSettings by lazy { LocalSettings.getInstance(appContext) }
@@ -63,7 +66,7 @@ class FetchMessagesManager @Inject constructor(
         val okHttpClient = AccountUtils.getHttpClient(userId)
 
         // Update Local with Remote
-        val newMessagesThreads = RefreshController.refreshThreads(
+        val newMessagesThreads = refreshController.refreshThreads(
             refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
             mailbox = mailbox,
             folder = folder,
@@ -126,9 +129,9 @@ class FetchMessagesManager @Inject constructor(
             }
         }
 
-        ThreadController.fetchIncompleteMessages(messages, mailbox, okHttpClient, realm)
+        threadController.fetchIncompleteMessages(messages, mailbox, okHttpClient, realm)
 
-        val message = MessageController.getThreadLastMessageInFolder(uid, realm)
+        val message = messageController.getThreadLastMessageInFolder(uid, realm)
         if (message == null) {
             val thread = ThreadController.getThread(uid, realm)
             Sentry.withScope { scope ->

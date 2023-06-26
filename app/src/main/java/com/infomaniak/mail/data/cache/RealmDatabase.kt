@@ -39,8 +39,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import javax.inject.Singleton
 
 @Suppress("ObjectPropertyName")
+@Singleton
 object RealmDatabase {
 
     val TAG: String = RealmDatabase::class.java.simpleName
@@ -91,24 +93,14 @@ object RealmDatabase {
     //region Close Realms
     fun close() {
         closeMailboxContent()
-        closeMailboxInfo()
         closeUserInfo()
-        closeAppSettings()
-    }
-
-    private fun closeAppSettings() {
-        _appSettings?.close()
-        _appSettings = null
+        _appSettings = null // TODO: To be removed when the injection is done
+        _mailboxInfo = null // TODO: To be removed when the injection is done
     }
 
     fun closeUserInfo() {
         _userInfo?.close()
         _userInfo = null
-    }
-
-    private fun closeMailboxInfo() {
-        _mailboxInfo?.close()
-        _mailboxInfo = null
     }
 
     fun closeMailboxContent() {

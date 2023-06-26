@@ -22,18 +22,15 @@ package com.infomaniak.mail.data.models.message
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
-import com.infomaniak.mail.data.cache.mailboxContent.FolderController
-import com.infomaniak.mail.data.cache.mailboxContent.FolderController.SEARCH_FOLDER_ID
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController.Companion.SEARCH_FOLDER_ID
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.getMessages.ActivitiesResult.MessageFlags
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.toRealmInstant
 import com.infomaniak.mail.utils.toShortUid
-import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.*
 import io.realm.kotlin.types.*
 import io.realm.kotlin.types.annotations.Ignore
@@ -242,7 +239,7 @@ class Message : RealmObject {
         isScheduled = flags.isScheduled
     }
 
-    fun isInTrash(realm: TypedRealm) = FolderController.getFolder(FolderRole.TRASH, realm)?.id == folderId
+    fun isInTrash(trashFolderId: String?) = trashFolderId == folderId
 
     fun shouldBeExpanded(index: Int, lastIndex: Int) = !isDraft && (!isSeen || index == lastIndex)
 

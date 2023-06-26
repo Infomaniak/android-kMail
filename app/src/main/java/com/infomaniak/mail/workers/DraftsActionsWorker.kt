@@ -62,13 +62,13 @@ import java.util.Date
 import java.util.Locale
 import java.util.UUID
 import javax.inject.Inject
-import javax.inject.Singleton
 import kotlin.properties.Delegates
 
 @HiltWorker
 class DraftsActionsWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted params: WorkerParameters,
+    private val draftController: DraftController,
     private val mainApplication: MainApplication,
     private val notificationManagerCompat: NotificationManagerCompat,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -90,7 +90,7 @@ class DraftsActionsWorker @AssistedInject constructor(
     override suspend fun launchWork(): Result = withContext(ioDispatcher) {
         Log.d(TAG, "Work started")
 
-        if (DraftController.getDraftsWithActionsCount(mailboxContentRealm) == 0L) return@withContext Result.success()
+        if (draftController.getDraftsWithActionsCount(mailboxContentRealm) == 0L) return@withContext Result.success()
         if (AccountUtils.currentMailboxId == AppSettings.DEFAULT_ID) return@withContext Result.failure()
 
         userId = inputData.getIntOrNull(USER_ID_KEY) ?: return@withContext Result.failure()
@@ -121,7 +121,7 @@ class DraftsActionsWorker @AssistedInject constructor(
 
     private suspend fun notifyNewDraftDetected() {
         draftLocalUuid?.let { localUuid ->
-            val draft = DraftController.getDraft(localUuid) ?: return@let
+            val draft = draftController.getDraft(localUuid) ?: return@let
             if (draft.action == DraftAction.SEND && isSnackBarFeedbackNeeded) {
                 setProgress(workDataOf(PROGRESS_DRAFT_ACTION_KEY to DraftAction.SEND.name))
             }
@@ -139,7 +139,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         var trackedDraftAction: DraftAction? = null
         var isTrackedDraftSuccess: Boolean? = null
 
-        val drafts = DraftController.getDraftsWithActions(mailboxContentRealm)
+        val drafts = draftController.getDraftsWithActions(mailboxContentRealm)
         Log.d(TAG, "handleDraftsActions: ${drafts.count()} drafts to handle")
         if (drafts.isEmpty()) return Result.failure()
 
@@ -309,7 +309,7 @@ class DraftsActionsWorker @AssistedInject constructor(
 
     private fun Attachment.updateLocalAttachment(localDraftUuid: String, remoteAttachment: Attachment) {
         mailboxContentRealm.writeBlocking {
-            DraftController.updateDraft(localDraftUuid, realm = this) { draft ->
+            draftController.updateDraft(localDraftUuid, realm = this) { draft ->
                 delete(draft.attachments.first { localAttachment -> localAttachment.uploadLocalUri == uploadLocalUri })
                 draft.attachments.add(remoteAttachment)
             }
@@ -400,13 +400,15 @@ class DraftsActionsWorker @AssistedInject constructor(
         return { realm -> realm.findLatest(draft)?.let(realm::delete) }
     }
 
-    @Singleton
-    class Scheduler @Inject constructor(private val workManager: WorkManager) {
+    class Scheduler @Inject constructor(
+        private val draftController: DraftController,
+        private val workManager: WorkManager,
+    ) {
 
         fun scheduleWork(draftLocalUuid: String? = null) {
 
             if (AccountUtils.currentMailboxId == AppSettings.DEFAULT_ID) return
-            if (DraftController.getDraftsWithActionsCount() == 0L) return
+            if (draftController.getDraftsWithActionsCount() == 0L) return
 
             Log.d(TAG, "Work scheduled")
 

@@ -31,9 +31,7 @@ import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.MatomoMail.trackSendingDraftEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
-import com.infomaniak.mail.data.cache.mailboxContent.DraftController.setPreviousMessage
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
@@ -44,6 +42,7 @@ import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.di.MailboxContentRealm
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.main.SnackBarManager
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
@@ -53,6 +52,7 @@ import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.MutableRealm
+import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.realmListOf
 import kotlinx.coroutines.*
@@ -63,7 +63,10 @@ import javax.inject.Inject
 @HiltViewModel
 class NewMessageViewModel @Inject constructor(
     application: Application,
+    private val draftController: DraftController,
     private val globalCoroutineScope: CoroutineScope,
+    @MailboxContentRealm private val mailboxContentRealm: Realm,
+    private val mergedContactController: MergedContactController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
@@ -95,7 +98,7 @@ class NewMessageViewModel @Inject constructor(
     private var isNewMessage = false
 
     val mergedContacts = liveData(ioCoroutineContext) {
-        val list = MergedContactController.getMergedContacts(sorted = true).copyFromRealm()
+        val list = mergedContactController.getMergedContacts(sorted = true).copyFromRealm()
         emit(list to arrangeMergedContacts(list))
     }
 
@@ -117,7 +120,7 @@ class NewMessageViewModel @Inject constructor(
 
         val mailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
 
-        val isSuccess = RealmDatabase.mailboxContent().writeBlocking {
+        val isSuccess = mailboxContentRealm.writeBlocking {
 
             runCatching {
                 val isRecreated = activityCreationStatus == CreationStatus.RECREATED
@@ -166,7 +169,7 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private fun getLatestDraft(draftLocalUuid: String?, realm: MutableRealm): Draft? {
-        return draftLocalUuid?.let { DraftController.getDraft(it, realm)?.copyFromRealm() }
+        return draftLocalUuid?.let { draftController.getDraft(it, realm)?.copyFromRealm() }
     }
 
     private fun fetchDraft(draftResource: String, messageUid: String): Draft? {
@@ -191,7 +194,13 @@ class NewMessageViewModel @Inject constructor(
                     previousMessageUid
                         ?.let { uid -> MessageController.getMessage(uid, realm = this@createDraft) }
                         ?.let { message ->
-                            val isSuccess = setPreviousMessage(draftMode, message, context, realm = this@createDraft)
+                            val isSuccess = draftController.setPreviousMessage(
+                                draft = draft,
+                                draftMode = draftMode,
+                                message = message,
+                                context = context,
+                                realm = this@createDraft,
+                            )
                             if (!isSuccess) return null
                         }
                 }
@@ -247,7 +256,7 @@ class NewMessageViewModel @Inject constructor(
 
     fun updateDraftInLocalIfRemoteHasChanged() = viewModelScope.launch(ioCoroutineContext) {
         if (draft.remoteUuid == null) {
-            DraftController.getDraft(draft.localUuid)?.let { localDraft ->
+            draftController.getDraft(draft.localUuid)?.let { localDraft ->
                 draft.remoteUuid = localDraft.remoteUuid
                 draft.messageUid = localDraft.messageUid
             }
@@ -347,13 +356,13 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private fun removeDraftFromRealm() {
-        RealmDatabase.mailboxContent().writeBlocking {
-            DraftController.getDraft(draft.localUuid, realm = this)?.let(::delete)
+        mailboxContentRealm.writeBlocking {
+            draftController.getDraft(draft.localUuid, realm = this)?.let(::delete)
         }
     }
 
     fun synchronizeViewModelDraftFromRealm() = viewModelScope.launch(ioCoroutineContext) {
-        DraftController.getDraft(draft.localUuid)?.let { draft = it.copyFromRealm() }
+        draftController.getDraft(draft.localUuid)?.let { draft = it.copyFromRealm() }
     }
 
     private fun saveDraftToLocal(action: DraftAction) {
@@ -361,8 +370,8 @@ class NewMessageViewModel @Inject constructor(
         draft.body = draft.uiBody.textToHtml() + (draft.uiSignature ?: "") + (draft.uiQuote ?: "")
         draft.action = action
 
-        RealmDatabase.mailboxContent().writeBlocking {
-            DraftController.upsertDraft(draft, realm = this)
+        mailboxContentRealm.writeBlocking {
+            draftController.upsertDraft(draft, realm = this)
             draft.messageUid?.let { MessageController.getMessage(it, realm = this)?.draftLocalUuid = draft.localUuid }
         }
     }
