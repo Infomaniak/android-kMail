@@ -120,13 +120,19 @@ class NewMessageViewModel @Inject constructor(
         val isSuccess = RealmDatabase.mailboxContent().writeBlocking {
 
             runCatching {
-                draft = if (arrivedFromExistingDraft || activityCreationStatus == CreationStatus.RECREATED) {
+                val isRecreated = activityCreationStatus == CreationStatus.RECREATED
+                val draftExists = arrivedFromExistingDraft || isRecreated
+
+                draft = if (draftExists) {
                     val uuid = draftLocalUuid ?: draft.localUuid
                     getLatestDraft(uuid, realm = this) ?: run {
-                        if (draftResource == null || messageUid == null) {
+                        if (isRecreated && (draftResource == null || messageUid == null)) {
+                            // We arrive here if : 1. It's a new draft, 2. There's no data, 3. We recreated the activity
+                            // In this case, we do not have data in realm, nor from the API,
+                            // hence draftResource and MessageUid null, so we need to create a new draft
                             createDraft(draftMode, previousMessageUid, recipient, mailbox, context)
                         } else {
-                            fetchDraft(draftResource, messageUid)
+                            fetchDraft(draftResource!!, messageUid!!)
                         } ?: return@writeBlocking false
                     }
                 } else {
