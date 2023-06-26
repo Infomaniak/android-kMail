@@ -23,23 +23,18 @@ import android.util.Log
 import androidx.work.WorkManager
 import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.auth.CredentialManager
-import com.infomaniak.lib.core.auth.TokenAuthenticator
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.networking.HttpClient
-import com.infomaniak.lib.core.networking.HttpClient.okHttpClient
 import com.infomaniak.lib.core.room.UserDatabase
 import com.infomaniak.mail.GplayUtils
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.appSettings.AppSettingsController
-import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.AppSettings
 import io.sentry.Sentry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.withLock
 import io.sentry.protocol.User as SentryUser
 
 object AccountUtils : CredentialManager() {
@@ -94,38 +89,6 @@ object AccountUtils : CredentialManager() {
     suspend fun addUser(user: User) {
         currentUser = user
         userDatabase.userDao().insert(user)
-    }
-
-    fun updateUserAndMailboxes(context: Context) = CoroutineScope(Dispatchers.IO).launch {
-        val user = ApiRepository.getUserProfile(okHttpClient).data ?: return@launch
-        updateMailboxes(context, user)
-    }
-
-    private suspend fun updateMailboxes(context: Context, user: User) {
-
-        val apiResponse = ApiRepository.getMailboxes(okHttpClient)
-        val mailboxes = apiResponse.data
-
-        when {
-            !apiResponse.isSuccess() -> return
-            mailboxes.isNullOrEmpty() -> removeUser(context, user)
-            else -> {
-                requestUser(user)
-                MailboxController.updateMailboxes(context, mailboxes)
-            }
-        }
-    }
-
-    private suspend fun requestUser(remoteUser: User) {
-        TokenAuthenticator.mutex.withLock {
-            if (remoteUser.id == currentUserId) {
-                remoteUser.organizations = arrayListOf()
-                requestCurrentUser()?.let { localUser ->
-                    setUserToken(remoteUser, localUser.apiToken)
-                    currentUser = remoteUser
-                }
-            }
-        }
     }
 
     suspend fun removeUser(context: Context, user: User) {

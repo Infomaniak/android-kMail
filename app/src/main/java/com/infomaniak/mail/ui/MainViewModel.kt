@@ -94,6 +94,7 @@ class MainViewModel @Inject constructor(
     // First boolean is the download status, second boolean is if the LoadMore button should be displayed
     val isDownloadingChanges: MutableLiveData<Pair<Boolean, Boolean?>> = MutableLiveData(false to null)
     val isNewFolderCreated = SingleLiveEvent<Boolean>()
+    val shouldStartNoMailboxActivity = SingleLiveEvent<Unit>()
 
     // Explanation of this Map : Map<Email, Map<Name, MergedContact>>
     val mergedContacts = MutableLiveData<Map<String, Map<String, MergedContact>>?>()
@@ -182,30 +183,33 @@ class MainViewModel @Inject constructor(
     }
 
     fun loadCurrentMailboxFromLocal() = liveData(ioCoroutineContext) {
+        emit(openMailbox())
+    }
+
+    private fun openMailbox(): Mailbox? {
         Log.d(TAG, "Load current mailbox from local")
 
-        MailboxController.getMailboxWithFallback(
+        val mailbox = MailboxController.getMailboxWithFallback(
             userId = AccountUtils.currentUserId,
             mailboxId = AccountUtils.currentMailboxId,
-        )?.let { mailbox ->
+        ) ?: return null
 
-            selectMailbox(mailbox)?.let { errorCode ->
-                when (errorCode) {
-                    MailboxErrorCode.INVALID_PASSWORD_MAILBOX,
-                    MailboxErrorCode.LOCKED_MAILBOX -> switchToValidMailbox()
-                    else -> Unit
-                }
-                return@liveData
+        selectMailbox(mailbox)?.let { errorCode ->
+            when (errorCode) {
+                MailboxErrorCode.INVALID_PASSWORD_MAILBOX,
+                MailboxErrorCode.LOCKED_MAILBOX -> switchToValidMailbox()
+                else -> Unit
             }
+            return null
+        }
 
-            if (currentFolderId == null) {
-                folderController.getFolder(DEFAULT_SELECTED_FOLDER)?.let { folder ->
-                    selectFolder(folder.id)
-                }
+        if (currentFolderId == null) {
+            folderController.getFolder(DEFAULT_SELECTED_FOLDER)?.let { folder ->
+                selectFolder(folder.id)
             }
         }
 
-        emit(null)
+        return mailbox
     }
 
     private fun switchToValidMailbox() = viewModelScope.launch(ioCoroutineContext) {
@@ -230,12 +234,16 @@ class MainViewModel @Inject constructor(
             Log.d(TAG, "Refresh mailboxes from remote")
             with(ApiRepository.getMailboxes()) {
                 if (isSuccess()) {
+                    if (data?.isEmpty() == true) {
+                        shouldStartNoMailboxActivity.postValue(Unit)
+                        return@launch
+                    }
                     val isCurrentMailboxDeleted = MailboxController.updateMailboxes(context, data!!)
                     if (isCurrentMailboxDeleted) return@launch
                 }
             }
 
-            val mailbox = currentMailbox.value!!
+            val mailbox = currentMailbox.value ?: openMailbox() ?: return@launch
 
             updateQuotas(mailbox)
             updatePermissions(mailbox)

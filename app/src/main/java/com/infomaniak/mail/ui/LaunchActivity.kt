@@ -28,7 +28,6 @@ import com.infomaniak.mail.MainApplication.Companion.firstLaunchTime
 import com.infomaniak.mail.MatomoMail.trackUserId
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
@@ -72,11 +71,6 @@ class LaunchActivity : AppCompatActivity() {
                     loginUser()
                 } else {
                     trackUserId(AccountUtils.currentUserId)
-
-                    // When MailboxController is migrated
-                    if (MailboxController.getMailboxesCount(user.id) == 0L) {
-                        AccountUtils.updateUserAndMailboxes(this@LaunchActivity)
-                    }
                     if (localSettings.isAppLocked && isKeyguardSecure() && getMainApplication().lastAppClosingTime == firstLaunchTime) {
                         startAppLockActivity()
                     } else {
