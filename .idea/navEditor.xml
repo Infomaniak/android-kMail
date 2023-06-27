@@ -219,6 +219,18 @@
                       </LayoutPositions>
                     </value>
                   </entry>
+                  <entry key="lo">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="12" />
+                            <option name="y" value="12" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
                   <entry key="loginActivity">
                     <value>
                       <LayoutPositions>
@@ -274,13 +286,13 @@
                       </LayoutPositions>
                     </value>
                   </entry>
-                  <entry key="messageActionBottomSheetDialog">
+                  <entry key="messageActionsBottomSheetDialog">
                     <value>
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="1964" />
-                            <option name="y" value="3970" />
+                            <option name="x" value="12" />
+                            <option name="y" value="12" />
                           </Point>
                         </option>
                         <option name="myPositions">
@@ -653,6 +665,11 @@
                         <option name="myPositions">
                           <map>
                             <entry key="action_threadListFragment_to_accountFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                            <entry key="action_threadListFragment_to_messageActionsBottomSheetDialog">
                               <value>
                                 <LayoutPositions />
                               </value>

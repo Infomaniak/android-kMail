@@ -53,6 +53,9 @@
         <action
             android:id="@+id/action_threadListFragment_to_multiSelectBottomSheetDialog"
             app:destination="@id/multiSelectBottomSheetDialog" />
+        <action
+            android:id="@+id/action_threadListFragment_to_lockedMailboxBottomSheetDialog"
+            app:destination="@id/lockedMailboxBottomSheetDialog" />
     </fragment>
 
     <activity
@@ -279,6 +282,9 @@
         <action
             android:id="@+id/action_accountFragment_to_attachMailboxFragment"
             app:destination="@+id/attachMailboxFragment" />
+        <action
+            android:id="@+id/action_accountFragment_to_lockedMailboxBottomSheetDialog"
+            app:destination="@id/lockedMailboxBottomSheetDialog" />
     </fragment>
 
     <fragment
@@ -510,5 +516,15 @@
         android:name="com.infomaniak.mail.ui.main.menu.RestoreEmailsBottomSheetDialog"
         android:label="ResoreEmailsBottomSheetDialog"
         tools:layout="@layout/bottom_sheet_restore_emails" />
+
+    <dialog
+        android:id="@+id/lockedMailboxBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.bottomSheetDialogs.LockedMailboxBottomSheetDialog"
+        android:label="LockedMailboxBottomSheetDialog"
+        tools:layout="@layout/bottom_sheet_information">
+        <argument
+            android:name="lockedMailboxName"
+            app:argType="string" />
+    </dialog>
 
 </navigation>
