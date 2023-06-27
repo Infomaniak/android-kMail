@@ -455,6 +455,7 @@ class RefreshController @Inject constructor(@MailboxContentRealm private val mai
             message.apply {
                 initMessageIds()
                 isSpam = folder.role == FolderRole.SPAM
+                isTrashed = folder.role == FolderRole.TRASH
                 shortUid = uid.toShortUid()
             }
 
@@ -552,9 +553,7 @@ class RefreshController @Inject constructor(@MailboxContentRealm private val mai
 
     private fun Thread.addMessageWithConditions(message: Message, realm: TypedRealm) {
         val folderRole = FolderController.getFolder(folderId, realm)?.role
-        val trashFolderId = FolderController.getFolder(FolderRole.TRASH, realm)?.id
-        val isInTrash = message.isInTrash(trashFolderId)
-        addMessageWithConditions(message, folderRole, isInTrash)
+        addMessageWithConditions(message, folderRole)
     }
     //endregion
 

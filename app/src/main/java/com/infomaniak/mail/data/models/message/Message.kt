@@ -102,6 +102,8 @@ class Message : RealmObject {
     @Transient
     var isSpam: Boolean = false
     @Transient
+    var isTrashed: Boolean = false
+    @Transient
     var messageIds: RealmSet<String> = realmSetOf()
     @Transient
     var draftLocalUuid: String? = null
@@ -156,6 +158,7 @@ class Message : RealmObject {
         date: RealmInstant,
         isFullyDownloaded: Boolean,
         isSpam: Boolean,
+        isTrashed: Boolean,
         messageIds: RealmSet<String>,
         draftLocalUuid: String?,
         isFromSearch: Boolean,
@@ -163,6 +166,7 @@ class Message : RealmObject {
         this.date = date
         this.isFullyDownloaded = isFullyDownloaded
         this.isSpam = isSpam
+        this.isTrashed = isTrashed
         this.messageIds = messageIds
         draftLocalUuid?.let { this.draftLocalUuid = it }
         this.isFromSearch = isFromSearch
@@ -238,8 +242,6 @@ class Message : RealmObject {
         isForwarded = flags.isForwarded
         isScheduled = flags.isScheduled
     }
-
-    fun isInTrash(trashFolderId: String?) = trashFolderId == folderId
 
     fun shouldBeExpanded(index: Int, lastIndex: Int) = !isDraft && (!isSeen || index == lastIndex)
 
