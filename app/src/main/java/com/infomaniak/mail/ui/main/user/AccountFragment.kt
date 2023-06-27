@@ -33,7 +33,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentAccountBinding
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.ui.main.menu.MailboxListFragment
+import com.infomaniak.mail.ui.main.MailboxListFragment
 import com.infomaniak.mail.ui.main.menu.SwitchMailboxesAdapter
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.animatedNavigation

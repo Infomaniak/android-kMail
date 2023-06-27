@@ -33,6 +33,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
     protected val mainViewModel: MainViewModel by activityViewModels()
 
     private var onClickListener: OnActionClick = object : OnActionClick {
+
         //region Main actions
         override fun onReply() = Unit
         override fun onReplyAll() = Unit
@@ -114,21 +115,21 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
             setText(R.string.actionMoveToInbox)
         }
     }
-}
 
-interface OnActionClick {
-    fun onArchive()
-    fun onReadUnread()
-    fun onMove()
-    fun onPostpone()
-    fun onFavorite()
-    fun onSpam()
-    fun onReportJunk()
-    fun onPrint()
-    fun onReportDisplayProblem()
+    interface OnActionClick {
+        fun onArchive()
+        fun onReadUnread()
+        fun onMove()
+        fun onPostpone()
+        fun onFavorite()
+        fun onSpam()
+        fun onReportJunk()
+        fun onPrint()
+        fun onReportDisplayProblem()
 
-    fun onReply()
-    fun onReplyAll()
-    fun onForward()
-    fun onDelete()
+        fun onReply()
+        fun onReplyAll()
+        fun onForward()
+        fun onDelete()
+    }
 }

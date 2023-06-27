@@ -26,7 +26,6 @@ import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -43,7 +42,7 @@ import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
-import com.infomaniak.mail.ui.bottomSheetDialogs.LockedMailboxBottomSheetDialogArgs
+import com.infomaniak.mail.ui.main.MailboxListFragment
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.utils.*
 import dagger.hilt.android.AndroidEntryPoint
@@ -278,16 +277,3 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
     )
 }
 
-interface MailboxListFragment {
-
-    val mailboxesAdapter: SwitchMailboxesAdapter
-    val currentClassName: String
-
-    fun Fragment.onLockedMailboxClicked(mailboxEmail: String) {
-        safeNavigate(
-            resId = R.id.lockedMailboxBottomSheetDialog,
-            args = LockedMailboxBottomSheetDialogArgs(mailboxEmail).toBundle(),
-            currentClassName = currentClassName,
-        )
-    }
-}
