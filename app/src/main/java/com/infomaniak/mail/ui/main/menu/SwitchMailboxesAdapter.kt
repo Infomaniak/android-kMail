@@ -41,6 +41,7 @@ class SwitchMailboxesAdapter(
     private val lifecycleScope: LifecycleCoroutineScope,
     private var mailboxes: List<Mailbox> = emptyList(),
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO, // TODO: Inject with hilt
+    private val onLockedMailboxClicked: (String) -> Unit,
 ) : RecyclerView.Adapter<SwitchMailboxesViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SwitchMailboxesViewHolder {
@@ -78,7 +79,7 @@ class SwitchMailboxesAdapter(
                 context.showToast(R.string.frelatedMailbox, Toast.LENGTH_LONG)
             }
 
-            setOnLockedMailboxClickListener { context.showToast(R.string.errorMailboxLocked, Toast.LENGTH_LONG) }
+            setOnLockedMailboxClickListener { onLockedMailboxClicked(mailbox.email) }
         }
     }
 

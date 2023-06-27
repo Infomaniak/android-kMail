@@ -42,6 +42,7 @@ import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
+import com.infomaniak.mail.ui.bottomSheetDialogs.LockedMailboxBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.utils.*
 import dagger.hilt.android.AndroidEntryPoint
@@ -64,7 +65,11 @@ class MenuDrawerFragment : MenuFoldersFragment() {
 
     private var canNavigate = AtomicBoolean(true)
 
-    private val addressAdapter = SwitchMailboxesAdapter(isInMenuDrawer, lifecycleScope)
+    private val addressAdapter = SwitchMailboxesAdapter(
+        isInMenuDrawer = isInMenuDrawer,
+        lifecycleScope = lifecycleScope,
+        onLockedMailboxClicked = ::onLockedMailboxClicked,
+    )
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentMenuDrawerBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -273,4 +278,12 @@ class MenuDrawerFragment : MenuFoldersFragment() {
             mainViewModel.createNewFolder(folderName!!.toString())
         },
     )
+
+    private fun onLockedMailboxClicked(mailboxEmail: String) {
+        safeNavigate(
+            resId = R.id.lockedMailboxBottomSheetDialog,
+            args = LockedMailboxBottomSheetDialogArgs(mailboxEmail).toBundle(),
+            currentClassName = MenuDrawerFragment::class.java.name,
+        )
+    }
 }

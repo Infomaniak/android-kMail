@@ -51,7 +51,11 @@ class AccountFragment : Fragment() {
 
     private val logoutAlert by lazy { initLogoutAlert() }
 
-    private var mailboxAdapter = SwitchMailboxesAdapter(isInMenuDrawer = false, lifecycleScope)
+    private var mailboxAdapter = SwitchMailboxesAdapter(
+        isInMenuDrawer = false,
+        lifecycleScope = lifecycleScope,
+        onLockedMailboxClicked = ::onLockedMailboxClicked,
+    )
 
     @Inject
     @IoDispatcher
@@ -108,4 +112,8 @@ class AccountFragment : Fragment() {
         description = AccountUtils.currentUser?.let { getString(R.string.confirmLogoutDescription, it.email) } ?: "",
         onPositiveButtonClicked = ::removeCurrentUser,
     )
+
+    private fun onLockedMailboxClicked(mailboxEmail: String) {
+        safeNavigate(AccountFragmentDirections.actionAccountFragmentToLockedMailboxBottomSheetDialog(mailboxEmail))
+    }
 }
