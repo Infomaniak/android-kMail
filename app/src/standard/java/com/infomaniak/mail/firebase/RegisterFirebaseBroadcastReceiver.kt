@@ -27,9 +27,9 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.utils.IRegisterFirebaseBroadcastReceiver
+import com.infomaniak.mail.utils.RegisterFirebaseBroadcastReceiver
 
-class RegisterFirebaseBroadcastReceiver : DefaultLifecycleObserver, IRegisterFirebaseBroadcastReceiver {
+class RegisterFirebaseBroadcastReceiver : DefaultLifecycleObserver, RegisterFirebaseBroadcastReceiver {
 
     private lateinit var localBroadcastManager: LocalBroadcastManager
     private var mainViewModel: MainViewModel? = null

@@ -99,12 +99,3 @@ class SettingRadioGroupView @JvmOverloads constructor(
     }
 }
 
-interface RadioCheckable {
-    val associatedValue: String?
-    fun check()
-    fun uncheck()
-}
-
-interface OnCheckListener {
-    fun onChecked(@IdRes viewId: Int)
-}
