@@ -33,6 +33,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentAccountBinding
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.main.menu.MailboxListFragment
 import com.infomaniak.mail.ui.main.menu.SwitchMailboxesAdapter
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.animatedNavigation
@@ -43,7 +44,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class AccountFragment : Fragment() {
+class AccountFragment : Fragment(), MailboxListFragment {
 
     private lateinit var binding: FragmentAccountBinding
     private val mainViewModel: MainViewModel by activityViewModels()
@@ -51,10 +52,11 @@ class AccountFragment : Fragment() {
 
     private val logoutAlert by lazy { initLogoutAlert() }
 
-    private var mailboxAdapter = SwitchMailboxesAdapter(
+    override val currentClassName: String = AccountFragment::class.java.name
+    override val mailboxesAdapter = SwitchMailboxesAdapter(
         isInMenuDrawer = false,
         lifecycleScope = lifecycleScope,
-        onLockedMailboxClicked = ::onLockedMailboxClicked,
+        onLockedMailboxClicked = { mailboxEmail -> onLockedMailboxClicked(mailboxEmail) },
     )
 
     @Inject
@@ -90,7 +92,7 @@ class AccountFragment : Fragment() {
         }
 
         mailboxesRecyclerView.apply {
-            adapter = mailboxAdapter
+            adapter = mailboxesAdapter
             isFocusable = false
         }
 
@@ -103,7 +105,7 @@ class AccountFragment : Fragment() {
     }
 
     private fun observeAccountsLive() {
-        mainViewModel.mailboxesLive.observe(viewLifecycleOwner, mailboxAdapter::setMailboxes)
+        mainViewModel.mailboxesLive.observe(viewLifecycleOwner, mailboxesAdapter::setMailboxes)
         lifecycleScope.launch(ioDispatcher) { accountViewModel.updateMailboxes() }
     }
 
@@ -112,8 +114,4 @@ class AccountFragment : Fragment() {
         description = AccountUtils.currentUser?.let { getString(R.string.confirmLogoutDescription, it.email) } ?: "",
         onPositiveButtonClicked = ::removeCurrentUser,
     )
-
-    private fun onLockedMailboxClicked(mailboxEmail: String) {
-        safeNavigate(AccountFragmentDirections.actionAccountFragmentToLockedMailboxBottomSheetDialog(mailboxEmail))
-    }
 }

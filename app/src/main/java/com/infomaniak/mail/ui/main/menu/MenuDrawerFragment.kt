@@ -26,6 +26,7 @@ import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -47,28 +48,26 @@ import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import java.util.concurrent.atomic.AtomicBoolean
 
 @AndroidEntryPoint
-class MenuDrawerFragment : MenuFoldersFragment() {
+class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
 
     private lateinit var binding: FragmentMenuDrawerBinding
     private val menuDrawerViewModel: MenuDrawerViewModel by viewModels()
 
     private val createFolderDialog by lazy { initNewFolderDialog() }
 
+    var exitDrawer: (() -> Unit)? = null
+
     override val isInMenuDrawer: Boolean = true
     override val defaultFoldersList: RecyclerView by lazy { binding.defaultFoldersList }
     override val customFoldersList: RecyclerView by lazy { binding.customFoldersList }
 
-    var exitDrawer: (() -> Unit)? = null
-
-    private var canNavigate = AtomicBoolean(true)
-
-    private val addressAdapter = SwitchMailboxesAdapter(
+    override val currentClassName: String = MenuDrawerFragment::class.java.name
+    override val mailboxesAdapter = SwitchMailboxesAdapter(
         isInMenuDrawer = isInMenuDrawer,
         lifecycleScope = lifecycleScope,
-        onLockedMailboxClicked = ::onLockedMailboxClicked,
+        onLockedMailboxClicked = { mailboxEmail -> onLockedMailboxClicked(mailboxEmail) },
     )
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -95,12 +94,12 @@ class MenuDrawerFragment : MenuFoldersFragment() {
             closeDrawer()
             safeNavigate(
                 directions = ThreadListFragmentDirections.actionThreadListFragmentToSettingsFragment(),
-                currentClassName = MenuDrawerFragment::class.java.name,
+                currentClassName = currentClassName,
             )
         }
 
         mailboxSwitcher.setOnClickListener {
-            addressesList.apply {
+            mailboxList.apply {
                 isVisible = !isVisible
                 mailboxExpandButton.toggleChevron(!isVisible)
                 mailboxSwitcherText.setTextAppearance(if (isVisible) R.style.BodyMedium_Accent else R.style.BodyMedium)
@@ -158,13 +157,13 @@ class MenuDrawerFragment : MenuFoldersFragment() {
 
         restoreMails.setOnClickListener {
             trackMenuDrawerEvent("restoreEmails")
-            safeNavigate(R.id.restoreEmailsBottomSheetDialog, currentClassName = MenuDrawerFragment::class.java.name)
+            safeNavigate(R.id.restoreEmailsBottomSheetDialog, currentClassName = currentClassName)
         }
     }
 
     override fun setupAdapters() {
         super.setupAdapters()
-        binding.addressesList.adapter = addressAdapter
+        binding.mailboxList.adapter = mailboxesAdapter
     }
 
     override fun onFolderSelected(folderId: String) {
@@ -194,7 +193,7 @@ class MenuDrawerFragment : MenuFoldersFragment() {
     private fun observeMailboxesLive() = with(binding) {
         menuDrawerViewModel.otherMailboxesLive.observe(viewLifecycleOwner) { mailboxes ->
 
-            addressAdapter.setMailboxes(mailboxes)
+            mailboxesAdapter.setMailboxes(mailboxes)
 
             val hasMoreThanOneMailbox = mailboxes.isNotEmpty()
 
@@ -250,7 +249,6 @@ class MenuDrawerFragment : MenuFoldersFragment() {
     }
 
     fun onDrawerOpened() {
-        canNavigate.set(true)
         trackScreen()
     }
 
@@ -260,7 +258,7 @@ class MenuDrawerFragment : MenuFoldersFragment() {
     }
 
     fun closeDropdowns() = with(binding) {
-        addressesList.isGone = true
+        mailboxList.isGone = true
         mailboxExpandButton.rotation = ResourcesCompat.getFloat(resources, R.dimen.angleViewNotRotated)
         customFoldersLayout.isVisible = true
         customFolders.setIsCollapsed(false)
@@ -278,12 +276,18 @@ class MenuDrawerFragment : MenuFoldersFragment() {
             mainViewModel.createNewFolder(folderName!!.toString())
         },
     )
+}
 
-    private fun onLockedMailboxClicked(mailboxEmail: String) {
+interface MailboxListFragment {
+
+    val mailboxesAdapter: SwitchMailboxesAdapter
+    val currentClassName: String
+
+    fun Fragment.onLockedMailboxClicked(mailboxEmail: String) {
         safeNavigate(
             resId = R.id.lockedMailboxBottomSheetDialog,
             args = LockedMailboxBottomSheetDialogArgs(mailboxEmail).toBundle(),
-            currentClassName = MenuDrawerFragment::class.java.name,
+            currentClassName = currentClassName,
         )
     }
 }
