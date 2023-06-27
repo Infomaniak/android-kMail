@@ -203,7 +203,7 @@
     <string name="googlePlayServicesAreRequired">Les Google Play Services sont requis</string>
     <string name="inboxFolder">Boîte de réception</string>
     <string name="loadingText">Chargement…</string>
-    <string name="lockedMailboxDescription">L’accès à votre adresse mail est actuellement bloqué. Nous vous invitons a contacter votre administrateur.</string>
+    <string name="lockedMailboxDescription">L’accès à votre adresse mail est actuellement bloqué. Nous vous invitons à contacter votre administrateur.</string>
     <string name="lockedMailboxTitle">L’adresse %s est bloquée</string>
     <string name="menuDrawerAdvancedActions">Actions avancées</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s utilisés</string>
