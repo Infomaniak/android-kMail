@@ -251,6 +251,7 @@ class ThreadController @Inject constructor(
                                     date = localMessage.date,
                                     isFullyDownloaded = true,
                                     isSpam = localMessage.isSpam,
+                                    isTrashed = localMessage.isTrashed,
                                     messageIds = localMessage.messageIds,
                                     draftLocalUuid = draftLocalUuid,
                                     isFromSearch = localMessage.isFromSearch,
