@@ -202,7 +202,8 @@
     <string name="googlePlayServicesAreRequired">Se requieren los servicios de Google Play</string>
     <string name="inboxFolder">Bandeja de entrada</string>
     <string name="loadingText">Cargando…</string>
-    <string name="lockedMailboxTitle">El acceso a su dirección de correo electrónico está bloqueado.\n\nPóngase en contacto con su administrador.</string>
+    <string name="lockedMailboxDescription">El acceso a su dirección de correo electrónico está bloqueado. Póngase en contacto con su administrador.</string>
+    <string name="lockedMailboxTitle">La dirección de correo electrónico %s está bloqueada</string>
     <string name="menuDrawerAdvancedActions">Acciones avanzadas</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s usado</string>
     <string name="messageDetailsDateAt">%1$s a las %2$s</string>
