@@ -452,6 +452,12 @@ class RefreshController @Inject constructor(@MailboxContentRealm private val mai
         messages.forEach { message ->
             scope.ensureActive()
 
+            val isMessageAlreadyAdded = folder.messages.firstOrNull { it == message && !it.isOrphan() } != null
+            if (isMessageAlreadyAdded) {
+                SentryDebug.sendAlreadyExistingMessage(folder, message)
+                return@forEach
+            }
+
             message.apply {
                 initMessageIds()
                 isSpam = folder.role == FolderRole.SPAM
@@ -459,13 +465,7 @@ class RefreshController @Inject constructor(@MailboxContentRealm private val mai
                 shortUid = uid.toShortUid()
             }
 
-            val existingMessage = folder.messages.firstOrNull { it == message }
-            if (existingMessage == null) {
-                folder.messages.add(message)
-            } else if (!existingMessage.isOrphan()) {
-                SentryDebug.sendAlreadyExistingMessage(folder, existingMessage, message)
-                return@forEach
-            }
+            folder.messages.add(message)
 
             val existingThreads = ThreadController.getThreads(message.messageIds, realm = this).toList()
 

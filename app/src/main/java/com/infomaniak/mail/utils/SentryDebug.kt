@@ -18,7 +18,6 @@
 package com.infomaniak.mail.utils
 
 import android.os.Bundle
-import android.util.Log
 import androidx.navigation.NavController
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
@@ -85,30 +84,16 @@ object SentryDebug {
         })
     }
 
-    fun sendAlreadyExistingMessage(folder: Folder, existingMessage: Message, newMessage: Message) {
-
+    fun sendAlreadyExistingMessage(folder: Folder, message: Message) {
         Sentry.withScope { scope ->
             scope.level = SentryLevel.ERROR
+            scope.setExtra("folder.name", folder.name)
             scope.setExtra("folder.id", folder.id)
-            scope.setExtra("existingMessage.folderId", existingMessage.folderId)
-            scope.setExtra("newMessage.folderId", newMessage.folderId)
-            scope.setExtra("uid", existingMessage.uid)
-            scope.setExtra("existingMessage.messageId", "${existingMessage.messageId}")
-            scope.setExtra("newMessage.messageId", "${newMessage.messageId}")
-            if (existingMessage.messageId == newMessage.messageId) {
-                Sentry.captureMessage("Same message id")
-            } else {
-                Sentry.captureMessage("Same message uid")
-            }
+            scope.setExtra("message.folderId", message.folderId)
+            scope.setExtra("message.uid", message.uid)
+            scope.setExtra("message.messageId", "${message.messageId}")
+            Sentry.captureMessage("Already existing message")
         }
-
-        Log.d("FolderSingle", "Message's Folder list has more than one element.")
-        Log.d("FolderSingle", "existingMessage.uid: ${existingMessage.uid}")
-        Log.d("FolderSingle", "folder.id: ${folder.id} | folderName: ${folder.name}")
-        Log.d("FolderSingle", "existingMessage.folderId: ${existingMessage.folderId}")
-        Log.d("FolderSingle", "newMessage.folderId: ${newMessage.folderId}")
-        Log.d("FolderSingle", "existingMessage.messageId: ${existingMessage.messageId}")
-        Log.d("FolderSingle", "newMessage.messageId: ${newMessage.messageId}")
     }
 
     fun sendMissingMessages(
