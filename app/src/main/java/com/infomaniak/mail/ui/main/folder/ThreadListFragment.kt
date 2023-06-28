@@ -102,8 +102,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         Utils.createRefreshTimer { binding.swipeRefreshLayout.isRefreshing = true }
     }
 
-    private var canRefreshThreads = false
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentThreadListBinding.inflate(inflater, container, false).also { binding = it }.root
     }
@@ -144,12 +142,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         binding.unreadCountChip.apply { isCloseIconVisible = isChecked }
     }
 
-    override fun onResume() = with(binding) {
+    override fun onResume() {
         super.onResume()
-
-        if (canRefreshThreads) mainViewModel.forceRefreshThreads()
-        canRefreshThreads = true
-
         updateSwipeActionsAccordingToSettings()
     }
 
