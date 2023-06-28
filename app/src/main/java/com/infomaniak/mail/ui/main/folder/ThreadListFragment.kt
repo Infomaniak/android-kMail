@@ -139,10 +139,13 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         observerDraftsActionsCompletedWorks()
     }
 
+    override fun onStart() {
+        super.onStart()
+        binding.unreadCountChip.apply { isCloseIconVisible = isChecked }
+    }
+
     override fun onResume() = with(binding) {
         super.onResume()
-
-        unreadCountChip.apply { isCloseIconVisible = isChecked } // TODO: Do we need this? If yes, do we need it HERE?
 
         if (canRefreshThreads) mainViewModel.forceRefreshThreads()
         canRefreshThreads = true
