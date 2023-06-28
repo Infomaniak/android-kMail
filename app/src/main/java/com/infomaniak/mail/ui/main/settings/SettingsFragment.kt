@@ -26,8 +26,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.infomaniak.lib.applock.Utils.isKeyguardSecure
 import com.infomaniak.lib.core.utils.openAppNotificationSettings
+import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.mail.MatomoMail.toFloat
 import com.infomaniak.mail.MatomoMail.trackEvent
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentSettingsBinding
 import com.infomaniak.mail.ui.MainViewModel
@@ -44,7 +46,11 @@ class SettingsFragment : Fragment() {
 
     private val mailboxesAdapter = SettingsMailboxesAdapter { selectedMailbox ->
         with(selectedMailbox) {
-            animatedNavigation(SettingsFragmentDirections.actionSettingsToMailboxSettings(objectId, email))
+            if (isValid) {
+                animatedNavigation(SettingsFragmentDirections.actionSettingsToMailboxSettings(objectId, email))
+            } else {
+                context?.showToast(R.string.errorMailboxLocked)
+            }
         }
     }
 
