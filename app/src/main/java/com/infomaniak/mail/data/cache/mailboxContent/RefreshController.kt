@@ -287,7 +287,7 @@ class RefreshController @Inject constructor(@MailboxContentRealm private val mai
             val impactedFoldersIds = mutableSetOf<String>().apply {
                 addAll(handleDeletedUids(scope, activities.deletedShortUids, folder.id))
                 addAll(handleUpdatedUids(scope, activities.updatedMessages, folder.id))
-                addSentryBreadcrumbsForActivities(logMessage, folder, activities)
+                addSentryBreadcrumbsForActivities(logMessage, mailbox.email, folder, activities)
             }
 
             impactedFoldersIds.forEach { folderId ->
@@ -356,7 +356,7 @@ class RefreshController @Inject constructor(@MailboxContentRealm private val mai
                 scope.ensureActive()
             }
 
-            handleSentryForAddedUids(logMessage, folder, uids, messages, cursor)
+            addSentryBreadcrumbsForAddedUids(logMessage, mailbox.email, folder, uids, messages, cursor)
         }
 
         return impactedThreads
@@ -600,20 +600,27 @@ class RefreshController @Inject constructor(@MailboxContentRealm private val mai
         }
     }
 
-    private fun addSentryBreadcrumbsForActivities(logMessage: String, folder: Folder, activities: ActivitiesResult) {
+    private fun addSentryBreadcrumbsForActivities(
+        logMessage: String,
+        email: String,
+        folder: Folder,
+        activities: ActivitiesResult,
+    ) {
         SentryDebug.addThreadsAlgoBreadcrumb(
             message = logMessage,
             data = mapOf(
-                "1_folderName" to folder.name,
-                "2_folderId" to folder.id,
-                "4_deleted" to activities.deletedShortUids.map { it },
-                "5_updated" to activities.updatedMessages.map { it.shortUid },
+                "1_mailbox" to email,
+                "2_folderName" to folder.name,
+                "3_folderId" to folder.id,
+                "5_deleted" to activities.deletedShortUids.map { it },
+                "6_updated" to activities.updatedMessages.map { it.shortUid },
             ),
         )
     }
 
-    private fun handleSentryForAddedUids(
+    private fun addSentryBreadcrumbsForAddedUids(
         logMessage: String,
+        email: String,
         folder: Folder,
         uids: List<Int>,
         messages: List<Message>,
@@ -622,9 +629,10 @@ class RefreshController @Inject constructor(@MailboxContentRealm private val mai
         SentryDebug.addThreadsAlgoBreadcrumb(
             message = logMessage,
             data = mapOf(
-                "1_folderName" to folder.name,
-                "2_folderId" to folder.id,
-                "3_added" to uids,
+                "1_mailbox" to email,
+                "2_folderName" to folder.name,
+                "3_folderId" to folder.id,
+                "4_added" to uids,
             ),
         )
 
