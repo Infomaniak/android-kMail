@@ -77,6 +77,4 @@ object GplayUtils {
             RegisterUserDeviceWorker.scheduleWork(context)
         }
     }
-
 }
-
