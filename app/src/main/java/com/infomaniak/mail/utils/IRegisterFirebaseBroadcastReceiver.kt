@@ -20,7 +20,7 @@ package com.infomaniak.mail.utils
 import androidx.fragment.app.FragmentActivity
 import com.infomaniak.mail.ui.MainViewModel
 
-interface RegisterFirebaseBroadcastReceiver {
+interface IRegisterFirebaseBroadcastReceiver {
 
     fun initFirebaseBroadcastReceiver(activity: FragmentActivity, mainViewModel: MainViewModel) = Unit
 }
