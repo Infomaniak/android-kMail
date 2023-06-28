@@ -185,7 +185,7 @@
     <string name="errorInvalidCredentials">Correo electrónico o contraseña no válidos</string>
     <string name="errorLoginDescription">La conexión ha fallado.</string>
     <string name="errorLoginTitle">Error de inicio de sesión</string>
-    <string name="errorMailboxLocked">Este buzón está bloqueado</string>
+    <string name="errorMailboxLocked">Esta dirección de correo electrónico está bloqueada</string>
     <string name="errorMoveDestinationNotFound">La carpeta de destino no existe</string>
     <string name="errorNewFolderAlreadyExists">La carpeta ya existe</string>
     <string name="errorNewFolderNameTooLong">El nombre de la carpeta no debe superar los 255 caracteres</string>
@@ -204,6 +204,8 @@
     <string name="loadingText">Cargando…</string>
     <string name="lockedMailboxDescription">El acceso a su dirección de correo electrónico está bloqueado. Póngase en contacto con su administrador.</string>
     <string name="lockedMailboxTitle">La dirección de correo electrónico %s está bloqueada</string>
+    <string name="lockedMailboxesDescription">El acceso a sus buzones de correo está bloqueado. Póngase en contacto con su administrador.</string>
+    <string name="lockedMailboxesTitle">Buzones de correo bloqueados</string>
     <string name="menuDrawerAdvancedActions">Acciones avanzadas</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s usado</string>
     <string name="messageDetailsDateAt">%1$s a las %2$s</string>
