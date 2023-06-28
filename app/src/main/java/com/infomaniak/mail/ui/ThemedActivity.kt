@@ -37,9 +37,11 @@ open class ThemedActivity : AppCompatActivity() {
 
         if (AccountUtils.currentUser == null) runBlocking {
             AccountUtils.requestCurrentUser()
-            Sentry.withScope { scope ->
-                scope.setExtra("has been fixed", "${AccountUtils.currentUser != null}")
-                Sentry.captureMessage("ThemedActivity> the current user is null")
+            if (AccountUtils.currentUser == null) {
+                Sentry.withScope { scope ->
+                    scope.setExtra("has been fixed", "false")
+                    Sentry.captureMessage("ThemedActivity> the current user is null")
+                }
             }
         }
 
