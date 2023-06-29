@@ -22,6 +22,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.utils.context
@@ -37,10 +38,13 @@ import com.infomaniak.lib.core.R as RCore
 
 class FolderAdapter(
     private val isInMenuDrawer: Boolean,
-    private var folders: List<Folder> = emptyList(),
     private var currentFolderId: String? = null,
     private val onClick: (folderId: String) -> Unit,
 ) : RecyclerView.Adapter<FolderViewHolder>() {
+
+    private val foldersDiffer = AsyncListDiffer(this, FolderDiffCallback())
+
+    private inline val folders get() = foldersDiffer.currentList
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FolderViewHolder {
         return FolderViewHolder(ItemFolderMenuDrawerBinding.inflate(LayoutInflater.from(parent.context), parent, false))
@@ -112,11 +116,8 @@ class FolderAdapter(
 
     @SuppressLint("NotifyDataSetChanged")
     fun setFolders(newFolders: List<Folder>, newCurrentFolderId: String?) {
-        // TODO: Temporary fix, we use a DiffUtil while waiting to do it with Realm or asynchronously.
-        val diffResult = DiffUtil.calculateDiff(FolderDiffCallback(newFolders))
         currentFolderId = newCurrentFolderId
-        folders = newFolders
-        diffResult.dispatchUpdatesTo(this)
+        foldersDiffer.submitList(newFolders)
     }
 
     fun updateSelectedState(newCurrentFolderId: String) {
@@ -137,18 +138,12 @@ class FolderAdapter(
 
     class FolderViewHolder(val binding: ItemFolderMenuDrawerBinding) : RecyclerView.ViewHolder(binding.root)
 
-    inner class FolderDiffCallback(private val newFolders: List<Folder>) : DiffUtil.Callback() {
-
-        override fun getOldListSize() = folders.count()
-
-        override fun getNewListSize() = newFolders.count()
-
-        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return folders[oldItemPosition].id == newFolders[newItemPosition].id
+    private class FolderDiffCallback : DiffUtil.ItemCallback<Folder>() {
+        override fun areItemsTheSame(oldFolder: Folder, newFolder: Folder): Boolean {
+            return oldFolder.id == newFolder.id
         }
 
-        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            val (oldFolder, newFolder) = folders[oldItemPosition] to newFolders[newItemPosition]
+        override fun areContentsTheSame(oldFolder: Folder, newFolder: Folder): Boolean {
             return oldFolder.name == newFolder.name &&
                     oldFolder.isFavorite == newFolder.isFavorite &&
                     oldFolder.path == newFolder.path &&
