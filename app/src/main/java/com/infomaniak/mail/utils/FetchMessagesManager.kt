@@ -55,7 +55,7 @@ class FetchMessagesManager @Inject constructor(
 
     private val localSettings by lazy { LocalSettings.getInstance(appContext) }
 
-    suspend fun execute(userId: Int, mailbox: Mailbox, mailboxContentRealm: Realm? = null) {
+    suspend fun execute(userId: Int, mailbox: Mailbox, messageUid: String? = null, mailboxContentRealm: Realm? = null) {
 
         // Don't launch sync if the mailbox's notifications have been disabled by the user
         if (mailbox.notificationsIsDisabled(notificationManagerCompat)) return
@@ -84,8 +84,9 @@ class FetchMessagesManager @Inject constructor(
                 mailbox = mailbox,
                 realm = realm,
                 unReadThreadsCount = unReadThreadsCount,
-                okHttpClient = okHttpClient,
                 isLastMessage = index == newMessagesThreads.lastIndex,
+                messageUid = messageUid,
+                okHttpClient = okHttpClient,
             )
         }
 
@@ -97,8 +98,9 @@ class FetchMessagesManager @Inject constructor(
         mailbox: Mailbox,
         realm: Realm,
         unReadThreadsCount: Int,
-        okHttpClient: OkHttpClient,
         isLastMessage: Boolean,
+        messageUid: String?,
+        okHttpClient: OkHttpClient,
     ) {
 
         fun contentIntent(isSummary: Boolean): PendingIntent {
@@ -130,23 +132,23 @@ class FetchMessagesManager @Inject constructor(
         }
 
         threadController.fetchIncompleteMessages(messages, mailbox, okHttpClient, realm)
-
-        val message = messageController.getThreadLastMessageInFolder(uid, realm)
-        if (message == null) {
-            val thread = ThreadController.getThread(uid, realm)
-            Sentry.withScope { scope ->
-                scope.level = SentryLevel.ERROR
-                scope.setExtra("email", "[${AccountUtils.currentMailboxEmail}]")
-                scope.setExtra("does Thread still exist ?", "[${thread != null}]")
-                scope.setExtra("folderName", "[${thread?.folder?.name}]")
-                scope.setExtra("threadUid", "[${thread?.uid}]")
-                scope.setExtra("messagesCount", "[${thread?.messages?.count()}]")
-                scope.setExtra("messagesFolder", "[${thread?.messages?.map { "${it.folder.name} (${it.folderId})" }}]")
-                Sentry.captureMessage("We are supposed to display a Notification, but we couldn't find the Message in the Thread.")
+        val message = messageController.getThreadLastMessageInFolder(uid, realm) ?: run {
+            ThreadController.getThread(uid, realm)?.let { thread ->
+                Sentry.withScope { scope ->
+                    scope.level = SentryLevel.ERROR
+                    scope.setExtra("does Thread still exist ?", "[true]")
+                    scope.setExtra("currentMailboxEmail", "[${AccountUtils.currentMailboxEmail}]")
+                    scope.setExtra("mailbox.email", "[${mailbox.email}]")
+                    scope.setExtra("messageUid", "[$messageUid]")
+                    scope.setExtra("folderName", "[${thread.folder.name}]")
+                    scope.setExtra("threadUid", "[${thread.uid}]")
+                    scope.setExtra("messagesCount", "[${thread.messages.count()}]")
+                    scope.setExtra("messagesFolder", "[${thread.messages.map { "${it.folder.name} (${it.folderId})" }}]")
+                    Sentry.captureMessage("We are supposed to display a Notification, but we couldn't find the Message in the Thread.")
+                }
             }
             return
         }
-
         if (message.isSeen) return // Ignore if it has already been seen
 
         val subject = appContext.formatSubject(message.subject)

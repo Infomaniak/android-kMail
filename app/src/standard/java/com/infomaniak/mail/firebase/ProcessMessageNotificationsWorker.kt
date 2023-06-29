@@ -63,7 +63,7 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
 
         val mailboxContentRealm = RealmDatabase.newMailboxContentInstance(userId, mailbox.mailboxId)
         MessageController.getMessage(messageUid, mailboxContentRealm)?.let { return@with Result.success() }
-        fetchMessagesManager.execute(userId, mailbox, mailboxContentRealm)
+        fetchMessagesManager.execute(userId, mailbox, messageUid, mailboxContentRealm)
 
         Log.i(TAG, "Work finished")
         Result.success()
