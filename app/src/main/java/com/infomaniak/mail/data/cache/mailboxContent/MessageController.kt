@@ -17,15 +17,14 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
+import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
-import com.infomaniak.mail.di.MailboxContentRealm
 import com.infomaniak.mail.utils.AccountUtils
 import io.realm.kotlin.MutableRealm
-import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.copyFromRealm
@@ -35,16 +34,16 @@ import io.realm.kotlin.query.RealmSingleQuery
 import io.realm.kotlin.query.Sort
 import javax.inject.Inject
 
-class MessageController @Inject constructor(@MailboxContentRealm private val mailboxContentRealm: Realm) {
+class MessageController @Inject constructor(private val mailboxContentRealm: RealmDatabase.MailboxContent) {
 
     fun getSortedMessages(threadUid: String): RealmQuery<Message>? {
-        return ThreadController.getThread(threadUid, mailboxContentRealm)
+        return ThreadController.getThread(threadUid, mailboxContentRealm())
             ?.messages?.query()
             ?.sort(Message::date.name, Sort.ASCENDING)
     }
 
     fun getMessage(uid: String): Message? {
-        return getMessage(uid, mailboxContentRealm)
+        return getMessage(uid, mailboxContentRealm())
     }
 
     fun getLastMessageToExecuteAction(thread: Thread): Message = with(thread) {
@@ -64,7 +63,7 @@ class MessageController @Inject constructor(@MailboxContentRealm private val mai
         )
     }
 
-    fun getThreadLastMessageInFolder(threadUid: String, realm: TypedRealm = mailboxContentRealm): Message? {
+    fun getThreadLastMessageInFolder(threadUid: String, realm: TypedRealm = mailboxContentRealm()): Message? {
         val thread = ThreadController.getThread(threadUid, realm)
         return thread?.messages?.query("${Message::folderId.name} == '${thread.folderId}'")?.find()?.lastOrNull()
     }
@@ -122,7 +121,7 @@ class MessageController @Inject constructor(@MailboxContentRealm private val mai
             queriesList.add("($containsSubject OR $containsPreview OR $containsBody)")
         }
 
-        return mailboxContentRealm.writeBlocking {
+        return mailboxContentRealm().writeBlocking {
             query<Message>(queriesList.joinToString(" AND ") { it }).find().copyFromRealm()
         }
     }

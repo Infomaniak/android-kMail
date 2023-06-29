@@ -21,19 +21,18 @@ import android.content.Context
 import com.infomaniak.lib.core.utils.contains
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.di.MailboxContentRealm
 import com.infomaniak.mail.ui.main.thread.MessageWebViewClient.Companion.CID_SCHEME
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.MessageBodyUtils
 import com.infomaniak.mail.utils.toDate
 import io.realm.kotlin.MutableRealm
-import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
@@ -47,23 +46,23 @@ import org.jsoup.nodes.Element
 import org.jsoup.nodes.TextNode
 import javax.inject.Inject
 
-class DraftController @Inject constructor(@MailboxContentRealm private val mailboxContentRealm: Realm) {
+class DraftController @Inject constructor(private val mailboxContentRealm: RealmDatabase.MailboxContent) {
 
     //region Get data
     fun getDraftsWithActions(realm: TypedRealm): RealmResults<Draft> {
         return getDraftsWithActionsQuery(realm).find()
     }
 
-    fun getDraftsWithActionsCount(realm: TypedRealm = mailboxContentRealm): Long {
+    fun getDraftsWithActionsCount(realm: TypedRealm = mailboxContentRealm()): Long {
         return getDraftsWithActionsQuery(realm).count().find()
     }
 
-    fun getDraft(localUuid: String, realm: TypedRealm = mailboxContentRealm): Draft? {
+    fun getDraft(localUuid: String, realm: TypedRealm = mailboxContentRealm()): Draft? {
         return getDraftQuery(Draft::localUuid.name, localUuid, realm).find()
     }
 
     fun getDraftByMessageUid(messageUid: String): Draft? {
-        return getDraftByMessageUid(messageUid, mailboxContentRealm)
+        return getDraftByMessageUid(messageUid, mailboxContentRealm())
     }
     //endregion
 
@@ -74,7 +73,7 @@ class DraftController @Inject constructor(@MailboxContentRealm private val mailb
 
     fun updateDraft(localUuid: String, realm: MutableRealm? = null, onUpdate: (draft: Draft) -> Unit) {
         val block: (MutableRealm) -> Unit = { getDraft(localUuid, realm = it)?.let(onUpdate) }
-        realm?.let(block) ?: mailboxContentRealm.writeBlocking(block)
+        realm?.let(block) ?: mailboxContentRealm().writeBlocking(block)
     }
     //endregion
 

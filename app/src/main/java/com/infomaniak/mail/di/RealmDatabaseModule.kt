@@ -43,7 +43,7 @@ object RealmDatabaseModule {
     fun providesMailboxInfoRealm() = RealmDatabase.mailboxInfo() // TODO: Waiting for AccountUtils injection
 
     @Provides
-    @MailboxContentRealm
-    fun providesMailboxContentRealm() = RealmDatabase.mailboxContent()
+    @Singleton
+    fun providesMailboxContent() = RealmDatabase.MailboxContent()
 
 }

@@ -19,6 +19,7 @@ package com.infomaniak.mail.data.cache.mailboxContent
 
 import android.util.Log
 import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode.*
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
@@ -28,7 +29,6 @@ import com.infomaniak.mail.data.models.getMessages.NewMessagesResult
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.di.MailboxContentRealm
 import com.infomaniak.mail.utils.*
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
@@ -42,7 +42,7 @@ import java.util.Date
 import javax.inject.Inject
 import kotlin.math.max
 
-class RefreshController @Inject constructor(@MailboxContentRealm private val mailboxContentRealm: Realm) {
+class RefreshController @Inject constructor(private val mailboxContentRealm: RealmDatabase.MailboxContent) {
 
     private var refreshThreadsJob: Job? = null
 
@@ -52,7 +52,7 @@ class RefreshController @Inject constructor(@MailboxContentRealm private val mai
         mailbox: Mailbox,
         folder: Folder,
         okHttpClient: OkHttpClient? = null,
-        realm: Realm = mailboxContentRealm,
+        realm: Realm = mailboxContentRealm(),
         started: (() -> Unit)? = null,
         stopped: (() -> Unit)? = null,
     ): List<Thread>? {
@@ -112,7 +112,7 @@ class RefreshController @Inject constructor(@MailboxContentRealm private val mai
         }.forEach { role ->
             scope.ensureActive()
 
-            FolderController.getFolder(role, mailboxContentRealm)?.let {
+            FolderController.getFolder(role, mailboxContentRealm())?.let {
                 refresh(scope, mailbox, it, okHttpClient)
             }
         }

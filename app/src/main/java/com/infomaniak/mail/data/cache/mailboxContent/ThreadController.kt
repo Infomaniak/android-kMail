@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.cache.mailboxContent
 
 import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.mailbox.Mailbox
@@ -25,7 +26,6 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.di.IoDispatcher
-import com.infomaniak.mail.di.MailboxContentRealm
 import com.infomaniak.mail.utils.SearchUtils.Companion.convertToSearchThreads
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
@@ -46,7 +46,7 @@ import okhttp3.OkHttpClient
 import javax.inject.Inject
 
 class ThreadController @Inject constructor(
-    @MailboxContentRealm private val mailboxContentRealm: Realm,
+    private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val refreshController: RefreshController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
@@ -57,15 +57,15 @@ class ThreadController @Inject constructor(
     }
 
     fun getSearchThreadsAsync(): Flow<ResultsChange<Thread>> {
-        return mailboxContentRealm.query<Thread>("${Thread::isFromSearch.name} == true").asFlow()
+        return mailboxContentRealm().query<Thread>("${Thread::isFromSearch.name} == true").asFlow()
     }
 
     fun getThread(uid: String): Thread? {
-        return getThread(uid, mailboxContentRealm)
+        return getThread(uid, mailboxContentRealm())
     }
 
     fun getThreadAsync(uid: String): Flow<SingleQueryChange<Thread>> {
-        return getThreadQuery(uid, mailboxContentRealm).asFlow()
+        return getThreadQuery(uid, mailboxContentRealm()).asFlow()
     }
 
     /**
@@ -109,7 +109,7 @@ class ThreadController @Inject constructor(
             }
         }
 
-        return@withContext mailboxContentRealm.writeBlocking {
+        return@withContext mailboxContentRealm().writeBlocking {
             val searchFolder = FolderController.getOrCreateSearchFolder(realm = this)
             remoteThreads.map { remoteThread ->
                 ensureActive()
@@ -136,7 +136,7 @@ class ThreadController @Inject constructor(
         messages: List<Message>,
         mailbox: Mailbox,
         okHttpClient: OkHttpClient? = null,
-        realm: Realm = mailboxContentRealm,
+        realm: Realm = mailboxContentRealm(),
     ) {
         val failedFoldersIds = realm.writeBlocking { fetchIncompleteMessages(messages, realm = this, okHttpClient) }
         updateFailedFolders(failedFoldersIds, mailbox, okHttpClient, realm)
@@ -156,7 +156,7 @@ class ThreadController @Inject constructor(
     }
 
     fun saveThreads(searchMessages: List<Message>) {
-        mailboxContentRealm.writeBlocking {
+        mailboxContentRealm().writeBlocking {
             FolderController.getOrCreateSearchFolder(realm = this).apply {
                 messages = searchMessages.toRealmList()
                 threads = searchMessages.convertToSearchThreads().toRealmList()
