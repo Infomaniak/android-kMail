@@ -128,7 +128,7 @@ class NewMessageViewModel @Inject constructor(
 
                 draft = if (draftExists) {
                     val uuid = draftLocalUuid ?: draft.localUuid
-                    getLatestDraft(uuid, realm = this) ?: run {
+                    getLatestDraft(uuid) ?: run {
                         if (isRecreated && (draftResource == null || messageUid == null)) {
                             // We arrive here if :
                             //    1. the user created a new Draft,
@@ -168,8 +168,8 @@ class NewMessageViewModel @Inject constructor(
         isInitSuccess.postValue(isSuccess)
     }
 
-    private fun getLatestDraft(draftLocalUuid: String?, realm: MutableRealm): Draft? {
-        return draftLocalUuid?.let { draftController.getDraft(it, realm)?.copyFromRealm() }
+    private fun getLatestDraft(draftLocalUuid: String?): Draft? {
+        return draftLocalUuid?.let { draftController.getDraft(it)?.copyFromRealm() }
     }
 
     private fun fetchDraft(draftResource: String, messageUid: String): Draft? {
@@ -357,7 +357,7 @@ class NewMessageViewModel @Inject constructor(
 
     private fun removeDraftFromRealm() {
         mailboxContentRealm.writeBlocking {
-            draftController.getDraft(draft.localUuid, realm = this)?.let(::delete)
+            draftController.getDraft(draft.localUuid)?.let(::delete)
         }
     }
 
