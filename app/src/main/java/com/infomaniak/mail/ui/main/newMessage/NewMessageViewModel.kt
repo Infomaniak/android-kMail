@@ -21,6 +21,7 @@ import android.app.Application
 import android.content.ClipDescription
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.core.net.toUri
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.utils.SingleLiveEvent
@@ -169,7 +170,7 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private fun getLatestDraft(draftLocalUuid: String?): Draft? {
-        return draftLocalUuid?.let { draftController.getDraft(it)?.copyFromRealm() }
+        return draftLocalUuid?.let(draftController::getDraft)?.copyFromRealm()
     }
 
     private fun fetchDraft(draftResource: String, messageUid: String): Draft? {
@@ -357,7 +358,7 @@ class NewMessageViewModel @Inject constructor(
 
     private fun removeDraftFromRealm() {
         mailboxContentRealm.writeBlocking {
-            draftController.getDraft(draft.localUuid)?.let(::delete)
+            draftController.getDraft(draft.localUuid, realm = this)?.let(::delete)
         }
     }
 
@@ -366,6 +367,7 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private fun saveDraftToLocal(action: DraftAction) {
+        Log.d("Draft", "Save Draft to local")
 
         draft.body = draft.uiBody.textToHtml() + (draft.uiSignature ?: "") + (draft.uiQuote ?: "")
         draft.action = action

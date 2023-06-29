@@ -58,8 +58,8 @@ class DraftController @Inject constructor(@MailboxContentRealm private val mailb
         return getDraftsWithActionsQuery(realm).count().find()
     }
 
-    fun getDraft(localUuid: String): Draft? {
-        return getDraft(localUuid, mailboxContentRealm)
+    fun getDraft(localUuid: String, realm: TypedRealm = mailboxContentRealm): Draft? {
+        return getDraftQuery(Draft::localUuid.name, localUuid, realm).find()
     }
 
     fun getDraftByMessageUid(messageUid: String): Draft? {
@@ -264,10 +264,6 @@ class DraftController @Inject constructor(@MailboxContentRealm private val mailb
 
         fun getDraftByMessageUid(messageUid: String, realm: TypedRealm): Draft? {
             return getDraftQuery(Draft::messageUid.name, messageUid, realm).find()
-        }
-
-        fun getDraft(localUuid: String, realm: TypedRealm): Draft? {
-            return getDraftQuery(Draft::localUuid.name, localUuid, realm).find()
         }
     }
 }

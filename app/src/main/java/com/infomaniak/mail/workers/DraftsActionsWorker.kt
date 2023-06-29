@@ -330,7 +330,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         var scheduledDate: String? = null
         var savedDraftUuid: String? = null
 
-        val updatedDraft = DraftController.getDraft(draft.localUuid, mailboxContentRealm)!!
+        val updatedDraft = draftController.getDraft(draft.localUuid, mailboxContentRealm)!!
         // TODO: Remove this whole `draft.attachments.forEach { … }` when the Attachment issue is fixed.
         updatedDraft.attachments.forEach { attachment ->
             if (attachment.uuid.isBlank()) {
