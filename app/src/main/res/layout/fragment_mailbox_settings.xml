@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak kMail - Android
-  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~ Copyright (C) 2022-2023 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     tools:title="myriam.rais@infomaniak.com">
 
     <androidx.core.widget.NestedScrollView
@@ -32,12 +32,10 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
-            android:orientation="vertical"
-            android:paddingTop="@dimen/marginStandardVerySmall">
+            android:orientation="vertical">
 
             <TextView
                 style="@style/SettingHeader"
-                android:layout_marginTop="@dimen/marginStandardSmall"
                 android:text="@string/settingsSectionGeneral" />
 
             <com.infomaniak.mail.ui.main.settings.ItemSettingView
@@ -51,6 +49,7 @@
                 android:id="@+id/settingsMailboxGeneralAutoreply"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 app:itemAction="chevron"
                 app:subtitle="@string/settingsDisabled"
                 app:title="@string/settingsMailboxGeneralAutoreply" />
@@ -59,6 +58,7 @@
                 android:id="@+id/settingsMailboxGeneralFolders"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 app:itemAction="chevron"
                 app:title="@string/settingsMailboxGeneralFolders" />
 
@@ -66,19 +66,24 @@
                 android:id="@+id/settingsMailboxGeneralNotifications"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 app:itemAction="toggle"
                 app:title="@string/settingsMailboxGeneralNotifications" />
 
-            <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+            <com.google.android.material.divider.MaterialDivider
+                style="@style/SettingSeparator"
+                android:visibility="gone" />
 
             <TextView
                 style="@style/SettingHeader"
-                android:text="@string/inboxFolder" />
+                android:text="@string/inboxFolder"
+                android:visibility="gone" />
 
             <com.infomaniak.mail.ui.main.settings.ItemSettingView
                 android:id="@+id/settingsInboxType"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 app:itemAction="chevron"
                 app:subtitle="@string/settingsDefault"
                 app:title="@string/settingsInboxType" />
@@ -87,30 +92,37 @@
                 android:id="@+id/settingsInboxRules"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 app:title="@string/settingsInboxRules" />
 
             <com.infomaniak.mail.ui.main.settings.ItemSettingView
                 android:id="@+id/settingsInboxRedirect"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 app:title="@string/settingsInboxRedirect" />
 
             <com.infomaniak.mail.ui.main.settings.ItemSettingView
                 android:id="@+id/settingsInboxAlias"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 app:title="@string/settingsInboxAlias" />
 
-            <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+            <com.google.android.material.divider.MaterialDivider
+                style="@style/SettingSeparator"
+                android:visibility="gone" />
 
             <TextView
                 style="@style/SettingHeader"
-                android:text="@string/settingsSectionSecurity" />
+                android:text="@string/settingsSectionSecurity"
+                android:visibility="gone" />
 
             <com.infomaniak.mail.ui.main.settings.ItemSettingView
                 android:id="@+id/settingsSecurityAdsFilter"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 app:itemAction="toggle"
                 app:title="@string/settingsSecurityAdsFilter"
                 tools:subtitle="@string/settingsDisabled" />
@@ -119,6 +131,7 @@
                 android:id="@+id/settingsSecuritySpamFilter"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 app:itemAction="toggle"
                 app:title="@string/settingsSecuritySpamFilter"
                 tools:subtitle="@string/settingsDisabled" />
@@ -127,26 +140,32 @@
                 android:id="@+id/settingsSecurityBlockedRecipients"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 app:itemAction="chevron"
                 app:subtitle="0 expeditor"
                 app:title="@string/settingsSecurityBlockedRecipients" />
 
-            <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+            <com.google.android.material.divider.MaterialDivider
+                style="@style/SettingSeparator"
+                android:visibility="gone" />
 
             <TextView
                 style="@style/SettingHeader"
-                android:text="@string/settingsSectionPrivacy" />
+                android:text="@string/settingsSectionPrivacy"
+                android:visibility="gone" />
 
             <com.infomaniak.mail.ui.main.settings.ItemSettingView
                 android:id="@+id/settingsPrivacyDeleteSearchHistory"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 app:title="@string/settingsPrivacyDeleteSearchHistory" />
 
             <com.infomaniak.mail.ui.main.settings.ItemSettingView
                 android:id="@+id/settingsPrivacyViewLogs"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 app:title="@string/settingsPrivacyViewLogs" />
 
         </LinearLayout>

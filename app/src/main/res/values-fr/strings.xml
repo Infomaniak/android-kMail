@@ -186,7 +186,7 @@
     <string name="errorInvalidCredentials">E-mail ou mot de passe invalide</string>
     <string name="errorLoginDescription">La connexion a échoué.</string>
     <string name="errorLoginTitle">Erreur de connexion</string>
-    <string name="errorMailboxLocked">Cette mailbox est bloquée</string>
+    <string name="errorMailboxLocked">Cette adresse est bloquée</string>
     <string name="errorMoveDestinationNotFound">Le dossier de destination n’existe pas</string>
     <string name="errorNewFolderAlreadyExists">Le dossier existe déjà</string>
     <string name="errorNewFolderNameTooLong">Le nom du dossier ne doit pas dépasser 255 caractères</string>
@@ -205,6 +205,8 @@
     <string name="loadingText">Chargement…</string>
     <string name="lockedMailboxDescription">L’accès à votre adresse mail est actuellement bloqué. Nous vous invitons à contacter votre administrateur.</string>
     <string name="lockedMailboxTitle">L’adresse %s est bloquée</string>
+    <string name="lockedMailboxesDescription">L’accès à vos adresses mail est actuellement bloqué. Nous vous invitons à contacter votre administrateur.</string>
+    <string name="lockedMailboxesTitle">Adresses mail bloquées</string>
     <string name="menuDrawerAdvancedActions">Actions avancées</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s utilisés</string>
     <string name="messageDetailsDateAt">%1$s à %2$s</string>

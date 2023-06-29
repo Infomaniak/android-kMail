@@ -16,6 +16,7 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -80,11 +81,19 @@
 
         <ImageView
             android:id="@+id/openExternal"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
+            android:layout_width="@dimen/mediumIconSize"
+            android:layout_height="@dimen/mediumIconSize"
             android:contentDescription="@string/contentDescriptionButtonOpenSystemSettings"
             android:src="@drawable/ic_open_external"
             android:visibility="gone" />
 
+        <ImageView
+            android:id="@+id/warning"
+            android:layout_width="@dimen/mediumIconSize"
+            android:layout_height="@dimen/mediumIconSize"
+            android:contentDescription="@string/errorMailboxLocked"
+            android:src="@drawable/ic_warning"
+            android:visibility="gone"
+            app:tint="@color/orangeWarning" />
     </FrameLayout>
 </LinearLayout>

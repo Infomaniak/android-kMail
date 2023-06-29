@@ -283,9 +283,9 @@ class LoginActivity : AppCompatActivity() {
 
             fun List<Mailbox>.computeErrorCode(): MailboxErrorCode? {
                 return when {
-                    none { it.isPasswordValid } -> MailboxErrorCode.INVALID_PASSWORD_MAILBOX
                     all { it.isLocked } -> MailboxErrorCode.LOCKED_MAILBOX
-                    all { !it.isPasswordValid && it.isLocked } -> MailboxErrorCode.NO_VALID_MAILBOX
+                    none { it.isPasswordValid } -> MailboxErrorCode.INVALID_PASSWORD_MAILBOX
+                    none { it.isValid } -> MailboxErrorCode.NO_VALID_MAILBOX
                     else -> null
                 }
             }

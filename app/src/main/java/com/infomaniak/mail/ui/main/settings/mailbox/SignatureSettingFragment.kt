@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,11 +22,62 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.infomaniak.mail.R
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.navArgs
+import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
+import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.signature.Signature
+import com.infomaniak.mail.databinding.FragmentSignatureSettingBinding
+import dagger.hilt.android.AndroidEntryPoint
+import io.realm.kotlin.ext.copyFromRealm
+import com.infomaniak.lib.core.R as RCore
 
+@AndroidEntryPoint
 class SignatureSettingFragment : Fragment() {
 
+    private lateinit var binding: FragmentSignatureSettingBinding
+
+    private val navigationArgs: SignatureSettingFragmentArgs by navArgs()
+    private val signatureSettingViewModel: SignatureSettingViewModel by viewModels()
+
+    private lateinit var signatureAdapter: SignatureSettingAdapter
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return inflater.inflate(R.layout.fragment_signature_setting, container, false)
+        return FragmentSignatureSettingBinding.inflate(inflater, container, false).also { binding = it }.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(signatureSettingViewModel) {
+        super.onViewCreated(view, savedInstanceState)
+
+        init(navigationArgs.mailboxObjectId).observe(viewLifecycleOwner) { mailbox ->
+            setupAdapter(mailbox)
+            runCatching {
+                updateSignatures()
+            }.onFailure {
+                showSnackbar(RCore.string.anErrorHasOccurred)
+            }
+            observeSignatures()
+        }
+    }
+
+    private fun setupAdapter(mailbox: Mailbox) {
+        binding.signatureList.adapter = SignatureSettingAdapter(
+            canManageSignature = mailbox.permissions?.canManageSignatures ?: false,
+            onSignatureSelected = ::onSignatureClicked,
+        ).also { signatureAdapter = it }
+    }
+
+    private fun observeSignatures() {
+        signatureSettingViewModel.signaturesLive.observe(viewLifecycleOwner, signatureAdapter::setSignatures)
+    }
+
+    private fun onSignatureClicked(signature: Signature) = with(signatureSettingViewModel) {
+        val newDefaultSignature = signature.copyFromRealm(UInt.MIN_VALUE).apply { isDefault = true }
+
+        runCatching {
+            setDefaultSignature(newDefaultSignature)
+        }.onFailure {
+            showSnackbar(RCore.string.anErrorHasOccurred)
+        }
     }
 }

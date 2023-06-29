@@ -39,6 +39,8 @@ class SettingRadioButtonView @JvmOverloads constructor(
 
     private val binding by lazy { ViewSettingRadioButtonBinding.inflate(LayoutInflater.from(context), this, true) }
 
+    private var onClickListener: OnClickListener? = null
+
     override var associatedValue: String? = null
 
     init {
@@ -48,7 +50,7 @@ class SettingRadioButtonView @JvmOverloads constructor(
                 val textString = getString(R.styleable.SettingRadioButtonView_text)
                 val checkMarkColor = getColor(
                     R.styleable.SettingRadioButtonView_checkMarkColor,
-                    context.getAttributeColor(RMaterial.attr.colorPrimary)
+                    context.getAttributeColor(RMaterial.attr.colorPrimary),
                 )
                 associatedValue = getString(R.styleable.SettingRadioButtonView_value)
 
@@ -56,17 +58,21 @@ class SettingRadioButtonView @JvmOverloads constructor(
                 text.text = textString
                 checkMark.setColorFilter(checkMarkColor)
 
-                root.setOnClickListener { (parent as? OnCheckListener)?.onChecked(this@SettingRadioButtonView.id) }
+                root.setOnClickListener {
+                    (parent as? OnCheckListener)?.onChecked(this@SettingRadioButtonView.id) ?: onClickListener?.onClick(root)
+                }
             }
         }
     }
 
-    override fun check() {
-        binding.checkMark.isVisible = true
+    override fun check() = with(binding) {
+        root.isEnabled = false
+        checkMark.isVisible = true
     }
 
-    override fun uncheck() {
-        binding.checkMark.isGone = true
+    override fun uncheck() = with(binding) {
+        root.isEnabled = true
+        checkMark.isGone = true
     }
 
     fun setText(newText: String) {
@@ -82,5 +88,9 @@ class SettingRadioButtonView @JvmOverloads constructor(
             isVisible = iconDrawable != null
             setImageDrawable(iconDrawable)
         }
+    }
+
+    override fun setOnClickListener(listener: OnClickListener?) {
+        onClickListener = listener
     }
 }

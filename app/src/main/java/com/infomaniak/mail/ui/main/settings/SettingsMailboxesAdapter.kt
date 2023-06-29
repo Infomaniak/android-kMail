@@ -38,7 +38,9 @@ class SettingsMailboxesAdapter(
     override fun onBindViewHolder(holder: SettingsMailboxViewHolder, position: Int) = with(holder.binding.root) {
         val mailbox = mailboxes[position]
         setTitle(mailbox.email)
+
         setOnClickListener { onMailboxSelected(mailbox) }
+        toggleMailboxBlockedState(!mailbox.isValid)
     }
 
     override fun getItemCount(): Int = mailboxes.count()

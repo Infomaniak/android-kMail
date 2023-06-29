@@ -39,6 +39,7 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.mailbox.MailboxLinkedResult
 import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.data.models.signature.SignaturesResult
 import com.infomaniak.mail.data.models.thread.ThreadResult
 import kotlinx.serialization.encodeToString
@@ -75,6 +76,10 @@ object ApiRepository : ApiRepositoryCore() {
 
     fun getSignatures(mailboxHostingId: Int, mailboxName: String): ApiResponse<SignaturesResult> {
         return callApi(ApiRoutes.signatures(mailboxHostingId, mailboxName), GET)
+    }
+
+    fun setDefaultSignature(mailboxHostingId: Int, mailboxName: String, signature: Signature): ApiResponse<Boolean> {
+        return callApi(ApiRoutes.signature(mailboxHostingId, mailboxName, signature.id), PUT, Json.encodeToString(signature))
     }
 
     fun getBackups(mailboxHostingId: Int, mailboxName: String): ApiResponse<BackupResult> {

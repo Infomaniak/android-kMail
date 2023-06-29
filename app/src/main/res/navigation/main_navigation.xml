@@ -354,7 +354,7 @@
             android:name="mailboxObjectId"
             app:argType="string" />
         <argument
-            android:name="mailboxName"
+            android:name="mailboxEmail"
             app:argType="string" />
         <action
             android:id="@+id/action_mailboxSettings_to_signatureSetting"
@@ -371,7 +371,11 @@
         android:id="@+id/signatureSettingFragment"
         android:name="com.infomaniak.mail.ui.main.settings.mailbox.SignatureSettingFragment"
         android:label="SignatureFragmentSetting"
-        tools:layout="@layout/fragment_signature_setting" />
+        tools:layout="@layout/fragment_signature_setting">
+        <argument
+            android:name="mailboxObjectId"
+            app:argType="string" />
+    </fragment>
 
     <fragment
         android:id="@+id/autoReplySettingFragment"

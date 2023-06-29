@@ -108,6 +108,11 @@ class ItemSettingView @JvmOverloads constructor(
         }
     }
 
+    fun toggleMailboxBlockedState(mustBlock: Boolean) = with(binding) {
+        warning.isVisible = mustBlock
+        chevron.isGone = mustBlock
+    }
+
     private enum class Action {
         NONE,
         CHEVRON,

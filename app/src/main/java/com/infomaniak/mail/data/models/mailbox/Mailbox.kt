@@ -67,6 +67,8 @@ class Mailbox : RealmObject {
     inline val notificationGroupId get() = uuid.hashCode()
     inline val notificationGroupKey get() = uuid
 
+    inline val isValid get() = isPasswordValid && !isLocked
+
     private fun createObjectId(userId: Int): String = "${userId}_${this.mailboxId}"
 
     fun initLocalValues(userId: Int, quotas: Quotas?, inboxUnreadCount: Int, permissions: MailboxPermissions?) {

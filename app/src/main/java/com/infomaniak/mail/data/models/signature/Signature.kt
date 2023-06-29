@@ -26,7 +26,13 @@ import kotlinx.serialization.Serializable
 class Signature : RealmObject {
     @PrimaryKey
     var id: Int = 0
+    var name: String = ""
     @SerialName("is_default")
     var isDefault: Boolean = false
     var content: String = ""
+
+    @SerialName("reply_to_id")
+    var replyToId: Int = 0 /* Required for the update call, do not delete */
+    @SerialName("sender_id")
+    var senderId: Int = 0 /* Required for the update call, do not delete */
 }

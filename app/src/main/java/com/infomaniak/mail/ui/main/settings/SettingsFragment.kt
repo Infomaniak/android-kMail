@@ -26,13 +26,14 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.infomaniak.lib.applock.Utils.isKeyguardSecure
 import com.infomaniak.lib.core.utils.openAppNotificationSettings
+import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.mail.MatomoMail.toFloat
 import com.infomaniak.mail.MatomoMail.trackEvent
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentSettingsBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.animatedNavigation
-import com.infomaniak.mail.utils.notYetImplemented
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -44,13 +45,13 @@ class SettingsFragment : Fragment() {
     private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
 
     private val mailboxesAdapter = SettingsMailboxesAdapter { selectedMailbox ->
-        notYetImplemented()
-        // animatedNavigation(
-        //     SettingsFragmentDirections.actionSettingsToMailboxSettings(
-        //         selectedMailbox.objectId,
-        //         selectedMailbox.email,
-        //     )
-        // )
+        with(selectedMailbox) {
+            if (isValid) {
+                animatedNavigation(SettingsFragmentDirections.actionSettingsToMailboxSettings(objectId, email))
+            } else {
+                context?.showToast(R.string.errorMailboxLocked)
+            }
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {

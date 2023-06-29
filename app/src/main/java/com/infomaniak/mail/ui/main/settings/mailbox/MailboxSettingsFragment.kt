@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@ import androidx.navigation.fragment.navArgs
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentMailboxSettingsBinding
 import com.infomaniak.mail.ui.main.settings.ItemSettingView
+import com.infomaniak.mail.utils.animatedNavigation
 import com.infomaniak.mail.utils.notYetImplemented
 
 class MailboxSettingsFragment : Fragment() {
@@ -39,7 +40,7 @@ class MailboxSettingsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.root.setTitle(navigationArgs.mailboxName)
+        binding.root.setTitle(navigationArgs.mailboxEmail)
         setSubtitlesInitialState()
         setupListeners()
     }
@@ -54,7 +55,11 @@ class MailboxSettingsFragment : Fragment() {
     }
 
     private fun setupListeners() = with(binding) {
-        settingsMailboxGeneralSignature.setOnClickListener { notYetImplemented() }
+        settingsMailboxGeneralSignature.setOnClickListener {
+            animatedNavigation(
+                MailboxSettingsFragmentDirections.actionMailboxSettingsToSignatureSetting(navigationArgs.mailboxObjectId)
+            )
+        }
         settingsMailboxGeneralAutoreply.setOnClickListener { notYetImplemented() }
         settingsMailboxGeneralFolders.setOnClickListener { notYetImplemented() }
         settingsMailboxGeneralNotifications.setOnClickListener { notYetImplemented() }
