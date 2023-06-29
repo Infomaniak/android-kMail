@@ -81,11 +81,15 @@ object RealmDatabase {
         }
     }
 
-    val newMailboxContentInstance get() = Realm.open(RealmConfig.mailboxContent(AccountUtils.currentMailboxId))
+    val newMailboxContentInstance get() = newMailboxContentInstance(AccountUtils.currentUserId, AccountUtils.currentMailboxId)
+
     fun newMailboxContentInstance(userId: Int, mailboxId: Int) = Realm.open(RealmConfig.mailboxContent(mailboxId, userId))
-    fun mailboxContent(): Realm = runBlocking(Dispatchers.IO) {
-        mailboxContentMutex.withLock {
-            _mailboxContent ?: newMailboxContentInstance.also { _mailboxContent = it }
+
+    class MailboxContent {
+        operator fun invoke() = runBlocking(Dispatchers.IO) {
+            mailboxContentMutex.withLock {
+                _mailboxContent ?: newMailboxContentInstance.also { _mailboxContent = it }
+            }
         }
     }
     //endregion

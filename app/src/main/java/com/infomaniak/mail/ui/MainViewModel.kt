@@ -30,6 +30,7 @@ import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.*
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
@@ -47,7 +48,6 @@ import com.infomaniak.mail.data.models.thread.SelectedThread
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.di.IoDispatcher
-import com.infomaniak.mail.di.MailboxContentRealm
 import com.infomaniak.mail.ui.main.SnackBarManager
 import com.infomaniak.mail.ui.main.SnackBarManager.*
 import com.infomaniak.mail.ui.main.folder.ThreadListViewModel
@@ -58,7 +58,6 @@ import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.NotificationUtils.cancelNotification
 import com.infomaniak.mail.utils.Utils.MailboxErrorCode
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -75,7 +74,7 @@ class MainViewModel @Inject constructor(
     private val addressBookController: AddressBookController,
     private val draftController: DraftController,
     private val folderController: FolderController,
-    @MailboxContentRealm private val mailboxContentRealm: Realm,
+    private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val mergedContactController: MergedContactController,
     private val messageController: MessageController,
     private val refreshController: RefreshController,
@@ -317,7 +316,7 @@ class MainViewModel @Inject constructor(
     private fun updateFolders(mailbox: Mailbox) {
         Log.d(TAG, "Force refresh Folders")
         ApiRepository.getFolders(mailbox.uuid).data?.let { folders ->
-            if (!mailboxContentRealm.isClosed()) folderController.update(folders, mailboxContentRealm)
+            if (!mailboxContentRealm().isClosed()) folderController.update(folders, mailboxContentRealm())
         }
     }
 
@@ -934,7 +933,7 @@ class MainViewModel @Inject constructor(
                 refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
                 mailbox = currentMailbox.value!!,
                 folder = folder,
-                realm = mailboxContentRealm,
+                realm = mailboxContentRealm(),
             )
         }
     }

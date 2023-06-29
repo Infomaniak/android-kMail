@@ -22,7 +22,6 @@ import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
-import com.infomaniak.mail.di.MailboxContentRealm
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
@@ -38,12 +37,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapNotNull
 import javax.inject.Inject
 
-class FolderController @Inject constructor(@MailboxContentRealm private val mailboxContentRealm: Realm) {
+class FolderController @Inject constructor(private val mailboxContentRealm: RealmDatabase.MailboxContent) {
 
     //region Get data
     private fun getFolders(
         exceptionsFoldersIds: List<String> = emptyList(),
-        realm: TypedRealm = mailboxContentRealm,
+        realm: TypedRealm = mailboxContentRealm(),
     ): RealmResults<Folder> {
         val realmQuery = if (exceptionsFoldersIds.isEmpty()) {
             getFoldersQuery(realm)
@@ -54,19 +53,19 @@ class FolderController @Inject constructor(@MailboxContentRealm private val mail
     }
 
     fun getRootsFoldersAsync(): Flow<ResultsChange<Folder>> {
-        return getFoldersQuery(mailboxContentRealm, onlyRoots = true).asFlow()
+        return getFoldersQuery(mailboxContentRealm(), onlyRoots = true).asFlow()
     }
 
     fun getFolder(id: String): Folder? {
-        return getFolderQuery(Folder::id.name, id, mailboxContentRealm).find()
+        return getFolderQuery(Folder::id.name, id, mailboxContentRealm()).find()
     }
 
     fun getFolder(role: FolderRole): Folder? {
-        return getFolderQuery(Folder.rolePropertyName, role.name, mailboxContentRealm).find()
+        return getFolderQuery(Folder.rolePropertyName, role.name, mailboxContentRealm()).find()
     }
 
     fun getFolderAsync(id: String): Flow<Folder> {
-        return getFolderQuery(Folder::id.name, id, mailboxContentRealm).asFlow().mapNotNull { it.obj }
+        return getFolderQuery(Folder::id.name, id, mailboxContentRealm()).asFlow().mapNotNull { it.obj }
     }
     //endregion
 

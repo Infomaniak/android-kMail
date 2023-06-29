@@ -30,7 +30,3 @@ annotation class UserInfoRealm
 @Retention(AnnotationRetention.BINARY)
 @Qualifier
 annotation class MailboxInfoRealm
-
-@Retention(AnnotationRetention.BINARY)
-@Qualifier
-annotation class MailboxContentRealm

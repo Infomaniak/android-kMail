@@ -54,8 +54,8 @@ class SwitchUserFragment : Fragment() {
                 requireContext().trackAccountEvent("switch")
                 AccountUtils.currentUser = user
                 AccountUtils.currentMailboxId = AppSettings.DEFAULT_ID
-                RealmDatabase.close()
                 AccountUtils.reloadApp?.invoke()
+                RealmDatabase.close()
             }
         }
     }

@@ -17,15 +17,14 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
+import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.Attachment
-import com.infomaniak.mail.di.MailboxContentRealm
-import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.query.RealmSingleQuery
 import javax.inject.Inject
 
-class AttachmentController @Inject constructor(@MailboxContentRealm private val mailboxContentRealm: Realm) {
+class AttachmentController @Inject constructor(private val mailboxContentRealm: RealmDatabase.MailboxContent) {
 
     //region Queries
     private fun getAttachmentQuery(resource: String, realm: TypedRealm): RealmSingleQuery<Attachment> {
@@ -34,14 +33,14 @@ class AttachmentController @Inject constructor(@MailboxContentRealm private val 
     //endregion
 
     //region Get data
-    fun getAttachment(resource: String, realm: TypedRealm = mailboxContentRealm): Attachment {
+    fun getAttachment(resource: String, realm: TypedRealm = mailboxContentRealm()): Attachment {
         return getAttachmentQuery(resource, realm).find()!!
     }
     //endregion
 
     //region Edit data
     fun updateSize(resource: String, newSize: Long) {
-        mailboxContentRealm.writeBlocking {
+        mailboxContentRealm().writeBlocking {
             getAttachment(resource, realm = this).size = newSize
         }
     }
