@@ -330,18 +330,19 @@ class DraftsActionsWorker @AssistedInject constructor(
         var scheduledDate: String? = null
         var savedDraftUuid: String? = null
 
+        val updatedDraft = DraftController.getDraft(draft.localUuid, mailboxContentRealm)!!
         // TODO: Remove this whole `draft.attachments.forEach { … }` when the Attachment issue is fixed.
-        draft.attachments.forEach { attachment ->
+        updatedDraft.attachments.forEach { attachment ->
             if (attachment.uuid.isBlank()) {
 
                 Sentry.withScope { scope ->
                     scope.level = SentryLevel.ERROR
                     scope.setExtra("attachmentUuid", attachment.uuid)
-                    scope.setExtra("attachmentsCount", "${draft.attachments.count()}")
-                    scope.setExtra("attachmentsUuids", "${draft.attachments.map { it.uuid }}")
-                    scope.setExtra("draftUuid", "${draft.remoteUuid}")
+                    scope.setExtra("attachmentsCount", "${updatedDraft.attachments.count()}")
+                    scope.setExtra("attachmentsUuids", "${updatedDraft.attachments.map { it.uuid }}")
+                    scope.setExtra("draftUuid", "${updatedDraft.remoteUuid}")
                     scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
-                    Sentry.captureMessage("We tried to [${draft.action?.name}] a Draft, but an Attachment didn't have its `uuid`.")
+                    Sentry.captureMessage("We tried to [${updatedDraft.action?.name}] a Draft, but an Attachment didn't have its `uuid`.")
                 }
 
                 return DraftActionResult(
@@ -354,11 +355,11 @@ class DraftsActionsWorker @AssistedInject constructor(
             }
         }
 
-        when (draft.action) {
-            DraftAction.SAVE -> with(ApiRepository.saveDraft(mailboxUuid, draft, okHttpClient)) {
+        when (updatedDraft.action) {
+            DraftAction.SAVE -> with(ApiRepository.saveDraft(mailboxUuid, updatedDraft, okHttpClient)) {
                 data?.let { data ->
                     realmActionOnDraft = { realm ->
-                        realm.findLatest(draft)?.apply {
+                        realm.findLatest(updatedDraft)?.apply {
                             remoteUuid = data.draftRemoteUuid
                             messageUid = data.messageUid
                             action = null
@@ -368,14 +369,14 @@ class DraftsActionsWorker @AssistedInject constructor(
                     savedDraftUuid = data.draftRemoteUuid
                 } ?: throwErrorAsException()
             }
-            DraftAction.SEND -> with(ApiRepository.sendDraft(mailboxUuid, draft, okHttpClient)) {
+            DraftAction.SEND -> with(ApiRepository.sendDraft(mailboxUuid, updatedDraft, okHttpClient)) {
                 when {
                     isSuccess() -> {
                         scheduledDate = data?.scheduledDate
-                        realmActionOnDraft = deleteDraftCallback(draft)
+                        realmActionOnDraft = deleteDraftCallback(updatedDraft)
                     }
                     error?.exception is SerializationException -> {
-                        realmActionOnDraft = deleteDraftCallback(draft)
+                        realmActionOnDraft = deleteDraftCallback(updatedDraft)
                         Sentry.withScope { scope ->
                             scope.level = SentryLevel.ERROR
                             Sentry.captureMessage("Return JSON for SendDraft API call was modified")
