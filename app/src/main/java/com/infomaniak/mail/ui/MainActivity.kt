@@ -180,10 +180,11 @@ class MainActivity : ThemedActivity() {
         getString(DraftsActionsWorker.RESULT_DRAFT_ACTION_KEY)?.let { draftAction ->
             when (draftAction.toEnumOrThrow<DraftAction>()) {
                 DraftAction.SAVE -> {
-                    showSavedDraftSnackBar(
-                        remoteDraftUuid = getString(DraftsActionsWorker.REMOTE_DRAFT_UUID_KEY)!!,
-                        associatedMailboxUuid = getString(DraftsActionsWorker.ASSOCIATED_MAILBOX_UUID_KEY)!!,
-                    )
+                    val associatedMailboxUuid = getString(DraftsActionsWorker.ASSOCIATED_MAILBOX_UUID_KEY)
+                    val remoteDraftUuid = getString(DraftsActionsWorker.REMOTE_DRAFT_UUID_KEY)
+                    if (associatedMailboxUuid != null && remoteDraftUuid != null) {
+                        showSavedDraftSnackBar(associatedMailboxUuid, remoteDraftUuid)
+                    }
                 }
                 DraftAction.SEND -> {
                     showSentDraftSnackBar()
@@ -201,7 +202,7 @@ class MainActivity : ThemedActivity() {
         }
     }
 
-    private fun showSavedDraftSnackBar(remoteDraftUuid: String, associatedMailboxUuid: String) {
+    private fun showSavedDraftSnackBar(associatedMailboxUuid: String, remoteDraftUuid: String) {
         mainViewModel.snackBarManager.setValue(
             title = getString(R.string.snackbarDraftSaved),
             undoData = null,
