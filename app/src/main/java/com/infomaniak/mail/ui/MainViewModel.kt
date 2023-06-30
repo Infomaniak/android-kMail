@@ -21,7 +21,6 @@ import android.app.Application
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
-import androidx.annotation.StringRes
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
@@ -267,17 +266,17 @@ class MainViewModel @Inject constructor(
 
     private fun selectMailbox(mailbox: Mailbox): MailboxErrorCode? {
 
-        fun displayToast(@StringRes title: Int) = viewModelScope.launch(Dispatchers.Main) {
+        fun displayToast(title: String) = viewModelScope.launch(Dispatchers.Main) {
             context.showToast(title, Toast.LENGTH_LONG)
         }
 
         if (!mailbox.isPasswordValid) {
             // TODO: Instead of this Toast & Exception, display a popup asking for correct password (we are currently waiting for the UX).
-            displayToast(R.string.frelatedMailbox)
+            displayToast(context.getString(R.string.frelatedMailbox))
             return MailboxErrorCode.INVALID_PASSWORD_MAILBOX
         }
         if (mailbox.isLocked) {
-            displayToast(R.string.lockedMailboxTitle)
+            displayToast(context.resources.getQuantityString(R.plurals.lockedMailboxTitle, 1))
             return MailboxErrorCode.LOCKED_MAILBOX
         }
 

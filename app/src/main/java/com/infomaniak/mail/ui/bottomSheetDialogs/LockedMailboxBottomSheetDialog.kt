@@ -30,7 +30,7 @@ class LockedMailboxBottomSheetDialog : InformationBottomSheetDialog() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
-        title.text = getString(R.string.lockedMailboxTitle, navigationArgs.lockedMailboxName)
+        title.text = getString(R.string.blockedMailboxTitle, navigationArgs.lockedMailboxName)
         description.setText(R.string.lockedMailboxDescription)
         illu.setBackgroundResource(R.drawable.ic_invalid_mailbox)
 
