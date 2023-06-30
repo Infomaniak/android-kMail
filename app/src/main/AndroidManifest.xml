@@ -109,6 +109,11 @@
             android:exported="false" />
 
         <activity
+            android:name=".ui.login.NoValidMailboxesActivity"
+            android:configChanges="orientation|screenSize"
+            android:exported="false" />
+
+        <activity
             android:name="com.infomaniak.lib.bugtracker.BugTrackerActivity"
             android:configChanges="orientation|screenSize"
             android:exported="false" />
