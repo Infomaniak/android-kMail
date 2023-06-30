@@ -17,11 +17,39 @@
  */
 package com.infomaniak.mail.ui.main.user
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
+import com.infomaniak.lib.core.models.user.User
+import com.infomaniak.mail.MatomoMail.trackAccountEvent
+import com.infomaniak.mail.data.cache.RealmDatabase
+import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
+import com.infomaniak.mail.data.models.AppSettings
+import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SwitchUserViewModel : ViewModel() {
+@HiltViewModel
+class SwitchUserViewModel @Inject constructor(
+    application: Application,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+) : AndroidViewModel(application) {
+
+    private inline val context get() = getApplication<Application>()
 
     val allUsers = AccountUtils.getAllUsers().map { users -> users.sortedBy { it.displayName } }
+
+    fun switchAccount(user: User) = viewModelScope.launch(ioDispatcher) {
+        if (user.id != AccountUtils.currentUserId) {
+            context.trackAccountEvent("switch")
+            AccountUtils.currentUser = user
+            AccountUtils.currentMailboxId = MailboxController.getFirstValidMailbox(user.id)?.mailboxId ?: AppSettings.DEFAULT_ID
+            AccountUtils.reloadApp?.invoke()
+            RealmDatabase.close()
+        }
+    }
 }
