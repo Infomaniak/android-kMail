@@ -22,22 +22,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.databinding.FragmentNoValidMailboxesBinding
-import com.infomaniak.mail.di.IoDispatcher
-import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.MailboxListFragment
 import com.infomaniak.mail.ui.main.menu.SwitchMailboxesAdapter
-import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineDispatcher
-import javax.inject.Inject
+import com.infomaniak.mail.ui.main.user.AccountFragmentDirections
+import com.infomaniak.mail.utils.animatedNavigation
 
-@AndroidEntryPoint
 class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
 
     private lateinit var binding: FragmentNoValidMailboxesBinding
-    private val mainViewModel: MainViewModel by activityViewModels()
 
 
     override val currentClassName: String = NoValidMailboxesFragment::class.java.name
@@ -47,25 +43,21 @@ class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
         onLockedMailboxClicked = { mailboxEmail -> onLockedMailboxClicked(mailboxEmail) },
     )
 
-    @Inject
-    @IoDispatcher
-    lateinit var ioDispatcher: CoroutineDispatcher
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentNoValidMailboxesBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
 
-        // changeAccountButton.setOnClickListener {
-        //     animatedNavigation(AccountFragmentDirections.actionAccountFragmentToSwitchUserFragment())
-        // }
-        //
-        // attachNewMailboxButton.setOnClickListener {
-        //     context.trackAccountEvent("addMailbox")
-        //     safeNavigate(AccountFragmentDirections.actionAccountFragmentToAttachMailboxFragment())
-        // }
-        //
+        changeAccountButton.setOnClickListener {
+            animatedNavigation(AccountFragmentDirections.actionAccountFragmentToSwitchUserFragment())
+        }
+
+        attachNewMailboxButton.setOnClickListener {
+            context?.trackAccountEvent("addMailbox")
+            safeNavigate(AccountFragmentDirections.actionAccountFragmentToAttachMailboxFragment())
+        }
+
         // mailboxesRecyclerView.apply {
         //     adapter = mailboxesAdapter
         //     isFocusable = false
