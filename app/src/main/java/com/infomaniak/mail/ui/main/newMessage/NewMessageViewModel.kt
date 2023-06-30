@@ -195,7 +195,7 @@ class NewMessageViewModel @Inject constructor(
                         ?.let { uid -> MessageController.getMessage(uid, realm = this@createDraft) }
                         ?.let { message ->
                             val isSuccess = draftController.setPreviousMessage(
-                                draft = draft,
+                                draft = this,
                                 draftMode = draftMode,
                                 message = message,
                                 context = context,
