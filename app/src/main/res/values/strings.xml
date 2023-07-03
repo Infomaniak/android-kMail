@@ -109,6 +109,7 @@
     <string name="buttonMore">More</string>
     <string name="buttonMoreStorage">Get more storage</string>
     <string name="buttonNewMessage">New message</string>
+    <string name="buttonPasswordForgotten">Forgot password?</string>
     <string name="buttonRefuse">Refuse</string>
     <string name="buttonReport">Report</string>
     <string name="buttonRestoreEmails">Restore emails</string>
@@ -181,6 +182,8 @@
     <string name="emptyStateSearchTitle">No results</string>
     <string name="emptyStateTrashDescription">Move the messages to the trash. They will be permanently deleted after 30 days.</string>
     <string name="emptyStateTrashTitle">Trash is empty</string>
+    <string name="enterPasswordDescription">For security reasons, you must enter the password of the mailbox %s\nor detach the mailbox</string>
+    <string name="enterPasswordTitle">Enter password</string>
     <string name="errorAlreadyLinkedMailbox">This email address is already linked to your account</string>
     <string name="errorAtLeastOneRecipient">At least one recipient is required</string>
     <string name="errorAttachAddressInput">Only Infomaniak email addresses are supported</string>

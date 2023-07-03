@@ -102,6 +102,7 @@
     <string name="buttonMore">Mehr</string>
     <string name="buttonMoreStorage">Mehr Speicherplatz erhalten</string>
     <string name="buttonNewMessage">Neue Nachricht</string>
+    <string name="buttonPasswordForgotten">Passwort vergessen?</string>
     <string name="buttonRefuse">Abfälle</string>
     <string name="buttonReport">Bericht</string>
     <string name="buttonRestoreEmails">E-Mails wiederherstellen</string>
@@ -174,6 +175,8 @@
     <string name="emptyStateSearchTitle">Keine Ergebnisse</string>
     <string name="emptyStateTrashDescription">Verschieben Sie die Nachrichten in den Papierkorb. Sie werden nach 30 Tagen endgültig gelöscht.</string>
     <string name="emptyStateTrashTitle">Der Papierkorb ist leer</string>
+    <string name="enterPasswordDescription">Aus Sicherheitsgründen müssen Sie das Passwort für die E-Mail-Adresse %s eingeben\noder die Adresse abtrennen</string>
+    <string name="enterPasswordTitle">Geben Sie das Passwort ein</string>
     <string name="errorAlreadyLinkedMailbox">Diese E-Mail-Adresse ist bereits mit Ihrem Konto verknüpft</string>
     <string name="errorAtLeastOneRecipient">Es ist mindestens ein Empfänger erforderlich</string>
     <string name="errorAttachAddressInput">Nur Infomaniak-Mailadressen werden unterstützt</string>

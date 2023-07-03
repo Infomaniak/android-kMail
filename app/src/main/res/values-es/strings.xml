@@ -102,6 +102,7 @@
     <string name="buttonMore">Más</string>
     <string name="buttonMoreStorage">Más espacio de almacenamiento</string>
     <string name="buttonNewMessage">Nuevo mensaje</string>
+    <string name="buttonPasswordForgotten">¿Ha olvidado su contraseña?</string>
     <string name="buttonRefuse">Desechos</string>
     <string name="buttonReport">Informe</string>
     <string name="buttonRestoreEmails">Restaurar correos electrónicos</string>
@@ -174,6 +175,8 @@
     <string name="emptyStateSearchTitle">Sin resultados</string>
     <string name="emptyStateTrashDescription">Mueve los mensajes a la papelera. Se borrarán definitivamente pasados 30 días.</string>
     <string name="emptyStateTrashTitle">La papelera está vacía</string>
+    <string name="enterPasswordDescription">Por razones de seguridad, debe introducir la contraseña de la dirección de correo electrónico %s\no eliminar la dirección</string>
+    <string name="enterPasswordTitle">Introduzca la contraseña</string>
     <string name="errorAlreadyLinkedMailbox">Esta dirección de correo electrónico ya está vinculada a su cuenta</string>
     <string name="errorAtLeastOneRecipient">Se precisa al menos un destinatario</string>
     <string name="errorAttachAddressInput">Sólo se admiten las direcciones de correo electrónico Infomaniak</string>

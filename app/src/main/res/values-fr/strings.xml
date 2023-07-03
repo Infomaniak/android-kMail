@@ -103,6 +103,7 @@
     <string name="buttonMore">Plus</string>
     <string name="buttonMoreStorage">Obtenir plus de stockage</string>
     <string name="buttonNewMessage">Nouveau message</string>
+    <string name="buttonPasswordForgotten">Mot de passe oublié ?</string>
     <string name="buttonRefuse">Refuser</string>
     <string name="buttonReport">Signaler</string>
     <string name="buttonRestoreEmails">Restaurer des e-mails</string>
@@ -175,6 +176,8 @@
     <string name="emptyStateSearchTitle">Aucun résultat</string>
     <string name="emptyStateTrashDescription">Déplacez les messages dans la corbeille. Ils seront supprimés définitivement au bout de 30 jours.</string>
     <string name="emptyStateTrashTitle">La corbeille est vide</string>
+    <string name="enterPasswordDescription">Pour des raisons de sécurité, vous devez saisir le mot de passe de l’adresse mail %s\nou détacher l’adresse</string>
+    <string name="enterPasswordTitle">Saisir le mot de passe</string>
     <string name="errorAlreadyLinkedMailbox">Cette adresse mail est déjà liée à votre compte</string>
     <string name="errorAtLeastOneRecipient">Il faut au minimum un destinataire</string>
     <string name="errorAttachAddressInput">Seules les adresses mail Infomaniak sont supportées</string>

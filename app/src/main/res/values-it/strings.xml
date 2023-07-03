@@ -102,6 +102,7 @@
     <string name="buttonMore">Di più</string>
     <string name="buttonMoreStorage">Ottenere più spazio di archiviazione</string>
     <string name="buttonNewMessage">Nuovo messaggio</string>
+    <string name="buttonPasswordForgotten">Avete dimenticato la password?</string>
     <string name="buttonRefuse">Rifiuto</string>
     <string name="buttonReport">Rapporto</string>
     <string name="buttonRestoreEmails">Ripristino delle e-mail</string>
@@ -174,6 +175,8 @@
     <string name="emptyStateSearchTitle">Nessun risultato</string>
     <string name="emptyStateTrashDescription">Spostate i messaggi nel cestino. Verranno eliminati definitivamente dopo 30 giorni.</string>
     <string name="emptyStateTrashTitle">Il cestino è vuoto</string>
+    <string name="enterPasswordDescription">Per motivi di sicurezza, è necessario inserire la password dell’indirizzo e-mail %s\no staccare l’indirizzo</string>
+    <string name="enterPasswordTitle">Inserire la password</string>
     <string name="errorAlreadyLinkedMailbox">Questo indirizzo e-mail è già collegato al vostro account</string>
     <string name="errorAtLeastOneRecipient">È richiesto almeno un destinatario</string>
     <string name="errorAttachAddressInput">Sono supportati solo gli indirizzi e-mail Infomaniak</string>
