@@ -172,7 +172,7 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
 
     @SuppressLint("SetTextI18n")
     private fun displayVersion() {
-        binding.appVersionName.text = "kMail Android version ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
+        binding.appVersionName.text = "ikMail Android version ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
     }
 
     private fun observeCurrentMailbox() {
