@@ -32,7 +32,7 @@ val Job.handler
         if (isActive) handleException(exception)
     }
 
-/** Ignore errors due to forced realm closure and notify sentry when necessary */
+/** Ignore errors due to forced Realm closure and notify Sentry when necessary */
 private fun handleException(exception: Throwable) {
 
     /** Ignore all errors due to voluntary realm closure
