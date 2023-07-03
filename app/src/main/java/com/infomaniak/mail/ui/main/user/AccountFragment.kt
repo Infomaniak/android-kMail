@@ -57,6 +57,7 @@ class AccountFragment : Fragment(), MailboxListFragment {
         isInMenuDrawer = false,
         lifecycleScope = lifecycleScope,
         onLockedMailboxClicked = { mailboxEmail -> onLockedMailboxClicked(mailboxEmail) },
+        onInvalidPasswordMailboxClicked = { mailboxEmail -> onInvalidPasswordMailboxClicked(mailboxEmail) },
     )
 
     @Inject
