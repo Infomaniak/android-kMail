@@ -109,7 +109,7 @@
             android:exported="false" />
 
         <activity
-            android:name=".ui.login.NoValidMailboxesActivity"
+            android:name=".ui.noValidMailboxes.NoValidMailboxesActivity"
             android:configChanges="orientation|screenSize"
             android:exported="false" />
 
