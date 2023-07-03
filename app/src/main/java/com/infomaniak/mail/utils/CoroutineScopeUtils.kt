@@ -35,8 +35,8 @@ val Job.handler
 /** Ignore errors due to forced Realm closure and notify Sentry when necessary */
 private fun handleException(exception: Throwable) {
 
-    /** Ignore all errors due to voluntary realm closure
-     * @return true if the error is recognized otherwise false
+    /** Ignore all errors due to voluntary Realm closure
+     * @return true if the error is recognized, otherwise false
      **/
     fun shouldIgnoreRealmError(): Boolean = exception.message?.run {
         return contains(ErrorCode.RLM_ERR_CLOSED_REALM.name)
