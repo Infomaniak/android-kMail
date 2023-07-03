@@ -137,7 +137,8 @@
                         </option>
                         <option name="myPositions">
                           <map>
-                            <entry key="action_detailedContactBottomSheetDialog_to_newMessageActivity">
+                            <entry
+                              key="action_detailedContactBottomSheetDialog_to_newMessageActivity">
                               <value>
                                 <LayoutPositions />
                               </value>

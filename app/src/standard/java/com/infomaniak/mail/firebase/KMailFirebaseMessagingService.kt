@@ -1,5 +1,5 @@
 /*
- * Infomaniak kMail - Android
+ * Infomaniak ikMail - Android
  * Copyright (C) 2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
@@ -66,9 +66,9 @@ class KMailFirebaseMessagingService : FirebaseMessagingService() {
         val mailboxId = message.data["mailbox_id"]?.toInt() ?: return
         val messageUid = message.data["message_uid"] ?: return
 
-        Log.d(TAG, "KMailFirebaseMessagingService>onMessageReceived: userId=$userId")
-        Log.d(TAG, "KMailFirebaseMessagingService>onMessageReceived: mailboxId=$mailboxId")
-        Log.d(TAG, "KMailFirebaseMessagingService>onMessageReceived: messageUid=$messageUid")
+        Log.d(TAG, "onMessageReceived: userId=$userId")
+        Log.d(TAG, "onMessageReceived: mailboxId=$mailboxId")
+        Log.d(TAG, "onMessageReceived: messageUid=$messageUid")
 
         if (mainApplication.isAppInBackground) {
             processMessageInBackground(userId, mailboxId, messageUid)
