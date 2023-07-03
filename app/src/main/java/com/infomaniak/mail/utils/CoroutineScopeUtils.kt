@@ -17,20 +17,38 @@
  */
 package com.infomaniak.mail.utils
 
+import io.realm.kotlin.internal.interop.ErrorCode
 import io.sentry.Sentry
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
-inline val CoroutineScope.handler
+val CoroutineScope.handler
     get() = CoroutineExceptionHandler { _, exception ->
-        if (isActive) Sentry.captureException(exception)
-        exception.printStackTrace()
+        if (isActive) handleException(exception)
     }
 
-inline val Job.handler
+val Job.handler
     get() = CoroutineExceptionHandler { _, exception ->
-        if (isActive) Sentry.captureException(exception)
-        exception.printStackTrace()
+        if (isActive) handleException(exception)
     }
+
+/** Ignore errors due to forced Realm closure and notify Sentry when necessary */
+private fun handleException(exception: Throwable) {
+
+    /** Ignore all errors due to voluntary Realm closure
+     * @return true if the error is recognized, otherwise false
+     **/
+    fun shouldIgnoreRealmError(): Boolean = exception.message?.run {
+        return contains(ErrorCode.RLM_ERR_CLOSED_REALM.name)
+                || contains(ErrorCode.RLM_ERR_INVALIDATED_OBJECT.name)
+                || contains(ErrorCode.RLM_ERR_INVALID_TABLE_REF.name)
+                || contains(ErrorCode.RLM_ERR_STALE_ACCESSOR.name)
+    } ?: false
+
+    if (shouldIgnoreRealmError()) return
+
+    exception.printStackTrace()
+    Sentry.captureException(exception)
+}
 
 fun CoroutineScope.coroutineContext(dispatcher: CoroutineDispatcher): CoroutineContext = coroutineContext + handler + dispatcher
