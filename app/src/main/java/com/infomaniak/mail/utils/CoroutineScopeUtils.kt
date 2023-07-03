@@ -45,10 +45,10 @@ private fun handleException(exception: Throwable) {
                 || contains(ErrorCode.RLM_ERR_STALE_ACCESSOR.name)
     } ?: false
 
-    if (!shouldIgnoreRealmError()) {
-        exception.printStackTrace()
-        Sentry.captureException(exception)
-    }
+    if (shouldIgnoreRealmError()) return
+
+    exception.printStackTrace()
+    Sentry.captureException(exception)
 }
 
 fun CoroutineScope.coroutineContext(dispatcher: CoroutineDispatcher): CoroutineContext = coroutineContext + handler + dispatcher
