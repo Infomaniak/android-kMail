@@ -32,8 +32,12 @@ val Job.handler
         if (isActive) handleException(exception)
     }
 
+/** Ignore errors due to forced realm closure and notify sentry when necessary */
 private fun handleException(exception: Throwable) {
 
+    /** Ignore all errors due to voluntary realm closure
+     * @return true if the error is recognized otherwise false
+     **/
     fun shouldIgnoreRealmError(): Boolean = exception.message?.run {
         return contains(ErrorCode.RLM_ERR_CLOSED_REALM.name) ||
                 contains(ErrorCode.RLM_ERR_INVALIDATED_OBJECT.name) ||
