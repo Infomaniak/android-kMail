@@ -49,11 +49,12 @@ class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
 
         changeAccountButton.setOnClickListener {
+            trackNoValidMailboxesEvent("switchAccount")
             safeNavigate(NoValidMailboxesFragmentDirections.actionNoValidMailboxesFragmentToSwitchUserFragment())
         }
 
         attachNewMailboxButton.setOnClickListener {
-            context?.trackAccountEvent("addMailbox")
+            trackNoValidMailboxesEvent(ADD_MAILBOX_NAME)
             safeNavigate(NoValidMailboxesFragmentDirections.actionNoValidMailboxesFragmentToAttachMailboxFragment())
         }
 

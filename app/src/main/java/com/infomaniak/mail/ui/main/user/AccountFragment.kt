@@ -28,6 +28,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.mail.MatomoMail.ADD_MAILBOX_NAME
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentAccountBinding
@@ -83,7 +84,7 @@ class AccountFragment : Fragment(), MailboxListFragment {
         }
 
         attachNewMailboxButton.setOnClickListener {
-            context.trackAccountEvent("addMailbox")
+            context.trackAccountEvent(ADD_MAILBOX_NAME)
             safeNavigate(AccountFragmentDirections.actionAccountFragmentToAttachMailboxFragment())
         }
 
