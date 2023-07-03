@@ -63,7 +63,7 @@ class Folder : RealmObject {
     @Transient
     var cursor: String? = null
     @Transient
-    var unreadCount: Int = 0
+    var unreadCountLocal: Int = 0
     @Transient
     var threads: RealmList<Thread> = realmListOf()
     @Transient
@@ -97,7 +97,7 @@ class Folder : RealmObject {
     ) {
         this.lastUpdatedAt = lastUpdatedAt
         this.cursor = cursor
-        this.unreadCount = unreadCount
+        this.unreadCountLocal = unreadCount
         this.threads.addAll(threads)
         this.messages.addAll(messages)
         this.remainingOldMessagesToFetch = remainingOldMessagesToFetch

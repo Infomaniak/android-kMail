@@ -496,7 +496,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             currentFolderCursor = folder.cursor
             Log.i("UI", "Received cursor: $currentFolderCursor | (${folder.name})")
             updateThreadsVisibility()
-            updateUnreadCount(folder.unreadCount)
+            updateUnreadCount(folder.unreadCountLocal)
             checkLastUpdateDay()
             updateUpdatedAt(folder.lastUpdatedAt?.toDate())
             startUpdatedAtJob()

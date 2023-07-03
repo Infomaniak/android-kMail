@@ -69,7 +69,7 @@ class FolderAdapter(
         val badge = when (folder.role) {
             FolderRole.DRAFT -> folder.threads.count()
             FolderRole.SENT, FolderRole.TRASH -> 0
-            else -> folder.unreadCount
+            else -> folder.unreadCountLocal
         }
 
         folder.role?.let {
@@ -147,7 +147,7 @@ class FolderAdapter(
             return oldFolder.name == newFolder.name &&
                     oldFolder.isFavorite == newFolder.isFavorite &&
                     oldFolder.path == newFolder.path &&
-                    oldFolder.unreadCount == newFolder.unreadCount &&
+                    oldFolder.unreadCountLocal == newFolder.unreadCountLocal &&
                     oldFolder.threads.count() == newFolder.threads.count()
         }
     }

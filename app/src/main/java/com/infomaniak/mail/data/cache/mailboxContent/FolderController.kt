@@ -109,7 +109,7 @@ class FolderController @Inject constructor(private val mailboxContentRealm: Real
                 remoteFolder.initLocalValues(
                     localFolder.lastUpdatedAt,
                     localFolder.cursor,
-                    localFolder.unreadCount,
+                    localFolder.unreadCountLocal,
                     localFolder.threads,
                     localFolder.messages,
                     localFolder.remainingOldMessagesToFetch,
@@ -187,7 +187,7 @@ class FolderController @Inject constructor(private val mailboxContentRealm: Real
             val folder = getFolder(id, realm) ?: return
 
             val unreadCount = ThreadController.getUnreadThreadsCount(folder)
-            folder.unreadCount = unreadCount
+            folder.unreadCountLocal = unreadCount
 
             if (folder.role == FolderRole.INBOX) {
                 MailboxController.updateMailbox(mailboxObjectId) { mailbox ->
