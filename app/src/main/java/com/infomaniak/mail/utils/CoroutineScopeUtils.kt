@@ -39,9 +39,10 @@ private fun handleException(exception: Throwable) {
      * @return true if the error is recognized otherwise false
      **/
     fun shouldIgnoreRealmError(): Boolean = exception.message?.run {
-        return contains(ErrorCode.RLM_ERR_CLOSED_REALM.name) ||
-                contains(ErrorCode.RLM_ERR_INVALIDATED_OBJECT.name) ||
-                contains(ErrorCode.RLM_ERR_INVALID_TABLE_REF.name)
+        return contains(ErrorCode.RLM_ERR_CLOSED_REALM.name)
+                || contains(ErrorCode.RLM_ERR_INVALIDATED_OBJECT.name)
+                || contains(ErrorCode.RLM_ERR_INVALID_TABLE_REF.name)
+                || contains(ErrorCode.RLM_ERR_STALE_ACCESSOR.name)
     } ?: false
 
     if (!shouldIgnoreRealmError()) {
