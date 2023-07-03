@@ -88,6 +88,11 @@ class Folder : RealmObject {
     val role: FolderRole?
         get() = enumValueOfOrNull<FolderRole>(_role)
 
+    // `> 0` should display the number.
+    // `-1` should display a pastille.
+    // `0` should display nothing.
+    val unreadCountToDisplay: Int get() = if (unreadCountLocal > 0) unreadCountLocal else if (unreadCountRemote > 0) -1 else 0
+
     fun initLocalValues(
         lastUpdatedAt: RealmInstant?,
         cursor: String?,

@@ -22,6 +22,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -69,7 +71,7 @@ class FolderAdapter(
         val badge = when (folder.role) {
             FolderRole.DRAFT -> folder.threads.count()
             FolderRole.SENT, FolderRole.TRASH -> 0
-            else -> folder.unreadCountLocal
+            else -> folder.unreadCountToDisplay
         }
 
         folder.role?.let {
@@ -99,13 +101,31 @@ class FolderAdapter(
         trackerValue: Float? = null,
         folderIndent: Int? = null,
     ) = with(item) {
+
+        fun setBadge() {
+            if (!isInMenuDrawer) {
+                badge = 0
+                return
+            }
+
+            with(binding) {
+                if (badgeText == -1) {
+                    itemBadge.isGone = true
+                    pastille.isVisible = true
+                } else {
+                    pastille.isGone = true
+                    badge = badgeText
+                }
+            }
+        }
+
         text = name
         icon = AppCompatResources.getDrawable(context, iconId)
         indent = context.resources.getDimension(RCore.dimen.marginStandard).toInt() * (folderIndent ?: 0)
-        badge = if (isInMenuDrawer) badgeText else 0
         itemStyle = if (isInMenuDrawer) SelectionStyle.MENU_DRAWER else SelectionStyle.OTHER
         textWeight = if (isInMenuDrawer) TextWeight.MEDIUM else TextWeight.REGULAR
 
+        setBadge()
         setSelectedState(currentFolderId == id)
 
         setOnClickListener {
@@ -147,7 +167,7 @@ class FolderAdapter(
             return oldFolder.name == newFolder.name &&
                     oldFolder.isFavorite == newFolder.isFavorite &&
                     oldFolder.path == newFolder.path &&
-                    oldFolder.unreadCountLocal == newFolder.unreadCountLocal &&
+                    oldFolder.unreadCountToDisplay == newFolder.unreadCountToDisplay &&
                     oldFolder.threads.count() == newFolder.threads.count()
         }
     }

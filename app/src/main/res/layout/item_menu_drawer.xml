@@ -58,6 +58,15 @@
                 tools:text="42" />
 
             <ImageView
+                android:id="@+id/pastille"
+                android:layout_width="wrap_content"
+                android:layout_height="8dp"
+                android:layout_marginEnd="@dimen/marginStandardSmall"
+                android:src="@drawable/ic_pastille"
+                android:visibility="gone"
+                app:tint="?android:attr/colorPrimary" />
+
+            <ImageView
                 android:id="@+id/checkmark"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/mediumIconSize"
