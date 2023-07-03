@@ -17,21 +17,57 @@
  */
 package com.infomaniak.mail.ui.login
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.webkit.WebView
+import androidx.navigation.NavDestination
+import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.mail.BuildConfig
+import com.infomaniak.mail.MatomoMail.trackDestination
+import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ActivityNoValidMailboxesBinding
 import com.infomaniak.mail.ui.ThemedActivity
+import com.infomaniak.mail.utils.SentryDebug
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class NoValidMailboxesActivity : ThemedActivity() {
 
     private val binding by lazy { ActivityNoValidMailboxesBinding.inflate(layoutInflater) }
     // private val noValidMailboxesViewModel: NoValidMailboxesViewModel by viewModels()
+
+
+    private val navController by lazy {
+        (supportFragmentManager.findFragmentById(R.id.hostFragment) as NavHostFragment).navController
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
 
         setContentView(binding.root)
+
+        setupNavController()
+    }
+
+    private fun setupNavController() {
+        navController.addOnDestinationChangedListener { _, destination, arguments ->
+            onDestinationChanged(destination, arguments)
+        }
+    }
+
+    // This `SuppressLint` seems useless, but it's for the CI. Don't remove it.
+    @SuppressLint("RestrictedApi")
+    private fun onDestinationChanged(destination: NavDestination, arguments: Bundle?) {
+
+        SentryDebug.addNavigationBreadcrumb(destination.displayName, arguments)
+
+        window.statusBarColor = if (destination.id == R.id.noValidMailboxesFragment) {
+            R.color.backgroundColor
+        } else {
+            R.color.backgroundHeaderColor
+        }.let(::getColor)
+
+        trackDestination(destination)
     }
 }

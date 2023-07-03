@@ -24,12 +24,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.infomaniak.lib.core.utils.safeNavigate
-import com.infomaniak.mail.MatomoMail.trackAccountEvent
+import com.infomaniak.mail.MatomoMail.ADD_MAILBOX_NAME
+import com.infomaniak.mail.MatomoMail.trackNoValidMailboxesEvent
 import com.infomaniak.mail.databinding.FragmentNoValidMailboxesBinding
 import com.infomaniak.mail.ui.main.MailboxListFragment
 import com.infomaniak.mail.ui.main.menu.SwitchMailboxesAdapter
-import com.infomaniak.mail.ui.main.user.AccountFragmentDirections
-import com.infomaniak.mail.utils.animatedNavigation
 
 class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
 
@@ -50,12 +49,12 @@ class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
 
         changeAccountButton.setOnClickListener {
-            animatedNavigation(AccountFragmentDirections.actionAccountFragmentToSwitchUserFragment())
+            safeNavigate(NoValidMailboxesFragmentDirections.actionNoValidMailboxesFragmentToSwitchUserFragment())
         }
 
         attachNewMailboxButton.setOnClickListener {
             context?.trackAccountEvent("addMailbox")
-            safeNavigate(AccountFragmentDirections.actionAccountFragmentToAttachMailboxFragment())
+            safeNavigate(NoValidMailboxesFragmentDirections.actionNoValidMailboxesFragmentToAttachMailboxFragment())
         }
 
         // mailboxesRecyclerView.apply {
