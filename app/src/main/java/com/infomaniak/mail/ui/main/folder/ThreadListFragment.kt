@@ -72,6 +72,7 @@ import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.login.NoMailboxActivity
+import com.infomaniak.mail.ui.login.NoValidMailboxesActivity
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
 import com.infomaniak.mail.utils.UiUtils.formatUnreadCount
@@ -116,6 +117,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         super.onViewCreated(view, savedInstanceState)
 
         observeNoMailboxActivityTriggers()
+        observeNoValidMailboxesActivityTriggers()
         setupDensityDependentUi()
         setupOnRefresh()
         setupAdapter()
@@ -190,6 +192,12 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun observeNoMailboxActivityTriggers() {
         mainViewModel.shouldStartNoMailboxActivity.observe(viewLifecycleOwner) {
             startActivity(Intent(requireContext(), NoMailboxActivity::class.java).clearStack())
+        }
+    }
+
+    private fun observeNoValidMailboxesActivityTriggers() {
+        mainViewModel.shouldStartNoValidMailboxesActivity.observe(viewLifecycleOwner) {
+            startActivity(Intent(requireContext(), NoValidMailboxesActivity::class.java).clearStack())
         }
     }
 

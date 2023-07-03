@@ -92,6 +92,7 @@ class MainViewModel @Inject constructor(
     val isDownloadingChanges: MutableLiveData<Pair<Boolean, Boolean?>> = MutableLiveData(false to null)
     val isNewFolderCreated = SingleLiveEvent<Boolean>()
     val shouldStartNoMailboxActivity = SingleLiveEvent<Unit>()
+    val shouldStartNoValidMailboxesActivity = SingleLiveEvent<Unit>()
 
     // Explanation of this Map : Map<Email, Map<Name, MergedContact>>
     val mergedContacts = MutableLiveData<Map<String, Map<String, MergedContact>>?>()
@@ -236,9 +237,12 @@ class MainViewModel @Inject constructor(
             Log.d(TAG, "Refresh mailboxes from remote")
             with(ApiRepository.getMailboxes()) {
                 if (isSuccess()) {
-                    if (data?.isEmpty() == true) {
-                        shouldStartNoMailboxActivity.postValue(Unit)
-                        return@launch
+                    when {
+                        data!!.isEmpty() -> {
+                            shouldStartNoMailboxActivity.postValue(Unit)
+                            return@launch
+                        }
+                        data!!.none { it.isValid } -> shouldStartNoValidMailboxesActivity.postValue(Unit)
                     }
                     val isCurrentMailboxDeleted = MailboxController.updateMailboxes(context, data!!)
                     if (isCurrentMailboxDeleted) return@launch
