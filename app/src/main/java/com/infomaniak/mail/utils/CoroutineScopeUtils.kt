@@ -17,20 +17,31 @@
  */
 package com.infomaniak.mail.utils
 
+import io.realm.kotlin.internal.interop.ErrorCode
 import io.sentry.Sentry
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
-inline val CoroutineScope.handler
+val CoroutineScope.handler
     get() = CoroutineExceptionHandler { _, exception ->
-        if (isActive) Sentry.captureException(exception)
-        exception.printStackTrace()
+        if (isActive) handleException(exception)
     }
 
-inline val Job.handler
+val Job.handler
     get() = CoroutineExceptionHandler { _, exception ->
-        if (isActive) Sentry.captureException(exception)
-        exception.printStackTrace()
+        if (isActive) handleException(exception)
     }
+
+private fun handleException(exception: Throwable) {
+
+    fun shouldIgnoreRealmError(): Boolean = exception.message?.run {
+        return contains(ErrorCode.RLM_ERR_CLOSED_REALM.name) || contains(ErrorCode.RLM_ERR_INVALIDATED_OBJECT.name)
+    } ?: false
+
+    if (!shouldIgnoreRealmError()) {
+        exception.printStackTrace()
+        Sentry.captureException(exception)
+    }
+}
 
 fun CoroutineScope.coroutineContext(dispatcher: CoroutineDispatcher): CoroutineContext = coroutineContext + handler + dispatcher
