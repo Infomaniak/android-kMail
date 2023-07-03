@@ -222,12 +222,14 @@
     <string name="googlePlayServicesAreRequired">Google Play Services are required</string>
     <string name="inboxFolder">Inbox</string>
     <string name="loadingText">Loading…</string>
-    <string name="lockedMailboxDescription">Access to your mailbox is currently blocked. Please contact your administrator.</string>
+    <plurals name="lockedMailboxDescription">
+        <item quantity="one">Access to your mailbox is currently blocked. Please contact your administrator.</item>
+        <item quantity="other">Access to your mailboxes is currently blocked. Please contact your administrator.</item>
+    </plurals>
     <plurals name="lockedMailboxTitle">
         <item quantity="one">Blocked mailbox</item>
         <item quantity="other">Blocked mailboxes</item>
     </plurals>
-    <string name="lockedMailboxesDescription">Access to your mailboxes is currently blocked. Please contact your administrator.</string>
     <string name="menuDrawerAdvancedActions">Advanced actions</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s used</string>
     <string name="messageDetailsDateAt">%1$s at %2$s</string>
