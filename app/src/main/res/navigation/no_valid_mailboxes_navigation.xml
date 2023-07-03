@@ -23,7 +23,7 @@
 
     <fragment
         android:id="@+id/noValidMailboxesFragment"
-        android:name="com.infomaniak.mail.ui.login.NoValidMailboxesFragment"
+        android:name="com.infomaniak.mail.ui.noValidMailboxes.NoValidMailboxesFragment"
         android:label="NoValidMailboxesFragment"
         tools:layout="@layout/fragment_no_valid_mailboxes">
         <action
