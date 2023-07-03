@@ -21,8 +21,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.lib.core.utils.showKeyboard
+import com.infomaniak.lib.core.utils.showProgress
+import com.infomaniak.mail.MatomoMail.trackNoValidMailboxesEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentInvalidPasswordBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -37,9 +41,23 @@ class InvalidPasswordFragment : Fragment() {
         return FragmentInvalidPasswordBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
         enterPasswordDescription.text = getString(R.string.enterPasswordDescription, navigationArgs.mailboxEmail)
+
+        passwordInput.showKeyboard()
+
+        confirmButton.apply {
+            isEnabled = false
+
+            passwordInput.doAfterTextChanged { isEnabled = passwordInput.text?.isNotBlank() == true }
+
+            setOnClickListener {
+                trackNoValidMailboxesEvent("confirmPassword")
+                showProgress()
+                // TODO
+            }
+        }
     }
 }

@@ -22,7 +22,6 @@ import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
 import com.infomaniak.mail.ui.bottomSheetDialogs.LockedMailboxBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.menu.SwitchMailboxesAdapter
-import com.infomaniak.mail.utils.animatedNavigation
 
 interface MailboxListFragment {
 
@@ -38,7 +37,7 @@ interface MailboxListFragment {
     }
 
     fun Fragment.onInvalidPasswordMailboxClicked(mailboxEmail: String) {
-        animatedNavigation(
+        safeNavigate(
             resId = R.id.invalidPasswordFragment,
             args = InvalidPasswordFragmentArgs(mailboxEmail).toBundle(),
             currentClassName = currentClassName,
