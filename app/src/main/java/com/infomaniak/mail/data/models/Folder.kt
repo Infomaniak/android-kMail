@@ -53,6 +53,8 @@ class Folder : RealmObject {
     private var _role: String? = null
     @SerialName("is_favorite")
     var isFavorite: Boolean = false
+    @SerialName("unread_count")
+    var unreadCountRemote: Int = 0
     var separator: String = ""
     var children: RealmList<Folder> = realmListOf()
     //endregion
