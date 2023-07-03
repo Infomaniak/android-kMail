@@ -21,25 +21,34 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.MatomoMail.ADD_MAILBOX_NAME
 import com.infomaniak.mail.MatomoMail.trackNoValidMailboxesEvent
+import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentNoValidMailboxesBinding
-import com.infomaniak.mail.ui.main.MailboxListFragment
 import com.infomaniak.mail.ui.main.menu.SwitchMailboxesAdapter
+import dagger.hilt.android.AndroidEntryPoint
 
-class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
+@AndroidEntryPoint
+class NoValidMailboxesFragment : Fragment() {
 
     private lateinit var binding: FragmentNoValidMailboxesBinding
+    private val noValidMailboxesViewModel: NoValidMailboxesViewModel by activityViewModels()
 
-
-    override val currentClassName: String = NoValidMailboxesFragment::class.java.name
-    override val mailboxesAdapter = SwitchMailboxesAdapter(
+    private val lockedMailboxesAdapter = SwitchMailboxesAdapter(
         isInMenuDrawer = false,
         lifecycleScope = lifecycleScope,
-        onLockedMailboxClicked = { mailboxEmail -> onLockedMailboxClicked(mailboxEmail) },
+        onLockedMailboxClicked = {},
+    )
+
+    private val invalidPasswordMailboxesAdapter = SwitchMailboxesAdapter(
+        isInMenuDrawer = false,
+        lifecycleScope = lifecycleScope,
+        onLockedMailboxClicked = {},
     )
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -47,6 +56,9 @@ class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
+
+        observeMailboxesCount()
+        observeMailboxesLive()
 
         changeAccountButton.setOnClickListener {
             trackNoValidMailboxesEvent("switchAccount")
@@ -58,16 +70,34 @@ class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
             safeNavigate(NoValidMailboxesFragmentDirections.actionNoValidMailboxesFragmentToAttachMailboxFragment())
         }
 
-        // mailboxesRecyclerView.apply {
-        //     adapter = mailboxesAdapter
-        //     isFocusable = false
-        // }
-
-        // observeAccountsLive()
     }
 
-    // private fun observeAccountsLive() {
-    //     mainViewModel.mailboxesLive.observe(viewLifecycleOwner, mailboxesAdapter::setMailboxes)
-    //     lifecycleScope.launch(ioDispatcher) { accountViewModel.updateMailboxes() }
-    // }
+    private fun setQuantityTextTitle(mailboxCount: Long) = with(binding) {
+        val count = mailboxCount.toInt()
+        val lockedMailboxTitleString = resources.getQuantityString(R.plurals.lockedMailboxTitle, count)
+
+        invalidMailboxTitle.text = lockedMailboxTitleString
+        lockedMailboxTitle.text = lockedMailboxTitleString
+        invalidPasswordTitle.text = resources.getQuantityString(R.plurals.blockedPasswordTitle, count)
+        invalidMailboxDescription.text = resources.getQuantityText(R.plurals.lockedMailboxDescription, count)
+    }
+
+    private fun observeMailboxesLive() = with(binding) {
+        noValidMailboxesViewModel.invalidPasswordMailboxesLive.observe(viewLifecycleOwner) { invalidPasswordMailboxes ->
+            invalidPasswordMailboxesGroup.isVisible = invalidPasswordMailboxes.isNotEmpty()
+            invalidPasswordMailboxesAdapter.setMailboxes(invalidPasswordMailboxes)
+            invalidPasswordMailboxesRecyclerView.adapter = invalidPasswordMailboxesAdapter
+        }
+
+        noValidMailboxesViewModel.lockedMailboxesLive.observe(viewLifecycleOwner) { lockedMailboxes ->
+            lockedMailboxesGroup.isVisible = lockedMailboxes.isNotEmpty()
+            lockedMailboxesAdapter.setMailboxes(lockedMailboxes)
+            lockedMailboxesRecyclerView.adapter = lockedMailboxesAdapter
+
+        }
+    }
+
+    private fun observeMailboxesCount() {
+        noValidMailboxesViewModel.mailboxesCount.observe(viewLifecycleOwner, ::setQuantityTextTitle)
+    }
 }

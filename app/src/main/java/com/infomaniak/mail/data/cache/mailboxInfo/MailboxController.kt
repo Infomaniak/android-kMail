@@ -43,6 +43,8 @@ object MailboxController {
 
     //region Queries
     private fun checkHasUserId(userId: Int) = "${Mailbox::userId.name} == '$userId'"
+    private val isMailboxLocked = "${Mailbox::isLocked.name} == true"
+    private val hasValidPassword = "${Mailbox::isPasswordValid.name} == true"
 
     private fun getMailboxesQuery(
         userId: Int? = null,
@@ -64,10 +66,7 @@ object MailboxController {
     }
 
     private fun getValidMailboxesQuery(userId: Int, realm: TypedRealm): RealmQuery<Mailbox> {
-        val isPasswordValid = "${Mailbox::isPasswordValid.name} == true"
-        val isNotLocked = "${Mailbox::isLocked.name} == false"
-
-        return realm.query("${checkHasUserId(userId)} AND $isPasswordValid AND $isNotLocked")
+        return realm.query("${checkHasUserId(userId)} AND $hasValidPassword AND (NOT $isMailboxLocked)")
     }
 
     private fun getMailboxQuery(objectId: String, realm: TypedRealm): RealmSingleQuery<Mailbox> {
@@ -77,6 +76,14 @@ object MailboxController {
     private fun getMailboxQuery(userId: Int, mailboxId: Int, realm: TypedRealm): RealmSingleQuery<Mailbox> {
         val checkMailboxId = "${Mailbox::mailboxId.name} == '$mailboxId'"
         return realm.query<Mailbox>("${checkHasUserId(userId)} AND $checkMailboxId").first()
+    }
+
+    private fun getInvalidPasswordMailboxesQuery(userId: Int, realm: TypedRealm): RealmQuery<Mailbox> {
+        return realm.query("${checkHasUserId(userId)} AND NOT ($hasValidPassword OR $isMailboxLocked)")
+    }
+
+    private fun getLockedMailboxesQuery(userId: Int, realm: TypedRealm): RealmQuery<Mailbox> {
+        return realm.query("${checkHasUserId(userId)} AND $isMailboxLocked")
     }
     //endregion
 
@@ -111,6 +118,14 @@ object MailboxController {
 
     fun getMailboxAsync(objectId: String): Flow<SingleQueryChange<Mailbox>> {
         return getMailboxQuery(objectId, defaultRealm).asFlow()
+    }
+
+    fun getInvalidPasswordMailboxes(userId: Int): Flow<RealmResults<Mailbox>> {
+        return getInvalidPasswordMailboxesQuery(userId, defaultRealm).asFlow().map { it.list }
+    }
+
+    fun getLockedMailboxes(userId: Int): Flow<RealmResults<Mailbox>> {
+        return getLockedMailboxesQuery(userId, defaultRealm).asFlow().map { it.list }
     }
     //endregion
 
