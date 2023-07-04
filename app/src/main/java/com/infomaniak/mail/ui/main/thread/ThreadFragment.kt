@@ -455,6 +455,6 @@ class ThreadFragment : Fragment() {
         const val COLLAPSE_TITLE_THRESHOLD = 0.5
         const val ARCHIVE_INDEX = 2
 
-        fun allAttachmentsFileName(subject: String) = "kMail-attachments-$subject.zip"
+        fun allAttachmentsFileName(subject: String) = "ikMail-attachments-$subject.zip"
     }
 }
