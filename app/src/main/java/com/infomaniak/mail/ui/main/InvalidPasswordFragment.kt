@@ -77,6 +77,7 @@ class InvalidPasswordFragment : Fragment() {
         }
 
         detachMailbox.setOnClickListener {
+            trackNoValidMailboxesEvent("detachMailbox")
             invalidPasswordViewModel.detachMailbox(navigationArgs.mailboxId).observe(viewLifecycleOwner) { error ->
                 showSnackbar(error)
             }
