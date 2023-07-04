@@ -23,8 +23,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.ui.MainViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 abstract class MenuFoldersFragment : Fragment() {
 
     protected val mainViewModel: MainViewModel by activityViewModels()
@@ -42,6 +46,9 @@ abstract class MenuFoldersFragment : Fragment() {
         FolderAdapter(isInMenuDrawer, onClick = ::onFolderSelected)
     }
 
+    @Inject
+    lateinit var folderController: FolderController
+
     protected abstract fun onFolderSelected(folderId: String)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -54,15 +61,14 @@ abstract class MenuFoldersFragment : Fragment() {
         customFoldersList.adapter = customFoldersAdapter
     }
 
+    /**
+     * Asynchronously validate folder name locally
+     * @return error string, otherwise null
+     */
     protected fun checkForFolderCreationErrors(folderName: CharSequence): String? {
-        val (defaultFolders, customFolders) = mainViewModel.currentFoldersLive.value!!
-        val allFolders = defaultFolders + customFolders
-
         return when {
             folderName.length > 255 -> getString(R.string.errorNewFolderNameTooLong)
-            allFolders.any { it.parent == null && it.name == folderName.toString() } -> {
-                context?.getString(R.string.errorNewFolderAlreadyExists)
-            }
+            folderController.getRootFolder(folderName) != null -> context?.getString(R.string.errorNewFolderAlreadyExists)
             else -> null
         }
     }
