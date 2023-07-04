@@ -67,11 +67,16 @@ object RefreshController {
             return@getOrElse null
         }
 
+        Log.i("API", "Refresh threads with mode: $refreshMode | (${folder.name})")
+
         refreshThreadsJob?.cancel()
         refreshThreadsJob = Job()
 
         return refreshWithRunCatching().also {
-            if (it != null) stopped?.invoke()
+            if (it != null) {
+                stopped?.invoke()
+                Log.d("API", "End of refreshing threads with mode: $refreshMode | (${folder.name})")
+            }
         }
     }
 
@@ -82,7 +87,9 @@ object RefreshController {
         folder: Folder,
         okHttpClient: OkHttpClient?,
     ): Set<Thread> {
-        Log.i("API", "Refresh threads with mode: $refreshMode | (${folder.name})")
+
+        Log.d("API", "Start of refreshing threads with mode: $refreshMode | (${folder.name})")
+
         return when (refreshMode) {
             REFRESH_FOLDER_WITH_ROLE -> refreshWithRoleConsideration(scope, mailbox, folder, okHttpClient)
             REFRESH_FOLDER -> refresh(scope, mailbox, folder, okHttpClient)
