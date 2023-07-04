@@ -26,10 +26,12 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
+import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.utils.FORMAT_DATE_WITH_TIMEZONE
 import com.infomaniak.lib.core.utils.FORMAT_EVENT_DATE
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.format
+import com.infomaniak.mail.MatomoMail.trackRestoreMailsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetRestoreEmailsBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -56,7 +58,11 @@ class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
 
         observeBackups()
 
-        datePickerText.doOnTextChanged { text, _, _, _ -> restoreMailsButton.isEnabled = text?.isNotBlank() == true }
+        datePickerText.doOnTextChanged { text, _, _, _ ->
+            trackRestoreMailsEvent("selectDate", TrackerAction.INPUT)
+            restoreMailsButton.isEnabled = text?.isNotBlank() == true
+        }
+
         restoreMailsButton.setOnClickListener { restoreEmails() }
     }
 
@@ -83,6 +89,7 @@ class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     private fun restoreEmails() {
+        trackRestoreMailsEvent("restore", TrackerAction.CLICK)
         val date = autoCompleteTextView.text.toString()
 
         restoreEmailViewModel.restoreEmails(formattedDates[date] ?: date).observe(viewLifecycleOwner) { apiResponse ->
