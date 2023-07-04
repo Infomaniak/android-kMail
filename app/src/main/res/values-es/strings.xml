@@ -187,9 +187,11 @@
     <string name="errorFolderDoesNotExist">La carpeta no existe</string>
     <string name="errorInvalidAttachment">El adjunto no es válido</string>
     <string name="errorInvalidCredentials">Correo electrónico o contraseña no válidos</string>
+    <string name="errorInvalidMailboxPassword">Contraseña incorrecta para la dirección de correo electrónico</string>
     <string name="errorLoginDescription">La conexión ha fallado.</string>
     <string name="errorLoginTitle">Error de inicio de sesión</string>
     <string name="errorMailboxLocked">Esta dirección de correo electrónico está bloqueada</string>
+    <string name="errorMailboxPasswordLength">La contraseña debe tener entre 6 y 80 caracteres</string>
     <string name="errorMoveDestinationNotFound">La carpeta de destino no existe</string>
     <string name="errorNewFolderAlreadyExists">La carpeta ya existe</string>
     <string name="errorNewFolderNameTooLong">El nombre de la carpeta no debe superar los 255 caracteres</string>

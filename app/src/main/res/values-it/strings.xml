@@ -187,9 +187,11 @@
     <string name="errorFolderDoesNotExist">La cartella è inesistente</string>
     <string name="errorInvalidAttachment">Allegato non valido</string>
     <string name="errorInvalidCredentials">Email o password non valide</string>
+    <string name="errorInvalidMailboxPassword">Password errata per l’indirizzo e-mail</string>
     <string name="errorLoginDescription">La connessione non è riuscita.</string>
     <string name="errorLoginTitle">Errore di accesso</string>
     <string name="errorMailboxLocked">Questo indirizzo e-mail è bloccato</string>
+    <string name="errorMailboxPasswordLength">La password deve essere compresa tra 6 e 80 caratteri</string>
     <string name="errorMoveDestinationNotFound">La cartella di destinazione è inesistente</string>
     <string name="errorNewFolderAlreadyExists">La cartella è già esistente</string>
     <string name="errorNewFolderNameTooLong">Il nome della cartella non deve superare i 255 caratteri</string>

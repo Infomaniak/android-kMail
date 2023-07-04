@@ -187,9 +187,11 @@
     <string name="errorFolderDoesNotExist">Der Ordner besteht nicht</string>
     <string name="errorInvalidAttachment">Dateianhang ungültig</string>
     <string name="errorInvalidCredentials">E-Mail oder Passwort ungültig</string>
+    <string name="errorInvalidMailboxPassword">Falsches Passwort für die E-Mail-Adresse</string>
     <string name="errorLoginDescription">Die Verbindung ist fehlgeschlagen.</string>
     <string name="errorLoginTitle">Login-Fehler</string>
     <string name="errorMailboxLocked">Diese Mailbox ist gesperrt</string>
+    <string name="errorMailboxPasswordLength">Das Passwort muss zwischen 6 und 80 Zeichen lang sein</string>
     <string name="errorMoveDestinationNotFound">Der Zielordner besteht nicht</string>
     <string name="errorNewFolderAlreadyExists">Der Ordner besteht bereits</string>
     <string name="errorNewFolderNameTooLong">Der Ordnername sollte nicht länger als 255 Zeichen sein.</string>

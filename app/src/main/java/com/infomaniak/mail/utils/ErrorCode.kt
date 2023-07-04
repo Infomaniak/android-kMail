@@ -37,6 +37,7 @@ object ErrorCode {
     //region Mailbox
     const val MAILBOX_LOCKED = "mailbox_locked"
     const val ERROR_WHILE_LINKING_MAILBOX = "error_while_linking_mailbox"
+    const val INVALID_MAILBOX_PASSWORD = "invalid_mailbox_password"
     //endregion
 
     //region Folder
@@ -92,6 +93,7 @@ object ErrorCode {
         // Mailbox
         ApiErrorCode(MAILBOX_LOCKED, R.string.errorMailboxLocked),
         ApiErrorCode(ERROR_WHILE_LINKING_MAILBOX, R.string.errorAlreadyLinkedMailbox),
+        ApiErrorCode(INVALID_MAILBOX_PASSWORD, R.string.errorInvalidMailboxPassword),
 
         // Folder
         ApiErrorCode(FOLDER_ALREADY_EXISTS, R.string.errorNewFolderAlreadyExists),

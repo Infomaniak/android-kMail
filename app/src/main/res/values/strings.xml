@@ -194,9 +194,11 @@
     <string name="errorFolderDoesNotExist">The folder does not exist</string>
     <string name="errorInvalidAttachment">Invalid attachment</string>
     <string name="errorInvalidCredentials">Invalid email or password</string>
+    <string name="errorInvalidMailboxPassword">Invalid mailbox password</string>
     <string name="errorLoginDescription">The connection failed.</string>
     <string name="errorLoginTitle">Login error</string>
     <string name="errorMailboxLocked">This mailbox is locked</string>
+    <string name="errorMailboxPasswordLength">The password must be between 6 and 80 characters</string>
     <string name="errorMoveDestinationNotFound">The destination folder does not exist</string>
     <string name="errorNewFolderAlreadyExists">The folder already exists</string>
     <string name="errorNewFolderNameTooLong">The folder name should not exceed 255 characters</string>

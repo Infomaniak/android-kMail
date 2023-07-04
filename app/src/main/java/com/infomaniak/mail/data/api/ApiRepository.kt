@@ -98,6 +98,10 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.addNewMailbox(), POST, mapOf("mail" to mailAddress, "password" to password))
     }
 
+    fun updateMailboxPassword(mailboxId: Int, password: String): ApiResponse<Boolean> {
+        return callApi(ApiRoutes.updateMailboxPassword(mailboxId), PUT, mapOf("password" to password))
+    }
+
     fun getFolders(mailboxUuid: String): ApiResponse<List<Folder>> = callApi(ApiRoutes.folders(mailboxUuid), GET)
 
     fun createFolder(mailboxUuid: String, name: String): ApiResponse<Folder> {
