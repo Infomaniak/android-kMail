@@ -166,6 +166,7 @@ class DraftsActionsWorker @AssistedInject constructor(
                     } else if (isTargetDraft) {
                         trackedDraftErrorMessageResId = errorMessageResId!!
                         isTrackedDraftSuccess = false
+                        haveAllDraftsSucceeded = false
                     }
                 }
             }.onFailure { exception ->
