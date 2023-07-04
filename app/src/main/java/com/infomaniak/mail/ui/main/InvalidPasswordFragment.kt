@@ -18,12 +18,15 @@
 package com.infomaniak.mail.ui.main
 
 import android.os.Bundle
+import android.text.Editable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.lib.core.utils.hideProgress
 import com.infomaniak.lib.core.utils.showKeyboard
 import com.infomaniak.lib.core.utils.showProgress
 import com.infomaniak.mail.MatomoMail.trackNoValidMailboxesEvent
@@ -36,6 +39,7 @@ class InvalidPasswordFragment : Fragment() {
 
     private lateinit var binding: FragmentInvalidPasswordBinding
     private val navigationArgs: InvalidPasswordFragmentArgs by navArgs()
+    private val invalidPasswordViewModel: InvalidPasswordViewModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentInvalidPasswordBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -51,13 +55,33 @@ class InvalidPasswordFragment : Fragment() {
         confirmButton.apply {
             isEnabled = false
 
-            passwordInput.doAfterTextChanged { isEnabled = passwordInput.text?.isNotBlank() == true }
+            passwordInput.doAfterTextChanged {
+                isEnabled = false
+                passwordInput.text?.let(::manageButtonState)
+            }
 
             setOnClickListener {
                 trackNoValidMailboxesEvent("confirmPassword")
                 showProgress()
-                // TODO
+                invalidPasswordViewModel.confirmPassword(
+                    navigationArgs.mailboxId,
+                    navigationArgs.mailboxObjectId,
+                    passwordInput.text?.trim().toString()
+                ).observe(viewLifecycleOwner) {
+                    passwordInputLayout.error = getString(it)
+                    passwordInput.text = null
+                    hideProgress(R.string.buttonConfirm)
+                }
             }
+        }
+    }
+
+    private fun manageButtonState(password: Editable) = with(binding) {
+        if (password.count() in 6..80) {
+            passwordInputLayout.helperText = null
+            confirmButton.isEnabled = true
+        } else {
+            if (passwordInputLayout.error == null) passwordInputLayout.helperText = getString(R.string.errorMailboxPasswordLength)
         }
     }
 }
