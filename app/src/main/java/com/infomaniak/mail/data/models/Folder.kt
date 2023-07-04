@@ -53,6 +53,8 @@ class Folder : RealmObject {
     private var _role: String? = null
     @SerialName("is_favorite")
     var isFavorite: Boolean = false
+    @SerialName("unread_count")
+    var unreadCountRemote: Int = 0
     var separator: String = ""
     var children: RealmList<Folder> = realmListOf()
     //endregion
@@ -63,7 +65,7 @@ class Folder : RealmObject {
     @Transient
     var cursor: String? = null
     @Transient
-    var unreadCount: Int = 0
+    var unreadCountLocal: Int = 0
     @Transient
     var threads: RealmList<Thread> = realmListOf()
     @Transient
@@ -86,6 +88,12 @@ class Folder : RealmObject {
     val role: FolderRole?
         get() = enumValueOfOrNull<FolderRole>(_role)
 
+    val unreadCountDisplay: UnreadDisplay
+        get() = UnreadDisplay(
+            count = unreadCountLocal,
+            shouldDisplayPastille = unreadCountLocal == 0 && unreadCountRemote > 0,
+        )
+
     fun initLocalValues(
         lastUpdatedAt: RealmInstant?,
         cursor: String?,
@@ -97,7 +105,7 @@ class Folder : RealmObject {
     ) {
         this.lastUpdatedAt = lastUpdatedAt
         this.cursor = cursor
-        this.unreadCount = unreadCount
+        this.unreadCountLocal = unreadCount
         this.threads.addAll(threads)
         this.messages.addAll(messages)
         this.remainingOldMessagesToFetch = remainingOldMessagesToFetch
@@ -131,6 +139,16 @@ class Folder : RealmObject {
         ARCHIVE(R.string.archiveFolder, R.drawable.ic_archive_folder, 7, "archiveFolder"),
         COMMERCIAL(R.string.commercialFolder, R.drawable.ic_promotions, 1, "commercialFolder"),
         SOCIALNETWORKS(R.string.socialNetworksFolder, R.drawable.ic_social_media, 2, "socialNetworksFolder"),
+    }
+
+    data class UnreadDisplay(
+        val count: Int,
+        val shouldDisplayPastille: Boolean = false,
+    ) {
+        override fun equals(other: Any?) = other === this ||
+                (other is UnreadDisplay && other.count == count && other.shouldDisplayPastille == shouldDisplayPastille)
+
+        override fun hashCode(): Int = count.hashCode() + shouldDisplayPastille.hashCode()
     }
 
     companion object {

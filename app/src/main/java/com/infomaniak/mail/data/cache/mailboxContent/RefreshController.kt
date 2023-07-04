@@ -296,6 +296,7 @@ class RefreshController @Inject constructor(private val mailboxContentRealm: Rea
 
             FolderController.getFolder(folder.id, realm = this)?.let {
                 it.lastUpdatedAt = Date().toRealmInstant()
+                it.unreadCountRemote = activities.unreadCountRemote
                 it.cursor = activities.cursor
             }
         }

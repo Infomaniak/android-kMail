@@ -152,6 +152,7 @@
     <string name="contentDescriptionIconStorage">Estado de almacenamiento</string>
     <string name="contentDescriptionOpenMailActions">Acciones de mensajes abiertos</string>
     <string name="contentDescriptionSelectedItem">Selección</string>
+    <string name="contentDescriptionUnreadPastille">Esta carpeta contiene mensajes no leídos</string>
     <string name="contentDescriptionUserAvatar">Avatar de usuario</string>
     <string name="contentDescriptionWarningIcon">Advertencia</string>
     <string name="createFolderName">Nombre de la carpeta</string>

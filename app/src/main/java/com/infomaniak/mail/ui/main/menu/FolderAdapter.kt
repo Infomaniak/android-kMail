@@ -22,6 +22,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -66,21 +68,21 @@ class FolderAdapter(
 
         val folderName = folder.getLocalizedName(context)
 
-        val badge = when (folder.role) {
-            FolderRole.DRAFT -> folder.threads.count()
-            FolderRole.SENT, FolderRole.TRASH -> 0
-            else -> folder.unreadCount
+        val unread = when (folder.role) {
+            FolderRole.DRAFT -> UnreadDisplay(folder.threads.count())
+            FolderRole.SENT, FolderRole.TRASH -> UnreadDisplay(0)
+            else -> folder.unreadCountDisplay
         }
 
         folder.role?.let {
-            setFolderUi(folder.id, folderName, it.folderIconRes, badge, it.matomoValue)
+            setFolderUi(folder.id, folderName, it.folderIconRes, unread, it.matomoValue)
         } ?: run {
             val indentLevel = folder.path.split(folder.separator).size - 1
             setFolderUi(
                 id = folder.id,
                 name = folderName,
                 iconId = if (folder.isFavorite) R.drawable.ic_folder_star else R.drawable.ic_folder,
-                badgeText = badge,
+                unread = unread,
                 trackerName = "customFolder",
                 trackerValue = indentLevel.toFloat(),
                 folderIndent = min(indentLevel, MAX_SUB_FOLDERS_INDENT),
@@ -94,18 +96,35 @@ class FolderAdapter(
         id: String,
         name: String,
         @DrawableRes iconId: Int,
-        badgeText: Int,
+        unread: UnreadDisplay,
         trackerName: String,
         trackerValue: Float? = null,
         folderIndent: Int? = null,
     ) = with(item) {
+
+        fun setUnreadCount() = with(binding) {
+            when {
+                !isInMenuDrawer -> {
+                    badge = 0
+                }
+                unread.shouldDisplayPastille -> {
+                    itemBadge.isGone = true
+                    pastille.isVisible = true
+                }
+                else -> {
+                    pastille.isGone = true
+                    badge = unread.count
+                }
+            }
+        }
+
         text = name
         icon = AppCompatResources.getDrawable(context, iconId)
         indent = context.resources.getDimension(RCore.dimen.marginStandard).toInt() * (folderIndent ?: 0)
-        badge = if (isInMenuDrawer) badgeText else 0
         itemStyle = if (isInMenuDrawer) SelectionStyle.MENU_DRAWER else SelectionStyle.OTHER
         textWeight = if (isInMenuDrawer) TextWeight.MEDIUM else TextWeight.REGULAR
 
+        setUnreadCount()
         setSelectedState(currentFolderId == id)
 
         setOnClickListener {
@@ -147,7 +166,7 @@ class FolderAdapter(
             return oldFolder.name == newFolder.name &&
                     oldFolder.isFavorite == newFolder.isFavorite &&
                     oldFolder.path == newFolder.path &&
-                    oldFolder.unreadCount == newFolder.unreadCount &&
+                    oldFolder.unreadCountDisplay == newFolder.unreadCountDisplay &&
                     oldFolder.threads.count() == newFolder.threads.count()
         }
     }

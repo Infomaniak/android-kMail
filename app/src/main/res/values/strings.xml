@@ -159,6 +159,7 @@
     <string name="contentDescriptionIconStorage">Storage status</string>
     <string name="contentDescriptionOpenMailActions">Open mail actions</string>
     <string name="contentDescriptionSelectedItem">Selected</string>
+    <string name="contentDescriptionUnreadPastille">This folder contains unread mails</string>
     <string name="contentDescriptionUserAvatar">User avatar</string>
     <string name="contentDescriptionWarningIcon">Warning</string>
     <string name="createFolderName">Name of the folder</string>
