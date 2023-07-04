@@ -60,8 +60,9 @@
             <ImageView
                 android:id="@+id/pastille"
                 android:layout_width="wrap_content"
-                android:layout_height="8dp"
+                android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/marginStandardSmall"
+                android:contentDescription="@string/contentDescriptionUnreadPastille"
                 android:src="@drawable/ic_pastille"
                 android:visibility="gone"
                 app:tint="?android:attr/colorPrimary" />

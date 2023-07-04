@@ -152,6 +152,7 @@
     <string name="contentDescriptionIconStorage">Stato di conservazione</string>
     <string name="contentDescriptionOpenMailActions">Azioni di apertura dei messaggi</string>
     <string name="contentDescriptionSelectedItem">Selezionato</string>
+    <string name="contentDescriptionUnreadPastille">Questa cartella contiene i messaggi non letti</string>
     <string name="contentDescriptionUserAvatar">Avatar utente</string>
     <string name="contentDescriptionWarningIcon">Avviso</string>
     <string name="createFolderName">Nome della cartella</string>

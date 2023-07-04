@@ -152,6 +152,7 @@
     <string name="contentDescriptionIconStorage">Speicherstatus</string>
     <string name="contentDescriptionOpenMailActions">Mail-Aktionen öffnen</string>
     <string name="contentDescriptionSelectedItem">Ausgewählte</string>
+    <string name="contentDescriptionUnreadPastille">Dieser Ordner enthält ungelesene Nachrichten</string>
     <string name="contentDescriptionUserAvatar">Benutzer-Avatar</string>
     <string name="contentDescriptionWarningIcon">Warnung</string>
     <string name="createFolderName">Name des Ordners</string>
