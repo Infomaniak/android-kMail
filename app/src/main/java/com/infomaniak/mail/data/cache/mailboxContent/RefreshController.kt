@@ -281,11 +281,12 @@ object RefreshController {
         val logMessage = "Deleted: ${activities.deletedShortUids.count()} | Updated: ${activities.updatedMessages.count()}"
         Log.d("API", "$logMessage | ${folder.name}")
 
+        addSentryBreadcrumbsForActivities(logMessage, mailbox.email, folder, activities)
+
         writeBlocking {
             val impactedFoldersIds = mutableSetOf<String>().apply {
                 addAll(handleDeletedUids(scope, activities.deletedShortUids, folder.id))
                 addAll(handleUpdatedUids(scope, activities.updatedMessages, folder.id))
-                addSentryBreadcrumbsForActivities(logMessage, mailbox.email, folder, activities)
             }
 
             impactedFoldersIds.forEach { folderId ->
@@ -328,6 +329,15 @@ object RefreshController {
         if (!apiResponse.isSuccess()) apiResponse.throwErrorAsException()
         scope.ensureActive()
 
+        addSentryBreadcrumbsForAddedUids(
+            logMessage = logMessage,
+            email = mailbox.email,
+            folder = folder,
+            uids = uids,
+            messages = apiResponse.data?.messages ?: emptyList(),
+            cursor = cursor,
+        )
+
         apiResponse.data?.messages?.let { messages ->
 
             writeBlocking {
@@ -355,7 +365,6 @@ object RefreshController {
                 scope.ensureActive()
             }
 
-            addSentryBreadcrumbsForAddedUids(logMessage, mailbox.email, folder, uids, messages, cursor)
         }
 
         return impactedThreads
