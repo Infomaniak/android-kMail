@@ -262,10 +262,11 @@ class ThreadFragment : Fragment() {
                 }
             }
             onAttachmentClicked = { attachment ->
-                trackAttachmentActionsEvent("openAttachment")
                 if (attachment.openWithIntent(requireContext()).hasSupportedApplications(requireContext())) {
+                    trackAttachmentActionsEvent("open")
                     attachment.display()
                 } else {
+                    trackAttachmentActionsEvent("download")
                     scheduleDownloadManager(attachment.downloadUrl, attachment.name)
                 }
             }
