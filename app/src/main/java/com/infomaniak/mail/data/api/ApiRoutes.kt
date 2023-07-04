@@ -48,7 +48,9 @@ object ApiRoutes {
         return "${signatures(mailboxHostingId, mailboxName)}/$signatureId"
     }
 
-    fun addNewMailbox() = "$MAIL_API/api/securedProxy/profile/workspace/mailbox"
+    fun manageMailboxes() = "$MAIL_API/api/securedProxy/profile/workspace/mailbox"
+
+    fun manageMailbox(mailboxId: Int) = "${manageMailboxes()}/$mailboxId"
 
     fun updateMailboxPassword(mailboxId: Int): String {
         return "$MAIL_API/api/securedProxy/cache/invalidation/profile/workspace/mailbox/$mailboxId/update_password"

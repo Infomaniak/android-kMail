@@ -95,6 +95,7 @@
     <string name="buttonCreate">Create</string>
     <string name="buttonCreateAccount">Create an account</string>
     <string name="buttonCreateFolder">Add a folder</string>
+    <string name="buttonDetachMailbox">Detach mailbox</string>
     <string name="buttonDownload">Download</string>
     <string name="buttonDownloadAll">Download all</string>
     <string name="buttonFeedback">Feedback</string>
@@ -182,7 +183,7 @@
     <string name="emptyStateSearchTitle">No results</string>
     <string name="emptyStateTrashDescription">Move the messages to the trash. They will be permanently deleted after 30 days.</string>
     <string name="emptyStateTrashTitle">Trash is empty</string>
-    <string name="enterPasswordDescription">For security reasons, you must enter the password of the mailbox %s\nor detach the mailbox</string>
+    <string name="enterPasswordDescription">For security reasons, you must enter the password of the mailbox %s</string>
     <string name="enterPasswordTitle">Enter password</string>
     <string name="errorAlreadyLinkedMailbox">This email address is already linked to your account</string>
     <string name="errorAtLeastOneRecipient">At least one recipient is required</string>

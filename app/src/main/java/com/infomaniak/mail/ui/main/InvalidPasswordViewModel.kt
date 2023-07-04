@@ -23,6 +23,7 @@ import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
+import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.coroutineContext
@@ -42,6 +43,17 @@ class InvalidPasswordViewModel @Inject constructor(
         if (apiResponse.isSuccess()) {
             MailboxController.updateMailbox(mailboxObjectId) { it.isPasswordValid = true }
             AccountUtils.switchToMailbox(mailboxId)
+        } else {
+            emit(apiResponse.translateError())
+        }
+    }
+
+    fun detachMailbox(mailboxId: Int) = liveData(ioCoroutineContext) {
+        val apiResponse = ApiRepository.detachMailbox(mailboxId)
+        if (apiResponse.isSuccess()) {
+            AccountUtils.switchToMailbox(
+                MailboxController.getFirstValidMailbox(AccountUtils.currentUserId)?.mailboxId ?: AppSettings.DEFAULT_ID
+            )
         } else {
             emit(apiResponse.translateError())
         }

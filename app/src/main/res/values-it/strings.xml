@@ -88,6 +88,7 @@
     <string name="buttonCreate">Creare</string>
     <string name="buttonCreateAccount">Creare un account</string>
     <string name="buttonCreateFolder">Aggiungere una cartella</string>
+    <string name="buttonDetachMailbox">Staccare l’indirizzo</string>
     <string name="buttonDownload">Scaricare</string>
     <string name="buttonDownloadAll">Scaricare tutti</string>
     <string name="buttonFeedback">Feedback</string>
@@ -175,7 +176,7 @@
     <string name="emptyStateSearchTitle">Nessun risultato</string>
     <string name="emptyStateTrashDescription">Spostate i messaggi nel cestino. Verranno eliminati definitivamente dopo 30 giorni.</string>
     <string name="emptyStateTrashTitle">Il cestino è vuoto</string>
-    <string name="enterPasswordDescription">Per motivi di sicurezza, è necessario inserire la password dell’indirizzo e-mail %s\no staccare l’indirizzo</string>
+    <string name="enterPasswordDescription">Per motivi di sicurezza, è necessario inserire la password dell’indirizzo e-mail %s</string>
     <string name="enterPasswordTitle">Inserire la password</string>
     <string name="errorAlreadyLinkedMailbox">Questo indirizzo e-mail è già collegato al vostro account</string>
     <string name="errorAtLeastOneRecipient">È richiesto almeno un destinatario</string>
