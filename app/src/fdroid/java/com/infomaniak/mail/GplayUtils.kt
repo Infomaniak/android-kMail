@@ -24,8 +24,7 @@ object GplayUtils {
 
     fun FragmentActivity.checkPlayServices() = Unit
 
-    fun Context.isGooglePlayServicesNotAvailable(): Boolean = true
+    fun Context.areGooglePlayServicesNotAvailable(): Boolean = true
 
     fun deleteFirebaseToken() = Unit
-
 }
