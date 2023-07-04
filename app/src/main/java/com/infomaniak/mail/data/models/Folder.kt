@@ -88,10 +88,11 @@ class Folder : RealmObject {
     val role: FolderRole?
         get() = enumValueOfOrNull<FolderRole>(_role)
 
-    // `> 0` should display the number.
-    // `-1` should display a pastille.
-    // `0` should display nothing.
-    val unreadCountToDisplay: Int get() = if (unreadCountLocal > 0) unreadCountLocal else if (unreadCountRemote > 0) -1 else 0
+    val unreadCountDisplay: UnreadDisplay
+        get() = UnreadDisplay(
+            count = unreadCountLocal,
+            shouldDisplayPastille = unreadCountLocal == 0 && unreadCountRemote > 0,
+        )
 
     fun initLocalValues(
         lastUpdatedAt: RealmInstant?,
@@ -138,6 +139,16 @@ class Folder : RealmObject {
         ARCHIVE(R.string.archiveFolder, R.drawable.ic_archive_folder, 7, "archiveFolder"),
         COMMERCIAL(R.string.commercialFolder, R.drawable.ic_promotions, 1, "commercialFolder"),
         SOCIALNETWORKS(R.string.socialNetworksFolder, R.drawable.ic_social_media, 2, "socialNetworksFolder"),
+    }
+
+    data class UnreadDisplay(
+        val count: Int,
+        val shouldDisplayPastille: Boolean = false,
+    ) {
+        override fun equals(other: Any?) = other === this ||
+                (other is UnreadDisplay && other.count == count && other.shouldDisplayPastille == shouldDisplayPastille)
+
+        override fun hashCode(): Int = count.hashCode() + shouldDisplayPastille.hashCode()
     }
 
     companion object {
