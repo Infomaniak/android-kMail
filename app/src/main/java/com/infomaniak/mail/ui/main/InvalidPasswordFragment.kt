@@ -67,7 +67,7 @@ class InvalidPasswordFragment : Fragment() {
                 invalidPasswordViewModel.confirmPassword(
                     navigationArgs.mailboxId,
                     navigationArgs.mailboxObjectId,
-                    passwordInput.text?.trim().toString()
+                    passwordInput.text?.trim().toString(),
                 ).observe(viewLifecycleOwner) {
                     passwordInputLayout.error = getString(it)
                     passwordInput.text = null
@@ -85,11 +85,15 @@ class InvalidPasswordFragment : Fragment() {
     }
 
     private fun manageButtonState(password: Editable) = with(binding) {
-        if (password.count() in 6..80) {
+        if (password.count() in PASSWORD_LENGTH_RANGE) {
             passwordInputLayout.helperText = null
             confirmButton.isEnabled = true
         } else {
             if (passwordInputLayout.error == null) passwordInputLayout.helperText = getString(R.string.errorMailboxPasswordLength)
         }
+    }
+
+    private companion object {
+        val PASSWORD_LENGTH_RANGE = 6..80
     }
 }

@@ -162,7 +162,7 @@ object MatomoMail : MatomoCore {
 
     fun Fragment.trackRestoreMailsEvent(name: String, action: TrackerAction) {
         trackEvent("restoreEmailsBottomSheet", name, action)
-	}
+    }
 
     fun Fragment.trackNoValidMailboxesEvent(name: String) {
         trackEvent("noValidMailboxes", name)

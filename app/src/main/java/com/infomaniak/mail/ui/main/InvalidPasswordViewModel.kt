@@ -52,7 +52,7 @@ class InvalidPasswordViewModel @Inject constructor(
         val apiResponse = ApiRepository.detachMailbox(mailboxId)
         if (apiResponse.isSuccess()) {
             AccountUtils.switchToMailbox(
-                MailboxController.getFirstValidMailbox(AccountUtils.currentUserId)?.mailboxId ?: AppSettings.DEFAULT_ID
+                MailboxController.getFirstValidMailbox(AccountUtils.currentUserId)?.mailboxId ?: AppSettings.DEFAULT_ID,
             )
         } else {
             emit(apiResponse.translateError())
