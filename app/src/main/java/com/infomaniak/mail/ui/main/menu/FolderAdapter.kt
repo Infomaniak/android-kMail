@@ -103,17 +103,18 @@ class FolderAdapter(
     ) = with(item) {
 
         fun setUnreadCount() = with(binding) {
-            if (!isInMenuDrawer) {
-                badge = 0
-                return
-            }
-
-            if (unread.shouldDisplayPastille) {
-                itemBadge.isGone = true
-                pastille.isVisible = true
-            } else {
-                pastille.isGone = true
-                badge = unread.count
+            when {
+                !isInMenuDrawer -> {
+                    badge = 0
+                }
+                unread.shouldDisplayPastille -> {
+                    itemBadge.isGone = true
+                    pastille.isVisible = true
+                }
+                else -> {
+                    pastille.isGone = true
+                    badge = unread.count
+                }
             }
         }
 
