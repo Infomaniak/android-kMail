@@ -41,7 +41,7 @@ class SwitchMailboxesAdapter(
     private val isInMenuDrawer: Boolean,
     private val lifecycleScope: LifecycleCoroutineScope,
     private val onLockedMailboxClicked: (String) -> Unit,
-    private val onInvalidPasswordMailboxClicked: (String) -> Unit,
+    private val onInvalidPasswordMailboxClicked: (Mailbox) -> Unit,
     private var mailboxes: List<Mailbox> = emptyList(),
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO, // TODO: Inject with hilt
 ) : RecyclerView.Adapter<SwitchMailboxesViewHolder>() {
@@ -93,7 +93,7 @@ class SwitchMailboxesAdapter(
                 }
             }
 
-            setOnOutdatedPasswordClickListener { onInvalidPasswordMailboxClicked(mailbox.email) }
+            setOnOutdatedPasswordClickListener { onInvalidPasswordMailboxClicked(mailbox) }
             setOnLockedMailboxClickListener { onLockedMailboxClicked(mailbox.email) }
         }
     }

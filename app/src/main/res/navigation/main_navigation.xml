@@ -446,6 +446,12 @@
         android:label="InvalidPasswordFragment"
         tools:layout="@layout/fragment_invalid_password">
         <argument
+            android:name="mailboxId"
+            app:argType="integer" />
+        <argument
+            android:name="mailboxObjectId"
+            app:argType="string" />
+        <argument
             android:name="mailboxEmail"
             app:argType="string" />
     </fragment>
