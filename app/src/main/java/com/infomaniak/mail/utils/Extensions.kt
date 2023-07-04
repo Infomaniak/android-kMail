@@ -29,6 +29,7 @@ import android.util.Patterns
 import android.view.View
 import android.view.Window
 import android.webkit.WebView
+import android.widget.Button
 import androidx.annotation.*
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.res.ResourcesCompat
@@ -36,10 +37,7 @@ import androidx.core.widget.NestedScrollView
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
+import androidx.lifecycle.*
 import androidx.navigation.NavDirections
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
@@ -87,6 +85,10 @@ import io.realm.kotlin.ext.query
 import io.realm.kotlin.query.Sort
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmObject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.invoke
+import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import org.jsoup.Jsoup
 import java.util.Calendar
@@ -366,9 +368,22 @@ fun Fragment.createInputDialog(
     @StringRes title: Int,
     @StringRes hint: Int,
     @StringRes confirmButtonText: Int,
-    onErrorCheck: (CharSequence) -> String?,
+    onErrorCheck: suspend (CharSequence) -> String?,
     onPositiveButtonClicked: (CharSequence?) -> Unit,
 ) = with(DialogInputBinding.inflate(layoutInflater)) {
+
+    var errorJob: Job? = null
+
+    fun Button.checkValidation(text: CharSequence) {
+        errorJob?.cancel()
+        errorJob = lifecycleScope.launch(Dispatchers.IO) {
+            val error = onErrorCheck(text.trim())
+            if (errorJob?.isActive == true) Dispatchers.Main {
+                textInputLayout.error = error
+                isEnabled = error == null
+            }
+        }
+    }
 
     fun AlertDialog.setupOnShowListener() = apply {
         setOnShowListener {
@@ -376,9 +391,13 @@ fun Fragment.createInputDialog(
             getButton(AlertDialog.BUTTON_POSITIVE).apply {
                 isEnabled = false
                 textInput.doAfterTextChanged {
-                    val error = if (it.isNullOrBlank()) null else onErrorCheck(it.trim())
-                    isEnabled = it?.isNotBlank() == true && error == null
-                    textInputLayout.error = error
+                    if (it.isNullOrBlank()) {
+                        errorJob?.cancel()
+                        isEnabled = false
+                        textInputLayout.error = null
+                    } else {
+                        checkValidation(it.trim())
+                    }
                 }
             }
         }
@@ -391,7 +410,10 @@ fun Fragment.createInputDialog(
         .setView(root)
         .setPositiveButton(confirmButtonText) { _, _ -> onPositiveButtonClicked(textInput.text?.trim()) }
         .setNegativeButton(R.string.buttonCancel, null)
-        .setOnDismissListener { textInput.text?.clear() }
+        .setOnDismissListener {
+            errorJob?.cancel()
+            textInput.text?.clear()
+        }
         .create()
         .setupOnShowListener()
 }

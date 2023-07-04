@@ -67,6 +67,10 @@ class FolderController @Inject constructor(private val mailboxContentRealm: Real
     fun getFolderAsync(id: String): Flow<Folder> {
         return getFolderQuery(Folder::id.name, id, mailboxContentRealm()).asFlow().mapNotNull { it.obj }
     }
+
+    fun getRootFolder(name: CharSequence) = with(mailboxContentRealm()) {
+        query<Folder>("$isRootFolder AND ${Folder::name.name} == '$name'").first().find()
+    }
     //endregion
 
     fun update(remoteFolders: List<Folder>, realm: Realm) {
@@ -122,6 +126,7 @@ class FolderController @Inject constructor(private val mailboxContentRealm: Real
         const val SEARCH_FOLDER_ID = "search_folder_id"
 
         private val isNotSearch = "${Folder::id.name} != '$SEARCH_FOLDER_ID'"
+        private val isRootFolder = "${Folder.parentsPropertyName}.@count == 0"
 
         //region Queries
         /**
@@ -130,7 +135,7 @@ class FolderController @Inject constructor(private val mailboxContentRealm: Real
          * The other location is in `Utils.formatFoldersListWithAllChildren()`.
          */
         private fun getFoldersQuery(realm: TypedRealm, onlyRoots: Boolean = false): RealmQuery<Folder> {
-            val rootsQuery = if (onlyRoots) " AND ${Folder.parentsPropertyName}.@count == 0" else ""
+            val rootsQuery = if (onlyRoots) " AND $isRootFolder" else ""
             return realm
                 .query<Folder>(isNotSearch + rootsQuery)
                 .sort(Folder::name.name, Sort.ASCENDING)
