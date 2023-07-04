@@ -391,7 +391,13 @@ fun Fragment.createInputDialog(
             getButton(AlertDialog.BUTTON_POSITIVE).apply {
                 isEnabled = false
                 textInput.doAfterTextChanged {
-                    if (it.isNullOrBlank()) isEnabled = false else checkValidation(it.trim())
+                    if (it.isNullOrBlank()) {
+                        errorJob?.cancel()
+                        isEnabled = false
+                        textInputLayout.error = null
+                    } else {
+                        checkValidation(it.trim())
+                    }
                 }
             }
         }
