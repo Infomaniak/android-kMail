@@ -32,6 +32,16 @@ import com.infomaniak.mail.data.models.correspondent.Correspondent
 
 object UiUtils {
 
+    data class UnreadDisplay(
+        val count: Int,
+        val shouldDisplayPastille: Boolean = false,
+    ) {
+        override fun equals(other: Any?) = other === this ||
+                (other is UnreadDisplay && other.count == count && other.shouldDisplayPastille == shouldDisplayPastille)
+
+        override fun hashCode(): Int = count.hashCode() + shouldDisplayPastille.hashCode()
+    }
+
     @ColorInt
     fun pointBetweenColors(@ColorInt from: Int, @ColorInt to: Int, percent: Float): Int {
         return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
