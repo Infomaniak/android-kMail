@@ -85,8 +85,7 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
 
         val messages = thread.messages.query(query).find()
 
-        val byMessagesIds = "${Message::messageId.name} IN {${messages.joinToString { "'${it.messageId}'" }}}"
-        val duplicates = thread.duplicates.query(byMessagesIds).find()
+        val duplicates = thread.duplicates.query("${Message::messageId.name} IN $0", messages.map { it.messageId }).find()
 
         return messages + duplicates
     }
