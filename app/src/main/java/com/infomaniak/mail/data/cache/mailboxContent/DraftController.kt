@@ -53,12 +53,12 @@ class DraftController @Inject constructor(private val mailboxContentRealm: Realm
         return getDraftsWithActionsQuery(realm).find()
     }
 
-    fun getDraftsWithActionsCount(realm: TypedRealm = mailboxContentRealm()): Long {
-        return getDraftsWithActionsQuery(realm).count().find()
+    fun getDraftsWithActionsCount(): Long {
+        return getDraftsWithActionsCount(mailboxContentRealm())
     }
 
-    fun getDraft(localUuid: String, realm: TypedRealm = mailboxContentRealm()): Draft? {
-        return getDraftQuery(Draft::localUuid.name, localUuid, realm).find()
+    fun getDraft(localUuid: String): Draft? {
+        return getDraft(localUuid, mailboxContentRealm())
     }
 
     fun getDraftByMessageUid(messageUid: String): Draft? {
@@ -257,6 +257,15 @@ class DraftController @Inject constructor(private val mailboxContentRealm: Realm
         }
         //endregion
 
+        //region Get data
+        fun getDraft(localUuid: String, realm: TypedRealm): Draft? {
+            return getDraftQuery(Draft::localUuid.name, localUuid, realm).find()
+        }
+
+        fun getDraftsWithActionsCount(realm: TypedRealm): Long {
+            return getDraftsWithActionsQuery(realm).count().find()
+        }
+
         fun getOrphanDrafts(realm: TypedRealm): RealmResults<Draft> {
             return getOrphanDraftsQuery(realm).find()
         }
@@ -264,5 +273,6 @@ class DraftController @Inject constructor(private val mailboxContentRealm: Realm
         fun getDraftByMessageUid(messageUid: String, realm: TypedRealm): Draft? {
             return getDraftQuery(Draft::messageUid.name, messageUid, realm).find()
         }
+        //endregion
     }
 }

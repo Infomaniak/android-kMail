@@ -357,7 +357,7 @@ class NewMessageViewModel @Inject constructor(
 
     private fun removeDraftFromRealm() {
         mailboxContentRealm().writeBlocking {
-            draftController.getDraft(draft.localUuid, realm = this)?.let(::delete)
+            DraftController.getDraft(draft.localUuid, realm = this)?.let(::delete)
         }
     }
 
