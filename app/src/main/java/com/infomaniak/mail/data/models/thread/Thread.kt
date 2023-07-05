@@ -52,13 +52,10 @@ import java.util.Date
 @Serializable
 class Thread : RealmObject {
 
+    //region Remote data
     @PrimaryKey
     var uid: String = ""
-    var folderId: String = ""
     var messages: RealmList<Message> = realmListOf()
-    var duplicates: RealmList<Message> = realmListOf()
-    var messagesIds: RealmSet<String> = realmSetOf()
-
     var date: RealmInstant = Date().toRealmInstant()
     @SerialName("unseen_messages")
     var unseenMessagesCount: Int = 0
@@ -67,6 +64,7 @@ class Thread : RealmObject {
     var subject: String? = null
     @SerialName("has_attachments")
     var hasAttachments: Boolean = false
+    @SerialName("has_drafts")
     var hasDrafts: Boolean = false
     @SerialName("flagged")
     var isFavorite: Boolean = false
@@ -74,8 +72,15 @@ class Thread : RealmObject {
     var isAnswered: Boolean = false
     @SerialName("forwarded")
     var isForwarded: Boolean = false
+    //endregion
 
-    //region Local data
+    //region Local data (Transient)
+    @Transient
+    var folderId: String = ""
+    @Transient
+    var duplicates: RealmList<Message> = realmListOf()
+    @Transient
+    var messagesIds: RealmSet<String> = realmSetOf()
     @Transient
     var isFromSearch: Boolean = false
     //endregion

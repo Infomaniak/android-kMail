@@ -46,7 +46,7 @@ import java.util.*
 @Serializable
 class Message : RealmObject {
 
-    //region API data
+    //region Remote data
     @PrimaryKey
     var uid: String = ""
     @SerialName("msg_id")

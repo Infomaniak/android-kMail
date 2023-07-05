@@ -46,7 +46,7 @@ import java.util.*
 @Serializable
 class Draft : RealmObject {
 
-    //region API data
+    //region Remote data
     @SerialName("uuid")
     var remoteUuid: String? = null
 
