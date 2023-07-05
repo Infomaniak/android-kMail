@@ -49,7 +49,7 @@ class SwitchUserViewModel @Inject constructor(
             AccountUtils.currentUser = user
             AccountUtils.currentMailboxId = MailboxController.getFirstValidMailbox(user.id)?.mailboxId ?: AppSettings.DEFAULT_ID
             AccountUtils.reloadApp?.invoke()
-            RealmDatabase.close()
+            RealmDatabase.reset()
         }
     }
 }
