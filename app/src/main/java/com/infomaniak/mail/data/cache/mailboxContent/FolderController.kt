@@ -40,18 +40,6 @@ import javax.inject.Inject
 class FolderController @Inject constructor(private val mailboxContentRealm: RealmDatabase.MailboxContent) {
 
     //region Get data
-    private fun getFolders(
-        exceptionsFoldersIds: List<String> = emptyList(),
-        realm: TypedRealm = mailboxContentRealm(),
-    ): RealmResults<Folder> {
-        val realmQuery = if (exceptionsFoldersIds.isEmpty()) {
-            getFoldersQuery(realm)
-        } else {
-            getFoldersQuery(exceptionsFoldersIds, realm)
-        }
-        return realmQuery.find()
-    }
-
     fun getRootsFoldersAsync(): Flow<ResultsChange<Folder>> {
         return getFoldersQuery(mailboxContentRealm(), onlyRoots = true).asFlow()
     }
@@ -152,6 +140,16 @@ class FolderController @Inject constructor(private val mailboxContentRealm: Real
         }
         //endregion
 
+        //region Get data
+        private fun getFolders(exceptionsFoldersIds: List<String> = emptyList(), realm: TypedRealm): RealmResults<Folder> {
+            val realmQuery = if (exceptionsFoldersIds.isEmpty()) {
+                getFoldersQuery(realm)
+            } else {
+                getFoldersQuery(exceptionsFoldersIds, realm)
+            }
+            return realmQuery.find()
+        }
+
         fun getFolder(id: String, realm: TypedRealm): Folder? {
             return getFolderQuery(Folder::id.name, id, realm).find()
         }
@@ -177,7 +175,9 @@ class FolderController @Inject constructor(private val mailboxContentRealm: Real
                 getFolder(FolderRole.TRASH, realm)?.id?.let(::add)
             }
         }
+        //endregion
 
+        //region Edit data
         fun updateFolder(id: String, realm: Realm, onUpdate: (folder: Folder) -> Unit) {
             realm.writeBlocking { getFolder(id, realm = this)?.let(onUpdate) }
         }
@@ -195,5 +195,6 @@ class FolderController @Inject constructor(private val mailboxContentRealm: Real
                 }
             }
         }
+        //endregion
     }
 }

@@ -90,7 +90,7 @@ class DraftsActionsWorker @AssistedInject constructor(
     override suspend fun launchWork(): Result = withContext(ioDispatcher) {
         Log.d(TAG, "Work started")
 
-        if (draftController.getDraftsWithActionsCount(mailboxContentRealm) == 0L) return@withContext Result.success()
+        if (DraftController.getDraftsWithActionsCount(mailboxContentRealm) == 0L) return@withContext Result.success()
         if (AccountUtils.currentMailboxId == AppSettings.DEFAULT_ID) return@withContext Result.failure()
 
         userId = inputData.getIntOrNull(USER_ID_KEY) ?: return@withContext Result.failure()
@@ -331,7 +331,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         var scheduledDate: String? = null
         var savedDraftUuid: String? = null
 
-        val updatedDraft = draftController.getDraft(draft.localUuid, mailboxContentRealm)!!
+        val updatedDraft = DraftController.getDraft(draft.localUuid, mailboxContentRealm)!!
         // TODO: Remove this whole `draft.attachments.forEach { … }` when the Attachment issue is fixed.
         updatedDraft.attachments.forEach { attachment ->
             if (attachment.uuid.isBlank()) {

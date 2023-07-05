@@ -63,11 +63,6 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
         )
     }
 
-    fun getThreadLastMessageInFolder(threadUid: String, realm: TypedRealm = mailboxContentRealm()): Message? {
-        val thread = ThreadController.getThread(threadUid, realm)
-        return thread?.messages?.query("${Message::folderId.name} == '${thread.folderId}'")?.find()?.lastOrNull()
-    }
-
     fun getUnseenMessages(thread: Thread): List<Message> {
         return getMessagesAndDuplicates(thread, "${Message::isSeen.name} == false")
     }
@@ -150,8 +145,14 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
         }
         //endregion
 
+        //region Get data
         fun getMessage(uid: String, realm: TypedRealm): Message? {
             return getMessageQuery(uid, realm).find()
+        }
+
+        fun getThreadLastMessageInFolder(threadUid: String, realm: TypedRealm): Message? {
+            val thread = ThreadController.getThread(threadUid, realm)
+            return thread?.messages?.query("${Message::folderId.name} == '${thread.folderId}'")?.find()?.lastOrNull()
         }
 
         fun getOldestMessage(folderId: String, realm: TypedRealm): Message? {
@@ -161,7 +162,9 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
         fun getNewestMessage(folderId: String, realm: TypedRealm): Message? {
             return getOldestOrNewestMessageQuery(folderId, Sort.DESCENDING, realm).find()
         }
+        //endregion
 
+        //region Edit data
         fun upsertMessage(message: Message, realm: MutableRealm) {
             realm.copyToRealm(message, UpdatePolicy.ALL)
         }
@@ -184,5 +187,6 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
                 deleteMessage(message, realm)
             }
         }
+        //endregion
     }
 }
