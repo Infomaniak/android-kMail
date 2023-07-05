@@ -57,7 +57,7 @@ class Mailbox : RealmObject {
     @Transient
     var quotas: Quotas? = null
     @Transient
-    var inboxUnreadCount: Int = 0
+    var unreadCountLocal: Int = 0
     @Transient
     var permissions: MailboxPermissions? = null
     //endregion
@@ -75,7 +75,7 @@ class Mailbox : RealmObject {
         this.objectId = createObjectId(userId)
         this.userId = userId
         this.quotas = quotas
-        this.inboxUnreadCount = inboxUnreadCount
+        this.unreadCountLocal = inboxUnreadCount
         this.permissions = permissions
     }
 

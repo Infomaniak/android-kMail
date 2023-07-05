@@ -57,7 +57,7 @@ class SwitchMailboxesAdapter(
 
         text = mailbox.email
 
-        if (isInMenuDrawer) badge = mailbox.inboxUnreadCount else itemStyle = SelectionStyle.ACCOUNT
+        if (isInMenuDrawer) badge = mailbox.unreadCountLocal else itemStyle = SelectionStyle.ACCOUNT
 
         holder.binding.root.setSelectedState(isCurrentMailbox)
 
