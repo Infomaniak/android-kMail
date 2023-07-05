@@ -106,12 +106,14 @@ class ThreadViewModel @Inject constructor(
         val thread = threadController.getThread(threadUid) ?: return@launch
         val messages = messageController.getMessageAndDuplicates(thread, message)
         val isSuccess = ApiRepository.deleteMessages(mailbox.uuid, messages.getUids()).isSuccess()
-        if (isSuccess) RefreshController.refreshThreads(
-            refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
-            mailbox = mailbox,
-            folder = message.folder,
-            realm = mailboxContentRealm()
-        )
+        if (isSuccess) {
+            RefreshController.refreshThreads(
+                refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
+                mailbox = mailbox,
+                folder = message.folder,
+                realm = mailboxContentRealm(),
+            )
+        }
     }
 
     fun clickOnQuickActionBar(threadUid: String, menuId: Int) = viewModelScope.launch(ioCoroutineContext) {

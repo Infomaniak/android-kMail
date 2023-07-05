@@ -110,7 +110,7 @@ object RefreshController {
         }.forEach { role ->
             scope.ensureActive()
 
-            FolderController.getFolder(role, this)?.let {
+            FolderController.getFolder(role, realm = this)?.let {
                 refresh(scope, mailbox, it, okHttpClient)
             }
         }
