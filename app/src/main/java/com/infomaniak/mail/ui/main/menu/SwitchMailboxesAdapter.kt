@@ -20,6 +20,8 @@ package com.infomaniak.mail.ui.main.menu
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.utils.showToast
@@ -31,6 +33,7 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.databinding.ItemSwitchMailboxBinding
 import com.infomaniak.mail.ui.main.menu.SwitchMailboxesAdapter.SwitchMailboxesViewHolder
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.UnreadDisplay
 import com.infomaniak.mail.views.MenuDrawerItemView.SelectionStyle
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -49,6 +52,23 @@ class SwitchMailboxesAdapter(
     }
 
     override fun onBindViewHolder(holder: SwitchMailboxesViewHolder, position: Int) = with(holder.binding.emailAddress) {
+
+        fun setUnreadCount(unread: UnreadDisplay) = with(binding) {
+            when {
+                !isInMenuDrawer -> {
+                    itemStyle = SelectionStyle.ACCOUNT
+                }
+                unread.shouldDisplayPastille -> {
+                    itemBadge.isGone = true
+                    pastille.isVisible = true
+                }
+                else -> {
+                    pastille.isGone = true
+                    badge = unread.count
+                }
+            }
+        }
+
         val mailbox = mailboxes[position]
         val isCurrentMailbox = mailbox.mailboxId == AccountUtils.currentMailboxId
 
@@ -57,7 +77,7 @@ class SwitchMailboxesAdapter(
 
         text = mailbox.email
 
-        if (isInMenuDrawer) badge = mailbox.inboxUnreadCount else itemStyle = SelectionStyle.ACCOUNT
+        setUnreadCount(mailbox.unreadCountDisplay)
 
         holder.binding.root.setSelectedState(isCurrentMailbox)
 

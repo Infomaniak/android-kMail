@@ -20,6 +20,7 @@ package com.infomaniak.mail.data.models.mailbox
 import androidx.core.app.NotificationManagerCompat
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Quotas
+import com.infomaniak.mail.utils.UnreadDisplay
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
@@ -46,6 +47,8 @@ class Mailbox : RealmObject {
     var isPasswordValid: Boolean = true
     @SerialName("is_locked")
     var isLocked: Boolean = false
+    @SerialName("unseen_messages")
+    var unreadCountRemote: Int = 0
     //endregion
 
     //region Local data (Transient)
@@ -57,7 +60,7 @@ class Mailbox : RealmObject {
     @Transient
     var quotas: Quotas? = null
     @Transient
-    var inboxUnreadCount: Int = 0
+    var unreadCountLocal: Int = 0
     @Transient
     var permissions: MailboxPermissions? = null
     //endregion
@@ -69,13 +72,19 @@ class Mailbox : RealmObject {
 
     inline val isValid get() = isPasswordValid && !isLocked
 
+    val unreadCountDisplay: UnreadDisplay
+        get() = UnreadDisplay(
+            count = unreadCountLocal,
+            shouldDisplayPastille = unreadCountLocal == 0 && unreadCountRemote > 0,
+        )
+
     private fun createObjectId(userId: Int): String = "${userId}_${this.mailboxId}"
 
     fun initLocalValues(userId: Int, quotas: Quotas?, inboxUnreadCount: Int, permissions: MailboxPermissions?) {
         this.objectId = createObjectId(userId)
         this.userId = userId
         this.quotas = quotas
-        this.inboxUnreadCount = inboxUnreadCount
+        this.unreadCountLocal = inboxUnreadCount
         this.permissions = permissions
     }
 

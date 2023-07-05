@@ -138,7 +138,7 @@ object MailboxController {
                     it.initLocalValues(
                         userId = userId,
                         quotas = localMailbox?.quotas,
-                        inboxUnreadCount = localMailbox?.inboxUnreadCount ?: 0,
+                        inboxUnreadCount = localMailbox?.unreadCountLocal ?: 0,
                         permissions = localMailbox?.permissions,
                     )
                 }

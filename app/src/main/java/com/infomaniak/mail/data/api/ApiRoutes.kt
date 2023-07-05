@@ -32,7 +32,7 @@ object ApiRoutes {
 
     fun contacts() = "${contact()}/all?with=emails,details,others,contacted_times&filters=has_email"
 
-    fun mailbox() = "$MAIL_API/api/mailbox"
+    fun mailbox() = "$MAIL_API/api/mailbox?with=unseen"
 
     fun permissions(linkId: Int, hostingId: Int) = "${mailbox()}/permissions?user_mailbox_id=$linkId&product_id=$hostingId"
 

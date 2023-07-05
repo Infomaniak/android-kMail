@@ -28,6 +28,7 @@ import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.utils.UnreadDisplay
 import com.infomaniak.mail.utils.Utils
 import io.realm.kotlin.ext.backlinks
 import io.realm.kotlin.ext.realmListOf
@@ -139,16 +140,6 @@ class Folder : RealmObject {
         ARCHIVE(R.string.archiveFolder, R.drawable.ic_archive_folder, 7, "archiveFolder"),
         COMMERCIAL(R.string.commercialFolder, R.drawable.ic_promotions, 1, "commercialFolder"),
         SOCIALNETWORKS(R.string.socialNetworksFolder, R.drawable.ic_social_media, 2, "socialNetworksFolder"),
-    }
-
-    data class UnreadDisplay(
-        val count: Int,
-        val shouldDisplayPastille: Boolean = false,
-    ) {
-        override fun equals(other: Any?) = other === this ||
-                (other is UnreadDisplay && other.count == count && other.shouldDisplayPastille == shouldDisplayPastille)
-
-        override fun hashCode(): Int = count.hashCode() + shouldDisplayPastille.hashCode()
     }
 
     companion object {

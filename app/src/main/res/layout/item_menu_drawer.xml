@@ -40,7 +40,6 @@
             android:gravity="start|center_vertical"
             android:lineSpacingMultiplier="1"
             android:lines="1"
-            android:maxLines="2"
             app:drawableStartCompat="@drawable/ic_folder"
             app:drawableTint="?android:attr/colorPrimary"
             tools:text="Folder (Default/Custom)" />
@@ -71,6 +70,7 @@
                 android:id="@+id/checkmark"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/mediumIconSize"
+                android:layout_marginEnd="@dimen/marginStandardVerySmall"
                 android:contentDescription="@string/contentDescriptionIconFolderSelected"
                 android:src="@drawable/ic_check"
                 android:visibility="gone"
@@ -80,6 +80,7 @@
                 android:id="@+id/warning"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/mediumIconSize"
+                android:layout_marginEnd="@dimen/marginStandardVerySmall"
                 android:contentDescription="@string/contentDescriptionWarningIcon"
                 android:src="@drawable/ic_warning"
                 android:visibility="gone"

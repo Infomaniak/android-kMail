@@ -191,7 +191,7 @@ class FolderController @Inject constructor(private val mailboxContentRealm: Real
 
             if (folder.role == FolderRole.INBOX) {
                 MailboxController.updateMailbox(mailboxObjectId) { mailbox ->
-                    mailbox.inboxUnreadCount = unreadCount
+                    mailbox.unreadCountLocal = unreadCount
                 }
             }
         }
