@@ -105,24 +105,9 @@ object RealmDatabase {
     //endregion
 
     //region Close Realms
-    fun reset() {
-        resetMailboxContent()
-        resetUserInfo()
-        _appSettings = null // TODO: To be removed when the injection is done
-        _mailboxInfo = null // TODO: To be removed when the injection is done
-    }
-
     fun closeOldRealms() {
         oldMailboxContent.get()?.close()
         oldUserInfo.get()?.close()
-    }
-
-    fun resetUserInfo() {
-        _userInfo = null
-    }
-
-    fun resetMailboxContent() {
-        _mailboxContent = null
     }
 
     private fun closeUserInfo() {
@@ -133,6 +118,23 @@ object RealmDatabase {
     fun closeMailboxContent() {
         _mailboxContent?.close()
         resetMailboxContent()
+    }
+    //endregion
+
+    //region Reset Realms
+    fun reset() {
+        resetMailboxContent()
+        resetUserInfo()
+        _mailboxInfo = null // TODO: To be removed when the injection is done
+        _appSettings = null // TODO: To be removed when the injection is done
+    }
+
+    fun resetUserInfo() {
+        _userInfo = null
+    }
+
+    fun resetMailboxContent() {
+        _mailboxContent = null
     }
     //endregion
 
