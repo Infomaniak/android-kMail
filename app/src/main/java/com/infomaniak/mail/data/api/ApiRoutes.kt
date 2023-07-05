@@ -34,7 +34,9 @@ object ApiRoutes {
 
     fun mailbox() = "$MAIL_API/api/mailbox?with=unseen"
 
-    fun permissions(linkId: Int, hostingId: Int) = "${mailbox()}/permissions?user_mailbox_id=$linkId&product_id=$hostingId"
+    fun permissions(linkId: Int, hostingId: Int): String {
+        return "$MAIL_API/api/mailbox/permissions?user_mailbox_id=$linkId&product_id=$hostingId"
+    }
 
     private fun apiMailbox(mailboxHostingId: Int, mailboxName: String): String {
         return "$INFOMANIAK_API_V1/mail_hostings/$mailboxHostingId/mailboxes/$mailboxName"
