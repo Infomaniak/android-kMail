@@ -47,7 +47,6 @@ import javax.inject.Inject
 
 class FetchMessagesManager @Inject constructor(
     private val appContext: Context,
-    private val messageController: MessageController,
     private val notificationManagerCompat: NotificationManagerCompat,
 ) {
 
@@ -129,8 +128,8 @@ class FetchMessagesManager @Inject constructor(
             }
         }
 
-        val message = messageController.getThreadLastMessageInFolder(uid, realm) ?: run {
         ThreadController.fetchIncompleteMessages(messages, mailbox, okHttpClient, realm)
+        val message = MessageController.getThreadLastMessageInFolder(uid, realm) ?: run {
             ThreadController.getThread(uid, realm)?.let { thread ->
                 Sentry.withScope { scope ->
                     scope.level = SentryLevel.ERROR
