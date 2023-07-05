@@ -46,6 +46,8 @@ class Mailbox : RealmObject {
     var isPasswordValid: Boolean = true
     @SerialName("is_locked")
     var isLocked: Boolean = false
+    @SerialName("unseen_messages")
+    var unreadCountRemote: Int = 0
     //endregion
 
     //region Local data (Transient)
