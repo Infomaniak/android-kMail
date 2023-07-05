@@ -42,8 +42,8 @@ object GplayUtils {
         }
     }
 
-    fun Context.isGooglePlayServicesNotAvailable(): Boolean = with(GoogleApiAvailability.getInstance()) {
-        return isGooglePlayServicesAvailable(this@isGooglePlayServicesNotAvailable) != ConnectionResult.SUCCESS
+    fun Context.areGooglePlayServicesNotAvailable(): Boolean {
+        return GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this) != ConnectionResult.SUCCESS
     }
 
     fun deleteFirebaseToken() = FirebaseMessaging.getInstance().deleteToken()

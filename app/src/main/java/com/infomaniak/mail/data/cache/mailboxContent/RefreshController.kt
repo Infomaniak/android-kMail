@@ -67,11 +67,16 @@ object RefreshController {
             return@getOrElse null
         }
 
+        Log.i("API", "Refresh threads with mode: $refreshMode | (${folder.name})")
+
         refreshThreadsJob?.cancel()
         refreshThreadsJob = Job()
 
         return refreshWithRunCatching().also {
-            if (it != null) stopped?.invoke()
+            if (it != null) {
+                stopped?.invoke()
+                Log.d("API", "End of refreshing threads with mode: $refreshMode | (${folder.name})")
+            }
         }
     }
 
@@ -82,7 +87,9 @@ object RefreshController {
         folder: Folder,
         okHttpClient: OkHttpClient?,
     ): Set<Thread> {
-        Log.i("API", "Refresh threads with mode: $refreshMode | (${folder.name})")
+
+        Log.d("API", "Start of refreshing threads with mode: $refreshMode | (${folder.name})")
+
         return when (refreshMode) {
             REFRESH_FOLDER_WITH_ROLE -> refreshWithRoleConsideration(scope, mailbox, folder, okHttpClient)
             REFRESH_FOLDER -> refresh(scope, mailbox, folder, okHttpClient)
@@ -281,11 +288,12 @@ object RefreshController {
         val logMessage = "Deleted: ${activities.deletedShortUids.count()} | Updated: ${activities.updatedMessages.count()}"
         Log.d("API", "$logMessage | ${folder.name}")
 
+        addSentryBreadcrumbsForActivities(logMessage, mailbox.email, folder, activities)
+
         writeBlocking {
             val impactedFoldersIds = mutableSetOf<String>().apply {
                 addAll(handleDeletedUids(scope, activities.deletedShortUids, folder.id))
                 addAll(handleUpdatedUids(scope, activities.updatedMessages, folder.id))
-                addSentryBreadcrumbsForActivities(logMessage, mailbox.email, folder, activities)
             }
 
             impactedFoldersIds.forEach { folderId ->
@@ -328,6 +336,15 @@ object RefreshController {
         if (!apiResponse.isSuccess()) apiResponse.throwErrorAsException()
         scope.ensureActive()
 
+        addSentryBreadcrumbsForAddedUids(
+            logMessage = logMessage,
+            email = mailbox.email,
+            folder = folder,
+            uids = uids,
+            messages = apiResponse.data?.messages ?: emptyList(),
+            cursor = cursor,
+        )
+
         apiResponse.data?.messages?.let { messages ->
 
             writeBlocking {
@@ -355,7 +372,6 @@ object RefreshController {
                 scope.ensureActive()
             }
 
-            addSentryBreadcrumbsForAddedUids(logMessage, mailbox.email, folder, uids, messages, cursor)
         }
 
         return impactedThreads

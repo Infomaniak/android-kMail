@@ -29,6 +29,7 @@ import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -49,6 +50,7 @@ import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListen
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.Utils
+import com.infomaniak.mail.GplayUtils.areGooglePlayServicesNotAvailable
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
@@ -97,6 +99,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     @Inject
     lateinit var draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler
+    @Inject
+    lateinit var notificationManagerCompat: NotificationManagerCompat
 
     private val showLoadingTimer: CountDownTimer by lazy {
         Utils.createRefreshTimer { binding.swipeRefreshLayout.isRefreshing = true }
@@ -144,13 +148,20 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         binding.unreadCountChip.apply { isCloseIconVisible = isChecked }
     }
 
-    override fun onResume() = with(binding) {
+    override fun onResume() {
         super.onResume()
-
-        if (canRefreshThreads) mainViewModel.forceRefreshThreads()
-        canRefreshThreads = true
-
+        refreshThreadsIfNotificationsAreDisabled()
         updateSwipeActionsAccordingToSettings()
+        canRefreshThreads = true
+    }
+
+    private fun refreshThreadsIfNotificationsAreDisabled() = with(mainViewModel) {
+        val areGoogleServicesDisabled = requireContext().areGooglePlayServicesNotAvailable()
+        val areAppNotifsDisabled = !notificationManagerCompat.areNotificationsEnabled()
+        val areMailboxNotifsDisabled = currentMailbox.value?.notificationsIsDisabled(notificationManagerCompat) == true
+        val shouldRefreshThreads = areGoogleServicesDisabled || areAppNotifsDisabled || areMailboxNotifsDisabled
+
+        if (shouldRefreshThreads && canRefreshThreads) forceRefreshThreads()
     }
 
     private fun updateSwipeActionsAccordingToSettings() = with(binding.threadsList) {
@@ -421,11 +432,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         mainViewModel.isInternetAvailable.observe(viewLifecycleOwner) { isAvailable ->
             TransitionManager.beginDelayedTransition(binding.root)
             binding.noNetwork.isGone = isAvailable
-            if (isAvailable) {
-                mainViewModel.forceRefreshThreads()
-            } else {
-                updateThreadsVisibility()
-            }
+            if (!isAvailable) updateThreadsVisibility()
         }
     }
 

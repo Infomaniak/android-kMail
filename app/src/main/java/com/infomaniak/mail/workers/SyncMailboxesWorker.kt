@@ -22,7 +22,7 @@ import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.*
 import androidx.work.PeriodicWorkRequest.Companion.MIN_PERIODIC_INTERVAL_MILLIS
-import com.infomaniak.mail.GplayUtils.isGooglePlayServicesNotAvailable
+import com.infomaniak.mail.GplayUtils.areGooglePlayServicesNotAvailable
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.di.IoDispatcher
@@ -73,7 +73,7 @@ class SyncMailboxesWorker @AssistedInject constructor(
 
         suspend fun scheduleWorkIfNeeded() = withContext(ioDispatcher) {
 
-            if (appContext.isGooglePlayServicesNotAvailable() && AccountUtils.getAllUsersCount() > 0) {
+            if (appContext.areGooglePlayServicesNotAvailable() && AccountUtils.getAllUsersCount() > 0) {
                 Log.d(TAG, "Work scheduled")
 
                 val workRequest =
