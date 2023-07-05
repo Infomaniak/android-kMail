@@ -35,6 +35,7 @@ import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.NotificationUtils.deleteMailNotificationChannel
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
+import io.realm.kotlin.internal.platform.WeakReference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
@@ -52,6 +53,9 @@ object RealmDatabase {
     private var _userInfo: Realm? = null
     private var _mailboxInfo: Realm? = null
     private var _mailboxContent: Realm? = null
+
+    private var oldUserInfo = WeakReference<Realm?>(null)
+    private var oldMailboxContent = WeakReference<Realm?>(null)
     //endregion
 
     //region Realms' mutexes
@@ -70,7 +74,10 @@ object RealmDatabase {
 
     fun userInfo(): Realm = runBlocking(Dispatchers.IO) {
         userInfoMutex.withLock {
-            _userInfo ?: Realm.open(RealmConfig.userInfo).also { _userInfo = it }
+            _userInfo ?: Realm.open(RealmConfig.userInfo).also {
+                _userInfo = it
+                oldUserInfo = WeakReference(it)
+            }
         }
     }
 
@@ -88,28 +95,44 @@ object RealmDatabase {
     class MailboxContent {
         operator fun invoke() = runBlocking(Dispatchers.IO) {
             mailboxContentMutex.withLock {
-                _mailboxContent ?: newMailboxContentInstance.also { _mailboxContent = it }
+                _mailboxContent ?: newMailboxContentInstance.also {
+                    _mailboxContent = it
+                    oldMailboxContent = WeakReference(it)
+                }
             }
         }
     }
     //endregion
 
     //region Close Realms
-    fun close() {
-        closeMailboxContent()
-        closeUserInfo()
+    fun reset() {
+        resetMailboxContent()
+        resetUserInfo()
         _appSettings = null // TODO: To be removed when the injection is done
         _mailboxInfo = null // TODO: To be removed when the injection is done
     }
 
-    fun closeUserInfo() {
-        _userInfo?.close()
+    fun closeOldRealms() {
+        oldMailboxContent.get()?.close()
+        oldUserInfo.get()?.close()
+    }
+
+    fun resetUserInfo() {
         _userInfo = null
+    }
+
+    fun resetMailboxContent() {
+        _mailboxContent = null
+    }
+
+    private fun closeUserInfo() {
+        _userInfo?.close()
+        resetUserInfo()
     }
 
     fun closeMailboxContent() {
         _mailboxContent?.close()
-        _mailboxContent = null
+        resetMailboxContent()
     }
     //endregion
 

@@ -63,14 +63,14 @@ object AccountUtils : CredentialManager() {
     override var currentUserId: Int = AppSettingsController.getAppSettings().currentUserId
         set(userId) {
             field = userId
-            RealmDatabase.closeUserInfo()
+            RealmDatabase.resetUserInfo()
             AppSettingsController.updateAppSettings { appSettings -> appSettings.currentUserId = userId }
         }
 
     var currentMailboxId: Int = AppSettingsController.getAppSettings().currentMailboxId
         set(mailboxId) {
             field = mailboxId
-            RealmDatabase.closeMailboxContent()
+            RealmDatabase.resetMailboxContent()
             AppSettingsController.updateAppSettings { appSettings -> appSettings.currentMailboxId = mailboxId }
         }
 
@@ -78,7 +78,7 @@ object AccountUtils : CredentialManager() {
 
     suspend fun switchToMailbox(mailboxId: Int) {
         currentMailboxId = mailboxId
-        RealmDatabase.close()
+        RealmDatabase.reset()
         reloadApp?.invoke()
     }
 
