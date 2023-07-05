@@ -77,7 +77,6 @@ class MainViewModel @Inject constructor(
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val mergedContactController: MergedContactController,
     private val messageController: MessageController,
-    private val refreshController: RefreshController,
     private val searchUtils: SearchUtils,
     private val sharedViewModelUtils: SharedViewModelUtils,
     private val threadController: ThreadController,
@@ -352,10 +351,11 @@ class MainViewModel @Inject constructor(
 
         if (isDownloadingChanges.value?.first == true) return@launch
 
-        refreshController.refreshThreads(
+        RefreshController.refreshThreads(
             refreshMode = RefreshMode.ONE_PAGE_OF_OLD_MESSAGES,
             mailbox = currentMailbox.value!!,
             folder = currentFolder.value!!,
+            realm = mailboxContentRealm(),
             started = ::startedDownload,
             stopped = ::stoppedDownload,
         )
@@ -393,10 +393,11 @@ class MainViewModel @Inject constructor(
             null to null
         }
 
-        refreshController.refreshThreads(
+        RefreshController.refreshThreads(
             refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
             mailbox = mailbox,
             folder = folder,
+            realm = mailboxContentRealm(),
             started = started,
             stopped = stopped,
         )
@@ -929,7 +930,7 @@ class MainViewModel @Inject constructor(
             val delay = REFRESH_DELAY + max(scheduledDate - timeNow, 0L)
             delay(min(delay, MAX_REFRESH_DELAY))
 
-            refreshController.refreshThreads(
+            RefreshController.refreshThreads(
                 refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
                 mailbox = currentMailbox.value!!,
                 folder = folder,

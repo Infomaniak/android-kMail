@@ -26,6 +26,7 @@ import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.trackUserInfo
 import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
@@ -49,9 +50,9 @@ import kotlin.collections.set
 @HiltViewModel
 class ThreadViewModel @Inject constructor(
     application: Application,
-    private val sharedViewModelUtils: SharedViewModelUtils,
+    private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val messageController: MessageController,
-    private val refreshController: RefreshController,
+    private val sharedViewModelUtils: SharedViewModelUtils,
     private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
@@ -105,7 +106,12 @@ class ThreadViewModel @Inject constructor(
         val thread = threadController.getThread(threadUid) ?: return@launch
         val messages = messageController.getMessageAndDuplicates(thread, message)
         val isSuccess = ApiRepository.deleteMessages(mailbox.uuid, messages.getUids()).isSuccess()
-        if (isSuccess) refreshController.refreshThreads(RefreshMode.REFRESH_FOLDER_WITH_ROLE, mailbox, message.folder)
+        if (isSuccess) RefreshController.refreshThreads(
+            refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
+            mailbox = mailbox,
+            folder = message.folder,
+            realm = mailboxContentRealm()
+        )
     }
 
     fun clickOnQuickActionBar(threadUid: String, menuId: Int) = viewModelScope.launch(ioCoroutineContext) {

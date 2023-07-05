@@ -20,6 +20,7 @@ package com.infomaniak.mail.utils
 import android.content.Context
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
@@ -35,8 +36,8 @@ import javax.inject.Inject
 
 class SharedViewModelUtils @Inject constructor(
     private val folderController: FolderController,
+    private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val messageController: MessageController,
-    private val refreshController: RefreshController,
 ) {
 
     suspend fun markAsSeen(
@@ -78,10 +79,11 @@ class SharedViewModelUtils @Inject constructor(
 
         foldersIds.forEach { folderId ->
             folderController.getFolder(folderId)?.let { folder ->
-                refreshController.refreshThreads(
+                RefreshController.refreshThreads(
                     refreshMode = RefreshMode.REFRESH_FOLDER,
                     mailbox = mailbox,
                     folder = folder,
+                    realm = mailboxContentRealm(),
                     started = started,
                     stopped = stopped,
                 )
