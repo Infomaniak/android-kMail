@@ -149,8 +149,7 @@ class ThreadController @Inject constructor(
 
         //region Queries
         private fun getThreadsQuery(messageIds: Set<String>, realm: TypedRealm): RealmQuery<Thread> {
-            val byMessagesIds = "ANY ${Thread::messagesIds.name} IN {${messageIds.joinToString { "'$it'" }}}"
-            return realm.query(byMessagesIds)
+            return realm.query("ANY ${Thread::messagesIds.name} IN $0", messageIds)
         }
 
         private fun getOrphanThreadsQuery(realm: TypedRealm): RealmQuery<Thread> {

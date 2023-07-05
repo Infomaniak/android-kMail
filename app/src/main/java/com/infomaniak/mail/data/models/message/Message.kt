@@ -170,7 +170,6 @@ class Message : RealmObject {
         this.messageIds = messageIds
         draftLocalUuid?.let { this.draftLocalUuid = it }
         this.isFromSearch = isFromSearch
-        messageId = messageId?.sanitize()
         shortUid = uid.toShortUid()
     }
 
@@ -205,9 +204,6 @@ class Message : RealmObject {
         return to to cc
     }
 
-    // TODO: Remove this when https://github.com/realm/realm-kotlin/issues/929 is fixed.
-    private fun String.sanitize() = replace("'", "")
-
     fun initMessageIds() {
 
         fun String.ifNotBlank(completion: (String) -> Unit) {
@@ -223,10 +219,7 @@ class Message : RealmObject {
         fun String.parseMessagesIds(): List<String> = this
             .removePrefix("<")
             .removeSuffix(">")
-            .sanitize()
             .split(">\\s*<|>?\\s+<?".toRegex())
-
-        messageId = messageId?.sanitize()
 
         messageIds = realmSetOf<String>().apply {
             messageId?.ifNotBlank { addAll(it.parseMessagesIds()) }

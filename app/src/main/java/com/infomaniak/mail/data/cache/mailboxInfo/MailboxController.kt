@@ -60,8 +60,7 @@ object MailboxController {
         return if (exceptionMailboxIds.isEmpty()) {
             query
         } else {
-            val checkIsNotInExceptions = "NOT ${Mailbox::mailboxId.name} IN {${exceptionMailboxIds.joinToString { "'$it'" }}}"
-            query.query(checkIsNotInExceptions)
+            query.query("NOT ${Mailbox::mailboxId.name} IN $0", exceptionMailboxIds)
         }
     }
 
