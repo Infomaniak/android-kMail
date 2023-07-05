@@ -49,7 +49,6 @@ class FetchMessagesManager @Inject constructor(
     private val appContext: Context,
     private val messageController: MessageController,
     private val notificationManagerCompat: NotificationManagerCompat,
-    private val threadController: ThreadController,
 ) {
 
     private val localSettings by lazy { LocalSettings.getInstance(appContext) }
@@ -130,8 +129,8 @@ class FetchMessagesManager @Inject constructor(
             }
         }
 
-        threadController.fetchIncompleteMessages(messages, mailbox, okHttpClient, realm)
         val message = messageController.getThreadLastMessageInFolder(uid, realm) ?: run {
+        ThreadController.fetchIncompleteMessages(messages, mailbox, okHttpClient, realm)
             ThreadController.getThread(uid, realm)?.let { thread ->
                 Sentry.withScope { scope ->
                     scope.level = SentryLevel.ERROR

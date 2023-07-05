@@ -19,7 +19,6 @@ package com.infomaniak.mail.data.cache.mailboxContent
 
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
@@ -47,7 +46,6 @@ import javax.inject.Inject
 
 class ThreadController @Inject constructor(
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
-    private val refreshController: RefreshController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
 
@@ -132,27 +130,8 @@ class ThreadController @Inject constructor(
         delete(query<Thread>("${Thread::isFromSearch.name} == true").find())
     }
 
-    suspend fun fetchIncompleteMessages(
-        messages: List<Message>,
-        mailbox: Mailbox,
-        okHttpClient: OkHttpClient? = null,
-        realm: Realm = mailboxContentRealm(),
-    ) {
-        val failedFoldersIds = realm.writeBlocking { fetchIncompleteMessages(messages, realm = this, okHttpClient) }
-        updateFailedFolders(failedFoldersIds, mailbox, okHttpClient, realm)
-    }
-
-    private suspend fun updateFailedFolders(
-        failedFoldersIds: Set<String>,
-        mailbox: Mailbox,
-        okHttpClient: OkHttpClient?,
-        realm: Realm,
-    ) = withContext(ioDispatcher) {
-        failedFoldersIds.forEach { folderId ->
-            FolderController.getFolder(folderId, realm)?.let { folder ->
-                refreshController.refreshThreads(RefreshMode.REFRESH_FOLDER, mailbox, folder, okHttpClient, realm)
-            }
-        }
+    suspend fun fetchIncompleteMessages(messages: List<Message>, mailbox: Mailbox, okHttpClient: OkHttpClient? = null) {
+        fetchIncompleteMessages(messages, mailbox, okHttpClient, mailboxContentRealm())
     }
 
     fun saveThreads(searchMessages: List<Message>) {
@@ -207,6 +186,7 @@ class ThreadController @Inject constructor(
         }
         //endregion
 
+        //region Get data
         fun getThread(uid: String, realm: TypedRealm): Thread? {
             return getThreadQuery(uid, realm).find()
         }
@@ -222,8 +202,39 @@ class ThreadController @Inject constructor(
         fun getOrphanThreads(realm: TypedRealm): RealmResults<Thread> {
             return getOrphanThreadsQuery(realm).find()
         }
+        //endregion
 
+        //region Edit data
         fun upsertThread(thread: Thread, realm: MutableRealm): Thread = realm.copyToRealm(thread, UpdatePolicy.ALL)
+
+        suspend fun fetchIncompleteMessages(
+            messages: List<Message>,
+            mailbox: Mailbox,
+            okHttpClient: OkHttpClient? = null,
+            realm: Realm,
+        ) {
+            val failedFoldersIds = realm.writeBlocking { fetchIncompleteMessages(messages, realm = this, okHttpClient) }
+            updateFailedFolders(failedFoldersIds, mailbox, okHttpClient, realm)
+        }
+
+        private suspend fun updateFailedFolders(
+            failedFoldersIds: Set<String>,
+            mailbox: Mailbox,
+            okHttpClient: OkHttpClient?,
+            realm: Realm,
+        ) {
+            failedFoldersIds.forEach { folderId ->
+                FolderController.getFolder(folderId, realm)?.let { folder ->
+                    RefreshController.refreshThreads(
+                        refreshMode = RefreshController.RefreshMode.REFRESH_FOLDER,
+                        mailbox = mailbox,
+                        folder = folder,
+                        okHttpClient = okHttpClient,
+                        realm = realm
+                    )
+                }
+            }
+        }
 
         fun fetchIncompleteMessages(
             messages: List<Message>,
@@ -268,5 +279,6 @@ class ThreadController @Inject constructor(
 
             return failedFoldersIds
         }
+        //endregion
     }
 }
