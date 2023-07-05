@@ -44,7 +44,7 @@ import kotlin.math.max
 @Serializable
 class Folder : RealmObject {
 
-    //region API data
+    //region Remote data
     @PrimaryKey
     var id: String = ""
     var path: String = ""

@@ -29,7 +29,7 @@ import kotlinx.serialization.Transient
 @Serializable
 class Mailbox : RealmObject {
 
-    //region API data
+    //region Remote data
     var uuid: String = ""
     var email: String = ""
     @SerialName("mailbox")

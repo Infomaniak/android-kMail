@@ -52,31 +52,35 @@ import java.util.Date
 @Serializable
 class Thread : RealmObject {
 
+    //region Remote data
     @PrimaryKey
     var uid: String = ""
-    var folderId: String = ""
     var messages: RealmList<Message> = realmListOf()
-    var duplicates: RealmList<Message> = realmListOf()
-    var messagesIds: RealmSet<String> = realmSetOf()
-
     var date: RealmInstant = Date().toRealmInstant()
     @SerialName("unseen_messages")
     var unseenMessagesCount: Int = 0
     var from: RealmList<Recipient> = realmListOf()
     var to: RealmList<Recipient> = realmListOf()
     var subject: String? = null
-    var size: Int = 0
     @SerialName("has_attachments")
     var hasAttachments: Boolean = false
+    @SerialName("has_drafts")
     var hasDrafts: Boolean = false
     @SerialName("flagged")
     var isFavorite: Boolean = false
+    @SerialName("answered")
     var isAnswered: Boolean = false
     @SerialName("forwarded")
     var isForwarded: Boolean = false
-    var isScheduled: Boolean = false
+    //endregion
 
-    //region Local data
+    //region Local data (Transient)
+    @Transient
+    var folderId: String = ""
+    @Transient
+    var duplicates: RealmList<Message> = realmListOf()
+    @Transient
+    var messagesIds: RealmSet<String> = realmSetOf()
     @Transient
     var isFromSearch: Boolean = false
     //endregion
@@ -160,13 +164,11 @@ class Thread : RealmObject {
         unseenMessagesCount = 0
         from = realmListOf()
         to = realmListOf()
-        size = 0
         hasAttachments = false
         hasDrafts = false
         isFavorite = false
         isAnswered = false
         isForwarded = false
-        isScheduled = false
     }
 
     private fun updateThread() {
@@ -178,13 +180,11 @@ class Thread : RealmObject {
             if (!message.isSeen) unseenMessagesCount++
             from += message.from
             to += message.to
-            size += message.size
             if (message.hasAttachments) hasAttachments = true
             if (message.isDraft) hasDrafts = true
             if (message.isFavorite) isFavorite = true
             if (message.isAnswered) isAnswered = true
             if (message.isForwarded) isForwarded = true
-            if (message.isScheduled) isScheduled = true
         }
 
         date = messages.last { it.folderId == folderId }.date
