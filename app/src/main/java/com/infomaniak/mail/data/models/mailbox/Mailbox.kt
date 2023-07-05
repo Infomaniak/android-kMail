@@ -20,7 +20,7 @@ package com.infomaniak.mail.data.models.mailbox
 import androidx.core.app.NotificationManagerCompat
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Quotas
-import com.infomaniak.mail.utils.UiUtils.UnreadDisplay
+import com.infomaniak.mail.utils.UnreadDisplay
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName

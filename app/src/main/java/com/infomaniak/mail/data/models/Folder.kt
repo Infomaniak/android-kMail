@@ -28,7 +28,7 @@ import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.utils.UiUtils.UnreadDisplay
+import com.infomaniak.mail.utils.UnreadDisplay
 import com.infomaniak.mail.utils.Utils
 import io.realm.kotlin.ext.backlinks
 import io.realm.kotlin.ext.realmListOf
