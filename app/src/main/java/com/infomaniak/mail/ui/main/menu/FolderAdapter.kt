@@ -22,8 +22,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.view.isGone
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -103,29 +101,15 @@ class FolderAdapter(
         folderIndent: Int? = null,
     ) = with(item) {
 
-        fun setUnreadCount() = with(binding) {
-            when {
-                !isInMenuDrawer -> {
-                    badge = 0
-                }
-                unread.shouldDisplayPastille -> {
-                    itemBadge.isGone = true
-                    pastille.isVisible = true
-                }
-                else -> {
-                    pastille.isGone = true
-                    badge = unread.count
-                }
-            }
-        }
-
         text = name
         icon = AppCompatResources.getDrawable(context, iconId)
         indent = context.resources.getDimension(RCore.dimen.marginStandard).toInt() * (folderIndent ?: 0)
         itemStyle = if (isInMenuDrawer) SelectionStyle.MENU_DRAWER else SelectionStyle.OTHER
         textWeight = if (isInMenuDrawer) TextWeight.MEDIUM else TextWeight.REGULAR
 
-        setUnreadCount()
+        badge = if (isInMenuDrawer) unread.count else 0
+        isPastilleDisplayed = unread.shouldDisplayPastille
+
         setSelectedState(currentFolderId == id)
 
         setOnClickListener {
