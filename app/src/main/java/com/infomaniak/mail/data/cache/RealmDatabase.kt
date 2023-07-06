@@ -74,10 +74,7 @@ object RealmDatabase {
 
     fun userInfo(): Realm = runBlocking(Dispatchers.IO) {
         userInfoMutex.withLock {
-            _userInfo ?: Realm.open(RealmConfig.userInfo).also {
-                _userInfo = it
-                oldUserInfo = WeakReference(it)
-            }
+            _userInfo ?: Realm.open(RealmConfig.userInfo).also { _userInfo = it }
         }
     }
 
@@ -97,7 +94,6 @@ object RealmDatabase {
                 _mailboxContent ?: newMailboxContentInstance.also {
                     closeOldRealms()
                     _mailboxContent = it
-                    oldMailboxContent = WeakReference(it)
                 }
             }
         }
@@ -127,6 +123,8 @@ object RealmDatabase {
         resetUserInfo()
         _mailboxInfo = null // TODO: To be removed when the injection is done
         _appSettings = null // TODO: To be removed when the injection is done
+        oldUserInfo = WeakReference(_userInfo)
+        oldMailboxContent = WeakReference(_mailboxContent)
     }
 
     fun resetUserInfo() {
