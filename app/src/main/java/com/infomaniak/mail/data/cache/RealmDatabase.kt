@@ -106,7 +106,7 @@ object RealmDatabase {
 
     //region Close Realms
     fun closeOldRealms() {
-        if (_mailboxContent == null) { // Only closes when mailbox is changed
+        if (_mailboxContent == null) { // Only closes when Mailbox is changed
             oldMailboxContent.get()?.close()
             oldUserInfo.get()?.close()
         }
