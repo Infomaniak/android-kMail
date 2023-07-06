@@ -442,7 +442,7 @@ class MainViewModel @Inject constructor(
         }
 
         if (isSuccess) {
-            sharedViewModelUtils.refreshFolders(
+            refreshFoldersAsync(
                 mailbox = mailbox,
                 messagesFoldersIds = messages.getFoldersIds(exception = trashId),
                 destinationFolderId = trashId,
@@ -508,7 +508,7 @@ class MainViewModel @Inject constructor(
 
         if (apiResponse.isSuccess() && mailbox.uuid == targetMailboxUuid) {
             val draftFolderId = folderController.getFolder(FolderRole.DRAFT)!!.id
-            sharedViewModelUtils.refreshFolders(mailbox, listOf(draftFolderId))
+            refreshFoldersAsync(mailbox, listOf(draftFolderId))
         }
 
         showDraftDeletedSnackBar(apiResponse)
@@ -536,7 +536,7 @@ class MainViewModel @Inject constructor(
         val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
 
         if (apiResponse.isSuccess()) {
-            sharedViewModelUtils.refreshFolders(
+            refreshFoldersAsync(
                 mailbox = mailbox,
                 messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id),
                 destinationFolderId = destinationFolder.id,
@@ -607,7 +607,7 @@ class MainViewModel @Inject constructor(
 
         if (apiResponse.isSuccess()) {
             val messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id)
-            sharedViewModelUtils.refreshFolders(
+            refreshFoldersAsync(
                 mailbox = mailbox,
                 messagesFoldersIds = messagesFoldersIds,
                 destinationFolderId = destinationFolder.id,
@@ -662,7 +662,7 @@ class MainViewModel @Inject constructor(
         val messages = getMessagesToMarkAsUnseen(threads, message)
         val isSuccess = ApiRepository.markMessagesAsUnseen(mailbox.uuid, messages.getUids()).isSuccess()
         if (isSuccess) {
-            sharedViewModelUtils.refreshFolders(
+            refreshFoldersAsync(
                 mailbox = mailbox,
                 messagesFoldersIds = messages.getFoldersIds(),
                 started = ::startedDownload,
@@ -718,7 +718,7 @@ class MainViewModel @Inject constructor(
         }
 
         if (isSuccess) {
-            sharedViewModelUtils.refreshFolders(
+            refreshFoldersAsync(
                 mailbox = mailbox,
                 messagesFoldersIds = messages.getFoldersIds(),
                 started = ::startedDownload,
@@ -767,7 +767,7 @@ class MainViewModel @Inject constructor(
         val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
 
         if (apiResponse.isSuccess()) {
-            sharedViewModelUtils.refreshFolders(
+            refreshFoldersAsync(
                 mailbox = mailbox,
                 messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id),
                 destinationFolderId = destinationFolder.id,
@@ -826,6 +826,7 @@ class MainViewModel @Inject constructor(
         val (resource, foldersIds, destinationFolderId) = undoData
 
         val snackbarTitle = if (ApiRepository.undoAction(resource).data == true) {
+            // Don't use `refreshFoldersAsync` here, it will make the Snackbars blink.
             sharedViewModelUtils.refreshFolders(mailbox, foldersIds, destinationFolderId, ::startedDownload, ::stoppedDownload)
             R.string.snackbarMoveCancelled
         } else {
@@ -862,6 +863,16 @@ class MainViewModel @Inject constructor(
         isNewFolderCreated.postValue(true)
     }
     //endregion
+
+    private fun refreshFoldersAsync(
+        mailbox: Mailbox,
+        messagesFoldersIds: List<String>,
+        destinationFolderId: String? = null,
+        started: (() -> Unit)? = null,
+        stopped: (() -> Unit)? = null,
+    ) = viewModelScope.launch(ioCoroutineContext) {
+        sharedViewModelUtils.refreshFolders(mailbox, messagesFoldersIds, destinationFolderId, started, stopped)
+    }
 
     private fun startedDownload() {
         isDownloadingChanges.postValue(true to null)
