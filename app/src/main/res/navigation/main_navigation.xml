@@ -56,6 +56,9 @@
         <action
             android:id="@+id/action_threadListFragment_to_lockedMailboxBottomSheetDialog"
             app:destination="@id/lockedMailboxBottomSheetDialog" />
+        <action
+            android:id="@+id/action_threadListFragment_to_invalidPasswordFragment"
+            app:destination="@id/invalidPasswordFragment" />
     </fragment>
 
     <activity
@@ -285,6 +288,9 @@
         <action
             android:id="@+id/action_accountFragment_to_lockedMailboxBottomSheetDialog"
             app:destination="@id/lockedMailboxBottomSheetDialog" />
+        <action
+            android:id="@+id/action_accountFragment_to_invalidPasswordFragment"
+            app:destination="@id/invalidPasswordFragment" />
     </fragment>
 
     <fragment
@@ -432,6 +438,22 @@
         <argument
             android:name="titleResId"
             app:argType="integer" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/invalidPasswordFragment"
+        android:name="com.infomaniak.mail.ui.main.InvalidPasswordFragment"
+        android:label="InvalidPasswordFragment"
+        tools:layout="@layout/fragment_invalid_password">
+        <argument
+            android:name="mailboxId"
+            app:argType="integer" />
+        <argument
+            android:name="mailboxObjectId"
+            app:argType="string" />
+        <argument
+            android:name="mailboxEmail"
+            app:argType="string" />
     </fragment>
 
     <activity

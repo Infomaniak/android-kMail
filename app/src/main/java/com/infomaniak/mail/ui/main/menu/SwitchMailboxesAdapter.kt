@@ -19,16 +19,13 @@ package com.infomaniak.mail.ui.main.menu
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.RecyclerView
-import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.mail.MatomoMail.SWITCH_MAILBOX_NAME
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
-import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.databinding.ItemSwitchMailboxBinding
 import com.infomaniak.mail.ui.main.menu.SwitchMailboxesAdapter.SwitchMailboxesViewHolder
@@ -42,9 +39,10 @@ import kotlinx.coroutines.launch
 class SwitchMailboxesAdapter(
     private val isInMenuDrawer: Boolean,
     private val lifecycleScope: LifecycleCoroutineScope,
+    private val onLockedMailboxClicked: (String) -> Unit,
+    private val onInvalidPasswordMailboxClicked: (Mailbox) -> Unit,
     private var mailboxes: List<Mailbox> = emptyList(),
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO, // TODO: Inject with hilt
-    private val onLockedMailboxClicked: (String) -> Unit,
 ) : RecyclerView.Adapter<SwitchMailboxesViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SwitchMailboxesViewHolder {
@@ -94,11 +92,7 @@ class SwitchMailboxesAdapter(
                 }
             }
 
-            setOnOutdatedPasswordClickListener {
-                // TODO: Instead of this Toast, display a popup asking for correct password (we are currently waiting for the UX).
-                context.showToast(R.string.frelatedMailbox, Toast.LENGTH_LONG)
-            }
-
+            setOnOutdatedPasswordClickListener { onInvalidPasswordMailboxClicked(mailbox) }
             setOnLockedMailboxClickListener { onLockedMailboxClicked(mailbox.email) }
         }
     }

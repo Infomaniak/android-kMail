@@ -67,6 +67,7 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
         isInMenuDrawer = isInMenuDrawer,
         lifecycleScope = lifecycleScope,
         onLockedMailboxClicked = { mailboxEmail -> onLockedMailboxClicked(mailboxEmail) },
+        onInvalidPasswordMailboxClicked = { mailbox -> onInvalidPasswordMailboxClicked(mailbox) },
     )
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {

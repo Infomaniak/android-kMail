@@ -88,6 +88,8 @@
     <string name="buttonCreate">Cree</string>
     <string name="buttonCreateAccount">Crear una cuenta</string>
     <string name="buttonCreateFolder">Añadir una carpeta</string>
+    <string name="buttonDetach">Desata</string>
+    <string name="buttonDetachMailbox">Separar dirección</string>
     <string name="buttonDownload">Descargar</string>
     <string name="buttonDownloadAll">Descargar todo</string>
     <string name="buttonFeedback">Comentarios</string>
@@ -102,6 +104,7 @@
     <string name="buttonMore">Más</string>
     <string name="buttonMoreStorage">Más espacio de almacenamiento</string>
     <string name="buttonNewMessage">Nuevo mensaje</string>
+    <string name="buttonPasswordForgotten">¿Ha olvidado su contraseña?</string>
     <string name="buttonRefuse">Desechos</string>
     <string name="buttonReport">Informe</string>
     <string name="buttonRestoreEmails">Restaurar correos electrónicos</string>
@@ -174,6 +177,8 @@
     <string name="emptyStateSearchTitle">Sin resultados</string>
     <string name="emptyStateTrashDescription">Mueve los mensajes a la papelera. Se borrarán definitivamente pasados 30 días.</string>
     <string name="emptyStateTrashTitle">La papelera está vacía</string>
+    <string name="enterPasswordDescription">Por razones de seguridad, debe introducir la contraseña de la dirección de correo electrónico %s</string>
+    <string name="enterPasswordTitle">Introduzca la contraseña</string>
     <string name="errorAlreadyLinkedMailbox">Esta dirección de correo electrónico ya está vinculada a su cuenta</string>
     <string name="errorAtLeastOneRecipient">Se precisa al menos un destinatario</string>
     <string name="errorAttachAddressInput">Sólo se admiten las direcciones de correo electrónico Infomaniak</string>
@@ -184,9 +189,11 @@
     <string name="errorFolderDoesNotExist">La carpeta no existe</string>
     <string name="errorInvalidAttachment">El adjunto no es válido</string>
     <string name="errorInvalidCredentials">Correo electrónico o contraseña no válidos</string>
+    <string name="errorInvalidMailboxPassword">Contraseña incorrecta para la dirección de correo electrónico</string>
     <string name="errorLoginDescription">La conexión ha fallado.</string>
     <string name="errorLoginTitle">Error de inicio de sesión</string>
     <string name="errorMailboxLocked">Esta dirección de correo electrónico está bloqueada</string>
+    <string name="errorMailboxPasswordLength">La contraseña debe tener entre 6 y 80 caracteres</string>
     <string name="errorMoveDestinationNotFound">La carpeta de destino no existe</string>
     <string name="errorNewFolderAlreadyExists">La carpeta ya existe</string>
     <string name="errorNewFolderNameTooLong">El nombre de la carpeta no debe superar los 255 caracteres</string>
@@ -255,6 +262,7 @@
     <string name="onBoardingTitle3">Pulse un mensaje durante unos segundos para seleccionar varios mensajes</string>
     <string name="onBoardingTitle4">¡Póngase en marcha!</string>
     <string name="pendingMessagesFolder">Mensajes pendientes</string>
+    <string name="popupDetachMailboxTitle">¿De verdad quieres dar de baja esta dirección de correo electrónico?</string>
     <string name="recentSearchesTitle">Búsquedas recientes</string>
     <string name="refreshTokenError">Te has desconectado por un problema. Vuelve a conectarte</string>
     <string name="reportDisplayProblemDescription">¿Aceptas compartir tus datos con nuestros desarrolladores para que puedan ayudarte con tu problema?</string>

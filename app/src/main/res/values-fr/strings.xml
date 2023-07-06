@@ -89,6 +89,8 @@
     <string name="buttonCreate">Créer</string>
     <string name="buttonCreateAccount">Créer un compte</string>
     <string name="buttonCreateFolder">Ajouter un dossier</string>
+    <string name="buttonDetach">Détacher</string>
+    <string name="buttonDetachMailbox">Détacher l’adresse</string>
     <string name="buttonDownload">Télécharger</string>
     <string name="buttonDownloadAll">Tout télécharger</string>
     <string name="buttonFeedback">Feedback</string>
@@ -103,6 +105,7 @@
     <string name="buttonMore">Plus</string>
     <string name="buttonMoreStorage">Obtenir plus de stockage</string>
     <string name="buttonNewMessage">Nouveau message</string>
+    <string name="buttonPasswordForgotten">Mot de passe oublié ?</string>
     <string name="buttonRefuse">Refuser</string>
     <string name="buttonReport">Signaler</string>
     <string name="buttonRestoreEmails">Restaurer des e-mails</string>
@@ -175,6 +178,8 @@
     <string name="emptyStateSearchTitle">Aucun résultat</string>
     <string name="emptyStateTrashDescription">Déplacez les messages dans la corbeille. Ils seront supprimés définitivement au bout de 30 jours.</string>
     <string name="emptyStateTrashTitle">La corbeille est vide</string>
+    <string name="enterPasswordDescription">Pour des raisons de sécurité, vous devez saisir le mot de passe de l’adresse mail %s</string>
+    <string name="enterPasswordTitle">Saisir le mot de passe</string>
     <string name="errorAlreadyLinkedMailbox">Cette adresse mail est déjà liée à votre compte</string>
     <string name="errorAtLeastOneRecipient">Il faut au minimum un destinataire</string>
     <string name="errorAttachAddressInput">Seules les adresses mail Infomaniak sont supportées</string>
@@ -185,9 +190,11 @@
     <string name="errorFolderDoesNotExist">Le dossier n’existe pas</string>
     <string name="errorInvalidAttachment">Pièce jointe non valide</string>
     <string name="errorInvalidCredentials">E-mail ou mot de passe invalide</string>
+    <string name="errorInvalidMailboxPassword">Mot de passe de l’adresse mail incorrect</string>
     <string name="errorLoginDescription">La connexion a échoué.</string>
     <string name="errorLoginTitle">Erreur de connexion</string>
     <string name="errorMailboxLocked">Cette adresse est bloquée</string>
+    <string name="errorMailboxPasswordLength">Le mot de passe doit comporter entre 6 et 80 caractères</string>
     <string name="errorMoveDestinationNotFound">Le dossier de destination n’existe pas</string>
     <string name="errorNewFolderAlreadyExists">Le dossier existe déjà</string>
     <string name="errorNewFolderNameTooLong">Le nom du dossier ne doit pas dépasser 255 caractères</string>
@@ -258,6 +265,7 @@
     <string name="onBoardingTitle3">Appuyez quelques secondes sur un message pour en sélectionner plusieurs</string>
     <string name="onBoardingTitle4">Lancez vous !</string>
     <string name="pendingMessagesFolder">Messages en attente</string>
+    <string name="popupDetachMailboxTitle">Souhaitez-vous vraiment détacher cette adresse mail ?</string>
     <string name="recentSearchesTitle">Recherches récentes</string>
     <string name="refreshTokenError">Vous avez été déconnecté en raison d’un problème. Veuillez vous reconnecter</string>
     <string name="reportDisplayProblemDescription">Acceptez-vous de partager vos données avec nos développeurs pour qu’ils puissent vous aider concernant votre problème ?</string>

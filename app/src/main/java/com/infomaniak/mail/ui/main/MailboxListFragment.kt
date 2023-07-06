@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.main
 import androidx.fragment.app.Fragment
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.ui.bottomSheetDialogs.LockedMailboxBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.menu.SwitchMailboxesAdapter
 
@@ -32,6 +33,14 @@ interface MailboxListFragment {
         safeNavigate(
             resId = R.id.lockedMailboxBottomSheetDialog,
             args = LockedMailboxBottomSheetDialogArgs(mailboxEmail).toBundle(),
+            currentClassName = currentClassName,
+        )
+    }
+
+    fun Fragment.onInvalidPasswordMailboxClicked(mailbox: Mailbox) {
+        safeNavigate(
+            resId = R.id.invalidPasswordFragment,
+            args = InvalidPasswordFragmentArgs(mailbox.mailboxId, mailbox.objectId, mailbox.email).toBundle(),
             currentClassName = currentClassName,
         )
     }

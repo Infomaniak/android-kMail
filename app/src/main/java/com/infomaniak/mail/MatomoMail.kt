@@ -164,6 +164,10 @@ object MatomoMail : MatomoCore {
         trackEvent("restoreEmailsBottomSheet", name, action)
     }
 
+    fun Fragment.trackInvalidPasswordMailboxEvent(name: String) {
+        trackEvent("invalidPasswordMailbox", name)
+    }
+
     // We need to invert this logical value to keep a coherent value for analytics because actions
     // conditions are inverted (ex: if the condition is `message.isSpam`, then we want to unspam)
     private fun Boolean.toMailActionValue() = (!this).toFloat()

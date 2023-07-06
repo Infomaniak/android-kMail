@@ -33,7 +33,6 @@ import io.realm.kotlin.ext.query
 import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
-import io.realm.kotlin.query.RealmScalarQuery
 import io.realm.kotlin.query.RealmSingleQuery
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -71,10 +70,6 @@ object MailboxController {
         return realm.query("${checkHasUserId(userId)} AND $isPasswordValid AND $isNotLocked")
     }
 
-    private fun getMailboxesCountQuery(userId: Int): RealmScalarQuery<Long> {
-        return getMailboxesQuery(userId).count()
-    }
-
     private fun getMailboxQuery(objectId: String, realm: TypedRealm): RealmSingleQuery<Mailbox> {
         return realm.query<Mailbox>("${Mailbox::objectId.name} == '$objectId'").first()
     }
@@ -93,8 +88,6 @@ object MailboxController {
     ): RealmResults<Mailbox> {
         return getMailboxesQuery(userId, exceptionMailboxIds, realm).find()
     }
-
-    fun getMailboxesCount(userId: Int): Long = getMailboxesCountQuery(userId).find()
 
     fun getMailboxesAsync(userId: Int, exceptionMailboxIds: List<Int> = emptyList()): Flow<RealmResults<Mailbox>> {
         return getMailboxesQuery(userId, exceptionMailboxIds).asFlow().map { it.list }

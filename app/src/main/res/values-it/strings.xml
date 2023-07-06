@@ -88,6 +88,8 @@
     <string name="buttonCreate">Creare</string>
     <string name="buttonCreateAccount">Creare un account</string>
     <string name="buttonCreateFolder">Aggiungere una cartella</string>
+    <string name="buttonDetach">Slegare</string>
+    <string name="buttonDetachMailbox">Staccare l’indirizzo</string>
     <string name="buttonDownload">Scaricare</string>
     <string name="buttonDownloadAll">Scaricare tutti</string>
     <string name="buttonFeedback">Feedback</string>
@@ -102,6 +104,7 @@
     <string name="buttonMore">Di più</string>
     <string name="buttonMoreStorage">Ottenere più spazio di archiviazione</string>
     <string name="buttonNewMessage">Nuovo messaggio</string>
+    <string name="buttonPasswordForgotten">Avete dimenticato la password?</string>
     <string name="buttonRefuse">Rifiuto</string>
     <string name="buttonReport">Rapporto</string>
     <string name="buttonRestoreEmails">Ripristino delle e-mail</string>
@@ -174,6 +177,8 @@
     <string name="emptyStateSearchTitle">Nessun risultato</string>
     <string name="emptyStateTrashDescription">Spostate i messaggi nel cestino. Verranno eliminati definitivamente dopo 30 giorni.</string>
     <string name="emptyStateTrashTitle">Il cestino è vuoto</string>
+    <string name="enterPasswordDescription">Per motivi di sicurezza, è necessario inserire la password dell’indirizzo e-mail %s</string>
+    <string name="enterPasswordTitle">Inserire la password</string>
     <string name="errorAlreadyLinkedMailbox">Questo indirizzo e-mail è già collegato al vostro account</string>
     <string name="errorAtLeastOneRecipient">È richiesto almeno un destinatario</string>
     <string name="errorAttachAddressInput">Sono supportati solo gli indirizzi e-mail Infomaniak</string>
@@ -184,9 +189,11 @@
     <string name="errorFolderDoesNotExist">La cartella è inesistente</string>
     <string name="errorInvalidAttachment">Allegato non valido</string>
     <string name="errorInvalidCredentials">Email o password non valide</string>
+    <string name="errorInvalidMailboxPassword">Password errata per l’indirizzo e-mail</string>
     <string name="errorLoginDescription">La connessione non è riuscita.</string>
     <string name="errorLoginTitle">Errore di accesso</string>
     <string name="errorMailboxLocked">Questo indirizzo e-mail è bloccato</string>
+    <string name="errorMailboxPasswordLength">La password deve essere compresa tra 6 e 80 caratteri</string>
     <string name="errorMoveDestinationNotFound">La cartella di destinazione è inesistente</string>
     <string name="errorNewFolderAlreadyExists">La cartella è già esistente</string>
     <string name="errorNewFolderNameTooLong">Il nome della cartella non deve superare i 255 caratteri</string>
@@ -255,6 +262,7 @@
     <string name="onBoardingTitle3">Premere un messaggio per alcuni secondi per selezionare più messaggi</string>
     <string name="onBoardingTitle4">Iniziate!</string>
     <string name="pendingMessagesFolder">Messaggi in sospeso</string>
+    <string name="popupDetachMailboxTitle">Vuoi davvero staccare questo indirizzo email?</string>
     <string name="recentSearchesTitle">Ricerche recenti</string>
     <string name="refreshTokenError">Sei stato disconnesso a causa di un problema. Riconnettiti</string>
     <string name="reportDisplayProblemDescription">Accettate di condividere i vostri dati con i nostri sviluppatori in modo che possano aiutarvi a risolvere il vostro problema?</string>
