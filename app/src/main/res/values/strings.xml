@@ -95,6 +95,7 @@
     <string name="buttonCreate">Create</string>
     <string name="buttonCreateAccount">Create an account</string>
     <string name="buttonCreateFolder">Add a folder</string>
+    <string name="buttonDetach">Detach</string>
     <string name="buttonDetachMailbox">Detach mailbox</string>
     <string name="buttonDownload">Download</string>
     <string name="buttonDownloadAll">Download all</string>
@@ -268,6 +269,7 @@
     <string name="onBoardingTitle3">Press a message for a few seconds to select multiple messages</string>
     <string name="onBoardingTitle4">Get started!</string>
     <string name="pendingMessagesFolder">Pending messages</string>
+    <string name="popupDetachMailboxTitle">Do you really want to detach this mailbox?</string>
     <string name="recentSearchesTitle">Recent searches</string>
     <string name="refreshTokenError">You’ve been disconnected due to a problem. Please log in again</string>
     <string name="reportDisplayProblemDescription">Do you agree to share your data with our developers so that they can help you with your problem?</string>

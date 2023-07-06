@@ -88,6 +88,7 @@
     <string name="buttonCreate">Cree</string>
     <string name="buttonCreateAccount">Crear una cuenta</string>
     <string name="buttonCreateFolder">Añadir una carpeta</string>
+    <string name="buttonDetach">Desata</string>
     <string name="buttonDetachMailbox">Separar dirección</string>
     <string name="buttonDownload">Descargar</string>
     <string name="buttonDownloadAll">Descargar todo</string>
@@ -261,6 +262,7 @@
     <string name="onBoardingTitle3">Pulse un mensaje durante unos segundos para seleccionar varios mensajes</string>
     <string name="onBoardingTitle4">¡Póngase en marcha!</string>
     <string name="pendingMessagesFolder">Mensajes pendientes</string>
+    <string name="popupDetachMailboxTitle">¿De verdad quieres dar de baja esta dirección de correo electrónico?</string>
     <string name="recentSearchesTitle">Búsquedas recientes</string>
     <string name="refreshTokenError">Te has desconectado por un problema. Vuelve a conectarte</string>
     <string name="reportDisplayProblemDescription">¿Aceptas compartir tus datos con nuestros desarrolladores para que puedan ayudarte con tu problema?</string>

@@ -33,6 +33,7 @@ import com.infomaniak.lib.core.utils.showProgress
 import com.infomaniak.mail.MatomoMail.trackNoValidMailboxesEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentInvalidPasswordBinding
+import com.infomaniak.mail.utils.createDescriptionDialog
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -78,9 +79,17 @@ class InvalidPasswordFragment : Fragment() {
 
         detachMailbox.setOnClickListener {
             trackNoValidMailboxesEvent("detachMailbox")
-            invalidPasswordViewModel.detachMailbox(navigationArgs.mailboxId).observe(viewLifecycleOwner) { error ->
-                showSnackbar(error)
-            }
+            createDescriptionDialog(
+                title = getString(R.string.popupDetachMailboxTitle),
+                description = navigationArgs.mailboxEmail,
+                confirmButtonText = R.string.buttonDetach,
+                onPositiveButtonClicked = {
+                    trackNoValidMailboxesEvent("detachMailboxConfirm")
+                    invalidPasswordViewModel.detachMailbox(navigationArgs.mailboxId).observe(viewLifecycleOwner) { error ->
+                        showSnackbar(error)
+                    }
+                },
+            ).show()
         }
     }
 

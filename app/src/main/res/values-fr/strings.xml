@@ -89,6 +89,7 @@
     <string name="buttonCreate">Créer</string>
     <string name="buttonCreateAccount">Créer un compte</string>
     <string name="buttonCreateFolder">Ajouter un dossier</string>
+    <string name="buttonDetach">Détacher</string>
     <string name="buttonDetachMailbox">Détacher l’adresse</string>
     <string name="buttonDownload">Télécharger</string>
     <string name="buttonDownloadAll">Tout télécharger</string>
@@ -264,6 +265,7 @@
     <string name="onBoardingTitle3">Appuyez quelques secondes sur un message pour en sélectionner plusieurs</string>
     <string name="onBoardingTitle4">Lancez vous !</string>
     <string name="pendingMessagesFolder">Messages en attente</string>
+    <string name="popupDetachMailboxTitle">Souhaitez-vous vraiment détacher cette adresse mail ?</string>
     <string name="recentSearchesTitle">Recherches récentes</string>
     <string name="refreshTokenError">Vous avez été déconnecté en raison d’un problème. Veuillez vous reconnecter</string>
     <string name="reportDisplayProblemDescription">Acceptez-vous de partager vos données avec nos développeurs pour qu’ils puissent vous aider concernant votre problème ?</string>

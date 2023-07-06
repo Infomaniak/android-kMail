@@ -88,6 +88,7 @@
     <string name="buttonCreate">erstellen.</string>
     <string name="buttonCreateAccount">Ein Konto erstellen</string>
     <string name="buttonCreateFolder">Einen Ordner hinzufügen</string>
+    <string name="buttonDetach">Lösen</string>
     <string name="buttonDetachMailbox">Adresse abtrennen</string>
     <string name="buttonDownload">Herunterladen</string>
     <string name="buttonDownloadAll">Alle herunterladen</string>
@@ -261,6 +262,7 @@
     <string name="onBoardingTitle3">Drücken Sie einige Sekunden auf eine Nachricht, um mehrere auszuwählen</string>
     <string name="onBoardingTitle4">Los geht’s!</string>
     <string name="pendingMessagesFolder">Anhängige Nachrichten</string>
+    <string name="popupDetachMailboxTitle">Möchten Sie diese E-Mail-Adresse wirklich losbinden?</string>
     <string name="recentSearchesTitle">Letzte Suchen</string>
     <string name="refreshTokenError">Sie wurden aufgrund eines Problems getrennt. Bitte verbinden Sie sich erneut.</string>
     <string name="reportDisplayProblemDescription">Sind Sie damit einverstanden, Ihre Daten mit unseren Entwicklern zu teilen, damit diese Ihnen bei Ihrem Problem helfen können?</string>
