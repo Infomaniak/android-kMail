@@ -51,15 +51,6 @@ class MenuDrawerItemView @JvmOverloads constructor(
     private var outdatedPasswordClickListener: (() -> Unit)? = null
     private var lockedMailboxClickListener: (() -> Unit)? = null
 
-    var badge: Int = 0
-        set(value) {
-            field = value
-            binding.itemBadge.apply {
-                isVisible = shouldDisplayBadge()
-                text = formatUnreadCount(value)
-            }
-        }
-
     var icon: Drawable? = null
         set(value) {
             field = value
@@ -104,16 +95,31 @@ class MenuDrawerItemView @JvmOverloads constructor(
             binding.itemName.typeface = if (fontFamily == TextWeight.MEDIUM) medium else regular
         }
 
+    var badge: Int = 0
+        set(value) {
+            field = value
+            binding.itemBadge.apply {
+                isVisible = shouldDisplayBadge()
+                text = formatUnreadCount(value)
+            }
+        }
+
+    var isPastilleDisplayed = false
+        set(isDisplayed) {
+            field = isDisplayed
+            computeEndIconVisibility()
+        }
+
     var isPasswordOutdated = false
         set(isOutdated) {
             field = isOutdated
-            computeWarningVisibility()
+            computeEndIconVisibility()
         }
 
     var isMailboxLocked = false
         set(isLocked) {
             field = isLocked
-            computeWarningVisibility()
+            computeEndIconVisibility()
         }
 
     private var isInSelectedState = false
@@ -143,16 +149,16 @@ class MenuDrawerItemView @JvmOverloads constructor(
         checkmark.isVisible = shouldDisplayCheckmark()
     }
 
+    private fun shouldDisplayBadge() = !shouldDisplayWarning() && !shouldDisplayPastille() && badge > 0
+    private fun shouldDisplayPastille() = !shouldDisplayWarning() && isPastilleDisplayed
+    private fun shouldDisplayCheckmark() = !shouldDisplayWarning() && isInSelectedState && itemStyle != SelectionStyle.MENU_DRAWER
     private fun shouldDisplayWarning() = isPasswordOutdated || isMailboxLocked
 
-    private fun shouldDisplayCheckmark() = !shouldDisplayWarning() && isInSelectedState && itemStyle != SelectionStyle.MENU_DRAWER
-
-    private fun shouldDisplayBadge() = !shouldDisplayWarning() && badge > 0
-
-    private fun computeWarningVisibility() = binding.apply {
-        warning.isVisible = shouldDisplayWarning()
-        checkmark.isVisible = shouldDisplayCheckmark()
+    private fun computeEndIconVisibility() = binding.apply {
         itemBadge.isVisible = shouldDisplayBadge()
+        pastille.isVisible = shouldDisplayPastille()
+        checkmark.isVisible = shouldDisplayCheckmark()
+        warning.isVisible = shouldDisplayWarning()
     }
 
     override fun setOnClickListener(onClickListener: OnClickListener?) {
