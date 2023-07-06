@@ -28,7 +28,6 @@ import com.infomaniak.mail.MainApplication.Companion.firstLaunchTime
 import com.infomaniak.mail.MatomoMail.trackUserId
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
@@ -62,7 +61,6 @@ class LaunchActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        RealmDatabase.closeOldRealms()
         handleNotificationDestinationIntent()
 
         lifecycleScope.launch(ioDispatcher) {

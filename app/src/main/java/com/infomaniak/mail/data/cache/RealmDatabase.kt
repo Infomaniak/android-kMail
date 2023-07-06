@@ -89,13 +89,13 @@ object RealmDatabase {
     }
 
     val newMailboxContentInstance get() = newMailboxContentInstance(AccountUtils.currentUserId, AccountUtils.currentMailboxId)
-
     fun newMailboxContentInstance(userId: Int, mailboxId: Int) = Realm.open(RealmConfig.mailboxContent(mailboxId, userId))
 
     class MailboxContent {
         operator fun invoke() = runBlocking(Dispatchers.IO) {
             mailboxContentMutex.withLock {
                 _mailboxContent ?: newMailboxContentInstance.also {
+                    closeOldRealms()
                     _mailboxContent = it
                     oldMailboxContent = WeakReference(it)
                 }
@@ -105,11 +105,9 @@ object RealmDatabase {
     //endregion
 
     //region Close Realms
-    fun closeOldRealms() {
-        if (_mailboxContent == null) { // Only closes when Mailbox is changed
-            oldMailboxContent.get()?.close()
-            oldUserInfo.get()?.close()
-        }
+    private fun closeOldRealms() {
+        oldMailboxContent.get()?.close()
+        oldUserInfo.get()?.close()
     }
 
     private fun closeUserInfo() {
