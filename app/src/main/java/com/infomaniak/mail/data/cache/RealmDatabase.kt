@@ -74,10 +74,7 @@ object RealmDatabase {
 
     fun userInfo(): Realm = runBlocking(Dispatchers.IO) {
         userInfoMutex.withLock {
-            _userInfo ?: Realm.open(RealmConfig.userInfo).also {
-                _userInfo = it
-                oldUserInfo = WeakReference(it)
-            }
+            _userInfo ?: Realm.open(RealmConfig.userInfo).also { _userInfo = it }
         }
     }
 
@@ -89,15 +86,14 @@ object RealmDatabase {
     }
 
     val newMailboxContentInstance get() = newMailboxContentInstance(AccountUtils.currentUserId, AccountUtils.currentMailboxId)
-
     fun newMailboxContentInstance(userId: Int, mailboxId: Int) = Realm.open(RealmConfig.mailboxContent(mailboxId, userId))
 
     class MailboxContent {
         operator fun invoke() = runBlocking(Dispatchers.IO) {
             mailboxContentMutex.withLock {
                 _mailboxContent ?: newMailboxContentInstance.also {
+                    closeOldRealms()
                     _mailboxContent = it
-                    oldMailboxContent = WeakReference(it)
                 }
             }
         }
@@ -105,11 +101,9 @@ object RealmDatabase {
     //endregion
 
     //region Close Realms
-    fun closeOldRealms() {
-        if (_mailboxContent == null) { // Only closes when Mailbox is changed
-            oldMailboxContent.get()?.close()
-            oldUserInfo.get()?.close()
-        }
+    private fun closeOldRealms() {
+        oldMailboxContent.get()?.close()
+        oldUserInfo.get()?.close()
     }
 
     private fun closeUserInfo() {
@@ -129,6 +123,8 @@ object RealmDatabase {
         resetUserInfo()
         _mailboxInfo = null // TODO: To be removed when the injection is done
         _appSettings = null // TODO: To be removed when the injection is done
+        oldUserInfo = WeakReference(_userInfo)
+        oldMailboxContent = WeakReference(_mailboxContent)
     }
 
     fun resetUserInfo() {
