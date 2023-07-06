@@ -89,7 +89,7 @@ class InvalidPasswordFragment : Fragment() {
             passwordInputLayout.helperText = null
             confirmButton.isEnabled = true
         } else {
-            if (passwordInputLayout.error == null) passwordInputLayout.helperText = getString(R.string.errorMailboxPasswordLength)
+            passwordInputLayout.helperText = if (password.isEmpty()) null else getString(R.string.errorMailboxPasswordLength)
         }
     }
 
