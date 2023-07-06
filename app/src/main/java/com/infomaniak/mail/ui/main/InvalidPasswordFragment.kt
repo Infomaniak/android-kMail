@@ -30,7 +30,7 @@ import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.hideProgress
 import com.infomaniak.lib.core.utils.showKeyboard
 import com.infomaniak.lib.core.utils.showProgress
-import com.infomaniak.mail.MatomoMail.trackNoValidMailboxesEvent
+import com.infomaniak.mail.MatomoMail.trackInvalidPasswordMailboxEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentInvalidPasswordBinding
 import com.infomaniak.mail.utils.createDescriptionDialog
@@ -63,7 +63,7 @@ class InvalidPasswordFragment : Fragment() {
             }
 
             setOnClickListener {
-                trackNoValidMailboxesEvent("confirmPassword")
+                trackInvalidPasswordMailboxEvent("updatePassword")
                 showProgress()
                 invalidPasswordViewModel.confirmPassword(
                     navigationArgs.mailboxId,
@@ -78,13 +78,13 @@ class InvalidPasswordFragment : Fragment() {
         }
 
         detachMailbox.setOnClickListener {
-            trackNoValidMailboxesEvent("detachMailbox")
+            trackInvalidPasswordMailboxEvent("detachMailbox")
             createDescriptionDialog(
                 title = getString(R.string.popupDetachMailboxTitle),
                 description = navigationArgs.mailboxEmail,
                 confirmButtonText = R.string.buttonDetach,
                 onPositiveButtonClicked = {
-                    trackNoValidMailboxesEvent("detachMailboxConfirm")
+                    trackInvalidPasswordMailboxEvent("detachMailboxConfirm")
                     invalidPasswordViewModel.detachMailbox(navigationArgs.mailboxId).observe(viewLifecycleOwner) { error ->
                         showSnackbar(error)
                     }

@@ -164,8 +164,8 @@ object MatomoMail : MatomoCore {
         trackEvent("restoreEmailsBottomSheet", name, action)
     }
 
-    fun Fragment.trackNoValidMailboxesEvent(name: String) {
-        trackEvent("noValidMailboxes", name)
+    fun Fragment.trackInvalidPasswordMailboxEvent(name: String) {
+        trackEvent("invalidPasswordMailbox", name)
     }
 
     // We need to invert this logical value to keep a coherent value for analytics because actions
