@@ -66,14 +66,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/marginStandardMedium"
-                android:layout_marginTop="@dimen/marginStandard"
+                android:layout_marginVertical="@dimen/marginStandard"
                 android:gravity="center"
                 tools:text="@string/errorMailboxLocked" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="@dimen/marginStandard">
+                android:layout_height="match_parent">
 
                 <TextView
                     android:id="@+id/invalidPasswordTitle"
@@ -90,7 +89,7 @@
                     android:id="@+id/invalidPasswordMailboxesRecyclerView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginVertical="@dimen/marginStandardMedium"
+                    android:layout_marginTop="@dimen/marginStandardMedium"
                     android:overScrollMode="never"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     app:layout_constraintBottom_toTopOf="@id/lockedMailboxTitle"
@@ -114,6 +113,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                    android:layout_marginTop="@dimen/marginStandard"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/invalidPasswordMailboxesRecyclerView"
@@ -123,7 +123,7 @@
                     android:id="@+id/lockedMailboxesRecyclerView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginVertical="@dimen/marginStandardMedium"
+                    android:layout_marginTop="@dimen/marginStandardMedium"
                     android:overScrollMode="never"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     app:layout_constraintBottom_toBottomOf="parent"
