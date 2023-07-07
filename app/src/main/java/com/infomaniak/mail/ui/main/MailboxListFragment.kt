@@ -22,12 +22,13 @@ import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.ui.bottomSheetDialogs.LockedMailboxBottomSheetDialogArgs
-import com.infomaniak.mail.ui.main.menu.SwitchMailboxesAdapter
+import com.infomaniak.mail.ui.main.menu.MailboxesAdapter
 
 interface MailboxListFragment {
 
-    val mailboxesAdapter: SwitchMailboxesAdapter
+    val mailboxesAdapter: MailboxesAdapter
     val currentClassName: String
+    val hasValidMailboxes: Boolean
 
     fun Fragment.onLockedMailboxClicked(mailboxEmail: String) {
         safeNavigate(

@@ -110,6 +110,12 @@ class MenuDrawerItemView @JvmOverloads constructor(
             computeEndIconVisibility()
         }
 
+    var hasValidMailbox = true
+        set(isDisplayed) {
+            field = isDisplayed
+            computeEndIconVisibility()
+        }
+
     var isPasswordOutdated = false
         set(isOutdated) {
             field = isOutdated
@@ -149,22 +155,28 @@ class MenuDrawerItemView @JvmOverloads constructor(
         checkmark.isVisible = shouldDisplayCheckmark()
     }
 
-    private fun shouldDisplayBadge() = !shouldDisplayWarning() && !shouldDisplayPastille() && badge > 0
-    private fun shouldDisplayPastille() = !shouldDisplayWarning() && isPastilleDisplayed
-    private fun shouldDisplayCheckmark() = !shouldDisplayWarning() && isInSelectedState && itemStyle != SelectionStyle.MENU_DRAWER
-    private fun shouldDisplayWarning() = isPasswordOutdated || isMailboxLocked
+    private fun shouldDisplayWarning() = (isPasswordOutdated || isMailboxLocked) && hasValidMailbox
+    private fun shouldDisplayChevron() = !hasValidMailbox && isPasswordOutdated && !isMailboxLocked
+    private fun shouldDisplayBadge() = !shouldDisplayWarning() && !shouldDisplayPastille() && badge > 0 && hasValidMailbox
+    private fun shouldDisplayPastille() = !shouldDisplayWarning() && isPastilleDisplayed && hasValidMailbox
+    private fun shouldDisplayCheckmark(): Boolean {
+        return !shouldDisplayWarning() && isInSelectedState && itemStyle != SelectionStyle.MENU_DRAWER && hasValidMailbox
+    }
 
     private fun computeEndIconVisibility() = binding.apply {
         itemBadge.isVisible = shouldDisplayBadge()
         pastille.isVisible = shouldDisplayPastille()
         checkmark.isVisible = shouldDisplayCheckmark()
         warning.isVisible = shouldDisplayWarning()
+        chevron.isVisible = shouldDisplayChevron()
     }
 
     override fun setOnClickListener(onClickListener: OnClickListener?) {
+        if (!hasValidMailbox && isMailboxLocked) return
+
         binding.root.setOnClickListener {
             when {
-                isPasswordOutdated -> outdatedPasswordClickListener?.invoke()
+                isPasswordOutdated && !isMailboxLocked -> outdatedPasswordClickListener?.invoke()
                 isMailboxLocked -> lockedMailboxClickListener?.invoke()
                 else -> onClickListener?.onClick(it)
             }

@@ -58,13 +58,15 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
 
     var exitDrawer: (() -> Unit)? = null
 
-    override val isInMenuDrawer: Boolean = true
+    override val isInMenuDrawer = true
     override val defaultFoldersList: RecyclerView by lazy { binding.defaultFoldersList }
     override val customFoldersList: RecyclerView by lazy { binding.customFoldersList }
 
+    override val hasValidMailboxes = true
     override val currentClassName: String = MenuDrawerFragment::class.java.name
-    override val mailboxesAdapter = SwitchMailboxesAdapter(
+    override val mailboxesAdapter = MailboxesAdapter(
         isInMenuDrawer = isInMenuDrawer,
+        hasValidMailboxes = hasValidMailboxes,
         lifecycleScope = lifecycleScope,
         onLockedMailboxClicked = { mailboxEmail -> onLockedMailboxClicked(mailboxEmail) },
         onInvalidPasswordMailboxClicked = { mailbox -> onInvalidPasswordMailboxClicked(mailbox) },

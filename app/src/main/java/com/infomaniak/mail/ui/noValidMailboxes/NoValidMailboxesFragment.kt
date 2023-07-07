@@ -30,25 +30,30 @@ import com.infomaniak.mail.MatomoMail.ADD_MAILBOX_NAME
 import com.infomaniak.mail.MatomoMail.trackNoValidMailboxesEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentNoValidMailboxesBinding
-import com.infomaniak.mail.ui.main.menu.SwitchMailboxesAdapter
+import com.infomaniak.mail.ui.main.MailboxListFragment
+import com.infomaniak.mail.ui.main.menu.MailboxesAdapter
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class NoValidMailboxesFragment : Fragment() {
+class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
 
     private lateinit var binding: FragmentNoValidMailboxesBinding
     private val noValidMailboxesViewModel: NoValidMailboxesViewModel by activityViewModels()
 
-    private val lockedMailboxesAdapter = SwitchMailboxesAdapter(
+    override val currentClassName: String = NoValidMailboxesFragment::class.java.name
+    override val hasValidMailboxes = false
+
+    override val mailboxesAdapter = MailboxesAdapter(
         isInMenuDrawer = false,
+        hasValidMailboxes = hasValidMailboxes,
         lifecycleScope = lifecycleScope,
-        onLockedMailboxClicked = {},
     )
 
-    private val invalidPasswordMailboxesAdapter = SwitchMailboxesAdapter(
+    private val invalidPasswordMailboxesAdapter = MailboxesAdapter(
         isInMenuDrawer = false,
+        hasValidMailboxes = hasValidMailboxes,
         lifecycleScope = lifecycleScope,
-        onLockedMailboxClicked = {},
+        onInvalidPasswordMailboxClicked = { mailbox -> onInvalidPasswordMailboxClicked(mailbox) },
     )
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -84,16 +89,15 @@ class NoValidMailboxesFragment : Fragment() {
 
     private fun observeMailboxesLive() = with(binding) {
         noValidMailboxesViewModel.invalidPasswordMailboxesLive.observe(viewLifecycleOwner) { invalidPasswordMailboxes ->
-            invalidPasswordMailboxesGroup.isVisible = invalidPasswordMailboxes.isNotEmpty()
             invalidPasswordMailboxesAdapter.setMailboxes(invalidPasswordMailboxes)
             invalidPasswordMailboxesRecyclerView.adapter = invalidPasswordMailboxesAdapter
+            invalidPasswordMailboxesGroup.isVisible = invalidPasswordMailboxes.isNotEmpty()
         }
 
         noValidMailboxesViewModel.lockedMailboxesLive.observe(viewLifecycleOwner) { lockedMailboxes ->
+            mailboxesAdapter.setMailboxes(lockedMailboxes)
+            lockedMailboxesRecyclerView.adapter = mailboxesAdapter
             lockedMailboxesGroup.isVisible = lockedMailboxes.isNotEmpty()
-            lockedMailboxesAdapter.setMailboxes(lockedMailboxes)
-            lockedMailboxesRecyclerView.adapter = lockedMailboxesAdapter
-
         }
     }
 

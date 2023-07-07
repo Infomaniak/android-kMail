@@ -80,6 +80,11 @@
                                 <LayoutPositions />
                               </value>
                             </entry>
+                            <entry key="action_accountFragment_to_invalidPasswordFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
                             <entry key="action_accountFragment_to_lockedMailboxBottomSheetDialog">
                               <value>
                                 <LayoutPositions />
@@ -142,8 +147,7 @@
                         </option>
                         <option name="myPositions">
                           <map>
-                            <entry
-                              key="action_detailedContactBottomSheetDialog_to_newMessageActivity">
+                            <entry key="action_detailedContactBottomSheetDialog_to_newMessageActivity">
                               <value>
                                 <LayoutPositions />
                               </value>
@@ -195,6 +199,18 @@
                         <option name="myPosition">
                           <Point>
                             <option name="x" value="744" />
+                            <option name="y" value="12" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
+                  <entry key="invalidPasswordFragment">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="12" />
                             <option name="y" value="12" />
                           </Point>
                         </option>
@@ -354,37 +370,6 @@
                             <option name="x" value="2208" />
                             <option name="y" value="2994" />
                           </Point>
-                        </option>
-                      </LayoutPositions>
-                    </value>
-                  </entry>
-                  <entry key="noValidMailboxesFragment">
-                    <value>
-                      <LayoutPositions>
-                        <option name="myPosition">
-                          <Point>
-                            <option name="x" value="12" />
-                            <option name="y" value="12" />
-                          </Point>
-                        </option>
-                        <option name="myPositions">
-                          <map>
-                            <entry key="action_accountFragment_to_attachMailboxFragment">
-                              <value>
-                                <LayoutPositions />
-                              </value>
-                            </entry>
-                            <entry key="action_accountFragment_to_lockedMailboxBottomSheetDialog">
-                              <value>
-                                <LayoutPositions />
-                              </value>
-                            </entry>
-                            <entry key="action_accountFragment_to_switchUserFragment">
-                              <value>
-                                <LayoutPositions />
-                              </value>
-                            </entry>
-                          </map>
                         </option>
                       </LayoutPositions>
                     </value>
@@ -706,6 +691,11 @@
                                 <LayoutPositions />
                               </value>
                             </entry>
+                            <entry key="action_threadListFragment_to_invalidPasswordFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
                             <entry key="action_threadListFragment_to_lockedMailboxBottomSheetDialog">
                               <value>
                                 <LayoutPositions />
@@ -870,7 +860,19 @@
                         <option name="myPosition">
                           <Point>
                             <option name="x" value="233" />
-                            <option name="y" value="368" />
+                            <option name="y" value="724" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
+                  <entry key="invalidPasswordFragment">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="233" />
+                            <option name="y" value="12" />
                           </Point>
                         </option>
                       </LayoutPositions>
@@ -882,12 +884,17 @@
                         <option name="myPosition">
                           <Point>
                             <option name="x" value="12" />
-                            <option name="y" value="191" />
+                            <option name="y" value="76" />
                           </Point>
                         </option>
                         <option name="myPositions">
                           <map>
                             <entry key="action_noValidMailboxesFragment_to_attachMailboxFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                            <entry key="action_noValidMailboxesFragment_to_invalidPasswordFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
@@ -908,7 +915,7 @@
                         <option name="myPosition">
                           <Point>
                             <option name="x" value="233" />
-                            <option name="y" value="12" />
+                            <option name="y" value="368" />
                           </Point>
                         </option>
                       </LayoutPositions>

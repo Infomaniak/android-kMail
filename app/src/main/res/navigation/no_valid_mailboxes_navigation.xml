@@ -32,6 +32,9 @@
         <action
             android:id="@+id/action_noValidMailboxesFragment_to_attachMailboxFragment"
             app:destination="@id/attachMailboxFragment" />
+        <action
+            android:id="@+id/action_noValidMailboxesFragment_to_invalidPasswordFragment"
+            app:destination="@id/invalidPasswordFragment" />
     </fragment>
 
     <fragment
@@ -45,5 +48,21 @@
         android:name="com.infomaniak.mail.ui.main.user.AttachMailboxFragment"
         android:label="AttachMailboxFragment"
         tools:layout="@layout/fragment_attach_mailbox" />
+
+    <fragment
+        android:id="@+id/invalidPasswordFragment"
+        android:name="com.infomaniak.mail.ui.main.InvalidPasswordFragment"
+        android:label="InvalidPasswordFragment"
+        tools:layout="@layout/fragment_invalid_password">
+        <argument
+            android:name="mailboxId"
+            app:argType="integer" />
+        <argument
+            android:name="mailboxObjectId"
+            app:argType="string" />
+        <argument
+            android:name="mailboxEmail"
+            app:argType="string" />
+    </fragment>
 
 </navigation>
