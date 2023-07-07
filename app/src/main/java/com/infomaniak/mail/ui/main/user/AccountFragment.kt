@@ -35,7 +35,7 @@ import com.infomaniak.mail.databinding.FragmentAccountBinding
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.MailboxListFragment
-import com.infomaniak.mail.ui.main.menu.SwitchMailboxesAdapter
+import com.infomaniak.mail.ui.main.menu.MailboxesAdapter
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.animatedNavigation
 import com.infomaniak.mail.utils.createDescriptionDialog
@@ -53,9 +53,11 @@ class AccountFragment : Fragment(), MailboxListFragment {
 
     private val logoutAlert by lazy { initLogoutAlert() }
 
+    override val hasValidMailboxes = true
     override val currentClassName: String = AccountFragment::class.java.name
-    override val mailboxesAdapter = SwitchMailboxesAdapter(
+    override val mailboxesAdapter = MailboxesAdapter(
         isInMenuDrawer = false,
+        hasValidMailboxes = hasValidMailboxes,
         lifecycleScope = lifecycleScope,
         onLockedMailboxClicked = { mailboxEmail -> onLockedMailboxClicked(mailboxEmail) },
         onInvalidPasswordMailboxClicked = { mailbox -> onInvalidPasswordMailboxClicked(mailbox) },
