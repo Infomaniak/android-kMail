@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.hideProgress
@@ -42,6 +43,7 @@ class AttachMailboxFragment : Fragment() {
 
     private lateinit var binding: FragmentAttachMailboxBinding
     private val accountViewModel: AccountViewModel by viewModels()
+    private val navigationArgs: AttachMailboxFragmentArgs by navArgs()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentAttachMailboxBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -61,7 +63,7 @@ class AttachMailboxFragment : Fragment() {
             setOnClickListener {
                 context.trackAccountEvent("addMailboxConfirm")
                 showProgress()
-                attachMailbox()
+                attachMailbox(navigationArgs.isFromNoValidMailboxesActivity)
             }
         }
     }
@@ -70,10 +72,11 @@ class AttachMailboxFragment : Fragment() {
         passwordInput.text?.isNotBlank() == true && mailInput.text?.trim().toString().isEmail()
     }
 
-    private fun attachMailbox() = with(binding) {
+    private fun attachMailbox(isFromNoValidMailboxesActivity: Boolean) = with(binding) {
         accountViewModel.attachNewMailbox(
             mailInput.text?.trim().toString(),
             passwordInput.text?.trim().toString(),
+            isFromNoValidMailboxesActivity,
         ).observe(viewLifecycleOwner) { apiResponse ->
 
             when {
