@@ -91,17 +91,14 @@ object RealmDatabase {
     class MailboxContent {
         operator fun invoke() = runBlocking(Dispatchers.IO) {
             mailboxContentMutex.withLock {
-                _mailboxContent ?: newMailboxContentInstance.also {
-                    closeOldRealms()
-                    _mailboxContent = it
-                }
+                _mailboxContent ?: newMailboxContentInstance.also { _mailboxContent = it }
             }
         }
     }
     //endregion
 
     //region Close Realms
-    private fun closeOldRealms() {
+    fun closeOldRealms() {
         oldMailboxContent.get()?.close()
         oldUserInfo.get()?.close()
     }

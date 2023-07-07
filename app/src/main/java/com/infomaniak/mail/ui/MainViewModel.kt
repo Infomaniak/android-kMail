@@ -162,6 +162,11 @@ class MainViewModel @Inject constructor(
         addSource(currentFilter) { value = value?.first to it }
     }.asFlow()
 
+    override fun onCleared() {
+        super.onCleared()
+        RealmDatabase.closeOldRealms()
+    }
+
     /**
      * Force update the `currentFilter` to its current value.
      * The sole effect will be to force the `currentThreadsLive` to trigger immediately.
