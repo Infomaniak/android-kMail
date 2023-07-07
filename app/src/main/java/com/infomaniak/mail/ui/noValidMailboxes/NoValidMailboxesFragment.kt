@@ -72,7 +72,11 @@ class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
 
         attachNewMailboxButton.setOnClickListener {
             trackNoValidMailboxesEvent(ADD_MAILBOX_NAME)
-            safeNavigate(NoValidMailboxesFragmentDirections.actionNoValidMailboxesFragmentToAttachMailboxFragment())
+            safeNavigate(
+                NoValidMailboxesFragmentDirections.actionNoValidMailboxesFragmentToAttachMailboxFragment(
+                    isFromNoValidMailboxesActivity = true,
+                )
+            )
         }
 
     }

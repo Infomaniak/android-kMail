@@ -47,7 +47,12 @@
         android:id="@+id/attachMailboxFragment"
         android:name="com.infomaniak.mail.ui.main.user.AttachMailboxFragment"
         android:label="AttachMailboxFragment"
-        tools:layout="@layout/fragment_attach_mailbox" />
+        tools:layout="@layout/fragment_attach_mailbox">
+        <argument
+            android:name="isFromNoValidMailboxesActivity"
+            android:defaultValue="false"
+            app:argType="boolean" />
+    </fragment>
 
     <fragment
         android:id="@+id/invalidPasswordFragment"
