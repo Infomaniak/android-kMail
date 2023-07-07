@@ -15,18 +15,17 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        app:layout_constraintBottom_toTopOf="@id/attachNewMailboxButton"
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -145,21 +144,24 @@
     <com.google.android.material.button.MaterialButton
         android:id="@+id/attachNewMailboxButton"
         style="@style/TextButtonPrimary"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_marginHorizontal="@dimen/marginStandard"
-        android:layout_marginTop="@dimen/marginStandardMedium"
+        android:layout_marginTop="@dimen/marginStandardSmall"
         android:text="@string/buttonAddEmailAddress"
         app:icon="@drawable/ic_add"
         app:iconGravity="textStart"
-        app:iconPadding="@dimen/marginStandardSmall" />
+        app:iconPadding="@dimen/marginStandardSmall"
+        app:layout_constraintBottom_toTopOf="@id/changeAccountButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/changeAccountButton"
         style="@style/TextButtonSecondary"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/marginStandard"
-        android:layout_marginVertical="@dimen/marginStandardMedium"
-        android:text="@string/buttonAccountSwitch" />
-
-</LinearLayout>
+        android:text="@string/buttonAccountSwitch"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
