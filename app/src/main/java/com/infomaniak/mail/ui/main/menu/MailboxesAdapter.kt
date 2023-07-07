@@ -62,7 +62,7 @@ class MailboxesAdapter(
 
         holder.binding.root.setSelectedState(isCurrentMailbox)
 
-        if (!isCurrentMailbox) {
+        if (!isCurrentMailbox || !hasValidMailboxes) {
             setOnClickListener {
                 if (isInMenuDrawer) {
                     context.trackMenuDrawerEvent(SWITCH_MAILBOX_NAME)
