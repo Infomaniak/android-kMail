@@ -80,10 +80,11 @@ class ThreadController @Inject constructor(
             remoteThread.messages.forEach { remoteMessage: Message ->
                 ensureActive()
 
+                remoteMessage.initMessageIds()
                 val localMessage = MessageController.getMessage(remoteMessage.uid, realm = this)
                 val message = if (localMessage == null) remoteMessage.apply { isFromSearch = true } else remoteMessage
 
-                remoteThread.messagesIds.add(message.messageId!!)
+                remoteThread.messagesIds += message.messageIds
                 searchFolder.messages.add(message)
             }
         }
