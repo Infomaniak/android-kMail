@@ -537,5 +537,8 @@ private fun Context.changeToolbarColorOnScroll(
 fun Activity.getMainApplication() = (application as MainApplication)
 
 fun Fragment.getStringWithBoldArg(@StringRes resId: Int, arg: String): Spanned {
-    return Html.fromHtml(getString(resId, "<b>$arg</b>"), Html.FROM_HTML_MODE_LEGACY)
+    val textColor = context?.getColor(R.color.primaryTextColor)?.let(Utils::colorToHexRepresentation)
+    val coloredArg = textColor?.let { "<font color=\"$it\">$arg</font color>" } ?: arg
+
+    return Html.fromHtml(getString(resId, "<b>$coloredArg</b>"), Html.FROM_HTML_MODE_LEGACY)
 }

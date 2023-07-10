@@ -21,7 +21,6 @@ import android.content.Context
 import androidx.annotation.RawRes
 import com.infomaniak.html.cleaner.HtmlSanitizer
 import com.infomaniak.mail.R
-import okhttp3.internal.toHexString
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import com.google.android.material.R as RMaterial
@@ -130,11 +129,9 @@ class HtmlFormatter(private val html: String) {
         }
 
         private fun formatCssVariable(variableName: String, color: Int): String {
-            val formattedColor = colorToHexRepresentation(color)
+            val formattedColor = Utils.colorToHexRepresentation(color)
             return "$variableName: $formattedColor;\n"
         }
-
-        private fun colorToHexRepresentation(color: Int) = "#" + color.toHexString().substring(2 until 8)
 
         fun Context.getCustomDarkMode(): String = loadCss(R.raw.custom_dark_mode)
 

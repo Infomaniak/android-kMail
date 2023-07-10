@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.utils
 
+import okhttp3.internal.toHexString
 import java.nio.charset.StandardCharsets
 
 object Utils {
@@ -31,6 +32,8 @@ object Utils {
     /** Beware: the API refuses a PAGE_SIZE bigger than 200. */
     const val PAGE_SIZE: Int = 50
     const val MAX_DELAY_BETWEEN_API_CALLS = 500L
+
+    fun colorToHexRepresentation(color: Int) = "#" + color.toHexString().substring(2 until 8)
 
     enum class MailboxErrorCode {
         NO_MAILBOX,
