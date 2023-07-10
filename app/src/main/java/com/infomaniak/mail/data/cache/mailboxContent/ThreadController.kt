@@ -31,9 +31,7 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
-import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.query
-import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.notifications.SingleQueryChange
@@ -79,32 +77,15 @@ class ThreadController @Inject constructor(
 
         fun MutableRealm.keepOldMessagesAndAddToSearchFolder(remoteThread: Thread, searchFolder: Folder) {
 
-            remoteThread.messages.forEachIndexed { index, remoteMessage: Message ->
+            remoteThread.messages.forEach { remoteMessage: Message ->
+                ensureActive()
 
-                val message = MessageController.getMessage(remoteMessage.uid, realm = this)?.let { localMessage ->
-                    localMessage.copyFromRealm().apply {
-                        isAnswered = remoteMessage.isAnswered
-                        isFavorite = remoteMessage.isFavorite
-                        isForwarded = remoteMessage.isForwarded
-                        isScheduled = remoteMessage.isScheduled
-                        isSeen = remoteMessage.isSeen
-                        remoteThread.messages[index] = this
-                    }
-                } ?: run {
-                    remoteMessage.apply {
-                        isFromSearch = true
-                    }
-                }
+                remoteMessage.initMessageIds()
+                val localMessage = MessageController.getMessage(remoteMessage.uid, realm = this)
+                val message = if (localMessage == null) remoteMessage.apply { isFromSearch = true } else remoteMessage
 
+                remoteThread.messagesIds += message.messageIds
                 searchFolder.messages.add(message)
-            }
-        }
-
-        fun Thread.handleDuplicatesMessages() {
-            if (messages.count() > 1) {
-                val firstMessage = messages.removeAt(0)
-                duplicates = messages
-                messages = realmListOf(firstMessage)
             }
         }
 
@@ -112,13 +93,10 @@ class ThreadController @Inject constructor(
             val searchFolder = FolderController.getOrCreateSearchFolder(realm = this)
             remoteThreads.map { remoteThread ->
                 ensureActive()
-                val remoteMessage = remoteThread.messages.first()
                 remoteThread.isFromSearch = true
-                remoteThread.folderId = remoteMessage.folderId
+                remoteThread.folderId = remoteThread.messages.first().folderId
 
                 keepOldMessagesAndAddToSearchFolder(remoteThread, searchFolder)
-                remoteThread.handleDuplicatesMessages()
-                remoteThread.recomputeThread()
 
                 return@map remoteThread
             }.also(searchFolder.threads::addAll)
