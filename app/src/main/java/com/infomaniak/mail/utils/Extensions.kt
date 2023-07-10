@@ -35,7 +35,6 @@ import android.widget.Button
 import androidx.annotation.*
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.text.toSpanned
 import androidx.core.widget.NestedScrollView
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
@@ -345,21 +344,14 @@ fun List<Message>.getUids(): List<String> = map { it.uid }
 
 fun Fragment.createDescriptionDialog(
     title: String,
-    description: Spanned,
+    description: CharSequence,
     @StringRes confirmButtonText: Int = R.string.buttonConfirm,
     onPositiveButtonClicked: () -> Unit,
 ) = requireActivity().createDescriptionDialog(title, description, confirmButtonText, onPositiveButtonClicked)
 
-fun Fragment.createDescriptionDialog(
-    title: String,
-    description: String,
-    @StringRes confirmButtonText: Int = R.string.buttonConfirm,
-    onPositiveButtonClicked: () -> Unit,
-): AlertDialog = createDescriptionDialog(title, description.toSpanned(), confirmButtonText, onPositiveButtonClicked)
-
 fun Activity.createDescriptionDialog(
     title: String,
-    description: Spanned,
+    description: CharSequence,
     @StringRes confirmButtonText: Int = R.string.buttonConfirm,
     onPositiveButtonClicked: () -> Unit,
 ) = with(DialogDescriptionBinding.inflate(layoutInflater)) {
