@@ -217,6 +217,7 @@ object RealmDatabase {
         fun mailboxContent(mailboxId: Int, userId: Int = AccountUtils.currentUserId) = RealmConfiguration
             .Builder(mailboxContentSet)
             .name(mailboxContentDbName(userId, mailboxId))
+            .schemaVersion(1)
             .deleteRealmIfMigrationNeeded() // TODO: Remove after next release
             .build()
         //endregion
