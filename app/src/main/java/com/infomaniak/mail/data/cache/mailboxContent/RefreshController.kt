@@ -429,7 +429,6 @@ object RefreshController {
         messageFlags: List<MessageFlags>,
         folderId: String,
     ): Set<String> {
-
         val impactedFolders = mutableSetOf<String>()
         val threads = mutableSetOf<Thread>()
 
@@ -458,33 +457,40 @@ object RefreshController {
     private fun MutableRealm.createMultiMessagesThreads(
         scope: CoroutineScope,
         folder: Folder,
-        messages: List<Message>,
+        remoteMessages: List<Message>,
     ): Set<Thread> {
 
         val idsOfFoldersWithIncompleteThreads = FolderController.getIdsOfFoldersWithIncompleteThreads(realm = this)
         val threadsToUpsert = mutableMapOf<String, Thread>()
 
-        messages.forEach { message ->
+        remoteMessages.forEach { remoteMessage ->
             scope.ensureActive()
 
-            val isMessageAlreadyAdded = folder.messages.firstOrNull { it == message && !it.isOrphan() } != null
+            val isMessageAlreadyAdded = folder.messages.firstOrNull { it == remoteMessage && !it.isOrphan() } != null
             if (isMessageAlreadyAdded) {
-                SentryDebug.sendAlreadyExistingMessage(folder, message)
+                SentryDebug.sendAlreadyExistingMessage(folder, remoteMessage)
                 return@forEach
             }
 
-            message.apply {
-                initMessageIds()
-                isSpam = folder.role == FolderRole.SPAM
-                isTrashed = folder.role == FolderRole.TRASH
-                shortUid = uid.toShortUid()
-            }
+            remoteMessage.initLocalValues(
+                date = remoteMessage.date,
+                isFullyDownloaded = false,
+                isSpam = folder.role == FolderRole.SPAM,
+                isTrashed = folder.role == FolderRole.TRASH,
+                draftLocalUuid = null,
+                isFromSearch = false
+            )
 
-            folder.messages.add(message)
+            folder.messages.add(remoteMessage)
 
-            val existingThreads = ThreadController.getThreads(message.messageIds, realm = this).toList()
+            val existingThreads = ThreadController.getThreads(remoteMessage.messageIds, realm = this).toList()
 
-            createNewThreadIfRequired(scope, existingThreads, message, idsOfFoldersWithIncompleteThreads)?.let { newThread ->
+            createNewThreadIfRequired(
+                scope,
+                existingThreads,
+                remoteMessage,
+                idsOfFoldersWithIncompleteThreads
+            )?.let { newThread ->
                 ThreadController.upsertThread(newThread, realm = this).also {
                     folder.threads.add(it)
                     threadsToUpsert[it.uid] = it
@@ -493,7 +499,7 @@ object RefreshController {
 
             val allExistingMessages = mutableSetOf<Message>().apply {
                 existingThreads.forEach { addAll(it.messages) }
-                add(message)
+                add(remoteMessage)
             }
 
             existingThreads.forEach { thread ->

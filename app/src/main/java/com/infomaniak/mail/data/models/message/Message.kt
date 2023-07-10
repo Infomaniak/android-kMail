@@ -159,9 +159,9 @@ class Message : RealmObject {
         isFullyDownloaded: Boolean,
         isSpam: Boolean,
         isTrashed: Boolean,
-        messageIds: RealmSet<String>,
         draftLocalUuid: String?,
         isFromSearch: Boolean,
+        messageIds: RealmSet<String> = computeMessageIds(),
     ) {
         this.date = date
         this.isFullyDownloaded = isFullyDownloaded
@@ -204,7 +204,7 @@ class Message : RealmObject {
         return to to cc
     }
 
-    fun initMessageIds() {
+    private fun computeMessageIds(): RealmSet<String> {
 
         fun String.ifNotBlank(completion: (String) -> Unit) {
             if (isNotBlank()) completion(this)
@@ -221,7 +221,7 @@ class Message : RealmObject {
             .removeSuffix(">")
             .split(">\\s*<|>?\\s+<?".toRegex())
 
-        messageIds = realmSetOf<String>().apply {
+        return realmSetOf<String>().apply {
             messageId?.ifNotBlank { addAll(it.parseMessagesIds()) }
             references?.ifNotBlank { addAll(it.parseMessagesIds()) }
             inReplyTo?.ifNotBlank { addAll(it.parseMessagesIds()) }
