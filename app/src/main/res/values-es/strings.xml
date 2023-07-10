@@ -211,7 +211,6 @@
     <string name="errorUnableToFlushFolder">Imposible vaciar la carpeta</string>
     <string name="failToOpenDraft">No se ha podido abrir el borrador</string>
     <string name="favoritesFolder">Favoritos</string>
-    <string name="frelatedMailbox">Contraseña no válida. Por ahora sólo se puede actualizar en el webmail.</string>
     <string name="fromTitle">De:</string>
     <string name="googlePlayServicesAreRequired">Se requieren los servicios de Google Play</string>
     <string name="inboxFolder">Bandeja de entrada</string>

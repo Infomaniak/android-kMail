@@ -213,7 +213,6 @@
     <string name="errorUnableToFlushFolder">Impossible de vider le dossier</string>
     <string name="failToOpenDraft">Échec de l’ouverture du brouillon</string>
     <string name="favoritesFolder">Favoris</string>
-    <string name="frelatedMailbox">Mot de passe invalide. Ne peut être mis à jour que sur le webmail pour l’instant.</string>
     <string name="fromTitle">De :</string>
     <string name="googlePlayServicesAreRequired">Les Google Play Services sont requis</string>
     <string name="inboxFolder">Boîte de réception</string>

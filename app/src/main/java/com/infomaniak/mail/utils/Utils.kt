@@ -38,7 +38,5 @@ object Utils {
     enum class MailboxErrorCode {
         NO_MAILBOX,
         NO_VALID_MAILBOX,
-        INVALID_PASSWORD_MAILBOX,
-        LOCKED_MAILBOX,
     }
 }

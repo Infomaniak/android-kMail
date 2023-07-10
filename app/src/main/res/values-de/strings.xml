@@ -211,7 +211,6 @@
     <string name="errorUnableToFlushFolder">Der Ordner kann nicht geleert werden</string>
     <string name="failToOpenDraft">Öffnen des Entwurfs fehlgeschlagen</string>
     <string name="favoritesFolder">Favoriten</string>
-    <string name="frelatedMailbox">Ungültiges Passwort. Kann vorerst nur über das Webmail aktualisiert werden.</string>
     <string name="fromTitle">Von:</string>
     <string name="googlePlayServicesAreRequired">Google Play Services sind erforderlich</string>
     <string name="inboxFolder">Posteingang</string>
