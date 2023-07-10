@@ -68,6 +68,11 @@
         <item quantity="many">%d de pièces jointes</item>
     </plurals>
     <string name="bccTitle">Cci :</string>
+    <string name="blockedMailboxTitle">L’adresse %s est bloquée</string>
+    <plurals name="blockedPasswordTitle">
+        <item quantity="one">Mot de passe bloqué</item>
+        <item quantity="other">Mots de passe bloqués</item>
+    </plurals>
     <string name="buttonAccept">Accepter</string>
     <string name="buttonAccountAssociatedEmailAddresses">Adresses mail associées au compte</string>
     <string name="buttonAccountDelete">Supprimer mon compte</string>
@@ -89,8 +94,7 @@
     <string name="buttonCreate">Créer</string>
     <string name="buttonCreateAccount">Créer un compte</string>
     <string name="buttonCreateFolder">Ajouter un dossier</string>
-    <string name="buttonDetach">Détacher</string>
-    <string name="buttonDetachMailbox">Détacher l’adresse</string>
+    <string name="buttonDetachMailbox">détacher l’adresse</string>
     <string name="buttonDownload">Télécharger</string>
     <string name="buttonDownloadAll">Tout télécharger</string>
     <string name="buttonFeedback">Feedback</string>
@@ -178,7 +182,9 @@
     <string name="emptyStateSearchTitle">Aucun résultat</string>
     <string name="emptyStateTrashDescription">Déplacez les messages dans la corbeille. Ils seront supprimés définitivement au bout de 30 jours.</string>
     <string name="emptyStateTrashTitle">La corbeille est vide</string>
-    <string name="enterPasswordDescription">Pour des raisons de sécurité, vous devez saisir le mot de passe de l’adresse mail %s</string>
+    <string name="enterPasswordDescription1">Votre mot de passe a été modifié. Si vous n’en êtes pas à l’origine, veuillez contacter votre administrateur.</string>
+    <string name="enterPasswordDescription2">Veuillez saisir le nouveau mot de passe de l’adresse mail %s</string>
+    <string name="enterPasswordOrDescription">ou</string>
     <string name="enterPasswordTitle">Saisir le mot de passe</string>
     <string name="errorAlreadyLinkedMailbox">Cette adresse mail est déjà liée à votre compte</string>
     <string name="errorAtLeastOneRecipient">Il faut au minimum un destinataire</string>
@@ -211,10 +217,14 @@
     <string name="googlePlayServicesAreRequired">Les Google Play Services sont requis</string>
     <string name="inboxFolder">Boîte de réception</string>
     <string name="loadingText">Chargement…</string>
-    <string name="lockedMailboxDescription">L’accès à votre adresse mail est actuellement bloqué. Nous vous invitons à contacter votre administrateur.</string>
-    <string name="lockedMailboxTitle">L’adresse %s est bloquée</string>
-    <string name="lockedMailboxesDescription">L’accès à vos adresses mail est actuellement bloqué. Nous vous invitons à contacter votre administrateur.</string>
-    <string name="lockedMailboxesTitle">Adresses mail bloquées</string>
+    <plurals name="lockedMailboxDescription">
+        <item quantity="one">L’accès à votre adresse mail est actuellement bloqué. Nous vous invitons à contacter votre administrateur.</item>
+        <item quantity="other">L’accès à vos adresses mail est actuellement bloqué. Nous vous invitons à contacter votre administrateur.</item>
+    </plurals>
+    <plurals name="lockedMailboxTitle">
+        <item quantity="one">Adresse mail bloquée</item>
+        <item quantity="other">Adresses mail bloquées</item>
+    </plurals>
     <string name="menuDrawerAdvancedActions">Actions avancées</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s utilisés</string>
     <string name="messageDetailsDateAt">%1$s à %2$s</string>
@@ -265,7 +275,8 @@
     <string name="onBoardingTitle3">Appuyez quelques secondes sur un message pour en sélectionner plusieurs</string>
     <string name="onBoardingTitle4">Lancez vous !</string>
     <string name="pendingMessagesFolder">Messages en attente</string>
-    <string name="popupDetachMailboxTitle">Souhaitez-vous vraiment détacher cette adresse mail ?</string>
+    <string name="popupDetachMailboxDescription">Êtes-vous sûr de vouloir détacher l’adresse %s ?</string>
+    <string name="popupDetachMailboxTitle">Détacher l’adresse</string>
     <string name="recentSearchesTitle">Recherches récentes</string>
     <string name="refreshTokenError">Vous avez été déconnecté en raison d’un problème. Veuillez vous reconnecter</string>
     <string name="reportDisplayProblemDescription">Acceptez-vous de partager vos données avec nos développeurs pour qu’ils puissent vous aider concernant votre problème ?</string>

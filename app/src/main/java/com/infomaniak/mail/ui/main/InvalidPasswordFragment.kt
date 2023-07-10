@@ -51,7 +51,7 @@ class InvalidPasswordFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
-        enterPasswordDescription.text = getStringWithBoldArg(R.string.enterPasswordDescription, navigationArgs.mailboxEmail)
+        enterPasswordDescription2.text = getStringWithBoldArg(R.string.enterPasswordDescription2, navigationArgs.mailboxEmail)
 
         passwordInput.showKeyboard()
 
@@ -81,7 +81,7 @@ class InvalidPasswordFragment : Fragment() {
         detachMailbox.setOnClickListener {
             trackInvalidPasswordMailboxEvent("detachMailbox")
             createDescriptionDialog(
-                title = getString(R.string.buttonDetachMailbox),
+                title = getString(R.string.popupDetachMailboxTitle),
                 description = getStringWithBoldArg(R.string.popupDetachMailboxDescription, navigationArgs.mailboxEmail),
                 onPositiveButtonClicked = {
                     trackInvalidPasswordMailboxEvent("detachMailboxConfirm")
