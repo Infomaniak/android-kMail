@@ -77,10 +77,6 @@ class Folder : RealmObject {
     var remainingOldMessagesToFetch: Int = DEFAULT_REMAINING_OLD_MESSAGES_TO_FETCH
     @Transient
     var isHistoryComplete: Boolean = DEFAULT_IS_HISTORY_COMPLETE
-    // TODO: Remove this before going into production
-    @Transient
-    @Suppress("PropertyName")
-    var _forceClearAllDatabases: String = "fake_variable_used_to_automatically_clean_Realm_DB"
     //endregion
 
     private val _parents by backlinks(Folder::children)

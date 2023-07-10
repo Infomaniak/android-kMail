@@ -201,28 +201,24 @@ object RealmDatabase {
             RealmConfiguration
                 .Builder(appSettingsSet)
                 .name(appSettingsDbName)
-                .deleteRealmIfMigrationNeeded() // TODO: Handle migration in production.
                 .build()
 
         val userInfo
             get() = RealmConfiguration
                 .Builder(userInfoSet)
                 .name(userInfoDbName(AccountUtils.currentUserId))
-                .deleteRealmIfMigrationNeeded() // TODO: Handle migration in production.
                 .build()
 
         val mailboxInfo =
             RealmConfiguration
                 .Builder(mailboxInfoSet)
                 .name(mailboxInfoDbName)
-                .deleteRealmIfMigrationNeeded() // TODO: Handle migration in production.
                 .build()
 
         fun mailboxContent(mailboxId: Int, userId: Int = AccountUtils.currentUserId) =
             RealmConfiguration
                 .Builder(mailboxContentSet)
                 .name(mailboxContentDbName(userId, mailboxId))
-                .deleteRealmIfMigrationNeeded() // TODO: Handle migration in production.
                 .build()
         //endregion
     }
