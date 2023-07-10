@@ -32,11 +32,6 @@ class MergedContact : RealmObject, Correspondent {
     override var name: String = ""
     var avatar: String? = null
 
-    // TODO: Remove this before going into production
-    @Transient
-    @Suppress("PropertyName")
-    var _forceClearAllDatabasesBecauseWeRemoveMergedContactWithoutEmail: String = "fake_variable_to_automatically_clean_Realm_DB"
-
     @delegate:Ignore
     override val initials by lazy { computeInitials() }
 

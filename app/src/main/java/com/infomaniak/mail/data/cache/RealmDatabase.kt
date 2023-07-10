@@ -197,33 +197,28 @@ object RealmDatabase {
         //endregion
 
         //region Configurations
-        val appSettings =
-            RealmConfiguration
-                .Builder(appSettingsSet)
-                .name(appSettingsDbName)
-                .deleteRealmIfMigrationNeeded() // TODO: Handle migration in production.
-                .build()
+        val appSettings = RealmConfiguration
+            .Builder(appSettingsSet)
+            .name(appSettingsDbName)
+            .build()
 
         val userInfo
             get() = RealmConfiguration
                 .Builder(userInfoSet)
                 .name(userInfoDbName(AccountUtils.currentUserId))
-                .deleteRealmIfMigrationNeeded() // TODO: Handle migration in production.
+                .deleteRealmIfMigrationNeeded() // TODO: Remove after next release
                 .build()
 
-        val mailboxInfo =
-            RealmConfiguration
-                .Builder(mailboxInfoSet)
-                .name(mailboxInfoDbName)
-                .deleteRealmIfMigrationNeeded() // TODO: Handle migration in production.
-                .build()
+        val mailboxInfo = RealmConfiguration
+            .Builder(mailboxInfoSet)
+            .name(mailboxInfoDbName)
+            .build()
 
-        fun mailboxContent(mailboxId: Int, userId: Int = AccountUtils.currentUserId) =
-            RealmConfiguration
-                .Builder(mailboxContentSet)
-                .name(mailboxContentDbName(userId, mailboxId))
-                .deleteRealmIfMigrationNeeded() // TODO: Handle migration in production.
-                .build()
+        fun mailboxContent(mailboxId: Int, userId: Int = AccountUtils.currentUserId) = RealmConfiguration
+            .Builder(mailboxContentSet)
+            .name(mailboxContentDbName(userId, mailboxId))
+            .deleteRealmIfMigrationNeeded() // TODO: Remove after next release
+            .build()
         //endregion
     }
 }
