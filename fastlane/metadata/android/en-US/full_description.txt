@@ -1,5 +1,5 @@
 The ikMail app requires your email addresses to be hosted by Infomaniak.
-This app allows you to manage your Infomaniak addresses in a completely secure environment. It is a beta version which will develop in line with your feedback.
+This app allows you to manage your Infomaniak addresses in a completely secure environment.
 
 With the ikMail app, you can:
 
