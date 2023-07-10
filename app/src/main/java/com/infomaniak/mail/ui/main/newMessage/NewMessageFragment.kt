@@ -51,6 +51,7 @@ import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition.INLINE
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -117,6 +118,9 @@ class NewMessageFragment : Fragment() {
         filePicker = FilePicker(this@NewMessageFragment)
 
         initUi()
+        Log.e("gibranlast", "onViewCreated - newMessageViewModel.draft: ${newMessageViewModel.draft}")
+        Log.e("gibranlast", "onViewCreated - newMessageViewModel.draft.body: ${newMessageViewModel.draft.body}")
+        Log.e("gibranlast", "onViewCreated - newMessageViewModel.draft.uiBody: ${newMessageViewModel.draft.uiBody}")
         initDraftAndViewModel()
 
         setOnFocusChangedListeners()
@@ -189,6 +193,7 @@ class NewMessageFragment : Fragment() {
             previousMessageUid,
             recipient,
         ).observe(viewLifecycleOwner) { isSuccess ->
+            Log.e("gibranlast", "initDraftAndViewModel.observe() - new instance of newMessageViewModel.draft: ${newMessageViewModel.draft}")
             if (isSuccess) {
                 hideLoader()
                 showKeyboardInCorrectView()
@@ -335,6 +340,7 @@ class NewMessageFragment : Fragment() {
         attachmentAdapter.addAll(draft.attachments.filterNot { it.disposition == INLINE })
         attachmentsRecyclerView.isGone = attachmentAdapter.itemCount == 0
 
+        Log.i("gibranlast", "populateUiWithViewModel: filling the UI of body with draft.uiBody [${draft.uiBody}]", );
         bodyText.setText(draft.uiBody)
 
         val alwaysShowExternalContent = localSettings.externalContent == LocalSettings.ExternalContent.ALWAYS
@@ -462,6 +468,7 @@ class NewMessageFragment : Fragment() {
 
     private fun doAfterBodyChange() {
         binding.bodyText.doAfterTextChanged { editable ->
+            Log.w("gibran", "doAfterBodyChange: got triggered", );
             editable?.toString()?.let(newMessageViewModel::updateMailBody)
         }
     }
@@ -509,10 +516,12 @@ class NewMessageFragment : Fragment() {
         newMessageViewModel.editorAction.observe(requireActivity()) { (editorAction, /*isToggled*/ _) ->
             when (editorAction) {
                 EditorAction.ATTACHMENT -> {
-                    filePicker.open { uris ->
-                        requireActivity().window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-                        newMessageViewModel.importAttachments(uris)
-                    }
+                    // filePicker.open { uris ->
+                    //     requireActivity().window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+                    //     newMessageViewModel.importAttachments(uris)
+                    // }
+                    Log.v("gibranlast", "observeEditorActions - newMessageViewModel.draft.body: ${newMessageViewModel.draft.body}")
+                    Log.v("gibranlast", "observeEditorActions - newMessageViewModel.draft.uiBody: ${newMessageViewModel.draft.uiBody}")
                 }
                 EditorAction.CAMERA -> notYetImplemented()
                 EditorAction.LINK -> notYetImplemented()
@@ -537,6 +546,7 @@ class NewMessageFragment : Fragment() {
     }
 
     override fun onStop() = with(newMessageViewModel) {
+        Log.w("gibran", "onStop: ", );
 
         // TODO:
         //  Currently, we don't handle the possibility to leave the App during Draft composition.
@@ -591,6 +601,16 @@ class NewMessageFragment : Fragment() {
 
         draft.attachments[position].getUploadLocalFile(requireContext(), draft.localUuid).delete()
         draft.attachments.removeAt(position)
+    }
+
+    override fun onDestroyView() {
+        Log.e("gibranlast", "onDestroyView: ", );
+        super.onDestroyView()
+    }
+
+    override fun onDestroy() {
+        Log.e("gibran", "onDestroy: ", );
+        super.onDestroy()
     }
 
     enum class FieldType {

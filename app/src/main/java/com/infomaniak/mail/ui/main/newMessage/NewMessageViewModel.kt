@@ -108,6 +108,10 @@ class NewMessageViewModel @Inject constructor(
         emit(mailboxes to currentMailboxIndex)
     }
 
+    init {
+        Log.e("gibranlast", "newMessageViewModel init: ", );
+    }
+
     fun initDraftAndViewModel(
         arrivedFromExistingDraft: Boolean,
         draftLocalUuid: String?,
@@ -118,6 +122,14 @@ class NewMessageViewModel @Inject constructor(
         recipient: Recipient?,
     ): LiveData<Boolean> = liveData(ioCoroutineContext) {
 
+        Log.e("gibran", "initDraftAndViewModel - arrivedFromExistingDraft: ${arrivedFromExistingDraft}")
+        Log.e("gibran", "initDraftAndViewModel - draftLocalUuid: ${draftLocalUuid}")
+        Log.e("gibran", "initDraftAndViewModel - draftResource: ${draftResource}")
+        Log.e("gibran", "initDraftAndViewModel - messageUid: ${messageUid}")
+        Log.e("gibran", "initDraftAndViewModel - draftMode: ${draftMode}")
+        Log.e("gibran", "initDraftAndViewModel - previousMessageUid: ${previousMessageUid}")
+        Log.e("gibran", "initDraftAndViewModel - recipient: ${recipient}")
+
         val mailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
 
         val isSuccess = mailboxContentRealm().writeBlocking {
@@ -125,10 +137,22 @@ class NewMessageViewModel @Inject constructor(
             runCatching {
                 val isRecreated = activityCreationStatus == CreationStatus.RECREATED
                 val draftExists = arrivedFromExistingDraft || isRecreated
+                Log.i("gibran", "initDraftAndViewModel - isRecreated: ${isRecreated}")
+                Log.i("gibran", "initDraftAndViewModel - draftExists: ${draftExists}")
 
                 draft = if (draftExists) {
                     val uuid = draftLocalUuid ?: draft.localUuid
-                    getLatestDraft(uuid) ?: run {
+                    Log.i("gibran", "initDraftAndViewModel - uuid: ${uuid}")
+                    val d = run {
+                        val d2 = getLatestDraft(uuid)
+                        Log.e("gibranlast", "initDraftAndViewModel: CREATED draft by getting it from realm with uuid", );
+                        Log.v("gibranlastfinal", "initDraftAndViewModel - draft.body: ${draft.body}")
+                        Log.v("gibranlastfinal", "initDraftAndViewModel - draft.uiBody: ${draft.uiBody}")
+                        Log.v("gibranlastfinal", "initDraftAndViewModel - d2?.body: ${d2?.body}")
+                        Log.v("gibranlastfinal", "initDraftAndViewModel - d2?.uiBody: ${d2?.uiBody}")
+                        d2
+                    } ?: run {
+                        Log.v("gibran", "initDraftAndViewModel: getLatestDraft returned null", );
                         if (isRecreated && (draftResource == null || messageUid == null)) {
                             // We arrive here if :
                             //    1. the user created a new Draft,
@@ -137,14 +161,22 @@ class NewMessageViewModel @Inject constructor(
                             // In this case, we do not have any data in Realm nor from the API,
                             // hence the null `draftResource` & `messageUid`,
                             // so we need to create a new Draft.
-                            createDraft(draftMode, previousMessageUid, recipient, mailbox, context)
+                            val d4 = createDraft(draftMode, previousMessageUid, recipient, mailbox, context)
+                            if (d4 != null) Log.e("gibranlast", "initDraftAndViewModel: CREATED draft from scratch because activity got recreated", );
+                            d4
                         } else {
-                            fetchDraft(draftResource!!, messageUid!!)
+                            val d3 = fetchDraft(draftResource!!, messageUid!!)
+                            if (d3 != null) Log.e("gibranlast", "initDraftAndViewModel: CREATED by getting fetching it from API", );
+                            d3
                         } ?: return@writeBlocking false
                     }
+                    Log.v("gibranlast", "initDraftAndViewModel - d.body: ${d.body}")
+                    d
                 } else {
                     isNewMessage = true
-                    createDraft(draftMode, previousMessageUid, recipient, mailbox, context) ?: return@writeBlocking false
+                    val d5 = createDraft(draftMode, previousMessageUid, recipient, mailbox, context) ?: return@writeBlocking false
+                    Log.e("gibranlast", "initDraftAndViewModel: CREATED from scratch because draft did not exist", );
+                    d5
                 }
 
                 if (draft.identityId.isNullOrBlank()) draft.addMissingSignatureData(mailbox, realm = this, context = context)
@@ -155,7 +187,9 @@ class NewMessageViewModel @Inject constructor(
             return@writeBlocking true
         }
 
+        Log.e("gibranlast", "initDraftAndViewModel - isSuccess: ${isSuccess}")
         if (isSuccess) {
+            Log.w("gibranlast", "about to splitSignatureAndQuoteFromBody: ", );
             splitSignatureAndQuoteFromBody()
             saveDraftSnapshot()
             if (draft.cc.isNotEmpty() || draft.bcc.isNotEmpty()) {
@@ -230,16 +264,20 @@ class NewMessageViewModel @Inject constructor(
 
         val replyPosition = draft.body.lastIndexOfOrMax(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME)
         val forwardPosition = draft.body.lastIndexOfOrMax(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME)
+        Log.w("gibranlast", "splitSignatureAndQuoteFromBody - about to split bodyWithQuote: ${bodyWithQuote}")
         val (body, quote) = if (replyPosition < forwardPosition) {
             doc.split(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME, bodyWithQuote)
         } else {
             doc.split(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME, bodyWithQuote)
         }
+        Log.w("gibranlast", "splitSignatureAndQuoteFromBody: which gave body of: $body", );
 
         draft.apply {
             uiBody = body.htmlToText()
             uiSignature = signature
             uiQuote = quote
+
+            Log.w("gibran", "splitSignatureAndQuoteFromBody gave uiBody: ${uiBody}")
         }
     }
 
@@ -300,8 +338,12 @@ class NewMessageViewModel @Inject constructor(
 
     fun updateMailBody(newBody: String) = with(draft) {
         if (newBody != uiBody) {
+            Log.e("gibran", "updateMailBody: overriding uiBody [${uiBody}] with newBody [${newBody}]", );
             uiBody = newBody
+            Log.w("gibran", "updateMailBody: about to start a debounce save", );
             saveDraftDebouncing()
+        } else {
+            Log.e("gibran", "updateMailBody: tried updateMailBody but newBody didn't change from uiBody", );
         }
     }
 
@@ -310,6 +352,7 @@ class NewMessageViewModel @Inject constructor(
         autoSaveJob?.cancel()
         autoSaveJob = viewModelScope.launch(ioCoroutineContext) {
             delay(DELAY_BEFORE_AUTO_SAVING_DRAFT)
+            Log.w("gibran", "saveDraftDebouncing: ", );
             saveDraftToLocal(DraftAction.SAVE)
         }
     }
@@ -324,6 +367,7 @@ class NewMessageViewModel @Inject constructor(
 
         if (shouldExecuteAction(action)) {
             context.trackSendingDraftEvent(action, draft)
+            Log.w("gibran", "executeDraftActionWhenStopping: ", );
             saveDraftToLocal(action)
             showDraftToastToUser(action, isFinishing, isTaskRoot)
             startWorkerCallback()
@@ -362,14 +406,28 @@ class NewMessageViewModel @Inject constructor(
     }
 
     fun synchronizeViewModelDraftFromRealm() = viewModelScope.launch(ioCoroutineContext) {
-        draftController.getDraft(draft.localUuid)?.let { draft = it.copyFromRealm() }
+        draftController.getDraft(draft.localUuid)?.let {
+            val d5 = it.copyFromRealm()
+            Log.w("gibranlastfinal", "synchronizeViewModelDraftFromRealm - draft.body: ${draft.body}")
+            Log.w("gibranlastfinal", "synchronizeViewModelDraftFromRealm - draft.uiBody: ${draft.uiBody}")
+            Log.w("gibranlastfinal", "synchronizeViewModelDraftFromRealm - d5.body: ${d5.body}")
+            Log.w("gibranlastfinal", "synchronizeViewModelDraftFromRealm - d5.uiBody: ${d5.uiBody}")
+            draft = d5
+            // TODO : Keep the local values of the previous instance
+            Log.v("gibranlast", "synchronizeViewModelDraftFromRealm - draft: ${draft}")
+        }
     }
 
     private fun saveDraftToLocal(action: DraftAction) {
         Log.d("Draft", "Save Draft to local")
 
+        Log.e("gibran", "saveDraftToLocal - before draft.body: ${draft.body}")
+        Log.e("gibran", "saveDraftToLocal - using the draft.uiBody: ${draft.uiBody}")
+
         draft.body = draft.uiBody.textToHtml() + (draft.uiSignature ?: "") + (draft.uiQuote ?: "")
         draft.action = action
+
+        Log.e("gibran", "saveDraftToLocal - after draft.body: ${draft.body}")
 
         mailboxContentRealm().writeBlocking {
             draftController.upsertDraft(draft, realm = this)

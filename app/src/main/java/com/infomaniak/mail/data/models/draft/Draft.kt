@@ -20,6 +20,7 @@
 package com.infomaniak.mail.data.models.draft
 
 import android.content.Context
+import android.util.Log
 import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.data.api.RealmInstantSerializer
@@ -95,6 +96,10 @@ class Draft : RealmObject {
     @Transient
     @Ignore
     var uiBody: String = ""
+        set(value) {
+            field = value
+            Log.i("gibranlast", "uiBody got set to [$value]", );
+        }
     @Transient
     @Ignore
     var uiSignature: String? = null
@@ -115,6 +120,7 @@ class Draft : RealmObject {
     }
 
     fun addMissingSignatureData(mailbox: Mailbox, realm: MutableRealm, context: Context) {
+        Log.e("gibranlast", "addMissingSignatureData: ", );
         initSignature(mailbox, realm, addContent = false, context = context)
     }
 
