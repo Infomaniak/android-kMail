@@ -1,5 +1,5 @@
 L'app ikMail nécessite que vos adresses mail soient chez Infomaniak.
-Cette app vous permet de gérer vos adresses Infomaniak dans un environnement entièrement sécurisé. Il s'agit d'une version bêta qui va rapidement évoluer selon vos retours.
+Cette app vous permet de gérer vos adresses Infomaniak dans un environnement entièrement sécurisé.
 
 Avec l'app ikMail, vous pouvez :
 

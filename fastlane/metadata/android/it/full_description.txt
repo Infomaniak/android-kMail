@@ -1,5 +1,5 @@
 Per potere utilizzare l'app ikMail, i tuoi indirizzi e-mail devono essere gestiti da Infomaniak.
-Questa app ti consente di gestire i tuoi indirizzi Infomaniak in un ambiente completamente protetto. È una versione beta che si evolverà rapidamente in base ai feedback degli utenti.
+Questa app ti consente di gestire i tuoi indirizzi Infomaniak in un ambiente completamente protetto.
 
 Con l'app ikMail, potrai:
 

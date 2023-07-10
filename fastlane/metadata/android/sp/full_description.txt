@@ -1,5 +1,5 @@
 La aplicación ikMail requiere que tus direcciones de correo estén con Infomaniak.
-Esta aplicación te permite gestionar tus direcciones Infomaniak en un entorno completamente seguro. Se trata de una versión beta que evolucionará rápidamente a partir de vuestros comentarios.
+Esta aplicación te permite gestionar tus direcciones Infomaniak en un entorno completamente seguro.
 
 Con la aplicación ikMail, puedes:
 

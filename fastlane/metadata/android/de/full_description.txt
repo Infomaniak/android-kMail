@@ -1,5 +1,5 @@
 Die App ikMail kann nur mit von Infomaniak verwalteten E-Mail-Adressen verwendet werden.
-Mit dieser App können Sie Ihre Infomaniak-Adressen in einer völlig sicheren Umgebung verwalten. Hierbei handelt es sich um eine Beta-Version, die sich rasch auf Basis Ihrer Rückmeldungen weiterentwickeln wird.
+Mit dieser App können Sie Ihre Infomaniak-Adressen in einer völlig sicheren Umgebung verwalten.
 
 Mit der App ikMail können Sie:
 
