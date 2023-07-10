@@ -148,7 +148,7 @@ class MainViewModel @Inject constructor(
 
     val currentFolderLive = _currentFolderId.flatMapLatest {
         it?.let(folderController::getFolderAsync) ?: emptyFlow()
-    }.asLiveData(ioCoroutineContext)
+    }.distinctUntilChanged().asLiveData(ioCoroutineContext)
 
     val currentFilter = SingleLiveEvent(ThreadFilter.ALL)
 
