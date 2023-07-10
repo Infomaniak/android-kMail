@@ -104,7 +104,7 @@ object MailboxController {
     fun getMailboxesCount(userId: Int): Long = getMailboxesCountQuery(userId).find()
 
     fun getMailboxesAsync(userId: Int, exceptionMailboxIds: List<Int> = emptyList()): Flow<RealmResults<Mailbox>> {
-        return getMailboxesQuery(userId, exceptionMailboxIds).asFlow().map { it.list }
+        return getMailboxesQuery(userId, exceptionMailboxIds).toMailboxesFlow()
     }
 
     fun getMailbox(objectId: String, realm: TypedRealm = defaultRealm): Mailbox? {
@@ -128,12 +128,14 @@ object MailboxController {
     }
 
     fun getInvalidPasswordMailboxes(userId: Int): Flow<RealmResults<Mailbox>> {
-        return getInvalidPasswordMailboxesQuery(userId, defaultRealm).asFlow().map { it.list }
+        return getInvalidPasswordMailboxesQuery(userId, defaultRealm).toMailboxesFlow()
     }
 
     fun getLockedMailboxes(userId: Int): Flow<RealmResults<Mailbox>> {
-        return getLockedMailboxesQuery(userId, defaultRealm).asFlow().map { it.list }
+        return getLockedMailboxesQuery(userId, defaultRealm).toMailboxesFlow()
     }
+
+    private fun RealmQuery<Mailbox>.toMailboxesFlow() = asFlow().map { it.list }
     //endregion
 
     //region Edit data
