@@ -23,6 +23,7 @@ import android.os.Bundle
 import android.webkit.WebView
 import androidx.activity.addCallback
 import androidx.activity.viewModels
+import androidx.core.text.toSpanned
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.google.android.material.button.MaterialButton
@@ -115,7 +116,7 @@ class NewMessageActivity : ThemedActivity() {
             trackNewMessageEvent("sendWithoutSubject")
             createDescriptionDialog(
                 title = getString(R.string.emailWithoutSubjectTitle),
-                description = getString(R.string.emailWithoutSubjectDescription),
+                description = getString(R.string.emailWithoutSubjectDescription).toSpanned(),
                 confirmButtonText = R.string.buttonContinue,
                 onPositiveButtonClicked = {
                     trackNewMessageEvent("sendWithoutSubjectConfirm")

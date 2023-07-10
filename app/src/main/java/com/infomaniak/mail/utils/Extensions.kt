@@ -25,6 +25,8 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
+import android.text.Html
+import android.text.Spanned
 import android.util.Patterns
 import android.view.View
 import android.view.Window
@@ -33,6 +35,7 @@ import android.widget.Button
 import androidx.annotation.*
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.text.toSpanned
 import androidx.core.widget.NestedScrollView
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
@@ -342,14 +345,21 @@ fun List<Message>.getUids(): List<String> = map { it.uid }
 
 fun Fragment.createDescriptionDialog(
     title: String,
-    description: String,
+    description: Spanned,
     @StringRes confirmButtonText: Int = R.string.buttonConfirm,
     onPositiveButtonClicked: () -> Unit,
 ) = requireActivity().createDescriptionDialog(title, description, confirmButtonText, onPositiveButtonClicked)
 
-fun Activity.createDescriptionDialog(
+fun Fragment.createDescriptionDialog(
     title: String,
     description: String,
+    @StringRes confirmButtonText: Int = R.string.buttonConfirm,
+    onPositiveButtonClicked: () -> Unit,
+): AlertDialog = createDescriptionDialog(title, description.toSpanned(), confirmButtonText, onPositiveButtonClicked)
+
+fun Activity.createDescriptionDialog(
+    title: String,
+    description: Spanned,
     @StringRes confirmButtonText: Int = R.string.buttonConfirm,
     onPositiveButtonClicked: () -> Unit,
 ) = with(DialogDescriptionBinding.inflate(layoutInflater)) {
@@ -525,3 +535,7 @@ private fun Context.changeToolbarColorOnScroll(
 }
 
 fun Activity.getMainApplication() = (application as MainApplication)
+
+fun Fragment.getStringWithBoldArg(@StringRes resId: Int, arg: String): Spanned {
+    return Html.fromHtml(getString(resId, "<b>$arg</b>"), Html.FROM_HTML_MODE_LEGACY)
+}

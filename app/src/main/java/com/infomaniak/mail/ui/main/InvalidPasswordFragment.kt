@@ -34,6 +34,7 @@ import com.infomaniak.mail.MatomoMail.trackInvalidPasswordMailboxEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentInvalidPasswordBinding
 import com.infomaniak.mail.utils.createDescriptionDialog
+import com.infomaniak.mail.utils.getStringWithBoldArg
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -50,7 +51,7 @@ class InvalidPasswordFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
-        enterPasswordDescription.text = getString(R.string.enterPasswordDescription, navigationArgs.mailboxEmail)
+        enterPasswordDescription.text = getStringWithBoldArg(R.string.enterPasswordDescription, navigationArgs.mailboxEmail)
 
         passwordInput.showKeyboard()
 
@@ -80,9 +81,8 @@ class InvalidPasswordFragment : Fragment() {
         detachMailbox.setOnClickListener {
             trackInvalidPasswordMailboxEvent("detachMailbox")
             createDescriptionDialog(
-                title = getString(R.string.popupDetachMailboxTitle),
-                description = navigationArgs.mailboxEmail,
-                confirmButtonText = R.string.buttonDetach,
+                title = getString(R.string.buttonDetachMailbox),
+                description = getStringWithBoldArg(R.string.popupDetachMailboxDescription, navigationArgs.mailboxEmail),
                 onPositiveButtonClicked = {
                     trackInvalidPasswordMailboxEvent("detachMailboxConfirm")
                     invalidPasswordViewModel.detachMailbox(navigationArgs.mailboxId).observe(viewLifecycleOwner) { error ->
