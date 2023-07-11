@@ -71,6 +71,8 @@ class SearchViewModel @Inject constructor(
     /** `_onPaginationTrigger` & `shouldPaginate` are closely related. Modifying one will impact the other. Beware. */
     private val _onPaginationTrigger = MutableStateFlow(0L)
     private var shouldPaginate: Boolean = false
+
+    /** Refreshes the search each time the timestamp changes, so that it doesn't refresh when the timestamp hasn't changed. */
     private val _onRefreshTrigger = MutableStateFlow(0L)
 
     val visibilityMode = MutableLiveData(VisibilityMode.RECENT_SEARCHES)
@@ -267,8 +269,8 @@ class SearchViewModel @Inject constructor(
         val filters: Set<ThreadFilter>,
         val folder: Folder?,
         val shouldGetNextPage: Boolean,
-        private val paginationTime: Long,
-        private val refreshTime: Long,
+        private val paginationTime: Long, // Used only to paginate when necessary due to `distinctUntilChanged`.
+        private val refreshTime: Long, // Used only to refresh when necessary due to `distinctUntilChanged`.
     )
 
     private companion object {
