@@ -38,6 +38,7 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SearchUtils
 import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.realm.kotlin.notifications.ResultsChange
 import io.sentry.Sentry
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -81,7 +82,7 @@ class SearchViewModel @Inject constructor(
     private var isFirstPage: Boolean = true
     private val isLastPage get() = resourceNext.isNullOrBlank()
 
-    val searchResults: LiveData<List<Thread>> = observeSearchAndFilters()
+    val searchResults: LiveData<ResultsChange<Thread>> = observeSearchAndFilters()
         .flatMapLatest { (queryData, filters, folder, shouldGetNextPage) ->
             val (query, saveInHistory) = queryData
             if (!shouldGetNextPage) resetPaginationData()
@@ -180,7 +181,7 @@ class SearchViewModel @Inject constructor(
         shouldGetNextPage: Boolean,
         filters: Set<ThreadFilter>,
         folder: Folder?,
-    ): Flow<List<Thread>> = flow {
+    ): Flow<ResultsChange<Thread>> = flow {
         getReadyForNewSearch(folder, filters, query)?.let { newFilters ->
             fetchThreads(folder, newFilters, query, shouldGetNextPage)
             emitThreads(saveInHistory, newFilters, query)
@@ -239,7 +240,7 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    private suspend fun FlowCollector<List<Thread>>.emitThreads(
+    private suspend fun FlowCollector<ResultsChange<Thread>>.emitThreads(
         saveInHistory: Boolean,
         newFilters: Set<ThreadFilter>,
         query: String?,
@@ -247,10 +248,10 @@ class SearchViewModel @Inject constructor(
         emitAll(threadController.getSearchThreadsAsync().mapLatest {
             if (saveInHistory) query?.let(history::postValue)
 
-            it.list.also { threads ->
+            it.also {
                 val resultsVisibilityMode = when {
                     newFilters.isEmpty() && isLengthTooShort(searchQuery) -> VisibilityMode.RECENT_SEARCHES
-                    threads.isEmpty() -> VisibilityMode.NO_RESULTS
+                    it.list.isEmpty() -> VisibilityMode.NO_RESULTS
                     else -> VisibilityMode.RESULTS
                 }
                 visibilityMode.postValue(resultsVisibilityMode)

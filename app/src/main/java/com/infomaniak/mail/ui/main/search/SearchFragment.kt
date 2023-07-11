@@ -52,6 +52,7 @@ import com.infomaniak.mail.databinding.FragmentSearchBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
 import com.infomaniak.mail.ui.main.search.SearchFolderAdapter.SearchFolderElement
+import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
 import com.infomaniak.mail.utils.addStickyDateDecoration
 import com.infomaniak.mail.utils.getLocalizedNameOrAllFolders
 import com.infomaniak.mail.utils.navigateToThread
@@ -321,10 +322,7 @@ class SearchFragment : Fragment() {
     }
 
     private fun observeSearchResults() {
-        searchViewModel.searchResults.observe(viewLifecycleOwner) {
-            threadListAdapter.updateList(it)
-            threadListAdapter.notifyDataSetChanged()
-        }
+        searchViewModel.searchResults.bindResultsChangeToAdapter(viewLifecycleOwner, threadListAdapter)
     }
 
     private fun observeHistory() {
