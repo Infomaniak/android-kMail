@@ -104,10 +104,11 @@ class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
         val count = mailboxCount.toInt()
         val lockedMailboxTitleString = resources.getQuantityString(R.plurals.lockedMailboxTitle, count)
 
-        invalidMailboxTitle.text = lockedMailboxTitleString
-        lockedMailboxTitle.text = lockedMailboxTitleString
         invalidPasswordTitle.text = resources.getQuantityString(R.plurals.blockedPasswordTitle, count)
-        invalidMailboxDescription.text = resources.getQuantityText(R.plurals.lockedMailboxDescription, count)
+        lockedMailboxTitle.text = lockedMailboxTitleString
+        noValidMailboxesEmptyState.apply {
+            title = lockedMailboxTitleString
+            description = resources.getQuantityText(R.plurals.lockedMailboxDescription, count)
+        }
     }
-
 }
