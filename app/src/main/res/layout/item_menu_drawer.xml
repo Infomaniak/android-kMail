@@ -89,7 +89,7 @@
             <ImageView
                 android:id="@+id/chevron"
                 android:layout_width="wrap_content"
-                android:layout_height="@dimen/mediumIconSize"
+                android:layout_height="@dimen/chevronSize"
                 android:layout_marginEnd="@dimen/marginStandardVerySmall"
                 android:contentDescription="@string/contentDescriptionIconFolderSelected"
                 android:src="@drawable/ic_chevron_right"

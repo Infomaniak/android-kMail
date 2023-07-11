@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Infomaniak kMail - Android
+  ~ Infomaniak ikMail - Android
   ~ Copyright (C) 2023 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
@@ -95,7 +95,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/invalidPasswordTitle"
-                    tools:itemCount="10"
+                    tools:itemCount="5"
                     tools:listitem="@layout/item_switch_mailbox" />
 
                 <androidx.constraintlayout.widget.Group
@@ -127,7 +127,7 @@
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/lockedMailboxTitle"
-                    tools:itemCount="10"
+                    tools:itemCount="5"
                     tools:listitem="@layout/item_switch_mailbox" />
 
                 <androidx.constraintlayout.widget.Group

@@ -63,7 +63,7 @@ class AttachMailboxFragment : Fragment() {
             setOnClickListener {
                 context.trackAccountEvent("addMailboxConfirm")
                 showProgress()
-                attachMailbox(navigationArgs.isFromNoValidMailboxesActivity)
+                attachMailbox()
             }
         }
     }
@@ -72,11 +72,11 @@ class AttachMailboxFragment : Fragment() {
         passwordInput.text?.isNotBlank() == true && mailInput.text?.trim().toString().isEmail()
     }
 
-    private fun attachMailbox(isFromNoValidMailboxesActivity: Boolean) = with(binding) {
+    private fun attachMailbox() = with(binding) {
         accountViewModel.attachNewMailbox(
             mailInput.text?.trim().toString(),
             passwordInput.text?.trim().toString(),
-            isFromNoValidMailboxesActivity,
+            navigationArgs.isFromNoValidMailboxesActivity,
         ).observe(viewLifecycleOwner) { apiResponse ->
 
             when {

@@ -1,5 +1,5 @@
 /*
- * Infomaniak kMail - Android
+ * Infomaniak ikMail - Android
  * Copyright (C) 2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,10 +19,8 @@ package com.infomaniak.mail.ui.noValidMailboxes
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.webkit.WebView
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
-import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ActivityNoValidMailboxesBinding
@@ -34,8 +32,6 @@ import dagger.hilt.android.AndroidEntryPoint
 class NoValidMailboxesActivity : ThemedActivity() {
 
     private val binding by lazy { ActivityNoValidMailboxesBinding.inflate(layoutInflater) }
-    // private val noValidMailboxesViewModel: NoValidMailboxesViewModel by viewModels()
-
 
     private val navController by lazy {
         (supportFragmentManager.findFragmentById(R.id.hostFragment) as NavHostFragment).navController
@@ -43,10 +39,8 @@ class NoValidMailboxesActivity : ThemedActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
 
         setContentView(binding.root)
-
         setupNavController()
     }
 

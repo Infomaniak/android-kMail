@@ -111,8 +111,8 @@ class MenuDrawerItemView @JvmOverloads constructor(
         }
 
     var hasValidMailbox = true
-        set(isDisplayed) {
-            field = isDisplayed
+        set(isValid) {
+            field = isValid
             computeEndIconVisibility()
         }
 
