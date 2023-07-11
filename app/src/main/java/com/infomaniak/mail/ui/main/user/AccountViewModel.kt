@@ -23,7 +23,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.models.ApiResponse
-import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.mailbox.MailboxLinkedResult
@@ -52,15 +51,8 @@ class AccountViewModel @Inject constructor(
     fun attachNewMailbox(
         address: String,
         password: String,
-        isFromNoValidMailboxesActivity: Boolean,
     ): LiveData<ApiResponse<MailboxLinkedResult>> = liveData(ioCoroutineContext) {
-        val okHttpClient = if (isFromNoValidMailboxesActivity) {
-            HttpClient.okHttpClientNoTokenInterceptor
-        } else {
-            HttpClient.okHttpClient
-        }
-
-        emit(ApiRepository.addNewMailbox(address, password, okHttpClient))
+        emit(ApiRepository.addNewMailbox(address, password))
     }
 
     fun switchToNewMailbox(newMailboxId: Int) = viewModelScope.launch(ioCoroutineContext) {

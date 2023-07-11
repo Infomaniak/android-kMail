@@ -94,12 +94,8 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.mailbox(), GET, okHttpClient = okHttpClient ?: HttpClient.okHttpClient)
     }
 
-    fun addNewMailbox(
-        mailAddress: String,
-        password: String,
-        okHttpClient: OkHttpClient = HttpClient.okHttpClient,
-    ): ApiResponse<MailboxLinkedResult> {
-        return callApi(ApiRoutes.manageMailboxes(), POST, mapOf("mail" to mailAddress, "password" to password), okHttpClient)
+    fun addNewMailbox(mailAddress: String, password: String): ApiResponse<MailboxLinkedResult> {
+        return callApi(ApiRoutes.manageMailboxes(), POST, mapOf("mail" to mailAddress, "password" to password))
     }
 
     fun detachMailbox(mailboxId: Int): ApiResponse<Boolean> = callApi(ApiRoutes.manageMailbox(mailboxId), DELETE)
