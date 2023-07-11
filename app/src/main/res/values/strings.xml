@@ -95,8 +95,7 @@
     <string name="buttonCreate">Create</string>
     <string name="buttonCreateAccount">Create an account</string>
     <string name="buttonCreateFolder">Add a folder</string>
-    <string name="buttonDetach">Detach</string>
-    <string name="buttonDetachMailbox">Detach mailbox</string>
+    <string name="buttonDetachMailbox">detach mailbox</string>
     <string name="buttonDownload">Download</string>
     <string name="buttonDownloadAll">Download all</string>
     <string name="buttonFeedback">Feedback</string>
@@ -184,7 +183,9 @@
     <string name="emptyStateSearchTitle">No results</string>
     <string name="emptyStateTrashDescription">Move the messages to the trash. They will be permanently deleted after 30 days.</string>
     <string name="emptyStateTrashTitle">Trash is empty</string>
-    <string name="enterPasswordDescription">For security reasons, you must enter the password of the mailbox %s</string>
+    <string name="enterPasswordDescription1">Your password has been changed. If you are not the cause, please contact your administrator.</string>
+    <string name="enterPasswordDescription2">Please enter the new password for the e-mail address %s</string>
+    <string name="enterPasswordOrDescription">or</string>
     <string name="enterPasswordTitle">Enter password</string>
     <string name="errorAlreadyLinkedMailbox">This email address is already linked to your account</string>
     <string name="errorAtLeastOneRecipient">At least one recipient is required</string>
@@ -219,8 +220,6 @@
     <string name="loadingText">Loading…</string>
     <string name="lockedMailboxDescription">Access to your mailbox is currently blocked. Please contact your administrator.</string>
     <string name="lockedMailboxTitle">Mailbox %s is blocked</string>
-    <string name="lockedMailboxesDescription">Access to your mailboxes is currently blocked. Please contact your administrator.</string>
-    <string name="lockedMailboxesTitle">Blocked mailboxes</string>
     <string name="menuDrawerAdvancedActions">Advanced actions</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s used</string>
     <string name="messageDetailsDateAt">%1$s at %2$s</string>
@@ -269,7 +268,8 @@
     <string name="onBoardingTitle3">Press a message for a few seconds to select multiple messages</string>
     <string name="onBoardingTitle4">Get started!</string>
     <string name="pendingMessagesFolder">Pending messages</string>
-    <string name="popupDetachMailboxTitle">Do you really want to detach this mailbox?</string>
+    <string name="popupDetachMailboxDescription">Are you sure you want to detach the %s address?</string>
+    <string name="popupDetachMailboxTitle">Detach mailbox</string>
     <string name="recentSearchesTitle">Recent searches</string>
     <string name="refreshTokenError">You’ve been disconnected due to a problem. Please log in again</string>
     <string name="reportDisplayProblemDescription">Do you agree to share your data with our developers so that they can help you with your problem?</string>

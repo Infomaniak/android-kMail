@@ -25,6 +25,8 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
+import android.text.Html
+import android.text.Spanned
 import android.util.Patterns
 import android.view.View
 import android.view.Window
@@ -342,14 +344,14 @@ fun List<Message>.getUids(): List<String> = map { it.uid }
 
 fun Fragment.createDescriptionDialog(
     title: String,
-    description: String,
+    description: CharSequence,
     @StringRes confirmButtonText: Int = R.string.buttonConfirm,
     onPositiveButtonClicked: () -> Unit,
 ) = requireActivity().createDescriptionDialog(title, description, confirmButtonText, onPositiveButtonClicked)
 
 fun Activity.createDescriptionDialog(
     title: String,
-    description: String,
+    description: CharSequence,
     @StringRes confirmButtonText: Int = R.string.buttonConfirm,
     onPositiveButtonClicked: () -> Unit,
 ) = with(DialogDescriptionBinding.inflate(layoutInflater)) {
@@ -525,3 +527,10 @@ private fun Context.changeToolbarColorOnScroll(
 }
 
 fun Activity.getMainApplication() = (application as MainApplication)
+
+fun Fragment.getStringWithBoldArg(@StringRes resId: Int, arg: String): Spanned {
+    val textColor = context?.getColor(R.color.primaryTextColor)?.let(Utils::colorToHexRepresentation)
+    val coloredArg = textColor?.let { "<font color=\"$it\">$arg</font color>" } ?: arg
+
+    return Html.fromHtml(getString(resId, "<b>$coloredArg</b>"), Html.FROM_HTML_MODE_LEGACY)
+}

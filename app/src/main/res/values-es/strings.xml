@@ -88,8 +88,7 @@
     <string name="buttonCreate">Cree</string>
     <string name="buttonCreateAccount">Crear una cuenta</string>
     <string name="buttonCreateFolder">Añadir una carpeta</string>
-    <string name="buttonDetach">Desata</string>
-    <string name="buttonDetachMailbox">Separar dirección</string>
+    <string name="buttonDetachMailbox">separar dirección</string>
     <string name="buttonDownload">Descargar</string>
     <string name="buttonDownloadAll">Descargar todo</string>
     <string name="buttonFeedback">Comentarios</string>
@@ -177,7 +176,9 @@
     <string name="emptyStateSearchTitle">Sin resultados</string>
     <string name="emptyStateTrashDescription">Mueve los mensajes a la papelera. Se borrarán definitivamente pasados 30 días.</string>
     <string name="emptyStateTrashTitle">La papelera está vacía</string>
-    <string name="enterPasswordDescription">Por razones de seguridad, debe introducir la contraseña de la dirección de correo electrónico %s</string>
+    <string name="enterPasswordDescription1">Su contraseña ha sido modificada. Si no es culpa suya, póngase en contacto con su administrador.</string>
+    <string name="enterPasswordDescription2">Por favor, introduzca la nueva contraseña para la dirección de correo electrónico %s</string>
+    <string name="enterPasswordOrDescription">o</string>
     <string name="enterPasswordTitle">Introduzca la contraseña</string>
     <string name="errorAlreadyLinkedMailbox">Esta dirección de correo electrónico ya está vinculada a su cuenta</string>
     <string name="errorAtLeastOneRecipient">Se precisa al menos un destinatario</string>
@@ -212,8 +213,6 @@
     <string name="loadingText">Cargando…</string>
     <string name="lockedMailboxDescription">El acceso a su dirección de correo electrónico está bloqueado. Póngase en contacto con su administrador.</string>
     <string name="lockedMailboxTitle">La dirección de correo electrónico %s está bloqueada</string>
-    <string name="lockedMailboxesDescription">El acceso a sus buzones de correo está bloqueado. Póngase en contacto con su administrador.</string>
-    <string name="lockedMailboxesTitle">Buzones de correo bloqueados</string>
     <string name="menuDrawerAdvancedActions">Acciones avanzadas</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s usado</string>
     <string name="messageDetailsDateAt">%1$s a las %2$s</string>
@@ -262,7 +261,8 @@
     <string name="onBoardingTitle3">Pulse un mensaje durante unos segundos para seleccionar varios mensajes</string>
     <string name="onBoardingTitle4">¡Póngase en marcha!</string>
     <string name="pendingMessagesFolder">Mensajes pendientes</string>
-    <string name="popupDetachMailboxTitle">¿De verdad quieres dar de baja esta dirección de correo electrónico?</string>
+    <string name="popupDetachMailboxDescription">¿Estás seguro de que quieres separar la dirección %s?</string>
+    <string name="popupDetachMailboxTitle">Separar dirección</string>
     <string name="recentSearchesTitle">Búsquedas recientes</string>
     <string name="refreshTokenError">Te has desconectado por un problema. Vuelve a conectarte</string>
     <string name="reportDisplayProblemDescription">¿Aceptas compartir tus datos con nuestros desarrolladores para que puedan ayudarte con tu problema?</string>

@@ -88,8 +88,7 @@
     <string name="buttonCreate">erstellen.</string>
     <string name="buttonCreateAccount">Ein Konto erstellen</string>
     <string name="buttonCreateFolder">Einen Ordner hinzufügen</string>
-    <string name="buttonDetach">Lösen</string>
-    <string name="buttonDetachMailbox">Adresse abtrennen</string>
+    <string name="buttonDetachMailbox">adresse abtrennen</string>
     <string name="buttonDownload">Herunterladen</string>
     <string name="buttonDownloadAll">Alle herunterladen</string>
     <string name="buttonFeedback">Rückmeldung</string>
@@ -177,7 +176,9 @@
     <string name="emptyStateSearchTitle">Keine Ergebnisse</string>
     <string name="emptyStateTrashDescription">Verschieben Sie die Nachrichten in den Papierkorb. Sie werden nach 30 Tagen endgültig gelöscht.</string>
     <string name="emptyStateTrashTitle">Der Papierkorb ist leer</string>
-    <string name="enterPasswordDescription">Aus Sicherheitsgründen müssen Sie das Passwort für die E-Mail-Adresse %s eingeben</string>
+    <string name="enterPasswordDescription1">Ihr Passwort wurde geändert. Wenn es nicht von Ihnen stammt, wenden Sie sich bitte an Ihren Administrator.</string>
+    <string name="enterPasswordDescription2">Bitte geben Sie das neue Passwort für die E-Mail-Adresse %s ein</string>
+    <string name="enterPasswordOrDescription">oder</string>
     <string name="enterPasswordTitle">Geben Sie das Passwort ein</string>
     <string name="errorAlreadyLinkedMailbox">Diese E-Mail-Adresse ist bereits mit Ihrem Konto verknüpft</string>
     <string name="errorAtLeastOneRecipient">Es ist mindestens ein Empfänger erforderlich</string>
@@ -212,8 +213,6 @@
     <string name="loadingText">Laden…</string>
     <string name="lockedMailboxDescription">Der Zugriff auf Ihre E-Mail-Adresse ist derzeit gesperrt. Bitte wenden Sie sich an Ihren Administrator.</string>
     <string name="lockedMailboxTitle">Mailbox %s ist blockiert</string>
-    <string name="lockedMailboxesDescription">Der Zugriff auf Ihre Mailboxen ist derzeit gesperrt. Bitte wenden Sie sich an Ihren Administrator.</string>
-    <string name="lockedMailboxesTitle">Gesperrte Mailadressen</string>
     <string name="menuDrawerAdvancedActions">Erweiterte Aktionen</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s verwendet</string>
     <string name="messageDetailsDateAt">%1$s um %2$s</string>
@@ -262,7 +261,8 @@
     <string name="onBoardingTitle3">Drücken Sie einige Sekunden auf eine Nachricht, um mehrere auszuwählen</string>
     <string name="onBoardingTitle4">Los geht’s!</string>
     <string name="pendingMessagesFolder">Anhängige Nachrichten</string>
-    <string name="popupDetachMailboxTitle">Möchten Sie diese E-Mail-Adresse wirklich losbinden?</string>
+    <string name="popupDetachMailboxDescription">Sind Sie sicher, dass Sie die Adresse %s lösen möchten?</string>
+    <string name="popupDetachMailboxTitle">Adresse abtrennen</string>
     <string name="recentSearchesTitle">Letzte Suchen</string>
     <string name="refreshTokenError">Sie wurden aufgrund eines Problems getrennt. Bitte verbinden Sie sich erneut.</string>
     <string name="reportDisplayProblemDescription">Sind Sie damit einverstanden, Ihre Daten mit unseren Entwicklern zu teilen, damit diese Ihnen bei Ihrem Problem helfen können?</string>

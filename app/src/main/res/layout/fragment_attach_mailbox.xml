@@ -30,7 +30,6 @@
         <TextView
             android:id="@+id/attachMailboxDescription"
             style="@style/SettingHeader"
-            android:layout_marginVertical="@dimen/marginStandardMedium"
             android:text="@string/attachAddressDescription"
             app:layout_constraintBottom_toTopOf="@id/mailInputLayout"
             app:layout_constraintEnd_toEndOf="parent"
@@ -42,6 +41,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/marginStandardMedium"
+            android:layout_marginTop="@dimen/marginStandard"
             android:hint="@string/attachAddressInputHint"
             app:errorEnabled="true"
             app:errorIconDrawable="@null"
