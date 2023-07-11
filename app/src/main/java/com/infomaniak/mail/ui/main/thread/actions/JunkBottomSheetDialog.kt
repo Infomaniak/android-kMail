@@ -65,7 +65,6 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
             createDescriptionDialog(
                 title = getString(R.string.reportPhishingTitle),
                 description = getString(R.string.reportPhishingDescription),
-                confirmButtonText = R.string.buttonReport,
                 onPositiveButtonClicked = { mainViewModel.reportPhishing(threadUid, message) },
             ).show()
         }
