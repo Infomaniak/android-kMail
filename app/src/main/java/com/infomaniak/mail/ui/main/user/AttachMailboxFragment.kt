@@ -24,7 +24,6 @@ import android.view.ViewGroup
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.hideProgress
@@ -43,7 +42,6 @@ class AttachMailboxFragment : Fragment() {
 
     private lateinit var binding: FragmentAttachMailboxBinding
     private val accountViewModel: AccountViewModel by viewModels()
-    private val navigationArgs: AttachMailboxFragmentArgs by navArgs()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentAttachMailboxBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -76,7 +74,6 @@ class AttachMailboxFragment : Fragment() {
         accountViewModel.attachNewMailbox(
             mailInput.text?.trim().toString(),
             passwordInput.text?.trim().toString(),
-            navigationArgs.isFromNoValidMailboxesActivity,
         ).observe(viewLifecycleOwner) { apiResponse ->
 
             when {
