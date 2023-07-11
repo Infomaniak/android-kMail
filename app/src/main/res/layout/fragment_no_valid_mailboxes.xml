@@ -27,11 +27,9 @@
         app:layout_constraintBottom_toTopOf="@id/attachNewMailboxButton"
         app:layout_constraintTop_toTopOf="parent">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:orientation="vertical">
+            android:layout_height="match_parent">
 
             <ImageView
                 android:id="@+id/logo"
@@ -39,106 +37,88 @@
                 android:layout_height="60dp"
                 android:layout_marginTop="@dimen/marginStandard"
                 android:importantForAccessibility="no"
-                android:src="@drawable/ic_logo_infomaniak_mail" />
+                android:src="@drawable/ic_logo_infomaniak_mail"
+                app:layout_constraintBottom_toTopOf="@id/noValidMailboxesEmptyState"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-            <ImageView
-                android:id="@+id/invalidMailboxIcon"
-                android:layout_width="wrap_content"
+            <com.infomaniak.mail.ui.main.EmptyStateView
+                android:id="@+id/noValidMailboxesEmptyState"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/marginLarge"
-                android:importantForAccessibility="no"
-                android:src="@drawable/ic_invalid_mailbox" />
+                app:icon="@drawable/ic_invalid_mailbox"
+                app:layout_constraintTop_toBottomOf="@id/logo"
+                tools:description="L’accès à vos adresses mail est actuellement bloqué. Nous vous invitons à contacter votre administrateur."
+                tools:title="Adresses bloquées" />
 
             <TextView
-                android:id="@+id/invalidMailboxTitle"
-                style="@style/H2"
+                android:id="@+id/invalidPasswordTitle"
+                style="@style/BodyMedium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                android:layout_marginTop="@dimen/marginLarge"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/noValidMailboxesEmptyState"
+                tools:text="Mots de passe bloqués" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/invalidPasswordMailboxesRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/marginStandardMedium"
+                android:overScrollMode="never"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constraintBottom_toTopOf="@id/lockedMailboxTitle"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/invalidPasswordTitle"
+                tools:itemCount="5"
+                tools:listitem="@layout/item_switch_mailbox" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/invalidPasswordMailboxesGroup"
                 android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:constraint_referenced_ids="invalidPasswordTitle,invalidPasswordMailboxesRecyclerView"
+                tools:visibility="visible" />
+
+            <TextView
+                android:id="@+id/lockedMailboxTitle"
+                style="@style/BodyMedium"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/marginStandardMedium"
                 android:layout_marginTop="@dimen/marginStandard"
-                android:gravity="center"
-                tools:text="@string/errorMailboxLocked" />
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/invalidPasswordMailboxesRecyclerView"
+                tools:text="Adresses bloquées" />
 
-            <TextView
-                android:id="@+id/invalidMailboxDescription"
-                style="@style/Body.Secondary"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/lockedMailboxesRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/marginStandardMedium"
-                android:layout_marginVertical="@dimen/marginStandard"
-                android:gravity="center"
-                tools:text="@string/errorMailboxLocked" />
+                android:layout_marginTop="@dimen/marginStandardMedium"
+                android:overScrollMode="never"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/lockedMailboxTitle"
+                tools:itemCount="5"
+                tools:listitem="@layout/item_switch_mailbox" />
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <TextView
-                    android:id="@+id/invalidPasswordTitle"
-                    style="@style/BodyMedium"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/marginStandardMedium"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:text="@string/errorMailboxLocked" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/invalidPasswordMailboxesRecyclerView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/marginStandardMedium"
-                    android:overScrollMode="never"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    app:layout_constraintBottom_toTopOf="@id/lockedMailboxTitle"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/invalidPasswordTitle"
-                    tools:itemCount="5"
-                    tools:listitem="@layout/item_switch_mailbox" />
-
-                <androidx.constraintlayout.widget.Group
-                    android:id="@+id/invalidPasswordMailboxesGroup"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:visibility="gone"
-                    app:constraint_referenced_ids="invalidPasswordTitle,invalidPasswordMailboxesRecyclerView"
-                    tools:visibility="visible" />
-
-                <TextView
-                    android:id="@+id/lockedMailboxTitle"
-                    style="@style/BodyMedium"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/marginStandardMedium"
-                    android:layout_marginTop="@dimen/marginStandard"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/invalidPasswordMailboxesRecyclerView"
-                    tools:text="@string/errorMailboxLocked" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/lockedMailboxesRecyclerView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/marginStandardMedium"
-                    android:overScrollMode="never"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/lockedMailboxTitle"
-                    tools:itemCount="5"
-                    tools:listitem="@layout/item_switch_mailbox" />
-
-                <androidx.constraintlayout.widget.Group
-                    android:id="@+id/lockedMailboxesGroup"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:visibility="gone"
-                    app:constraint_referenced_ids="lockedMailboxTitle,lockedMailboxesRecyclerView"
-                    tools:visibility="visible" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </LinearLayout>
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/lockedMailboxesGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:constraint_referenced_ids="lockedMailboxTitle,lockedMailboxesRecyclerView"
+                tools:visibility="visible" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 
     <com.google.android.material.button.MaterialButton
@@ -148,7 +128,6 @@
         android:layout_marginHorizontal="@dimen/marginStandard"
         android:layout_marginTop="@dimen/marginStandardSmall"
         android:text="@string/buttonAddEmailAddress"
-        app:icon="@drawable/ic_add"
         app:iconGravity="textStart"
         app:iconPadding="@dimen/marginStandardSmall"
         app:layout_constraintBottom_toTopOf="@id/changeAccountButton"
