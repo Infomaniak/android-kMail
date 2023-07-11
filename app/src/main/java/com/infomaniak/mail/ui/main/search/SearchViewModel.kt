@@ -38,6 +38,7 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SearchUtils
 import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.realm.kotlin.notifications.ResultsChange
 import io.sentry.Sentry
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -68,8 +69,11 @@ class SearchViewModel @Inject constructor(
     val selectedFolder: Folder? get() = _selectedFolder.value
 
     /** `_onPaginationTrigger` & `shouldPaginate` are closely related. Modifying one will impact the other. Beware. */
-    private val _onPaginationTrigger = MutableLiveData(Unit)
+    private val _onPaginationTrigger = MutableStateFlow(0L)
     private var shouldPaginate: Boolean = false
+
+    /** Refreshes the search each time the timestamp changes, so that it doesn't refresh when the timestamp hasn't changed. */
+    private val _onRefreshTrigger = MutableStateFlow(0L)
 
     val visibilityMode = MutableLiveData(VisibilityMode.RECENT_SEARCHES)
     val history = SingleLiveEvent<String>()
@@ -81,7 +85,7 @@ class SearchViewModel @Inject constructor(
     private var isFirstPage: Boolean = true
     private val isLastPage get() = resourceNext.isNullOrBlank()
 
-    val searchResults: LiveData<List<Thread>> = observeSearchAndFilters()
+    val searchResults: LiveData<ResultsChange<Thread>> = observeSearchAndFilters()
         .flatMapLatest { (queryData, filters, folder, shouldGetNextPage) ->
             val (query, saveInHistory) = queryData
             if (!shouldGetNextPage) resetPaginationData()
@@ -100,10 +104,11 @@ class SearchViewModel @Inject constructor(
             _searchQuery.asFlow(),
             _selectedFilters,
             _selectedFolder,
-            _onPaginationTrigger.asFlow(),
-        ) { queryData, filters, folder, _ ->
-            NewSearchInfo(queryData, filters, folder, shouldPaginate)
-        }.debounce(SEARCH_DEBOUNCE_DURATION)
+            _onPaginationTrigger,
+            _onRefreshTrigger,
+        ) { queryData, filters, folder, paginationTime, refreshTime ->
+            NewSearchInfo(queryData, filters, folder, shouldPaginate, paginationTime, refreshTime)
+        }.distinctUntilChanged().debounce(SEARCH_DEBOUNCE_DURATION)
     }
 
     fun init(dummyFolderId: String) {
@@ -111,7 +116,8 @@ class SearchViewModel @Inject constructor(
     }
 
     fun refreshSearch() {
-        searchQuery(searchQuery)
+        resetPaginationIntent()
+        _onRefreshTrigger.value = System.currentTimeMillis()
     }
 
     fun searchQuery(query: String, saveInHistory: Boolean = false) {
@@ -144,7 +150,7 @@ class SearchViewModel @Inject constructor(
     fun nextPage() {
         if (isLastPage) return
         shouldPaginate = true
-        _onPaginationTrigger.value = Unit
+        _onPaginationTrigger.value = System.currentTimeMillis()
     }
 
     private fun ThreadFilter.select() {
@@ -180,7 +186,7 @@ class SearchViewModel @Inject constructor(
         shouldGetNextPage: Boolean,
         filters: Set<ThreadFilter>,
         folder: Folder?,
-    ): Flow<List<Thread>> = flow {
+    ): Flow<ResultsChange<Thread>> = flow {
         getReadyForNewSearch(folder, filters, query)?.let { newFilters ->
             fetchThreads(folder, newFilters, query, shouldGetNextPage)
             emitThreads(saveInHistory, newFilters, query)
@@ -239,7 +245,7 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    private suspend fun FlowCollector<List<Thread>>.emitThreads(
+    private suspend fun FlowCollector<ResultsChange<Thread>>.emitThreads(
         saveInHistory: Boolean,
         newFilters: Set<ThreadFilter>,
         query: String?,
@@ -247,10 +253,10 @@ class SearchViewModel @Inject constructor(
         emitAll(threadController.getSearchThreadsAsync().mapLatest {
             if (saveInHistory) query?.let(history::postValue)
 
-            it.list.also { threads ->
+            it.also {
                 val resultsVisibilityMode = when {
                     newFilters.isEmpty() && isLengthTooShort(searchQuery) -> VisibilityMode.RECENT_SEARCHES
-                    threads.isEmpty() -> VisibilityMode.NO_RESULTS
+                    it.list.isEmpty() -> VisibilityMode.NO_RESULTS
                     else -> VisibilityMode.RESULTS
                 }
                 visibilityMode.postValue(resultsVisibilityMode)
@@ -263,6 +269,8 @@ class SearchViewModel @Inject constructor(
         val filters: Set<ThreadFilter>,
         val folder: Folder?,
         val shouldGetNextPage: Boolean,
+        private val paginationTime: Long, // Used only to paginate when necessary due to `distinctUntilChanged`.
+        private val refreshTime: Long, // Used only to refresh when necessary due to `distinctUntilChanged`.
     )
 
     private companion object {
