@@ -31,6 +31,7 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
+import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.notifications.ResultsChange
@@ -66,26 +67,40 @@ class ThreadController @Inject constructor(
     }
 
     /**
-     * Init the search Threads that we have recovered from the API.
-     * - Format remote Threads to make them work with the existing logic
-     * - Keep old Messages data if it's already existing in local
-     * - Handle Duplicates with the existing logic
-     * @param remoteThreads The list of API Threads that need to be treated
-     * @return a list of search Threads
+     * Initialize and retrieve the search threads obtained from the API.
+     * - Format the remote threads to make them compatible with the existing logic.
+     * - Preserve old message data if it already exists locally.
+     * - Handle duplicates using the existing logic.
+     * @param remoteThreads The list of API threads that need to be processed.
+     * @param folderRole The role of the selected folder. This is only useful when selecting the spam or trash folder.
+     * @return A list of search threads. The search only returns messages from spam or trash if we explicitly selected those folders
      */
-    suspend fun initAndGetSearchFolderThreads(remoteThreads: List<Thread>): List<Thread> = withContext(ioDispatcher) {
+    suspend fun initAndGetSearchFolderThreads(
+        remoteThreads: List<Thread>,
+        folderRole: Folder.FolderRole?,
+    ): List<Thread> = withContext(ioDispatcher) {
 
         fun MutableRealm.keepOldMessagesAndAddToSearchFolder(remoteThread: Thread, searchFolder: Folder) {
 
             remoteThread.messages.forEach { remoteMessage: Message ->
                 ensureActive()
 
-                remoteMessage.initMessageIds()
                 val localMessage = MessageController.getMessage(remoteMessage.uid, realm = this)
-                val message = if (localMessage == null) remoteMessage.apply { isFromSearch = true } else remoteMessage
 
-                remoteThread.messagesIds += message.messageIds
-                searchFolder.messages.add(message)
+                // The search only returns messages from spam or trash if we explicitly selected those folders
+                // which is the reason why we can compute `isSpam` and `isTrashed` values so loosely.
+                remoteMessage.initLocalValues(
+                    date = localMessage?.date ?: remoteMessage.date,
+                    isFullyDownloaded = localMessage?.isFullyDownloaded ?: false,
+                    isSpam = folderRole == Folder.FolderRole.SPAM,
+                    isTrashed = folderRole == Folder.FolderRole.TRASH,
+                    draftLocalUuid = localMessage?.draftLocalUuid,
+                    isFromSearch = localMessage == null
+                )
+                remoteMessage.body = localMessage?.body?.copyFromRealm()
+
+                remoteThread.messagesIds += remoteMessage.messageIds
+                searchFolder.messages.add(remoteMessage)
             }
         }
 

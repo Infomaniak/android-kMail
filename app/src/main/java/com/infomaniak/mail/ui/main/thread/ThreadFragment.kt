@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
-import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.drawable.InsetDrawable
@@ -228,7 +227,7 @@ class ThreadFragment : Fragment() {
     private fun shouldLoadDistantResources(): Boolean = alwaysShowExternalContent && isNotInSpam
 
     private fun observeOpenAttachment() {
-        getBackNavigationResult<Intent>(DownloadAttachmentProgressDialog.OPEN_WITH, ::startActivity)
+        getBackNavigationResult(DownloadAttachmentProgressDialog.OPEN_WITH, ::startActivity)
     }
 
     private fun setupAdapter(threadUid: String) = with(binding) {
