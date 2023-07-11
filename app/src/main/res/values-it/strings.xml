@@ -67,6 +67,11 @@
         <item quantity="other">%d allegati</item>
     </plurals>
     <string name="bccTitle">Bcc:</string>
+    <string name="blockedMailboxTitle">L’indirizzo e-mail %s è bloccato</string>
+    <plurals name="blockedPasswordTitle">
+        <item quantity="one">Password bloccata</item>
+        <item quantity="other">Password bloccate</item>
+    </plurals>
     <string name="buttonAccept">Accetta</string>
     <string name="buttonAccountAssociatedEmailAddresses">Indirizzi e-mail associati a questo account</string>
     <string name="buttonAccountDelete">Cancellare l’account</string>
@@ -211,8 +216,14 @@
     <string name="googlePlayServicesAreRequired">I servizi Google Play sono necessari</string>
     <string name="inboxFolder">Posta in arrivo</string>
     <string name="loadingText">Caricamento…</string>
-    <string name="lockedMailboxDescription">L’accesso al vostro indirizzo e-mail è attualmente bloccato. Si prega di contattare l’amministratore.</string>
-    <string name="lockedMailboxTitle">L’indirizzo e-mail %s è bloccato</string>
+    <plurals name="lockedMailboxDescription">
+        <item quantity="one">L’accesso al vostro indirizzo e-mail è attualmente bloccato. Si prega di contattare l’amministratore.</item>
+        <item quantity="other">L’accesso alle caselle di posta elettronica è attualmente bloccato. Contattare l’amministratore.</item>
+    </plurals>
+    <plurals name="lockedMailboxTitle">
+        <item quantity="one">Indirizzo e-mail bloccato</item>
+        <item quantity="other">Indirizzi e-mail bloccati</item>
+    </plurals>
     <string name="menuDrawerAdvancedActions">Azioni avanzate</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s usato</string>
     <string name="messageDetailsDateAt">%1$s alle %2$s</string>

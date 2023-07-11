@@ -1,5 +1,5 @@
 /*
- * Infomaniak kMail - Android
+ * Infomaniak ikMail - Android
  * Copyright (C) 2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
@@ -40,17 +40,19 @@ class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
     private lateinit var binding: FragmentNoValidMailboxesBinding
     private val noValidMailboxesViewModel: NoValidMailboxesViewModel by activityViewModels()
 
+    private val isInMenuDrawer = false
+
     override val currentClassName: String = NoValidMailboxesFragment::class.java.name
     override val hasValidMailboxes = false
 
     override val mailboxesAdapter = MailboxesAdapter(
-        isInMenuDrawer = false,
+        isInMenuDrawer = isInMenuDrawer,
         hasValidMailboxes = hasValidMailboxes,
         lifecycleScope = lifecycleScope,
     )
 
     private val invalidPasswordMailboxesAdapter = MailboxesAdapter(
-        isInMenuDrawer = false,
+        isInMenuDrawer = isInMenuDrawer,
         hasValidMailboxes = hasValidMailboxes,
         lifecycleScope = lifecycleScope,
         onInvalidPasswordMailboxClicked = { mailbox -> onInvalidPasswordMailboxClicked(mailbox) },
@@ -78,17 +80,6 @@ class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
                 )
             )
         }
-
-    }
-
-    private fun setQuantityTextTitle(mailboxCount: Long) = with(binding) {
-        val count = mailboxCount.toInt()
-        val lockedMailboxTitleString = resources.getQuantityString(R.plurals.lockedMailboxTitle, count)
-
-        invalidMailboxTitle.text = lockedMailboxTitleString
-        lockedMailboxTitle.text = lockedMailboxTitleString
-        invalidPasswordTitle.text = resources.getQuantityString(R.plurals.blockedPasswordTitle, count)
-        invalidMailboxDescription.text = resources.getQuantityText(R.plurals.lockedMailboxDescription, count)
     }
 
     private fun observeMailboxesLive() = with(binding) {
@@ -108,4 +99,15 @@ class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
     private fun observeMailboxesCount() {
         noValidMailboxesViewModel.mailboxesCount.observe(viewLifecycleOwner, ::setQuantityTextTitle)
     }
+
+    private fun setQuantityTextTitle(mailboxCount: Long) = with(binding) {
+        val count = mailboxCount.toInt()
+        val lockedMailboxTitleString = resources.getQuantityString(R.plurals.lockedMailboxTitle, count)
+
+        invalidMailboxTitle.text = lockedMailboxTitleString
+        lockedMailboxTitle.text = lockedMailboxTitleString
+        invalidPasswordTitle.text = resources.getQuantityString(R.plurals.blockedPasswordTitle, count)
+        invalidMailboxDescription.text = resources.getQuantityText(R.plurals.lockedMailboxDescription, count)
+    }
+
 }
