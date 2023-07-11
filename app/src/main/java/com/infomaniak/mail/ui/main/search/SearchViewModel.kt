@@ -69,8 +69,9 @@ class SearchViewModel @Inject constructor(
     val selectedFolder: Folder? get() = _selectedFolder.value
 
     /** `_onPaginationTrigger` & `shouldPaginate` are closely related. Modifying one will impact the other. Beware. */
-    private val _onPaginationTrigger = MutableLiveData(Unit)
+    private val _onPaginationTrigger = MutableStateFlow(0L)
     private var shouldPaginate: Boolean = false
+    private val _onRefreshTrigger = MutableStateFlow(0L)
 
     val visibilityMode = MutableLiveData(VisibilityMode.RECENT_SEARCHES)
     val history = SingleLiveEvent<String>()
@@ -101,9 +102,10 @@ class SearchViewModel @Inject constructor(
             _searchQuery.asFlow(),
             _selectedFilters,
             _selectedFolder,
-            _onPaginationTrigger.asFlow(),
-        ) { queryData, filters, folder, _ ->
-            NewSearchInfo(queryData, filters, folder, shouldPaginate)
+            _onPaginationTrigger,
+            _onRefreshTrigger,
+        ) { queryData, filters, folder, paginationTime, refreshTime ->
+            NewSearchInfo(queryData, filters, folder, shouldPaginate, paginationTime, refreshTime)
         }.distinctUntilChanged().debounce(SEARCH_DEBOUNCE_DURATION)
     }
 
@@ -112,7 +114,8 @@ class SearchViewModel @Inject constructor(
     }
 
     fun refreshSearch() {
-        searchQuery(searchQuery)
+        resetPaginationIntent()
+        _onRefreshTrigger.value = System.currentTimeMillis()
     }
 
     fun searchQuery(query: String, saveInHistory: Boolean = false) {
@@ -145,7 +148,7 @@ class SearchViewModel @Inject constructor(
     fun nextPage() {
         if (isLastPage) return
         shouldPaginate = true
-        _onPaginationTrigger.value = Unit
+        _onPaginationTrigger.value = System.currentTimeMillis()
     }
 
     private fun ThreadFilter.select() {
@@ -264,6 +267,8 @@ class SearchViewModel @Inject constructor(
         val filters: Set<ThreadFilter>,
         val folder: Folder?,
         val shouldGetNextPage: Boolean,
+        private val paginationTime: Long,
+        private val refreshTime: Long,
     )
 
     private companion object {

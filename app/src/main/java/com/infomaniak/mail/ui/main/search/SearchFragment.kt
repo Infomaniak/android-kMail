@@ -208,7 +208,10 @@ class SearchFragment : Fragment() {
             showKeyboard()
 
             doOnTextChanged { text, _, _, _ ->
-                searchViewModel.searchQuery(text.toString())
+                val newQuery = text.toString()
+                if (searchViewModel.searchQuery != newQuery) {
+                    searchViewModel.searchQuery(newQuery)
+                }
             }
 
             setOnEditorActionListener { _, actionId, _ ->
