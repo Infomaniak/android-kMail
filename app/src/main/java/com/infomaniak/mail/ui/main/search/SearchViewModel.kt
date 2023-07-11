@@ -104,7 +104,7 @@ class SearchViewModel @Inject constructor(
             _onPaginationTrigger.asFlow(),
         ) { queryData, filters, folder, _ ->
             NewSearchInfo(queryData, filters, folder, shouldPaginate)
-        }.debounce(SEARCH_DEBOUNCE_DURATION)
+        }.distinctUntilChanged().debounce(SEARCH_DEBOUNCE_DURATION)
     }
 
     fun init(dummyFolderId: String) {
