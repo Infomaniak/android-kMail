@@ -72,8 +72,8 @@ class ThreadController @Inject constructor(
      * - Preserve old message data if it already exists locally.
      * - Handle duplicates using the existing logic.
      * @param remoteThreads The list of API threads that need to be processed.
-     * @param folderRole The role of the selected folder.
-     * @return A list of search threads.
+     * @param folderRole The role of the selected folder. This is only useful when selecting the spam or trash folder.
+     * @return A list of search threads. The search only returns messages from spam or trash if we explicitly selected those folders
      */
     suspend fun initAndGetSearchFolderThreads(
         remoteThreads: List<Thread>,
@@ -87,6 +87,8 @@ class ThreadController @Inject constructor(
 
                 val localMessage = MessageController.getMessage(remoteMessage.uid, realm = this)
 
+                // The search only returns messages from spam or trash if we explicitly selected those folders
+                // which is the reason why we can compute `isSpam` and `isTrashed` values so loosely.
                 remoteMessage.initLocalValues(
                     date = localMessage?.date ?: remoteMessage.date,
                     isFullyDownloaded = localMessage?.isFullyDownloaded ?: false,
