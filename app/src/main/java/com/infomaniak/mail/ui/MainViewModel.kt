@@ -19,14 +19,12 @@ package com.infomaniak.mail.ui
 
 import android.app.Application
 import android.content.Context
+import android.content.Intent
 import android.util.Log
-import android.widget.Toast
-import androidx.annotation.StringRes
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.lib.core.utils.SingleLiveEvent
-import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
@@ -51,12 +49,12 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.SnackBarManager
 import com.infomaniak.mail.ui.main.SnackBarManager.*
 import com.infomaniak.mail.ui.main.folder.ThreadListViewModel
+import com.infomaniak.mail.ui.noValidMailboxes.NoValidMailboxesActivity
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.NotificationUtils.cancelNotification
-import com.infomaniak.mail.utils.Utils.MailboxErrorCode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.coroutines.*
@@ -197,14 +195,12 @@ class MainViewModel @Inject constructor(
             mailboxId = AccountUtils.currentMailboxId,
         ) ?: return null
 
-        selectMailbox(mailbox)?.let { errorCode ->
-            when (errorCode) {
-                MailboxErrorCode.INVALID_PASSWORD_MAILBOX,
-                MailboxErrorCode.LOCKED_MAILBOX -> switchToValidMailbox()
-                else -> Unit
-            }
+        if (mailbox.isLocked || !mailbox.isPasswordValid) {
+            switchToValidMailbox()
             return null
         }
+
+        selectMailbox(mailbox)
 
         if (currentFolderId == null) {
             folderController.getFolder(DEFAULT_SELECTED_FOLDER)?.let { folder ->
@@ -218,9 +214,7 @@ class MainViewModel @Inject constructor(
     private fun switchToValidMailbox() = viewModelScope.launch(ioCoroutineContext) {
         MailboxController.getFirstValidMailbox(AccountUtils.currentUserId)?.let {
             AccountUtils.switchToMailbox(it.mailboxId)
-        } ?: run {
-            AccountUtils.removeUser(context, AccountUtils.currentUser!!)
-        }
+        } ?: context.startActivity(Intent(context, NoValidMailboxesActivity::class.java))
     }
 
     fun dismissCurrentMailboxNotifications() = viewModelScope.launch(ioCoroutineContext) {
@@ -237,9 +231,12 @@ class MainViewModel @Inject constructor(
             Log.d(TAG, "Refresh mailboxes from remote")
             with(ApiRepository.getMailboxes()) {
                 if (isSuccess()) {
-                    if (data?.isEmpty() == true) {
-                        shouldStartNoMailboxActivity.postValue(Unit)
-                        return@launch
+                    when {
+                        data!!.isEmpty() -> {
+                            shouldStartNoMailboxActivity.postValue(Unit)
+                            return@launch
+                        }
+                        data!!.none { it.isValid } -> Dispatchers.Main { context.launchNoValidMailboxesActivity() }
                     }
                     val isCurrentMailboxDeleted = MailboxController.updateMailboxes(context, data!!)
                     if (isCurrentMailboxDeleted) return@launch
@@ -265,22 +262,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun selectMailbox(mailbox: Mailbox): MailboxErrorCode? {
-
-        fun displayToast(@StringRes title: Int) = viewModelScope.launch(Dispatchers.Main) {
-            context.showToast(title, Toast.LENGTH_LONG)
-        }
-
-        if (!mailbox.isPasswordValid) {
-            // TODO: Instead of this Toast & Exception, display a popup asking for correct password (we are currently waiting for the UX).
-            displayToast(R.string.frelatedMailbox)
-            return MailboxErrorCode.INVALID_PASSWORD_MAILBOX
-        }
-        if (mailbox.isLocked) {
-            displayToast(R.string.lockedMailboxTitle)
-            return MailboxErrorCode.LOCKED_MAILBOX
-        }
-
+    private fun selectMailbox(mailbox: Mailbox) {
         if (mailbox.objectId != _currentMailboxObjectId.value) {
             Log.d(TAG, "Select mailbox: ${mailbox.email}")
             if (mailbox.mailboxId != AccountUtils.currentMailboxId) AccountUtils.currentMailboxId = mailbox.mailboxId
@@ -288,8 +270,6 @@ class MainViewModel @Inject constructor(
             _currentMailboxObjectId.value = mailbox.objectId
             _currentFolderId.value = null
         }
-
-        return null
     }
 
     private fun selectFolder(folderId: String) {

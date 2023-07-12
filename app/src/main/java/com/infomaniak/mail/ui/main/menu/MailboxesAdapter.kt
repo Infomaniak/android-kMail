@@ -26,18 +26,19 @@ import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.databinding.ItemSwitchMailboxBinding
-import com.infomaniak.mail.ui.main.menu.SwitchMailboxesAdapter.SwitchMailboxesViewHolder
+import com.infomaniak.mail.ui.main.menu.MailboxesAdapter.SwitchMailboxesViewHolder
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.views.MenuDrawerItemView.SelectionStyle
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class SwitchMailboxesAdapter(
+class MailboxesAdapter(
     private val isInMenuDrawer: Boolean,
+    private val hasValidMailboxes: Boolean,
     private val lifecycleScope: LifecycleCoroutineScope,
-    private val onLockedMailboxClicked: (String) -> Unit,
-    private val onInvalidPasswordMailboxClicked: (Mailbox) -> Unit,
+    private val onInvalidPasswordMailboxClicked: ((Mailbox) -> Unit)? = null,
+    private val onLockedMailboxClicked: ((String) -> Unit)? = null,
     private var mailboxes: List<Mailbox> = emptyList(),
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO, // TODO: Inject with hilt
 ) : RecyclerView.Adapter<SwitchMailboxesViewHolder>() {
@@ -57,10 +58,11 @@ class SwitchMailboxesAdapter(
         isPastilleDisplayed = mailbox.unreadCountDisplay.shouldDisplayPastille
         isPasswordOutdated = !mailbox.isPasswordValid
         isMailboxLocked = mailbox.isLocked
+        hasValidMailbox = hasValidMailboxes
 
         holder.binding.root.setSelectedState(isCurrentMailbox)
 
-        if (!isCurrentMailbox) {
+        if (!isCurrentMailbox || !hasValidMailboxes) {
             setOnClickListener {
                 if (isInMenuDrawer) {
                     context.trackMenuDrawerEvent(SWITCH_MAILBOX_NAME)
@@ -73,8 +75,8 @@ class SwitchMailboxesAdapter(
                 }
             }
 
-            setOnOutdatedPasswordClickListener { onInvalidPasswordMailboxClicked(mailbox) }
-            setOnLockedMailboxClickListener { onLockedMailboxClicked(mailbox.email) }
+            setOnOutdatedPasswordClickListener { onInvalidPasswordMailboxClicked?.invoke(mailbox) }
+            setOnLockedMailboxClickListener { onLockedMailboxClicked?.invoke(mailbox.email) }
         }
     }
 

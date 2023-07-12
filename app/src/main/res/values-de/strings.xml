@@ -67,6 +67,11 @@
         <item quantity="other">%d Anhänge</item>
     </plurals>
     <string name="bccTitle">Bcc:</string>
+    <string name="blockedMailboxTitle">Mailbox %s ist blockiert</string>
+    <plurals name="blockedPasswordTitle">
+        <item quantity="one">Passwort blockiert</item>
+        <item quantity="other">Blockierte Passwörter</item>
+    </plurals>
     <string name="buttonAccept">Akzeptieren</string>
     <string name="buttonAccountAssociatedEmailAddresses">Mit diesem Konto verbundene E-Mail-Adressen</string>
     <string name="buttonAccountDelete">Konto löschen</string>
@@ -205,13 +210,18 @@
     <string name="errorUnableToFlushFolder">Der Ordner kann nicht geleert werden</string>
     <string name="failToOpenDraft">Öffnen des Entwurfs fehlgeschlagen</string>
     <string name="favoritesFolder">Favoriten</string>
-    <string name="frelatedMailbox">Ungültiges Passwort. Kann vorerst nur über das Webmail aktualisiert werden.</string>
     <string name="fromTitle">Von:</string>
     <string name="googlePlayServicesAreRequired">Google Play Services sind erforderlich</string>
     <string name="inboxFolder">Posteingang</string>
     <string name="loadingText">Laden…</string>
-    <string name="lockedMailboxDescription">Der Zugriff auf Ihre E-Mail-Adresse ist derzeit gesperrt. Bitte wenden Sie sich an Ihren Administrator.</string>
-    <string name="lockedMailboxTitle">Mailbox %s ist blockiert</string>
+    <plurals name="lockedMailboxDescription">
+        <item quantity="one">Der Zugriff auf Ihre E-Mail-Adresse ist derzeit gesperrt. Bitte wenden Sie sich an Ihren Administrator.</item>
+        <item quantity="other">Der Zugriff auf Ihre Mailboxen ist derzeit gesperrt. Bitte wenden Sie sich an Ihren Administrator.</item>
+    </plurals>
+    <plurals name="lockedMailboxTitle">
+        <item quantity="one">Blockierte E-Mail-Adresse</item>
+        <item quantity="other">Gesperrte Mailadressen</item>
+    </plurals>
     <string name="menuDrawerAdvancedActions">Erweiterte Aktionen</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s verwendet</string>
     <string name="messageDetailsDateAt">%1$s um %2$s</string>

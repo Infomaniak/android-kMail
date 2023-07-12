@@ -74,6 +74,11 @@
         <item quantity="other">%d attachments</item>
     </plurals>
     <string name="bccTitle">Bcc:</string>
+    <string name="blockedMailboxTitle">Mailbox %s is blocked</string>
+    <plurals name="blockedPasswordTitle">
+        <item quantity="one">Blocked password</item>
+        <item quantity="other">Blocked passwords</item>
+    </plurals>
     <string name="buttonAccept">Accept</string>
     <string name="buttonAccountAssociatedEmailAddresses">Email addresses associated with this account</string>
     <string name="buttonAccountDelete">Delete account</string>
@@ -212,13 +217,18 @@
     <string name="errorUnableToFlushFolder">Folder cannot be emptied</string>
     <string name="failToOpenDraft">Failed to open draft</string>
     <string name="favoritesFolder">Favorites</string>
-    <string name="frelatedMailbox">Invalid password. Can only be updated on the webmail for now.</string>
     <string name="fromTitle">From:</string>
     <string name="googlePlayServicesAreRequired">Google Play Services are required</string>
     <string name="inboxFolder">Inbox</string>
     <string name="loadingText">Loading…</string>
-    <string name="lockedMailboxDescription">Access to your mailbox is currently blocked. Please contact your administrator.</string>
-    <string name="lockedMailboxTitle">Mailbox %s is blocked</string>
+    <plurals name="lockedMailboxDescription">
+        <item quantity="one">Access to your mailbox is currently blocked. Please contact your administrator.</item>
+        <item quantity="other">Access to your mailboxes is currently blocked. Please contact your administrator.</item>
+    </plurals>
+    <plurals name="lockedMailboxTitle">
+        <item quantity="one">Blocked mailbox</item>
+        <item quantity="other">Blocked mailboxes</item>
+    </plurals>
     <string name="menuDrawerAdvancedActions">Advanced actions</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s used</string>
     <string name="messageDetailsDateAt">%1$s at %2$s</string>

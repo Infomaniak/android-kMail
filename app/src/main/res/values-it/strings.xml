@@ -54,6 +54,7 @@
     <string name="appSecurityDescription">Proteggete l’accesso alla vostra applicazione attivando il blocco del telefono.</string>
     <string name="archiveFolder">Archivio</string>
     <string name="attachAddressDescription">Se hai già un indirizzo e-mail Infomaniak, accedi ora</string>
+    <string name="attachAddressInputHelper">Sono supportati solo gli indirizzi e-mail Infomaniak</string>
     <string name="attachAddressInputHint">Indirizzo e-mail</string>
     <string name="attachAddressPasswordInputHint">Password</string>
     <string name="attachAddressTitle">Aggiungi indirizzo e-mail</string>
@@ -67,6 +68,11 @@
         <item quantity="other">%d allegati</item>
     </plurals>
     <string name="bccTitle">Bcc:</string>
+    <string name="blockedMailboxTitle">L’indirizzo e-mail %s è bloccato</string>
+    <plurals name="blockedPasswordTitle">
+        <item quantity="one">Password bloccata</item>
+        <item quantity="other">Password bloccate</item>
+    </plurals>
     <string name="buttonAccept">Accetta</string>
     <string name="buttonAccountAssociatedEmailAddresses">Indirizzi e-mail associati a questo account</string>
     <string name="buttonAccountDelete">Cancellare l’account</string>
@@ -205,13 +211,18 @@
     <string name="errorUnableToFlushFolder">Impossibile svuotare la cartella</string>
     <string name="failToOpenDraft">Impossibile aprire la bozza</string>
     <string name="favoritesFolder">Preferiti</string>
-    <string name="frelatedMailbox">Password non valida. Per ora può essere aggiornata solo sulla webmail.</string>
     <string name="fromTitle">Da:</string>
     <string name="googlePlayServicesAreRequired">I servizi Google Play sono necessari</string>
     <string name="inboxFolder">Posta in arrivo</string>
     <string name="loadingText">Caricamento…</string>
-    <string name="lockedMailboxDescription">L’accesso al vostro indirizzo e-mail è attualmente bloccato. Si prega di contattare l’amministratore.</string>
-    <string name="lockedMailboxTitle">L’indirizzo e-mail %s è bloccato</string>
+    <plurals name="lockedMailboxDescription">
+        <item quantity="one">L’accesso al tuo indirizzo e-mail è attualmente bloccato. Si prega di contattare l’amministratore.</item>
+        <item quantity="other">L’accesso alle caselle di posta elettronica è attualmente bloccato. Contattare l’amministratore.</item>
+    </plurals>
+    <plurals name="lockedMailboxTitle">
+        <item quantity="one">Indirizzo e-mail bloccato</item>
+        <item quantity="other">Indirizzi e-mail bloccati</item>
+    </plurals>
     <string name="menuDrawerAdvancedActions">Azioni avanzate</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s usato</string>
     <string name="messageDetailsDateAt">%1$s alle %2$s</string>
@@ -284,7 +295,7 @@
     <string name="settingsAccentColorDescription">Scegliere il colore d’accento per l’applicazione</string>
     <string name="settingsAppLock">Blocco dell’app</string>
     <string name="settingsCancellationPeriodDescription">Avete la possibilità di annullare l’invio della vostra email fino a 30 secondi.</string>
-    <string name="settingsCancellationPeriodTitle">Periodo di cancellazione dell\'invio</string>
+    <string name="settingsCancellationPeriodTitle">Periodo di cancellazione dell’invio</string>
     <string name="settingsDefault">Predefinito</string>
     <string name="settingsDelaySeconds">%d secondi</string>
     <string name="settingsDensityOptionCompact">Compatto</string>

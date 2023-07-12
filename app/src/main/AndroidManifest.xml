@@ -109,6 +109,12 @@
             android:exported="false" />
 
         <activity
+            android:name=".ui.noValidMailboxes.NoValidMailboxesActivity"
+            android:configChanges="orientation|screenSize"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
             android:name="com.infomaniak.lib.bugtracker.BugTrackerActivity"
             android:configChanges="orientation|screenSize"
             android:exported="false" />

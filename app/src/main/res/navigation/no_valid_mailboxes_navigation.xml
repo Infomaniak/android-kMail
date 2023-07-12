@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak ikMail - Android
+  ~ Copyright (C) 2023 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/no_valid_mailboxes_navigation"
+    app:startDestination="@id/noValidMailboxesFragment">
+
+    <fragment
+        android:id="@+id/noValidMailboxesFragment"
+        android:name="com.infomaniak.mail.ui.noValidMailboxes.NoValidMailboxesFragment"
+        android:label="NoValidMailboxesFragment"
+        tools:layout="@layout/fragment_no_valid_mailboxes">
+        <action
+            android:id="@+id/action_noValidMailboxesFragment_to_switchUserFragment"
+            app:destination="@id/switchUserFragment" />
+        <action
+            android:id="@+id/action_noValidMailboxesFragment_to_attachMailboxFragment"
+            app:destination="@id/attachMailboxFragment" />
+        <action
+            android:id="@+id/action_noValidMailboxesFragment_to_invalidPasswordFragment"
+            app:destination="@id/invalidPasswordFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/switchUserFragment"
+        android:name="com.infomaniak.mail.ui.main.user.SwitchUserFragment"
+        android:label="SwitchUserFragment"
+        tools:layout="@layout/fragment_switch_user" />
+
+    <fragment
+        android:id="@+id/attachMailboxFragment"
+        android:name="com.infomaniak.mail.ui.main.user.AttachMailboxFragment"
+        android:label="AttachMailboxFragment"
+        tools:layout="@layout/fragment_attach_mailbox" />
+
+    <fragment
+        android:id="@+id/invalidPasswordFragment"
+        android:name="com.infomaniak.mail.ui.main.InvalidPasswordFragment"
+        android:label="InvalidPasswordFragment"
+        tools:layout="@layout/fragment_invalid_password">
+        <argument
+            android:name="mailboxId"
+            app:argType="integer" />
+        <argument
+            android:name="mailboxObjectId"
+            app:argType="string" />
+        <argument
+            android:name="mailboxEmail"
+            app:argType="string" />
+    </fragment>
+
+</navigation>

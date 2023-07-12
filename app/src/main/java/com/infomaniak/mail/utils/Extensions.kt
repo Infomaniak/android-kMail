@@ -23,6 +23,7 @@ import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.text.Html
@@ -78,6 +79,7 @@ import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.ui.main.thread.MessageWebViewClient
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragmentArgs
+import com.infomaniak.mail.ui.noValidMailboxes.NoValidMailboxesActivity
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
@@ -533,4 +535,8 @@ fun Fragment.getStringWithBoldArg(@StringRes resId: Int, arg: String): Spanned {
     val coloredArg = textColor?.let { "<font color=\"$it\">$arg</font color>" } ?: arg
 
     return Html.fromHtml(getString(resId, "<b>$coloredArg</b>"), Html.FROM_HTML_MODE_LEGACY)
+}
+
+fun Context.launchNoValidMailboxesActivity() {
+    startActivity(Intent(this, NoValidMailboxesActivity::class.java).clearStack())
 }

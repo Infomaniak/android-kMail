@@ -52,6 +52,7 @@ object MatomoMail : MatomoCore {
     const val ACTION_SPAM_NAME = "spam"
     const val ACTION_PRINT_NAME = "print"
     const val ACTION_POSTPONE_NAME = "postpone"
+    const val ADD_MAILBOX_NAME = "addMailbox"
     const val SWITCH_MAILBOX_NAME = "switchMailbox"
     //endregion
 
@@ -162,6 +163,10 @@ object MatomoMail : MatomoCore {
 
     fun Fragment.trackRestoreMailsEvent(name: String, action: TrackerAction) {
         trackEvent("restoreEmailsBottomSheet", name, action)
+    }
+
+    fun Fragment.trackNoValidMailboxesEvent(name: String) {
+        trackEvent("noValidMailboxes", name)
     }
 
     fun Fragment.trackInvalidPasswordMailboxEvent(name: String) {

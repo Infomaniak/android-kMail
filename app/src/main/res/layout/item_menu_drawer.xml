@@ -86,6 +86,14 @@
                 android:visibility="gone"
                 app:tint="@color/orangeWarning" />
 
+            <ImageView
+                android:id="@+id/chevron"
+                android:layout_width="@dimen/chevronSize"
+                android:layout_height="@dimen/chevronSize"
+                android:layout_marginEnd="@dimen/marginStandardVerySmall"
+                android:contentDescription="@string/contentDescriptionIconFolderSelected"
+                android:src="@drawable/ic_chevron_right"
+                android:visibility="gone" />
         </FrameLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

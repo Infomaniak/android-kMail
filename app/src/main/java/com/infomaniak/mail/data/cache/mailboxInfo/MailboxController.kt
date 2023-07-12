@@ -33,6 +33,7 @@ import io.realm.kotlin.ext.query
 import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
+import io.realm.kotlin.query.RealmScalarQuery
 import io.realm.kotlin.query.RealmSingleQuery
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -43,6 +44,8 @@ object MailboxController {
 
     //region Queries
     private fun checkHasUserId(userId: Int) = "${Mailbox::userId.name} == '$userId'"
+    private val isMailboxLocked = "${Mailbox::isLocked.name} == true"
+    private val hasValidPassword = "${Mailbox::isPasswordValid.name} == true"
 
     private fun getMailboxesQuery(
         userId: Int? = null,
@@ -64,10 +67,11 @@ object MailboxController {
     }
 
     private fun getValidMailboxesQuery(userId: Int, realm: TypedRealm): RealmQuery<Mailbox> {
-        val isPasswordValid = "${Mailbox::isPasswordValid.name} == true"
-        val isNotLocked = "${Mailbox::isLocked.name} == false"
+        return realm.query("${checkHasUserId(userId)} AND $hasValidPassword AND (NOT $isMailboxLocked)")
+    }
 
-        return realm.query("${checkHasUserId(userId)} AND $isPasswordValid AND $isNotLocked")
+    private fun getMailboxesCountQuery(userId: Int): RealmScalarQuery<Long> {
+        return getMailboxesQuery(userId).count()
     }
 
     private fun getMailboxQuery(objectId: String, realm: TypedRealm): RealmSingleQuery<Mailbox> {
@@ -77,6 +81,14 @@ object MailboxController {
     private fun getMailboxQuery(userId: Int, mailboxId: Int, realm: TypedRealm): RealmSingleQuery<Mailbox> {
         val checkMailboxId = "${Mailbox::mailboxId.name} == '$mailboxId'"
         return realm.query<Mailbox>("${checkHasUserId(userId)} AND $checkMailboxId").first()
+    }
+
+    private fun getInvalidPasswordMailboxesQuery(userId: Int, realm: TypedRealm): RealmQuery<Mailbox> {
+        return realm.query("${checkHasUserId(userId)} AND NOT ($hasValidPassword OR $isMailboxLocked)")
+    }
+
+    private fun getLockedMailboxesQuery(userId: Int, realm: TypedRealm): RealmQuery<Mailbox> {
+        return realm.query("${checkHasUserId(userId)} AND $isMailboxLocked")
     }
     //endregion
 
@@ -89,8 +101,10 @@ object MailboxController {
         return getMailboxesQuery(userId, exceptionMailboxIds, realm).find()
     }
 
+    fun getMailboxesCount(userId: Int): Flow<Long> = getMailboxesCountQuery(userId).asFlow()
+
     fun getMailboxesAsync(userId: Int, exceptionMailboxIds: List<Int> = emptyList()): Flow<RealmResults<Mailbox>> {
-        return getMailboxesQuery(userId, exceptionMailboxIds).asFlow().map { it.list }
+        return getMailboxesQuery(userId, exceptionMailboxIds).toMailboxesFlow()
     }
 
     fun getMailbox(objectId: String, realm: TypedRealm = defaultRealm): Mailbox? {
@@ -112,6 +126,16 @@ object MailboxController {
     fun getMailboxAsync(objectId: String): Flow<SingleQueryChange<Mailbox>> {
         return getMailboxQuery(objectId, defaultRealm).asFlow()
     }
+
+    fun getInvalidPasswordMailboxes(userId: Int): Flow<RealmResults<Mailbox>> {
+        return getInvalidPasswordMailboxesQuery(userId, defaultRealm).toMailboxesFlow()
+    }
+
+    fun getLockedMailboxes(userId: Int): Flow<RealmResults<Mailbox>> {
+        return getLockedMailboxesQuery(userId, defaultRealm).toMailboxesFlow()
+    }
+
+    private fun RealmQuery<Mailbox>.toMailboxesFlow() = asFlow().map { it.list }
     //endregion
 
     //region Edit data
