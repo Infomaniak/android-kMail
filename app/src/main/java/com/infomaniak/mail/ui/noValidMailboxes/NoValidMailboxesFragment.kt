@@ -64,9 +64,19 @@ class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
 
+        setupAdapters()
+        setupListeners()
+
         observeMailboxesCount()
         observeMailboxesLive()
+    }
 
+    private fun setupAdapters() = with(binding) {
+        lockedMailboxesRecyclerView.adapter = mailboxesAdapter
+        invalidPasswordMailboxesRecyclerView.adapter = invalidPasswordMailboxesAdapter
+    }
+
+    private fun setupListeners() = with(binding) {
         changeAccountButton.setOnClickListener {
             trackNoValidMailboxesEvent("switchAccount")
             safeNavigate(NoValidMailboxesFragmentDirections.actionNoValidMailboxesFragmentToSwitchUserFragment())
@@ -81,19 +91,17 @@ class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
     private fun observeMailboxesLive() = with(binding) {
         noValidMailboxesViewModel.invalidPasswordMailboxesLive.observe(viewLifecycleOwner) { invalidPasswordMailboxes ->
             invalidPasswordMailboxesAdapter.setMailboxes(invalidPasswordMailboxes)
-            invalidPasswordMailboxesRecyclerView.adapter = invalidPasswordMailboxesAdapter
             invalidPasswordMailboxesGroup.isVisible = invalidPasswordMailboxes.isNotEmpty()
         }
 
         noValidMailboxesViewModel.lockedMailboxesLive.observe(viewLifecycleOwner) { lockedMailboxes ->
             mailboxesAdapter.setMailboxes(lockedMailboxes)
-            lockedMailboxesRecyclerView.adapter = mailboxesAdapter
             lockedMailboxesGroup.isVisible = lockedMailboxes.isNotEmpty()
         }
     }
 
     private fun observeMailboxesCount() {
-        noValidMailboxesViewModel.mailboxesCount.observe(viewLifecycleOwner, ::setQuantityTextTitle)
+        noValidMailboxesViewModel.mailboxesCountLive.observe(viewLifecycleOwner, ::setQuantityTextTitle)
     }
 
     private fun setQuantityTextTitle(mailboxCount: Long) = with(binding) {

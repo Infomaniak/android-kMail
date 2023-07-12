@@ -101,7 +101,7 @@ object MailboxController {
         return getMailboxesQuery(userId, exceptionMailboxIds, realm).find()
     }
 
-    fun getMailboxesCount(userId: Int): Long = getMailboxesCountQuery(userId).find()
+    fun getMailboxesCount(userId: Int): Flow<Long> = getMailboxesCountQuery(userId).asFlow()
 
     fun getMailboxesAsync(userId: Int, exceptionMailboxIds: List<Int> = emptyList()): Flow<RealmResults<Mailbox>> {
         return getMailboxesQuery(userId, exceptionMailboxIds).toMailboxesFlow()

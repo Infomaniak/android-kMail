@@ -19,7 +19,6 @@ package com.infomaniak.mail.ui.noValidMailboxes
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
-import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.di.IoDispatcher
@@ -36,9 +35,7 @@ class NoValidMailboxesViewModel @Inject constructor(
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
-    val mailboxesCount = liveData(ioCoroutineContext) {
-        emit(MailboxController.getMailboxesCount(AccountUtils.currentUserId))
-    }
+    val mailboxesCountLive = MailboxController.getMailboxesCount(AccountUtils.currentUserId).asLiveData(ioCoroutineContext)
 
     val lockedMailboxesLive = MailboxController.getLockedMailboxes(AccountUtils.currentUserId).asLiveData(ioCoroutineContext)
 
