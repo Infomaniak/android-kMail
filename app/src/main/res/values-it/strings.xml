@@ -54,6 +54,7 @@
     <string name="appSecurityDescription">Proteggete l’accesso alla vostra applicazione attivando il blocco del telefono.</string>
     <string name="archiveFolder">Archivio</string>
     <string name="attachAddressDescription">Se hai già un indirizzo e-mail Infomaniak, accedi ora</string>
+    <string name="attachAddressInputHelper">Sono supportati solo gli indirizzi e-mail Infomaniak</string>
     <string name="attachAddressInputHint">Indirizzo e-mail</string>
     <string name="attachAddressPasswordInputHint">Password</string>
     <string name="attachAddressTitle">Aggiungi indirizzo e-mail</string>
@@ -215,7 +216,7 @@
     <string name="inboxFolder">Posta in arrivo</string>
     <string name="loadingText">Caricamento…</string>
     <plurals name="lockedMailboxDescription">
-        <item quantity="one">L’accesso al vostro indirizzo e-mail è attualmente bloccato. Si prega di contattare l’amministratore.</item>
+        <item quantity="one">L’accesso al tuo indirizzo e-mail è attualmente bloccato. Si prega di contattare l’amministratore.</item>
         <item quantity="other">L’accesso alle caselle di posta elettronica è attualmente bloccato. Contattare l’amministratore.</item>
     </plurals>
     <plurals name="lockedMailboxTitle">
@@ -294,7 +295,7 @@
     <string name="settingsAccentColorDescription">Scegliere il colore d’accento per l’applicazione</string>
     <string name="settingsAppLock">Blocco dell’app</string>
     <string name="settingsCancellationPeriodDescription">Avete la possibilità di annullare l’invio della vostra email fino a 30 secondi.</string>
-    <string name="settingsCancellationPeriodTitle">Periodo di cancellazione dell\'invio</string>
+    <string name="settingsCancellationPeriodTitle">Periodo di cancellazione dell’invio</string>
     <string name="settingsDefault">Predefinito</string>
     <string name="settingsDelaySeconds">%d secondi</string>
     <string name="settingsDensityOptionCompact">Compatto</string>
