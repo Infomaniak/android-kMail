@@ -176,8 +176,8 @@ class MenuDrawerItemView @JvmOverloads constructor(
 
         binding.root.setOnClickListener {
             when {
-                isPasswordOutdated && !isMailboxLocked -> outdatedPasswordClickListener?.invoke()
                 isMailboxLocked -> lockedMailboxClickListener?.invoke()
+                isPasswordOutdated -> outdatedPasswordClickListener?.invoke()
                 else -> onClickListener?.onClick(it)
             }
         }
