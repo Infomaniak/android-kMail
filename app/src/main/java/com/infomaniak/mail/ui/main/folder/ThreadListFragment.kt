@@ -116,7 +116,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         super.onViewCreated(view, savedInstanceState)
 
         observeNoMailboxActivityTriggers()
-        observeNoValidMailboxesActivityTriggers()
         setupDensityDependentUi()
         setupOnRefresh()
         setupAdapter()
@@ -191,12 +190,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun observeNoMailboxActivityTriggers() {
         mainViewModel.shouldStartNoMailboxActivity.observe(viewLifecycleOwner) {
             startActivity(Intent(requireContext(), NoMailboxActivity::class.java).clearStack())
-        }
-    }
-
-    private fun observeNoValidMailboxesActivityTriggers() {
-        mainViewModel.shouldStartNoValidMailboxesActivity.observe(viewLifecycleOwner) {
-            requireContext().launchNoValidMailboxesActivity()
         }
     }
 
