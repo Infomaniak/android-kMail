@@ -20,10 +20,14 @@ package com.infomaniak.mail.ui.main.user
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.OnFocusChangeListener
 import android.view.ViewGroup
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.hideProgress
@@ -50,13 +54,21 @@ class AttachMailboxFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
-        mailInput.showKeyboard()
+        mailInput.apply {
+            showKeyboard()
+            manageErrorOnTextChange(mailInputLayout, attachMailboxButton)
+
+            onFocusChangeListener = OnFocusChangeListener { _, hasFocus ->
+                if (!hasFocus && text?.isNotBlank() == true && !isEmail()) {
+                    mailInputLayout.error = getString(R.string.errorInvalidEmailAddress)
+                }
+            }
+        }
+
+        passwordInput.manageErrorOnTextChange(passwordInputLayout, attachMailboxButton)
 
         attachMailboxButton.apply {
             isEnabled = false
-
-            mailInput.doAfterTextChanged { isEnabled = shouldEnableButton() }
-            passwordInput.doAfterTextChanged { isEnabled = shouldEnableButton() }
 
             setOnClickListener {
                 context.trackAccountEvent("addMailboxConfirm")
@@ -66,8 +78,17 @@ class AttachMailboxFragment : Fragment() {
         }
     }
 
+    private fun TextInputEditText.manageErrorOnTextChange(inputLayout: TextInputLayout, sendButton: MaterialButton) {
+        doAfterTextChanged {
+            if (text?.isNotBlank() == true) inputLayout.error = null
+            sendButton.isEnabled = shouldEnableButton()
+        }
+    }
+
+    private fun TextInputEditText.isEmail() = text?.trim().toString().isEmail()
+
     private fun shouldEnableButton() = with(binding) {
-        passwordInput.text?.isNotBlank() == true && mailInput.text?.trim().toString().isEmail()
+        passwordInput.text?.isNotBlank() == true && mailInput.isEmail()
     }
 
     private fun attachMailbox() = with(binding) {
@@ -82,8 +103,9 @@ class AttachMailboxFragment : Fragment() {
                     return@observe
                 }
                 apiResponse.error?.code == ErrorCode.INVALID_CREDENTIALS -> {
-                    mailInputLayout.error = getString(R.string.errorAttachAddressInput)
-                    passwordInputLayout.error = getString(apiResponse.translateError())
+                    val error = getString(apiResponse.translateError())
+                    mailInputLayout.error = error
+                    passwordInputLayout.error = error
                 }
                 else -> {
                     mailInputLayout.error = null
@@ -93,7 +115,7 @@ class AttachMailboxFragment : Fragment() {
             }
 
             passwordInput.text = null
-            attachMailboxButton.hideProgress(R.string.buttonAttachEmailAddress)
+            attachMailboxButton.hideProgress(R.string.buttonAttachMailbox)
         }
     }
 }

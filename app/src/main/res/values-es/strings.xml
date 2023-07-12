@@ -53,10 +53,11 @@
     <string name="alertBlockedImagesDisplayContent">Mostrar el contenido</string>
     <string name="appSecurityDescription">Protege el acceso a tu aplicación activando el bloqueo del teléfono.</string>
     <string name="archiveFolder">Archivado</string>
-    <string name="attachAddressDescription">Si ya dispone de una dirección de correo electrónico Infomaniak, conéctese ahora</string>
-    <string name="attachAddressInputHint">Dirección de correo electrónico</string>
-    <string name="attachAddressPasswordInputHint">Contraseña</string>
-    <string name="attachAddressTitle">Añadir dirección de correo electrónico</string>
+    <string name="attachMailboxDescription1">Si ya dispone de una dirección de correo electrónico Infomaniak, conéctese ahora</string>
+    <string name="attachMailboxDescription2">Sólo se admiten las direcciones de correo electrónico Infomaniak</string>
+    <string name="attachMailboxInputHint">Dirección de correo electrónico</string>
+    <string name="attachMailboxPasswordInputHint">Contraseña</string>
+    <string name="attachMailboxTitle">Añadir dirección de correo electrónico</string>
     <string name="attachmentActionCamera">Cámara</string>
     <string name="attachmentActionFile">Adjuntar un archivo</string>
     <string name="attachmentActionPhotoLibrary">Enviar una foto desde la fototeca</string>
@@ -79,7 +80,7 @@
     <string name="buttonAccountSwitch">Cambiar de cuenta</string>
     <string name="buttonAddAccount">Añadir una cuenta</string>
     <string name="buttonAddEmailAddress">Añadir una dirección de correo electrónico</string>
-    <string name="buttonAttachEmailAddress">Añadir dirección de correo electrónico</string>
+    <string name="buttonAttachMailbox">Añadir dirección de correo electrónico</string>
     <string name="buttonAttachment">Añadir un archivo adjunto</string>
     <string name="buttonAvailableSoon">Disponible en breve</string>
     <string name="buttonBold">Negrita</string>
@@ -186,7 +187,6 @@
     <string name="enterPasswordTitle">Introduzca la contraseña</string>
     <string name="errorAlreadyLinkedMailbox">Esta dirección de correo electrónico ya está vinculada a su cuenta</string>
     <string name="errorAtLeastOneRecipient">Se precisa al menos un destinatario</string>
-    <string name="errorAttachAddressInput">Sólo se admiten las direcciones de correo electrónico Infomaniak</string>
     <string name="errorAttachmentNotFound">No se ha encontrado el adjunto</string>
     <string name="errorCorruptAttachment">No se ha podido gestionar el borrador, un archivo adjunto está dañado</string>
     <string name="errorDraftNotFound">No se puede encontrar el borrador</string>
@@ -194,6 +194,7 @@
     <string name="errorFolderDoesNotExist">La carpeta no existe</string>
     <string name="errorInvalidAttachment">El adjunto no es válido</string>
     <string name="errorInvalidCredentials">Correo electrónico o contraseña no válidos</string>
+    <string name="errorInvalidEmailAddress">Dirección de correo electrónico no válida</string>
     <string name="errorInvalidMailboxPassword">Contraseña incorrecta para la dirección de correo electrónico</string>
     <string name="errorLoginDescription">La conexión ha fallado.</string>
     <string name="errorLoginTitle">Error de inicio de sesión</string>

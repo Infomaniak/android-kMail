@@ -28,13 +28,22 @@
         android:layout_height="match_parent">
 
         <TextView
-            android:id="@+id/attachMailboxDescription"
+            android:id="@+id/attachMailboxDescription1"
             style="@style/SettingHeader"
-            android:text="@string/attachAddressDescription"
-            app:layout_constraintBottom_toTopOf="@id/mailInputLayout"
+            android:text="@string/attachMailboxDescription1"
+            app:layout_constraintBottom_toTopOf="@id/attachMailboxDescription2"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/attachMailboxDescription2"
+            style="@style/SettingHeader"
+            android:paddingTop="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/attachMailboxDescription1"
+            android:text="@string/attachMailboxDescription2" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/mailInputLayout"
@@ -42,14 +51,13 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/marginStandardMedium"
             android:layout_marginTop="@dimen/marginStandard"
-            android:hint="@string/attachAddressInputHint"
+            android:hint="@string/attachMailboxInputHint"
             app:errorEnabled="true"
             app:errorIconDrawable="@null"
-            app:helperText="@string/errorAttachAddressInput"
             app:layout_constraintBottom_toTopOf="@id/passwordInputLayout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/attachMailboxDescription">
+            app:layout_constraintTop_toBottomOf="@id/attachMailboxDescription2">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/mailInput"
@@ -65,7 +73,7 @@
             android:layout_height="0dp"
             android:layout_marginHorizontal="@dimen/marginStandardMedium"
             android:layout_marginTop="@dimen/marginStandardSmall"
-            android:hint="@string/attachAddressPasswordInputHint"
+            android:hint="@string/attachMailboxPasswordInputHint"
             app:endIconContentDescription="@string/contentDescriptionButtonShowPassword"
             app:endIconDrawable="@drawable/ic_show_password"
             app:endIconMode="password_toggle"
@@ -89,7 +97,7 @@
             android:layout_width="0dp"
             android:layout_marginHorizontal="@dimen/marginStandard"
             android:layout_marginBottom="@dimen/marginStandardSmall"
-            android:text="@string/buttonAttachEmailAddress"
+            android:text="@string/buttonAttachMailbox"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
