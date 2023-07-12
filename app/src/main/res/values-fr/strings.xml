@@ -106,7 +106,6 @@
     <string name="buttonNewMessage">Nouveau message</string>
     <string name="buttonPasswordForgotten">Mot de passe oublié ?</string>
     <string name="buttonRefuse">Refuser</string>
-    <string name="buttonReport">Signaler</string>
     <string name="buttonRestoreEmails">Restaurer des e-mails</string>
     <string name="buttonSchedule">Programmer l’envoi de l’e-mail</string>
     <string name="buttonSeeAll">Voir tout</string>
