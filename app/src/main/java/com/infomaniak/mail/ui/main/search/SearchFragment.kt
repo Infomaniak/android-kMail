@@ -325,7 +325,7 @@ class SearchFragment : Fragment() {
     }
 
     private fun observeSearchResults() {
-        searchViewModel.searchResults.bindResultsChangeToAdapter(viewLifecycleOwner, threadListAdapter)
+        searchViewModel.searchResultsLiveData(lifecycle).bindResultsChangeToAdapter(viewLifecycleOwner, threadListAdapter)
     }
 
     private fun observeHistory() {

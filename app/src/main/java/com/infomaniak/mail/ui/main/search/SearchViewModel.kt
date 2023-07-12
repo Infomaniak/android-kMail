@@ -85,7 +85,7 @@ class SearchViewModel @Inject constructor(
     private var isFirstPage: Boolean = true
     private val isLastPage get() = resourceNext.isNullOrBlank()
 
-    val searchResults: LiveData<ResultsChange<Thread>> = observeSearchAndFilters()
+    val searchResults: Flow<ResultsChange<Thread>> = observeSearchAndFilters()
         .flatMapLatest { (queryData, filters, folder, shouldGetNextPage) ->
             val (query, saveInHistory) = queryData
             if (!shouldGetNextPage) resetPaginationData()
@@ -97,7 +97,10 @@ class SearchViewModel @Inject constructor(
                 folder,
             )
         }
-        .asLiveData(ioCoroutineContext)
+
+    fun searchResultsLiveData(lifecycle: Lifecycle): LiveData<ResultsChange<Thread>> {
+        return searchResults.flowWithLifecycle(lifecycle).asLiveData(ioCoroutineContext)
+    }
 
     private fun observeSearchAndFilters(): Flow<NewSearchInfo> {
         return combine(
