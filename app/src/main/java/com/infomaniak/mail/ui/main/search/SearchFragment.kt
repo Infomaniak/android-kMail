@@ -102,6 +102,8 @@ class SearchFragment : Fragment() {
         )
     }
 
+    private lateinit var searchAdapter: SearchFolderAdapter
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentSearchBinding.inflate(inflater, container, false).also { binding = it }.root
     }
@@ -153,12 +155,11 @@ class SearchFragment : Fragment() {
                 addAll(customFolders)
             }.toList()
 
-            popupMenu.setAdapter(
-                SearchFolderAdapter(folders) { folder, title ->
-                    onFolderSelected(folder, title)
-                    popupMenu.dismiss()
-                }
-            )
+            searchAdapter = SearchFolderAdapter(folders) { folder, title ->
+                onFolderSelected(folder, title)
+                popupMenu.dismiss()
+            }
+            popupMenu.setAdapter(searchAdapter)
         }
 
         return popupMenu
@@ -177,6 +178,8 @@ class SearchFragment : Fragment() {
             setCompoundDrawablesRelativeWithIntrinsicBounds(drawable, 0, R.drawable.ic_chevron_down, 0)
             text = title
         }
+
+        searchAdapter.updateVisuallySelectedFolder(folder)
     }
 
     private fun setAttachmentsUi() = with(searchViewModel) {
