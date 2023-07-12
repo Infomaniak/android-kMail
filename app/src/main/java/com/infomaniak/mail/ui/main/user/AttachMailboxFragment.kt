@@ -58,11 +58,7 @@ class AttachMailboxFragment : Fragment() {
             showKeyboard()
             manageErrorOnTextChange(mailInputLayout, attachMailboxButton)
 
-            onFocusChangeListener = OnFocusChangeListener { _, hasFocus ->
-                if (!hasFocus && text?.isNotBlank() == true && !isEmail()) {
-                    mailInputLayout.error = getString(R.string.errorInvalidEmailAddress)
-                }
-            }
+            onFocusChangeListener = OnFocusChangeListener { _, hasFocus -> manageErrorOnFocusChange(hasFocus) }
         }
 
         passwordInput.manageErrorOnTextChange(passwordInputLayout, attachMailboxButton)
@@ -74,6 +70,15 @@ class AttachMailboxFragment : Fragment() {
                 context.trackAccountEvent("addMailboxConfirm")
                 showProgress()
                 attachMailbox()
+            }
+        }
+    }
+
+    private fun TextInputEditText.manageErrorOnFocusChange(hasFocus: Boolean) = with(binding) {
+        if (!hasFocus) {
+            when {
+                text.isNullOrBlank() -> mailInputLayout.error = null
+                !isEmail() -> mailInputLayout.error = getString(R.string.errorInvalidEmailAddress)
             }
         }
     }
