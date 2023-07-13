@@ -22,6 +22,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.utils.SearchUtils
 import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -32,6 +33,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ThreadListViewModel @Inject constructor(
+    private val searchUtils: SearchUtils,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -52,6 +54,11 @@ class ThreadListViewModel @Inject constructor(
                 updatedAtTrigger.postValue(Unit)
             }
         }
+    }
+
+    fun deleteSearchData() = viewModelScope.launch(ioCoroutineContext) {
+        // Delete Search data in case they couldn't be deleted at the end of the previous Search.
+        searchUtils.deleteRealmSearchData()
     }
 
     data class SelectedDraft(
