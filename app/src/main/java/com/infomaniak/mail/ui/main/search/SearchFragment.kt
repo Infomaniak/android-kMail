@@ -126,6 +126,11 @@ class SearchFragment : Fragment() {
         observeHistory()
     }
 
+    override fun onStop() {
+        searchViewModel.cancelSearch()
+        super.onStop()
+    }
+
     private fun setupListeners() = with(binding) {
         toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
         swipeRefreshLayout.setOnRefreshListener { searchViewModel.refreshSearch() }
@@ -135,8 +140,8 @@ class SearchFragment : Fragment() {
         val popupMenu = createPopupMenu()
         binding.folderDropDown.setOnClickListener { popupMenu.show() }
         updateFolderDropDownUi(
-            folder = searchViewModel.selectedFolder,
-            title = requireContext().getLocalizedNameOrAllFolders(searchViewModel.selectedFolder),
+            folder = searchViewModel.currentFolder,
+            title = requireContext().getLocalizedNameOrAllFolders(searchViewModel.currentFolder),
         )
     }
 
@@ -212,7 +217,7 @@ class SearchFragment : Fragment() {
 
             doOnTextChanged { text, _, _, _ ->
                 val newQuery = text.toString()
-                if (searchViewModel.searchQuery != newQuery) {
+                if (searchViewModel.currentSearchQuery != newQuery) {
                     searchViewModel.searchQuery(newQuery)
                 }
             }
@@ -234,7 +239,7 @@ class SearchFragment : Fragment() {
             stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
             onThreadClicked = { thread ->
                 with(searchViewModel) {
-                    if (!isLengthTooShort(searchQuery)) history.value = searchQuery
+                    if (!isLengthTooShort(currentSearchQuery)) history.value = currentSearchQuery
                     navigateToThread(thread, mainViewModel)
                 }
             }
@@ -328,7 +333,7 @@ class SearchFragment : Fragment() {
     }
 
     private fun observeSearchResults() {
-        searchViewModel.searchResultsLiveData(lifecycle).bindResultsChangeToAdapter(viewLifecycleOwner, threadListAdapter)
+        searchViewModel.searchResults.bindResultsChangeToAdapter(viewLifecycleOwner, threadListAdapter)
     }
 
     private fun observeHistory() {
