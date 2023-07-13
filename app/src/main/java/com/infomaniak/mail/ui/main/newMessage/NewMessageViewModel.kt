@@ -77,6 +77,10 @@ class NewMessageViewModel @Inject constructor(
     private var autoSaveJob: Job? = null
 
     var draft: Draft = Draft()
+        set(value) {
+            field = value
+            if (field.body.isNotEmpty()) splitSignatureAndQuoteFromBody()
+        }
 
     var isAutoCompletionOpened = false
     var isEditorExpanded = false
@@ -156,7 +160,6 @@ class NewMessageViewModel @Inject constructor(
         }
 
         if (isSuccess) {
-            splitSignatureAndQuoteFromBody()
             saveDraftSnapshot()
             if (draft.cc.isNotEmpty() || draft.bcc.isNotEmpty()) {
                 otherFieldsAreAllEmpty.postValue(false)
@@ -362,10 +365,7 @@ class NewMessageViewModel @Inject constructor(
     }
 
     fun synchronizeViewModelDraftFromRealm() = viewModelScope.launch(ioCoroutineContext) {
-        draftController.getDraft(draft.localUuid)?.let {
-            draft = it.copyFromRealm()
-            splitSignatureAndQuoteFromBody()
-        }
+        draftController.getDraft(draft.localUuid)?.let { draft = it.copyFromRealm() }
     }
 
     private fun saveDraftToLocal(action: DraftAction) {
