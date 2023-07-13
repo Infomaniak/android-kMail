@@ -190,7 +190,7 @@ class NewMessageViewModel @Inject constructor(
         Log.e("gibranlast", "initDraftAndViewModel - isSuccess: ${isSuccess}")
         if (isSuccess) {
             Log.w("gibranlast", "about to splitSignatureAndQuoteFromBody: ", );
-            splitSignatureAndQuoteFromBody()
+            draft.splitSignatureAndQuoteFromBody()
             saveDraftSnapshot()
             if (draft.cc.isNotEmpty() || draft.bcc.isNotEmpty()) {
                 otherFieldsAreAllEmpty.postValue(false)
@@ -242,7 +242,7 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    private fun splitSignatureAndQuoteFromBody() {
+    private fun Draft.splitSignatureAndQuoteFromBody() {
 
         fun Document.split(divClassName: String, defaultValue: String): Pair<String, String?> {
             return getElementsByClass(divClassName).firstOrNull()?.let {
@@ -258,12 +258,12 @@ class NewMessageViewModel @Inject constructor(
             return if (index == -1) Int.MAX_VALUE else index
         }
 
-        val doc = Jsoup.parse(draft.body)
+        val doc = Jsoup.parse(body)
 
-        val (bodyWithQuote, signature) = doc.split(MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME, draft.body)
+        val (bodyWithQuote, signature) = doc.split(MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME, body)
 
-        val replyPosition = draft.body.lastIndexOfOrMax(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME)
-        val forwardPosition = draft.body.lastIndexOfOrMax(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME)
+        val replyPosition = body.lastIndexOfOrMax(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME)
+        val forwardPosition = body.lastIndexOfOrMax(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME)
         Log.w("gibranlast", "splitSignatureAndQuoteFromBody - about to split bodyWithQuote: ${bodyWithQuote}")
         val (body, quote) = if (replyPosition < forwardPosition) {
             doc.split(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME, bodyWithQuote)
@@ -272,13 +272,11 @@ class NewMessageViewModel @Inject constructor(
         }
         Log.w("gibranlast", "splitSignatureAndQuoteFromBody: which gave body of: $body", );
 
-        draft.apply {
-            uiBody = body.htmlToText()
-            uiSignature = signature
-            uiQuote = quote
+        uiBody = body.htmlToText()
+        uiSignature = signature
+        uiQuote = quote
 
-            Log.w("gibran", "splitSignatureAndQuoteFromBody gave uiBody: ${uiBody}")
-        }
+        Log.w("gibran", "splitSignatureAndQuoteFromBody gave uiBody: $uiBody")
     }
 
     private fun saveDraftSnapshot() = with(draft) {
@@ -412,6 +410,7 @@ class NewMessageViewModel @Inject constructor(
             Log.w("gibranlastfinal", "synchronizeViewModelDraftFromRealm - draft.uiBody: ${draft.uiBody}")
             Log.w("gibranlastfinal", "synchronizeViewModelDraftFromRealm - d5.body: ${d5.body}")
             Log.w("gibranlastfinal", "synchronizeViewModelDraftFromRealm - d5.uiBody: ${d5.uiBody}")
+            d5.splitSignatureAndQuoteFromBody()
             draft = d5
             // TODO : Keep the local values of the previous instance
             Log.v("gibranlast", "synchronizeViewModelDraftFromRealm - draft: ${draft}")
