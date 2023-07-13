@@ -58,7 +58,7 @@ class AttachMailboxFragment : Fragment() {
             showKeyboard()
             manageErrorOnTextChange(mailInputLayout, attachMailboxButton)
 
-            onFocusChangeListener = OnFocusChangeListener { _, hasFocus -> manageErrorOnFocusChange(hasFocus) }
+            onFocusChangeListener = OnFocusChangeListener { _, hasFocus -> manageEmailErrorOnFocusChange(hasFocus) }
         }
 
         passwordInput.manageErrorOnTextChange(passwordInputLayout, attachMailboxButton)
@@ -74,7 +74,7 @@ class AttachMailboxFragment : Fragment() {
         }
     }
 
-    private fun TextInputEditText.manageErrorOnFocusChange(hasFocus: Boolean) = with(binding) {
+    private fun TextInputEditText.manageEmailErrorOnFocusChange(hasFocus: Boolean) = with(binding) {
         if (!hasFocus) {
             when {
                 text.isNullOrBlank() -> mailInputLayout.error = null

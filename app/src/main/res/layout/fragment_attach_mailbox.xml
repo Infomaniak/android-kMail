@@ -40,10 +40,10 @@
             android:id="@+id/attachMailboxDescription2"
             style="@style/SettingHeader"
             android:paddingTop="0dp"
+            android:text="@string/attachMailboxDescription2"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/attachMailboxDescription1"
-            android:text="@string/attachMailboxDescription2" />
+            app:layout_constraintTop_toBottomOf="@id/attachMailboxDescription1" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/mailInputLayout"
@@ -70,7 +70,7 @@
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/passwordInputLayout"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/marginStandardMedium"
             android:layout_marginTop="@dimen/marginStandardSmall"
             android:hint="@string/attachMailboxPasswordInputHint"
