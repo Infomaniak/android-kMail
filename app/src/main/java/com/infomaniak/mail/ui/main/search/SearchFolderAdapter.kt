@@ -81,7 +81,6 @@ class SearchFolderAdapter(
                 setSelectedState(folder == selectedFolder)
 
                 setOnClickListener {
-                    selectedFolder = folder
                     onClickListener(folder, entryName)
                 }
             }
@@ -100,6 +99,10 @@ class SearchFolderAdapter(
     override fun areAllItemsEnabled(): Boolean = false
 
     override fun isEnabled(position: Int): Boolean = getItemViewType(position) != SEPARATOR.itemId
+
+    fun updateVisuallySelectedFolder(folder: Folder?) {
+        selectedFolder = folder
+    }
 
     enum class SearchFolderElement(val itemId: Int) {
         FOLDER(0),
