@@ -55,7 +55,11 @@ class ThreadController @Inject constructor(
     }
 
     fun getSearchThreadsAsync(): Flow<ResultsChange<Thread>> {
-        return mailboxContentRealm().query<Thread>("${Thread::isFromSearch.name} == true").asFlow()
+        return getSearchThreadsQuery(mailboxContentRealm()).asFlow()
+    }
+
+    fun getSearchThreadsCount(): Long {
+        return getSearchThreadsQuery(mailboxContentRealm()).count().find()
     }
 
     fun getThread(uid: String): Thread? {
@@ -147,6 +151,10 @@ class ThreadController @Inject constructor(
 
         private fun getOrphanThreadsQuery(realm: TypedRealm): RealmQuery<Thread> {
             return realm.query("${Thread::folderId.name} == ''")
+        }
+
+        private fun getSearchThreadsQuery(realm: TypedRealm): RealmQuery<Thread> {
+            return realm.query("${Thread::isFromSearch.name} == true")
         }
 
         private fun getUnreadThreadsCountQuery(folder: Folder): RealmScalarQuery<Long> {
