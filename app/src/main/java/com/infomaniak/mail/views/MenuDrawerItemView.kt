@@ -131,13 +131,13 @@ class MenuDrawerItemView @JvmOverloads constructor(
     private var isInSelectedState = false
 
     init {
-        attrs?.getAttributes(context, R.styleable.MenuDrawerItemView) {
-            badge = getInteger(R.styleable.MenuDrawerItemView_badge, badge)
-            icon = getDrawable(R.styleable.MenuDrawerItemView_icon)
-            indent = getDimensionPixelSize(R.styleable.MenuDrawerItemView_indent, indent)
-            itemStyle = SelectionStyle.values()[getInteger(R.styleable.MenuDrawerItemView_itemStyle, 0)]
-            text = getString(R.styleable.MenuDrawerItemView_text)
-            textWeight = TextWeight.values()[getInteger(R.styleable.MenuDrawerItemView_textWeight, 0)]
+        attrs?.getAttributes(context, R.styleable.DecoratedTextItemView) {
+            badge = getInteger(R.styleable.DecoratedTextItemView_badge, badge)
+            icon = getDrawable(R.styleable.DecoratedTextItemView_icon)
+            indent = getDimensionPixelSize(R.styleable.DecoratedTextItemView_indent, indent)
+            itemStyle = SelectionStyle.values()[getInteger(R.styleable.DecoratedTextItemView_itemStyle, 0)]
+            text = getString(R.styleable.DecoratedTextItemView_text)
+            textWeight = TextWeight.values()[getInteger(R.styleable.DecoratedTextItemView_textWeight, 0)]
         }
     }
 

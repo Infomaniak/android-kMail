@@ -49,9 +49,9 @@ abstract class DecoratedTextItemView @JvmOverloads constructor(
         }
 
     init {
-        attrs?.getAttributes(context, com.infomaniak.mail.R.styleable.MenuDrawerItemView) {
-            icon = getDrawable(com.infomaniak.mail.R.styleable.MenuDrawerItemView_icon)
-            text = getString(com.infomaniak.mail.R.styleable.MenuDrawerItemView_text)
+        attrs?.getAttributes(context, com.infomaniak.mail.R.styleable.DecoratedTextItemView) {
+            icon = getDrawable(com.infomaniak.mail.R.styleable.DecoratedTextItemView_icon)
+            text = getString(com.infomaniak.mail.R.styleable.DecoratedTextItemView_text)
         }
 
         binding.root.apply {

@@ -19,7 +19,9 @@ package com.infomaniak.mail.views
 
 import android.content.Context
 import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.util.AttributeSet
+import android.widget.ImageView
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.content.res.getDimensionPixelSizeOrThrow
 import com.google.android.material.shape.ShapeAppearanceModel
@@ -37,6 +39,16 @@ abstract class SelectableTextItemView @JvmOverloads constructor(
 
     private val regular by lazy { ResourcesCompat.getFont(context, com.infomaniak.lib.core.R.font.suisseintl_regular) }
     private val medium by lazy { ResourcesCompat.getFont(context, com.infomaniak.lib.core.R.font.suisseintl_medium) }
+
+    var endIcon: Drawable? = null
+        set(value) {
+            field = value
+            ImageView(context).apply {
+                setImageDrawable(value)
+                // TODO: contentDescription =
+                binding.endIconLayout.addView(this)
+            }
+        }
 
     var itemStyle = SelectionStyle.MENU_DRAWER
         set(value) {
@@ -67,23 +79,22 @@ abstract class SelectableTextItemView @JvmOverloads constructor(
     private var isInSelectedState = false
 
     init {
-        attrs?.getAttributes(context, R.styleable.MenuDrawerItemView) {
-            itemStyle = SelectionStyle.values()[getInteger(R.styleable.MenuDrawerItemView_itemStyle, 0)]
-            textWeight = TextWeight.values()[getInteger(R.styleable.MenuDrawerItemView_textWeight, 0)]
+        attrs?.getAttributes(context, R.styleable.DecoratedTextItemView) {
+            itemStyle = SelectionStyle.values()[getInteger(R.styleable.DecoratedTextItemView_itemStyle, 0)]
+            textWeight = TextWeight.values()[getInteger(R.styleable.DecoratedTextItemView_textWeight, 0)]
+        }
+    }
+
+    fun setSelectedState(isSelected: Boolean) = with(binding) {
+        isInSelectedState = isSelected
+        val (color, textAppearance) = if (isSelected && itemStyle == SelectionStyle.MENU_DRAWER) {
+            context.getAttributeColor(RMaterial.attr.colorPrimaryContainer) to R.style.BodyMedium_Accent
+        } else {
+            Color.TRANSPARENT to if (textWeight == TextWeight.MEDIUM) R.style.BodyMedium else R.style.Body
         }
 
-        fun setSelectedState(isSelected: Boolean) = with(binding) {
-            isInSelectedState = isSelected
-            val (color, textAppearance) = if (isSelected && itemStyle == SelectionStyle.MENU_DRAWER) {
-                context.getAttributeColor(RMaterial.attr.colorPrimaryContainer) to R.style.BodyMedium_Accent
-            } else {
-                Color.TRANSPARENT to if (textWeight == TextWeight.MEDIUM) R.style.BodyMedium else R.style.Body
-            }
-
-            root.setCardBackgroundColor(color)
-            itemName.setTextAppearance(textAppearance)
-
-        }
+        root.setCardBackgroundColor(color)
+        itemName.setTextAppearance(textAppearance)
     }
 
     enum class SelectionStyle {

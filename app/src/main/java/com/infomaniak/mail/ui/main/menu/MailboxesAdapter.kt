@@ -21,12 +21,15 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewbinding.ViewBinding
 import com.infomaniak.mail.MatomoMail.SWITCH_MAILBOX_NAME
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.databinding.ItemInvalidMailboxBinding
 import com.infomaniak.mail.databinding.ItemSwitchMailboxBinding
-import com.infomaniak.mail.ui.main.menu.MailboxesAdapter.SwitchMailboxesViewHolder
+import com.infomaniak.mail.ui.main.menu.MailboxesAdapter.MailboxesViewHolder
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.views.MenuDrawerItemView.SelectionStyle
 import kotlinx.coroutines.CoroutineDispatcher
@@ -41,17 +44,31 @@ class MailboxesAdapter(
     private val onLockedMailboxClicked: ((String) -> Unit)? = null,
     private var mailboxes: List<Mailbox> = emptyList(),
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO, // TODO: Inject with hilt
-) : RecyclerView.Adapter<SwitchMailboxesViewHolder>() {
+) : RecyclerView.Adapter<MailboxesViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SwitchMailboxesViewHolder {
-        return SwitchMailboxesViewHolder(ItemSwitchMailboxBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MailboxesViewHolder {
+        val layoutInflater = LayoutInflater.from(parent.context)
+        val binding = if (viewType == DisplayType.INVALID_MAILBOX.layout) {
+            ItemInvalidMailboxBinding.inflate(layoutInflater, parent, false)
+        } else {
+            ItemSwitchMailboxBinding.inflate(layoutInflater, parent, false)
+        }
+
+        return MailboxesViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: SwitchMailboxesViewHolder, position: Int) = with(holder.binding.emailAddress) {
-
+    override fun onBindViewHolder(holder: MailboxesViewHolder, position: Int) = with(holder.binding) {
         val mailbox = mailboxes[position]
         val isCurrentMailbox = mailbox.mailboxId == AccountUtils.currentMailboxId
 
+        when (getItemViewType(position)) {
+            DisplayType.VALID_MAILBOX.layout -> (this as ItemSwitchMailboxBinding).displayValidMailbox(mailbox, isCurrentMailbox)
+            DisplayType.INVALID_MAILBOX.layout -> (this as ItemInvalidMailboxBinding).displayInvalidMailbox(mailbox)
+            else -> Unit
+        }
+    }
+
+    private fun ItemSwitchMailboxBinding.displayValidMailbox(mailbox: Mailbox, isCurrentMailbox: Boolean) = with(root) {
         text = mailbox.email
 
         if (isInMenuDrawer) badge = mailbox.unreadCountDisplay.count else itemStyle = SelectionStyle.ACCOUNT
@@ -60,7 +77,7 @@ class MailboxesAdapter(
         isMailboxLocked = mailbox.isLocked
         hasValidMailbox = hasValidMailboxes
 
-        holder.binding.root.setSelectedState(isCurrentMailbox)
+        setSelectedState(isCurrentMailbox)
 
         if (!isCurrentMailbox || !hasValidMailboxes) {
             setOnClickListener {
@@ -80,6 +97,19 @@ class MailboxesAdapter(
         }
     }
 
+    private fun ItemInvalidMailboxBinding.displayInvalidMailbox(mailbox: Mailbox) = with(root) {
+        text = mailbox.email
+
+        if (!mailbox.isLocked) {
+            shouldDisplayChevron = true
+            setOnClickListener { onInvalidPasswordMailboxClicked?.invoke(mailbox) }
+        }
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return if (mailboxes[position].isValid) DisplayType.VALID_MAILBOX.layout else DisplayType.INVALID_MAILBOX.layout
+    }
+
     override fun getItemCount(): Int = mailboxes.count()
 
     fun setMailboxes(newMailboxes: List<Mailbox>) {
@@ -87,5 +117,10 @@ class MailboxesAdapter(
         notifyDataSetChanged()
     }
 
-    class SwitchMailboxesViewHolder(val binding: ItemSwitchMailboxBinding) : RecyclerView.ViewHolder(binding.root)
+    private enum class DisplayType(val layout: Int) {
+        INVALID_MAILBOX(R.layout.item_invalid_mailbox),
+        VALID_MAILBOX(R.layout.item_switch_mailbox),
+    }
+
+    class MailboxesViewHolder(val binding: ViewBinding) : RecyclerView.ViewHolder(binding.root)
 }
