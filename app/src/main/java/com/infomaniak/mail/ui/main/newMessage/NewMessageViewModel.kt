@@ -156,7 +156,7 @@ class NewMessageViewModel @Inject constructor(
         }
 
         if (isSuccess) {
-            draft.splitSignatureAndQuoteFromBody()
+            splitSignatureAndQuoteFromBody()
             saveDraftSnapshot()
             if (draft.cc.isNotEmpty() || draft.bcc.isNotEmpty()) {
                 otherFieldsAreAllEmpty.postValue(false)
@@ -208,7 +208,7 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    private fun Draft.splitSignatureAndQuoteFromBody() {
+    private fun splitSignatureAndQuoteFromBody() {
 
         fun Document.split(divClassName: String, defaultValue: String): Pair<String, String?> {
             return getElementsByClass(divClassName).firstOrNull()?.let {
@@ -224,21 +224,23 @@ class NewMessageViewModel @Inject constructor(
             return if (index == -1) Int.MAX_VALUE else index
         }
 
-        val doc = Jsoup.parse(body)
+        val doc = Jsoup.parse(draft.body)
 
-        val (bodyWithQuote, signature) = doc.split(MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME, body)
+        val (bodyWithQuote, signature) = doc.split(MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME, draft.body)
 
-        val replyPosition = body.lastIndexOfOrMax(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME)
-        val forwardPosition = body.lastIndexOfOrMax(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME)
+        val replyPosition = draft.body.lastIndexOfOrMax(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME)
+        val forwardPosition = draft.body.lastIndexOfOrMax(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME)
         val (body, quote) = if (replyPosition < forwardPosition) {
             doc.split(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME, bodyWithQuote)
         } else {
             doc.split(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME, bodyWithQuote)
         }
 
-        uiBody = body.htmlToText()
-        uiSignature = signature
-        uiQuote = quote
+        draft.apply {
+            uiBody = body.htmlToText()
+            uiSignature = signature
+            uiQuote = quote
+        }
     }
 
     private fun saveDraftSnapshot() = with(draft) {
@@ -361,9 +363,8 @@ class NewMessageViewModel @Inject constructor(
 
     fun synchronizeViewModelDraftFromRealm() = viewModelScope.launch(ioCoroutineContext) {
         draftController.getDraft(draft.localUuid)?.let {
-            val d5 = it.copyFromRealm()
-            d5.splitSignatureAndQuoteFromBody()
-            draft = d5
+            draft = it.copyFromRealm()
+            splitSignatureAndQuoteFromBody()
         }
     }
 
