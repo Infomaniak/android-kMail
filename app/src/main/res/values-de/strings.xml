@@ -53,10 +53,11 @@
     <string name="alertBlockedImagesDisplayContent">Inhalt anzeigen</string>
     <string name="appSecurityDescription">Schützen Sie den Zugriff auf Ihre App, indem Sie Ihre Telefonsperre aktivieren.</string>
     <string name="archiveFolder">Archiviert</string>
-    <string name="attachAddressDescription">Sie haben bereits eine Infomaniak-Mailadresse, loggen Sie sich jetzt ein</string>
-    <string name="attachAddressInputHint">Mailadresse</string>
-    <string name="attachAddressPasswordInputHint">Passwort</string>
-    <string name="attachAddressTitle">Mailadresse hinzufügen</string>
+    <string name="attachMailboxDescription1">Sie haben bereits eine Infomaniak-Mailadresse, loggen Sie sich jetzt ein</string>
+    <string name="attachMailboxDescription2">Nur Infomaniak-Mailadressen werden unterstützt</string>
+    <string name="attachMailboxInputHint">Mailadresse</string>
+    <string name="attachMailboxPasswordInputHint">Passwort</string>
+    <string name="attachMailboxTitle">Mailadresse hinzufügen</string>
     <string name="attachmentActionCamera">Kamera</string>
     <string name="attachmentActionFile">Eine Datei anhängen</string>
     <string name="attachmentActionPhotoLibrary">Ein Foto aus der Fotobibliothek senden</string>
@@ -79,7 +80,7 @@
     <string name="buttonAccountSwitch">Konto ändern</string>
     <string name="buttonAddAccount">Account hinzufügen</string>
     <string name="buttonAddEmailAddress">Eine E-Mail-Adresse hinzufügen</string>
-    <string name="buttonAttachEmailAddress">Mailadresse hinzufügen</string>
+    <string name="buttonAttachMailbox">Mailadresse hinzufügen</string>
     <string name="buttonAttachment">Einen Anhang hinzufügen</string>
     <string name="buttonAvailableSoon">Bald verfügbar</string>
     <string name="buttonBold">Kühn</string>
@@ -186,7 +187,6 @@
     <string name="enterPasswordTitle">Geben Sie das Passwort ein</string>
     <string name="errorAlreadyLinkedMailbox">Diese E-Mail-Adresse ist bereits mit Ihrem Konto verknüpft</string>
     <string name="errorAtLeastOneRecipient">Es ist mindestens ein Empfänger erforderlich</string>
-    <string name="errorAttachAddressInput">Nur Infomaniak-Mailadressen werden unterstützt</string>
     <string name="errorAttachmentNotFound">Dateianhang unauffindbar</string>
     <string name="errorCorruptAttachment">Der Entwurf konnte nicht bearbeitet werden, ein Anhang ist beschädigt</string>
     <string name="errorDraftNotFound">Entwurf unauffindbar</string>
@@ -194,6 +194,7 @@
     <string name="errorFolderDoesNotExist">Der Ordner besteht nicht</string>
     <string name="errorInvalidAttachment">Dateianhang ungültig</string>
     <string name="errorInvalidCredentials">E-Mail oder Passwort ungültig</string>
+    <string name="errorInvalidEmailAddress">Ungültige E-Mail-Adresse</string>
     <string name="errorInvalidMailboxPassword">Falsches Passwort für die E-Mail-Adresse</string>
     <string name="errorLoginDescription">Die Verbindung ist fehlgeschlagen.</string>
     <string name="errorLoginTitle">Login-Fehler</string>

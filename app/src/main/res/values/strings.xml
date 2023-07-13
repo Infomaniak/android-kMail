@@ -60,10 +60,11 @@
     <string name="alertBlockedImagesDisplayContent">Display content</string>
     <string name="appSecurityDescription">Protect access to your app by enabling your phone lock.</string>
     <string name="archiveFolder">Archived</string>
-    <string name="attachAddressDescription">If you already have an Infomaniak email address, connect now</string>
-    <string name="attachAddressInputHint">Email address</string>
-    <string name="attachAddressPasswordInputHint">Password</string>
-    <string name="attachAddressTitle">Add email address</string>
+    <string name="attachMailboxDescription1">If you already have an Infomaniak email address, connect now</string>
+    <string name="attachMailboxDescription2">Only Infomaniak email addresses are supported</string>
+    <string name="attachMailboxInputHint">Email address</string>
+    <string name="attachMailboxPasswordInputHint">Password</string>
+    <string name="attachMailboxTitle">Add email address</string>
     <string name="attachmentActionCamera">Camera</string>
     <string name="attachmentActionFile">Attach a file</string>
     <string name="attachmentActionPhotoLibrary">Send a photo from the photo library</string>
@@ -86,7 +87,7 @@
     <string name="buttonAccountSwitch">Change account</string>
     <string name="buttonAddAccount">Add an account</string>
     <string name="buttonAddEmailAddress">Add an email address</string>
-    <string name="buttonAttachEmailAddress">Add this email address</string>
+    <string name="buttonAttachMailbox">Add this email address</string>
     <string name="buttonAttachment">Add an attachment</string>
     <string name="buttonAvailableSoon">Available soon</string>
     <string name="buttonBold">Bold</string>
@@ -193,7 +194,6 @@
     <string name="enterPasswordTitle">Enter password</string>
     <string name="errorAlreadyLinkedMailbox">This email address is already linked to your account</string>
     <string name="errorAtLeastOneRecipient">At least one recipient is required</string>
-    <string name="errorAttachAddressInput">Only Infomaniak email addresses are supported</string>
     <string name="errorAttachmentNotFound">Attachment cannot be found</string>
     <string name="errorCorruptAttachment">Failed to handle draft, an attachment is corrupted</string>
     <string name="errorDraftNotFound">Draft cannot be found</string>
@@ -201,6 +201,7 @@
     <string name="errorFolderDoesNotExist">The folder does not exist</string>
     <string name="errorInvalidAttachment">Invalid attachment</string>
     <string name="errorInvalidCredentials">Invalid email or password</string>
+    <string name="errorInvalidEmailAddress">Invalid mail address</string>
     <string name="errorInvalidMailboxPassword">Invalid mailbox password</string>
     <string name="errorLoginDescription">The connection failed.</string>
     <string name="errorLoginTitle">Login error</string>

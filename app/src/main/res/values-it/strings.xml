@@ -53,11 +53,11 @@
     <string name="alertBlockedImagesDisplayContent">Visualizza il contenuto</string>
     <string name="appSecurityDescription">Proteggete l’accesso alla vostra applicazione attivando il blocco del telefono.</string>
     <string name="archiveFolder">Archivio</string>
-    <string name="attachAddressDescription">Se hai già un indirizzo e-mail Infomaniak, accedi ora</string>
-    <string name="attachAddressInputHelper">Sono supportati solo gli indirizzi e-mail Infomaniak</string>
-    <string name="attachAddressInputHint">Indirizzo e-mail</string>
-    <string name="attachAddressPasswordInputHint">Password</string>
-    <string name="attachAddressTitle">Aggiungi indirizzo e-mail</string>
+    <string name="attachMailboxDescription1">Se hai già un indirizzo e-mail Infomaniak, accedi ora</string>
+    <string name="attachMailboxDescription2">Sono supportati solo gli indirizzi e-mail Infomaniak</string>
+    <string name="attachMailboxInputHint">Indirizzo e-mail</string>
+    <string name="attachMailboxPasswordInputHint">Password</string>
+    <string name="attachMailboxTitle">Aggiungi indirizzo e-mail</string>
     <string name="attachmentActionCamera">Macchina fotografica</string>
     <string name="attachmentActionFile">Allegare un file</string>
     <string name="attachmentActionPhotoLibrary">Inviare una foto dalla libreria fotografica</string>
@@ -80,7 +80,7 @@
     <string name="buttonAccountSwitch">Modifica del conto</string>
     <string name="buttonAddAccount">Aggiungere un account</string>
     <string name="buttonAddEmailAddress">Aggiungere un indirizzo e-mail</string>
-    <string name="buttonAttachEmailAddress">Aggiungi l’indirizzo e-mail</string>
+    <string name="buttonAttachMailbox">Aggiungi l’indirizzo e-mail</string>
     <string name="buttonAttachment">Aggiungere un allegato</string>
     <string name="buttonAvailableSoon">Disponibile a breve</string>
     <string name="buttonBold">In grassetto</string>
@@ -187,7 +187,6 @@
     <string name="enterPasswordTitle">Inserisci la password</string>
     <string name="errorAlreadyLinkedMailbox">Questo indirizzo e-mail è già collegato al vostro account</string>
     <string name="errorAtLeastOneRecipient">È richiesto almeno un destinatario</string>
-    <string name="errorAttachAddressInput">Sono supportati solo gli indirizzi e-mail Infomaniak</string>
     <string name="errorAttachmentNotFound">Allegato non trovato</string>
     <string name="errorCorruptAttachment">Impossibile gestire la bozza, un allegato è danneggiato</string>
     <string name="errorDraftNotFound">Bozza non trovata</string>
@@ -195,6 +194,7 @@
     <string name="errorFolderDoesNotExist">La cartella è inesistente</string>
     <string name="errorInvalidAttachment">Allegato non valido</string>
     <string name="errorInvalidCredentials">Email o password non valide</string>
+    <string name="errorInvalidEmailAddress">Indirizzo e-mail non valido</string>
     <string name="errorInvalidMailboxPassword">Password errata per l’indirizzo e-mail</string>
     <string name="errorLoginDescription">La connessione non è riuscita.</string>
     <string name="errorLoginTitle">Errore di accesso</string>
