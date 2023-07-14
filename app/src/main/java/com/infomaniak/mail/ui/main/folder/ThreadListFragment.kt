@@ -116,6 +116,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         super.onViewCreated(view, savedInstanceState)
 
         observeNoMailboxActivityTriggers()
+        threadListViewModel.deleteSearchData()
         setupDensityDependentUi()
         setupOnRefresh()
         setupAdapter()

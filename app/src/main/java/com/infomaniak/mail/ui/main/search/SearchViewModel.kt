@@ -20,7 +20,10 @@ package com.infomaniak.mail.ui.main.search
 import android.app.Application
 import android.content.Context
 import android.util.Log
-import androidx.lifecycle.*
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.trackSearchEvent
@@ -29,7 +32,6 @@ import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.data.models.thread.ThreadResult
 import com.infomaniak.mail.di.IoDispatcher
@@ -38,19 +40,16 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SearchUtils
 import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.realm.kotlin.notifications.ResultsChange
 import io.sentry.Sentry
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
-@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     application: Application,
     private val globalCoroutineScope: CoroutineScope,
-    private val searchUtils: SearchUtils,
     private val messageController: MessageController,
+    private val searchUtils: SearchUtils,
     private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
@@ -59,21 +58,16 @@ class SearchViewModel @Inject constructor(
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
-    private val _searchQuery = MutableLiveData("" to false)
-    val searchQuery: String get() = _searchQuery.value!!.first
+    var currentFolder: Folder? = null
+        private set
+    var currentSearchQuery: String = ""
+        private set
 
-    private val _selectedFilters = MutableStateFlow(emptySet<ThreadFilter>())
-    private inline val selectedFilters get() = _selectedFilters.value.toMutableSet()
+    private var currentFilters = mutableSetOf<ThreadFilter>()
 
-    private val _selectedFolder = MutableStateFlow<Folder?>(null)
-    val selectedFolder: Folder? get() = _selectedFolder.value
-
-    /** `_onPaginationTrigger` & `shouldPaginate` are closely related. Modifying one will impact the other. Beware. */
-    private val _onPaginationTrigger = MutableStateFlow(0L)
-    private var shouldPaginate: Boolean = false
-
-    /** Refreshes the search each time the timestamp changes, so that it doesn't refresh when the timestamp hasn't changed. */
-    private val _onRefreshTrigger = MutableStateFlow(0L)
+    private var lastExecutedFolder: Folder? = null
+    private var lastExecutedSearchQuery: String = ""
+    private var lastExecutedFilters = mutableSetOf<ThreadFilter>()
 
     val visibilityMode = MutableLiveData(VisibilityMode.RECENT_SEARCHES)
     val history = SingleLiveEvent<String>()
@@ -85,56 +79,40 @@ class SearchViewModel @Inject constructor(
     private var isFirstPage: Boolean = true
     private val isLastPage get() = resourceNext.isNullOrBlank()
 
-    val searchResults: Flow<ResultsChange<Thread>> = observeSearchAndFilters()
-        .flatMapLatest { (queryData, filters, folder, shouldGetNextPage) ->
-            val (query, saveInHistory) = queryData
-            if (!shouldGetNextPage) resetPaginationData()
-            searchThreads(
-                query = if (isLengthTooShort(query)) null else query,
-                saveInHistory,
-                shouldGetNextPage,
-                filters,
-                folder,
-            )
-        }
-
-    fun searchResultsLiveData(lifecycle: Lifecycle): LiveData<ResultsChange<Thread>> {
-        return searchResults.flowWithLifecycle(lifecycle).asLiveData(ioCoroutineContext)
-    }
-
-    private fun observeSearchAndFilters(): Flow<NewSearchInfo> {
-        return combine(
-            _searchQuery.asFlow(),
-            _selectedFilters,
-            _selectedFolder,
-            _onPaginationTrigger,
-            _onRefreshTrigger,
-        ) { queryData, filters, folder, paginationTime, refreshTime ->
-            NewSearchInfo(queryData, filters, folder, shouldPaginate, paginationTime, refreshTime)
-        }.distinctUntilChanged().debounce(SEARCH_DEBOUNCE_DURATION)
-    }
+    private var searchJob: Job? = null
+    val searchResults = threadController.getSearchThreadsAsync().asLiveData(ioCoroutineContext)
 
     fun init(dummyFolderId: String) {
         this.dummyFolderId = dummyFolderId
     }
 
-    fun refreshSearch() {
-        resetPaginationIntent()
-        _onRefreshTrigger.value = System.currentTimeMillis()
+    fun cancelSearch() {
+        searchJob?.cancel()
     }
 
-    fun searchQuery(query: String, saveInHistory: Boolean = false) {
-        resetPaginationIntent()
-        _searchQuery.value = query to saveInHistory
+    fun executePendingSearch() = viewModelScope.launch(ioCoroutineContext) {
+        val hasPendingSearch = lastExecutedSearchQuery != currentSearchQuery
+                || lastExecutedFolder != currentFolder
+                || lastExecutedFilters != currentFilters
+
+        if (hasPendingSearch) search()
     }
 
-    fun selectFolder(folder: Folder?) {
-        resetPaginationIntent()
-        _selectedFolder.value = folder
+    fun refreshSearch() = viewModelScope.launch(ioCoroutineContext) {
+        search()
     }
 
-    fun setFilter(filter: ThreadFilter, isEnabled: Boolean = true) {
-        resetPaginationIntent()
+    fun searchQuery(query: String, saveInHistory: Boolean = false) = viewModelScope.launch(ioCoroutineContext) {
+        if (query.isNotBlank() && isLengthTooShort(query)) return@launch
+        search(query.trim().also { currentSearchQuery = it }, saveInHistory)
+    }
+
+    fun selectFolder(folder: Folder?) = viewModelScope.launch(ioCoroutineContext) {
+        search(folder = folder.also { currentFolder = it })
+    }
+
+    fun setFilter(filter: ThreadFilter, isEnabled: Boolean = true) = viewModelScope.launch(ioCoroutineContext) {
+        if (isEnabled && currentFilters.contains(filter)) return@launch
         if (isEnabled) {
             context.trackSearchEvent(filter.matomoValue)
             filter.select()
@@ -143,29 +121,24 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    fun unselectMutuallyExclusiveFilters() {
-        resetPaginationIntent()
-        _selectedFilters.value = selectedFilters.apply {
+    fun unselectMutuallyExclusiveFilters() = viewModelScope.launch(ioCoroutineContext) {
+        currentFilters.apply {
             removeAll(listOf(ThreadFilter.SEEN, ThreadFilter.UNSEEN, ThreadFilter.STARRED))
         }
+        search(filters = currentFilters)
     }
 
-    fun nextPage() {
-        if (isLastPage) return
-        shouldPaginate = true
-        _onPaginationTrigger.value = System.currentTimeMillis()
+    fun nextPage() = viewModelScope.launch(ioCoroutineContext) {
+        if (isLastPage) return@launch
+        search(shouldGetNextPage = true)
     }
 
-    private fun ThreadFilter.select() {
-        _selectedFilters.value = searchUtils.selectFilter(filter = this, selectedFilters)
+    private suspend fun ThreadFilter.select() {
+        search(filters = searchUtils.selectFilter(filter = this, currentFilters).also { currentFilters = it })
     }
 
-    private fun ThreadFilter.unselect() {
-        _selectedFilters.value = selectedFilters.apply { remove(this@unselect) }
-    }
-
-    private fun resetPaginationIntent() {
-        shouldPaginate = false
+    private suspend fun ThreadFilter.unselect() {
+        search(filters = currentFilters.apply { remove(this@unselect) }.also { currentFilters = it })
     }
 
     private fun resetPaginationData() {
@@ -174,6 +147,7 @@ class SearchViewModel @Inject constructor(
     }
 
     override fun onCleared() {
+        cancelSearch()
         globalCoroutineScope.launch(ioDispatcher) {
             searchUtils.deleteRealmSearchData()
             Log.i(TAG, "SearchViewModel>onCleared: called")
@@ -181,28 +155,38 @@ class SearchViewModel @Inject constructor(
         super.onCleared()
     }
 
-    fun isLengthTooShort(query: String?) = query == null || query.length < MIN_SEARCH_QUERY
+    fun isLengthTooShort(query: String) = query.length < MIN_SEARCH_QUERY
 
-    private fun searchThreads(
-        query: String?,
-        saveInHistory: Boolean,
-        shouldGetNextPage: Boolean,
-        filters: Set<ThreadFilter>,
-        folder: Folder?,
-    ): Flow<ResultsChange<Thread>> = flow {
-        getReadyForNewSearch(folder, filters, query)?.let { newFilters ->
-            fetchThreads(folder, newFilters, query, shouldGetNextPage)
-            emitThreads(saveInHistory, newFilters, query)
+    private suspend fun search(
+        query: String = currentSearchQuery,
+        saveInHistory: Boolean = false,
+        filters: Set<ThreadFilter> = currentFilters,
+        folder: Folder? = currentFolder,
+        shouldGetNextPage: Boolean = false
+    ) = withContext(ioCoroutineContext) {
+        searchJob?.cancel()
+        searchJob = launch {
+            delay(SEARCH_DEBOUNCE_DURATION)
+
+            if (!shouldGetNextPage) resetPaginationData()
+
+            computeSearchFilters(folder, filters, query)?.let { newFilters ->
+                fetchThreads(folder, newFilters, query, shouldGetNextPage)
+                if (saveInHistory) query.let(history::postValue)
+            }
         }
     }
 
-    private suspend fun getReadyForNewSearch(folder: Folder?, filters: Set<ThreadFilter>, query: String?): Set<ThreadFilter>? {
+    private suspend fun computeSearchFilters(
+        folder: Folder?,
+        filters: Set<ThreadFilter>,
+        query: String?
+    ): Set<ThreadFilter>? {
 
         val newFilters = if (folder == null) filters else (filters + ThreadFilter.FOLDER)
 
-        if (isFirstPage && isLastPage) searchUtils.deleteRealmSearchData()
-
-        return if (newFilters.isEmpty() && query.isNullOrBlank()) {
+        return if (newFilters.isEmpty() && query.isNullOrBlank() && currentFolder == null) {
+            searchUtils.deleteRealmSearchData()
             visibilityMode.postValue(VisibilityMode.RECENT_SEARCHES)
             null
         } else {
@@ -213,7 +197,7 @@ class SearchViewModel @Inject constructor(
     private suspend fun fetchThreads(
         folder: Folder?,
         newFilters: Set<ThreadFilter>,
-        query: String?,
+        query: String,
         shouldGetNextPage: Boolean,
     ) {
 
@@ -239,6 +223,10 @@ class SearchViewModel @Inject constructor(
         val searchFilters = searchUtils.searchFilters(query, newFilters, resource)
         val apiResponse = ApiRepository.searchThreads(currentMailbox.uuid, folderId, searchFilters, resource)
 
+        searchJob?.ensureActive()
+
+        if (isFirstPage && isLastPage) searchUtils.deleteRealmSearchData()
+
         if (apiResponse.isSuccess()) with(apiResponse) {
             initSearchFolderThreads()
             resourceNext = data?.resourceNext
@@ -246,35 +234,19 @@ class SearchViewModel @Inject constructor(
         } else if (isLastPage) {
             threadController.saveThreads(searchMessages = messageController.searchMessages(query, newFilters, folderId))
         }
+
+        if (folder != lastExecutedFolder) lastExecutedFolder = folder
+        if (newFilters != lastExecutedFilters) lastExecutedFilters = newFilters.toMutableSet()
+        if (query != lastExecutedSearchQuery) lastExecutedSearchQuery = query
+
+        val resultsVisibilityMode = when {
+            newFilters.isEmpty() && isLengthTooShort(query) -> VisibilityMode.RECENT_SEARCHES
+            threadController.getSearchThreadsCount() == 0L -> VisibilityMode.NO_RESULTS
+            else -> VisibilityMode.RESULTS
+        }
+
+        visibilityMode.postValue(resultsVisibilityMode)
     }
-
-    private suspend fun FlowCollector<ResultsChange<Thread>>.emitThreads(
-        saveInHistory: Boolean,
-        newFilters: Set<ThreadFilter>,
-        query: String?,
-    ) {
-        emitAll(threadController.getSearchThreadsAsync().mapLatest {
-            if (saveInHistory) query?.let(history::postValue)
-
-            it.also {
-                val resultsVisibilityMode = when {
-                    newFilters.isEmpty() && isLengthTooShort(searchQuery) -> VisibilityMode.RECENT_SEARCHES
-                    it.list.isEmpty() -> VisibilityMode.NO_RESULTS
-                    else -> VisibilityMode.RESULTS
-                }
-                visibilityMode.postValue(resultsVisibilityMode)
-            }
-        })
-    }
-
-    private data class NewSearchInfo(
-        val queryData: Pair<String, Boolean>,
-        val filters: Set<ThreadFilter>,
-        val folder: Folder?,
-        val shouldGetNextPage: Boolean,
-        private val paginationTime: Long, // Used only to paginate when necessary due to `distinctUntilChanged`.
-        private val refreshTime: Long, // Used only to refresh when necessary due to `distinctUntilChanged`.
-    )
 
     private companion object {
 

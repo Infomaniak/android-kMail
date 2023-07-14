@@ -75,7 +75,6 @@ class MainViewModel @Inject constructor(
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val mergedContactController: MergedContactController,
     private val messageController: MessageController,
-    private val searchUtils: SearchUtils,
     private val sharedViewModelUtils: SharedViewModelUtils,
     private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -256,9 +255,6 @@ class MainViewModel @Inject constructor(
                         refreshThreads(mailbox, folder.id)
                     }
                 }
-
-            // Delete Search data in case they couldn't be deleted at the end of the previous Search.
-            searchUtils.deleteRealmSearchData()
         }
     }
 
