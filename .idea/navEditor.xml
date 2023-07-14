@@ -384,6 +384,18 @@
                       </LayoutPositions>
                     </value>
                   </entry>
+                  <entry key="newAccountFragment">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="270" />
+                            <option name="y" value="-2130" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
                   <entry key="newMessageActivity">
                     <value>
                       <LayoutPositions>

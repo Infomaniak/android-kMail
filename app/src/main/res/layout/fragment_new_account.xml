@@ -16,128 +16,136 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingHorizontal="@dimen/marginStandard">
+    android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/illustration"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/marginStandard"
-        android:src="@drawable/new_account_illustration"
-        app:layout_constrainedHeight="true"
-        app:layout_constraintBottom_toTopOf="@+id/title"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed" />
+    <com.google.android.material.appbar.MaterialToolbar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
-    <TextView
-        android:id="@+id/title"
-        style="@style/H1"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/marginLarge"
-        android:text="Créez votre adresse mail gratuite à vie"
-        android:textAlignment="center"
-        app:layout_constraintBottom_toTopOf="@+id/chipStorageMailLayout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/illustration"
-        app:layout_constraintWidth_max="400dp" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingHorizontal="@dimen/marginStandard">
 
-    <View
-        android:id="@+id/chipHelper"
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:visibility="invisible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/chipStorageMailLayout"
-        app:layout_constraintWidth_max="400dp" />
-
-    <FrameLayout
-        android:id="@+id/chipStorageMailLayout"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/marginStandardSmall"
-        android:layout_marginTop="@dimen/marginStandardSmall"
-        app:layout_constraintBottom_toTopOf="@id/description"
-        app:layout_constraintEnd_toStartOf="@id/chipStorageDriveLayout"
-        app:layout_constraintStart_toStartOf="@id/chipHelper"
-        app:layout_constraintTop_toBottomOf="@id/title"
-        app:layout_constraintWidth_max="200dp">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/chipStorageMail"
-            style="@style/LabelMedium.Accent"
+        <ImageView
+            android:id="@+id/illustration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:backgroundTint="?attr/colorPrimaryContainer"
-            android:clickable="false"
-            android:focusable="false"
-            android:maxLines="2"
-            android:minHeight="0dp"
-            android:paddingHorizontal="@dimen/marginStandardSmall"
-            android:text="20 Go de stockage Mail" />
+            android:layout_marginTop="@dimen/marginStandard"
+            android:src="@drawable/new_account_illustration"
+            app:layout_constrainedHeight="true"
+            app:layout_constraintBottom_toTopOf="@+id/title"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed" />
 
-    </FrameLayout>
+        <TextView
+            android:id="@+id/title"
+            style="@style/H1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/marginLarge"
+            android:text="Créez votre adresse mail gratuite à vie"
+            android:textAlignment="center"
+            app:layout_constraintBottom_toTopOf="@+id/chipStorageMailLayout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/illustration"
+            app:layout_constraintWidth_max="400dp" />
 
-    <FrameLayout
-        android:id="@+id/chipStorageDriveLayout"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/marginStandardSmall"
-        android:layout_marginEnd="@dimen/marginStandardSmall"
-        app:layout_constraintEnd_toEndOf="@id/chipHelper"
-        app:layout_constraintStart_toEndOf="@id/chipStorageMailLayout"
-        app:layout_constraintTop_toBottomOf="@id/title"
-        app:layout_constraintWidth_max="200dp">
+        <View
+            android:id="@+id/chipHelper"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:visibility="invisible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/chipStorageMailLayout"
+            app:layout_constraintWidth_max="400dp" />
+
+        <FrameLayout
+            android:id="@+id/chipStorageMailLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/marginStandardSmall"
+            android:layout_marginTop="@dimen/marginStandardSmall"
+            app:layout_constraintBottom_toTopOf="@id/description"
+            app:layout_constraintEnd_toStartOf="@id/chipStorageDriveLayout"
+            app:layout_constraintStart_toStartOf="@id/chipHelper"
+            app:layout_constraintTop_toBottomOf="@id/title"
+            app:layout_constraintWidth_max="200dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/chipStorageMail"
+                style="@style/LabelMedium.Accent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:backgroundTint="?attr/colorPrimaryContainer"
+                android:clickable="false"
+                android:focusable="false"
+                android:maxLines="2"
+                android:minHeight="0dp"
+                android:paddingHorizontal="@dimen/marginStandardSmall"
+                android:text="20 Go de stockage Mail" />
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/chipStorageDriveLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/marginStandardSmall"
+            android:layout_marginEnd="@dimen/marginStandardSmall"
+            app:layout_constraintEnd_toEndOf="@id/chipHelper"
+            app:layout_constraintStart_toEndOf="@id/chipStorageMailLayout"
+            app:layout_constraintTop_toBottomOf="@id/title"
+            app:layout_constraintWidth_max="200dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/chipStorageDrive"
+                style="@style/LabelMedium.Accent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:backgroundTint="?attr/colorPrimaryContainer"
+                android:clickable="false"
+                android:focusable="false"
+                android:maxLines="2"
+                android:minHeight="0dp"
+                android:paddingHorizontal="@dimen/marginStandardSmall"
+                android:text="15 Go de stockage kDrive" />
+
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/description"
+            style="@style/BodySmall.Secondary"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/marginStandard"
+            android:layout_marginBottom="@dimen/marginStandard"
+            android:textAlignment="center"
+            app:layout_constraintBottom_toTopOf="@+id/createNewAddressButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/chipStorageMailLayout"
+            app:layout_constraintWidth_max="400dp"
+            tools:text="Communiquez et stockez vos documents et photos dans un écosystème sans publicité qui respecte votre vie privée." />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/chipStorageDrive"
-            style="@style/LabelMedium.Accent"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:backgroundTint="?attr/colorPrimaryContainer"
-            android:clickable="false"
-            android:focusable="false"
-            android:maxLines="2"
-            android:minHeight="0dp"
-            android:paddingHorizontal="@dimen/marginStandardSmall"
-            android:text="15 Go de stockage kDrive" />
+            android:id="@+id/createNewAddressButton"
+            style="@style/TextButtonPrimary"
+            android:layout_width="0dp"
+            android:text="Créer une adresse mail gratuite"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
-    </FrameLayout>
-
-    <TextView
-        android:id="@+id/description"
-        style="@style/BodySmall.Secondary"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/marginStandard"
-        android:layout_marginBottom="@dimen/marginStandard"
-        android:textAlignment="center"
-        app:layout_constraintBottom_toTopOf="@+id/materialButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/chipStorageMailLayout"
-        app:layout_constraintWidth_max="400dp"
-        tools:text="Communiquez et stockez vos documents et photos dans un écosystème sans publicité qui respecte votre vie privée." />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/materialButton"
-        style="@style/TextButtonPrimary"
-        android:layout_width="0dp"
-        android:text="Créer une adresse mail gratuite"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
