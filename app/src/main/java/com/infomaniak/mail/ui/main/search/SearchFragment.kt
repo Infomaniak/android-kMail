@@ -112,7 +112,7 @@ class SearchFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         searchViewModel.init(navigationArgs.dummyFolderId)
-        searchViewModel.launchWaitingSearch()
+        searchViewModel.executePendingSearch()
 
         setupListeners()
         setFoldersDropdownUi()
