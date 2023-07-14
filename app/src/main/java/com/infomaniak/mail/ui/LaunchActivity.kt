@@ -22,9 +22,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDeepLinkBuilder
-import com.infomaniak.lib.applock.LockActivity
-import com.infomaniak.lib.applock.Utils.isKeyguardSecure
-import com.infomaniak.mail.MainApplication.Companion.firstLaunchTime
 import com.infomaniak.mail.MatomoMail.trackUserId
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -36,7 +33,6 @@ import com.infomaniak.mail.ui.login.LoginActivityArgs
 import com.infomaniak.mail.ui.main.thread.ThreadFragmentArgs
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SentryDebug
-import com.infomaniak.mail.utils.getMainApplication
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -71,11 +67,7 @@ class LaunchActivity : AppCompatActivity() {
                     loginUser()
                 } else {
                     trackUserId(AccountUtils.currentUserId)
-                    if (localSettings.isAppLocked && isKeyguardSecure() && getMainApplication().lastAppClosingTime == firstLaunchTime) {
-                        startAppLockActivity()
-                    } else {
-                        startApp()
-                    }
+                    startApp()
                 }
             }
         }
@@ -91,15 +83,6 @@ class LaunchActivity : AppCompatActivity() {
         } ?: run {
             startActivity(Intent(this, MainActivity::class.java))
         }
-    }
-
-    private fun startAppLockActivity() {
-        LockActivity.startAppLockActivity(
-            context = this,
-            destinationClass = MainActivity::class.java,
-            primaryColor = localSettings.accentColor.getPrimary(this)
-        )
-        getMainApplication().resetLastAppClosing()
     }
 
     private fun loginUser() {
