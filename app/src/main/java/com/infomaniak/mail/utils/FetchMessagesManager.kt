@@ -34,10 +34,13 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.LaunchActivityArgs
+import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity
+import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.NotificationUtils.buildNewMessageNotification
 import io.realm.kotlin.Realm
 import io.sentry.Sentry
@@ -109,7 +112,31 @@ class FetchMessagesManager @Inject constructor(
             return PendingIntent.getActivity(appContext, requestCode.hashCode(), intent, NotificationUtilsCore.pendingIntentFlags)
         }
 
-        fun showNotification(contentText: String, isSummary: Boolean, title: String = "", description: String? = null) {
+        fun NotificationCompat.Builder.addActions(messageUid: String) {
+            val actionsRequestCode = 0
+            val actionsFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            val actionsIcon = 0
+
+            val replyIntent = Intent(appContext, NewMessageActivity::class.java).apply {
+                val bundle = NewMessageActivityArgs(
+                    draftMode = DraftMode.REPLY,
+                    previousMessageUid = messageUid,
+                ).toBundle()
+                putExtras(bundle)
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+            val replyPendingIntent = PendingIntent.getActivity(appContext, actionsRequestCode, replyIntent, actionsFlags)
+
+            addAction(actionsIcon, appContext.getString(R.string.actionReply), replyPendingIntent)
+        }
+
+        fun showNotification(
+            contentText: String,
+            isSummary: Boolean,
+            title: String = "",
+            description: String? = null,
+            messageUid: String,
+        ) {
             appContext.buildNewMessageNotification(mailbox.channelId, title, description).apply {
                 if (isSummary) {
                     setContentTitle(null)
@@ -119,6 +146,7 @@ class FetchMessagesManager @Inject constructor(
                 setContentText(contentText)
                 setColorized(true)
                 setContentIntent(contentIntent(isSummary = isSummary))
+                addActions(messageUid)
                 setGroup(mailbox.notificationGroupKey)
                 setGroupSummary(isSummary)
                 color = localSettings.accentColor.getPrimary(appContext)
@@ -167,6 +195,7 @@ class FetchMessagesManager @Inject constructor(
             isSummary = false,
             title = message.sender.displayedName(appContext),
             description = description,
+            messageUid = message.uid,
         )
 
         // Show group summary notification
@@ -179,6 +208,7 @@ class FetchMessagesManager @Inject constructor(
             showNotification(
                 contentText = summaryText,
                 isSummary = true,
+                messageUid = message.uid,
             )
         }
     }
