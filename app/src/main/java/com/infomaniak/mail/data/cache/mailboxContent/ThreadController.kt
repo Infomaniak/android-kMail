@@ -21,6 +21,7 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
@@ -81,7 +82,7 @@ class ThreadController @Inject constructor(
      */
     suspend fun initAndGetSearchFolderThreads(
         remoteThreads: List<Thread>,
-        folderRole: Folder.FolderRole?,
+        folderRole: FolderRole?,
     ): List<Thread> = withContext(ioDispatcher) {
 
         fun MutableRealm.keepOldMessagesAndAddToSearchFolder(remoteThread: Thread, searchFolder: Folder) {
@@ -96,8 +97,8 @@ class ThreadController @Inject constructor(
                 remoteMessage.initLocalValues(
                     date = localMessage?.date ?: remoteMessage.date,
                     isFullyDownloaded = localMessage?.isFullyDownloaded ?: false,
-                    isSpam = folderRole == Folder.FolderRole.SPAM,
-                    isTrashed = folderRole == Folder.FolderRole.TRASH,
+                    isSpam = folderRole == FolderRole.SPAM,
+                    isTrashed = folderRole == FolderRole.TRASH,
                     draftLocalUuid = localMessage?.draftLocalUuid,
                     isFromSearch = localMessage == null
                 )
