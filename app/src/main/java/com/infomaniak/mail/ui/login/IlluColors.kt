@@ -25,7 +25,7 @@ import com.airbnb.lottie.model.KeyPath
 import com.google.android.material.color.utilities.Hct
 import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.LocalSettings.*
 import com.infomaniak.mail.utils.changePathColor
 
 object IlluColors {
@@ -60,7 +60,7 @@ object IlluColors {
         96.0,
     )
 
-    fun LottieAnimationView.changeIllustrationColors(position: Int, accentColor: LocalSettings.AccentColor) {
+    fun LottieAnimationView.changeIllustrationColors(position: Int, accentColor: AccentColor) {
         updateAccentColorIndependentColors(position)
         updateAccentColorDependentColors(accentColor, position)
     }
@@ -197,19 +197,19 @@ object IlluColors {
     //endregion
 
     //region Accent color dependent part
-    private fun LottieAnimationView.updateAccentColorDependentColors(accentColor: LocalSettings.AccentColor, position: Int) {
+    private fun LottieAnimationView.updateAccentColorDependentColors(accentColor: AccentColor, position: Int) {
         val palette = context.getPaletteFor(accentColor)
         val pathsToColor = getPathsToColorFromPalette(palette)
         colorPaths(pathsToColor, position)
     }
 
     @SuppressLint("RestrictedApi")
-    fun Context.getPaletteFor(accentColor: LocalSettings.AccentColor): IntArray {
+    fun Context.getPaletteFor(accentColor: AccentColor): IntArray {
         return when (accentColor) {
-            LocalSettings.AccentColor.PINK -> resources.getIntArray(R.array.pinkColors)
-            LocalSettings.AccentColor.BLUE -> resources.getIntArray(R.array.blueColors)
-            LocalSettings.AccentColor.SYSTEM -> {
-                val primary = LocalSettings.AccentColor.SYSTEM.getPrimary(this)
+            AccentColor.PINK -> resources.getIntArray(R.array.pinkColors)
+            AccentColor.BLUE -> resources.getIntArray(R.array.blueColors)
+            AccentColor.SYSTEM -> {
+                val primary = AccentColor.SYSTEM.getPrimary(this)
                 val primaryColor = Hct.fromInt(primary)
 
                 val tones = if (isNightModeEnabled()) darkTones else lightTones

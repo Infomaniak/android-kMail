@@ -51,6 +51,7 @@ import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.LocalSettings.*
 import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition.INLINE
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -337,7 +338,7 @@ class NewMessageFragment : Fragment() {
 
         bodyText.setText(draft.uiBody)
 
-        val alwaysShowExternalContent = localSettings.externalContent == LocalSettings.ExternalContent.ALWAYS
+        val alwaysShowExternalContent = localSettings.externalContent == ExternalContent.ALWAYS
 
         draft.uiSignature?.let { html ->
             signatureWebView.apply {
