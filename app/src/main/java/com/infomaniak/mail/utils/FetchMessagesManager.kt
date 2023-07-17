@@ -160,17 +160,25 @@ class FetchMessagesManager @Inject constructor(
         val formattedPreview = preview.replace("\\n+\\s*".toRegex(), "\n") // Ignore multiple/start whitespaces
         val description = "$subject$formattedPreview"
 
-        // Show message notification
-        showNotification(subject, false, message.sender.displayedName(appContext), description)
+        // Show Message notification
+        showNotification(
+            contentText = subject,
+            isSummary = false,
+            title = message.sender.displayedName(appContext),
+            description = description,
+        )
 
         // Show group summary notification
         if (isLastMessage) {
             val summaryText = appContext.resources.getQuantityString(
                 R.plurals.newMessageNotificationSummary,
                 unReadThreadsCount,
-                unReadThreadsCount
+                unReadThreadsCount,
             )
-            showNotification(summaryText, true)
+            showNotification(
+                contentText = summaryText,
+                isSummary = true,
+            )
         }
     }
 
