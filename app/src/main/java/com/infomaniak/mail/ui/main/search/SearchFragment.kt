@@ -140,10 +140,6 @@ class SearchFragment : Fragment() {
     private fun setFoldersDropdownUi() {
         val popupMenu = createPopupMenu()
         binding.folderDropDown.setOnClickListener { popupMenu.show() }
-        updateFolderDropDownUi(
-            folder = searchViewModel.currentFolder,
-            title = requireContext().getLocalizedNameOrAllFolders(searchViewModel.currentFolder),
-        )
     }
 
     private fun createPopupMenu(): ListPopupWindow {
@@ -154,7 +150,8 @@ class SearchFragment : Fragment() {
             width = resources.getDimensionPixelSize(R.dimen.maxSearchChipWidth)
         }
 
-        mainViewModel.currentFoldersLive.value?.let { (defaultFolders, customFolders) ->
+        mainViewModel.currentFoldersLive.observe(viewLifecycleOwner) { (defaultFolders, customFolders) ->
+
             val folders = defaultFolders.toMutableList<Any>().apply {
                 add(0, SearchFolderElement.ALL_FOLDERS)
                 add(SearchFolderElement.SEPARATOR)
@@ -165,7 +162,13 @@ class SearchFragment : Fragment() {
                 onFolderSelected(folder, title)
                 popupMenu.dismiss()
             }
+
             popupMenu.setAdapter(searchAdapter)
+
+            updateFolderDropDownUi(
+                folder = searchViewModel.currentFolder,
+                title = requireContext().getLocalizedNameOrAllFolders(searchViewModel.currentFolder),
+            )
         }
 
         return popupMenu
