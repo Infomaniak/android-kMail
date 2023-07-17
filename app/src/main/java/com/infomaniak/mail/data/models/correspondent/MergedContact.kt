@@ -21,7 +21,6 @@ import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.Ignore
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.parcelize.Parcelize
-import kotlinx.serialization.Transient
 
 @Parcelize
 @Suppress("PROPERTY_WONT_BE_SERIALIZED")

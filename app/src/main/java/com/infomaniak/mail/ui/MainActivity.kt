@@ -61,7 +61,7 @@ import java.util.UUID
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity : ThemedActivity() {
+class MainActivity : BaseActivity() {
 
     // This binding is not private because it's used in ThreadListFragment (`(activity as? MainActivity)?.binding`)
     val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }

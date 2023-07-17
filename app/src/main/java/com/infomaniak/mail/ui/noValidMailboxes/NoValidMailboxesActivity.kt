@@ -24,12 +24,12 @@ import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ActivityNoValidMailboxesBinding
-import com.infomaniak.mail.ui.ThemedActivity
+import com.infomaniak.mail.ui.BaseActivity
 import com.infomaniak.mail.utils.SentryDebug
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class NoValidMailboxesActivity : ThemedActivity() {
+class NoValidMailboxesActivity : BaseActivity() {
 
     private val binding by lazy { ActivityNoValidMailboxesBinding.inflate(layoutInflater) }
 

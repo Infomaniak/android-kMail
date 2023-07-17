@@ -49,6 +49,7 @@ import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.MatomoMail.trackThreadActionsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.LocalSettings.ExternalContent
 import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder.FolderRole
@@ -78,7 +79,7 @@ class ThreadFragment : Fragment() {
     private val threadViewModel: ThreadViewModel by viewModels()
 
     private val alwaysShowExternalContent by lazy {
-        LocalSettings.getInstance(requireContext()).externalContent == LocalSettings.ExternalContent.ALWAYS
+        LocalSettings.getInstance(requireContext()).externalContent == ExternalContent.ALWAYS
     }
 
     private val threadAdapter by lazy { ThreadAdapter(shouldLoadDistantResources()) }
