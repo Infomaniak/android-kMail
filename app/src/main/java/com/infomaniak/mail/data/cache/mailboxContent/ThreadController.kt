@@ -92,7 +92,7 @@ class ThreadController @Inject constructor(
 
                 val localMessage = MessageController.getMessage(remoteMessage.uid, realm = this)
 
-                // The search only returns messages from spam or trash if we explicitly selected those folders
+                // The Search only returns Messages from SPAM or TRASH if we explicitly selected those folders,
                 // which is the reason why we can compute `isSpam` and `isTrashed` values so loosely.
                 remoteMessage.initLocalValues(
                     date = localMessage?.date ?: remoteMessage.date,
@@ -100,7 +100,7 @@ class ThreadController @Inject constructor(
                     isSpam = folderRole == FolderRole.SPAM,
                     isTrashed = folderRole == FolderRole.TRASH,
                     draftLocalUuid = localMessage?.draftLocalUuid,
-                    isFromSearch = localMessage == null
+                    isFromSearch = localMessage == null,
                 )
                 remoteMessage.body = localMessage?.body?.copyFromRealm()
 
