@@ -91,9 +91,9 @@ class SearchViewModel @Inject constructor(
     }
 
     fun executePendingSearch() = viewModelScope.launch(ioCoroutineContext) {
-        val hasPendingSearch = lastExecutedSearchQuery != currentSearchQuery
-                || lastExecutedFolder != currentFolder
-                || lastExecutedFilters != currentFilters
+        val hasPendingSearch = (lastExecutedSearchQuery != currentSearchQuery)
+                || (lastExecutedFolder != currentFolder)
+                || (lastExecutedFilters != currentFilters)
 
         if (hasPendingSearch) search()
     }
