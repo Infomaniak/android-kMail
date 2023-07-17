@@ -75,7 +75,7 @@
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/fromMailAddress"
                         style="@style/TextButton"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:clickable="false"
                         android:focusable="false"

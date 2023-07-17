@@ -58,7 +58,7 @@ class SignatureSettingViewModel @Inject constructor(
     fun init(mailboxObjectId: String) = liveData(ioDispatcher) {
         mailbox = MailboxController.getMailbox(mailboxObjectId)!!
         customRealm = RealmDatabase.newMailboxContentInstance(AccountUtils.currentUserId, mailbox.mailboxId)
-        signaturesLive = SignatureController.getSignaturesLive(customRealm!!).asLiveData(coroutineContext)
+        signaturesLive = SignatureController.getSignaturesAsync(customRealm!!).asLiveData(coroutineContext)
 
         emit(mailbox)
     }

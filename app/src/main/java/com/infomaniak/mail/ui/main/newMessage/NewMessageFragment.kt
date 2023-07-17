@@ -34,9 +34,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.webkit.WebView
-import android.widget.ArrayAdapter
 import android.widget.ListPopupWindow
-import android.widget.PopupWindow
 import androidx.core.net.MailTo
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -56,7 +54,7 @@ import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition.INLINE
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.*
-import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.*
@@ -69,7 +67,6 @@ import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.UUID
 import javax.inject.Inject
-import com.google.android.material.R as RMaterial
 
 @AndroidEntryPoint
 class NewMessageFragment : Fragment() {
@@ -86,10 +83,10 @@ class NewMessageFragment : Fragment() {
     private lateinit var filePicker: FilePicker
 
     private val attachmentAdapter = AttachmentAdapter(shouldDisplayCloseButton = true, onDelete = ::onDeleteAttachment)
+    private lateinit var signatureAdapter: SignatureAdapter
 
     private val webViewUtils by lazy { WebViewUtils(requireContext()) }
 
-    private var mailboxes = emptyList<Mailbox>()
     private var selectedMailboxIndex = 0
     private var lastFieldToTakeFocus: FieldType? = TO
     var shouldSendInsteadOfSave: Boolean = false
@@ -126,11 +123,22 @@ class NewMessageFragment : Fragment() {
         doAfterBodyChange()
 
         observeContacts()
-        observeMailboxes()
+        // observeMailboxes()
         observeEditorActions()
         observeNewAttachments()
         observeCcAndBccVisibility()
         observeDraftWorkerResults()
+        observeInitSuccess()
+    }
+
+    private fun observeInitSuccess() {
+        newMessageViewModel.isInitSuccess.observe(viewLifecycleOwner) { isSuccess ->
+            Log.e("gibran", "observeInitSuccess: FRAGMENT COLLECTED IT");
+            if (isSuccess) {
+                val (signatures, signatureMap) = newMessageViewModel.signatures
+                setupFromField(signatures, signatureMap)
+            }
+        }
     }
 
     override fun onStart() {
@@ -467,37 +475,30 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun observeMailboxes() {
-        newMessageViewModel.mailboxes.observe(viewLifecycleOwner) {
-            setupFromField(it.first, it.second)
-        }
-    }
+    // private fun observeMailboxes() {
+    //     newMessageViewModel.mailboxes.observe(viewLifecycleOwner) {
+    //         setupFromField(it.first, it.second)
+    //     }
+    // }
 
-    // TODO: Since we don't want to allow changing email & signature, maybe this code could be simplified?
-    private fun setupFromField(mailboxes: List<Mailbox>, currentMailboxIndex: Int) = with(binding) {
+    private fun setupFromField(signatures: List<Signature>, signatureMap: Map<Int, Signature>) = with(binding) {
+        // fromMailAddress.text = signatureMap[newMessageViewModel.selectedSignatureId]!!.senderIdn
 
-        this@NewMessageFragment.mailboxes = mailboxes
-        selectedMailboxIndex = currentMailboxIndex
-        val mails = mailboxes.map { it.email }
-
-        fromMailAddress.text = mailboxes[selectedMailboxIndex].email
-
-        val adapter = ArrayAdapter(context, RMaterial.layout.support_simple_spinner_dropdown_item, mails)
-        addressListPopupWindow.apply {
-            setAdapter(adapter)
-            isModal = true
-            inputMethodMode = PopupWindow.INPUT_METHOD_NOT_NEEDED
-            anchorView = fromMailAddress
-            width = fromMailAddress.width
-            setOnItemClickListener { _, _, position, _ ->
-                fromMailAddress.text = mails[position]
-                selectedMailboxIndex = position
-                dismiss()
-            }
-        }
-
-        // TODO: This is disabled for now, because we probably don't want to allow changing email & signature.
-        // if (mails.count() > 1) {
+        // val adapter = SignatureAdapter(signatures)
+        // addressListPopupWindow.apply {
+        //     setAdapter(adapter)
+        //     isModal = true
+        //     inputMethodMode = PopupWindow.INPUT_METHOD_NOT_NEEDED
+        //     anchorView = fromMailAddress
+        //     width = fromMailAddress.width
+        //     setOnItemClickListener { _, _, position, _ ->
+        //         fromMailAddress.text = mails[position]
+        //         selectedMailboxIndex = position
+        //         dismiss()
+        //     }
+        // }
+        //
+        // if (signatures.count() > 1) {
         //     fromMailAddress.apply {
         //         setOnClickListener { _ -> addressListPopupWindow.show() }
         //         isClickable = true

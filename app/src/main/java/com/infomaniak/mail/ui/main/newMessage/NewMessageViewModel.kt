@@ -35,6 +35,7 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
+import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.data.models.Attachment
@@ -43,6 +44,7 @@ import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.main.SnackBarManager
@@ -55,7 +57,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.realmListOf
+import io.realm.kotlin.query.RealmResults
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableSharedFlow
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import javax.inject.Inject
@@ -81,6 +85,8 @@ class NewMessageViewModel @Inject constructor(
             field = value
             if (field.body.isNotEmpty()) splitSignatureAndQuoteFromBody()
         }
+    var selectedSignatureId = -1
+    lateinit var signatures: Pair<RealmResults<Signature>, Map<Int, Signature>>
 
     var isAutoCompletionOpened = false
     var isEditorExpanded = false
@@ -89,7 +95,8 @@ class NewMessageViewModel @Inject constructor(
 
     // Boolean: For toggleable actions, `false` if the formatting has been removed and `true` if the formatting has been applied.
     val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
-    val isInitSuccess = SingleLiveEvent<Boolean>()
+    private val _isInitSuccess = MutableSharedFlow<Boolean>()
+    val isInitSuccess get() = _isInitSuccess.asLiveData(ioCoroutineContext)
     val importedAttachments = MutableLiveData<Pair<MutableList<Attachment>, ImportationResult>>()
     val isSendingAllowed = MutableLiveData(false)
 
@@ -121,10 +128,11 @@ class NewMessageViewModel @Inject constructor(
         previousMessageUid: String?,
         recipient: Recipient?,
     ): LiveData<Boolean> = liveData(ioCoroutineContext) {
+        val realm = mailboxContentRealm()
 
         val mailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
 
-        val isSuccess = mailboxContentRealm().writeBlocking {
+        val isSuccess = realm.writeBlocking {
 
             runCatching {
                 val isRecreated = activityCreationStatus == CreationStatus.RECREATED
@@ -160,6 +168,7 @@ class NewMessageViewModel @Inject constructor(
         }
 
         if (isSuccess) {
+            signatures = SignatureController.getSignaturesMap(realm)
             saveDraftSnapshot()
             if (draft.cc.isNotEmpty() || draft.bcc.isNotEmpty()) {
                 otherFieldsAreAllEmpty.postValue(false)
@@ -168,7 +177,8 @@ class NewMessageViewModel @Inject constructor(
         }
 
         emit(isSuccess)
-        isInitSuccess.postValue(isSuccess)
+        Log.i("gibran", "initDraftAndViewModel: emitting isSuccess from view model");
+        _isInitSuccess.emit(isSuccess)
     }
 
     private fun getLatestDraft(draftLocalUuid: String?): Draft? {
