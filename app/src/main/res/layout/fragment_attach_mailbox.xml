@@ -75,7 +75,6 @@
             android:layout_marginTop="@dimen/marginStandardSmall"
             android:hint="@string/attachMailboxPasswordInputHint"
             app:endIconContentDescription="@string/contentDescriptionButtonShowPassword"
-            app:endIconDrawable="@drawable/ic_show_password"
             app:endIconMode="password_toggle"
             app:errorEnabled="true"
             app:errorIconDrawable="@null"
