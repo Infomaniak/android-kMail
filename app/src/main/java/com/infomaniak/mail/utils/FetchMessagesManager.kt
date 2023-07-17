@@ -115,7 +115,6 @@ class FetchMessagesManager @Inject constructor(
         fun NotificationCompat.Builder.addActions(messageUid: String, notificationId: Int) {
             val actionsRequestCode = 0
             val actionsFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-            val actionsIcon = 0
 
             val replyIntent = Intent(appContext, NewMessageActivity::class.java).apply {
                 val bundle = NewMessageActivityArgs(
@@ -128,7 +127,7 @@ class FetchMessagesManager @Inject constructor(
             }
             val replyPendingIntent = PendingIntent.getActivity(appContext, actionsRequestCode, replyIntent, actionsFlags)
 
-            addAction(actionsIcon, appContext.getString(R.string.actionReply), replyPendingIntent)
+            addAction(NotificationCompat.Action(null, appContext.getString(R.string.actionReply), replyPendingIntent))
         }
 
         fun showNotification(
