@@ -46,6 +46,7 @@ class SharedViewModelUtils @Inject constructor(
         message: Message? = null,
         started: (() -> Unit)? = null,
         stopped: (() -> Unit)? = null,
+        shouldRefresh: Boolean = true,
     ) {
 
         val messages = when (message) {
@@ -55,7 +56,7 @@ class SharedViewModelUtils @Inject constructor(
 
         val isSuccess = ApiRepository.markMessagesAsSeen(mailbox.uuid, messages.getUids()).isSuccess()
 
-        if (isSuccess) {
+        if (isSuccess && shouldRefresh) {
             refreshFolders(
                 mailbox = mailbox,
                 messagesFoldersIds = messages.getFoldersIds(),
