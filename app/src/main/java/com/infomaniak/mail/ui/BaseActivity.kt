@@ -28,7 +28,7 @@ import com.infomaniak.mail.utils.getMainApplication
 import io.sentry.Sentry
 import kotlinx.coroutines.runBlocking
 
-open class ThemedActivity : AppCompatActivity() {
+open class BaseActivity : AppCompatActivity() {
 
     protected val localSettings by lazy { LocalSettings.getInstance(this) }
 
@@ -40,7 +40,7 @@ open class ThemedActivity : AppCompatActivity() {
             if (AccountUtils.currentUser == null) {
                 Sentry.withScope { scope ->
                     scope.setExtra("has been fixed", "false")
-                    Sentry.captureMessage("ThemedActivity> the current user is null")
+                    Sentry.captureMessage("BaseActivity> the current user is null")
                 }
             }
         }
@@ -55,7 +55,7 @@ open class ThemedActivity : AppCompatActivity() {
         if (localSettings.isAppLocked && isKeyguardSecure()) with(getMainApplication()) {
             lastAppClosingTime?.let {
                 LockActivity.lockAfterTimeout(
-                    context = this@ThemedActivity,
+                    context = this@BaseActivity,
                     destinationClass = this::class.java,
                     lastAppClosingTime = it,
                     primaryColor = localSettings.accentColor.getPrimary(this),

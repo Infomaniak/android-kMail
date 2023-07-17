@@ -24,7 +24,7 @@ import com.infomaniak.mail.BuildConfig.SHOP_URL
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.ActivityNoMailboxBinding
-import com.infomaniak.mail.ui.ThemedActivity
+import com.infomaniak.mail.ui.BaseActivity
 import com.infomaniak.mail.ui.login.IlluColors.Category
 import com.infomaniak.mail.ui.login.IlluColors.IlluColors
 import com.infomaniak.mail.ui.login.IlluColors.getPaletteFor
@@ -32,7 +32,7 @@ import com.infomaniak.mail.ui.login.IlluColors.keyPath
 import com.infomaniak.mail.utils.changePathColor
 import com.infomaniak.mail.utils.repeatFrame
 
-class NoMailboxActivity : ThemedActivity() {
+class NoMailboxActivity : BaseActivity() {
 
     private val binding by lazy { ActivityNoMailboxBinding.inflate(layoutInflater) }
 
