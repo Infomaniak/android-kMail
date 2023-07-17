@@ -72,7 +72,7 @@ class FolderController @Inject constructor(private val mailboxContentRealm: Real
         }
     }
 
-    fun deleteSearchData(realm: MutableRealm) = with(getOrCreateSearchFolder(realm)) {
+    fun deleteSearchFolderData(realm: MutableRealm) = with(getOrCreateSearchFolder(realm)) {
         messages = realmListOf()
         threads = realmListOf()
     }

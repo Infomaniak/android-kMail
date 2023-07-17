@@ -80,7 +80,7 @@ class SearchUtils @Inject constructor(
             Log.i(TAG, "SearchUtils>deleteRealmSearchData: remove old search data")
             messageController.deleteSearchMessages(realm = this)
             threadController.deleteSearchThreads(realm = this)
-            folderController.deleteSearchData(realm = this)
+            folderController.deleteSearchFolderData(realm = this)
         }
     }
 
