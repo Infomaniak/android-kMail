@@ -166,6 +166,11 @@ object RealmDatabase {
         //region Configurations names
         const val appSettingsDbName = "AppSettings.realm"
         const val mailboxInfoDbName = "MailboxInfo.realm"
+
+        const val USER_INFO_SCHEMA_VERSION = 1L
+        const val MAILBOX_INFO_SCHEMA_VERSION = 1L
+        const val MAILBOX_CONTENT_SCHEMA_VERSION = 1L
+
         fun userInfoDbName(userId: Int) = "User-${userId}.realm"
         fun mailboxContentDbNamePrefix(userId: Int) = "Mailbox-${userId}-"
         fun mailboxContentDbName(userId: Int, mailboxId: Int) = "${mailboxContentDbNamePrefix(userId)}${mailboxId}.realm"
@@ -206,19 +211,22 @@ object RealmDatabase {
             get() = RealmConfiguration
                 .Builder(userInfoSet)
                 .name(userInfoDbName(AccountUtils.currentUserId))
-                .deleteRealmIfMigrationNeeded() // TODO: Remove after next release
+                .schemaVersion(USER_INFO_SCHEMA_VERSION)
+                .migration(USER_INFO_MIGRATION)
                 .build()
 
         val mailboxInfo = RealmConfiguration
             .Builder(mailboxInfoSet)
             .name(mailboxInfoDbName)
+            .schemaVersion(MAILBOX_INFO_SCHEMA_VERSION)
+            .migration(MAILBOX_INFO_MIGRATION)
             .build()
 
         fun mailboxContent(mailboxId: Int, userId: Int = AccountUtils.currentUserId) = RealmConfiguration
             .Builder(mailboxContentSet)
             .name(mailboxContentDbName(userId, mailboxId))
-            .schemaVersion(1)
-            .deleteRealmIfMigrationNeeded() // TODO: Remove after next release
+            .schemaVersion(MAILBOX_CONTENT_SCHEMA_VERSION)
+            .migration(MAILBOX_CONTENT_MIGRATION)
             .build()
         //endregion
     }
