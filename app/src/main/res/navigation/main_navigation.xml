@@ -77,6 +77,11 @@
             android:name="shouldLoadDistantResources"
             android:defaultValue="false"
             app:argType="boolean" />
+
+        <argument
+            android:name="notificationId"
+            android:defaultValue="-1"
+            app:argType="integer" />
         <!-- Endregion -->
 
         <!-- Region Get draft -->

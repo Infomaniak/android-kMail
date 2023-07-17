@@ -112,7 +112,7 @@ class FetchMessagesManager @Inject constructor(
             return PendingIntent.getActivity(appContext, requestCode.hashCode(), intent, NotificationUtilsCore.pendingIntentFlags)
         }
 
-        fun NotificationCompat.Builder.addActions(messageUid: String) {
+        fun NotificationCompat.Builder.addActions(messageUid: String, notificationId: Int) {
             val actionsRequestCode = 0
             val actionsFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
             val actionsIcon = 0
@@ -121,6 +121,7 @@ class FetchMessagesManager @Inject constructor(
                 val bundle = NewMessageActivityArgs(
                     draftMode = DraftMode.REPLY,
                     previousMessageUid = messageUid,
+                    notificationId = notificationId,
                 ).toBundle()
                 putExtras(bundle)
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -138,6 +139,9 @@ class FetchMessagesManager @Inject constructor(
             messageUid: String,
         ) {
             appContext.buildNewMessageNotification(mailbox.channelId, title, description).apply {
+
+                val notificationId = if (isSummary) mailbox.notificationGroupId else uid.hashCode()
+
                 if (isSummary) {
                     setContentTitle(null)
                     setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
@@ -146,12 +150,11 @@ class FetchMessagesManager @Inject constructor(
                 setContentText(contentText)
                 setColorized(true)
                 setContentIntent(contentIntent(isSummary = isSummary))
-                addActions(messageUid)
+                addActions(messageUid, notificationId)
                 setGroup(mailbox.notificationGroupKey)
                 setGroupSummary(isSummary)
                 color = localSettings.accentColor.getPrimary(appContext)
 
-                val notificationId = if (isSummary) mailbox.notificationGroupId else uid.hashCode()
                 @Suppress("MissingPermission")
                 notificationManagerCompat.notify(notificationId, build())
             }
