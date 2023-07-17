@@ -52,7 +52,7 @@ class FetchMessagesManager @Inject constructor(
 
     private val localSettings by lazy { LocalSettings.getInstance(appContext) }
 
-    suspend fun execute(userId: Int, mailbox: Mailbox, messageUid: String? = null, mailboxContentRealm: Realm? = null) {
+    suspend fun execute(userId: Int, mailbox: Mailbox, sentryMessageUid: String? = null, mailboxContentRealm: Realm? = null) {
 
         // Don't launch sync if the mailbox's notifications have been disabled by the user
         if (mailbox.notificationsIsDisabled(notificationManagerCompat)) return
@@ -82,7 +82,7 @@ class FetchMessagesManager @Inject constructor(
                 realm = realm,
                 unReadThreadsCount = unReadThreadsCount,
                 isLastMessage = index == newMessagesThreads.lastIndex,
-                messageUid = messageUid,
+                sentryMessageUid = sentryMessageUid,
                 okHttpClient = okHttpClient,
             )
         }
@@ -96,7 +96,7 @@ class FetchMessagesManager @Inject constructor(
         realm: Realm,
         unReadThreadsCount: Int,
         isLastMessage: Boolean,
-        messageUid: String?,
+        sentryMessageUid: String?,
         okHttpClient: OkHttpClient,
     ) {
 
@@ -136,7 +136,7 @@ class FetchMessagesManager @Inject constructor(
                     scope.setExtra("does Thread still exist ?", "[true]")
                     scope.setExtra("currentMailboxEmail", "[${AccountUtils.currentMailboxEmail}]")
                     scope.setExtra("mailbox.email", "[${mailbox.email}]")
-                    scope.setExtra("messageUid", "[$messageUid]")
+                    scope.setExtra("messageUid", "[$sentryMessageUid]")
                     scope.setExtra("folderName", "[${thread.folder.name}]")
                     scope.setExtra("threadUid", "[${thread.uid}]")
                     scope.setExtra("messagesCount", "[${thread.messages.count()}]")
