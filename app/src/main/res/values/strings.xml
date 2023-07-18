@@ -162,6 +162,7 @@
     <string name="contentDescriptionIconCalendar">Has Calendar event</string>
     <string name="contentDescriptionIconFavorite">Is favorite</string>
     <string name="contentDescriptionIconFolderSelected">Folder selected</string>
+    <string name="contentDescriptionIconInvalidPassword">Unblock mailbox</string>
     <string name="contentDescriptionIconNewMail">New</string>
     <string name="contentDescriptionIconStorage">Storage status</string>
     <string name="contentDescriptionOpenMailActions">Open mail actions</string>

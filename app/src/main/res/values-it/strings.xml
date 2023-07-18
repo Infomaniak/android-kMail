@@ -155,6 +155,7 @@
     <string name="contentDescriptionIconCalendar">Ha un evento di calendario</string>
     <string name="contentDescriptionIconFavorite">È il preferito</string>
     <string name="contentDescriptionIconFolderSelected">Cartella selezionata</string>
+    <string name="contentDescriptionIconInvalidPassword">Sbloccare l’indirizzo e-mail</string>
     <string name="contentDescriptionIconNewMail">Nuovo</string>
     <string name="contentDescriptionIconStorage">Stato di conservazione</string>
     <string name="contentDescriptionOpenMailActions">Azioni di apertura dei messaggi</string>

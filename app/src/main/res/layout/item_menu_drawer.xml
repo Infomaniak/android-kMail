@@ -91,7 +91,7 @@
                 android:layout_width="@dimen/chevronSize"
                 android:layout_height="@dimen/chevronSize"
                 android:layout_marginEnd="@dimen/marginStandardVerySmall"
-                android:contentDescription="@string/contentDescriptionIconFolderSelected"
+                android:contentDescription="@string/contentDescriptionIconInvalidPassword"
                 android:src="@drawable/ic_chevron_right"
                 android:visibility="gone" />
         </FrameLayout>

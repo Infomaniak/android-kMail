@@ -155,6 +155,7 @@
     <string name="contentDescriptionIconCalendar">Hat Kalender Ereignis</string>
     <string name="contentDescriptionIconFavorite">Ist Favorit</string>
     <string name="contentDescriptionIconFolderSelected">Ordner ausgewählt</string>
+    <string name="contentDescriptionIconInvalidPassword">E-Mail-Adresse entsperren</string>
     <string name="contentDescriptionIconNewMail">Neu</string>
     <string name="contentDescriptionIconStorage">Speicherstatus</string>
     <string name="contentDescriptionOpenMailActions">Mail-Aktionen öffnen</string>

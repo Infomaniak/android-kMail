@@ -157,6 +157,7 @@
     <string name="contentDescriptionIconCalendar">Contient un évènement Calendar</string>
     <string name="contentDescriptionIconFavorite">Est favori</string>
     <string name="contentDescriptionIconFolderSelected">Dossier sélectionné</string>
+    <string name="contentDescriptionIconInvalidPassword">Débloquer l’adresse</string>
     <string name="contentDescriptionIconNewMail">Nouveau</string>
     <string name="contentDescriptionIconStorage">État du stockage</string>
     <string name="contentDescriptionOpenMailActions">Ouvrir les actions du message</string>
