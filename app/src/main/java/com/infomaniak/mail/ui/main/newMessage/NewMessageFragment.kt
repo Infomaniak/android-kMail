@@ -86,11 +86,9 @@ class NewMessageFragment : Fragment() {
     private lateinit var filePicker: FilePicker
 
     private val attachmentAdapter = AttachmentAdapter(shouldDisplayCloseButton = true, onDelete = ::onDeleteAttachment)
-    // private lateinit var signatureAdapter: SignatureAdapter
 
     private val webViewUtils by lazy { WebViewUtils(requireContext()) }
 
-    // private var selectedMailboxIndex = 0
     private var lastFieldToTakeFocus: FieldType? = TO
     var shouldSendInsteadOfSave: Boolean = false
 
@@ -126,7 +124,6 @@ class NewMessageFragment : Fragment() {
         doAfterBodyChange()
 
         observeContacts()
-        // observeMailboxes()
         observeEditorActions()
         observeNewAttachments()
         observeCcAndBccVisibility()
@@ -368,7 +365,6 @@ class NewMessageFragment : Fragment() {
                 draft.uiSignature = null
                 signatureGroup.isGone = true
             }
-            // signatureGroup.isVisible = true
         }
 
         draft.uiQuote?.let { html ->
@@ -386,7 +382,6 @@ class NewMessageFragment : Fragment() {
                 draft.uiQuote = null
                 quoteGroup.isGone = true
             }
-            // quoteGroup.isVisible = true
         }
     }
 
@@ -481,35 +476,29 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    // private fun observeMailboxes() {
-    //     newMessageViewModel.mailboxes.observe(viewLifecycleOwner) {
-    //         setupFromField(it.first, it.second)
-    //     }
-    // }
-
     private fun setupFromField(signatures: List<Signature>, signatureMap: Map<Int, Signature>) = with(binding) {
         val selectedSignature = signatures.find { it.id == newMessageViewModel.selectedSignatureId }!!
         updateSelectedSignatureFromField(selectedSignature)
 
-        val adapter = SignatureAdapter(signatures, newMessageViewModel.selectedSignatureId)
+        val adapter = SignatureAdapter(signatures, newMessageViewModel.selectedSignatureId) { newSelectedSignature ->
+            updateSelectedSignatureFromField(newSelectedSignature)
+            updateBodySignature(newSelectedSignature.content)
+
+            newMessageViewModel.apply {
+                selectedSignatureId = newSelectedSignature.id
+                draft.identityId = newSelectedSignature.id.toString()
+                saveDraftDebouncing()
+            }
+
+            addressListPopupWindow.dismiss()
+        }
+
         addressListPopupWindow.apply {
             setAdapter(adapter)
             isModal = true
             inputMethodMode = PopupWindow.INPUT_METHOD_NOT_NEEDED
             anchorView = fromMailAddress
             width = fromMailAddress.width
-            setOnItemClickListener { _, _, position, _ ->
-                val newSelectedSignature = signatures[position]
-                updateSelectedSignatureFromField(newSelectedSignature)
-                updateBodySignature(newSelectedSignature.content)
-                adapter.updateSelectedSignature(newSelectedSignature.id)
-                newMessageViewModel.apply {
-                    selectedSignatureId = newSelectedSignature.id
-                    draft.identityId = newSelectedSignature.id.toString()
-                    saveDraftDebouncing()
-                }
-                dismiss()
-            }
         }
 
         if (signatures.count() > 1) {

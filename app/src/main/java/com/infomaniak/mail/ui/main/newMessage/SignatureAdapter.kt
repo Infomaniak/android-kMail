@@ -28,6 +28,7 @@ import com.infomaniak.mail.databinding.ItemSignatureBinding
 class SignatureAdapter(
     private var signatures: List<Signature>,
     private var selectedSignatureId: Int,
+    private val onClickListener: (signature: Signature) -> Unit,
 ) : ListAdapter {
 
     override fun registerDataSetObserver(observer: DataSetObserver?) = Unit
@@ -48,6 +49,11 @@ class SignatureAdapter(
             fullNameAndName.text = "${signature.expeditorName} (${signature.name})"
             emailAddress.text = signature.senderIdn
             // TODO : Add a selected style to the selected item
+
+            root.setOnClickListener {
+                onClickListener(signature)
+                updateSelectedSignature(signature.id)
+            }
         }.root
     }
 
@@ -57,15 +63,11 @@ class SignatureAdapter(
 
     override fun isEmpty(): Boolean = count == 0
 
-    override fun areAllItemsEnabled(): Boolean = false
+    override fun areAllItemsEnabled(): Boolean = true
 
-    override fun isEnabled(position: Int): Boolean = getItem(position).id != selectedSignatureId
+    override fun isEnabled(position: Int): Boolean = true
 
-    // fun updateSignatures(newSignatures: List<Signature>) {
-    //     signatures = newSignatures
-    // }
-
-    fun updateSelectedSignature(newSelectedSignatureId: Int) {
+    private fun updateSelectedSignature(newSelectedSignatureId: Int) {
         selectedSignatureId = newSelectedSignatureId
     }
 }
