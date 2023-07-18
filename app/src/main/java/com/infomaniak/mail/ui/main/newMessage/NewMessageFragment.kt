@@ -44,6 +44,7 @@ import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
@@ -69,6 +70,7 @@ import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.*
 import java.util.UUID
 import javax.inject.Inject
 
@@ -129,15 +131,6 @@ class NewMessageFragment : Fragment() {
         observeNewAttachments()
         observeCcAndBccVisibility()
         observeDraftWorkerResults()
-        observeInitSuccess()
-    }
-
-    private fun observeInitSuccess() {
-        // TODO : Move this observe in the other observe of the live data after initDraftAndViewModel
-        newMessageViewModel.isInitSuccess.observe(viewLifecycleOwner) { isSuccess ->
-            Log.e("gibran", "observeInitSuccess: FRAGMENT COLLECTED IT");
-            if (isSuccess) setupFromField()
-        }
     }
 
     override fun onStart() {
@@ -197,12 +190,16 @@ class NewMessageFragment : Fragment() {
             previousMessageUid,
             recipient,
         ).observe(viewLifecycleOwner) { isSuccess ->
-            // TODO : Move new observe here and rollback the stateflow into a single live event
+            Log.e("gibran", "initDraftAndViewModel: FRAGMENT COLLECTED IT");
             if (isSuccess) {
                 hideLoader()
                 showKeyboardInCorrectView()
                 populateViewModelWithExternalMailData()
                 populateUiWithViewModel()
+
+                // The observe usually happens before onResume, but here we need the view to be entirely laid out for the popup
+                // window to not crash because anchor might not be ready.
+                lifecycleScope.launch(Dispatchers.Main) { setupFromField() }
             } else requireActivity().apply {
                 showToast(R.string.failToOpenDraft)
                 finish()
@@ -383,6 +380,54 @@ class NewMessageFragment : Fragment() {
         }
     }
 
+    private fun setupFromField() = with(binding) {
+        val signatures = newMessageViewModel.signatures
+        Log.e("gibran", "setupFromField - signatures: ${signatures}")
+        val selectedSignature = signatures.find { it.id == newMessageViewModel.selectedSignatureId }!!
+        updateSelectedSignatureFromField(selectedSignature)
+
+        val adapter = SignatureAdapter(signatures, newMessageViewModel.selectedSignatureId) { newSelectedSignature ->
+            updateSelectedSignatureFromField(newSelectedSignature)
+            updateBodySignature(newSelectedSignature.content)
+
+            newMessageViewModel.apply {
+                selectedSignatureId = newSelectedSignature.id
+                draft.identityId = newSelectedSignature.id.toString()
+                saveDraftDebouncing()
+            }
+
+            addressListPopupWindow.dismiss()
+        }
+
+        addressListPopupWindow.apply {
+            setAdapter(adapter)
+            isModal = true
+            inputMethodMode = PopupWindow.INPUT_METHOD_NOT_NEEDED
+            anchorView = fromMailAddress
+            width = fromMailAddress.width
+        }
+
+        if (signatures.count() > 1) {
+            fromMailAddress.apply {
+                icon = AppCompatResources.getDrawable(context, R.drawable.ic_chevron_down)
+                Log.e("gibran", "setupFromField: about to set click listner");
+                setOnClickListener { _ ->
+                    Log.e("gibran", "setupFromField: got clicked");
+                    addressListPopupWindow.show()
+                }
+            }
+        }
+    }
+
+    private fun updateBodySignature(signatureContent: String) = with(binding) {
+        newMessageViewModel.draft.uiSignature = encapsulateSignatureContentWithInfomaniakClass(signatureContent)
+        signatureWebView.loadContent(signatureContent, signatureGroup)
+    }
+
+    private fun updateSelectedSignatureFromField(signature: Signature) {
+        binding.fromMailAddress.text = "${signature.expeditorName} <${signature.senderIdn}> (${signature.name})"
+    }
+
     private fun WebView.loadContent(html: String, webViewGroup: Group) {
         val processedHtml = webViewUtils.processHtmlForDisplay(html, context.isNightModeEnabled())
         webViewGroup.isVisible = processedHtml.isNotBlank()
@@ -472,51 +517,6 @@ class NewMessageFragment : Fragment() {
         binding.bodyText.doAfterTextChanged { editable ->
             editable?.toString()?.let(newMessageViewModel::updateMailBody)
         }
-    }
-
-    private fun setupFromField() = with(binding) {
-        val signatures = newMessageViewModel.signatures
-        val selectedSignature = signatures.find { it.id == newMessageViewModel.selectedSignatureId }!!
-        updateSelectedSignatureFromField(selectedSignature)
-
-        val adapter = SignatureAdapter(signatures, newMessageViewModel.selectedSignatureId) { newSelectedSignature ->
-            updateSelectedSignatureFromField(newSelectedSignature)
-            updateBodySignature(newSelectedSignature.content)
-
-            newMessageViewModel.apply {
-                selectedSignatureId = newSelectedSignature.id
-                draft.identityId = newSelectedSignature.id.toString()
-                saveDraftDebouncing()
-            }
-
-            addressListPopupWindow.dismiss()
-        }
-
-        addressListPopupWindow.apply {
-            setAdapter(adapter)
-            isModal = true
-            inputMethodMode = PopupWindow.INPUT_METHOD_NOT_NEEDED
-            anchorView = fromMailAddress
-            width = fromMailAddress.width
-        }
-
-        if (signatures.count() > 1) {
-            fromMailAddress.apply {
-                icon = AppCompatResources.getDrawable(context, R.drawable.ic_chevron_down)
-                setOnClickListener { _ -> addressListPopupWindow.show() }
-                isClickable = true
-                isFocusable = true
-            }
-        }
-    }
-
-    private fun updateBodySignature(signatureContent: String) = with(binding) {
-        newMessageViewModel.draft.uiSignature = encapsulateSignatureContentWithInfomaniakClass(signatureContent)
-        signatureWebView.loadContent(signatureContent, signatureGroup)
-    }
-
-    private fun updateSelectedSignatureFromField(signature: Signature) {
-        binding.fromMailAddress.text = "${signature.expeditorName} <${signature.senderIdn}> (${signature.name})"
     }
 
     private fun observeEditorActions() {

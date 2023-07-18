@@ -59,7 +59,6 @@ import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.query.RealmResults
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.MutableSharedFlow
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import javax.inject.Inject
@@ -95,8 +94,7 @@ class NewMessageViewModel @Inject constructor(
 
     // Boolean: For toggleable actions, `false` if the formatting has been removed and `true` if the formatting has been applied.
     val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
-    private val _isInitSuccess = MutableSharedFlow<Boolean>()
-    val isInitSuccess get() = _isInitSuccess.asLiveData(ioCoroutineContext)
+    val isInitSuccess = SingleLiveEvent<Boolean>()
     val importedAttachments = MutableLiveData<Pair<MutableList<Attachment>, ImportationResult>>()
     val isSendingAllowed = MutableLiveData(false)
 
@@ -177,9 +175,9 @@ class NewMessageViewModel @Inject constructor(
             }
         }
 
-        emit(isSuccess)
         Log.i("gibran", "initDraftAndViewModel: emitting isSuccess from view model");
-        _isInitSuccess.emit(isSuccess)
+        emit(isSuccess)
+        isInitSuccess.postValue(isSuccess)
     }
 
     private fun getLatestDraft(draftLocalUuid: String?): Draft? {
