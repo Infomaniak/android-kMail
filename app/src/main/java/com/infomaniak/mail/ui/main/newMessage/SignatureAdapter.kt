@@ -22,6 +22,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ListAdapter
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.databinding.ItemSignatureBinding
 
@@ -48,11 +49,16 @@ class SignatureAdapter(
             val signature = getItem(position)
             fullNameAndName.text = "${signature.expeditorName} (${signature.name})"
             emailAddress.text = signature.senderIdn
-            // TODO : Add a selected style to the selected item
 
-            root.setOnClickListener {
-                onClickListener(signature)
-                updateSelectedSignature(signature.id)
+            val isSelected = selectedSignatureId == signature.id
+            val backgroundColorRes = if (isSelected) R.color.backgroundSelectedSignature else R.color.backgroundColorTertiary
+            root.apply {
+                setCardBackgroundColor(parent.context.getColor(backgroundColorRes))
+
+                setOnClickListener {
+                    onClickListener(signature)
+                    updateSelectedSignature(signature.id)
+                }
             }
         }.root
     }

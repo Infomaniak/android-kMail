@@ -45,6 +45,7 @@
     <color name="backgroundSnackbarColor">@color/rabbit</color>
     <color name="elevatedBackground">@color/bat</color>
     <color name="backgroundDisabledPrimaryButton">@color/elephant</color>
+    <color name="backgroundSelectedSignature">@color/elephant</color>
 
     <!-- Texts -->
     <color name="primaryTextColor">@color/rabbit</color>
