@@ -54,10 +54,8 @@ object SignatureController {
         return getAllSignaturesQuery(realm).asFlow().map { it.list }
     }
 
-    fun getSignaturesMap(realm: TypedRealm): Pair<RealmResults<Signature>, Map<Int, Signature>> {
-        val signatures = getAllSignaturesQuery(realm).find()
-        val signatureMap = signatures.associateBy { it.id }
-        return signatures to signatureMap
+    fun getAllSignatures(realm: TypedRealm): RealmResults<Signature> {
+        return getAllSignaturesQuery(realm).find()
     }
     //endregion
 

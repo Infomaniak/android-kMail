@@ -136,10 +136,7 @@ class NewMessageFragment : Fragment() {
         // TODO : Move this observe in the other observe of the live data after initDraftAndViewModel
         newMessageViewModel.isInitSuccess.observe(viewLifecycleOwner) { isSuccess ->
             Log.e("gibran", "observeInitSuccess: FRAGMENT COLLECTED IT");
-            if (isSuccess) {
-                val (signatures, signatureMap) = newMessageViewModel.signatures
-                setupFromField(signatures, signatureMap)
-            }
+            if (isSuccess) setupFromField()
         }
     }
 
@@ -477,7 +474,8 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun setupFromField(signatures: List<Signature>, signatureMap: Map<Int, Signature>) = with(binding) {
+    private fun setupFromField() = with(binding) {
+        val signatures = newMessageViewModel.signatures
         val selectedSignature = signatures.find { it.id == newMessageViewModel.selectedSignatureId }!!
         updateSelectedSignatureFromField(selectedSignature)
 

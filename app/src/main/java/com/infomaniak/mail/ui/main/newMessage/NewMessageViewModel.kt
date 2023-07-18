@@ -86,7 +86,7 @@ class NewMessageViewModel @Inject constructor(
             if (field.body.isNotEmpty()) splitSignatureAndQuoteFromBody()
         }
     var selectedSignatureId = -1
-    lateinit var signatures: Pair<RealmResults<Signature>, Map<Int, Signature>>
+    lateinit var signatures: RealmResults<Signature>
 
     var isAutoCompletionOpened = false
     var isEditorExpanded = false
@@ -169,7 +169,7 @@ class NewMessageViewModel @Inject constructor(
 
         if (isSuccess) {
             selectedSignatureId = draft.identityId!!.toInt()
-            signatures = SignatureController.getSignaturesMap(realm)
+            signatures = SignatureController.getAllSignatures(realm)
             saveDraftSnapshot()
             if (draft.cc.isNotEmpty() || draft.bcc.isNotEmpty()) {
                 otherFieldsAreAllEmpty.postValue(false)
