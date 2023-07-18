@@ -36,7 +36,7 @@
     <string name="actionReply">Antwort</string>
     <string name="actionReplyAll">Alle antworten</string>
     <string name="actionReportDisplayProblem">Ein Anzeigeproblem melden</string>
-    <string name="actionReportJunk">Schrott melden</string>
+    <string name="actionReportJunk">Spam melden</string>
     <string name="actionShortMarkAsRead">Lesen Sie</string>
     <string name="actionShortMarkAsUnread">Ungelesen</string>
     <string name="actionShortSpam">Spam</string>
