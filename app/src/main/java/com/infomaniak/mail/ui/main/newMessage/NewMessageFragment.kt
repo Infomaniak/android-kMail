@@ -56,6 +56,7 @@ import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition.INLINE
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.*
+import com.infomaniak.mail.data.models.draft.Draft.Companion.encapsulateSignatureContentWithInfomaniakClass
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
@@ -134,12 +135,11 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeInitSuccess() {
+        // TODO : Move this observe in the other observe of the live data after initDraftAndViewModel
         newMessageViewModel.isInitSuccess.observe(viewLifecycleOwner) { isSuccess ->
             Log.e("gibran", "observeInitSuccess: FRAGMENT COLLECTED IT");
             if (isSuccess) {
                 val (signatures, signatureMap) = newMessageViewModel.signatures
-                val selectedSignatureId = signatures.firstOrNull { it.isDefault }?.id
-                newMessageViewModel.selectedSignatureId = selectedSignatureId!!
                 setupFromField(signatures, signatureMap)
             }
         }
@@ -202,6 +202,7 @@ class NewMessageFragment : Fragment() {
             previousMessageUid,
             recipient,
         ).observe(viewLifecycleOwner) { isSuccess ->
+            // TODO : Move new observe here and rollback the stateflow into a single live event
             if (isSuccess) {
                 hideLoader()
                 showKeyboardInCorrectView()
@@ -490,7 +491,7 @@ class NewMessageFragment : Fragment() {
         val selectedSignature = signatures.find { it.id == newMessageViewModel.selectedSignatureId }!!
         updateSelectedSignatureFromField(selectedSignature)
 
-        val adapter = SignatureAdapter(signatures)
+        val adapter = SignatureAdapter(signatures, newMessageViewModel.selectedSignatureId)
         addressListPopupWindow.apply {
             setAdapter(adapter)
             isModal = true
@@ -521,12 +522,12 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun updateBodySignature(signatureContent: String) = with(binding) {
-        newMessageViewModel.draft.uiSignature = signatureContent
+        newMessageViewModel.draft.uiSignature = encapsulateSignatureContentWithInfomaniakClass(signatureContent)
         signatureWebView.loadContent(signatureContent, signatureGroup)
     }
 
     private fun updateSelectedSignatureFromField(signature: Signature) {
-        binding.fromMailAddress.text = "${signature.addressName} <${signature.senderIdn}> (${signature.name})"
+        binding.fromMailAddress.text = "${signature.expeditorName} <${signature.senderIdn}> (${signature.name})"
     }
 
     private fun observeEditorActions() {

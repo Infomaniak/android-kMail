@@ -168,6 +168,7 @@ class NewMessageViewModel @Inject constructor(
         }
 
         if (isSuccess) {
+            selectedSignatureId = draft.identityId!!.toInt()
             signatures = SignatureController.getSignaturesMap(realm)
             saveDraftSnapshot()
             if (draft.cc.isNotEmpty() || draft.bcc.isNotEmpty()) {
@@ -258,6 +259,7 @@ class NewMessageViewModel @Inject constructor(
 
     private fun saveDraftSnapshot() = with(draft) {
         snapshot = DraftSnapshot(
+            identityId,
             to.toSet(),
             cc.toSet(),
             bcc.toSet(),
@@ -445,6 +447,7 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private data class DraftSnapshot(
+        val identityId: String?,
         val to: Set<Recipient>,
         val cc: Set<Recipient>,
         val bcc: Set<Recipient>,
@@ -454,7 +457,8 @@ class NewMessageViewModel @Inject constructor(
     )
 
     private fun DraftSnapshot.hasChanges(): Boolean {
-        return to != draft.to.toSet() ||
+        return identityId != draft.identityId ||
+                to != draft.to.toSet() ||
                 cc != draft.cc.toSet() ||
                 bcc != draft.bcc.toSet() ||
                 subject != draft.subject ||

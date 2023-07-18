@@ -28,7 +28,7 @@ class Signature : RealmObject {
     var id: Int = 0
     var name: String = ""
     @SerialName("full_name")
-    var addressName: String = ""
+    var expeditorName: String = ""
     @SerialName("is_default")
     var isDefault: Boolean = false
     var content: String = ""

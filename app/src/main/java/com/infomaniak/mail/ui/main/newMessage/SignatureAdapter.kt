@@ -26,10 +26,9 @@ import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.databinding.ItemSignatureBinding
 
 class SignatureAdapter(
-    private var signatures: List<Signature>
+    private var signatures: List<Signature>,
+    private var selectedSignatureId: Int,
 ) : ListAdapter {
-
-    private var selectedSignatureId: Long = -1
 
     override fun registerDataSetObserver(observer: DataSetObserver?) = Unit
 
@@ -46,7 +45,7 @@ class SignatureAdapter(
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         return convertView ?: ItemSignatureBinding.inflate(LayoutInflater.from(parent!!.context), parent, false).apply {
             val signature = getItem(position)
-            fullNameAndName.text = "${signature.addressName} (${signature.name})"
+            fullNameAndName.text = "${signature.expeditorName} (${signature.name})"
             emailAddress.text = signature.senderIdn
             // TODO : Add a selected style to the selected item
         }.root
@@ -60,13 +59,13 @@ class SignatureAdapter(
 
     override fun areAllItemsEnabled(): Boolean = false
 
-    override fun isEnabled(position: Int): Boolean = getItemId(position) != selectedSignatureId
+    override fun isEnabled(position: Int): Boolean = getItem(position).id != selectedSignatureId
 
     // fun updateSignatures(newSignatures: List<Signature>) {
     //     signatures = newSignatures
     // }
 
     fun updateSelectedSignature(newSelectedSignatureId: Int) {
-        selectedSignatureId = newSelectedSignatureId.toLong()
+        selectedSignatureId = newSelectedSignatureId
     }
 }
