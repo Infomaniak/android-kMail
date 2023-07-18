@@ -19,17 +19,8 @@ package com.infomaniak.mail.views
 
 import android.content.Context
 import android.graphics.Color
-import android.graphics.drawable.Drawable
 import android.util.AttributeSet
-import android.widget.ImageView
-import androidx.annotation.DimenRes
-import androidx.annotation.StringRes
-import androidx.core.content.res.ResourcesCompat
-import androidx.core.content.res.getDimensionPixelSizeOrThrow
-import com.google.android.material.shape.ShapeAppearanceModel
-import com.infomaniak.lib.core.utils.getAttributes
-import com.infomaniak.lib.core.utils.setMargins
-import com.infomaniak.lib.core.utils.setMarginsRelative
+import androidx.appcompat.content.res.AppCompatResources
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.getAttributeColor
 import com.google.android.material.R as RMaterial
@@ -40,41 +31,11 @@ abstract class SelectableTextItemView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : DecoratedTextItemView(context, attrs, defStyleAttr) {
 
-    private val regular by lazy { ResourcesCompat.getFont(context, com.infomaniak.lib.core.R.font.suisseintl_regular) }
-    private val medium by lazy { ResourcesCompat.getFont(context, com.infomaniak.lib.core.R.font.suisseintl_medium) }
-
-    var itemStyle = SelectionStyle.OTHER
-        set(value) {
-            field = value
-            if (value == SelectionStyle.MENU_DRAWER) {
-                binding.root.apply {
-                    context.obtainStyledAttributes(R.style.MenuDrawerItem, intArrayOf(android.R.attr.layout_marginStart)).let {
-                        setMarginsRelative(it.getDimensionPixelSizeOrThrow(0))
-                        it.recycle()
-                    }
-                    ShapeAppearanceModel.builder(context, 0, R.style.MenuDrawerItemShapeAppearance).build()
-                }
-            } else {
-                binding.root.apply {
-                    setMarginsRelative(0)
-                    shapeAppearanceModel = shapeAppearanceModel.toBuilder().setAllCornerSizes(0.0f).build()
-                    setContentPadding(0, 0, 0, 0)
-                }
-            }
-        }
-
-    var textWeight = TextWeight.MEDIUM
-        set(fontFamily) {
-            field = fontFamily
-            binding.itemName.typeface = if (fontFamily == TextWeight.MEDIUM) medium else regular
-        }
-
     private var isInSelectedState = false
 
-    init {
-        attrs?.getAttributes(context, R.styleable.DecoratedTextItemView) {
-            itemStyle = SelectionStyle.values()[getInteger(R.styleable.DecoratedTextItemView_itemStyle, 0)]
-            textWeight = TextWeight.values()[getInteger(R.styleable.DecoratedTextItemView_textWeight, 0)]
+    private val checkIcon by lazy {
+        AppCompatResources.getDrawable(context, R.drawable.ic_check)?.apply {
+            setTint(context.getAttributeColor(RMaterial.attr.colorPrimary))
         }
     }
 
@@ -88,25 +49,7 @@ abstract class SelectableTextItemView @JvmOverloads constructor(
 
         root.setCardBackgroundColor(color)
         itemName.setTextAppearance(textAppearance)
-    }
 
-    fun setEndIcon(icon: Drawable?, @DimenRes marginEnd: Int, @StringRes contentDescriptionRes: Int?) {
-        ImageView(context).apply {
-            setImageDrawable(icon)
-            contentDescription = contentDescriptionRes?.let(context::getString)
-            binding.endIconLayout.addView(this)
-            setMargins(right = resources.getDimension(marginEnd).toInt())
-        }
-    }
-
-    enum class SelectionStyle {
-        MENU_DRAWER,
-        ACCOUNT,
-        OTHER,
-    }
-
-    enum class TextWeight {
-        REGULAR,
-        MEDIUM,
+        setEndIcon(if (isSelected) checkIcon else null, R.string.contentDescriptionSelectedItem)
     }
 }

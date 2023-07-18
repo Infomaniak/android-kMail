@@ -22,13 +22,12 @@ import android.util.AttributeSet
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import com.infomaniak.mail.R
-import com.infomaniak.lib.core.R as RCore
 
 class InvalidMailboxItemView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : SelectableTextItemView(context, attrs, defStyleAttr) {
+) : DecoratedTextItemView(context, attrs, defStyleAttr) {
 
     private val chevronIcon by lazy { AppCompatResources.getDrawable(context, R.drawable.ic_chevron_right) }
     private val warningIcon by lazy {
@@ -48,7 +47,7 @@ class InvalidMailboxItemView @JvmOverloads constructor(
             else -> null to null
         }
 
-        setEndIcon(endIcon, RCore.dimen.marginStandardVerySmall, contentDescription)
+        setEndIcon(endIcon, contentDescription)
     }
 
     override fun setOnClickListener(onClickListener: OnClickListener?) {
