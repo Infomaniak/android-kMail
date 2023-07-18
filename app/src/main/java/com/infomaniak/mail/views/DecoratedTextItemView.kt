@@ -22,10 +22,7 @@ import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
-import androidx.core.content.res.getDimensionPixelSizeOrThrow
-import com.google.android.material.shape.ShapeAppearanceModel
 import com.infomaniak.lib.core.utils.getAttributes
-import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.mail.databinding.ViewDecoratedTextItemBinding
 
 abstract class DecoratedTextItemView @JvmOverloads constructor(
@@ -53,16 +50,9 @@ abstract class DecoratedTextItemView @JvmOverloads constructor(
             icon = getDrawable(com.infomaniak.mail.R.styleable.DecoratedTextItemView_icon)
             text = getString(com.infomaniak.mail.R.styleable.DecoratedTextItemView_text)
         }
+    }
 
-        binding.root.apply {
-            context.obtainStyledAttributes(
-                com.infomaniak.mail.R.style.MenuDrawerItem,
-                intArrayOf(android.R.attr.layout_marginStart)
-            ).let {
-                setMarginsRelative(it.getDimensionPixelSizeOrThrow(0))
-                it.recycle()
-            }
-            ShapeAppearanceModel.builder(context, 0, com.infomaniak.mail.R.style.MenuDrawerItemShapeAppearance).build()
-        }
+    override fun setOnClickListener(onClickListener: OnClickListener?) {
+        binding.root.setOnClickListener(onClickListener)
     }
 }
