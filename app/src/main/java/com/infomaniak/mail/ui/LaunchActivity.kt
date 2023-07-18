@@ -24,7 +24,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDeepLinkBuilder
 import com.infomaniak.mail.MatomoMail.trackUserId
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
@@ -43,8 +42,6 @@ import javax.inject.Inject
 class LaunchActivity : AppCompatActivity() {
 
     private val navigationArgs: LaunchActivityArgs? by lazy { intent?.extras?.let(LaunchActivityArgs::fromBundle) }
-
-    private val localSettings by lazy { LocalSettings.getInstance(this) }
 
     @Inject
     @IoDispatcher
@@ -69,6 +66,9 @@ class LaunchActivity : AppCompatActivity() {
                     trackUserId(AccountUtils.currentUserId)
                     startApp()
                 }
+                // After starting the destination activity, we run finish to make sure we close the LaunchScreen,
+                // so that even when we return, the activity will still be closed.
+                finish()
             }
         }
     }
