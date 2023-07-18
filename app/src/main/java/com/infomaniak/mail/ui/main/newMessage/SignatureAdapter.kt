@@ -46,7 +46,7 @@ class SignatureAdapter(
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         return convertView ?: ItemSignatureBinding.inflate(LayoutInflater.from(parent!!.context), parent, false).apply {
             val signature = getItem(position)
-            fullNameAndName.text = "${signature.addressName} ${signature.name}"
+            fullNameAndName.text = "${signature.addressName} (${signature.name})"
             emailAddress.text = signature.senderIdn
             // TODO : Add a selected style to the selected item
         }.root
