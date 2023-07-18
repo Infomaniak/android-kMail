@@ -61,8 +61,6 @@ object RefreshController {
                 return@withContext realm.handleRefreshMode(refreshMode, scope = this, mailbox, folder, okHttpClient).toList()
             }
         }.getOrElse {
-            // It failed, but not because we cancelled it. Something bad happened, so we call the `stopped` callback.
-            if (it !is CancellationException) stopped?.invoke()
             if (it is ApiErrorException) it.handleApiErrors()
             return@getOrElse null
         }
@@ -73,10 +71,9 @@ object RefreshController {
         refreshThreadsJob = Job()
 
         return refreshWithRunCatching().also {
-            if (it != null) {
-                stopped?.invoke()
-                Log.d("API", "End of refreshing threads with mode: $refreshMode | (${folder.name})")
-            }
+            it?.let { Log.d("API", "End of refreshing threads with mode: $refreshMode | (${folder.name})") }
+            // Whether there's an error or not we call the `stopped` callback.
+            stopped?.invoke()
         }
     }
 
