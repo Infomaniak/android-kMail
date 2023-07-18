@@ -19,8 +19,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@color/backgroundColorTertiary"
     android:orientation="vertical"
-    android:padding="@dimen/marginStandardMedium">
+    android:paddingHorizontal="@dimen/marginStandardMedium"
+    android:paddingVertical="@dimen/marginStandardSmall">
 
     <TextView
         android:id="@+id/fullNameAndName"

@@ -35,6 +35,8 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.webkit.WebView
 import android.widget.ListPopupWindow
+import android.widget.PopupWindow
+import androidx.constraintlayout.widget.Group
 import androidx.core.net.MailTo
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -83,11 +85,11 @@ class NewMessageFragment : Fragment() {
     private lateinit var filePicker: FilePicker
 
     private val attachmentAdapter = AttachmentAdapter(shouldDisplayCloseButton = true, onDelete = ::onDeleteAttachment)
-    private lateinit var signatureAdapter: SignatureAdapter
+    // private lateinit var signatureAdapter: SignatureAdapter
 
     private val webViewUtils by lazy { WebViewUtils(requireContext()) }
 
-    private var selectedMailboxIndex = 0
+    // private var selectedMailboxIndex = 0
     private var lastFieldToTakeFocus: FieldType? = TO
     var shouldSendInsteadOfSave: Boolean = false
 
@@ -136,6 +138,8 @@ class NewMessageFragment : Fragment() {
             Log.e("gibran", "observeInitSuccess: FRAGMENT COLLECTED IT");
             if (isSuccess) {
                 val (signatures, signatureMap) = newMessageViewModel.signatures
+                val selectedSignatureId = signatures.firstOrNull { it.isDefault }?.id
+                newMessageViewModel.selectedSignatureId = selectedSignatureId!!
                 setupFromField(signatures, signatureMap)
             }
         }
@@ -350,7 +354,8 @@ class NewMessageFragment : Fragment() {
 
         draft.uiSignature?.let { html ->
             signatureWebView.apply {
-                loadContent(html)
+                settings.setupNewMessageWebViewSettings()
+                loadContent(html, signatureGroup)
                 initWebViewClientAndBridge(
                     attachments = emptyList(),
                     messageUid = "SIGNATURE-${draft.messageUid}",
@@ -362,12 +367,13 @@ class NewMessageFragment : Fragment() {
                 draft.uiSignature = null
                 signatureGroup.isGone = true
             }
-            signatureGroup.isVisible = true
+            // signatureGroup.isVisible = true
         }
 
         draft.uiQuote?.let { html ->
             quoteWebView.apply {
-                loadContent(html)
+                settings.setupNewMessageWebViewSettings()
+                loadContent(html, quoteGroup)
                 initWebViewClientAndBridge(
                     attachments = draft.attachments,
                     messageUid = "QUOTE-${draft.messageUid}",
@@ -379,14 +385,13 @@ class NewMessageFragment : Fragment() {
                 draft.uiQuote = null
                 quoteGroup.isGone = true
             }
-            quoteGroup.isVisible = true
+            // quoteGroup.isVisible = true
         }
     }
 
-    private fun WebView.loadContent(html: String) {
-        settings.setupNewMessageWebViewSettings()
-
+    private fun WebView.loadContent(html: String, webViewGroup: Group) {
         val processedHtml = webViewUtils.processHtmlForDisplay(html, context.isNightModeEnabled())
+        webViewGroup.isVisible = processedHtml.isNotBlank()
         loadDataWithBaseURL("", processedHtml, ClipDescription.MIMETYPE_TEXT_HTML, Utils.UTF_8, "")
     }
 
@@ -482,29 +487,46 @@ class NewMessageFragment : Fragment() {
     // }
 
     private fun setupFromField(signatures: List<Signature>, signatureMap: Map<Int, Signature>) = with(binding) {
-        // fromMailAddress.text = signatureMap[newMessageViewModel.selectedSignatureId]!!.senderIdn
+        val selectedSignature = signatures.find { it.id == newMessageViewModel.selectedSignatureId }!!
+        updateSelectedSignatureFromField(selectedSignature)
 
-        // val adapter = SignatureAdapter(signatures)
-        // addressListPopupWindow.apply {
-        //     setAdapter(adapter)
-        //     isModal = true
-        //     inputMethodMode = PopupWindow.INPUT_METHOD_NOT_NEEDED
-        //     anchorView = fromMailAddress
-        //     width = fromMailAddress.width
-        //     setOnItemClickListener { _, _, position, _ ->
-        //         fromMailAddress.text = mails[position]
-        //         selectedMailboxIndex = position
-        //         dismiss()
-        //     }
-        // }
-        //
-        // if (signatures.count() > 1) {
-        //     fromMailAddress.apply {
-        //         setOnClickListener { _ -> addressListPopupWindow.show() }
-        //         isClickable = true
-        //         isFocusable = true
-        //     }
-        // }
+        val adapter = SignatureAdapter(signatures)
+        addressListPopupWindow.apply {
+            setAdapter(adapter)
+            isModal = true
+            inputMethodMode = PopupWindow.INPUT_METHOD_NOT_NEEDED
+            anchorView = fromMailAddress
+            width = fromMailAddress.width
+            setOnItemClickListener { _, _, position, _ ->
+                val newSelectedSignature = signatures[position]
+                updateSelectedSignatureFromField(newSelectedSignature)
+                updateBodySignature(newSelectedSignature.content)
+                adapter.updateSelectedSignature(newSelectedSignature.id)
+                newMessageViewModel.apply {
+                    selectedSignatureId = newSelectedSignature.id
+                    draft.identityId = newSelectedSignature.id.toString()
+                    saveDraftDebouncing()
+                }
+                dismiss()
+            }
+        }
+
+        if (signatures.count() > 1) {
+            fromMailAddress.apply {
+                setOnClickListener { _ -> addressListPopupWindow.show() }
+                isClickable = true
+                isFocusable = true
+            }
+        }
+    }
+
+    private fun updateBodySignature(signatureContent: String) = with(binding) {
+        newMessageViewModel.draft.uiSignature = signatureContent
+        signatureWebView.loadContent(signatureContent, signatureGroup)
+    }
+
+    private fun updateSelectedSignatureFromField(signature: Signature) {
+        binding.fromMailAddress.text = "${signature.addressName} <${signature.senderIdn}> (${signature.name})"
     }
 
     private fun observeEditorActions() {

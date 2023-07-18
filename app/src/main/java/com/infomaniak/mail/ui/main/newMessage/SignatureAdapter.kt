@@ -48,6 +48,7 @@ class SignatureAdapter(
             val signature = getItem(position)
             fullNameAndName.text = "${signature.addressName} ${signature.name}"
             emailAddress.text = signature.senderIdn
+            // TODO : Add a selected style to the selected item
         }.root
     }
 
@@ -61,9 +62,9 @@ class SignatureAdapter(
 
     override fun isEnabled(position: Int): Boolean = getItemId(position) != selectedSignatureId
 
-    fun updateSignatures(newSignatures: List<Signature>) {
-        signatures = newSignatures
-    }
+    // fun updateSignatures(newSignatures: List<Signature>) {
+    //     signatures = newSignatures
+    // }
 
     fun updateSelectedSignature(newSelectedSignatureId: Int) {
         selectedSignatureId = newSelectedSignatureId.toLong()
