@@ -65,7 +65,7 @@
                 <FrameLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="@dimen/marginStandardMedium"
+                    android:layout_marginEnd="@dimen/alternativeMargin"
                     app:layout_constraintBottom_toBottomOf="@id/fromPrefix"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0"
@@ -84,6 +84,10 @@
                         android:maxLines="1"
                         android:textColor="@color/primaryTextColor"
                         android:visibility="gone"
+                        app:iconGravity="end"
+                        app:iconSize="@dimen/mediumIconSize"
+                        app:iconTint="@color/iconColor"
+                        tools:icon="@drawable/ic_chevron_down"
                         tools:text="myriam.rais@ik.me"
                         tools:visibility="visible" />
 

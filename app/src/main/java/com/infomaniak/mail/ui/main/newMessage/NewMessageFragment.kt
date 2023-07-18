@@ -36,6 +36,7 @@ import android.view.WindowManager
 import android.webkit.WebView
 import android.widget.ListPopupWindow
 import android.widget.PopupWindow
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.Group
 import androidx.core.net.MailTo
 import androidx.core.view.isGone
@@ -503,6 +504,7 @@ class NewMessageFragment : Fragment() {
 
         if (signatures.count() > 1) {
             fromMailAddress.apply {
+                icon = AppCompatResources.getDrawable(context, R.drawable.ic_chevron_down)
                 setOnClickListener { _ -> addressListPopupWindow.show() }
                 isClickable = true
                 isFocusable = true
