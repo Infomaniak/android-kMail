@@ -20,7 +20,9 @@ package com.infomaniak.mail.views
 import android.content.Context
 import android.util.AttributeSet
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.content.ContextCompat
 import com.infomaniak.mail.R
+import com.infomaniak.lib.core.R as RCore
 
 class InvalidMailboxItemView @JvmOverloads constructor(
     context: Context,
@@ -28,13 +30,30 @@ class InvalidMailboxItemView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : SelectableTextItemView(context, attrs, defStyleAttr) {
 
-    var shouldDisplayChevron = false
-        set(shouldDisplay) {
-            field = shouldDisplay
-            endIcon = if (shouldDisplay) AppCompatResources.getDrawable(context, R.drawable.ic_chevron_right) else null
+    private val chevronIcon by lazy { AppCompatResources.getDrawable(context, R.drawable.ic_chevron_right) }
+    private val warningIcon by lazy {
+        AppCompatResources.getDrawable(context, R.drawable.ic_warning)?.apply {
+            setTint(ContextCompat.getColor(context, R.color.orangeWarning))
+        }
+    }
+
+    var hasNoValidMailboxes = false
+    var isPasswordOutdated = false
+    var isMailboxLocked = false
+
+    fun computeEndIconVisibility() {
+        val (endIcon, contentDescription) = when {
+            !hasNoValidMailboxes -> warningIcon to R.string.contentDescriptionWarningIcon
+            !isMailboxLocked && isPasswordOutdated -> chevronIcon to R.string.contentDescriptionIconInvalidPassword
+            else -> null to null
         }
 
+        setEndIcon(endIcon, RCore.dimen.marginStandardVerySmall, contentDescription)
+    }
+
     override fun setOnClickListener(onClickListener: OnClickListener?) {
+        if (hasNoValidMailboxes && isMailboxLocked) return
+
         binding.root.setOnClickListener(onClickListener)
     }
 }

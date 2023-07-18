@@ -22,10 +22,13 @@ import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.widget.ImageView
+import androidx.annotation.DimenRes
+import androidx.annotation.StringRes
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.content.res.getDimensionPixelSizeOrThrow
 import com.google.android.material.shape.ShapeAppearanceModel
 import com.infomaniak.lib.core.utils.getAttributes
+import com.infomaniak.lib.core.utils.setMargins
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.getAttributeColor
@@ -40,17 +43,7 @@ abstract class SelectableTextItemView @JvmOverloads constructor(
     private val regular by lazy { ResourcesCompat.getFont(context, com.infomaniak.lib.core.R.font.suisseintl_regular) }
     private val medium by lazy { ResourcesCompat.getFont(context, com.infomaniak.lib.core.R.font.suisseintl_medium) }
 
-    var endIcon: Drawable? = null
-        set(value) {
-            field = value
-            ImageView(context).apply {
-                setImageDrawable(value)
-                // TODO: contentDescription =
-                binding.endIconLayout.addView(this)
-            }
-        }
-
-    var itemStyle = SelectionStyle.MENU_DRAWER
+    var itemStyle = SelectionStyle.OTHER
         set(value) {
             field = value
             if (value == SelectionStyle.MENU_DRAWER) {
@@ -65,7 +58,7 @@ abstract class SelectableTextItemView @JvmOverloads constructor(
                 binding.root.apply {
                     setMarginsRelative(0)
                     shapeAppearanceModel = shapeAppearanceModel.toBuilder().setAllCornerSizes(0.0f).build()
-                    if (value == SelectionStyle.ACCOUNT) setContentPadding(0, 0, 0, 0)
+                    setContentPadding(0, 0, 0, 0)
                 }
             }
         }
@@ -95,6 +88,15 @@ abstract class SelectableTextItemView @JvmOverloads constructor(
 
         root.setCardBackgroundColor(color)
         itemName.setTextAppearance(textAppearance)
+    }
+
+    fun setEndIcon(icon: Drawable?, @DimenRes marginEnd: Int, @StringRes contentDescriptionRes: Int?) {
+        ImageView(context).apply {
+            setImageDrawable(icon)
+            contentDescription = contentDescriptionRes?.let(context::getString)
+            binding.endIconLayout.addView(this)
+            setMargins(right = resources.getDimension(marginEnd).toInt())
+        }
     }
 
     enum class SelectionStyle {

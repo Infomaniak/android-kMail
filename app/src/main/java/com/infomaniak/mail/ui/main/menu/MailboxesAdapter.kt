@@ -31,7 +31,8 @@ import com.infomaniak.mail.databinding.ItemInvalidMailboxBinding
 import com.infomaniak.mail.databinding.ItemSwitchMailboxBinding
 import com.infomaniak.mail.ui.main.menu.MailboxesAdapter.MailboxesViewHolder
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.views.MenuDrawerItemView.SelectionStyle
+import com.infomaniak.mail.views.MenuDrawerItemView
+import com.infomaniak.mail.views.SelectableTextItemView.SelectionStyle
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -63,7 +64,9 @@ class MailboxesAdapter(
 
         when (getItemViewType(position)) {
             DisplayType.VALID_MAILBOX.layout -> (this as ItemSwitchMailboxBinding).displayValidMailbox(mailbox, isCurrentMailbox)
-            DisplayType.INVALID_MAILBOX.layout -> (this as ItemInvalidMailboxBinding).displayInvalidMailbox(mailbox)
+            DisplayType.INVALID_MAILBOX.layout -> {
+                (this as ItemInvalidMailboxBinding).displayInvalidMailbox(mailbox, isCurrentMailbox)
+            }
             else -> Unit
         }
     }
@@ -71,11 +74,8 @@ class MailboxesAdapter(
     private fun ItemSwitchMailboxBinding.displayValidMailbox(mailbox: Mailbox, isCurrentMailbox: Boolean) = with(root) {
         text = mailbox.email
 
-        if (isInMenuDrawer) badge = mailbox.unreadCountDisplay.count else itemStyle = SelectionStyle.ACCOUNT
+        if (isInMenuDrawer) badge = mailbox.unreadCountDisplay.count else itemStyle = MenuDrawerItemView.SelectionStyle.ACCOUNT
         isPastilleDisplayed = mailbox.unreadCountDisplay.shouldDisplayPastille
-        isPasswordOutdated = !mailbox.isPasswordValid
-        isMailboxLocked = mailbox.isLocked
-        hasValidMailbox = hasValidMailboxes
 
         setSelectedState(isCurrentMailbox)
 
@@ -91,18 +91,26 @@ class MailboxesAdapter(
                     AccountUtils.switchToMailbox(mailbox.mailboxId)
                 }
             }
-
-            setOnOutdatedPasswordClickListener { onInvalidPasswordMailboxClicked?.invoke(mailbox) }
-            setOnLockedMailboxClickListener { onLockedMailboxClicked?.invoke(mailbox.email) }
         }
     }
 
-    private fun ItemInvalidMailboxBinding.displayInvalidMailbox(mailbox: Mailbox) = with(root) {
+    private fun ItemInvalidMailboxBinding.displayInvalidMailbox(mailbox: Mailbox, isCurrentMailbox: Boolean) = with(root) {
         text = mailbox.email
 
-        if (!mailbox.isLocked) {
-            shouldDisplayChevron = true
-            setOnClickListener { onInvalidPasswordMailboxClicked?.invoke(mailbox) }
+        itemStyle = if (isInMenuDrawer) SelectionStyle.MENU_DRAWER else SelectionStyle.OTHER
+        setSelectedState(isCurrentMailbox)
+
+        isPasswordOutdated = !mailbox.isPasswordValid
+        isMailboxLocked = mailbox.isLocked
+        hasNoValidMailboxes = !hasValidMailboxes
+
+        computeEndIconVisibility()
+
+        setOnClickListener {
+            when {
+                isMailboxLocked -> onLockedMailboxClicked?.invoke(mailbox.email)
+                isPasswordOutdated -> onInvalidPasswordMailboxClicked?.invoke(mailbox)
+            }
         }
     }
 
