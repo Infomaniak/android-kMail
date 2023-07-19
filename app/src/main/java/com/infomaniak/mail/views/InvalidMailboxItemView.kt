@@ -20,7 +20,6 @@ package com.infomaniak.mail.views
 import android.content.Context
 import android.util.AttributeSet
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.content.ContextCompat
 import com.infomaniak.mail.R
 
 class InvalidMailboxItemView @JvmOverloads constructor(
@@ -30,11 +29,7 @@ class InvalidMailboxItemView @JvmOverloads constructor(
 ) : DecoratedTextItemView(context, attrs, defStyleAttr) {
 
     private val chevronIcon by lazy { AppCompatResources.getDrawable(context, R.drawable.ic_chevron_right) }
-    private val warningIcon by lazy {
-        AppCompatResources.getDrawable(context, R.drawable.ic_warning)?.apply {
-            setTint(ContextCompat.getColor(context, R.color.orangeWarning))
-        }
-    }
+    private val warningIcon by lazy { AppCompatResources.getDrawable(context, R.drawable.ic_warning) }
 
     var hasNoValidMailboxes = false
     var isPasswordOutdated = false

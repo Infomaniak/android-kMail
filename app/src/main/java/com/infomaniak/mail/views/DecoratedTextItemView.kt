@@ -109,7 +109,6 @@ abstract class DecoratedTextItemView @JvmOverloads constructor(
 
     enum class SelectionStyle {
         MENU_DRAWER,
-        ACCOUNT,
         OTHER,
     }
 

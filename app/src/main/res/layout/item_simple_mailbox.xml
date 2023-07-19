@@ -22,5 +22,4 @@
     android:layout_height="wrap_content"
     app:icon="@drawable/ic_envelope"
     app:itemStyle="other"
-    tools:badge="420"
     tools:text="myriam.rais@infomaniak.com" />
