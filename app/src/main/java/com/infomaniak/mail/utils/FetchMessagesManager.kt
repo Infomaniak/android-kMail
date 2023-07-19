@@ -69,6 +69,7 @@ class FetchMessagesManager @Inject constructor(
             folder = folder,
             okHttpClient = okHttpClient,
             realm = realm,
+            isFromService = true,
         ) ?: return
 
         Log.d(TAG, "launchWork: ${mailbox.email} has ${newMessagesThreads.count()} Threads with new Messages")
