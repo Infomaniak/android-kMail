@@ -70,7 +70,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     trackBottomSheetMessageActionsEvent(ACTION_REPLY_NAME)
                     safeNavigateToNewMessageActivity(
                         draftMode = DraftMode.REPLY,
-                        messageUid = messageUid,
+                        previousMessageUid = messageUid,
                         currentClassName = currentClassName,
                         shouldLoadDistantResources = navigationArgs.shouldLoadDistantResources,
                     )
@@ -80,7 +80,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     trackBottomSheetMessageActionsEvent(ACTION_REPLY_ALL_NAME)
                     safeNavigateToNewMessageActivity(
                         draftMode = DraftMode.REPLY_ALL,
-                        messageUid = messageUid,
+                        previousMessageUid = messageUid,
                         currentClassName = currentClassName,
                         shouldLoadDistantResources = navigationArgs.shouldLoadDistantResources,
                     )
@@ -90,7 +90,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     trackBottomSheetMessageActionsEvent(ACTION_FORWARD_NAME)
                     safeNavigateToNewMessageActivity(
                         draftMode = DraftMode.FORWARD,
-                        messageUid = messageUid,
+                        previousMessageUid = messageUid,
                         currentClassName = currentClassName,
                         shouldLoadDistantResources = navigationArgs.shouldLoadDistantResources,
                     )

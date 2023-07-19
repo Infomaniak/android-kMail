@@ -199,7 +199,7 @@ class ThreadFragment : Fragment() {
                 R.id.quickActionForward -> {
                     safeNavigateToNewMessageActivity(
                         draftMode = DraftMode.FORWARD,
-                        messageUid = lastMessageToReplyTo.uid,
+                        previousMessageUid = lastMessageToReplyTo.uid,
                         shouldLoadDistantResources = shouldLoadDistantResources(lastMessageToReplyTo.uid),
                     )
                 }
@@ -324,7 +324,7 @@ class ThreadFragment : Fragment() {
         if (message.getRecipientsForReplyTo(true).second.isEmpty()) {
             safeNavigateToNewMessageActivity(
                 draftMode = DraftMode.REPLY,
-                messageUid = message.uid,
+                previousMessageUid = message.uid,
                 shouldLoadDistantResources = shouldLoadDistantResources(message.uid),
             )
         } else {

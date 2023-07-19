@@ -49,7 +49,7 @@ open class ReplyBottomSheetDialog : ActionsBottomSheetDialog() {
 
             safeNavigateToNewMessageActivity(
                 draftMode = replyMode,
-                messageUid = messageUid,
+                previousMessageUid = messageUid,
                 currentClassName = currentClassName,
                 shouldLoadDistantResources = navigationArgs.shouldLoadDistantResources,
             )
