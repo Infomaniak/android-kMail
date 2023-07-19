@@ -147,8 +147,8 @@ class NewMessageViewModel @Inject constructor(
                             //    3. then recreated the activity.
                             // In this case, we do not have any data in Realm nor from the API,
                             // hence the null `draftResource` & `messageUid`,
-                            // so we need to create a new Draft.
-                            createDraft(draftMode, previousMessageUid, recipient, mailbox, context)
+                            // so we can just reuse the already existing Draft.
+                            draft
                         } else {
                             fetchDraft(draftResource!!, messageUid!!)
                         } ?: return@writeBlocking false
