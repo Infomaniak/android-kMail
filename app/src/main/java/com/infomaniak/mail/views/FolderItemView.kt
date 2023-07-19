@@ -31,7 +31,7 @@ interface FolderItemView {
 
     fun setIndent() = binding.itemName.setMarginsRelative(start = indent)
 
-    fun AttributeSet.getIndent(context: Context) {
+    fun AttributeSet.getIndentAttribute(context: Context) {
         getAttributes(context, R.styleable.DecoratedTextItemView) {
             indent = getDimensionPixelSize(R.styleable.DecoratedTextItemView_indent, indent)
         }

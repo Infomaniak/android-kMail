@@ -33,6 +33,6 @@ class SimpleFolderItemView @JvmOverloads constructor(
         }
 
     init {
-        attrs?.getIndent(context)
+        attrs?.getIndentAttribute(context)
     }
 }

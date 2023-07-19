@@ -24,5 +24,4 @@
     app:icon="@drawable/ic_folder"
     app:itemStyle="other"
     app:textWeight="regular"
-    tools:badge="42"
     tools:text="Folder (Default/Custom)" />

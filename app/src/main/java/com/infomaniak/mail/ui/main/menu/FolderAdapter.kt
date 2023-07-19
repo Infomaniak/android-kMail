@@ -73,13 +73,12 @@ class FolderAdapter(
     }
 
     override fun onBindViewHolder(holder: FolderViewHolder, position: Int) = with(holder.binding) {
-
         val folder = folders[position]
 
-        when (getItemViewType(position)) {
-            DisplayType.SIMPLE_FOLDER.layout -> (this as ItemSimpleFolderBinding).root.displayFolder(folder)
-            DisplayType.MENU_DRAWER.layout -> (this as ItemFolderMenuDrawerBinding).root.displayMenuDrawerFolder(folder)
-            else -> Unit
+        if (getItemViewType(position) == DisplayType.SIMPLE_FOLDER.layout) {
+            (this as ItemSimpleFolderBinding).root.displayFolder(folder)
+        } else {
+            (this as ItemFolderMenuDrawerBinding).root.displayMenuDrawerFolder(folder)
         }
     }
 
@@ -137,8 +136,8 @@ class FolderAdapter(
                 isPastilleDisplayed = unread?.shouldDisplayPastille ?: false
             }
             is SimpleFolderItemView -> {
-                setSelectedState(currentFolderId == folderId)
                 indent = computeIndent(context, folderIndent)
+                setSelectedState(currentFolderId == folderId)
             }
         }
 
