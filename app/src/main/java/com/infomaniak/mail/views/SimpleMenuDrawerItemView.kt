@@ -18,10 +18,15 @@
 package com.infomaniak.mail.views
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.util.AttributeSet
+import androidx.annotation.StringRes
 
 class SimpleMenuDrawerItemView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : DecoratedTextItemView(context, attrs, defStyleAttr)
+) : DecoratedTextItemView(context, attrs, defStyleAttr) {
+
+    override fun setEndIcon(icon: Drawable?, @StringRes contentDescriptionRes: Int?) = Unit
+}

@@ -47,7 +47,25 @@
         <FrameLayout
             android:id="@+id/endIconLayout"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/unreadCountChip"
+                style="@style/BodySmallMedium.Accent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/marginStandardSmall"
+                android:visibility="gone"
+                tools:text="42" />
+
+            <ImageView
+                android:id="@+id/endIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:ignore="ContentDescription"
+                tools:src="@drawable/ic_pastille" />
+        </FrameLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
 

@@ -22,11 +22,10 @@ import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
-import android.widget.ImageView
-import androidx.annotation.DimenRes
 import androidx.annotation.StringRes
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.content.res.getDimensionPixelSizeOrThrow
+import androidx.core.view.isGone
 import com.google.android.material.shape.ShapeAppearanceModel
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.setMargins
@@ -42,6 +41,8 @@ abstract class DecoratedTextItemView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     val binding by lazy { ViewDecoratedTextItemBinding.inflate(LayoutInflater.from(context), this, true) }
+
+    open val endIconMarginRes: Int = RCore.dimen.marginStandardVerySmall
 
     private val regular by lazy { ResourcesCompat.getFont(context, com.infomaniak.lib.core.R.font.suisseintl_regular) }
     private val medium by lazy { ResourcesCompat.getFont(context, com.infomaniak.lib.core.R.font.suisseintl_medium) }
@@ -97,16 +98,12 @@ abstract class DecoratedTextItemView @JvmOverloads constructor(
         binding.root.setOnClickListener(onClickListener)
     }
 
-    fun setEndIcon(
-        icon: Drawable?,
-        @StringRes contentDescriptionRes: Int?,
-        @DimenRes marginEnd: Int = RCore.dimen.marginStandardVerySmall,
-    ) {
-        ImageView(context).apply {
+    open fun setEndIcon(icon: Drawable?, @StringRes contentDescriptionRes: Int?) {
+        binding.endIcon.apply {
+            isGone = icon == null
             setImageDrawable(icon)
             contentDescription = contentDescriptionRes?.let(context::getString)
-            binding.endIconLayout.addView(this)
-            setMargins(right = resources.getDimension(marginEnd).toInt())
+            setMargins(right = resources.getDimension(endIconMarginRes).toInt())
         }
     }
 
