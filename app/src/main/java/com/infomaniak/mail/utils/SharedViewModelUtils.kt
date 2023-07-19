@@ -40,13 +40,16 @@ class SharedViewModelUtils @Inject constructor(
     private val messageController: MessageController,
 ) {
 
+    /**
+     * @param shouldRefreshThreads Sometimes, we don't want to refresh Threads after doing this action. For example, when replying to a Message.
+     */
     suspend fun markAsSeen(
         mailbox: Mailbox,
         threads: List<Thread>,
         message: Message? = null,
         started: (() -> Unit)? = null,
         stopped: (() -> Unit)? = null,
-        shouldRefresh: Boolean = true,
+        shouldRefreshThreads: Boolean = true,
     ) {
 
         val messages = when (message) {
@@ -56,7 +59,7 @@ class SharedViewModelUtils @Inject constructor(
 
         val isSuccess = ApiRepository.markMessagesAsSeen(mailbox.uuid, messages.getUids()).isSuccess()
 
-        if (isSuccess && shouldRefresh) {
+        if (isSuccess && shouldRefreshThreads) {
             refreshFolders(
                 mailbox = mailbox,
                 messagesFoldersIds = messages.getFoldersIds(),

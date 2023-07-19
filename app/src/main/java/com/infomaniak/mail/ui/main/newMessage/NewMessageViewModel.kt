@@ -191,7 +191,7 @@ class NewMessageViewModel @Inject constructor(
             mailbox = mailbox,
             threads = message.threads.filter { it.folderId == message.folderId },
             message = message,
-            shouldRefresh = false,
+            shouldRefreshThreads = false,
         )
     }
 
