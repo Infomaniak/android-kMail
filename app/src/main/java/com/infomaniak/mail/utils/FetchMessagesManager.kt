@@ -44,7 +44,6 @@ import io.realm.kotlin.Realm
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import okhttp3.OkHttpClient
-import java.util.UUID
 import javax.inject.Inject
 
 class FetchMessagesManager @Inject constructor(
@@ -119,6 +118,10 @@ class FetchMessagesManager @Inject constructor(
 
         fun NotificationCompat.Builder.addActions(messageUid: String, notificationId: Int) {
 
+            val actionsRequestCode = messageUid.hashCode()
+            val actionsFlags = NotificationUtilsCore.pendingIntentFlags
+
+            // Reply action
             val replyIntent = Intent(appContext, LaunchActivity::class.java).clearStack().apply {
                 putExtras(
                     LaunchActivityArgs(
@@ -130,14 +133,7 @@ class FetchMessagesManager @Inject constructor(
                     ).toBundle(),
                 )
             }
-
-            val replyPendingIntent = PendingIntent.getActivity(
-                appContext,
-                UUID.randomUUID().hashCode(),
-                replyIntent,
-                NotificationUtilsCore.pendingIntentFlags,
-            )
-
+            val replyPendingIntent = PendingIntent.getActivity(appContext, actionsRequestCode, replyIntent, actionsFlags)
             addAction(NotificationCompat.Action(null, appContext.getString(R.string.actionReply), replyPendingIntent))
         }
 
