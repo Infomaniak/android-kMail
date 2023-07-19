@@ -47,8 +47,8 @@ class SignatureAdapter(
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         return convertView ?: ItemSignatureBinding.inflate(LayoutInflater.from(parent!!.context), parent, false).apply {
             val signature = getItem(position)
-            fullNameAndName.text = "${signature.expeditorName} (${signature.name})"
-            emailAddress.text = signature.senderIdn
+            fullNameAndName.text = "${signature.senderName} (${signature.name})"
+            emailAddress.text = signature.senderEmailIdn
 
             val isSelected = selectedSignatureId == signature.id
             val backgroundColorRes = if (isSelected) R.color.backgroundSelectedSignature else R.color.backgroundColorTertiary
