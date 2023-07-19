@@ -28,7 +28,6 @@ import androidx.core.content.res.getDimensionPixelSizeOrThrow
 import androidx.core.view.isGone
 import com.google.android.material.shape.ShapeAppearanceModel
 import com.infomaniak.lib.core.utils.getAttributes
-import com.infomaniak.lib.core.utils.setMargins
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewDecoratedTextItemBinding
@@ -103,7 +102,7 @@ abstract class DecoratedTextItemView @JvmOverloads constructor(
             isGone = icon == null
             setImageDrawable(icon)
             contentDescription = contentDescriptionRes?.let(context::getString)
-            setMargins(right = resources.getDimension(endIconMarginRes).toInt())
+            setMarginsRelative(end = resources.getDimension(endIconMarginRes).toInt())
         }
     }
 

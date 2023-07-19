@@ -20,7 +20,7 @@ package com.infomaniak.mail.views
 import android.content.Context
 import android.util.AttributeSet
 
-class MoveFolderItemView @JvmOverloads constructor(
+class SimpleFolderItemView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,

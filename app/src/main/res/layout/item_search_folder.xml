@@ -15,10 +15,10 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<com.infomaniak.mail.views.MenuDrawerItemView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.infomaniak.mail.views.SimpleFolderItemView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/menuDrawerItem"
+    android:id="@+id/simpleFolderItemView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:itemStyle="other"
