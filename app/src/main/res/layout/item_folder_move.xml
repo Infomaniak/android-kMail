@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak ikMail - Android
-  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~ Copyright (C) 2023 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -15,13 +15,14 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<com.infomaniak.mail.views.FolderMenuDrawerItemView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.infomaniak.mail.views.MoveFolderItemView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/item"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:itemStyle="menuDrawer"
-    app:textWeight="medium"
     app:icon="@drawable/ic_folder"
+    app:itemStyle="other"
+    app:textWeight="regular"
     tools:badge="42"
     tools:text="Folder (Default/Custom)" />
