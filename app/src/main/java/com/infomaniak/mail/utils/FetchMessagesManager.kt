@@ -52,7 +52,7 @@ class FetchMessagesManager @Inject constructor(
 
     private val localSettings by lazy { LocalSettings.getInstance(appContext) }
 
-    suspend fun execute(userId: Int, mailbox: Mailbox, messageUid: String? = null, mailboxContentRealm: Realm? = null) {
+    suspend fun execute(userId: Int, mailbox: Mailbox, sentryMessageUid: String? = null, mailboxContentRealm: Realm? = null) {
 
         // Don't launch sync if the mailbox's notifications have been disabled by the user
         if (mailbox.notificationsIsDisabled(notificationManagerCompat)) return
@@ -69,6 +69,7 @@ class FetchMessagesManager @Inject constructor(
             folder = folder,
             okHttpClient = okHttpClient,
             realm = realm,
+            isFromService = true,
         ) ?: return
 
         Log.d(TAG, "launchWork: ${mailbox.email} has ${newMessagesThreads.count()} Threads with new Messages")
@@ -82,7 +83,7 @@ class FetchMessagesManager @Inject constructor(
                 realm = realm,
                 unReadThreadsCount = unReadThreadsCount,
                 isLastMessage = index == newMessagesThreads.lastIndex,
-                messageUid = messageUid,
+                sentryMessageUid = sentryMessageUid,
                 okHttpClient = okHttpClient,
             )
         }
@@ -96,7 +97,7 @@ class FetchMessagesManager @Inject constructor(
         realm: Realm,
         unReadThreadsCount: Int,
         isLastMessage: Boolean,
-        messageUid: String?,
+        sentryMessageUid: String?,
         okHttpClient: OkHttpClient,
     ) {
 
@@ -136,7 +137,7 @@ class FetchMessagesManager @Inject constructor(
                     scope.setExtra("does Thread still exist ?", "[true]")
                     scope.setExtra("currentMailboxEmail", "[${AccountUtils.currentMailboxEmail}]")
                     scope.setExtra("mailbox.email", "[${mailbox.email}]")
-                    scope.setExtra("messageUid", "[$messageUid]")
+                    scope.setExtra("messageUid", "[$sentryMessageUid]")
                     scope.setExtra("folderName", "[${thread.folder.name}]")
                     scope.setExtra("threadUid", "[${thread.uid}]")
                     scope.setExtra("messagesCount", "[${thread.messages.count()}]")
@@ -160,17 +161,25 @@ class FetchMessagesManager @Inject constructor(
         val formattedPreview = preview.replace("\\n+\\s*".toRegex(), "\n") // Ignore multiple/start whitespaces
         val description = "$subject$formattedPreview"
 
-        // Show message notification
-        showNotification(subject, false, message.sender.displayedName(appContext), description)
+        // Show Message notification
+        showNotification(
+            contentText = subject,
+            isSummary = false,
+            title = message.sender.displayedName(appContext),
+            description = description,
+        )
 
         // Show group summary notification
         if (isLastMessage) {
             val summaryText = appContext.resources.getQuantityString(
                 R.plurals.newMessageNotificationSummary,
                 unReadThreadsCount,
-                unReadThreadsCount
+                unReadThreadsCount,
             )
-            showNotification(summaryText, true)
+            showNotification(
+                contentText = summaryText,
+                isSummary = true,
+            )
         }
     }
 

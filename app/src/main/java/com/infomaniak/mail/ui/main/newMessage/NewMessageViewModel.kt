@@ -55,6 +55,7 @@ import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.MutableRealm
+import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.query.RealmResults
@@ -70,6 +71,7 @@ class NewMessageViewModel @Inject constructor(
     private val globalCoroutineScope: CoroutineScope,
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val mergedContactController: MergedContactController,
+    private val sharedViewModelUtils: SharedViewModelUtils,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
@@ -127,7 +129,6 @@ class NewMessageViewModel @Inject constructor(
         recipient: Recipient?,
     ): LiveData<Boolean> = liveData(ioCoroutineContext) {
         val realm = mailboxContentRealm()
-
         val mailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
 
         val isSuccess = realm.writeBlocking {
@@ -166,6 +167,7 @@ class NewMessageViewModel @Inject constructor(
         }
 
         if (isSuccess) {
+            markAsRead(previousMessageUid, mailbox, realm)
             selectedSignatureId = draft.identityId!!.toInt()
             signatures = SignatureController.getAllSignatures(realm)
             saveDraftSnapshot()
@@ -177,6 +179,26 @@ class NewMessageViewModel @Inject constructor(
 
         emit(isSuccess)
         isInitSuccess.postValue(isSuccess)
+    }
+
+    /**
+     * If we are answering to a Message, we need to mark it as read.
+     */
+    private suspend fun markAsRead(
+        previousMessageUid: String?,
+        mailbox: Mailbox,
+        realm: TypedRealm,
+    ) {
+        if (previousMessageUid == null) return
+        val message = MessageController.getMessage(previousMessageUid, realm) ?: return
+        if (message.isSeen) return
+
+        sharedViewModelUtils.markAsSeen(
+            mailbox = mailbox,
+            threads = message.threads.filter { it.folderId == message.folderId },
+            message = message,
+            shouldRefreshThreads = false,
+        )
     }
 
     private fun getLatestDraft(draftLocalUuid: String?): Draft? {

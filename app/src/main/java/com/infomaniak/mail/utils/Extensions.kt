@@ -229,7 +229,7 @@ fun getAnimatedNavOptions() = NavOptions
 
 fun Fragment.safeNavigateToNewMessageActivity(
     draftMode: DraftMode,
-    messageUid: String,
+    previousMessageUid: String,
     currentClassName: String? = null,
     shouldLoadDistantResources: Boolean = false,
 ) {
@@ -238,7 +238,7 @@ fun Fragment.safeNavigateToNewMessageActivity(
         args = NewMessageActivityArgs(
             arrivedFromExistingDraft = false,
             draftMode = draftMode,
-            previousMessageUid = messageUid,
+            previousMessageUid = previousMessageUid,
             shouldLoadDistantResources = shouldLoadDistantResources,
         ).toBundle(),
         currentClassName = currentClassName,

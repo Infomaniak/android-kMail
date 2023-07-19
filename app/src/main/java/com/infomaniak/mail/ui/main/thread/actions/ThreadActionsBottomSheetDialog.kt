@@ -83,7 +83,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     trackBottomSheetThreadActionsEvent(ACTION_REPLY_NAME)
                     safeNavigateToNewMessageActivity(
                         draftMode = DraftMode.REPLY,
-                        messageUid = messageUidToReply,
+                        previousMessageUid = messageUidToReply,
                         currentClassName = currentClassName,
                         shouldLoadDistantResources = navigationArgs.shouldLoadDistantResources,
                     )
@@ -93,7 +93,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     trackBottomSheetThreadActionsEvent(ACTION_REPLY_ALL_NAME)
                     safeNavigateToNewMessageActivity(
                         draftMode = DraftMode.REPLY_ALL,
-                        messageUid = messageUidToReply,
+                        previousMessageUid = messageUidToReply,
                         currentClassName = currentClassName,
                         shouldLoadDistantResources = navigationArgs.shouldLoadDistantResources,
                     )
@@ -103,7 +103,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     trackBottomSheetThreadActionsEvent(ACTION_FORWARD_NAME)
                     safeNavigateToNewMessageActivity(
                         draftMode = DraftMode.FORWARD,
-                        messageUid = messageUidToReply,
+                        previousMessageUid = messageUidToReply,
                         currentClassName = currentClassName,
                         shouldLoadDistantResources = navigationArgs.shouldLoadDistantResources,
                     )

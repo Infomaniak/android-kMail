@@ -51,6 +51,7 @@ object RefreshController {
         folder: Folder,
         okHttpClient: OkHttpClient? = null,
         realm: Realm,
+        isFromService: Boolean = false,
         started: (() -> Unit)? = null,
         stopped: (() -> Unit)? = null,
     ): List<Thread>? {
@@ -62,7 +63,7 @@ object RefreshController {
             }
         }.getOrElse {
             // It failed, but not because we cancelled it. Something bad happened, so we call the `stopped` callback.
-            if (it !is CancellationException) stopped?.invoke()
+            if (it !is CancellationException || isFromService) stopped?.invoke()
             if (it is ApiErrorException) it.handleApiErrors()
             return@getOrElse null
         }
