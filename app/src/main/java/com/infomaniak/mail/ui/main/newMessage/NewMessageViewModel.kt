@@ -45,6 +45,7 @@ import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
@@ -248,10 +249,36 @@ class NewMessageViewModel @Inject constructor(
                                 realm = this@createDraft,
                             )
                             if (!isSuccess) return null
+
+                            val mostFittingSignature = guessMostFittingSignature(message)
                         }
                 }
             }
         }
+    }
+
+    private fun guessMostFittingSignature(message: Message): Signature? {
+        var bestSignature: Signature? = null
+
+        signatures.forEach { signature ->
+            message.to.forEach { recipient ->
+                val emailMatches = recipient.email == signature.senderEmailIdn
+                val nameMatches = recipient.name == signature.senderName
+
+                val fitScore = when {
+                    emailMatches && nameMatches -> 2
+                    emailMatches -> 1
+                    else -> 0
+                }
+
+                when (fitScore) {
+                    2 -> return signature
+                    1 -> bestSignature = signature
+                }
+            }
+        }
+
+        return bestSignature
     }
 
     private fun splitSignatureAndQuoteFromBody() {
