@@ -76,15 +76,22 @@ class RegisterUserDeviceWorker @AssistedInject constructor(
         private const val TAG = "RegisterUserDeviceWorker"
         private const val INITIAL_DELAY = 15L // 15s
 
+        /**
+         * Schedule RegisterUserDeviceWorker
+         *
+         * To avoid problems with the refreshToken at login time, we delay the register by [INITIAL_DELAY].
+         * For future launches, we'll reset the register to the same duration, as this method is also used in the [com.infomaniak.mail.MainApplication].
+         * so when the app is relaunched several times, only the last relaunch is taken into account.
+         *
+         * @param context The Application context
+         */
         // TODO: (Hilt) - Need refactor
-        fun scheduleWork(context: Context, allowInitialDelay: Boolean = false) {
+        fun scheduleWork(context: Context) {
             Log.i(TAG, "work scheduled")
 
             val workRequest = OneTimeWorkRequestBuilder<RegisterUserDeviceWorker>()
                 .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
-                .apply {
-                    if (allowInitialDelay) setInitialDelay(INITIAL_DELAY, TimeUnit.SECONDS)
-                }
+                .setInitialDelay(INITIAL_DELAY, TimeUnit.SECONDS)
                 .build()
 
             WorkManager.getInstance(context).enqueueUniqueWork(TAG, ExistingWorkPolicy.REPLACE, workRequest)

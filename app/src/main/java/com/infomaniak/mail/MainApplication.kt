@@ -47,10 +47,8 @@ import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.mail.MatomoMail.buildTracker
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.UrlTraceInterceptor
-import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
-import com.infomaniak.mail.firebase.RegisterUserDeviceWorker
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ErrorCode
@@ -118,7 +116,6 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
         configureInfomaniakCore()
         initNotificationChannel()
         configureHttpClient()
-        registerUserDeviceIfNeeded()
     }
 
     override fun onStart(owner: LifecycleOwner) {
@@ -203,12 +200,6 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
         HttpClient.apply {
             init(tokenInterceptorListener())
             customInterceptor = listOf(UrlTraceInterceptor())
-        }
-    }
-
-    private fun registerUserDeviceIfNeeded() {
-        if (AccountUtils.currentUserId != AppSettings.DEFAULT_ID) {
-            RegisterUserDeviceWorker.scheduleWork(context = this, allowInitialDelay = true)
         }
     }
 

@@ -18,12 +18,27 @@
 package com.infomaniak.mail
 
 import androidx.lifecycle.LifecycleOwner
+import com.infomaniak.mail.GplayUtils.areGooglePlayServicesNotAvailable
+import com.infomaniak.mail.data.models.AppSettings
+import com.infomaniak.mail.firebase.RegisterUserDeviceWorker
+import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.workers.BaseProcessMessageNotificationsWorker
 
 class StandardMainApplication : MainApplication() {
 
+    override fun onCreate() {
+        super.onCreate()
+        registerUserDeviceIfNeeded()
+    }
+
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
         BaseProcessMessageNotificationsWorker.cancelWorks(workManager)
+    }
+
+    private fun registerUserDeviceIfNeeded() {
+        if (AccountUtils.currentUserId != AppSettings.DEFAULT_ID && !areGooglePlayServicesNotAvailable()) {
+            RegisterUserDeviceWorker.scheduleWork(context = this)
+        }
     }
 }
