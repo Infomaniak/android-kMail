@@ -28,12 +28,11 @@ import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.databinding.ItemInvalidMailboxBinding
+import com.infomaniak.mail.databinding.ItemMailboxMenuDrawerBinding
 import com.infomaniak.mail.databinding.ItemSimpleMailboxBinding
-import com.infomaniak.mail.databinding.ItemSwitchMailboxBinding
 import com.infomaniak.mail.ui.main.menu.MailboxesAdapter.MailboxesViewHolder
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.views.DecoratedTextItemView.SelectionStyle
-import com.infomaniak.mail.views.MenuDrawerItemView
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -51,7 +50,7 @@ class MailboxesAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MailboxesViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding = when (viewType) {
-            DisplayType.VALID_MAILBOX.layout -> ItemSwitchMailboxBinding.inflate(layoutInflater, parent, false)
+            DisplayType.MENU_DRAWER_MAILBOX.layout -> ItemMailboxMenuDrawerBinding.inflate(layoutInflater, parent, false)
             DisplayType.INVALID_MAILBOX.layout -> ItemInvalidMailboxBinding.inflate(layoutInflater, parent, false)
             else -> ItemSimpleMailboxBinding.inflate(layoutInflater, parent, false)
         }
@@ -64,7 +63,9 @@ class MailboxesAdapter(
         val isCurrentMailbox = mailbox.mailboxId == AccountUtils.currentMailboxId
 
         when (getItemViewType(position)) {
-            DisplayType.VALID_MAILBOX.layout -> (this as ItemSwitchMailboxBinding).displayValidMailbox(mailbox, isCurrentMailbox)
+            DisplayType.MENU_DRAWER_MAILBOX.layout -> {
+                (this as ItemMailboxMenuDrawerBinding).displayMenuDrawerMailbox(mailbox, isCurrentMailbox)
+            }
             DisplayType.INVALID_MAILBOX.layout -> (this as ItemInvalidMailboxBinding).displayInvalidMailbox(mailbox)
             else -> (this as ItemSimpleMailboxBinding).displaySimpleMailbox(mailbox, isCurrentMailbox)
         }
@@ -86,22 +87,14 @@ class MailboxesAdapter(
         }
     }
 
-    private fun ItemSwitchMailboxBinding.displayValidMailbox(mailbox: Mailbox, isCurrentMailbox: Boolean) = with(root) {
+    private fun ItemMailboxMenuDrawerBinding.displayMenuDrawerMailbox(mailbox: Mailbox, isCurrentMailbox: Boolean) = with(root) {
         text = mailbox.email
-
-        if (isInMenuDrawer) badge = mailbox.unreadCountDisplay.count else itemStyle = MenuDrawerItemView.SelectionStyle.ACCOUNT
+        unreadCount = mailbox.unreadCountDisplay.count
         isPastilleDisplayed = mailbox.unreadCountDisplay.shouldDisplayPastille
-
-        setSelectedState(isCurrentMailbox)
 
         if (!isCurrentMailbox) {
             setOnClickListener {
-                if (isInMenuDrawer) {
-                    context.trackMenuDrawerEvent(SWITCH_MAILBOX_NAME)
-                } else {
-                    context.trackAccountEvent(SWITCH_MAILBOX_NAME)
-                }
-
+                context.trackMenuDrawerEvent(SWITCH_MAILBOX_NAME)
                 lifecycleScope.launch(ioDispatcher) {
                     AccountUtils.switchToMailbox(mailbox.mailboxId)
                 }
@@ -131,7 +124,7 @@ class MailboxesAdapter(
     override fun getItemViewType(position: Int): Int {
         return when {
             !mailboxes[position].isValid -> DisplayType.INVALID_MAILBOX.layout
-            isInMenuDrawer -> DisplayType.VALID_MAILBOX.layout
+            isInMenuDrawer -> DisplayType.MENU_DRAWER_MAILBOX.layout
             else -> DisplayType.SIMPLE_MAILBOX.layout
         }
     }
@@ -145,7 +138,7 @@ class MailboxesAdapter(
 
     private enum class DisplayType(val layout: Int) {
         INVALID_MAILBOX(R.layout.item_invalid_mailbox),
-        VALID_MAILBOX(R.layout.item_switch_mailbox),
+        MENU_DRAWER_MAILBOX(R.layout.item_mailbox_menu_drawer),
         SIMPLE_MAILBOX(R.layout.item_simple_mailbox),
     }
 
