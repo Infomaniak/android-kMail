@@ -379,6 +379,12 @@ class NewMessageFragment : Fragment() {
         }
     }
 
+    private fun WebView.loadContent(html: String, webViewGroup: Group) {
+        val processedHtml = webViewUtils.processHtmlForDisplay(html, context.isNightModeEnabled())
+        webViewGroup.isVisible = processedHtml.isNotBlank()
+        loadDataWithBaseURL("", processedHtml, ClipDescription.MIMETYPE_TEXT_HTML, Utils.UTF_8, "")
+    }
+
     private fun setupFromField() = with(binding) {
         val signatures = newMessageViewModel.signatures
         val selectedSignature = signatures.find { it.id == newMessageViewModel.selectedSignatureId }!!
@@ -425,12 +431,6 @@ class NewMessageFragment : Fragment() {
             signature.senderIdn
         }
         binding.fromMailAddress.text = formattedExpeditor
-    }
-
-    private fun WebView.loadContent(html: String, webViewGroup: Group) {
-        val processedHtml = webViewUtils.processHtmlForDisplay(html, context.isNightModeEnabled())
-        webViewGroup.isVisible = processedHtml.isNotBlank()
-        loadDataWithBaseURL("", processedHtml, ClipDescription.MIMETYPE_TEXT_HTML, Utils.UTF_8, "")
     }
 
     private fun populateViewModelWithExternalMailData() {

@@ -20,7 +20,6 @@ package com.infomaniak.mail.ui.main.newMessage
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
-import android.util.Log
 import android.webkit.WebView
 import androidx.activity.addCallback
 import androidx.activity.viewModels
@@ -137,7 +136,7 @@ class NewMessageActivity : BaseActivity() {
     }
 
     private fun observeInitSuccess() {
-        newMessageViewModel.isInitSuccess.observe(this@NewMessageActivity) { isSuccess ->
+        newMessageViewModel.isInitSuccess.observe(this) { isSuccess ->
             if (isSuccess) {
                 setupEditorActions()
                 setupEditorFormatActionsToggle()
