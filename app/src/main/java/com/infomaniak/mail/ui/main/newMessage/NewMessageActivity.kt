@@ -138,7 +138,6 @@ class NewMessageActivity : BaseActivity() {
 
     private fun observeInitSuccess() {
         newMessageViewModel.isInitSuccess.observe(this@NewMessageActivity) { isSuccess ->
-            Log.e("gibran", "observeInitSuccess: ACTIVITY COLLECTED IT");
             if (isSuccess) {
                 setupEditorActions()
                 setupEditorFormatActionsToggle()

@@ -190,7 +190,6 @@ class NewMessageFragment : Fragment() {
             previousMessageUid,
             recipient,
         ).observe(viewLifecycleOwner) { isSuccess ->
-            Log.e("gibran", "initDraftAndViewModel: FRAGMENT COLLECTED IT");
             if (isSuccess) {
                 hideLoader()
                 showKeyboardInCorrectView()
@@ -382,7 +381,6 @@ class NewMessageFragment : Fragment() {
 
     private fun setupFromField() = with(binding) {
         val signatures = newMessageViewModel.signatures
-        Log.e("gibran", "setupFromField - signatures: ${signatures}")
         val selectedSignature = signatures.find { it.id == newMessageViewModel.selectedSignatureId }!!
         updateSelectedSignatureFromField(selectedSignature)
 
@@ -410,11 +408,7 @@ class NewMessageFragment : Fragment() {
         if (signatures.count() > 1) {
             fromMailAddress.apply {
                 icon = AppCompatResources.getDrawable(context, R.drawable.ic_chevron_down)
-                Log.e("gibran", "setupFromField: about to set click listner");
-                setOnClickListener { _ ->
-                    Log.e("gibran", "setupFromField: got clicked");
-                    addressListPopupWindow.show()
-                }
+                setOnClickListener { _ -> addressListPopupWindow.show() }
             }
         }
     }

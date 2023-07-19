@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="1"
-            tools:text="Joris Body von Neuman of the Castle the great and reknowned (Officielle)" />
+            tools:text="Hubert Blaine Wolfeschlegelsteinhausenbergerdorff Sr. (Officielle)" />
 
         <TextView
             android:id="@+id/emailAddress"
@@ -45,7 +45,7 @@
             android:layout_height="wrap_content"
             android:ellipsize="middle"
             android:maxLines="1"
-            tools:text="joris.bodin@infomaniak.comjoris.bodin@infomaniak.comjoris.bodin@infomaniak.com" />
+            tools:text="hubert.blaine.wolfeschlegelsteinhausenbergerdorff@infomaniak.com" />
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

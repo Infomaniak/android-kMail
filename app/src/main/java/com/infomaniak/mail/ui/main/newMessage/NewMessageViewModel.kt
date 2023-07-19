@@ -175,7 +175,6 @@ class NewMessageViewModel @Inject constructor(
             }
         }
 
-        Log.i("gibran", "initDraftAndViewModel: emitting isSuccess from view model");
         emit(isSuccess)
         isInitSuccess.postValue(isSuccess)
     }
