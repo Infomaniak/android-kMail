@@ -161,6 +161,10 @@
             </intent-filter>
         </receiver>
 
+        <receiver
+            android:name=".receivers.NotificationActionsReceiver"
+            android:exported="false" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="@string/ATTACHMENTS_AUTHORITY"

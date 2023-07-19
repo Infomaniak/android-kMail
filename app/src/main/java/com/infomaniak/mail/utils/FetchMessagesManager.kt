@@ -37,6 +37,7 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.receivers.NotificationActionsReceiver
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.LaunchActivityArgs
 import com.infomaniak.mail.utils.NotificationUtils.buildNewMessageNotification
@@ -120,6 +121,22 @@ class FetchMessagesManager @Inject constructor(
 
             val actionsRequestCode = messageUid.hashCode()
             val actionsFlags = NotificationUtilsCore.pendingIntentFlags
+
+            // Archive action
+            val archiveIntent = Intent(appContext, NotificationActionsReceiver::class.java).apply {
+                putExtra(NotificationActionsReceiver.ARCHIVE_ACTION, messageUid)
+                putExtra(NotificationActionsReceiver.NOTIFICATION_ID, notificationId)
+            }
+            val archivePendingIntent = PendingIntent.getBroadcast(appContext, actionsRequestCode, archiveIntent, actionsFlags)
+            addAction(NotificationCompat.Action(null, appContext.getString(R.string.actionArchive), archivePendingIntent))
+
+            // Delete action
+            val deleteIntent = Intent(appContext, NotificationActionsReceiver::class.java).apply {
+                putExtra(NotificationActionsReceiver.DELETE_ACTION, messageUid)
+                putExtra(NotificationActionsReceiver.NOTIFICATION_ID, notificationId)
+            }
+            val deletePendingIntent = PendingIntent.getBroadcast(appContext, actionsRequestCode, deleteIntent, actionsFlags)
+            addAction(NotificationCompat.Action(null, appContext.getString(R.string.actionDelete), deletePendingIntent))
 
             // Reply action
             val replyIntent = Intent(appContext, LaunchActivity::class.java).clearStack().apply {
