@@ -419,7 +419,12 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun updateSelectedSignatureFromField(signature: Signature) {
-        binding.fromMailAddress.text = "${signature.expeditorName} <${signature.senderIdn}> (${signature.name})"
+        val formattedExpeditor = if (newMessageViewModel.signatures.count() > 1) {
+            "${signature.expeditorName} <${signature.senderIdn}> (${signature.name})"
+        } else {
+            signature.senderIdn
+        }
+        binding.fromMailAddress.text = formattedExpeditor
     }
 
     private fun WebView.loadContent(html: String, webViewGroup: Group) {
