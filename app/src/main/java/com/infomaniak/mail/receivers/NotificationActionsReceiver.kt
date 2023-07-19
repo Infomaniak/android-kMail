@@ -27,10 +27,14 @@ import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.getUids
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -38,16 +42,28 @@ class NotificationActionsReceiver : BroadcastReceiver() {
 
     @Inject
     lateinit var notificationManagerCompat: NotificationManagerCompat
+
     @Inject
     lateinit var sharedUtils: SharedUtils
+
     @Inject
     lateinit var mailboxContentRealm: RealmDatabase.MailboxContent
+
     @Inject
     lateinit var folderController: FolderController
 
+    @Inject
+    @IoDispatcher
+    lateinit var ioDispatcher: CoroutineDispatcher
+
     override fun onReceive(context: Context?, intent: Intent?) {
-        val notificationId = intent?.getIntExtra(NOTIFICATION_ID, -1) ?: return
-        val action = intent.getStringExtra(ACTION) ?: return
+        CoroutineScope(ioDispatcher).launch { intent?.let(::handleNotificationIntent) }
+    }
+
+    private fun handleNotificationIntent(intent: Intent) {
+
+        val notificationId = intent.getIntExtra(NOTIFICATION_ID, -1)
+        val action = intent.action ?: return
         val messageUid = intent.getStringExtra(MESSAGE_UID) ?: return
 
         val folderRole = when (action) {
@@ -75,12 +91,12 @@ class NotificationActionsReceiver : BroadcastReceiver() {
         if (notificationId == -1) return
 
         notificationManagerCompat.cancel(notificationId)
+        // TODO: Dismiss the "summary notification" if there is no more Notifications (maybe store a list of all NotificationsIds ?)
     }
 
     companion object {
         const val NOTIFICATION_ID = "notification_id"
         const val MESSAGE_UID = "message_uid"
-        const val ACTION = "action"
         const val ARCHIVE_ACTION = "archive_action"
         const val DELETE_ACTION = "delete_action"
     }

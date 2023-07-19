@@ -21,6 +21,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import androidx.annotation.IdRes
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.infomaniak.lib.core.utils.NotificationUtilsCore
@@ -38,7 +39,6 @@ import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.receivers.NotificationActionsReceiver
-import com.infomaniak.mail.receivers.NotificationActionsReceiver.Companion.ACTION
 import com.infomaniak.mail.receivers.NotificationActionsReceiver.Companion.ARCHIVE_ACTION
 import com.infomaniak.mail.receivers.NotificationActionsReceiver.Companion.DELETE_ACTION
 import com.infomaniak.mail.receivers.NotificationActionsReceiver.Companion.MESSAGE_UID
@@ -50,6 +50,7 @@ import io.realm.kotlin.Realm
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import okhttp3.OkHttpClient
+import java.util.UUID
 import javax.inject.Inject
 
 class FetchMessagesManager @Inject constructor(
@@ -122,30 +123,25 @@ class FetchMessagesManager @Inject constructor(
             return PendingIntent.getActivity(appContext, requestCode.hashCode(), intent, NotificationUtilsCore.pendingIntentFlags)
         }
 
-        fun NotificationCompat.Builder.addActions(messageUid: String, notificationId: Int) {
+        fun NotificationCompat.Builder.addActions(messageUid: String?, notificationId: Int) {
 
-            val actionsRequestCode = messageUid.hashCode()
+            // TODO: Is it ok to use a random requestCode?
+            //  Before, we used `messageUid.hashCode()`, but the same requestCode is
+            //  used for the Notification click event, so it overrides the Intent.
+            val actionsRequestCode = UUID.randomUUID().hashCode()
             val actionsFlags = NotificationUtilsCore.pendingIntentFlags
 
-            // Archive action
-            val archiveIntent = Intent(appContext, NotificationActionsReceiver::class.java).apply {
-                putExtra(NOTIFICATION_ID, notificationId)
-                putExtra(ACTION, ARCHIVE_ACTION)
-                putExtra(MESSAGE_UID, messageUid)
+            // Create Intents
+            fun createIntent(notificationAction: String): Intent {
+                return Intent(appContext, NotificationActionsReceiver::class.java).apply {
+                    action = notificationAction
+                    putExtra(NOTIFICATION_ID, notificationId)
+                    putExtra(MESSAGE_UID, messageUid)
+                }
             }
-            val archivePendingIntent = PendingIntent.getBroadcast(appContext, actionsRequestCode, archiveIntent, actionsFlags)
-            addAction(NotificationCompat.Action(null, appContext.getString(R.string.actionArchive), archivePendingIntent))
 
-            // Delete action
-            val deleteIntent = Intent(appContext, NotificationActionsReceiver::class.java).apply {
-                putExtra(NOTIFICATION_ID, notificationId)
-                putExtra(ACTION, DELETE_ACTION)
-                putExtra(MESSAGE_UID, messageUid)
-            }
-            val deletePendingIntent = PendingIntent.getBroadcast(appContext, actionsRequestCode, deleteIntent, actionsFlags)
-            addAction(NotificationCompat.Action(null, appContext.getString(R.string.actionDelete), deletePendingIntent))
-
-            // Reply action
+            val archiveIntent = createIntent(ARCHIVE_ACTION)
+            val deleteIntent = createIntent(DELETE_ACTION)
             val replyIntent = Intent(appContext, LaunchActivity::class.java).clearStack().apply {
                 putExtras(
                     LaunchActivityArgs(
@@ -157,8 +153,33 @@ class FetchMessagesManager @Inject constructor(
                     ).toBundle(),
                 )
             }
-            val replyPendingIntent = PendingIntent.getActivity(appContext, actionsRequestCode, replyIntent, actionsFlags)
-            addAction(NotificationCompat.Action(null, appContext.getString(R.string.actionReply), replyPendingIntent))
+
+            // Create PendingIntents
+            fun createPendingIntent(intent: Intent, isActivity: Boolean = false): PendingIntent {
+                return if (isActivity) {
+                    PendingIntent.getActivity(appContext, actionsRequestCode, intent, actionsFlags)
+                } else {
+                    PendingIntent.getBroadcast(appContext, actionsRequestCode, intent, actionsFlags)
+                }
+            }
+
+            val archivePendingIntent = createPendingIntent(archiveIntent)
+            val deletePendingIntent = createPendingIntent(deleteIntent)
+            val replyPendingIntent = createPendingIntent(replyIntent, isActivity = true)
+
+            // Create Actions
+            fun createAction(@IdRes title: Int, pendingIntent: PendingIntent): NotificationCompat.Action {
+                return NotificationCompat.Action(null, appContext.getString(title), pendingIntent)
+            }
+
+            val archiveAction = createAction(R.string.actionArchive, archivePendingIntent)
+            val deleteAction = createAction(R.string.actionDelete, deletePendingIntent)
+            val replyAction = createAction(R.string.actionReply, replyPendingIntent)
+
+            // Add Actions
+            addAction(archiveAction)
+            addAction(deleteAction)
+            addAction(replyAction)
         }
 
         fun showNotification(
@@ -166,7 +187,7 @@ class FetchMessagesManager @Inject constructor(
             isSummary: Boolean,
             title: String = "",
             description: String? = null,
-            messageUid: String,
+            messageUid: String? = null,
         ) {
             appContext.buildNewMessageNotification(mailbox.channelId, title, description).apply {
 
@@ -179,8 +200,8 @@ class FetchMessagesManager @Inject constructor(
                 setSubText(mailbox.email)
                 setContentText(contentText)
                 setColorized(true)
-                setContentIntent(contentIntent(isSummary = isSummary))
-                addActions(messageUid, notificationId)
+                setContentIntent(contentIntent(isSummary))
+                if (!isSummary) addActions(messageUid, notificationId)
                 setGroup(mailbox.notificationGroupKey)
                 setGroupSummary(isSummary)
                 color = localSettings.accentColor.getPrimary(appContext)
@@ -241,7 +262,6 @@ class FetchMessagesManager @Inject constructor(
             showNotification(
                 contentText = summaryText,
                 isSummary = true,
-                messageUid = message.uid,
             )
         }
     }
