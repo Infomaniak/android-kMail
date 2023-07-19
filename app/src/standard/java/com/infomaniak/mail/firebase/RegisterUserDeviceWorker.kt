@@ -31,6 +31,7 @@ import dagger.assisted.AssistedInject
 import io.sentry.Sentry
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import java.util.concurrent.TimeUnit
 
 @HiltWorker
 class RegisterUserDeviceWorker @AssistedInject constructor(
@@ -73,13 +74,17 @@ class RegisterUserDeviceWorker @AssistedInject constructor(
 
     companion object {
         private const val TAG = "RegisterUserDeviceWorker"
+        private const val INITIAL_DELAY = 15L // 15s
 
         // TODO: (Hilt) - Need refactor
-        fun scheduleWork(context: Context) {
+        fun scheduleWork(context: Context, allowInitialDelay: Boolean = false) {
             Log.i(TAG, "work scheduled")
 
             val workRequest = OneTimeWorkRequestBuilder<RegisterUserDeviceWorker>()
                 .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
+                .apply {
+                    if (allowInitialDelay) setInitialDelay(INITIAL_DELAY, TimeUnit.SECONDS)
+                }
                 .build()
 
             WorkManager.getInstance(context).enqueueUniqueWork(TAG, ExistingWorkPolicy.REPLACE, workRequest)
