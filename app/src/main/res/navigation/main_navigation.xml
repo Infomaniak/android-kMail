@@ -59,6 +59,22 @@
         <action
             android:id="@+id/action_threadListFragment_to_invalidPasswordFragment"
             app:destination="@id/invalidPasswordFragment" />
+
+        <!-- Region Notification: Click on Reply -->
+        <argument
+            android:name="replyToMessageUid"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="draftMode"
+            android:defaultValue="REPLY"
+            app:argType="com.infomaniak.mail.data.models.draft.Draft$DraftMode" />
+        <argument
+            android:name="notificationId"
+            android:defaultValue="-1"
+            app:argType="integer" />
+        <!-- Endregion -->
     </fragment>
 
     <activity
@@ -465,11 +481,8 @@
         android:id="@+id/launchActivity"
         android:name="com.infomaniak.mail.ui.LaunchActivity"
         android:label="LaunchActivity">
-        <argument
-            android:name="openThreadUid"
-            android:defaultValue="@null"
-            app:argType="string"
-            app:nullable="true" />
+
+        <!-- Region Notification: Switch to correct User & Mailbox -->
         <argument
             android:name="userId"
             android:defaultValue="-1"
@@ -478,6 +491,31 @@
             android:name="mailboxId"
             android:defaultValue="-1"
             app:argType="integer" />
+        <!-- Endregion -->
+
+        <!-- Region Notification: Click on Notif -->
+        <argument
+            android:name="openThreadUid"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+        <!-- Endregion -->
+
+        <!-- Region Notification: Click on Reply -->
+        <argument
+            android:name="replyToMessageUid"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="draftMode"
+            android:defaultValue="REPLY"
+            app:argType="com.infomaniak.mail.data.models.draft.Draft$DraftMode" />
+        <argument
+            android:name="notificationId"
+            android:defaultValue="-1"
+            app:argType="integer" />
+        <!-- Endregion -->
     </activity>
 
     <activity

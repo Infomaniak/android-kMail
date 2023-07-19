@@ -39,8 +39,6 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.LaunchActivityArgs
-import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity
-import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.NotificationUtils.buildNewMessageNotification
 import io.realm.kotlin.Realm
 import io.sentry.Sentry
@@ -106,26 +104,38 @@ class FetchMessagesManager @Inject constructor(
 
         fun contentIntent(isSummary: Boolean): PendingIntent {
             val intent = Intent(appContext, LaunchActivity::class.java).clearStack().apply {
-                putExtras(LaunchActivityArgs(if (isSummary) null else uid, userId, mailbox.mailboxId).toBundle())
+                putExtras(
+                    LaunchActivityArgs(
+                        userId = userId,
+                        mailboxId = mailbox.mailboxId,
+                        openThreadUid = if (isSummary) null else uid,
+                    ).toBundle(),
+                )
             }
             val requestCode = if (isSummary) mailbox.uuid else uid
             return PendingIntent.getActivity(appContext, requestCode.hashCode(), intent, NotificationUtilsCore.pendingIntentFlags)
         }
 
         fun NotificationCompat.Builder.addActions(messageUid: String, notificationId: Int) {
-            val actionsRequestCode = 0
-            val actionsFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
 
-            val replyIntent = Intent(appContext, NewMessageActivity::class.java).apply {
-                val bundle = NewMessageActivityArgs(
-                    draftMode = DraftMode.REPLY,
-                    previousMessageUid = messageUid,
-                    notificationId = notificationId,
-                ).toBundle()
-                putExtras(bundle)
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            val replyIntent = Intent(appContext, LaunchActivity::class.java).clearStack().apply {
+                putExtras(
+                    LaunchActivityArgs(
+                        userId = userId,
+                        mailboxId = mailbox.mailboxId,
+                        replyToMessageUid = messageUid,
+                        draftMode = DraftMode.REPLY,
+                        notificationId = notificationId,
+                    ).toBundle(),
+                )
             }
-            val replyPendingIntent = PendingIntent.getActivity(appContext, actionsRequestCode, replyIntent, actionsFlags)
+
+            val replyPendingIntent = PendingIntent.getActivity(
+                appContext,
+                messageUid.hashCode(),
+                replyIntent,
+                NotificationUtilsCore.pendingIntentFlags,
+            )
 
             addAction(NotificationCompat.Action(null, appContext.getString(R.string.actionReply), replyPendingIntent))
         }
