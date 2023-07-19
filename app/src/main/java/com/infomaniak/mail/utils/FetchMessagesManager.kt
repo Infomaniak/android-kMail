@@ -38,6 +38,11 @@ import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.receivers.NotificationActionsReceiver
+import com.infomaniak.mail.receivers.NotificationActionsReceiver.Companion.ACTION
+import com.infomaniak.mail.receivers.NotificationActionsReceiver.Companion.ARCHIVE_ACTION
+import com.infomaniak.mail.receivers.NotificationActionsReceiver.Companion.DELETE_ACTION
+import com.infomaniak.mail.receivers.NotificationActionsReceiver.Companion.MESSAGE_UID
+import com.infomaniak.mail.receivers.NotificationActionsReceiver.Companion.NOTIFICATION_ID
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.LaunchActivityArgs
 import com.infomaniak.mail.utils.NotificationUtils.buildNewMessageNotification
@@ -124,16 +129,18 @@ class FetchMessagesManager @Inject constructor(
 
             // Archive action
             val archiveIntent = Intent(appContext, NotificationActionsReceiver::class.java).apply {
-                putExtra(NotificationActionsReceiver.ARCHIVE_ACTION, messageUid)
-                putExtra(NotificationActionsReceiver.NOTIFICATION_ID, notificationId)
+                putExtra(NOTIFICATION_ID, notificationId)
+                putExtra(ACTION, ARCHIVE_ACTION)
+                putExtra(MESSAGE_UID, messageUid)
             }
             val archivePendingIntent = PendingIntent.getBroadcast(appContext, actionsRequestCode, archiveIntent, actionsFlags)
             addAction(NotificationCompat.Action(null, appContext.getString(R.string.actionArchive), archivePendingIntent))
 
             // Delete action
             val deleteIntent = Intent(appContext, NotificationActionsReceiver::class.java).apply {
-                putExtra(NotificationActionsReceiver.DELETE_ACTION, messageUid)
-                putExtra(NotificationActionsReceiver.NOTIFICATION_ID, notificationId)
+                putExtra(NOTIFICATION_ID, notificationId)
+                putExtra(ACTION, DELETE_ACTION)
+                putExtra(MESSAGE_UID, messageUid)
             }
             val deletePendingIntent = PendingIntent.getBroadcast(appContext, actionsRequestCode, deleteIntent, actionsFlags)
             addAction(NotificationCompat.Action(null, appContext.getString(R.string.actionDelete), deletePendingIntent))

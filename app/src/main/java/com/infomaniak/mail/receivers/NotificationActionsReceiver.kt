@@ -21,6 +21,15 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationManagerCompat
+import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.RealmDatabase
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController
+import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
+import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.SharedUtils
+import com.infomaniak.mail.utils.getUids
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -29,25 +38,37 @@ class NotificationActionsReceiver : BroadcastReceiver() {
 
     @Inject
     lateinit var notificationManagerCompat: NotificationManagerCompat
+    @Inject
+    lateinit var sharedUtils: SharedUtils
+    @Inject
+    lateinit var mailboxContentRealm: RealmDatabase.MailboxContent
+    @Inject
+    lateinit var folderController: FolderController
 
     override fun onReceive(context: Context?, intent: Intent?) {
         val notificationId = intent?.getIntExtra(NOTIFICATION_ID, -1) ?: return
+        val action = intent.getStringExtra(ACTION) ?: return
+        val messageUid = intent.getStringExtra(MESSAGE_UID) ?: return
 
-        intent.getStringExtra(ARCHIVE_ACTION)?.let { messageUid ->
-            archiveMessage(messageUid, notificationId)
-        }
+        val folderRole = when (action) {
+            ARCHIVE_ACTION -> FolderRole.ARCHIVE
+            DELETE_ACTION -> FolderRole.TRASH
+            else -> null
+        } ?: return
 
-        intent.getStringExtra(DELETE_ACTION)?.let { messageUid ->
-            deleteMessage(messageUid, notificationId)
-        }
-    }
-
-    private fun archiveMessage(messageUid: String, notificationId: Int) {
+        executeAction(messageUid, folderRole)
         dismissNotification(notificationId)
     }
 
-    private fun deleteMessage(messageUid: String, notificationId: Int) {
-        dismissNotification(notificationId)
+    private fun executeAction(messageUid: String, folderRole: FolderRole) {
+        val mailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId) ?: return
+        val message = MessageController.getMessage(messageUid, mailboxContentRealm()) ?: return
+        val destinationId = folderController.getFolder(folderRole)?.id ?: return
+
+        val threads = message.threads.filter { it.folderId == message.folderId }
+        val messages = sharedUtils.getMessagesToMove(threads, message)
+
+        ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationId)
     }
 
     private fun dismissNotification(notificationId: Int) {
@@ -58,6 +79,8 @@ class NotificationActionsReceiver : BroadcastReceiver() {
 
     companion object {
         const val NOTIFICATION_ID = "notification_id"
+        const val MESSAGE_UID = "message_uid"
+        const val ACTION = "action"
         const val ARCHIVE_ACTION = "archive_action"
         const val DELETE_ACTION = "delete_action"
     }
