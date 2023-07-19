@@ -76,7 +76,7 @@
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/mailboxSwitcher"
-                style="@style/MenuDrawerItem">
+                style="@style/DecoratedTextItem">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -136,7 +136,7 @@
                 android:visibility="gone"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:itemCount="3"
-                tools:listitem="@layout/item_switch_mailbox"
+                tools:listitem="@layout/item_mailbox_menu_drawer"
                 tools:visibility="visible" />
 
             <com.google.android.material.divider.MaterialDivider

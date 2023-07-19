@@ -291,18 +291,18 @@
         <item name="dividerInsetStart">@dimen/marginStandard</item>
     </style>
 
-    <style name="MenuDrawerItem" parent="Widget.Material3.CardView.Filled">
-        <item name="android:layout_height">@dimen/menuDrawerItemViewHeight</item>
+    <style name="DecoratedTextItem" parent="Widget.Material3.CardView.Filled">
+        <item name="android:layout_height">@dimen/DecoratedTextItemViewHeight</item>
         <item name="android:layout_marginStart">@dimen/marginStandardSmall</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:paddingEnd">@dimen/marginStandard</item>
         <item name="android:paddingStart">@dimen/marginStandard</item>
         <item name="cardBackgroundColor">@android:color/transparent</item>
         <item name="rippleColor">?attr/colorControlHighlight</item>
-        <item name="shapeAppearanceOverlay">@style/MenuDrawerItemShapeAppearance</item>
+        <item name="shapeAppearanceOverlay">@style/DecoratedTextItemShapeAppearance</item>
     </style>
 
-    <style name="MenuDrawerItemShapeAppearance">
+    <style name="DecoratedTextItemShapeAppearance">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSizeTopRight">0dp</item>
         <item name="cornerSizeTopLeft">10dp</item>

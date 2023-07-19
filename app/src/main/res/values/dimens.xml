@@ -39,7 +39,7 @@
 
     <!-- Menu Drawer -->
 
-    <dimen name="menuDrawerItemViewHeight">48dp</dimen>
+    <dimen name="DecoratedTextItemViewHeight">48dp</dimen>
 
     <!-- Settings -->
     <dimen name="settingsSeparatorHorizontalPadding">16dp</dimen>
