@@ -42,6 +42,7 @@ import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
+import com.infomaniak.mail.data.models.draft.Draft.Companion.encapsulateSignatureContentWithInfomaniakClass
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.mailbox.Mailbox
@@ -61,6 +62,7 @@ import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.query.RealmResults
+import io.realm.kotlin.types.RealmList
 import kotlinx.coroutines.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -234,7 +236,8 @@ class NewMessageViewModel @Inject constructor(
     ): Draft? {
         return Draft().apply {
             initLocalValues(mimeType = ClipDescription.MIMETYPE_TEXT_HTML)
-            initSignature(mailbox, realm = this@createDraft, context = context)
+            val shouldPreSelectSignature = draftMode == DraftMode.REPLY || draftMode == DraftMode.REPLY_ALL
+            initSignature(mailbox, realm = this@createDraft, addContent = !shouldPreSelectSignature, context = context)
             when (draftMode) {
                 DraftMode.NEW_MAIL -> recipient?.let { to = realmListOf(it) }
                 DraftMode.REPLY, DraftMode.REPLY_ALL, DraftMode.FORWARD -> {
@@ -250,35 +253,91 @@ class NewMessageViewModel @Inject constructor(
                             )
                             if (!isSuccess) return null
 
-                            val mostFittingSignature = guessMostFittingSignature(message)
+                            if (shouldPreSelectSignature) {
+                                val mostFittingSignature = guessMostFittingSignature(message)
+                                identityId = mostFittingSignature.id.toString()
+                                body += encapsulateSignatureContentWithInfomaniakClass(mostFittingSignature.content)
+                            }
                         }
                 }
             }
         }
     }
 
-    private fun guessMostFittingSignature(message: Message): Signature? {
-        var bestSignature: Signature? = null
+    private fun guessMostFittingSignature(message: Message): Signature {
+        val signatureEmailsMap = mutableMapOf<String, MutableList<Signature>>()
+        var defaultSignature: Signature? = null
 
         signatures.forEach { signature ->
-            message.to.forEach { recipient ->
-                val emailMatches = recipient.email == signature.senderEmailIdn
-                val nameMatches = recipient.name == signature.senderName
+            signatureEmailsMap.getOrPut(signature.senderEmail) { mutableListOf() }.add(signature)
+            if (signature.isDefault) defaultSignature = signature
+        }
 
-                val fitScore = when {
-                    emailMatches && nameMatches -> 2
-                    emailMatches -> 1
-                    else -> 0
-                }
+        findSignatureInRecipients(message.to, signatureEmailsMap)?.let { return it }
+        findSignatureInRecipients(message.from, signatureEmailsMap)?.let { return it }
+        findSignatureInRecipients(message.cc, signatureEmailsMap)?.let { return it }
 
-                when (fitScore) {
-                    2 -> return signature
-                    1 -> bestSignature = signature
+        return defaultSignature!!
+    }
+
+    private fun findSignatureInRecipients(
+        recipients: RealmList<Recipient>,
+        signatureEmailsMap: MutableMap<String, MutableList<Signature>>,
+    ): Signature? {
+        val matchingEmailRecipients = recipients.filter { it.email in signatureEmailsMap }
+
+        if (matchingEmailRecipients.isEmpty()) return null // If no recipient represents us, go to next recipients
+
+        var bestScore = -1
+        var bestSignature: Signature? = null
+        matchingEmailRecipients.forEach { recipient ->
+            val (score, signature) = computeScore(recipient, signatureEmailsMap[recipient.email]!!)
+            when (score) {
+                4 -> return signature
+                else -> {
+                    if (score > bestScore) {
+                        bestScore = score
+                        bestSignature = signature
+                    }
                 }
             }
         }
 
         return bestSignature
+    }
+
+    /**
+     * Only pass in signatures that have the same email address as recipient
+     */
+    private fun computeScore(recipient: Recipient, signatures: MutableList<Signature>): Pair<Int, Signature> {
+        var bestScore = -1
+        var bestSignature: Signature? = null
+
+        signatures.forEach { signature ->
+            when (val fitScore = computeScore(recipient, signature)) {
+                4 -> return fitScore to signature
+                else -> if (bestScore < fitScore) {
+                    bestScore = fitScore
+                    bestSignature = signature
+                }
+            }
+        }
+
+        return bestScore to bestSignature!!
+    }
+
+    private fun computeScore(recipient: Recipient, signature: Signature): Int {
+        val isExactMatch = recipient.name == signature.senderName && recipient.email == signature.senderEmail
+        val isDefault = signature.isDefault
+
+        val fitScore = when {
+            isExactMatch && isDefault -> 4
+            isExactMatch -> 3
+            isDefault -> 2
+            else -> 1
+        }
+
+        return fitScore
     }
 
     private fun splitSignatureAndQuoteFromBody() {
