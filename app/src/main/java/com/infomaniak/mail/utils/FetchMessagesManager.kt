@@ -56,7 +56,7 @@ class FetchMessagesManager @Inject constructor(
 
     suspend fun execute(userId: Int, mailbox: Mailbox, sentryMessageUid: String? = null, mailboxContentRealm: Realm? = null) {
 
-        // Don't launch sync if the mailbox's notifications have been disabled by the user
+        // Don't launch sync if the Mailbox's notifications have been disabled by the user
         if (mailbox.notificationsIsDisabled(notificationManagerCompat)) return
 
         val realm = mailboxContentRealm ?: RealmDatabase.newMailboxContentInstance(userId, mailbox.mailboxId)
@@ -79,7 +79,7 @@ class FetchMessagesManager @Inject constructor(
         // Notify Threads with new Messages
         val unReadThreadsCount = ThreadController.getUnreadThreadsCount(folder)
         newMessagesThreads.forEachIndexed { index, thread ->
-            thread.showNotification(
+            thread.showThreadNotification(
                 userId = userId,
                 mailbox = mailbox,
                 realm = realm,
@@ -93,7 +93,7 @@ class FetchMessagesManager @Inject constructor(
         realm.close()
     }
 
-    private suspend fun Thread.showNotification(
+    private suspend fun Thread.showThreadNotification(
         userId: Int,
         mailbox: Mailbox,
         realm: Realm,
@@ -211,7 +211,7 @@ class FetchMessagesManager @Inject constructor(
             messageUid = message.uid,
         )
 
-        // Show group summary notification
+        // Show Group Summary notification
         if (isLastMessage) {
             val summaryText = appContext.resources.getQuantityString(
                 R.plurals.newMessageNotificationSummary,

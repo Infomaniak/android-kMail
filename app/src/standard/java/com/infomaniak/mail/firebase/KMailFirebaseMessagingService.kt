@@ -42,6 +42,7 @@ class KMailFirebaseMessagingService : FirebaseMessagingService() {
 
     @Inject
     lateinit var notificationManagerCompat: NotificationManagerCompat
+
     @Inject
     lateinit var processMessageNotificationsScheduler: ProcessMessageNotificationsWorker.Scheduler
 

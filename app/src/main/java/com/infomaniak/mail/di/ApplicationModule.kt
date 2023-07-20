@@ -41,8 +41,8 @@ object ApplicationModule {
     @Provides
     fun providesMainApplication(application: Application) = application as MainApplication
 
-    @Singleton
     @Provides
+    @Singleton
     fun providesNotificationManagerCompat(appContext: Context): NotificationManagerCompat {
         return NotificationManagerCompat.from(appContext)
     }
@@ -50,8 +50,8 @@ object ApplicationModule {
     @Provides
     fun providesWorkManager(appContext: Context) = WorkManager.getInstance(appContext)
 
-    @Singleton
     @Provides
+    @Singleton
     fun providesGlobalCoroutineScope(@DefaultDispatcher defaultDispatcher: CoroutineDispatcher): CoroutineScope {
         return CoroutineScope(defaultDispatcher)
     }

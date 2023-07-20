@@ -19,6 +19,7 @@ package com.infomaniak.mail.di
 
 import javax.inject.Qualifier
 
+//region Globals qualifiers
 @Retention(AnnotationRetention.BINARY)
 @Qualifier
 annotation class DefaultDispatcher
@@ -30,3 +31,4 @@ annotation class IoDispatcher
 @Retention(AnnotationRetention.BINARY)
 @Qualifier
 annotation class MainDispatcher
+//endregion

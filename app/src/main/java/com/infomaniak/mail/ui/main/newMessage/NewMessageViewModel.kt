@@ -205,7 +205,7 @@ class NewMessageViewModel @Inject constructor(
     }
 
     /**
-     * If we are answering to a Message, we need to mark it as read.
+     * If we are replying to a Message, we need to mark it as read.
      */
     private suspend fun markAsRead(
         previousMessageUid: String?,
