@@ -15,14 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-@file:UseSerializers(RealmListSerializer::class, RealmInstantSerializer::class)
+@file:UseSerializers(RealmListSerializer::class)
 
 package com.infomaniak.mail.data.models.draft
 
 import android.content.Context
 import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
-import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.models.Attachment

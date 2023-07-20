@@ -22,6 +22,7 @@ package com.infomaniak.mail.data.models.message
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
+import com.infomaniak.mail.data.api.UnwrappingJsonListSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController.Companion.SEARCH_FOLDER_ID
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder
@@ -37,10 +38,7 @@ import io.realm.kotlin.types.annotations.Ignore
 import io.realm.kotlin.types.annotations.PrimaryKey
 import io.sentry.Sentry
 import io.sentry.SentryLevel
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
-import kotlinx.serialization.UseSerializers
+import kotlinx.serialization.*
 import java.util.*
 
 @Serializable
@@ -61,6 +59,7 @@ class Message : RealmObject {
     @SerialName("reply_to")
     var replyTo: RealmList<Recipient> = realmListOf()
     @SerialName("in_reply_to")
+    @Serializable(with = UnwrappingJsonListSerializer::class)
     var inReplyTo: String? = null
     var references: String? = null
     @SerialName("dkim_status")
