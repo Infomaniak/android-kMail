@@ -30,7 +30,10 @@ import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.di.IoDispatcher
-import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.NotificationUtils.NotificationPayload
+import com.infomaniak.mail.utils.NotificationUtils.NotificationPayload.NotificationBehavior
+import com.infomaniak.mail.utils.NotificationUtils.NotificationPayload.NotificationBehavior.NotificationType
+import com.infomaniak.mail.utils.NotificationUtils.showNotification
 import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.getUids
 import dagger.hilt.android.AndroidEntryPoint
@@ -57,41 +60,77 @@ class NotificationActionsReceiver : BroadcastReceiver() {
     lateinit var ioDispatcher: CoroutineDispatcher
 
     override fun onReceive(context: Context, intent: Intent) {
-        CoroutineScope(ioDispatcher).launch { handleNotificationIntent(context, intent) }
+        CoroutineScope(ioDispatcher).launch {
+            val payload = intent.getSerializableExtra(EXTRA_PAYLOAD) as? NotificationPayload ?: return@launch
+            val action = intent.action!!
+            handleNotificationIntent(context, payload, action)
+        }
     }
 
-    private fun handleNotificationIntent(context: Context, intent: Intent) {
+    private fun handleNotificationIntent(context: Context, payload: NotificationPayload, action: String) = with(payload) {
 
-        val userId = intent.getIntExtra(USER_ID, -1)
-        val mailboxId = intent.getIntExtra(MAILBOX_ID, -1)
+        // Undo action
+        if (action == UNDO_ACTION) {
+            executeUndoAction(context, payload)
+            return
+        }
+
+        // Other actions
         val realm = RealmDatabase.newMailboxContentInstance(userId, mailboxId)
         val mailbox = MailboxController.getMailbox(userId, mailboxId) ?: return
-
-        val notificationId = intent.getIntExtra(NOTIFICATION_ID, -1)
-        val action = intent.action ?: return
-        val messageUid = intent.getStringExtra(MESSAGE_UID) ?: return
-
-        val folderRole = when (action) {
-            ARCHIVE_ACTION -> FolderRole.ARCHIVE
-            DELETE_ACTION -> FolderRole.TRASH
+        val (folderRole, undoNotificationTitle) = when (action) {
+            ARCHIVE_ACTION -> FolderRole.ARCHIVE to "Archived" // TODO: Translate
+            DELETE_ACTION -> FolderRole.TRASH to "Deleted" // TODO: Translate
             else -> null
         } ?: return
-
-        executeAction(realm, mailbox, messageUid, folderRole)
-        dismissNotification(context, mailbox, notificationId)
+        executeAction(context, realm, mailbox, folderRole, undoNotificationTitle, payload)
     }
 
-    private fun executeAction(realm: TypedRealm, mailbox: Mailbox, messageUid: String, folderRole: FolderRole) {
-        val message = MessageController.getMessage(messageUid, realm) ?: return
+    private fun executeUndoAction(context: Context, payload: NotificationPayload) {
+
+        // TODO: Check if this is the correct call
+        val isSuccess = ApiRepository.undoAction(payload.behavior?.undoResource!!).isSuccess()
+
+        if (isSuccess) {
+            showNotification(
+                context = context,
+                notificationManagerCompat = notificationManagerCompat,
+                payload = payload.apply { behavior = null },
+            )
+        }
+    }
+
+    private fun executeAction(
+        context: Context,
+        realm: TypedRealm,
+        mailbox: Mailbox,
+        folderRole: FolderRole,
+        undoNotificationTitle: String,
+        payload: NotificationPayload,
+    ) {
+        val message = MessageController.getMessage(payload.messageUid!!, realm) ?: return
         val destinationId = folderController.getFolder(folderRole)?.id ?: return
 
         val threads = message.threads.filter { it.folderId == message.folderId }
         val messages = sharedUtils.getMessagesToMove(threads, message)
 
-        val isSuccess = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationId).isSuccess()
-        if (isSuccess) {
-            // TODO: Update the Notification and add an Undo button.
-        }
+        val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationId)
+        val undoResource = apiResponse.data?.undoResource ?: return
+
+        showNotification(
+            context = context,
+            notificationManagerCompat = notificationManagerCompat,
+            payload = payload.apply {
+                behavior = NotificationBehavior(
+                    type = NotificationType.UNDO,
+                    behaviorTitle = undoNotificationTitle,
+                    undoResource = undoResource,
+                )
+            },
+        )
+
+        // TODO: Dismiss at the right time, with a 3 ou 5 sec timer (check the `undoResource` timer too)
+        // dismissNotification(context, mailbox, notificationId)
     }
 
     private fun dismissNotification(context: Context, mailbox: Mailbox, notificationId: Int) {
@@ -105,11 +144,9 @@ class NotificationActionsReceiver : BroadcastReceiver() {
     }
 
     companion object {
-        const val USER_ID = "user_id"
-        const val MAILBOX_ID = "mailbox_id"
-        const val NOTIFICATION_ID = "notification_id"
-        const val MESSAGE_UID = "message_uid"
+        const val EXTRA_PAYLOAD = "extra_payload"
         const val ARCHIVE_ACTION = "archive_action"
         const val DELETE_ACTION = "delete_action"
+        const val UNDO_ACTION = "undo_action"
     }
 }
