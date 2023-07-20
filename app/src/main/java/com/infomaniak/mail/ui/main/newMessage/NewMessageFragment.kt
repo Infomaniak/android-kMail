@@ -190,7 +190,7 @@ class NewMessageFragment : Fragment() {
             draftMode,
             previousMessageUid,
             recipient,
-        ).observe(viewLifecycleOwner) { isSuccess ->
+        ).observe(viewLifecycleOwner) { (isSuccess, signatures) ->
             if (isSuccess) {
                 hideLoader()
                 showKeyboardInCorrectView()
@@ -199,7 +199,7 @@ class NewMessageFragment : Fragment() {
 
                 // The observe usually happens before onResume, but here we need the view to be entirely laid out for the popup
                 // window to not crash because anchor might not be ready.
-                lifecycleScope.launch(Dispatchers.Main) { setupFromField() }
+                lifecycleScope.launch(Dispatchers.Main) { setupFromField(signatures) }
             } else requireActivity().apply {
                 showToast(R.string.failToOpenDraft)
                 finish()
@@ -386,13 +386,12 @@ class NewMessageFragment : Fragment() {
         loadDataWithBaseURL("", processedHtml, ClipDescription.MIMETYPE_TEXT_HTML, Utils.UTF_8, "")
     }
 
-    private fun setupFromField() = with(binding) {
-        val signatures = newMessageViewModel.signatures
+    private fun setupFromField(signatures: List<Signature>) = with(binding) {
         val selectedSignature = signatures.find { it.id == newMessageViewModel.selectedSignatureId }!!
-        updateSelectedSignatureFromField(selectedSignature)
+        updateSelectedSignatureFromField(signatures, selectedSignature)
 
         val adapter = SignatureAdapter(signatures, newMessageViewModel.selectedSignatureId) { newSelectedSignature ->
-            updateSelectedSignatureFromField(newSelectedSignature)
+            updateSelectedSignatureFromField(signatures, newSelectedSignature)
             updateBodySignature(newSelectedSignature.content)
 
             newMessageViewModel.apply {
@@ -425,8 +424,8 @@ class NewMessageFragment : Fragment() {
         signatureWebView.loadContent(signatureContent, signatureGroup)
     }
 
-    private fun updateSelectedSignatureFromField(signature: Signature) {
-        val formattedExpeditor = if (newMessageViewModel.signatures.count() > 1) {
+    private fun updateSelectedSignatureFromField(signatures: List<Signature>, signature: Signature) {
+        val formattedExpeditor = if (signatures.count() > 1) {
             "${signature.senderName} <${signature.senderEmailIdn}> (${signature.name})"
         } else {
             signature.senderEmailIdn

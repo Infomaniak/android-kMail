@@ -92,7 +92,6 @@ class NewMessageViewModel @Inject constructor(
             if (field.body.isNotEmpty()) splitSignatureAndQuoteFromBody()
         }
     var selectedSignatureId = -1
-    lateinit var signatures: List<Signature>
 
     var isAutoCompletionOpened = false
     var isEditorExpanded = false
@@ -133,14 +132,17 @@ class NewMessageViewModel @Inject constructor(
         draftMode: DraftMode,
         previousMessageUid: String?,
         recipient: Recipient?,
-    ): LiveData<Boolean> = liveData(ioCoroutineContext) {
+    ): LiveData<Pair<Boolean, List<Signature>>> = liveData(ioCoroutineContext) {
         val realm = mailboxContentRealm()
         val mailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
 
-        val isSuccess = realm.writeBlocking {
-            fetchSignatures(mailbox)
+        var signatures: List<Signature> = emptyList()
 
+        val isSuccess = realm.writeBlocking {
             runCatching {
+                fetchSignatures(mailbox)
+                signatures = SignatureController.getAllSignatures(realm)
+
                 val isRecreated = activityCreationStatus == CreationStatus.RECREATED
                 val draftExists = arrivedFromExistingDraft || isRecreated
 
@@ -162,7 +164,7 @@ class NewMessageViewModel @Inject constructor(
                     }
                 } else {
                     isNewMessage = true
-                    createDraft(draftMode, previousMessageUid, recipient, mailbox, context) ?: return@writeBlocking false
+                    createDraft(draftMode, previousMessageUid, recipient, mailbox, signatures, context) ?: return@writeBlocking false
                 }
 
                 if (draft.identityId.isNullOrBlank()) draft.addMissingSignatureData(realm = this)
@@ -184,13 +186,12 @@ class NewMessageViewModel @Inject constructor(
             }
         }
 
-        emit(isSuccess)
+        emit(isSuccess to signatures)
         isInitSuccess.postValue(isSuccess)
     }
 
     private fun MutableRealm.fetchSignatures(mailbox: Mailbox) {
         SharedViewModelUtils.updateSignatures(mailbox, realm = this, context)
-        signatures = SignatureController.getAllSignatures(realm = this).copyFromRealm() // TODO : Necessary ?
     }
 
     /**
@@ -237,6 +238,7 @@ class NewMessageViewModel @Inject constructor(
         previousMessageUid: String?,
         recipient: Recipient?,
         mailbox: Mailbox,
+        signatures: List<Signature>,
         context: Context,
     ): Draft? {
         return Draft().apply {
@@ -259,7 +261,7 @@ class NewMessageViewModel @Inject constructor(
                             if (!isSuccess) return null
 
                             if (shouldPreSelectSignature) {
-                                val mostFittingSignature = guessMostFittingSignature(message)
+                                val mostFittingSignature = guessMostFittingSignature(message, signatures)
                                 identityId = mostFittingSignature.id.toString()
                                 body += encapsulateSignatureContentWithInfomaniakClass(mostFittingSignature.content)
                             }
@@ -269,7 +271,7 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    private fun guessMostFittingSignature(message: Message): Signature {
+    private fun guessMostFittingSignature(message: Message, signatures: List<Signature>): Signature {
         val signatureEmailsMap = mutableMapOf<String, MutableList<Signature>>()
         var defaultSignature: Signature? = null
 
