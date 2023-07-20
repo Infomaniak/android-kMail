@@ -30,7 +30,7 @@ abstract class UnreadItemView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : DecoratedTextItemView(context, attrs, defStyleAttr) {
+) : SelectableTextItemView(context, attrs, defStyleAttr) {
 
     override val endIconMarginRes = RCore.dimen.marginStandardSmall
 

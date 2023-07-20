@@ -34,8 +34,8 @@ import com.infomaniak.mail.data.models.Folder.*
 import com.infomaniak.mail.databinding.*
 import com.infomaniak.mail.ui.main.menu.FolderAdapter.FolderViewHolder
 import com.infomaniak.mail.utils.UnreadDisplay
-import com.infomaniak.mail.views.decoratedTextItemView.DecoratedTextItemView
 import com.infomaniak.mail.views.decoratedTextItemView.FolderMenuDrawerItemView
+import com.infomaniak.mail.views.decoratedTextItemView.SelectableTextItemView
 import com.infomaniak.mail.views.decoratedTextItemView.SimpleFolderItemView
 import kotlin.math.min
 import com.infomaniak.lib.core.R as RCore
@@ -98,7 +98,7 @@ class FolderAdapter(
         displayFolder(folder, unread)
     }
 
-    private fun DecoratedTextItemView.displayFolder(folder: Folder, unread: UnreadDisplay? = null) {
+    private fun SelectableTextItemView.displayFolder(folder: Folder, unread: UnreadDisplay? = null) {
         val folderName = folder.getLocalizedName(context)
 
         folder.role?.let {
@@ -117,7 +117,7 @@ class FolderAdapter(
         }
     }
 
-    private fun DecoratedTextItemView.setFolderUi(
+    private fun SelectableTextItemView.setFolderUi(
         folderId: String,
         name: String,
         @DrawableRes iconId: Int,
@@ -128,6 +128,7 @@ class FolderAdapter(
     ) {
         text = name
         icon = AppCompatResources.getDrawable(context, iconId)
+        setSelectedState(currentFolderId == folderId)
 
         when (this) {
             is FolderMenuDrawerItemView -> {
@@ -135,10 +136,7 @@ class FolderAdapter(
                 unreadCount = unread?.count ?: 0
                 isPastilleDisplayed = unread?.shouldDisplayPastille ?: false
             }
-            is SimpleFolderItemView -> {
-                indent = computeIndent(context, folderIndent)
-                setSelectedState(currentFolderId == folderId)
-            }
+            is SimpleFolderItemView -> indent = computeIndent(context, folderIndent)
         }
 
         setOnClickListener {
