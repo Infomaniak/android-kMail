@@ -40,20 +40,25 @@ class SignatureAdapter(
 
     override fun getItem(position: Int): Signature = signatures[position]
 
-    override fun getItemId(position: Int): Long = getItem(position).id.toLong()
+    override fun getItemId(position: Int): Long = getItem(position).id.toLong() // UUID.randomUUID().hashCode().toLong()
 
     override fun hasStableIds(): Boolean = true
 
+    private fun inflateAndGetNewBinding(parent: ViewGroup?): ItemSignatureBinding {
+        return ItemSignatureBinding.inflate(LayoutInflater.from(parent!!.context), parent, false).apply { root.tag = this }
+    }
+
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-        return convertView ?: ItemSignatureBinding.inflate(LayoutInflater.from(parent!!.context), parent, false).apply {
+        return (if (convertView == null) inflateAndGetNewBinding(parent) else convertView.tag as ItemSignatureBinding).apply {
             val signature = getItem(position)
             fullNameAndName.text = "${signature.senderName} (${signature.name})"
             emailAddress.text = signature.senderEmailIdn
 
             val isSelected = selectedSignatureId == signature.id
             val backgroundColorRes = if (isSelected) R.color.backgroundSelectedSignature else R.color.backgroundColorTertiary
+
             root.apply {
-                setCardBackgroundColor(parent.context.getColor(backgroundColorRes))
+                setCardBackgroundColor(parent!!.context.getColor(backgroundColorRes))
 
                 setOnClickListener {
                     onClickListener(signature)

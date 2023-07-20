@@ -85,7 +85,7 @@ class NewMessageFragment : Fragment() {
     }
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
 
-    private val addressListPopupWindow by lazy { ListPopupWindow(binding.root.context) }
+    private lateinit var addressListPopupWindow: ListPopupWindow
     private lateinit var filePicker: FilePicker
 
     private val attachmentAdapter = AttachmentAdapter(shouldDisplayCloseButton = true, onDelete = ::onDeleteAttachment)
@@ -155,6 +155,8 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun initUi() = with(binding) {
+        addressListPopupWindow = ListPopupWindow(binding.root.context)
+
         toolbar.setNavigationOnClickListener { activity?.onBackPressedDispatcher?.onBackPressed() }
         changeToolbarColorOnScroll(toolbar, compositionNestedScrollView)
 
