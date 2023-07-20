@@ -75,6 +75,11 @@ class SharedViewModelUtils @Inject constructor(
         }
     }
 
+    fun getMessagesToMove(threads: List<Thread>, message: Message?) = when (message) {
+        null -> threads.flatMap(messageController::getMovableMessages)
+        else -> messageController.getMessageAndDuplicates(threads.first(), message)
+    }
+
     suspend fun refreshFolders(
         mailbox: Mailbox,
         messagesFoldersIds: List<String>,

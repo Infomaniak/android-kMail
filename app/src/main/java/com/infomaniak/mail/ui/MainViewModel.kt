@@ -512,7 +512,7 @@ class MainViewModel @Inject constructor(
         val threads = getActionThreads(threadsUids.toList()).ifEmpty { return@launch }
         val message = messageUid?.let { messageController.getMessage(it)!! }
 
-        val messages = getMessagesToMove(threads, message)
+        val messages = sharedViewModelUtils.getMessagesToMove(threads, message)
 
         val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
 
@@ -550,11 +550,6 @@ class MainViewModel @Inject constructor(
         val undoData = apiResponse.data?.undoResource?.let { UndoData(it, undoFoldersIds, undoDestinationId) }
         snackBarManager.postValue(snackbarTitle, undoData)
     }
-
-    private fun getMessagesToMove(threads: List<Thread>, message: Message?) = when (message) {
-        null -> threads.flatMap(messageController::getMovableMessages)
-        else -> messageController.getMessageAndDuplicates(threads.first(), message)
-    }
     //endregion
 
     //region Archive
@@ -582,7 +577,7 @@ class MainViewModel @Inject constructor(
         val destinationFolderRole = if (isArchived) FolderRole.INBOX else FolderRole.ARCHIVE
         val destinationFolder = folderController.getFolder(destinationFolderRole)!!
 
-        val messages = getMessagesToMove(threads, message)
+        val messages = sharedViewModelUtils.getMessagesToMove(threads, message)
 
         val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
 
