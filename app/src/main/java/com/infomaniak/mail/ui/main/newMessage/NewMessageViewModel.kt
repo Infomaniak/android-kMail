@@ -92,7 +92,7 @@ class NewMessageViewModel @Inject constructor(
             if (field.body.isNotEmpty()) splitSignatureAndQuoteFromBody()
         }
     var selectedSignatureId = -1
-    lateinit var signatures: RealmResults<Signature>
+    lateinit var signatures: List<Signature>
 
     var isAutoCompletionOpened = false
     var isEditorExpanded = false
@@ -176,7 +176,6 @@ class NewMessageViewModel @Inject constructor(
             dismissNotification(notificationId)
             markAsRead(previousMessageUid, mailbox, realm)
             selectedSignatureId = draft.identityId!!.toInt()
-            signatures = SignatureController.getAllSignatures(realm)
             saveDraftSnapshot()
             if (draft.cc.isNotEmpty() || draft.bcc.isNotEmpty()) {
                 otherFieldsAreAllEmpty.postValue(false)
@@ -261,6 +260,25 @@ class NewMessageViewModel @Inject constructor(
                         }
                 }
             }
+        }
+    }
+
+    private fun Draft.addMissingSignatureData(mailbox: Mailbox, realm: MutableRealm, context: Context) {
+        initSignature(mailbox, realm, addContent = false, context = context)
+    }
+
+
+    private fun Draft.initSignature(mailbox: Mailbox, realm: MutableRealm, addContent: Boolean = true, context: Context) {
+
+        SharedViewModelUtils.updateSignatures(mailbox, realm, context)
+        signatures = SignatureController.getAllSignatures(realm).copyFromRealm() // TODO : Necessary ?
+
+        val signature = SignatureController.getSignature(realm)
+
+        identityId = signature.id.toString()
+
+        if (addContent && signature.content.isNotEmpty()) {
+            body += encapsulateSignatureContentWithInfomaniakClass(signature.content)
         }
     }
 
