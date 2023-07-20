@@ -101,6 +101,7 @@
     <color name="backgroundSnackbarColor">@color/orca</color>
     <color name="elevatedBackground">@color/swan</color>
     <color name="backgroundDisabledPrimaryButton">@color/shark</color>
+    <color name="backgroundSelectedSignature">@color/mouse</color>
 
     <color name="menuDrawerBackgroundColor">@color/backgroundColorSecondary</color>
     <color name="newMessageBackgroundColor">@color/backgroundColor</color>

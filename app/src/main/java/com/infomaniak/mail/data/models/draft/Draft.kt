@@ -126,7 +126,7 @@ class Draft : RealmObject {
         identityId = signature.id.toString()
 
         if (addContent && signature.content.isNotEmpty()) {
-            body += """<div class="${MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME}">${signature.content}</div>"""
+            body += encapsulateSignatureContentWithInfomaniakClass(signature.content)
         }
     }
 
@@ -151,5 +151,9 @@ class Draft : RealmObject {
     companion object {
         val actionPropertyName get() = Draft::_action.name
         private val draftJson = Json(ApiController.json) { encodeDefaults = true }
+
+        fun encapsulateSignatureContentWithInfomaniakClass(signatureContent: String): String {
+            return """<div class="${MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME}">$signatureContent</div>"""
+        }
     }
 }

@@ -35,6 +35,7 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
+import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.data.models.Attachment
@@ -43,6 +44,7 @@ import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.main.SnackBarManager
@@ -56,6 +58,7 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.realmListOf
+import io.realm.kotlin.query.RealmResults
 import kotlinx.coroutines.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -83,6 +86,8 @@ class NewMessageViewModel @Inject constructor(
             field = value
             if (field.body.isNotEmpty()) splitSignatureAndQuoteFromBody()
         }
+    var selectedSignatureId = -1
+    lateinit var signatures: RealmResults<Signature>
 
     var isAutoCompletionOpened = false
     var isEditorExpanded = false
@@ -123,7 +128,6 @@ class NewMessageViewModel @Inject constructor(
         previousMessageUid: String?,
         recipient: Recipient?,
     ): LiveData<Boolean> = liveData(ioCoroutineContext) {
-
         val realm = mailboxContentRealm()
         val mailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
 
@@ -164,6 +168,8 @@ class NewMessageViewModel @Inject constructor(
 
         if (isSuccess) {
             markAsRead(previousMessageUid, mailbox, realm)
+            selectedSignatureId = draft.identityId!!.toInt()
+            signatures = SignatureController.getAllSignatures(realm)
             saveDraftSnapshot()
             if (draft.cc.isNotEmpty() || draft.bcc.isNotEmpty()) {
                 otherFieldsAreAllEmpty.postValue(false)
@@ -272,6 +278,7 @@ class NewMessageViewModel @Inject constructor(
 
     private fun saveDraftSnapshot() = with(draft) {
         snapshot = DraftSnapshot(
+            identityId,
             to.toSet(),
             cc.toSet(),
             bcc.toSet(),
@@ -459,6 +466,7 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private data class DraftSnapshot(
+        val identityId: String?,
         val to: Set<Recipient>,
         val cc: Set<Recipient>,
         val bcc: Set<Recipient>,
@@ -468,7 +476,8 @@ class NewMessageViewModel @Inject constructor(
     )
 
     private fun DraftSnapshot.hasChanges(): Boolean {
-        return to != draft.to.toSet() ||
+        return identityId != draft.identityId ||
+                to != draft.to.toSet() ||
                 cc != draft.cc.toSet() ||
                 bcc != draft.bcc.toSet() ||
                 subject != draft.subject ||

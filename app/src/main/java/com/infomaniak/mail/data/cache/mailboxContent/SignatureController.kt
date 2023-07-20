@@ -50,8 +50,12 @@ object SignatureController {
         return getDefaultSignature(realm) ?: getAllSignaturesQuery(realm).first().find()!!
     }
 
-    fun getSignaturesLive(realm: TypedRealm): Flow<RealmResults<Signature>> {
-        return getAllSignaturesQuery(realm).find().asFlow().map { it.list }
+    fun getSignaturesAsync(realm: TypedRealm): Flow<RealmResults<Signature>> {
+        return getAllSignaturesQuery(realm).asFlow().map { it.list }
+    }
+
+    fun getAllSignatures(realm: TypedRealm): RealmResults<Signature> {
+        return getAllSignaturesQuery(realm).find()
     }
     //endregion
 

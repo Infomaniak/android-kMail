@@ -27,9 +27,15 @@ class Signature : RealmObject {
     @PrimaryKey
     var id: Int = 0
     var name: String = ""
+    @SerialName("full_name")
+    var senderName: String = ""
     @SerialName("is_default")
     var isDefault: Boolean = false
     var content: String = ""
+    @SerialName("sender")
+    var senderEmail: String = ""
+    @SerialName("sender_idn")
+    var senderEmailIdn: String = ""
 
     @SerialName("reply_to_id")
     var replyToId: Int = 0 /* Required for the update call, do not delete */
