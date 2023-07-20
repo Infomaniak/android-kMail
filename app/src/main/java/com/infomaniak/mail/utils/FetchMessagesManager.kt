@@ -44,6 +44,7 @@ import io.realm.kotlin.Realm
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import okhttp3.OkHttpClient
+import java.util.UUID
 import javax.inject.Inject
 
 class FetchMessagesManager @Inject constructor(
@@ -132,7 +133,7 @@ class FetchMessagesManager @Inject constructor(
 
             val replyPendingIntent = PendingIntent.getActivity(
                 appContext,
-                messageUid.hashCode(),
+                UUID.randomUUID().hashCode(),
                 replyIntent,
                 NotificationUtilsCore.pendingIntentFlags,
             )
