@@ -116,18 +116,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
-        // Here, we use `arguments` instead of `navigationArgs` because we need mutable data.
-        if (arguments?.getString(navigationArgs::replyToMessageUid.name) != null) {
-            // If we are coming from the Reply action of a Notification, we need to navigate to NewMessageActivity
-            safeNavigate(
-                directions = ThreadListFragmentDirections.actionThreadListFragmentToNewMessageActivity(
-                    draftMode = navigationArgs.draftMode,
-                    previousMessageUid = navigationArgs.replyToMessageUid,
-                    notificationId = navigationArgs.notificationId,
-                ),
-            )
-            arguments?.remove(navigationArgs::replyToMessageUid.name)
-        }
+        navigateFromNotificationToNewMessage()
 
         super.onViewCreated(view, savedInstanceState)
 
@@ -158,6 +147,21 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         observeUpdatedAtTriggers()
         observeContacts()
         observerDraftsActionsCompletedWorks()
+    }
+
+    private fun navigateFromNotificationToNewMessage() {
+        // Here, we use `arguments` instead of `navigationArgs` because we need mutable data.
+        if (arguments?.getString(navigationArgs::replyToMessageUid.name) != null) {
+            // If we are coming from the Reply action of a Notification, we need to navigate to NewMessageActivity
+            safeNavigate(
+                directions = ThreadListFragmentDirections.actionThreadListFragmentToNewMessageActivity(
+                    draftMode = navigationArgs.draftMode,
+                    previousMessageUid = navigationArgs.replyToMessageUid,
+                    notificationId = navigationArgs.notificationId,
+                ),
+            )
+            arguments?.remove(navigationArgs::replyToMessageUid.name)
+        }
     }
 
     override fun onStart() {
