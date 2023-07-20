@@ -138,6 +138,7 @@ class NewMessageViewModel @Inject constructor(
         val mailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
 
         val isSuccess = realm.writeBlocking {
+            fetchSignatures(mailbox)
 
             runCatching {
                 val isRecreated = activityCreationStatus == CreationStatus.RECREATED
@@ -164,7 +165,7 @@ class NewMessageViewModel @Inject constructor(
                     createDraft(draftMode, previousMessageUid, recipient, mailbox, context) ?: return@writeBlocking false
                 }
 
-                if (draft.identityId.isNullOrBlank()) draft.addMissingSignatureData(mailbox, realm = this, context = context)
+                if (draft.identityId.isNullOrBlank()) draft.addMissingSignatureData(realm = this)
             }.onFailure {
                 return@writeBlocking false
             }
@@ -185,6 +186,11 @@ class NewMessageViewModel @Inject constructor(
 
         emit(isSuccess)
         isInitSuccess.postValue(isSuccess)
+    }
+
+    private fun MutableRealm.fetchSignatures(mailbox: Mailbox) {
+        SharedViewModelUtils.updateSignatures(mailbox, realm = this, context)
+        signatures = SignatureController.getAllSignatures(realm = this).copyFromRealm() // TODO : Necessary ?
     }
 
     /**
@@ -236,7 +242,7 @@ class NewMessageViewModel @Inject constructor(
         return Draft().apply {
             initLocalValues(mimeType = ClipDescription.MIMETYPE_TEXT_HTML)
             val shouldPreSelectSignature = draftMode == DraftMode.REPLY || draftMode == DraftMode.REPLY_ALL
-            initSignature(mailbox, realm = this@createDraft, addContent = !shouldPreSelectSignature, context = context)
+            initSignature(realm = this@createDraft, addContent = !shouldPreSelectSignature)
             when (draftMode) {
                 DraftMode.NEW_MAIL -> recipient?.let { to = realmListOf(it) }
                 DraftMode.REPLY, DraftMode.REPLY_ALL, DraftMode.FORWARD -> {
@@ -260,25 +266,6 @@ class NewMessageViewModel @Inject constructor(
                         }
                 }
             }
-        }
-    }
-
-    private fun Draft.addMissingSignatureData(mailbox: Mailbox, realm: MutableRealm, context: Context) {
-        initSignature(mailbox, realm, addContent = false, context = context)
-    }
-
-
-    private fun Draft.initSignature(mailbox: Mailbox, realm: MutableRealm, addContent: Boolean = true, context: Context) {
-
-        SharedViewModelUtils.updateSignatures(mailbox, realm, context)
-        signatures = SignatureController.getAllSignatures(realm).copyFromRealm() // TODO : Necessary ?
-
-        val signature = SignatureController.getSignature(realm)
-
-        identityId = signature.id.toString()
-
-        if (addContent && signature.content.isNotEmpty()) {
-            body += encapsulateSignatureContentWithInfomaniakClass(signature.content)
         }
     }
 
