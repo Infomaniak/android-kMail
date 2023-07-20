@@ -19,7 +19,7 @@ android {
         applicationId 'com.infomaniak.mail'
         minSdk 25
         targetSdk 33
-        versionCode 1_00_005_02
+        versionCode 1_00_005_03
         versionName '1.0.5'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 
