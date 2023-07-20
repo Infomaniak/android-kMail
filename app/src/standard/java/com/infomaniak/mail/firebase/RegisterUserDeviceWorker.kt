@@ -49,7 +49,6 @@ class RegisterUserDeviceWorker @AssistedInject constructor(
         val firebaseToken = localSettings.firebaseToken!!
 
         AccountUtils.getAllUsersSync().forEach { user ->
-            if (localSettings.firebaseRegisteredUsers.contains(user.id.toString())) return@forEach
             val okHttpClient = AccountUtils.getHttpClient(user.id)
             val registrationInfo = RegistrationInfo(applicationContext, firebaseToken)
             val apiResponse = FirebaseApiRepository.registerForNotifications(registrationInfo, okHttpClient)
