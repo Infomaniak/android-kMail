@@ -31,7 +31,7 @@ import com.infomaniak.mail.databinding.ItemSearchFolderBinding
 import com.infomaniak.mail.ui.main.search.SearchFolderAdapter.SearchFolderElement.FOLDER
 import com.infomaniak.mail.ui.main.search.SearchFolderAdapter.SearchFolderElement.SEPARATOR
 import com.infomaniak.mail.utils.getLocalizedNameOrAllFolders
-import com.infomaniak.mail.views.SimpleFolderItemView
+import com.infomaniak.mail.views.decoratedTextItemView.SimpleFolderItemView
 
 class SearchFolderAdapter(
     val folders: List<Any>,

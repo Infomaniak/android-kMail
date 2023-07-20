@@ -15,38 +15,39 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.views
+package com.infomaniak.mail.views.decoratedTextItemView
 
 import android.content.Context
-import android.graphics.Color
 import android.util.AttributeSet
 import androidx.appcompat.content.res.AppCompatResources
 import com.infomaniak.mail.R
-import com.infomaniak.mail.utils.getAttributeColor
-import com.google.android.material.R as RMaterial
 
-abstract class SelectableTextItemView @JvmOverloads constructor(
+class InvalidMailboxItemView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
 ) : DecoratedTextItemView(context, attrs, defStyleAttr) {
 
-    private val checkIcon by lazy {
-        AppCompatResources.getDrawable(context, R.drawable.ic_check)?.apply {
-            setTint(context.getAttributeColor(RMaterial.attr.colorPrimary))
+    private val chevronIcon by lazy { AppCompatResources.getDrawable(context, R.drawable.ic_chevron_right) }
+    private val warningIcon by lazy { AppCompatResources.getDrawable(context, R.drawable.ic_warning) }
+
+    var hasNoValidMailboxes = false
+    var isPasswordOutdated = false
+    var isMailboxLocked = false
+
+    fun computeEndIconVisibility() {
+        val (endIcon, contentDescription) = when {
+            !hasNoValidMailboxes -> warningIcon to R.string.contentDescriptionWarningIcon
+            !isMailboxLocked && isPasswordOutdated -> chevronIcon to R.string.contentDescriptionIconInvalidPassword
+            else -> null to null
         }
+
+        setEndIcon(endIcon, contentDescription)
     }
 
-    fun setSelectedState(isSelected: Boolean) = with(binding) {
-        val (color, textAppearance) = if (isSelected && itemStyle == SelectionStyle.MENU_DRAWER) {
-            context.getAttributeColor(RMaterial.attr.colorPrimaryContainer) to R.style.BodyMedium_Accent
-        } else {
-            Color.TRANSPARENT to if (textWeight == TextWeight.MEDIUM) R.style.BodyMedium else R.style.Body
-        }
+    override fun setOnClickListener(onClickListener: OnClickListener?) {
+        if (hasNoValidMailboxes && isMailboxLocked) return
 
-        root.setCardBackgroundColor(color)
-        itemName.setTextAppearance(textAppearance)
-
-        setEndIcon(if (isSelected) checkIcon else null, R.string.contentDescriptionSelectedItem)
+        binding.root.setOnClickListener(onClickListener)
     }
 }

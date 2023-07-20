@@ -15,24 +15,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.views
+package com.infomaniak.mail.views.decoratedTextItemView
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.util.AttributeSet
+import androidx.annotation.StringRes
 
-class SimpleFolderItemView @JvmOverloads constructor(
+class SimpleMenuDrawerItemView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : SelectableTextItemView(context, attrs, defStyleAttr), FolderItemView {
+) : DecoratedTextItemView(context, attrs, defStyleAttr) {
 
-    override var indent = 0
-        set(value) {
-            field = value
-            setIndent()
-        }
-
-    init {
-        attrs?.getIndentAttribute(context)
-    }
+    override fun setEndIcon(icon: Drawable?, @StringRes contentDescriptionRes: Int?) = Unit
 }

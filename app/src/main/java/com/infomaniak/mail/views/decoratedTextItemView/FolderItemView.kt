@@ -15,18 +15,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.views
+package com.infomaniak.mail.views.decoratedTextItemView
 
 import android.content.Context
-import android.graphics.drawable.Drawable
 import android.util.AttributeSet
-import androidx.annotation.StringRes
+import com.infomaniak.lib.core.utils.getAttributes
+import com.infomaniak.lib.core.utils.setMarginsRelative
+import com.infomaniak.mail.R
+import com.infomaniak.mail.databinding.ViewDecoratedTextItemBinding
 
-class SimpleMenuDrawerItemView @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0,
-) : DecoratedTextItemView(context, attrs, defStyleAttr) {
+interface FolderItemView {
 
-    override fun setEndIcon(icon: Drawable?, @StringRes contentDescriptionRes: Int?) = Unit
+    val binding: ViewDecoratedTextItemBinding
+    var indent: Int
+
+    fun setIndent() = binding.itemName.setMarginsRelative(start = indent)
+
+    fun AttributeSet.getIndentAttribute(context: Context) {
+        getAttributes(context, R.styleable.DecoratedTextItemView) {
+            indent = getDimensionPixelSize(R.styleable.DecoratedTextItemView_indent, indent)
+        }
+    }
 }

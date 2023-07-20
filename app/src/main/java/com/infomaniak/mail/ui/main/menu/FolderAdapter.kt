@@ -34,9 +34,9 @@ import com.infomaniak.mail.data.models.Folder.*
 import com.infomaniak.mail.databinding.*
 import com.infomaniak.mail.ui.main.menu.FolderAdapter.FolderViewHolder
 import com.infomaniak.mail.utils.UnreadDisplay
-import com.infomaniak.mail.views.DecoratedTextItemView
-import com.infomaniak.mail.views.FolderMenuDrawerItemView
-import com.infomaniak.mail.views.SimpleFolderItemView
+import com.infomaniak.mail.views.decoratedTextItemView.DecoratedTextItemView
+import com.infomaniak.mail.views.decoratedTextItemView.FolderMenuDrawerItemView
+import com.infomaniak.mail.views.decoratedTextItemView.SimpleFolderItemView
 import kotlin.math.min
 import com.infomaniak.lib.core.R as RCore
 

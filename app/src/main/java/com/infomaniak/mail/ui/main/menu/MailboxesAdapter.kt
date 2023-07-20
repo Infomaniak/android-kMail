@@ -32,7 +32,7 @@ import com.infomaniak.mail.databinding.ItemMailboxMenuDrawerBinding
 import com.infomaniak.mail.databinding.ItemSimpleMailboxBinding
 import com.infomaniak.mail.ui.main.menu.MailboxesAdapter.MailboxesViewHolder
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.views.DecoratedTextItemView.SelectionStyle
+import com.infomaniak.mail.views.decoratedTextItemView.DecoratedTextItemView.SelectionStyle
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

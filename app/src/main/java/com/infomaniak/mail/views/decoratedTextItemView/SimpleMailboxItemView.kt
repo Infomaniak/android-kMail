@@ -15,25 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.views
+package com.infomaniak.mail.views.decoratedTextItemView
 
 import android.content.Context
 import android.util.AttributeSet
-import com.infomaniak.lib.core.utils.getAttributes
-import com.infomaniak.lib.core.utils.setMarginsRelative
-import com.infomaniak.mail.R
-import com.infomaniak.mail.databinding.ViewDecoratedTextItemBinding
 
-interface FolderItemView {
-
-    val binding: ViewDecoratedTextItemBinding
-    var indent: Int
-
-    fun setIndent() = binding.itemName.setMarginsRelative(start = indent)
-
-    fun AttributeSet.getIndentAttribute(context: Context) {
-        getAttributes(context, R.styleable.DecoratedTextItemView) {
-            indent = getDimensionPixelSize(R.styleable.DecoratedTextItemView_indent, indent)
-        }
-    }
-}
+class SimpleMailboxItemView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0,
+) : SelectableTextItemView(context, attrs, defStyleAttr)
