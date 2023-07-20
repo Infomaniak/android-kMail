@@ -41,8 +41,10 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.receivers.NotificationActionsReceiver
 import com.infomaniak.mail.receivers.NotificationActionsReceiver.Companion.ARCHIVE_ACTION
 import com.infomaniak.mail.receivers.NotificationActionsReceiver.Companion.DELETE_ACTION
+import com.infomaniak.mail.receivers.NotificationActionsReceiver.Companion.MAILBOX_ID
 import com.infomaniak.mail.receivers.NotificationActionsReceiver.Companion.MESSAGE_UID
 import com.infomaniak.mail.receivers.NotificationActionsReceiver.Companion.NOTIFICATION_ID
+import com.infomaniak.mail.receivers.NotificationActionsReceiver.Companion.USER_ID
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.LaunchActivityArgs
 import com.infomaniak.mail.utils.NotificationUtils.buildNewMessageNotification
@@ -135,6 +137,8 @@ class FetchMessagesManager @Inject constructor(
             fun createIntent(notificationAction: String): Intent {
                 return Intent(appContext, NotificationActionsReceiver::class.java).apply {
                     action = notificationAction
+                    putExtra(USER_ID, userId)
+                    putExtra(MAILBOX_ID, mailbox.mailboxId)
                     putExtra(NOTIFICATION_ID, notificationId)
                     putExtra(MESSAGE_UID, messageUid)
                 }

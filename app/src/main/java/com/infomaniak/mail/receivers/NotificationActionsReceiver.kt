@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.receivers
 
+import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -27,11 +28,13 @@ import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.getUids
 import dagger.hilt.android.AndroidEntryPoint
+import io.realm.kotlin.TypedRealm
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -47,20 +50,22 @@ class NotificationActionsReceiver : BroadcastReceiver() {
     lateinit var sharedUtils: SharedUtils
 
     @Inject
-    lateinit var mailboxContentRealm: RealmDatabase.MailboxContent
-
-    @Inject
     lateinit var folderController: FolderController
 
     @Inject
     @IoDispatcher
     lateinit var ioDispatcher: CoroutineDispatcher
 
-    override fun onReceive(context: Context?, intent: Intent?) {
-        CoroutineScope(ioDispatcher).launch { intent?.let(::handleNotificationIntent) }
+    override fun onReceive(context: Context, intent: Intent) {
+        CoroutineScope(ioDispatcher).launch { handleNotificationIntent(context, intent) }
     }
 
-    private fun handleNotificationIntent(intent: Intent) {
+    private fun handleNotificationIntent(context: Context, intent: Intent) {
+
+        val userId = intent.getIntExtra(USER_ID, -1)
+        val mailboxId = intent.getIntExtra(MAILBOX_ID, -1)
+        val realm = RealmDatabase.newMailboxContentInstance(userId, mailboxId)
+        val mailbox = MailboxController.getMailbox(userId, mailboxId) ?: return
 
         val notificationId = intent.getIntExtra(NOTIFICATION_ID, -1)
         val action = intent.action ?: return
@@ -72,29 +77,36 @@ class NotificationActionsReceiver : BroadcastReceiver() {
             else -> null
         } ?: return
 
-        executeAction(messageUid, folderRole)
-        dismissNotification(notificationId)
+        executeAction(realm, mailbox, messageUid, folderRole)
+        dismissNotification(context, mailbox, notificationId)
     }
 
-    private fun executeAction(messageUid: String, folderRole: FolderRole) {
-        val mailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId) ?: return
-        val message = MessageController.getMessage(messageUid, mailboxContentRealm()) ?: return
+    private fun executeAction(realm: TypedRealm, mailbox: Mailbox, messageUid: String, folderRole: FolderRole) {
+        val message = MessageController.getMessage(messageUid, realm) ?: return
         val destinationId = folderController.getFolder(folderRole)?.id ?: return
 
         val threads = message.threads.filter { it.folderId == message.folderId }
         val messages = sharedUtils.getMessagesToMove(threads, message)
 
-        ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationId)
+        val isSuccess = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationId).isSuccess()
+        if (isSuccess) {
+            // TODO: Update the Notification and add an Undo button.
+        }
     }
 
-    private fun dismissNotification(notificationId: Int) {
+    private fun dismissNotification(context: Context, mailbox: Mailbox, notificationId: Int) {
         if (notificationId == -1) return
 
-        notificationManagerCompat.cancel(notificationId)
-        // TODO: Dismiss the "summary notification" if there is no more Notifications (maybe store a list of all NotificationsIds ?)
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val count = notificationManager.activeNotifications.count { mailbox.notificationGroupKey in it.groupKey }
+
+        val notificationIdToCancel = if (count <= 2) mailbox.notificationGroupId else notificationId
+        notificationManagerCompat.cancel(notificationIdToCancel)
     }
 
     companion object {
+        const val USER_ID = "user_id"
+        const val MAILBOX_ID = "mailbox_id"
         const val NOTIFICATION_ID = "notification_id"
         const val MESSAGE_UID = "message_uid"
         const val ARCHIVE_ACTION = "archive_action"
