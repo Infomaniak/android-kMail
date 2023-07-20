@@ -26,7 +26,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.lib.core.R as RCore
 
-class UnreadItemView @JvmOverloads constructor(
+abstract class UnreadItemView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
