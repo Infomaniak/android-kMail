@@ -183,6 +183,7 @@ class NewMessageFragment : Fragment() {
     private fun initDraftAndViewModel() = with(newMessageActivityArgs) {
         newMessageViewModel.initDraftAndViewModel(
             arrivedFromExistingDraft,
+            notificationId,
             draftLocalUuid,
             draftResource,
             messageUid,

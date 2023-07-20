@@ -37,6 +37,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.distinctUntilChanged
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -86,6 +87,7 @@ import com.infomaniak.lib.core.R as RCore
 class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private lateinit var binding: FragmentThreadListBinding
+    private val navigationArgs: ThreadListFragmentArgs by navArgs()
     private val mainViewModel: MainViewModel by activityViewModels()
     private val threadListViewModel: ThreadListViewModel by viewModels()
 
@@ -113,6 +115,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+        navigateFromNotificationToNewMessage()
+
         super.onViewCreated(view, savedInstanceState)
 
         observeNoMailboxActivityTriggers()
@@ -142,6 +147,21 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         observeUpdatedAtTriggers()
         observeContacts()
         observerDraftsActionsCompletedWorks()
+    }
+
+    private fun navigateFromNotificationToNewMessage() {
+        // Here, we use `arguments` instead of `navigationArgs` because we need mutable data.
+        if (arguments?.getString(navigationArgs::replyToMessageUid.name) != null) {
+            // If we are coming from the Reply action of a Notification, we need to navigate to NewMessageActivity
+            safeNavigate(
+                directions = ThreadListFragmentDirections.actionThreadListFragmentToNewMessageActivity(
+                    draftMode = navigationArgs.draftMode,
+                    previousMessageUid = navigationArgs.replyToMessageUid,
+                    notificationId = navigationArgs.notificationId,
+                ),
+            )
+            arguments?.remove(navigationArgs::replyToMessageUid.name)
+        }
     }
 
     override fun onStart() {

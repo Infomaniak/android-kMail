@@ -22,6 +22,7 @@ import android.content.ClipDescription
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.utils.SingleLiveEvent
@@ -71,6 +72,7 @@ class NewMessageViewModel @Inject constructor(
     private val globalCoroutineScope: CoroutineScope,
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val mergedContactController: MergedContactController,
+    private val notificationManagerCompat: NotificationManagerCompat,
     private val sharedViewModelUtils: SharedViewModelUtils,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
@@ -121,6 +123,7 @@ class NewMessageViewModel @Inject constructor(
 
     fun initDraftAndViewModel(
         arrivedFromExistingDraft: Boolean,
+        notificationId: Int,
         draftLocalUuid: String?,
         draftResource: String?,
         messageUid: String?,
@@ -167,6 +170,7 @@ class NewMessageViewModel @Inject constructor(
         }
 
         if (isSuccess) {
+            dismissNotification(notificationId)
             markAsRead(previousMessageUid, mailbox, realm)
             selectedSignatureId = draft.identityId!!.toInt()
             signatures = SignatureController.getAllSignatures(realm)
@@ -179,6 +183,15 @@ class NewMessageViewModel @Inject constructor(
 
         emit(isSuccess)
         isInitSuccess.postValue(isSuccess)
+    }
+
+    /**
+     * If we came from a Notification's action, we need to dismiss the Notification.
+     */
+    private fun dismissNotification(notificationId: Int) {
+        if (notificationId == -1) return
+
+        notificationManagerCompat.cancel(notificationId)
     }
 
     /**

@@ -29,6 +29,7 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.login.LoginActivity
 import com.infomaniak.mail.ui.login.LoginActivityArgs
+import com.infomaniak.mail.ui.main.folder.ThreadListFragmentArgs
 import com.infomaniak.mail.ui.main.thread.ThreadFragmentArgs
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SentryDebug
@@ -74,14 +75,37 @@ class LaunchActivity : AppCompatActivity() {
     }
 
     private fun startApp() {
-        navigationArgs?.openThreadUid?.let {
-            NavDeepLinkBuilder(this)
-                .setGraph(R.navigation.main_navigation)
-                .setDestination(R.id.threadFragment, ThreadFragmentArgs(it).toBundle())
-                .setComponentName(MainActivity::class.java)
-                .createTaskStackBuilder().startActivities()
-        } ?: run {
-            startActivity(Intent(this, MainActivity::class.java))
+
+        val openThreadUid = navigationArgs?.openThreadUid
+        val replyToMessageUid = navigationArgs?.replyToMessageUid
+
+        when {
+            openThreadUid != null -> {
+                NavDeepLinkBuilder(this)
+                    .setGraph(R.navigation.main_navigation)
+                    .setDestination(R.id.threadFragment, ThreadFragmentArgs(openThreadUid).toBundle())
+                    .setComponentName(MainActivity::class.java)
+                    .createTaskStackBuilder()
+                    .startActivities()
+            }
+            replyToMessageUid != null -> {
+                NavDeepLinkBuilder(this)
+                    .setGraph(R.navigation.main_navigation)
+                    .setDestination(
+                        destId = R.id.threadListFragment,
+                        args = ThreadListFragmentArgs(
+                            replyToMessageUid = replyToMessageUid,
+                            draftMode = navigationArgs?.draftMode!!,
+                            notificationId = navigationArgs?.notificationId!!,
+                        ).toBundle(),
+                    )
+                    .setComponentName(MainActivity::class.java)
+                    .createTaskStackBuilder()
+                    .startActivities()
+            }
+            else -> {
+                startActivity(Intent(this, MainActivity::class.java))
+            }
         }
     }
 
