@@ -54,6 +54,7 @@ import com.infomaniak.mail.ui.main.SnackBarManager
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.CreationStatus
 import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType
+import com.infomaniak.mail.ui.main.newMessage.NewMessageViewModel.SignatureFitScore.*
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -61,7 +62,6 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.realmListOf
-import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.types.RealmList
 import kotlinx.coroutines.*
 import org.jsoup.Jsoup
@@ -288,14 +288,14 @@ class NewMessageViewModel @Inject constructor(
 
         if (matchingEmailRecipients.isEmpty()) return null // If no recipient represents us, go to next recipients
 
-        var bestScore = -1
+        var bestScore = NO_MATCH
         var bestSignature: Signature? = null
         matchingEmailRecipients.forEach { recipient ->
             val (score, signature) = computeScore(recipient, signatureEmailsMap[recipient.email]!!)
             when (score) {
-                4 -> return signature
+                EXACT_MATCH_DEFAULT -> return signature
                 else -> {
-                    if (score > bestScore) {
+                    if (score.strictlyGreaterThan(bestScore)) {
                         bestScore = score
                         bestSignature = signature
                     }
@@ -309,14 +309,14 @@ class NewMessageViewModel @Inject constructor(
     /**
      * Only pass in signatures that have the same email address as recipient
      */
-    private fun computeScore(recipient: Recipient, signatures: MutableList<Signature>): Pair<Int, Signature> {
-        var bestScore = -1
+    private fun computeScore(recipient: Recipient, signatures: MutableList<Signature>): Pair<SignatureFitScore, Signature> {
+        var bestScore: SignatureFitScore = NO_MATCH
         var bestSignature: Signature? = null
 
         signatures.forEach { signature ->
             when (val fitScore = computeScore(recipient, signature)) {
-                4 -> return fitScore to signature
-                else -> if (bestScore < fitScore) {
+                EXACT_MATCH_DEFAULT -> return fitScore to signature
+                else -> if (fitScore.strictlyGreaterThan(bestScore)) {
                     bestScore = fitScore
                     bestSignature = signature
                 }
@@ -326,18 +326,28 @@ class NewMessageViewModel @Inject constructor(
         return bestScore to bestSignature!!
     }
 
-    private fun computeScore(recipient: Recipient, signature: Signature): Int {
+    private fun computeScore(recipient: Recipient, signature: Signature): SignatureFitScore {
         val isExactMatch = recipient.name == signature.senderName && recipient.email == signature.senderEmail
         val isDefault = signature.isDefault
 
         val fitScore = when {
-            isExactMatch && isDefault -> 4
-            isExactMatch -> 3
-            isDefault -> 2
-            else -> 1
+            isExactMatch && isDefault -> EXACT_MATCH_DEFAULT
+            isExactMatch -> EXACT_MATCH
+            isDefault -> ONLY_EMAIL_MATCH_DEFAULT
+            else -> ONLY_EMAIL_MATCH
         }
 
         return fitScore
+    }
+
+    enum class SignatureFitScore(private val weight: Int) {
+        EXACT_MATCH_DEFAULT(4),
+        EXACT_MATCH(3),
+        ONLY_EMAIL_MATCH_DEFAULT(2),
+        ONLY_EMAIL_MATCH(1),
+        NO_MATCH(0);
+
+        fun strictlyGreaterThan(other: SignatureFitScore): Boolean = weight > other.weight
     }
 
     private fun splitSignatureAndQuoteFromBody() {
