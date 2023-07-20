@@ -27,6 +27,18 @@
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
+        <ImageView
+            android:id="@+id/expandCustomFolderButton"
+            android:layout_width="@dimen/chevronSize"
+            android:layout_height="@dimen/chevronSize"
+            android:layout_marginStart="@dimen/marginStandardSmall"
+            android:layout_marginEnd="@dimen/marginStandardMedium"
+            android:contentDescription="@string/contentDescriptionButtonExpandCustomFolders"
+            android:src="@drawable/ic_chevron_down"
+            android:visibility="gone"
+            app:tint="@color/iconColorPrimaryText"
+            tools:visibility="visible" />
+
         <TextView
             android:id="@+id/itemName"
             style="@style/BodyMedium"
