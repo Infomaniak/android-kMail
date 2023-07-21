@@ -25,6 +25,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.infomaniak.lib.applock.Utils.isKeyguardSecure
+import com.infomaniak.lib.applock.Utils.silentlyReverseSwitch
 import com.infomaniak.lib.core.utils.openAppNotificationSettings
 import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.mail.MatomoMail.toFloat
@@ -105,7 +106,7 @@ class SettingsFragment : Fragment() {
             setOnClickListener {
                 trackEvent("settingsGeneral", "lock", value = isChecked.toFloat())
                 // Reverse switch (before official parameter changed) by silent click
-                requireActivity().reverseSwitch(localSettings)
+                requireActivity().silentlyReverseSwitch(toggle!!) { isChecked -> localSettings.isAppLocked = isChecked }
             }
         }
 
