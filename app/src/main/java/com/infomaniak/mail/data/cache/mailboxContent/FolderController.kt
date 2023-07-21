@@ -185,6 +185,19 @@ class FolderController @Inject constructor(private val mailboxContentRealm: Real
             realm.writeBlocking { getFolder(id, realm = this)?.let(onUpdate) }
         }
 
+        fun updateFolderAndChildren(id: String, realm: Realm, onUpdate: (folder: Folder) -> Unit) {
+            realm.writeBlocking {
+                getFolder(id, realm = this)?.let { recursivelyUpdateChildren(it, onUpdate) }
+            }
+        }
+
+        private fun recursivelyUpdateChildren(folder: Folder, onUpdate: (folder: Folder) -> Unit) {
+            folder.let {
+                onUpdate(it)
+                it.children.forEach { child -> recursivelyUpdateChildren(child, onUpdate) }
+            }
+        }
+
         fun refreshUnreadCount(id: String, mailboxObjectId: String, realm: MutableRealm) {
 
             val folder = getFolder(id, realm) ?: return

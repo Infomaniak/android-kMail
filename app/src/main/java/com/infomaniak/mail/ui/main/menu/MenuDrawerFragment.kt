@@ -173,6 +173,10 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
         closeDrawer()
     }
 
+    override fun onFolderCollapse(folderId: String, shouldCollapse: Boolean) {
+        menuDrawerViewModel.toggleFolderCollapsingState(folderId, shouldCollapse)
+    }
+
     @SuppressLint("SetTextI18n")
     private fun displayVersion() {
         binding.appVersionName.text = "ikMail Android version ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"

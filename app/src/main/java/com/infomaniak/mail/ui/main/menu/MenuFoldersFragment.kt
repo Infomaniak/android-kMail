@@ -39,17 +39,19 @@ abstract class MenuFoldersFragment : Fragment() {
     protected abstract val isInMenuDrawer: Boolean
 
     protected val defaultFoldersAdapter: FolderAdapter by lazy {
-        FolderAdapter(isInMenuDrawer, onClick = ::onFolderSelected)
+        FolderAdapter(isInMenuDrawer, onFolderClicked = ::onFolderSelected)
     }
 
     protected val customFoldersAdapter: FolderAdapter by lazy {
-        FolderAdapter(isInMenuDrawer, onClick = ::onFolderSelected)
+        FolderAdapter(isInMenuDrawer, onFolderClicked = ::onFolderSelected, onCollapseClicked = ::onFolderCollapse)
     }
 
     @Inject
     lateinit var folderController: FolderController
 
     protected abstract fun onFolderSelected(folderId: String)
+
+    protected abstract fun onFolderCollapse(folderId: String, shouldCollapse: Boolean)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

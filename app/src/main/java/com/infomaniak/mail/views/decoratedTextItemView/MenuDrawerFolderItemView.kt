@@ -46,9 +46,8 @@ class MenuDrawerFolderItemView @JvmOverloads constructor(
             setIndent()
         }
 
-    override fun setOnClickListener(onClickListener: OnClickListener?) = with(binding) {
-        root.setOnClickListener(onClickListener)
-        expandCustomFolderButton.setOnExpandableItemClickListener(null)
+    fun setOnCollapsableClickListener(onClickListener: OnClickListener?) {
+        binding.expandCustomFolderButton.setOnExpandableItemClickListener(onClickListener)
     }
 
     init {

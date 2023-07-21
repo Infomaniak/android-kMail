@@ -20,16 +20,20 @@ package com.infomaniak.mail.ui.main.menu
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.mail.data.cache.RealmDatabase
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class MenuDrawerViewModel @Inject constructor(
+    private val mailboxContentRealm: RealmDatabase.MailboxContent,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -39,4 +43,8 @@ class MenuDrawerViewModel @Inject constructor(
         userId = AccountUtils.currentUserId,
         exceptionMailboxIds = listOf(AccountUtils.currentMailboxId),
     ).asLiveData(ioCoroutineContext)
+
+    fun toggleFolderCollapsingState(folderId: String, shouldCollapse: Boolean) = viewModelScope.launch(ioCoroutineContext) {
+        FolderController.updateFolderAndChildren(folderId, mailboxContentRealm()) { it.isExpanded = !shouldCollapse }
+    }
 }

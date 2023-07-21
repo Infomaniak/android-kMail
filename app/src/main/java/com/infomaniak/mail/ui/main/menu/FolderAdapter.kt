@@ -22,6 +22,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.view.isGone
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -41,7 +42,8 @@ import kotlin.math.min
 class FolderAdapter(
     private val isInMenuDrawer: Boolean,
     private var currentFolderId: String? = null,
-    private val onClick: (folderId: String) -> Unit,
+    private val onFolderClicked: (folderId: String) -> Unit,
+    private val onCollapseClicked: ((folderId: String, shouldCollapse: Boolean) -> Unit)? = null,
 ) : RecyclerView.Adapter<FolderViewHolder>() {
 
     private val foldersDiffer = AsyncListDiffer(this, FolderDiffCallback())
@@ -134,19 +136,22 @@ class FolderAdapter(
                 indent = computeStartMargin(folder) + computeIndent(context, folderIndent)
                 unreadCount = unread?.count ?: 0
                 isPastilleDisplayed = unread?.shouldDisplayPastille ?: false
-                canCollapse = folder.children.isNotEmpty()
+                canCollapse = folder.canCollapse
                 isCollapsed = !folder.isExpanded
+                binding.root.isGone = !canCollapse && isCollapsed
+                if (canCollapse) setOnCollapsableClickListener { onCollapseClicked?.invoke(folder.id, isCollapsed) }
             }
             is SelectableFolderItemView -> indent = computeIndent(folderIndent)
         }
 
         setOnClickListener {
             if (isInMenuDrawer) context.trackMenuDrawerEvent(trackerName, value = trackerValue)
-            onClick.invoke(folder.id)
+            onFolderClicked.invoke(folder.id)
         }
     }
 
     private fun FolderMenuDrawerItemView.computeStartMargin(folder: Folder): Int {
+        // TODO: refactor this
         if (!hasCollabsableFolder) return resources.getDimension(RCore.dimen.marginStandardSmall).toInt()
 
         val marginStart = if (folder.canCollapse) RCore.dimen.marginStandardSmall else R.dimen.folderUncollapsableIndent
@@ -193,7 +198,8 @@ class FolderAdapter(
                     oldFolder.isFavorite == newFolder.isFavorite &&
                     oldFolder.path == newFolder.path &&
                     oldFolder.unreadCountDisplay == newFolder.unreadCountDisplay &&
-                    oldFolder.threads.count() == newFolder.threads.count()
+                    oldFolder.threads.count() == newFolder.threads.count() &&
+                    oldFolder.isExpanded == newFolder.isExpanded
         }
     }
 }
