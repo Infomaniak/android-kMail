@@ -164,7 +164,7 @@ class NewMessageViewModel @Inject constructor(
                     }
                 } else {
                     isNewMessage = true
-                    createDraft(draftMode, previousMessageUid, recipient, mailbox, signatures, context) ?: return@writeBlocking false
+                    createDraft(draftMode, previousMessageUid, recipient, signatures, context) ?: return@writeBlocking false
                 }
 
                 if (draft.identityId.isNullOrBlank()) draft.addMissingSignatureData(realm = this)
@@ -237,7 +237,6 @@ class NewMessageViewModel @Inject constructor(
         draftMode: DraftMode,
         previousMessageUid: String?,
         recipient: Recipient?,
-        mailbox: Mailbox,
         signatures: List<Signature>,
         context: Context,
     ): Draft? {
