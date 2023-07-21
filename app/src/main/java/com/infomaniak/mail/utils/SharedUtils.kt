@@ -34,7 +34,7 @@ import io.sentry.Sentry
 import io.sentry.SentryLevel
 import javax.inject.Inject
 
-class SharedViewModelUtils @Inject constructor(
+class SharedUtils @Inject constructor(
     private val folderController: FolderController,
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val messageController: MessageController,

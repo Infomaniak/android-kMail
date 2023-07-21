@@ -36,7 +36,7 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.SharedViewModelUtils
+import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.getUids
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -52,7 +52,7 @@ class ThreadViewModel @Inject constructor(
     application: Application,
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val messageController: MessageController,
-    private val sharedViewModelUtils: SharedViewModelUtils,
+    private val sharedUtils: SharedUtils,
     private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
@@ -92,7 +92,7 @@ class ThreadViewModel @Inject constructor(
 
         emit(Triple(thread, isExpandedMap, isThemeTheSameMap))
 
-        if (thread.unseenMessagesCount > 0) sharedViewModelUtils.markAsSeen(mailbox, listOf(thread))
+        if (thread.unseenMessagesCount > 0) sharedUtils.markAsSeen(mailbox, listOf(thread))
     }
 
     fun fetchIncompleteMessages(messages: List<Message>) {

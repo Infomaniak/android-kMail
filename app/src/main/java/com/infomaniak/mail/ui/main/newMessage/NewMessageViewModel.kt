@@ -76,7 +76,7 @@ class NewMessageViewModel @Inject constructor(
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val mergedContactController: MergedContactController,
     private val notificationManagerCompat: NotificationManagerCompat,
-    private val sharedViewModelUtils: SharedViewModelUtils,
+    private val sharedUtils: SharedUtils,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
@@ -192,7 +192,7 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private fun MutableRealm.fetchSignatures(mailbox: Mailbox) {
-        SharedViewModelUtils.updateSignatures(mailbox, realm = this, context)
+        SharedUtils.updateSignatures(mailbox, realm = this, context)
     }
 
     /**
@@ -216,7 +216,7 @@ class NewMessageViewModel @Inject constructor(
         val message = MessageController.getMessage(previousMessageUid, realm) ?: return
         if (message.isSeen) return
 
-        sharedViewModelUtils.markAsSeen(
+        sharedUtils.markAsSeen(
             mailbox = mailbox,
             threads = message.threads.filter { it.folderId == message.folderId },
             message = message,
