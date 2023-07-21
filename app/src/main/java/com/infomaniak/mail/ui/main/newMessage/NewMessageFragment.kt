@@ -198,10 +198,7 @@ class NewMessageFragment : Fragment() {
                 showKeyboardInCorrectView()
                 populateViewModelWithExternalMailData()
                 populateUiWithViewModel()
-
-                // The observe usually happens before onResume, but here we need the view to be entirely laid out for the popup
-                // window to not crash because anchor might not be ready.
-                lifecycleScope.launch(Dispatchers.Main) { setupFromField(signatures) }
+                setupFromField(signatures)
             } else requireActivity().apply {
                 showToast(R.string.failToOpenDraft)
                 finish()
@@ -405,12 +402,13 @@ class NewMessageFragment : Fragment() {
             addressListPopupWindow.dismiss()
         }
 
+        fromMailAddress.post { addressListPopupWindow.width = fromMailAddress.width }
+
         addressListPopupWindow.apply {
             setAdapter(adapter)
             isModal = true
             inputMethodMode = PopupWindow.INPUT_METHOD_NOT_NEEDED
             anchorView = fromMailAddress
-            width = fromMailAddress.width
         }
 
         if (signatures.count() > 1) {
