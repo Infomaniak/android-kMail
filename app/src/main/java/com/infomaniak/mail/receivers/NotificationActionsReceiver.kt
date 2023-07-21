@@ -39,7 +39,6 @@ import com.infomaniak.mail.utils.NotificationUtils.showNotification
 import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.getUids
 import dagger.hilt.android.AndroidEntryPoint
-import io.realm.kotlin.TypedRealm
 import kotlinx.coroutines.*
 import javax.inject.Inject
 
@@ -82,14 +81,12 @@ class NotificationActionsReceiver : BroadcastReceiver() {
         }
 
         // Other actions
-        val realm = RealmDatabase.newMailboxContentInstance(userId, mailboxId)
-        val mailbox = MailboxController.getMailbox(userId, mailboxId) ?: return
         val (folderRole, undoNotificationTitle) = when (action) {
             ARCHIVE_ACTION -> FolderRole.ARCHIVE to R.string.notificationTitleArchive
             DELETE_ACTION -> FolderRole.TRASH to R.string.notificationTitleDelete
             else -> null
         } ?: return
-        executeAction(context, realm, mailbox, folderRole, undoNotificationTitle, payload)
+        executeAction(context, folderRole, undoNotificationTitle, payload)
     }
 
     private fun executeUndoAction(context: Context, payload: NotificationPayload) {
@@ -106,12 +103,10 @@ class NotificationActionsReceiver : BroadcastReceiver() {
 
     private fun executeAction(
         context: Context,
-        realm: TypedRealm,
-        mailbox: Mailbox,
         folderRole: FolderRole,
         @StringRes undoNotificationTitle: Int,
         payload: NotificationPayload,
-    ) {
+    ) = with(payload) {
 
         showNotification(
             context = context,
@@ -129,18 +124,19 @@ class NotificationActionsReceiver : BroadcastReceiver() {
             delay(UNDO_TIMEOUT)
             ensureActive()
 
-            val message = MessageController.getMessage(payload.messageUid!!, realm) ?: return@launch
+            val realm = RealmDatabase.newMailboxContentInstance(userId, mailboxId)
+            val message = MessageController.getMessage(messageUid!!, realm) ?: return@launch
+            val threads = message.threads.filter { it.folderId == message.folderId }
+
+            val mailbox = MailboxController.getMailbox(userId, mailboxId) ?: return@launch
+            val messages = sharedUtils.getMessagesToMove(threads, message)
             val destinationId = folderController.getFolder(folderRole)?.id ?: return@launch
 
-            val threads = message.threads.filter { it.folderId == message.folderId }
-            val messages = sharedUtils.getMessagesToMove(threads, message)
-
             ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationId)
-
-            dismissNotification(context, mailbox, payload.notificationId)
+            dismissNotification(context, mailbox, notificationId)
         }
 
-        notificationJobsBus.register(payload.notificationId, job)
+        notificationJobsBus.register(notificationId, job)
     }
 
     private fun dismissNotification(context: Context, mailbox: Mailbox, notificationId: Int) {
