@@ -19,7 +19,6 @@
 
 package com.infomaniak.mail.data.models.draft
 
-import android.content.Context
 import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.data.api.RealmInstantSerializer
@@ -27,9 +26,7 @@ import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.correspondent.Recipient
-import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.utils.MessageBodyUtils
-import com.infomaniak.mail.utils.SharedViewModelUtils
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.RealmList
@@ -114,13 +111,11 @@ class Draft : RealmObject {
         mimeType?.let { this.mimeType = it }
     }
 
-    fun addMissingSignatureData(mailbox: Mailbox, realm: MutableRealm, context: Context) {
-        initSignature(mailbox, realm, addContent = false, context = context)
+    fun addMissingSignatureData(realm: MutableRealm) {
+        initSignature(realm, addContent = false)
     }
 
-    fun initSignature(mailbox: Mailbox, realm: MutableRealm, addContent: Boolean = true, context: Context) {
-
-        SharedViewModelUtils.updateSignatures(mailbox, realm, context)
+    fun initSignature(realm: MutableRealm, addContent: Boolean) {
         val signature = SignatureController.getSignature(realm)
 
         identityId = signature.id.toString()

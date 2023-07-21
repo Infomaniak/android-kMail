@@ -44,7 +44,6 @@ import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
@@ -85,7 +84,7 @@ class NewMessageFragment : Fragment() {
     }
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
 
-    private val addressListPopupWindow by lazy { ListPopupWindow(binding.root.context) }
+    private lateinit var addressListPopupWindow: ListPopupWindow
     private lateinit var filePicker: FilePicker
 
     private val attachmentAdapter = AttachmentAdapter(shouldDisplayCloseButton = true, onDelete = ::onDeleteAttachment)
@@ -155,6 +154,8 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun initUi() = with(binding) {
+        addressListPopupWindow = ListPopupWindow(binding.root.context)
+
         toolbar.setNavigationOnClickListener { activity?.onBackPressedDispatcher?.onBackPressed() }
         changeToolbarColorOnScroll(toolbar, compositionNestedScrollView)
 
@@ -190,16 +191,13 @@ class NewMessageFragment : Fragment() {
             draftMode,
             previousMessageUid,
             recipient,
-        ).observe(viewLifecycleOwner) { isSuccess ->
+        ).observe(viewLifecycleOwner) { (isSuccess, signatures) ->
             if (isSuccess) {
                 hideLoader()
                 showKeyboardInCorrectView()
                 populateViewModelWithExternalMailData()
                 populateUiWithViewModel()
-
-                // The observe usually happens before onResume, but here we need the view to be entirely laid out for the popup
-                // window to not crash because anchor might not be ready.
-                lifecycleScope.launch(Dispatchers.Main) { setupFromField() }
+                setupFromField(signatures)
             } else requireActivity().apply {
                 showToast(R.string.failToOpenDraft)
                 finish()
@@ -386,13 +384,12 @@ class NewMessageFragment : Fragment() {
         loadDataWithBaseURL("", processedHtml, ClipDescription.MIMETYPE_TEXT_HTML, Utils.UTF_8, "")
     }
 
-    private fun setupFromField() = with(binding) {
-        val signatures = newMessageViewModel.signatures
+    private fun setupFromField(signatures: List<Signature>) = with(binding) {
         val selectedSignature = signatures.find { it.id == newMessageViewModel.selectedSignatureId }!!
-        updateSelectedSignatureFromField(selectedSignature)
+        updateSelectedSignatureFromField(signatures.count(), selectedSignature)
 
         val adapter = SignatureAdapter(signatures, newMessageViewModel.selectedSignatureId) { newSelectedSignature ->
-            updateSelectedSignatureFromField(newSelectedSignature)
+            updateSelectedSignatureFromField(signatures.count(), newSelectedSignature)
             updateBodySignature(newSelectedSignature.content)
 
             newMessageViewModel.apply {
@@ -404,12 +401,13 @@ class NewMessageFragment : Fragment() {
             addressListPopupWindow.dismiss()
         }
 
+        fromMailAddress.post { addressListPopupWindow.width = fromMailAddress.width }
+
         addressListPopupWindow.apply {
             setAdapter(adapter)
             isModal = true
             inputMethodMode = PopupWindow.INPUT_METHOD_NOT_NEEDED
             anchorView = fromMailAddress
-            width = fromMailAddress.width
         }
 
         if (signatures.count() > 1) {
@@ -425,8 +423,8 @@ class NewMessageFragment : Fragment() {
         signatureWebView.loadContent(signatureContent, signatureGroup)
     }
 
-    private fun updateSelectedSignatureFromField(signature: Signature) {
-        val formattedExpeditor = if (newMessageViewModel.signatures.count() > 1) {
+    private fun updateSelectedSignatureFromField(signaturesCount: Int, signature: Signature) {
+        val formattedExpeditor = if (signaturesCount > 1) {
             "${signature.senderName} <${signature.senderEmailIdn}> (${signature.name})"
         } else {
             signature.senderEmailIdn

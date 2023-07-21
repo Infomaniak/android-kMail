@@ -42,9 +42,11 @@ import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
+import com.infomaniak.mail.data.models.draft.Draft.Companion.encapsulateSignatureContentWithInfomaniakClass
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
@@ -52,6 +54,7 @@ import com.infomaniak.mail.ui.main.SnackBarManager
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.CreationStatus
 import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType
+import com.infomaniak.mail.ui.main.newMessage.NewMessageViewModel.SignatureScore.*
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -59,7 +62,7 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.realmListOf
-import io.realm.kotlin.query.RealmResults
+import io.realm.kotlin.types.RealmList
 import kotlinx.coroutines.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -89,7 +92,6 @@ class NewMessageViewModel @Inject constructor(
             if (field.body.isNotEmpty()) splitSignatureAndQuoteFromBody()
         }
     var selectedSignatureId = -1
-    lateinit var signatures: RealmResults<Signature>
 
     var isAutoCompletionOpened = false
     var isEditorExpanded = false
@@ -130,13 +132,18 @@ class NewMessageViewModel @Inject constructor(
         draftMode: DraftMode,
         previousMessageUid: String?,
         recipient: Recipient?,
-    ): LiveData<Boolean> = liveData(ioCoroutineContext) {
+    ): LiveData<Pair<Boolean, List<Signature>>> = liveData(ioCoroutineContext) {
         val realm = mailboxContentRealm()
         val mailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
 
-        val isSuccess = realm.writeBlocking {
+        var signatures: List<Signature> = emptyList()
 
+        val isSuccess = realm.writeBlocking {
             runCatching {
+
+                fetchSignatures(mailbox)
+                signatures = SignatureController.getAllSignatures(realm)
+
                 val isRecreated = activityCreationStatus == CreationStatus.RECREATED
                 val draftExists = arrivedFromExistingDraft || isRecreated
 
@@ -158,10 +165,10 @@ class NewMessageViewModel @Inject constructor(
                     }
                 } else {
                     isNewMessage = true
-                    createDraft(draftMode, previousMessageUid, recipient, mailbox, context) ?: return@writeBlocking false
+                    createDraft(draftMode, previousMessageUid, recipient, signatures, context) ?: return@writeBlocking false
                 }
 
-                if (draft.identityId.isNullOrBlank()) draft.addMissingSignatureData(mailbox, realm = this, context = context)
+                if (draft.identityId.isNullOrBlank()) draft.addMissingSignatureData(realm = this)
             }.onFailure {
                 return@writeBlocking false
             }
@@ -173,7 +180,6 @@ class NewMessageViewModel @Inject constructor(
             dismissNotification(notificationId)
             markAsRead(previousMessageUid, mailbox, realm)
             selectedSignatureId = draft.identityId!!.toInt()
-            signatures = SignatureController.getAllSignatures(realm)
             saveDraftSnapshot()
             if (draft.cc.isNotEmpty() || draft.bcc.isNotEmpty()) {
                 otherFieldsAreAllEmpty.postValue(false)
@@ -181,8 +187,12 @@ class NewMessageViewModel @Inject constructor(
             }
         }
 
-        emit(isSuccess)
+        emit(isSuccess to signatures)
         isInitSuccess.postValue(isSuccess)
+    }
+
+    private fun MutableRealm.fetchSignatures(mailbox: Mailbox) {
+        SharedViewModelUtils.updateSignatures(mailbox, realm = this, context)
     }
 
     /**
@@ -228,12 +238,16 @@ class NewMessageViewModel @Inject constructor(
         draftMode: DraftMode,
         previousMessageUid: String?,
         recipient: Recipient?,
-        mailbox: Mailbox,
+        signatures: List<Signature>,
         context: Context,
     ): Draft? {
         return Draft().apply {
+
             initLocalValues(mimeType = ClipDescription.MIMETYPE_TEXT_HTML)
-            initSignature(mailbox, realm = this@createDraft, context = context)
+
+            val shouldPreselectSignature = draftMode == DraftMode.REPLY || draftMode == DraftMode.REPLY_ALL
+            initSignature(realm = this@createDraft, addContent = !shouldPreselectSignature)
+
             when (draftMode) {
                 DraftMode.NEW_MAIL -> recipient?.let { to = realmListOf(it) }
                 DraftMode.REPLY, DraftMode.REPLY_ALL, DraftMode.FORWARD -> {
@@ -248,10 +262,95 @@ class NewMessageViewModel @Inject constructor(
                                 realm = this@createDraft,
                             )
                             if (!isSuccess) return null
+
+                            if (shouldPreselectSignature) {
+                                val mostFittingSignature = guessMostFittingSignature(message, signatures)
+                                identityId = mostFittingSignature.id.toString()
+                                body += encapsulateSignatureContentWithInfomaniakClass(mostFittingSignature.content)
+                            }
                         }
                 }
             }
         }
+    }
+
+    private fun guessMostFittingSignature(message: Message, signatures: List<Signature>): Signature {
+        val signatureEmailsMap = mutableMapOf<String, MutableList<Signature>>()
+        var defaultSignature: Signature? = null
+
+        signatures.forEach { signature ->
+            signatureEmailsMap.getOrPut(signature.senderEmail) { mutableListOf() }.add(signature)
+            if (signature.isDefault) defaultSignature = signature
+        }
+
+        findSignatureInRecipients(message.to, signatureEmailsMap)?.let { return it }
+        findSignatureInRecipients(message.from, signatureEmailsMap)?.let { return it }
+        findSignatureInRecipients(message.cc, signatureEmailsMap)?.let { return it }
+
+        return defaultSignature!!
+    }
+
+    private fun findSignatureInRecipients(
+        recipients: RealmList<Recipient>,
+        signatureEmailsMap: MutableMap<String, MutableList<Signature>>,
+    ): Signature? {
+
+        val matchingEmailRecipients = recipients.filter { it.email in signatureEmailsMap }
+        if (matchingEmailRecipients.isEmpty()) return null // If no Recipient represents us, go to next Recipients
+
+        var bestScore = NO_MATCH
+        var bestSignature: Signature? = null
+        matchingEmailRecipients.forEach { recipient ->
+            val (score, signature) = computeScore(recipient, signatureEmailsMap[recipient.email]!!)
+            when (score) {
+                EXACT_MATCH_AND_IS_DEFAULT -> return signature
+                else -> {
+                    if (score.strictlyGreaterThan(bestScore)) {
+                        bestScore = score
+                        bestSignature = signature
+                    }
+                }
+            }
+        }
+
+        return bestSignature
+    }
+
+    /**
+     * Only pass in Signatures that have the same email address as the Recipient
+     */
+    private fun computeScore(recipient: Recipient, signatures: MutableList<Signature>): Pair<SignatureScore, Signature> {
+        var bestScore: SignatureScore = NO_MATCH
+        var bestSignature: Signature? = null
+
+        signatures.forEach { signature ->
+            when (val score = computeScore(recipient, signature)) {
+                EXACT_MATCH_AND_IS_DEFAULT -> return score to signature
+                else -> if (score.strictlyGreaterThan(bestScore)) {
+                    bestScore = score
+                    bestSignature = signature
+                }
+            }
+        }
+
+        return bestScore to bestSignature!!
+    }
+
+    /**
+     * Only pass in a Signature that has the same email address as the Recipient
+     */
+    private fun computeScore(recipient: Recipient, signature: Signature): SignatureScore {
+        val isExactMatch = recipient.name == signature.senderName
+        val isDefault = signature.isDefault
+
+        val score = when {
+            isExactMatch && isDefault -> EXACT_MATCH_AND_IS_DEFAULT
+            isExactMatch -> EXACT_MATCH
+            isDefault -> ONLY_EMAIL_MATCH_AND_IS_DEFAULT
+            else -> ONLY_EMAIL_MATCH
+        }
+
+        return score
     }
 
     private fun splitSignatureAndQuoteFromBody() {
@@ -476,6 +575,16 @@ class NewMessageViewModel @Inject constructor(
     enum class ImportationResult {
         SUCCESS,
         FILE_SIZE_TOO_BIG,
+    }
+
+    enum class SignatureScore(private val weight: Int) {
+        EXACT_MATCH_AND_IS_DEFAULT(4),
+        EXACT_MATCH(3),
+        ONLY_EMAIL_MATCH_AND_IS_DEFAULT(2),
+        ONLY_EMAIL_MATCH(1),
+        NO_MATCH(0);
+
+        fun strictlyGreaterThan(other: SignatureScore): Boolean = weight > other.weight
     }
 
     private data class DraftSnapshot(
