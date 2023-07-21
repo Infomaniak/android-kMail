@@ -96,29 +96,28 @@ class ThreadListMultiSelection {
                 }
                 R.id.quickActionDelete -> {
 
-                    fun multiselectDelete() {
+                    fun multiSelectDelete() {
                         threadListFragment.trackMultiSelectActionEvent(ACTION_DELETE_NAME, selectedThreadsCount)
                         deleteThreads(selectedThreadsUids)
                         isMultiSelectOn = false
                     }
 
-                    val titleId = when (currentFolder.value?.role) {
-                        FolderRole.DRAFT -> R.string.threadListEmptyDraftButton
-                        FolderRole.SPAM -> R.string.threadListEmptySpamButton
-                        FolderRole.TRASH -> R.string.threadListEmptyTrashButton
-                        else -> null
+                    fun confirmMultiSelectDelete() {
+                        val resources = threadListFragment.resources
+                        val titleId = R.plurals.threadListDeletionConfirmationAlertTitle
+                        threadListFragment.createDescriptionDialog(
+                            title = resources.getQuantityString(titleId, selectedThreadsCount, selectedThreadsCount),
+                            description = resources.getQuantityString(
+                                R.plurals.threadListDeletionConfirmationAlertDescription,
+                                selectedThreadsCount,
+                            ),
+                            onPositiveButtonClicked = { multiSelectDelete() },
+                        ).show()
                     }
 
-                    val shouldDisplayConfirmationDialog = titleId != null
-
-                    if (shouldDisplayConfirmationDialog) {
-                        threadListFragment.createDescriptionDialog(
-                            title = threadListFragment.getString(titleId!!),
-                            description = threadListFragment.getString(R.string.threadListEmptyFolderAlertDescription),
-                            onPositiveButtonClicked = { multiselectDelete() },
-                        ).show()
-                    } else {
-                        multiselectDelete()
+                    when (currentFolder.value?.role) {
+                        FolderRole.DRAFT, FolderRole.SPAM, FolderRole.TRASH -> confirmMultiSelectDelete()
+                        else -> multiSelectDelete()
                     }
                 }
                 R.id.quickActionMenu -> {
@@ -127,7 +126,7 @@ class ThreadListMultiSelection {
                         isMultiSelectOn = false
                         ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(
                             threadUid = selectedThreadsUids.single(),
-                            shouldLoadDistantResources = false
+                            shouldLoadDistantResources = false,
                         )
                     } else {
                         ThreadListFragmentDirections.actionThreadListFragmentToMultiSelectBottomSheetDialog()
