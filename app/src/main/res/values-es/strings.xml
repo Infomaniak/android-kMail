@@ -261,8 +261,10 @@
     <string name="notificationNewMessagesChannelName">Nuevos correos electrónicos</string>
     <string name="notificationSyncDraftChannelName">Guardar borradores</string>
     <string name="notificationSyncMessagesChannelName">Recuperación de nuevos correos electrónicos</string>
+    <string name="notificationTitleArchive">Archivado</string>
     <string name="notificationTitleCouldNotSaveDraft">No se ha podido guardar el borrador</string>
     <string name="notificationTitleCouldNotSendDraft">No se ha podido enviar el correo electrónico</string>
+    <string name="notificationTitleDelete">Suprimido</string>
     <string name="onBoardingDescription2">Personaliza tus accesos directos libremente en los ajustes de la aplicación.</string>
     <string name="onBoardingDescription3">Archiva, elimina, mueve o marca varios mensajes a la vez.</string>
     <string name="onBoardingDescription4">Cree una dirección gratuita o conéctese a una cuenta Infomaniak existente.</string>

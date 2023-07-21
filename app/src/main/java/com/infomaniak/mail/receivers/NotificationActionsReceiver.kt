@@ -21,7 +21,9 @@ import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import androidx.annotation.StringRes
 import androidx.core.app.NotificationManagerCompat
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
@@ -83,8 +85,8 @@ class NotificationActionsReceiver : BroadcastReceiver() {
         val realm = RealmDatabase.newMailboxContentInstance(userId, mailboxId)
         val mailbox = MailboxController.getMailbox(userId, mailboxId) ?: return
         val (folderRole, undoNotificationTitle) = when (action) {
-            ARCHIVE_ACTION -> FolderRole.ARCHIVE to "Archived" // TODO: Translate
-            DELETE_ACTION -> FolderRole.TRASH to "Deleted" // TODO: Translate
+            ARCHIVE_ACTION -> FolderRole.ARCHIVE to R.string.notificationTitleArchive
+            DELETE_ACTION -> FolderRole.TRASH to R.string.notificationTitleDelete
             else -> null
         } ?: return
         executeAction(context, realm, mailbox, folderRole, undoNotificationTitle, payload)
@@ -107,7 +109,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
         realm: TypedRealm,
         mailbox: Mailbox,
         folderRole: FolderRole,
-        undoNotificationTitle: String,
+        @StringRes undoNotificationTitle: Int,
         payload: NotificationPayload,
     ) {
 
@@ -117,7 +119,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
             payload = payload.apply {
                 behavior = NotificationBehavior(
                     type = NotificationType.UNDO,
-                    behaviorTitle = undoNotificationTitle,
+                    behaviorTitle = context.getString(undoNotificationTitle),
                 )
             },
         )

@@ -261,8 +261,10 @@
     <string name="notificationNewMessagesChannelName">Neue Emails</string>
     <string name="notificationSyncDraftChannelName">Speichern von Entwürfen</string>
     <string name="notificationSyncMessagesChannelName">Abrufen neuer E-Mails</string>
+    <string name="notificationTitleArchive">Archiviert</string>
     <string name="notificationTitleCouldNotSaveDraft">Der Entwurf konnte nicht gespeichert werden</string>
     <string name="notificationTitleCouldNotSendDraft">Die E-Mail konnte nicht gesendet werden</string>
+    <string name="notificationTitleDelete">Gelöscht</string>
     <string name="onBoardingDescription2">Passen Sie Ihre Shortcuts in den Einstellungen der App frei an.</string>
     <string name="onBoardingDescription3">Archivieren, Löschen, Verschieben oder Favorisieren mehrerer Nachrichten auf einmal.</string>
     <string name="onBoardingDescription4">Erstellen Sie eine kostenlose Adresse oder melden Sie sich bei einem bestehenden Infomaniak-Konto an.</string>
