@@ -132,8 +132,8 @@ class NotificationActionsReceiver : BroadcastReceiver() {
             val messages = sharedUtils.getMessagesToMove(threads, message)
             val destinationId = folderController.getFolder(folderRole)?.id ?: return@launch
 
-            ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationId)
             dismissNotification(context, mailbox, notificationId)
+            ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationId)
         }
 
         notificationJobsBus.register(notificationId, job)
