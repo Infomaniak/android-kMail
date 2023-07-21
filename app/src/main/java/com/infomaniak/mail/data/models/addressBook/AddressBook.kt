@@ -15,16 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-@file:UseSerializers(RealmListSerializer::class)
-
 package com.infomaniak.mail.data.models.addressBook
 
-import com.infomaniak.mail.data.api.RealmListSerializer
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.UseSerializers
 
 @Serializable
 class AddressBook : RealmObject {
