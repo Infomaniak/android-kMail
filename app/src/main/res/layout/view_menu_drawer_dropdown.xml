@@ -29,7 +29,7 @@
         tools:ignore="RtlSymmetry">
 
         <ImageView
-            android:id="@+id/expandCustomFolderButton"
+            android:id="@+id/expandCustomFoldersButton"
             android:layout_width="@dimen/chevronSize"
             android:layout_height="@dimen/chevronSize"
             android:layout_marginEnd="@dimen/marginStandardMedium"
@@ -53,7 +53,7 @@
             android:paddingEnd="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/actionButton"
-            app:layout_constraintStart_toEndOf="@id/expandCustomFolderButton"
+            app:layout_constraintStart_toEndOf="@id/expandCustomFoldersButton"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="@string/buttonFolders" />
 

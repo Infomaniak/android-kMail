@@ -48,6 +48,8 @@ class FolderAdapter(
 
     private inline val folders get() = foldersDiffer.currentList
 
+    private var hasCollabsableFolder = false
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FolderViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding = if (viewType == DisplayType.SELECTABLE_FOLDER.layout) {
@@ -99,11 +101,11 @@ class FolderAdapter(
         val folderName = folder.getLocalizedName(context)
 
         folder.role?.let {
-            setFolderUi(folder.id, folderName, it.folderIconRes, unread, it.matomoValue)
+            setFolderUi(folder, folderName, it.folderIconRes, unread, it.matomoValue)
         } ?: run {
             val indentLevel = folder.path.split(folder.separator).size - 1
             setFolderUi(
-                folderId = folder.id,
+                folder = folder,
                 name = folderName,
                 iconId = if (folder.isFavorite) R.drawable.ic_folder_star else R.drawable.ic_folder,
                 unread = unread,
@@ -115,7 +117,7 @@ class FolderAdapter(
     }
 
     private fun SelectableTextItemView.setFolderUi(
-        folderId: String,
+        folder: Folder,
         name: String,
         @DrawableRes iconId: Int,
         unread: UnreadDisplay?,
@@ -125,27 +127,37 @@ class FolderAdapter(
     ) {
         text = name
         icon = AppCompatResources.getDrawable(context, iconId)
-        setSelectedState(currentFolderId == folderId)
+        setSelectedState(currentFolderId == folder.id)
 
         when (this) {
             is MenuDrawerFolderItemView -> {
-                indent = computeIndent(folderIndent)
+                indent = computeStartMargin(folder) + computeIndent(context, folderIndent)
                 unreadCount = unread?.count ?: 0
                 isPastilleDisplayed = unread?.shouldDisplayPastille ?: false
+                canCollapse = folder.children.isNotEmpty()
+                isCollapsed = !folder.isExpanded
             }
             is SelectableFolderItemView -> indent = computeIndent(folderIndent)
         }
 
         setOnClickListener {
             if (isInMenuDrawer) context.trackMenuDrawerEvent(trackerName, value = trackerValue)
-            onClick.invoke(folderId)
+            onClick.invoke(folder.id)
         }
+    }
+
+    private fun FolderMenuDrawerItemView.computeStartMargin(folder: Folder): Int {
+        if (!hasCollabsableFolder) return resources.getDimension(RCore.dimen.marginStandardSmall).toInt()
+
+        val marginStart = if (folder.canCollapse) RCore.dimen.marginStandardSmall else R.dimen.folderUncollapsableIndent
+        return resources.getDimension(marginStart).toInt()
     }
 
     @SuppressLint("NotifyDataSetChanged")
     fun setFolders(newFolders: List<Folder>, newCurrentFolderId: String?) {
         currentFolderId = newCurrentFolderId
         foldersDiffer.submitList(newFolders)
+        hasCollabsableFolder = newFolders.any { it.canCollapse }
     }
 
     fun updateSelectedState(newCurrentFolderId: String) {

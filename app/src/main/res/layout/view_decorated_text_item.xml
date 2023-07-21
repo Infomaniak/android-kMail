@@ -20,23 +20,27 @@
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/RoundedDecoratedTextItem">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginHorizontal="@dimen/marginStandardMedium"
+        android:layout_marginStart="@dimen/marginStandardSmall"
+        android:layout_marginEnd="@dimen/marginStandardMedium"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <ImageView
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/expandCustomFolderButton"
-            android:layout_width="@dimen/chevronSize"
-            android:layout_height="@dimen/chevronSize"
-            android:layout_marginStart="@dimen/marginStandardSmall"
-            android:layout_marginEnd="@dimen/marginStandardMedium"
+            style="@style/IconButtonSmall"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
             android:contentDescription="@string/contentDescriptionButtonExpandCustomFolders"
-            android:src="@drawable/ic_chevron_down"
             android:visibility="gone"
-            app:tint="@color/iconColorPrimaryText"
+            app:icon="@drawable/ic_chevron_down"
+            app:iconSize="@dimen/chevronSize"
+            app:iconTint="@color/iconColorPrimaryText"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/itemName"
+            app:layout_constraintTop_toTopOf="parent"
             tools:visibility="visible" />
 
         <TextView
@@ -44,7 +48,7 @@
             style="@style/BodyMedium"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/marginStandardSmall"
+            android:layout_marginHorizontal="@dimen/marginStandardSmall"
             android:layout_weight="1"
             android:drawablePadding="@dimen/marginStandardMedium"
             android:ellipsize="end"
@@ -52,11 +56,17 @@
             android:maxLines="1"
             app:drawableStartCompat="@drawable/ic_folder"
             app:drawableTint="?android:attr/colorPrimary"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/expandCustomFolderButton"
+            app:layout_constraintTop_toTopOf="parent"
             tools:text="Folder (Default/Custom)" />
 
         <FrameLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <TextView
                 android:id="@+id/unreadCountChip"
@@ -75,5 +85,5 @@
                 tools:ignore="ContentDescription"
                 tools:src="@drawable/ic_pastille" />
         </FrameLayout>
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

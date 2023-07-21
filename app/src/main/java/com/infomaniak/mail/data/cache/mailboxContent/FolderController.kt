@@ -105,6 +105,7 @@ class FolderController @Inject constructor(private val mailboxContentRealm: Real
                     localFolder.messages,
                     localFolder.remainingOldMessagesToFetch,
                     localFolder.isHistoryComplete,
+                    localFolder.isExpanded,
                 )
             }
         }

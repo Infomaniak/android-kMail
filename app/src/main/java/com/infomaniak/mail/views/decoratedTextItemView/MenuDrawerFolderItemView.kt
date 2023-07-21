@@ -19,12 +19,26 @@ package com.infomaniak.mail.views.decoratedTextItemView
 
 import android.content.Context
 import android.util.AttributeSet
+import androidx.core.view.isVisible
+import com.infomaniak.mail.views.ExpandableItem
 
 class MenuDrawerFolderItemView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : UnreadItemView(context, attrs, defStyleAttr), IndentableFolder {
+) : UnreadItemView(context, attrs, defStyleAttr), FolderItemView, ExpandableItem {
+
+    var canCollapse = false
+        set(isCollapsable) {
+            field = isCollapsable
+            binding.expandCustomFolderButton.isVisible = isCollapsable
+        }
+
+    override var isCollapsed = false
+        set(value) {
+            field = value
+            binding.expandCustomFolderButton.rotation = getRotation(isCollapsed)
+        }
 
     override var indent = 0
         set(value) {
@@ -32,4 +46,12 @@ class MenuDrawerFolderItemView @JvmOverloads constructor(
             setIndent()
         }
 
+    override fun setOnClickListener(onClickListener: OnClickListener?) = with(binding) {
+        root.setOnClickListener(onClickListener)
+        expandCustomFolderButton.setOnExpandableItemClickListener(null)
+    }
+
+    init {
+        attrs?.getIndentAttribute(context)
+    }
 }

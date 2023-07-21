@@ -49,14 +49,14 @@ class MenuDrawerDropdownView @JvmOverloads constructor(
                 actionButton.contentDescription = getString(R.styleable.MenuDrawerDropdownView_actionContentDescription)
             }
 
-            expandCustomFolderButton.rotation = getRotation(isCollapsed)
+            expandCustomFoldersButton.rotation = getRotation(isCollapsed)
             setOnClickListener(null)
         }
     }
 
     fun setIsCollapsed(newState: Boolean) {
         isCollapsed = newState
-        binding.expandCustomFolderButton.rotation = getRotation(isCollapsed)
+        binding.expandCustomFoldersButton.rotation = getRotation(isCollapsed)
     }
 
     private fun getRotation(isCollapsed: Boolean): Float = ResourcesCompat.getFloat(
@@ -67,7 +67,7 @@ class MenuDrawerDropdownView @JvmOverloads constructor(
     override fun setOnClickListener(listener: OnClickListener?) = with(binding) {
         root.setOnClickListener {
             isCollapsed = !isCollapsed
-            expandCustomFolderButton.toggleChevron(isCollapsed)
+            expandCustomFoldersButton.toggleChevron(isCollapsed)
             listener?.onClick(root)
         }
     }
