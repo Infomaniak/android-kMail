@@ -24,11 +24,9 @@ import android.widget.FrameLayout
 import androidx.annotation.StringRes
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.fragment.app.FragmentActivity
-import com.infomaniak.lib.applock.Utils.silentlyReverseSwitch
+import com.google.android.material.switchmaterial.SwitchMaterial
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.ViewItemSettingBinding
 
 class ItemSettingView @JvmOverloads constructor(
@@ -46,6 +44,8 @@ class ItemSettingView @JvmOverloads constructor(
         set(value) {
             binding.toggle.isChecked = value
         }
+
+    val toggle: SwitchMaterial? get() = if (action == Action.TOGGLE) binding.toggle else null
 
     init {
         attrs?.getAttributes(context, R.styleable.ItemSettingView) {
@@ -99,12 +99,6 @@ class ItemSettingView @JvmOverloads constructor(
         binding.subtitle.apply {
             text = subtitle
             isVisible = true
-        }
-    }
-
-    fun FragmentActivity.reverseSwitch(localSettings: LocalSettings) {
-        if (action == Action.TOGGLE) {
-            silentlyReverseSwitch(binding.toggle) { isChecked -> localSettings.isAppLocked = isChecked }
         }
     }
 
