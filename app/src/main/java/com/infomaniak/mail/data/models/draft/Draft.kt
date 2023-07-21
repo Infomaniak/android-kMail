@@ -115,7 +115,7 @@ class Draft : RealmObject {
         initSignature(realm, addContent = false)
     }
 
-    fun initSignature(realm: MutableRealm, addContent: Boolean = true) {
+    fun initSignature(realm: MutableRealm, addContent: Boolean) {
         val signature = SignatureController.getSignature(realm)
 
         identityId = signature.id.toString()
