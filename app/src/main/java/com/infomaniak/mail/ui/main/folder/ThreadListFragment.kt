@@ -101,6 +101,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     @Inject
     lateinit var draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler
+
     @Inject
     lateinit var notificationManagerCompat: NotificationManagerCompat
 

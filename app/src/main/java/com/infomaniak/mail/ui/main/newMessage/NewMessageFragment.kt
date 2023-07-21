@@ -198,9 +198,11 @@ class NewMessageFragment : Fragment() {
                 populateViewModelWithExternalMailData()
                 populateUiWithViewModel()
                 setupFromField(signatures)
-            } else requireActivity().apply {
-                showToast(R.string.failToOpenDraft)
-                finish()
+            } else {
+                requireActivity().apply {
+                    showToast(R.string.failToOpenDraft)
+                    finish()
+                }
             }
         }
     }

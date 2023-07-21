@@ -75,7 +75,7 @@ class MainViewModel @Inject constructor(
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val mergedContactController: MergedContactController,
     private val messageController: MessageController,
-    private val sharedViewModelUtils: SharedViewModelUtils,
+    private val sharedUtils: SharedUtils,
     private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
@@ -512,7 +512,7 @@ class MainViewModel @Inject constructor(
         val threads = getActionThreads(threadsUids.toList()).ifEmpty { return@launch }
         val message = messageUid?.let { messageController.getMessage(it)!! }
 
-        val messages = getMessagesToMove(threads, message)
+        val messages = sharedUtils.getMessagesToMove(threads, message)
 
         val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
 
@@ -550,11 +550,6 @@ class MainViewModel @Inject constructor(
         val undoData = apiResponse.data?.undoResource?.let { UndoData(it, undoFoldersIds, undoDestinationId) }
         snackBarManager.postValue(snackbarTitle, undoData)
     }
-
-    private fun getMessagesToMove(threads: List<Thread>, message: Message?) = when (message) {
-        null -> threads.flatMap(messageController::getMovableMessages)
-        else -> messageController.getMessageAndDuplicates(threads.first(), message)
-    }
     //endregion
 
     //region Archive
@@ -582,7 +577,7 @@ class MainViewModel @Inject constructor(
         val destinationFolderRole = if (isArchived) FolderRole.INBOX else FolderRole.ARCHIVE
         val destinationFolder = folderController.getFolder(destinationFolderRole)!!
 
-        val messages = getMessagesToMove(threads, message)
+        val messages = sharedUtils.getMessagesToMove(threads, message)
 
         val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
 
@@ -631,7 +626,7 @@ class MainViewModel @Inject constructor(
         if (isSeen) {
             markAsUnseen(mailbox, threads, message)
         } else {
-            sharedViewModelUtils.markAsSeen(mailbox, threads, message, ::startedDownload, ::stoppedDownload)
+            sharedUtils.markAsSeen(mailbox, threads, message, ::startedDownload, ::stoppedDownload)
         }
     }
 
@@ -808,7 +803,7 @@ class MainViewModel @Inject constructor(
 
         val snackbarTitle = if (ApiRepository.undoAction(resource).data == true) {
             // Don't use `refreshFoldersAsync` here, it will make the Snackbars blink.
-            sharedViewModelUtils.refreshFolders(mailbox, foldersIds, destinationFolderId, ::startedDownload, ::stoppedDownload)
+            sharedUtils.refreshFolders(mailbox, foldersIds, destinationFolderId, ::startedDownload, ::stoppedDownload)
             R.string.snackbarMoveCancelled
         } else {
             RCore.string.anErrorHasOccurred
@@ -852,7 +847,7 @@ class MainViewModel @Inject constructor(
         started: (() -> Unit)? = null,
         stopped: (() -> Unit)? = null,
     ) = viewModelScope.launch(ioCoroutineContext) {
-        sharedViewModelUtils.refreshFolders(mailbox, messagesFoldersIds, destinationFolderId, started, stopped)
+        sharedUtils.refreshFolders(mailbox, messagesFoldersIds, destinationFolderId, started, stopped)
     }
 
     private fun startedDownload() {

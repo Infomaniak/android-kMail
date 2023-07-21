@@ -34,7 +34,7 @@ import io.sentry.Sentry
 import io.sentry.SentryLevel
 import javax.inject.Inject
 
-class SharedViewModelUtils @Inject constructor(
+class SharedUtils @Inject constructor(
     private val folderController: FolderController,
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val messageController: MessageController,
@@ -73,6 +73,11 @@ class SharedViewModelUtils @Inject constructor(
                 stopped = stopped,
             )
         }
+    }
+
+    fun getMessagesToMove(threads: List<Thread>, message: Message?) = when (message) {
+        null -> threads.flatMap(messageController::getMovableMessages)
+        else -> messageController.getMessageAndDuplicates(threads.first(), message)
     }
 
     suspend fun refreshFolders(
