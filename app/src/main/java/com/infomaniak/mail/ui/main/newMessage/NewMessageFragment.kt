@@ -44,7 +44,6 @@ import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
@@ -387,10 +386,10 @@ class NewMessageFragment : Fragment() {
 
     private fun setupFromField(signatures: List<Signature>) = with(binding) {
         val selectedSignature = signatures.find { it.id == newMessageViewModel.selectedSignatureId }!!
-        updateSelectedSignatureFromField(signatures, selectedSignature)
+        updateSelectedSignatureFromField(signatures.count(), selectedSignature)
 
         val adapter = SignatureAdapter(signatures, newMessageViewModel.selectedSignatureId) { newSelectedSignature ->
-            updateSelectedSignatureFromField(signatures, newSelectedSignature)
+            updateSelectedSignatureFromField(signatures.count(), newSelectedSignature)
             updateBodySignature(newSelectedSignature.content)
 
             newMessageViewModel.apply {
@@ -424,8 +423,8 @@ class NewMessageFragment : Fragment() {
         signatureWebView.loadContent(signatureContent, signatureGroup)
     }
 
-    private fun updateSelectedSignatureFromField(signatures: List<Signature>, signature: Signature) {
-        val formattedExpeditor = if (signatures.count() > 1) {
+    private fun updateSelectedSignatureFromField(signaturesCount: Int, signature: Signature) {
+        val formattedExpeditor = if (signaturesCount > 1) {
             "${signature.senderName} <${signature.senderEmailIdn}> (${signature.name})"
         } else {
             signature.senderEmailIdn

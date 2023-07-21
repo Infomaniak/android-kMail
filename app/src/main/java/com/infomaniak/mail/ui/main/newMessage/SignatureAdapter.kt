@@ -40,7 +40,7 @@ class SignatureAdapter(
 
     override fun getItem(position: Int): Signature = signatures[position]
 
-    override fun getItemId(position: Int): Long = getItem(position).id.toLong() // UUID.randomUUID().hashCode().toLong()
+    override fun getItemId(position: Int): Long = getItem(position).id.toLong()
 
     override fun hasStableIds(): Boolean = true
 
@@ -58,7 +58,7 @@ class SignatureAdapter(
             val backgroundColorRes = if (isSelected) R.color.backgroundSelectedSignature else R.color.backgroundColorTertiary
 
             root.apply {
-                setCardBackgroundColor(parent!!.context.getColor(backgroundColorRes))
+                setCardBackgroundColor(context.getColor(backgroundColorRes))
 
                 setOnClickListener {
                     onClickListener(signature)

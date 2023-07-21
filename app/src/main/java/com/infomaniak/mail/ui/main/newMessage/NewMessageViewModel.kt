@@ -313,7 +313,7 @@ class NewMessageViewModel @Inject constructor(
     }
 
     /**
-     * Only pass in signatures that have the same email address as recipient
+     * Only pass in signatures that have the same email address as the recipient
      */
     private fun computeScore(recipient: Recipient, signatures: MutableList<Signature>): Pair<SignatureFitScore, Signature> {
         var bestScore: SignatureFitScore = NO_MATCH
@@ -332,8 +332,11 @@ class NewMessageViewModel @Inject constructor(
         return bestScore to bestSignature!!
     }
 
+    /**
+     * Only pass in a signature that has the same email address as the recipient
+     */
     private fun computeScore(recipient: Recipient, signature: Signature): SignatureFitScore {
-        val isExactMatch = recipient.name == signature.senderName && recipient.email == signature.senderEmail
+        val isExactMatch = recipient.name == signature.senderName
         val isDefault = signature.isDefault
 
         val fitScore = when {
@@ -344,16 +347,6 @@ class NewMessageViewModel @Inject constructor(
         }
 
         return fitScore
-    }
-
-    enum class SignatureFitScore(private val weight: Int) {
-        EXACT_MATCH_DEFAULT(4),
-        EXACT_MATCH(3),
-        ONLY_EMAIL_MATCH_DEFAULT(2),
-        ONLY_EMAIL_MATCH(1),
-        NO_MATCH(0);
-
-        fun strictlyGreaterThan(other: SignatureFitScore): Boolean = weight > other.weight
     }
 
     private fun splitSignatureAndQuoteFromBody() {
@@ -578,6 +571,16 @@ class NewMessageViewModel @Inject constructor(
     enum class ImportationResult {
         SUCCESS,
         FILE_SIZE_TOO_BIG,
+    }
+
+    enum class SignatureFitScore(private val weight: Int) {
+        EXACT_MATCH_DEFAULT(4),
+        EXACT_MATCH(3),
+        ONLY_EMAIL_MATCH_DEFAULT(2),
+        ONLY_EMAIL_MATCH(1),
+        NO_MATCH(0);
+
+        fun strictlyGreaterThan(other: SignatureFitScore): Boolean = weight > other.weight
     }
 
     private data class DraftSnapshot(
