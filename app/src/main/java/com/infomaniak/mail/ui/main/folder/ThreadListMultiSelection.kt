@@ -103,18 +103,20 @@ class ThreadListMultiSelection {
                     }
 
                     val titleId = when (currentFolder.value?.role) {
-                        FolderRole.DRAFT -> R.string.threadListEmptyDraftButton
-                        FolderRole.SPAM -> R.string.threadListEmptySpamButton
-                        FolderRole.TRASH -> R.string.threadListEmptyTrashButton
+                        FolderRole.DRAFT, FolderRole.SPAM, FolderRole.TRASH -> R.plurals.threadListDeletionConfirmationAlertTitle
                         else -> null
                     }
 
                     val shouldDisplayConfirmationDialog = titleId != null
 
                     if (shouldDisplayConfirmationDialog) {
+                        val resources = threadListFragment.resources
                         threadListFragment.createDescriptionDialog(
-                            title = threadListFragment.getString(titleId!!),
-                            description = threadListFragment.getString(R.string.threadListEmptyFolderAlertDescription),
+                            title = resources.getQuantityString(titleId!!, selectedThreadsCount, selectedThreadsCount),
+                            description = resources.getQuantityString(
+                                R.plurals.threadListDeletionConfirmationAlertDescription,
+                                selectedThreadsCount,
+                            ),
                             onPositiveButtonClicked = { multiselectDelete() },
                         ).show()
                     } else {
