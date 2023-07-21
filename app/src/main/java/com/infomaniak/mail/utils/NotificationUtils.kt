@@ -161,12 +161,13 @@ object NotificationUtils : NotificationUtilsCore() {
         context.buildNewMessageNotification(mailbox.channelId, title, description).apply {
 
             val notificationId = if (isSummary) mailbox.notificationGroupId else threadUid.hashCode()
+            payload.notificationId = notificationId
 
             if (isSummary) {
                 setContentTitle(null)
                 setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
             } else {
-                addActions(context, notificationId, payload)
+                addActions(context, payload)
             }
 
             setSubText(mailbox.email)
@@ -182,11 +183,7 @@ object NotificationUtils : NotificationUtilsCore() {
         }
     }
 
-    private fun NotificationCompat.Builder.addActions(
-        context: Context,
-        notificationId: Int,
-        payload: NotificationPayload,
-    ) = with(payload) {
+    private fun NotificationCompat.Builder.addActions(context: Context, payload: NotificationPayload) = with(payload) {
 
         if (isUndo) {
             val undoAction = context.createBroadcastAction(
@@ -250,6 +247,7 @@ object NotificationUtils : NotificationUtilsCore() {
         val mailboxId: Int,
         val threadUid: String,
         val messageUid: String? = null,
+        var notificationId: Int = -1,
         var behavior: NotificationBehavior? = null,
         private val payloadTitle: String? = null,
         private val payloadContent: String? = null,
@@ -261,7 +259,6 @@ object NotificationUtils : NotificationUtilsCore() {
             val behaviorTitle: String? = null,
             val behaviorContent: String? = null,
             val behaviorDescription: String? = null,
-            val undoResource: String? = null,
         ) : Serializable {
             enum class NotificationType : Serializable {
                 SUMMARY,

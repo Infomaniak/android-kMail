@@ -38,9 +38,7 @@ import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.getUids
 import dagger.hilt.android.AndroidEntryPoint
 import io.realm.kotlin.TypedRealm
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -50,17 +48,23 @@ class NotificationActionsReceiver : BroadcastReceiver() {
     lateinit var notificationManagerCompat: NotificationManagerCompat
 
     @Inject
+    lateinit var folderController: FolderController
+
+    @Inject
     lateinit var sharedUtils: SharedUtils
 
     @Inject
-    lateinit var folderController: FolderController
+    lateinit var notificationJobsBus: NotificationJobsBus
 
     @Inject
     @IoDispatcher
     lateinit var ioDispatcher: CoroutineDispatcher
 
+    @Inject
+    lateinit var globalCoroutineScope: CoroutineScope
+
     override fun onReceive(context: Context, intent: Intent) {
-        CoroutineScope(ioDispatcher).launch {
+        globalCoroutineScope.launch(ioDispatcher) {
             val payload = intent.getSerializableExtra(EXTRA_PAYLOAD) as? NotificationPayload ?: return@launch
             val action = intent.action!!
             handleNotificationIntent(context, payload, action)
@@ -88,16 +92,14 @@ class NotificationActionsReceiver : BroadcastReceiver() {
 
     private fun executeUndoAction(context: Context, payload: NotificationPayload) {
 
-        // TODO: Check if this is the correct call
-        val isSuccess = ApiRepository.undoAction(payload.behavior?.undoResource!!).isSuccess()
+        // Cancel action
+        notificationJobsBus.unregister(payload.notificationId)
 
-        if (isSuccess) {
-            showNotification(
-                context = context,
-                notificationManagerCompat = notificationManagerCompat,
-                payload = payload.apply { behavior = null },
-            )
-        }
+        showNotification(
+            context = context,
+            notificationManagerCompat = notificationManagerCompat,
+            payload = payload.apply { behavior = null },
+        )
     }
 
     private fun executeAction(
@@ -108,14 +110,6 @@ class NotificationActionsReceiver : BroadcastReceiver() {
         undoNotificationTitle: String,
         payload: NotificationPayload,
     ) {
-        val message = MessageController.getMessage(payload.messageUid!!, realm) ?: return
-        val destinationId = folderController.getFolder(folderRole)?.id ?: return
-
-        val threads = message.threads.filter { it.folderId == message.folderId }
-        val messages = sharedUtils.getMessagesToMove(threads, message)
-
-        val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationId)
-        val undoResource = apiResponse.data?.undoResource ?: return
 
         showNotification(
             context = context,
@@ -124,13 +118,27 @@ class NotificationActionsReceiver : BroadcastReceiver() {
                 behavior = NotificationBehavior(
                     type = NotificationType.UNDO,
                     behaviorTitle = undoNotificationTitle,
-                    undoResource = undoResource,
                 )
             },
         )
 
-        // TODO: Dismiss at the right time, with a 3 ou 5 sec timer (check the `undoResource` timer too)
-        // dismissNotification(context, mailbox, notificationId)
+        val job = globalCoroutineScope.launch(ioDispatcher) {
+
+            delay(UNDO_TIMEOUT)
+            ensureActive()
+
+            val message = MessageController.getMessage(payload.messageUid!!, realm) ?: return@launch
+            val destinationId = folderController.getFolder(folderRole)?.id ?: return@launch
+
+            val threads = message.threads.filter { it.folderId == message.folderId }
+            val messages = sharedUtils.getMessagesToMove(threads, message)
+
+            ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationId)
+
+            dismissNotification(context, mailbox, payload.notificationId)
+        }
+
+        notificationJobsBus.register(payload.notificationId, job)
     }
 
     private fun dismissNotification(context: Context, mailbox: Mailbox, notificationId: Int) {
@@ -148,5 +156,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
         const val ARCHIVE_ACTION = "archive_action"
         const val DELETE_ACTION = "delete_action"
         const val UNDO_ACTION = "undo_action"
+
+        private const val UNDO_TIMEOUT = 6_000L
     }
 }
