@@ -56,8 +56,8 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             setMarkAsReadUi(isSeen)
             setFavoriteUi(isFavorite)
 
-            binding.lightTheme.apply {
-                if (requireContext().isNightModeEnabled()) {
+            if (requireContext().isNightModeEnabled() && isOpenedFromThreadFragment) {
+                binding.lightTheme.apply {
                     isVisible = true
                     setText(if (isThemeTheSame) R.string.actionViewInLight else R.string.actionViewInDark)
                     setClosingOnClickListener { mainViewModel.toggleLightThemeForMessage.value = message }

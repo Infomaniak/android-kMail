@@ -238,6 +238,10 @@
         <argument
             android:name="shouldLoadDistantResources"
             app:argType="boolean" />
+        <argument
+            android:name="isOpenedFromThreadFragment"
+            android:defaultValue="true"
+            app:argType="boolean" />
         <action
             android:id="@+id/action_messageActionsBottomSheet_to_newMessageActivity"
             app:destination="@id/newMessageActivity" />
