@@ -33,6 +33,7 @@ import com.infomaniak.mail.databinding.ItemSimpleMailboxBinding
 import com.infomaniak.mail.ui.main.menu.MailboxesAdapter.MailboxesViewHolder
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.views.decoratedTextItemView.DecoratedTextItemView.SelectionStyle
+import com.infomaniak.mail.views.decoratedTextItemView.SelectableTextItemView
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -51,8 +52,8 @@ class MailboxesAdapter(
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding = when (viewType) {
             DisplayType.MENU_DRAWER_MAILBOX.layout -> ItemMailboxMenuDrawerBinding.inflate(layoutInflater, parent, false)
-            DisplayType.INVALID_MAILBOX.layout -> ItemInvalidMailboxBinding.inflate(layoutInflater, parent, false)
-            else -> ItemSimpleMailboxBinding.inflate(layoutInflater, parent, false)
+            DisplayType.SIMPLE_MAILBOX.layout -> ItemSimpleMailboxBinding.inflate(layoutInflater, parent, false)
+            else -> ItemInvalidMailboxBinding.inflate(layoutInflater, parent, false)
         }
 
         return MailboxesViewHolder(binding)
@@ -66,35 +67,37 @@ class MailboxesAdapter(
             DisplayType.MENU_DRAWER_MAILBOX.layout -> {
                 (this as ItemMailboxMenuDrawerBinding).displayMenuDrawerMailbox(mailbox, isCurrentMailbox)
             }
+            DisplayType.SIMPLE_MAILBOX.layout -> {
+                (this as ItemSimpleMailboxBinding).displaySimpleMailbox(mailbox, isCurrentMailbox)
+            }
             DisplayType.INVALID_MAILBOX.layout -> (this as ItemInvalidMailboxBinding).displayInvalidMailbox(mailbox)
-            else -> (this as ItemSimpleMailboxBinding).displaySimpleMailbox(mailbox, isCurrentMailbox)
         }
     }
 
     private fun ItemSimpleMailboxBinding.displaySimpleMailbox(mailbox: Mailbox, isCurrentMailbox: Boolean) = with(root) {
-        text = mailbox.email
-
+        displayValidMailbox(mailbox, isCurrentMailbox) { context.trackAccountEvent(SWITCH_MAILBOX_NAME) }
         setSelectedState(isCurrentMailbox)
-
-        if (!isCurrentMailbox) {
-            setOnClickListener {
-                context.trackAccountEvent(SWITCH_MAILBOX_NAME)
-
-                lifecycleScope.launch(ioDispatcher) {
-                    AccountUtils.switchToMailbox(mailbox.mailboxId)
-                }
-            }
-        }
     }
 
+
     private fun ItemMailboxMenuDrawerBinding.displayMenuDrawerMailbox(mailbox: Mailbox, isCurrentMailbox: Boolean) = with(root) {
-        text = mailbox.email
+        displayValidMailbox(mailbox, isCurrentMailbox) { context.trackMenuDrawerEvent(SWITCH_MAILBOX_NAME) }
+
         unreadCount = mailbox.unreadCountDisplay.count
         isPastilleDisplayed = mailbox.unreadCountDisplay.shouldDisplayPastille
+    }
+
+    private fun SelectableTextItemView.displayValidMailbox(
+        mailbox: Mailbox,
+        isCurrentMailbox: Boolean,
+        trackerCallback: () -> Unit,
+    ) {
+        text = mailbox.email
 
         if (!isCurrentMailbox) {
             setOnClickListener {
-                context.trackMenuDrawerEvent(SWITCH_MAILBOX_NAME)
+                trackerCallback()
+
                 lifecycleScope.launch(ioDispatcher) {
                     AccountUtils.switchToMailbox(mailbox.mailboxId)
                 }
