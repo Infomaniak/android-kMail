@@ -393,6 +393,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                             isSeen = message.isSeen,
                             isThemeTheSame = true,
                             shouldLoadDistantResources = false,
+                            isOpenedFromThreadFragment = false,
                         )
                     )
                 } ?: safeNavigate(
