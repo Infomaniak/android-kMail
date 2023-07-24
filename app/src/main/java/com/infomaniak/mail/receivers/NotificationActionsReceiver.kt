@@ -32,10 +32,10 @@ import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.di.IoDispatcher
-import com.infomaniak.mail.utils.NotificationUtils.NotificationPayload
-import com.infomaniak.mail.utils.NotificationUtils.NotificationPayload.NotificationBehavior
-import com.infomaniak.mail.utils.NotificationUtils.NotificationPayload.NotificationBehavior.NotificationType
-import com.infomaniak.mail.utils.NotificationUtils.showNotification
+import com.infomaniak.mail.utils.NotificationPayload
+import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior
+import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior.*
+import com.infomaniak.mail.utils.NotificationUtils.showMessageNotification
 import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.getUids
 import dagger.hilt.android.AndroidEntryPoint
@@ -94,7 +94,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
         // Cancel action
         notificationJobsBus.unregister(payload.notificationId)
 
-        showNotification(
+        showMessageNotification(
             context = context,
             notificationManagerCompat = notificationManagerCompat,
             payload = payload.apply { behavior = null },
@@ -108,7 +108,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
         payload: NotificationPayload,
     ) = with(payload) {
 
-        showNotification(
+        showMessageNotification(
             context = context,
             notificationManagerCompat = notificationManagerCompat,
             payload = payload.apply {

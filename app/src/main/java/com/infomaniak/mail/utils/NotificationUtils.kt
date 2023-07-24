@@ -39,9 +39,6 @@ import com.infomaniak.mail.receivers.NotificationActionsReceiver.Companion.EXTRA
 import com.infomaniak.mail.receivers.NotificationActionsReceiver.Companion.UNDO_ACTION
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.LaunchActivityArgs
-import com.infomaniak.mail.utils.NotificationUtils.NotificationPayload.*
-import com.infomaniak.mail.utils.NotificationUtils.NotificationPayload.NotificationBehavior.*
-import java.io.Serializable
 import java.util.UUID
 
 object NotificationUtils : NotificationUtilsCore() {
@@ -116,7 +113,11 @@ object NotificationUtils : NotificationUtilsCore() {
         )
     }
 
-    fun Context.buildNewMessageNotification(channelId: String, title: String, description: String?): NotificationCompat.Builder {
+    private fun Context.buildMessageNotification(
+        channelId: String,
+        title: String,
+        description: String?,
+    ): NotificationCompat.Builder {
         return buildNotification(channelId, DEFAULT_SMALL_ICON, title, description)
             .setCategory(Notification.CATEGORY_EMAIL)
     }
@@ -136,7 +137,7 @@ object NotificationUtils : NotificationUtilsCore() {
         )
     }
 
-    fun showNotification(
+    fun showMessageNotification(
         context: Context,
         notificationManagerCompat: NotificationManagerCompat,
         payload: NotificationPayload,
@@ -158,7 +159,7 @@ object NotificationUtils : NotificationUtilsCore() {
 
         val mailbox = MailboxController.getMailbox(userId, mailboxId) ?: return@with
 
-        context.buildNewMessageNotification(mailbox.channelId, title, description).apply {
+        context.buildMessageNotification(mailbox.channelId, title, description).apply {
 
             val notificationId = if (isSummary) mailbox.notificationGroupId else threadUid.hashCode()
             payload.notificationId = notificationId
@@ -183,94 +184,60 @@ object NotificationUtils : NotificationUtilsCore() {
         }
     }
 
-    private fun NotificationCompat.Builder.addActions(context: Context, payload: NotificationPayload) = with(payload) {
+    private fun NotificationCompat.Builder.addActions(context: Context, payload: NotificationPayload) {
 
-        if (isUndo) {
-            val undoAction = context.createBroadcastAction(
+        fun createBroadcastAction(@StringRes title: Int, intent: Intent): NotificationCompat.Action {
+            val requestCode = UUID.randomUUID().hashCode()
+            val pendingIntent = PendingIntent.getBroadcast(context, requestCode, intent, pendingIntentFlags)
+            return NotificationCompat.Action(null, context.getString(title), pendingIntent)
+        }
+
+        fun createActivityAction(@StringRes title: Int, activity: Class<*>, args: Bundle): NotificationCompat.Action {
+            val requestCode = UUID.randomUUID().hashCode()
+            val intent = Intent(context, activity).clearStack().putExtras(args)
+            val pendingIntent = PendingIntent.getActivity(context, requestCode, intent, pendingIntentFlags)
+            return NotificationCompat.Action(null, context.getString(title), pendingIntent)
+        }
+
+        fun createBroadcastIntent(notificationAction: String): Intent {
+            return Intent(context, NotificationActionsReceiver::class.java).apply {
+                action = notificationAction
+                putExtra(EXTRA_PAYLOAD, payload)
+            }
+        }
+
+        if (payload.isUndo) {
+            val undoAction = createBroadcastAction(
                 title = R.string.buttonCancel,
-                intent = context.createBroadcastIntent(UNDO_ACTION, payload),
+                intent = createBroadcastIntent(UNDO_ACTION),
             )
 
             addAction(undoAction)
-            return@with
+            return
         }
 
-        val archiveAction = context.createBroadcastAction(
+        val archiveAction = createBroadcastAction(
             title = R.string.actionArchive,
-            intent = context.createBroadcastIntent(ARCHIVE_ACTION, payload),
+            intent = createBroadcastIntent(ARCHIVE_ACTION),
         )
-        val deleteAction = context.createBroadcastAction(
+        val deleteAction = createBroadcastAction(
             title = R.string.actionDelete,
-            intent = context.createBroadcastIntent(DELETE_ACTION, payload),
+            intent = createBroadcastIntent(DELETE_ACTION),
         )
-        val replyAction = context.createActivityAction(
+        val replyAction = createActivityAction(
             title = R.string.actionReply,
             activity = LaunchActivity::class.java,
             args = LaunchActivityArgs(
-                userId = userId,
-                mailboxId = mailboxId,
-                replyToMessageUid = messageUid,
+                userId = payload.userId,
+                mailboxId = payload.mailboxId,
+                replyToMessageUid = payload.messageUid,
                 draftMode = DraftMode.REPLY,
-                notificationId = notificationId,
+                notificationId = payload.notificationId,
             ).toBundle(),
         )
 
         addAction(archiveAction)
         addAction(deleteAction)
         addAction(replyAction)
-    }
-
-    private fun Context.createBroadcastAction(@StringRes title: Int, intent: Intent): NotificationCompat.Action {
-        val context = this
-        val requestCode = UUID.randomUUID().hashCode()
-        val pendingIntent = PendingIntent.getBroadcast(context, requestCode, intent, pendingIntentFlags)
-        return NotificationCompat.Action(null, getString(title), pendingIntent)
-    }
-
-    private fun Context.createActivityAction(@StringRes title: Int, activity: Class<*>, args: Bundle): NotificationCompat.Action {
-        val context = this
-        val requestCode = UUID.randomUUID().hashCode()
-        val intent = Intent(context, activity).clearStack().putExtras(args)
-        val pendingIntent = PendingIntent.getActivity(context, requestCode, intent, pendingIntentFlags)
-        return NotificationCompat.Action(null, getString(title), pendingIntent)
-    }
-
-    private fun Context.createBroadcastIntent(notificationAction: String, payload: NotificationPayload): Intent {
-        return Intent(this, NotificationActionsReceiver::class.java).apply {
-            action = notificationAction
-            putExtra(EXTRA_PAYLOAD, payload)
-        }
-    }
-
-    data class NotificationPayload(
-        val userId: Int,
-        val mailboxId: Int,
-        val threadUid: String,
-        val messageUid: String? = null,
-        var notificationId: Int = -1,
-        var behavior: NotificationBehavior? = null,
-        private val payloadTitle: String? = null,
-        private val payloadContent: String? = null,
-        private val payloadDescription: String? = null,
-    ) : Serializable {
-
-        data class NotificationBehavior(
-            val type: NotificationType,
-            val behaviorTitle: String? = null,
-            val behaviorContent: String? = null,
-            val behaviorDescription: String? = null,
-        ) : Serializable {
-            enum class NotificationType : Serializable {
-                SUMMARY,
-                UNDO,
-            }
-        }
-
-        val isSummary get() = behavior?.type == NotificationType.SUMMARY
-        val isUndo get() = behavior?.type == NotificationType.UNDO
-
-        val title get() = (if (behavior != null) behavior?.behaviorTitle else payloadTitle) ?: ""
-        val content get() = if (behavior != null) behavior?.behaviorContent else payloadContent
-        val description get() = if (behavior != null) behavior?.behaviorDescription else payloadDescription
     }
 }

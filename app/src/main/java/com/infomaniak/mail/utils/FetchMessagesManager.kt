@@ -30,10 +30,9 @@ import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.utils.NotificationUtils.NotificationPayload
-import com.infomaniak.mail.utils.NotificationUtils.NotificationPayload.NotificationBehavior
-import com.infomaniak.mail.utils.NotificationUtils.NotificationPayload.NotificationBehavior.NotificationType
-import com.infomaniak.mail.utils.NotificationUtils.showNotification
+import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior
+import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior.NotificationType
+import com.infomaniak.mail.utils.NotificationUtils.showMessageNotification
 import io.realm.kotlin.Realm
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -127,7 +126,7 @@ class FetchMessagesManager @Inject constructor(
         val description = "$subject$formattedPreview"
 
         // Show Message notification
-        showNotification(
+        showMessageNotification(
             context = appContext,
             notificationManagerCompat = notificationManagerCompat,
             payload = NotificationPayload(
@@ -148,7 +147,7 @@ class FetchMessagesManager @Inject constructor(
                 unReadThreadsCount,
                 unReadThreadsCount,
             )
-            showNotification(
+            showMessageNotification(
                 context = appContext,
                 notificationManagerCompat = notificationManagerCompat,
                 payload = NotificationPayload(
