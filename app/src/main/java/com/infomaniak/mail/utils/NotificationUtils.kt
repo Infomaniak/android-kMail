@@ -17,18 +17,29 @@
  */
 package com.infomaniak.mail.utils
 
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationChannelGroup
-import android.app.NotificationManager
+import android.app.*
 import android.content.Context
+import android.content.Intent
 import android.os.Build
+import android.os.Bundle
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import com.infomaniak.lib.core.utils.NotificationUtilsCore
+import com.infomaniak.lib.core.utils.clearStack
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.draft.Draft.DraftAction
+import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
+import com.infomaniak.mail.data.models.draft.Draft.*
 import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.receivers.NotificationActionsReceiver
+import com.infomaniak.mail.receivers.NotificationActionsReceiver.Companion.ARCHIVE_ACTION
+import com.infomaniak.mail.receivers.NotificationActionsReceiver.Companion.DELETE_ACTION
+import com.infomaniak.mail.receivers.NotificationActionsReceiver.Companion.EXTRA_PAYLOAD
+import com.infomaniak.mail.receivers.NotificationActionsReceiver.Companion.UNDO_ACTION
+import com.infomaniak.mail.ui.LaunchActivity
+import com.infomaniak.mail.ui.LaunchActivityArgs
+import java.util.UUID
 
 object NotificationUtils : NotificationUtilsCore() {
 
@@ -102,7 +113,11 @@ object NotificationUtils : NotificationUtilsCore() {
         )
     }
 
-    fun Context.buildNewMessageNotification(channelId: String, title: String, description: String?): NotificationCompat.Builder {
+    private fun Context.buildMessageNotification(
+        channelId: String,
+        title: String,
+        description: String?,
+    ): NotificationCompat.Builder {
         return buildNotification(channelId, DEFAULT_SMALL_ICON, title, description)
             .setCategory(Notification.CATEGORY_EMAIL)
     }
@@ -120,5 +135,106 @@ object NotificationUtils : NotificationUtilsCore() {
             title = getString(if (action == DraftAction.SEND) R.string.notificationTitleCouldNotSendDraft else R.string.notificationTitleCouldNotSaveDraft),
             description = getString(errorMessageRes),
         )
+    }
+
+    fun showMessageNotification(
+        context: Context,
+        notificationManagerCompat: NotificationManagerCompat,
+        payload: NotificationPayload,
+    ) = with(payload) {
+
+        fun contentIntent(mailboxUuid: String, isSummary: Boolean, isUndo: Boolean): PendingIntent? {
+            if (isUndo) return null
+
+            val intent = Intent(context, LaunchActivity::class.java).clearStack().putExtras(
+                LaunchActivityArgs(
+                    userId = userId,
+                    mailboxId = mailboxId,
+                    openThreadUid = if (isSummary) null else threadUid,
+                ).toBundle(),
+            )
+            val requestCode = if (isSummary) mailboxUuid else threadUid
+            return PendingIntent.getActivity(context, requestCode.hashCode(), intent, pendingIntentFlags)
+        }
+
+        val mailbox = MailboxController.getMailbox(userId, mailboxId) ?: return@with
+
+        context.buildMessageNotification(mailbox.channelId, title, description).apply {
+
+            if (isSummary) {
+                setContentTitle(null)
+                setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
+            } else {
+                addActions(context, payload)
+            }
+
+            setSubText(mailbox.email)
+            setContentText(content)
+            setColorized(true)
+            setContentIntent(contentIntent(mailbox.uuid, isSummary, isUndo))
+            setGroup(mailbox.notificationGroupKey)
+            setGroupSummary(isSummary)
+            color = LocalSettings.getInstance(context).accentColor.getPrimary(context)
+
+            @Suppress("MissingPermission")
+            notificationManagerCompat.notify(notificationId, build())
+        }
+    }
+
+    private fun NotificationCompat.Builder.addActions(context: Context, payload: NotificationPayload) {
+
+        fun createBroadcastAction(@StringRes title: Int, intent: Intent): NotificationCompat.Action {
+            val requestCode = UUID.randomUUID().hashCode()
+            val pendingIntent = PendingIntent.getBroadcast(context, requestCode, intent, pendingIntentFlags)
+            return NotificationCompat.Action(null, context.getString(title), pendingIntent)
+        }
+
+        fun createActivityAction(@StringRes title: Int, activity: Class<*>, args: Bundle): NotificationCompat.Action {
+            val requestCode = UUID.randomUUID().hashCode()
+            val intent = Intent(context, activity).clearStack().putExtras(args)
+            val pendingIntent = PendingIntent.getActivity(context, requestCode, intent, pendingIntentFlags)
+            return NotificationCompat.Action(null, context.getString(title), pendingIntent)
+        }
+
+        fun createBroadcastIntent(notificationAction: String): Intent {
+            return Intent(context, NotificationActionsReceiver::class.java).apply {
+                action = notificationAction
+                putExtra(EXTRA_PAYLOAD, payload)
+            }
+        }
+
+        if (payload.isUndo) {
+            val undoAction = createBroadcastAction(
+                title = R.string.buttonCancel,
+                intent = createBroadcastIntent(UNDO_ACTION),
+            )
+
+            addAction(undoAction)
+            return
+        }
+
+        val archiveAction = createBroadcastAction(
+            title = R.string.actionArchive,
+            intent = createBroadcastIntent(ARCHIVE_ACTION),
+        )
+        val deleteAction = createBroadcastAction(
+            title = R.string.actionDelete,
+            intent = createBroadcastIntent(DELETE_ACTION),
+        )
+        val replyAction = createActivityAction(
+            title = R.string.actionReply,
+            activity = LaunchActivity::class.java,
+            args = LaunchActivityArgs(
+                userId = payload.userId,
+                mailboxId = payload.mailboxId,
+                replyToMessageUid = payload.messageUid,
+                draftMode = DraftMode.REPLY,
+                notificationId = payload.notificationId,
+            ).toBundle(),
+        )
+
+        addAction(archiveAction)
+        addAction(deleteAction)
+        addAction(replyAction)
     }
 }

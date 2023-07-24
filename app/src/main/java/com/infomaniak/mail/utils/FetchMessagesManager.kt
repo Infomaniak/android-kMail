@@ -17,16 +17,10 @@
  */
 package com.infomaniak.mail.utils
 
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import android.util.Log
-import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.infomaniak.lib.core.utils.NotificationUtilsCore
-import com.infomaniak.lib.core.utils.clearStack
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
@@ -34,25 +28,21 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder.FolderRole
-import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.ui.LaunchActivity
-import com.infomaniak.mail.ui.LaunchActivityArgs
-import com.infomaniak.mail.utils.NotificationUtils.buildNewMessageNotification
+import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior
+import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior.NotificationType
+import com.infomaniak.mail.utils.NotificationUtils.showMessageNotification
 import io.realm.kotlin.Realm
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import okhttp3.OkHttpClient
-import java.util.UUID
 import javax.inject.Inject
 
 class FetchMessagesManager @Inject constructor(
     private val appContext: Context,
     private val notificationManagerCompat: NotificationManagerCompat,
 ) {
-
-    private val localSettings by lazy { LocalSettings.getInstance(appContext) }
 
     suspend fun execute(userId: Int, mailbox: Mailbox, sentryMessageUid: String? = null, mailboxContentRealm: Realm? = null) {
 
@@ -103,73 +93,6 @@ class FetchMessagesManager @Inject constructor(
         okHttpClient: OkHttpClient,
     ) {
 
-        fun contentIntent(isSummary: Boolean): PendingIntent {
-            val intent = Intent(appContext, LaunchActivity::class.java).clearStack().apply {
-                putExtras(
-                    LaunchActivityArgs(
-                        userId = userId,
-                        mailboxId = mailbox.mailboxId,
-                        openThreadUid = if (isSummary) null else uid,
-                    ).toBundle(),
-                )
-            }
-            val requestCode = if (isSummary) mailbox.uuid else uid
-            return PendingIntent.getActivity(appContext, requestCode.hashCode(), intent, NotificationUtilsCore.pendingIntentFlags)
-        }
-
-        fun NotificationCompat.Builder.addActions(messageUid: String, notificationId: Int) {
-
-            val replyIntent = Intent(appContext, LaunchActivity::class.java).clearStack().apply {
-                putExtras(
-                    LaunchActivityArgs(
-                        userId = userId,
-                        mailboxId = mailbox.mailboxId,
-                        replyToMessageUid = messageUid,
-                        draftMode = DraftMode.REPLY,
-                        notificationId = notificationId,
-                    ).toBundle(),
-                )
-            }
-
-            val replyPendingIntent = PendingIntent.getActivity(
-                appContext,
-                UUID.randomUUID().hashCode(),
-                replyIntent,
-                NotificationUtilsCore.pendingIntentFlags,
-            )
-
-            addAction(NotificationCompat.Action(null, appContext.getString(R.string.actionReply), replyPendingIntent))
-        }
-
-        fun showNotification(
-            contentText: String,
-            isSummary: Boolean,
-            title: String = "",
-            description: String? = null,
-            messageUid: String,
-        ) {
-            appContext.buildNewMessageNotification(mailbox.channelId, title, description).apply {
-
-                val notificationId = if (isSummary) mailbox.notificationGroupId else uid.hashCode()
-
-                if (isSummary) {
-                    setContentTitle(null)
-                    setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
-                }
-                setSubText(mailbox.email)
-                setContentText(contentText)
-                setColorized(true)
-                setContentIntent(contentIntent(isSummary = isSummary))
-                addActions(messageUid, notificationId)
-                setGroup(mailbox.notificationGroupKey)
-                setGroupSummary(isSummary)
-                color = localSettings.accentColor.getPrimary(appContext)
-
-                @Suppress("MissingPermission")
-                notificationManagerCompat.notify(notificationId, build())
-            }
-        }
-
         ThreadController.fetchIncompleteMessages(messages, mailbox, okHttpClient, realm)
         val message = MessageController.getThreadLastMessageInFolder(uid, realm) ?: run {
             ThreadController.getThread(uid, realm)?.let { thread ->
@@ -203,12 +126,19 @@ class FetchMessagesManager @Inject constructor(
         val description = "$subject$formattedPreview"
 
         // Show Message notification
-        showNotification(
-            contentText = subject,
-            isSummary = false,
-            title = message.sender.displayedName(appContext),
-            description = description,
-            messageUid = message.uid,
+        showMessageNotification(
+            context = appContext,
+            notificationManagerCompat = notificationManagerCompat,
+            payload = NotificationPayload(
+                userId = userId,
+                mailboxId = mailbox.mailboxId,
+                threadUid = uid,
+                messageUid = message.uid,
+                notificationId = uid.hashCode(),
+                payloadTitle = message.sender.displayedName(appContext),
+                payloadContent = subject,
+                payloadDescription = description,
+            )
         )
 
         // Show Group Summary notification
@@ -218,10 +148,19 @@ class FetchMessagesManager @Inject constructor(
                 unReadThreadsCount,
                 unReadThreadsCount,
             )
-            showNotification(
-                contentText = summaryText,
-                isSummary = true,
-                messageUid = message.uid,
+            showMessageNotification(
+                context = appContext,
+                notificationManagerCompat = notificationManagerCompat,
+                payload = NotificationPayload(
+                    userId = userId,
+                    mailboxId = mailbox.mailboxId,
+                    threadUid = uid,
+                    notificationId = mailbox.notificationGroupId,
+                    behavior = NotificationBehavior(
+                        type = NotificationType.SUMMARY,
+                        behaviorContent = summaryText,
+                    ),
+                ),
             )
         }
     }

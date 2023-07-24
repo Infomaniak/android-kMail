@@ -267,8 +267,10 @@
     <string name="notificationNewMessagesChannelName">Nouveaux e-mails</string>
     <string name="notificationSyncDraftChannelName">Sauvegarde des brouillons</string>
     <string name="notificationSyncMessagesChannelName">Récupération des nouveaux emails</string>
+    <string name="notificationTitleArchive">Archivé</string>
     <string name="notificationTitleCouldNotSaveDraft">Le brouillon n’a pas pu être sauvegardé</string>
     <string name="notificationTitleCouldNotSendDraft">L’e-mail n’a pas pu être envoyé</string>
+    <string name="notificationTitleDelete">Supprimé</string>
     <string name="onBoardingDescription2">Personnalisez librement vos raccourcis dans les paramètres de l’app.</string>
     <string name="onBoardingDescription3">Archivez, supprimez, déplacez ou mettez en favoris plusieurs messages en une fois.</string>
     <string name="onBoardingDescription4">Créez une adresse gratuite ou connectez-vous à un compte Infomaniak existant.</string>

@@ -261,8 +261,10 @@
     <string name="notificationNewMessagesChannelName">Nuove e-mail</string>
     <string name="notificationSyncDraftChannelName">Salvataggio delle bozze</string>
     <string name="notificationSyncMessagesChannelName">Recupero di nuove e-mail</string>
+    <string name="notificationTitleArchive">Archiviato</string>
     <string name="notificationTitleCouldNotSaveDraft">Non è stato possibile salvare la bozza</string>
     <string name="notificationTitleCouldNotSendDraft">Non è stato possibile inviare l’e-mail</string>
+    <string name="notificationTitleDelete">Soppresso</string>
     <string name="onBoardingDescription2">Personalizzate liberamente i vostri collegamenti nelle impostazioni dell’app.</string>
     <string name="onBoardingDescription3">Archiviare, eliminare, spostare o inserire tra i preferiti più messaggi contemporaneamente.</string>
     <string name="onBoardingDescription4">Create un indirizzo gratuito o collegatevi a un account Infomaniak esistente.</string>
