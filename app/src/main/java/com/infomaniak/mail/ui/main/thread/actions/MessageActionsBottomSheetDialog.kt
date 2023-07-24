@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.lib.core.utils.safeNavigate
@@ -114,6 +115,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 override fun onReadUnread() {
                     trackBottomSheetMessageActionsEvent(ACTION_MARK_AS_SEEN_NAME, message.isSeen)
                     mainViewModel.toggleMessageSeenStatus(threadUid, message)
+                    findNavController().popBackStack(R.id.threadFragment, inclusive = true)
                 }
 
                 override fun onMove() {
