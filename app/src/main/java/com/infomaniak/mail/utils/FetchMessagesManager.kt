@@ -134,6 +134,7 @@ class FetchMessagesManager @Inject constructor(
                 mailboxId = mailbox.mailboxId,
                 threadUid = uid,
                 messageUid = message.uid,
+                notificationId = uid.hashCode(),
                 payloadTitle = message.sender.displayedName(appContext),
                 payloadContent = subject,
                 payloadDescription = description,
@@ -154,6 +155,7 @@ class FetchMessagesManager @Inject constructor(
                     userId = userId,
                     mailboxId = mailbox.mailboxId,
                     threadUid = uid,
+                    notificationId = mailbox.notificationGroupId,
                     behavior = NotificationBehavior(
                         type = NotificationType.SUMMARY,
                         behaviorContent = summaryText,

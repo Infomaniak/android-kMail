@@ -161,9 +161,6 @@ object NotificationUtils : NotificationUtilsCore() {
 
         context.buildMessageNotification(mailbox.channelId, title, description).apply {
 
-            val notificationId = if (isSummary) mailbox.notificationGroupId else threadUid.hashCode()
-            payload.notificationId = notificationId
-
             if (isSummary) {
                 setContentTitle(null)
                 setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)

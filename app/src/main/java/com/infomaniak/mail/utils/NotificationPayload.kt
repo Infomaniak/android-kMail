@@ -28,7 +28,7 @@ data class NotificationPayload(
     val mailboxId: Int,
     val threadUid: String,
     val messageUid: String? = null,
-    var notificationId: Int = -1,
+    var notificationId: Int,
     var behavior: NotificationBehavior? = null,
     private val payloadTitle: String? = null,
     private val payloadContent: String? = null,
