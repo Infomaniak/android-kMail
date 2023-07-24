@@ -122,12 +122,25 @@ class ThreadListMultiSelection {
                 }
                 R.id.quickActionMenu -> {
                     threadListFragment.trackMultiSelectActionEvent(OPEN_ACTION_BOTTOM_SHEET, selectedThreadsCount)
-                    val direction = if (selectedThreadsUids.count() == 1) {
+                    val direction = if (selectedThreadsCount == 1) {
+                        val thread = selectedThreads.single()
                         isMultiSelectOn = false
-                        ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(
-                            threadUid = selectedThreadsUids.single(),
-                            shouldLoadDistantResources = false,
-                        )
+                        if (thread.isSingleMessage) {
+                            ThreadListFragmentDirections.actionThreadListFragmentToMessageActionsBottomSheetDialog(
+                                messageUid = thread.messageUid,
+                                threadUid = thread.uid,
+                                isFavorite = thread.isFavorite,
+                                isSeen = thread.unseenMessagesCount == 0,
+                                isThemeTheSame = true,
+                                shouldLoadDistantResources = false,
+                                isOpenedFromThreadFragment = false,
+                            )
+                        } else {
+                            ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(
+                                threadUid = selectedThreadsUids.single(),
+                                shouldLoadDistantResources = false,
+                            )
+                        }
                     } else {
                         ThreadListFragmentDirections.actionThreadListFragmentToMultiSelectBottomSheetDialog()
                     }
