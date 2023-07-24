@@ -205,7 +205,7 @@ class ThreadFragment : Fragment() {
                 }
                 R.id.quickActionMenu -> {
                     if (threadAdapter.messages.count() == 1) {
-                        threadAdapter.messages.single().navigateToActionBottomsheet()
+                        threadAdapter.messages.single().navigateToActionsBottomSheet()
                     } else {
                         safeNavigate(
                             ThreadFragmentDirections.actionThreadFragmentToThreadActionsBottomSheetDialog(
@@ -278,13 +278,13 @@ class ThreadFragment : Fragment() {
                 trackMessageActionsEvent(ACTION_REPLY_NAME)
                 replyTo(message)
             }
-            onMenuClicked = { message -> message.navigateToActionBottomsheet() }
+            onMenuClicked = { message -> message.navigateToActionsBottomSheet() }
         }
     }
 
-    private fun Message.navigateToActionBottomsheet() {
+    private fun Message.navigateToActionsBottomSheet() {
         safeNavigate(
-            ThreadFragmentDirections.actionThreadFragmentToMessageActionBottomSheetDialog(
+            ThreadFragmentDirections.actionThreadFragmentToMessageActionsBottomSheetDialog(
                 messageUid = uid,
                 threadUid = navigationArgs.threadUid,
                 isFavorite = isFavorite,

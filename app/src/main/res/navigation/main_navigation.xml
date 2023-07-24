@@ -161,7 +161,7 @@
             android:name="threadUid"
             app:argType="string" />
         <action
-            android:id="@+id/action_threadFragment_to_messageActionBottomSheetDialog"
+            android:id="@+id/action_threadFragment_to_messageActionsBottomSheetDialog"
             app:destination="@id/messageActionsBottomSheetDialog" />
         <action
             android:id="@+id/action_threadFragment_to_newMessageActivity"
