@@ -24,7 +24,6 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.MatomoMail.ADD_MAILBOX_NAME
 import com.infomaniak.mail.MatomoMail.trackNoValidMailboxesEvent
@@ -48,13 +47,11 @@ class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
     override val mailboxesAdapter = MailboxesAdapter(
         isInMenuDrawer = isInMenuDrawer,
         hasValidMailboxes = hasValidMailboxes,
-        lifecycleScope = lifecycleScope,
     )
 
     private val invalidPasswordMailboxesAdapter = MailboxesAdapter(
         isInMenuDrawer = isInMenuDrawer,
         hasValidMailboxes = hasValidMailboxes,
-        lifecycleScope = lifecycleScope,
         onInvalidPasswordMailboxClicked = { mailbox -> onInvalidPasswordMailboxClicked(mailbox) },
     )
 

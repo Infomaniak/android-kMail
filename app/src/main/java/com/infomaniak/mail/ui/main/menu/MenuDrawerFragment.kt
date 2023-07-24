@@ -67,7 +67,7 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
     override val mailboxesAdapter = MailboxesAdapter(
         isInMenuDrawer = isInMenuDrawer,
         hasValidMailboxes = hasValidMailboxes,
-        lifecycleScope = lifecycleScope,
+        onValidMailboxClicked = { mailboxId -> onValidMailboxClicked(mailboxId) },
         onLockedMailboxClicked = { mailboxEmail -> onLockedMailboxClicked(mailboxEmail) },
         onInvalidPasswordMailboxClicked = { mailbox -> onInvalidPasswordMailboxClicked(mailbox) },
     )
