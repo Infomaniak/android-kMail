@@ -18,11 +18,11 @@
 
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
@@ -40,6 +40,7 @@
             app:layout_constrainedHeight="true"
             app:layout_constraintBottom_toTopOf="@+id/title"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHeight_min="150dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_chainStyle="packed" />
@@ -130,13 +131,31 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/marginStandard"
             android:layout_marginBottom="@dimen/marginStandard"
+            android:text="Communiquez et stockez vos documents et photos dans un écosystème sans publicité qui respecte votre vie privée."
             android:textAlignment="center"
             app:layout_constraintBottom_toTopOf="@+id/createNewAddressButton"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/chipStorageMailLayout"
-            app:layout_constraintWidth_max="400dp"
-            tools:text="Communiquez et stockez vos documents et photos dans un écosystème sans publicité qui respecte votre vie privée." />
+            app:layout_constraintWidth_max="400dp" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/buttonGuideline"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.8" />
+
+        <!--TODO : 56dp in dimen-->
+        <View
+            android:id="@+id/dummyButton"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toTopOf="@id/createNewAddressButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/buttonGuideline" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/createNewAddressButton"
@@ -145,7 +164,8 @@
             android:text="Créer une adresse mail gratuite"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/dummyButton" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -103,7 +103,7 @@ class LoginFragment : Fragment() {
 
         infomaniakLogin = context.getInfomaniakLogin()
 
-        val introPagerAdapter = IntroPagerAdapter(parentFragmentManager, lifecycle, navigationArgs.isFirstAccount)
+        val introPagerAdapter = IntroPagerAdapter(childFragmentManager, viewLifecycleOwner.lifecycle, navigationArgs.isFirstAccount)
         introViewpager.apply {
             adapter = introPagerAdapter
             registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
@@ -139,15 +139,16 @@ class LoginFragment : Fragment() {
         }
 
         signInButton.setOnClickListener {
-            signInButton.isEnabled = false
-            connectButton.isEnabled = false
-            trackAccountEvent("openCreationWebview")
-            infomaniakLogin.startCreateAccountWebView(
-                resultLauncher = createAccountResultLauncher,
-                createAccountUrl = BuildConfig.CREATE_ACCOUNT_URL,
-                successHost = BuildConfig.CREATE_ACCOUNT_SUCCESS_HOST,
-                cancelHost = BuildConfig.CREATE_ACCOUNT_CANCEL_HOST,
-            )
+            safeNavigate(LoginFragmentDirections.actionLoginFragmentToNewAccountFragment())
+            // signInButton.isEnabled = false
+            // connectButton.isEnabled = false
+            // trackAccountEvent("openCreationWebview")
+            // infomaniakLogin.startCreateAccountWebView(
+            //     resultLauncher = createAccountResultLauncher,
+            //     createAccountUrl = BuildConfig.CREATE_ACCOUNT_URL,
+            //     successHost = BuildConfig.CREATE_ACCOUNT_SUCCESS_HOST,
+            //     cancelHost = BuildConfig.CREATE_ACCOUNT_CANCEL_HOST,
+            // )
         }
 
         introViewModel.updatedAccentColor.observe(viewLifecycleOwner) { (newAccentColor, oldAccentColor) ->

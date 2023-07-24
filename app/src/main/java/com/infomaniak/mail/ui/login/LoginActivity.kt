@@ -22,12 +22,14 @@ import android.os.Bundle
 import androidx.activity.addCallback
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.utils.Utils.lockOrientationForSmallScreens
 import com.infomaniak.lib.login.ApiToken
+import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.MatomoMail.trackUserInfo
 import com.infomaniak.mail.R
@@ -35,8 +37,11 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.databinding.ActivityLoginBinding
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.Utils.MailboxErrorCode
+import com.infomaniak.mail.utils.getAttributeColor
 import dagger.hilt.android.AndroidEntryPoint
+import com.google.android.material.R as RMaterial
 import com.infomaniak.lib.core.R as RCore
 
 @AndroidEntryPoint
@@ -62,7 +67,27 @@ class LoginActivity : AppCompatActivity() {
 
         handleOnBackPressed()
 
+        setupNavController()
+
         trackScreen()
+    }
+
+    private fun setupNavController() {
+        navController.addOnDestinationChangedListener { _, destination, arguments ->
+            onDestinationChanged(destination, arguments)
+        }
+    }
+
+    private fun onDestinationChanged(destination: NavDestination, arguments: Bundle?) {
+        SentryDebug.addNavigationBreadcrumb(destination.displayName, arguments)
+
+        window.statusBarColor = if (destination.id == R.id.loginFragment) {
+            getAttributeColor(RMaterial.attr.colorContainer)
+        } else {
+            getColor(R.color.backgroundColor)
+        }
+
+        trackDestination(destination)
     }
 
     private fun handleOnBackPressed() {

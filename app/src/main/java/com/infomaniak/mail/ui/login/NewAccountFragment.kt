@@ -27,7 +27,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.R
 import com.infomaniak.lib.core.models.ApiResponse
@@ -48,7 +50,6 @@ import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.getInfomaniakLogin
-import com.infomaniak.mail.utils.launchNoValidMailboxesActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -59,6 +60,7 @@ import javax.inject.Inject
 class NewAccountFragment : Fragment() {
 
     private lateinit var binding: FragmentNewAccountBinding
+    private val introViewModel: IntroViewModel by activityViewModels()
 
     private lateinit var infomaniakLogin: InfomaniakLogin
 
@@ -87,6 +89,11 @@ class NewAccountFragment : Fragment() {
             }
         }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        introViewModel.updatedAccentColor.value?.first?.theme?.let { requireActivity().setTheme(it) }
+        super.onCreate(savedInstanceState)
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentNewAccountBinding.inflate(inflater, container, false).also { binding = it }.root
     }
@@ -95,6 +102,8 @@ class NewAccountFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         infomaniakLogin = context.getInfomaniakLogin()
+
+        toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
 
         createNewAddressButton.setOnClickListener {
             createNewAddressButton.isEnabled = false
@@ -149,10 +158,11 @@ class NewAccountFragment : Fragment() {
                 AccountUtils.reloadApp?.invoke()
             }
             is Utils.MailboxErrorCode -> withContext(mainDispatcher) {
-                when (returnValue) {
-                    Utils.MailboxErrorCode.NO_MAILBOX -> launchNoMailboxActivity()
-                    Utils.MailboxErrorCode.NO_VALID_MAILBOX -> launchNoValidMailboxesActivity()
-                }
+                // TODO :
+                // when (returnValue) {
+                //     Utils.MailboxErrorCode.NO_MAILBOX -> launchNoMailboxActivity()
+                //     Utils.MailboxErrorCode.NO_VALID_MAILBOX -> launchNoValidMailboxesActivity()
+                // }
             }
             is ApiResponse<*> -> withContext(mainDispatcher) { showError(getString(returnValue.translatedError)) }
             else -> withContext(mainDispatcher) { showError(getString(R.string.anErrorHasOccurred)) }
