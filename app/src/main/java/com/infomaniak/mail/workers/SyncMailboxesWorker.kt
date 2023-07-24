@@ -36,6 +36,9 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/**
+ * Routinely fetch Messages (when user doesn't have PlayServices).
+ */
 @HiltWorker
 class SyncMailboxesWorker @AssistedInject constructor(
     @Assisted appContext: Context,

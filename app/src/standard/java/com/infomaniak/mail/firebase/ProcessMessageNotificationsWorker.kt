@@ -34,6 +34,9 @@ import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/**
+ * Process Firebase notifications.
+ */
 @HiltWorker
 class ProcessMessageNotificationsWorker @AssistedInject constructor(
     @Assisted appContext: Context,
