@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.main.thread.actions
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.isNightModeEnabled
@@ -33,6 +34,7 @@ import com.infomaniak.mail.MatomoMail.ACTION_POSTPONE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_PRINT_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_REPLY_ALL_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_REPLY_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_SPAM_NAME
 import com.infomaniak.mail.MatomoMail.trackBottomSheetMessageActionsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder.FolderRole
@@ -55,6 +57,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
             setMarkAsReadUi(isSeen)
             setFavoriteUi(isFavorite)
+            setSpamUi()
 
             if (requireContext().isNightModeEnabled() && isOpenedFromThreadFragment) {
                 binding.lightTheme.apply {
@@ -132,7 +135,10 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     mainViewModel.toggleMessageFavoriteStatus(threadUid, message)
                 }
 
-                override fun onSpam() = Unit
+                override fun onSpam() = with(mainViewModel) {
+                    trackBottomSheetMessageActionsEvent(ACTION_SPAM_NAME, isCurrentFolderRole(FolderRole.SPAM))
+                    toggleMessageSpamStatus(threadUid, message)
+                }
 
                 override fun onReportJunk() {
                     safeNavigate(
@@ -152,6 +158,16 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 }
                 //endregion
             })
+        }
+    }
+
+    private fun setSpamUi() = with(binding) {
+        if (mainViewModel.isCurrentFolderRole(FolderRole.SPAM)) {
+            reportJunk.isGone = true
+            spam.apply {
+                isVisible = true
+                setText(R.string.actionNonSpam)
+            }
         }
     }
 }
