@@ -31,8 +31,6 @@ abstract class SelectableTextItemView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : DecoratedTextItemView(context, attrs, defStyleAttr) {
 
-    private var isInSelectedState = false
-
     private val checkIcon by lazy {
         AppCompatResources.getDrawable(context, R.drawable.ic_check)?.apply {
             setTint(context.getAttributeColor(RMaterial.attr.colorPrimary))
@@ -40,7 +38,6 @@ abstract class SelectableTextItemView @JvmOverloads constructor(
     }
 
     fun setSelectedState(isSelected: Boolean) = with(binding) {
-        isInSelectedState = isSelected
         val (color, textAppearance) = if (isSelected && itemStyle == SelectionStyle.MENU_DRAWER) {
             context.getAttributeColor(RMaterial.attr.colorPrimaryContainer) to R.style.BodyMedium_Accent
         } else {
