@@ -304,10 +304,10 @@ fun List<Folder>.getMenuFolders(): Pair<List<Folder>, List<Folder>> {
         val defaultFolders = list
             .filter { it.role != null }
             .sortedBy { it.role?.order }
-            .formatFoldersListWithAllChildren()
+            .flatMapFolderChildren()
             .also(list::removeAll)
 
-        val customFolders = list.formatFoldersListWithAllChildren()
+        val customFolders = list.flatMapFolderChildren()
 
         defaultFolders to customFolders
     }
@@ -318,7 +318,7 @@ fun List<Folder>.getMenuFolders(): Pair<List<Folder>, List<Folder>> {
  * So if this sort logic changes, it needs to be changed in both locations.
  * The other location is in `FolderController.getFoldersQuery()`.
  */
-fun List<Folder>.formatFoldersListWithAllChildren(): List<Folder> {
+fun List<Folder>.flatMapFolderChildren(): List<Folder> {
 
     if (isEmpty()) return this
 
@@ -327,9 +327,14 @@ fun List<Folder>.formatFoldersListWithAllChildren(): List<Folder> {
         outputList: MutableList<Folder> = mutableListOf(),
     ): List<Folder> {
 
-        val firstFolder = inputList.removeFirst()
-        outputList.add(firstFolder.copyFromRealm(1u))
-        inputList.addAll(0, firstFolder.children.query().sort(Folder::name.name, Sort.ASCENDING).find())
+        val folder = inputList.removeFirst()
+        if (folder.isManaged()) {
+            outputList.add(folder.copyFromRealm(1u))
+            inputList.addAll(0, folder.children.query().sort(Folder::name.name, Sort.ASCENDING).find())
+        } else {
+            outputList.add(folder)
+            inputList.addAll(folder.children)
+        }
 
         return if (inputList.isEmpty()) outputList else formatFolderWithAllChildren(inputList, outputList)
     }
