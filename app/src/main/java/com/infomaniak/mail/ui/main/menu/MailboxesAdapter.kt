@@ -116,12 +116,10 @@ class MailboxesAdapter(
 
         computeEndIconVisibility()
 
-        setOnClickListener {
-            when {
-                isMailboxLocked -> onLockedMailboxClicked?.invoke(mailbox.email)
-                isPasswordOutdated -> onInvalidPasswordMailboxClicked?.invoke(mailbox)
-            }
-        }
+        initSetOnClickListener(
+            onLockedMailboxClicked = { onLockedMailboxClicked?.invoke(mailbox.email) },
+            onInvalidPasswordMailboxClicked = { onInvalidPasswordMailboxClicked?.invoke(mailbox) },
+        )
     }
 
     override fun getItemViewType(position: Int): Int {

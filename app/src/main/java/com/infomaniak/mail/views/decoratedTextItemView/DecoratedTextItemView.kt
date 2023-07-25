@@ -31,7 +31,6 @@ import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewDecoratedTextItemBinding
-import com.infomaniak.lib.core.R as RCore
 
 abstract class DecoratedTextItemView @JvmOverloads constructor(
     context: Context,
@@ -41,7 +40,7 @@ abstract class DecoratedTextItemView @JvmOverloads constructor(
 
     val binding by lazy { ViewDecoratedTextItemBinding.inflate(LayoutInflater.from(context), this, true) }
 
-    open val endIconMarginRes: Int = RCore.dimen.marginStandardVerySmall
+    open val endIconMarginRes: Int = ResourcesCompat.ID_NULL
 
     private val regular by lazy { ResourcesCompat.getFont(context, com.infomaniak.lib.core.R.font.suisseintl_regular) }
     private val medium by lazy { ResourcesCompat.getFont(context, com.infomaniak.lib.core.R.font.suisseintl_medium) }
@@ -102,7 +101,14 @@ abstract class DecoratedTextItemView @JvmOverloads constructor(
             isGone = icon == null
             setImageDrawable(icon)
             contentDescription = contentDescriptionRes?.let(context::getString)
-            setMarginsRelative(end = resources.getDimension(endIconMarginRes).toInt())
+
+            val endMargin = if (endIconMarginRes == ResourcesCompat.ID_NULL) {
+                ResourcesCompat.ID_NULL
+            } else {
+                resources.getDimension(endIconMarginRes)
+            }.toInt()
+
+            setMarginsRelative(end = endMargin)
         }
     }
 

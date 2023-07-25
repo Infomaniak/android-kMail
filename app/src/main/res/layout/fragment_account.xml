@@ -101,7 +101,6 @@
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/attachNewMailboxButton"
                     style="@style/IconButton"
-                    android:layout_marginEnd="@dimen/marginStandardVerySmall"
                     android:contentDescription="@string/buttonAddEmailAddress"
                     app:icon="@drawable/ic_add_circle"
                     app:iconSize="@dimen/marginStandardMedium"
