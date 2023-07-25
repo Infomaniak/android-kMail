@@ -22,7 +22,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.view.isGone
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -138,8 +137,8 @@ class FolderAdapter(
                 isPastilleDisplayed = unread?.shouldDisplayPastille ?: false
                 canCollapse = folder.canCollapse
                 isCollapsed = !folder.isExpanded
-                binding.root.isGone = !canCollapse && isCollapsed
                 if (canCollapse) setOnCollapsableClickListener { onCollapseClicked?.invoke(folder.id, isCollapsed) }
+                computeFolderVisibility()
             }
             is SelectableFolderItemView -> indent = computeIndent(folderIndent)
         }
