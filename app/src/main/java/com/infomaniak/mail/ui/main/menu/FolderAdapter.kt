@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui.main.menu
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
@@ -34,11 +33,10 @@ import com.infomaniak.mail.data.models.Folder.*
 import com.infomaniak.mail.databinding.*
 import com.infomaniak.mail.ui.main.menu.FolderAdapter.FolderViewHolder
 import com.infomaniak.mail.utils.UnreadDisplay
-import com.infomaniak.mail.views.decoratedTextItemView.FolderMenuDrawerItemView
+import com.infomaniak.mail.views.decoratedTextItemView.MenuDrawerFolderItemView
 import com.infomaniak.mail.views.decoratedTextItemView.SelectableFolderItemView
 import com.infomaniak.mail.views.decoratedTextItemView.SelectableTextItemView
 import kotlin.math.min
-import com.infomaniak.lib.core.R as RCore
 
 class FolderAdapter(
     private val isInMenuDrawer: Boolean,
@@ -75,10 +73,9 @@ class FolderAdapter(
     override fun onBindViewHolder(holder: FolderViewHolder, position: Int) = with(holder.binding) {
         val folder = folders[position]
 
-        if (getItemViewType(position) == DisplayType.SELECTABLE_FOLDER.layout) {
-            (this as ItemSelectableFolderBinding).root.displayFolder(folder)
-        } else {
-            (this as ItemFolderMenuDrawerBinding).root.displayMenuDrawerFolder(folder)
+        when (getItemViewType(position)) {
+            DisplayType.SELECTABLE_FOLDER.layout -> (this as ItemSelectableFolderBinding).root.displayFolder(folder)
+            DisplayType.MENU_DRAWER.layout -> (this as ItemFolderMenuDrawerBinding).root.displayMenuDrawerFolder(folder)
         }
     }
 
@@ -88,7 +85,7 @@ class FolderAdapter(
 
     override fun getItemCount() = folders.size
 
-    private fun FolderMenuDrawerItemView.displayMenuDrawerFolder(folder: Folder) {
+    private fun MenuDrawerFolderItemView.displayMenuDrawerFolder(folder: Folder) {
         val unread = when (folder.role) {
             FolderRole.DRAFT -> UnreadDisplay(folder.threads.count())
             FolderRole.SENT, FolderRole.TRASH -> UnreadDisplay(0)
@@ -131,22 +128,18 @@ class FolderAdapter(
         setSelectedState(currentFolderId == folderId)
 
         when (this) {
-            is FolderMenuDrawerItemView -> {
-                indent = computeIndent(context, folderIndent)
+            is MenuDrawerFolderItemView -> {
+                indent = computeIndent(folderIndent)
                 unreadCount = unread?.count ?: 0
                 isPastilleDisplayed = unread?.shouldDisplayPastille ?: false
             }
-            is SelectableFolderItemView -> indent = computeIndent(context, folderIndent)
+            is SelectableFolderItemView -> indent = computeIndent(folderIndent)
         }
 
         setOnClickListener {
             if (isInMenuDrawer) context.trackMenuDrawerEvent(trackerName, value = trackerValue)
             onClick.invoke(folderId)
         }
-    }
-
-    private fun computeIndent(context: Context, folderIndent: Int?): Int {
-        return context.resources.getDimension(RCore.dimen.marginStandard).toInt() * (folderIndent ?: 0)
     }
 
     @SuppressLint("NotifyDataSetChanged")

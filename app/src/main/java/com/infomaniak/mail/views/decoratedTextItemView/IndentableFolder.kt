@@ -17,19 +17,19 @@
  */
 package com.infomaniak.mail.views.decoratedTextItemView
 
-import android.content.Context
-import android.util.AttributeSet
+import com.infomaniak.lib.core.utils.context
+import com.infomaniak.lib.core.utils.setMarginsRelative
+import com.infomaniak.mail.databinding.ViewDecoratedTextItemBinding
+import com.infomaniak.lib.core.R as RCore
 
-class FolderMenuDrawerItemView @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0,
-) : UnreadItemView(context, attrs, defStyleAttr), FolderItemView {
+interface IndentableFolder {
 
-    override var indent = 0
-        set(value) {
-            field = value
-            setIndent()
-        }
+    val binding: ViewDecoratedTextItemBinding
+    var indent: Int
 
+    fun setIndent() = binding.itemName.setMarginsRelative(start = indent)
+
+    fun computeIndent(folderIndent: Int?): Int {
+        return binding.context.resources.getDimension(RCore.dimen.marginStandard).toInt() * (folderIndent ?: 0)
+    }
 }

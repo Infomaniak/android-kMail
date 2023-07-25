@@ -20,8 +20,16 @@ package com.infomaniak.mail.views.decoratedTextItemView
 import android.content.Context
 import android.util.AttributeSet
 
-class MailboxMenuDrawerItemView @JvmOverloads constructor(
+class MenuDrawerFolderItemView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : UnreadItemView(context, attrs, defStyleAttr)
+) : UnreadItemView(context, attrs, defStyleAttr), IndentableFolder {
+
+    override var indent = 0
+        set(value) {
+            field = value
+            setIndent()
+        }
+
+}

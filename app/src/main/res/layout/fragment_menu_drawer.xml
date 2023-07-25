@@ -76,7 +76,7 @@
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/mailboxSwitcher"
-                style="@style/DecoratedTextItem">
+                style="@style/RoundedDecoratedTextItem">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"

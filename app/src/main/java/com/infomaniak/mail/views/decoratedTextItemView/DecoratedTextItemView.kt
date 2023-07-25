@@ -56,11 +56,14 @@ abstract class DecoratedTextItemView @JvmOverloads constructor(
             field = value
             if (value == SelectionStyle.MENU_DRAWER) {
                 binding.root.apply {
-                    context.obtainStyledAttributes(R.style.DecoratedTextItem, intArrayOf(android.R.attr.layout_marginStart)).let {
+                    context.obtainStyledAttributes(
+                        R.style.RoundedDecoratedTextItem,
+                        intArrayOf(android.R.attr.layout_marginStart)
+                    ).let {
                         setMarginsRelative(it.getDimensionPixelSizeOrThrow(0))
                         it.recycle()
                     }
-                    ShapeAppearanceModel.builder(context, 0, R.style.DecoratedTextItemShapeAppearance).build()
+                    ShapeAppearanceModel.builder(context, 0, R.style.RoundedDecoratedTextItemShapeAppearance).build()
                 }
             } else {
                 binding.root.apply {

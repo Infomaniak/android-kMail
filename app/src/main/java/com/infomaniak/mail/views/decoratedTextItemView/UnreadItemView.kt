@@ -24,6 +24,8 @@ import androidx.core.view.isVisible
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.UiUtils
+import com.infomaniak.mail.utils.getAttributeColor
+import com.google.android.material.R as RMaterial
 import com.infomaniak.lib.core.R as RCore
 
 abstract class UnreadItemView @JvmOverloads constructor(
@@ -34,7 +36,11 @@ abstract class UnreadItemView @JvmOverloads constructor(
 
     override val endIconMarginRes = RCore.dimen.marginStandardSmall
 
-    private val pastille by lazy { AppCompatResources.getDrawable(context, R.drawable.ic_pastille) }
+    private val pastille by lazy {
+        AppCompatResources.getDrawable(context, R.drawable.ic_pastille)?.apply {
+            setTint(context.getAttributeColor(RMaterial.attr.colorPrimary))
+        }
+    }
 
     var unreadCount: Int = 0
         set(value) {
