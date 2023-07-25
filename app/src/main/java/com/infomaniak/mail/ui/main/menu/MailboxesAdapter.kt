@@ -51,8 +51,8 @@ class MailboxesAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MailboxesViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding = when (viewType) {
-            DisplayType.MENU_DRAWER_MAILBOX.layout -> ItemMailboxMenuDrawerBinding.inflate(layoutInflater, parent, false)
             DisplayType.SIMPLE_MAILBOX.layout -> ItemSimpleMailboxBinding.inflate(layoutInflater, parent, false)
+            DisplayType.MENU_DRAWER_MAILBOX.layout -> ItemMailboxMenuDrawerBinding.inflate(layoutInflater, parent, false)
             else -> ItemInvalidMailboxBinding.inflate(layoutInflater, parent, false)
         }
 
@@ -64,11 +64,11 @@ class MailboxesAdapter(
         val isCurrentMailbox = mailbox.mailboxId == AccountUtils.currentMailboxId
 
         when (getItemViewType(position)) {
-            DisplayType.MENU_DRAWER_MAILBOX.layout -> {
-                (this as ItemMailboxMenuDrawerBinding).displayMenuDrawerMailbox(mailbox, isCurrentMailbox)
-            }
             DisplayType.SIMPLE_MAILBOX.layout -> {
                 (this as ItemSimpleMailboxBinding).displaySimpleMailbox(mailbox, isCurrentMailbox)
+            }
+            DisplayType.MENU_DRAWER_MAILBOX.layout -> {
+                (this as ItemMailboxMenuDrawerBinding).displayMenuDrawerMailbox(mailbox, isCurrentMailbox)
             }
             DisplayType.INVALID_MAILBOX.layout -> (this as ItemInvalidMailboxBinding).displayInvalidMailbox(mailbox)
         }
