@@ -31,7 +31,7 @@ import com.infomaniak.mail.databinding.ItemSearchFolderBinding
 import com.infomaniak.mail.ui.main.search.SearchFolderAdapter.SearchFolderElement.FOLDER
 import com.infomaniak.mail.ui.main.search.SearchFolderAdapter.SearchFolderElement.SEPARATOR
 import com.infomaniak.mail.utils.getLocalizedNameOrAllFolders
-import com.infomaniak.mail.views.decoratedTextItemView.SimpleFolderItemView
+import com.infomaniak.mail.views.decoratedTextItemView.SelectableFolderItemView
 
 class SearchFolderAdapter(
     val folders: List<Any>,
@@ -73,7 +73,7 @@ class SearchFolderAdapter(
         folder: Folder?,
     ): View {
         return (convertView ?: ItemSearchFolderBinding.inflate(LayoutInflater.from(context), parent, false).root).apply {
-            findViewById<SimpleFolderItemView>(R.id.simpleFolderItemView).apply {
+            findViewById<SelectableFolderItemView>(R.id.simpleFolderItemView).apply {
                 val entryName: String = context.getLocalizedNameOrAllFolders(folder)
                 text = entryName
                 icon = AppCompatResources.getDrawable(context, folder?.getIcon() ?: R.drawable.ic_all_folders)

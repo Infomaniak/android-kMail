@@ -121,7 +121,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/associatedEmailAddresses"
                     tools:itemCount="10"
-                    tools:listitem="@layout/item_simple_mailbox" />
+                    tools:listitem="@layout/item_selectable_mailbox" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.core.widget.NestedScrollView>

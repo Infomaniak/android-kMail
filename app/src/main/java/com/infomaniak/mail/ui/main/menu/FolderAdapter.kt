@@ -35,8 +35,8 @@ import com.infomaniak.mail.databinding.*
 import com.infomaniak.mail.ui.main.menu.FolderAdapter.FolderViewHolder
 import com.infomaniak.mail.utils.UnreadDisplay
 import com.infomaniak.mail.views.decoratedTextItemView.FolderMenuDrawerItemView
+import com.infomaniak.mail.views.decoratedTextItemView.SelectableFolderItemView
 import com.infomaniak.mail.views.decoratedTextItemView.SelectableTextItemView
-import com.infomaniak.mail.views.decoratedTextItemView.SimpleFolderItemView
 import kotlin.math.min
 import com.infomaniak.lib.core.R as RCore
 
@@ -52,8 +52,8 @@ class FolderAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FolderViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
-        val binding = if (viewType == DisplayType.SIMPLE_FOLDER.layout) {
-            ItemSimpleFolderBinding.inflate(layoutInflater, parent, false)
+        val binding = if (viewType == DisplayType.SELECTABLE_FOLDER.layout) {
+            ItemSelectableFolderBinding.inflate(layoutInflater, parent, false)
         } else {
             ItemFolderMenuDrawerBinding.inflate(layoutInflater, parent, false)
         }
@@ -64,8 +64,8 @@ class FolderAdapter(
     override fun onBindViewHolder(holder: FolderViewHolder, position: Int, payloads: MutableList<Any>) {
         if (payloads.firstOrNull() == Unit) {
             val folder = folders[position]
-            if (getItemViewType(position) == DisplayType.SIMPLE_FOLDER.layout) {
-                (holder.binding as ItemSimpleFolderBinding).root.setSelectedState(currentFolderId == folder.id)
+            if (getItemViewType(position) == DisplayType.SELECTABLE_FOLDER.layout) {
+                (holder.binding as ItemSelectableFolderBinding).root.setSelectedState(currentFolderId == folder.id)
             }
         } else {
             super.onBindViewHolder(holder, position, payloads)
@@ -75,15 +75,15 @@ class FolderAdapter(
     override fun onBindViewHolder(holder: FolderViewHolder, position: Int) = with(holder.binding) {
         val folder = folders[position]
 
-        if (getItemViewType(position) == DisplayType.SIMPLE_FOLDER.layout) {
-            (this as ItemSimpleFolderBinding).root.displayFolder(folder)
+        if (getItemViewType(position) == DisplayType.SELECTABLE_FOLDER.layout) {
+            (this as ItemSelectableFolderBinding).root.displayFolder(folder)
         } else {
             (this as ItemFolderMenuDrawerBinding).root.displayMenuDrawerFolder(folder)
         }
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (isInMenuDrawer) DisplayType.MENU_DRAWER.layout else DisplayType.SIMPLE_FOLDER.layout
+        return if (isInMenuDrawer) DisplayType.MENU_DRAWER.layout else DisplayType.SELECTABLE_FOLDER.layout
     }
 
     override fun getItemCount() = folders.size
@@ -136,7 +136,7 @@ class FolderAdapter(
                 unreadCount = unread?.count ?: 0
                 isPastilleDisplayed = unread?.shouldDisplayPastille ?: false
             }
-            is SimpleFolderItemView -> indent = computeIndent(context, folderIndent)
+            is SelectableFolderItemView -> indent = computeIndent(context, folderIndent)
         }
 
         setOnClickListener {
@@ -168,7 +168,7 @@ class FolderAdapter(
     }
 
     private enum class DisplayType(val layout: Int) {
-        SIMPLE_FOLDER(R.layout.item_simple_folder),
+        SELECTABLE_FOLDER(R.layout.item_selectable_folder),
         MENU_DRAWER(R.layout.item_folder_menu_drawer),
     }
 

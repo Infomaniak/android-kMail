@@ -17,11 +17,7 @@
  */
 package com.infomaniak.mail.views.decoratedTextItemView
 
-import android.content.Context
-import android.util.AttributeSet
-import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.setMarginsRelative
-import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewDecoratedTextItemBinding
 
 interface FolderItemView {
@@ -30,10 +26,4 @@ interface FolderItemView {
     var indent: Int
 
     fun setIndent() = binding.itemName.setMarginsRelative(start = indent)
-
-    fun AttributeSet.getIndentAttribute(context: Context) {
-        getAttributes(context, R.styleable.DecoratedTextItemView) {
-            indent = getDimensionPixelSize(R.styleable.DecoratedTextItemView_indent, indent)
-        }
-    }
 }

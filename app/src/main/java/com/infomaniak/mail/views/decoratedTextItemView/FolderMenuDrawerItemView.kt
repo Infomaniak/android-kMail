@@ -32,7 +32,4 @@ class FolderMenuDrawerItemView @JvmOverloads constructor(
             setIndent()
         }
 
-    init {
-        attrs?.getIndentAttribute(context)
-    }
 }

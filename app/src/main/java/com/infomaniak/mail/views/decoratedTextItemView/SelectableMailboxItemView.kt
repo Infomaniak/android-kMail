@@ -20,19 +20,8 @@ package com.infomaniak.mail.views.decoratedTextItemView
 import android.content.Context
 import android.util.AttributeSet
 
-class SimpleFolderItemView @JvmOverloads constructor(
+class SelectableMailboxItemView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : SelectableTextItemView(context, attrs, defStyleAttr), FolderItemView {
-
-    override var indent = 0
-        set(value) {
-            field = value
-            setIndent()
-        }
-
-    init {
-        attrs?.getIndentAttribute(context)
-    }
-}
+) : SelectableTextItemView(context, attrs, defStyleAttr)
