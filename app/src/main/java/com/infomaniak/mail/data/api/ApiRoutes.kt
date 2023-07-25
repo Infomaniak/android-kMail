@@ -26,6 +26,8 @@ object ApiRoutes {
 
     fun resource(resource: String) = "$MAIL_API$resource"
 
+    fun ping() = "$MAIL_API/api/ping-with-auth"
+
     fun addressBooks() = "$MAIL_API/api/pim/addressbook"
 
     fun contact() = "$MAIL_API/api/pim/contact"
