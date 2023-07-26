@@ -57,6 +57,8 @@ object ApiRepository : ApiRepositoryCore() {
         okHttpClient: OkHttpClient = HttpClient.okHttpClient,
     ): T = ApiController.callApi(url, method, body, okHttpClient, true)
 
+    fun ping(): ApiResponse<String> = callApi(ApiRoutes.ping(), GET)
+
     fun getAddressBooks(): ApiResponse<AddressBooksResult> = callApi(ApiRoutes.addressBooks(), GET)
 
     fun getContacts(): ApiResponse<List<Contact>> = callApi(ApiRoutes.contacts(), GET)

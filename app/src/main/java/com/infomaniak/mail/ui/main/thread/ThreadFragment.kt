@@ -297,7 +297,7 @@ class ThreadFragment : Fragment() {
 
     private fun scheduleDownloadManager(downloadUrl: String, filename: String) {
 
-        fun scheduleDownloadManager() = DownloadManagerUtils.scheduleDownload(requireContext(), downloadUrl, filename)
+        fun scheduleDownloadManager() = threadViewModel.scheduleDownload(downloadUrl, filename)
 
         if (permissionUtils.hasDownloadManagerPermission) {
             scheduleDownloadManager()
