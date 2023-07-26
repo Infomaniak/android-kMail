@@ -25,7 +25,7 @@
         <attr name="padding" format="dimension" />
     </declare-styleable>
 
-    <declare-styleable name="MenuDrawerItemView">
+    <declare-styleable name="DecoratedTextItemView">
         <attr name="badge" format="integer" />
         <attr name="icon" />
         <attr name="indent" format="dimension" />

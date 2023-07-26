@@ -1,6 +1,6 @@
 /*
  * Infomaniak ikMail - Android
- * Copyright (C) 2022-2023 Infomaniak Network SA
+ * Copyright (C) 2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,35 +18,34 @@
 package com.infomaniak.mail.views
 
 import android.content.Context
-import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
+import androidx.annotation.StringRes
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.content.res.getDimensionPixelSizeOrThrow
-import androidx.core.view.isVisible
+import androidx.core.view.isGone
 import com.google.android.material.shape.ShapeAppearanceModel
-import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.getAttributes
+import com.infomaniak.lib.core.utils.setMargins
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.mail.R
-import com.infomaniak.mail.databinding.ItemMenuDrawerBinding
-import com.infomaniak.mail.utils.UiUtils.formatUnreadCount
-import com.infomaniak.mail.utils.getAttributeColor
-import com.google.android.material.R as RMaterial
+import com.infomaniak.mail.databinding.ViewDecoratedTextItemBinding
 import com.infomaniak.lib.core.R as RCore
 
-class MenuDrawerItemView @JvmOverloads constructor(
+abstract class DecoratedTextItemView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
-    val binding by lazy { ItemMenuDrawerBinding.inflate(LayoutInflater.from(context), this, true) }
+    val binding by lazy { ViewDecoratedTextItemBinding.inflate(LayoutInflater.from(context), this, true) }
 
-    private val regular by lazy { ResourcesCompat.getFont(context, RCore.font.suisseintl_regular) }
-    private val medium by lazy { ResourcesCompat.getFont(context, RCore.font.suisseintl_medium) }
+    open val endIconMarginRes: Int = RCore.dimen.marginStandardVerySmall
+
+    private val regular by lazy { ResourcesCompat.getFont(context, com.infomaniak.lib.core.R.font.suisseintl_regular) }
+    private val medium by lazy { ResourcesCompat.getFont(context, com.infomaniak.lib.core.R.font.suisseintl_medium) }
 
     var icon: Drawable? = null
         set(value) {
@@ -54,13 +53,7 @@ class MenuDrawerItemView @JvmOverloads constructor(
             binding.itemName.setCompoundDrawablesWithIntrinsicBounds(value, null, null, null)
         }
 
-    var indent: Int = 0
-        set(value) {
-            field = value
-            binding.itemName.setMarginsRelative(start = value)
-        }
-
-    var itemStyle = SelectionStyle.MENU_DRAWER
+    var itemStyle = SelectionStyle.OTHER
         set(value) {
             field = value
             if (value == SelectionStyle.MENU_DRAWER) {
@@ -75,7 +68,7 @@ class MenuDrawerItemView @JvmOverloads constructor(
                 binding.root.apply {
                     setMarginsRelative(0)
                     shapeAppearanceModel = shapeAppearanceModel.toBuilder().setAllCornerSizes(0.0f).build()
-                    if (value == SelectionStyle.ACCOUNT) setContentPadding(0, 0, 0, 0)
+                    setContentPadding(0, 0, 0, 0)
                 }
             }
         }
@@ -92,65 +85,30 @@ class MenuDrawerItemView @JvmOverloads constructor(
             binding.itemName.typeface = if (fontFamily == TextWeight.MEDIUM) medium else regular
         }
 
-    var badge: Int = 0
-        set(value) {
-            field = value
-            binding.itemBadge.apply {
-                isVisible = shouldDisplayBadge()
-                text = formatUnreadCount(value)
-            }
-        }
-
-    var isPastilleDisplayed = false
-        set(isDisplayed) {
-            field = isDisplayed
-            computeEndIconVisibility()
-        }
-
-    private var isInSelectedState = false
-
     init {
         attrs?.getAttributes(context, R.styleable.DecoratedTextItemView) {
-            badge = getInteger(R.styleable.DecoratedTextItemView_badge, badge)
             icon = getDrawable(R.styleable.DecoratedTextItemView_icon)
-            indent = getDimensionPixelSize(R.styleable.DecoratedTextItemView_indent, indent)
             itemStyle = SelectionStyle.values()[getInteger(R.styleable.DecoratedTextItemView_itemStyle, 0)]
             text = getString(R.styleable.DecoratedTextItemView_text)
             textWeight = TextWeight.values()[getInteger(R.styleable.DecoratedTextItemView_textWeight, 0)]
         }
     }
 
-    fun setSelectedState(isSelected: Boolean) = with(binding) {
-        isInSelectedState = isSelected
-        val (color, textAppearance) = if (isSelected && itemStyle == SelectionStyle.MENU_DRAWER) {
-            context.getAttributeColor(RMaterial.attr.colorPrimaryContainer) to R.style.BodyMedium_Accent
-        } else {
-            Color.TRANSPARENT to if (textWeight == TextWeight.MEDIUM) R.style.BodyMedium else R.style.Body
-        }
-
-        root.setCardBackgroundColor(color)
-        itemName.setTextAppearance(textAppearance)
-
-        checkmark.isVisible = shouldDisplayCheckmark()
-    }
-
-    private fun shouldDisplayBadge() = !shouldDisplayPastille() && badge > 0
-    private fun shouldDisplayPastille() = isPastilleDisplayed
-    private fun shouldDisplayCheckmark() = isInSelectedState && itemStyle != SelectionStyle.MENU_DRAWER
-
-    private fun computeEndIconVisibility() = binding.apply {
-        itemBadge.isVisible = shouldDisplayBadge()
-        pastille.isVisible = shouldDisplayPastille()
-        checkmark.isVisible = shouldDisplayCheckmark()
-    }
-
     override fun setOnClickListener(onClickListener: OnClickListener?) {
         binding.root.setOnClickListener(onClickListener)
     }
 
+    open fun setEndIcon(icon: Drawable?, @StringRes contentDescriptionRes: Int?) {
+        binding.endIcon.apply {
+            isGone = icon == null
+            setImageDrawable(icon)
+            contentDescription = contentDescriptionRes?.let(context::getString)
+            setMargins(right = resources.getDimension(endIconMarginRes).toInt())
+        }
+    }
+
     enum class SelectionStyle {
         MENU_DRAWER,
-        ACCOUNT,
         OTHER,
     }
 

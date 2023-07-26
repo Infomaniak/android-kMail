@@ -21,14 +21,18 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewbinding.ViewBinding
 import com.infomaniak.mail.MatomoMail.SWITCH_MAILBOX_NAME
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.mailbox.Mailbox
-import com.infomaniak.mail.databinding.ItemSwitchMailboxBinding
-import com.infomaniak.mail.ui.main.menu.MailboxesAdapter.SwitchMailboxesViewHolder
+import com.infomaniak.mail.databinding.ItemInvalidMailboxBinding
+import com.infomaniak.mail.databinding.ItemMailboxMenuDrawerBinding
+import com.infomaniak.mail.databinding.ItemSimpleMailboxBinding
+import com.infomaniak.mail.ui.main.menu.MailboxesAdapter.MailboxesViewHolder
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.views.MenuDrawerItemView.SelectionStyle
+import com.infomaniak.mail.views.DecoratedTextItemView.SelectionStyle
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -41,42 +45,87 @@ class MailboxesAdapter(
     private val onLockedMailboxClicked: ((String) -> Unit)? = null,
     private var mailboxes: List<Mailbox> = emptyList(),
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO, // TODO: Inject with hilt
-) : RecyclerView.Adapter<SwitchMailboxesViewHolder>() {
+) : RecyclerView.Adapter<MailboxesViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SwitchMailboxesViewHolder {
-        return SwitchMailboxesViewHolder(ItemSwitchMailboxBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MailboxesViewHolder {
+        val layoutInflater = LayoutInflater.from(parent.context)
+        val binding = when (viewType) {
+            DisplayType.MENU_DRAWER_MAILBOX.layout -> ItemMailboxMenuDrawerBinding.inflate(layoutInflater, parent, false)
+            DisplayType.INVALID_MAILBOX.layout -> ItemInvalidMailboxBinding.inflate(layoutInflater, parent, false)
+            else -> ItemSimpleMailboxBinding.inflate(layoutInflater, parent, false)
+        }
+
+        return MailboxesViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: SwitchMailboxesViewHolder, position: Int) = with(holder.binding.emailAddress) {
-
+    override fun onBindViewHolder(holder: MailboxesViewHolder, position: Int) = with(holder.binding) {
         val mailbox = mailboxes[position]
         val isCurrentMailbox = mailbox.mailboxId == AccountUtils.currentMailboxId
 
+        when (getItemViewType(position)) {
+            DisplayType.MENU_DRAWER_MAILBOX.layout -> {
+                (this as ItemMailboxMenuDrawerBinding).displayMenuDrawerMailbox(mailbox, isCurrentMailbox)
+            }
+            DisplayType.INVALID_MAILBOX.layout -> (this as ItemInvalidMailboxBinding).displayInvalidMailbox(mailbox)
+            else -> (this as ItemSimpleMailboxBinding).displaySimpleMailbox(mailbox, isCurrentMailbox)
+        }
+    }
+
+    private fun ItemSimpleMailboxBinding.displaySimpleMailbox(mailbox: Mailbox, isCurrentMailbox: Boolean) = with(root) {
         text = mailbox.email
 
-        if (isInMenuDrawer) badge = mailbox.unreadCountDisplay.count else itemStyle = SelectionStyle.ACCOUNT
-        isPastilleDisplayed = mailbox.unreadCountDisplay.shouldDisplayPastille
-        isPasswordOutdated = !mailbox.isPasswordValid
-        isMailboxLocked = mailbox.isLocked
-        hasValidMailbox = hasValidMailboxes
+        setSelectedState(isCurrentMailbox)
 
-        holder.binding.root.setSelectedState(isCurrentMailbox)
-
-        if (!isCurrentMailbox || !hasValidMailboxes) {
+        if (!isCurrentMailbox) {
             setOnClickListener {
-                if (isInMenuDrawer) {
-                    context.trackMenuDrawerEvent(SWITCH_MAILBOX_NAME)
-                } else {
-                    context.trackAccountEvent(SWITCH_MAILBOX_NAME)
-                }
+                context.trackAccountEvent(SWITCH_MAILBOX_NAME)
 
                 lifecycleScope.launch(ioDispatcher) {
                     AccountUtils.switchToMailbox(mailbox.mailboxId)
                 }
             }
+        }
+    }
 
-            setOnOutdatedPasswordClickListener { onInvalidPasswordMailboxClicked?.invoke(mailbox) }
-            setOnLockedMailboxClickListener { onLockedMailboxClicked?.invoke(mailbox.email) }
+    private fun ItemMailboxMenuDrawerBinding.displayMenuDrawerMailbox(mailbox: Mailbox, isCurrentMailbox: Boolean) = with(root) {
+        text = mailbox.email
+        unreadCount = mailbox.unreadCountDisplay.count
+        isPastilleDisplayed = mailbox.unreadCountDisplay.shouldDisplayPastille
+
+        if (!isCurrentMailbox) {
+            setOnClickListener {
+                context.trackMenuDrawerEvent(SWITCH_MAILBOX_NAME)
+                lifecycleScope.launch(ioDispatcher) {
+                    AccountUtils.switchToMailbox(mailbox.mailboxId)
+                }
+            }
+        }
+    }
+
+    private fun ItemInvalidMailboxBinding.displayInvalidMailbox(mailbox: Mailbox) = with(root) {
+        text = mailbox.email
+
+        itemStyle = if (isInMenuDrawer) SelectionStyle.MENU_DRAWER else SelectionStyle.OTHER
+
+        isPasswordOutdated = !mailbox.isPasswordValid
+        isMailboxLocked = mailbox.isLocked
+        hasNoValidMailboxes = !hasValidMailboxes
+
+        computeEndIconVisibility()
+
+        setOnClickListener {
+            when {
+                isMailboxLocked -> onLockedMailboxClicked?.invoke(mailbox.email)
+                isPasswordOutdated -> onInvalidPasswordMailboxClicked?.invoke(mailbox)
+            }
+        }
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return when {
+            !mailboxes[position].isValid -> DisplayType.INVALID_MAILBOX.layout
+            isInMenuDrawer -> DisplayType.MENU_DRAWER_MAILBOX.layout
+            else -> DisplayType.SIMPLE_MAILBOX.layout
         }
     }
 
@@ -87,5 +136,11 @@ class MailboxesAdapter(
         notifyDataSetChanged()
     }
 
-    class SwitchMailboxesViewHolder(val binding: ItemSwitchMailboxBinding) : RecyclerView.ViewHolder(binding.root)
+    private enum class DisplayType(val layout: Int) {
+        INVALID_MAILBOX(R.layout.item_invalid_mailbox),
+        MENU_DRAWER_MAILBOX(R.layout.item_mailbox_menu_drawer),
+        SIMPLE_MAILBOX(R.layout.item_simple_mailbox),
+    }
+
+    class MailboxesViewHolder(val binding: ViewBinding) : RecyclerView.ViewHolder(binding.root)
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak ikMail - Android
-  ~ Copyright (C) 2022-2023 Infomaniak Network SA
+  ~ Copyright (C) 2023 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -18,15 +18,14 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/addressItemView"
     style="@style/MenuDrawerItem">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginStart="@dimen/marginStandardMedium"
-        android:layout_marginEnd="@dimen/marginStandardMedium"
-        android:gravity="center_vertical">
+        android:layout_marginHorizontal="@dimen/marginStandardMedium"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
         <TextView
             android:id="@+id/itemName"
@@ -38,8 +37,7 @@
             android:drawablePadding="@dimen/marginStandardMedium"
             android:ellipsize="end"
             android:gravity="start|center_vertical"
-            android:lineSpacingMultiplier="1"
-            android:lines="1"
+            android:maxLines="1"
             app:drawableStartCompat="@drawable/ic_folder"
             app:drawableTint="?android:attr/colorPrimary"
             tools:text="Folder (Default/Custom)" />
@@ -49,51 +47,21 @@
             android:layout_height="wrap_content">
 
             <TextView
-                android:id="@+id/itemBadge"
+                android:id="@+id/unreadCountChip"
                 style="@style/BodySmallMedium.Accent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/marginStandardSmall"
+                android:visibility="gone"
                 tools:text="42" />
 
             <ImageView
-                android:id="@+id/pastille"
+                android:id="@+id/endIcon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/marginStandardSmall"
-                android:contentDescription="@string/contentDescriptionUnreadPastille"
-                android:src="@drawable/ic_pastille"
                 android:visibility="gone"
-                app:tint="?android:attr/colorPrimary" />
-
-            <ImageView
-                android:id="@+id/checkmark"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/mediumIconSize"
-                android:layout_marginEnd="@dimen/marginStandardVerySmall"
-                android:contentDescription="@string/contentDescriptionIconFolderSelected"
-                android:src="@drawable/ic_check"
-                android:visibility="gone"
-                app:tint="?android:attr/colorPrimary" />
-
-            <ImageView
-                android:id="@+id/warning"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/mediumIconSize"
-                android:layout_marginEnd="@dimen/marginStandardVerySmall"
-                android:contentDescription="@string/contentDescriptionWarningIcon"
-                android:src="@drawable/ic_warning"
-                android:visibility="gone"
-                app:tint="@color/orangeWarning" />
-
-            <ImageView
-                android:id="@+id/chevron"
-                android:layout_width="@dimen/chevronSize"
-                android:layout_height="@dimen/chevronSize"
-                android:layout_marginEnd="@dimen/marginStandardVerySmall"
-                android:contentDescription="@string/contentDescriptionIconInvalidPassword"
-                android:src="@drawable/ic_chevron_right"
-                android:visibility="gone" />
+                tools:ignore="ContentDescription"
+                tools:src="@drawable/ic_pastille" />
         </FrameLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
