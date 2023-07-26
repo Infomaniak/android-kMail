@@ -48,7 +48,7 @@ class SignatureSettingViewModel @Inject constructor(
     lateinit var mailbox: Mailbox
         private set
 
-    var customRealm: Realm? = null
+    private var customRealm: Realm? = null
 
     fun init(mailboxObjectId: String) = liveData(ioDispatcher) {
         mailbox = MailboxController.getMailbox(mailboxObjectId)!!

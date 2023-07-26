@@ -34,7 +34,7 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.NotificationPayload
 import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior
-import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior.*
+import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior.NotificationType
 import com.infomaniak.mail.utils.NotificationUtils.showMessageNotification
 import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.getUids

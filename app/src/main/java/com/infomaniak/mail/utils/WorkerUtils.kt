@@ -36,7 +36,7 @@ object WorkerUtils {
     fun getWorkInfoLiveData(
         tag: String,
         workManager: WorkManager,
-        states: List<WorkInfo.State>
+        states: List<WorkInfo.State>,
     ): LiveData<MutableList<WorkInfo>> {
         val workQuery = WorkQuery.Builder.fromTags(listOf(tag)).addStates(states).build()
         return workManager.getWorkInfosLiveData(workQuery)

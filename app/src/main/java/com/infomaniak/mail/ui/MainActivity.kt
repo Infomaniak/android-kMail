@@ -136,7 +136,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun observeDraftWorkerResults() {
-        WorkerUtils.flushWorkersBefore(this, this) {
+        WorkerUtils.flushWorkersBefore(context = this, lifecycleOwner = this) {
             draftsActionsWorkerScheduler.getRunningWorkInfoLiveData().observe(this) {
                 it.forEach { workInfo ->
                     workInfo.progress.getString(DraftsActionsWorker.PROGRESS_DRAFT_ACTION_KEY)?.let { draftAction ->
