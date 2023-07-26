@@ -137,7 +137,7 @@ class FolderAdapter(
                 unreadCount = unread?.count ?: 0
                 isPastilleDisplayed = unread?.shouldDisplayPastille ?: false
                 canCollapse = folder.canCollapse
-                isCollapsed = !folder.isExpanded
+                isCollapsed = folder.isCollapsed
                 if (canCollapse) setOnCollapsableClickListener { onCollapseClicked?.invoke(folder.id, isCollapsed) }
                 computeFolderVisibility()
             }
@@ -199,7 +199,7 @@ class FolderAdapter(
                     oldFolder.path == newFolder.path &&
                     oldFolder.unreadCountDisplay == newFolder.unreadCountDisplay &&
                     oldFolder.threads.count() == newFolder.threads.count() &&
-                    oldFolder.isExpanded == newFolder.isExpanded
+                    oldFolder.isCollapsed == newFolder.isCollapsed
         }
     }
 }

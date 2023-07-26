@@ -19,15 +19,14 @@ package com.infomaniak.mail.views.decoratedTextItemView
 
 import android.content.Context
 import android.util.AttributeSet
-import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import com.infomaniak.mail.views.ExpandableItem
+import com.infomaniak.mail.views.CollapsableItem
 
 class MenuDrawerFolderItemView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : UnreadItemView(context, attrs, defStyleAttr), IndentableFolder, ExpandableItem {
+) : UnreadItemView(context, attrs, defStyleAttr), IndentableFolder, CollapsableItem {
 
     var canCollapse = false
         set(isCollapsable) {
@@ -48,10 +47,10 @@ class MenuDrawerFolderItemView @JvmOverloads constructor(
         }
 
     fun setOnCollapsableClickListener(onClickListener: OnClickListener?) {
-        binding.expandCustomFolderButton.setOnExpandableItemClickListener(onClickListener)
+        binding.expandCustomFolderButton.setOnCollapsableItemClickListener(onClickListener)
     }
 
     fun computeFolderVisibility() {
-        binding.root.isGone = !canCollapse && isCollapsed
+        binding.root.isVisible = canCollapse || !isCollapsed
     }
 }

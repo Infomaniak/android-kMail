@@ -24,12 +24,12 @@ import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.toggleChevron
 
-interface ExpandableItem {
+interface CollapsableItem {
 
     val binding: ViewBinding
     var isCollapsed: Boolean
 
-    fun View.setOnExpandableItemClickListener(listener: View.OnClickListener?) {
+    fun View.setOnCollapsableItemClickListener(listener: View.OnClickListener?) {
         setOnClickListener {
             isCollapsed = !isCollapsed
             toggleChevron(isCollapsed)

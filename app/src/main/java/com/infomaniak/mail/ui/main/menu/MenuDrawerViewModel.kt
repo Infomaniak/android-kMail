@@ -45,6 +45,6 @@ class MenuDrawerViewModel @Inject constructor(
     ).asLiveData(ioCoroutineContext)
 
     fun toggleFolderCollapsingState(folderId: String, shouldCollapse: Boolean) = viewModelScope.launch(ioCoroutineContext) {
-        FolderController.updateFolderAndChildren(folderId, mailboxContentRealm()) { it.isExpanded = !shouldCollapse }
+        FolderController.updateFolderAndChildren(folderId, mailboxContentRealm()) { it.isCollapsed = shouldCollapse }
     }
 }
