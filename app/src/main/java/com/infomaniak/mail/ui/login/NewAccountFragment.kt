@@ -31,7 +31,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.InfomaniakCore
-import com.infomaniak.lib.core.R
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.networking.HttpClient
@@ -42,6 +41,7 @@ import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.MatomoMail.trackUserInfo
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.databinding.FragmentNewAccountBinding
@@ -55,6 +55,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import com.infomaniak.lib.core.R as RCore
 
 @AndroidEntryPoint
 class NewAccountFragment : Fragment() {
@@ -81,7 +82,7 @@ class NewAccountFragment : Fragment() {
                     when {
                         translatedError?.isNotBlank() == true -> showError(translatedError)
                         authCode?.isNotBlank() == true -> authenticateUser(authCode)
-                        else -> showError(getString(R.string.anErrorHasOccurred))
+                        else -> showError(getString(RCore.string.anErrorHasOccurred))
                     }
                 } else {
                     enableConnectButtons()
@@ -100,6 +101,7 @@ class NewAccountFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
+        requireActivity().window.statusBarColor = context.getColor(R.color.backgroundColor)
 
         infomaniakLogin = context.getInfomaniakLogin()
 
@@ -165,28 +167,28 @@ class NewAccountFragment : Fragment() {
                 // }
             }
             is ApiResponse<*> -> withContext(mainDispatcher) { showError(getString(returnValue.translatedError)) }
-            else -> withContext(mainDispatcher) { showError(getString(R.string.anErrorHasOccurred)) }
+            else -> withContext(mainDispatcher) { showError(getString(RCore.string.anErrorHasOccurred)) }
         }
     }
 
     private fun onAuthenticateUserError(errorStatus: InfomaniakLogin.ErrorStatus) {
         val errorResId = when (errorStatus) {
-            InfomaniakLogin.ErrorStatus.SERVER -> R.string.serverError
-            InfomaniakLogin.ErrorStatus.CONNECTION -> R.string.connectionError
-            else -> R.string.anErrorHasOccurred
+            InfomaniakLogin.ErrorStatus.SERVER -> RCore.string.serverError
+            InfomaniakLogin.ErrorStatus.CONNECTION -> RCore.string.connectionError
+            else -> RCore.string.anErrorHasOccurred
         }
         showError(getString(errorResId))
     }
 
     companion object {
         suspend fun authenticateUser(context: Context, apiToken: ApiToken): Any {
-            if (AccountUtils.getUserById(apiToken.userId) != null) return getErrorResponse(R.string.errorUserAlreadyPresent)
+            if (AccountUtils.getUserById(apiToken.userId) != null) return getErrorResponse(RCore.string.errorUserAlreadyPresent)
 
             InfomaniakCore.bearerToken = apiToken.accessToken
             val userProfileResponse = ApiRepository.getUserProfile(HttpClient.okHttpClientNoTokenInterceptor)
 
             if (userProfileResponse.result == ApiResponse.Status.ERROR) return userProfileResponse
-            if (userProfileResponse.data == null) return getErrorResponse(R.string.anErrorHasOccurred)
+            if (userProfileResponse.data == null) return getErrorResponse(RCore.string.anErrorHasOccurred)
 
             val user = userProfileResponse.data!!.apply {
                 this.apiToken = apiToken
@@ -206,7 +208,7 @@ class NewAccountFragment : Fragment() {
 
                         return@let if (mailboxes.none { it.isValid }) Utils.MailboxErrorCode.NO_VALID_MAILBOX else user
                     } ?: run {
-                        getErrorResponse(R.string.serverError)
+                        getErrorResponse(RCore.string.serverError)
                     }
                 }
             }

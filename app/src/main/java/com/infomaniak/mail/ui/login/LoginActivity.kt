@@ -39,9 +39,7 @@ import com.infomaniak.mail.databinding.ActivityLoginBinding
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.Utils.MailboxErrorCode
-import com.infomaniak.mail.utils.getAttributeColor
 import dagger.hilt.android.AndroidEntryPoint
-import com.google.android.material.R as RMaterial
 import com.infomaniak.lib.core.R as RCore
 
 @AndroidEntryPoint
@@ -80,13 +78,6 @@ class LoginActivity : AppCompatActivity() {
 
     private fun onDestinationChanged(destination: NavDestination, arguments: Bundle?) {
         SentryDebug.addNavigationBreadcrumb(destination.displayName, arguments)
-
-        window.statusBarColor = if (destination.id == R.id.loginFragment) {
-            getAttributeColor(RMaterial.attr.colorContainer)
-        } else {
-            getColor(R.color.backgroundColor)
-        }
-
         trackDestination(destination)
     }
 
