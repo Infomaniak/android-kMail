@@ -29,10 +29,10 @@ interface CollapsableItem {
     val binding: ViewBinding
     var isCollapsed: Boolean
 
-    fun View.setOnCollapsableItemClickListener(listener: View.OnClickListener?) {
+    fun View.setOnCollapsableItemClickListener(listener: View.OnClickListener?, chevron: View = this) {
         setOnClickListener {
             isCollapsed = !isCollapsed
-            toggleChevron(isCollapsed)
+            chevron.toggleChevron(isCollapsed)
             listener?.onClick(binding.root)
         }
     }

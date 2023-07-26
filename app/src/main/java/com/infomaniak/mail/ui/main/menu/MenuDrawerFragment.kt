@@ -267,9 +267,9 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
         mailboxList.isGone = true
         mailboxExpandButton.rotation = ResourcesCompat.getFloat(resources, R.dimen.angleViewNotRotated)
         customFoldersLayout.isVisible = true
-        customFolders.setIsCollapsed(false)
+        customFolders.isCollapsed = false
         advancedActionsLayout.isGone = true
-        advancedActions.setIsCollapsed(true)
+        advancedActions.isCollapsed = true
     }
 
     private fun initNewFolderDialog() = createInputDialog(
