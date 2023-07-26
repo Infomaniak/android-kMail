@@ -165,7 +165,7 @@ class NewMessageViewModel @Inject constructor(
                     }
                 } else {
                     isNewMessage = true
-                    createDraft(draftMode, previousMessageUid, recipient, signatures, context) ?: return@writeBlocking false
+                    createDraft(draftMode, previousMessageUid, recipient, signatures) ?: return@writeBlocking false
                 }
 
                 if (draft.identityId.isNullOrBlank()) draft.addMissingSignatureData(realm = this)
@@ -239,7 +239,6 @@ class NewMessageViewModel @Inject constructor(
         previousMessageUid: String?,
         recipient: Recipient?,
         signatures: List<Signature>,
-        context: Context,
     ): Draft? {
         return Draft().apply {
 
@@ -258,7 +257,6 @@ class NewMessageViewModel @Inject constructor(
                                 draft = this,
                                 draftMode = draftMode,
                                 message = message,
-                                context = context,
                                 realm = this@createDraft,
                             )
                             if (!isSuccess) return null
