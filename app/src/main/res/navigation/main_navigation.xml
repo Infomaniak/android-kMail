@@ -550,15 +550,7 @@
         <argument
             android:name="position"
             app:argType="integer" />
-        <action
-            android:id="@+id/action_introFragment_to_newAccountFragment"
-            app:destination="@id/newAccountFragment" />
     </fragment>
-
-    <fragment
-        android:id="@+id/newAccountFragment"
-        android:name="com.infomaniak.mail.ui.login.NewAccountFragment"
-        android:label="NewAccountFragment" />
 
     <dialog
         android:id="@+id/downloadAttachmentProgressDialog"
