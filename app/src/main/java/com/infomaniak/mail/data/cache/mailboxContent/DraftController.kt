@@ -46,7 +46,10 @@ import org.jsoup.nodes.Element
 import org.jsoup.nodes.TextNode
 import javax.inject.Inject
 
-class DraftController @Inject constructor(private val mailboxContentRealm: RealmDatabase.MailboxContent) {
+class DraftController @Inject constructor(
+    private val mailboxContentRealm: RealmDatabase.MailboxContent,
+    private val appContext: Context,
+) {
 
     //region Get data
     fun getDraftsWithActions(realm: TypedRealm): RealmResults<Draft> {
@@ -78,7 +81,7 @@ class DraftController @Inject constructor(private val mailboxContentRealm: Realm
     //endregion
 
     //region Open Draft
-    fun setPreviousMessage(draft: Draft, draftMode: DraftMode, message: Message, context: Context, realm: MutableRealm): Boolean {
+    fun setPreviousMessage(draft: Draft, draftMode: DraftMode, message: Message, realm: MutableRealm): Boolean {
 
         var isSuccess = true
 
@@ -104,7 +107,7 @@ class DraftController @Inject constructor(private val mailboxContentRealm: Realm
                 draft.to = toList.toRealmList()
                 draft.cc = ccList.toRealmList()
 
-                draft.body += context.replyQuote(previousMessage)
+                draft.body += appContext.replyQuote(previousMessage)
             }
             DraftMode.FORWARD -> {
                 draft.forwardedUid = previousMessage.uid
@@ -116,7 +119,7 @@ class DraftController @Inject constructor(private val mailboxContentRealm: Realm
                     }
                 }
 
-                draft.body += context.forwardQuote(previousMessage, draft.attachments)
+                draft.body += appContext.forwardQuote(previousMessage, draft.attachments)
             }
             DraftMode.NEW_MAIL -> Unit
         }
@@ -127,7 +130,7 @@ class DraftController @Inject constructor(private val mailboxContentRealm: Realm
     private fun Context.replyQuote(message: Message): String {
 
         val date = message.date.toDate()
-        val from = message.fromName(context = this)
+        val from = message.fromName()
         val messageReplyHeader = getString(R.string.messageReplyHeader, date, from)
 
         val previousBody = getHtmlDocument(message)?.let { document ->
@@ -186,7 +189,7 @@ class DraftController @Inject constructor(private val mailboxContentRealm: Realm
         return """
             <div class="${MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME}">
             <div>---------- $messageForwardHeader ---------<br></div>
-            <div>$fromTitle ${message.fromName(context = this)}<br></div>
+            <div>$fromTitle ${message.fromName()}<br></div>
             <div>$dateTitle ${message.date.toDate()}<br></div>
             <div>$subjectTitle ${message.subject}<br></div>
             <div>$toTitle ${message.to.joinToString { it.quotedDisplay() }}<br></div>
@@ -206,8 +209,8 @@ class DraftController @Inject constructor(private val mailboxContentRealm: Realm
         select(CID_IMAGE_CSS_QUERY).forEach { imageElement -> actionOnImage(imageElement) }
     }
 
-    private fun Message.fromName(context: Context): String {
-        return from.firstOrNull()?.quotedDisplay() ?: context.getString(R.string.unknownRecipientTitle)
+    private fun Message.fromName(): String {
+        return from.firstOrNull()?.quotedDisplay() ?: appContext.getString(R.string.unknownRecipientTitle)
     }
 
     private fun Recipient.quotedDisplay(): String = "${("$name ").ifBlank { "" }}&lt;$email&gt;"
