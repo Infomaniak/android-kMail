@@ -20,8 +20,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    app:icon="@drawable/ic_folder"
     app:itemStyle="menuDrawer"
     app:textWeight="medium"
-    app:icon="@drawable/ic_folder"
     tools:badge="42"
     tools:text="Folder (Default/Custom)" />
