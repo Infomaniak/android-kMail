@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.login
 
+import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Build
@@ -24,37 +25,29 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.infomaniak.lib.core.R
-import com.infomaniak.lib.core.models.ApiResponse
-import com.infomaniak.lib.core.models.user.User
-import com.infomaniak.lib.core.networking.HttpClient
-import com.infomaniak.lib.core.utils.*
-import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
-import com.infomaniak.lib.login.ApiToken
-import com.infomaniak.lib.login.InfomaniakLogin
-import com.infomaniak.mail.BuildConfig
+import com.infomaniak.lib.core.utils.hideProgress
+import com.infomaniak.lib.core.utils.initProgress
+import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.lib.core.utils.showProgress
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.databinding.FragmentLoginBinding
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
-import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.Utils
+import com.infomaniak.mail.utils.LoginUtils
+import com.infomaniak.mail.utils.UiUtils
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -64,7 +57,7 @@ class LoginFragment : Fragment() {
     private val navigationArgs by lazy { LoginActivityArgs.fromBundle(requireActivity().intent.extras ?: bundleOf()) }
     private val introViewModel: IntroViewModel by activityViewModels()
 
-    private lateinit var infomaniakLogin: InfomaniakLogin
+    private val loginActivity by lazy { requireActivity() as LoginActivity }
 
     @Inject
     @IoDispatcher
@@ -74,24 +67,16 @@ class LoginFragment : Fragment() {
     @MainDispatcher
     lateinit var mainDispatcher: CoroutineDispatcher
 
-    private val webViewLoginResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
-        with(result) {
-            if (resultCode == AppCompatActivity.RESULT_OK) {
-                val authCode = data?.getStringExtra(InfomaniakLogin.CODE_TAG)
-                val translatedError = data?.getStringExtra(InfomaniakLogin.ERROR_TRANSLATED_TAG)
-                when {
-                    translatedError?.isNotBlank() == true -> showError(translatedError)
-                    authCode?.isNotBlank() == true -> authenticateUser(authCode)
-                    else -> showError(getString(R.string.anErrorHasOccurred))
-                }
-            } else {
-                enableConnectButtons()
-            }
-        }
-    }
+    @Inject
+    lateinit var loginUtils: LoginUtils
 
-    private val createAccountResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
-        result.handleCreateAccountActivityResult()
+    private lateinit var webViewLoginResultLauncher: ActivityResultLauncher<Intent>
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        webViewLoginResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
+            loginUtils.handleWebViewLoginResult(this, result, loginActivity.infomaniakLogin, ::onFailedLogin)
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -101,9 +86,12 @@ class LoginFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
-        infomaniakLogin = context.getInfomaniakLogin()
+        val introPagerAdapter = IntroPagerAdapter(
+            manager = childFragmentManager,
+            lifecycle = viewLifecycleOwner.lifecycle,
+            isFirstAccount = navigationArgs.isFirstAccount
+        )
 
-        val introPagerAdapter = IntroPagerAdapter(childFragmentManager, viewLifecycleOwner.lifecycle, navigationArgs.isFirstAccount)
         introViewpager.apply {
             adapter = introPagerAdapter
             registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
@@ -133,22 +121,13 @@ class LoginFragment : Fragment() {
             setOnClickListener {
                 signInButton.isEnabled = false
                 showProgress()
-                trackAccountEvent("openLoginWebview")
-                infomaniakLogin.startWebViewLogin(webViewLoginResultLauncher)
+                requireContext().trackAccountEvent("openLoginWebview")
+                loginActivity.infomaniakLogin.startWebViewLogin(webViewLoginResultLauncher)
             }
         }
 
         signInButton.setOnClickListener {
             safeNavigate(LoginFragmentDirections.actionLoginFragmentToNewAccountFragment())
-            // signInButton.isEnabled = false
-            // connectButton.isEnabled = false
-            // trackAccountEvent("openCreationWebview")
-            // infomaniakLogin.startCreateAccountWebView(
-            //     resultLauncher = createAccountResultLauncher,
-            //     createAccountUrl = BuildConfig.CREATE_ACCOUNT_URL,
-            //     successHost = BuildConfig.CREATE_ACCOUNT_SUCCESS_HOST,
-            //     cancelHost = BuildConfig.CREATE_ACCOUNT_CANCEL_HOST,
-            // )
         }
 
         introViewModel.updatedAccentColor.observe(viewLifecycleOwner) { (newAccentColor, oldAccentColor) ->
@@ -156,68 +135,9 @@ class LoginFragment : Fragment() {
         }
     }
 
-    private fun ActivityResult.handleCreateAccountActivityResult() {
-        if (resultCode == AppCompatActivity.RESULT_OK) {
-            val translatedError = data?.getStringExtra(InfomaniakLogin.ERROR_TRANSLATED_TAG)
-            when {
-                translatedError.isNullOrBlank() -> infomaniakLogin.startWebViewLogin(webViewLoginResultLauncher, false)
-                else -> showError(translatedError)
-            }
-        }
-        with(binding) {
-            connectButton.isEnabled = true
-            signInButton.isEnabled = true
-        }
-    }
-
     private fun updateUi(newAccentColor: AccentColor, oldAccentColor: AccentColor) {
         animatePrimaryColorElements(newAccentColor, oldAccentColor)
         animateSecondaryColorElements(newAccentColor, oldAccentColor)
-    }
-
-    private fun authenticateUser(authCode: String) = lifecycleScope.launch(ioDispatcher) {
-        infomaniakLogin.getToken(
-            okHttpClient = HttpClient.okHttpClientNoTokenInterceptor,
-            code = authCode,
-            onSuccess = ::onAuthenticateUserSuccess,
-            onError = ::onAuthenticateUserError,
-        )
-    }
-
-    private fun onAuthenticateUserSuccess(apiToken: ApiToken) = lifecycleScope.launch(ioDispatcher) {
-        when (val returnValue = LoginActivity.authenticateUser(requireContext(), apiToken)) {
-            is User -> {
-                trackAccountEvent("loggedIn")
-                AccountUtils.reloadApp?.invoke()
-            }
-            is Utils.MailboxErrorCode -> withContext(mainDispatcher) {
-                when (returnValue) {
-                    Utils.MailboxErrorCode.NO_MAILBOX -> launchNoMailboxActivity()
-                    Utils.MailboxErrorCode.NO_VALID_MAILBOX -> requireContext().launchNoValidMailboxesActivity()
-                }
-            }
-            is ApiResponse<*> -> withContext(mainDispatcher) { showError(getString(returnValue.translatedError)) }
-            else -> withContext(mainDispatcher) { showError(getString(R.string.anErrorHasOccurred)) }
-        }
-    }
-
-    private fun onAuthenticateUserError(errorStatus: InfomaniakLogin.ErrorStatus) {
-        val errorResId = when (errorStatus) {
-            InfomaniakLogin.ErrorStatus.SERVER -> R.string.serverError
-            InfomaniakLogin.ErrorStatus.CONNECTION -> R.string.connectionError
-            else -> R.string.anErrorHasOccurred
-        }
-        showError(getString(errorResId))
-    }
-
-    private fun showError(error: String) {
-        showSnackbar(error)
-        enableConnectButtons()
-    }
-
-    private fun enableConnectButtons() = with(binding) {
-        connectButton.hideProgress(R.string.connect)
-        signInButton.isEnabled = true
     }
 
     private fun animatePrimaryColorElements(newAccentColor: AccentColor, oldAccentColor: AccentColor) {
@@ -245,22 +165,18 @@ class LoginFragment : Fragment() {
         }
     }
 
-    private fun ViewPager2.removeOverScroll() {
-        (getChildAt(0) as? RecyclerView)?.overScrollMode = View.OVER_SCROLL_NEVER
+    private fun onFailedLogin() = with(binding) {
+        connectButton.hideProgress(R.string.connect)
+        signInButton.isEnabled = true
     }
 
-
-    private fun launchNoMailboxActivity() {
-        startActivity(Intent(context, NoMailboxActivity::class.java).clearStack())
+    private fun ViewPager2.removeOverScroll() {
+        (getChildAt(0) as? RecyclerView)?.overScrollMode = View.OVER_SCROLL_NEVER
     }
 
     fun getViewPagerCurrentItem(): Int = binding.introViewpager.currentItem
 
     fun goBackAPage() {
         binding.introViewpager.currentItem -= 1
-    }
-
-    private fun trackAccountEvent(name: String) {
-        requireContext().trackAccountEvent(name)
     }
 }
