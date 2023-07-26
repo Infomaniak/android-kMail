@@ -19,7 +19,6 @@ package com.infomaniak.mail.ui.main.menu
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.infomaniak.mail.MatomoMail.SWITCH_MAILBOX_NAME
@@ -34,18 +33,14 @@ import com.infomaniak.mail.ui.main.menu.MailboxesAdapter.MailboxesViewHolder
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.views.decoratedTextItemView.DecoratedTextItemView.SelectionStyle
 import com.infomaniak.mail.views.decoratedTextItemView.SelectableTextItemView
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class MailboxesAdapter(
     private val isInMenuDrawer: Boolean,
     private val hasValidMailboxes: Boolean,
-    private val lifecycleScope: LifecycleCoroutineScope,
+    private val onValidMailboxClicked: ((Int) -> Unit)? = null,
     private val onInvalidPasswordMailboxClicked: ((Mailbox) -> Unit)? = null,
     private val onLockedMailboxClicked: ((String) -> Unit)? = null,
     private var mailboxes: List<Mailbox> = emptyList(),
-    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO, // TODO: Inject with hilt
 ) : RecyclerView.Adapter<MailboxesViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MailboxesViewHolder {
@@ -97,10 +92,7 @@ class MailboxesAdapter(
         if (!isCurrentMailbox) {
             setOnClickListener {
                 trackerCallback()
-
-                lifecycleScope.launch(ioDispatcher) {
-                    AccountUtils.switchToMailbox(mailbox.mailboxId)
-                }
+                onValidMailboxClicked?.invoke(mailbox.mailboxId)
             }
         }
     }

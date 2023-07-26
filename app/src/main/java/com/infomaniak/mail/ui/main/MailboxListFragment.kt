@@ -18,11 +18,14 @@
 package com.infomaniak.mail.ui.main
 
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.ui.bottomSheetDialogs.LockedMailboxBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.menu.MailboxesAdapter
+import com.infomaniak.mail.utils.AccountUtils
+import kotlinx.coroutines.launch
 
 interface MailboxListFragment {
 
@@ -44,5 +47,9 @@ interface MailboxListFragment {
             args = InvalidPasswordFragmentArgs(mailbox.mailboxId, mailbox.objectId, mailbox.email).toBundle(),
             currentClassName = currentClassName,
         )
+    }
+
+    fun Fragment.onValidMailboxClicked(mailboxId: Int) {
+        lifecycleScope.launch { AccountUtils.switchToMailbox(mailboxId) }
     }
 }

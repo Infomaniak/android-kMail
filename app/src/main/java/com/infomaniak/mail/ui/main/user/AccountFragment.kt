@@ -58,7 +58,7 @@ class AccountFragment : Fragment(), MailboxListFragment {
     override val mailboxesAdapter = MailboxesAdapter(
         isInMenuDrawer = false,
         hasValidMailboxes = hasValidMailboxes,
-        lifecycleScope = lifecycleScope,
+        onValidMailboxClicked = { mailboxId -> onValidMailboxClicked(mailboxId) },
         onLockedMailboxClicked = { mailboxEmail -> onLockedMailboxClicked(mailboxEmail) },
         onInvalidPasswordMailboxClicked = { mailbox -> onInvalidPasswordMailboxClicked(mailbox) },
     )
