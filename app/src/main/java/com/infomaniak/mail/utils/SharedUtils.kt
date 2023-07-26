@@ -17,8 +17,7 @@
  */
 package com.infomaniak.mail.utils
 
-import android.content.Context
-import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
+import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
@@ -31,7 +30,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.kotlin.MutableRealm
 import io.sentry.Sentry
-import io.sentry.SentryLevel
+import kotlinx.serialization.encodeToString
 import javax.inject.Inject
 
 class SharedUtils @Inject constructor(
@@ -108,46 +107,12 @@ class SharedUtils @Inject constructor(
 
     companion object {
 
-        fun updateSignatures(mailbox: Mailbox, realm: MutableRealm, context: Context) {
+        fun MutableRealm.updateSignatures(mailbox: Mailbox) {
             with(ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName)) {
-
                 if (isSuccess()) {
-
-                    val defaultSignaturesCount = data?.signatures?.count { it.isDefault } ?: -1
-                    when {
-                        data == null -> Sentry.withScope { scope ->
-                            scope.level = SentryLevel.ERROR
-                            scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
-                            scope.setExtra("apiResponse", toString())
-                            scope.setExtra("status", result.name)
-                            scope.setExtra("errorCode", "${error?.code}")
-                            scope.setExtra("errorDescription", "${error?.description}")
-                            scope.setExtra("errorTranslated", context.getString(translateError()))
-                            Sentry.captureMessage("Signature: The call to get Signatures returned a `null` data")
-                        }
-                        data?.signatures?.isEmpty() == true -> Sentry.withScope { scope ->
-                            scope.level = SentryLevel.ERROR
-                            scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
-                            Sentry.captureMessage("Signature: This user doesn't have any Signature")
-                        }
-                        defaultSignaturesCount == 0 -> Sentry.withScope { scope ->
-                            scope.level = SentryLevel.ERROR
-                            scope.setExtra("signaturesCount", "${data?.signatures?.count()}")
-                            scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
-                            Sentry.captureMessage("Signature: This user has Signatures, but no default one")
-                        }
-                        defaultSignaturesCount > 1 -> Sentry.withScope { scope ->
-                            scope.level = SentryLevel.ERROR
-                            scope.setExtra("defaultSignaturesCount", "$defaultSignaturesCount")
-                            scope.setExtra("totalSignaturesCount", "${data?.signatures?.count()}")
-                            scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
-                            Sentry.captureMessage("Signature: This user has several default Signatures")
-                        }
-                    }
-
-                    SignatureController.update(data?.signatures ?: emptyList(), realm)
+                    SignatureController.update(data?.signatures ?: emptyList(), realm = this@updateSignatures)
                 } else {
-                    throwErrorAsException()
+                    Sentry.captureException(ApiErrorException(ApiController.json.encodeToString(value = this)))
                 }
             }
         }
