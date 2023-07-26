@@ -22,10 +22,11 @@ import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.utils.copyListToRealm
+import com.infomaniak.mail.utils.flatMapFolderChildren
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
-import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.notifications.ResultsChange
@@ -62,13 +63,15 @@ class FolderController @Inject constructor(private val mailboxContentRealm: Real
     //endregion
 
     fun update(remoteFolders: List<Folder>, realm: Realm) {
+        val remoteFoldersWithChildren = remoteFolders.flatMapFolderChildren()
+
         realm.writeBlocking {
 
             Log.d(RealmDatabase.TAG, "Folders: Delete outdated data")
-            deleteOutdatedFolders(remoteFolders)
+            deleteOutdatedFolders(remoteFoldersWithChildren)
 
             Log.d(RealmDatabase.TAG, "Folders: Save new data")
-            insertNewData(remoteFolders)
+            insertNewData(remoteFoldersWithChildren)
         }
     }
 
@@ -104,9 +107,9 @@ class FolderController @Inject constructor(private val mailboxContentRealm: Real
                     localFolder.isHistoryComplete,
                 )
             }
-
-            copyToRealm(remoteFolder, UpdatePolicy.ALL)
         }
+
+        copyListToRealm(remoteFolders)
     }
     //endregion
 
