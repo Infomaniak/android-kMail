@@ -17,8 +17,6 @@
  */
 package com.infomaniak.mail.ui.main.settings.mailbox
 
-import android.app.Application
-import android.content.Context
 import androidx.lifecycle.*
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
@@ -28,7 +26,7 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.SharedUtils
+import com.infomaniak.mail.utils.SharedUtils.Companion.updateSignatures
 import com.infomaniak.mail.utils.throwErrorAsException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.Realm
@@ -39,11 +37,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignatureSettingViewModel @Inject constructor(
-    application: Application,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-) : AndroidViewModel(application) {
-
-    private inline val context: Context get() = getApplication()
+) : ViewModel() {
 
     private val coroutineContext = viewModelScope.coroutineContext + ioDispatcher
 
@@ -69,7 +64,7 @@ class SignatureSettingViewModel @Inject constructor(
     }
 
     fun updateSignatures() = viewModelScope.launch(ioDispatcher) {
-        customRealm!!.writeBlocking { SharedUtils.updateSignatures(mailbox, this, context) }
+        customRealm!!.writeBlocking { updateSignatures(mailbox) }
     }
 
     override fun onCleared() {

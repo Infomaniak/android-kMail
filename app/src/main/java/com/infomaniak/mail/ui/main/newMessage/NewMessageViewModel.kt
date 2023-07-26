@@ -57,6 +57,7 @@ import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType
 import com.infomaniak.mail.ui.main.newMessage.NewMessageViewModel.SignatureScore.*
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
+import com.infomaniak.mail.utils.SharedUtils.Companion.updateSignatures
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
@@ -141,7 +142,7 @@ class NewMessageViewModel @Inject constructor(
         val isSuccess = realm.writeBlocking {
             runCatching {
 
-                fetchSignatures(mailbox)
+                updateSignatures(mailbox)
                 signatures = SignatureController.getAllSignatures(realm)
 
                 val isRecreated = activityCreationStatus == CreationStatus.RECREATED
@@ -189,10 +190,6 @@ class NewMessageViewModel @Inject constructor(
 
         emit(isSuccess to signatures)
         isInitSuccess.postValue(isSuccess)
-    }
-
-    private fun MutableRealm.fetchSignatures(mailbox: Mailbox) {
-        SharedUtils.updateSignatures(mailbox, realm = this, context)
     }
 
     /**
