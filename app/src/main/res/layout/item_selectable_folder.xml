@@ -15,11 +15,12 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<com.infomaniak.mail.views.SimpleMailboxItemView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.infomaniak.mail.views.decoratedTextItemView.SelectableFolderItemView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:icon="@drawable/ic_envelope"
+    app:icon="@drawable/ic_folder"
     app:itemStyle="other"
-    tools:text="myriam.rais@infomaniak.com" />
+    app:textWeight="regular"
+    tools:text="Folder (Default/Custom)" />

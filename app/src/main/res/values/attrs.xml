@@ -28,7 +28,6 @@
     <declare-styleable name="DecoratedTextItemView">
         <attr name="badge" format="integer" />
         <attr name="icon" />
-        <attr name="indent" format="dimension" />
         <attr name="itemStyle" format="enum">
             <enum name="menuDrawer" value="0" />
             <enum name="other" value="1" />

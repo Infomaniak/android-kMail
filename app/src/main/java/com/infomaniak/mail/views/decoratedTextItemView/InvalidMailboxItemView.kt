@@ -15,18 +15,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.views
+package com.infomaniak.mail.views.decoratedTextItemView
 
 import android.content.Context
 import android.util.AttributeSet
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.content.res.ResourcesCompat
 import com.infomaniak.mail.R
+import com.infomaniak.lib.core.R as RCore
 
 class InvalidMailboxItemView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
 ) : DecoratedTextItemView(context, attrs, defStyleAttr) {
+
+    override val endIconMarginRes: Int
+        get() = if (itemStyle == SelectionStyle.MENU_DRAWER) RCore.dimen.marginStandardSmall else ResourcesCompat.ID_NULL
 
     private val chevronIcon by lazy { AppCompatResources.getDrawable(context, R.drawable.ic_chevron_right) }
     private val warningIcon by lazy { AppCompatResources.getDrawable(context, R.drawable.ic_warning) }
@@ -45,9 +50,14 @@ class InvalidMailboxItemView @JvmOverloads constructor(
         setEndIcon(endIcon, contentDescription)
     }
 
-    override fun setOnClickListener(onClickListener: OnClickListener?) {
+    fun initSetOnClickListener(onLockedMailboxClicked: (() -> Unit)?, onInvalidPasswordMailboxClicked: (() -> Unit)?) {
         if (hasNoValidMailboxes && isMailboxLocked) return
 
-        binding.root.setOnClickListener(onClickListener)
+        super.setOnClickListener {
+            when {
+                isMailboxLocked -> onLockedMailboxClicked?.invoke()
+                isPasswordOutdated -> onInvalidPasswordMailboxClicked?.invoke()
+            }
+        }
     }
 }

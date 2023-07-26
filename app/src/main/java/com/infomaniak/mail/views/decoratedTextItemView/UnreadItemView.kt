@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.views
+package com.infomaniak.mail.views.decoratedTextItemView
 
 import android.content.Context
 import android.util.AttributeSet
@@ -24,17 +24,23 @@ import androidx.core.view.isVisible
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.UiUtils
+import com.infomaniak.mail.utils.getAttributeColor
+import com.google.android.material.R as RMaterial
 import com.infomaniak.lib.core.R as RCore
 
 abstract class UnreadItemView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : DecoratedTextItemView(context, attrs, defStyleAttr) {
+) : SelectableTextItemView(context, attrs, defStyleAttr) {
 
     override val endIconMarginRes = RCore.dimen.marginStandardSmall
 
-    private val pastille by lazy { AppCompatResources.getDrawable(context, R.drawable.ic_pastille) }
+    private val pastille by lazy {
+        AppCompatResources.getDrawable(context, R.drawable.ic_pastille)?.apply {
+            setTint(context.getAttributeColor(RMaterial.attr.colorPrimary))
+        }
+    }
 
     var unreadCount: Int = 0
         set(value) {

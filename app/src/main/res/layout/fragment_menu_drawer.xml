@@ -76,7 +76,7 @@
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/mailboxSwitcher"
-                style="@style/MenuDrawerItem">
+                style="@style/RoundedDecoratedTextItem">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -136,7 +136,7 @@
                 android:visibility="gone"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:itemCount="3"
-                tools:listitem="@layout/item_switch_mailbox"
+                tools:listitem="@layout/item_mailbox_menu_drawer"
                 tools:visibility="visible" />
 
             <com.google.android.material.divider.MaterialDivider
@@ -215,14 +215,14 @@
                 android:orientation="vertical"
                 android:visibility="gone">
 
-                <com.infomaniak.mail.views.SimpleMenuDrawerItemView
+                <com.infomaniak.mail.views.decoratedTextItemView.SimpleMenuDrawerItemView
                     android:id="@+id/importMails"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:icon="@drawable/ic_drawer_download"
                     app:text="@string/buttonImportEmails" />
 
-                <com.infomaniak.mail.views.SimpleMenuDrawerItemView
+                <com.infomaniak.mail.views.decoratedTextItemView.SimpleMenuDrawerItemView
                     android:id="@+id/restoreMails"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -236,14 +236,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
-            <com.infomaniak.mail.views.SimpleMenuDrawerItemView
+            <com.infomaniak.mail.views.decoratedTextItemView.SimpleMenuDrawerItemView
                 android:id="@+id/feedback"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:icon="@drawable/ic_feedback"
                 app:text="@string/buttonFeedback" />
 
-            <com.infomaniak.mail.views.SimpleMenuDrawerItemView
+            <com.infomaniak.mail.views.decoratedTextItemView.SimpleMenuDrawerItemView
                 android:id="@+id/help"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

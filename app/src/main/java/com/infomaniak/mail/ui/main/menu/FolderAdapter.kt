@@ -25,17 +25,18 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.infomaniak.lib.core.utils.context
+import androidx.viewbinding.ViewBinding
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.*
-import com.infomaniak.mail.databinding.ItemFolderMenuDrawerBinding
+import com.infomaniak.mail.databinding.*
 import com.infomaniak.mail.ui.main.menu.FolderAdapter.FolderViewHolder
 import com.infomaniak.mail.utils.UnreadDisplay
-import com.infomaniak.mail.views.MenuDrawerItemView.*
+import com.infomaniak.mail.views.decoratedTextItemView.MenuDrawerFolderItemView
+import com.infomaniak.mail.views.decoratedTextItemView.SelectableFolderItemView
+import com.infomaniak.mail.views.decoratedTextItemView.SelectableTextItemView
 import kotlin.math.min
-import com.infomaniak.lib.core.R as RCore
 
 class FolderAdapter(
     private val isInMenuDrawer: Boolean,
@@ -48,37 +49,61 @@ class FolderAdapter(
     private inline val folders get() = foldersDiffer.currentList
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FolderViewHolder {
-        return FolderViewHolder(ItemFolderMenuDrawerBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+        val layoutInflater = LayoutInflater.from(parent.context)
+        val binding = if (viewType == DisplayType.SELECTABLE_FOLDER.layout) {
+            ItemSelectableFolderBinding.inflate(layoutInflater, parent, false)
+        } else {
+            ItemFolderMenuDrawerBinding.inflate(layoutInflater, parent, false)
+        }
+
+        return FolderViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: FolderViewHolder, position: Int, payloads: MutableList<Any>) {
         if (payloads.firstOrNull() == Unit) {
             val folder = folders[position]
-            val isSelected = currentFolderId == folder.id
-            holder.binding.item.setSelectedState(isSelected)
+            if (getItemViewType(position) == DisplayType.SELECTABLE_FOLDER.layout) {
+                (holder.binding as ItemSelectableFolderBinding).root.setSelectedState(currentFolderId == folder.id)
+            }
         } else {
             super.onBindViewHolder(holder, position, payloads)
         }
     }
 
     override fun onBindViewHolder(holder: FolderViewHolder, position: Int) = with(holder.binding) {
-
         val folder = folders[position]
 
-        val folderName = folder.getLocalizedName(context)
+        when (getItemViewType(position)) {
+            DisplayType.SELECTABLE_FOLDER.layout -> (this as ItemSelectableFolderBinding).root.displayFolder(folder)
+            DisplayType.MENU_DRAWER.layout -> (this as ItemFolderMenuDrawerBinding).root.displayMenuDrawerFolder(folder)
+        }
+    }
 
+    override fun getItemViewType(position: Int): Int {
+        return if (isInMenuDrawer) DisplayType.MENU_DRAWER.layout else DisplayType.SELECTABLE_FOLDER.layout
+    }
+
+    override fun getItemCount() = folders.size
+
+    private fun MenuDrawerFolderItemView.displayMenuDrawerFolder(folder: Folder) {
         val unread = when (folder.role) {
             FolderRole.DRAFT -> UnreadDisplay(folder.threads.count())
             FolderRole.SENT, FolderRole.TRASH -> UnreadDisplay(0)
             else -> folder.unreadCountDisplay
         }
 
+        displayFolder(folder, unread)
+    }
+
+    private fun SelectableTextItemView.displayFolder(folder: Folder, unread: UnreadDisplay? = null) {
+        val folderName = folder.getLocalizedName(context)
+
         folder.role?.let {
             setFolderUi(folder.id, folderName, it.folderIconRes, unread, it.matomoValue)
         } ?: run {
             val indentLevel = folder.path.split(folder.separator).size - 1
             setFolderUi(
-                id = folder.id,
+                folderId = folder.id,
                 name = folderName,
                 iconId = if (folder.isFavorite) R.drawable.ic_folder_star else R.drawable.ic_folder,
                 unread = unread,
@@ -89,32 +114,31 @@ class FolderAdapter(
         }
     }
 
-    override fun getItemCount() = folders.size
-
-    private fun ItemFolderMenuDrawerBinding.setFolderUi(
-        id: String,
+    private fun SelectableTextItemView.setFolderUi(
+        folderId: String,
         name: String,
         @DrawableRes iconId: Int,
-        unread: UnreadDisplay,
+        unread: UnreadDisplay?,
         trackerName: String,
         trackerValue: Float? = null,
         folderIndent: Int? = null,
-    ) = with(item) {
-
+    ) {
         text = name
         icon = AppCompatResources.getDrawable(context, iconId)
-        indent = context.resources.getDimension(RCore.dimen.marginStandard).toInt() * (folderIndent ?: 0)
-        itemStyle = if (isInMenuDrawer) SelectionStyle.MENU_DRAWER else SelectionStyle.OTHER
-        textWeight = if (isInMenuDrawer) TextWeight.MEDIUM else TextWeight.REGULAR
+        setSelectedState(currentFolderId == folderId)
 
-        badge = if (isInMenuDrawer) unread.count else 0
-        isPastilleDisplayed = unread.shouldDisplayPastille
-
-        setSelectedState(currentFolderId == id)
+        when (this) {
+            is MenuDrawerFolderItemView -> {
+                indent = computeIndent(folderIndent)
+                unreadCount = unread?.count ?: 0
+                isPastilleDisplayed = unread?.shouldDisplayPastille ?: false
+            }
+            is SelectableFolderItemView -> indent = computeIndent(folderIndent)
+        }
 
         setOnClickListener {
             if (isInMenuDrawer) context.trackMenuDrawerEvent(trackerName, value = trackerValue)
-            onClick.invoke(id)
+            onClick.invoke(folderId)
         }
     }
 
@@ -136,11 +160,16 @@ class FolderAdapter(
         notifyItemChanged(position)
     }
 
+    private enum class DisplayType(val layout: Int) {
+        SELECTABLE_FOLDER(R.layout.item_selectable_folder),
+        MENU_DRAWER(R.layout.item_folder_menu_drawer),
+    }
+
     private companion object {
         const val MAX_SUB_FOLDERS_INDENT = 2
     }
 
-    class FolderViewHolder(val binding: ItemFolderMenuDrawerBinding) : RecyclerView.ViewHolder(binding.root)
+    class FolderViewHolder(val binding: ViewBinding) : RecyclerView.ViewHolder(binding.root)
 
     private class FolderDiffCallback : DiffUtil.ItemCallback<Folder>() {
         override fun areItemsTheSame(oldFolder: Folder, newFolder: Folder): Boolean {

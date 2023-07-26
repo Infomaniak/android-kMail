@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.views
+package com.infomaniak.mail.views.decoratedTextItemView
 
 import android.content.Context
 import android.graphics.drawable.Drawable
@@ -28,11 +28,9 @@ import androidx.core.content.res.getDimensionPixelSizeOrThrow
 import androidx.core.view.isGone
 import com.google.android.material.shape.ShapeAppearanceModel
 import com.infomaniak.lib.core.utils.getAttributes
-import com.infomaniak.lib.core.utils.setMargins
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewDecoratedTextItemBinding
-import com.infomaniak.lib.core.R as RCore
 
 abstract class DecoratedTextItemView @JvmOverloads constructor(
     context: Context,
@@ -42,7 +40,7 @@ abstract class DecoratedTextItemView @JvmOverloads constructor(
 
     val binding by lazy { ViewDecoratedTextItemBinding.inflate(LayoutInflater.from(context), this, true) }
 
-    open val endIconMarginRes: Int = RCore.dimen.marginStandardVerySmall
+    open val endIconMarginRes: Int = ResourcesCompat.ID_NULL
 
     private val regular by lazy { ResourcesCompat.getFont(context, com.infomaniak.lib.core.R.font.suisseintl_regular) }
     private val medium by lazy { ResourcesCompat.getFont(context, com.infomaniak.lib.core.R.font.suisseintl_medium) }
@@ -58,11 +56,14 @@ abstract class DecoratedTextItemView @JvmOverloads constructor(
             field = value
             if (value == SelectionStyle.MENU_DRAWER) {
                 binding.root.apply {
-                    context.obtainStyledAttributes(R.style.MenuDrawerItem, intArrayOf(android.R.attr.layout_marginStart)).let {
+                    context.obtainStyledAttributes(
+                        R.style.RoundedDecoratedTextItem,
+                        intArrayOf(android.R.attr.layout_marginStart)
+                    ).let {
                         setMarginsRelative(it.getDimensionPixelSizeOrThrow(0))
                         it.recycle()
                     }
-                    ShapeAppearanceModel.builder(context, 0, R.style.MenuDrawerItemShapeAppearance).build()
+                    ShapeAppearanceModel.builder(context, 0, R.style.RoundedDecoratedTextItemShapeAppearance).build()
                 }
             } else {
                 binding.root.apply {
@@ -103,7 +104,14 @@ abstract class DecoratedTextItemView @JvmOverloads constructor(
             isGone = icon == null
             setImageDrawable(icon)
             contentDescription = contentDescriptionRes?.let(context::getString)
-            setMargins(right = resources.getDimension(endIconMarginRes).toInt())
+
+            val endMargin = if (endIconMarginRes == ResourcesCompat.ID_NULL) {
+                ResourcesCompat.ID_NULL
+            } else {
+                resources.getDimension(endIconMarginRes)
+            }.toInt()
+
+            setMarginsRelative(end = endMargin)
         }
     }
 

@@ -31,7 +31,7 @@
         android:layout_marginStart="@dimen/marginStandardVerySmall"
         app:cardCornerRadius="@null"
         app:cardPreventCornerOverlap="false"
-        app:shapeAppearanceOverlay="@style/MenuDrawerItemShapeAppearance">
+        app:shapeAppearanceOverlay="@style/RoundedDecoratedTextItemShapeAppearance">
 
         <!-- This needs to be passed as the handle used for dragging cards around in the DragDropSwipeRecyclerview library -->
         <View
