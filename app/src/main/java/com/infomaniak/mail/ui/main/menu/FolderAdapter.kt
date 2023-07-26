@@ -37,6 +37,7 @@ import com.infomaniak.mail.views.decoratedTextItemView.MenuDrawerFolderItemView
 import com.infomaniak.mail.views.decoratedTextItemView.SelectableFolderItemView
 import com.infomaniak.mail.views.decoratedTextItemView.SelectableTextItemView
 import kotlin.math.min
+import com.infomaniak.lib.core.R as RCore
 
 class FolderAdapter(
     private val isInMenuDrawer: Boolean,
@@ -132,7 +133,7 @@ class FolderAdapter(
 
         when (this) {
             is MenuDrawerFolderItemView -> {
-                indent = computeStartMargin(folder) + computeIndent(context, folderIndent)
+                indent = computeStartMargin(folder) + computeIndent(folderIndent)
                 unreadCount = unread?.count ?: 0
                 isPastilleDisplayed = unread?.shouldDisplayPastille ?: false
                 canCollapse = folder.canCollapse
@@ -149,7 +150,7 @@ class FolderAdapter(
         }
     }
 
-    private fun FolderMenuDrawerItemView.computeStartMargin(folder: Folder): Int {
+    private fun MenuDrawerFolderItemView.computeStartMargin(folder: Folder): Int {
         // TODO: refactor this
         if (!hasCollabsableFolder) return resources.getDimension(RCore.dimen.marginStandardSmall).toInt()
 

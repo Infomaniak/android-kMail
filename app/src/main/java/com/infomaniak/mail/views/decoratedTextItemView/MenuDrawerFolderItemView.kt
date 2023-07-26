@@ -27,7 +27,7 @@ class MenuDrawerFolderItemView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : UnreadItemView(context, attrs, defStyleAttr), FolderItemView, ExpandableItem {
+) : UnreadItemView(context, attrs, defStyleAttr), IndentableFolder, ExpandableItem {
 
     var canCollapse = false
         set(isCollapsable) {
@@ -53,9 +53,5 @@ class MenuDrawerFolderItemView @JvmOverloads constructor(
 
     fun computeFolderVisibility() {
         binding.root.isGone = !canCollapse && isCollapsed
-    }
-
-    init {
-        attrs?.getIndentAttribute(context)
     }
 }
