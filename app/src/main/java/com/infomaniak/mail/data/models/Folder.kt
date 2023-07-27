@@ -93,7 +93,7 @@ class Folder : RealmObject {
         )
 
     val canCollapse: Boolean
-        get() = role == null && children.isNotEmpty() && !path.contains("/")
+        get() = role == null && children.isNotEmpty() && !path.contains(separator)
 
     fun initLocalValues(
         lastUpdatedAt: RealmInstant?,

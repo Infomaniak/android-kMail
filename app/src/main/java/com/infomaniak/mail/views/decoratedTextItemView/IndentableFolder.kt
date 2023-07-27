@@ -17,19 +17,31 @@
  */
 package com.infomaniak.mail.views.decoratedTextItemView
 
+import androidx.core.view.marginStart
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.setMarginsRelative
+import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewDecoratedTextItemBinding
 import com.infomaniak.lib.core.R as RCore
 
 interface IndentableFolder {
 
     val binding: ViewDecoratedTextItemBinding
-    var indent: Int
 
-    fun setIndent() = binding.itemName.setMarginsRelative(start = indent)
+    fun setIndent(indent: Int, hasCollapsableFolder: Boolean = false, folderCanCollapse: Boolean = false) {
+        val totalStartMargin = computeStartMargin(hasCollapsableFolder, folderCanCollapse) + computeIndent(indent)
+        binding.itemName.setMarginsRelative(start = totalStartMargin)
+    }
 
-    fun computeIndent(folderIndent: Int?): Int {
-        return binding.context.resources.getDimension(RCore.dimen.marginStandard).toInt() * (folderIndent ?: 0)
+    private fun computeIndent(indent: Int): Int {
+        return binding.context.resources.getDimension(RCore.dimen.marginStandard).toInt() * indent
+    }
+
+    private fun computeStartMargin(hasCollapsableFolder: Boolean, folderCanCollapse: Boolean): Int = with(binding) {
+        return if (hasCollapsableFolder && !folderCanCollapse) {
+            context.resources.getDimension(R.dimen.folderUncollapsableIndent).toInt()
+        } else {
+            itemName.marginStart
+        }
     }
 }

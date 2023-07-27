@@ -37,7 +37,6 @@ import com.infomaniak.mail.views.decoratedTextItemView.MenuDrawerFolderItemView
 import com.infomaniak.mail.views.decoratedTextItemView.SelectableFolderItemView
 import com.infomaniak.mail.views.decoratedTextItemView.SelectableTextItemView
 import kotlin.math.min
-import com.infomaniak.lib.core.R as RCore
 
 class FolderAdapter(
     private val isInMenuDrawer: Boolean,
@@ -125,37 +124,29 @@ class FolderAdapter(
         unread: UnreadDisplay?,
         trackerName: String,
         trackerValue: Float? = null,
-        folderIndent: Int? = null,
+        folderIndent: Int = 0,
     ) {
         text = name
         icon = AppCompatResources.getDrawable(context, iconId)
         setSelectedState(currentFolderId == folder.id)
 
         when (this) {
+            is SelectableFolderItemView -> setIndent(folderIndent)
             is MenuDrawerFolderItemView -> {
-                indent = computeStartMargin(folder) + computeIndent(folderIndent)
-                unreadCount = unread?.count ?: 0
                 isPastilleDisplayed = unread?.shouldDisplayPastille ?: false
+                unreadCount = unread?.count ?: 0
                 canCollapse = folder.canCollapse
                 isCollapsed = folder.isCollapsed
                 if (canCollapse) setOnCollapsableClickListener { onCollapseClicked?.invoke(folder.id, isCollapsed) }
                 computeFolderVisibility()
+                setIndent(folderIndent, hasCollabsableFolder, canCollapse)
             }
-            is SelectableFolderItemView -> indent = computeIndent(folderIndent)
         }
 
         setOnClickListener {
             if (isInMenuDrawer) context.trackMenuDrawerEvent(trackerName, value = trackerValue)
             onFolderClicked.invoke(folder.id)
         }
-    }
-
-    private fun MenuDrawerFolderItemView.computeStartMargin(folder: Folder): Int {
-        // TODO: refactor this
-        if (!hasCollabsableFolder) return resources.getDimension(RCore.dimen.marginStandardSmall).toInt()
-
-        val marginStart = if (folder.canCollapse) RCore.dimen.marginStandardSmall else R.dimen.folderUncollapsableIndent
-        return resources.getDimension(marginStart).toInt()
     }
 
     @SuppressLint("NotifyDataSetChanged")
