@@ -27,6 +27,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMo
 import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.kotlin.MutableRealm
 import io.sentry.Sentry
@@ -107,12 +108,14 @@ class SharedUtils @Inject constructor(
 
     companion object {
 
-        fun MutableRealm.updateSignatures(mailbox: Mailbox) {
+        fun MutableRealm.updateAndGetSignatures(mailbox: Mailbox): List<Signature>? {
             with(ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName)) {
-                if (isSuccess()) {
-                    SignatureController.update(data?.signatures ?: emptyList(), realm = this@updateSignatures)
+                if (isSuccess() && !data?.signatures.isNullOrEmpty()) {
+                    SignatureController.update(data!!.signatures, realm = this@updateAndGetSignatures)
+                    return data!!.signatures
                 } else {
                     Sentry.captureException(ApiErrorException(ApiController.json.encodeToString(value = this)))
+                    return null
                 }
             }
         }
