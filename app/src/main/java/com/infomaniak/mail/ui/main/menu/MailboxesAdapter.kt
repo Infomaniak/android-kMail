@@ -71,7 +71,7 @@ class MailboxesAdapter(
 
     private fun ItemSelectableMailboxBinding.displaySelectableMailbox(mailbox: Mailbox, isCurrentMailbox: Boolean) = with(root) {
         displayValidMailbox(mailbox, isCurrentMailbox) { context.trackAccountEvent(SWITCH_MAILBOX_NAME) }
-        setSelectedState(isCurrentMailbox, itemStyle, textWeight)
+        setSelectedState(isCurrentMailbox)
     }
 
 

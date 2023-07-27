@@ -33,10 +33,16 @@ interface UnreadableItem {
     var unreadCount: Int
     var isPastilleDisplayed: Boolean
 
-    fun getPastille(): Drawable? = with(binding) {
+    val pastille: Drawable?
+
+    fun initPastille(): Drawable? = with(binding) {
         return AppCompatResources.getDrawable(context, R.drawable.ic_pastille)?.apply {
             setTint(context.getAttributeColor(com.google.android.material.R.attr.colorPrimary))
         }
+    }
+
+    fun DecoratedTextItemView.setPastille() {
+        setEndIcon(if (isPastilleDisplayed) pastille else null, R.string.contentDescriptionUnreadPastille)
     }
 
     fun setUnreadBadge() {

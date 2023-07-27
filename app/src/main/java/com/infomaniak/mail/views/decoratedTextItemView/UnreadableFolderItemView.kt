@@ -23,12 +23,15 @@ import androidx.core.view.isVisible
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.toggleChevron
 import com.infomaniak.mail.views.CollapsableItem
+import com.infomaniak.lib.core.R as RCore
 
-class MenuDrawerFolderItemView @JvmOverloads constructor(
+class UnreadableFolderItemView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : UnreadItemView(context, attrs, defStyleAttr), IndentableFolder, CollapsableItem {
+) : FolderItemView(context, attrs, defStyleAttr), IndentableFolder, CollapsableItem, UnreadableItem {
+
+    override val endIconMarginRes = RCore.dimen.marginStandardSmall
 
     private var onCollapsedFolderClicked: OnClickListener? = null
 
@@ -52,6 +55,21 @@ class MenuDrawerFolderItemView @JvmOverloads constructor(
                 setOnCollapsableItemClickListener(if (canBeCollapsed) onCollapsedFolderClicked else null)
             }
         }
+
+    override val pastille by lazy(::initPastille)
+
+    override var unreadCount: Int = 0
+        set(value) {
+            field = value
+            setUnreadBadge()
+        }
+
+    override var isPastilleDisplayed = false
+        set(isDisplayed) {
+            field = isDisplayed
+            setPastille()
+        }
+
 
     fun setCollapsingButtonContentDescription(folderName: String) {
         val contentDescription = context.getString(R.string.contentDescriptionButtonExpandFolder, folderName)

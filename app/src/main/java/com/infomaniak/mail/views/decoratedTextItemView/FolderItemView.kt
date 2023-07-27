@@ -19,27 +19,9 @@ package com.infomaniak.mail.views.decoratedTextItemView
 
 import android.content.Context
 import android.util.AttributeSet
-import com.infomaniak.lib.core.R as RCore
 
-class UnreadableMailboxItemView @JvmOverloads constructor(
+abstract class FolderItemView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : MailboxItemView(context, attrs, defStyleAttr), UnreadableItem, SelectableItem {
-
-    override val endIconMarginRes = RCore.dimen.marginStandardSmall
-
-    override val pastille by lazy(::initPastille)
-
-    override var unreadCount: Int = 0
-        set(value) {
-            field = value
-            setUnreadBadge()
-        }
-
-    override var isPastilleDisplayed = false
-        set(isDisplayed) {
-            field = isDisplayed
-            setPastille()
-        }
-}
+) : DecoratedTextItemView(context, attrs, defStyleAttr), IndentableFolder, SelectableItem

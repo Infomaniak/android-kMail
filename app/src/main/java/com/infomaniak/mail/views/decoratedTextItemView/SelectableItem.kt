@@ -30,19 +30,18 @@ interface SelectableItem {
 
     val binding: ViewDecoratedTextItemBinding
 
-    fun DecoratedTextItemView.setSelectedState(isSelected: Boolean, itemStyle: SelectionStyle, textWeight: TextWeight) =
-        with(binding) {
-            val (color, textAppearance) = if (isSelected && itemStyle == SelectionStyle.MENU_DRAWER) {
-                context.getAttributeColor(com.google.android.material.R.attr.colorPrimaryContainer) to R.style.BodyMedium_Accent
-            } else {
-                android.graphics.Color.TRANSPARENT to if (textWeight == TextWeight.MEDIUM) R.style.BodyMedium else R.style.Body
-            }
-
-            root.setCardBackgroundColor(color)
-            itemName.setTextAppearance(textAppearance)
-
-            setEndIcon(if (isSelected) getCheckmarkIcon() else null, R.string.contentDescriptionSelectedItem)
+    fun DecoratedTextItemView.setSelectedState(isSelected: Boolean) = with(binding) {
+        val (color, textAppearance) = if (isSelected && itemStyle == SelectionStyle.MENU_DRAWER) {
+            context.getAttributeColor(com.google.android.material.R.attr.colorPrimaryContainer) to R.style.BodyMedium_Accent
+        } else {
+            android.graphics.Color.TRANSPARENT to if (textWeight == TextWeight.MEDIUM) R.style.BodyMedium else R.style.Body
         }
+
+        root.setCardBackgroundColor(color)
+        itemName.setTextAppearance(textAppearance)
+
+        setEndIcon(if (isSelected) getCheckmarkIcon() else null, R.string.contentDescriptionSelectedItem)
+    }
 
     fun getCheckmarkIcon(): Drawable? = with(binding) {
         return AppCompatResources.getDrawable(context, R.drawable.ic_check)?.apply {

@@ -151,7 +151,7 @@
                 android:overScrollMode="never"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:itemCount="5"
-                tools:listitem="@layout/item_folder_menu_drawer" />
+                tools:listitem="@layout/item_unreadable_folder" />
 
             <com.google.android.material.divider.MaterialDivider
                 style="@style/MenuDrawerDivider"
@@ -179,7 +179,7 @@
                     android:overScrollMode="never"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     tools:itemCount="2"
-                    tools:listitem="@layout/item_folder_menu_drawer" />
+                    tools:listitem="@layout/item_unreadable_folder" />
 
                 <TextView
                     android:id="@+id/noFolderText"

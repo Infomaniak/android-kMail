@@ -93,7 +93,7 @@
                     android:overScrollMode="never"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     tools:itemCount="4"
-                    tools:listitem="@layout/item_folder_menu_drawer" />
+                    tools:listitem="@layout/item_unreadable_folder" />
 
                 <com.google.android.material.divider.MaterialDivider
                     style="@style/MenuDrawerDivider"
@@ -108,7 +108,7 @@
                     android:overScrollMode="never"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     tools:itemCount="6"
-                    tools:listitem="@layout/item_folder_menu_drawer" />
+                    tools:listitem="@layout/item_unreadable_folder" />
 
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>

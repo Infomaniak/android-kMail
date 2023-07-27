@@ -33,9 +33,7 @@ import com.infomaniak.mail.data.models.Folder.*
 import com.infomaniak.mail.databinding.*
 import com.infomaniak.mail.ui.main.menu.FolderAdapter.FolderViewHolder
 import com.infomaniak.mail.utils.UnreadDisplay
-import com.infomaniak.mail.views.decoratedTextItemView.MenuDrawerFolderItemView
-import com.infomaniak.mail.views.decoratedTextItemView.SelectableFolderItemView
-import com.infomaniak.mail.views.decoratedTextItemView.SelectableTextItemView
+import com.infomaniak.mail.views.decoratedTextItemView.*
 import kotlin.math.min
 
 class FolderAdapter(
@@ -56,7 +54,7 @@ class FolderAdapter(
         val binding = if (viewType == DisplayType.SELECTABLE_FOLDER.layout) {
             ItemSelectableFolderBinding.inflate(layoutInflater, parent, false)
         } else {
-            ItemFolderMenuDrawerBinding.inflate(layoutInflater, parent, false)
+            ItemUnreadableFolderBinding.inflate(layoutInflater, parent, false)
         }
 
         return FolderViewHolder(binding)
@@ -66,7 +64,7 @@ class FolderAdapter(
         if (payloads.firstOrNull() == Unit) {
             val folder = folders[position]
             if (getItemViewType(position) == DisplayType.SELECTABLE_FOLDER.layout) {
-                (holder.binding as ItemSelectableFolderBinding).root.setSelectedState(currentFolderId == folder.id)
+                (holder.binding as ItemSelectableFolderBinding).root.apply { setSelectedState(currentFolderId == folder.id) }
             }
         } else {
             super.onBindViewHolder(holder, position, payloads)
@@ -78,7 +76,7 @@ class FolderAdapter(
 
         when (getItemViewType(position)) {
             DisplayType.SELECTABLE_FOLDER.layout -> (this as ItemSelectableFolderBinding).root.displayFolder(folder)
-            DisplayType.MENU_DRAWER.layout -> (this as ItemFolderMenuDrawerBinding).root.displayMenuDrawerFolder(folder)
+            DisplayType.MENU_DRAWER.layout -> (this as ItemUnreadableFolderBinding).root.displayMenuDrawerFolder(folder)
         }
     }
 
@@ -88,7 +86,7 @@ class FolderAdapter(
 
     override fun getItemCount() = folders.size
 
-    private fun MenuDrawerFolderItemView.displayMenuDrawerFolder(folder: Folder) {
+    private fun UnreadableFolderItemView.displayMenuDrawerFolder(folder: Folder) {
         val unread = when (folder.role) {
             FolderRole.DRAFT -> UnreadDisplay(folder.threads.count())
             FolderRole.SENT, FolderRole.TRASH -> UnreadDisplay(0)
@@ -98,7 +96,7 @@ class FolderAdapter(
         displayFolder(folder, unread)
     }
 
-    private fun SelectableTextItemView.displayFolder(folder: Folder, unread: UnreadDisplay? = null) {
+    private fun FolderItemView.displayFolder(folder: Folder, unread: UnreadDisplay? = null) {
         folder.role?.let {
             setFolderUi(folder, it.folderIconRes, unread, it.matomoValue)
         } ?: run {
@@ -114,7 +112,7 @@ class FolderAdapter(
         }
     }
 
-    private fun SelectableTextItemView.setFolderUi(
+    private fun FolderItemView.setFolderUi(
         folder: Folder,
         @DrawableRes iconId: Int,
         unread: UnreadDisplay?,
@@ -126,11 +124,11 @@ class FolderAdapter(
 
         text = folderName
         icon = AppCompatResources.getDrawable(context, iconId)
-        setSelectedState(currentFolderId == folder.id)
+        setSelectedState(isSelected = currentFolderId == folder.id)
 
         when (this) {
             is SelectableFolderItemView -> setIndent(folderIndent)
-            is MenuDrawerFolderItemView -> {
+            is UnreadableFolderItemView -> {
                 initOnCollapsableClickListener { onCollapseClicked?.invoke(folder.id, isCollapsed) }
                 isPastilleDisplayed = unread?.shouldDisplayPastille ?: false
                 unreadCount = unread?.count ?: 0
@@ -178,7 +176,7 @@ class FolderAdapter(
 
     private enum class DisplayType(val layout: Int) {
         SELECTABLE_FOLDER(R.layout.item_selectable_folder),
-        MENU_DRAWER(R.layout.item_folder_menu_drawer),
+        MENU_DRAWER(R.layout.item_unreadable_folder),
     }
 
     private companion object {
