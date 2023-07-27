@@ -52,7 +52,7 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.thread.SelectedThread
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.*
-import com.infomaniak.mail.ui.main.folder.ThreadListAdapter.ThreadViewHolder
+import com.infomaniak.mail.ui.main.folder.ThreadListAdapter.ThreadListViewHolder
 import com.infomaniak.mail.utils.*
 import kotlin.math.abs
 import com.google.android.material.R as RMaterial
@@ -66,7 +66,7 @@ class ThreadListAdapter(
     private var contacts: Map<String, Map<String, MergedContact>>,
     private val onSwipeFinished: () -> Unit,
     private val multiSelection: MultiSelectionListener<SelectedThread>? = null,
-) : DragDropSwipeAdapter<Any, ThreadViewHolder>(mutableListOf()), RealmChangesBinding.OnRealmChanged<Thread> {
+) : DragDropSwipeAdapter<Any, ThreadListViewHolder>(mutableListOf()), RealmChangesBinding.OnRealmChanged<Thread> {
 
     private lateinit var recyclerView: RecyclerView
 
@@ -95,7 +95,7 @@ class ThreadListAdapter(
         this.recyclerView = recyclerView
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ThreadViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ThreadListViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding = when (viewType) {
             R.layout.item_thread_date_separator -> ItemThreadDateSeparatorBinding.inflate(layoutInflater, parent, false)
@@ -105,10 +105,10 @@ class ThreadListAdapter(
             else -> CardviewThreadItemBinding.inflate(layoutInflater, parent, false)
         }
 
-        return ThreadViewHolder(binding)
+        return ThreadListViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: ThreadViewHolder, position: Int, payloads: MutableList<Any>) {
+    override fun onBindViewHolder(holder: ThreadListViewHolder, position: Int, payloads: MutableList<Any>) {
         val payload = payloads.firstOrNull()
         if (payload is NotificationType && holder.itemViewType == DisplayType.THREAD.layout) {
             val binding = holder.binding as CardviewThreadItemBinding
@@ -123,7 +123,7 @@ class ThreadListAdapter(
         }
     }
 
-    override fun onBindViewHolder(item: Any, viewHolder: ThreadViewHolder, position: Int) = with(viewHolder.binding) {
+    override fun onBindViewHolder(item: Any, viewHolder: ThreadListViewHolder, position: Int) = with(viewHolder.binding) {
         when (getItemViewType(position)) {
             DisplayType.THREAD.layout -> (this as CardviewThreadItemBinding).displayThread(item as Thread)
             DisplayType.DATE_SEPARATOR.layout -> (this as ItemThreadDateSeparatorBinding).displayDateSeparator(item as String)
@@ -305,7 +305,7 @@ class ThreadListAdapter(
         // seeAllText.text = "See all $threadsNumber"
     }
 
-    override fun onSwipeStarted(item: Any, viewHolder: ThreadViewHolder) {
+    override fun onSwipeStarted(item: Any, viewHolder: ThreadListViewHolder) {
         (item as Thread).updateDynamicIcons()
     }
 
@@ -345,7 +345,7 @@ class ThreadListAdapter(
 
     override fun onIsSwiping(
         item: Any?,
-        viewHolder: ThreadViewHolder,
+        viewHolder: ThreadListViewHolder,
         offsetX: Int,
         offsetY: Int,
         canvasUnder: Canvas?,
@@ -376,7 +376,7 @@ class ThreadListAdapter(
         return if (progress < SWIPE_ANIMATION_THRESHOLD) max * progress / SWIPE_ANIMATION_THRESHOLD else max
     }
 
-    override fun onSwipeAnimationFinished(viewHolder: ThreadViewHolder) {
+    override fun onSwipeAnimationFinished(viewHolder: ThreadListViewHolder) {
         viewHolder.isSwipedOverHalf = false
         onSwipeFinished()
         unblockOtherSwipes()
@@ -390,9 +390,9 @@ class ThreadListAdapter(
         swipingIsAuthorized = true
     }
 
-    override fun getViewHolder(itemView: View): ThreadViewHolder = ThreadViewHolder { itemView }
+    override fun getViewHolder(itemView: View): ThreadListViewHolder = ThreadListViewHolder { itemView }
 
-    override fun getViewToTouchToStartDraggingItem(item: Any, viewHolder: ThreadViewHolder, position: Int): View? {
+    override fun getViewToTouchToStartDraggingItem(item: Any, viewHolder: ThreadListViewHolder, position: Int): View? {
         return when (getItemViewType(position)) {
             DisplayType.THREAD.layout -> (viewHolder.binding as CardviewThreadItemBinding).goneHandle
             DisplayType.FLUSH_FOLDER_BUTTON.layout -> (viewHolder.binding as ItemThreadFlushFolderButtonBinding).goneHandle
@@ -401,7 +401,7 @@ class ThreadListAdapter(
         }
     }
 
-    override fun canBeSwiped(item: Any, viewHolder: ThreadViewHolder, position: Int): Boolean {
+    override fun canBeSwiped(item: Any, viewHolder: ThreadListViewHolder, position: Int): Boolean {
         return getItemViewType(position) == DisplayType.THREAD.layout && swipingIsAuthorized
     }
 
@@ -508,7 +508,7 @@ class ThreadListAdapter(
         }
     }
 
-    class ThreadViewHolder(val binding: ViewBinding) : ViewHolder(binding.root) {
+    class ThreadListViewHolder(val binding: ViewBinding) : ViewHolder(binding.root) {
         var isSwipedOverHalf = false
     }
 }
