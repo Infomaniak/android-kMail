@@ -141,6 +141,7 @@
     <string name="contentDescriptionButtonDeleteSignature">Unterschrift löschen</string>
     <string name="contentDescriptionButtonExpandAccountSelection">Kontoauswahl erweitern</string>
     <string name="contentDescriptionButtonExpandCustomFolders">Erweitern von benutzerdefinierten Ordnern</string>
+    <string name="contentDescriptionButtonExpandFolder">Ordner erweitern %s</string>
     <string name="contentDescriptionButtonExpandHeader">Kopfzeile erweitern</string>
     <string name="contentDescriptionButtonExpandRecipients">Siehe Details</string>
     <string name="contentDescriptionButtonFilterSearch">Suche filtern</string>

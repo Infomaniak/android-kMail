@@ -20,6 +20,7 @@ package com.infomaniak.mail.views.decoratedTextItemView
 import android.content.Context
 import android.util.AttributeSet
 import androidx.core.view.isVisible
+import com.infomaniak.mail.R
 import com.infomaniak.mail.views.CollapsableItem
 
 class MenuDrawerFolderItemView @JvmOverloads constructor(
@@ -44,6 +45,11 @@ class MenuDrawerFolderItemView @JvmOverloads constructor(
             field = value
             binding.collapseCustomFolderButton.rotateChevron()
         }
+
+    fun setCollapsingButtonContentDescription(folderName: String) {
+        val contentDescription = context.getString(R.string.contentDescriptionButtonExpandFolder, folderName)
+        binding.collapseCustomFolderButton.contentDescription = contentDescription
+    }
 
     fun initOnCollapsableClickListener(onClickListener: OnClickListener?) {
         onCollapsedFolderClicked = onClickListener

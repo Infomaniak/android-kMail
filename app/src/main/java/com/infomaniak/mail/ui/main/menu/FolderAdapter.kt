@@ -122,7 +122,9 @@ class FolderAdapter(
         trackerValue: Float? = null,
         folderIndent: Int = 0,
     ) {
-        text = folder.getLocalizedName(context)
+        val folderName = folder.getLocalizedName(context)
+
+        text = folderName
         icon = AppCompatResources.getDrawable(context, iconId)
         setSelectedState(currentFolderId == folder.id)
 
@@ -136,6 +138,7 @@ class FolderAdapter(
                 isCollapsed = folder.isCollapsed
                 computeFolderVisibility()
                 setIndent(folderIndent, hasCollabsableFolder, canCollapse)
+                setCollapsingButtonContentDescription(folderName)
             }
         }
 
