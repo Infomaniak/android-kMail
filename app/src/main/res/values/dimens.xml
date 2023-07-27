@@ -36,6 +36,7 @@
     <dimen name="standardIconSize">24dp</dimen>
     <dimen name="maxSearchChipWidth">300dp</dimen>
     <dimen name="contactPopupMaxWidth">300dp</dimen>
+    <dimen name="textButtonPrimaryHeight">56dp</dimen>
 
     <!-- Menu Drawer -->
 

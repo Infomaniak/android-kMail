@@ -50,7 +50,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/marginLarge"
-            android:text="Créez votre adresse mail gratuite à vie"
+            android:text="@string/newAccountTitle"
             android:textAlignment="center"
             app:layout_constraintBottom_toTopOf="@+id/chipStorageMailLayout"
             app:layout_constraintEnd_toEndOf="parent"
@@ -92,7 +92,7 @@
                 android:maxLines="2"
                 android:minHeight="0dp"
                 android:paddingHorizontal="@dimen/marginStandardSmall"
-                android:text="20 Go de stockage Mail" />
+                android:text="@string/newAccountStorageMail" />
 
         </FrameLayout>
 
@@ -119,7 +119,7 @@
                 android:maxLines="2"
                 android:minHeight="0dp"
                 android:paddingHorizontal="@dimen/marginStandardSmall"
-                android:text="15 Go de stockage kDrive" />
+                android:text="@string/newAccountStorageDrive" />
 
         </FrameLayout>
 
@@ -130,7 +130,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/marginStandard"
             android:layout_marginBottom="@dimen/marginStandard"
-            android:text="Communiquez et stockez vos documents et photos dans un écosystème sans publicité qui respecte votre vie privée."
+            android:text="@string/newAccountDescription"
             android:textAlignment="center"
             app:layout_constraintBottom_toTopOf="@+id/createNewAddressButton"
             app:layout_constraintEnd_toEndOf="parent"
@@ -145,11 +145,10 @@
             android:orientation="horizontal"
             app:layout_constraintGuide_percent="0.8" />
 
-        <!--TODO : 56dp in dimen-->
         <View
             android:id="@+id/dummyButton"
             android:layout_width="0dp"
-            android:layout_height="56dp"
+            android:layout_height="@dimen/textButtonPrimaryHeight"
             android:visibility="invisible"
             app:layout_constraintBottom_toTopOf="@id/createNewAddressButton"
             app:layout_constraintEnd_toEndOf="parent"
@@ -160,7 +159,7 @@
             android:id="@+id/createNewAddressButton"
             style="@style/TextButtonPrimary"
             android:layout_width="0dp"
-            android:text="Créer une adresse mail gratuite"
+            android:text="@string/buttonCreate"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

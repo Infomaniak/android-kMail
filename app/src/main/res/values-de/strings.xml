@@ -141,12 +141,14 @@
     <string name="contentDescriptionButtonDeleteSignature">Unterschrift löschen</string>
     <string name="contentDescriptionButtonExpandAccountSelection">Kontoauswahl erweitern</string>
     <string name="contentDescriptionButtonExpandCustomFolders">Erweitern von benutzerdefinierten Ordnern</string>
+    <string name="contentDescriptionButtonExpandFolder">Ordner erweitern %s</string>
     <string name="contentDescriptionButtonExpandHeader">Kopfzeile erweitern</string>
     <string name="contentDescriptionButtonExpandRecipients">Siehe Details</string>
     <string name="contentDescriptionButtonFilterSearch">Suche filtern</string>
     <string name="contentDescriptionButtonMenu">Menü</string>
     <string name="contentDescriptionButtonNext">Weiter</string>
     <string name="contentDescriptionButtonOpenSystemSettings">Öffnen Sie die Benachrichtigungseinstellungen des Systems</string>
+    <string name="contentDescriptionButtonSelectSignature">Wählen Sie eine andere Signatur</string>
     <string name="contentDescriptionButtonSettings">Einstellungen</string>
     <string name="contentDescriptionButtonShowPassword">Passwort anzeigen</string>
     <string name="contentDescriptionContactAlreadyUsed">Kontakt bereits als Empfänger verwendet</string>
@@ -241,6 +243,10 @@
         <item quantity="one">%d ausgewählt</item>
         <item quantity="other">%d ausgewählt</item>
     </plurals>
+    <string name="newAccountDescription">Kommunizieren und speichern Sie Ihre Dokumente und Fotos in einem werbefreien Ökosystem, das Ihre Privatsphäre respektiert</string>
+    <string name="newAccountStorageDrive">15 GB kDrive-Speicher</string>
+    <string name="newAccountStorageMail">20 GB Mail-Speicher</string>
+    <string name="newAccountTitle">Erstellen Sie Ihre lebenslange kostenlose E-Mail-Adresse</string>
     <string name="newFolderDialogHint">Name des Ordners</string>
     <string name="newFolderDialogMovePositiveButton">Erstellen und verschieben</string>
     <string name="newFolderDialogTitle">Neuer Ordner</string>

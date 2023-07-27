@@ -140,7 +140,7 @@
     </style>
 
     <style name="TextButtonPrimary" parent="Widget.Material3.Button">
-        <item name="android:layout_height">56dp</item>
+        <item name="android:layout_height">@dimen/textButtonPrimaryHeight</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:letterSpacing">0</item>
         <item name="android:maxWidth">500dp</item>
