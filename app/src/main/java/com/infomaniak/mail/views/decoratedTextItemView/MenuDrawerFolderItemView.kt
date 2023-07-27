@@ -31,17 +31,17 @@ class MenuDrawerFolderItemView @JvmOverloads constructor(
     var canCollapse = false
         set(value) {
             field = value
-            binding.expandCustomFolderButton.isVisible = value
+            binding.collapseCustomFolderButton.isVisible = value
         }
 
     override var isCollapsed = false
         set(value) {
             field = value
-            binding.expandCustomFolderButton.rotation = getRotation(isCollapsed)
+            binding.collapseCustomFolderButton.rotation = getRotation(isCollapsed)
         }
 
     fun setOnCollapsableClickListener(onClickListener: OnClickListener?) {
-        binding.expandCustomFolderButton.setOnCollapsableItemClickListener(onClickListener)
+        binding.collapseCustomFolderButton.setOnCollapsableItemClickListener(onClickListener)
     }
 
     fun computeFolderVisibility() {
