@@ -46,11 +46,12 @@ import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.data.LocalSettings.AccentColor
+import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.databinding.FragmentLoginBinding
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.Utils
+import com.infomaniak.mail.utils.Utils.MailboxErrorCode
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -187,12 +188,13 @@ class LoginFragment : Fragment() {
         when (val returnValue = LoginActivity.authenticateUser(requireContext(), apiToken)) {
             is User -> {
                 trackAccountEvent("loggedIn")
+                MailboxController.getFirstValidMailbox(returnValue.id)?.mailboxId?.let { AccountUtils.currentMailboxId = it }
                 AccountUtils.reloadApp?.invoke()
             }
-            is Utils.MailboxErrorCode -> withContext(mainDispatcher) {
+            is MailboxErrorCode -> withContext(mainDispatcher) {
                 when (returnValue) {
-                    Utils.MailboxErrorCode.NO_MAILBOX -> launchNoMailboxActivity()
-                    Utils.MailboxErrorCode.NO_VALID_MAILBOX -> requireContext().launchNoValidMailboxesActivity()
+                    MailboxErrorCode.NO_MAILBOX -> launchNoMailboxActivity()
+                    MailboxErrorCode.NO_VALID_MAILBOX -> requireContext().launchNoValidMailboxesActivity()
                 }
             }
             is ApiResponse<*> -> withContext(mainDispatcher) { showError(getString(returnValue.translatedError)) }
