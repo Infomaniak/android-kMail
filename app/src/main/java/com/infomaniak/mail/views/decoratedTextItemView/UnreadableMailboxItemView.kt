@@ -19,9 +19,25 @@ package com.infomaniak.mail.views.decoratedTextItemView
 
 import android.content.Context
 import android.util.AttributeSet
+import com.infomaniak.mail.R
 
-class SelectableMailboxItemView @JvmOverloads constructor(
+class UnreadableMailboxItemView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : MailboxItemView(context, attrs, defStyleAttr), SelectableItem
+) : MailboxItemView(context, attrs, defStyleAttr), UnreadableItem {
+
+    override val endIconMarginRes = com.infomaniak.lib.core.R.dimen.marginStandardSmall
+
+    override var unreadCount: Int = 0
+        set(value) {
+            field = value
+            setUnreadBadge()
+        }
+
+    override var isPastilleDisplayed = false
+        set(isDisplayed) {
+            field = isDisplayed
+            setEndIcon(if (isDisplayed) getPastille() else null, R.string.contentDescriptionUnreadPastille)
+        }
+}

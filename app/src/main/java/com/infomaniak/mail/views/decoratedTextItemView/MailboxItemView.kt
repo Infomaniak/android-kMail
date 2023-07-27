@@ -20,8 +20,8 @@ package com.infomaniak.mail.views.decoratedTextItemView
 import android.content.Context
 import android.util.AttributeSet
 
-class MenuDrawerMailboxItemView @JvmOverloads constructor(
+abstract class MailboxItemView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : UnreadItemView(context, attrs, defStyleAttr)
+) : DecoratedTextItemView(context, attrs, defStyleAttr)

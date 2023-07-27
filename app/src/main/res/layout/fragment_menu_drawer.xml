@@ -135,7 +135,7 @@
                 android:visibility="gone"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:itemCount="3"
-                tools:listitem="@layout/item_mailbox_menu_drawer"
+                tools:listitem="@layout/item_unreadable_mailbox"
                 tools:visibility="visible" />
 
             <com.google.android.material.divider.MaterialDivider

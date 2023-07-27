@@ -28,7 +28,7 @@ class InvalidMailboxItemView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : DecoratedTextItemView(context, attrs, defStyleAttr) {
+) : MailboxItemView(context, attrs, defStyleAttr) {
 
     override val endIconMarginRes: Int
         get() = if (itemStyle == SelectionStyle.MENU_DRAWER) RCore.dimen.marginStandardSmall else ResourcesCompat.ID_NULL
