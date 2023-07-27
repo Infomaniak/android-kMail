@@ -33,9 +33,7 @@ interface IndentableFolder {
         binding.itemName.setMarginsRelative(start = totalStartMargin)
     }
 
-    private fun computeIndent(indent: Int): Int {
-        return binding.context.resources.getDimension(RCore.dimen.marginStandard).toInt() * indent
-    }
+    private fun computeIndent(indent: Int) = binding.context.resources.getDimension(RCore.dimen.marginStandard).toInt() * indent
 
     private fun computeStartMargin(hasCollapsableFolder: Boolean, folderCanCollapse: Boolean): Int = with(binding) {
         return if (hasCollapsableFolder && !folderCanCollapse) {
