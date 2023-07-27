@@ -235,11 +235,12 @@ class LocalSettings private constructor(context: Context) {
 
     //region Firebase
     var firebaseToken: String?
-        get() = sharedPreferences.getString(FIREBASE_TOKEN_KEY, null)
+        get() = sharedPreferences.getString(FIREBASE_TOKEN_KEY, DEFAULT_FIREBASE_TOKEN)
         set(value) = sharedPreferences.transaction { putString(FIREBASE_TOKEN_KEY, value) }
 
     var firebaseRegisteredUsers: MutableSet<String>
-        get() = sharedPreferences.getStringSet(FIREBASE_REGISTERED_USERS_KEY, emptySet())!!.mapNotNull { it }.toMutableSet()
+        get() = sharedPreferences.getStringSet(FIREBASE_REGISTERED_USERS_KEY, DEFAULT_FIREBASE_REGISTERED_USERS)!!
+            .mapNotNull { it }.toMutableSet()
         private set(value) = sharedPreferences.transaction { putStringSet(FIREBASE_REGISTERED_USERS_KEY, value) }
 
     fun markUserAsRegisteredByFirebase(userId: Int) {
@@ -288,6 +289,8 @@ class LocalSettings private constructor(context: Context) {
         val DEFAULT_SWIPE_ACTION_LEFT = SwipeAction.DELETE
         private val DEFAULT_EXTERNAL_CONTENT = ExternalContent.ALWAYS
         private const val DEFAULT_RECENT_SEARCHES = "[]"
+        private val DEFAULT_FIREBASE_TOKEN = null
+        private val DEFAULT_FIREBASE_REGISTERED_USERS = emptySet<String>()
         //endregion
 
         //region Keys
