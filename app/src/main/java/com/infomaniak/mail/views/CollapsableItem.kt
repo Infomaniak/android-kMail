@@ -28,6 +28,7 @@ interface CollapsableItem {
 
     val binding: ViewBinding
     var isCollapsed: Boolean
+    var canCollapse: Boolean
 
     fun View.setOnCollapsableItemClickListener(listener: View.OnClickListener?, chevron: View = this) {
         setOnClickListener {
@@ -37,7 +38,11 @@ interface CollapsableItem {
         }
     }
 
-    fun getRotation(isCollapsed: Boolean): Float {
+    fun View.rotateChevron() {
+        rotation = getRotation(isCollapsed)
+    }
+
+    private fun getRotation(isCollapsed: Boolean): Float {
         val rotationAngle = if (isCollapsed) R.dimen.angleViewNotRotated else R.dimen.angleViewRotated
         return ResourcesCompat.getFloat(binding.context.resources, rotationAngle)
     }

@@ -35,9 +35,10 @@ class MenuDrawerDropdownView @JvmOverloads constructor(
 
     override val binding by lazy { ViewMenuDrawerDropdownBinding.inflate(LayoutInflater.from(context), this, true) }
 
+    override var canCollapse = false
     override var isCollapsed = false
         set(shouldCollapse) {
-            rotateButton()
+            binding.collapseCustomFoldersButton.rotateChevron()
             field = shouldCollapse
         }
 
@@ -51,17 +52,13 @@ class MenuDrawerDropdownView @JvmOverloads constructor(
                 actionButton.contentDescription = getString(R.styleable.MenuDrawerDropdownView_actionContentDescription)
             }
 
-            rotateButton()
+            collapseCustomFoldersButton.rotateChevron()
             setOnClickListener(null)
         }
     }
 
-    private fun rotateButton() {
-        binding.expandCustomFoldersButton.rotation = getRotation(isCollapsed)
-    }
-
     override fun setOnClickListener(listener: OnClickListener?) = with(binding) {
-        root.setOnCollapsableItemClickListener(listener, expandCustomFoldersButton)
+        root.setOnCollapsableItemClickListener(listener, collapseCustomFoldersButton)
     }
 
     fun setOnActionClickListener(listener: OnClickListener) {

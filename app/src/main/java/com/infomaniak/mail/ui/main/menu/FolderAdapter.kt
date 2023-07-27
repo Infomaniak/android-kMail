@@ -99,15 +99,12 @@ class FolderAdapter(
     }
 
     private fun SelectableTextItemView.displayFolder(folder: Folder, unread: UnreadDisplay? = null) {
-        val folderName = folder.getLocalizedName(context)
-
         folder.role?.let {
-            setFolderUi(folder, folderName, it.folderIconRes, unread, it.matomoValue)
+            setFolderUi(folder, it.folderIconRes, unread, it.matomoValue)
         } ?: run {
             val indentLevel = folder.path.split(folder.separator).size - 1
             setFolderUi(
                 folder = folder,
-                name = folderName,
                 iconId = if (folder.isFavorite) R.drawable.ic_folder_star else R.drawable.ic_folder,
                 unread = unread,
                 trackerName = "customFolder",
@@ -119,25 +116,24 @@ class FolderAdapter(
 
     private fun SelectableTextItemView.setFolderUi(
         folder: Folder,
-        name: String,
         @DrawableRes iconId: Int,
         unread: UnreadDisplay?,
         trackerName: String,
         trackerValue: Float? = null,
         folderIndent: Int = 0,
     ) {
-        text = name
+        text = folder.getLocalizedName(context)
         icon = AppCompatResources.getDrawable(context, iconId)
         setSelectedState(currentFolderId == folder.id)
 
         when (this) {
             is SelectableFolderItemView -> setIndent(folderIndent)
             is MenuDrawerFolderItemView -> {
+                initOnCollapsableClickListener { onCollapseClicked?.invoke(folder.id, isCollapsed) }
                 isPastilleDisplayed = unread?.shouldDisplayPastille ?: false
                 unreadCount = unread?.count ?: 0
                 canCollapse = folder.canCollapse
                 isCollapsed = folder.isCollapsed
-                if (canCollapse) setOnCollapsableClickListener { onCollapseClicked?.invoke(folder.id, isCollapsed) }
                 computeFolderVisibility()
                 setIndent(folderIndent, hasCollabsableFolder, canCollapse)
             }

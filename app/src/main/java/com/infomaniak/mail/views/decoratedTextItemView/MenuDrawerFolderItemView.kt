@@ -28,20 +28,25 @@ class MenuDrawerFolderItemView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : UnreadItemView(context, attrs, defStyleAttr), IndentableFolder, CollapsableItem {
 
-    var canCollapse = false
+    private var onCollapsedFolderClicked: OnClickListener? = null
+
+    override var canCollapse = false
         set(value) {
             field = value
-            binding.collapseCustomFolderButton.isVisible = value
+            binding.collapseCustomFolderButton.apply {
+                isVisible = value
+                setOnCollapsableItemClickListener(if (canCollapse) onCollapsedFolderClicked else null)
+            }
         }
 
     override var isCollapsed = false
         set(value) {
             field = value
-            binding.collapseCustomFolderButton.rotation = getRotation(isCollapsed)
+            binding.collapseCustomFolderButton.rotateChevron()
         }
 
-    fun setOnCollapsableClickListener(onClickListener: OnClickListener?) {
-        binding.collapseCustomFolderButton.setOnCollapsableItemClickListener(onClickListener)
+    fun initOnCollapsableClickListener(onClickListener: OnClickListener?) {
+        onCollapsedFolderClicked = onClickListener
     }
 
     fun computeFolderVisibility() {
