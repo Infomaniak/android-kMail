@@ -38,7 +38,7 @@ class MenuDrawerDropdownView @JvmOverloads constructor(
     override var canCollapse = false
     override var isCollapsed = false
         set(shouldCollapse) {
-            binding.collapseCustomFoldersButton.rotateChevron()
+            binding.collapseButton.rotateChevron()
             field = shouldCollapse
         }
 
@@ -52,13 +52,13 @@ class MenuDrawerDropdownView @JvmOverloads constructor(
                 actionButton.contentDescription = getString(R.styleable.MenuDrawerDropdownView_actionContentDescription)
             }
 
-            collapseCustomFoldersButton.rotateChevron()
+            collapseButton.rotateChevron()
             setOnClickListener(null)
         }
     }
 
     override fun setOnClickListener(listener: OnClickListener?) = with(binding) {
-        root.setOnCollapsableItemClickListener(listener, collapseCustomFoldersButton)
+        root.setOnCollapsableItemClickListener(listener, collapseButton)
     }
 
     fun setOnActionClickListener(listener: OnClickListener) {
