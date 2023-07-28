@@ -93,7 +93,7 @@ class NewAccountFragment : Fragment() {
 
         toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
 
-        selectDrawableAccordingToTheme()
+        selectIllustrationAccordingToTheme()
 
         loginUtils.initShowError(::showError)
 
@@ -109,7 +109,7 @@ class NewAccountFragment : Fragment() {
         }
     }
 
-    private fun selectDrawableAccordingToTheme() = with(binding) {
+    private fun selectIllustrationAccordingToTheme() = with(binding) {
         val drawableRes = when (introViewModel.updatedAccentColor.value?.first) {
             AccentColor.PINK -> R.drawable.new_account_illustration_pink
             AccentColor.BLUE -> R.drawable.new_account_illustration_blue
