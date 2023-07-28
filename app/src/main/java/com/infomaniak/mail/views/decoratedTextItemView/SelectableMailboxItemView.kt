@@ -24,4 +24,4 @@ class SelectableMailboxItemView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : MailboxItemView(context, attrs, defStyleAttr), SelectableItem
+) : MailboxItemView(context, attrs, defStyleAttr)

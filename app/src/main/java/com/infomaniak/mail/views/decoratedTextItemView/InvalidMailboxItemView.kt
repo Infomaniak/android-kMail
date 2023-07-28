@@ -30,6 +30,8 @@ class InvalidMailboxItemView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : MailboxItemView(context, attrs, defStyleAttr) {
 
+    override fun setSelectedState(isSelected: Boolean) = Unit
+
     override val endIconMarginRes: Int
         get() = if (itemStyle == SelectionStyle.MENU_DRAWER) RCore.dimen.marginStandardSmall else ResourcesCompat.ID_NULL
 

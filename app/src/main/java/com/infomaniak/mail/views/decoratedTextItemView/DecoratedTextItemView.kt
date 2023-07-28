@@ -23,14 +23,18 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.annotation.StringRes
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.content.res.getDimensionPixelSizeOrThrow
 import androidx.core.view.isGone
 import com.google.android.material.shape.ShapeAppearanceModel
+import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewDecoratedTextItemBinding
+import com.infomaniak.mail.utils.getAttributeColor
+import com.google.android.material.R as RMaterial
 
 abstract class DecoratedTextItemView @JvmOverloads constructor(
     context: Context,
@@ -41,6 +45,12 @@ abstract class DecoratedTextItemView @JvmOverloads constructor(
     val binding by lazy { ViewDecoratedTextItemBinding.inflate(LayoutInflater.from(context), this, true) }
 
     open val endIconMarginRes: Int = ResourcesCompat.ID_NULL
+
+    private val checkmark by lazy {
+        AppCompatResources.getDrawable(context, R.drawable.ic_check)?.apply {
+            setTint(context.getAttributeColor(RMaterial.attr.colorPrimary))
+        }
+    }
 
     private val regular by lazy { ResourcesCompat.getFont(context, com.infomaniak.lib.core.R.font.suisseintl_regular) }
     private val medium by lazy { ResourcesCompat.getFont(context, com.infomaniak.lib.core.R.font.suisseintl_medium) }
@@ -80,7 +90,7 @@ abstract class DecoratedTextItemView @JvmOverloads constructor(
             binding.itemName.text = value
         }
 
-    var textWeight = TextWeight.MEDIUM
+    private var textWeight = TextWeight.MEDIUM
         set(fontFamily) {
             field = fontFamily
             binding.itemName.typeface = if (fontFamily == TextWeight.MEDIUM) medium else regular
@@ -113,6 +123,19 @@ abstract class DecoratedTextItemView @JvmOverloads constructor(
 
             setMarginsRelative(end = endMargin)
         }
+    }
+
+    open fun setSelectedState(isSelected: Boolean) = with(binding) {
+        val (color, textAppearance) = if (isSelected && itemStyle == SelectionStyle.MENU_DRAWER) {
+            context.getAttributeColor(RMaterial.attr.colorPrimaryContainer) to R.style.BodyMedium_Accent
+        } else {
+            android.graphics.Color.TRANSPARENT to if (textWeight == TextWeight.MEDIUM) R.style.BodyMedium else R.style.Body
+        }
+
+        root.setCardBackgroundColor(color)
+        itemName.setTextAppearance(textAppearance)
+
+        setEndIcon(if (isSelected) checkmark else null, R.string.contentDescriptionSelectedItem)
     }
 
     enum class SelectionStyle {

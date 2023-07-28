@@ -25,7 +25,7 @@ class UnreadableMailboxItemView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : MailboxItemView(context, attrs, defStyleAttr), UnreadableItem, SelectableItem {
+) : MailboxItemView(context, attrs, defStyleAttr), UnreadableItem {
 
     override val endIconMarginRes = RCore.dimen.marginStandardSmall
 

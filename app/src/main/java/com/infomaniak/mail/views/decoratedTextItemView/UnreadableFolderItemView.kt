@@ -29,7 +29,7 @@ class UnreadableFolderItemView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : FolderItemView(context, attrs, defStyleAttr), IndentableFolder, CollapsableItem, UnreadableItem {
+) : FolderItemView(context, attrs, defStyleAttr), CollapsableItem, UnreadableItem {
 
     override val endIconMarginRes = RCore.dimen.marginStandardSmall
 

@@ -29,4 +29,6 @@ class SimpleMenuDrawerItemView @JvmOverloads constructor(
 ) : DecoratedTextItemView(context, attrs, defStyleAttr) {
 
     override fun setEndIcon(icon: Drawable?, @StringRes contentDescriptionRes: Int?) = Unit
+
+    override fun setSelectedState(isSelected: Boolean) = Unit
 }
