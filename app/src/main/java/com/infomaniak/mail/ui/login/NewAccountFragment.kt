@@ -27,6 +27,7 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -36,6 +37,7 @@ import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.databinding.FragmentNewAccountBinding
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
@@ -65,6 +67,10 @@ class NewAccountFragment : Fragment() {
 
     private lateinit var webViewLoginResultLauncher: ActivityResultLauncher<Intent>
 
+    private val createAccountResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
+        result.handleCreateAccountActivityResult()
+    }
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         webViewLoginResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
@@ -87,6 +93,8 @@ class NewAccountFragment : Fragment() {
 
         toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
 
+        selectDrawableAccordingToTheme()
+
         loginUtils.initShowError(::showError)
 
         createNewAddressButton.setOnClickListener {
@@ -101,8 +109,16 @@ class NewAccountFragment : Fragment() {
         }
     }
 
-    private val createAccountResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
-        result.handleCreateAccountActivityResult()
+    private fun selectDrawableAccordingToTheme() = with(binding) {
+        val drawableRes = when (introViewModel.updatedAccentColor.value?.first) {
+            AccentColor.PINK -> R.drawable.new_account_illustration_pink
+            AccentColor.BLUE -> R.drawable.new_account_illustration_blue
+            AccentColor.SYSTEM -> R.drawable.new_account_illustration_material
+            null -> null
+        }
+
+        val drawable = ResourcesCompat.getDrawable(resources, drawableRes!!, null)
+        binding.illustration.setImageDrawable(drawable)
     }
 
     private fun ActivityResult.handleCreateAccountActivityResult() {
