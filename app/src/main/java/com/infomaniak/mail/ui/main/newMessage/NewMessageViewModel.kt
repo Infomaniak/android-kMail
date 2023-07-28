@@ -270,12 +270,11 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private fun guessMostFittingSignature(message: Message, signatures: List<Signature>): Signature {
-        val signatureEmailsMap = mutableMapOf<String, MutableList<Signature>>()
         var defaultSignature: Signature? = null
 
-        signatures.forEach { signature ->
-            signatureEmailsMap.getOrPut(signature.senderEmail) { mutableListOf() }.add(signature)
+        val signatureEmailsMap = signatures.groupBy { signature ->
             if (signature.isDefault) defaultSignature = signature
+            signature.senderEmail
         }
 
         findSignatureInRecipients(message.to, signatureEmailsMap)?.let { return it }
@@ -287,7 +286,7 @@ class NewMessageViewModel @Inject constructor(
 
     private fun findSignatureInRecipients(
         recipients: RealmList<Recipient>,
-        signatureEmailsMap: MutableMap<String, MutableList<Signature>>,
+        signatureEmailsMap: Map<String, List<Signature>>,
     ): Signature? {
 
         val matchingEmailRecipients = recipients.filter { it.email in signatureEmailsMap }
@@ -314,7 +313,7 @@ class NewMessageViewModel @Inject constructor(
     /**
      * Only pass in Signatures that have the same email address as the Recipient
      */
-    private fun computeScore(recipient: Recipient, signatures: MutableList<Signature>): Pair<SignatureScore, Signature> {
+    private fun computeScore(recipient: Recipient, signatures: List<Signature>): Pair<SignatureScore, Signature> {
         var bestScore: SignatureScore = NO_MATCH
         var bestSignature: Signature? = null
 
