@@ -169,7 +169,7 @@ object RealmDatabase {
 
         const val USER_INFO_SCHEMA_VERSION = 1L
         const val MAILBOX_INFO_SCHEMA_VERSION = 1L
-        const val MAILBOX_CONTENT_SCHEMA_VERSION = 2L
+        const val MAILBOX_CONTENT_SCHEMA_VERSION = 3L
 
         fun userInfoDbName(userId: Int) = "User-${userId}.realm"
         fun mailboxContentDbNamePrefix(userId: Int) = "Mailbox-${userId}-"

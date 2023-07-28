@@ -40,6 +40,8 @@
     <!-- Menu Drawer -->
 
     <dimen name="decoratedTextItemViewHeight">48dp</dimen>
+    <dimen name="folderUncollapsableIndent">36dp</dimen>
+    <dimen name="folderCollapseButtonSize">28dp</dimen>
 
     <!-- Settings -->
     <dimen name="settingsSeparatorHorizontalPadding">16dp</dimen>

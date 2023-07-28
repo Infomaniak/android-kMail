@@ -143,6 +143,7 @@
     <string name="contentDescriptionButtonDeleteSignature">Supprimer la signature</string>
     <string name="contentDescriptionButtonExpandAccountSelection">Déplier la sélection de compte</string>
     <string name="contentDescriptionButtonExpandCustomFolders">Déplier les dossiers personnalisés</string>
+    <string name="contentDescriptionButtonExpandFolder">Déplier le dossier %s</string>
     <string name="contentDescriptionButtonExpandHeader">Déplier l’entête</string>
     <string name="contentDescriptionButtonExpandRecipients">Voir les détails</string>
     <string name="contentDescriptionButtonFilterSearch">Filtrer la recherche</string>

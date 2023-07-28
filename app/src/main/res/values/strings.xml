@@ -148,6 +148,7 @@
     <string name="contentDescriptionButtonDeleteSignature">Delete signature</string>
     <string name="contentDescriptionButtonExpandAccountSelection">Expand account selection</string>
     <string name="contentDescriptionButtonExpandCustomFolders">Expand custom folders</string>
+    <string name="contentDescriptionButtonExpandFolder">Expand folder %s</string>
     <string name="contentDescriptionButtonExpandHeader">Expand header</string>
     <string name="contentDescriptionButtonExpandRecipients">See details</string>
     <string name="contentDescriptionButtonFilterSearch">Filter search</string>

@@ -21,23 +21,26 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
-import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewMenuDrawerDropdownBinding
-import com.infomaniak.mail.utils.toggleChevron
+import com.infomaniak.mail.views.CollapsableItem
 
 class MenuDrawerDropdownView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : FrameLayout(context, attrs, defStyleAttr) {
+) : FrameLayout(context, attrs, defStyleAttr), CollapsableItem {
 
-    val binding by lazy { ViewMenuDrawerDropdownBinding.inflate(LayoutInflater.from(context), this, true) }
+    override val binding by lazy { ViewMenuDrawerDropdownBinding.inflate(LayoutInflater.from(context), this, true) }
 
-    var isCollapsed = false
-        private set
+    override var canCollapse = false
+    override var isCollapsed = false
+        set(shouldCollapse) {
+            binding.collapseCustomFoldersButton.rotateChevron()
+            field = shouldCollapse
+        }
 
     init {
         with(binding) {
@@ -49,27 +52,13 @@ class MenuDrawerDropdownView @JvmOverloads constructor(
                 actionButton.contentDescription = getString(R.styleable.MenuDrawerDropdownView_actionContentDescription)
             }
 
-            expandCustomFolderButton.rotation = getRotation(isCollapsed)
+            collapseCustomFoldersButton.rotateChevron()
             setOnClickListener(null)
         }
     }
 
-    fun setIsCollapsed(newState: Boolean) {
-        isCollapsed = newState
-        binding.expandCustomFolderButton.rotation = getRotation(isCollapsed)
-    }
-
-    private fun getRotation(isCollapsed: Boolean): Float = ResourcesCompat.getFloat(
-        context.resources,
-        if (isCollapsed) R.dimen.angleViewNotRotated else R.dimen.angleViewRotated
-    )
-
     override fun setOnClickListener(listener: OnClickListener?) = with(binding) {
-        root.setOnClickListener {
-            isCollapsed = !isCollapsed
-            expandCustomFolderButton.toggleChevron(isCollapsed)
-            listener?.onClick(root)
-        }
+        root.setOnCollapsableItemClickListener(listener, collapseCustomFoldersButton)
     }
 
     fun setOnActionClickListener(listener: OnClickListener) {

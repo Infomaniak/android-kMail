@@ -141,6 +141,7 @@
     <string name="contentDescriptionButtonDeleteSignature">Cancella la firma</string>
     <string name="contentDescriptionButtonExpandAccountSelection">Ampliare la selezione dei conti</string>
     <string name="contentDescriptionButtonExpandCustomFolders">Espandere le cartelle personalizzate</string>
+    <string name="contentDescriptionButtonExpandFolder">Espandi la cartella %s</string>
     <string name="contentDescriptionButtonExpandHeader">Espandi intestazione</string>
     <string name="contentDescriptionButtonExpandRecipients">Vedi dettagli</string>
     <string name="contentDescriptionButtonFilterSearch">Filtro di ricerca</string>

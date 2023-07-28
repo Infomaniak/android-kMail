@@ -90,6 +90,8 @@ class MoveFragment : MenuFoldersFragment() {
         findNavController().popBackStack()
     }
 
+    override fun onFolderCollapse(folderId: String, shouldCollapse: Boolean) = Unit
+
     private fun initNewFolderDialog() = with(navigationArgs) {
         createInputDialog(
             title = R.string.newFolderDialogTitle,
