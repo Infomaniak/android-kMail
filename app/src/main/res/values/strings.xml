@@ -368,6 +368,7 @@
     <string name="snackbarBlockUserConfirmation">Sender is now blocked</string>
     <string name="snackbarContactSaved">New contact successfully registered</string>
     <string name="snackbarDisplayProblemReported">Display problem reported</string>
+    <string name="snackbarDownloadInProgress">Download in progress…</string>
     <string name="snackbarDraftDeleted">Draft deleted</string>
     <string name="snackbarDraftSaved">Draft saved</string>
     <string name="snackbarDraftSaving">Saving draft</string>

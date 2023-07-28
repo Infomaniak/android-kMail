@@ -361,6 +361,7 @@
     <string name="snackbarBlockUserConfirmation">Il mittente è ora bloccato</string>
     <string name="snackbarContactSaved">Nuovo contatto registrato con successo</string>
     <string name="snackbarDisplayProblemReported">Problema di visualizzazione segnalato</string>
+    <string name="snackbarDownloadInProgress">Download in corso…</string>
     <string name="snackbarDraftDeleted">Bozza cancellata</string>
     <string name="snackbarDraftSaved">Bozza salvata</string>
     <string name="snackbarDraftSaving">Salvataggio della bozza</string>
