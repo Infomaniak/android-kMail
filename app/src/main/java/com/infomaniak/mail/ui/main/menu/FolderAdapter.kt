@@ -184,12 +184,15 @@ class FolderAdapter(
         }
 
         override fun areContentsTheSame(oldFolder: Folder, newFolder: Folder): Boolean {
+
+            val collapseIsTheSame = newFolder.canCollapse || oldFolder.isCollapsed == newFolder.isCollapsed
+
             return oldFolder.name == newFolder.name &&
                     oldFolder.isFavorite == newFolder.isFavorite &&
                     oldFolder.path == newFolder.path &&
                     oldFolder.unreadCountDisplay == newFolder.unreadCountDisplay &&
                     oldFolder.threads.count() == newFolder.threads.count() &&
-                    oldFolder.isCollapsed == newFolder.isCollapsed
+                    collapseIsTheSame
         }
     }
 }
