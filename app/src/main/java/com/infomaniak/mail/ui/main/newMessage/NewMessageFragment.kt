@@ -226,8 +226,14 @@ class NewMessageFragment : Fragment() {
         when (newMessageActivityArgs.draftMode) {
             DraftMode.REPLY,
             DraftMode.REPLY_ALL -> focusBodyField()
-            DraftMode.NEW_MAIL -> if (newMessageActivityArgs.recipient == null) focusToField() else focusBodyField()
             DraftMode.FORWARD -> focusToField()
+            DraftMode.NEW_MAIL -> {
+                if (newMessageActivityArgs.recipient == null && newMessageViewModel.draft.to.isEmpty()) {
+                    focusToField()
+                } else {
+                    focusBodyField()
+                }
+            }
         }
     }
 
