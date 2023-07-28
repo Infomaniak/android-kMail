@@ -1,5 +1,5 @@
 [versions]
-androidGradlePlugin = "8.1.0"
+androidGradlePlugin = "8.0.2"
 dotsindicator = "5.0"
 dragdropswipeRecyclerview = "1.1.1"
 firebaseMessagingKtx = "23.2.0"
