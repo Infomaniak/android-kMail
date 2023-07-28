@@ -49,7 +49,7 @@ class FolderAdapter(
 
     private inline val folders get() = foldersDiffer.currentList
 
-    private var hasCollabsableFolder = false
+    private var hasCollapsableFolder = false
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FolderViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -137,7 +137,7 @@ class FolderAdapter(
                 canCollapse = folder.canCollapse
                 isCollapsed = folder.isCollapsed
                 computeFolderVisibility()
-                setIndent(folderIndent, hasCollabsableFolder, canCollapse)
+                setIndent(folderIndent, hasCollapsableFolder, canCollapse)
                 setCollapsingButtonContentDescription(folderName)
             }
         }
@@ -152,7 +152,7 @@ class FolderAdapter(
     fun setFolders(newFolders: List<Folder>, newCurrentFolderId: String?) {
         currentFolderId = newCurrentFolderId
         foldersDiffer.submitList(newFolders)
-        hasCollabsableFolder = newFolders.any { it.canCollapse }
+        hasCollapsableFolder = newFolders.any { it.canCollapse }
     }
 
     fun updateSelectedState(newCurrentFolderId: String) {
@@ -184,12 +184,15 @@ class FolderAdapter(
         }
 
         override fun areContentsTheSame(oldFolder: Folder, newFolder: Folder): Boolean {
+
+            val collapseIsTheSame = newFolder.canCollapse || oldFolder.isCollapsed == newFolder.isCollapsed
+
             return oldFolder.name == newFolder.name &&
                     oldFolder.isFavorite == newFolder.isFavorite &&
                     oldFolder.path == newFolder.path &&
                     oldFolder.unreadCountDisplay == newFolder.unreadCountDisplay &&
                     oldFolder.threads.count() == newFolder.threads.count() &&
-                    oldFolder.isCollapsed == newFolder.isCollapsed
+                    collapseIsTheSame
         }
     }
 }

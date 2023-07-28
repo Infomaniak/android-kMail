@@ -21,6 +21,7 @@ import android.content.Context
 import android.util.AttributeSet
 import androidx.core.view.isVisible
 import com.infomaniak.mail.R
+import com.infomaniak.mail.utils.toggleChevron
 import com.infomaniak.mail.views.CollapsableItem
 
 class MenuDrawerFolderItemView @JvmOverloads constructor(
@@ -43,7 +44,7 @@ class MenuDrawerFolderItemView @JvmOverloads constructor(
     override var isCollapsed = false
         set(value) {
             field = value
-            binding.collapseCustomFolderButton.rotateChevron()
+            binding.collapseCustomFolderButton.toggleChevron(value)
         }
 
     fun setCollapsingButtonContentDescription(folderName: String) {
