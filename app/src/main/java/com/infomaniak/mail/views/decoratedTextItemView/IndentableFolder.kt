@@ -17,19 +17,35 @@
  */
 package com.infomaniak.mail.views.decoratedTextItemView
 
+import androidx.core.content.res.getDimensionPixelSizeOrThrow
+import androidx.core.view.marginEnd
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.setMarginsRelative
+import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewDecoratedTextItemBinding
 import com.infomaniak.lib.core.R as RCore
 
 interface IndentableFolder {
 
     val binding: ViewDecoratedTextItemBinding
-    var indent: Int
 
-    fun setIndent() = binding.itemName.setMarginsRelative(start = indent)
+    fun setIndent(indent: Int, hasCollapsableFolder: Boolean = false, folderCanCollapse: Boolean = false) {
+        val totalStartMargin = computeStartMargin(hasCollapsableFolder, folderCanCollapse) + computeIndent(indent)
+        binding.itemName.apply { setMarginsRelative(start = totalStartMargin, end = marginEnd) }
+    }
 
-    fun computeIndent(folderIndent: Int?): Int {
-        return binding.context.resources.getDimension(RCore.dimen.marginStandard).toInt() * (folderIndent ?: 0)
+    private fun computeIndent(indent: Int) = binding.context.resources.getDimension(RCore.dimen.marginStandard).toInt() * indent
+
+    private fun computeStartMargin(hasCollapsableFolder: Boolean, folderCanCollapse: Boolean): Int = with(binding.context) {
+        return if (hasCollapsableFolder && !folderCanCollapse) {
+            resources.getDimension(R.dimen.folderUncollapsableIndent).toInt()
+        } else {
+            obtainStyledAttributes(
+                R.style.RoundedDecoratedTextItem,
+                intArrayOf(android.R.attr.layout_marginStart),
+            ).let { attributes ->
+                attributes.getDimensionPixelSizeOrThrow(0).also { attributes.recycle() }
+            }
+        }
     }
 }

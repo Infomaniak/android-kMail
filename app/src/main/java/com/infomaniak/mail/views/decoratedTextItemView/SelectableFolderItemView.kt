@@ -24,11 +24,4 @@ class SelectableFolderItemView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : SelectableTextItemView(context, attrs, defStyleAttr), IndentableFolder {
-
-    override var indent = 0
-        set(value) {
-            field = value
-            setIndent()
-        }
-}
+) : SelectableTextItemView(context, attrs, defStyleAttr), IndentableFolder

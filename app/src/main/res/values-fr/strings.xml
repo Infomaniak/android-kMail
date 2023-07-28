@@ -372,6 +372,7 @@
     <string name="snackbarBlockUserConfirmation">L’expéditeur est maintenant bloqué</string>
     <string name="snackbarContactSaved">Nouveau contact enregistré avec succès</string>
     <string name="snackbarDisplayProblemReported">Problème d’affichage signalé</string>
+    <string name="snackbarDownloadInProgress">Téléchargement en cours…</string>
     <string name="snackbarDraftDeleted">Brouillon supprimé</string>
     <string name="snackbarDraftSaved">Brouillon enregistré</string>
     <string name="snackbarDraftSaving">Enregistrement du brouillon</string>

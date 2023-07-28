@@ -76,6 +76,8 @@ class Folder : RealmObject {
     var remainingOldMessagesToFetch: Int = DEFAULT_REMAINING_OLD_MESSAGES_TO_FETCH
     @Transient
     var isHistoryComplete: Boolean = DEFAULT_IS_HISTORY_COMPLETE
+    @Transient
+    var isCollapsed: Boolean = false
     //endregion
 
     private val _parents by backlinks(Folder::children)
@@ -90,6 +92,9 @@ class Folder : RealmObject {
             shouldDisplayPastille = unreadCountLocal == 0 && unreadCountRemote > 0,
         )
 
+    val canCollapse: Boolean
+        get() = role == null && children.isNotEmpty() && !path.contains(separator)
+
     fun initLocalValues(
         lastUpdatedAt: RealmInstant?,
         cursor: String?,
@@ -98,6 +103,7 @@ class Folder : RealmObject {
         messages: RealmList<Message>,
         remainingOldMessagesToFetch: Int,
         isHistoryComplete: Boolean,
+        isCollapsed: Boolean,
     ) {
         this.lastUpdatedAt = lastUpdatedAt
         this.cursor = cursor
@@ -106,6 +112,7 @@ class Folder : RealmObject {
         this.messages.addAll(messages)
         this.remainingOldMessagesToFetch = remainingOldMessagesToFetch
         this.isHistoryComplete = isHistoryComplete
+        this.isCollapsed = isCollapsed
     }
 
     fun getLocalizedName(context: Context): String {

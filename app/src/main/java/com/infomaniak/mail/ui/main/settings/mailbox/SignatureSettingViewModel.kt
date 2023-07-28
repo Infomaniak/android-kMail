@@ -26,7 +26,7 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.SharedUtils.Companion.updateSignatures
+import com.infomaniak.mail.utils.SharedUtils.Companion.updateAndGetSignatures
 import com.infomaniak.mail.utils.throwErrorAsException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.Realm
@@ -64,7 +64,7 @@ class SignatureSettingViewModel @Inject constructor(
     }
 
     fun updateSignatures() = viewModelScope.launch(ioDispatcher) {
-        customRealm!!.writeBlocking { updateSignatures(mailbox) }
+        customRealm!!.writeBlocking { updateAndGetSignatures(mailbox) }
     }
 
     override fun onCleared() {

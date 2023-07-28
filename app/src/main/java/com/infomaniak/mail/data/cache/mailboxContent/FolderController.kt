@@ -105,6 +105,7 @@ class FolderController @Inject constructor(private val mailboxContentRealm: Real
                     localFolder.messages,
                     localFolder.remainingOldMessagesToFetch,
                     localFolder.isHistoryComplete,
+                    localFolder.isCollapsed,
                 )
             }
         }
@@ -182,6 +183,21 @@ class FolderController @Inject constructor(private val mailboxContentRealm: Real
         //region Edit data
         fun updateFolder(id: String, realm: Realm, onUpdate: (folder: Folder) -> Unit) {
             realm.writeBlocking { getFolder(id, realm = this)?.let(onUpdate) }
+        }
+
+        fun updateFolderAndChildren(id: String, realm: Realm, onUpdate: (folder: Folder) -> Unit) {
+
+            tailrec fun updateChildrenRecursively(inputList: MutableList<Folder>) {
+                val folder = inputList.removeFirst()
+                onUpdate(folder)
+                inputList.addAll(folder.children)
+
+                if (inputList.isNotEmpty()) updateChildrenRecursively(inputList)
+            }
+
+            realm.writeBlocking {
+                getFolder(id, realm = this)?.let { folder -> updateChildrenRecursively(mutableListOf(folder)) }
+            }
         }
 
         fun refreshUnreadCount(id: String, mailboxObjectId: String, realm: MutableRealm) {

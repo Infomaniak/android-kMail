@@ -173,6 +173,10 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
         closeDrawer()
     }
 
+    override fun onFolderCollapse(folderId: String, shouldCollapse: Boolean) {
+        menuDrawerViewModel.toggleFolderCollapsingState(folderId, shouldCollapse)
+    }
+
     @SuppressLint("SetTextI18n")
     private fun displayVersion() {
         binding.appVersionName.text = "ikMail Android version ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
@@ -263,9 +267,9 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
         mailboxList.isGone = true
         mailboxExpandButton.rotation = ResourcesCompat.getFloat(resources, R.dimen.angleViewNotRotated)
         customFoldersLayout.isVisible = true
-        customFolders.setIsCollapsed(false)
+        customFolders.isCollapsed = false
         advancedActionsLayout.isGone = true
-        advancedActions.setIsCollapsed(true)
+        advancedActions.isCollapsed = true
     }
 
     private fun initNewFolderDialog() = createInputDialog(

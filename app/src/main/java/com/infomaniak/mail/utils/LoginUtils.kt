@@ -30,10 +30,12 @@ import com.infomaniak.lib.core.utils.clearStack
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
+import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.login.LoginActivity
 import com.infomaniak.mail.ui.login.NoMailboxActivity
+import com.infomaniak.mail.utils.Utils.MailboxErrorCode
 import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -86,12 +88,13 @@ class LoginUtils @Inject constructor(
             when (val returnValue = LoginActivity.authenticateUser(requireContext(), apiToken)) {
                 is User -> {
                     requireContext().trackAccountEvent("loggedIn")
+                    MailboxController.getFirstValidMailbox(returnValue.id)?.mailboxId?.let { AccountUtils.currentMailboxId = it }
                     AccountUtils.reloadApp?.invoke()
                 }
-                is Utils.MailboxErrorCode -> withContext(mainDispatcher) {
+                is MailboxErrorCode -> withContext(mainDispatcher) {
                     when (returnValue) {
-                        Utils.MailboxErrorCode.NO_MAILBOX -> launchNoMailboxActivity()
-                        Utils.MailboxErrorCode.NO_VALID_MAILBOX -> requireContext().launchNoValidMailboxesActivity()
+                        MailboxErrorCode.NO_MAILBOX -> launchNoMailboxActivity()
+                        MailboxErrorCode.NO_VALID_MAILBOX -> requireContext().launchNoValidMailboxesActivity()
                     }
                 }
                 is ApiResponse<*> -> withContext(mainDispatcher) {

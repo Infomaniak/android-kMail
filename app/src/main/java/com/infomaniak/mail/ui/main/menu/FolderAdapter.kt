@@ -41,12 +41,15 @@ import kotlin.math.min
 class FolderAdapter(
     private val isInMenuDrawer: Boolean,
     private var currentFolderId: String? = null,
-    private val onClick: (folderId: String) -> Unit,
+    private val onFolderClicked: (folderId: String) -> Unit,
+    private val onCollapseClicked: ((folderId: String, shouldCollapse: Boolean) -> Unit)? = null,
 ) : RecyclerView.Adapter<FolderViewHolder>() {
 
     private val foldersDiffer = AsyncListDiffer(this, FolderDiffCallback())
 
     private inline val folders get() = foldersDiffer.currentList
+
+    private var hasCollabsableFolder = false
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FolderViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -96,15 +99,12 @@ class FolderAdapter(
     }
 
     private fun SelectableTextItemView.displayFolder(folder: Folder, unread: UnreadDisplay? = null) {
-        val folderName = folder.getLocalizedName(context)
-
         folder.role?.let {
-            setFolderUi(folder.id, folderName, it.folderIconRes, unread, it.matomoValue)
+            setFolderUi(folder, it.folderIconRes, unread, it.matomoValue)
         } ?: run {
             val indentLevel = folder.path.split(folder.separator).size - 1
             setFolderUi(
-                folderId = folder.id,
-                name = folderName,
+                folder = folder,
                 iconId = if (folder.isFavorite) R.drawable.ic_folder_star else R.drawable.ic_folder,
                 unread = unread,
                 trackerName = "customFolder",
@@ -115,30 +115,36 @@ class FolderAdapter(
     }
 
     private fun SelectableTextItemView.setFolderUi(
-        folderId: String,
-        name: String,
+        folder: Folder,
         @DrawableRes iconId: Int,
         unread: UnreadDisplay?,
         trackerName: String,
         trackerValue: Float? = null,
-        folderIndent: Int? = null,
+        folderIndent: Int = 0,
     ) {
-        text = name
+        val folderName = folder.getLocalizedName(context)
+
+        text = folderName
         icon = AppCompatResources.getDrawable(context, iconId)
-        setSelectedState(currentFolderId == folderId)
+        setSelectedState(currentFolderId == folder.id)
 
         when (this) {
+            is SelectableFolderItemView -> setIndent(folderIndent)
             is MenuDrawerFolderItemView -> {
-                indent = computeIndent(folderIndent)
-                unreadCount = unread?.count ?: 0
+                initOnCollapsableClickListener { onCollapseClicked?.invoke(folder.id, isCollapsed) }
                 isPastilleDisplayed = unread?.shouldDisplayPastille ?: false
+                unreadCount = unread?.count ?: 0
+                canCollapse = folder.canCollapse
+                isCollapsed = folder.isCollapsed
+                computeFolderVisibility()
+                setIndent(folderIndent, hasCollabsableFolder, canCollapse)
+                setCollapsingButtonContentDescription(folderName)
             }
-            is SelectableFolderItemView -> indent = computeIndent(folderIndent)
         }
 
         setOnClickListener {
             if (isInMenuDrawer) context.trackMenuDrawerEvent(trackerName, value = trackerValue)
-            onClick.invoke(folderId)
+            onFolderClicked.invoke(folder.id)
         }
     }
 
@@ -146,6 +152,7 @@ class FolderAdapter(
     fun setFolders(newFolders: List<Folder>, newCurrentFolderId: String?) {
         currentFolderId = newCurrentFolderId
         foldersDiffer.submitList(newFolders)
+        hasCollabsableFolder = newFolders.any { it.canCollapse }
     }
 
     fun updateSelectedState(newCurrentFolderId: String) {
@@ -181,7 +188,8 @@ class FolderAdapter(
                     oldFolder.isFavorite == newFolder.isFavorite &&
                     oldFolder.path == newFolder.path &&
                     oldFolder.unreadCountDisplay == newFolder.unreadCountDisplay &&
-                    oldFolder.threads.count() == newFolder.threads.count()
+                    oldFolder.threads.count() == newFolder.threads.count() &&
+                    oldFolder.isCollapsed == newFolder.isCollapsed
         }
     }
 }

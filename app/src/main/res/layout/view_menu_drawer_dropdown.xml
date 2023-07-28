@@ -29,10 +29,10 @@
         tools:ignore="RtlSymmetry">
 
         <ImageView
-            android:id="@+id/expandCustomFolderButton"
+            android:id="@+id/collapseCustomFoldersButton"
             android:layout_width="@dimen/chevronSize"
             android:layout_height="@dimen/chevronSize"
-            android:layout_marginEnd="@dimen/alternativeMargin"
+            android:layout_marginEnd="@dimen/marginStandardMedium"
             android:contentDescription="@string/contentDescriptionButtonExpandCustomFolders"
             android:src="@drawable/ic_chevron_down"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -46,14 +46,14 @@
             style="@style/BodySmall"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/marginStandardSmall"
+            android:layout_marginEnd="@dimen/marginStandardSmall"
             android:layout_weight="1"
             android:paddingVertical="0dp"
             android:paddingStart="0dp"
             android:paddingEnd="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/actionButton"
-            app:layout_constraintStart_toEndOf="@id/expandCustomFolderButton"
+            app:layout_constraintStart_toEndOf="@id/collapseCustomFoldersButton"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="@string/buttonFolders" />
 

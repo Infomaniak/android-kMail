@@ -19,17 +19,43 @@ package com.infomaniak.mail.views.decoratedTextItemView
 
 import android.content.Context
 import android.util.AttributeSet
+import androidx.core.view.isVisible
+import com.infomaniak.mail.R
+import com.infomaniak.mail.views.CollapsableItem
 
 class MenuDrawerFolderItemView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : UnreadItemView(context, attrs, defStyleAttr), IndentableFolder {
+) : UnreadItemView(context, attrs, defStyleAttr), IndentableFolder, CollapsableItem {
 
-    override var indent = 0
+    private var onCollapsedFolderClicked: OnClickListener? = null
+
+    override var canCollapse = false
         set(value) {
             field = value
-            setIndent()
+            binding.collapseCustomFolderButton.apply {
+                isVisible = value
+                setOnCollapsableItemClickListener(if (canCollapse) onCollapsedFolderClicked else null)
+            }
         }
 
+    override var isCollapsed = false
+        set(value) {
+            field = value
+            binding.collapseCustomFolderButton.rotateChevron()
+        }
+
+    fun setCollapsingButtonContentDescription(folderName: String) {
+        val contentDescription = context.getString(R.string.contentDescriptionButtonExpandFolder, folderName)
+        binding.collapseCustomFolderButton.contentDescription = contentDescription
+    }
+
+    fun initOnCollapsableClickListener(onClickListener: OnClickListener?) {
+        onCollapsedFolderClicked = onClickListener
+    }
+
+    fun computeFolderVisibility() {
+        binding.root.isVisible = canCollapse || !isCollapsed
+    }
 }

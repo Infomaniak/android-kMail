@@ -366,6 +366,7 @@
     <string name="snackbarBlockUserConfirmation">El remitente está bloqueado</string>
     <string name="snackbarContactSaved">Nuevo contacto registrado correctamente</string>
     <string name="snackbarDisplayProblemReported">Problema de visualización notificado</string>
+    <string name="snackbarDownloadInProgress">Descarga en proceso…</string>
     <string name="snackbarDraftDeleted">Borrador suprimido</string>
     <string name="snackbarDraftSaved">Borrador guardado</string>
     <string name="snackbarDraftSaving">Guardando el borrador</string>
