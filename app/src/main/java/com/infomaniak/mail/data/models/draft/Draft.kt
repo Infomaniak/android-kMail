@@ -136,10 +136,10 @@ class Draft : RealmObject {
     }
 
     enum class DraftMode {
-        NEW_MAIL,
         REPLY,
         REPLY_ALL,
         FORWARD,
+        NEW_MAIL,
     }
 
     companion object {

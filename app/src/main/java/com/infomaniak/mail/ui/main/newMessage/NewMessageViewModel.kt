@@ -245,7 +245,6 @@ class NewMessageViewModel @Inject constructor(
             initSignature(realm = this@createDraft, addContent = !shouldPreselectSignature)
 
             when (draftMode) {
-                DraftMode.NEW_MAIL -> recipient?.let { to = realmListOf(it) }
                 DraftMode.REPLY, DraftMode.REPLY_ALL, DraftMode.FORWARD -> {
                     previousMessageUid
                         ?.let { uid -> MessageController.getMessage(uid, realm = this@createDraft) }
@@ -265,6 +264,7 @@ class NewMessageViewModel @Inject constructor(
                             }
                         }
                 }
+                DraftMode.NEW_MAIL -> recipient?.let { to = realmListOf(it) }
             }
         }
     }
