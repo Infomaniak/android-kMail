@@ -53,36 +53,36 @@
             android:layout_marginTop="@dimen/marginLarge"
             android:text="@string/newAccountTitle"
             android:textAlignment="center"
-            app:layout_constraintBottom_toTopOf="@+id/chipStorageMailLayout"
+            app:layout_constraintBottom_toTopOf="@+id/chipStorageMailLayoutHeightMeasure"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/illustration"
             app:layout_constraintWidth_max="400dp" />
 
         <View
-            android:id="@+id/chipHelper"
+            android:id="@+id/chipWidthHelper"
             android:layout_width="0dp"
             android:layout_height="1dp"
             android:visibility="invisible"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/chipStorageMailLayout"
+            app:layout_constraintTop_toTopOf="@id/chipStorageMailLayoutHeightMeasure"
             app:layout_constraintWidth_max="400dp" />
 
         <FrameLayout
-            android:id="@+id/chipStorageMailLayout"
+            android:id="@+id/chipStorageMailLayoutHeightMeasure"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/marginStandardSmall"
             android:layout_marginTop="@dimen/marginStandardSmall"
+            android:visibility="invisible"
             app:layout_constraintBottom_toTopOf="@id/description"
-            app:layout_constraintEnd_toStartOf="@id/chipStorageDriveLayout"
-            app:layout_constraintStart_toStartOf="@id/chipHelper"
-            app:layout_constraintTop_toBottomOf="@id/title"
-            app:layout_constraintWidth_max="200dp">
+            app:layout_constraintEnd_toStartOf="@id/chipStorageDriveLayoutHeightMeasure"
+            app:layout_constraintStart_toStartOf="@id/chipWidthHelper"
+            app:layout_constraintTop_toBottomOf="@id/title">
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/chipStorageMail"
+                android:id="@+id/chipStorageMailHeightMeasure"
                 style="@style/LabelMedium.Accent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -98,18 +98,18 @@
         </FrameLayout>
 
         <FrameLayout
-            android:id="@+id/chipStorageDriveLayout"
+            android:id="@+id/chipStorageDriveLayoutHeightMeasure"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/marginStandardSmall"
             android:layout_marginEnd="@dimen/marginStandardSmall"
-            app:layout_constraintEnd_toEndOf="@id/chipHelper"
-            app:layout_constraintStart_toEndOf="@id/chipStorageMailLayout"
-            app:layout_constraintTop_toBottomOf="@id/title"
-            app:layout_constraintWidth_max="200dp">
+            android:visibility="invisible"
+            app:layout_constraintEnd_toEndOf="@id/chipWidthHelper"
+            app:layout_constraintStart_toEndOf="@id/chipStorageMailLayoutHeightMeasure"
+            app:layout_constraintTop_toBottomOf="@id/title">
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/chipStorageDrive"
+                android:id="@+id/chipStorageDriveHeightMeasure"
                 style="@style/LabelMedium.Accent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -124,6 +124,64 @@
 
         </FrameLayout>
 
+        <FrameLayout
+            android:id="@+id/mailStorageLayout"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="@dimen/marginStandardSmall"
+            app:layout_constraintBottom_toBottomOf="@id/chipBottomBarrier"
+            app:layout_constraintEnd_toStartOf="@id/driveStorageLayout"
+            app:layout_constraintStart_toStartOf="@id/chipWidthHelper"
+            app:layout_constraintTop_toTopOf="@id/chipWidthHelper">
+
+            <!--If you want to update this string or button's style also change the same properties on chipStorageMailHeightMeasure-->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/mailStorageChip"
+                style="@style/LabelMedium.Accent"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:backgroundTint="?attr/colorPrimaryContainer"
+                android:clickable="false"
+                android:focusable="false"
+                android:paddingHorizontal="@dimen/marginStandardSmall"
+                android:text="@string/newAccountStorageMail" />
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/driveStorageLayout"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginEnd="@dimen/marginStandardSmall"
+            app:layout_constraintBottom_toBottomOf="@id/chipBottomBarrier"
+            app:layout_constraintEnd_toEndOf="@id/chipWidthHelper"
+            app:layout_constraintStart_toEndOf="@id/mailStorageLayout"
+            app:layout_constraintTop_toTopOf="@id/chipWidthHelper">
+
+            <!--If you want to update this string or button's style also change the same properties on chipStorageDriveHeightMeasure-->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/driveStorageChip"
+                style="@style/LabelMedium.Accent"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:backgroundTint="?attr/colorPrimaryContainer"
+                android:clickable="false"
+                android:focusable="false"
+                android:paddingHorizontal="@dimen/marginStandardSmall"
+                android:text="@string/newAccountStorageDrive" />
+
+        </FrameLayout>
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/chipBottomBarrier"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="chipStorageMailLayoutHeightMeasure,chipStorageDriveLayoutHeightMeasure" />
+
         <TextView
             android:id="@+id/description"
             style="@style/BodySmall.Secondary"
@@ -136,7 +194,7 @@
             app:layout_constraintBottom_toTopOf="@+id/createNewAddressButton"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/chipStorageMailLayout"
+            app:layout_constraintTop_toBottomOf="@id/chipStorageMailLayoutHeightMeasure"
             app:layout_constraintWidth_max="400dp" />
 
         <androidx.constraintlayout.widget.Guideline
