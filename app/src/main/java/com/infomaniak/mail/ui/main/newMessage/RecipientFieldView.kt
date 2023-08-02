@@ -197,7 +197,12 @@ class RecipientFieldView @JvmOverloads constructor(
         }
 
         singleChip.root.setOnClickListener {
-            showContactContextMenu(contactChipAdapter.getRecipients().first(), singleChip.root, true)
+            if (isSelfCollapsed) {
+                expand()
+                textInput.showKeyboard()
+            } else {
+                showContactContextMenu(contactChipAdapter.getRecipients().first(), singleChip.root, isForSingleChip = true)
+            }
         }
     }
 
