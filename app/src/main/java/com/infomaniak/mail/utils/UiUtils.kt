@@ -24,6 +24,7 @@ import android.graphics.Color
 import android.os.Build
 import android.widget.TextView
 import androidx.annotation.ColorInt
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.toColor
 import androidx.core.graphics.toColorInt
 import androidx.core.view.isGone
@@ -127,4 +128,6 @@ object UiUtils {
             null
         }
     }
+
+    fun dividerDrawable(context: Context) = AppCompatResources.getDrawable(context, R.drawable.divider)
 }

@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.newMessage
 
 import android.content.Context
+import android.graphics.drawable.InsetDrawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -34,12 +35,15 @@ import com.google.android.flexbox.JustifyContent
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.hideKeyboard
 import com.infomaniak.lib.core.utils.showKeyboard
+import com.infomaniak.lib.core.utils.toPx
+import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ViewContactChipContextMenuBinding
 import com.infomaniak.mail.databinding.ViewRecipientFieldBinding
+import com.infomaniak.mail.utils.UiUtils.dividerDrawable
 import com.infomaniak.mail.utils.isEmail
 import com.infomaniak.mail.utils.toggleChevron
 import kotlin.math.min
@@ -339,7 +343,11 @@ class RecipientFieldView @JvmOverloads constructor(
         onToggleEverythingCallback: ((isCollapsed: Boolean) -> Unit)? = null,
         setSnackBarCallback: (titleRes: Int) -> Unit,
     ) {
+
+        val dividerItemDecorator = DividerItemDecorator(InsetDrawable(dividerDrawable(context), 16.toPx(), 0, 16.toPx(), 0))
+
         autoCompletedContacts = autoComplete
+        autoCompletedContacts.addItemDecoration(dividerItemDecorator)
         autoCompletedContacts.adapter = contactAdapter
 
         onToggleEverything = onToggleEverythingCallback
