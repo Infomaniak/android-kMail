@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.login
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import androidx.activity.addCallback
@@ -84,6 +85,8 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
+    // This `SuppressLint` seems useless, but it's for the CI. Don't remove it.
+    @SuppressLint("RestrictedApi")
     private fun onDestinationChanged(destination: NavDestination, arguments: Bundle?) {
         SentryDebug.addNavigationBreadcrumb(destination.displayName, arguments)
         trackDestination(destination)
