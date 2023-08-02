@@ -58,7 +58,7 @@ class LoginUtils @Inject constructor(
         fragment: Fragment,
         result: ActivityResult,
         infomaniakLogin: InfomaniakLogin,
-        onFailedLogin: () -> Unit
+        onFailedLogin: () -> Unit,
     ) = with(fragment) {
         if (result.resultCode == AppCompatActivity.RESULT_OK) {
             val authCode = result.data?.getStringExtra(InfomaniakLogin.CODE_TAG)
@@ -73,17 +73,18 @@ class LoginUtils @Inject constructor(
         }
     }
 
-    private fun Fragment.authenticateUser(authCode: String, infomaniakLogin: InfomaniakLogin) =
+    private fun Fragment.authenticateUser(authCode: String, infomaniakLogin: InfomaniakLogin) {
         lifecycleScope.launch(ioDispatcher) {
             infomaniakLogin.getToken(
                 okHttpClient = HttpClient.okHttpClientNoTokenInterceptor,
                 code = authCode,
                 onSuccess = { onAuthenticateUserSuccess(it) },
-                onError = { onAuthenticateUserError(it) }
+                onError = { onAuthenticateUserError(it) },
             )
         }
+    }
 
-    private fun Fragment.onAuthenticateUserSuccess(apiToken: ApiToken) =
+    private fun Fragment.onAuthenticateUserSuccess(apiToken: ApiToken) {
         lifecycleScope.launch(ioDispatcher) {
             when (val returnValue = LoginActivity.authenticateUser(requireContext(), apiToken)) {
                 is User -> {
@@ -105,6 +106,7 @@ class LoginUtils @Inject constructor(
                 }
             }
         }
+    }
 
     private fun Fragment.launchNoMailboxActivity() {
         startActivity(Intent(requireContext(), NoMailboxActivity::class.java).clearStack())

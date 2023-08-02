@@ -73,12 +73,12 @@ class NewAccountFragment : Fragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         webViewLoginResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
-            loginUtils.handleWebViewLoginResult(this, result, loginActivity.infomaniakLogin, ::onFailedLogin)
+            loginUtils.handleWebViewLoginResult(fragment = this, result, loginActivity.infomaniakLogin, ::onFailedLogin)
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        introViewModel.updatedAccentColor.value?.first?.theme?.let { requireActivity().setTheme(it) }
+        introViewModel.updatedAccentColor.value?.first?.theme?.let(requireActivity()::setTheme)
         super.onCreate(savedInstanceState)
     }
 
@@ -106,15 +106,16 @@ class NewAccountFragment : Fragment() {
         }
     }
 
-    private fun selectIllustrationAccordingToTheme() = with(binding) {
-        val drawableRes = when (introViewModel.updatedAccentColor.value?.first) {
+    private fun selectIllustrationAccordingToTheme() {
+        val accentColor = introViewModel.updatedAccentColor.value?.first ?: return
+
+        val drawableRes = when (accentColor) {
             AccentColor.PINK -> R.drawable.new_account_illustration_pink
             AccentColor.BLUE -> R.drawable.new_account_illustration_blue
             AccentColor.SYSTEM -> R.drawable.new_account_illustration_material
-            null -> null
         }
 
-        val drawable = ResourcesCompat.getDrawable(resources, drawableRes!!, null)
+        val drawable = ResourcesCompat.getDrawable(resources, drawableRes, null)
         binding.illustration.setImageDrawable(drawable)
     }
 
@@ -123,8 +124,8 @@ class NewAccountFragment : Fragment() {
             val translatedError = data?.getStringExtra(InfomaniakLogin.ERROR_TRANSLATED_TAG)
             when {
                 translatedError.isNullOrBlank() -> loginActivity.infomaniakLogin.startWebViewLogin(
-                    webViewLoginResultLauncher,
-                    false
+                    resultLauncher = webViewLoginResultLauncher,
+                    removeCookies = false,
                 )
                 else -> showError(translatedError)
             }

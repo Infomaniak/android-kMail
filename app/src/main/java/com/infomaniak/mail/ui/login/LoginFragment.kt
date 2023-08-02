@@ -41,7 +41,6 @@ import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.utils.showProgress
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.data.LocalSettings.AccentColor
-import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.databinding.FragmentLoginBinding
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
@@ -76,7 +75,7 @@ class LoginFragment : Fragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         webViewLoginResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
-            loginUtils.handleWebViewLoginResult(this, result, loginActivity.infomaniakLogin, ::onFailedLogin)
+            loginUtils.handleWebViewLoginResult(fragment = this, result, loginActivity.infomaniakLogin, ::onFailedLogin)
         }
     }
 
@@ -90,7 +89,7 @@ class LoginFragment : Fragment() {
         val introPagerAdapter = IntroPagerAdapter(
             manager = childFragmentManager,
             lifecycle = viewLifecycleOwner.lifecycle,
-            isFirstAccount = navigationArgs.isFirstAccount
+            isFirstAccount = navigationArgs.isFirstAccount,
         )
 
         introViewpager.apply {

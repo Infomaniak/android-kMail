@@ -111,7 +111,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         binding.mainActions.setAction(R.id.actionReadUnread, readIcon, readText)
 
         // val isFromArchive = mainViewModel.currentFolder.value?.role == FolderRole.ARCHIVE
-        // TODO : When decided by UI/UX, change how the icon is displayed (when trying to archive from inside the Archive folder).
+        // TODO: When decided by UI/UX, change how the icon is displayed (when trying to archive from inside the Archive folder).
 
         val isFromSpam = mainViewModel.currentFolder.value?.role == FolderRole.SPAM
         val (spamIcon, spamText) = getSpamIconAndText(isFromSpam)
