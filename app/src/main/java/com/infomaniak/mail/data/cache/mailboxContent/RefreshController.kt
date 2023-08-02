@@ -479,7 +479,7 @@ object RefreshController {
                 isSpam = folder.role == FolderRole.SPAM,
                 isTrashed = folder.role == FolderRole.TRASH,
                 draftLocalUuid = null,
-                isFromSearch = false
+                isFromSearch = false,
             )
 
             folder.messages.add(remoteMessage)
@@ -490,7 +490,7 @@ object RefreshController {
                 scope,
                 existingThreads,
                 remoteMessage,
-                idsOfFoldersWithIncompleteThreads
+                idsOfFoldersWithIncompleteThreads,
             )?.let { newThread ->
                 ThreadController.upsertThread(newThread, realm = this).also {
                     folder.threads.add(it)

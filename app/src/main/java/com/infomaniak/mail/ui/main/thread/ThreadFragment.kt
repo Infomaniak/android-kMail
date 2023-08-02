@@ -26,7 +26,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.ColorUtils
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -64,6 +63,7 @@ import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialog
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
+import com.infomaniak.mail.utils.UiUtils.dividerDrawable
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -235,10 +235,8 @@ class ThreadFragment : Fragment() {
     }
 
     private fun setupAdapter(threadUid: String) = with(binding) {
-        AppCompatResources.getDrawable(context, R.drawable.divider)?.let {
-            messagesList.addItemDecoration(DividerItemDecorator(InsetDrawable(it, 0)))
-        }
 
+        messagesList.addItemDecoration(DividerItemDecorator(InsetDrawable(dividerDrawable(context), 0)))
         messagesList.recycledViewPool.setMaxRecycledViews(0, 0)
 
         messagesList.adapter = threadAdapter.apply {
