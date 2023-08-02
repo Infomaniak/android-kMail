@@ -36,7 +36,6 @@
             android:visibility="gone"
             app:icon="@drawable/ic_chevron_down"
             app:iconSize="@dimen/chevronSize"
-            app:iconTint="@color/iconColorPrimaryText"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
