@@ -30,7 +30,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.login.InfomaniakLogin
@@ -90,8 +89,6 @@ class NewAccountFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
         requireActivity().window.statusBarColor = context.getColor(R.color.backgroundColor)
-
-        toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
 
         selectIllustrationAccordingToTheme()
 
