@@ -134,7 +134,7 @@ class FolderAdapter(
                 initOnCollapsableClickListener { onCollapseClicked?.invoke(folder.id, isCollapsed) }
                 isPastilleDisplayed = unread?.shouldDisplayPastille ?: false
                 unreadCount = unread?.count ?: 0
-                canCollapse = folder.canCollapse
+                canCollapse = folder.canBeCollapsed
                 isCollapsed = folder.isCollapsed
                 computeFolderVisibility()
                 setIndent(folderIndent, hasCollapsableFolder!!, canCollapse)
@@ -152,10 +152,9 @@ class FolderAdapter(
     fun setFolders(newFolders: List<Folder>, newCurrentFolderId: String?) {
         currentFolderId = newCurrentFolderId
 
-        val newHasCollapsableFolder = newFolders.any { it.canCollapse }
-        if (hasCollapsableFolder == null || newHasCollapsableFolder == hasCollapsableFolder) {
-            foldersDiffer.submitList(newFolders)
-        } else {
+        foldersDiffer.submitList(newFolders)
+        val newHasCollapsableFolder = newFolders.any { it.canBeCollapsed }
+        if (hasCollapsableFolder != null && newHasCollapsableFolder != hasCollapsableFolder) {
             notifyDataSetChanged()
         }
         hasCollapsableFolder = newHasCollapsableFolder
@@ -191,14 +190,14 @@ class FolderAdapter(
 
         override fun areContentsTheSame(oldFolder: Folder, newFolder: Folder): Boolean {
 
-            val collapseIsTheSame = newFolder.canCollapse || oldFolder.isCollapsed == newFolder.isCollapsed
+            val collapseIsTheSame = newFolder.canBeCollapsed || oldFolder.isCollapsed == newFolder.isCollapsed
 
             return oldFolder.name == newFolder.name &&
                     oldFolder.isFavorite == newFolder.isFavorite &&
                     oldFolder.path == newFolder.path &&
                     oldFolder.unreadCountDisplay == newFolder.unreadCountDisplay &&
                     oldFolder.threads.count() == newFolder.threads.count() &&
-                    oldFolder.children.isEmpty() == newFolder.children.isEmpty() &&
+                    oldFolder.canBeCollapsed == newFolder.canBeCollapsed &&
                     collapseIsTheSame
         }
     }

@@ -92,8 +92,11 @@ class Folder : RealmObject {
             shouldDisplayPastille = unreadCountLocal == 0 && unreadCountRemote > 0,
         )
 
-    val canCollapse: Boolean
-        get() = role == null && children.isNotEmpty() && !path.contains(separator)
+    val canBeCollapsed: Boolean
+        get() = role == null && children.isNotEmpty() && isRoot
+
+    val isRoot: Boolean
+        get() = !path.contains(separator)
 
     fun initLocalValues(
         lastUpdatedAt: RealmInstant?,
