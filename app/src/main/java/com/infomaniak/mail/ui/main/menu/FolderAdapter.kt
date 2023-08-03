@@ -49,7 +49,7 @@ class FolderAdapter(
 
     private inline val folders get() = foldersDiffer.currentList
 
-    private var hasCollapsableFolder = false
+    private var hasCollapsableFolder: Boolean? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FolderViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -137,7 +137,7 @@ class FolderAdapter(
                 canCollapse = folder.canCollapse
                 isCollapsed = folder.isCollapsed
                 computeFolderVisibility()
-                setIndent(folderIndent, hasCollapsableFolder, canCollapse)
+                setIndent(folderIndent, hasCollapsableFolder!!, canCollapse)
                 setCollapsingButtonContentDescription(folderName)
             }
         }
@@ -151,8 +151,14 @@ class FolderAdapter(
     @SuppressLint("NotifyDataSetChanged")
     fun setFolders(newFolders: List<Folder>, newCurrentFolderId: String?) {
         currentFolderId = newCurrentFolderId
-        foldersDiffer.submitList(newFolders)
-        hasCollapsableFolder = newFolders.any { it.canCollapse }
+
+        val newHasCollapsableFolder = newFolders.any { it.canCollapse }
+        if (hasCollapsableFolder == null || newHasCollapsableFolder == hasCollapsableFolder) {
+            foldersDiffer.submitList(newFolders)
+        } else {
+            notifyDataSetChanged()
+        }
+        hasCollapsableFolder = newHasCollapsableFolder
     }
 
     fun updateSelectedState(newCurrentFolderId: String) {
