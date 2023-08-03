@@ -163,14 +163,15 @@ object RealmDatabase {
 
     private object RealmConfig {
 
+        //region Configurations versions
+        const val USER_INFO_SCHEMA_VERSION = 1L
+        const val MAILBOX_INFO_SCHEMA_VERSION = 1L
+        const val MAILBOX_CONTENT_SCHEMA_VERSION = 4L
+        //endregion
+
         //region Configurations names
         const val appSettingsDbName = "AppSettings.realm"
         const val mailboxInfoDbName = "MailboxInfo.realm"
-
-        const val USER_INFO_SCHEMA_VERSION = 1L
-        const val MAILBOX_INFO_SCHEMA_VERSION = 1L
-        const val MAILBOX_CONTENT_SCHEMA_VERSION = 3L
-
         fun userInfoDbName(userId: Int) = "User-${userId}.realm"
         fun mailboxContentDbNamePrefix(userId: Int) = "Mailbox-${userId}-"
         fun mailboxContentDbName(userId: Int, mailboxId: Int) = "${mailboxContentDbNamePrefix(userId)}${mailboxId}.realm"

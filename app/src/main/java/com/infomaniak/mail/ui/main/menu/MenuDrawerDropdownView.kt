@@ -35,12 +35,13 @@ class MenuDrawerDropdownView @JvmOverloads constructor(
 
     override val binding by lazy { ViewMenuDrawerDropdownBinding.inflate(LayoutInflater.from(context), this, true) }
 
-    override var canCollapse = false
     override var isCollapsed = false
         set(shouldCollapse) {
             binding.collapseButton.rotateChevron()
             field = shouldCollapse
         }
+
+    override var canBeCollapsed = false
 
     init {
         with(binding) {

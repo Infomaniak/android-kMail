@@ -134,10 +134,10 @@ class FolderAdapter(
                 initOnCollapsableClickListener { onCollapseClicked?.invoke(folder.id, isCollapsed) }
                 isPastilleDisplayed = unread?.shouldDisplayPastille ?: false
                 unreadCount = unread?.count ?: 0
-                canCollapse = folder.canBeCollapsed
+                isHidden = folder.isHidden
                 isCollapsed = folder.isCollapsed
-                computeFolderVisibility()
-                setIndent(folderIndent, hasCollapsableFolder!!, canCollapse)
+                canBeCollapsed = folder.canBeCollapsed
+                setIndent(folderIndent, hasCollapsableFolder!!, canBeCollapsed)
                 setCollapsingButtonContentDescription(folderName)
             }
         }
@@ -189,16 +189,13 @@ class FolderAdapter(
         }
 
         override fun areContentsTheSame(oldFolder: Folder, newFolder: Folder): Boolean {
-
-            val collapseIsTheSame = newFolder.canBeCollapsed || oldFolder.isCollapsed == newFolder.isCollapsed
-
             return oldFolder.name == newFolder.name &&
                     oldFolder.isFavorite == newFolder.isFavorite &&
                     oldFolder.path == newFolder.path &&
                     oldFolder.unreadCountDisplay == newFolder.unreadCountDisplay &&
                     oldFolder.threads.count() == newFolder.threads.count() &&
-                    oldFolder.canBeCollapsed == newFolder.canBeCollapsed &&
-                    collapseIsTheSame
+                    oldFolder.isHidden == newFolder.isHidden &&
+                    oldFolder.canBeCollapsed == newFolder.canBeCollapsed
         }
     }
 }

@@ -29,15 +29,15 @@ interface IndentableFolder {
 
     val binding: ViewDecoratedTextItemBinding
 
-    fun setIndent(indent: Int, hasCollapsableFolder: Boolean = false, folderCanCollapse: Boolean = false) {
-        val totalStartMargin = computeStartMargin(hasCollapsableFolder, folderCanCollapse) + computeIndent(indent)
+    fun setIndent(indent: Int, hasCollapsableFolder: Boolean = false, canBeCollapsed: Boolean = false) {
+        val totalStartMargin = computeStartMargin(hasCollapsableFolder, canBeCollapsed) + computeIndent(indent)
         binding.itemName.apply { setMarginsRelative(start = totalStartMargin, end = marginEnd) }
     }
 
     private fun computeIndent(indent: Int) = binding.context.resources.getDimension(RCore.dimen.marginStandard).toInt() * indent
 
-    private fun computeStartMargin(hasCollapsableFolder: Boolean, folderCanCollapse: Boolean): Int = with(binding.context) {
-        return if (hasCollapsableFolder && !folderCanCollapse) {
+    private fun computeStartMargin(hasCollapsableFolder: Boolean, canBeCollapsed: Boolean): Int = with(binding.context) {
+        return if (hasCollapsableFolder && !canBeCollapsed) {
             resources.getDimension(R.dimen.folderUncollapsableIndent).toInt()
         } else {
             val attrs = obtainStyledAttributes(R.style.RoundedDecoratedTextItem, intArrayOf(android.R.attr.layout_marginStart))
