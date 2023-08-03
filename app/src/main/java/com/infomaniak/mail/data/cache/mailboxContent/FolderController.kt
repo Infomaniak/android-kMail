@@ -71,7 +71,7 @@ class FolderController @Inject constructor(private val mailboxContentRealm: Real
             deleteOutdatedFolders(remoteFoldersWithChildren)
 
             Log.d(RealmDatabase.TAG, "Folders: Save new data")
-            insertNewData(remoteFoldersWithChildren)
+            upsertFolders(remoteFoldersWithChildren)
         }
     }
 
@@ -92,7 +92,7 @@ class FolderController @Inject constructor(private val mailboxContentRealm: Real
         delete(folder)
     }
 
-    private fun MutableRealm.insertNewData(remoteFolders: List<Folder>) {
+    private fun MutableRealm.upsertFolders(remoteFolders: List<Folder>) {
 
         remoteFolders.forEach { remoteFolder ->
 

@@ -198,6 +198,7 @@ class FolderAdapter(
                     oldFolder.path == newFolder.path &&
                     oldFolder.unreadCountDisplay == newFolder.unreadCountDisplay &&
                     oldFolder.threads.count() == newFolder.threads.count() &&
+                    oldFolder.children.isEmpty() == newFolder.children.isEmpty() &&
                     collapseIsTheSame
         }
     }
