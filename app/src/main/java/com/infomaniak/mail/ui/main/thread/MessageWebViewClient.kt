@@ -81,17 +81,15 @@ class MessageWebViewClient(
     }
 
     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
-        request.url?.let {
+        request.url?.let { uri ->
 
-            if (it.scheme == "mailto") {
-                // TODO : Clean those two lines
-                if (navigateToNewMessageActivity == null) return true
-                navigateToNewMessageActivity!!(it)
+            if (uri.scheme == "mailto") {
+                navigateToNewMessageActivity?.invoke(uri)
                 return true
             }
 
             runCatching {
-                Intent(Intent.ACTION_VIEW, it).apply {
+                Intent(Intent.ACTION_VIEW, uri).apply {
                     context.startActivity(this)
                 }
             }.onFailure {
