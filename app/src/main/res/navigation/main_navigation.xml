@@ -27,9 +27,6 @@
         android:label="ThreadListFragment"
         tools:layout="@layout/fragment_thread_list">
         <action
-            android:id="@+id/action_threadListFragment_to_newMessageActivity"
-            app:destination="@id/newMessageActivity" />
-        <action
             android:id="@+id/action_threadListFragment_to_searchFragment"
             app:destination="@id/searchFragment" />
         <action
@@ -164,9 +161,6 @@
             android:id="@+id/action_threadFragment_to_messageActionsBottomSheetDialog"
             app:destination="@id/messageActionsBottomSheetDialog" />
         <action
-            android:id="@+id/action_threadFragment_to_newMessageActivity"
-            app:destination="@id/newMessageActivity" />
-        <action
             android:id="@+id/action_threadFragment_to_threadActionsBottomSheetDialog"
             app:destination="@id/threadActionsBottomSheetDialog" />
         <action
@@ -210,9 +204,6 @@
         <argument
             android:name="recipient"
             app:argType="com.infomaniak.mail.data.models.correspondent.Recipient" />
-        <action
-            android:id="@+id/action_detailedContactBottomSheetDialog_to_newMessageActivity"
-            app:destination="@id/newMessageActivity" />
     </dialog>
 
     <dialog
@@ -242,9 +233,6 @@
             android:name="isOpenedFromThreadFragment"
             android:defaultValue="true"
             app:argType="boolean" />
-        <action
-            android:id="@+id/action_messageActionsBottomSheet_to_newMessageActivity"
-            app:destination="@id/newMessageActivity" />
     </dialog>
 
     <dialog
@@ -263,9 +251,6 @@
         <argument
             android:name="shouldLoadDistantResources"
             app:argType="boolean" />
-        <action
-            android:id="@+id/action_threadActionsBottomSheet_to_newMessageActivity"
-            app:destination="@id/newMessageActivity" />
     </dialog>
 
     <dialog
@@ -279,9 +264,6 @@
         <argument
             android:name="shouldLoadDistantResources"
             app:argType="boolean" />
-        <action
-            android:id="@+id/action_replyBottomSheetDialog_to_newMessageActivity"
-            app:destination="@id/newMessageActivity" />
     </dialog>
 
     <fragment

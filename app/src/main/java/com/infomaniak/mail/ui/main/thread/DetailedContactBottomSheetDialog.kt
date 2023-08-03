@@ -32,6 +32,7 @@ import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.ui.main.thread.actions.ActionsBottomSheetDialog
 import com.infomaniak.mail.utils.copyRecipientEmailToClipboard
 import com.infomaniak.mail.utils.observeNotNull
+import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -58,11 +59,8 @@ class DetailedContactBottomSheetDialog : ActionsBottomSheetDialog() {
 
         writeMail.setClosingOnClickListener {
             trackContactActionsEvent("writeEmail")
-            safeNavigate(
-                resId = R.id.newMessageActivity,
-                args = NewMessageActivityArgs(recipient = navigationArgs.recipient).toBundle(),
-                currentClassName = currentClassName,
-            )
+            val args = NewMessageActivityArgs(recipient = navigationArgs.recipient).toBundle()
+            safeNavigateToNewMessageActivity(args, currentClassName)
         }
         addToContacts.setClosingOnClickListener {
             trackContactActionsEvent("addToContacts")

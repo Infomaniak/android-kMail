@@ -70,6 +70,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.DialogDescriptionBinding
 import com.infomaniak.mail.databinding.DialogInputBinding
+import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.login.IlluColors.IlluColors
 import com.infomaniak.mail.ui.main.folder.DateSeparatorItemDecoration
@@ -233,30 +234,32 @@ fun Fragment.safeNavigateToNewMessageActivity(
     currentClassName: String? = null,
     shouldLoadDistantResources: Boolean = false,
 ) {
-    safeNavigate(
-        resId = R.id.newMessageActivity,
-        args = NewMessageActivityArgs(
+    safeNavigateToNewMessageActivity(
+        NewMessageActivityArgs(
             arrivedFromExistingDraft = false,
             draftMode = draftMode,
             previousMessageUid = previousMessageUid,
             shouldLoadDistantResources = shouldLoadDistantResources,
         ).toBundle(),
-        currentClassName = currentClassName,
+        currentClassName
     )
+}
+
+fun Fragment.safeNavigateToNewMessageActivity(args: Bundle? = null, currentClassName: String? = null) {
+    if (canNavigate(currentClassName)) (activity as MainActivity).navigateToNewMessageActivity(args)
 }
 
 fun Fragment.navigateToThread(thread: Thread, mainViewModel: MainViewModel) {
     if (thread.isOnlyOneDraft) { // Directly go to NewMessage screen
         trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
         mainViewModel.navigateToSelectedDraft(thread.messages.first()).observe(viewLifecycleOwner) {
-            safeNavigate(
-                R.id.newMessageActivity,
+            safeNavigateToNewMessageActivity(
                 NewMessageActivityArgs(
                     arrivedFromExistingDraft = true,
                     draftLocalUuid = it.draftLocalUuid,
                     draftResource = it.draftResource,
                     messageUid = it.messageUid,
-                ).toBundle(),
+                ).toBundle()
             )
         }
     } else {
