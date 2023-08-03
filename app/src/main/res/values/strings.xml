@@ -155,6 +155,7 @@
     <string name="contentDescriptionButtonMenu">Menu</string>
     <string name="contentDescriptionButtonNext">Next</string>
     <string name="contentDescriptionButtonOpenSystemSettings">Open system’s notification settings</string>
+    <string name="contentDescriptionButtonSelectSignature">Select a different signature</string>
     <string name="contentDescriptionButtonSettings">Settings</string>
     <string name="contentDescriptionButtonShowPassword">Show password</string>
     <string name="contentDescriptionContactAlreadyUsed">Contact already used as recipient</string>
@@ -249,6 +250,10 @@
         <item quantity="one">%d selected</item>
         <item quantity="other">%d selected</item>
     </plurals>
+    <string name="newAccountDescription">Communicate and store your documents and photos in an ad-free ecosystem that respects your privacy</string>
+    <string name="newAccountStorageDrive">15 GB of kDrive storage</string>
+    <string name="newAccountStorageMail">20 GB of free mail storage</string>
+    <string name="newAccountTitle">Create your lifetime free email address</string>
     <string name="newFolderDialogHint">Folder name</string>
     <string name="newFolderDialogMovePositiveButton">Create and move</string>
     <string name="newFolderDialogTitle">New folder</string>

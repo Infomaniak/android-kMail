@@ -17,17 +17,23 @@
  */
 package com.infomaniak.mail.ui.login
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import androidx.activity.addCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.utils.Utils.lockOrientationForSmallScreens
+import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.login.ApiToken
+import com.infomaniak.lib.login.InfomaniakLogin
+import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.MatomoMail.trackUserInfo
 import com.infomaniak.mail.R
@@ -35,7 +41,9 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.databinding.ActivityLoginBinding
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.Utils.MailboxErrorCode
+import com.infomaniak.mail.utils.getInfomaniakLogin
 import dagger.hilt.android.AndroidEntryPoint
 import com.infomaniak.lib.core.R as RCore
 
@@ -54,15 +62,34 @@ class LoginActivity : AppCompatActivity() {
         }!!
     }
 
+    lateinit var infomaniakLogin: InfomaniakLogin
+
     override fun onCreate(savedInstanceState: Bundle?) {
         lockOrientationForSmallScreens()
 
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
+        infomaniakLogin = getInfomaniakLogin()
+
         handleOnBackPressed()
 
+        setupNavController()
+
         trackScreen()
+    }
+
+    private fun setupNavController() {
+        navController.addOnDestinationChangedListener { _, destination, arguments ->
+            onDestinationChanged(destination, arguments)
+        }
+    }
+
+    // This `SuppressLint` seems useless, but it's for the CI. Don't remove it.
+    @SuppressLint("RestrictedApi")
+    private fun onDestinationChanged(destination: NavDestination, arguments: Bundle?) {
+        SentryDebug.addNavigationBreadcrumb(destination.displayName, arguments)
+        trackDestination(destination)
     }
 
     private fun handleOnBackPressed() {

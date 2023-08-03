@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak ikMail - Android
+  ~ Copyright (C) 2023 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="@layout/fragment_new_account">
+
+    <View
+        android:id="@+id/chipWidthHelper"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/mailStorageChipLayoutHeightMeasure"
+        app:layout_constraintWidth_max="400dp" />
+
+    <FrameLayout
+        android:id="@+id/mailStorageChipLayoutHeightMeasure"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/marginStandardSmall"
+        android:layout_marginTop="@dimen/marginStandardSmall"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@id/description"
+        app:layout_constraintEnd_toStartOf="@id/driveStorageChipLayoutHeightMeasure"
+        app:layout_constraintStart_toStartOf="@id/chipWidthHelper"
+        app:layout_constraintTop_toBottomOf="@id/title">
+
+        <!-- If you want to update this string or button's style also change the same properties on mailStorageChip -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/mailStorageChipHeightMeasure"
+            style="@style/LabelMedium.Accent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:backgroundTint="?attr/colorPrimaryContainer"
+            android:clickable="false"
+            android:focusable="false"
+            android:maxLines="2"
+            android:minHeight="0dp"
+            android:paddingHorizontal="@dimen/marginStandardSmall"
+            android:text="@string/newAccountStorageMail" />
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/driveStorageChipLayoutHeightMeasure"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/marginStandardSmall"
+        android:layout_marginEnd="@dimen/marginStandardSmall"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="@id/chipWidthHelper"
+        app:layout_constraintStart_toEndOf="@id/mailStorageChipLayoutHeightMeasure"
+        app:layout_constraintTop_toBottomOf="@id/title">
+
+        <!-- If you want to update this string or button's style also change the same properties on driveStorageChip -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/driveStorageChipHeightMeasure"
+            style="@style/LabelMedium.Accent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:backgroundTint="?attr/colorPrimaryContainer"
+            android:clickable="false"
+            android:focusable="false"
+            android:maxLines="2"
+            android:minHeight="0dp"
+            android:paddingHorizontal="@dimen/marginStandardSmall"
+            android:text="@string/newAccountStorageDrive" />
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/mailStorageLayout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="@dimen/marginStandardSmall"
+        app:layout_constraintBottom_toBottomOf="@id/chipBottomBarrier"
+        app:layout_constraintEnd_toStartOf="@id/driveStorageLayout"
+        app:layout_constraintStart_toStartOf="@id/chipWidthHelper"
+        app:layout_constraintTop_toTopOf="@id/chipWidthHelper">
+
+        <!-- If you want to update this string or button's style also change the same properties on mailStorageChipHeightMeasure -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/mailStorageChip"
+            style="@style/LabelMedium.Accent"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:backgroundTint="?attr/colorPrimaryContainer"
+            android:clickable="false"
+            android:focusable="false"
+            android:paddingHorizontal="@dimen/marginStandardSmall"
+            android:text="@string/newAccountStorageMail" />
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/driveStorageLayout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginEnd="@dimen/marginStandardSmall"
+        app:layout_constraintBottom_toBottomOf="@id/chipBottomBarrier"
+        app:layout_constraintEnd_toEndOf="@id/chipWidthHelper"
+        app:layout_constraintStart_toEndOf="@id/mailStorageLayout"
+        app:layout_constraintTop_toTopOf="@id/chipWidthHelper">
+
+        <!-- If you want to update this string or button's style also change the same properties on driveStorageChipHeightMeasure -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/driveStorageChip"
+            style="@style/LabelMedium.Accent"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:backgroundTint="?attr/colorPrimaryContainer"
+            android:clickable="false"
+            android:focusable="false"
+            android:paddingHorizontal="@dimen/marginStandardSmall"
+            android:text="@string/newAccountStorageDrive" />
+
+    </FrameLayout>
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/chipBottomBarrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="mailStorageChipLayoutHeightMeasure,driveStorageChipLayoutHeightMeasure" />
+
+</merge>

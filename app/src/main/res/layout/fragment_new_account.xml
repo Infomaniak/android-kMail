@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak ikMail - Android
+  ~ Copyright (C) 2023 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingHorizontal="@dimen/marginStandard">
+
+        <ImageView
+            android:id="@+id/illustration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/marginStandard"
+            android:importantForAccessibility="no"
+            app:layout_constrainedHeight="true"
+            app:layout_constraintBottom_toTopOf="@+id/title"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHeight_min="150dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:src="@drawable/new_account_illustration_pink" />
+
+        <TextView
+            android:id="@+id/title"
+            style="@style/H1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/marginLarge"
+            android:text="@string/newAccountTitle"
+            android:textAlignment="center"
+            app:layout_constraintBottom_toTopOf="@+id/mailStorageChipLayoutHeightMeasure"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/illustration"
+            app:layout_constraintWidth_max="400dp" />
+
+        <include layout="@layout/new_account_storage_chips" />
+
+        <TextView
+            android:id="@+id/description"
+            style="@style/BodySmall.Secondary"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/marginStandard"
+            android:layout_marginBottom="@dimen/marginStandard"
+            android:text="@string/newAccountDescription"
+            android:textAlignment="center"
+            app:layout_constraintBottom_toTopOf="@+id/createNewAddressButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/mailStorageChipLayoutHeightMeasure"
+            app:layout_constraintWidth_max="400dp" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/buttonGuideline"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.8" />
+
+        <View
+            android:id="@+id/dummyButton"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/textButtonPrimaryHeight"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toTopOf="@id/createNewAddressButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/buttonGuideline" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/createNewAddressButton"
+            style="@style/TextButtonPrimary"
+            android:layout_width="0dp"
+            android:text="@string/buttonCreate"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/dummyButton" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>

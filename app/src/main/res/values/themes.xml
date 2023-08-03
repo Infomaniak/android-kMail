@@ -105,6 +105,7 @@
 
     <!-- Login -->
 
+    <!-- TODO: Doesn't work, can't inherit from both parents at the same time -->
     <style name="AppTheme.LoginBase" parent="AppTheme.Pink">
         <item name="android:navigationBarColor">@color/backgroundOnBoardingColor</item>
         <item name="android:windowBackground">@color/backgroundOnBoardingColor</item>

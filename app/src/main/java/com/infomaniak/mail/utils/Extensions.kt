@@ -435,11 +435,11 @@ fun DragDropSwipeRecyclerView.addStickyDateDecoration(adapter: ThreadListAdapter
 }
 
 fun Context.getLocalizedNameOrAllFolders(folder: Folder?): String {
-    return folder?.getLocalizedName(this) ?: getString(R.string.searchFilterFolder)
+    return folder?.getLocalizedName(context = this) ?: getString(R.string.searchFilterFolder)
 }
 
 fun Context.getInfomaniakLogin(): InfomaniakLogin {
-    return InfomaniakLogin(this, appUID = BuildConfig.APPLICATION_ID, clientID = BuildConfig.CLIENT_ID)
+    return InfomaniakLogin(context = this, appUID = BuildConfig.APPLICATION_ID, clientID = BuildConfig.CLIENT_ID)
 }
 
 fun Window.updateNavigationBarColor(color: Int) {

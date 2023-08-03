@@ -203,7 +203,7 @@ class ThreadListAdapter(
     }
 
     private fun CardviewThreadItemBinding.updateSelectedState(selectedThread: SelectedThread) {
-        // TODO : Modify the ui accordingly
+        // TODO: Modify the UI accordingly
         val isSelected = multiSelection?.selectedItems?.contains(selectedThread) == true
         selectionCardView.backgroundTintList = if (isSelected) {
             ColorStateList.valueOf(context.getAttributeColor(RMaterial.attr.colorPrimaryContainer))

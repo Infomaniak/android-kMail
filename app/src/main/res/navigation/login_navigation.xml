@@ -25,6 +25,16 @@
         android:id="@+id/loginFragment"
         android:name="com.infomaniak.mail.ui.login.LoginFragment"
         android:label="LoginFragment"
-        tools:layout="@layout/fragment_login" />
+        tools:layout="@layout/fragment_login">
+        <action
+            android:id="@+id/action_loginFragment_to_newAccountFragment"
+            app:destination="@id/newAccountFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/newAccountFragment"
+        android:name="com.infomaniak.mail.ui.login.NewAccountFragment"
+        android:label="NewAccountFragment"
+        tools:layout="@layout/fragment_new_account" />
 
 </navigation>

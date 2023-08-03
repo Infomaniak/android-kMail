@@ -150,6 +150,7 @@
     <string name="contentDescriptionButtonMenu">Menu</string>
     <string name="contentDescriptionButtonNext">Suivant</string>
     <string name="contentDescriptionButtonOpenSystemSettings">Ouvrir les paramètres de notification du système</string>
+    <string name="contentDescriptionButtonSelectSignature">Sélectionner une autre signature</string>
     <string name="contentDescriptionButtonSettings">Paramètres</string>
     <string name="contentDescriptionButtonShowPassword">Voir le mot de passe</string>
     <string name="contentDescriptionContactAlreadyUsed">Contact déjà utilisé comme destinataire</string>
@@ -247,6 +248,10 @@
         <item quantity="other">%d sélectionnés</item>
         <item quantity="many">%d de sélectionnés</item>
     </plurals>
+    <string name="newAccountDescription">Communiquez et stockez vos documents et photos dans un écosystème sans publicité qui respecte votre vie privée</string>
+    <string name="newAccountStorageDrive">15 Go de stockage kDrive</string>
+    <string name="newAccountStorageMail">20 Go de stockage Mail</string>
+    <string name="newAccountTitle">Créez votre adresse mail gratuite à vie</string>
     <string name="newFolderDialogHint">Nom du dossier</string>
     <string name="newFolderDialogMovePositiveButton">Créer et déplacer</string>
     <string name="newFolderDialogTitle">Nouveau dossier</string>
