@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.main.thread
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
@@ -28,7 +29,6 @@ import com.infomaniak.lib.core.utils.toDp
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.models.Attachment
-import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.Utils
 import java.io.ByteArrayInputStream
@@ -39,6 +39,7 @@ class MessageWebViewClient(
     private val messageUid: String,
     private var shouldLoadDistantResources: Boolean,
     private val onBlockedResourcesDetected: (() -> Unit)? = null,
+    private val navigateToNewMessageActivity: ((Uri) -> Unit)?,
 ) : WebViewClient() {
 
     private val emptyResource by lazy { WebResourceResponse("text/plain", "utf-8", ByteArrayInputStream(ByteArray(0))) }
@@ -83,9 +84,9 @@ class MessageWebViewClient(
         request.url?.let {
 
             if (it.scheme == "mailto") {
-                Intent(Intent.ACTION_SENDTO, it, context, NewMessageActivity::class.java).apply {
-                    context.startActivity(this)
-                }
+                // TODO : Clean those two lines
+                if (navigateToNewMessageActivity == null) return true
+                navigateToNewMessageActivity!!(it)
                 return true
             }
 

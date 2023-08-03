@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.main.thread
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ScaleGestureDetector
 import android.view.ViewConfiguration
@@ -75,6 +76,7 @@ class ThreadAdapter(
     var onDownloadAllClicked: ((message: Message) -> Unit)? = null
     var onReplyClicked: ((Message) -> Unit)? = null
     var onMenuClicked: ((Message) -> Unit)? = null
+    var navigateToNewMessageActivity: ((Uri) -> Unit)? = null
 
     private lateinit var recyclerView: RecyclerView
     private val webViewUtils by lazy { WebViewUtils(recyclerView.context) }
@@ -415,7 +417,7 @@ class ThreadAdapter(
 
         quoteButtonFrameLayout.isVisible = message.hasQuote
 
-        initWebViewClientIfNeeded(message)
+        initWebViewClientIfNeeded(message, navigateToNewMessageActivity)
 
         // If the view holder got recreated while the fragment is not destroyed, keep the user's choice effective
         if (isMessageUidManuallyAllowed(message.uid)) {
@@ -520,7 +522,7 @@ class ThreadAdapter(
             }
         }
 
-        fun initWebViewClientIfNeeded(message: Message) {
+        fun initWebViewClientIfNeeded(message: Message, navigateToNewMessageActivity: ((Uri) -> Unit)?) {
 
             fun promptUserForDistantImages() {
                 binding.promptUserForDistantImages()
@@ -532,12 +534,14 @@ class ThreadAdapter(
                     messageUid = message.uid,
                     shouldLoadDistantResources = shouldLoadDistantResources,
                     onBlockedResourcesDetected = ::promptUserForDistantImages,
+                    navigateToNewMessageActivity = navigateToNewMessageActivity,
                 )
                 _fullMessageWebViewClient = binding.fullMessageWebView.initWebViewClientAndBridge(
                     attachments = message.attachments,
                     messageUid = message.uid,
                     shouldLoadDistantResources = shouldLoadDistantResources,
                     onBlockedResourcesDetected = ::promptUserForDistantImages,
+                    navigateToNewMessageActivity = navigateToNewMessageActivity,
                 )
             }
         }

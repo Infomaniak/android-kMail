@@ -131,6 +131,12 @@
             app:argType="com.infomaniak.mail.data.models.correspondent.Recipient"
             app:nullable="true" />
         <!-- Endregion -->
+
+        <argument
+            android:name="mailToUri"
+            android:defaultValue="@null"
+            app:argType="android.net.Uri"
+            app:nullable="true" />
     </activity>
 
     <fragment

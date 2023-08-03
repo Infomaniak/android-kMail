@@ -24,6 +24,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.text.Html
@@ -189,6 +190,7 @@ fun WebView.initWebViewClientAndBridge(
     messageUid: String,
     shouldLoadDistantResources: Boolean,
     onBlockedResourcesDetected: (() -> Unit)? = null,
+    navigateToNewMessageActivity: ((Uri) -> Unit)?,
 ): MessageWebViewClient {
 
     addJavascriptInterface(WebViewUtils.jsBridge, "ikmail")
@@ -205,6 +207,7 @@ fun WebView.initWebViewClientAndBridge(
         messageUid,
         shouldLoadDistantResources,
         onBlockedResourcesDetected,
+        navigateToNewMessageActivity,
     ).also {
         webViewClient = it
     }

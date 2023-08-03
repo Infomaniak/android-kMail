@@ -283,6 +283,11 @@ class ThreadFragment : Fragment() {
                 replyTo(message)
             }
             onMenuClicked = { message -> message.navigateToActionsBottomSheet() }
+            navigateToNewMessageActivity = { uri ->
+                safeNavigateToNewMessageActivity(
+                    NewMessageActivityArgs(mailToUri = uri).toBundle()
+                )
+            }
         }
     }
 

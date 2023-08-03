@@ -359,6 +359,7 @@ class NewMessageFragment : Fragment() {
                     attachments = emptyList(),
                     messageUid = "SIGNATURE-${draft.messageUid}",
                     shouldLoadDistantResources = true,
+                    navigateToNewMessageActivity = null,
                 )
             }
             removeSignature.setOnClickListener {
@@ -376,6 +377,7 @@ class NewMessageFragment : Fragment() {
                     attachments = draft.attachments,
                     messageUid = "QUOTE-${draft.messageUid}",
                     shouldLoadDistantResources = alwaysShowExternalContent || newMessageActivityArgs.shouldLoadDistantResources,
+                    navigateToNewMessageActivity = null,
                 )
             }
             removeQuote.setOnClickListener {
