@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.main
 import android.view.View
 import androidx.annotation.StringRes
 import androidx.fragment.app.FragmentActivity
+import com.google.android.material.snackbar.Snackbar
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.R as RCore
@@ -27,6 +28,7 @@ import com.infomaniak.lib.core.R as RCore
 class SnackBarManager {
 
     private val snackBarFeedback = SingleLiveEvent<SnackBarData>()
+    private var previousSnackbar: Snackbar? = null
 
     // Give a CoordinatorLayout to `view` in order to support swipe to dismiss
     fun setup(
@@ -45,7 +47,8 @@ class SnackBarManager {
 
             val buttonTitle = buttonTitleRes ?: RCore.string.buttonCancel
 
-            showSnackbar(view, title, getAnchor?.invoke(), buttonTitle, onActionClicked = safeAction)
+            previousSnackbar?.dismiss()
+            previousSnackbar = showSnackbar(view, title, getAnchor?.invoke(), buttonTitle, onActionClicked = safeAction)
         }
     }
 

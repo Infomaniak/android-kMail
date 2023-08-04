@@ -32,9 +32,11 @@ import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.AppSettings
+import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.databinding.ActivityNewMessageBinding
 import com.infomaniak.mail.ui.BaseActivity
 import com.infomaniak.mail.ui.LaunchActivity
+import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.createDescriptionDialog
 import com.infomaniak.mail.utils.getAttributeColor
@@ -106,8 +108,15 @@ class NewMessageActivity : BaseActivity() {
 
     private fun tryToSendEmail() {
 
+        fun setSnackBarActivityResult() {
+            val resultIntent = Intent()
+            resultIntent.putExtra(MainActivity.DRAFT_ACTION_KEY, DraftAction.SEND.name)
+            setResult(RESULT_OK, resultIntent)
+        }
+
         fun sendEmail() {
             newMessageFragment.shouldSendInsteadOfSave = true
+            setSnackBarActivityResult()
             finishAppAndRemoveTaskIfNeeded()
         }
 

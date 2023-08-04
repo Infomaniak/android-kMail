@@ -429,10 +429,6 @@ class DraftsActionsWorker @AssistedInject constructor(
             workManager.enqueueUniqueWork(TAG, ExistingWorkPolicy.APPEND_OR_REPLACE, workRequest)
         }
 
-        fun getRunningWorkInfoLiveData(): LiveData<MutableList<WorkInfo>> {
-            return WorkerUtils.getWorkInfoLiveData(TAG, workManager, listOf(WorkInfo.State.RUNNING))
-        }
-
         fun getCompletedWorkInfoLiveData(): LiveData<MutableList<WorkInfo>> {
             return WorkerUtils.getWorkInfoLiveData(TAG, workManager, listOf(WorkInfo.State.SUCCEEDED))
         }

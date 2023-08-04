@@ -570,9 +570,7 @@ class NewMessageFragment : Fragment() {
             val isFinishing = requireActivity().isFinishing
             val isTaskRoot = requireActivity().isTaskRoot
             val action = if (shouldSendInsteadOfSave) DraftAction.SEND else DraftAction.SAVE
-            executeDraftActionWhenStopping(action, isFinishing, isTaskRoot) {
-                startWorker()
-            }
+            executeDraftActionWhenStopping(action, isFinishing, isTaskRoot, ::startWorker)
         } else {
             shouldExecuteDraftActionWhenStopping = true
         }
