@@ -40,12 +40,8 @@ interface IndentableFolder {
         return if (hasCollapsableFolder && !folderCanCollapse) {
             resources.getDimension(R.dimen.folderUncollapsableIndent).toInt()
         } else {
-            obtainStyledAttributes(
-                R.style.RoundedDecoratedTextItem,
-                intArrayOf(android.R.attr.layout_marginStart),
-            ).let { attributes ->
-                attributes.getDimensionPixelSizeOrThrow(0).also { attributes.recycle() }
-            }
+            val attrs = obtainStyledAttributes(R.style.RoundedDecoratedTextItem, intArrayOf(android.R.attr.layout_marginStart))
+            attrs.getDimensionPixelSizeOrThrow(0).also { attrs.recycle() }
         }
     }
 }

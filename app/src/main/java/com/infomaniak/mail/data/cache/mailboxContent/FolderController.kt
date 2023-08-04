@@ -121,11 +121,6 @@ class FolderController @Inject constructor(private val mailboxContentRealm: Real
         private val isRootFolder = "${Folder.parentsPropertyName}.@count == 0"
 
         //region Queries
-        /**
-         * The `sortByName` for Folders is done twice in the app, but it's not factorisable.
-         * So if this sort logic changes, it needs to be changed in both locations.
-         * The other location is in `Utils.formatFoldersListWithAllChildren()`.
-         */
         private fun getFoldersQuery(realm: TypedRealm, onlyRoots: Boolean = false): RealmQuery<Folder> {
             val rootsQuery = if (onlyRoots) " AND $isRootFolder" else ""
             return realm

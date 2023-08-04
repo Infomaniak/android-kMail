@@ -58,7 +58,7 @@ abstract class DecoratedTextItemView @JvmOverloads constructor(
                 binding.root.apply {
                     context.obtainStyledAttributes(
                         R.style.RoundedDecoratedTextItem,
-                        intArrayOf(android.R.attr.layout_marginStart)
+                        intArrayOf(android.R.attr.layout_marginStart),
                     ).let {
                         setMarginsRelative(it.getDimensionPixelSizeOrThrow(0))
                         it.recycle()
