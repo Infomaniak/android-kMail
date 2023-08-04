@@ -144,6 +144,7 @@
     <string name="contentDescriptionButtonDeleteDraft">Delete draft</string>
     <string name="contentDescriptionButtonDeleteHistory">Delete history entry</string>
     <string name="contentDescriptionButtonDeleteQuote">Delete quoted messages</string>
+    <string name="contentDescriptionButtonDeleteSearch">Clear search</string>
     <string name="contentDescriptionButtonDeleteSignature">Delete signature</string>
     <string name="contentDescriptionButtonExpandAccountSelection">Expand account selection</string>
     <string name="contentDescriptionButtonExpandCustomFolders">Expand custom folders</string>

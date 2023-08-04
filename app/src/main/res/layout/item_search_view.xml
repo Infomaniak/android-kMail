@@ -33,6 +33,7 @@
         app:boxStrokeColor="@null"
         app:boxStrokeWidth="0dp"
         app:endIconDrawable="@drawable/ic_close_search"
+        app:endIconContentDescription="@string/contentDescriptionButtonDeleteSearch"
         app:endIconMode="clear_text"
         app:hintEnabled="false"
         app:placeholderText="@string/searchFieldPlaceholder"

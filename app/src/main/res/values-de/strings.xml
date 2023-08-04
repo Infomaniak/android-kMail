@@ -137,6 +137,7 @@
     <string name="contentDescriptionButtonDeleteDraft">Entwurf löschen</string>
     <string name="contentDescriptionButtonDeleteHistory">Historieneintrag löschen</string>
     <string name="contentDescriptionButtonDeleteQuote">Zitierte Nachrichten löschen</string>
+    <string name="contentDescriptionButtonDeleteSearch">Suche löschen</string>
     <string name="contentDescriptionButtonDeleteSignature">Unterschrift löschen</string>
     <string name="contentDescriptionButtonExpandAccountSelection">Kontoauswahl erweitern</string>
     <string name="contentDescriptionButtonExpandCustomFolders">Erweitern von benutzerdefinierten Ordnern</string>

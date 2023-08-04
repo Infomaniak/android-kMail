@@ -137,6 +137,7 @@
     <string name="contentDescriptionButtonDeleteDraft">Borrar borrador</string>
     <string name="contentDescriptionButtonDeleteHistory">Borrar entrada del historial</string>
     <string name="contentDescriptionButtonDeleteQuote">Borrar mensajes citados</string>
+    <string name="contentDescriptionButtonDeleteSearch">Borrar búsqueda</string>
     <string name="contentDescriptionButtonDeleteSignature">Borrar firma</string>
     <string name="contentDescriptionButtonExpandAccountSelection">Ampliar la selección de cuentas</string>
     <string name="contentDescriptionButtonExpandCustomFolders">Ampliar carpetas personalizadas</string>
