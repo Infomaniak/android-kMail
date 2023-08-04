@@ -20,4 +20,8 @@
     <style name="BottomSheetDialogTheme" parent="BottomSheetDialogTheme.Base">
         <item name="android:navigationBarColor">@color/backgroundColorSecondary</item>
     </style>
+
+    <style name="SearchTextInputEditTextStyle" parent="SearchTextInputEditTextStyle.Base">
+        <item name="android:importantForAutofill">no</item>
+    </style>
 </resources>

@@ -77,33 +77,16 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/searchInputLayout"
+                style="@style/SearchTextInputLayoutStyle"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/searchViewHeight"
                 android:layout_marginHorizontal="@dimen/marginStandardMedium"
                 android:layout_marginTop="@dimen/marginStandardMedium"
-                android:layout_marginBottom="@dimen/marginStandardSmall"
-                app:boxStrokeColor="@null"
-                app:boxStrokeWidth="0dp"
-                app:endIconContentDescription="@string/contentDescriptionButtonDeleteSearch"
-                app:endIconDrawable="@drawable/ic_close_search"
-                app:endIconMode="clear_text"
-                app:hintEnabled="false"
-                app:placeholderText="@string/searchFieldPlaceholder"
-                app:placeholderTextColor="@color/tertiaryTextColor">
+                android:layout_marginBottom="@dimen/marginStandardSmall">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/searchTextInput"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:drawableStart="@drawable/ic_search_small"
-                    android:drawablePadding="@dimen/marginStandardSmall"
-                    android:hint="@string/searchFieldPlaceholder"
-                    android:imeOptions="actionSearch"
-                    android:importantForAutofill="no"
-                    android:inputType="textFilter"
-                    android:lines="1"
-                    android:padding="0dp"
-                    android:textColorHint="@color/tertiaryTextColor" />
+                    style="@style/SearchTextInputEditTextStyle" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <androidx.core.widget.NestedScrollView

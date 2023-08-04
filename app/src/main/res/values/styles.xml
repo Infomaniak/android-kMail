@@ -435,6 +435,34 @@
         <item name="cornerSize">20dp</item>
     </style>
 
+    <!-- SearchBar -->
+
+    <style name="SearchTextInputLayoutStyle">
+        <item name="boxStrokeColor">@null</item>
+        <item name="boxStrokeWidth">0dp</item>
+        <item name="endIconContentDescription">@string/contentDescriptionButtonDeleteSearch</item>
+        <item name="endIconDrawable">@drawable/ic_close_search</item>
+        <item name="endIconMode">clear_text</item>
+        <item name="hintEnabled">false</item>
+        <item name="placeholderText">@string/searchFieldPlaceholder</item>
+        <item name="placeholderTextColor">@color/tertiaryTextColor</item>
+    </style>
+
+    <style name="SearchTextInputEditTextStyle.Base">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:drawableStart">@drawable/ic_search_small</item>
+        <item name="android:drawablePadding">@dimen/marginStandardSmall</item>
+        <item name="android:hint">@string/searchFieldPlaceholder</item>
+        <item name="android:imeOptions">actionSearch</item>
+        <item name="android:inputType">textFilter</item>
+        <item name="android:lines">1</item>
+        <item name="android:padding">0dp</item>
+        <item name="android:textColorHint">@color/tertiaryTextColor</item>
+    </style>
+
+    <style name="SearchTextInputEditTextStyle" parent="SearchTextInputEditTextStyle.Base" />
+
     <!-- Divider -->
 
     <style name="ItemDivider">
