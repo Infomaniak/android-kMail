@@ -22,7 +22,6 @@ import android.os.CountDownTimer
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo
 import android.widget.ListPopupWindow
 import android.widget.PopupWindow
 import androidx.core.view.isGone
@@ -41,6 +40,7 @@ import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListen
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollDirection
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollState
 import com.infomaniak.lib.core.utils.Utils
+import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.hideKeyboard
 import com.infomaniak.lib.core.utils.showKeyboard
 import com.infomaniak.mail.MatomoMail.trackSearchEvent
@@ -52,10 +52,8 @@ import com.infomaniak.mail.databinding.FragmentSearchBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
 import com.infomaniak.mail.ui.main.search.SearchFolderAdapter.SearchFolderElement
+import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
-import com.infomaniak.mail.utils.addStickyDateDecoration
-import com.infomaniak.mail.utils.getLocalizedNameOrAllFolders
-import com.infomaniak.mail.utils.navigateToThread
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -215,11 +213,7 @@ class SearchFragment : Fragment() {
     }
 
     private fun setSearchBarUi() = with(binding.searchBar) {
-        searchInputLayout.setEndIconOnClickListener {
-            searchTextInput.text?.clear()
-            trackSearchEvent("deleteSearch")
-        }
-
+        searchInputLayout.trackSearchEndIconClick(context, searchTextInput)
         searchTextInput.apply {
             showKeyboard()
 
@@ -230,14 +224,7 @@ class SearchFragment : Fragment() {
                 }
             }
 
-            setOnEditorActionListener { _, actionId, _ ->
-                if (actionId == EditorInfo.IME_ACTION_SEARCH && !text.isNullOrBlank()) {
-                    trackSearchEvent("validateSearch")
-                    searchViewModel.searchQuery(text.toString(), saveInHistory = true)
-                    hideKeyboard()
-                }
-                true // Action got consumed
-            }
+            setupOnEditorActionListener(context) { query -> searchViewModel.searchQuery(query, saveInHistory = true) }
         }
     }
 

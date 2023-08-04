@@ -21,7 +21,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
@@ -29,13 +28,14 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
-import com.infomaniak.lib.core.utils.hideKeyboard
+import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.MatomoMail.trackCreateFolderEvent
-import com.infomaniak.mail.MatomoMail.trackSearchEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.FragmentMoveBinding
 import com.infomaniak.mail.utils.createInputDialog
+import com.infomaniak.mail.utils.setupOnEditorActionListener
+import com.infomaniak.mail.utils.trackSearchEndIconClick
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -125,12 +125,8 @@ class MoveFragment : MenuFoldersFragment() {
 
     private fun setSearchBarUi() = with(binding) {
         searchResultsList.adapter = searchResultsAdpater
-        // TODO: Factorize
-        searchInputLayout.setEndIconOnClickListener {
-            searchTextInput.text?.clear()
-            trackSearchEvent("deleteSearch")
-        }
 
+        searchInputLayout.trackSearchEndIconClick(context, searchTextInput)
         searchTextInput.apply {
 
             doOnTextChanged { text, _, _, _ ->
@@ -138,14 +134,7 @@ class MoveFragment : MenuFoldersFragment() {
                 if (text?.isNotBlank() == true) moveViewModel.searchQuery(text.toString())
             }
 
-            setOnEditorActionListener { _, actionId, _ ->
-                if (actionId == EditorInfo.IME_ACTION_SEARCH && !text.isNullOrBlank()) {
-                    trackSearchEvent("validateSearch")
-                    moveViewModel.searchQuery(text.toString())
-                    hideKeyboard()
-                }
-                true // Action got consumed
-            }
+            setupOnEditorActionListener(context, moveViewModel::searchQuery)
         }
     }
 
