@@ -26,7 +26,6 @@ import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -47,8 +46,6 @@ class MoveViewModel @Inject constructor(
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
     private var searchJob: Job? = null
-
-    private val draftFolderId: String? = FolderController.getFolder(FolderRole.DRAFT, mailboxContentRealm())?.id
 
     var searchResults: MutableLiveData<List<Folder>> = MutableLiveData()
 
@@ -78,6 +75,6 @@ class MoveViewModel @Inject constructor(
     }
 
     private companion object {
-        const val SEARCH_DEBOUNCE_DURATION = 300L
+        const val SEARCH_DEBOUNCE_DURATION = 200L
     }
 }
