@@ -21,11 +21,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
+import com.infomaniak.lib.core.utils.hideKeyboard
 import com.infomaniak.mail.MatomoMail.trackCreateFolderEvent
+import com.infomaniak.mail.MatomoMail.trackSearchEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.FragmentMoveBinding
@@ -39,7 +45,11 @@ class MoveFragment : MenuFoldersFragment() {
     private val navigationArgs: MoveFragmentArgs by navArgs()
     private val moveViewModel: MoveViewModel by viewModels()
 
+    private var currentFolderId: String? = null
+
     private val createFolderDialog by lazy { initNewFolderDialog() }
+
+    private val searchResultsAdpater by lazy { FolderAdapter(isInMenuDrawer, onFolderClicked = ::onFolderSelected) }
 
     override val defaultFoldersList: RecyclerView by lazy { binding.defaultFoldersList }
     override val customFoldersList: RecyclerView by lazy { binding.customFoldersList }
@@ -53,8 +63,15 @@ class MoveFragment : MenuFoldersFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupListeners()
+        setSearchBarUi()
         observeFolderId()
         observeNewFolderCreation()
+        observeSearchResults()
+    }
+
+    override fun onStop() {
+        moveViewModel.cancelSearch()
+        super.onStop()
     }
 
     private fun setupListeners() = with(binding) {
@@ -77,6 +94,7 @@ class MoveFragment : MenuFoldersFragment() {
         val (defaultFolders, customFolders) = mainViewModel.currentFoldersLive.value!!
         defaultFoldersAdapter.setFolders(defaultFolders.filterNot { it.role == FolderRole.DRAFT }, folderId)
         customFoldersAdapter.setFolders(customFolders, folderId)
+        currentFolderId = folderId
     }
 
     private fun observeNewFolderCreation() {
@@ -103,5 +121,42 @@ class MoveFragment : MenuFoldersFragment() {
                 mainViewModel.moveToNewFolder(folderName!!.toString(), threadsUids, messageUid)
             },
         )
+    }
+
+    private fun setSearchBarUi() = with(binding) {
+        searchResultsList.adapter = searchResultsAdpater
+        // TODO: Factorize
+        searchInputLayout.setEndIconOnClickListener {
+            searchTextInput.text?.clear()
+            trackSearchEvent("deleteSearch")
+        }
+
+        searchTextInput.apply {
+
+            doOnTextChanged { text, _, _, _ ->
+                toggleFolderListsVisibility(!text.isNullOrBlank())
+                if (text?.isNotBlank() == true) moveViewModel.searchQuery(text.toString())
+            }
+
+            setOnEditorActionListener { _, actionId, _ ->
+                if (actionId == EditorInfo.IME_ACTION_SEARCH && !text.isNullOrBlank()) {
+                    trackSearchEvent("validateSearch")
+                    moveViewModel.searchQuery(text.toString())
+                    hideKeyboard()
+                }
+                true // Action got consumed
+            }
+        }
+    }
+
+    private fun toggleFolderListsVisibility(isSearching: Boolean) = with(binding) {
+        searchResultsList.isVisible = isSearching
+        moveFoldersLists.isGone = isSearching
+    }
+
+    private fun observeSearchResults() {
+        moveViewModel.searchResults.observe(viewLifecycleOwner) { folders ->
+            searchResultsAdpater.setFolders(folders, currentFolderId)
+        }
     }
 }

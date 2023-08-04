@@ -17,19 +17,28 @@
  */
 package com.infomaniak.mail.ui.main.menu
 
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.mail.data.cache.RealmDatabase
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
+import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class MoveViewModel @Inject constructor(
+    private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val messageController: MessageController,
     private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -37,11 +46,38 @@ class MoveViewModel @Inject constructor(
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
+    private var searchJob: Job? = null
+
+    private val draftFolderId: String? = FolderController.getFolder(FolderRole.DRAFT, mailboxContentRealm())?.id
+
+    var searchResults: MutableLiveData<List<Folder>> = MutableLiveData()
+
+    fun cancelSearch() {
+        searchJob?.cancel()
+    }
+
     fun getFolderIdByMessage(messageUid: String) = liveData(ioCoroutineContext) {
         emit(messageController.getMessage(messageUid)!!.folderId)
     }
 
     fun getFolderIdByThread(threadUid: String) = liveData(ioCoroutineContext) {
         emit(threadController.getThread(threadUid)!!.folderId)
+    }
+
+    fun searchQuery(query: String) = viewModelScope.launch(ioCoroutineContext) {
+        searchJob?.cancel()
+        searchJob = launch {
+            delay(SEARCH_DEBOUNCE_DURATION)
+            searchResults.postValue(FolderController.getFoldersByName(query.trim(), mailboxContentRealm()))
+        }
+    }
+
+    override fun onCleared() {
+        cancelSearch()
+        super.onCleared()
+    }
+
+    private companion object {
+        const val SEARCH_DEBOUNCE_DURATION = 300L
     }
 }
