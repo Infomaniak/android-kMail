@@ -77,7 +77,9 @@ class Folder : RealmObject {
     @Transient
     var isHistoryComplete: Boolean = DEFAULT_IS_HISTORY_COMPLETE
     @Transient
-    var isCollapsed: Boolean = false
+    var isHidden: Boolean = false // For children only (a children Folder is hidden if its parent is collapsed)
+    @Transient
+    var isCollapsed: Boolean = false // For parents only (collapsing a parent Folder will hide its children)
     //endregion
 
     private val _parents by backlinks(Folder::children)
@@ -92,8 +94,11 @@ class Folder : RealmObject {
             shouldDisplayPastille = unreadCountLocal == 0 && unreadCountRemote > 0,
         )
 
-    val canCollapse: Boolean
-        get() = role == null && children.isNotEmpty() && !path.contains(separator)
+    val canBeCollapsed: Boolean // For parents only (only a parent can be collapsed, its children will be hidden instead)
+        get() = role == null && children.isNotEmpty() && isRoot
+
+    val isRoot: Boolean
+        get() = !path.contains(separator)
 
     fun initLocalValues(
         lastUpdatedAt: RealmInstant?,
@@ -103,6 +108,7 @@ class Folder : RealmObject {
         messages: RealmList<Message>,
         remainingOldMessagesToFetch: Int,
         isHistoryComplete: Boolean,
+        isHidden: Boolean,
         isCollapsed: Boolean,
     ) {
         this.lastUpdatedAt = lastUpdatedAt
@@ -112,6 +118,7 @@ class Folder : RealmObject {
         this.messages.addAll(messages)
         this.remainingOldMessagesToFetch = remainingOldMessagesToFetch
         this.isHistoryComplete = isHistoryComplete
+        this.isHidden = isHidden
         this.isCollapsed = isCollapsed
     }
 

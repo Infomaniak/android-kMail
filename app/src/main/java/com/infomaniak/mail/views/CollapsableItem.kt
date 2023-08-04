@@ -27,8 +27,9 @@ import com.infomaniak.mail.utils.toggleChevron
 interface CollapsableItem {
 
     val binding: ViewBinding
+
     var isCollapsed: Boolean
-    var canCollapse: Boolean
+    var canBeCollapsed: Boolean
 
     fun View.setOnCollapsableItemClickListener(listener: View.OnClickListener?, chevron: View = this) {
         setOnClickListener {

@@ -49,7 +49,7 @@ class FolderAdapter(
 
     private inline val folders get() = foldersDiffer.currentList
 
-    private var hasCollapsableFolder = false
+    private var hasCollapsableFolder: Boolean? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FolderViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -134,10 +134,10 @@ class FolderAdapter(
                 initOnCollapsableClickListener { onCollapseClicked?.invoke(folder.id, isCollapsed) }
                 isPastilleDisplayed = unread?.shouldDisplayPastille ?: false
                 unreadCount = unread?.count ?: 0
-                canCollapse = folder.canCollapse
+                isHidden = folder.isHidden
                 isCollapsed = folder.isCollapsed
-                computeFolderVisibility()
-                setIndent(folderIndent, hasCollapsableFolder, canCollapse)
+                canBeCollapsed = folder.canBeCollapsed
+                setIndent(folderIndent, hasCollapsableFolder!!, canBeCollapsed)
                 setCollapsingButtonContentDescription(folderName)
             }
         }
@@ -151,8 +151,17 @@ class FolderAdapter(
     @SuppressLint("NotifyDataSetChanged")
     fun setFolders(newFolders: List<Folder>, newCurrentFolderId: String?) {
         currentFolderId = newCurrentFolderId
+
         foldersDiffer.submitList(newFolders)
-        hasCollapsableFolder = newFolders.any { it.canCollapse }
+        val newHasCollapsableFolder = newFolders.any { it.canBeCollapsed }
+
+        val isFirstTime = hasCollapsableFolder == null
+        val collapsableFolderExistenceHasChanged = newHasCollapsableFolder != hasCollapsableFolder
+        if (!isFirstTime && collapsableFolderExistenceHasChanged) {
+            notifyDataSetChanged()
+        }
+
+        hasCollapsableFolder = newHasCollapsableFolder
     }
 
     fun updateSelectedState(newCurrentFolderId: String) {
@@ -184,15 +193,13 @@ class FolderAdapter(
         }
 
         override fun areContentsTheSame(oldFolder: Folder, newFolder: Folder): Boolean {
-
-            val collapseIsTheSame = newFolder.canCollapse || oldFolder.isCollapsed == newFolder.isCollapsed
-
             return oldFolder.name == newFolder.name &&
                     oldFolder.isFavorite == newFolder.isFavorite &&
                     oldFolder.path == newFolder.path &&
                     oldFolder.unreadCountDisplay == newFolder.unreadCountDisplay &&
                     oldFolder.threads.count() == newFolder.threads.count() &&
-                    collapseIsTheSame
+                    oldFolder.isHidden == newFolder.isHidden &&
+                    oldFolder.canBeCollapsed == newFolder.canBeCollapsed
         }
     }
 }

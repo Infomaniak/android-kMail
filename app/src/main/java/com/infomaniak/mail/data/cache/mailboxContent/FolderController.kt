@@ -71,7 +71,7 @@ class FolderController @Inject constructor(private val mailboxContentRealm: Real
             deleteOutdatedFolders(remoteFoldersWithChildren)
 
             Log.d(RealmDatabase.TAG, "Folders: Save new data")
-            insertNewData(remoteFoldersWithChildren)
+            upsertFolders(remoteFoldersWithChildren)
         }
     }
 
@@ -92,11 +92,15 @@ class FolderController @Inject constructor(private val mailboxContentRealm: Real
         delete(folder)
     }
 
-    private fun MutableRealm.insertNewData(remoteFolders: List<Folder>) {
+    private fun MutableRealm.upsertFolders(remoteFolders: List<Folder>) {
 
         remoteFolders.forEach { remoteFolder ->
 
             getFolder(remoteFolder.id, realm = this)?.let { localFolder ->
+
+                val collapseStateNeedsReset = remoteFolder.isRoot && remoteFolder.children.isEmpty()
+                val isCollapsed = if (collapseStateNeedsReset) false else localFolder.isCollapsed
+
                 remoteFolder.initLocalValues(
                     localFolder.lastUpdatedAt,
                     localFolder.cursor,
@@ -105,7 +109,8 @@ class FolderController @Inject constructor(private val mailboxContentRealm: Real
                     localFolder.messages,
                     localFolder.remainingOldMessagesToFetch,
                     localFolder.isHistoryComplete,
-                    localFolder.isCollapsed,
+                    localFolder.isHidden,
+                    isCollapsed,
                 )
             }
         }

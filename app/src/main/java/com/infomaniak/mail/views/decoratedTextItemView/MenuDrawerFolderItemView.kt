@@ -32,19 +32,25 @@ class MenuDrawerFolderItemView @JvmOverloads constructor(
 
     private var onCollapsedFolderClicked: OnClickListener? = null
 
-    override var canCollapse = false
+    var isHidden = false
         set(value) {
             field = value
-            binding.collapseCustomFolderButton.apply {
-                isVisible = value
-                setOnCollapsableItemClickListener(if (canCollapse) onCollapsedFolderClicked else null)
-            }
+            binding.root.isVisible = !value
         }
 
     override var isCollapsed = false
         set(value) {
             field = value
             binding.collapseCustomFolderButton.toggleChevron(value)
+        }
+
+    override var canBeCollapsed = false
+        set(value) {
+            field = value
+            binding.collapseCustomFolderButton.apply {
+                isVisible = value
+                setOnCollapsableItemClickListener(if (canBeCollapsed) onCollapsedFolderClicked else null)
+            }
         }
 
     fun setCollapsingButtonContentDescription(folderName: String) {
@@ -54,9 +60,5 @@ class MenuDrawerFolderItemView @JvmOverloads constructor(
 
     fun initOnCollapsableClickListener(onClickListener: OnClickListener?) {
         onCollapsedFolderClicked = onClickListener
-    }
-
-    fun computeFolderVisibility() {
-        binding.root.isVisible = canCollapse || !isCollapsed
     }
 }
