@@ -77,9 +77,9 @@ class Folder : RealmObject {
     @Transient
     var isHistoryComplete: Boolean = DEFAULT_IS_HISTORY_COMPLETE
     @Transient
-    var isHidden: Boolean = false // For children only
+    var isHidden: Boolean = false // For children only (a children Folder is hidden if its parent is collapsed)
     @Transient
-    var isCollapsed: Boolean = false // For parents only
+    var isCollapsed: Boolean = false // For parents only (collapsing a parent Folder will hide its children)
     //endregion
 
     private val _parents by backlinks(Folder::children)
@@ -94,7 +94,7 @@ class Folder : RealmObject {
             shouldDisplayPastille = unreadCountLocal == 0 && unreadCountRemote > 0,
         )
 
-    val canBeCollapsed: Boolean // For parents only
+    val canBeCollapsed: Boolean // For parents only (only a parent can be collapsed, its children will be hidden instead)
         get() = role == null && children.isNotEmpty() && isRoot
 
     val isRoot: Boolean
