@@ -34,6 +34,7 @@
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/searchTextInput"
-            style="@style/SearchTextInputEditTextStyle" />
+            style="@style/SearchTextInputEditTextStyle"
+            android:drawablePadding="@dimen/marginStandardSmall" />
     </com.google.android.material.textfield.TextInputLayout>
 </com.google.android.material.card.MaterialCardView>

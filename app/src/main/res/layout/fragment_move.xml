@@ -80,13 +80,15 @@
                 style="@style/SearchTextInputLayoutStyle"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/searchViewHeight"
-                android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                android:layout_marginStart="@dimen/marginStandardSmall"
+                android:layout_marginEnd="@dimen/marginStandardMedium"
                 android:layout_marginTop="@dimen/marginStandardMedium"
                 android:layout_marginBottom="@dimen/marginStandardSmall">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/searchTextInput"
-                    style="@style/SearchTextInputEditTextStyle" />
+                    style="@style/SearchTextInputEditTextStyle"
+                    android:drawablePadding="@dimen/marginStandardMedium" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <androidx.core.widget.NestedScrollView
