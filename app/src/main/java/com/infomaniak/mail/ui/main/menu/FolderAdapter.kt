@@ -154,9 +154,13 @@ class FolderAdapter(
 
         foldersDiffer.submitList(newFolders)
         val newHasCollapsableFolder = newFolders.any { it.canBeCollapsed }
-        if (hasCollapsableFolder != null && newHasCollapsableFolder != hasCollapsableFolder) {
+
+        val isFirstTime = hasCollapsableFolder == null
+        val collapsableFolderExistenceHasChanged = newHasCollapsableFolder != hasCollapsableFolder
+        if (!isFirstTime && collapsableFolderExistenceHasChanged) {
             notifyDataSetChanged()
         }
+
         hasCollapsableFolder = newHasCollapsableFolder
     }
 

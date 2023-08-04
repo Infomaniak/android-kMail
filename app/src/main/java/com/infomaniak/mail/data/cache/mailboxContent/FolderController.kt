@@ -98,11 +98,8 @@ class FolderController @Inject constructor(private val mailboxContentRealm: Real
 
             getFolder(remoteFolder.id, realm = this)?.let { localFolder ->
 
-                val isCollapsed = if (remoteFolder.isRoot && remoteFolder.children.isEmpty()) {
-                    false
-                } else {
-                    localFolder.isCollapsed
-                }
+                val collapseStateNeedsReset = remoteFolder.isRoot && remoteFolder.children.isEmpty()
+                val isCollapsed = if (collapseStateNeedsReset) false else localFolder.isCollapsed
 
                 remoteFolder.initLocalValues(
                     localFolder.lastUpdatedAt,
