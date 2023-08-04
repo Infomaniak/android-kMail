@@ -325,10 +325,10 @@
     <string name="settingsOptionAlways">Sempre</string>
     <string name="settingsOptionAskMe">Chiedetemi</string>
     <string name="settingsOptionDarkTheme">Scuro</string>
-    <string name="settingsOptionDiscussions">Discussioni</string>
     <string name="settingsOptionLightTheme">Luce</string>
-    <string name="settingsOptionMessages">Messaggi</string>
     <string name="settingsOptionSystemTheme">Sistema</string>
+    <string name="settingsOptionThreadModeConversation">Discussioni</string>
+    <string name="settingsOptionThreadModeMessage">Messaggi</string>
     <string name="settingsPrivacyDeleteSearchHistory">Cancella la cronologia delle ricerche</string>
     <string name="settingsPrivacyViewLogs">Visualizza i log</string>
     <string name="settingsSectionAppearance">Aspetto</string>
@@ -359,6 +359,7 @@
     <string name="settingsTheme">Tema</string>
     <string name="settingsThemeChoiceTitle">Scelta del tema</string>
     <string name="settingsThreadListDensityTitle">Densità dell’elenco delle discussioni</string>
+    <string name="settingsThreadModeTitle">Modalità di visualizzazione dei messaggi</string>
     <string name="settingsTitle">Impostazioni</string>
     <string name="settingsTransferAsAttachment">Come allegato</string>
     <string name="settingsTransferEmailsDescription">Quando si inoltra un’e-mail, scegliere la modalità di visualizzazione più adatta.</string>

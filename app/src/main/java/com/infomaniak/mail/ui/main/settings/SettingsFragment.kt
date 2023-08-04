@@ -83,6 +83,7 @@ class SettingsFragment : Fragment() {
             settingsThreadListDensity.setSubtitle(threadDensity.localisedNameRes)
             settingsTheme.setSubtitle(theme.localisedNameRes)
             settingsAccentColor.setSubtitle(accentColor.localisedNameRes)
+            settingsThreadMode.setSubtitle(threadMode.localisedNameRes)
             settingsExternalContent.setSubtitle(externalContent.localisedNameRes)
         }
     }
@@ -126,6 +127,10 @@ class SettingsFragment : Fragment() {
 
         settingsSwipeActions.setOnClickListener {
             animatedNavigation(SettingsFragmentDirections.actionSettingsToSwipeActionsSetting())
+        }
+
+        settingsThreadMode.setOnClickListener {
+            animatedNavigation(SettingsFragmentDirections.actionSettingsToThreadModeSetting())
         }
 
         settingsExternalContent.setOnClickListener {

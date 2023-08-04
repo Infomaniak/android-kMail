@@ -336,6 +336,9 @@
             android:id="@+id/action_settings_to_swipeActionsSetting"
             app:destination="@id/swipeActionsSettingsFragment" />
         <action
+            android:id="@+id/action_settings_to_threadModeSetting"
+            app:destination="@id/threadModeSettingFragment" />
+        <action
             android:id="@+id/action_settings_to_externalContentSetting"
             app:destination="@id/externalContentSettingFragment" />
     </fragment>
@@ -357,6 +360,12 @@
         android:name="com.infomaniak.mail.ui.main.settings.AccentColorSettingFragment"
         android:label="AccentColorSettingFragment"
         tools:layout="@layout/fragment_accent_color_setting" />
+
+    <fragment
+        android:id="@+id/threadModeSettingFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.ThreadModeSettingFragment"
+        android:label="ThreadModeSettingFragment"
+        tools:layout="@layout/fragment_thread_mode_setting" />
 
     <fragment
         android:id="@+id/externalContentSettingFragment"
