@@ -98,8 +98,8 @@ class ThreadController @Inject constructor(
                     isFullyDownloaded = localMessage?.isFullyDownloaded() ?: false,
                     isSpam = folderRole == FolderRole.SPAM,
                     isTrashed = folderRole == FolderRole.TRASH,
-                    draftLocalUuid = localMessage?.draftLocalUuid,
                     isFromSearch = localMessage == null,
+                    draftLocalUuid = localMessage?.draftLocalUuid,
                 )
 
                 localMessage?.let(remoteMessage::keepHeavyData)
@@ -261,9 +261,9 @@ class ThreadController @Inject constructor(
                                     isFullyDownloaded = true,
                                     isSpam = localMessage.isSpam,
                                     isTrashed = localMessage.isTrashed,
-                                    messageIds = localMessage.messageIds,
-                                    draftLocalUuid = draftLocalUuid,
                                     isFromSearch = localMessage.isFromSearch,
+                                    draftLocalUuid = draftLocalUuid,
+                                    messageIds = localMessage.messageIds,
                                 )
 
                                 MessageController.upsertMessage(remoteMessage, realm)
