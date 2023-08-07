@@ -34,9 +34,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/marginStandardMedium"
-            android:layout_marginTop="@dimen/marginStandardMedium"
-            android:layout_marginBottom="@dimen/marginStandardSmall"
+            android:layout_marginVertical="@dimen/marginStandardMedium"
+            android:layout_marginStart="@dimen/marginStandard"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
@@ -71,7 +70,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginVertical="@dimen/marginStandardMedium"
+            android:layout_marginVertical="@dimen/marginStandardSmall"
             android:orientation="vertical">
 
             <com.google.android.material.card.MaterialCardView
@@ -81,9 +80,7 @@
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:paddingVertical="@dimen/marginStandardVerySmall"
-                    android:paddingStart="@dimen/marginStandardMedium"
-                    android:paddingEnd="@dimen/marginStandard">
+                    android:paddingHorizontal="@dimen/marginStandardMedium">
 
                     <ImageView
                         android:id="@+id/selectedAddressIcon"

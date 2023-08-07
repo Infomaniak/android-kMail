@@ -24,9 +24,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginStart="@dimen/marginStandardMedium"
-        android:gravity="center_vertical"
-        android:paddingEnd="@dimen/marginStandardVerySmall"
-        tools:ignore="RtlSymmetry">
+        android:gravity="center_vertical">
 
         <ImageView
             android:id="@+id/collapseButton"

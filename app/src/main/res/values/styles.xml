@@ -287,17 +287,15 @@
         <item name="android:layout_marginTop">@dimen/marginStandardSmall</item>
         <item name="android:layout_marginBottom">@dimen/marginStandardSmall</item>
         <item name="dividerColor">@color/separatorColor</item>
-        <item name="dividerInsetEnd">@dimen/marginStandard</item>
-        <item name="dividerInsetStart">@dimen/marginStandard</item>
+        <item name="dividerInsetStart">@dimen/marginStandardSmall</item>
     </style>
 
     <style name="RoundedDecoratedTextItem" parent="Widget.Material3.CardView.Filled">
         <item name="android:layout_height">@dimen/decoratedItemViewHeight</item>
         <item name="android:layout_marginStart">@dimen/marginStandardSmall</item>
         <item name="android:layout_width">match_parent</item>
-        <item name="android:paddingEnd">@dimen/marginStandard</item>
-        <item name="android:paddingStart">@dimen/marginStandard</item>
         <item name="cardBackgroundColor">@android:color/transparent</item>
+        <item name="cardPreventCornerOverlap">false</item>
         <item name="rippleColor">?attr/colorControlHighlight</item>
         <item name="shapeAppearanceOverlay">@style/RoundedDecoratedTextItemShapeAppearance</item>
     </style>
