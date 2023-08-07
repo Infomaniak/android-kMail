@@ -238,13 +238,13 @@ fun Fragment.safeNavigateToNewMessageActivity(
     shouldLoadDistantResources: Boolean = false,
 ) {
     safeNavigateToNewMessageActivity(
-        NewMessageActivityArgs(
+        args = NewMessageActivityArgs(
             arrivedFromExistingDraft = false,
             draftMode = draftMode,
             previousMessageUid = previousMessageUid,
             shouldLoadDistantResources = shouldLoadDistantResources,
         ).toBundle(),
-        currentClassName
+        currentClassName = currentClassName,
     )
 }
 
@@ -262,7 +262,7 @@ fun Fragment.navigateToThread(thread: Thread, mainViewModel: MainViewModel) {
                     draftLocalUuid = it.draftLocalUuid,
                     draftResource = it.draftResource,
                     messageUid = it.messageUid,
-                ).toBundle()
+                ).toBundle(),
             )
         }
     } else {

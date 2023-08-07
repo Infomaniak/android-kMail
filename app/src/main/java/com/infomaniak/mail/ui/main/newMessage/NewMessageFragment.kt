@@ -442,21 +442,21 @@ class NewMessageFragment : Fragment() {
         binding.fromMailAddress.text = formattedExpeditor
     }
 
-    private fun populateViewModelWithExternalMailData() {
-        when (requireActivity().intent?.action) {
+    private fun populateViewModelWithExternalMailData() = with(requireActivity()) {
+        when (intent?.action) {
             Intent.ACTION_SEND -> handleSingleSendIntent()
             Intent.ACTION_SEND_MULTIPLE -> handleMultipleSendIntent()
-            Intent.ACTION_VIEW, Intent.ACTION_SENDTO -> handleMailTo(requireActivity().intent.data, requireActivity().intent)
+            Intent.ACTION_VIEW, Intent.ACTION_SENDTO -> handleMailTo(intent.data, intent)
         }
 
-        if (newMessageActivityArgs.mailToUri != null) handleMailTo(newMessageActivityArgs.mailToUri, null)
+        if (newMessageActivityArgs.mailToUri != null) handleMailTo(newMessageActivityArgs.mailToUri)
     }
 
     /**
      * Handle `MailTo` from [Intent.ACTION_VIEW] or [Intent.ACTION_SENDTO]
      * Get [Intent.ACTION_VIEW] data with [MailTo] and [Intent.ACTION_SENDTO] with [Intent]
      */
-    private fun handleMailTo(uri: Uri?, intent: Intent?) = with(newMessageViewModel) {
+    private fun handleMailTo(uri: Uri?, intent: Intent? = null) = with(newMessageViewModel) {
 
         /**
          * Mailto grammar accept 'name_of_recipient<email>' for recipients

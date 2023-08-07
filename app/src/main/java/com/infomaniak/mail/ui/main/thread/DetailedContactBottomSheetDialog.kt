@@ -23,7 +23,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
-import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.MatomoMail.trackContactActionsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetDetailedContactBinding
@@ -59,8 +58,10 @@ class DetailedContactBottomSheetDialog : ActionsBottomSheetDialog() {
 
         writeMail.setClosingOnClickListener {
             trackContactActionsEvent("writeEmail")
-            val args = NewMessageActivityArgs(recipient = navigationArgs.recipient).toBundle()
-            safeNavigateToNewMessageActivity(args, currentClassName)
+            safeNavigateToNewMessageActivity(
+                args = NewMessageActivityArgs(recipient = navigationArgs.recipient).toBundle(),
+                currentClassName = currentClassName,
+            )
         }
         addToContacts.setClosingOnClickListener {
             trackContactActionsEvent("addToContacts")

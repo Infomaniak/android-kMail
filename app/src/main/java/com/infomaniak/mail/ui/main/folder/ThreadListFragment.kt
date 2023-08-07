@@ -160,7 +160,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                     draftMode = navigationArgs.draftMode,
                     previousMessageUid = navigationArgs.replyToMessageUid,
                     notificationId = navigationArgs.notificationId,
-                ).toBundle()
+                ).toBundle(),
             )
             arguments?.remove(navigationArgs::replyToMessageUid.name)
         }

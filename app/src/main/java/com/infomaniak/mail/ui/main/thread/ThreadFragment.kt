@@ -254,7 +254,7 @@ class ThreadFragment : Fragment() {
                         draftLocalUuid = message.draftLocalUuid,
                         draftResource = message.draftResource,
                         messageUid = message.uid,
-                    ).toBundle()
+                    ).toBundle(),
                 )
             }
             onDeleteDraftClicked = { message ->
