@@ -478,8 +478,8 @@ object RefreshController {
                 isFullyDownloaded = false,
                 isSpam = folder.role == FolderRole.SPAM,
                 isTrashed = folder.role == FolderRole.TRASH,
-                draftLocalUuid = null,
                 isFromSearch = false,
+                draftLocalUuid = null,
             )
 
             folder.messages.add(remoteMessage)
