@@ -85,7 +85,7 @@ class DraftController @Inject constructor(
 
         var isSuccess = true
 
-        val previousMessage = if (message.isFullyDownloaded) {
+        val previousMessage = if (message.isFullyDownloaded()) {
             message
         } else {
             isSuccess = ThreadController.fetchMessagesHeavyData(listOf(message), realm).isEmpty()

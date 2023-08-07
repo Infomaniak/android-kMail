@@ -35,6 +35,7 @@ import com.infomaniak.mail.utils.toShortUid
 import io.realm.kotlin.ext.*
 import io.realm.kotlin.types.*
 import io.realm.kotlin.types.annotations.Ignore
+import io.realm.kotlin.types.annotations.PersistedName
 import io.realm.kotlin.types.annotations.PrimaryKey
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -102,7 +103,8 @@ class Message : RealmObject {
 
     //region Local data (Transient)
     @Transient
-    var isFullyDownloaded: Boolean = false
+    @PersistedName("isFullyDownloaded")
+    private var _isFullyDownloaded: Boolean = false
     @Transient
     var isSpam: Boolean = false
     @Transient
@@ -180,7 +182,7 @@ class Message : RealmObject {
         messageIds: RealmSet<String> = computeMessageIds(),
     ) {
         this.date = date
-        this.isFullyDownloaded = isFullyDownloaded
+        this._isFullyDownloaded = isFullyDownloaded
         this.isSpam = isSpam
         this.isTrashed = isTrashed
         this.messageIds = messageIds
@@ -198,6 +200,10 @@ class Message : RealmObject {
         _acknowledge = message._acknowledge
         driveUrl = message.driveUrl
     }
+
+    // We had a bug once where we lost the Attachments.
+    // Since we only fetch sdfgsdfgsqdjkfgsqjkfgqsk
+    fun isFullyDownloaded(): Boolean = if (hasAttachments && attachments.isEmpty()) false else _isFullyDownloaded
 
     private inline fun <reified T : TypedRealmObject> RealmList<T>.detachedFromRealm(depth: UInt = UInt.MIN_VALUE): List<T> {
         return if (isManaged()) copyFromRealm(depth) else this

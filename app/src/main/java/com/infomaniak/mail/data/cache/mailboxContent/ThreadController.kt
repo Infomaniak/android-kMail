@@ -95,7 +95,7 @@ class ThreadController @Inject constructor(
                 // which is the reason why we can compute `isSpam` and `isTrashed` values so loosely.
                 remoteMessage.initLocalValues(
                     date = localMessage?.date ?: remoteMessage.date,
-                    isFullyDownloaded = localMessage?.isFullyDownloaded ?: false,
+                    isFullyDownloaded = localMessage?.isFullyDownloaded() ?: false,
                     isSpam = folderRole == FolderRole.SPAM,
                     isTrashed = folderRole == FolderRole.TRASH,
                     draftLocalUuid = localMessage?.draftLocalUuid,
@@ -243,7 +243,7 @@ class ThreadController @Inject constructor(
             val failedFoldersIds = mutableSetOf<String>()
 
             messages.forEach { localMessage ->
-                if (!localMessage.isFullyDownloaded) {
+                if (!localMessage.isFullyDownloaded()) {
                     with(ApiRepository.getMessage(localMessage.resource, okHttpClient)) {
                         if (isSuccess()) {
                             data?.also { remoteMessage ->
