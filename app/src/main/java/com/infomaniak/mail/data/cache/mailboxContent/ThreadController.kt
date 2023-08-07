@@ -32,7 +32,6 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
-import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.notifications.ResultsChange
@@ -102,7 +101,8 @@ class ThreadController @Inject constructor(
                     draftLocalUuid = localMessage?.draftLocalUuid,
                     isFromSearch = localMessage == null,
                 )
-                remoteMessage.body = localMessage?.body?.copyFromRealm()
+
+                localMessage?.let(remoteMessage::keepHeavyData)
 
                 remoteThread.messagesIds += remoteMessage.messageIds
                 searchFolder.messages.add(remoteMessage)
