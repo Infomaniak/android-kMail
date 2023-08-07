@@ -35,6 +35,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.infomaniak.lib.core.R
+import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.hideProgress
 import com.infomaniak.lib.core.utils.initProgress
 import com.infomaniak.lib.core.utils.safeNavigate
@@ -85,6 +86,8 @@ class LoginFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
+
+        loginUtils.initShowError(::showError)
 
         val introPagerAdapter = IntroPagerAdapter(
             manager = childFragmentManager,
@@ -163,6 +166,11 @@ class LoginFragment : Fragment() {
         UiUtils.animateColorChange(oldSecondaryBackground, newSecondaryBackground) { color ->
             requireActivity().window.statusBarColor = color
         }
+    }
+
+    private fun showError(error: String) {
+        showSnackbar(error)
+        onFailedLogin()
     }
 
     private fun onFailedLogin() = with(binding) {
