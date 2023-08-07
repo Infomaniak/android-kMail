@@ -36,6 +36,7 @@ import com.infomaniak.mail.databinding.FragmentSettingsBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.animatedNavigation
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class SettingsFragment : Fragment() {
@@ -43,7 +44,8 @@ class SettingsFragment : Fragment() {
     private lateinit var binding: FragmentSettingsBinding
     private val mainViewModel: MainViewModel by activityViewModels()
 
-    private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
+    @Inject
+    lateinit var localSettings: LocalSettings
 
     private val mailboxesAdapter = SettingsMailboxesAdapter { selectedMailbox ->
         with(selectedMailbox) {

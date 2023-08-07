@@ -37,10 +37,9 @@ import java.util.concurrent.TimeUnit
 class RegisterUserDeviceWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted params: WorkerParameters,
+    private val localSettings: LocalSettings,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : BaseCoroutineWorker(appContext, params) {
-
-    private val localSettings by lazy { LocalSettings.getInstance(appContext) }
 
     override suspend fun launchWork(): Result = withContext(ioDispatcher) {
 

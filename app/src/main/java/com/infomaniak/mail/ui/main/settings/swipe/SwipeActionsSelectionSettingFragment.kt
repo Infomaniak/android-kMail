@@ -31,13 +31,17 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.SwipeAction
 import com.infomaniak.mail.data.LocalSettings.SwipeAction.*
 import com.infomaniak.mail.databinding.FragmentSwipeActionsSelectionSettingBinding
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class SwipeActionsSelectionSettingFragment : Fragment() {
 
     private lateinit var binding: FragmentSwipeActionsSelectionSettingBinding
     private val navigationArgs: SwipeActionsSelectionSettingFragmentArgs by navArgs()
 
-    private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
+    @Inject
+    lateinit var localSettings: LocalSettings
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentSwipeActionsSelectionSettingBinding.inflate(inflater, container, false).also { binding = it }.root

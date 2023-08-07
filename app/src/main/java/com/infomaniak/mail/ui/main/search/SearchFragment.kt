@@ -57,6 +57,7 @@ import com.infomaniak.mail.utils.addStickyDateDecoration
 import com.infomaniak.mail.utils.getLocalizedNameOrAllFolders
 import com.infomaniak.mail.utils.navigateToThread
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class SearchFragment : Fragment() {
@@ -66,20 +67,14 @@ class SearchFragment : Fragment() {
     private val mainViewModel by activityViewModels<MainViewModel>()
     private val searchViewModel by viewModels<SearchViewModel>()
 
-    private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
+    @Inject
+    lateinit var localSettings: LocalSettings
+
+    @Inject
+    lateinit var threadListAdapter: ThreadListAdapter
 
     private val showLoadingTimer: CountDownTimer by lazy {
         Utils.createRefreshTimer { binding.swipeRefreshLayout.isRefreshing = true }
-    }
-
-    private val threadListAdapter by lazy {
-        ThreadListAdapter(
-            context = requireContext(),
-            threadDensity = localSettings.threadDensity,
-            folderRole = null,
-            contacts = mainViewModel.mergedContacts.value ?: emptyMap(),
-            onSwipeFinished = {},
-        )
     }
 
     private val recentSearchAdapter by lazy {
@@ -114,6 +109,7 @@ class SearchFragment : Fragment() {
         searchViewModel.init(navigationArgs.dummyFolderId)
         searchViewModel.executePendingSearch()
 
+        setupThreadListAdapter()
         setupListeners()
         setFoldersDropdownUi()
         setAttachmentsUi()
@@ -130,6 +126,14 @@ class SearchFragment : Fragment() {
     override fun onStop() {
         searchViewModel.cancelSearch()
         super.onStop()
+    }
+
+    private fun setupThreadListAdapter() {
+        threadListAdapter(
+            folderRole = null,
+            contacts = mainViewModel.mergedContacts.value ?: emptyMap(),
+            onSwipeFinished = {},
+        )
     }
 
     private fun setupListeners() = with(binding) {

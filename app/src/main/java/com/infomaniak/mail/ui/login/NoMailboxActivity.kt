@@ -22,7 +22,6 @@ import com.infomaniak.lib.core.utils.Utils.lockOrientationForSmallScreens
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.mail.BuildConfig.SHOP_URL
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.ActivityNoMailboxBinding
 import com.infomaniak.mail.ui.BaseActivity
 import com.infomaniak.mail.ui.login.IlluColors.Category
@@ -31,7 +30,9 @@ import com.infomaniak.mail.ui.login.IlluColors.getPaletteFor
 import com.infomaniak.mail.ui.login.IlluColors.keyPath
 import com.infomaniak.mail.utils.changePathColor
 import com.infomaniak.mail.utils.repeatFrame
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class NoMailboxActivity : BaseActivity() {
 
     private val binding by lazy { ActivityNoMailboxBinding.inflate(layoutInflater) }
@@ -73,7 +74,7 @@ class NoMailboxActivity : BaseActivity() {
     }
 
     private fun getAccentDependentIlluColors(): List<IlluColors> {
-        val colors = getPaletteFor(LocalSettings.getInstance(this).accentColor)
+        val colors = getPaletteFor(localSettings.accentColor)
         val pinkColor4 = colors[4]
         val pinkColor10 = colors[10]
 

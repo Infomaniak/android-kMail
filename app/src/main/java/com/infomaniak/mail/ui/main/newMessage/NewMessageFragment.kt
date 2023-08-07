@@ -94,7 +94,8 @@ class NewMessageFragment : Fragment() {
     private var lastFieldToTakeFocus: FieldType? = TO
     var shouldSendInsteadOfSave: Boolean = false
 
-    private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
+    @Inject
+    lateinit var localSettings: LocalSettings
 
     @Inject
     lateinit var draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler

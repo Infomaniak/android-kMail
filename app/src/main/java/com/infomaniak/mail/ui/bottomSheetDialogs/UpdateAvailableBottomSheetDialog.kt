@@ -24,11 +24,15 @@ import com.infomaniak.lib.core.utils.getAppName
 import com.infomaniak.lib.core.utils.goToPlaystore
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import com.infomaniak.lib.core.R as RCore
 
+@AndroidEntryPoint
 class UpdateAvailableBottomSheetDialog : InformationBottomSheetDialog() {
 
-    private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
+    @Inject
+    lateinit var localSettings: LocalSettings
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)

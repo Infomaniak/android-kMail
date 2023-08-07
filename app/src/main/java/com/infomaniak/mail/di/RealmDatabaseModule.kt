@@ -45,5 +45,4 @@ object RealmDatabaseModule {
     @Provides
     @Singleton
     fun providesMailboxContent() = RealmDatabase.MailboxContent()
-
 }

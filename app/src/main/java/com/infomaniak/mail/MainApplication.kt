@@ -78,6 +78,9 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
         private set
 
     @Inject
+    lateinit var localSettings: LocalSettings
+
+    @Inject
     lateinit var workerFactory: HiltWorkerFactory
 
     @Inject
@@ -169,7 +172,7 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
     }
 
     private fun enforceAppTheme() {
-        AppCompatDelegate.setDefaultNightMode(LocalSettings.getInstance(this).theme.mode)
+        AppCompatDelegate.setDefaultNightMode(localSettings.theme.mode)
     }
 
     private fun configureAccountUtils() {

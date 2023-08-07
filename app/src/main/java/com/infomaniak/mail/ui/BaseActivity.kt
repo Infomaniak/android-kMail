@@ -30,10 +30,11 @@ import kotlinx.coroutines.runBlocking
 
 open class BaseActivity : AppCompatActivity() {
 
-    protected val localSettings by lazy { LocalSettings.getInstance(this) }
+    // Don't try to replace this with a dependency injection, it won't work.
+    protected val localSettings by lazy { LocalSettings.getInstance(context = this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(LocalSettings.getInstance(this).accentColor.theme)
+        setTheme(localSettings.accentColor.theme)
 
         if (AccountUtils.currentUser == null) runBlocking {
             AccountUtils.requestCurrentUser()
@@ -52,13 +53,16 @@ open class BaseActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        if (localSettings.isAppLocked && isKeyguardSecure()) with(getMainApplication()) {
+        val isAppLocked = localSettings.isAppLocked
+        val accentColor = localSettings.accentColor
+
+        if (isAppLocked && isKeyguardSecure()) with(getMainApplication()) {
             lastAppClosingTime?.let {
                 LockActivity.lockAfterTimeout(
                     context = this@BaseActivity,
                     destinationClass = this::class.java,
                     lastAppClosingTime = it,
-                    primaryColor = localSettings.accentColor.getPrimary(this),
+                    primaryColor = accentColor.getPrimary(this),
                 )
             }
 

@@ -29,12 +29,16 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentSwipeActionsSettingsBinding
 import com.infomaniak.mail.utils.animatedNavigation
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class SwipeActionsSettingsFragment : Fragment() {
 
     private lateinit var binding: FragmentSwipeActionsSettingsBinding
 
-    private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
+    @Inject
+    lateinit var localSettings: LocalSettings
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentSwipeActionsSettingsBinding.inflate(inflater, container, false).also { binding = it }.root

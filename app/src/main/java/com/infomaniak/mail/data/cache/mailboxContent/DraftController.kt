@@ -47,8 +47,8 @@ import org.jsoup.nodes.TextNode
 import javax.inject.Inject
 
 class DraftController @Inject constructor(
-    private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val appContext: Context,
+    private val mailboxContentRealm: RealmDatabase.MailboxContent,
 ) {
 
     //region Get data

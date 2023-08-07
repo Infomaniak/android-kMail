@@ -22,6 +22,7 @@ import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.WorkManager
 import com.infomaniak.mail.MainApplication
+import com.infomaniak.mail.data.LocalSettings
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -54,5 +55,11 @@ object ApplicationModule {
     @Singleton
     fun providesGlobalCoroutineScope(@DefaultDispatcher defaultDispatcher: CoroutineDispatcher): CoroutineScope {
         return CoroutineScope(defaultDispatcher)
+    }
+
+    @Provides
+    @Singleton
+    fun providesLocalSettings(appContext: Context): LocalSettings {
+        return LocalSettings.getInstance(appContext)
     }
 }

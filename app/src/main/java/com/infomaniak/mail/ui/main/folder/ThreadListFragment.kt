@@ -94,11 +94,14 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private val threadListMultiSelection by lazy { ThreadListMultiSelection() }
 
-    private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
-
-    private lateinit var threadListAdapter: ThreadListAdapter
     private var lastUpdatedDate: Date? = null
     private var previousCustomFolderId: String? = null
+
+    @Inject
+    lateinit var localSettings: LocalSettings
+
+    @Inject
+    lateinit var threadListAdapter: ThreadListAdapter
 
     @Inject
     lateinit var draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler
@@ -227,9 +230,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun setupAdapter() = with(threadListViewModel) {
 
-        threadListAdapter = ThreadListAdapter(
-            context = requireContext(),
-            threadDensity = localSettings.threadDensity,
+        threadListAdapter(
             folderRole = mainViewModel.currentFolder.value?.role,
             contacts = mainViewModel.mergedContacts.value ?: emptyMap(),
             onSwipeFinished = { isRecoveringFinished.value = true },
@@ -237,7 +238,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 override var isEnabled by mainViewModel::isMultiSelectOn
                 override val selectedItems by mainViewModel::selectedThreads
                 override val publishSelectedItems = mainViewModel::publishSelectedItems
-            }
+            },
         )
 
         binding.threadsList.apply {
