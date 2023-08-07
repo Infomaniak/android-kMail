@@ -57,8 +57,8 @@ class FolderController @Inject constructor(private val mailboxContentRealm: Real
         return getFolderQuery(Folder::id.name, id, mailboxContentRealm()).asFlow().mapNotNull { it.obj }
     }
 
-    fun getRootFolder(name: CharSequence) = with(mailboxContentRealm()) {
-        query<Folder>("$isRootFolder AND ${Folder::name.name} == '$name'").first().find()
+    fun getRootFolder(name: String) = with(mailboxContentRealm()) {
+        query<Folder>("$isRootFolder AND ${Folder::name.name} == $0", name).first().find()
     }
     //endregion
 
@@ -139,7 +139,7 @@ class FolderController @Inject constructor(private val mailboxContentRealm: Real
         }
 
         private fun getFolderQuery(key: String, value: String, realm: TypedRealm): RealmSingleQuery<Folder> {
-            return realm.query<Folder>("$key == '$value'").first()
+            return realm.query<Folder>("$key == $0", value).first()
         }
         //endregion
 

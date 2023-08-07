@@ -75,12 +75,12 @@ object MailboxController {
     }
 
     private fun getMailboxQuery(objectId: String, realm: TypedRealm): RealmSingleQuery<Mailbox> {
-        return realm.query<Mailbox>("${Mailbox::objectId.name} == '$objectId'").first()
+        return realm.query<Mailbox>("${Mailbox::objectId.name} == $0", objectId).first()
     }
 
     private fun getMailboxQuery(userId: Int, mailboxId: Int, realm: TypedRealm): RealmSingleQuery<Mailbox> {
-        val checkMailboxId = "${Mailbox::mailboxId.name} == '$mailboxId'"
-        return realm.query<Mailbox>("${checkHasUserId(userId)} AND $checkMailboxId").first()
+        val checkMailboxId = "${Mailbox::mailboxId.name} == $0"
+        return realm.query<Mailbox>("${checkHasUserId(userId)} AND $checkMailboxId", mailboxId).first()
     }
 
     private fun getInvalidPasswordMailboxesQuery(userId: Int, realm: TypedRealm): RealmQuery<Mailbox> {
