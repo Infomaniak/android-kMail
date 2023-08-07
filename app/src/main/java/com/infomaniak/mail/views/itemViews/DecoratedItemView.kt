@@ -40,8 +40,6 @@ sealed class DecoratedItemView @JvmOverloads constructor(
 
     val binding by lazy { ViewDecoratedTextItemBinding.inflate(LayoutInflater.from(context), this, true) }
 
-    open val endIconMarginRes: Int = ResourcesCompat.ID_NULL
-
     private val regular by lazy { ResourcesCompat.getFont(context, com.infomaniak.lib.core.R.font.suisseintl_regular) }
     private val medium by lazy { ResourcesCompat.getFont(context, com.infomaniak.lib.core.R.font.suisseintl_medium) }
 
@@ -104,14 +102,6 @@ sealed class DecoratedItemView @JvmOverloads constructor(
             isGone = icon == null
             setImageDrawable(icon)
             contentDescription = contentDescriptionRes?.let(context::getString)
-
-            val endMargin = if (endIconMarginRes == ResourcesCompat.ID_NULL) {
-                ResourcesCompat.ID_NULL
-            } else {
-                resources.getDimension(endIconMarginRes)
-            }.toInt()
-
-            setMarginsRelative(end = endMargin)
         }
     }
 
