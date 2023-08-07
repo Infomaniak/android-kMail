@@ -40,7 +40,6 @@ import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListen
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollDirection
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollState
 import com.infomaniak.lib.core.utils.Utils
-import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.hideKeyboard
 import com.infomaniak.lib.core.utils.showKeyboard
 import com.infomaniak.mail.MatomoMail.trackSearchEvent
@@ -213,7 +212,7 @@ class SearchFragment : Fragment() {
     }
 
     private fun setSearchBarUi() = with(binding.searchBar) {
-        searchInputLayout.trackSearchEndIconClick(context, searchTextInput)
+        searchInputLayout.trackSearchEndIconClick()
         searchTextInput.apply {
             showKeyboard()
 
@@ -222,7 +221,7 @@ class SearchFragment : Fragment() {
                 if (searchViewModel.currentSearchQuery != newQuery) searchViewModel.searchQuery(newQuery)
             }
 
-            setupOnEditorActionListener(context) { _, query, _ -> searchViewModel.searchQuery(query, saveInHistory = true) }
+            setupOnEditorActionListener { query -> searchViewModel.searchQuery(query, saveInHistory = true) }
         }
     }
 

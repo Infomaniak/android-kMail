@@ -569,22 +569,18 @@ fun Context.launchNoMailboxActivity(shouldStartLoginActivity: Boolean = false) {
     startActivity(Intent(this, NoMailboxActivity::class.java))
 }
 
-fun TextInputLayout.trackSearchEndIconClick(context: Context, inputEditText: TextInputEditText) {
+fun TextInputLayout.trackSearchEndIconClick() {
     setEndIconOnClickListener {
-        inputEditText.text?.clear()
+        editText?.text?.clear()
         context.trackSearchEvent("deleteSearch")
     }
 }
 
-fun TextInputEditText.setupOnEditorActionListener(
-    context: Context,
-    folders: List<Folder> = emptyList(),
-    searchCallback: (Context, String, List<Folder>) -> Unit,
-) {
+fun TextInputEditText.setupOnEditorActionListener(searchCallback: (String) -> Unit) {
     setOnEditorActionListener { _, actionId, _ ->
         if (actionId == EditorInfo.IME_ACTION_SEARCH && !text.isNullOrBlank()) {
             context.trackSearchEvent("validateSearch")
-            searchCallback(context, text.toString(), folders)
+            searchCallback(text.toString())
             hideKeyboard()
         }
         true // Action got consumed

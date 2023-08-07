@@ -28,7 +28,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
-import com.infomaniak.lib.core.utils.context
+import com.infomaniak.lib.core.utils.hideKeyboard
 import com.infomaniak.mail.MatomoMail.trackCreateFolderEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder.FolderRole
@@ -44,8 +44,6 @@ class MoveFragment : MenuFoldersFragment() {
     private lateinit var binding: FragmentMoveBinding
     private val navigationArgs: MoveFragmentArgs by navArgs()
     private val moveViewModel: MoveViewModel by viewModels()
-
-    private var currentFolderId: String? = null
 
     private val createFolderDialog by lazy { initNewFolderDialog() }
 
@@ -70,6 +68,7 @@ class MoveFragment : MenuFoldersFragment() {
     }
 
     override fun onStop() {
+        binding.searchTextInput.hideKeyboard()
         moveViewModel.cancelSearch()
         super.onStop()
     }
@@ -94,7 +93,6 @@ class MoveFragment : MenuFoldersFragment() {
         val (defaultFolders, customFolders) = mainViewModel.currentFoldersLive.value!!
         defaultFoldersAdapter.setFolders(defaultFolders.filterNot { it.role == FolderRole.DRAFT }, folderId)
         customFoldersAdapter.setFolders(customFolders, folderId)
-        currentFolderId = folderId
     }
 
     private fun observeNewFolderCreation() {
@@ -126,16 +124,16 @@ class MoveFragment : MenuFoldersFragment() {
     private fun setSearchBarUi() = with(binding) {
         searchResultsList.adapter = searchResultsAdpater
 
-        searchInputLayout.trackSearchEndIconClick(context, searchTextInput)
+        searchInputLayout.trackSearchEndIconClick()
         searchTextInput.apply {
             val allFolders = mainViewModel.currentFoldersLive.value!!.let { it.first + it.second }
 
             doOnTextChanged { text, _, _, _ ->
                 toggleFolderListsVisibility(!text.isNullOrBlank())
-                if (text?.isNotBlank() == true) moveViewModel.filterFolders(context, text.toString(), allFolders)
+                if (text?.isNotBlank() == true) moveViewModel.filterFolders(text.toString(), allFolders)
             }
 
-            setupOnEditorActionListener(context, allFolders, moveViewModel::filterFolders)
+            setupOnEditorActionListener { query -> moveViewModel.filterFolders(query, allFolders) }
         }
     }
 
@@ -145,8 +143,6 @@ class MoveFragment : MenuFoldersFragment() {
     }
 
     private fun observeSearchResults() {
-        moveViewModel.filterResults.observe(viewLifecycleOwner) { folders ->
-            searchResultsAdpater.setFolders(folders, currentFolderId)
-        }
+        moveViewModel.filterResults.observe(viewLifecycleOwner) { folders -> searchResultsAdpater.setFolders(folders) }
     }
 }

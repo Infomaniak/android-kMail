@@ -17,12 +17,12 @@
  */
 package com.infomaniak.mail.ui.main.menu
 
+import android.app.Application
 import android.content.Context
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
-import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
@@ -37,11 +37,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MoveViewModel @Inject constructor(
-    private val mailboxContentRealm: RealmDatabase.MailboxContent,
+    application: Application,
     private val messageController: MessageController,
     private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-) : ViewModel() {
+) : AndroidViewModel(application) {
+
+    private inline val context: Context get() = getApplication()
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
@@ -61,7 +63,7 @@ class MoveViewModel @Inject constructor(
         emit(threadController.getThread(threadUid)!!.folderId)
     }
 
-    fun filterFolders(context: Context, query: String, folders: List<Folder>) = viewModelScope.launch(ioCoroutineContext) {
+    fun filterFolders(query: String, folders: List<Folder>) = viewModelScope.launch(ioCoroutineContext) {
         filterJob?.cancel()
         filterJob = launch {
             delay(FILTER_DEBOUNCE_DURATION)
