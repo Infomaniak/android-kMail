@@ -36,8 +36,9 @@ import com.infomaniak.mail.data.cache.mailboxInfo.PermissionsController
 import com.infomaniak.mail.data.cache.mailboxInfo.QuotasController
 import com.infomaniak.mail.data.cache.userInfo.AddressBookController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
-import com.infomaniak.mail.data.models.*
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.MoveResult
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.mailbox.Mailbox
@@ -47,7 +48,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.SnackBarManager
-import com.infomaniak.mail.ui.main.SnackBarManager.*
+import com.infomaniak.mail.ui.main.SnackBarManager.UndoData
 import com.infomaniak.mail.ui.main.folder.ThreadListViewModel
 import com.infomaniak.mail.ui.noValidMailboxes.NoValidMailboxesActivity
 import com.infomaniak.mail.utils.*
