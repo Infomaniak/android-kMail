@@ -34,7 +34,7 @@
             android:id="@+id/mainActions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/marginStandardMedium"
+            android:layout_marginBottom="@dimen/marginStandardSmall"
             app:menu="@menu/main_actions_thread_message_menu" />
 
         <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
@@ -44,6 +44,7 @@
             android:visibility="gone"
             app:icon="@drawable/ic_view_in_light"
             app:text="@string/actionViewInLight"
+            app:visibleDivider="false"
             tools:visibility="visible" />
 
         <!-- TODO: Display this when Postpone/Snooze action will be done (v2) -->
@@ -54,6 +55,7 @@
             android:visibility="gone"
             app:icon="@drawable/ic_alarm_clock"
             app:text="@string/actionPostpone"
+            app:visibleDivider="false"
             tools:visibility="visible" />
 
         <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
@@ -61,7 +63,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:icon="@drawable/ic_email_action_move"
-            app:text="@string/actionMove" />
+            app:text="@string/actionMove"
+            app:visibleDivider="false" />
 
         <FrameLayout
             android:layout_width="match_parent"

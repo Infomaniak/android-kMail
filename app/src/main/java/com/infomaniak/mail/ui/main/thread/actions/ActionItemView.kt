@@ -86,6 +86,10 @@ class ActionItemView @JvmOverloads constructor(
 
     fun setText(@StringRes textResourceId: Int) = binding.button.setText(textResourceId)
 
+    fun setDividerVisibility(isVisible: Boolean) {
+        binding.divider.isVisible = isVisible
+    }
+
     private companion object {
         const val NOT_SET = -1
     }
