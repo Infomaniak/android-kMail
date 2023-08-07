@@ -208,18 +208,18 @@ class ThreadController @Inject constructor(
         suspend fun fetchMessagesHeavyData(
             messages: List<Message>,
             mailbox: Mailbox,
-            okHttpClient: OkHttpClient? = null,
             realm: Realm,
+            okHttpClient: OkHttpClient? = null,
         ) {
             val failedFoldersIds = realm.writeBlocking { fetchMessagesHeavyData(messages, realm = this, okHttpClient) }
-            updateFailedFolders(failedFoldersIds, mailbox, okHttpClient, realm)
+            updateFailedFolders(failedFoldersIds, mailbox, realm, okHttpClient)
         }
 
         private suspend fun updateFailedFolders(
             failedFoldersIds: Set<String>,
             mailbox: Mailbox,
-            okHttpClient: OkHttpClient?,
             realm: Realm,
+            okHttpClient: OkHttpClient?,
         ) {
             failedFoldersIds.forEach { folderId ->
                 FolderController.getFolder(folderId, realm)?.let { folder ->
