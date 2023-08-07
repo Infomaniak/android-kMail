@@ -89,8 +89,6 @@ class Message : RealmObject {
     var isScheduled: Boolean = false
     var preview: String = ""
     var size: Int = 0
-    @SerialName("safe_display")
-    var safeDisplay: Boolean? = null
     @SerialName("has_unsubscribe_link")
     var hasUnsubscribeLink: Boolean? = null
     //endregion
