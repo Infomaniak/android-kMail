@@ -93,7 +93,8 @@ class FetchMessagesManager @Inject constructor(
         okHttpClient: OkHttpClient,
     ) {
 
-        ThreadController.fetchIncompleteMessages(messages, mailbox, okHttpClient, realm)
+        ThreadController.fetchMessagesHeavyData(messages, mailbox, realm, okHttpClient)
+
         val message = MessageController.getThreadLastMessageInFolder(uid, realm) ?: run {
             ThreadController.getThread(uid, realm)?.let { thread ->
                 Sentry.withScope { scope ->

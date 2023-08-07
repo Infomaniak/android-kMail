@@ -32,7 +32,6 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
-import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.notifications.ResultsChange
@@ -102,7 +101,8 @@ class ThreadController @Inject constructor(
                     draftLocalUuid = localMessage?.draftLocalUuid,
                     isFromSearch = localMessage == null,
                 )
-                remoteMessage.body = localMessage?.body?.copyFromRealm()
+
+                localMessage?.let(remoteMessage::keepHeavyData)
 
                 remoteThread.messagesIds += remoteMessage.messageIds
                 searchFolder.messages.add(remoteMessage)
@@ -127,10 +127,6 @@ class ThreadController @Inject constructor(
     //region Edit data
     fun deleteSearchThreads(realm: MutableRealm) = with(realm) {
         delete(query<Thread>("${Thread::isFromSearch.name} == true").find())
-    }
-
-    suspend fun fetchIncompleteMessages(messages: List<Message>, mailbox: Mailbox, okHttpClient: OkHttpClient? = null) {
-        fetchIncompleteMessages(messages, mailbox, okHttpClient, mailboxContentRealm())
     }
 
     fun saveThreads(searchMessages: List<Message>) {
@@ -209,21 +205,21 @@ class ThreadController @Inject constructor(
         //region Edit data
         fun upsertThread(thread: Thread, realm: MutableRealm): Thread = realm.copyToRealm(thread, UpdatePolicy.ALL)
 
-        suspend fun fetchIncompleteMessages(
+        suspend fun fetchMessagesHeavyData(
             messages: List<Message>,
             mailbox: Mailbox,
-            okHttpClient: OkHttpClient? = null,
             realm: Realm,
+            okHttpClient: OkHttpClient? = null,
         ) {
-            val failedFoldersIds = realm.writeBlocking { fetchIncompleteMessages(messages, realm = this, okHttpClient) }
-            updateFailedFolders(failedFoldersIds, mailbox, okHttpClient, realm)
+            val failedFoldersIds = realm.writeBlocking { fetchMessagesHeavyData(messages, realm = this, okHttpClient) }
+            updateFailedFolders(failedFoldersIds, mailbox, realm, okHttpClient)
         }
 
         private suspend fun updateFailedFolders(
             failedFoldersIds: Set<String>,
             mailbox: Mailbox,
-            okHttpClient: OkHttpClient?,
             realm: Realm,
+            okHttpClient: OkHttpClient?,
         ) {
             failedFoldersIds.forEach { folderId ->
                 FolderController.getFolder(folderId, realm)?.let { folder ->
@@ -238,7 +234,7 @@ class ThreadController @Inject constructor(
             }
         }
 
-        fun fetchIncompleteMessages(
+        fun fetchMessagesHeavyData(
             messages: List<Message>,
             realm: MutableRealm,
             okHttpClient: OkHttpClient? = null,

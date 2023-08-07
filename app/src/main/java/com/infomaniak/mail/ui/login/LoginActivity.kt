@@ -21,7 +21,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import androidx.activity.addCallback
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavDestination
@@ -30,7 +29,6 @@ import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.utils.Utils.lockOrientationForSmallScreens
-import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.mail.MatomoMail.trackDestination

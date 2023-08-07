@@ -89,10 +89,15 @@ class Message : RealmObject {
     var isScheduled: Boolean = false
     var preview: String = ""
     var size: Int = 0
-    @SerialName("safe_display")
-    var safeDisplay: Boolean? = null
     @SerialName("has_unsubscribe_link")
     var hasUnsubscribeLink: Boolean? = null
+
+    // TODO: Those are unused for now, but if we ever want to use them, we need to save them in `Message.keepHeavyData()`.
+    //  If we don't do it now, we'll probably forget to do it in the future.
+    //  When we use them, ce can remove all comments here and in `Message.keepHeavyData()`.
+    private var _acknowledge: String = Acknowledge.NONE.name.lowercase()
+    @SerialName("drive_url")
+    var driveUrl: String = ""
     //endregion
 
     //region Local data (Transient)
@@ -153,6 +158,18 @@ class Message : RealmObject {
         NOT_SIGNED,
     }
 
+    var acknowledge: Acknowledge?
+        get() = enumValueOfOrNull<Acknowledge>(_acknowledge)
+        set(value) {
+            value?.name?.lowercase()?.let { _acknowledge = it }
+        }
+
+    enum class Acknowledge {
+        NONE,
+        PENDING,
+        ACKNOWLEDGED,
+    }
+
     fun initLocalValues(
         date: RealmInstant,
         isFullyDownloaded: Boolean,
@@ -170,6 +187,16 @@ class Message : RealmObject {
         draftLocalUuid?.let { this.draftLocalUuid = it }
         this.isFromSearch = isFromSearch
         shortUid = uid.toShortUid()
+    }
+
+    fun keepHeavyData(message: Message) {
+        attachments = message.attachments.copyFromRealm().toRealmList()
+        body = message.body?.copyFromRealm()
+
+        // TODO: Those are unused for now, but if we ever want to use them, we need to save them here.
+        //  If we don't do it now, we'll probably forget to do it in the future.
+        _acknowledge = message._acknowledge
+        driveUrl = message.driveUrl
     }
 
     private inline fun <reified T : TypedRealmObject> RealmList<T>.detachedFromRealm(depth: UInt = UInt.MIN_VALUE): List<T> {

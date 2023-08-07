@@ -438,7 +438,7 @@ class ThreadFragment : Fragment() {
 
     private fun onMessagesUpdate(messages: List<Message>) {
         Log.i("UI", "Received ${messages.size} messages")
-        threadViewModel.fetchIncompleteMessages(messages)
+        threadViewModel.fetchMessagesHeavyData(messages)
     }
 
     private fun leaveThread() {
