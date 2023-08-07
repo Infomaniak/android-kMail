@@ -91,6 +91,9 @@ class Message : RealmObject {
     var size: Int = 0
     @SerialName("has_unsubscribe_link")
     var hasUnsubscribeLink: Boolean? = null
+    private var _acknowledge: String = Acknowledge.NONE.name.lowercase()
+    @SerialName("drive_url")
+    var driveUrl: String = ""
     //endregion
 
     //region Local data (Transient)
@@ -149,6 +152,18 @@ class Message : RealmObject {
         VALID,
         NOT_VALID,
         NOT_SIGNED,
+    }
+
+    var acknowledge: Acknowledge?
+        get() = enumValueOfOrNull<Acknowledge>(_acknowledge)
+        set(value) {
+            value?.name?.lowercase()?.let { _acknowledge = it }
+        }
+
+    enum class Acknowledge {
+        NONE,
+        PENDING,
+        ACKNOWLEDGED,
     }
 
     fun initLocalValues(
