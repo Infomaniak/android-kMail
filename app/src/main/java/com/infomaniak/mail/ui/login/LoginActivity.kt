@@ -20,7 +20,6 @@ package com.infomaniak.mail.ui.login
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
-import androidx.activity.addCallback
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavDestination
@@ -54,12 +53,6 @@ class LoginActivity : AppCompatActivity() {
         (supportFragmentManager.findFragmentById(R.id.hostFragment) as NavHostFragment).navController
     }
 
-    private val loginFragment by lazy {
-        supportFragmentManager.findFragmentById(R.id.hostFragment)?.let {
-            it.childFragmentManager.primaryNavigationFragment as LoginFragment
-        }!!
-    }
-
     lateinit var infomaniakLogin: InfomaniakLogin
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,8 +62,6 @@ class LoginActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         infomaniakLogin = getInfomaniakLogin()
-
-        handleOnBackPressed()
 
         setupNavController()
 
@@ -88,16 +79,6 @@ class LoginActivity : AppCompatActivity() {
     private fun onDestinationChanged(destination: NavDestination, arguments: Bundle?) {
         SentryDebug.addNavigationBreadcrumb(destination.displayName, arguments)
         trackDestination(destination)
-    }
-
-    private fun handleOnBackPressed() {
-        onBackPressedDispatcher.addCallback(this) {
-            if (navController.currentDestination?.id == R.id.loginFragment) {
-                if (loginFragment.getViewPagerCurrentItem() == 0) finish() else loginFragment.goBackAPage()
-            } else {
-                navController.popBackStack()
-            }
-        }
     }
 
     companion object {

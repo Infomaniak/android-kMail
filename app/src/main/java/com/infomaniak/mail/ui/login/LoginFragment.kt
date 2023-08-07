@@ -25,6 +25,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.addCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.os.bundleOf
@@ -83,7 +84,7 @@ class LoginFragment : Fragment() {
         return FragmentLoginBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
         val introPagerAdapter = IntroPagerAdapter(
@@ -133,6 +134,14 @@ class LoginFragment : Fragment() {
         introViewModel.updatedAccentColor.observe(viewLifecycleOwner) { (newAccentColor, oldAccentColor) ->
             updateUi(newAccentColor, oldAccentColor)
         }
+
+        handleOnBackPressed()
+    }
+
+    private fun handleOnBackPressed() = with(requireActivity()) {
+        onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            if (getViewPagerCurrentItem() == 0) finish() else goBackAPage()
+        }
     }
 
     private fun updateUi(newAccentColor: AccentColor, oldAccentColor: AccentColor) {
@@ -174,9 +183,9 @@ class LoginFragment : Fragment() {
         (getChildAt(0) as? RecyclerView)?.overScrollMode = View.OVER_SCROLL_NEVER
     }
 
-    fun getViewPagerCurrentItem(): Int = binding.introViewpager.currentItem
+    private fun getViewPagerCurrentItem(): Int = binding.introViewpager.currentItem
 
-    fun goBackAPage() {
+    private fun goBackAPage() {
         binding.introViewpager.currentItem -= 1
     }
 }
