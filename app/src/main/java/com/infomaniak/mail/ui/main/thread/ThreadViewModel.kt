@@ -96,10 +96,10 @@ class ThreadViewModel @Inject constructor(
         if (thread.unseenMessagesCount > 0) sharedUtils.markAsSeen(mailbox, listOf(thread))
     }
 
-    fun fetchIncompleteMessages(messages: List<Message>) {
+    fun fetchMessagesHeavyData(messages: List<Message>) {
         fetchMessagesJob?.cancel()
         fetchMessagesJob = viewModelScope.launch(ioCoroutineContext) {
-            threadController.fetchIncompleteMessages(messages, mailbox)
+            ThreadController.fetchMessagesHeavyData(messages, mailbox, okHttpClient = null, mailboxContentRealm())
         }
     }
 

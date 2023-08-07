@@ -129,10 +129,6 @@ class ThreadController @Inject constructor(
         delete(query<Thread>("${Thread::isFromSearch.name} == true").find())
     }
 
-    suspend fun fetchIncompleteMessages(messages: List<Message>, mailbox: Mailbox, okHttpClient: OkHttpClient? = null) {
-        fetchIncompleteMessages(messages, mailbox, okHttpClient, mailboxContentRealm())
-    }
-
     fun saveThreads(searchMessages: List<Message>) {
         mailboxContentRealm().writeBlocking {
             FolderController.getOrCreateSearchFolder(realm = this).apply {
@@ -209,13 +205,13 @@ class ThreadController @Inject constructor(
         //region Edit data
         fun upsertThread(thread: Thread, realm: MutableRealm): Thread = realm.copyToRealm(thread, UpdatePolicy.ALL)
 
-        suspend fun fetchIncompleteMessages(
+        suspend fun fetchMessagesHeavyData(
             messages: List<Message>,
             mailbox: Mailbox,
             okHttpClient: OkHttpClient? = null,
             realm: Realm,
         ) {
-            val failedFoldersIds = realm.writeBlocking { fetchIncompleteMessages(messages, realm = this, okHttpClient) }
+            val failedFoldersIds = realm.writeBlocking { fetchMessagesHeavyData(messages, realm = this, okHttpClient) }
             updateFailedFolders(failedFoldersIds, mailbox, okHttpClient, realm)
         }
 
@@ -238,7 +234,7 @@ class ThreadController @Inject constructor(
             }
         }
 
-        fun fetchIncompleteMessages(
+        fun fetchMessagesHeavyData(
             messages: List<Message>,
             realm: MutableRealm,
             okHttpClient: OkHttpClient? = null,
