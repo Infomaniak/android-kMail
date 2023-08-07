@@ -138,10 +138,6 @@ class FolderController @Inject constructor(private val mailboxContentRealm: Real
             return realm.query("NOT ${Folder::id.name} IN $0 AND $isNotSearch", exceptionsFoldersIds)
         }
 
-        private fun getSearchFoldersQuery(key: String, value: String, realm: TypedRealm): RealmQuery<Folder> {
-            return realm.query("${Folder.rolePropertyName} != '${FolderRole.DRAFT.name}' AND $key CONTAINS[c] $0", value)
-        }
-
         private fun getFolderQuery(key: String, value: String, realm: TypedRealm): RealmSingleQuery<Folder> {
             return realm.query<Folder>("$key == $0", value).first()
         }
@@ -155,10 +151,6 @@ class FolderController @Inject constructor(private val mailboxContentRealm: Real
                 getFoldersQuery(exceptionsFoldersIds, realm)
             }
             return realmQuery.find()
-        }
-
-        fun getFoldersByName(name: String, realm: TypedRealm): RealmResults<Folder> {
-            return getSearchFoldersQuery(Folder::name.name, name, realm).find()
         }
 
         fun getFolder(id: String, realm: TypedRealm): Folder? {

@@ -219,12 +219,10 @@ class SearchFragment : Fragment() {
 
             doOnTextChanged { text, _, _, _ ->
                 val newQuery = text.toString()
-                if (searchViewModel.currentSearchQuery != newQuery) {
-                    searchViewModel.searchQuery(newQuery)
-                }
+                if (searchViewModel.currentSearchQuery != newQuery) searchViewModel.searchQuery(newQuery)
             }
 
-            setupOnEditorActionListener(context) { query -> searchViewModel.searchQuery(query, saveInHistory = true) }
+            setupOnEditorActionListener(context) { _, query, _ -> searchViewModel.searchQuery(query, saveInHistory = true) }
         }
     }
 

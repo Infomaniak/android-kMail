@@ -576,11 +576,15 @@ fun TextInputLayout.trackSearchEndIconClick(context: Context, inputEditText: Tex
     }
 }
 
-fun TextInputEditText.setupOnEditorActionListener(context: Context, searchCallback: (String) -> Unit) {
+fun TextInputEditText.setupOnEditorActionListener(
+    context: Context,
+    folders: List<Folder> = emptyList(),
+    searchCallback: (Context, String, List<Folder>) -> Unit,
+) {
     setOnEditorActionListener { _, actionId, _ ->
         if (actionId == EditorInfo.IME_ACTION_SEARCH && !text.isNullOrBlank()) {
             context.trackSearchEvent("validateSearch")
-            searchCallback(text.toString())
+            searchCallback(context, text.toString(), folders)
             hideKeyboard()
         }
         true // Action got consumed

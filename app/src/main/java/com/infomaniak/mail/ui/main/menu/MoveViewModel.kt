@@ -17,12 +17,12 @@
  */
 package com.infomaniak.mail.ui.main.menu
 
+import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
@@ -45,12 +45,12 @@ class MoveViewModel @Inject constructor(
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
-    private var searchJob: Job? = null
+    private var filterJob: Job? = null
 
-    var searchResults: MutableLiveData<List<Folder>> = MutableLiveData()
+    var filterResults: MutableLiveData<List<Folder>> = MutableLiveData()
 
     fun cancelSearch() {
-        searchJob?.cancel()
+        filterJob?.cancel()
     }
 
     fun getFolderIdByMessage(messageUid: String) = liveData(ioCoroutineContext) {
@@ -61,11 +61,16 @@ class MoveViewModel @Inject constructor(
         emit(threadController.getThread(threadUid)!!.folderId)
     }
 
-    fun searchQuery(query: String) = viewModelScope.launch(ioCoroutineContext) {
-        searchJob?.cancel()
-        searchJob = launch {
-            delay(SEARCH_DEBOUNCE_DURATION)
-            searchResults.postValue(FolderController.getFoldersByName(query.trim(), mailboxContentRealm()))
+    fun filterFolders(context: Context, query: String, folders: List<Folder>) = viewModelScope.launch(ioCoroutineContext) {
+        filterJob?.cancel()
+        filterJob = launch {
+            delay(FILTER_DEBOUNCE_DURATION)
+            val filteredFolders = folders.filter { folder ->
+                val folderName = folder.role?.folderNameRes?.let(context::getString) ?: folder.name
+                folderName.contains(query.trim(), ignoreCase = true)
+            }
+
+            filterResults.postValue(filteredFolders)
         }
     }
 
@@ -75,6 +80,6 @@ class MoveViewModel @Inject constructor(
     }
 
     private companion object {
-        const val SEARCH_DEBOUNCE_DURATION = 200L
+        const val FILTER_DEBOUNCE_DURATION = 200L
     }
 }

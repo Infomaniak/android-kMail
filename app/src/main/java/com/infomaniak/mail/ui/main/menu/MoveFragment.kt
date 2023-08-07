@@ -128,13 +128,14 @@ class MoveFragment : MenuFoldersFragment() {
 
         searchInputLayout.trackSearchEndIconClick(context, searchTextInput)
         searchTextInput.apply {
+            val allFolders = mainViewModel.currentFoldersLive.value!!.let { it.first + it.second }
 
             doOnTextChanged { text, _, _, _ ->
                 toggleFolderListsVisibility(!text.isNullOrBlank())
-                if (text?.isNotBlank() == true) moveViewModel.searchQuery(text.toString())
+                if (text?.isNotBlank() == true) moveViewModel.filterFolders(context, text.toString(), allFolders)
             }
 
-            setupOnEditorActionListener(context, moveViewModel::searchQuery)
+            setupOnEditorActionListener(context, allFolders, moveViewModel::filterFolders)
         }
     }
 
@@ -144,7 +145,7 @@ class MoveFragment : MenuFoldersFragment() {
     }
 
     private fun observeSearchResults() {
-        moveViewModel.searchResults.observe(viewLifecycleOwner) { folders ->
+        moveViewModel.filterResults.observe(viewLifecycleOwner) { folders ->
             searchResultsAdpater.setFolders(folders, currentFolderId)
         }
     }
