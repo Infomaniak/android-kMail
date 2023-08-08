@@ -100,6 +100,7 @@ import org.jsoup.Jsoup
 import java.util.Calendar
 import java.util.Date
 import java.util.Scanner
+import com.infomaniak.lib.core.R as RCore
 
 fun Fragment.notYetImplemented(anchor: View? = null) = showSnackbar(getString(R.string.workInProgressTitle), anchor)
 
@@ -370,7 +371,7 @@ fun Activity.createDescriptionDialog(
     MaterialAlertDialogBuilder(context)
         .setView(root)
         .setPositiveButton(confirmButtonText) { _, _ -> onPositiveButtonClicked() }
-        .setNegativeButton(R.string.buttonCancel, null)
+        .setNegativeButton(RCore.string.buttonCancel, null)
         .create()
 }
 
@@ -419,7 +420,7 @@ fun Fragment.createInputDialog(
     return@with MaterialAlertDialogBuilder(context)
         .setView(root)
         .setPositiveButton(confirmButtonText) { _, _ -> onPositiveButtonClicked(textInput.text?.trim()) }
-        .setNegativeButton(R.string.buttonCancel, null)
+        .setNegativeButton(RCore.string.buttonCancel, null)
         .setOnDismissListener {
             errorJob?.cancel()
             textInput.text?.clear()

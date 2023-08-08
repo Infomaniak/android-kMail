@@ -41,6 +41,7 @@ import com.infomaniak.mail.receivers.NotificationActionsReceiver.Companion.UNDO_
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.LaunchActivityArgs
 import java.util.UUID
+import com.infomaniak.lib.core.R as RCore
 
 object NotificationUtils : NotificationUtilsCore() {
 
@@ -206,7 +207,7 @@ object NotificationUtils : NotificationUtilsCore() {
 
         if (payload.isUndo) {
             val undoAction = createBroadcastAction(
-                title = R.string.buttonCancel,
+                title = RCore.string.buttonCancel,
                 intent = createBroadcastIntent(UNDO_ACTION),
             )
 
