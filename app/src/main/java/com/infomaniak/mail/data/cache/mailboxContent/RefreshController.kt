@@ -71,9 +71,15 @@ class RefreshController @Inject constructor() {
                 return@withContext realm.handleRefreshMode(refreshMode, scope = this, mailbox, folder, okHttpClient).toList()
             }
         }.getOrElse {
+
+            // We force-cancelled, so we need to call the `stopped` callback.
+            if (it is CancellationException && (it.message == FORCE_CANCEL || isFromService)) stopped?.invoke()
+
             // It failed, but not because we cancelled it. Something bad happened, so we call the `stopped` callback.
-            if (it !is CancellationException || it.message == FORCE_CANCEL || isFromService) stopped?.invoke()
+            if (it !is CancellationException) stopped?.invoke()
+
             if (it is ApiErrorException) it.handleApiErrors()
+
             return@getOrElse null
         }
 
