@@ -137,8 +137,8 @@ object RealmDatabase {
     //endregion
 
     //region Delete Realm
-    fun deleteMailboxContent(mailboxId: Int) {
-        Realm.deleteRealm(RealmConfig.mailboxContent(mailboxId))
+    fun deleteMailboxContent(mailboxId: Int, userId: Int = AccountUtils.currentUserId) {
+        Realm.deleteRealm(RealmConfig.mailboxContent(mailboxId, userId))
     }
 
     fun removeUserData(context: Context, userId: Int) {
@@ -226,7 +226,7 @@ object RealmDatabase {
             .migration(MAILBOX_INFO_MIGRATION)
             .build()
 
-        fun mailboxContent(mailboxId: Int, userId: Int = AccountUtils.currentUserId) = RealmConfiguration
+        fun mailboxContent(mailboxId: Int, userId: Int) = RealmConfiguration
             .Builder(mailboxContentSet)
             .name(mailboxContentDbName(userId, mailboxId))
             .schemaVersion(MAILBOX_CONTENT_SCHEMA_VERSION)

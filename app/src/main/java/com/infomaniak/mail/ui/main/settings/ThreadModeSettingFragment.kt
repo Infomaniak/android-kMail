@@ -22,6 +22,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ThreadMode
@@ -38,6 +39,7 @@ class ThreadModeSettingFragment : Fragment() {
     lateinit var localSettings: LocalSettings
 
     private lateinit var binding: FragmentThreadModeSettingBinding
+    private val threadModeSettingViewModel: ThreadModeSettingViewModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentThreadModeSettingBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -55,6 +57,7 @@ class ThreadModeSettingFragment : Fragment() {
 
         onItemCheckedListener { _, _, threadMode ->
             localSettings.threadMode = threadMode as ThreadMode
+            threadModeSettingViewModel.dropAllMailboxesContent()
         }
     }
 }
