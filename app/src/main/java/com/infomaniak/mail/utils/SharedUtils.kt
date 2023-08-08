@@ -37,6 +37,7 @@ import javax.inject.Inject
 class SharedUtils @Inject constructor(
     private val folderController: FolderController,
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
+    private val refreshController: RefreshController,
     private val messageController: MessageController,
 ) {
 
@@ -94,7 +95,7 @@ class SharedUtils @Inject constructor(
 
         foldersIds.forEach { folderId ->
             folderController.getFolder(folderId)?.let { folder ->
-                RefreshController.refreshThreads(
+                refreshController.refreshThreads(
                     refreshMode = RefreshMode.REFRESH_FOLDER,
                     mailbox = mailbox,
                     folder = folder,

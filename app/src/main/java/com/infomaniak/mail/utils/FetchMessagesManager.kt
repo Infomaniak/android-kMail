@@ -42,6 +42,8 @@ import javax.inject.Inject
 class FetchMessagesManager @Inject constructor(
     private val appContext: Context,
     private val notificationManagerCompat: NotificationManagerCompat,
+    private val refreshController: RefreshController,
+    private val threadController: ThreadController,
 ) {
 
     suspend fun execute(userId: Int, mailbox: Mailbox, sentryMessageUid: String? = null, mailboxContentRealm: Realm? = null) {
@@ -55,7 +57,7 @@ class FetchMessagesManager @Inject constructor(
         val okHttpClient = AccountUtils.getHttpClient(userId)
 
         // Update Local with Remote
-        val newMessagesThreads = RefreshController.refreshThreads(
+        val newMessagesThreads = refreshController.refreshThreads(
             refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
             mailbox = mailbox,
             folder = folder,
@@ -93,7 +95,7 @@ class FetchMessagesManager @Inject constructor(
         okHttpClient: OkHttpClient,
     ) {
 
-        ThreadController.fetchMessagesHeavyData(messages, mailbox, realm, okHttpClient)
+        threadController.fetchMessagesHeavyData(messages, mailbox, realm, okHttpClient)
 
         val message = MessageController.getThreadLastMessageInFolder(uid, realm) ?: run {
             ThreadController.getThread(uid, realm)?.let { thread ->

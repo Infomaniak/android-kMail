@@ -38,9 +38,12 @@ import io.sentry.Sentry
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
 import java.util.Date
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.math.max
 
-object RefreshController {
+@Singleton
+class RefreshController @Inject constructor() {
 
     private var refreshThreadsJob: Job? = null
 

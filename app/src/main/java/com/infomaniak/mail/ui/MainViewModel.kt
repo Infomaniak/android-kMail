@@ -77,6 +77,7 @@ class MainViewModel @Inject constructor(
     private val folderController: FolderController,
     private val mergedContactController: MergedContactController,
     private val messageController: MessageController,
+    private val refreshController: RefreshController,
     private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
@@ -333,7 +334,7 @@ class MainViewModel @Inject constructor(
 
         if (isDownloadingChanges.value?.first == true) return@launch
 
-        RefreshController.refreshThreads(
+        refreshController.refreshThreads(
             refreshMode = RefreshMode.ONE_PAGE_OF_OLD_MESSAGES,
             mailbox = currentMailbox.value!!,
             folder = currentFolder.value!!,
@@ -375,7 +376,7 @@ class MainViewModel @Inject constructor(
             null to null
         }
 
-        RefreshController.refreshThreads(
+        refreshController.refreshThreads(
             refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
             mailbox = mailbox,
             folder = folder,
@@ -918,7 +919,7 @@ class MainViewModel @Inject constructor(
             val delay = REFRESH_DELAY + max(scheduledDate - timeNow, 0L)
             delay(min(delay, MAX_REFRESH_DELAY))
 
-            RefreshController.refreshThreads(
+            refreshController.refreshThreads(
                 refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
                 mailbox = currentMailbox.value!!,
                 folder = folder,
