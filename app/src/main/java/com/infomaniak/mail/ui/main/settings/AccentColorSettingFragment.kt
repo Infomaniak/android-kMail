@@ -32,12 +32,16 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.data.LocalSettings.AccentColor.*
 import com.infomaniak.mail.databinding.FragmentAccentColorSettingBinding
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class AccentColorSettingFragment : Fragment() {
 
     private lateinit var binding: FragmentAccentColorSettingBinding
 
-    private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
+    @Inject
+    lateinit var localSettings: LocalSettings
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentAccentColorSettingBinding.inflate(inflater, container, false).also { binding = it }.root

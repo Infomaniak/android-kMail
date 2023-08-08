@@ -22,9 +22,16 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.AccentColor
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class IntroViewModel(application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class IntroViewModel @Inject constructor(
+    application: Application,
+    localSettings: LocalSettings,
+) : AndroidViewModel(application) {
+
     var updatedAccentColor: MutableLiveData<Pair<AccentColor, AccentColor>> = MutableLiveData(
-        LocalSettings.getInstance(application).accentColor to LocalSettings.getInstance(application).accentColor
+        localSettings.accentColor to localSettings.accentColor,
     )
 }

@@ -54,7 +54,8 @@ class IntroFragment : Fragment() {
     private val navigationArgs: IntroFragmentArgs by navArgs()
     private val introViewModel: IntroViewModel by activityViewModels()
 
-    private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
+    @Inject
+    lateinit var localSettings: LocalSettings
 
     @Inject
     @IoDispatcher

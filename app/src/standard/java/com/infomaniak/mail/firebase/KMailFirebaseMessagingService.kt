@@ -37,8 +37,10 @@ import javax.inject.Inject
 class KMailFirebaseMessagingService : FirebaseMessagingService() {
 
     private val mainApplication by lazy { application as MainApplication }
-    private val localSettings by lazy { LocalSettings.getInstance(this) }
     private val realmMailboxInfo by lazy { RealmDatabase.newMailboxInfoInstance }
+
+    @Inject
+    lateinit var localSettings: LocalSettings
 
     @Inject
     lateinit var notificationManagerCompat: NotificationManagerCompat

@@ -30,10 +30,12 @@ import kotlinx.coroutines.runBlocking
 
 open class BaseActivity : AppCompatActivity() {
 
-    protected val localSettings by lazy { LocalSettings.getInstance(this) }
+    // TODO: Try to replace this with a dependency injection.
+    //  Currently, it crashes because the lateinit value isn't initialized when the `MainActivity.onCreate()` calls its super.
+    protected val localSettings by lazy { LocalSettings.getInstance(context = this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(LocalSettings.getInstance(this).accentColor.theme)
+        setTheme(localSettings.accentColor.theme)
 
         if (AccountUtils.currentUser == null) runBlocking {
             AccountUtils.requestCurrentUser()

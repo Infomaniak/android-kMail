@@ -69,13 +69,13 @@ import com.infomaniak.lib.core.R as RCore
 @HiltViewModel
 class MainViewModel @Inject constructor(
     application: Application,
+    private val mailboxContentRealm: RealmDatabase.MailboxContent,
+    private val sharedUtils: SharedUtils,
     private val addressBookController: AddressBookController,
     private val draftController: DraftController,
     private val folderController: FolderController,
-    private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val mergedContactController: MergedContactController,
     private val messageController: MessageController,
-    private val sharedUtils: SharedUtils,
     private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {

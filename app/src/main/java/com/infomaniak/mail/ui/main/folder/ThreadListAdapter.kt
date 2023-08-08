@@ -54,23 +54,19 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.*
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter.ThreadListViewHolder
 import com.infomaniak.mail.utils.*
+import dagger.hilt.android.qualifiers.ActivityContext
+import javax.inject.Inject
 import kotlin.math.abs
 import com.google.android.material.R as RMaterial
 import com.infomaniak.lib.core.R as RCore
 
 // TODO: Do we want to extract features from LoaderAdapter (in Core) and put them here? Same for all adapters in the app?
-class ThreadListAdapter(
-    context: Context,
-    private val threadDensity: ThreadDensity,
-    private var folderRole: FolderRole?,
-    private var contacts: Map<String, Map<String, MergedContact>>,
-    private val onSwipeFinished: () -> Unit,
-    private val multiSelection: MultiSelectionListener<SelectedThread>? = null,
+class ThreadListAdapter @Inject constructor(
+    @ActivityContext context: Context,
+    private val localSettings: LocalSettings,
 ) : DragDropSwipeAdapter<Any, ThreadListViewHolder>(mutableListOf()), RealmChangesBinding.OnRealmChanged<Thread> {
 
     private lateinit var recyclerView: RecyclerView
-
-    private val localSettings by lazy { LocalSettings.getInstance(context) }
 
     private val cardCornerRadius by lazy { context.resources.getDimension(R.dimen.alternativeMargin) }
     private val threadMarginCompact by lazy { context.resources.getDimension(RCore.dimen.marginStandardVerySmall).toInt() }
@@ -86,8 +82,25 @@ class ThreadListAdapter(
     var onFlushClicked: ((dialogTitle: String) -> Unit)? = null
     var onLoadMoreClicked: (() -> Unit)? = null
 
+    private var folderRole: FolderRole? = null
+    private lateinit var contacts: Map<String, Map<String, MergedContact>>
+    private lateinit var onSwipeFinished: () -> Unit
+    private var multiSelection: MultiSelectionListener<SelectedThread>? = null
+
     init {
         setHasStableIds(true)
+    }
+
+    operator fun invoke(
+        folderRole: FolderRole?,
+        contacts: Map<String, Map<String, MergedContact>>,
+        onSwipeFinished: () -> Unit,
+        multiSelection: MultiSelectionListener<SelectedThread>? = null,
+    ) {
+        this.folderRole = folderRole
+        this.contacts = contacts
+        this.onSwipeFinished = onSwipeFinished
+        this.multiSelection = multiSelection
     }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
@@ -182,12 +195,12 @@ class ThreadListAdapter(
             if (multiSelection?.isEnabled == true) toggleSelection(selectedThread) else onThreadClicked?.invoke(thread)
         }
 
-        if (multiSelection != null) {
+        multiSelection?.let { listener ->
             updateSelectedState(selectedThread)
 
             selectionCardView.setOnLongClickListener {
                 context.trackMultiSelectionEvent("enable", TrackerAction.LONG_PRESS)
-                if (!multiSelection.isEnabled) multiSelection.isEnabled = true
+                if (!listener.isEnabled) listener.isEnabled = true
                 toggleSelection(selectedThread)
                 true
             }
@@ -211,14 +224,16 @@ class ThreadListAdapter(
             context.getColorStateList(R.color.backgroundColor)
         }
 
-        expeditorAvatar.isVisible = !isSelected && threadDensity == LARGE
-        checkMarkLayout.isVisible = multiSelection?.isEnabled == true
+        with(localSettings) {
+            expeditorAvatar.isVisible = !isSelected && threadDensity == LARGE
+            checkMarkLayout.isVisible = multiSelection?.isEnabled == true
 
-        checkedState.isVisible = isSelected
-        uncheckedState.isVisible = threadDensity != LARGE && !isSelected
+            checkedState.isVisible = isSelected
+            uncheckedState.isVisible = threadDensity != LARGE && !isSelected
+        }
     }
 
-    private fun CardviewThreadItemBinding.setupThreadDensityDependentUi() {
+    private fun CardviewThreadItemBinding.setupThreadDensityDependentUi() = with(localSettings) {
         val margin = if (threadDensity == COMPACT) threadMarginCompact else threadMarginOther
         threadCard.setMarginsRelative(top = margin, bottom = margin)
 
@@ -230,7 +245,7 @@ class ThreadListAdapter(
     }
 
     private fun ImageView.reshapeToDensity() {
-        val checkMarkSize = if (threadDensity == LARGE) checkMarkSizeLarge else checkMarkSizeOther
+        val checkMarkSize = if (localSettings.threadDensity == LARGE) checkMarkSizeLarge else checkMarkSizeOther
         layoutParams.apply {
             width = checkMarkSize
             height = checkMarkSize
@@ -408,7 +423,7 @@ class ThreadListAdapter(
     override fun createDiffUtil(oldList: List<Any>, newList: List<Any>): DragDropSwipeDiffCallback<Any>? = null
 
     override fun updateList(itemList: List<Thread>) {
-        dataSet = formatList(itemList, recyclerView.context, folderRole, threadDensity, isLoadMoreDisplayed)
+        dataSet = formatList(itemList, recyclerView.context, folderRole, localSettings.threadDensity, isLoadMoreDisplayed)
     }
 
     fun updateContacts(newContacts: Map<String, Map<String, MergedContact>>) {

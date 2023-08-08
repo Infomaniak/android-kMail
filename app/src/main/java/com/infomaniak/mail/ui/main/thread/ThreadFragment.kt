@@ -69,6 +69,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import java.util.concurrent.atomic.AtomicBoolean
+import javax.inject.Inject
 import kotlin.math.absoluteValue
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -77,14 +78,13 @@ import com.google.android.material.R as RMaterial
 @AndroidEntryPoint
 class ThreadFragment : Fragment() {
 
+    @Inject
+    lateinit var localSettings: LocalSettings
+
     private lateinit var binding: FragmentThreadBinding
     private val navigationArgs: ThreadFragmentArgs by navArgs()
     private val mainViewModel: MainViewModel by activityViewModels()
     private val threadViewModel: ThreadViewModel by viewModels()
-
-    private val alwaysShowExternalContent by lazy {
-        LocalSettings.getInstance(requireContext()).externalContent == ExternalContent.ALWAYS
-    }
 
     private val threadAdapter by lazy { ThreadAdapter(shouldLoadDistantResources()) }
     private val permissionUtils by lazy { PermissionUtils(this) }
@@ -229,7 +229,7 @@ class ThreadFragment : Fragment() {
         return (isMessageSpecificallyAllowed && isNotInSpam) || shouldLoadDistantResources()
     }
 
-    private fun shouldLoadDistantResources(): Boolean = alwaysShowExternalContent && isNotInSpam
+    private fun shouldLoadDistantResources(): Boolean = localSettings.externalContent == ExternalContent.ALWAYS && isNotInSpam
 
     private fun observeOpenAttachment() {
         getBackNavigationResult(DownloadAttachmentProgressDialog.OPEN_WITH, ::startActivity)
