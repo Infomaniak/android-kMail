@@ -359,6 +359,7 @@ class NewMessageFragment : Fragment() {
                     attachments = emptyList(),
                     messageUid = "SIGNATURE-${draft.messageUid}",
                     shouldLoadDistantResources = true,
+                    navigateToNewMessageActivity = null,
                 )
             }
             removeSignature.setOnClickListener {
@@ -376,6 +377,7 @@ class NewMessageFragment : Fragment() {
                     attachments = draft.attachments,
                     messageUid = "QUOTE-${draft.messageUid}",
                     shouldLoadDistantResources = alwaysShowExternalContent || newMessageActivityArgs.shouldLoadDistantResources,
+                    navigateToNewMessageActivity = null,
                 )
             }
             removeQuote.setOnClickListener {
@@ -440,19 +442,21 @@ class NewMessageFragment : Fragment() {
         binding.fromMailAddress.text = formattedExpeditor
     }
 
-    private fun populateViewModelWithExternalMailData() {
-        when (requireActivity().intent?.action) {
+    private fun populateViewModelWithExternalMailData() = with(requireActivity()) {
+        when (intent?.action) {
             Intent.ACTION_SEND -> handleSingleSendIntent()
             Intent.ACTION_SEND_MULTIPLE -> handleMultipleSendIntent()
-            Intent.ACTION_VIEW, Intent.ACTION_SENDTO -> handleMailTo()
+            Intent.ACTION_VIEW, Intent.ACTION_SENDTO -> handleMailTo(intent.data, intent)
         }
+
+        if (newMessageActivityArgs.mailToUri != null) handleMailTo(newMessageActivityArgs.mailToUri)
     }
 
     /**
      * Handle `MailTo` from [Intent.ACTION_VIEW] or [Intent.ACTION_SENDTO]
      * Get [Intent.ACTION_VIEW] data with [MailTo] and [Intent.ACTION_SENDTO] with [Intent]
      */
-    private fun handleMailTo() = with(newMessageViewModel) {
+    private fun handleMailTo(uri: Uri?, intent: Intent? = null) = with(newMessageViewModel) {
 
         /**
          * Mailto grammar accept 'name_of_recipient<email>' for recipients
@@ -468,26 +472,25 @@ class NewMessageFragment : Fragment() {
             if (email.isEmail()) Recipient().initLocalValues(email, email) else parseEmailWithName(email)
         }
 
-        val intent = requireActivity().intent
-        intent?.data?.let { uri ->
+        uri?.let { uri ->
             if (!MailTo.isMailTo(uri)) return@with
 
             val mailToIntent = MailTo.parse(uri)
             val to = mailToIntent.to?.splitToRecipientList()
                 ?: emptyList()
             val cc = mailToIntent.cc?.splitToRecipientList()
-                ?: intent.getStringArrayExtra(Intent.EXTRA_CC)?.map { Recipient().initLocalValues(it, it) }
+                ?: intent?.getStringArrayExtra(Intent.EXTRA_CC)?.map { Recipient().initLocalValues(it, it) }
                 ?: emptyList()
             val bcc = mailToIntent.bcc?.splitToRecipientList()
-                ?: intent.getStringArrayExtra(Intent.EXTRA_BCC)?.map { Recipient().initLocalValues(it, it) }
+                ?: intent?.getStringArrayExtra(Intent.EXTRA_BCC)?.map { Recipient().initLocalValues(it, it) }
                 ?: emptyList()
 
             draft.to.addAll(to)
             draft.cc.addAll(cc)
             draft.bcc.addAll(bcc)
 
-            draft.subject = mailToIntent.subject ?: intent.getStringExtra(Intent.EXTRA_SUBJECT)
-            draft.uiBody = mailToIntent.body ?: intent.getStringExtra(Intent.EXTRA_TEXT) ?: ""
+            draft.subject = mailToIntent.subject ?: intent?.getStringExtra(Intent.EXTRA_SUBJECT)
+            draft.uiBody = mailToIntent.body ?: intent?.getStringExtra(Intent.EXTRA_TEXT) ?: ""
 
             saveDraftDebouncing()
         }

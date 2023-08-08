@@ -73,6 +73,7 @@ import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.login.NoMailboxActivity
+import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
 import com.infomaniak.mail.utils.UiUtils.formatUnreadCount
@@ -154,12 +155,12 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         // Here, we use `arguments` instead of `navigationArgs` because we need mutable data.
         if (arguments?.getString(navigationArgs::replyToMessageUid.name) != null) {
             // If we are coming from the Reply action of a Notification, we need to navigate to NewMessageActivity
-            safeNavigate(
-                directions = ThreadListFragmentDirections.actionThreadListFragmentToNewMessageActivity(
+            safeNavigateToNewMessageActivity(
+                NewMessageActivityArgs(
                     draftMode = navigationArgs.draftMode,
                     previousMessageUid = navigationArgs.replyToMessageUid,
                     notificationId = navigationArgs.notificationId,
-                ),
+                ).toBundle(),
             )
             arguments?.remove(navigationArgs::replyToMessageUid.name)
         }
@@ -311,7 +312,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         newMessageFab.setOnClickListener {
             trackNewMessageEvent("openFromFab")
-            safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToNewMessageActivity())
+            safeNavigateToNewMessageActivity()
         }
 
         threadsList.scrollListener = object : OnListScrollListener {

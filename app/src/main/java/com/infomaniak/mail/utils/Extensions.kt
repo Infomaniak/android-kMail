@@ -24,6 +24,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.text.Html
@@ -70,6 +71,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.DialogDescriptionBinding
 import com.infomaniak.mail.databinding.DialogInputBinding
+import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.login.IlluColors.IlluColors
 import com.infomaniak.mail.ui.main.folder.DateSeparatorItemDecoration
@@ -188,6 +190,7 @@ fun WebView.initWebViewClientAndBridge(
     messageUid: String,
     shouldLoadDistantResources: Boolean,
     onBlockedResourcesDetected: (() -> Unit)? = null,
+    navigateToNewMessageActivity: ((Uri) -> Unit)?,
 ): MessageWebViewClient {
 
     addJavascriptInterface(WebViewUtils.jsBridge, "ikmail")
@@ -204,6 +207,7 @@ fun WebView.initWebViewClientAndBridge(
         messageUid,
         shouldLoadDistantResources,
         onBlockedResourcesDetected,
+        navigateToNewMessageActivity,
     ).also {
         webViewClient = it
     }
@@ -233,8 +237,7 @@ fun Fragment.safeNavigateToNewMessageActivity(
     currentClassName: String? = null,
     shouldLoadDistantResources: Boolean = false,
 ) {
-    safeNavigate(
-        resId = R.id.newMessageActivity,
+    safeNavigateToNewMessageActivity(
         args = NewMessageActivityArgs(
             arrivedFromExistingDraft = false,
             draftMode = draftMode,
@@ -245,12 +248,15 @@ fun Fragment.safeNavigateToNewMessageActivity(
     )
 }
 
+fun Fragment.safeNavigateToNewMessageActivity(args: Bundle? = null, currentClassName: String? = null) {
+    if (canNavigate(currentClassName)) (activity as MainActivity).navigateToNewMessageActivity(args)
+}
+
 fun Fragment.navigateToThread(thread: Thread, mainViewModel: MainViewModel) {
     if (thread.isOnlyOneDraft) { // Directly go to NewMessage screen
         trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
         mainViewModel.navigateToSelectedDraft(thread.messages.first()).observe(viewLifecycleOwner) {
-            safeNavigate(
-                R.id.newMessageActivity,
+            safeNavigateToNewMessageActivity(
                 NewMessageActivityArgs(
                     arrivedFromExistingDraft = true,
                     draftLocalUuid = it.draftLocalUuid,

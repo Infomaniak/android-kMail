@@ -23,7 +23,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
-import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.MatomoMail.trackContactActionsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetDetailedContactBinding
@@ -32,6 +31,7 @@ import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.ui.main.thread.actions.ActionsBottomSheetDialog
 import com.infomaniak.mail.utils.copyRecipientEmailToClipboard
 import com.infomaniak.mail.utils.observeNotNull
+import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -58,8 +58,7 @@ class DetailedContactBottomSheetDialog : ActionsBottomSheetDialog() {
 
         writeMail.setClosingOnClickListener {
             trackContactActionsEvent("writeEmail")
-            safeNavigate(
-                resId = R.id.newMessageActivity,
+            safeNavigateToNewMessageActivity(
                 args = NewMessageActivityArgs(recipient = navigationArgs.recipient).toBundle(),
                 currentClassName = currentClassName,
             )
