@@ -366,6 +366,8 @@
     <string name="settingsThemeChoiceTitle">Choix du thème</string>
     <string name="settingsThreadListDensityTitle">Densité de la liste de conversation</string>
     <string name="settingsThreadModeTitle">Mode d’affichage des messages</string>
+    <string name="settingsThreadModeWarningDescription">Attention, modifier cette option va télécharger à nouveau tous vos messages</string>
+    <string name="settingsThreadModeWarningTitle">Passer en mode %s ?</string>
     <string name="settingsTitle">Paramètres</string>
     <string name="settingsTransferAsAttachment">En pièce jointe</string>
     <string name="settingsTransferEmailsDescription">Lorsque vous transférez un mail, choisissez le mode d’affichage qui vous convient le mieux</string>

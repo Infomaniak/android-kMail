@@ -360,6 +360,8 @@
     <string name="settingsThemeChoiceTitle">Scelta del tema</string>
     <string name="settingsThreadListDensityTitle">Densità dell’elenco delle discussioni</string>
     <string name="settingsThreadModeTitle">Modalità di visualizzazione dei messaggi</string>
+    <string name="settingsThreadModeWarningDescription">Please note that changing this option will download all your messages again</string>
+    <string name="settingsThreadModeWarningTitle">Passare alla modalità %s?</string>
     <string name="settingsTitle">Impostazioni</string>
     <string name="settingsTransferAsAttachment">Come allegato</string>
     <string name="settingsTransferEmailsDescription">Quando si inoltra un’e-mail, scegliere la modalità di visualizzazione più adatta.</string>

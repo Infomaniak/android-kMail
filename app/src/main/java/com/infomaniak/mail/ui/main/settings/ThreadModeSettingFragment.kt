@@ -29,6 +29,7 @@ import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.LocalSettings.ThreadMode.CONVERSATION
 import com.infomaniak.mail.data.LocalSettings.ThreadMode.MESSAGE
 import com.infomaniak.mail.databinding.FragmentThreadModeSettingBinding
+import com.infomaniak.mail.utils.createDescriptionDialog
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -55,9 +56,19 @@ class ThreadModeSettingFragment : Fragment() {
 
         check(localSettings.threadMode)
 
-        onItemCheckedListener { _, _, threadMode ->
-            localSettings.threadMode = threadMode as ThreadMode
-            threadModeSettingViewModel.dropAllMailboxesContent()
+        onItemCheckedListener { _, _, enum ->
+            val threadMode = enum as ThreadMode
+            createDescriptionDialog(
+                title = getString(R.string.settingsThreadModeWarningTitle, getString(threadMode.localisedNameRes)),
+                description = getString(R.string.settingsThreadModeWarningDescription),
+                onPositiveButtonClicked = {
+                    localSettings.threadMode = threadMode
+                    threadModeSettingViewModel.dropAllMailboxesContent()
+                },
+                onDismissed = {
+                    check(localSettings.threadMode)
+                },
+            ).show()
         }
     }
 }
