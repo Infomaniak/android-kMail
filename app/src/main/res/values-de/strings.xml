@@ -86,7 +86,6 @@
     <string name="buttonBold">Kühn</string>
     <string name="buttonBulletPoint">Aufzählungspunkt</string>
     <string name="buttonCamera">Machen Sie ein Foto</string>
-    <string name="buttonCancel">Abbrechen</string>
     <string name="buttonClose">Schliessen Sie</string>
     <string name="buttonConfirm">Bestätigen</string>
     <string name="buttonConfirmRestoreEmails">Wiederherstellen</string>
@@ -287,7 +286,7 @@
     <string name="refreshTokenError">Sie wurden aufgrund eines Problems getrennt. Bitte verbinden Sie sich erneut.</string>
     <string name="reportDisplayProblemDescription">Sind Sie damit einverstanden, Ihre Daten mit unseren Entwicklern zu teilen, damit diese Ihnen bei Ihrem Problem helfen können?</string>
     <string name="reportDisplayProblemTitle">Ein Anzeigeproblem melden</string>
-    <string name="reportPhishingDescription">Wenn diese Nachricht versucht, vertrauliche Informationen (Passwort, Bankdaten usw.) zu stehlen und/oder sich als eine anerkannte Identität ausgibt, handelt es sich um Phishing.\n\nIndem Sie uns diese Nachricht melden, können Sie die Erkennung gefährlicher Nachrichten für alle unsere Nutzer beschleunigen.\n\nDie Meldung wird an unser Sicherheitsteam weitergeleitet, das sie analysiert und Massnahmen ergreift. Die E-Mail wird außerdem automatisch in Ihren Spam-Ordner verschoben.</string>
+    <string name="reportPhishingDescription">Wenn diese Nachricht versucht, vertrauliche Informationen (Passwort, Bankdaten usw.) zu stehlen und/oder sich als eine anerkannte Identität ausgibt, handelt es sich um Phishing.\n\nIndem Sie uns diese Nachricht melden, können Sie die Erkennung gefährlicher Nachrichten für alle unsere Nutzer beschleunigen.\n\nDie Meldung wird an unser Sicherheitsteam weitergeleitet, das sie analysiert und Massnahmen ergreift. Die E-Mail wird ausserdem automatisch in Ihren Spam-Ordner verschoben.</string>
     <string name="reportPhishingTitle">Einen Phishing-Versuch melden</string>
     <string name="restoreEmailsBackupDate">Datum der Sicherung</string>
     <string name="restoreEmailsText">Alle E-Mails werden wieder in Ihrem Posteingang landen.</string>
