@@ -18,6 +18,7 @@
 package com.infomaniak.mail.views.decoratedTextItemView
 
 import android.content.Context
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -129,7 +130,7 @@ abstract class DecoratedTextItemView @JvmOverloads constructor(
         val (color, textAppearance) = if (isSelected && itemStyle == SelectionStyle.MENU_DRAWER) {
             context.getAttributeColor(RMaterial.attr.colorPrimaryContainer) to R.style.BodyMedium_Accent
         } else {
-            android.graphics.Color.TRANSPARENT to if (textWeight == TextWeight.MEDIUM) R.style.BodyMedium else R.style.Body
+            Color.TRANSPARENT to if (textWeight == TextWeight.MEDIUM) R.style.BodyMedium else R.style.Body
         }
 
         root.setCardBackgroundColor(color)
