@@ -40,7 +40,7 @@ class ActionItemView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
-    val binding by lazy { ItemBottomSheetActionBinding.inflate(LayoutInflater.from(context), this, true) }
+    private val binding by lazy { ItemBottomSheetActionBinding.inflate(LayoutInflater.from(context), this, true) }
 
     init {
         attrs?.getAttributes(context, R.styleable.ActionItemView) {
