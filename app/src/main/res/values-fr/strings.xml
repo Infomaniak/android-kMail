@@ -207,6 +207,7 @@
     <string name="errorMailboxPasswordLength">Le mot de passe doit comporter entre 6 et 80 caractères</string>
     <string name="errorMoveDestinationNotFound">Le dossier de destination n’existe pas</string>
     <string name="errorNewFolderAlreadyExists">Le dossier existe déjà</string>
+    <string name="errorNewFolderInvalidCharacter">Le nom du dossier comporte des caractères invalides</string>
     <string name="errorNewFolderNameTooLong">Le nom du dossier ne doit pas dépasser 255 caractères</string>
     <string name="errorRefusedRecipients">Le serveur refuse tous les destinataires</string>
     <string name="errorRefusedSender">Le serveur refuse l’expéditeur</string>

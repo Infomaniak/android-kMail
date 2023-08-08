@@ -70,8 +70,13 @@ abstract class MenuFoldersFragment : Fragment() {
     protected fun checkForFolderCreationErrors(folderName: CharSequence): String? {
         return when {
             folderName.length > 255 -> getString(R.string.errorNewFolderNameTooLong)
+            folderName.contains(Regex(INVALID_CHARACTERS_PATTERN)) -> getString(R.string.errorNewFolderInvalidCharacter)
             folderController.getRootFolder(folderName.toString()) != null -> context?.getString(R.string.errorNewFolderAlreadyExists)
             else -> null
         }
+    }
+
+    private companion object {
+        const val INVALID_CHARACTERS_PATTERN = "[/'\"]"
     }
 }

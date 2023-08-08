@@ -212,6 +212,7 @@
     <string name="errorMailboxPasswordLength">The password must be between 6 and 80 characters</string>
     <string name="errorMoveDestinationNotFound">The destination folder does not exist</string>
     <string name="errorNewFolderAlreadyExists">The folder already exists</string>
+    <string name="errorNewFolderInvalidCharacter">The folder name contains invalid characters</string>
     <string name="errorNewFolderNameTooLong">The folder name should not exceed 255 characters</string>
     <string name="errorRefusedRecipients">The server is refusing all recipients</string>
     <string name="errorRefusedSender">The server is refusing the sender</string>
