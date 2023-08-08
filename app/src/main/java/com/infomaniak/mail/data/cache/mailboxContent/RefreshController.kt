@@ -45,11 +45,13 @@ import kotlin.math.max
 @Singleton
 class RefreshController @Inject constructor() {
 
+    private const val FORCE_CANCEL = "this_is_a_forced_cancellation_of_the_threads_algorithm"
+
     private var refreshThreadsJob: Job? = null
 
     //region Fetch Messages
     fun cancelRefresh() {
-        refreshThreadsJob?.cancel()
+        refreshThreadsJob?.cancel(CancellationException(FORCE_CANCEL))
     }
 
     suspend fun refreshThreads(
@@ -70,7 +72,7 @@ class RefreshController @Inject constructor() {
             }
         }.getOrElse {
             // It failed, but not because we cancelled it. Something bad happened, so we call the `stopped` callback.
-            if (it !is CancellationException || isFromService) stopped?.invoke()
+            if (it !is CancellationException || it.message == FORCE_CANCEL || isFromService) stopped?.invoke()
             if (it is ApiErrorException) it.handleApiErrors()
             return@getOrElse null
         }
