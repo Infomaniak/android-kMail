@@ -228,12 +228,12 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         binding.swipeRefreshLayout.setOnRefreshListener(this)
     }
 
-    private fun setupAdapter() = with(threadListViewModel) {
+    private fun setupAdapter() {
 
         threadListAdapter(
             folderRole = mainViewModel.currentFolder.value?.role,
             contacts = mainViewModel.mergedContacts.value ?: emptyMap(),
-            onSwipeFinished = { isRecoveringFinished.value = true },
+            onSwipeFinished = { threadListViewModel.isRecoveringFinished.value = true },
             multiSelection = object : MultiSelectionListener<SelectedThread> {
                 override var isEnabled by mainViewModel::isMultiSelectOn
                 override val selectedItems by mainViewModel::selectedThreads

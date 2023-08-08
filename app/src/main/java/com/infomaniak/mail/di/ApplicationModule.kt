@@ -59,7 +59,5 @@ object ApplicationModule {
 
     @Provides
     @Singleton
-    fun providesLocalSettings(appContext: Context): LocalSettings {
-        return LocalSettings.getInstance(appContext)
-    }
+    fun providesLocalSettings(appContext: Context): LocalSettings = LocalSettings.getInstance(appContext)
 }

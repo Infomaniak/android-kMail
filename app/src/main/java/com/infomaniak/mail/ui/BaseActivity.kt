@@ -30,7 +30,8 @@ import kotlinx.coroutines.runBlocking
 
 open class BaseActivity : AppCompatActivity() {
 
-    // Don't try to replace this with a dependency injection, it won't work.
+    // TODO: Try to replace this with a dependency injection.
+    //  Currently, it crashes because the lateinit value isn't initialized when the `MainActivity.onCreate()` calls its super.
     protected val localSettings by lazy { LocalSettings.getInstance(context = this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,16 +54,13 @@ open class BaseActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        val isAppLocked = localSettings.isAppLocked
-        val accentColor = localSettings.accentColor
-
-        if (isAppLocked && isKeyguardSecure()) with(getMainApplication()) {
+        if (localSettings.isAppLocked && isKeyguardSecure()) with(getMainApplication()) {
             lastAppClosingTime?.let {
                 LockActivity.lockAfterTimeout(
                     context = this@BaseActivity,
                     destinationClass = this::class.java,
                     lastAppClosingTime = it,
-                    primaryColor = accentColor.getPrimary(this),
+                    primaryColor = localSettings.accentColor.getPrimary(this),
                 )
             }
 

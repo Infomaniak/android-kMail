@@ -30,9 +30,7 @@ import com.infomaniak.mail.ui.login.IlluColors.getPaletteFor
 import com.infomaniak.mail.ui.login.IlluColors.keyPath
 import com.infomaniak.mail.utils.changePathColor
 import com.infomaniak.mail.utils.repeatFrame
-import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint
 class NoMailboxActivity : BaseActivity() {
 
     private val binding by lazy { ActivityNoMailboxBinding.inflate(layoutInflater) }

@@ -224,19 +224,21 @@ class ThreadListAdapter @Inject constructor(
             context.getColorStateList(R.color.backgroundColor)
         }
 
-        expeditorAvatar.isVisible = !isSelected && localSettings.threadDensity == LARGE
-        checkMarkLayout.isVisible = multiSelection?.isEnabled == true
+        with(localSettings) {
+            expeditorAvatar.isVisible = !isSelected && threadDensity == LARGE
+            checkMarkLayout.isVisible = multiSelection?.isEnabled == true
 
-        checkedState.isVisible = isSelected
-        uncheckedState.isVisible = localSettings.threadDensity != LARGE && !isSelected
+            checkedState.isVisible = isSelected
+            uncheckedState.isVisible = threadDensity != LARGE && !isSelected
+        }
     }
 
-    private fun CardviewThreadItemBinding.setupThreadDensityDependentUi() {
-        val margin = if (localSettings.threadDensity == COMPACT) threadMarginCompact else threadMarginOther
+    private fun CardviewThreadItemBinding.setupThreadDensityDependentUi() = with(localSettings) {
+        val margin = if (threadDensity == COMPACT) threadMarginCompact else threadMarginOther
         threadCard.setMarginsRelative(top = margin, bottom = margin)
 
-        expeditorAvatar.isVisible = localSettings.threadDensity == LARGE
-        mailBodyPreview.isGone = localSettings.threadDensity == COMPACT
+        expeditorAvatar.isVisible = threadDensity == LARGE
+        mailBodyPreview.isGone = threadDensity == COMPACT
 
         checkMarkBackground.reshapeToDensity()
         uncheckedState.reshapeToDensity()
