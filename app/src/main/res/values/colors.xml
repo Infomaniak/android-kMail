@@ -118,9 +118,9 @@
     <color name="onColorfulBackground">@color/white</color>
     <color name="textDisabledPrimaryButton">@color/white</color>
 
-    <!-- Separators -->
-    <color name="separatorColor">@color/mouse</color>
-    <color name="popupSeparatorColor">@color/mouse</color>
+    <!-- Dividers -->
+    <color name="dividerColor">@color/mouse</color>
+    <color name="popupDividerColor">@color/mouse</color>
 
     <!-- Icons -->
     <color name="iconColorPrimaryText">@color/primaryTextColor</color>

@@ -283,13 +283,6 @@
 
     <!-- MenuDrawer -->
 
-    <style name="MenuDrawerDivider" parent="Widget.Material3.MaterialDivider">
-        <item name="android:layout_marginTop">@dimen/marginStandardSmall</item>
-        <item name="android:layout_marginBottom">@dimen/marginStandardSmall</item>
-        <item name="dividerColor">@color/separatorColor</item>
-        <item name="dividerInsetStart">@dimen/marginStandardSmall</item>
-    </style>
-
     <style name="RoundedDecoratedTextItem" parent="Widget.Material3.CardView.Filled">
         <item name="android:layout_height">@dimen/decoratedItemViewHeight</item>
         <item name="android:layout_marginStart">@dimen/marginStandardSmall</item>
@@ -381,14 +374,6 @@
 
     <!-- Settings -->
 
-    <style name="SettingSeparator">
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_marginEnd">@dimen/settingsSeparatorHorizontalPadding</item>
-        <item name="android:layout_marginStart">@dimen/settingsSeparatorHorizontalPadding</item>
-        <item name="dividerColor">@color/separatorColor</item>
-    </style>
-
     <style name="SettingHeader" parent="BodySmall.Secondary">
         <item name="android:gravity">center_vertical</item>
         <item name="android:layout_height">wrap_content</item>
@@ -450,6 +435,22 @@
         <item name="cornerSize">20dp</item>
     </style>
 
+    <!-- Divider -->
+
+    <style name="ItemDivider">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_marginEnd">@dimen/dividerHorizontalPadding</item>
+        <item name="android:layout_marginStart">@dimen/dividerHorizontalPadding</item>
+        <item name="dividerColor">@color/dividerColor</item>
+    </style>
+
+    <style name="MenuDrawerDivider" parent="Widget.Material3.MaterialDivider">
+        <item name="android:layout_marginTop">@dimen/marginStandardSmall</item>
+        <item name="android:layout_marginBottom">@dimen/marginStandardSmall</item>
+        <item name="dividerColor">@color/dividerColor</item>
+        <item name="dividerInsetStart">@dimen/marginStandardSmall</item>
+    </style>
 
     <!-- Other -->
 

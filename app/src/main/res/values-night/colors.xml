@@ -56,9 +56,9 @@
     <color name="onColorfulBackground">@color/bat</color>
     <color name="textDisabledPrimaryButton">@color/bat</color>
 
-    <!-- Separators -->
-    <color name="separatorColor">@color/orca</color>
-    <color name="popupSeparatorColor">@color/elephant</color>
+    <!-- Dividers -->
+    <color name="dividerColor">@color/orca</color>
+    <color name="popupDividerColor">@color/elephant</color>
 
     <!-- Icons -->
     <color name="iconColor">@color/shark</color>

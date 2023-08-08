@@ -46,7 +46,7 @@
     <dimen name="folderCollapseButtonSize">28dp</dimen>
 
     <!-- Settings -->
-    <dimen name="settingsSeparatorHorizontalPadding">16dp</dimen>
+    <dimen name="dividerHorizontalPadding">16dp</dimen>
 
     <!-- Other -->
 

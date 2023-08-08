@@ -74,7 +74,7 @@
             android:layout_height="12sp"
             android:layout_marginVertical="@dimen/alternativeMargin"
             android:visibility="gone"
-            app:dividerColor="@color/separatorColor"
+            app:dividerColor="@color/dividerColor"
             tools:visibility="visible" />
 
         <com.google.android.material.button.MaterialButton

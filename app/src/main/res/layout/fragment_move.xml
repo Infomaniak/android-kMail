@@ -96,11 +96,9 @@
                     tools:listitem="@layout/item_folder_menu_drawer" />
 
                 <com.google.android.material.divider.MaterialDivider
-                    style="@style/MenuDrawerDivider"
+                    style="@style/ItemDivider"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:dividerInsetEnd="@dimen/marginStandardMedium"
-                    app:dividerInsetStart="@dimen/marginStandardMedium" />
+                    android:layout_height="wrap_content" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/customFoldersList"

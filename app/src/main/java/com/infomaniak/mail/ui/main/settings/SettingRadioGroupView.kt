@@ -53,7 +53,7 @@ class SettingRadioGroupView @JvmOverloads constructor(
 
         if (shouldAddDividers) {
             showDividers = SHOW_DIVIDER_MIDDLE
-            dividerPadding = resources.getDimension(R.dimen.settingsSeparatorHorizontalPadding).toInt()
+            dividerPadding = resources.getDimension(R.dimen.dividerHorizontalPadding).toInt()
             dividerDrawable = ContextCompat.getDrawable(context, R.drawable.divider)
         }
     }
