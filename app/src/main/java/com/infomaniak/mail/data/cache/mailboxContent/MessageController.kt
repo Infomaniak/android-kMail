@@ -94,7 +94,11 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
         return listOf(message) + thread.duplicates.query("${Message::messageId.name} == $0", message.messageId).find()
     }
 
-    fun searchMessages(searchQuery: String?, filters: Set<ThreadFilter>, folderId: String?): List<Message> {
+    fun searchMessages(
+        searchQuery: String?,
+        filters: Set<ThreadFilter>,
+        folderId: String?,
+    ): List<Message> = with(mailboxContentRealm()) {
         val queriesList = mutableListOf<String>().apply {
             filters.forEach { filter ->
                 when (filter) {
@@ -108,16 +112,18 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
             }
         }
 
-        if (searchQuery?.isNotBlank() == true) {
-            val containsSubject = "${Message::subject.name} CONTAINS[c] '$searchQuery'"
-            val containsPreview = "${Message::preview.name} CONTAINS[c] '$searchQuery'"
-            val containsBody = "${Message::body.name}.${Body::value.name} CONTAINS[c] '$searchQuery'"
-            queriesList.add("($containsSubject OR $containsPreview OR $containsBody)")
-        }
+        val filtersQuery = queriesList.joinToString(" AND ") { it }
 
-        return mailboxContentRealm().writeBlocking {
-            query<Message>(queriesList.joinToString(" AND ") { it }).find().copyFromRealm()
-        }
+        return if (searchQuery?.isNotBlank() == true) {
+            val containsSubject = "${Message::subject.name} CONTAINS[c] $0"
+            val containsPreview = "${Message::preview.name} CONTAINS[c] $0"
+            val containsBody = "${Message::body.name}.${Body::value.name} CONTAINS[c] $0"
+            val beginQuery = if (filtersQuery.isNotBlank()) "$filtersQuery AND " else ""
+
+            query<Message>("$beginQuery ($containsSubject OR $containsPreview OR $containsBody)", searchQuery)
+        } else {
+            query<Message>(filtersQuery)
+        }.find().copyFromRealm()
     }
     //endregion
 
