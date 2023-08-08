@@ -169,8 +169,8 @@ class FolderController @Inject constructor(private val mailboxContentRealm: Real
 
         /**
          * An "incomplete Thread" is a Thread in a specific Folder where only Messages from this Folder are displayed.
-         * - In the Drafts, we only want to display draft Messages.
-         * - In the Trash, we only want to display deleted Messages.
+         * - In the Draft folder, we only want to display draft Messages.
+         * - In the Trash folder, we only want to display deleted Messages.
          */
         fun getIdsOfFoldersWithIncompleteThreads(realm: TypedRealm): List<String> {
             return mutableListOf<String>().apply {

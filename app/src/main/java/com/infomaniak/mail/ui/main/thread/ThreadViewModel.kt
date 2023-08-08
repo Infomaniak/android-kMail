@@ -54,6 +54,7 @@ class ThreadViewModel @Inject constructor(
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val messageController: MessageController,
     private val sharedUtils: SharedUtils,
+    private val refreshController: RefreshController,
     private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
@@ -99,7 +100,7 @@ class ThreadViewModel @Inject constructor(
     fun fetchMessagesHeavyData(messages: List<Message>) {
         fetchMessagesJob?.cancel()
         fetchMessagesJob = viewModelScope.launch(ioCoroutineContext) {
-            ThreadController.fetchMessagesHeavyData(messages, mailbox, mailboxContentRealm())
+            threadController.fetchMessagesHeavyData(messages, mailbox, mailboxContentRealm())
         }
     }
 
@@ -108,7 +109,7 @@ class ThreadViewModel @Inject constructor(
         val messages = messageController.getMessageAndDuplicates(thread, message)
         val isSuccess = ApiRepository.deleteMessages(mailbox.uuid, messages.getUids()).isSuccess()
         if (isSuccess) {
-            RefreshController.refreshThreads(
+            refreshController.refreshThreads(
                 refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
                 mailbox = mailbox,
                 folder = message.folder,

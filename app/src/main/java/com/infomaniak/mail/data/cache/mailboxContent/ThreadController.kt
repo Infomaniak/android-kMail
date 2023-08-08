@@ -46,6 +46,7 @@ import javax.inject.Inject
 
 class ThreadController @Inject constructor(
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
+    private val refreshController: RefreshController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
 
@@ -129,6 +130,48 @@ class ThreadController @Inject constructor(
         delete(query<Thread>("${Thread::isFromSearch.name} == true").find())
     }
 
+    /**
+     * Asynchronously fetches heavy data for a list of messages within a given mailbox and realm.
+     *
+     * This function fetches heavy data associated with the provided list of messages, such as attachments
+     * or other resource-intensive content. It operates within the given realm and mailbox context.
+     *
+     * This function is deliberately present here as it relies on a method accessible solely through injection.
+     *
+     * @param messages List of messages for which heavy data needs to be fetched.
+     * @param mailbox The mailbox context within which the heavy data should be fetched.
+     * @param realm The realm context in which the heavy data fetching and updates should occur.
+     * @param okHttpClient An optional OkHttpClient instance to use for making network requests. If not provided, a default client will be used.
+     */
+    suspend fun fetchMessagesHeavyData(
+        messages: List<Message>,
+        mailbox: Mailbox,
+        realm: Realm,
+        okHttpClient: OkHttpClient? = null,
+    ) {
+        val failedFoldersIds = realm.writeBlocking { fetchMessagesHeavyData(messages, realm = this, okHttpClient) }
+        updateFailedFolders(failedFoldersIds, mailbox, realm, okHttpClient)
+    }
+
+    private suspend fun updateFailedFolders(
+        failedFoldersIds: Set<String>,
+        mailbox: Mailbox,
+        realm: Realm,
+        okHttpClient: OkHttpClient?,
+    ) {
+        failedFoldersIds.forEach { folderId ->
+            FolderController.getFolder(folderId, realm)?.let { folder ->
+                refreshController.refreshThreads(
+                    refreshMode = RefreshMode.REFRESH_FOLDER,
+                    mailbox = mailbox,
+                    folder = folder,
+                    okHttpClient = okHttpClient,
+                    realm = realm,
+                )
+            }
+        }
+    }
+
     fun saveThreads(searchMessages: List<Message>) {
         mailboxContentRealm().writeBlocking {
             FolderController.getOrCreateSearchFolder(realm = this).apply {
@@ -204,35 +247,6 @@ class ThreadController @Inject constructor(
 
         //region Edit data
         fun upsertThread(thread: Thread, realm: MutableRealm): Thread = realm.copyToRealm(thread, UpdatePolicy.ALL)
-
-        suspend fun fetchMessagesHeavyData(
-            messages: List<Message>,
-            mailbox: Mailbox,
-            realm: Realm,
-            okHttpClient: OkHttpClient? = null,
-        ) {
-            val failedFoldersIds = realm.writeBlocking { fetchMessagesHeavyData(messages, realm = this, okHttpClient) }
-            updateFailedFolders(failedFoldersIds, mailbox, realm, okHttpClient)
-        }
-
-        private suspend fun updateFailedFolders(
-            failedFoldersIds: Set<String>,
-            mailbox: Mailbox,
-            realm: Realm,
-            okHttpClient: OkHttpClient?,
-        ) {
-            failedFoldersIds.forEach { folderId ->
-                FolderController.getFolder(folderId, realm)?.let { folder ->
-                    RefreshController.refreshThreads(
-                        refreshMode = RefreshMode.REFRESH_FOLDER,
-                        mailbox = mailbox,
-                        folder = folder,
-                        okHttpClient = okHttpClient,
-                        realm = realm,
-                    )
-                }
-            }
-        }
 
         fun fetchMessagesHeavyData(
             messages: List<Message>,
