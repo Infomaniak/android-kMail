@@ -130,6 +130,19 @@ class ThreadController @Inject constructor(
         delete(query<Thread>("${Thread::isFromSearch.name} == true").find())
     }
 
+    /**
+     * Asynchronously fetches heavy data for a list of messages within a given mailbox and realm.
+     *
+     * This function fetches heavy data associated with the provided list of messages, such as attachments
+     * or other resource-intensive content. It operates within the given realm and mailbox context.
+     *
+     * This function is deliberately present here as it relies on a method accessible solely through injection.
+     *
+     * @param messages List of messages for which heavy data needs to be fetched.
+     * @param mailbox The mailbox context within which the heavy data should be fetched.
+     * @param realm The realm context in which the heavy data fetching and updates should occur.
+     * @param okHttpClient An optional OkHttpClient instance to use for making network requests. If not provided, a default client will be used.
+     */
     suspend fun fetchMessagesHeavyData(
         messages: List<Message>,
         mailbox: Mailbox,
