@@ -462,17 +462,18 @@ class NewMessageViewModel @Inject constructor(
     ) = globalCoroutineScope.launch(ioDispatcher) {
         autoSaveJob?.cancel()
 
-        if (shouldExecuteAction(action)) {
-            context.trackSendingDraftEvent(action, draft)
-            saveDraftToLocal(action)
-            showDraftToastToUser(action, isFinishing, isTaskRoot)
-            startWorkerCallback()
-            if (action == DraftAction.SAVE && !isFinishing) {
-                isNewMessage = false
-                saveDraftSnapshot()
-            }
-        } else if (isNewMessage) {
-            removeDraftFromRealm()
+        if (isSavingDraftWithoutChanges(action)) {
+            if (isNewMessage) removeDraftFromRealm()
+            return@launch
+        }
+
+        context.trackSendingDraftEvent(action, draft)
+        saveDraftToLocal(action)
+        showDraftToastToUser(action, isFinishing, isTaskRoot)
+        startWorkerCallback()
+        if (action == DraftAction.SAVE && !isFinishing) {
+            isNewMessage = false
+            saveDraftSnapshot()
         }
     }
 
@@ -517,7 +518,7 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    private fun shouldExecuteAction(action: DraftAction) = action == DraftAction.SEND || snapshot?.hasChanges() == true
+    private fun isSavingDraftWithoutChanges(action: DraftAction) = action == DraftAction.SAVE && snapshot?.hasChanges() != true
 
     fun updateIsSendingAllowed() {
         isSendingAllowed.postValue(draft.to.isNotEmpty() || draft.cc.isNotEmpty() || draft.bcc.isNotEmpty())

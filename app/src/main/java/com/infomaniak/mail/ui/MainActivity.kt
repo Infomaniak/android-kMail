@@ -81,6 +81,11 @@ class MainActivity : BaseActivity() {
         (supportFragmentManager.findFragmentById(R.id.hostFragment) as NavHostFragment).navController
     }
 
+    private val newMessageActivityResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
+        val draftAction = result.data?.getStringExtra(DRAFT_ACTION_KEY)?.let(DraftAction::valueOf)
+        if (draftAction == DraftAction.SEND) mainViewModel.snackBarManager.setValue(getString(R.string.snackbarEmailSending))
+    }
+
     @Inject
     lateinit var draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler
 
@@ -140,16 +145,6 @@ class MainActivity : BaseActivity() {
 
     private fun observeDraftWorkerResults() {
         WorkerUtils.flushWorkersBefore(context = this, lifecycleOwner = this) {
-            draftsActionsWorkerScheduler.getRunningWorkInfoLiveData().observe(this) {
-                it.forEach { workInfo ->
-                    workInfo.progress.getString(DraftsActionsWorker.PROGRESS_DRAFT_ACTION_KEY)?.let { draftAction ->
-                        if (draftAction.toEnumOrThrow<DraftAction>() == DraftAction.SEND) {
-                            mainViewModel.snackBarManager.setValue(getString(R.string.snackbarEmailSending))
-                        }
-                    }
-                }
-            }
-
             val treatedWorkInfoUuids = mutableSetOf<UUID>()
 
             draftsActionsWorkerScheduler.getCompletedWorkInfoLiveData().observe(this) {
@@ -189,9 +184,7 @@ class MainActivity : BaseActivity() {
                         showSavedDraftSnackBar(associatedMailboxUuid, remoteDraftUuid)
                     }
                 }
-                DraftAction.SEND -> {
-                    showSentDraftSnackBar()
-                }
+                DraftAction.SEND -> showSentDraftSnackBar()
             }
         }
     }
@@ -208,7 +201,6 @@ class MainActivity : BaseActivity() {
     private fun showSavedDraftSnackBar(associatedMailboxUuid: String, remoteDraftUuid: String) {
         mainViewModel.snackBarManager.setValue(
             title = getString(R.string.snackbarDraftSaved),
-            undoData = null,
             buttonTitle = R.string.actionDelete,
             customBehaviour = {
                 trackEvent("snackbar", "deleteDraft")
@@ -402,10 +394,11 @@ class MainActivity : BaseActivity() {
     fun navigateToNewMessageActivity(args: Bundle? = null) {
         val intent = Intent(this, NewMessageActivity::class.java)
         args?.let(intent::putExtras)
-        startActivity(intent)
+        newMessageActivityResultLauncher.launch(intent)
     }
 
-    private companion object {
-        const val FULLY_SLID = 1.0f
+    companion object {
+        private const val FULLY_SLID = 1.0f
+        const val DRAFT_ACTION_KEY = "draftAction"
     }
 }
