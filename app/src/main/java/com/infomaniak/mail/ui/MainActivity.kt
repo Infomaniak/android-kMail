@@ -21,6 +21,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.util.Log
 import android.view.View
 import android.webkit.WebView
@@ -38,6 +39,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.work.Data
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.networking.LiveDataNetworkStatus
+import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.Utils.toEnumOrThrow
 import com.infomaniak.lib.stores.checkUpdateIsAvailable
 import com.infomaniak.mail.BuildConfig
@@ -81,9 +83,13 @@ class MainActivity : BaseActivity() {
         (supportFragmentManager.findFragmentById(R.id.hostFragment) as NavHostFragment).navController
     }
 
+    private val showSendingSnackBarTimer: CountDownTimer by lazy {
+        Utils.createRefreshTimer(1_000L) { mainViewModel.snackBarManager.setValue(getString(R.string.snackbarEmailSending)) }
+    }
+
     private val newMessageActivityResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         val draftAction = result.data?.getStringExtra(DRAFT_ACTION_KEY)?.let(DraftAction::valueOf)
-        if (draftAction == DraftAction.SEND) mainViewModel.snackBarManager.setValue(getString(R.string.snackbarEmailSending))
+        if (draftAction == DraftAction.SEND) showSendingSnackBarTimer.start()
     }
 
     @Inject
@@ -210,6 +216,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun showSentDraftSnackBar() {
+        showSendingSnackBarTimer.cancel()
         mainViewModel.snackBarManager.setValue(getString(R.string.snackbarEmailSent))
     }
 
