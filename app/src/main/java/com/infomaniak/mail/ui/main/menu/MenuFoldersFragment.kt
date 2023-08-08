@@ -70,7 +70,7 @@ abstract class MenuFoldersFragment : Fragment() {
     protected fun checkForFolderCreationErrors(folderName: CharSequence): String? {
         return when {
             folderName.length > 255 -> getString(R.string.errorNewFolderNameTooLong)
-            folderController.getRootFolder(folderName) != null -> context?.getString(R.string.errorNewFolderAlreadyExists)
+            folderController.getRootFolder(folderName.toString()) != null -> context?.getString(R.string.errorNewFolderAlreadyExists)
             else -> null
         }
     }

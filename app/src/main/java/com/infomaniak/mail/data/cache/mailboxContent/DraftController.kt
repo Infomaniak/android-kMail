@@ -252,7 +252,7 @@ class DraftController @Inject constructor(
         }
 
         private fun getDraftQuery(key: String, value: String, realm: TypedRealm): RealmSingleQuery<Draft> {
-            return realm.query<Draft>("$key == '$value'").first()
+            return realm.query<Draft>("$key == $0", value).first()
         }
 
         private fun getDraftsWithActionsQuery(realm: TypedRealm): RealmQuery<Draft> {

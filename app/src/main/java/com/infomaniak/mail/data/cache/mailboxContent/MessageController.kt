@@ -91,7 +91,7 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
     }
 
     fun getMessageAndDuplicates(thread: Thread, message: Message): List<Message> {
-        return listOf(message) + thread.duplicates.query("${Message::messageId.name} == '${message.messageId}'").find()
+        return listOf(message) + thread.duplicates.query("${Message::messageId.name} == $0", message.messageId).find()
     }
 
     fun searchMessages(searchQuery: String?, filters: Set<ThreadFilter>, folderId: String?): List<Message> {
@@ -133,14 +133,13 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
 
         //region Queries
         private fun getOldestOrNewestMessageQuery(folderId: String, sort: Sort, realm: TypedRealm): RealmSingleQuery<Message> {
-            val byFolderId = "${Message::folderId.name} == '$folderId'"
+            val byFolderId = "${Message::folderId.name} == $0"
             val isNotFromSearch = "${Message::isFromSearch.name} == false"
-            return realm.query<Message>("$byFolderId AND $isNotFromSearch").sort(Message::shortUid.name, sort).first()
+            return realm.query<Message>("$byFolderId AND $isNotFromSearch", folderId).sort(Message::shortUid.name, sort).first()
         }
 
         private fun getMessageQuery(uid: String, realm: TypedRealm): RealmSingleQuery<Message> {
-            val byUid = "${Message::uid.name} == '$uid'"
-            return realm.query<Message>(byUid).first()
+            return realm.query<Message>("${Message::uid.name} == $0", uid).first()
         }
         //endregion
 
@@ -151,7 +150,7 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
 
         fun getThreadLastMessageInFolder(threadUid: String, realm: TypedRealm): Message? {
             val thread = ThreadController.getThread(threadUid, realm)
-            return thread?.messages?.query("${Message::folderId.name} == '${thread.folderId}'")?.find()?.lastOrNull()
+            return thread?.messages?.query("${Message::folderId.name} == $0", thread.folderId)?.find()?.lastOrNull()
         }
 
         fun getOldestMessage(folderId: String, realm: TypedRealm): Message? {

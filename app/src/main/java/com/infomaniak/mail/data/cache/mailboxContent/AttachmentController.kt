@@ -36,7 +36,7 @@ class AttachmentController @Inject constructor(private val mailboxContentRealm: 
 
         //region Queries
         private fun getAttachmentQuery(resource: String, realm: TypedRealm): RealmSingleQuery<Attachment> {
-            return realm.query<Attachment>("${Attachment::resource.name} == '$resource'").first()
+            return realm.query<Attachment>("${Attachment::resource.name} == $0", resource).first()
         }
         //endregion
     }

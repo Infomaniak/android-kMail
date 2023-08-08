@@ -180,7 +180,7 @@ class ThreadController @Inject constructor(
         }
 
         private fun getThreadQuery(uid: String, realm: TypedRealm): RealmSingleQuery<Thread> {
-            return realm.query<Thread>("${Thread::uid.name} == '$uid'").first()
+            return realm.query<Thread>("${Thread::uid.name} == $0", uid).first()
         }
         //endregion
 
