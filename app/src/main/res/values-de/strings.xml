@@ -205,6 +205,7 @@
     <string name="errorMailboxPasswordLength">Das Passwort muss zwischen 6 und 80 Zeichen lang sein</string>
     <string name="errorMoveDestinationNotFound">Der Zielordner besteht nicht</string>
     <string name="errorNewFolderAlreadyExists">Der Ordner besteht bereits</string>
+    <string name="errorNewFolderInvalidCharacter">Der Ordnername enthält ungültige Zeichen</string>
     <string name="errorNewFolderNameTooLong">Der Ordnername sollte nicht länger als 255 Zeichen sein.</string>
     <string name="errorRefusedRecipients">Der Server lehnt alle Empfänger ab</string>
     <string name="errorRefusedSender">Der Server lehnt den Absender ab</string>

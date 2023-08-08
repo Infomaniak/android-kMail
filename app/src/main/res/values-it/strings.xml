@@ -205,6 +205,7 @@
     <string name="errorMailboxPasswordLength">La password deve essere compresa tra 6 e 80 caratteri</string>
     <string name="errorMoveDestinationNotFound">La cartella di destinazione è inesistente</string>
     <string name="errorNewFolderAlreadyExists">La cartella è già esistente</string>
+    <string name="errorNewFolderInvalidCharacter">Il nome della cartella contiene caratteri non validi</string>
     <string name="errorNewFolderNameTooLong">Il nome della cartella non deve superare i 255 caratteri</string>
     <string name="errorRefusedRecipients">Il server respinge tutti i destinatari</string>
     <string name="errorRefusedSender">Il server respinge il mittente</string>
