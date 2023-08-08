@@ -62,7 +62,10 @@ import io.sentry.android.core.SentryAndroid
 import io.sentry.android.core.SentryAndroidOptions
 import io.sentry.android.fragment.FragmentLifecycleIntegration
 import io.sentry.android.fragment.FragmentLifecycleState
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.matomo.sdk.Tracker
 import java.util.Date
 import java.util.UUID

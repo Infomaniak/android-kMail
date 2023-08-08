@@ -30,7 +30,8 @@ import com.infomaniak.lib.core.utils.clearStack
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
-import com.infomaniak.mail.data.models.draft.Draft.*
+import com.infomaniak.mail.data.models.draft.Draft.DraftAction
+import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.receivers.NotificationActionsReceiver
 import com.infomaniak.mail.receivers.NotificationActionsReceiver.Companion.ARCHIVE_ACTION

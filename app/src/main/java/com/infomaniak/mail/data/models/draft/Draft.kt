@@ -37,7 +37,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.UseSerializers
 import kotlinx.serialization.json.*
-import java.util.*
+import java.util.UUID
 
 @Serializable
 class Draft : RealmObject {

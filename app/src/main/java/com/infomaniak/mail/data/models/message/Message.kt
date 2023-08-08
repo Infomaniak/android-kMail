@@ -39,8 +39,11 @@ import io.realm.kotlin.types.annotations.PersistedName
 import io.realm.kotlin.types.annotations.PrimaryKey
 import io.sentry.Sentry
 import io.sentry.SentryLevel
-import kotlinx.serialization.*
-import java.util.*
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
+import kotlinx.serialization.UseSerializers
+import java.util.Date
 
 @Serializable
 class Message : RealmObject {
