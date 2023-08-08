@@ -329,6 +329,8 @@ object RefreshController {
 
         if (uids.isEmpty()) return emptySet()
 
+        addSentryBreadcrumbsForAddedUids(logMessage = logMessage, email = mailbox.email, folder = folder, uids = uids)
+
         val impactedThreads = mutableSetOf<Thread>()
 
         val before = System.currentTimeMillis()
@@ -337,13 +339,11 @@ object RefreshController {
         if (!apiResponse.isSuccess()) apiResponse.throwErrorAsException()
         scope.ensureActive()
 
-        addSentryBreadcrumbsForAddedUids(
-            logMessage = logMessage,
-            email = mailbox.email,
+        SentryDebug.sendMissingMessages(
+            sentUids = uids,
+            receivedMessages = apiResponse.data?.messages ?: emptyList(),
             folder = folder,
-            uids = uids,
-            messages = apiResponse.data?.messages ?: emptyList(),
-            cursor = cursor,
+            newCursor = cursor,
         )
 
         apiResponse.data?.messages?.let { messages ->
@@ -645,8 +645,6 @@ object RefreshController {
         email: String,
         folder: Folder,
         uids: List<Int>,
-        messages: List<Message>,
-        cursor: String,
     ) {
         SentryDebug.addThreadsAlgoBreadcrumb(
             message = logMessage,
@@ -657,8 +655,6 @@ object RefreshController {
                 "4_added" to uids,
             ),
         )
-
-        SentryDebug.sendMissingMessages(uids, messages, folder, cursor)
     }
     //endregion
 
