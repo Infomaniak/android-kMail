@@ -48,6 +48,10 @@ class RefreshController @Inject constructor() {
     private var refreshThreadsJob: Job? = null
 
     //region Fetch Messages
+    fun cancelRefresh() {
+        refreshThreadsJob?.cancel()
+    }
+
     suspend fun refreshThreads(
         refreshMode: RefreshMode,
         mailbox: Mailbox,

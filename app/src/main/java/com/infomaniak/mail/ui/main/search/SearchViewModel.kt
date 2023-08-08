@@ -29,6 +29,7 @@ import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.trackSearchEvent
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
+import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder
@@ -167,6 +168,8 @@ class SearchViewModel @Inject constructor(
         searchJob?.cancel()
         searchJob = launch {
             delay(SEARCH_DEBOUNCE_DURATION)
+
+            RefreshController.cancelRefresh()
 
             if (!shouldGetNextPage) resetPaginationData()
 
