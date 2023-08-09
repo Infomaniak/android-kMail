@@ -67,8 +67,6 @@ class NewMessageActivity : BaseActivity() {
             return
         }
 
-        handleOnBackPressed()
-
         setupSnackBar()
         setupSendButton()
         setupSystemBars()
@@ -84,13 +82,7 @@ class NewMessageActivity : BaseActivity() {
         return true
     }
 
-    private fun handleOnBackPressed() = with(newMessageViewModel) {
-        onBackPressedDispatcher.addCallback(this@NewMessageActivity) {
-            if (isAutoCompletionOpened) newMessageFragment.closeAutoCompletion() else finishAppAndRemoveTaskIfNeeded()
-        }
-    }
-
-    private fun finishAppAndRemoveTaskIfNeeded() {
+    fun finishAppAndRemoveTaskIfNeeded() {
         if (isTaskRoot) finishAndRemoveTask() else finish()
     }
 

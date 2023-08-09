@@ -36,6 +36,7 @@ import android.view.WindowManager
 import android.webkit.WebView
 import android.widget.ListPopupWindow
 import android.widget.PopupWindow
+import androidx.activity.addCallback
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.Group
 import androidx.core.net.MailTo
@@ -89,10 +90,10 @@ class NewMessageFragment : Fragment() {
 
     private val attachmentAdapter = AttachmentAdapter(shouldDisplayCloseButton = true, onDelete = ::onDeleteAttachment)
 
+    private val newMessageActivity by lazy { requireActivity() as NewMessageActivity }
     private val webViewUtils by lazy { WebViewUtils(requireContext()) }
 
     private var lastFieldToTakeFocus: FieldType? = TO
-    var shouldSendInsteadOfSave: Boolean = false
 
     @Inject
     lateinit var localSettings: LocalSettings
@@ -121,6 +122,8 @@ class NewMessageFragment : Fragment() {
         initUi()
         initDraftAndViewModel()
 
+        handleOnBackPressed()
+
         setOnFocusChangedListeners()
 
         doAfterSubjectChange()
@@ -146,6 +149,12 @@ class NewMessageFragment : Fragment() {
             binding.quoteWebView.reload()
         }
         super.onConfigurationChanged(newConfig)
+    }
+
+    private fun handleOnBackPressed() = with(newMessageViewModel) {
+        newMessageActivity.onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            if (isAutoCompletionOpened) closeAutoCompletion() else newMessageActivity.finishAppAndRemoveTaskIfNeeded()
+        }
     }
 
     private fun updateCreationStatus() = with(newMessageViewModel) {

@@ -96,6 +96,7 @@ class NewMessageViewModel @Inject constructor(
 
     var isAutoCompletionOpened = false
     var isEditorExpanded = false
+    var shouldSendInsteadOfSave = false
     var otherFieldsAreAllEmpty = SingleLiveEvent(true)
     var initializeFieldsAsOpen = SingleLiveEvent<Boolean>()
 
