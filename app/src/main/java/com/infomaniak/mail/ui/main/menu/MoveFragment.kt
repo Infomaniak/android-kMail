@@ -31,6 +31,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.utils.hideKeyboard
 import com.infomaniak.mail.MatomoMail.trackCreateFolderEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.FragmentMoveBinding
 import com.infomaniak.mail.utils.createInputDialog
@@ -47,9 +48,7 @@ class MoveFragment : MenuFoldersFragment() {
 
     private val createFolderDialog by lazy { initNewFolderDialog() }
 
-    private val searchResultsAdpater by lazy {
-        FolderAdapter(isInMenuDrawer, shouldIndent = false, onFolderClicked = ::onFolderSelected)
-    }
+    private lateinit var searchResultsAdpater: FolderAdapter
 
     override val defaultFoldersList: RecyclerView by lazy { binding.defaultFoldersList }
     override val customFoldersList: RecyclerView by lazy { binding.customFoldersList }
@@ -63,7 +62,6 @@ class MoveFragment : MenuFoldersFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupListeners()
-        setSearchBarUi()
         observeFolderId()
         observeNewFolderCreation()
         observeSearchResults()
@@ -92,9 +90,13 @@ class MoveFragment : MenuFoldersFragment() {
     }
 
     private fun setAdaptersFolders(folderId: String) {
-        val (defaultFolders, customFolders) = mainViewModel.currentFoldersLive.value!!
-        defaultFoldersAdapter.setFolders(defaultFolders.filterNot { it.role == FolderRole.DRAFT }, folderId)
+        val (defaultFoldersWithoutTrash, customFolders) = mainViewModel.currentFoldersLive.value!!.let { foldersLists ->
+            foldersLists.first.filterNot { it.role == FolderRole.DRAFT } to foldersLists.second
+        }
+
+        defaultFoldersAdapter.setFolders(defaultFoldersWithoutTrash, folderId)
         customFoldersAdapter.setFolders(customFolders, folderId)
+        setSearchBarUi(allFolders = defaultFoldersWithoutTrash + customFolders, currentFolderId = folderId)
     }
 
     private fun observeNewFolderCreation() {
@@ -123,15 +125,17 @@ class MoveFragment : MenuFoldersFragment() {
         )
     }
 
-    private fun setSearchBarUi() = with(binding) {
+    private fun setSearchBarUi(allFolders: List<Folder>, currentFolderId: String) = with(binding) {
+        searchResultsAdpater = FolderAdapter(
+            isInMenuDrawer,
+            currentFolderId,
+            shouldIndent = false,
+            onFolderClicked = ::onFolderSelected,
+        )
         searchResultsList.adapter = searchResultsAdpater
 
         searchInputLayout.trackSearchEndIconClick()
         searchTextInput.apply {
-            val allFolders = mainViewModel.currentFoldersLive.value!!.let { (defaultFoldersList, customFoldersList) ->
-                defaultFoldersList.filterNot { it.role == FolderRole.DRAFT } + customFoldersList
-            }
-
             doOnTextChanged { text, _, _, _ ->
                 toggleFolderListsVisibility(!text.isNullOrBlank())
                 if (text?.isNotBlank() == true) moveViewModel.filterFolders(text.toString(), allFolders)
