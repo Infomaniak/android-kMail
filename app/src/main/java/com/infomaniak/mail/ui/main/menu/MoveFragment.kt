@@ -47,7 +47,9 @@ class MoveFragment : MenuFoldersFragment() {
 
     private val createFolderDialog by lazy { initNewFolderDialog() }
 
-    private val searchResultsAdpater by lazy { FolderAdapter(isInMenuDrawer, onFolderClicked = ::onFolderSelected) }
+    private val searchResultsAdpater by lazy {
+        FolderAdapter(isInMenuDrawer, shouldIndent = false, onFolderClicked = ::onFolderSelected)
+    }
 
     override val defaultFoldersList: RecyclerView by lazy { binding.defaultFoldersList }
     override val customFoldersList: RecyclerView by lazy { binding.customFoldersList }
