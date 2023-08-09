@@ -66,10 +66,6 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     setText(if (isThemeTheSame) R.string.actionViewInLight else R.string.actionViewInDark)
                     setClosingOnClickListener { mainViewModel.toggleLightThemeForMessage.value = message }
                 }
-
-                // TODO: When 'postpone' action will be dev, replace move item by the postpone one below
-                //  and delete the line app:visibleDivider="false" in move item
-                binding.move.setDividerVisibility(isVisible = true)
             }
 
             initOnClickListener(object : OnActionClick {

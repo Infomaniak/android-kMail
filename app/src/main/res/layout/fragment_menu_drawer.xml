@@ -35,13 +35,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginVertical="@dimen/marginStandardMedium"
-            android:layout_marginStart="@dimen/marginStandard"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/marginStandard"
                 android:contentDescription="@string/appNameFull"
                 android:src="@drawable/ic_logo_infomaniak_mail"
                 app:layout_constraintStart_toStartOf="parent" />
