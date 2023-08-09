@@ -62,27 +62,22 @@ class RefreshController @Inject constructor() {
         stopped: (() -> Unit)? = null,
     ): List<Thread>? {
 
-        suspend fun secondTry(job: Job): List<Thread>? = runCatching {
+        suspend fun refreshWithRunCatching(job: Job, isFirstTime: Boolean = true): List<Thread>? = runCatching {
             withContext(Dispatchers.IO + job) {
-                delay(Utils.DELAY_BEFORE_FETCHING_ACTIVITIES_AGAIN)
-                ensureActive()
-                realm.handleRefreshMode(refreshMode, scope = this, mailbox, folder, okHttpClient).toList()
-            }
-        }.getOrElse {
-            handleAllExceptions(it, stopped)
-        }
-
-        suspend fun firstTry(job: Job) = runCatching {
-            withContext(Dispatchers.IO + job) {
-                started?.invoke()
+                if (isFirstTime) {
+                    started?.invoke()
+                } else {
+                    delay(Utils.DELAY_BEFORE_FETCHING_ACTIVITIES_AGAIN)
+                    ensureActive()
+                }
                 realm.handleRefreshMode(refreshMode, scope = this, mailbox, folder, okHttpClient).toList()
             }
         }.getOrElse {
             // If fetching the activities failed because of a not found Message, we should pause briefly
             // before trying again to retrieve activities, to ensure that the API is up-to-date.
-            if (it is ApiErrorException && it.errorCode == ErrorCode.MESSAGE_NOT_FOUND) {
+            if (it is ApiErrorException && it.errorCode == ErrorCode.MESSAGE_NOT_FOUND && isFirstTime) {
                 Sentry.captureException(it)
-                secondTry(job)
+                refreshWithRunCatching(job, isFirstTime = false)
             } else {
                 handleAllExceptions(it, stopped)
             }
@@ -93,7 +88,7 @@ class RefreshController @Inject constructor() {
         refreshThreadsJob?.cancel()
         refreshThreadsJob = Job()
 
-        return firstTry(refreshThreadsJob!!).also {
+        return refreshWithRunCatching(refreshThreadsJob!!).also {
             if (it != null) {
                 stopped?.invoke()
                 Log.d("API", "End of refreshing threads with mode: $refreshMode | (${folder.name})")
