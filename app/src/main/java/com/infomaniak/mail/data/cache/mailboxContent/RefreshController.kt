@@ -58,7 +58,6 @@ class RefreshController @Inject constructor() {
         folder: Folder,
         okHttpClient: OkHttpClient? = null,
         realm: Realm,
-        isFromService: Boolean = false,
         started: (() -> Unit)? = null,
         stopped: (() -> Unit)? = null,
     ): List<Thread>? {
@@ -71,7 +70,7 @@ class RefreshController @Inject constructor() {
         }.getOrElse {
 
             // We force-cancelled, so we need to call the `stopped` callback.
-            if (it is ForcedCancellationException || isFromService) stopped?.invoke()
+            if (it is ForcedCancellationException) stopped?.invoke()
 
             // It failed, but not because we cancelled it. Something bad happened, so we call the `stopped` callback.
             if (it !is CancellationException) stopped?.invoke()
