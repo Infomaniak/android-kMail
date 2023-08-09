@@ -33,9 +33,9 @@ import com.infomaniak.mail.data.models.Folder.*
 import com.infomaniak.mail.databinding.*
 import com.infomaniak.mail.ui.main.menu.FolderAdapter.FolderViewHolder
 import com.infomaniak.mail.utils.UnreadDisplay
-import com.infomaniak.mail.views.decoratedTextItemView.MenuDrawerFolderItemView
-import com.infomaniak.mail.views.decoratedTextItemView.SelectableFolderItemView
-import com.infomaniak.mail.views.decoratedTextItemView.SelectableTextItemView
+import com.infomaniak.mail.views.itemViews.SelectableFolderItemView
+import com.infomaniak.mail.views.itemViews.SelectableItemView
+import com.infomaniak.mail.views.itemViews.UnreadFolderItemView
 import kotlin.math.min
 
 class FolderAdapter(
@@ -88,7 +88,7 @@ class FolderAdapter(
 
     override fun getItemCount() = folders.size
 
-    private fun MenuDrawerFolderItemView.displayMenuDrawerFolder(folder: Folder) {
+    private fun UnreadFolderItemView.displayMenuDrawerFolder(folder: Folder) {
         val unread = when (folder.role) {
             FolderRole.DRAFT -> UnreadDisplay(folder.threads.count())
             FolderRole.SENT, FolderRole.TRASH -> UnreadDisplay(0)
@@ -98,7 +98,7 @@ class FolderAdapter(
         displayFolder(folder, unread)
     }
 
-    private fun SelectableTextItemView.displayFolder(folder: Folder, unread: UnreadDisplay? = null) {
+    private fun SelectableItemView.displayFolder(folder: Folder, unread: UnreadDisplay? = null) {
         folder.role?.let {
             setFolderUi(folder, it.folderIconRes, unread, it.matomoValue)
         } ?: run {
@@ -114,7 +114,7 @@ class FolderAdapter(
         }
     }
 
-    private fun SelectableTextItemView.setFolderUi(
+    private fun SelectableItemView.setFolderUi(
         folder: Folder,
         @DrawableRes iconId: Int,
         unread: UnreadDisplay?,
@@ -130,7 +130,7 @@ class FolderAdapter(
 
         when (this) {
             is SelectableFolderItemView -> setIndent(folderIndent)
-            is MenuDrawerFolderItemView -> {
+            is UnreadFolderItemView -> {
                 initOnCollapsableClickListener { onCollapseClicked?.invoke(folder.id, isCollapsed) }
                 isPastilleDisplayed = unread?.shouldDisplayPastille ?: false
                 unreadCount = unread?.count ?: 0
@@ -140,6 +140,7 @@ class FolderAdapter(
                 setIndent(folderIndent, hasCollapsableFolder!!, canBeCollapsed)
                 setCollapsingButtonContentDescription(folderName)
             }
+            else -> throw IllegalStateException("`${this::class.simpleName}` cannot exists here. Only Folder classes are allowed")
         }
 
         setOnClickListener {

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.views.decoratedTextItemView
+package com.infomaniak.mail.views.itemViews
 
 import android.content.Context
 import android.util.AttributeSet
@@ -28,7 +28,7 @@ class InvalidMailboxItemView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : DecoratedTextItemView(context, attrs, defStyleAttr) {
+) : DecoratedItemView(context, attrs, defStyleAttr) {
 
     override val endIconMarginRes: Int
         get() = if (itemStyle == SelectionStyle.MENU_DRAWER) RCore.dimen.marginStandardSmall else ResourcesCompat.ID_NULL

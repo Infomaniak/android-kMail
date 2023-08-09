@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.views.decoratedTextItemView
+package com.infomaniak.mail.views.itemViews
 
 import android.content.Context
 import android.graphics.drawable.Drawable
@@ -32,7 +32,7 @@ import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewDecoratedTextItemBinding
 
-abstract class DecoratedTextItemView @JvmOverloads constructor(
+sealed class DecoratedItemView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
@@ -87,11 +87,11 @@ abstract class DecoratedTextItemView @JvmOverloads constructor(
         }
 
     init {
-        attrs?.getAttributes(context, R.styleable.DecoratedTextItemView) {
-            icon = getDrawable(R.styleable.DecoratedTextItemView_icon)
-            itemStyle = SelectionStyle.values()[getInteger(R.styleable.DecoratedTextItemView_itemStyle, 0)]
-            text = getString(R.styleable.DecoratedTextItemView_text)
-            textWeight = TextWeight.values()[getInteger(R.styleable.DecoratedTextItemView_textWeight, 0)]
+        attrs?.getAttributes(context, R.styleable.DecoratedItemView) {
+            icon = getDrawable(R.styleable.DecoratedItemView_icon)
+            itemStyle = SelectionStyle.values()[getInteger(R.styleable.DecoratedItemView_itemStyle, 0)]
+            text = getString(R.styleable.DecoratedItemView_text)
+            textWeight = TextWeight.values()[getInteger(R.styleable.DecoratedItemView_textWeight, 0)]
         }
     }
 

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.views.decoratedTextItemView
+package com.infomaniak.mail.views.itemViews
 
 import androidx.core.content.res.getDimensionPixelSizeOrThrow
 import androidx.core.view.marginEnd

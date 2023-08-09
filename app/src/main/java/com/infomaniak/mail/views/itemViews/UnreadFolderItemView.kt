@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.views.decoratedTextItemView
+package com.infomaniak.mail.views.itemViews
 
 import android.content.Context
 import android.util.AttributeSet
@@ -24,7 +24,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.toggleChevron
 import com.infomaniak.mail.views.CollapsableItem
 
-class MenuDrawerFolderItemView @JvmOverloads constructor(
+class UnreadFolderItemView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
