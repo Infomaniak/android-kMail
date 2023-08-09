@@ -130,10 +130,9 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
                             bucketIdentifier = BuildConfig.BUGTRACKER_MAIL_BUCKET_ID,
                             projectName = BuildConfig.BUGTRACKER_MAIL_PROJECT_NAME,
                             repoGitHub = BuildConfig.GITHUB_REPO,
-                        ).toBundle()
+                        ).toBundle(),
                     )
-                    startActivity(this)
-                }
+                }.also(::startActivity)
             } else {
                 trackMenuDrawerEvent("feedback")
                 context.openUrl(getString(R.string.urlUserReportAndroid))
