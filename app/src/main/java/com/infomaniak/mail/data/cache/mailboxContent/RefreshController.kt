@@ -295,6 +295,11 @@ class RefreshController @Inject constructor() {
         previousCursor: String,
     ): Set<Thread> {
 
+        // After performing an action on a Message, we should pause briefly
+        // before retrieving activities to ensure that the API is up-to-date.
+        delay(Utils.DELAY_BEFORE_FETCHING_ACTIVITIES)
+        scope.ensureActive()
+
         val activities = getMessagesUidsDelta(mailbox.uuid, folder.id, okHttpClient, previousCursor) ?: return emptySet()
         scope.ensureActive()
 
