@@ -21,7 +21,7 @@
         <item name="android:navigationBarColor">@color/backgroundColorSecondary</item>
     </style>
 
-    <style name="SearchTextInputEditTextStyle" parent="SearchTextInputEditTextStyle.Base">
+    <style name="SearchTextInputEditTextStyle" parent="BaseSearchTextInputEditTextStyle">
         <item name="android:importantForAutofill">no</item>
     </style>
 </resources>

@@ -448,7 +448,7 @@
         <item name="placeholderTextColor">@color/tertiaryTextColor</item>
     </style>
 
-    <style name="SearchTextInputEditTextStyle.Base">
+    <style name="BaseSearchTextInputEditTextStyle">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:drawableStart">@drawable/ic_search_small</item>
@@ -460,7 +460,7 @@
         <item name="android:textColorHint">@color/tertiaryTextColor</item>
     </style>
 
-    <style name="SearchTextInputEditTextStyle" parent="SearchTextInputEditTextStyle.Base" />
+    <style name="SearchTextInputEditTextStyle" parent="BaseSearchTextInputEditTextStyle" />
 
     <!-- Divider -->
 
