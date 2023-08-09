@@ -125,7 +125,8 @@ class MainActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
+        // Avoid calling the webview factory if not in debug as it crashes for some people in production
+        if (BuildConfig.DEBUG) WebView.setWebContentsDebuggingEnabled(true)
 
         setContentView(binding.root)
         handleOnBackPressed()
