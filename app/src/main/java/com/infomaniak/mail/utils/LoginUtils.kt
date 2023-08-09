@@ -81,26 +81,25 @@ class LoginUtils @Inject constructor(
         }
     }
 
-    private fun Fragment.onAuthenticateUserSuccess(apiToken: ApiToken) {
-        lifecycleScope.launch(ioDispatcher) {
-            when (val returnValue = LoginActivity.authenticateUser(requireContext(), apiToken)) {
-                is User -> {
-                    requireContext().trackAccountEvent("loggedIn")
-                    MailboxController.getFirstValidMailbox(returnValue.id)?.mailboxId?.let { AccountUtils.currentMailboxId = it }
-                    AccountUtils.reloadApp?.invoke()
+    private fun Fragment.onAuthenticateUserSuccess(apiToken: ApiToken) = lifecycleScope.launch(ioDispatcher) {
+        val context = requireContext()
+        when (val returnValue = LoginActivity.authenticateUser(context, apiToken)) {
+            is User -> {
+                context.trackAccountEvent("loggedIn")
+                MailboxController.getFirstValidMailbox(returnValue.id)?.mailboxId?.let { AccountUtils.currentMailboxId = it }
+                AccountUtils.reloadApp?.invoke()
+            }
+            is MailboxErrorCode -> withContext(mainDispatcher) {
+                when (returnValue) {
+                    MailboxErrorCode.NO_MAILBOX -> context.launchNoMailboxActivity()
+                    MailboxErrorCode.NO_VALID_MAILBOX -> context.launchNoValidMailboxesActivity()
                 }
-                is MailboxErrorCode -> withContext(mainDispatcher) {
-                    when (returnValue) {
-                        MailboxErrorCode.NO_MAILBOX -> requireContext().launchNoMailboxActivity()
-                        MailboxErrorCode.NO_VALID_MAILBOX -> requireContext().launchNoValidMailboxesActivity()
-                    }
-                }
-                is ApiResponse<*> -> withContext(mainDispatcher) {
-                    showError(requireContext().getString(returnValue.translatedError))
-                }
-                else -> withContext(mainDispatcher) {
-                    showError(requireContext().getString(R.string.anErrorHasOccurred))
-                }
+            }
+            is ApiResponse<*> -> withContext(mainDispatcher) {
+                showError(context.getString(returnValue.translatedError))
+            }
+            else -> withContext(mainDispatcher) {
+                showError(context.getString(R.string.anErrorHasOccurred))
             }
         }
     }
