@@ -29,6 +29,7 @@ import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.trackSearchEvent
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
+import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder
@@ -48,8 +49,9 @@ import javax.inject.Inject
 class SearchViewModel @Inject constructor(
     application: Application,
     private val globalCoroutineScope: CoroutineScope,
-    private val messageController: MessageController,
     private val searchUtils: SearchUtils,
+    private val messageController: MessageController,
+    private val refreshController: RefreshController,
     private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
@@ -167,6 +169,8 @@ class SearchViewModel @Inject constructor(
         searchJob?.cancel()
         searchJob = launch {
             delay(SEARCH_DEBOUNCE_DURATION)
+
+            refreshController.cancelRefresh()
 
             if (!shouldGetNextPage) resetPaginationData()
 

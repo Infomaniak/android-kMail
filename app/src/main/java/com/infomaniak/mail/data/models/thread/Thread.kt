@@ -28,10 +28,7 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.isSmallerThanDays
-import com.infomaniak.mail.utils.toDate
-import com.infomaniak.mail.utils.toRealmInstant
+import com.infomaniak.mail.utils.*
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.*
@@ -203,8 +200,23 @@ class Thread : RealmObject {
     }
 
     fun computeAvatarRecipient(): Recipient? {
-        val message = messages.lastOrNull { it.folder.role != FolderRole.SENT } ?: messages.last()
-        return message.from.firstOrNull()
+        return runCatching {
+            val message = messages.lastOrNull { it.folder.role != FolderRole.SENT } ?: messages.last()
+            return@runCatching message.from.firstOrNull()
+        }.getOrElse { throwable ->
+            Sentry.withScope { scope ->
+                scope.level = SentryLevel.ERROR
+                scope.setExtra("thread.folder.name", folder.name)
+                scope.setExtra("thread.folder.id", folder.id)
+                scope.setExtra("thread.uid", uid)
+                scope.setExtra("thread.messages.count", "${messages.count()}")
+                scope.setExtra("thread.duplicates.count", "${duplicates.count()}")
+                scope.setExtra("thread.isFromSearch", "$isFromSearch")
+                scope.setExtra("thread.hasDrafts", "$hasDrafts")
+                Sentry.captureException(throwable)
+            }
+            return@getOrElse null
+        }
     }
 
     fun computeDisplayedRecipients(): RealmList<Recipient> {
