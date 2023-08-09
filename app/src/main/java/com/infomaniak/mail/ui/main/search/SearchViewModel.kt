@@ -49,8 +49,9 @@ import javax.inject.Inject
 class SearchViewModel @Inject constructor(
     application: Application,
     private val globalCoroutineScope: CoroutineScope,
-    private val messageController: MessageController,
     private val searchUtils: SearchUtils,
+    private val messageController: MessageController,
+    private val refreshController: RefreshController,
     private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
@@ -169,7 +170,7 @@ class SearchViewModel @Inject constructor(
         searchJob = launch {
             delay(SEARCH_DEBOUNCE_DURATION)
 
-            RefreshController.cancelRefresh()
+            refreshController.cancelRefresh()
 
             if (!shouldGetNextPage) resetPaginationData()
 
