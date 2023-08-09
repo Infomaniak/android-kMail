@@ -90,13 +90,13 @@ class MoveFragment : MenuFoldersFragment() {
     }
 
     private fun setAdaptersFolders(folderId: String) {
-        val (defaultFoldersWithoutTrash, customFolders) = mainViewModel.currentFoldersLive.value!!.let { foldersLists ->
+        val (defaultFoldersWithoutDraft, customFolders) = mainViewModel.currentFoldersLive.value!!.let { foldersLists ->
             foldersLists.first.filterNot { it.role == FolderRole.DRAFT } to foldersLists.second
         }
 
-        defaultFoldersAdapter.setFolders(defaultFoldersWithoutTrash, folderId)
+        defaultFoldersAdapter.setFolders(defaultFoldersWithoutDraft, folderId)
         customFoldersAdapter.setFolders(customFolders, folderId)
-        setSearchBarUi(allFolders = defaultFoldersWithoutTrash + customFolders, currentFolderId = folderId)
+        setSearchBarUi(allFolders = defaultFoldersWithoutDraft + customFolders, currentFolderId = folderId)
     }
 
     private fun observeNewFolderCreation() {
