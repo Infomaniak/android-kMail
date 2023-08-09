@@ -64,7 +64,6 @@ import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MainApplication
 import com.infomaniak.mail.MatomoMail.OPEN_FROM_DRAFT_NAME
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
-import com.infomaniak.mail.MatomoMail.trackSearchEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity
 import com.infomaniak.mail.data.models.Attachment
@@ -569,17 +568,16 @@ fun Context.launchNoMailboxActivity(shouldStartLoginActivity: Boolean = false) {
     startActivity(Intent(this, NoMailboxActivity::class.java))
 }
 
-fun TextInputLayout.trackSearchEndIconClick() {
+fun TextInputLayout.setOnEndIconClickListener(trackerCallback: () -> Unit) {
     setEndIconOnClickListener {
         editText?.text?.clear()
-        context.trackSearchEvent("deleteSearch")
+        trackerCallback()
     }
 }
 
 fun TextInputEditText.setupOnEditorActionListener(searchCallback: (String) -> Unit) {
     setOnEditorActionListener { _, actionId, _ ->
         if (actionId == EditorInfo.IME_ACTION_SEARCH && !text.isNullOrBlank()) {
-            context.trackSearchEvent("validateSearch")
             searchCallback(text.toString())
             hideKeyboard()
         }
