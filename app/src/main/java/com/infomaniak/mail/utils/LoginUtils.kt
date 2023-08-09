@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.utils
 
-import android.content.Intent
 import androidx.activity.result.ActivityResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -26,7 +25,6 @@ import com.infomaniak.lib.core.R
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.networking.HttpClient
-import com.infomaniak.lib.core.utils.clearStack
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
@@ -34,7 +32,6 @@ import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.login.LoginActivity
-import com.infomaniak.mail.ui.login.NoMailboxActivity
 import com.infomaniak.mail.utils.Utils.MailboxErrorCode
 import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.CoroutineDispatcher
@@ -58,7 +55,7 @@ class LoginUtils @Inject constructor(
         fragment: Fragment,
         result: ActivityResult,
         infomaniakLogin: InfomaniakLogin,
-        onFailedLogin: () -> Unit,
+        resetLoginButtons: () -> Unit,
     ) = with(fragment) {
         if (result.resultCode == AppCompatActivity.RESULT_OK) {
             val authCode = result.data?.getStringExtra(InfomaniakLogin.CODE_TAG)
@@ -68,9 +65,9 @@ class LoginUtils @Inject constructor(
                 authCode?.isNotBlank() == true -> authenticateUser(authCode, infomaniakLogin)
                 else -> showError(requireContext().getString(R.string.anErrorHasOccurred))
             }
-        } else {
-            onFailedLogin()
         }
+
+        resetLoginButtons()
     }
 
     private fun Fragment.authenticateUser(authCode: String, infomaniakLogin: InfomaniakLogin) {
@@ -84,32 +81,27 @@ class LoginUtils @Inject constructor(
         }
     }
 
-    private fun Fragment.onAuthenticateUserSuccess(apiToken: ApiToken) {
-        lifecycleScope.launch(ioDispatcher) {
-            when (val returnValue = LoginActivity.authenticateUser(requireContext(), apiToken)) {
-                is User -> {
-                    requireContext().trackAccountEvent("loggedIn")
-                    MailboxController.getFirstValidMailbox(returnValue.id)?.mailboxId?.let { AccountUtils.currentMailboxId = it }
-                    AccountUtils.reloadApp?.invoke()
-                }
-                is MailboxErrorCode -> withContext(mainDispatcher) {
-                    when (returnValue) {
-                        MailboxErrorCode.NO_MAILBOX -> launchNoMailboxActivity()
-                        MailboxErrorCode.NO_VALID_MAILBOX -> requireContext().launchNoValidMailboxesActivity()
-                    }
-                }
-                is ApiResponse<*> -> withContext(mainDispatcher) {
-                    showError(requireContext().getString(returnValue.translatedError))
-                }
-                else -> withContext(mainDispatcher) {
-                    showError(requireContext().getString(R.string.anErrorHasOccurred))
+    private fun Fragment.onAuthenticateUserSuccess(apiToken: ApiToken) = lifecycleScope.launch(ioDispatcher) {
+        val context = requireContext()
+        when (val returnValue = LoginActivity.authenticateUser(context, apiToken)) {
+            is User -> {
+                context.trackAccountEvent("loggedIn")
+                MailboxController.getFirstValidMailbox(returnValue.id)?.mailboxId?.let { AccountUtils.currentMailboxId = it }
+                AccountUtils.reloadApp?.invoke()
+            }
+            is MailboxErrorCode -> withContext(mainDispatcher) {
+                when (returnValue) {
+                    MailboxErrorCode.NO_MAILBOX -> context.launchNoMailboxActivity()
+                    MailboxErrorCode.NO_VALID_MAILBOX -> context.launchNoValidMailboxesActivity()
                 }
             }
+            is ApiResponse<*> -> withContext(mainDispatcher) {
+                showError(context.getString(returnValue.translatedError))
+            }
+            else -> withContext(mainDispatcher) {
+                showError(context.getString(R.string.anErrorHasOccurred))
+            }
         }
-    }
-
-    private fun Fragment.launchNoMailboxActivity() {
-        startActivity(Intent(requireContext(), NoMailboxActivity::class.java).clearStack())
     }
 
     private fun Fragment.onAuthenticateUserError(errorStatus: InfomaniakLogin.ErrorStatus) {

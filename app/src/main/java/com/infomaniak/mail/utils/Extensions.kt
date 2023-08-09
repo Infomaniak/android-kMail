@@ -74,6 +74,9 @@ import com.infomaniak.mail.databinding.DialogInputBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.login.IlluColors.IlluColors
+import com.infomaniak.mail.ui.login.LoginActivity
+import com.infomaniak.mail.ui.login.LoginActivityArgs
+import com.infomaniak.mail.ui.login.NoMailboxActivity
 import com.infomaniak.mail.ui.main.folder.DateSeparatorItemDecoration
 import com.infomaniak.mail.ui.main.folder.HeaderItemDecoration
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
@@ -544,6 +547,19 @@ fun Fragment.getStringWithBoldArg(@StringRes resId: Int, arg: String): Spanned {
     return Html.fromHtml(getString(resId, "<b>$coloredArg</b>"), Html.FROM_HTML_MODE_LEGACY)
 }
 
+fun Context.launchLoginActivity(shouldClearStack: Boolean = false, args: LoginActivityArgs? = null) {
+    Intent(this, LoginActivity::class.java).apply {
+        if (shouldClearStack) clearStack()
+        args?.let { putExtras(args.toBundle()) }
+        startActivity(this)
+    }
+}
+
 fun Context.launchNoValidMailboxesActivity() {
     startActivity(Intent(this, NoValidMailboxesActivity::class.java).clearStack())
+}
+
+fun Context.launchNoMailboxActivity(shouldStartLoginActivity: Boolean = false) {
+    if (shouldStartLoginActivity) launchLoginActivity(shouldClearStack = true)
+    startActivity(Intent(this, NoMailboxActivity::class.java))
 }

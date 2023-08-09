@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.main.folder
 
-import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.text.format.DateUtils
@@ -72,7 +71,6 @@ import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.ui.login.NoMailboxActivity
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
@@ -125,7 +123,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         super.onViewCreated(view, savedInstanceState)
 
-        observeNoMailboxActivityTriggers()
         threadListViewModel.deleteSearchData()
         setupDensityDependentUi()
         setupOnRefresh()
@@ -211,12 +208,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     override fun onRefresh() {
         if (mainViewModel.isDownloadingChanges.value?.first == true) return
         mainViewModel.forceRefreshThreads()
-    }
-
-    private fun observeNoMailboxActivityTriggers() {
-        mainViewModel.shouldStartNoMailboxActivity.observe(viewLifecycleOwner) {
-            startActivity(Intent(requireContext(), NoMailboxActivity::class.java).clearStack())
-        }
     }
 
     private fun setupDensityDependentUi() = with(binding) {
