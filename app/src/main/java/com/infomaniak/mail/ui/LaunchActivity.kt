@@ -27,12 +27,12 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
-import com.infomaniak.mail.ui.login.LoginActivity
 import com.infomaniak.mail.ui.login.LoginActivityArgs
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentArgs
 import com.infomaniak.mail.ui.main.thread.ThreadFragmentArgs
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SentryDebug
+import com.infomaniak.mail.utils.launchLoginActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -62,7 +62,7 @@ class LaunchActivity : AppCompatActivity() {
 
             withContext(mainDispatcher) {
                 if (user == null) {
-                    loginUser()
+                    launchLoginActivity(args = LoginActivityArgs(isFirstAccount = true))
                 } else {
                     trackUserId(AccountUtils.currentUserId)
                     startApp()
@@ -106,13 +106,6 @@ class LaunchActivity : AppCompatActivity() {
             else -> {
                 startActivity(Intent(this, MainActivity::class.java))
             }
-        }
-    }
-
-    private fun loginUser() {
-        Intent(this, LoginActivity::class.java).apply {
-            putExtras(LoginActivityArgs(isFirstAccount = true).toBundle())
-            startActivity(this)
         }
     }
 
