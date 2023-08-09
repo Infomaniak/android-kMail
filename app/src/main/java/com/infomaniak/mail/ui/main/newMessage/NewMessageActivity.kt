@@ -21,7 +21,6 @@ import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.webkit.WebView
-import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -50,12 +49,6 @@ class NewMessageActivity : BaseActivity() {
     private val binding by lazy { ActivityNewMessageBinding.inflate(layoutInflater) }
     private val newMessageViewModel: NewMessageViewModel by viewModels()
 
-    private val newMessageFragment by lazy {
-        supportFragmentManager.findFragmentById(R.id.fragmentContainer)?.let {
-            it.childFragmentManager.primaryNavigationFragment as NewMessageFragment
-        }!!
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
@@ -66,8 +59,6 @@ class NewMessageActivity : BaseActivity() {
             finish()
             return
         }
-
-        handleOnBackPressed()
 
         setupSnackBar()
         setupSendButton()
@@ -84,13 +75,7 @@ class NewMessageActivity : BaseActivity() {
         return true
     }
 
-    private fun handleOnBackPressed() = with(newMessageViewModel) {
-        onBackPressedDispatcher.addCallback(this@NewMessageActivity) {
-            if (isAutoCompletionOpened) newMessageFragment.closeAutoCompletion() else finishAppAndRemoveTaskIfNeeded()
-        }
-    }
-
-    private fun finishAppAndRemoveTaskIfNeeded() {
+    fun finishAppAndRemoveTaskIfNeeded() {
         if (isTaskRoot) finishAndRemoveTask() else finish()
     }
 
@@ -115,7 +100,7 @@ class NewMessageActivity : BaseActivity() {
         }
 
         fun sendEmail() {
-            newMessageFragment.shouldSendInsteadOfSave = true
+            newMessageViewModel.shouldSendInsteadOfSave = true
             setSnackBarActivityResult()
             finishAppAndRemoveTaskIfNeeded()
         }
