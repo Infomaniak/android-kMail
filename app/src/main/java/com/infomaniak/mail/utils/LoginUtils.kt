@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.utils
 
-import android.content.Intent
 import androidx.activity.result.ActivityResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -33,7 +32,6 @@ import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.login.LoginActivity
-import com.infomaniak.mail.ui.login.NoMailboxActivity
 import com.infomaniak.mail.utils.Utils.MailboxErrorCode
 import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.CoroutineDispatcher
@@ -93,7 +91,7 @@ class LoginUtils @Inject constructor(
                 }
                 is MailboxErrorCode -> withContext(mainDispatcher) {
                     when (returnValue) {
-                        MailboxErrorCode.NO_MAILBOX -> launchNoMailboxActivity()
+                        MailboxErrorCode.NO_MAILBOX -> requireContext().launchNoMailboxActivity()
                         MailboxErrorCode.NO_VALID_MAILBOX -> requireContext().launchNoValidMailboxesActivity()
                     }
                 }
@@ -105,10 +103,6 @@ class LoginUtils @Inject constructor(
                 }
             }
         }
-    }
-
-    private fun Fragment.launchNoMailboxActivity() {
-        startActivity(Intent(requireContext(), NoMailboxActivity::class.java))
     }
 
     private fun Fragment.onAuthenticateUserError(errorStatus: InfomaniakLogin.ErrorStatus) {
