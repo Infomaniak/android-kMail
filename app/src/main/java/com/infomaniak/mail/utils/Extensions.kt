@@ -586,3 +586,5 @@ fun TextInputEditText.setupOnEditorActionListener(searchCallback: (String) -> Un
         true // Action got consumed
     }
 }
+
+fun CharSequence.standardize(): String = toString().removeAccents().trim().lowercase()

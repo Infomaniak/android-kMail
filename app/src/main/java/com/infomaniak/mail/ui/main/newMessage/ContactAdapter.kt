@@ -23,13 +23,13 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.utils.context
-import com.infomaniak.lib.core.utils.removeAccents
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.databinding.ItemContactBinding
 import com.infomaniak.mail.ui.main.newMessage.ContactAdapter.ContactType.*
 import com.infomaniak.mail.ui.main.newMessage.ContactAdapter.ContactViewHolder
+import com.infomaniak.mail.utils.standardize
 
 @SuppressLint("NotifyDataSetChanged")
 class ContactAdapter(
@@ -131,8 +131,6 @@ class ContactAdapter(
     fun removeUsedEmail(email: String) = usedContacts.remove(email.standardize())
 
     fun addUsedContact(email: String) = usedContacts.add(email.standardize())
-
-    private fun CharSequence.standardize(): String = toString().removeAccents().trim().lowercase()
 
     fun updateContacts(allContacts: List<MergedContact>) {
         this.allContacts = allContacts

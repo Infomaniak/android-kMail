@@ -28,6 +28,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.coroutineContext
+import com.infomaniak.mail.utils.standardize
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
@@ -69,7 +70,7 @@ class MoveViewModel @Inject constructor(
             delay(FILTER_DEBOUNCE_DURATION)
             val filteredFolders = folders.filter { folder ->
                 val folderName = folder.role?.folderNameRes?.let(context::getString) ?: folder.name
-                folderName.contains(query.trim(), ignoreCase = true)
+                folderName.standardize().contains(query.standardize())
             }
 
             filterResults.postValue(filteredFolders)
