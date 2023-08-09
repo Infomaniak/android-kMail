@@ -126,7 +126,9 @@ class MoveFragment : MenuFoldersFragment() {
 
         searchInputLayout.trackSearchEndIconClick()
         searchTextInput.apply {
-            val allFolders = mainViewModel.currentFoldersLive.value!!.let { it.first + it.second }
+            val allFolders = mainViewModel.currentFoldersLive.value!!.let { (defaultFoldersList, customFoldersList) ->
+                defaultFoldersList.filterNot { it.role == FolderRole.DRAFT } + customFoldersList
+            }
 
             doOnTextChanged { text, _, _, _ ->
                 toggleFolderListsVisibility(!text.isNullOrBlank())
