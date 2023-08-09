@@ -77,7 +77,7 @@ class LoginFragment : Fragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         webViewLoginResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
-            loginUtils.handleWebViewLoginResult(fragment = this, result, loginActivity.infomaniakLogin, ::onFailedLogin)
+            loginUtils.handleWebViewLoginResult(fragment = this, result, loginActivity.infomaniakLogin, ::resetLoginButtons)
         }
     }
 
@@ -179,10 +179,10 @@ class LoginFragment : Fragment() {
 
     private fun showError(error: String) {
         showSnackbar(error)
-        onFailedLogin()
+        resetLoginButtons()
     }
 
-    private fun onFailedLogin() = with(binding) {
+    private fun resetLoginButtons() = with(binding) {
         connectButton.hideProgress(R.string.connect)
         signInButton.isEnabled = true
     }

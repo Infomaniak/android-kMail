@@ -26,7 +26,6 @@ import com.infomaniak.lib.core.R
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.networking.HttpClient
-import com.infomaniak.lib.core.utils.clearStack
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
@@ -58,7 +57,7 @@ class LoginUtils @Inject constructor(
         fragment: Fragment,
         result: ActivityResult,
         infomaniakLogin: InfomaniakLogin,
-        onFailedLogin: () -> Unit,
+        resetLoginButtons: () -> Unit,
     ) = with(fragment) {
         if (result.resultCode == AppCompatActivity.RESULT_OK) {
             val authCode = result.data?.getStringExtra(InfomaniakLogin.CODE_TAG)
@@ -68,9 +67,9 @@ class LoginUtils @Inject constructor(
                 authCode?.isNotBlank() == true -> authenticateUser(authCode, infomaniakLogin)
                 else -> showError(requireContext().getString(R.string.anErrorHasOccurred))
             }
-        } else {
-            onFailedLogin()
         }
+
+        resetLoginButtons()
     }
 
     private fun Fragment.authenticateUser(authCode: String, infomaniakLogin: InfomaniakLogin) {
@@ -109,7 +108,7 @@ class LoginUtils @Inject constructor(
     }
 
     private fun Fragment.launchNoMailboxActivity() {
-        startActivity(Intent(requireContext(), NoMailboxActivity::class.java).clearStack())
+        startActivity(Intent(requireContext(), NoMailboxActivity::class.java))
     }
 
     private fun Fragment.onAuthenticateUserError(errorStatus: InfomaniakLogin.ErrorStatus) {
