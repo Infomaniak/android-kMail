@@ -57,6 +57,7 @@ class SignatureSettingFragment : Fragment() {
                 showSnackbar(RCore.string.anErrorHasOccurred)
             }
             observeSignatures()
+            observeApiError()
         }
     }
 
@@ -67,6 +68,12 @@ class SignatureSettingFragment : Fragment() {
         ).also { signatureAdapter = it }
     }
 
+    private fun observeApiError() {
+        signatureSettingViewModel.showError.observe(viewLifecycleOwner) { stringRes ->
+            showSnackbar(stringRes)
+        }
+    }
+
     private fun observeSignatures() {
         signatureSettingViewModel.signaturesLive.observe(viewLifecycleOwner, signatureAdapter::setSignatures)
     }
@@ -74,10 +81,6 @@ class SignatureSettingFragment : Fragment() {
     private fun onSignatureClicked(signature: Signature) = with(signatureSettingViewModel) {
         val newDefaultSignature = signature.copyFromRealm(UInt.MIN_VALUE).apply { isDefault = true }
 
-        runCatching {
-            setDefaultSignature(newDefaultSignature)
-        }.onFailure {
-            showSnackbar(RCore.string.anErrorHasOccurred)
-        }
+        setDefaultSignature(newDefaultSignature)
     }
 }

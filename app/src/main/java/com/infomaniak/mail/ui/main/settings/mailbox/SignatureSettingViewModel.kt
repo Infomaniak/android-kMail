@@ -18,6 +18,8 @@
 package com.infomaniak.mail.ui.main.settings.mailbox
 
 import androidx.lifecycle.*
+import com.infomaniak.lib.core.R
+import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
@@ -48,6 +50,8 @@ class SignatureSettingViewModel @Inject constructor(
     lateinit var mailbox: Mailbox
         private set
 
+    val showError = SingleLiveEvent<Int>() // StringRes
+
     private var customRealm: Realm? = null
 
     fun init(mailboxObjectId: String) = liveData(ioDispatcher) {
@@ -59,8 +63,12 @@ class SignatureSettingViewModel @Inject constructor(
     }
 
     fun setDefaultSignature(signature: Signature) = viewModelScope.launch(ioDispatcher) {
-        val apiResponse = ApiRepository.setDefaultSignature(mailbox.hostingId, mailbox.mailboxName, signature)
-        if (apiResponse.isSuccess()) updateSignatures() else apiResponse.throwErrorAsException()
+        runCatching {
+            val apiResponse = ApiRepository.setDefaultSignature(mailbox.hostingId, mailbox.mailboxName, signature)
+            if (apiResponse.isSuccess()) updateSignatures() else apiResponse.throwErrorAsException()
+        }.onFailure {
+            showError.postValue(R.string.anErrorHasOccurred)
+        }
     }
 
     fun updateSignatures() = viewModelScope.launch(ioDispatcher) {
