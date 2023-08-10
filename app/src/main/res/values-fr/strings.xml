@@ -139,7 +139,6 @@
     <string name="contentDescriptionButtonDeleteDraft">Supprimer le brouillon</string>
     <string name="contentDescriptionButtonDeleteHistory">Supprimer l’entrée de l’historique</string>
     <string name="contentDescriptionButtonDeleteQuote">Supprimer les messages cités</string>
-    <string name="contentDescriptionButtonDeleteSearch">Effacer la recherche</string>
     <string name="contentDescriptionButtonDeleteSignature">Supprimer la signature</string>
     <string name="contentDescriptionButtonExpandAccountSelection">Déplier la sélection de compte</string>
     <string name="contentDescriptionButtonExpandCustomFolders">Déplier les dossiers personnalisés</string>
@@ -243,6 +242,7 @@
     <string name="moreStorageText1">Votre boîte est pleine et vous ne pouvez plus recevoir de nouveaux messages 🥲</string>
     <string name="moreStorageText2">Vous pourrez prochainement débloquer les limites de votre adresse mail ik.me (stockage limite, envoi, redirection, …)</string>
     <string name="moreStorageTitle">Votre boîte est pleine ? Obtenez plus de stockage !</string>
+    <string name="moveSearchFieldPlaceholder">Rechercher un dossier</string>
     <string name="moveTitle">Dans quel dossier souhaitez-vous déplacer votre e-mail ?</string>
     <plurals name="multipleSelectionCount">
         <item quantity="one">%d sélectionné</item>

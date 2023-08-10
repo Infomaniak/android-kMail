@@ -568,14 +568,14 @@ fun Context.launchNoMailboxActivity(shouldStartLoginActivity: Boolean = false) {
     startActivity(Intent(this, NoMailboxActivity::class.java))
 }
 
-fun TextInputLayout.setOnEndIconClickListener(trackerCallback: () -> Unit) {
+fun TextInputLayout.setOnClearTextClickListener(trackerCallback: () -> Unit) {
     setEndIconOnClickListener {
         editText?.text?.clear()
         trackerCallback()
     }
 }
 
-fun TextInputEditText.setupOnEditorActionListener(searchCallback: (String) -> Unit) {
+fun TextInputEditText.handleEditorSearchAction(searchCallback: (String) -> Unit) {
     setOnEditorActionListener { _, actionId, _ ->
         if (actionId == EditorInfo.IME_ACTION_SEARCH && !text.isNullOrBlank()) {
             searchCallback(text.toString())

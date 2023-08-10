@@ -38,8 +38,8 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.FragmentMoveBinding
 import com.infomaniak.mail.utils.createInputDialog
-import com.infomaniak.mail.utils.setOnEndIconClickListener
-import com.infomaniak.mail.utils.setupOnEditorActionListener
+import com.infomaniak.mail.utils.handleEditorSearchAction
+import com.infomaniak.mail.utils.setOnClearTextClickListener
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -53,7 +53,7 @@ class MoveFragment : MenuFoldersFragment() {
 
     private lateinit var searchResultsAdpater: FolderAdapter
 
-    private var shouldTrackFolderSearch = true
+    private var hasAlreadyTrackedFolderSearch = false
 
     override val defaultFoldersList: RecyclerView by lazy { binding.defaultFoldersList }
     override val customFoldersList: RecyclerView by lazy { binding.customFoldersList }
@@ -139,19 +139,19 @@ class MoveFragment : MenuFoldersFragment() {
         )
         searchResultsList.adapter = searchResultsAdpater
 
-        searchInputLayout.setOnEndIconClickListener { trackMoveSearchEvent(SEARCH_DELETE_NAME) }
+        searchInputLayout.setOnClearTextClickListener { trackMoveSearchEvent(SEARCH_DELETE_NAME) }
         searchTextInput.apply {
             doOnTextChanged { text, _, _, _ ->
                 toggleFolderListsVisibility(!text.isNullOrBlank())
-                if (text?.isNotBlank() == true) moveViewModel.filterFolders(text.toString(), allFolders)
-                if (shouldTrackFolderSearch) {
+                if (text?.isNotBlank() == true) moveViewModel.filterFolders(text.toString(), allFolders, shouldDebounce = true)
+                if (!hasAlreadyTrackedFolderSearch) {
                     trackMoveSearchEvent("executeSearch")
-                    shouldTrackFolderSearch = false
+                    hasAlreadyTrackedFolderSearch = true
                 }
             }
 
-            setupOnEditorActionListener { query ->
-                moveViewModel.filterFolders(query, allFolders)
+            handleEditorSearchAction { query ->
+                moveViewModel.filterFolders(query, allFolders, shouldDebounce = false)
                 trackMoveSearchEvent(SEARCH_VALIDATE_NAME)
             }
         }

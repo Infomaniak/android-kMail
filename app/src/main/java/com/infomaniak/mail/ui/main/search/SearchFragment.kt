@@ -214,7 +214,7 @@ class SearchFragment : Fragment() {
     }
 
     private fun setSearchBarUi() = with(binding.searchBar) {
-        searchInputLayout.setOnEndIconClickListener { trackSearchEvent(SEARCH_DELETE_NAME) }
+        searchInputLayout.setOnClearTextClickListener { trackSearchEvent(SEARCH_DELETE_NAME) }
         searchTextInput.apply {
             showKeyboard()
 
@@ -223,7 +223,7 @@ class SearchFragment : Fragment() {
                 if (searchViewModel.currentSearchQuery != newQuery) searchViewModel.searchQuery(newQuery)
             }
 
-            setupOnEditorActionListener { query ->
+            handleEditorSearchAction { query ->
                 searchViewModel.searchQuery(query, saveInHistory = true)
                 context.trackSearchEvent(SEARCH_VALIDATE_NAME)
             }

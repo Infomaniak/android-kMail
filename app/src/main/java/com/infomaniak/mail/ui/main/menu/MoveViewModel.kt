@@ -64,10 +64,10 @@ class MoveViewModel @Inject constructor(
         emit(threadController.getThread(threadUid)!!.folderId)
     }
 
-    fun filterFolders(query: String, folders: List<Folder>) = viewModelScope.launch(ioCoroutineContext) {
+    fun filterFolders(query: String, folders: List<Folder>, shouldDebounce: Boolean) = viewModelScope.launch(ioCoroutineContext) {
         filterJob?.cancel()
         filterJob = launch {
-            delay(FILTER_DEBOUNCE_DURATION)
+            if (shouldDebounce) delay(FILTER_DEBOUNCE_DURATION)
             val filteredFolders = folders.filter { folder ->
                 val folderName = folder.role?.folderNameRes?.let(context::getString) ?: folder.name
                 folderName.standardize().contains(query.standardize())
@@ -83,6 +83,6 @@ class MoveViewModel @Inject constructor(
     }
 
     private companion object {
-        const val FILTER_DEBOUNCE_DURATION = 200L
+        const val FILTER_DEBOUNCE_DURATION = 300L
     }
 }

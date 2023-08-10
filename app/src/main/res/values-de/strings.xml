@@ -137,7 +137,6 @@
     <string name="contentDescriptionButtonDeleteDraft">Entwurf löschen</string>
     <string name="contentDescriptionButtonDeleteHistory">Historieneintrag löschen</string>
     <string name="contentDescriptionButtonDeleteQuote">Zitierte Nachrichten löschen</string>
-    <string name="contentDescriptionButtonDeleteSearch">Suche löschen</string>
     <string name="contentDescriptionButtonDeleteSignature">Unterschrift löschen</string>
     <string name="contentDescriptionButtonExpandAccountSelection">Kontoauswahl erweitern</string>
     <string name="contentDescriptionButtonExpandCustomFolders">Erweitern von benutzerdefinierten Ordnern</string>
@@ -239,6 +238,7 @@
     <string name="moreStorageText1">Ihre Mailbox ist voll und Sie können keine weiteren Nachrichten empfangen 🥲</string>
     <string name="moreStorageText2">Sie werden bald in der Lage sein, die Grenzen Ihrer ik.me-E-Mail-Adresse freizugeben (Speicherlimit, Senden, Weiterleiten, …)</string>
     <string name="moreStorageTitle">Ist Ihre Box voll? Holen Sie sich mehr Stauraum!</string>
+    <string name="moveSearchFieldPlaceholder">Einen Ordner suchen</string>
     <string name="moveTitle">In welchen Ordner möchten Sie Ihre E-Mails verschieben?</string>
     <plurals name="multipleSelectionCount">
         <item quantity="one">%d ausgewählt</item>

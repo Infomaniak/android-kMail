@@ -440,19 +440,17 @@
     <style name="SearchTextInputLayoutStyle">
         <item name="boxStrokeColor">@null</item>
         <item name="boxStrokeWidth">0dp</item>
-        <item name="endIconContentDescription">@string/contentDescriptionButtonDeleteSearch</item>
         <item name="endIconDrawable">@drawable/ic_close_search</item>
+        <!-- The endIconMode down here got its clear function overriden in the code,
+        but we keep it because it provides a system contentDescription -->
         <item name="endIconMode">clear_text</item>
         <item name="hintEnabled">false</item>
-        <item name="placeholderText">@string/searchFieldPlaceholder</item>
-        <item name="placeholderTextColor">@color/tertiaryTextColor</item>
     </style>
 
     <style name="BaseSearchTextInputEditTextStyle">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:drawableStart">@drawable/ic_search_small</item>
-        <item name="android:hint">@string/searchFieldPlaceholder</item>
         <item name="android:imeOptions">actionSearch</item>
         <item name="android:inputType">textFilter</item>
         <item name="android:lines">1</item>

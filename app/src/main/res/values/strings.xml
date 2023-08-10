@@ -144,7 +144,6 @@
     <string name="contentDescriptionButtonDeleteDraft">Delete draft</string>
     <string name="contentDescriptionButtonDeleteHistory">Delete history entry</string>
     <string name="contentDescriptionButtonDeleteQuote">Delete quoted messages</string>
-    <string name="contentDescriptionButtonDeleteSearch">Clear search</string>
     <string name="contentDescriptionButtonDeleteSignature">Delete signature</string>
     <string name="contentDescriptionButtonExpandAccountSelection">Expand account selection</string>
     <string name="contentDescriptionButtonExpandCustomFolders">Expand custom folders</string>
@@ -246,6 +245,7 @@
     <string name="moreStorageText1">Your mailbox is full and you can‘t receive any more messages 🥲</string>
     <string name="moreStorageText2">You will soon be able to unblock the limits of your ik.me email address (storage limit, sending, forwarding, …)</string>
     <string name="moreStorageTitle">Is your box full? Get more storage!</string>
+    <string name="moveSearchFieldPlaceholder">Search a folder</string>
     <string name="moveTitle">Which folder do you want to move your email to?</string>
     <plurals name="multipleSelectionCount">
         <item quantity="one">%d selected</item>
