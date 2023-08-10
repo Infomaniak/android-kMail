@@ -23,7 +23,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.signature.Signature
@@ -37,7 +36,6 @@ class SignatureSettingFragment : Fragment() {
 
     private lateinit var binding: FragmentSignatureSettingBinding
 
-    private val navigationArgs: SignatureSettingFragmentArgs by navArgs()
     private val signatureSettingViewModel: SignatureSettingViewModel by viewModels()
 
     private lateinit var signatureAdapter: SignatureSettingAdapter
@@ -49,16 +47,14 @@ class SignatureSettingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(signatureSettingViewModel) {
         super.onViewCreated(view, savedInstanceState)
 
-        init(navigationArgs.mailboxObjectId).observe(viewLifecycleOwner) { mailbox ->
-            setupAdapter(mailbox)
-            runCatching {
-                updateSignatures()
-            }.onFailure {
-                showSnackbar(RCore.string.anErrorHasOccurred)
-            }
-            observeSignatures()
-            observeApiError()
+        setupAdapter(mailbox)
+        runCatching {
+            updateSignatures()
+        }.onFailure {
+            showSnackbar(RCore.string.anErrorHasOccurred)
         }
+        observeSignatures()
+        observeApiError()
     }
 
     private fun setupAdapter(mailbox: Mailbox) {

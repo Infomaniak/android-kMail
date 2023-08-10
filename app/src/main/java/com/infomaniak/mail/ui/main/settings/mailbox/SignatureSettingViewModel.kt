@@ -17,50 +17,40 @@
  */
 package com.infomaniak.mail.ui.main.settings.mailbox
 
-import androidx.lifecycle.*
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.R
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
-import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SharedUtils.Companion.updateAndGetSignatures
 import com.infomaniak.mail.utils.throwErrorAsException
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.realm.kotlin.Realm
-import io.realm.kotlin.query.RealmResults
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SignatureSettingViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     private val coroutineContext = viewModelScope.coroutineContext + ioDispatcher
 
-    lateinit var signaturesLive: LiveData<RealmResults<Signature>>
-        private set
+    private val mailboxObjectId = savedStateHandle.get<String>(SignatureSettingFragmentArgs::mailboxObjectId.name)!!
+    val mailbox = MailboxController.getMailbox(mailboxObjectId)!!
+    private var customRealm = RealmDatabase.newMailboxContentInstance(AccountUtils.currentUserId, mailbox.mailboxId)
 
-    lateinit var mailbox: Mailbox
-        private set
-
+    val signaturesLive = SignatureController.getSignaturesAsync(customRealm).asLiveData(coroutineContext)
     val showError = SingleLiveEvent<Int>() // StringRes
-
-    private var customRealm: Realm? = null
-
-    fun init(mailboxObjectId: String) = liveData(ioDispatcher) {
-        mailbox = MailboxController.getMailbox(mailboxObjectId)!!
-        customRealm = RealmDatabase.newMailboxContentInstance(AccountUtils.currentUserId, mailbox.mailboxId)
-        signaturesLive = SignatureController.getSignaturesAsync(customRealm!!).asLiveData(coroutineContext)
-
-        emit(mailbox)
-    }
 
     fun setDefaultSignature(signature: Signature) = viewModelScope.launch(ioDispatcher) {
         runCatching {
@@ -72,11 +62,11 @@ class SignatureSettingViewModel @Inject constructor(
     }
 
     fun updateSignatures() = viewModelScope.launch(ioDispatcher) {
-        customRealm!!.writeBlocking { updateAndGetSignatures(mailbox) }
+        customRealm.writeBlocking { updateAndGetSignatures(mailbox) }
     }
 
     override fun onCleared() {
-        customRealm?.close()
+        customRealm.close()
         super.onCleared()
     }
 }
