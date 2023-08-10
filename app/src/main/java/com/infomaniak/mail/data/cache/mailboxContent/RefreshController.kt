@@ -62,22 +62,25 @@ class RefreshController @Inject constructor() {
         stopped: (() -> Unit)? = null,
     ): List<Thread>? {
 
-        suspend fun refreshWithRunCatching() = runCatching {
-            return@runCatching withContext(Dispatchers.IO + refreshThreadsJob!!) {
-                started?.invoke()
-                return@withContext realm.handleRefreshMode(refreshMode, scope = this, mailbox, folder, okHttpClient).toList()
+        suspend fun refreshWithRunCatching(job: Job, isFirstTime: Boolean = true): List<Thread>? = runCatching {
+            withContext(Dispatchers.IO + job) {
+                if (isFirstTime) {
+                    started?.invoke()
+                } else {
+                    delay(Utils.DELAY_BEFORE_FETCHING_ACTIVITIES_AGAIN)
+                    ensureActive()
+                }
+                realm.handleRefreshMode(refreshMode, scope = this, mailbox, folder, okHttpClient).toList()
             }
         }.getOrElse {
-
-            // We force-cancelled, so we need to call the `stopped` callback.
-            if (it is ForcedCancellationException) stopped?.invoke()
-
-            // It failed, but not because we cancelled it. Something bad happened, so we call the `stopped` callback.
-            if (it !is CancellationException) stopped?.invoke()
-
-            if (it is ApiErrorException) it.handleApiErrors()
-
-            return@getOrElse null
+            // If fetching the activities failed because of a not found Message, we should pause briefly
+            // before trying again to retrieve activities, to ensure that the API is up-to-date.
+            if (it is ApiErrorException && it.errorCode == ErrorCode.MESSAGE_NOT_FOUND && isFirstTime) {
+                Sentry.captureException(it)
+                refreshWithRunCatching(job, isFirstTime = false)
+            } else {
+                handleAllExceptions(it, stopped)
+            }
         }
 
         Log.i("API", "Refresh threads with mode: $refreshMode | (${folder.name})")
@@ -85,7 +88,7 @@ class RefreshController @Inject constructor() {
         refreshThreadsJob?.cancel()
         refreshThreadsJob = Job()
 
-        return refreshWithRunCatching().also {
+        return refreshWithRunCatching(refreshThreadsJob!!).also {
             if (it != null) {
                 stopped?.invoke()
                 Log.d("API", "End of refreshing threads with mode: $refreshMode | (${folder.name})")
@@ -618,7 +621,20 @@ class RefreshController @Inject constructor() {
     //endregion
 
     //region Handle errors
-    private fun ApiErrorException.handleApiErrors() {
+    private fun handleAllExceptions(throwable: Throwable, stopped: (() -> Unit)?): Nothing? {
+
+        // We force-cancelled, so we need to call the `stopped` callback.
+        if (throwable is ForcedCancellationException) stopped?.invoke()
+
+        // It failed, but not because we cancelled it. Something bad happened, so we call the `stopped` callback.
+        if (throwable !is CancellationException) stopped?.invoke()
+
+        if (throwable is ApiErrorException) throwable.handleOtherApiErrors()
+
+        return null
+    }
+
+    private fun ApiErrorException.handleOtherApiErrors() {
         when (errorCode) {
             ErrorCode.FOLDER_DOES_NOT_EXIST -> Unit
             else -> Sentry.captureException(this)
