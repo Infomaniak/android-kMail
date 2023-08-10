@@ -15,38 +15,51 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.views.decoratedTextItemView
+package com.infomaniak.mail.views.itemViews
 
 import android.content.Context
-import android.graphics.Color
 import android.util.AttributeSet
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.view.isVisible
+import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.mail.R
+import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.getAttributeColor
 import com.google.android.material.R as RMaterial
+import com.infomaniak.lib.core.R as RCore
 
-abstract class SelectableTextItemView @JvmOverloads constructor(
+abstract class UnreadItemView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : DecoratedTextItemView(context, attrs, defStyleAttr) {
+) : SelectableItemView(context, attrs, defStyleAttr) {
 
-    private val checkIcon by lazy {
-        AppCompatResources.getDrawable(context, R.drawable.ic_check)?.apply {
+    override val endIconMarginRes = RCore.dimen.marginStandardSmall
+
+    private val pastille by lazy {
+        AppCompatResources.getDrawable(context, R.drawable.ic_pastille)?.apply {
             setTint(context.getAttributeColor(RMaterial.attr.colorPrimary))
         }
     }
 
-    fun setSelectedState(isSelected: Boolean) = with(binding) {
-        val (color, textAppearance) = if (isSelected && itemStyle == SelectionStyle.MENU_DRAWER) {
-            context.getAttributeColor(RMaterial.attr.colorPrimaryContainer) to R.style.BodyMedium_Accent
-        } else {
-            Color.TRANSPARENT to if (textWeight == TextWeight.MEDIUM) R.style.BodyMedium else R.style.Body
+    var unreadCount: Int = 0
+        set(value) {
+            field = value
+            binding.unreadCountChip.apply {
+                text = UiUtils.formatUnreadCount(unreadCount)
+                isVisible = !isPastilleDisplayed && unreadCount > 0
+            }
         }
 
-        root.setCardBackgroundColor(color)
-        itemName.setTextAppearance(textAppearance)
+    var isPastilleDisplayed = false
+        set(isDisplayed) {
+            field = isDisplayed
+            setEndIcon(if (isDisplayed) pastille else null, R.string.contentDescriptionUnreadPastille)
+        }
 
-        setEndIcon(if (isSelected) checkIcon else null, R.string.contentDescriptionSelectedItem)
+    init {
+        attrs?.getAttributes(context, R.styleable.DecoratedItemView) {
+            unreadCount = getInteger(R.styleable.DecoratedItemView_badge, unreadCount)
+        }
     }
 }

@@ -292,7 +292,7 @@
     </style>
 
     <style name="RoundedDecoratedTextItem" parent="Widget.Material3.CardView.Filled">
-        <item name="android:layout_height">@dimen/decoratedTextItemViewHeight</item>
+        <item name="android:layout_height">@dimen/decoratedItemViewHeight</item>
         <item name="android:layout_marginStart">@dimen/marginStandardSmall</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:paddingEnd">@dimen/marginStandard</item>

@@ -25,7 +25,7 @@
         <attr name="padding" format="dimension" />
     </declare-styleable>
 
-    <declare-styleable name="DecoratedTextItemView">
+    <declare-styleable name="DecoratedItemView">
         <attr name="badge" format="integer" />
         <attr name="icon" />
         <attr name="itemStyle" format="enum">

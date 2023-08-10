@@ -31,8 +31,8 @@ import com.infomaniak.mail.databinding.ItemMailboxMenuDrawerBinding
 import com.infomaniak.mail.databinding.ItemSelectableMailboxBinding
 import com.infomaniak.mail.ui.main.menu.MailboxesAdapter.MailboxesViewHolder
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.views.decoratedTextItemView.DecoratedTextItemView.SelectionStyle
-import com.infomaniak.mail.views.decoratedTextItemView.SelectableTextItemView
+import com.infomaniak.mail.views.itemViews.DecoratedItemView.SelectionStyle
+import com.infomaniak.mail.views.itemViews.SelectableItemView
 
 class MailboxesAdapter(
     private val isInMenuDrawer: Boolean,
@@ -82,7 +82,7 @@ class MailboxesAdapter(
         isPastilleDisplayed = mailbox.unreadCountDisplay.shouldDisplayPastille
     }
 
-    private fun SelectableTextItemView.displayValidMailbox(
+    private fun SelectableItemView.displayValidMailbox(
         mailbox: Mailbox,
         isCurrentMailbox: Boolean,
         trackerCallback: () -> Unit,
