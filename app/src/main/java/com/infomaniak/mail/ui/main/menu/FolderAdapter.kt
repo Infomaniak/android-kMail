@@ -33,9 +33,7 @@ import com.infomaniak.mail.data.models.Folder.*
 import com.infomaniak.mail.databinding.*
 import com.infomaniak.mail.ui.main.menu.FolderAdapter.FolderViewHolder
 import com.infomaniak.mail.utils.UnreadDisplay
-import com.infomaniak.mail.views.itemViews.SelectableFolderItemView
-import com.infomaniak.mail.views.itemViews.SelectableItemView
-import com.infomaniak.mail.views.itemViews.UnreadFolderItemView
+import com.infomaniak.mail.views.itemViews.*
 import kotlin.math.min
 
 class FolderAdapter(
@@ -140,7 +138,9 @@ class FolderAdapter(
                 setIndent(folderIndent, hasCollapsableFolder!!, canBeCollapsed)
                 setCollapsingButtonContentDescription(folderName)
             }
-            else -> throw IllegalStateException("`${this::class.simpleName}` cannot exists here. Only Folder classes are allowed")
+            is SelectableMailboxItemView, is UnreadItemView -> {
+                throw IllegalStateException("`${this::class.simpleName}` cannot exists here. Only Folder classes are allowed")
+            }
         }
 
         setOnClickListener {
