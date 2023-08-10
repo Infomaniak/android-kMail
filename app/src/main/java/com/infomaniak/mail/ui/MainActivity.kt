@@ -216,6 +216,7 @@ class MainActivity : BaseActivity() {
         )
     }
 
+    // Still display the snackbar even if it took three times 10 seconds of timeout to succeed
     private fun showSentDraftSnackBar() {
         showSendingSnackBarTimer.cancel()
         mainViewModel.snackBarManager.setValue(getString(R.string.snackbarEmailSent))
