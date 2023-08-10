@@ -550,13 +550,14 @@ fun Fragment.getStringWithBoldArg(@StringRes resId: Int, arg: String): Spanned {
 fun Context.launchLoginActivity(shouldClearStack: Boolean = false, args: LoginActivityArgs? = null) {
     Intent(this, LoginActivity::class.java).apply {
         if (shouldClearStack) clearStack()
-        args?.let { putExtras(args.toBundle()) }
-        startActivity(this)
-    }
+        args?.toBundle()?.let(::putExtras)
+    }.also(::startActivity)
 }
 
 fun Context.launchNoValidMailboxesActivity() {
-    startActivity(Intent(this, NoValidMailboxesActivity::class.java).clearStack())
+    Intent(this, NoValidMailboxesActivity::class.java).apply {
+        clearStack()
+    }.also(::startActivity)
 }
 
 fun Context.launchNoMailboxActivity(shouldStartLoginActivity: Boolean = false) {
