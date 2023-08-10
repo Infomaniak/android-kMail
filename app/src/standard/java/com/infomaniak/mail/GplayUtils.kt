@@ -21,6 +21,7 @@ import android.content.Context
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.withCreated
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.firebase.messaging.FirebaseMessaging
@@ -28,8 +29,9 @@ import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.firebase.RegisterUserDeviceWorker
 import com.infomaniak.mail.utils.AccountUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import io.sentry.Sentry
+import io.sentry.SentryLevel
+import kotlinx.coroutines.launch
 
 object GplayUtils {
 
@@ -49,23 +51,35 @@ object GplayUtils {
     fun deleteFirebaseToken() = FirebaseMessaging.getInstance().deleteToken()
 
     private fun FragmentActivity.checkFirebaseRegistration() {
-        lifecycleScope.launchWhenCreated {
-            checkFirebaseRegistration(this@checkFirebaseRegistration)
+        lifecycleScope.launch {
+            lifecycle.withCreated { checkFirebaseRegistration(this@checkFirebaseRegistration) }
         }
     }
 
-    private suspend fun checkFirebaseRegistration(context: Context) = withContext(Dispatchers.IO) {
+    private fun checkFirebaseRegistration(context: Context) {
 
         val localSettings = LocalSettings.getInstance(context)
         val registeredUsersIds = localSettings.firebaseRegisteredUsers.map { it.toInt() }.toSet()
         val noNeedUsersRegistration = AccountUtils.getAllUsersSync().map { it.id }.minus(registeredUsersIds).isEmpty()
 
         Log.d("firebase", "checkFirebaseRegistration: (skip users registration): $noNeedUsersRegistration")
-        if (noNeedUsersRegistration) return@withContext
+        if (noNeedUsersRegistration) return
 
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (!task.isSuccessful) {
+                Sentry.withScope { scope ->
+                    scope.level = SentryLevel.ERROR
+                    scope.setExtra("task.exception", task.exception.toString())
+                    Sentry.captureMessage("Fetching FCM registration token failed")
+                }
                 Log.w("firebase", "Fetching FCM registration token failed", task.exception)
+                return@addOnCompleteListener
+            }
+            if (task.result == null) {
+                Sentry.withScope { scope ->
+                    scope.level = SentryLevel.ERROR
+                    Sentry.captureMessage("FirebaseMessaging token is null")
+                }
                 return@addOnCompleteListener
             }
 

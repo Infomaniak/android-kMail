@@ -35,7 +35,7 @@ class RegistrationInfo private constructor(
         val DEVICE_MODEL: String = android.os.Build.MODEL
 
         fun getDeviceName(contentResolver: ContentResolver): String {
-            return Settings.Global.getString(contentResolver, "device_name")
+            return Settings.Global.getString(contentResolver, "device_name").ifBlank { DEVICE_MODEL }
         }
     }
 }
