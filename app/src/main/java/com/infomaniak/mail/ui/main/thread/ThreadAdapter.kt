@@ -385,11 +385,8 @@ class ThreadAdapter(
     }
 
     private fun ThreadViewHolder.bindContent(message: Message) {
-        message.body?.let { body ->
-            bindBody(body, message)
-        } ?: run {
-            binding.bindShimmer()
-        }
+        binding.messageLoader.isVisible = message.body == null
+        message.body?.let { body -> bindBody(body, message) }
     }
 
     private fun ThreadViewHolder.bindBody(body: Body, message: Message) = with(binding) {
@@ -424,10 +421,6 @@ class ThreadAdapter(
             bodyWebViewClient.unblockDistantResources()
             fullMessageWebViewClient.unblockDistantResources()
         }
-    }
-
-    private fun ItemMessageBinding.bindShimmer() {
-        messageLoader.isVisible = true
     }
 
     private fun ThreadViewHolder.onExpandOrCollapseMessage(message: Message, shouldTrack: Boolean = true) = with(binding) {
