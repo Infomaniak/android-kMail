@@ -19,7 +19,6 @@ package com.infomaniak.mail.ui.main.newMessage
 
 import android.app.Application
 import android.content.ClipDescription
-import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
@@ -81,8 +80,6 @@ class NewMessageViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
-
-    private inline val context: Context get() = getApplication()
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
     private var autoSaveJob: Job? = null

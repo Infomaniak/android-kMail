@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui.main.thread.actions
 
 import android.app.Application
-import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
@@ -26,6 +25,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.AttachmentController
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.LocalStorageUtils
+import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -37,8 +37,6 @@ class DownloadAttachmentViewModel @Inject constructor(
     private val attachmentController: AttachmentController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
-
-    private inline val context: Context get() = getApplication()
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 

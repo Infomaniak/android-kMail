@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui
 
 import android.app.Application
-import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.*
@@ -81,8 +80,6 @@ class MainViewModel @Inject constructor(
     private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
-
-    private inline val context: Context get() = getApplication()
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
     private var refreshMailboxesAndFoldersJob: Job? = null
