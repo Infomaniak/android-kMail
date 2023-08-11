@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.utils
 
-import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
@@ -31,7 +30,6 @@ import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.kotlin.MutableRealm
 import io.sentry.Sentry
-import kotlinx.serialization.encodeToString
 import javax.inject.Inject
 
 class SharedUtils @Inject constructor(
@@ -115,7 +113,7 @@ class SharedUtils @Inject constructor(
                     SignatureController.update(data!!.signatures, realm = this@updateAndGetSignatures)
                     return data!!.signatures
                 } else {
-                    Sentry.captureException(ApiErrorException(ApiController.json.encodeToString(value = this)))
+                    Sentry.captureException(getApiException())
                     return null
                 }
             }
