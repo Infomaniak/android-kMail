@@ -17,25 +17,44 @@
  */
 package com.infomaniak.mail.ui.main.menu
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import android.content.Context
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.coroutineContext
+import com.infomaniak.mail.utils.standardize
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class MoveViewModel @Inject constructor(
+    application: Application,
     private val messageController: MessageController,
     private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-) : ViewModel() {
+) : AndroidViewModel(application) {
+
+    private inline val context: Context get() = getApplication()
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
+
+    private var filterJob: Job? = null
+
+    var filterResults: MutableLiveData<List<Folder>> = MutableLiveData()
+
+    fun cancelSearch() {
+        filterJob?.cancel()
+    }
 
     fun getFolderIdByMessage(messageUid: String) = liveData(ioCoroutineContext) {
         emit(messageController.getMessage(messageUid)!!.folderId)
@@ -43,5 +62,27 @@ class MoveViewModel @Inject constructor(
 
     fun getFolderIdByThread(threadUid: String) = liveData(ioCoroutineContext) {
         emit(threadController.getThread(threadUid)!!.folderId)
+    }
+
+    fun filterFolders(query: String, folders: List<Folder>, shouldDebounce: Boolean) = viewModelScope.launch(ioCoroutineContext) {
+        filterJob?.cancel()
+        filterJob = launch {
+            if (shouldDebounce) delay(FILTER_DEBOUNCE_DURATION)
+            val filteredFolders = folders.filter { folder ->
+                val folderName = folder.role?.folderNameRes?.let(context::getString) ?: folder.name
+                folderName.standardize().contains(query.standardize())
+            }
+
+            filterResults.postValue(filteredFolders)
+        }
+    }
+
+    override fun onCleared() {
+        cancelSearch()
+        super.onCleared()
+    }
+
+    private companion object {
+        const val FILTER_DEBOUNCE_DURATION = 300L
     }
 }

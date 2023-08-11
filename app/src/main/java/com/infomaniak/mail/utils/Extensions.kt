@@ -32,6 +32,7 @@ import android.text.Spanned
 import android.util.Patterns
 import android.view.View
 import android.view.Window
+import android.view.inputmethod.EditorInfo
 import android.webkit.WebView
 import android.widget.Button
 import androidx.annotation.*
@@ -52,6 +53,8 @@ import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.*
@@ -564,3 +567,22 @@ fun Context.launchNoMailboxActivity(shouldStartLoginActivity: Boolean = false) {
     if (shouldStartLoginActivity) launchLoginActivity(shouldClearStack = true)
     startActivity(Intent(this, NoMailboxActivity::class.java))
 }
+
+fun TextInputLayout.setOnClearTextClickListener(trackerCallback: () -> Unit) {
+    setEndIconOnClickListener {
+        editText?.text?.clear()
+        trackerCallback()
+    }
+}
+
+fun TextInputEditText.handleEditorSearchAction(searchCallback: (String) -> Unit) {
+    setOnEditorActionListener { _, actionId, _ ->
+        if (actionId == EditorInfo.IME_ACTION_SEARCH && !text.isNullOrBlank()) {
+            searchCallback(text.toString())
+            hideKeyboard()
+        }
+        true // Action got consumed
+    }
+}
+
+fun CharSequence.standardize(): String = toString().removeAccents().trim().lowercase()

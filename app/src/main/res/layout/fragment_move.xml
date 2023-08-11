@@ -69,48 +69,84 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <androidx.core.widget.NestedScrollView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:animateLayoutChanges="true"
-            android:background="@color/backgroundColor"
-            android:clipToPadding="false"
-            android:paddingTop="@dimen/alternativeMargin"
-            android:paddingBottom="@dimen/marginStandardMedium"
-            android:scrollbars="none">
+            android:orientation="vertical">
 
-            <LinearLayout
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/searchInputLayout"
+                style="@style/SearchTextInputLayoutStyle"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:animateLayoutChanges="true"
-                android:orientation="vertical">
+                android:layout_height="@dimen/searchViewHeight"
+                android:layout_marginStart="@dimen/marginStandardSmall"
+                android:layout_marginTop="@dimen/marginStandardMedium"
+                android:layout_marginEnd="@dimen/marginStandardMedium"
+                android:layout_marginBottom="@dimen/marginStandardSmall">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/searchTextInput"
+                    style="@style/SearchTextInputEditTextStyle"
+                    android:hint="@string/moveSearchFieldPlaceholder"
+                    android:drawablePadding="@dimen/marginStandardMedium" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <androidx.core.widget.NestedScrollView
+                    android:id="@+id/moveFoldersLists"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/backgroundColor"
+                    android:clipToPadding="false"
+                    android:fillViewport="true"
+                    android:paddingBottom="@dimen/marginStandardMedium"
+                    android:scrollbars="none">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/defaultFoldersList"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:nestedScrollingEnabled="false"
+                            android:overScrollMode="never"
+                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                            tools:itemCount="4"
+                            tools:listitem="@layout/item_folder_menu_drawer" />
+
+                        <com.google.android.material.divider.MaterialDivider
+                            style="@style/ItemDivider"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/customFoldersList"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:nestedScrollingEnabled="false"
+                            android:overScrollMode="never"
+                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                            tools:itemCount="6"
+                            tools:listitem="@layout/item_folder_menu_drawer" />
+                    </LinearLayout>
+                </androidx.core.widget.NestedScrollView>
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/defaultFoldersList"
+                    android:id="@+id/searchResultsList"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:nestedScrollingEnabled="false"
-                    android:overScrollMode="never"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    tools:itemCount="4"
-                    tools:listitem="@layout/item_folder_menu_drawer" />
-
-                <com.google.android.material.divider.MaterialDivider
-                    style="@style/ItemDivider"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/customFoldersList"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:nestedScrollingEnabled="false"
-                    android:overScrollMode="never"
+                    android:layout_height="match_parent"
+                    android:paddingBottom="@dimen/marginStandardMedium"
+                    android:visibility="gone"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     tools:itemCount="6"
                     tools:listitem="@layout/item_folder_menu_drawer" />
-
-            </LinearLayout>
-        </androidx.core.widget.NestedScrollView>
+            </FrameLayout>
+        </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 </LinearLayout>

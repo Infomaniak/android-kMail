@@ -238,6 +238,7 @@
     <string name="moreStorageText1">La casella di posta elettronica è piena e non è possibile ricevere altri messaggi 🥲</string>
     <string name="moreStorageText2">Presto potrete sbloccare i limiti del vostro indirizzo e-mail ik.me (limite di archiviazione, invio, inoltro, …).</string>
     <string name="moreStorageTitle">La vostra scatola è piena? Ottieni più spazio!</string>
+    <string name="moveSearchFieldPlaceholder">Ricerca di un file</string>
     <string name="moveTitle">In quale cartella vuoi spostare il tuo e-mail?</string>
     <plurals name="multipleSelectionCount">
         <item quantity="one">%d selezionato</item>

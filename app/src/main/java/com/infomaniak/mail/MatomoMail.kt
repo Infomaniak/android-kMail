@@ -53,6 +53,9 @@ object MatomoMail : MatomoCore {
     const val ACTION_PRINT_NAME = "print"
     const val ACTION_POSTPONE_NAME = "postpone"
     const val ADD_MAILBOX_NAME = "addMailbox"
+    const val SEARCH_FOLDER_FILTER_NAME = "folderFilter"
+    const val SEARCH_DELETE_NAME = "deleteSearch"
+    const val SEARCH_VALIDATE_NAME = "validateSearch"
     const val SWITCH_MAILBOX_NAME = "switchMailbox"
     //endregion
 
@@ -105,6 +108,10 @@ object MatomoMail : MatomoCore {
 
     fun Fragment.trackSearchEvent(name: String, value: Boolean? = null) {
         requireContext().trackSearchEvent(name, value)
+    }
+
+    fun Fragment.trackMoveSearchEvent(name: String) {
+        trackEvent("moveSearch", name)
     }
 
     fun Context.trackMessageEvent(name: String, value: Boolean? = null) {

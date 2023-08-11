@@ -21,6 +21,7 @@ package com.infomaniak.mail.data.models.thread
 
 import android.content.Context
 import com.infomaniak.lib.core.utils.*
+import com.infomaniak.mail.MatomoMail.SEARCH_FOLDER_FILTER_NAME
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
@@ -238,12 +239,12 @@ class Thread : RealmObject {
     override fun hashCode(): Int = uid.hashCode()
 
     enum class ThreadFilter(val matomoValue: String) {
-        ALL("folderFilter"),
+        ALL(SEARCH_FOLDER_FILTER_NAME),
         SEEN("readFilter"),
         UNSEEN("unreadFilter"),
         STARRED("favoriteFilter"),
         ATTACHMENTS("attachmentFilter"),
-        FOLDER("folderFilter"),
+        FOLDER(SEARCH_FOLDER_FILTER_NAME),
     }
 
     companion object {

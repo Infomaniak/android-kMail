@@ -39,6 +39,7 @@ import kotlin.math.min
 class FolderAdapter(
     private val isInMenuDrawer: Boolean,
     private var currentFolderId: String? = null,
+    private val shouldIndent: Boolean = true,
     private val onFolderClicked: (folderId: String) -> Unit,
     private val onCollapseClicked: ((folderId: String, shouldCollapse: Boolean) -> Unit)? = null,
 ) : RecyclerView.Adapter<FolderViewHolder>() {
@@ -100,7 +101,7 @@ class FolderAdapter(
         folder.role?.let {
             setFolderUi(folder, it.folderIconRes, unread, it.matomoValue)
         } ?: run {
-            val indentLevel = folder.path.split(folder.separator).size - 1
+            val indentLevel = if (shouldIndent) folder.path.split(folder.separator).size - 1 else 0
             setFolderUi(
                 folder = folder,
                 iconId = if (folder.isFavorite) R.drawable.ic_folder_star else R.drawable.ic_folder,
@@ -150,8 +151,8 @@ class FolderAdapter(
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun setFolders(newFolders: List<Folder>, newCurrentFolderId: String?) {
-        currentFolderId = newCurrentFolderId
+    fun setFolders(newFolders: List<Folder>, newCurrentFolderId: String? = null) {
+        newCurrentFolderId?.let { currentFolderId = it }
 
         foldersDiffer.submitList(newFolders)
         val newHasCollapsableFolder = newFolders.any { it.canBeCollapsed }
