@@ -37,7 +37,7 @@ class StandardMainApplication : MainApplication() {
     }
 
     private fun registerUserDeviceIfNeeded() {
-        if (AccountUtils.currentUserId != AppSettings.DEFAULT_ID && !areGooglePlayServicesNotAvailable()) {
+        if (AccountUtils.currentUserId != AppSettings.DEFAULT_ID && !areGooglePlayServicesNotAvailable() && localSettings.firebaseToken != null) {
             RegisterUserDeviceWorker.scheduleWork(context = this)
         }
     }

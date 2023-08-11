@@ -61,6 +61,7 @@ class RegisterUserDeviceWorker @AssistedInject constructor(
                 }.onFailure { exception ->
                     Sentry.captureException(exception)
                     Log.w(TAG, "launchWork: register ${user.id} failed", exception)
+                    return@withContext Result.retry()
                 }
             }
         }
