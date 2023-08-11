@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui.main.menu
 
 import android.app.Application
-import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
@@ -27,6 +26,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.standardize
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -43,8 +43,6 @@ class MoveViewModel @Inject constructor(
     private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
-
-    private inline val context: Context get() = getApplication()
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 

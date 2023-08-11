@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui.main.thread
 
 import android.app.Application
-import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
@@ -36,10 +35,7 @@ import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.di.IoDispatcher
-import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.SharedUtils
-import com.infomaniak.mail.utils.coroutineContext
-import com.infomaniak.mail.utils.getUids
+import com.infomaniak.mail.utils.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
@@ -58,8 +54,6 @@ class ThreadViewModel @Inject constructor(
     private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
-
-    private inline val context: Context get() = getApplication()
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
     private var fetchMessagesJob: Job? = null
