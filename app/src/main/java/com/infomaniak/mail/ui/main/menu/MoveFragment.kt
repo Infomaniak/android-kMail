@@ -51,9 +51,13 @@ class MoveFragment : MenuFoldersFragment() {
 
     private val createFolderDialog by lazy { initNewFolderDialog() }
 
-    private lateinit var searchResultsAdpater: FolderAdapter
+    private val searchResultsAdpater by lazy {
+        FolderAdapter(isInMenuDrawer, shouldIndent = false, onFolderClicked = ::onFolderSelected)
+    }
 
     private var hasAlreadyTrackedFolderSearch = false
+
+    private var currentFolderId: String? = null
 
     override val defaultFoldersList: RecyclerView by lazy { binding.defaultFoldersList }
     override val customFoldersList: RecyclerView by lazy { binding.customFoldersList }
@@ -95,13 +99,15 @@ class MoveFragment : MenuFoldersFragment() {
     }
 
     private fun setAdaptersFolders(folderId: String) {
+        currentFolderId = folderId
+
         val (defaultFoldersWithoutDraft, customFolders) = mainViewModel.currentFoldersLive.value!!.let { foldersLists ->
             foldersLists.first.filterNot { it.role == FolderRole.DRAFT } to foldersLists.second
         }
 
         defaultFoldersAdapter.setFolders(defaultFoldersWithoutDraft, folderId)
         customFoldersAdapter.setFolders(customFolders, folderId)
-        setSearchBarUi(allFolders = defaultFoldersWithoutDraft + customFolders, currentFolderId = folderId)
+        setSearchBarUi(allFolders = defaultFoldersWithoutDraft + customFolders)
     }
 
     private fun observeNewFolderCreation() {
@@ -130,20 +136,18 @@ class MoveFragment : MenuFoldersFragment() {
         )
     }
 
-    private fun setSearchBarUi(allFolders: List<Folder>, currentFolderId: String) = with(binding) {
-        searchResultsAdpater = FolderAdapter(
-            isInMenuDrawer,
-            currentFolderId,
-            shouldIndent = false,
-            onFolderClicked = ::onFolderSelected,
-        )
+    private fun setSearchBarUi(allFolders: List<Folder>) = with(binding) {
         searchResultsList.adapter = searchResultsAdpater
 
         searchInputLayout.setOnClearTextClickListener { trackMoveSearchEvent(SEARCH_DELETE_NAME) }
         searchTextInput.apply {
-            doOnTextChanged { text, _, _, _ ->
-                toggleFolderListsVisibility(!text.isNullOrBlank())
-                if (text?.isNotBlank() == true) moveViewModel.filterFolders(text.toString(), allFolders, shouldDebounce = true)
+            toggleFolderListsVisibility(!text.isNullOrBlank())
+            doOnTextChanged { newQuery, _, _, _ ->
+                toggleFolderListsVisibility(!newQuery.isNullOrBlank())
+                if (newQuery?.isNotBlank() == true) {
+                    moveViewModel.filterFolders(newQuery.toString(), allFolders, shouldDebounce = true)
+                }
+
                 if (!hasAlreadyTrackedFolderSearch) {
                     trackMoveSearchEvent("executeSearch")
                     hasAlreadyTrackedFolderSearch = true
@@ -163,6 +167,8 @@ class MoveFragment : MenuFoldersFragment() {
     }
 
     private fun observeSearchResults() {
-        moveViewModel.filterResults.observe(viewLifecycleOwner) { folders -> searchResultsAdpater.setFolders(folders) }
+        moveViewModel.filterResults.observe(viewLifecycleOwner) { folders ->
+            searchResultsAdpater.setFolders(folders, currentFolderId)
+        }
     }
 }
