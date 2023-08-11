@@ -21,7 +21,6 @@ import android.content.Context
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.withCreated
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.firebase.messaging.FirebaseMessaging
@@ -31,7 +30,8 @@ import com.infomaniak.mail.firebase.RegisterUserDeviceWorker
 import com.infomaniak.mail.utils.AccountUtils
 import io.sentry.Sentry
 import io.sentry.SentryLevel
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 object GplayUtils {
 
@@ -51,19 +51,19 @@ object GplayUtils {
     fun deleteFirebaseToken() = FirebaseMessaging.getInstance().deleteToken()
 
     private fun FragmentActivity.checkFirebaseRegistration() {
-        lifecycleScope.launch {
-            lifecycle.withCreated { checkFirebaseRegistration(this@checkFirebaseRegistration) }
+        lifecycleScope.launchWhenCreated {
+            checkFirebaseRegistration(this@checkFirebaseRegistration)
         }
     }
 
-    private fun checkFirebaseRegistration(context: Context) {
+    private suspend fun checkFirebaseRegistration(context: Context) = withContext(Dispatchers.IO) {
 
         val localSettings = LocalSettings.getInstance(context)
         val registeredUsersIds = localSettings.firebaseRegisteredUsers.map { it.toInt() }.toSet()
         val noNeedUsersRegistration = AccountUtils.getAllUsersSync().map { it.id }.minus(registeredUsersIds).isEmpty()
 
         Log.d("firebase", "checkFirebaseRegistration: (skip users registration): $noNeedUsersRegistration")
-        if (noNeedUsersRegistration) return
+        if (noNeedUsersRegistration) return@withContext
 
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (!task.isSuccessful) {
