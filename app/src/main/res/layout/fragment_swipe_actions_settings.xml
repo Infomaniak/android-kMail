@@ -65,7 +65,7 @@
 
             </LinearLayout>
 
-            <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+            <com.google.android.material.divider.MaterialDivider style="@style/ItemDivider" />
 
             <LinearLayout
                 android:id="@+id/swipeLeftCardview"

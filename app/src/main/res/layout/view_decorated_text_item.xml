@@ -46,7 +46,8 @@
             style="@style/BodyMedium"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_marginHorizontal="@dimen/marginStandardSmall"
+            android:layout_marginStart="@dimen/marginStandardSmall"
+            android:layout_marginEnd="@dimen/marginStandardMedium"
             android:drawablePadding="@dimen/marginStandardMedium"
             android:ellipsize="end"
             android:gravity="start|center_vertical"
@@ -70,7 +71,6 @@
                 style="@style/BodySmallMedium.Accent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/marginStandardSmall"
                 android:visibility="gone"
                 tools:text="42" />
 

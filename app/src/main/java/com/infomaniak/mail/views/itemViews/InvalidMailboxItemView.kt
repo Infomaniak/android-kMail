@@ -20,18 +20,13 @@ package com.infomaniak.mail.views.itemViews
 import android.content.Context
 import android.util.AttributeSet
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.content.res.ResourcesCompat
 import com.infomaniak.mail.R
-import com.infomaniak.lib.core.R as RCore
 
 class InvalidMailboxItemView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
 ) : DecoratedItemView(context, attrs, defStyleAttr) {
-
-    override val endIconMarginRes: Int
-        get() = if (itemStyle == SelectionStyle.MENU_DRAWER) RCore.dimen.marginStandardSmall else ResourcesCompat.ID_NULL
 
     private val chevronIcon by lazy { AppCompatResources.getDrawable(context, R.drawable.ic_chevron_right) }
     private val warningIcon by lazy { AppCompatResources.getDrawable(context, R.drawable.ic_warning) }

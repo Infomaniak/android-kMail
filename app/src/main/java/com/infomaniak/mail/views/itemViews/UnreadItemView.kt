@@ -26,15 +26,12 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.getAttributeColor
 import com.google.android.material.R as RMaterial
-import com.infomaniak.lib.core.R as RCore
 
 abstract class UnreadItemView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
 ) : SelectableItemView(context, attrs, defStyleAttr) {
-
-    override val endIconMarginRes = RCore.dimen.marginStandardSmall
 
     private val pastille by lazy {
         AppCompatResources.getDrawable(context, R.drawable.ic_pastille)?.apply {

@@ -28,8 +28,8 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.databinding.ItemDividerHorizontalBinding
 import com.infomaniak.mail.databinding.ItemSearchFolderBinding
+import com.infomaniak.mail.ui.main.search.SearchFolderAdapter.SearchFolderElement.DIVIDER
 import com.infomaniak.mail.ui.main.search.SearchFolderAdapter.SearchFolderElement.FOLDER
-import com.infomaniak.mail.ui.main.search.SearchFolderAdapter.SearchFolderElement.SEPARATOR
 import com.infomaniak.mail.utils.getLocalizedNameOrAllFolders
 import com.infomaniak.mail.views.itemViews.SelectableFolderItemView
 
@@ -55,14 +55,14 @@ class SearchFolderAdapter(
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         val context = parent!!.context
         return when (getItemViewType(position)) {
-            SEPARATOR.itemId -> bindSeparator(convertView, context, parent)
+            DIVIDER.itemId -> bindDivider(convertView, context, parent)
             else -> bindFolder(convertView, context, parent, getItem(position) as? Folder)
         }
     }
 
-    private fun bindSeparator(convertView: View?, context: Context?, parent: ViewGroup): View {
+    private fun bindDivider(convertView: View?, context: Context?, parent: ViewGroup): View {
         return convertView ?: ItemDividerHorizontalBinding.inflate(LayoutInflater.from(context), parent, false).root.apply {
-            setDividerColorResource(R.color.popupSeparatorColor)
+            setDividerColorResource(R.color.popupDividerColor)
         }
     }
 
@@ -96,7 +96,7 @@ class SearchFolderAdapter(
 
     override fun areAllItemsEnabled(): Boolean = false
 
-    override fun isEnabled(position: Int): Boolean = getItemViewType(position) != SEPARATOR.itemId
+    override fun isEnabled(position: Int): Boolean = getItemViewType(position) != DIVIDER.itemId
 
     fun updateVisuallySelectedFolder(folder: Folder?) {
         selectedFolder = folder
@@ -105,6 +105,6 @@ class SearchFolderAdapter(
     enum class SearchFolderElement(val itemId: Int) {
         FOLDER(0),
         ALL_FOLDERS(1),
-        SEPARATOR(2),
+        DIVIDER(2),
     }
 }

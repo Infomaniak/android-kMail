@@ -40,7 +40,7 @@ class ActionItemView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
-    val binding by lazy { ItemBottomSheetActionBinding.inflate(LayoutInflater.from(context), this, true) }
+    private val binding by lazy { ItemBottomSheetActionBinding.inflate(LayoutInflater.from(context), this, true) }
 
     init {
         attrs?.getAttributes(context, R.styleable.ActionItemView) {
@@ -57,7 +57,7 @@ class ActionItemView @JvmOverloads constructor(
 
                 divider.apply {
                     isVisible = getBoolean(R.styleable.ActionItemView_visibleDivider, true)
-                    dividerColor = getColor(R.styleable.ActionItemView_dividerColor, context.getColor(R.color.separatorColor))
+                    dividerColor = getColor(R.styleable.ActionItemView_dividerColor, context.getColor(R.color.dividerColor))
                 }
 
                 if (getBoolean(R.styleable.ActionItemView_staffOnly, false)) {
@@ -85,6 +85,10 @@ class ActionItemView @JvmOverloads constructor(
     }
 
     fun setText(@StringRes textResourceId: Int) = binding.button.setText(textResourceId)
+
+    fun setDividerVisibility(isVisible: Boolean) {
+        binding.divider.isVisible = isVisible
+    }
 
     private companion object {
         const val NOT_SET = -1

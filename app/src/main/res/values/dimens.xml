@@ -19,6 +19,7 @@
 
     <!-- View sizes -->
 
+    <dimen name="accountAvatarSize">110dp</dimen>
     <dimen name="attachmentChipMaxSize">160dp</dimen>
     <dimen name="alternativeMargin">12dp</dimen>
     <dimen name="chevronSize">12dp</dimen>
@@ -45,7 +46,7 @@
     <dimen name="folderCollapseButtonSize">28dp</dimen>
 
     <!-- Settings -->
-    <dimen name="settingsSeparatorHorizontalPadding">16dp</dimen>
+    <dimen name="dividerHorizontalPadding">16dp</dimen>
 
     <!-- Other -->
 

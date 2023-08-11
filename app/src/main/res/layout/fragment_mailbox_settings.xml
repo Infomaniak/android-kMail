@@ -71,7 +71,7 @@
                 app:title="@string/settingsMailboxGeneralNotifications" />
 
             <com.google.android.material.divider.MaterialDivider
-                style="@style/SettingSeparator"
+                style="@style/ItemDivider"
                 android:visibility="gone" />
 
             <TextView
@@ -110,7 +110,7 @@
                 app:title="@string/settingsInboxAlias" />
 
             <com.google.android.material.divider.MaterialDivider
-                style="@style/SettingSeparator"
+                style="@style/ItemDivider"
                 android:visibility="gone" />
 
             <TextView
@@ -146,7 +146,7 @@
                 app:title="@string/settingsSecurityBlockedRecipients" />
 
             <com.google.android.material.divider.MaterialDivider
-                style="@style/SettingSeparator"
+                style="@style/ItemDivider"
                 android:visibility="gone" />
 
             <TextView

@@ -158,7 +158,7 @@ class SearchFragment : Fragment() {
 
             val folders = defaultFolders.toMutableList<Any>().apply {
                 add(0, SearchFolderElement.ALL_FOLDERS)
-                add(SearchFolderElement.SEPARATOR)
+                add(SearchFolderElement.DIVIDER)
                 addAll(customFolders)
             }.toList()
 
