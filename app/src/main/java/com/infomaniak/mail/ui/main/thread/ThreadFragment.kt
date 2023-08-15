@@ -458,22 +458,16 @@ class ThreadFragment : Fragment() {
             val backgroundColor = context.getColor(R.color.externalTagBackground)
             val textColor = context.getColor(R.color.externalTagOnBackground)
             val textTypeface = ResourcesCompat.getFont(context, R.font.external_tag_font)!!
+            val textSize = resources.getDimensionPixelSize(R.dimen.externalTagTextSize).toFloat()
             setSpan(
                 /* what = */ RoundedBackgroundSpan(
                     backgroundColor = backgroundColor,
                     textColor = textColor,
                     textTypeface = textTypeface,
+                    fontSize = textSize,
                     radius = 8f,
                     verticalOffset = 4f,
                 ),
-                /* start = */ startIndex,
-                /* end = */ endIndex,
-                /* flags = */ Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-            )
-
-            val textSize = resources.getDimensionPixelSize(R.dimen.externalTagTextSize)
-            setSpan(
-                /* what = */ AbsoluteSizeSpan(textSize),
                 /* start = */ startIndex,
                 /* end = */ endIndex,
                 /* flags = */ Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
