@@ -20,6 +20,7 @@
 package com.infomaniak.mail.data.models.thread
 
 import android.content.Context
+import android.os.Build
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.MatomoMail.SEARCH_FOLDER_FILTER_NAME
 import com.infomaniak.mail.R
@@ -45,6 +46,9 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.UseSerializers
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 import java.util.Date
 
 @Serializable
@@ -191,12 +195,23 @@ class Thread : RealmObject {
 
     fun formatDate(context: Context): String = with(date.toDate()) {
         when {
-            isInTheFuture() -> format(FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR)
+            isInTheFuture() -> formatNumericalDayMonthYear()
             isToday() -> format(FORMAT_DATE_HOUR_MINUTE)
             isYesterday() -> context.getString(R.string.messageDetailsYesterday)
             isSmallerThanDays(6) -> format(FORMAT_DAY_OF_THE_WEEK)
             isThisYear() -> format(FORMAT_DATE_SHORT_DAY_ONE_CHAR)
-            else -> format(FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR)
+            else -> formatNumericalDayMonthYear()
+        }
+    }
+
+    private fun Date.formatNumericalDayMonthYear(): String {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // Adapts order of day, month and year according to the locale
+            val shortDateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)
+            toInstant().atZone(ZoneId.systemDefault()).toLocalDate().format(shortDateFormatter)
+        } else {
+            // Fallback on unambiguous date format for any locale
+            format(FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR)
         }
     }
 
