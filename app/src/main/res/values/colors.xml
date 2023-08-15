@@ -137,6 +137,10 @@
     <!-- Progressbar -->
     <color name="progressbarTrackColor">@color/mouse</color>
 
+    <!-- External tag -->
+    <color name="externalTagBackground">@color/swipeFavorite</color>
+    <color name="externalTagOnBackground">@color/orca</color>
+
     <!-- Swipe actions -->
     <color name="swipeDelete">@color/redDestructiveAction</color>
     <color name="swipeMove">@color/fougere_light</color>

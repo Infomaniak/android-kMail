@@ -18,7 +18,6 @@
 <resources>
 
     <!-- View sizes -->
-
     <dimen name="accountAvatarSize">110dp</dimen>
     <dimen name="attachmentChipMaxSize">160dp</dimen>
     <dimen name="alternativeMargin">12dp</dimen>
@@ -40,7 +39,6 @@
     <dimen name="textButtonPrimaryHeight">56dp</dimen>
 
     <!-- Menu Drawer -->
-
     <dimen name="decoratedItemViewHeight">48dp</dimen>
     <dimen name="folderUncollapsableIndent">36dp</dimen>
     <dimen name="folderCollapseButtonSize">28dp</dimen>
@@ -48,8 +46,10 @@
     <!-- Settings -->
     <dimen name="dividerHorizontalPadding">16dp</dimen>
 
-    <!-- Other -->
+    <!-- External tag -->
+    <dimen name="externalTagTextSize">12sp</dimen>
 
+    <!-- Other -->
     <dimen name="roundCornerRadius">100dp</dimen>
     <dimen name="angleViewNotRotated">0.0</dimen>
     <dimen name="angleViewRotated">180.0</dimen>

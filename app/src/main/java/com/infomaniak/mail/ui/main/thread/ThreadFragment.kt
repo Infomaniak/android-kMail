@@ -21,12 +21,18 @@ import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
+import android.text.Spannable
+import android.text.method.LinkMovementMethod
+import android.text.style.AbsoluteSizeSpan
+import android.text.style.ClickableSpan
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.ColorUtils
+import androidx.core.text.toSpannable
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -419,8 +425,9 @@ class ThreadFragment : Fragment() {
             return@with
         }
 
-        val subject = context.formatSubject(thread.subject)
-        threadSubject.text = subject
+        val (subject, spannedSubject) = computeSubject(thread)
+        threadSubject.text = spannedSubject
+        threadSubject.movementMethod = LinkMovementMethod.getInstance()
         toolbarSubject.text = subject
 
         iconFavorite.apply {
@@ -434,6 +441,59 @@ class ThreadFragment : Fragment() {
         }
 
         isFavorite = thread.isFavorite
+    }
+
+    private fun FragmentThreadBinding.computeSubject(thread: Thread): Pair<String, CharSequence> {
+        val subject = context.formatSubject(thread.subject)
+        val isThreadInternal = false // TODO
+        if (isThreadInternal) return subject to subject
+
+        val externalPostfix = "Externe"// TODO : getString(R.string.externalTag)
+        val postfixedSubject = "$subject $externalPostfix"
+
+        val spannedSubject = postfixedSubject.toSpannable().apply {
+            val startIndex = subject.length + 1
+            val endIndex = startIndex + externalPostfix.length
+
+            val backgroundColor = context.getColor(R.color.externalTagBackground)
+            val textColor = context.getColor(R.color.externalTagOnBackground)
+            val textTypeface = ResourcesCompat.getFont(context, R.font.external_tag_font)!!
+            setSpan(
+                /* what = */ RoundedBackgroundSpan(
+                    backgroundColor = backgroundColor,
+                    textColor = textColor,
+                    textTypeface = textTypeface,
+                    radius = 8f,
+                    verticalOffset = 4f,
+                ),
+                /* start = */ startIndex,
+                /* end = */ endIndex,
+                /* flags = */ Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+
+            val textSize = resources.getDimensionPixelSize(R.dimen.externalTagTextSize)
+            setSpan(
+                /* what = */ AbsoluteSizeSpan(textSize),
+                /* start = */ startIndex,
+                /* end = */ endIndex,
+                /* flags = */ Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+
+            // TODO : Currently, the clickable zone extends beyond the span up to the edge of the textview. This is the same
+            //  comportment that Gmail has. See if we can find a fix for this later
+            setSpan(
+                /* what = */ object : ClickableSpan() {
+                    override fun onClick(widget: View) {
+                        mainViewModel.snackBarManager.setValue("TODO : Externe")
+                    }
+                },
+                /* start = */ startIndex,
+                /* end = */ endIndex,
+                /* flags = */ Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+
+        return subject to spannedSubject
     }
 
     private fun onMessagesUpdate(messages: List<Message>) {
