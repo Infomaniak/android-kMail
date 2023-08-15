@@ -21,6 +21,7 @@ import android.content.Context
 import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.*
+import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
@@ -59,7 +60,7 @@ class RegisterUserDeviceWorker @AssistedInject constructor(
                 runCatching {
                     apiResponse.throwErrorAsException()
                 }.onFailure { exception ->
-                    Sentry.captureException(exception)
+                    if (exception !is ApiController.NetworkException) Sentry.captureException(exception)
                     Log.w(TAG, "launchWork: register ${user.id} failed", exception)
                     return@withContext Result.retry()
                 }
