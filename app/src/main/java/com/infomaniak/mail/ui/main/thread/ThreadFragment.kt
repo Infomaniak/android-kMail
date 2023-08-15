@@ -23,7 +23,6 @@ import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
 import android.text.Spannable
 import android.text.method.LinkMovementMethod
-import android.text.style.AbsoluteSizeSpan
 import android.text.style.ClickableSpan
 import android.util.Log
 import android.view.LayoutInflater
@@ -61,6 +60,7 @@ import com.infomaniak.mail.data.LocalSettings.ExternalContent
 import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
@@ -443,12 +443,26 @@ class ThreadFragment : Fragment() {
         isFavorite = thread.isFavorite
     }
 
+    private fun Recipient.isExternal(): Boolean {
+        val emailDictionary = mainViewModel.mergedContacts.value ?: run {
+            // TODO : Sentry could not check if recipient isExternal because no merged contacts
+            emptyMap()
+        }
+
+        val isUnknownContact = email !in emailDictionary
+        val isMailerDaemon = """mailer-daemon@(?:.+\.)?infomaniak\.ch""".toRegex(RegexOption.IGNORE_CASE).matches(email)
+        val trustedDomains = listOf("@infomaniak.com", "@infomaniak.event", "@swisstransfer.com")
+        val isUntrustedDomain = email.isEmail() && trustedDomains.none { email.endsWith(it) }
+
+        return isUnknownContact && !isMailerDaemon && isUntrustedDomain
+    }
+
     private fun FragmentThreadBinding.computeSubject(thread: Thread): Pair<String, CharSequence> {
         val subject = context.formatSubject(thread.subject)
-        val isThreadInternal = false // TODO
-        if (isThreadInternal) return subject to subject
+        val (externalRecipientEmail, externalRecipientQuantity) = findExternalRecipients(thread)
+        if (externalRecipientQuantity == 0) return subject to subject
 
-        val externalPostfix = "Externe"// TODO : getString(R.string.externalTag)
+        val externalPostfix = getString(R.string.externalTag)
         val postfixedSubject = "$subject $externalPostfix"
 
         val spannedSubject = postfixedSubject.toSpannable().apply {
@@ -478,7 +492,20 @@ class ThreadFragment : Fragment() {
             setSpan(
                 /* what = */ object : ClickableSpan() {
                     override fun onClick(widget: View) {
-                        mainViewModel.snackBarManager.setValue("TODO : Externe")
+                        val description = resources.getQuantityString(
+                            R.plurals.externalDialogDescriptionExpeditor,
+                            externalRecipientQuantity,
+                            externalRecipientEmail,
+                        )
+
+                        // TODO : Reuse instance ?
+                        createDescriptionDialog(
+                            title = getString(R.string.externalDialogTitleExpeditor),
+                            description = description,
+                            confirmButtonText = R.string.externalDialogConfirmButton,
+                            displayCancelButton = false,
+                            onPositiveButtonClicked = {},
+                        ).show()
                     }
                 },
                 /* start = */ startIndex,
@@ -488,6 +515,30 @@ class ThreadFragment : Fragment() {
         }
 
         return subject to spannedSubject
+    }
+
+    /**
+     * Only returns a quantity of at most 2, used to differentiate between the singular or plural form of the dialog message
+     */
+    private fun findExternalRecipients(thread: Thread): Pair<String?, Int> {
+        var externalRecipientEmail: String? = null
+        var externalRecipientQuantity = 0
+
+        run outerloop@{
+            thread.messages.forEach { message ->
+                message.from.forEach { recipient ->
+                    if (recipient.isExternal()) {
+                        if (externalRecipientQuantity++ == 0) {
+                            externalRecipientEmail = recipient.email
+                        } else {
+                            return@outerloop
+                        }
+                    }
+                }
+            }
+        }
+
+        return Pair(externalRecipientEmail, externalRecipientQuantity)
     }
 
     private fun onMessagesUpdate(messages: List<Message>) {

@@ -363,6 +363,7 @@ fun Fragment.createDescriptionDialog(
     title: String,
     description: CharSequence,
     @StringRes confirmButtonText: Int = R.string.buttonConfirm,
+    displayCancelButton: Boolean = true,
     onPositiveButtonClicked: () -> Unit,
     onDismissed: (() -> Unit)? = null,
 ): AlertDialog {
@@ -370,6 +371,7 @@ fun Fragment.createDescriptionDialog(
         title,
         description,
         confirmButtonText,
+        displayCancelButton,
         onPositiveButtonClicked,
         onDismissed,
     )
@@ -379,6 +381,7 @@ fun Activity.createDescriptionDialog(
     title: String,
     description: CharSequence,
     @StringRes confirmButtonText: Int = R.string.buttonConfirm,
+    displayCancelButton: Boolean = true,
     onPositiveButtonClicked: () -> Unit,
     onDismissed: (() -> Unit)? = null,
 ) = with(DialogDescriptionBinding.inflate(layoutInflater)) {
@@ -389,7 +392,7 @@ fun Activity.createDescriptionDialog(
     MaterialAlertDialogBuilder(context)
         .setView(root)
         .setPositiveButton(confirmButtonText) { _, _ -> onPositiveButtonClicked() }
-        .setNegativeButton(RCore.string.buttonCancel, null)
+        .also { if (displayCancelButton) it.setNegativeButton(RCore.string.buttonCancel, null) }
         .setOnDismissListener { onDismissed?.invoke() }
         .create()
 }
