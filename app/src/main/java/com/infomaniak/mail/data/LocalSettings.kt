@@ -221,9 +221,9 @@ class LocalSettings private constructor(context: Context) {
         get() = getEnum(THREAD_MODE_KEY, DEFAULT_THREAD_MODE)
         set(value) = putEnum(THREAD_MODE_KEY, value)
 
-    enum class ThreadMode(@StringRes val localisedNameRes: Int) {
-        CONVERSATION(R.string.settingsOptionThreadModeConversation),
-        MESSAGE(R.string.settingsOptionThreadModeMessage),
+    enum class ThreadMode(@StringRes val localisedNameRes: Int, val matomoValue: String) {
+        CONVERSATION(R.string.settingsOptionThreadModeConversation, "conversation"),
+        MESSAGE(R.string.settingsOptionThreadModeMessage, "message"),
     }
     //endregion
 
