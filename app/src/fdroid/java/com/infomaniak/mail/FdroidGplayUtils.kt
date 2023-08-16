@@ -19,12 +19,6 @@ package com.infomaniak.mail
 
 import android.content.Context
 import androidx.fragment.app.FragmentActivity
+import com.infomaniak.mail.GplayUtils
 
-object GplayUtils {
-
-    fun FragmentActivity.checkPlayServices() = Unit
-
-    fun Context.areGooglePlayServicesNotAvailable(): Boolean = true
-
-    fun deleteFirebaseToken() = Unit
-}
+class FdroidGplayUtils : GplayUtils

@@ -26,44 +26,47 @@ import com.google.android.gms.common.GoogleApiAvailability
 import com.google.firebase.messaging.FirebaseMessaging
 import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.firebase.RegisterUserDeviceWorker
 import com.infomaniak.mail.utils.AccountUtils
 import io.sentry.Sentry
 import io.sentry.SentryLevel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object GplayUtils {
+@Singleton
+class StandardPlayServicesUtils @Inject constructor(
+    private val appContext: Context,
+    private val localSettings: LocalSettings,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+) : PlayServicesUtils {
 
-    fun FragmentActivity.checkPlayServices(): Unit = with(GoogleApiAvailability.getInstance()) {
-        val errorCode = isGooglePlayServicesAvailable(this@checkPlayServices)
+    override fun checkPlayServices(fragmentActivity: FragmentActivity): Unit = with(GoogleApiAvailability.getInstance()) {
+        val errorCode = isGooglePlayServicesAvailable(fragmentActivity)
         when {
-            errorCode == ConnectionResult.SUCCESS -> checkFirebaseRegistration()
-            isUserResolvableError(errorCode) -> makeGooglePlayServicesAvailable(this@checkPlayServices)
-            else -> showToast(R.string.googlePlayServicesAreRequired)
+            errorCode == ConnectionResult.SUCCESS -> fragmentActivity.checkFirebaseRegistration()
+            isUserResolvableError(errorCode) -> makeGooglePlayServicesAvailable(fragmentActivity)
+            else -> fragmentActivity.showToast(R.string.googlePlayServicesAreRequired)
         }
     }
 
-    fun Context.areGooglePlayServicesNotAvailable(): Boolean {
-        return GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this) != ConnectionResult.SUCCESS
+    override fun areGooglePlayServicesNotAvailable(): Boolean {
+        return GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(appContext) != ConnectionResult.SUCCESS
     }
 
-    fun deleteFirebaseToken() = FirebaseMessaging.getInstance().deleteToken()
-
-    private fun FragmentActivity.checkFirebaseRegistration() {
-        lifecycleScope.launchWhenCreated {
-            checkFirebaseRegistration(this@checkFirebaseRegistration)
-        }
+    override fun deleteFirebaseToken() {
+        FirebaseMessaging.getInstance().deleteToken()
     }
 
-    private suspend fun checkFirebaseRegistration(context: Context) = withContext(Dispatchers.IO) {
+    private fun FragmentActivity.checkFirebaseRegistration() = lifecycleScope.launch(ioDispatcher) {
 
-        val localSettings = LocalSettings.getInstance(context)
         val registeredUsersIds = localSettings.firebaseRegisteredUsers.map { it.toInt() }.toSet()
         val noNeedUsersRegistration = AccountUtils.getAllUsersSync().map { it.id }.minus(registeredUsersIds).isEmpty()
 
         Log.d("firebase", "checkFirebaseRegistration: (skip users registration): $noNeedUsersRegistration")
-        if (noNeedUsersRegistration) return@withContext
+        if (noNeedUsersRegistration) return@launch
 
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (!task.isSuccessful) {
@@ -88,7 +91,7 @@ object GplayUtils {
             if (token != localSettings.firebaseToken) localSettings.clearRegisteredFirebaseUsers()
 
             localSettings.firebaseToken = token
-            RegisterUserDeviceWorker.scheduleWork(context)
+            RegisterUserDeviceWorker.scheduleWork(this@checkFirebaseRegistration)
         }
     }
 }
