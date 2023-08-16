@@ -20,6 +20,7 @@ package com.infomaniak.mail.utils
 import android.os.Bundle
 import androidx.navigation.NavController
 import com.infomaniak.mail.BuildConfig
+import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
@@ -84,11 +85,12 @@ object SentryDebug {
         })
     }
 
-    fun sendAlreadyExistingMessage(folder: Folder, message: Message) {
+    fun sendAlreadyExistingMessage(folder: Folder, message: Message, threadMode: ThreadMode) {
         Sentry.withScope { scope ->
             scope.level = SentryLevel.ERROR
             scope.setExtra("folder.name", folder.name)
             scope.setExtra("folder.id", folder.id)
+            scope.setExtra("threadMode", threadMode.name)
             scope.setExtra("message.folderId", message.folderId)
             scope.setExtra("message.uid", message.uid)
             scope.setExtra("message.messageId", "${message.messageId}")

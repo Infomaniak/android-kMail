@@ -489,7 +489,7 @@ class RefreshController @Inject constructor(private val localSettings: LocalSett
 
             val isMessageAlreadyAdded = folder.messages.firstOrNull { it == remoteMessage && !it.isOrphan() } != null
             if (isMessageAlreadyAdded) {
-                SentryDebug.sendAlreadyExistingMessage(folder, remoteMessage)
+                SentryDebug.sendAlreadyExistingMessage(folder, remoteMessage, localSettings.threadMode)
                 return@forEach
             }
 
@@ -531,7 +531,7 @@ class RefreshController @Inject constructor(private val localSettings: LocalSett
 
             val isMessageAlreadyAdded = folder.messages.firstOrNull { it == remoteMessage && !it.isOrphan() } != null
             if (isMessageAlreadyAdded) {
-                SentryDebug.sendAlreadyExistingMessage(folder, remoteMessage)
+                SentryDebug.sendAlreadyExistingMessage(folder, remoteMessage, localSettings.threadMode)
                 return@forEach
             }
 
