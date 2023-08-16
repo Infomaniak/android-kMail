@@ -102,8 +102,12 @@ object RealmDatabase {
 
     //region Close Realms
     fun closeOldRealms() {
-        oldMailboxContent.get()?.close()
-        oldUserInfo.get()?.close()
+        oldUserInfo.get()?.let {
+            if (!it.isClosed()) it.close()
+        }
+        oldMailboxContent.get()?.let {
+            if (!it.isClosed()) it.close()
+        }
     }
 
     private fun closeUserInfo() {
@@ -118,12 +122,12 @@ object RealmDatabase {
     //endregion
 
     //region Reset Realms
-    fun reset() {
-        resetMailboxContent()
-        resetUserInfo()
-        _mailboxInfo = null // TODO: To be removed when the injection is done
-        _appSettings = null // TODO: To be removed when the injection is done
+    fun backUpPreviousRealms() {
         oldUserInfo = WeakReference(_userInfo)
+        backUpPreviousMailboxContent()
+    }
+
+    fun backUpPreviousMailboxContent() {
         oldMailboxContent = WeakReference(_mailboxContent)
     }
 
