@@ -65,9 +65,7 @@ class ThreadModeSettingFragment : Fragment() {
                     localSettings.threadMode = threadMode
                     threadModeSettingViewModel.dropAllMailboxesContent()
                 },
-                onDismissed = {
-                    check(localSettings.threadMode)
-                },
+                onDismissed = { check(localSettings.threadMode) },
             ).show()
         }
     }
