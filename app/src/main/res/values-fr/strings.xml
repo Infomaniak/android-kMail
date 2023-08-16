@@ -28,7 +28,7 @@
     <string name="actionMarkAsUnread">Marquer comme non lu</string>
     <string name="actionMove">Déplacer</string>
     <string name="actionMoveToInbox">Déplacer vers la boîte de réception</string>
-    <string name="actionNonSpam">Signaler comme non spam</string>
+    <string name="actionNonSpam">Signaler comme légitime</string>
     <string name="actionOpenIn">Ouvrir dans</string>
     <string name="actionPhishing">Signaler comme hameçonnage</string>
     <string name="actionPostpone">Reporter</string>

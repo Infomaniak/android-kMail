@@ -19,12 +19,10 @@ package com.infomaniak.mail.ui.main.thread.actions
 
 import android.os.Bundle
 import android.view.View
-import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.isNightModeEnabled
-import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_DELETE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_FAVORITE_NAME
@@ -35,7 +33,6 @@ import com.infomaniak.mail.MatomoMail.ACTION_POSTPONE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_PRINT_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_REPLY_ALL_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_REPLY_NAME
-import com.infomaniak.mail.MatomoMail.ACTION_SPAM_NAME
 import com.infomaniak.mail.MatomoMail.trackBottomSheetMessageActionsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder.FolderRole
@@ -58,9 +55,8 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
             setMarkAsReadUi(isSeen)
             setFavoriteUi(isFavorite)
-            setSpamUi()
 
-            if (requireContext().isNightModeEnabled() && isOpenedFromThreadFragment) {
+            if (requireContext().isNightModeEnabled()) {
                 binding.lightTheme.apply {
                     isVisible = true
                     setText(if (isThemeTheSame) R.string.actionViewInLight else R.string.actionViewInDark)
@@ -137,18 +133,9 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     mainViewModel.toggleMessageFavoriteStatus(threadUid, message)
                 }
 
-                override fun onSpam() = with(mainViewModel) {
-                    trackBottomSheetMessageActionsEvent(ACTION_SPAM_NAME, isCurrentFolderRole(FolderRole.SPAM))
-                    toggleMessageSpamStatus(threadUid, message)
-                }
+                override fun onUnspam() = Unit
 
-                override fun onReportJunk() {
-                    safeNavigate(
-                        resId = R.id.junkBottomSheetDialog,
-                        args = JunkBottomSheetDialogArgs(threadUid, messageUid).toBundle(),
-                        currentClassName = currentClassName,
-                    )
-                }
+                override fun onReportJunk() = Unit
 
                 override fun onPrint() {
                     trackBottomSheetMessageActionsEvent(ACTION_PRINT_NAME)
@@ -160,16 +147,6 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 }
                 //endregion
             })
-        }
-    }
-
-    private fun setSpamUi() = with(binding) {
-        if (mainViewModel.isCurrentFolderRole(FolderRole.SPAM)) {
-            reportJunk.isGone = true
-            spam.apply {
-                isVisible = true
-                setText(R.string.actionNonSpam)
-            }
         }
     }
 }

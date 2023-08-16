@@ -24,6 +24,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_DELETE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_FAVORITE_NAME
@@ -62,7 +63,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         }
 
         binding.postpone.isGone = true
-        setSpamUi()
+        setJunkUi()
 
         threadActionsViewModel.getThreadAndMessageUidToReplyTo(
             threadUid,
@@ -146,12 +147,18 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     mainViewModel.toggleThreadFavoriteStatus(threadUid)
                 }
 
-                override fun onSpam() = with(mainViewModel) {
-                    trackBottomSheetThreadActionsEvent(ACTION_SPAM_NAME, isCurrentFolderRole(FolderRole.SPAM))
-                    toggleThreadSpamStatus(threadUid)
+                override fun onUnspam() {
+                    trackBottomSheetThreadActionsEvent(ACTION_SPAM_NAME, value = true)
+                    mainViewModel.toggleThreadSpamStatus(threadUid)
                 }
 
-                override fun onReportJunk() = Unit
+                override fun onReportJunk() {
+                    safeNavigate(
+                        resId = R.id.junkBottomSheetDialog,
+                        args = JunkBottomSheetDialogArgs(threadUid, messageUidToReply).toBundle(),
+                        currentClassName = currentClassName,
+                    )
+                }
 
                 override fun onPrint() {
                     trackBottomSheetThreadActionsEvent(ACTION_PRINT_NAME)
@@ -166,11 +173,12 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         }
     }
 
-    private fun setSpamUi() = with(binding) {
-        reportJunk.isGone = true
-        spam.apply {
-            isVisible = true
-            setText(if (mainViewModel.isCurrentFolderRole(FolderRole.SPAM)) R.string.actionNonSpam else R.string.actionSpam)
+    private fun setJunkUi() = with(binding) {
+        val isInSpam = mainViewModel.isCurrentFolderRole(FolderRole.SPAM)
+        unspam.isVisible = isInSpam
+        reportJunk.apply {
+            isGone = isInSpam
+            setText(if (isInSpam) R.string.actionNonSpam else R.string.actionReportJunk)
         }
     }
 }

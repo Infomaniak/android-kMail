@@ -42,9 +42,6 @@
             android:id="@+id/action_threadListFragment_to_threadActionsBottomSheetDialog"
             app:destination="@id/threadActionsBottomSheetDialog" />
         <action
-            android:id="@+id/action_threadListFragment_to_messageActionsBottomSheetDialog"
-            app:destination="@id/messageActionsBottomSheetDialog" />
-        <action
             android:id="@+id/action_threadListFragment_to_moveFragment"
             app:destination="@id/moveFragment" />
         <action
@@ -234,10 +231,6 @@
             app:argType="boolean" />
         <argument
             android:name="shouldLoadDistantResources"
-            app:argType="boolean" />
-        <argument
-            android:name="isOpenedFromThreadFragment"
-            android:defaultValue="true"
             app:argType="boolean" />
     </dialog>
 
