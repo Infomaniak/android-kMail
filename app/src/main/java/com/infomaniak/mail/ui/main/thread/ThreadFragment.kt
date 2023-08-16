@@ -474,23 +474,21 @@ class ThreadFragment : Fragment() {
             val textTypeface = ResourcesCompat.getFont(context, R.font.external_tag_font)!!
             val textSize = resources.getDimensionPixelSize(R.dimen.externalTagTextSize).toFloat()
             setSpan(
-                /* what = */ RoundedBackgroundSpan(
+                RoundedBackgroundSpan(
                     backgroundColor = backgroundColor,
                     textColor = textColor,
                     textTypeface = textTypeface,
                     fontSize = textSize,
-                    radius = 8f,
-                    verticalOffset = 4f,
                 ),
-                /* start = */ startIndex,
-                /* end = */ endIndex,
-                /* flags = */ Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                startIndex,
+                endIndex,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
             )
 
             // TODO : Currently, the clickable zone extends beyond the span up to the edge of the textview. This is the same
             //  comportment that Gmail has. See if we can find a fix for this later
             setSpan(
-                /* what = */ object : ClickableSpan() {
+                object : ClickableSpan() {
                     override fun onClick(widget: View) {
                         val description = resources.getQuantityString(
                             R.plurals.externalDialogDescriptionExpeditor,
@@ -508,9 +506,9 @@ class ThreadFragment : Fragment() {
                         ).show()
                     }
                 },
-                /* start = */ startIndex,
-                /* end = */ endIndex,
-                /* flags = */ Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                startIndex,
+                endIndex,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
             )
         }
 

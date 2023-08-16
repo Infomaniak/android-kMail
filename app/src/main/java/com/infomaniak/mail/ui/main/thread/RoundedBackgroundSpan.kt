@@ -36,13 +36,10 @@ class RoundedBackgroundSpan(
     private val textColor: Int,
     private val textTypeface: Typeface,
     private val fontSize: Float,
-    private val padding: Int = 16,
-    private val radius: Float,
-    private val verticalOffset: Float,
 ) : ReplacementSpan(), LineHeightSpan {
     override fun getSize(paint: Paint, text: CharSequence?, start: Int, end: Int, fm: FontMetricsInt?): Int {
         paint.setGivenTextStyle()
-        return (padding + paint.measureText(text, start, end) + padding).toInt()
+        return (LEFT_MARGIN + PADDING + paint.measureText(text, start, end) + PADDING).toInt()
     }
 
     override fun draw(
@@ -60,22 +57,22 @@ class RoundedBackgroundSpan(
         val width = paint.measureText(text, start, end)
 
         val rect = RectF(
-            /* left = */ x,
-            /* top = */ top.toFloat() + verticalOffset,
-            /* right = */ x + width + 2 * padding,
-            /* bottom = */ bottom.toFloat() - verticalOffset
+            /* left = */ LEFT_MARGIN + x,
+            /* top = */ top.toFloat() + VERTICAL_OFFSET,
+            /* right = */ LEFT_MARGIN + x + width + 2 * PADDING,
+            /* bottom = */ bottom.toFloat() - VERTICAL_OFFSET
         )
 
         paint.color = backgroundColor
-        canvas.drawRoundRect(rect, radius, radius, paint)
+        canvas.drawRoundRect(rect, CORNER_RADIUS, CORNER_RADIUS, paint)
 
         paint.setGivenTextStyle()
         canvas.drawText(
             /* text = */ text,
             /* start = */ start,
             /* end = */ end,
-            /* x = */ x + padding,
-            /* y = */ y.toFloat() - verticalOffset,
+            /* x = */ LEFT_MARGIN + x + PADDING,
+            /* y = */ y.toFloat() - VERTICAL_OFFSET,
             /* paint = */ paint
         )
     }
@@ -89,4 +86,11 @@ class RoundedBackgroundSpan(
     }
 
     override fun chooseHeight(text: CharSequence?, start: Int, end: Int, spanstartv: Int, lineHeight: Int, fm: FontMetricsInt?) {}
+
+    private companion object {
+        const val LEFT_MARGIN = 4
+        const val PADDING = 16
+        const val VERTICAL_OFFSET = 4
+        const val CORNER_RADIUS = 6f
+    }
 }
