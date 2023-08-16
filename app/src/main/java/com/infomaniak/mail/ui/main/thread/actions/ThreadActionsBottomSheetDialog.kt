@@ -147,17 +147,17 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     mainViewModel.toggleThreadFavoriteStatus(threadUid)
                 }
 
-                override fun onUnspam() {
-                    trackBottomSheetThreadActionsEvent(ACTION_SPAM_NAME, value = true)
-                    mainViewModel.toggleThreadSpamStatus(threadUid)
-                }
-
-                override fun onReportJunk() {
-                    safeNavigate(
-                        resId = R.id.junkBottomSheetDialog,
-                        args = JunkBottomSheetDialogArgs(threadUid, messageUidToReply).toBundle(),
-                        currentClassName = currentClassName,
-                    )
+                override fun onReportJunk() = with(mainViewModel) {
+                    if (isCurrentFolderRole(FolderRole.SPAM)) {
+                        trackBottomSheetThreadActionsEvent(ACTION_SPAM_NAME, value = true)
+                        toggleThreadSpamStatus(threadUid)
+                    } else {
+                        safeNavigate(
+                            resId = R.id.junkBottomSheetDialog,
+                            args = JunkBottomSheetDialogArgs(threadUid, messageUidToReply).toBundle(),
+                            currentClassName = currentClassName,
+                        )
+                    }
                 }
 
                 override fun onPrint() {
@@ -173,13 +173,15 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         }
     }
 
-    private fun setJunkUi() = with(binding) {
-        junkLayout.isVisible = true
-        val isInSpam = mainViewModel.isCurrentFolderRole(FolderRole.SPAM)
-        unspam.isVisible = isInSpam
-        reportJunk.apply {
-            isGone = isInSpam
-            setText(if (isInSpam) R.string.actionNonSpam else R.string.actionReportJunk)
+    private fun setJunkUi() = binding.reportJunk.apply {
+        val (text, icon) = if (mainViewModel.isCurrentFolderRole(FolderRole.SPAM)) {
+            R.string.actionNonSpam to R.drawable.ic_drawer_inbox
+        } else {
+            R.string.actionReportJunk to R.drawable.ic_report_junk
         }
+
+        setText(text)
+        setIconResource(icon)
+        isVisible = true
     }
 }

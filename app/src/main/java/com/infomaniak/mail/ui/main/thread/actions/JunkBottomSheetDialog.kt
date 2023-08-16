@@ -53,8 +53,6 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private fun handleButtons(threadUid: String, message: Message) = with(navigationArgs) {
 
-        setSpamUi(message)
-
         binding.spam.setClosingOnClickListener {
             trackBottomSheetThreadActionsEvent(ACTION_SPAM_NAME, message.isSpam)
             mainViewModel.toggleThreadSpamStatus(threadUid)
@@ -73,9 +71,5 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
             trackBottomSheetThreadActionsEvent("blockUser")
             mainViewModel.blockUser(message)
         }
-    }
-
-    private fun setSpamUi(message: Message) {
-        binding.spam.setText(if (message.isSpam) R.string.actionNonSpam else R.string.actionSpam)
     }
 }

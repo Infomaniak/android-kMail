@@ -47,7 +47,6 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         override fun onMove() = Unit
         override fun onPostpone() = Unit
         override fun onFavorite() = Unit
-        override fun onUnspam() = Unit
         override fun onReportJunk() = Unit
         override fun onPrint() = Unit
         override fun onReportDisplayProblem() = Unit
@@ -68,7 +67,6 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         move.setClosingOnClickListener { onClickListener.onMove() }
         postpone.setClosingOnClickListener { onClickListener.onPostpone() }
         favorite.setClosingOnClickListener { onClickListener.onFavorite() }
-        unspam.setClosingOnClickListener { onClickListener.onUnspam() }
         reportJunk.setClosingOnClickListener { onClickListener.onReportJunk() }
         print.setClosingOnClickListener { onClickListener.onPrint() }
         reportDisplayProblem.setClosingOnClickListener { onClickListener.onReportDisplayProblem() }
@@ -122,7 +120,6 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         fun onMove()
         fun onPostpone()
         fun onFavorite()
-        fun onUnspam()
         fun onReportJunk()
         fun onPrint()
         fun onReportDisplayProblem()
