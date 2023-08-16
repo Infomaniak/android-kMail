@@ -504,9 +504,10 @@ class RefreshController @Inject constructor(private val localSettings: LocalSett
 
             folder.messages.add(remoteMessage)
 
-            val newThread = remoteMessage.toThread()
-            newThread.addFirstMessage(remoteMessage)
-            newThread.recomputeThread(realm = this)
+            val newThread = remoteMessage.toThread().apply {
+                addFirstMessage(remoteMessage)
+                recomputeThread(realm = this@createMessageModeThreads)
+            }
 
             ThreadController.upsertThread(newThread, realm = this).also {
                 folder.threads.add(it)
@@ -603,8 +604,9 @@ class RefreshController @Inject constructor(private val localSettings: LocalSett
 
         if (existingThreads.none { it.folderId == newMessage.folderId }) {
 
-            newThread = newMessage.toThread()
-            newThread.addFirstMessage(newMessage)
+            newThread = newMessage.toThread().apply {
+                addFirstMessage(newMessage)
+            }
 
             val referenceThread = getReferenceThread(existingThreads, idsOfFoldersWithIncompleteThreads)
             if (referenceThread != null) addPreviousMessagesToThread(scope, newThread, referenceThread)
