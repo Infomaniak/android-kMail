@@ -24,7 +24,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.infomaniak.mail.MainApplication
-import com.infomaniak.mail.PlayServicesUtils
+import com.infomaniak.mail.utils.PlayServicesUtils
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController

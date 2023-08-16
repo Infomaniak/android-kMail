@@ -54,6 +54,7 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ErrorCode
 import com.infomaniak.mail.utils.NotificationUtils.buildGeneralNotification
 import com.infomaniak.mail.utils.NotificationUtils.initNotificationChannel
+import com.infomaniak.mail.utils.PlayServicesUtils
 import com.infomaniak.mail.workers.SyncMailboxesWorker
 import dagger.hilt.android.HiltAndroidApp
 import io.sentry.SentryEvent

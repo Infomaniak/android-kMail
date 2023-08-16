@@ -22,7 +22,7 @@ import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.*
 import androidx.work.PeriodicWorkRequest.Companion.MIN_PERIODIC_INTERVAL_MILLIS
-import com.infomaniak.mail.PlayServicesUtils
+import com.infomaniak.mail.utils.PlayServicesUtils
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.di.IoDispatcher

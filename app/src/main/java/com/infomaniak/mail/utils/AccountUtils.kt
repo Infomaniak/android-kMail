@@ -26,7 +26,6 @@ import com.infomaniak.lib.core.auth.CredentialManager
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.room.UserDatabase
-import com.infomaniak.mail.PlayServicesUtils
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.appSettings.AppSettingsController

@@ -29,6 +29,7 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.firebase.RegisterUserDeviceWorker
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.PlayServicesUtils
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineDispatcher

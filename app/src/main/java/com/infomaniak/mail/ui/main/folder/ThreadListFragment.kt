@@ -55,7 +55,7 @@ import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.MatomoMail.trackThreadListEvent
-import com.infomaniak.mail.PlayServicesUtils
+import com.infomaniak.mail.utils.PlayServicesUtils
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.Companion.DEFAULT_SWIPE_ACTION_LEFT
