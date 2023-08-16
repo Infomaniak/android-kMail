@@ -368,16 +368,19 @@ class RefreshController @Inject constructor(private val localSettings: LocalSett
             writeBlocking {
                 findLatest(folder)?.let { latestFolder ->
                     val allImpactedThreads = if (localSettings.threadMode == ThreadMode.MESSAGE) {
-                        createMessageModeThreads(scope, latestFolder, messages)
+                        createMessageModeThreads(scope, latestFolder, messages).also {
+                            FolderController.refreshUnreadCount(folder.id, mailbox.objectId, realm = this)
+                        }
+
                     } else {
-                        createConversationModeThreads(scope, latestFolder, messages)
+                        createConversationModeThreads(scope, latestFolder, messages).also { threads ->
+                            val impactedFoldersIds = (threads.map { it.folderId }.toSet()) + folder.id
+                            impactedFoldersIds.forEach { folderId ->
+                                FolderController.refreshUnreadCount(folderId, mailbox.objectId, realm = this)
+                            }
+                        }
                     }
                     Log.d("Realm", "Saved Messages: ${latestFolder.name} | ${latestFolder.messages.count()}")
-
-                    val impactedFoldersIds = (allImpactedThreads.map { it.folderId }.toSet()) + folder.id
-                    impactedFoldersIds.forEach { folderId ->
-                        FolderController.refreshUnreadCount(folderId, mailbox.objectId, realm = this)
-                    }
 
                     impactedThreads += allImpactedThreads.filter { it.folderId == folder.id }
                 }
