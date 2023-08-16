@@ -63,7 +63,7 @@ class ThreadModeSettingFragment : Fragment() {
                 description = getString(R.string.settingsThreadModeWarningDescription),
                 onPositiveButtonClicked = {
                     localSettings.threadMode = threadMode
-                    threadModeSettingViewModel.dropAllMailboxesContent()
+                    threadModeSettingViewModel.dropAllMailboxesContentThenReloadApp()
                 },
                 onDismissed = { check(localSettings.threadMode) },
             ).show()

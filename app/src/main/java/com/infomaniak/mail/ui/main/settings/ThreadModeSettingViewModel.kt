@@ -33,7 +33,7 @@ class ThreadModeSettingViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
-    fun dropAllMailboxesContent() = viewModelScope.launch(ioDispatcher) {
+    fun dropAllMailboxesContentThenReloadApp() = viewModelScope.launch(ioDispatcher) {
 
         RealmDatabase.closeMailboxContent()
 
