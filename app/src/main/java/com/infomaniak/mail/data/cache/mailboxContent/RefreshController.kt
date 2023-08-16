@@ -45,9 +45,7 @@ import javax.inject.Singleton
 import kotlin.math.max
 
 @Singleton
-class RefreshController @Inject constructor(
-    private val localSettings: LocalSettings,
-) {
+class RefreshController @Inject constructor(private val localSettings: LocalSettings) {
 
     private var refreshThreadsJob: Job? = null
 
