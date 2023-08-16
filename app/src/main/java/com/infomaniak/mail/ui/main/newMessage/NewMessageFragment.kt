@@ -206,7 +206,7 @@ class NewMessageFragment : Fragment() {
                 hideLoader()
                 showKeyboardInCorrectView()
                 populateViewModelWithExternalMailData()
-                populateUiWithViewModel()
+                populateUiWithViewModel(draftMode == DraftMode.REPLY || draftMode == DraftMode.REPLY_ALL)
                 setupFromField(signatures)
             } else {
                 requireActivity().apply {
@@ -342,13 +342,14 @@ class NewMessageFragment : Fragment() {
         newMessageViewModel.isAutoCompletionOpened = isAutoCompletionOpened
     }
 
-    private fun populateUiWithViewModel() = with(binding) {
+    private fun populateUiWithViewModel(shouldWarnForExternalContacts: Boolean) = with(binding) {
         val draft = newMessageViewModel.draft
 
         val ccAndBccFieldsAreEmpty = draft.cc.isEmpty() && draft.bcc.isEmpty()
-        toField.initRecipients(draft.to, ccAndBccFieldsAreEmpty)
-        ccField.initRecipients(draft.cc)
-        bccField.initRecipients(draft.bcc)
+        val mergedContactMap = newMessageViewModel.mergedContacts.value?.second ?: emptyMap()
+        toField.initRecipients(draft.to, shouldWarnForExternalContacts, mergedContactMap, ccAndBccFieldsAreEmpty)
+        ccField.initRecipients(draft.cc, shouldWarnForExternalContacts, mergedContactMap)
+        bccField.initRecipients(draft.bcc, shouldWarnForExternalContacts, mergedContactMap)
 
         newMessageViewModel.updateIsSendingAllowed()
 

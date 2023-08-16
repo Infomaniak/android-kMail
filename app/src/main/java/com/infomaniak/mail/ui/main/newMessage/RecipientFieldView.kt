@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.newMessage
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.drawable.InsetDrawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -32,6 +33,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
+import com.google.android.material.chip.Chip
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.hideKeyboard
 import com.infomaniak.lib.core.utils.showKeyboard
@@ -278,7 +280,9 @@ class RecipientFieldView @JvmOverloads constructor(
 
         singleChip.root.apply {
             isGone = isTextInputAccessible
-            text = contactChipAdapter.getRecipients().firstOrNull()?.getNameOrEmail() ?: ""
+            val styledRecipient = contactChipAdapter.getRecipients().firstOrNull()
+            text = styledRecipient?.getNameOrEmail() ?: ""
+            setChipStyle(styledRecipient?.displayAsExternal == true)
         }
         plusChip.apply {
             isGone = !isCollapsed || contactChipAdapter.itemCount <= 1
@@ -314,7 +318,7 @@ class RecipientFieldView @JvmOverloads constructor(
         val recipient = Recipient().initLocalValues(email, name)
         val recipientIsNew = contactAdapter.addUsedContact(email)
         if (recipientIsNew) {
-            contactChipAdapter.addChip(recipient)
+            contactChipAdapter.addChip(StyledRecipient(recipient, false))
             onContactAdded?.invoke(recipient)
             clearField()
         }
@@ -370,10 +374,17 @@ class RecipientFieldView @JvmOverloads constructor(
         binding.textInput.setText("")
     }
 
-    fun initRecipients(initialRecipients: List<Recipient>, otherFieldsAreAllEmpty: Boolean = true) {
+    fun initRecipients(
+        initialRecipients: List<Recipient>,
+        shouldWarnForExternalContacts: Boolean,
+        mergedContactMap: Map<String, Map<String, MergedContact>>,
+        otherFieldsAreAllEmpty: Boolean = true,
+    ) {
 
         initialRecipients.forEach {
-            if (contactChipAdapter.addChip(it)) contactAdapter.addUsedContact(it.email)
+            val shouldDisplayAsExternal = shouldWarnForExternalContacts && it.email !in mergedContactMap
+            val styledRecipient = StyledRecipient(it, shouldDisplayAsExternal)
+            if (contactChipAdapter.addChip(styledRecipient)) contactAdapter.addUsedContact(it.email)
         }
 
         updateCollapsedChipValues(isSelfCollapsed)
@@ -403,8 +414,31 @@ class RecipientFieldView @JvmOverloads constructor(
 
     private fun shouldDisplayChevron(): Boolean = canCollapseEverything && otherFieldsAreAllEmpty
 
-    private companion object {
-        const val MAX_WIDTH_PERCENTAGE = 0.8
-        const val MAX_ALLOWED_RECIPIENT = 99
+    companion object {
+        private const val MAX_WIDTH_PERCENTAGE = 0.8
+        private const val MAX_ALLOWED_RECIPIENT = 99
+        private const val EXTERNAL_CHIP_STROKE_WIDTH = 1
+        private const val NO_STROKE = 0f
+
+        fun Chip.setChipStyle(displayAsExternal: Boolean) {
+            if (displayAsExternal) {
+                chipBackgroundColor = context.getColorStateList(R.color.chip_contact_background_color_external)
+                setTextColor(context.getColorStateList(R.color.chip_contact_text_color_external))
+                chipStrokeColor = ColorStateList.valueOf(context.getColor(R.color.externalTagBackground))
+                chipStrokeWidth = EXTERNAL_CHIP_STROKE_WIDTH.toPx().toFloat()
+            } else {
+                chipBackgroundColor = context.getColorStateList(R.color.chip_contact_background_color)
+                setTextColor(context.getColorStateList(R.color.chip_contact_text_color))
+                chipStrokeColor = null
+                chipStrokeWidth = NO_STROKE
+            }
+        }
+    }
+
+    class StyledRecipient(recipient: Recipient, val displayAsExternal: Boolean) : Recipient() {
+        init {
+            name = recipient.name
+            email = recipient.email
+        }
     }
 }

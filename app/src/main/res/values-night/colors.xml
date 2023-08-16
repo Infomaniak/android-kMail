@@ -74,6 +74,9 @@
     <!-- Progressbar -->
     <color name="progressbarTrackColor">@color/orca</color>
 
+    <!-- External tag -->
+    <color name="externalChipBackground">@color/orca</color>
+
     <!-- Swipe actions -->
     <color name="swipeDelete">@color/redDestructiveAction</color>
     <color name="swipeMove">@color/fougere_dark</color>

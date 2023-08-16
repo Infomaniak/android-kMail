@@ -140,6 +140,7 @@
     <!-- External tag -->
     <color name="externalTagBackground">@color/swipeFavorite</color>
     <color name="externalTagOnBackground">@color/orca</color>
+    <color name="externalChipBackground">@color/polar_bear</color>
 
     <!-- Swipe actions -->
     <color name="swipeDelete">@color/redDestructiveAction</color>

@@ -22,12 +22,16 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ChipContactBinding
+import com.infomaniak.mail.ui.main.newMessage.RecipientFieldView.Companion.setChipStyle
+import com.infomaniak.mail.ui.main.newMessage.RecipientFieldView.StyledRecipient
+
 
 class ContactChipAdapter(
     val openContextMenu: (Recipient, BackspaceAwareChip) -> Unit,
     val onBackspace: (Recipient) -> Unit,
 ) : RecyclerView.Adapter<ContactChipAdapter.ContactChipViewHolder>() {
-    private val recipients = mutableSetOf<Recipient>()
+
+    private val recipients = mutableSetOf<StyledRecipient>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactChipViewHolder {
         return ContactChipViewHolder(ChipContactBinding.inflate(LayoutInflater.from(parent.context), parent, false))
@@ -39,6 +43,7 @@ class ContactChipAdapter(
             text = recipient.getNameOrEmail()
             setOnClickListener { openContextMenu(recipient, root) }
             setOnBackspaceListener { onBackspace(recipient) }
+            setChipStyle(recipient.displayAsExternal)
         }
     }
 
@@ -48,7 +53,7 @@ class ContactChipAdapter(
 
     fun getRecipients() = recipients
 
-    fun addChip(recipient: Recipient): Boolean {
+    fun addChip(recipient: StyledRecipient): Boolean {
         return recipients.add(recipient).also { addedSuccessfully ->
             if (addedSuccessfully) notifyItemInserted(itemCount - 1)
         }

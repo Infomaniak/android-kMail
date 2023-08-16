@@ -60,7 +60,6 @@ import com.infomaniak.mail.data.LocalSettings.ExternalContent
 import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder.FolderRole
-import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
@@ -443,20 +442,6 @@ class ThreadFragment : Fragment() {
         isFavorite = thread.isFavorite
     }
 
-    private fun Recipient.isExternal(): Boolean {
-        val emailDictionary = mainViewModel.mergedContacts.value ?: run {
-            // TODO : Sentry could not check if recipient isExternal because no merged contacts
-            emptyMap()
-        }
-
-        val isUnknownContact = email !in emailDictionary
-        val isMailerDaemon = """mailer-daemon@(?:.+\.)?infomaniak\.ch""".toRegex(RegexOption.IGNORE_CASE).matches(email)
-        val trustedDomains = listOf("@infomaniak.com", "@infomaniak.event", "@swisstransfer.com")
-        val isUntrustedDomain = email.isEmail() && trustedDomains.none { email.endsWith(it) }
-
-        return isUnknownContact && !isMailerDaemon && isUntrustedDomain
-    }
-
     private fun FragmentThreadBinding.computeSubject(thread: Thread): Pair<String, CharSequence> {
         val subject = context.formatSubject(thread.subject)
         val (externalRecipientEmail, externalRecipientQuantity) = findExternalRecipients(thread)
@@ -525,7 +510,12 @@ class ThreadFragment : Fragment() {
         run outerloop@{
             thread.messages.forEach { message ->
                 message.from.forEach { recipient ->
-                    if (recipient.isExternal()) {
+                    val emailDictionary = mainViewModel.mergedContacts.value ?: run {
+                        // TODO : Sentry could not check if recipient isExternal because no merged contacts
+                        emptyMap()
+                    }
+
+                    if (recipient.isExternal(emailDictionary)) {
                         if (externalRecipientQuantity++ == 0) {
                             externalRecipientEmail = recipient.email
                         } else {
