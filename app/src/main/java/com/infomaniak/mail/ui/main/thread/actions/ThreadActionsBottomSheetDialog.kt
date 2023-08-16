@@ -174,6 +174,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     }
 
     private fun setJunkUi() = with(binding) {
+        junkLayout.isVisible = true
         val isInSpam = mainViewModel.isCurrentFolderRole(FolderRole.SPAM)
         unspam.isVisible = isInSpam
         reportJunk.apply {

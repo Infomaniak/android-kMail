@@ -75,15 +75,18 @@
                 app:visibleDivider="false" />
 
             <FrameLayout
+                android:id="@+id/junkLayout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:visibility="visible">
 
                 <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
                     android:id="@+id/unspam"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:visibility="gone"
-                    app:icon="@drawable/ic_non_spam"
+                    app:icon="@drawable/ic_drawer_inbox"
                     app:text="@string/actionNonSpam"
                     app:visibleDivider="false" />
 
