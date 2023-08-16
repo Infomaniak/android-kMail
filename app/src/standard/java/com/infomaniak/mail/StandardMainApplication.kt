@@ -19,7 +19,6 @@ package com.infomaniak.mail
 
 import androidx.lifecycle.LifecycleOwner
 import com.infomaniak.mail.data.models.AppSettings
-import com.infomaniak.mail.firebase.RegisterUserDeviceWorker
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.workers.BaseProcessMessageNotificationsWorker
 
@@ -38,7 +37,7 @@ class StandardMainApplication : MainApplication() {
     private fun registerUserDeviceIfNeeded() {
         val areGooglePlayServicesAvailable = !playServicesUtils.areGooglePlayServicesNotAvailable()
         if (AccountUtils.currentUserId != AppSettings.DEFAULT_ID && areGooglePlayServicesAvailable && localSettings.firebaseToken != null) {
-            RegisterUserDeviceWorker.scheduleWork(context = this)
+            registerUserDeviceWorkerScheduler.scheduleWork()
         }
     }
 }
