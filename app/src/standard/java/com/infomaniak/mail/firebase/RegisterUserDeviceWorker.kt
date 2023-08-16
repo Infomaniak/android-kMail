@@ -33,6 +33,8 @@ import io.sentry.Sentry
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @HiltWorker
 class RegisterUserDeviceWorker @AssistedInject constructor(
@@ -72,9 +74,8 @@ class RegisterUserDeviceWorker @AssistedInject constructor(
         Result.success()
     }
 
-    companion object {
-        private const val TAG = "RegisterUserDeviceWorker"
-        private const val INITIAL_DELAY = 15L // 15s
+    @Singleton
+    class Scheduler @Inject constructor(private val workManager: WorkManager) {
 
         /**
          * Schedule RegisterUserDeviceWorker
@@ -82,11 +83,8 @@ class RegisterUserDeviceWorker @AssistedInject constructor(
          * To avoid problems with the refreshToken at login time, we delay the register by [INITIAL_DELAY].
          * For future launches, we'll reset the register to the same duration, as this method is also used in the [com.infomaniak.mail.MainApplication].
          * so when the app is relaunched several times, only the last relaunch is taken into account.
-         *
-         * @param context The Application context
          */
-        // TODO: (Hilt) - Need refactor
-        fun scheduleWork(context: Context) {
+        fun scheduleWork() {
             Log.i(TAG, "work scheduled")
 
             val workRequest = OneTimeWorkRequestBuilder<RegisterUserDeviceWorker>()
@@ -94,7 +92,12 @@ class RegisterUserDeviceWorker @AssistedInject constructor(
                 .setInitialDelay(INITIAL_DELAY, TimeUnit.SECONDS)
                 .build()
 
-            WorkManager.getInstance(context).enqueueUniqueWork(TAG, ExistingWorkPolicy.REPLACE, workRequest)
+            workManager.enqueueUniqueWork(TAG, ExistingWorkPolicy.REPLACE, workRequest)
         }
+    }
+
+    companion object {
+        private const val TAG = "RegisterUserDeviceWorker"
+        private const val INITIAL_DELAY = 15L // 15s
     }
 }
