@@ -45,6 +45,8 @@ class Mailbox : RealmObject {
     var isLimited: Boolean = false
     @SerialName("is_password_valid")
     var isPasswordValid: Boolean = true
+    @SerialName("is_primary")
+    var isPrimary: Boolean = false
     @SerialName("is_locked")
     var isLocked: Boolean = false
     @SerialName("unseen_messages")
