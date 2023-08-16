@@ -41,6 +41,7 @@ import javax.inject.Singleton
 class StandardPlayServicesUtils @Inject constructor(
     private val appContext: Context,
     private val localSettings: LocalSettings,
+    private val registerUserDeviceWorkerScheduler: RegisterUserDeviceWorker.Scheduler,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : PlayServicesUtils {
 
@@ -92,7 +93,7 @@ class StandardPlayServicesUtils @Inject constructor(
             if (token != localSettings.firebaseToken) localSettings.clearRegisteredFirebaseUsers()
 
             localSettings.firebaseToken = token
-            RegisterUserDeviceWorker.scheduleWork(this@checkFirebaseRegistration)
+            registerUserDeviceWorkerScheduler.scheduleWork()
         }
     }
 }
