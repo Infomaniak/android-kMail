@@ -486,12 +486,17 @@ class RefreshController @Inject constructor(private val localSettings: LocalSett
     ): Set<Thread> {
 
         val threadsToUpsert = mutableSetOf<Thread>()
+        val existingMessages = folder.messages.associateByTo(mutableMapOf()) { it.uid }
 
         remoteMessages.forEach { remoteMessage ->
             scope.ensureActive()
 
-            val isMessageAlreadyAdded = folder.messages.firstOrNull { it == remoteMessage && !it.isOrphan() } != null
-            if (isMessageAlreadyAdded) {
+            // Get updated version of existing Message
+            val existingMessage = existingMessages[remoteMessage.uid]?.let {
+                if (it.isManaged()) it else MessageController.getMessage(it.uid, realm = this)
+            }
+            // Send Sentry and leave if needed
+            if (existingMessage != null && !existingMessage.isOrphan()) {
                 SentryDebug.sendAlreadyExistingMessage(folder, remoteMessage, localSettings.threadMode)
                 return@forEach
             }
@@ -505,7 +510,7 @@ class RefreshController @Inject constructor(private val localSettings: LocalSett
                 draftLocalUuid = null,
             )
 
-            folder.messages.add(remoteMessage)
+            if (existingMessage == null) folder.messages.add(remoteMessage)
 
             val newThread = remoteMessage.toThread()
             newThread.recomputeThread(realm = this)
@@ -514,6 +519,8 @@ class RefreshController @Inject constructor(private val localSettings: LocalSett
                 folder.threads.add(it)
                 threadsToUpsert += it.copyFromRealm(1u)
             }
+
+            existingMessages[remoteMessage.uid] = remoteMessage
         }
 
         return threadsToUpsert
@@ -527,12 +534,17 @@ class RefreshController @Inject constructor(private val localSettings: LocalSett
 
         val idsOfFoldersWithIncompleteThreads = FolderController.getIdsOfFoldersWithIncompleteThreads(realm = this)
         val threadsToUpsert = mutableMapOf<String, Thread>()
+        val existingMessages = folder.messages.associateByTo(mutableMapOf()) { it.uid }
 
         remoteMessages.forEach { remoteMessage ->
             scope.ensureActive()
 
-            val isMessageAlreadyAdded = folder.messages.firstOrNull { it == remoteMessage && !it.isOrphan() } != null
-            if (isMessageAlreadyAdded) {
+            // Get updated version of existing Message
+            val existingMessage = existingMessages[remoteMessage.uid]?.let {
+                if (it.isManaged()) it else MessageController.getMessage(it.uid, realm = this)
+            }
+            // Send Sentry and leave if needed
+            if (existingMessage != null && !existingMessage.isOrphan()) {
                 SentryDebug.sendAlreadyExistingMessage(folder, remoteMessage, localSettings.threadMode)
                 return@forEach
             }
@@ -546,7 +558,7 @@ class RefreshController @Inject constructor(private val localSettings: LocalSett
                 draftLocalUuid = null,
             )
 
-            folder.messages.add(remoteMessage)
+            if (existingMessage == null) folder.messages.add(remoteMessage)
 
             val existingThreads = ThreadController.getThreads(remoteMessage.messageIds, realm = this).toList()
 
@@ -581,6 +593,8 @@ class RefreshController @Inject constructor(private val localSettings: LocalSett
 
                 threadsToUpsert[thread.uid] = ThreadController.upsertThread(thread, realm = this)
             }
+
+            existingMessages[remoteMessage.uid] = remoteMessage
         }
 
         val allImpactedThreads = mutableSetOf<Thread>()
