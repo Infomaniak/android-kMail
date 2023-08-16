@@ -276,6 +276,8 @@ class Message : RealmObject {
     fun toThread() = Thread().apply {
         uid = this@Message.uid
         folderId = this@Message.folderId
+        messagesIds += this@Message.messageIds
+        messages += this@Message
     }
 
     fun isOrphan(): Boolean = threads.isEmpty() && threadsDuplicatedIn.isEmpty()

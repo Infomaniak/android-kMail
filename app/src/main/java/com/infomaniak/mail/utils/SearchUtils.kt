@@ -26,7 +26,6 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.di.IoDispatcher
-import io.realm.kotlin.ext.toRealmList
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -91,7 +90,6 @@ class SearchUtils @Inject constructor(
             return map { message ->
                 message.toThread().apply {
                     uid = "search-${message.uid}"
-                    messages = listOf(message).toRealmList()
                     isFromSearch = true
                     recomputeThread()
                 }
