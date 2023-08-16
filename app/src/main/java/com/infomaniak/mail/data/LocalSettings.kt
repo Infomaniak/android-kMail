@@ -232,9 +232,9 @@ class LocalSettings private constructor(context: Context) {
         get() = getEnum(EXTERNAL_CONTENT_KEY, DEFAULT_EXTERNAL_CONTENT)
         set(value) = putEnum(EXTERNAL_CONTENT_KEY, value)
 
-    enum class ExternalContent(val apiCallValue: String, @StringRes val localisedNameRes: Int) {
-        ALWAYS("true", R.string.settingsOptionAlways),
-        ASK_ME("false", R.string.settingsOptionAskMe),
+    enum class ExternalContent(val apiCallValue: String, @StringRes val localisedNameRes: Int, val matomoValue: String) {
+        ALWAYS("true", R.string.settingsOptionAlways, "always"),
+        ASK_ME("false", R.string.settingsOptionAskMe, "askMe"),
     }
     //endregion
 
