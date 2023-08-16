@@ -96,6 +96,9 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
     lateinit var workManager: WorkManager // Only used in the standard flavor
 
     @Inject
+    lateinit var playServicesUtils: PlayServicesUtils
+
+    @Inject
     @IoDispatcher
     lateinit var ioDispatcher: CoroutineDispatcher
 
@@ -225,7 +228,7 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
             CoroutineScope(mainDispatcher).launch { showToast(notificationText) }
         }
 
-        CoroutineScope(ioDispatcher).launch { AccountUtils.removeUser(this@MainApplication, user) }
+        CoroutineScope(ioDispatcher).launch { AccountUtils.removeUser(this@MainApplication, user, playServicesUtils) }
     }
 
     private fun tokenInterceptorListener() = object : TokenInterceptorListener {

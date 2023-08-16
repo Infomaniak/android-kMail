@@ -30,6 +30,7 @@ import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.MatomoMail.ADD_MAILBOX_NAME
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
+import com.infomaniak.mail.PlayServicesUtils
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentAccountBinding
 import com.infomaniak.mail.di.IoDispatcher
@@ -62,6 +63,9 @@ class AccountFragment : Fragment(), MailboxListFragment {
         onLockedMailboxClicked = { mailboxEmail -> onLockedMailboxClicked(mailboxEmail) },
         onInvalidPasswordMailboxClicked = { mailbox -> onInvalidPasswordMailboxClicked(mailbox) },
     )
+
+    @Inject
+    lateinit var playServicesUtils: PlayServicesUtils
 
     @Inject
     @IoDispatcher
@@ -105,7 +109,7 @@ class AccountFragment : Fragment(), MailboxListFragment {
 
     private fun removeCurrentUser() = lifecycleScope.launch(ioDispatcher) {
         requireContext().trackAccountEvent("logOutConfirm")
-        AccountUtils.removeUser(requireContext(), AccountUtils.currentUser!!)
+        AccountUtils.removeUser(requireContext(), AccountUtils.currentUser!!, playServicesUtils)
     }
 
     private fun observeAccountsLive() {
