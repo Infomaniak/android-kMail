@@ -77,7 +77,7 @@ class RefreshController @Inject constructor(private val localSettings: LocalSett
         }.getOrElse {
             // If fetching the activities failed because of a not found Message, we should pause briefly
             // before trying again to retrieve activities, to ensure that the API is up-to-date.
-            if (it is ApiErrorException && it.errorCode == ErrorCode.MESSAGE_NOT_FOUND && isFirstTime) {
+            if (isFirstTime && it is ApiErrorException && it.errorCode == ErrorCode.MESSAGE_NOT_FOUND) {
                 Sentry.captureException(it)
                 refreshWithRunCatching(job, isFirstTime = false)
             } else {
