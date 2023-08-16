@@ -17,8 +17,16 @@
  */
 package com.infomaniak.mail
 
-import android.content.Context
-import androidx.fragment.app.FragmentActivity
-import com.infomaniak.mail.GplayUtils
+import com.infomaniak.mail.utils.PlayServicesUtils
+import dagger.Binds
+import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 
-class FdroidGplayUtils : GplayUtils
+@Module
+@InstallIn(SingletonComponent::class)
+interface FdroidModule {
+
+    @Binds
+    fun bindPlayServicesUtils(impl: FdroidPlayServicesUtils): PlayServicesUtils
+}
