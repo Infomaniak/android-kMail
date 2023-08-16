@@ -43,10 +43,10 @@ import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.Utils.toEnumOrThrow
 import com.infomaniak.lib.stores.checkUpdateIsAvailable
 import com.infomaniak.mail.BuildConfig
-import com.infomaniak.mail.GplayUtils.checkPlayServices
 import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
+import com.infomaniak.mail.utils.PlayServicesUtils
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.*
 import com.infomaniak.mail.databinding.ActivityMainBinding
@@ -94,6 +94,9 @@ class MainActivity : BaseActivity() {
 
     @Inject
     lateinit var draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler
+
+    @Inject
+    lateinit var playServicesUtils: PlayServicesUtils
 
     private val drawerListener = object : DrawerLayout.DrawerListener {
 
@@ -256,7 +259,7 @@ class MainActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
-        checkPlayServices()
+        playServicesUtils.checkPlayServices(this)
 
         if (binding.drawerLayout.isOpen) colorSystemBarsWithMenuDrawer()
     }

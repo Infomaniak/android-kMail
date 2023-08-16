@@ -54,6 +54,7 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ErrorCode
 import com.infomaniak.mail.utils.NotificationUtils.buildGeneralNotification
 import com.infomaniak.mail.utils.NotificationUtils.initNotificationChannel
+import com.infomaniak.mail.utils.PlayServicesUtils
 import com.infomaniak.mail.workers.SyncMailboxesWorker
 import dagger.hilt.android.HiltAndroidApp
 import io.sentry.SentryEvent
@@ -94,6 +95,9 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
 
     @Inject
     lateinit var workManager: WorkManager // Only used in the standard flavor
+
+    @Inject
+    lateinit var playServicesUtils: PlayServicesUtils
 
     @Inject
     @IoDispatcher
@@ -225,7 +229,7 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
             CoroutineScope(mainDispatcher).launch { showToast(notificationText) }
         }
 
-        CoroutineScope(ioDispatcher).launch { AccountUtils.removeUser(this@MainApplication, user) }
+        CoroutineScope(ioDispatcher).launch { AccountUtils.removeUser(this@MainApplication, user, playServicesUtils) }
     }
 
     private fun tokenInterceptorListener() = object : TokenInterceptorListener {

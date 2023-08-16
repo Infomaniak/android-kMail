@@ -18,7 +18,6 @@
 package com.infomaniak.mail
 
 import androidx.lifecycle.LifecycleOwner
-import com.infomaniak.mail.GplayUtils.areGooglePlayServicesNotAvailable
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.firebase.RegisterUserDeviceWorker
 import com.infomaniak.mail.utils.AccountUtils
@@ -37,7 +36,8 @@ class StandardMainApplication : MainApplication() {
     }
 
     private fun registerUserDeviceIfNeeded() {
-        if (AccountUtils.currentUserId != AppSettings.DEFAULT_ID && !areGooglePlayServicesNotAvailable() && localSettings.firebaseToken != null) {
+        val areGooglePlayServicesAvailable = !playServicesUtils.areGooglePlayServicesNotAvailable()
+        if (AccountUtils.currentUserId != AppSettings.DEFAULT_ID && areGooglePlayServicesAvailable && localSettings.firebaseToken != null) {
             RegisterUserDeviceWorker.scheduleWork(context = this)
         }
     }

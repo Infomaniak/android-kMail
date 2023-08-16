@@ -26,7 +26,6 @@ import com.infomaniak.lib.core.auth.CredentialManager
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.room.UserDatabase
-import com.infomaniak.mail.GplayUtils
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.appSettings.AppSettingsController
@@ -91,7 +90,7 @@ object AccountUtils : CredentialManager() {
         userDatabase.userDao().insert(user)
     }
 
-    suspend fun removeUser(context: Context, user: User) {
+    suspend fun removeUser(context: Context, user: User, playServicesUtils: PlayServicesUtils) {
 
         fun logoutUserToken() {
             CoroutineScope(Dispatchers.IO).launch {
@@ -113,7 +112,7 @@ object AccountUtils : CredentialManager() {
         if (user.id == currentUserId) {
             if (getAllUsersCount() == 0) {
                 resetSettings(context, localSettings)
-                GplayUtils.deleteFirebaseToken()
+                playServicesUtils.deleteFirebaseToken()
             }
             reloadApp?.invoke()
         }

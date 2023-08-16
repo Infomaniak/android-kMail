@@ -23,8 +23,8 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import com.infomaniak.mail.GplayUtils
 import com.infomaniak.mail.MainApplication
+import com.infomaniak.mail.utils.PlayServicesUtils
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
@@ -46,6 +46,9 @@ class KMailFirebaseMessagingService : FirebaseMessagingService() {
     lateinit var notificationManagerCompat: NotificationManagerCompat
 
     @Inject
+    lateinit var playServicesUtils: PlayServicesUtils
+
+    @Inject
     lateinit var processMessageNotificationsScheduler: ProcessMessageNotificationsWorker.Scheduler
 
     override fun onNewToken(token: String) {
@@ -61,7 +64,7 @@ class KMailFirebaseMessagingService : FirebaseMessagingService() {
         Log.i(TAG, "onMessageReceived: ${message.data}")
 
         if (AccountUtils.currentUserId == AppSettings.DEFAULT_ID) {
-            GplayUtils.deleteFirebaseToken()
+            playServicesUtils.deleteFirebaseToken()
             return
         }
 

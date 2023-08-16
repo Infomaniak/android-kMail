@@ -17,14 +17,16 @@
  */
 package com.infomaniak.mail
 
-import android.content.Context
-import androidx.fragment.app.FragmentActivity
+import com.infomaniak.mail.utils.PlayServicesUtils
+import dagger.Binds
+import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 
-object GplayUtils {
+@Module
+@InstallIn(SingletonComponent::class)
+interface FdroidModule {
 
-    fun FragmentActivity.checkPlayServices() = Unit
-
-    fun Context.areGooglePlayServicesNotAvailable(): Boolean = true
-
-    fun deleteFirebaseToken() = Unit
+    @Binds
+    fun bindPlayServicesUtils(impl: FdroidPlayServicesUtils): PlayServicesUtils
 }
