@@ -714,8 +714,8 @@ class MainViewModel @Inject constructor(
     //endregion
 
     //region Spam
-    fun toggleMessageSpamStatus(threadUid: String, message: Message, displaySnackbar: Boolean = true) {
-        toggleThreadsOrMessageSpamStatus(threadsUids = listOf(threadUid), message = message, displaySnackbar = displaySnackbar)
+    private fun toggleMessageSpamStatus(threadUid: String, message: Message) {
+        toggleThreadsOrMessageSpamStatus(threadsUids = listOf(threadUid), message = message, displaySnackbar = false)
     }
 
     fun toggleThreadSpamStatus(threadUid: String) {
@@ -751,9 +751,7 @@ class MainViewModel @Inject constructor(
             )
         }
 
-        if (displaySnackbar) {
-            showMoveSnackbar(threads, message, messages, apiResponse, destinationFolder)
-        }
+        if (displaySnackbar) showMoveSnackbar(threads, message, messages, apiResponse, destinationFolder)
     }
 
     private fun getMessagesToSpamOrHam(threads: List<Thread>, message: Message?) = when (message) {
@@ -769,7 +767,7 @@ class MainViewModel @Inject constructor(
         val apiResponse = ApiRepository.reportPhishing(mailboxUuid, message.folderId, message.shortUid)
 
         val snackbarTitle = if (apiResponse.isSuccess()) {
-            if (!isCurrentFolderRole(FolderRole.SPAM)) toggleMessageSpamStatus(threadUid, message, displaySnackbar = false)
+            if (!isCurrentFolderRole(FolderRole.SPAM)) toggleMessageSpamStatus(threadUid, message)
             R.string.snackbarReportPhishingConfirmation
         } else {
             RCore.string.anErrorHasOccurred

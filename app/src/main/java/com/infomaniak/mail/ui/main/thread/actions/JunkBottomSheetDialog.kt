@@ -51,14 +51,14 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
         }
     }
 
-    private fun handleButtons(threadUid: String, message: Message) = with(navigationArgs) {
+    private fun handleButtons(threadUid: String, message: Message) = with(binding) {
 
-        binding.spam.setClosingOnClickListener {
+        spam.setClosingOnClickListener {
             trackBottomSheetThreadActionsEvent(ACTION_SPAM_NAME, message.isSpam)
             mainViewModel.toggleThreadSpamStatus(threadUid)
         }
 
-        binding.phishing.setClosingOnClickListener {
+        phishing.setClosingOnClickListener {
             trackBottomSheetThreadActionsEvent("signalPhishing")
             createDescriptionDialog(
                 title = getString(R.string.reportPhishingTitle),
@@ -67,7 +67,7 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
             ).show()
         }
 
-        binding.blockSender.setClosingOnClickListener {
+        blockSender.setClosingOnClickListener {
             trackBottomSheetThreadActionsEvent("blockUser")
             mainViewModel.blockUser(message)
         }
