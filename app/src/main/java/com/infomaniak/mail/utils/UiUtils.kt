@@ -30,6 +30,10 @@ import androidx.core.graphics.toColorInt
 import androidx.core.view.isGone
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.Correspondent
+import com.infomaniak.mail.data.models.correspondent.MergedContact
+import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.data.models.draft.Draft
+import com.infomaniak.mail.data.models.thread.Thread
 
 object UiUtils {
 
@@ -130,4 +134,55 @@ object UiUtils {
     }
 
     fun dividerDrawable(context: Context) = AppCompatResources.getDrawable(context, R.drawable.divider)
+
+    /**
+     * Only returns a quantity of at most 2, used to differentiate between the singular or plural form of the dialog messages
+     */
+    fun findExternalRecipientsInThread(
+        thread: Thread,
+        emailDictionary: Map<String, Map<String, MergedContact>>,
+    ): Pair<String?, Int> {
+        var externalRecipientEmail: String? = null
+        var externalRecipientQuantity = 0
+
+        thread.messages.forEach { message ->
+            val (singleEmail, quantityForThisMessage) = findExternalRecipientInIterables(emailDictionary, message.from)
+
+            externalRecipientQuantity += quantityForThisMessage
+            if (externalRecipientQuantity > 1) return null to 2
+
+            if (quantityForThisMessage == 1) externalRecipientEmail = singleEmail
+        }
+
+        return externalRecipientEmail to externalRecipientQuantity
+    }
+
+    fun findExternalRecipientInDraft(draft: Draft, emailDictionary: Map<String, Map<String, MergedContact>>): Pair<String?, Int> {
+        return findExternalRecipientInIterables(emailDictionary, draft.to, draft.cc, draft.bcc)
+    }
+
+    /**
+     * Only returns a quantity of at most 2, used to differentiate between the singular or plural form of the dialog messages
+     */
+    private fun findExternalRecipientInIterables(
+        emailDictionary: Map<String, Map<String, MergedContact>>,
+        vararg recipientLists: Iterable<Recipient>,
+    ): Pair<String?, Int> {
+        var externalRecipientEmail: String? = null
+        var externalRecipientQuantity = 0
+
+        recipientLists.forEach { recipientList ->
+            recipientList.forEach { recipient ->
+                if (recipient.isExternal(emailDictionary)) {
+                    if (externalRecipientQuantity++ == 0) {
+                        externalRecipientEmail = recipient.email
+                    } else {
+                        return null to 2
+                    }
+                }
+            }
+        }
+
+        return externalRecipientEmail to externalRecipientQuantity
+    }
 }

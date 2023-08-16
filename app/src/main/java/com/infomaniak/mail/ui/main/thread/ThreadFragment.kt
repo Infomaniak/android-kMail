@@ -444,7 +444,12 @@ class ThreadFragment : Fragment() {
 
     private fun FragmentThreadBinding.computeSubject(thread: Thread): Pair<String, CharSequence> {
         val subject = context.formatSubject(thread.subject)
-        val (externalRecipientEmail, externalRecipientQuantity) = findExternalRecipients(thread)
+
+        val emailDictionary = mainViewModel.mergedContacts.value ?: run {
+            // TODO : Sentry could not check if recipient isExternal because no merged contacts
+            emptyMap()
+        }
+        val (externalRecipientEmail, externalRecipientQuantity) = UiUtils.findExternalRecipientsInThread(thread, emailDictionary)
         if (externalRecipientQuantity == 0) return subject to subject
 
         val externalPostfix = getString(R.string.externalTag)
@@ -498,35 +503,6 @@ class ThreadFragment : Fragment() {
         }
 
         return subject to spannedSubject
-    }
-
-    /**
-     * Only returns a quantity of at most 2, used to differentiate between the singular or plural form of the dialog message
-     */
-    private fun findExternalRecipients(thread: Thread): Pair<String?, Int> {
-        var externalRecipientEmail: String? = null
-        var externalRecipientQuantity = 0
-
-        run outerloop@{
-            thread.messages.forEach { message ->
-                message.from.forEach { recipient ->
-                    val emailDictionary = mainViewModel.mergedContacts.value ?: run {
-                        // TODO : Sentry could not check if recipient isExternal because no merged contacts
-                        emptyMap()
-                    }
-
-                    if (recipient.isExternal(emailDictionary)) {
-                        if (externalRecipientQuantity++ == 0) {
-                            externalRecipientEmail = recipient.email
-                        } else {
-                            return@outerloop
-                        }
-                    }
-                }
-            }
-        }
-
-        return Pair(externalRecipientEmail, externalRecipientQuantity)
     }
 
     private fun onMessagesUpdate(messages: List<Message>) {

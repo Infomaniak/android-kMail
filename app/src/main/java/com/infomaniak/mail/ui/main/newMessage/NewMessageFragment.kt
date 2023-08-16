@@ -351,6 +351,11 @@ class NewMessageFragment : Fragment() {
         ccField.initRecipients(draft.cc, shouldWarnForExternalContacts, mergedContactMap)
         bccField.initRecipients(draft.bcc, shouldWarnForExternalContacts, mergedContactMap)
 
+        if (shouldWarnForExternalContacts) {
+            val (externalRecipientEmail, externalRecipientQuantity) = UiUtils.findExternalRecipientInDraft(draft, mergedContactMap)
+            // TODO : show bottom bar
+        }
+
         newMessageViewModel.updateIsSendingAllowed()
 
         subjectTextField.setText(draft.subject)
