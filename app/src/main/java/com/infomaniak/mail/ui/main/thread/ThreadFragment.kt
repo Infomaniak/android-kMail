@@ -208,17 +208,13 @@ class ThreadFragment : Fragment() {
                     )
                 }
                 R.id.quickActionMenu -> {
-                    if (threadAdapter.messages.count() == 1) {
-                        threadAdapter.messages.single().navigateToActionsBottomSheet()
-                    } else {
-                        safeNavigate(
-                            ThreadFragmentDirections.actionThreadFragmentToThreadActionsBottomSheetDialog(
-                                threadUid = navigationArgs.threadUid,
-                                messageUidToReplyTo = lastMessageToReplyTo.uid,
-                                shouldLoadDistantResources = shouldLoadDistantResources(lastMessageToReplyTo.uid),
-                            )
+                    safeNavigate(
+                        ThreadFragmentDirections.actionThreadFragmentToThreadActionsBottomSheetDialog(
+                            threadUid = navigationArgs.threadUid,
+                            messageUidToReplyTo = lastMessageToReplyTo.uid,
+                            shouldLoadDistantResources = shouldLoadDistantResources(lastMessageToReplyTo.uid),
                         )
-                    }
+                    )
                 }
             }
         }

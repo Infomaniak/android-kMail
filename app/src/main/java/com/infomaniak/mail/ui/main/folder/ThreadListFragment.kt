@@ -379,19 +379,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 false
             }
             SwipeAction.QUICKACTIONS_MENU -> {
-                singleMessage?.let { message ->
-                    safeNavigate(
-                        ThreadListFragmentDirections.actionThreadListFragmentToMessageActionsBottomSheetDialog(
-                            messageUid = message.uid,
-                            threadUid = threadUid,
-                            isFavorite = message.isFavorite,
-                            isSeen = message.isSeen,
-                            isThemeTheSame = true,
-                            shouldLoadDistantResources = false,
-                            isOpenedFromThreadFragment = false,
-                        )
-                    )
-                } ?: safeNavigate(
+                safeNavigate(
                     ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(
                         threadUid = threadUid,
                         shouldLoadDistantResources = false,
