@@ -325,10 +325,10 @@
     <string name="settingsOptionAlways">Siempre</string>
     <string name="settingsOptionAskMe">Pregúntame</string>
     <string name="settingsOptionDarkTheme">Oscuro</string>
-    <string name="settingsOptionDiscussions">Debates</string>
     <string name="settingsOptionLightTheme">Luz</string>
-    <string name="settingsOptionMessages">Mensajes</string>
     <string name="settingsOptionSystemTheme">Sistema</string>
+    <string name="settingsOptionThreadModeConversation">Debates</string>
+    <string name="settingsOptionThreadModeMessage">Mensajes</string>
     <string name="settingsPrivacyDeleteSearchHistory">Eliminar el historial de búsqueda</string>
     <string name="settingsPrivacyViewLogs">Ver registros</string>
     <string name="settingsSectionAppearance">Apariencia</string>
@@ -359,6 +359,9 @@
     <string name="settingsTheme">Tema</string>
     <string name="settingsThemeChoiceTitle">Elección del tema</string>
     <string name="settingsThreadListDensityTitle">Densidad de la lista de hilos</string>
+    <string name="settingsThreadModeTitle">Modo de visualización de mensajes</string>
+    <string name="settingsThreadModeWarningDescription">Ten en cuenta que al cambiar esta opción se descargarán de nuevo todos tus mensajes</string>
+    <string name="settingsThreadModeWarningTitle">¿Cambiar al modo %s?</string>
     <string name="settingsTitle">Ajustes</string>
     <string name="settingsTransferAsAttachment">Como anexo</string>
     <string name="settingsTransferEmailsDescription">Cuando reenvíe un correo electrónico, elija el modo de visualización que más le convenga</string>

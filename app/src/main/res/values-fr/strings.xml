@@ -331,10 +331,10 @@
     <string name="settingsOptionAlways">Toujours</string>
     <string name="settingsOptionAskMe">Me demander</string>
     <string name="settingsOptionDarkTheme">Sombre</string>
-    <string name="settingsOptionDiscussions">Discussions</string>
     <string name="settingsOptionLightTheme">Clair</string>
-    <string name="settingsOptionMessages">Messages</string>
     <string name="settingsOptionSystemTheme">Système</string>
+    <string name="settingsOptionThreadModeConversation">Discussions</string>
+    <string name="settingsOptionThreadModeMessage">Messages</string>
     <string name="settingsPrivacyDeleteSearchHistory">Effacer l’historique des recherches</string>
     <string name="settingsPrivacyViewLogs">Consulter les logs</string>
     <string name="settingsSectionAppearance">Apparence</string>
@@ -365,6 +365,9 @@
     <string name="settingsTheme">Thème</string>
     <string name="settingsThemeChoiceTitle">Choix du thème</string>
     <string name="settingsThreadListDensityTitle">Densité de la liste de conversation</string>
+    <string name="settingsThreadModeTitle">Mode d’affichage des messages</string>
+    <string name="settingsThreadModeWarningDescription">Attention, modifier cette option va télécharger à nouveau tous vos messages</string>
+    <string name="settingsThreadModeWarningTitle">Passer en mode %s ?</string>
     <string name="settingsTitle">Paramètres</string>
     <string name="settingsTransferAsAttachment">En pièce jointe</string>
     <string name="settingsTransferEmailsDescription">Lorsque vous transférez un mail, choisissez le mode d’affichage qui vous convient le mieux</string>

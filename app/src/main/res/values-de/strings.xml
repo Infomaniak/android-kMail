@@ -325,10 +325,10 @@
     <string name="settingsOptionAlways">Immer</string>
     <string name="settingsOptionAskMe">Fragen Sie mich</string>
     <string name="settingsOptionDarkTheme">Dunkel</string>
-    <string name="settingsOptionDiscussions">Diskussionen</string>
     <string name="settingsOptionLightTheme">Hell</string>
-    <string name="settingsOptionMessages">Nachrichten</string>
     <string name="settingsOptionSystemTheme">System</string>
+    <string name="settingsOptionThreadModeConversation">Diskussionen</string>
+    <string name="settingsOptionThreadModeMessage">Nachrichten</string>
     <string name="settingsPrivacyDeleteSearchHistory">Suchverlauf löschen</string>
     <string name="settingsPrivacyViewLogs">Protokolle ansehen</string>
     <string name="settingsSectionAppearance">Erscheinungsbild</string>
@@ -359,6 +359,9 @@
     <string name="settingsTheme">Thema</string>
     <string name="settingsThemeChoiceTitle">Wahl des Themas</string>
     <string name="settingsThreadListDensityTitle">Dichte der Fadenliste</string>
+    <string name="settingsThreadModeTitle">Modus der Nachrichtenanzeige</string>
+    <string name="settingsThreadModeWarningDescription">Achtung: Wenn Sie diese Option ändern, werden alle Ihre Nachrichten erneut heruntergeladen</string>
+    <string name="settingsThreadModeWarningTitle">In den Modus %s wechseln?</string>
     <string name="settingsTitle">Einstellungen</string>
     <string name="settingsTransferAsAttachment">Als Anhang</string>
     <string name="settingsTransferEmailsDescription">Wenn Sie eine E-Mail weiterleiten, wählen Sie den Anzeigemodus, der Ihnen am besten gefällt</string>

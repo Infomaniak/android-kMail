@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak ikMail - Android
-  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~ Copyright (C) 2022-2023 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -20,8 +20,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:title="@string/settingsTransferEmailsTitle"
-    tools:context=".ui.main.settings.send.ForwardMailsSettingFragment">
+    app:title="@string/settingsThreadModeTitle"
+    tools:context=".ui.main.settings.ThreadModeSettingFragment">
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -34,7 +34,7 @@
 
             <TextView
                 style="@style/SettingHeader"
-                android:text="@string/settingsTransferEmailsDescription" />
+                android:text="@string/settingsSelectDisplayModeDescription" />
 
             <com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
                 android:id="@+id/radioGroup"
@@ -42,16 +42,18 @@
                 android:layout_height="wrap_content">
 
                 <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
-                    android:id="@+id/inBody"
+                    android:id="@+id/conversationMode"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:text="@string/settingsTransferInBody" />
+                    app:icon="@drawable/ic_thread_mode_conversation"
+                    app:text="@string/settingsOptionThreadModeConversation" />
 
                 <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
-                    android:id="@+id/asAttachment"
+                    android:id="@+id/messageMode"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:text="@string/settingsTransferAsAttachment" />
+                    app:icon="@drawable/ic_thread_mode_message"
+                    app:text="@string/settingsOptionThreadModeMessage" />
 
             </com.infomaniak.mail.ui.main.settings.SettingRadioGroupView>
         </LinearLayout>

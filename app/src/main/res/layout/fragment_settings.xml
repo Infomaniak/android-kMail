@@ -115,6 +115,14 @@
                 app:title="@string/settingsSwipeActionsTitle" />
 
             <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                android:id="@+id/settingsThreadMode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:itemAction="chevron"
+                app:title="@string/settingsThreadModeTitle"
+                tools:subtitle="@string/settingsOptionThreadModeConversation" />
+
+            <com.infomaniak.mail.ui.main.settings.ItemSettingView
                 android:id="@+id/settingsExternalContent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

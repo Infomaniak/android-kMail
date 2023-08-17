@@ -34,7 +34,6 @@
 
             <TextView
                 style="@style/SettingHeader"
-                android:layout_marginTop="@dimen/marginStandardMedium"
                 android:text="@string/settingsCancellationPeriodDescription" />
 
             <com.infomaniak.mail.ui.main.settings.SettingRadioGroupView

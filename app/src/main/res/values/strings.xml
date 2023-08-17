@@ -332,10 +332,10 @@
     <string name="settingsOptionAlways">Always</string>
     <string name="settingsOptionAskMe">Ask me</string>
     <string name="settingsOptionDarkTheme">Dark</string>
-    <string name="settingsOptionDiscussions">Discussions</string>
     <string name="settingsOptionLightTheme">Light</string>
-    <string name="settingsOptionMessages">Messages</string>
     <string name="settingsOptionSystemTheme">System</string>
+    <string name="settingsOptionThreadModeConversation">Discussions</string>
+    <string name="settingsOptionThreadModeMessage">Messages</string>
     <string name="settingsPrivacyDeleteSearchHistory">Delete search history</string>
     <string name="settingsPrivacyViewLogs">View logs</string>
     <string name="settingsSectionAppearance">Appearance</string>
@@ -366,6 +366,9 @@
     <string name="settingsTheme">Theme</string>
     <string name="settingsThemeChoiceTitle">Theme choice</string>
     <string name="settingsThreadListDensityTitle">Thread list density</string>
+    <string name="settingsThreadModeTitle">Message display mode</string>
+    <string name="settingsThreadModeWarningDescription">Please note that changing this option will download all your messages again</string>
+    <string name="settingsThreadModeWarningTitle">Switch to %s mode?</string>
     <string name="settingsTitle">Settings</string>
     <string name="settingsTransferAsAttachment">As an attachment</string>
     <string name="settingsTransferEmailsDescription">When forwarding an email, choose the display mode that suits you best</string>

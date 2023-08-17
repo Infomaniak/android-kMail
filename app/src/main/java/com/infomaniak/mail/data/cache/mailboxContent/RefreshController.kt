@@ -18,6 +18,8 @@
 package com.infomaniak.mail.data.cache.mailboxContent
 
 import android.util.Log
+import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode.*
 import com.infomaniak.mail.data.models.Folder
@@ -43,7 +45,7 @@ import javax.inject.Singleton
 import kotlin.math.max
 
 @Singleton
-class RefreshController @Inject constructor() {
+class RefreshController @Inject constructor(private val localSettings: LocalSettings) {
 
     private var refreshThreadsJob: Job? = null
 
@@ -75,7 +77,7 @@ class RefreshController @Inject constructor() {
         }.getOrElse {
             // If fetching the activities failed because of a not found Message, we should pause briefly
             // before trying again to retrieve activities, to ensure that the API is up-to-date.
-            if (it is ApiErrorException && it.errorCode == ErrorCode.MESSAGE_NOT_FOUND && isFirstTime) {
+            if (isFirstTime && it is ApiErrorException && it.errorCode == ErrorCode.MESSAGE_NOT_FOUND) {
                 Sentry.captureException(it)
                 refreshWithRunCatching(job, isFirstTime = false)
             } else {
@@ -365,13 +367,20 @@ class RefreshController @Inject constructor() {
 
             writeBlocking {
                 findLatest(folder)?.let { latestFolder ->
-                    val allImpactedThreads = createMultiMessagesThreads(scope, latestFolder, messages)
-                    Log.d("Realm", "Saved Messages: ${latestFolder.name} | ${latestFolder.messages.count()}")
+                    val allImpactedThreads = if (localSettings.threadMode == ThreadMode.MESSAGE) {
+                        createMessageModeThreads(scope, latestFolder, messages).also {
+                            FolderController.refreshUnreadCount(folder.id, mailbox.objectId, realm = this)
+                        }
 
-                    val impactedFoldersIds = (allImpactedThreads.map { it.folderId }.toSet()) + folder.id
-                    impactedFoldersIds.forEach { folderId ->
-                        FolderController.refreshUnreadCount(folderId, mailbox.objectId, realm = this)
+                    } else {
+                        createConversationModeThreads(scope, latestFolder, messages).also { threads ->
+                            val impactedFoldersIds = (threads.map { it.folderId }.toSet()) + folder.id
+                            impactedFoldersIds.forEach { folderId ->
+                                FolderController.refreshUnreadCount(folderId, mailbox.objectId, realm = this)
+                            }
+                        }
                     }
+                    Log.d("Realm", "Saved Messages: ${latestFolder.name} | ${latestFolder.messages.count()}")
 
                     impactedThreads += allImpactedThreads.filter { it.folderId == folder.id }
                 }
@@ -470,7 +479,47 @@ class RefreshController @Inject constructor() {
     //endregion
 
     //region Create Threads
-    private fun MutableRealm.createMultiMessagesThreads(
+    private fun MutableRealm.createMessageModeThreads(
+        scope: CoroutineScope,
+        folder: Folder,
+        remoteMessages: List<Message>,
+    ): Set<Thread> {
+
+        val threadsToUpsert = mutableSetOf<Thread>()
+
+        remoteMessages.forEach { remoteMessage ->
+            scope.ensureActive()
+
+            val isMessageAlreadyAdded = folder.messages.firstOrNull { it == remoteMessage && !it.isOrphan() } != null
+            if (isMessageAlreadyAdded) {
+                SentryDebug.sendAlreadyExistingMessage(folder, remoteMessage, localSettings.threadMode)
+                return@forEach
+            }
+
+            remoteMessage.initLocalValues(
+                date = remoteMessage.date,
+                isFullyDownloaded = false,
+                isSpam = folder.role == FolderRole.SPAM,
+                isTrashed = folder.role == FolderRole.TRASH,
+                isFromSearch = false,
+                draftLocalUuid = null,
+            )
+
+            folder.messages.add(remoteMessage)
+
+            val newThread = remoteMessage.toThread()
+            newThread.recomputeThread(realm = this)
+
+            ThreadController.upsertThread(newThread, realm = this).also {
+                folder.threads.add(it)
+                threadsToUpsert += it.copyFromRealm(1u)
+            }
+        }
+
+        return threadsToUpsert
+    }
+
+    private fun MutableRealm.createConversationModeThreads(
         scope: CoroutineScope,
         folder: Folder,
         remoteMessages: List<Message>,
@@ -484,7 +533,7 @@ class RefreshController @Inject constructor() {
 
             val isMessageAlreadyAdded = folder.messages.firstOrNull { it == remoteMessage && !it.isOrphan() } != null
             if (isMessageAlreadyAdded) {
-                SentryDebug.sendAlreadyExistingMessage(folder, remoteMessage)
+                SentryDebug.sendAlreadyExistingMessage(folder, remoteMessage, localSettings.threadMode)
                 return@forEach
             }
 
@@ -557,7 +606,6 @@ class RefreshController @Inject constructor() {
         if (existingThreads.none { it.folderId == newMessage.folderId }) {
 
             newThread = newMessage.toThread()
-            newThread.addFirstMessage(newMessage)
 
             val referenceThread = getReferenceThread(existingThreads, idsOfFoldersWithIncompleteThreads)
             if (referenceThread != null) addPreviousMessagesToThread(scope, newThread, referenceThread)

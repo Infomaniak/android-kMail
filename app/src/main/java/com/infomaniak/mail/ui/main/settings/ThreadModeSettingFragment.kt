@@ -22,42 +22,53 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.LocalSettings.ExternalContent
-import com.infomaniak.mail.data.LocalSettings.ExternalContent.ALWAYS
-import com.infomaniak.mail.data.LocalSettings.ExternalContent.ASK_ME
-import com.infomaniak.mail.databinding.FragmentExternalContentSettingBinding
+import com.infomaniak.mail.data.LocalSettings.ThreadMode
+import com.infomaniak.mail.data.LocalSettings.ThreadMode.CONVERSATION
+import com.infomaniak.mail.data.LocalSettings.ThreadMode.MESSAGE
+import com.infomaniak.mail.databinding.FragmentThreadModeSettingBinding
+import com.infomaniak.mail.utils.createDescriptionDialog
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ExternalContentSettingFragment : Fragment() {
-
-    private lateinit var binding: FragmentExternalContentSettingBinding
+class ThreadModeSettingFragment : Fragment() {
 
     @Inject
     lateinit var localSettings: LocalSettings
 
+    private lateinit var binding: FragmentThreadModeSettingBinding
+    private val threadModeSettingViewModel: ThreadModeSettingViewModel by viewModels()
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return FragmentExternalContentSettingBinding.inflate(inflater, container, false).also { binding = it }.root
+        return FragmentThreadModeSettingBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding.radioGroup) {
         super.onViewCreated(view, savedInstanceState)
 
         initBijectionTable(
-            R.id.always to ALWAYS,
-            R.id.askMe to ASK_ME,
+            R.id.conversationMode to CONVERSATION,
+            R.id.messageMode to MESSAGE,
         )
 
-        check(localSettings.externalContent)
+        check(localSettings.threadMode)
 
         onItemCheckedListener { _, _, enum ->
-            val externalContent = enum as ExternalContent
-            trackEvent("settingsExternalContent", externalContent.matomoValue)
-            localSettings.externalContent = externalContent
+            val threadMode = enum as ThreadMode
+            createDescriptionDialog(
+                title = getString(R.string.settingsThreadModeWarningTitle, getString(threadMode.localisedNameRes)),
+                description = getString(R.string.settingsThreadModeWarningDescription),
+                onPositiveButtonClicked = {
+                    trackEvent("settingsThreadMode", threadMode.matomoValue)
+                    localSettings.threadMode = threadMode
+                    threadModeSettingViewModel.dropAllMailboxesContentThenReloadApp()
+                },
+                onDismissed = { check(localSettings.threadMode) },
+            ).show()
         }
     }
 }

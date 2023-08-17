@@ -216,14 +216,25 @@ class LocalSettings private constructor(context: Context) {
     }
     //endregion
 
+    //region Thread mode
+    var threadMode: ThreadMode
+        get() = getEnum(THREAD_MODE_KEY, DEFAULT_THREAD_MODE)
+        set(value) = putEnum(THREAD_MODE_KEY, value)
+
+    enum class ThreadMode(@StringRes val localisedNameRes: Int, val matomoValue: String) {
+        CONVERSATION(R.string.settingsOptionThreadModeConversation, "conversation"),
+        MESSAGE(R.string.settingsOptionThreadModeMessage, "message"),
+    }
+    //endregion
+
     //region External content
     var externalContent: ExternalContent
         get() = getEnum(EXTERNAL_CONTENT_KEY, DEFAULT_EXTERNAL_CONTENT)
         set(value) = putEnum(EXTERNAL_CONTENT_KEY, value)
 
-    enum class ExternalContent(val apiCallValue: String, @StringRes val localisedNameRes: Int) {
-        ALWAYS("true", R.string.settingsOptionAlways),
-        ASK_ME("false", R.string.settingsOptionAskMe),
+    enum class ExternalContent(val apiCallValue: String, @StringRes val localisedNameRes: Int, val matomoValue: String) {
+        ALWAYS("true", R.string.settingsOptionAlways, "always"),
+        ASK_ME("false", R.string.settingsOptionAskMe, "askMe"),
     }
     //endregion
 
@@ -287,6 +298,7 @@ class LocalSettings private constructor(context: Context) {
         private val INITIAL_SWIPE_ACTION = SwipeAction.TUTORIAL
         val DEFAULT_SWIPE_ACTION_RIGHT = SwipeAction.READ_UNREAD
         val DEFAULT_SWIPE_ACTION_LEFT = SwipeAction.DELETE
+        private val DEFAULT_THREAD_MODE = ThreadMode.CONVERSATION
         private val DEFAULT_EXTERNAL_CONTENT = ExternalContent.ALWAYS
         private const val DEFAULT_RECENT_SEARCHES = "[]"
         private val DEFAULT_FIREBASE_TOKEN = null
@@ -308,6 +320,7 @@ class LocalSettings private constructor(context: Context) {
         private const val ACCENT_COLOR_KEY = "accentColorKey"
         private const val SWIPE_RIGHT_KEY = "swipeRightKey"
         private const val SWIPE_LEFT_KEY = "swipeLeftKey"
+        private const val THREAD_MODE_KEY = "threadModeKey"
         private const val EXTERNAL_CONTENT_KEY = "externalContentKey"
         private const val RECENT_SEARCHES_KEY = "recentSearchesKey"
         private const val FIREBASE_TOKEN_KEY = "firebaseTokenKey"

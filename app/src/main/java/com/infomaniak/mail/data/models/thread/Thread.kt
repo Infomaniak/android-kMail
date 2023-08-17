@@ -109,11 +109,6 @@ class Thread : RealmObject {
 
     val isOnlyOneDraft get() = isOnlyOneMessage && hasDrafts
 
-    fun addFirstMessage(message: Message) {
-        messagesIds += message.messageIds
-        messages.add(message)
-    }
-
     fun addMessageWithConditions(newMessage: Message, folderRole: FolderRole?) {
 
         val shouldAddMessage = when (folderRole) {

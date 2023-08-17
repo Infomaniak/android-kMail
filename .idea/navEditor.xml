@@ -200,6 +200,18 @@
                       </LayoutPositions>
                     </value>
                   </entry>
+                  <entry key="displayModeSettingFragment">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="12" />
+                            <option name="y" value="12" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
                   <entry key="downloadAttachmentProgressDialog">
                     <value>
                       <LayoutPositions>
@@ -405,18 +417,6 @@
                       </LayoutPositions>
                     </value>
                   </entry>
-                  <entry key="newAccountFragment">
-                    <value>
-                      <LayoutPositions>
-                        <option name="myPosition">
-                          <Point>
-                            <option name="x" value="270" />
-                            <option name="y" value="-2130" />
-                          </Point>
-                        </option>
-                      </LayoutPositions>
-                    </value>
-                  </entry>
                   <entry key="newMessageActivity">
                     <value>
                       <LayoutPositions>
@@ -526,6 +526,11 @@
                         <option name="myPositions">
                           <map>
                             <entry key="action_settings_to_accentColorSetting">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                            <entry key="action_settings_to_displayModeSetting">
                               <value>
                                 <LayoutPositions />
                               </value>
@@ -693,7 +698,7 @@
                                 <LayoutPositions />
                               </value>
                             </entry>
-                            <entry key="action_threadFragment_to_messageActionBottomSheetDialog">
+                            <entry key="action_threadFragment_to_messageActionsBottomSheetDialog">
                               <value>
                                 <LayoutPositions />
                               </value>

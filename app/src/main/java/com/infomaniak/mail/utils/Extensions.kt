@@ -364,13 +364,23 @@ fun Fragment.createDescriptionDialog(
     description: CharSequence,
     @StringRes confirmButtonText: Int = R.string.buttonConfirm,
     onPositiveButtonClicked: () -> Unit,
-) = requireActivity().createDescriptionDialog(title, description, confirmButtonText, onPositiveButtonClicked)
+    onDismissed: (() -> Unit)? = null,
+): AlertDialog {
+    return requireActivity().createDescriptionDialog(
+        title,
+        description,
+        confirmButtonText,
+        onPositiveButtonClicked,
+        onDismissed,
+    )
+}
 
 fun Activity.createDescriptionDialog(
     title: String,
     description: CharSequence,
     @StringRes confirmButtonText: Int = R.string.buttonConfirm,
     onPositiveButtonClicked: () -> Unit,
+    onDismissed: (() -> Unit)? = null,
 ) = with(DialogDescriptionBinding.inflate(layoutInflater)) {
 
     dialogTitle.text = title
@@ -380,6 +390,7 @@ fun Activity.createDescriptionDialog(
         .setView(root)
         .setPositiveButton(confirmButtonText) { _, _ -> onPositiveButtonClicked() }
         .setNegativeButton(RCore.string.buttonCancel, null)
+        .setOnDismissListener { onDismissed?.invoke() }
         .create()
 }
 

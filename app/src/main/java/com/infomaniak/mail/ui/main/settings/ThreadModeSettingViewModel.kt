@@ -1,6 +1,6 @@
 /*
  * Infomaniak ikMail - Android
- * Copyright (C) 2023 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,17 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.user
+package com.infomaniak.mail.ui.main.settings
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.map
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.infomaniak.lib.core.models.user.User
-import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
-import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -34,22 +29,18 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SwitchUserViewModel @Inject constructor(
-    application: Application,
+class ThreadModeSettingViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-) : AndroidViewModel(application) {
+) : ViewModel() {
 
-    private inline val context get() = getApplication<Application>()
+    fun dropAllMailboxesContentThenReloadApp() = viewModelScope.launch(ioDispatcher) {
 
-    val allUsers = AccountUtils.getAllUsers().map { users -> users.sortedBy { it.displayName } }
+        RealmDatabase.closeMailboxContent()
 
-    fun switchAccount(user: User) = viewModelScope.launch(ioDispatcher) {
-        if (user.id != AccountUtils.currentUserId) {
-            context.trackAccountEvent("switch")
-            RealmDatabase.backUpPreviousRealms()
-            AccountUtils.currentUser = user
-            AccountUtils.currentMailboxId = MailboxController.getFirstValidMailbox(user.id)?.mailboxId ?: AppSettings.DEFAULT_ID
-            AccountUtils.reloadApp?.invoke()
+        MailboxController.getMailboxes().forEach { mailbox ->
+            RealmDatabase.deleteMailboxContent(mailbox.mailboxId, mailbox.userId)
         }
+
+        AccountUtils.reloadApp?.invoke()
     }
 }
