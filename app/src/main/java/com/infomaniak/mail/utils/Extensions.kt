@@ -70,6 +70,7 @@ import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.DialogDescriptionBinding
@@ -601,3 +602,24 @@ fun TextInputEditText.handleEditorSearchAction(searchCallback: (String) -> Unit)
 fun CharSequence.standardize(): String = toString().removeAccents().trim().lowercase()
 
 inline val AndroidViewModel.context: Context get() = getApplication()
+
+suspend fun Context.manageMailboxesEdgeCases(mailboxes: List<Mailbox>, playServicesUtils: PlayServicesUtils): Boolean {
+
+    val shouldStop = when {
+        mailboxes.isEmpty() -> {
+            AccountUtils.removeUser(this, AccountUtils.currentUser!!, playServicesUtils)
+            true
+        }
+        mailboxes.none { it.isValid } -> {
+            Dispatchers.Main { launchNoValidMailboxesActivity() }
+            true
+        }
+        mailboxes.none { it.mailboxId == AccountUtils.currentMailboxId } -> {
+            AccountUtils.reloadApp?.invoke()
+            true
+        }
+        else -> false
+    }
+
+    return shouldStop
+}

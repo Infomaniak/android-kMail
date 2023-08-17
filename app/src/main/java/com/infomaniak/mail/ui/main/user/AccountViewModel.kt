@@ -28,20 +28,16 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.mailbox.MailboxLinkedResult
 import com.infomaniak.mail.di.IoDispatcher
-import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.context
-import com.infomaniak.mail.utils.coroutineContext
-import com.infomaniak.mail.utils.launchNoValidMailboxesActivity
+import com.infomaniak.mail.utils.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class AccountViewModel @Inject constructor(
     application: Application,
+    private val playServicesUtils: PlayServicesUtils,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
@@ -53,23 +49,7 @@ class AccountViewModel @Inject constructor(
         val mailboxes = ApiRepository.getMailboxes(AccountUtils.getHttpClient(AccountUtils.currentUserId)).data ?: return false
         MailboxController.updateMailboxes(context, mailboxes)
 
-        val shouldStop = when {
-            mailboxes.isEmpty() -> {
-                shouldStartNoMailboxActivity.postValue(Unit)
-                true
-            }
-            mailboxes.none { it.isValid } -> {
-                Dispatchers.Main { context.launchNoValidMailboxesActivity() }
-                true
-            }
-            mailboxes.none { it.mailboxId == AccountUtils.currentMailboxId } -> {
-                AccountUtils.reloadApp?.invoke()
-                true
-            }
-            else -> false
-        }
-
-        return shouldStop
+        return context.manageMailboxesEdgeCases(mailboxes, playServicesUtils)
     }
 
     fun attachNewMailbox(
