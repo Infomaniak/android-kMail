@@ -495,7 +495,7 @@ class RefreshController @Inject constructor(private val localSettings: LocalSett
 
             val newThread = if (isConversationMode) {
 
-                // Other pre-existing Threads that will also require this Message and will furnish the prior Messages for this new Thread
+                // Other pre-existing Threads that will also require this Message and will provide the prior Messages for this new Thread
                 val existingThreads = ThreadController.getThreads(remoteMessage.messageIds, realm = this)
 
                 val thread = createNewThreadIfRequired(
