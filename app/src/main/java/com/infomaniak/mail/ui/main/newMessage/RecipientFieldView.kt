@@ -414,6 +414,12 @@ class RecipientFieldView @JvmOverloads constructor(
 
     private fun shouldDisplayChevron(): Boolean = canCollapseEverything && otherFieldsAreAllEmpty
 
+    fun findAlreadyExistingExternalRecipientsInFields(): Pair<String?, Int> {
+        val recipients = contactChipAdapter.getRecipients().filter { it.displayAsExternal }
+        val recipientCount = recipients.count()
+        return (if (recipientCount == 1) recipients.single().email else null) to recipientCount
+    }
+
     companion object {
         private const val MAX_WIDTH_PERCENTAGE = 0.8
         private const val MAX_ALLOWED_RECIPIENT = 99

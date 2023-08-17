@@ -266,7 +266,11 @@ class NewMessageFragment : Fragment() {
             autoComplete = autoCompleteTo,
             onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(TO, hasOpened) },
             onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, TO) },
-            onContactRemovedCallback = { newMessageViewModel.removeRecipientFromField(it, TO) },
+            onContactRemovedCallback = {
+                newMessageViewModel.removeRecipientFromField(it, TO)
+                updateBannerVisibility()
+
+            },
             onCopyContactAddressCallback = ::copyRecipientEmailToClipboard,
             gotFocusCallback = { fieldGotFocus(TO) },
             onToggleEverythingCallback = ::openAdvancedFields,
@@ -277,7 +281,10 @@ class NewMessageFragment : Fragment() {
             autoComplete = autoCompleteCc,
             onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(CC, hasOpened) },
             onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, CC) },
-            onContactRemovedCallback = { newMessageViewModel.removeRecipientFromField(it, CC) },
+            onContactRemovedCallback = {
+                newMessageViewModel.removeRecipientFromField(it, CC)
+                updateBannerVisibility()
+            },
             onCopyContactAddressCallback = ::copyRecipientEmailToClipboard,
             gotFocusCallback = { fieldGotFocus(CC) },
             setSnackBarCallback = ::setSnackBar,
@@ -287,7 +294,10 @@ class NewMessageFragment : Fragment() {
             autoComplete = autoCompleteBcc,
             onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(BCC, hasOpened) },
             onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, BCC) },
-            onContactRemovedCallback = { newMessageViewModel.removeRecipientFromField(it, BCC) },
+            onContactRemovedCallback = {
+                newMessageViewModel.removeRecipientFromField(it, BCC)
+                updateBannerVisibility()
+            },
             onCopyContactAddressCallback = ::copyRecipientEmailToClipboard,
             gotFocusCallback = { fieldGotFocus(BCC) },
             setSnackBarCallback = ::setSnackBar,
@@ -352,7 +362,10 @@ class NewMessageFragment : Fragment() {
         bccField.initRecipients(draft.bcc, shouldWarnForExternalContacts, mergedContactMap)
 
         if (shouldWarnForExternalContacts) {
-            val (externalRecipientEmail, externalRecipientQuantity) = UiUtils.findExternalRecipientInDraft(draft, mergedContactMap)
+            val (externalRecipientEmail, externalRecipientQuantity) = UiUtils.findExternalRecipientInDraft(
+                draft,
+                mergedContactMap
+            )
             newMessageViewModel.isExternalBannerVisible.value = externalRecipientEmail to externalRecipientQuantity
         }
 
@@ -402,6 +415,25 @@ class NewMessageFragment : Fragment() {
                 quoteGroup.isGone = true
             }
         }
+    }
+
+    private fun updateBannerVisibility() = with(binding) {
+        var externalRecipientEmail: String? = null
+        var externalRecipientQuantity = 0
+
+        listOf(toField, ccField, bccField).forEach { field ->
+            val (email, quantity) = field.findAlreadyExistingExternalRecipientsInFields()
+            externalRecipientQuantity += quantity
+
+            if (externalRecipientQuantity > 1) {
+                newMessageViewModel.isExternalBannerVisible.value = null to 2
+                return
+            } else if (quantity == 1) {
+                externalRecipientEmail = email
+            }
+        }
+
+        newMessageViewModel.isExternalBannerVisible.value = externalRecipientEmail to externalRecipientQuantity
     }
 
     private fun WebView.loadContent(html: String, webViewGroup: Group) {
