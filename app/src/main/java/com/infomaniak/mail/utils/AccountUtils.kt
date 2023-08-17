@@ -30,9 +30,11 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.appSettings.AppSettingsController
 import com.infomaniak.mail.data.models.AppSettings
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import io.sentry.Sentry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
 import io.sentry.protocol.User as SentryUser
 
@@ -79,6 +81,31 @@ object AccountUtils : CredentialManager() {
         RealmDatabase.backUpPreviousMailboxContent()
         currentMailboxId = mailboxId
         reloadApp?.invoke()
+    }
+
+    suspend fun manageMailboxesEdgeCases(
+        context: Context,
+        mailboxes: List<Mailbox>,
+        playServicesUtils: PlayServicesUtils,
+    ): Boolean {
+
+        val shouldStop = when {
+            mailboxes.isEmpty() -> {
+                removeUser(context, currentUser!!, playServicesUtils)
+                true
+            }
+            mailboxes.none { it.isValid } -> {
+                Dispatchers.Main { context.launchNoValidMailboxesActivity() }
+                true
+            }
+            mailboxes.none { it.mailboxId == currentMailboxId } -> {
+                reloadApp?.invoke()
+                true
+            }
+            else -> false
+        }
+
+        return shouldStop
     }
 
     suspend fun requestCurrentUser(): User? {

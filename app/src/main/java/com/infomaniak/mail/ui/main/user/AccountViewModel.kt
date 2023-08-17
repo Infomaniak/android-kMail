@@ -28,7 +28,10 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.mailbox.MailboxLinkedResult
 import com.infomaniak.mail.di.IoDispatcher
-import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.PlayServicesUtils
+import com.infomaniak.mail.utils.context
+import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -49,7 +52,7 @@ class AccountViewModel @Inject constructor(
         val mailboxes = ApiRepository.getMailboxes(AccountUtils.getHttpClient(AccountUtils.currentUserId)).data ?: return false
         MailboxController.updateMailboxes(context, mailboxes)
 
-        return context.manageMailboxesEdgeCases(mailboxes, playServicesUtils)
+        return AccountUtils.manageMailboxesEdgeCases(context, mailboxes, playServicesUtils)
     }
 
     fun attachNewMailbox(

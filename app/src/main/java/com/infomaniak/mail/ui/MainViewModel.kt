@@ -233,7 +233,7 @@ class MainViewModel @Inject constructor(
             with(ApiRepository.getMailboxes()) {
                 if (isSuccess()) {
                     MailboxController.updateMailboxes(context, data!!)
-                    if (context.manageMailboxesEdgeCases(data!!, playServicesUtils)) return@launch
+                    if (AccountUtils.manageMailboxesEdgeCases(context, data!!, playServicesUtils)) return@launch
                 }
             }
 
