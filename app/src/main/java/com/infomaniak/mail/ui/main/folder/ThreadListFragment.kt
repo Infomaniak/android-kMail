@@ -509,7 +509,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
             threadListAdapter.apply {
                 updateFolderRole(folder.role)
-                updateLoadMore(shouldDisplayLoadMore = false)
+                if (hasSwitchedToAnotherFolder()) updateLoadMore(shouldDisplayLoadMore = false)
             }
 
             binding.newMessageFab.extend()
