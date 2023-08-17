@@ -31,7 +31,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.work.Configuration
-import androidx.work.WorkManager
 import coil.ImageLoader
 import coil.ImageLoaderFactory
 import com.facebook.stetho.Stetho
@@ -49,7 +48,6 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.UrlTraceInterceptor
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
-import com.infomaniak.mail.firebase.RegisterUserDeviceWorker
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ErrorCode
@@ -93,12 +91,6 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
 
     @Inject
     lateinit var notificationManagerCompat: NotificationManagerCompat
-
-    @Inject
-    lateinit var workManager: WorkManager // Only used in the standard flavor
-
-    @Inject
-    lateinit var registerUserDeviceWorkerScheduler: RegisterUserDeviceWorker.Scheduler // Only used in the standard flavor
 
     @Inject
     lateinit var playServicesUtils: PlayServicesUtils
