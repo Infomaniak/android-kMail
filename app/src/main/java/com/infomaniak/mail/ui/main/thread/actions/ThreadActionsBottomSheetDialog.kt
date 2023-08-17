@@ -24,6 +24,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_DELETE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_FAVORITE_NAME
@@ -53,6 +54,8 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
     private val currentClassName: String by lazy { ThreadActionsBottomSheetDialog::class.java.name }
 
+    private val isSpamFolder = mainViewModel.isCurrentFolderRole(FolderRole.SPAM)
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(navigationArgs) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -62,7 +65,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         }
 
         binding.postpone.isGone = true
-        setSpamUi()
+        setJunkUi()
 
         threadActionsViewModel.getThreadAndMessageUidToReplyTo(
             threadUid,
@@ -146,12 +149,18 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     mainViewModel.toggleThreadFavoriteStatus(threadUid)
                 }
 
-                override fun onSpam() = with(mainViewModel) {
-                    trackBottomSheetThreadActionsEvent(ACTION_SPAM_NAME, isCurrentFolderRole(FolderRole.SPAM))
-                    toggleThreadSpamStatus(threadUid)
+                override fun onReportJunk()  {
+                    if (isSpamFolder) {
+                        trackBottomSheetThreadActionsEvent(ACTION_SPAM_NAME, value = true)
+                        mainViewModel.toggleThreadSpamStatus(threadUid)
+                    } else {
+                        safeNavigate(
+                            resId = R.id.junkBottomSheetDialog,
+                            args = JunkBottomSheetDialogArgs(threadUid, messageUidToReply).toBundle(),
+                            currentClassName = currentClassName,
+                        )
+                    }
                 }
-
-                override fun onReportJunk() = Unit
 
                 override fun onPrint() {
                     trackBottomSheetThreadActionsEvent(ACTION_PRINT_NAME)
@@ -166,11 +175,15 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         }
     }
 
-    private fun setSpamUi() = with(binding) {
-        reportJunk.isGone = true
-        spam.apply {
-            isVisible = true
-            setText(if (mainViewModel.isCurrentFolderRole(FolderRole.SPAM)) R.string.actionNonSpam else R.string.actionSpam)
+    private fun setJunkUi() = binding.reportJunk.apply {
+        val (text, icon) = if (isSpamFolder) {
+            R.string.actionNonSpam to R.drawable.ic_drawer_inbox
+        } else {
+            R.string.actionReportJunk to R.drawable.ic_report_junk
         }
+
+        setText(text)
+        setIconResource(icon)
+        isVisible = true
     }
 }
