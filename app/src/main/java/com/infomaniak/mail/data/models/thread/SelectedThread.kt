@@ -36,9 +36,6 @@ data class SelectedThread private constructor(
         firstMessage = thread.messages.first(),
     )
 
-    val isSingleMessage get() = messagesCount == 1
-    val messageUid get() = firstMessage.uid
-
     override fun equals(other: Any?) = other === this || (other is SelectedThread && other.uid == uid)
 
     override fun hashCode(): Int = uid.hashCode()
