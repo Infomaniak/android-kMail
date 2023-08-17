@@ -42,7 +42,6 @@ import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.data.models.thread.SelectedThread
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.di.IoDispatcher
@@ -101,7 +100,7 @@ class MainViewModel @Inject constructor(
             isMultiSelectOnLiveData.value = value
         }
 
-    val selectedThreadsLiveData = MutableLiveData(mutableSetOf<SelectedThread>())
+    val selectedThreadsLiveData = MutableLiveData(mutableSetOf<Thread>())
     inline val selectedThreads
         get() = selectedThreadsLiveData.value!!
 
@@ -893,9 +892,7 @@ class MainViewModel @Inject constructor(
             selectedThreads.clear()
         } else {
             context.trackMultiSelectionEvent("all")
-            currentThreadsLive.value?.list?.forEach { thread ->
-                selectedThreads.add(SelectedThread(thread))
-            }
+            currentThreadsLive.value?.list?.forEach { thread -> selectedThreads.add(thread) }
         }
 
         publishSelectedItems()

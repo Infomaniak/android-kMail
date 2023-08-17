@@ -34,7 +34,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity
 import com.infomaniak.mail.data.models.Folder.FolderRole
-import com.infomaniak.mail.data.models.thread.SelectedThread
+import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
@@ -189,7 +189,7 @@ class ThreadListMultiSelection {
         threadListFragment.requireActivity().window.updateNavigationBarColor(navBarColor)
     }
 
-    private fun updateSelectedCount(selectedThreads: MutableSet<SelectedThread>) {
+    private fun updateSelectedCount(selectedThreads: MutableSet<Thread>) {
         val threadCount = selectedThreads.count()
         binding.selectedCount.text = threadListFragment.resources.getQuantityString(
             R.plurals.multipleSelectionCount,
@@ -203,7 +203,7 @@ class ThreadListMultiSelection {
         binding.selectAll.setText(selectAllLabel)
     }
 
-    private fun updateMultiSelectActionsStatus(selectedThreads: MutableSet<SelectedThread>) {
+    private fun updateMultiSelectActionsStatus(selectedThreads: MutableSet<Thread>) {
         computeReadFavoriteStatus(selectedThreads).let { (shouldRead, shouldFavorite) ->
             shouldMultiselectRead = shouldRead
             shouldMultiselectFavorite = shouldFavorite
@@ -233,7 +233,7 @@ class ThreadListMultiSelection {
         private const val ARCHIVE_INDEX = 1
         private const val FAVORITE_INDEX = 2
 
-        fun computeReadFavoriteStatus(selectedThreads: Set<SelectedThread>): Pair<Boolean, Boolean> {
+        fun computeReadFavoriteStatus(selectedThreads: Set<Thread>): Pair<Boolean, Boolean> {
             var shouldUnread = true
             var shouldUnfavorite = selectedThreads.isNotEmpty()
 
