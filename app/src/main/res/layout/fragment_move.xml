@@ -87,8 +87,8 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/searchTextInput"
                     style="@style/SearchTextInputEditTextStyle"
-                    android:hint="@string/moveSearchFieldPlaceholder"
-                    android:drawablePadding="@dimen/marginStandardMedium" />
+                    android:drawablePadding="@dimen/marginStandardMedium"
+                    android:hint="@string/moveSearchFieldPlaceholder" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <FrameLayout

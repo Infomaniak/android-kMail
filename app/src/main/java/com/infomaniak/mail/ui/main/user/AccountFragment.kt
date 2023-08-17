@@ -30,7 +30,6 @@ import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.MatomoMail.ADD_MAILBOX_NAME
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
-import com.infomaniak.mail.utils.PlayServicesUtils
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentAccountBinding
 import com.infomaniak.mail.di.IoDispatcher
@@ -38,6 +37,7 @@ import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.MailboxListFragment
 import com.infomaniak.mail.ui.main.menu.MailboxesAdapter
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.PlayServicesUtils
 import com.infomaniak.mail.utils.animatedNavigation
 import com.infomaniak.mail.utils.createDescriptionDialog
 import dagger.hilt.android.AndroidEntryPoint
