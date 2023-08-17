@@ -51,13 +51,16 @@ class KMailFirebaseMessagingService : FirebaseMessagingService() {
     @Inject
     lateinit var processMessageNotificationsScheduler: ProcessMessageNotificationsWorker.Scheduler
 
+    @Inject
+    lateinit var registerUserDeviceWorkerScheduler: RegisterUserDeviceWorker.Scheduler
+
     override fun onNewToken(token: String) {
         Log.i(TAG, "onNewToken: new token received")
         localSettings.apply {
             firebaseToken = token
             clearRegisteredFirebaseUsers()
         }
-        RegisterUserDeviceWorker.scheduleWork(this)
+        registerUserDeviceWorkerScheduler.scheduleWork()
     }
 
     override fun onMessageReceived(message: RemoteMessage) {

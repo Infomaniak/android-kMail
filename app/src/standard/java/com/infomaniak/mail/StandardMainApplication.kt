@@ -19,11 +19,14 @@ package com.infomaniak.mail
 
 import androidx.lifecycle.LifecycleOwner
 import com.infomaniak.mail.data.models.AppSettings
-import com.infomaniak.mail.firebase.RegisterUserDeviceWorker
+import com.infomaniak.mail.di.StandardEntryPoint
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.workers.BaseProcessMessageNotificationsWorker
+import dagger.hilt.android.EntryPointAccessors
 
 class StandardMainApplication : MainApplication() {
+
+    private val hiltEntryPoint by lazy { EntryPointAccessors.fromApplication(this, StandardEntryPoint::class.java) }
 
     override fun onCreate() {
         super.onCreate()
@@ -32,13 +35,13 @@ class StandardMainApplication : MainApplication() {
 
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
-        BaseProcessMessageNotificationsWorker.cancelWorks(workManager)
+        BaseProcessMessageNotificationsWorker.cancelWorks(hiltEntryPoint.workManager())
     }
 
     private fun registerUserDeviceIfNeeded() {
         val areGooglePlayServicesAvailable = !playServicesUtils.areGooglePlayServicesNotAvailable()
         if (AccountUtils.currentUserId != AppSettings.DEFAULT_ID && areGooglePlayServicesAvailable && localSettings.firebaseToken != null) {
-            RegisterUserDeviceWorker.scheduleWork(context = this)
+            hiltEntryPoint.registerUserDeviceWorkerScheduler().scheduleWork()
         }
     }
 }

@@ -31,7 +31,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.work.Configuration
-import androidx.work.WorkManager
 import coil.ImageLoader
 import coil.ImageLoaderFactory
 import com.facebook.stetho.Stetho
@@ -92,9 +91,6 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
 
     @Inject
     lateinit var notificationManagerCompat: NotificationManagerCompat
-
-    @Inject
-    lateinit var workManager: WorkManager // Only used in the standard flavor
 
     @Inject
     lateinit var playServicesUtils: PlayServicesUtils
