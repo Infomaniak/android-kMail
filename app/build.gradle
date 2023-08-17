@@ -13,12 +13,12 @@ android {
 
     namespace 'com.infomaniak.mail'
 
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId 'com.infomaniak.mail'
         minSdk 25
-        targetSdk 33
+        targetSdk 34
         versionCode 1_00_008_01
         versionName '1.0.8'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
