@@ -29,6 +29,8 @@ import android.widget.FrameLayout
 import androidx.core.view.children
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.recyclerview.widget.AsyncListDiffer
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
@@ -62,8 +64,10 @@ class ThreadAdapter(
     private val shouldLoadDistantResources: Boolean,
 ) : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBinding.OnRealmChanged<Message> {
 
-    var messages = listOf<Message>()
-        private set
+    override val realmAsyncListDiffer = AsyncListDiffer(this, MessageDiffCallback())
+
+    inline val messages: MutableList<Message> get() = realmAsyncListDiffer.currentList
+
     private val manuallyAllowedMessageUids = mutableSetOf<String>()
     var isExpandedMap = mutableMapOf<String, Boolean>()
     var isThemeTheSameMap = mutableMapOf<String, Boolean>()
@@ -88,10 +92,6 @@ class ThreadAdapter(
         super.onAttachedToRecyclerView(recyclerView)
     }
 
-    override fun updateList(itemList: List<Message>) {
-        messages = itemList
-    }
-
     override fun getItemCount() = messages.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ThreadViewHolder {
@@ -101,13 +101,6 @@ class ThreadAdapter(
             onContactClicked,
             onAttachmentClicked,
         )
-    }
-
-    // Add here everything in a Message that can be updated in the UI.
-    override fun areContentsTheSame(oldItem: Message, newItem: Message): Boolean {
-        return newItem.body?.value == oldItem.body?.value &&
-                newItem.isSeen == oldItem.isSeen &&
-                newItem.isFavorite == oldItem.isFavorite
     }
 
     override fun onBindViewHolder(holder: ThreadViewHolder, position: Int, payloads: MutableList<Any>) = with(holder.binding) {
@@ -482,6 +475,18 @@ class ThreadAdapter(
         const val FORMAT_EMAIL_DATE_HOUR = "HH:mm"
         const val FORMAT_EMAIL_DATE_SHORT_DATE = "d MMM"
         const val FORMAT_EMAIL_DATE_LONG_DATE = "d MMM yyyy"
+    }
+
+    private class MessageDiffCallback : DiffUtil.ItemCallback<Message>() {
+        override fun areItemsTheSame(oldMessage: Message, newMessage: Message): Boolean {
+            return oldMessage.uid == newMessage.uid
+        }
+
+        override fun areContentsTheSame(oldMessage: Message, newMessage: Message): Boolean {
+            return newMessage.body?.value == oldMessage.body?.value &&
+                    newMessage.isSeen == oldMessage.isSeen &&
+                    newMessage.isFavorite == oldMessage.isFavorite
+        }
     }
 
     class ThreadViewHolder(

@@ -31,6 +31,7 @@ import androidx.annotation.DrawableRes
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeAdapter
@@ -67,6 +68,8 @@ class ThreadListAdapter @Inject constructor(
 ) : DragDropSwipeAdapter<Any, ThreadListViewHolder>(mutableListOf()), RealmChangesBinding.OnRealmChanged<Thread> {
 
     private lateinit var recyclerView: RecyclerView
+
+    override val realmAsyncListDiffer: AsyncListDiffer<Thread>? = null
 
     private val cardCornerRadius by lazy { context.resources.getDimension(R.dimen.alternativeMargin) }
     private val threadMarginCompact by lazy { context.resources.getDimension(RCore.dimen.marginStandardVerySmall).toInt() }
