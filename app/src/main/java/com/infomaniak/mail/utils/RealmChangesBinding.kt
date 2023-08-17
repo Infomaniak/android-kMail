@@ -17,9 +17,9 @@
  */
 package com.infomaniak.mail.utils
 
-import android.annotation.SuppressLint
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
+import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.mail.utils.RealmChangesBinding.OnRealmChanged
 import io.realm.kotlin.notifications.*
@@ -32,7 +32,7 @@ import io.realm.kotlin.types.RealmObject
  * This adapter will automatically handle any updates to its data and call `notifyDataSetChanged()`,
  * `notifyItemInserted()`, `notifyItemRemoved()` or `notifyItemRangeChanged()` as appropriate.
  * In case there are changes but we want to notify them only if needed,
- * we can override the [OnRealmChanged.areContentsTheSame] method.
+ * we can override the [OnRealmChanged.realmAsyncListDiffer].
  *
  * The RealmAdapter will stop receiving updates if the Realm instance providing the [ResultsChange] or [ListChange] is
  * closed.
@@ -73,22 +73,25 @@ class RealmChangesBinding<T : BaseRealmObject, VH : RecyclerView.ViewHolder> pri
 
         val list = resultsChange.list
 
+        fun notifyAdapter() {
+            notifyAdapter(resultsChange.list)
+            notifyAfterUpdate(list)
+        }
+
         beforeUpdateAdapter?.invoke(list)
 
         when (resultsChange) {
 
             is InitialResults -> { // First call
-                realmInitial(list)
+                notifyAdapter(list)
                 notifyAfterUpdate(list)
             }
 
             is UpdatedResults -> { // Any update
                 waitingBeforeNotifyAdapter?.observeWaiting {
-                    resultsChange.notifyAdapter()
-                    notifyAfterUpdate(list)
+                    notifyAdapter()
                 } ?: run {
-                    resultsChange.notifyAdapter()
-                    notifyAfterUpdate(list)
+                    notifyAdapter()
                 }
             }
 
@@ -99,22 +102,25 @@ class RealmChangesBinding<T : BaseRealmObject, VH : RecyclerView.ViewHolder> pri
 
         val list = listChange.list
 
+        fun notifyAdapter() {
+            notifyAdapter(listChange.list)
+            notifyAfterUpdate(list)
+        }
+
         beforeUpdateAdapter?.invoke(list)
 
         when (listChange) {
 
             is InitialList -> { // First call
-                realmInitial(list)
+                notifyAdapter(list)
                 notifyAfterUpdate(list)
             }
 
             is UpdatedList -> { // Any update
                 waitingBeforeNotifyAdapter?.observeWaiting {
-                    listChange.notifyAdapter()
-                    notifyAfterUpdate(list)
+                    notifyAdapter()
                 } ?: run {
-                    listChange.notifyAdapter()
-                    notifyAfterUpdate(list)
+                    notifyAdapter()
                 }
             }
 
@@ -149,61 +155,9 @@ class RealmChangesBinding<T : BaseRealmObject, VH : RecyclerView.ViewHolder> pri
         waitingBeforeNotifyAdapter?.removeObservers(lifecycleOwner)
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    private fun realmInitial(itemList: List<T>) {
+    private fun notifyAdapter(itemList: List<T>) {
         onRealmChanged.updateList(itemList)
-        recyclerViewAdapter.notifyDataSetChanged()
-    }
-
-    private fun UpdatedResults<T>.notifyAdapter() {
-        onRealmChanged.updateList(list)
-        notifyItemRanges(list)
-    }
-
-    private fun UpdatedList<T>.notifyAdapter() {
-        onRealmChanged.updateList(list)
-        notifyItemRanges(list)
-    }
-
-    private fun ListChangeSet.notifyItemRanges(newList: List<T>) {
-        deletionRanges.forEach { recyclerViewAdapter.notifyItemRangeRemoved(it.startIndex, it.length) }
-        insertionRanges.forEach { recyclerViewAdapter.notifyItemRangeInserted(it.startIndex, it.length) }
-        changeRanges.forEach { changeRange ->
-            if (previousList.isEmpty()) {
-                recyclerViewAdapter.notifyItemRangeChanged(changeRange.startIndex, changeRange.length)
-            } else {
-                runCatching {
-                    // We will avoid notifying each item in a row, instead we will notify by range while we can.
-                    // To do this, we count the number of changes in a row, then as soon as we have a different element
-                    // we notify the previous ones with a notification by range.
-                    onlyNotifyChangesIfNeeded(changeRange, newList)
-                }.onFailure {
-                    // In case the `areContentsTheSame` method has not been overridden, then we notify all changes
-                    recyclerViewAdapter.notifyItemRangeChanged(changeRange.startIndex, changeRange.length)
-                }
-            }
-        }
-    }
-
-    private fun onlyNotifyChangesIfNeeded(changeRange: ListChangeSet.Range, newList: List<T>) {
-        var start = changeRange.startIndex
-        var count = 0
-        for (index in changeRange.startIndex until changeRange.startIndex + changeRange.length) {
-            if (onRealmChanged.areContentsTheSame(previousList[index], newList[index])) {
-                // The content has not changed so there is no need to notify the adapter.
-                // However, if we had changes previously, we will notify them.
-                if (count > 0) {
-                    recyclerViewAdapter.notifyItemRangeChanged(start, count)
-                    count = 0
-                }
-            } else {
-                // For the first change we get its index in start and then we count the number of changes
-                if (count == 0) start = index
-                count++
-            }
-        }
-        // If we finish the iteration and we still have some modifications to notify, we treat them here
-        if (count > 0) recyclerViewAdapter.notifyItemRangeChanged(start, count)
+        onRealmChanged.realmAsyncListDiffer?.submitList(itemList)
     }
 
     private fun LiveData<Boolean>.observeWaiting(whenCanNotify: () -> Unit) {
@@ -220,9 +174,12 @@ class RealmChangesBinding<T : BaseRealmObject, VH : RecyclerView.ViewHolder> pri
     }
 
     interface OnRealmChanged<T> {
-        fun updateList(itemList: List<T>)
+
+        val realmAsyncListDiffer: AsyncListDiffer<T>?
+
+        fun updateList(itemList: List<T>) = Unit
+
         fun deleteList() = Unit
-        fun areContentsTheSame(oldItem: T, newItem: T): Boolean = throw UnsupportedOperationException()
     }
 
     companion object {
