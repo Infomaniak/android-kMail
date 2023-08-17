@@ -69,10 +69,13 @@ class NewMessageActivity : BaseActivity() {
     }
 
     private fun setupExternalBanner() = with(binding) {
+        var manuallyClosed = false
+
         var externalRecipientEmail: String? = null
         var externalRecipientQuantity = 0
 
         closeButton.setOnClickListener {
+            manuallyClosed = true
             externalBanner.isGone = true
         }
 
@@ -94,7 +97,7 @@ class NewMessageActivity : BaseActivity() {
         }
 
         newMessageViewModel.isExternalBannerVisible.observe(this@NewMessageActivity) { (email, externalQuantity) ->
-            externalBanner.isVisible = externalQuantity > 0
+            externalBanner.isGone = manuallyClosed || externalQuantity == 0
             externalRecipientEmail = email
             externalRecipientQuantity = externalQuantity
         }
