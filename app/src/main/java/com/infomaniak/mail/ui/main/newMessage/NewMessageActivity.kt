@@ -63,8 +63,41 @@ class NewMessageActivity : BaseActivity() {
         setupSnackBar()
         setupSendButton()
         setupSystemBars()
+        setupExternalBanner()
 
         observeInitSuccess()
+    }
+
+    private fun setupExternalBanner() = with(binding) {
+        var externalRecipientEmail: String? = null
+        var externalRecipientQuantity = 0
+
+        closeButton.setOnClickListener {
+            externalBanner.isGone = true
+        }
+
+        informationButton.setOnClickListener {
+            val description = resources.getQuantityString(
+                R.plurals.externalDialogDescriptionExpeditor,
+                externalRecipientQuantity,
+                externalRecipientEmail,
+            )
+
+            // TODO : Reuse instance ?
+            createDescriptionDialog(
+                title = getString(R.string.externalDialogTitleRecipient),
+                description = description,
+                confirmButtonText = R.string.externalDialogConfirmButton,
+                displayCancelButton = false,
+                onPositiveButtonClicked = {},
+            ).show()
+        }
+
+        newMessageViewModel.isExternalBannerVisible.observe(this@NewMessageActivity) { (email, externalQuantity) ->
+            externalBanner.isVisible = externalQuantity > 0
+            externalRecipientEmail = email
+            externalRecipientQuantity = externalQuantity
+        }
     }
 
     private fun isAuth(): Boolean {

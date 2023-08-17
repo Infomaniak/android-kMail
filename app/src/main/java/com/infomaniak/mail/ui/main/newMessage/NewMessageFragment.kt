@@ -353,7 +353,7 @@ class NewMessageFragment : Fragment() {
 
         if (shouldWarnForExternalContacts) {
             val (externalRecipientEmail, externalRecipientQuantity) = UiUtils.findExternalRecipientInDraft(draft, mergedContactMap)
-            // TODO : show bottom bar
+            newMessageViewModel.isExternalBannerVisible.value = externalRecipientEmail to externalRecipientQuantity
         }
 
         newMessageViewModel.updateIsSendingAllowed()

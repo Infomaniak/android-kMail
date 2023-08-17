@@ -102,6 +102,7 @@ class NewMessageViewModel @Inject constructor(
     val isInitSuccess = SingleLiveEvent<Boolean>()
     val importedAttachments = MutableLiveData<Pair<MutableList<Attachment>, ImportationResult>>()
     val isSendingAllowed = MutableLiveData(false)
+    val isExternalBannerVisible = MutableLiveData<Pair<String?, Int>>()
 
     val snackBarManager by lazy { SnackBarManager() }
     var shouldExecuteDraftActionWhenStopping = true
