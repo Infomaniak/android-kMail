@@ -17,8 +17,8 @@
  */
 package com.infomaniak.mail.di
 
-import com.infomaniak.mail.utils.PlayServicesUtils
 import com.infomaniak.mail.StandardPlayServicesUtils
+import com.infomaniak.mail.utils.PlayServicesUtils
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
