@@ -453,12 +453,14 @@ class ThreadFragment : Fragment() {
         if (externalRecipientQuantity == 0) return subject to subject
 
         val externalPostfix = getString(R.string.externalTag)
-        val postfixedSubject = "$subject $externalPostfix"
+        val separator = " "
+        val postfixedSubject = "$subject$separator$externalPostfix"
 
         val spannedSubject = postfixedSubject.toSpannable().apply {
-            val startIndex = subject.length + 1
+            val startIndex = subject.length + separator.length
             val endIndex = startIndex + externalPostfix.length
 
+            // TODO : Put in its own function
             val backgroundColor = context.getColor(R.color.externalTagBackground)
             val textColor = context.getColor(R.color.externalTagOnBackground)
             val textTypeface = ResourcesCompat.getFont(context, R.font.external_tag_font)!!
@@ -475,6 +477,7 @@ class ThreadFragment : Fragment() {
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
             )
 
+            // TODO : Put in its own function
             // TODO : Currently, the clickable zone extends beyond the span up to the edge of the textview. This is the same
             //  comportment that Gmail has. See if we can find a fix for this later
             setSpan(
