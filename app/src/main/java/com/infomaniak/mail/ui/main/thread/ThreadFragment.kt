@@ -424,6 +424,9 @@ class ThreadFragment : Fragment() {
             return@with
         }
 
+        // TODO : If mergedContact live data is notified, do we want to recompute the subject to update the "external" tag? Like,
+        //  first time you ever login, if it takes long to get your contacts you might open a thread before it finished and have
+        //  no mergedContacts to compare against, therefore everyone will be considered external.
         val (subject, spannedSubject) = computeSubject(thread)
         threadSubject.text = spannedSubject
         threadSubject.movementMethod = LinkMovementMethod.getInstance()
@@ -460,52 +463,60 @@ class ThreadFragment : Fragment() {
             val startIndex = subject.length + separator.length
             val endIndex = startIndex + externalPostfix.length
 
-            // TODO : Put in its own function
-            val backgroundColor = context.getColor(R.color.externalTagBackground)
-            val textColor = context.getColor(R.color.externalTagOnBackground)
-            val textTypeface = ResourcesCompat.getFont(context, R.font.external_tag_font)!!
-            val textSize = resources.getDimensionPixelSize(R.dimen.externalTagTextSize).toFloat()
-            setSpan(
-                RoundedBackgroundSpan(
-                    backgroundColor = backgroundColor,
-                    textColor = textColor,
-                    textTypeface = textTypeface,
-                    fontSize = textSize,
-                ),
-                startIndex,
-                endIndex,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-            )
+            setExternalTagSpan(startIndex, endIndex)
 
-            // TODO : Put in its own function
-            // TODO : Currently, the clickable zone extends beyond the span up to the edge of the textview. This is the same
-            //  comportment that Gmail has. See if we can find a fix for this later
-            setSpan(
-                object : ClickableSpan() {
-                    override fun onClick(widget: View) {
-                        val description = resources.getQuantityString(
-                            R.plurals.externalDialogDescriptionExpeditor,
-                            externalRecipientQuantity,
-                            externalRecipientEmail,
-                        )
+            setClickableSpan(startIndex, endIndex) {
+                val description = resources.getQuantityString(
+                    R.plurals.externalDialogDescriptionExpeditor,
+                    externalRecipientQuantity,
+                    externalRecipientEmail,
+                )
 
-                        // TODO : Reuse instance ?
-                        createDescriptionDialog(
-                            title = getString(R.string.externalDialogTitleExpeditor),
-                            description = description,
-                            confirmButtonText = R.string.externalDialogConfirmButton,
-                            displayCancelButton = false,
-                            onPositiveButtonClicked = {},
-                        ).show()
-                    }
-                },
-                startIndex,
-                endIndex,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-            )
+                // TODO : Reuse instance?
+                createInformationDialog(
+                    title = getString(R.string.externalDialogTitleExpeditor),
+                    description = description,
+                    confirmButtonText = R.string.externalDialogConfirmButton,
+                ).show()
+            }
         }
 
         return subject to spannedSubject
+    }
+
+    private fun Spannable.setExternalTagSpan(startIndex: Int, endIndex: Int) = with(binding) {
+        val backgroundColor = context.getColor(R.color.externalTagBackground)
+        val textColor = context.getColor(R.color.externalTagOnBackground)
+        val textTypeface = ResourcesCompat.getFont(context, R.font.external_tag_font)!!
+        val textSize = resources.getDimensionPixelSize(R.dimen.externalTagTextSize).toFloat()
+        setSpan(
+            RoundedBackgroundSpan(
+                backgroundColor = backgroundColor,
+                textColor = textColor,
+                textTypeface = textTypeface,
+                fontSize = textSize,
+            ),
+            startIndex,
+            endIndex,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+    }
+
+    private fun Spannable.setClickableSpan(
+        startIndex: Int,
+        endIndex: Int,
+        onClick: () -> Unit,
+    ) {
+        // TODO : Currently, the clickable zone extends beyond the span up to the edge of the textview. This is the same
+        //  comportment that Gmail has. See if we can find a fix for this later
+        setSpan(
+            object : ClickableSpan() {
+                override fun onClick(widget: View) = onClick()
+            },
+            startIndex,
+            endIndex,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
     }
 
     private fun onMessagesUpdate(messages: List<Message>) {

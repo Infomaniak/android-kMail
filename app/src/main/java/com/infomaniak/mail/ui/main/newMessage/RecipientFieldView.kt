@@ -377,12 +377,12 @@ class RecipientFieldView @JvmOverloads constructor(
     fun initRecipients(
         initialRecipients: List<Recipient>,
         shouldWarnForExternalContacts: Boolean,
-        mergedContactMap: Map<String, Map<String, MergedContact>>,
+        emailDictionary: Map<String, Map<String, MergedContact>>,
         otherFieldsAreAllEmpty: Boolean = true,
     ) {
 
         initialRecipients.forEach {
-            val shouldDisplayAsExternal = shouldWarnForExternalContacts && it.email !in mergedContactMap
+            val shouldDisplayAsExternal = shouldWarnForExternalContacts && it.isExternal(emailDictionary)
             val styledRecipient = StyledRecipient(it, shouldDisplayAsExternal)
             if (contactChipAdapter.addChip(styledRecipient)) contactAdapter.addUsedContact(it.email)
         }

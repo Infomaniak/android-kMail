@@ -51,9 +51,9 @@
                 style="@style/BodySmall"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/marginStandardMedium"
+                android:layout_marginHorizontal="@dimen/marginStandardMedium"
                 android:layout_weight="1"
-                android:text="Destinataire externe" />
+                android:text="@string/externalDialogTitleRecipient" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/informationButton"

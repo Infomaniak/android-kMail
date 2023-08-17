@@ -359,6 +359,32 @@ fun List<Message>.getFoldersIds(exception: String? = null) = mapNotNull { if (it
 fun List<Message>.getUids(): List<String> = map { it.uid }
 //endregion
 
+fun Fragment.createInformationDialog(
+    title: String,
+    description: CharSequence,
+    @StringRes confirmButtonText: Int,
+): AlertDialog {
+    return requireActivity().createInformationDialog(
+        title,
+        description,
+        confirmButtonText,
+    )
+}
+
+fun Activity.createInformationDialog(
+    title: String,
+    description: CharSequence,
+    @StringRes confirmButtonText: Int,
+): AlertDialog {
+    return createDescriptionDialog(
+        title,
+        description,
+        confirmButtonText,
+        false,
+        onPositiveButtonClicked = {}
+    )
+}
+
 fun Fragment.createDescriptionDialog(
     title: String,
     description: CharSequence,

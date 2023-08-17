@@ -138,7 +138,7 @@
     <color name="progressbarTrackColor">@color/mouse</color>
 
     <!-- External tag -->
-    <color name="externalTagBackground">@color/swipeFavorite</color>
+    <color name="externalTagBackground">@color/favoriteYellow</color>
     <color name="externalTagOnBackground">@color/orca</color>
     <color name="externalChipBackground">@color/polar_bear</color>
 

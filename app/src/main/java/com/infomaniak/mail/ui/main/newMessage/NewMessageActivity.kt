@@ -36,10 +36,7 @@ import com.infomaniak.mail.databinding.ActivityNewMessageBinding
 import com.infomaniak.mail.ui.BaseActivity
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.MainActivity
-import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.createDescriptionDialog
-import com.infomaniak.mail.utils.getAttributeColor
-import com.infomaniak.mail.utils.updateNavigationBarColor
+import com.infomaniak.mail.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 import com.google.android.material.R as RMaterial
 
@@ -86,13 +83,11 @@ class NewMessageActivity : BaseActivity() {
                 externalRecipientEmail,
             )
 
-            // TODO : Reuse instance ?
-            createDescriptionDialog(
+            // TODO : Reuse instance?
+            createInformationDialog(
                 title = getString(R.string.externalDialogTitleRecipient),
                 description = description,
                 confirmButtonText = R.string.externalDialogConfirmButton,
-                displayCancelButton = false,
-                onPositiveButtonClicked = {},
             ).show()
         }
 

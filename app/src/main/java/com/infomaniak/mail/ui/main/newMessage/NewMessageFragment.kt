@@ -206,7 +206,13 @@ class NewMessageFragment : Fragment() {
                 hideLoader()
                 showKeyboardInCorrectView()
                 populateViewModelWithExternalMailData()
-                populateUiWithViewModel(draftMode == DraftMode.REPLY || draftMode == DraftMode.REPLY_ALL)
+
+                // TODO : Read account setting telling us if the external content should be activated
+                val isExternalContentSettingActivated = true
+                val shouldWarnForExternalContacts = isExternalContentSettingActivated
+                        && (draftMode == DraftMode.REPLY || draftMode == DraftMode.REPLY_ALL)
+                populateUiWithViewModel(shouldWarnForExternalContacts)
+
                 setupFromField(signatures)
             } else {
                 requireActivity().apply {
@@ -356,16 +362,13 @@ class NewMessageFragment : Fragment() {
         val draft = newMessageViewModel.draft
 
         val ccAndBccFieldsAreEmpty = draft.cc.isEmpty() && draft.bcc.isEmpty()
-        val mergedContactMap = newMessageViewModel.mergedContacts.value?.second ?: emptyMap()
-        toField.initRecipients(draft.to, shouldWarnForExternalContacts, mergedContactMap, ccAndBccFieldsAreEmpty)
-        ccField.initRecipients(draft.cc, shouldWarnForExternalContacts, mergedContactMap)
-        bccField.initRecipients(draft.bcc, shouldWarnForExternalContacts, mergedContactMap)
+        val emailDictionary = newMessageViewModel.mergedContacts.value?.second ?: emptyMap()
+        toField.initRecipients(draft.to, shouldWarnForExternalContacts, emailDictionary, ccAndBccFieldsAreEmpty)
+        ccField.initRecipients(draft.cc, shouldWarnForExternalContacts, emailDictionary)
+        bccField.initRecipients(draft.bcc, shouldWarnForExternalContacts, emailDictionary)
 
         if (shouldWarnForExternalContacts) {
-            val (externalRecipientEmail, externalRecipientQuantity) = UiUtils.findExternalRecipientInDraft(
-                draft,
-                mergedContactMap
-            )
+            val (externalRecipientEmail, externalRecipientQuantity) = UiUtils.findExternalRecipientInDraft(draft, emailDictionary)
             newMessageViewModel.isExternalBannerVisible.value = externalRecipientEmail to externalRecipientQuantity
         }
 
@@ -422,14 +425,14 @@ class NewMessageFragment : Fragment() {
         var externalRecipientQuantity = 0
 
         listOf(toField, ccField, bccField).forEach { field ->
-            val (email, quantity) = field.findAlreadyExistingExternalRecipientsInFields()
-            externalRecipientQuantity += quantity
+            val (singleEmail, quantityForThisField) = field.findAlreadyExistingExternalRecipientsInFields()
+            externalRecipientQuantity += quantityForThisField
 
             if (externalRecipientQuantity > 1) {
                 newMessageViewModel.isExternalBannerVisible.value = null to 2
                 return
-            } else if (quantity == 1) {
-                externalRecipientEmail = email
+            } else if (quantityForThisField == 1) {
+                externalRecipientEmail = singleEmail
             }
         }
 
