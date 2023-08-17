@@ -140,11 +140,11 @@ object MailboxController {
     //endregion
 
     //region Edit data
-    suspend fun updateMailboxes(
+    fun updateMailboxes(
         context: Context,
         remoteMailboxes: List<Mailbox>,
         userId: Int = AccountUtils.currentUserId,
-    ): Boolean {
+    ) {
 
         context.initMailNotificationChannel(remoteMailboxes)
 
@@ -162,25 +162,23 @@ object MailboxController {
             }
         }
 
-        return update(mailboxes, userId)
+        update(mailboxes, userId)
     }
 
-    private suspend fun update(remoteMailboxes: List<Mailbox>, userId: Int): Boolean {
+    private fun update(remoteMailboxes: List<Mailbox>, userId: Int) {
 
         // Get current data
         Log.d(RealmDatabase.TAG, "Mailboxes: Get current data")
         val localQuotasAndPermissions = getMailboxes(userId).associate { it.objectId to (it.quotas to it.permissions) }
 
-        val isCurrentMailboxDeleted = defaultRealm.writeBlocking {
+        defaultRealm.writeBlocking {
 
             Log.d(RealmDatabase.TAG, "Mailboxes: Save new data")
             upsertMailboxes(localQuotasAndPermissions, remoteMailboxes)
 
             Log.d(RealmDatabase.TAG, "Mailboxes: Delete outdated data")
-            return@writeBlocking deleteOutdatedData(remoteMailboxes, userId)
+            deleteOutdatedData(remoteMailboxes, userId)
         }
-
-        return isCurrentMailboxDeleted.also { if (it) AccountUtils.reloadApp?.invoke() }
     }
 
     private fun MutableRealm.upsertMailboxes(
@@ -196,7 +194,7 @@ object MailboxController {
         }
     }
 
-    private fun MutableRealm.deleteOutdatedData(remoteMailboxes: List<Mailbox>, userId: Int): Boolean {
+    private fun MutableRealm.deleteOutdatedData(remoteMailboxes: List<Mailbox>, userId: Int) {
         val outdatedMailboxes = getMailboxes(userId, remoteMailboxes.map { it.mailboxId }, realm = this)
         val isCurrentMailboxDeleted = outdatedMailboxes.any { it.mailboxId == AccountUtils.currentMailboxId }
         if (isCurrentMailboxDeleted) {
@@ -205,8 +203,6 @@ object MailboxController {
         }
         outdatedMailboxes.forEach { RealmDatabase.deleteMailboxContent(it.mailboxId) }
         delete(outdatedMailboxes)
-
-        return isCurrentMailboxDeleted
     }
 
     fun updateMailbox(objectId: String, onUpdate: (mailbox: Mailbox) -> Unit) {

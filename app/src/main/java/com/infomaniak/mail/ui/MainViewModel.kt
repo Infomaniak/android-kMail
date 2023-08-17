@@ -231,15 +231,23 @@ class MainViewModel @Inject constructor(
             Log.d(TAG, "Refresh mailboxes from remote")
             with(ApiRepository.getMailboxes()) {
                 if (isSuccess()) {
+
+                    MailboxController.updateMailboxes(context, data!!)
+
                     when {
                         data!!.isEmpty() -> {
                             shouldStartNoMailboxActivity.postValue(Unit)
                             return@launch
                         }
-                        data!!.none { it.isValid } -> Dispatchers.Main { context.launchNoValidMailboxesActivity() }
+                        data!!.none { it.isValid } -> {
+                            Dispatchers.Main { context.launchNoValidMailboxesActivity() }
+                            return@launch
+                        }
+                        data!!.none { it.email == AccountUtils.currentMailboxEmail } -> {
+                            AccountUtils.reloadApp?.invoke()
+                            return@launch
+                        }
                     }
-                    val isCurrentMailboxDeleted = MailboxController.updateMailboxes(context, data!!)
-                    if (isCurrentMailboxDeleted) return@launch
                 }
             }
 

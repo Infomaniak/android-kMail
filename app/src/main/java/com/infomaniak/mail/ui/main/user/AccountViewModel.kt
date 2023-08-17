@@ -23,14 +23,19 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.models.ApiResponse
+import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.mailbox.MailboxLinkedResult
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.coroutineContext
+import com.infomaniak.mail.utils.launchNoValidMailboxesActivity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -42,10 +47,29 @@ class AccountViewModel @Inject constructor(
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
-    suspend fun updateMailboxes() {
-        val userId = AccountUtils.currentUserId
-        val mailboxes = ApiRepository.getMailboxes(AccountUtils.getHttpClient(userId)).data ?: return
-        MailboxController.updateMailboxes(getApplication(), mailboxes, userId)
+    val shouldStartNoMailboxActivity = SingleLiveEvent<Unit>()
+
+    suspend fun updateMailboxes(): Boolean {
+        val mailboxes = ApiRepository.getMailboxes(AccountUtils.getHttpClient(AccountUtils.currentUserId)).data ?: return false
+        MailboxController.updateMailboxes(context, mailboxes)
+
+        val shouldStop = when {
+            mailboxes.isEmpty() -> {
+                shouldStartNoMailboxActivity.postValue(Unit)
+                true
+            }
+            mailboxes.none { it.isValid } -> {
+                Dispatchers.Main { context.launchNoValidMailboxesActivity() }
+                true
+            }
+            mailboxes.none { it.mailboxId == AccountUtils.currentMailboxId } -> {
+                AccountUtils.reloadApp?.invoke()
+                true
+            }
+            else -> false
+        }
+
+        return shouldStop
     }
 
     fun attachNewMailbox(
@@ -56,7 +80,9 @@ class AccountViewModel @Inject constructor(
     }
 
     fun switchToNewMailbox(newMailboxId: Int) = viewModelScope.launch(ioCoroutineContext) {
-        updateMailboxes()
+        val shouldStop = updateMailboxes()
+        if (shouldStop) return@launch
+
         AccountUtils.switchToMailbox(newMailboxId)
     }
 }
