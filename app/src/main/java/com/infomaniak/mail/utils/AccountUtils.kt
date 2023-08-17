@@ -86,12 +86,12 @@ object AccountUtils : CredentialManager() {
     suspend fun manageMailboxesEdgeCases(
         context: Context,
         mailboxes: List<Mailbox>,
-        playServicesUtils: PlayServicesUtils,
+        launchNoMailboxActivity: () -> Unit,
     ): Boolean {
 
         val shouldStop = when {
             mailboxes.isEmpty() -> {
-                removeUser(context, currentUser!!, playServicesUtils)
+                launchNoMailboxActivity()
                 true
             }
             mailboxes.none { it.isValid } -> {
@@ -117,7 +117,7 @@ object AccountUtils : CredentialManager() {
         userDatabase.userDao().insert(user)
     }
 
-    suspend fun removeUser(context: Context, user: User, playServicesUtils: PlayServicesUtils) {
+    suspend fun removeUser(context: Context, user: User, playServicesUtils: PlayServicesUtils, shouldReload: Boolean = true) {
 
         fun logoutUserToken() {
             CoroutineScope(Dispatchers.IO).launch {
@@ -141,7 +141,7 @@ object AccountUtils : CredentialManager() {
                 resetSettings(context, localSettings)
                 playServicesUtils.deleteFirebaseToken()
             }
-            reloadApp?.invoke()
+            if (shouldReload) reloadApp?.invoke()
         }
     }
 

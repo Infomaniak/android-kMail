@@ -29,7 +29,6 @@ import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.mailbox.MailboxLinkedResult
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.PlayServicesUtils
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -40,7 +39,6 @@ import javax.inject.Inject
 @HiltViewModel
 class AccountViewModel @Inject constructor(
     application: Application,
-    private val playServicesUtils: PlayServicesUtils,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
@@ -52,7 +50,11 @@ class AccountViewModel @Inject constructor(
         val mailboxes = ApiRepository.getMailboxes(AccountUtils.getHttpClient(AccountUtils.currentUserId)).data ?: return false
         MailboxController.updateMailboxes(context, mailboxes)
 
-        return AccountUtils.manageMailboxesEdgeCases(context, mailboxes, playServicesUtils)
+        return AccountUtils.manageMailboxesEdgeCases(
+            context = context,
+            mailboxes = mailboxes,
+            launchNoMailboxActivity = { shouldStartNoMailboxActivity.postValue(Unit) },
+        )
     }
 
     fun attachNewMailbox(

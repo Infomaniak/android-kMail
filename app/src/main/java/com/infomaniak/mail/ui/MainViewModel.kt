@@ -68,7 +68,6 @@ import com.infomaniak.lib.core.R as RCore
 class MainViewModel @Inject constructor(
     application: Application,
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
-    private val playServicesUtils: PlayServicesUtils,
     private val sharedUtils: SharedUtils,
     private val addressBookController: AddressBookController,
     private val draftController: DraftController,
@@ -233,7 +232,14 @@ class MainViewModel @Inject constructor(
             with(ApiRepository.getMailboxes()) {
                 if (isSuccess()) {
                     MailboxController.updateMailboxes(context, data!!)
-                    if (AccountUtils.manageMailboxesEdgeCases(context, data!!, playServicesUtils)) return@launch
+
+                    val shouldStop = AccountUtils.manageMailboxesEdgeCases(
+                        context = context,
+                        mailboxes = data!!,
+                        launchNoMailboxActivity = { shouldStartNoMailboxActivity.postValue(Unit) },
+                    )
+
+                    if (shouldStop) return@launch
                 }
             }
 

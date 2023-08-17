@@ -578,7 +578,7 @@ fun Context.launchNoValidMailboxesActivity() {
 
 fun Context.launchNoMailboxActivity(shouldStartLoginActivity: Boolean = false) {
     if (shouldStartLoginActivity) launchLoginActivity(shouldClearStack = true)
-    startActivity(Intent(this, NoMailboxActivity::class.java))
+    Intent(this, NoMailboxActivity::class.java).also(::startActivity)
 }
 
 fun TextInputLayout.setOnClearTextClickListener(trackerCallback: () -> Unit) {
