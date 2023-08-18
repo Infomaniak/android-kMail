@@ -352,9 +352,9 @@ class RefreshController @Inject constructor(private val localSettings: LocalSett
         val logMessage = "Added: ${uids.count()}"
         Log.d("API", "$logMessage | ${folder.name}")
 
-        if (uids.isEmpty()) return emptySet()
-
         addSentryBreadcrumbsForAddedUids(logMessage = logMessage, email = mailbox.email, folder = folder, uids = uids)
+
+        if (uids.isEmpty()) return emptySet()
 
         val impactedThreads = mutableSetOf<Thread>()
 
