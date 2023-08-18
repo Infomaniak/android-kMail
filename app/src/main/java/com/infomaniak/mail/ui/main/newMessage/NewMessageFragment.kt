@@ -360,15 +360,20 @@ class NewMessageFragment : Fragment() {
 
     private fun populateUiWithViewModel(shouldWarnForExternalContacts: Boolean) = with(binding) {
         val draft = newMessageViewModel.draft
+        val aliases = newMessageViewModel.aliases
 
         val ccAndBccFieldsAreEmpty = draft.cc.isEmpty() && draft.bcc.isEmpty()
         val emailDictionary = newMessageViewModel.mergedContacts.value?.second ?: emptyMap()
-        toField.initRecipients(draft.to, shouldWarnForExternalContacts, emailDictionary, ccAndBccFieldsAreEmpty)
-        ccField.initRecipients(draft.cc, shouldWarnForExternalContacts, emailDictionary)
-        bccField.initRecipients(draft.bcc, shouldWarnForExternalContacts, emailDictionary)
+        toField.initRecipients(draft.to, shouldWarnForExternalContacts, emailDictionary, aliases, ccAndBccFieldsAreEmpty)
+        ccField.initRecipients(draft.cc, shouldWarnForExternalContacts, emailDictionary, aliases)
+        bccField.initRecipients(draft.bcc, shouldWarnForExternalContacts, emailDictionary, aliases)
 
         if (shouldWarnForExternalContacts) {
-            val (externalRecipientEmail, externalRecipientQuantity) = UiUtils.findExternalRecipientInDraft(draft, emailDictionary)
+            val (externalRecipientEmail, externalRecipientQuantity) = UiUtils.findExternalRecipientInDraft(
+                draft,
+                aliases,
+                emailDictionary,
+            )
             newMessageViewModel.isExternalBannerVisible.value = externalRecipientEmail to externalRecipientQuantity
         }
 

@@ -112,6 +112,7 @@ class NewMessageViewModel @Inject constructor(
 
     private var isNewMessage = false
 
+    var aliases: List<String> = emptyList()
     val mergedContacts = liveData(ioCoroutineContext) {
         val list = mergedContactController.getMergedContacts(sorted = true).copyFromRealm()
         emit(list to arrangeMergedContacts(list))
@@ -179,6 +180,7 @@ class NewMessageViewModel @Inject constructor(
                 otherFieldsAreAllEmpty.postValue(false)
                 initializeFieldsAsOpen.postValue(true)
             }
+            aliases = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!.aliases
         }
 
         emit(isSuccess to signatures)

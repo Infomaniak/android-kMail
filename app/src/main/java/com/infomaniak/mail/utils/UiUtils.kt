@@ -141,12 +141,13 @@ object UiUtils {
     fun findExternalRecipientsInThread(
         thread: Thread,
         emailDictionary: Map<String, Map<String, MergedContact>>,
+        aliases: List<String>,
     ): Pair<String?, Int> {
         var externalRecipientEmail: String? = null
         var externalRecipientQuantity = 0
 
         thread.messages.forEach { message ->
-            val (singleEmail, quantityForThisMessage) = findExternalRecipientInIterables(emailDictionary, message.from)
+            val (singleEmail, quantityForThisMessage) = findExternalRecipientInIterables(emailDictionary, aliases, message.from)
 
             externalRecipientQuantity += quantityForThisMessage
             if (externalRecipientQuantity > 1) return null to 2
@@ -157,8 +158,12 @@ object UiUtils {
         return externalRecipientEmail to externalRecipientQuantity
     }
 
-    fun findExternalRecipientInDraft(draft: Draft, emailDictionary: Map<String, Map<String, MergedContact>>): Pair<String?, Int> {
-        return findExternalRecipientInIterables(emailDictionary, draft.to, draft.cc, draft.bcc)
+    fun findExternalRecipientInDraft(
+        draft: Draft,
+        aliases: List<String>,
+        emailDictionary: Map<String, Map<String, MergedContact>>,
+    ): Pair<String?, Int> {
+        return findExternalRecipientInIterables(emailDictionary, aliases, draft.to, draft.cc, draft.bcc)
     }
 
     /**
@@ -166,6 +171,7 @@ object UiUtils {
      */
     private fun findExternalRecipientInIterables(
         emailDictionary: Map<String, Map<String, MergedContact>>,
+        aliases: List<String>,
         vararg recipientLists: Iterable<Recipient>,
     ): Pair<String?, Int> {
         var externalRecipientEmail: String? = null
@@ -173,7 +179,7 @@ object UiUtils {
 
         recipientLists.forEach { recipientList ->
             recipientList.forEach { recipient ->
-                if (recipient.isExternal(emailDictionary)) {
+                if (recipient.isExternal(emailDictionary, aliases)) {
                     if (externalRecipientQuantity++ == 0) {
                         externalRecipientEmail = recipient.email
                     } else {

@@ -35,6 +35,7 @@ import androidx.core.text.toSpannable
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.MediatorLiveData
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
@@ -60,7 +61,9 @@ import com.infomaniak.mail.data.LocalSettings.ExternalContent
 import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadBinding
@@ -136,11 +139,41 @@ class ThreadFragment : Fragment() {
             observeContacts()
             observeQuickActionBarClicks()
             observeOpenAttachment()
+            observerSubjectUpdateTrigger()
         }
 
         permissionUtils.registerDownloadManagerPermission()
         mainViewModel.toggleLightThemeForMessage.observe(viewLifecycleOwner, threadAdapter::toggleLightMode)
     }
+
+    private fun observerSubjectUpdateTrigger() {
+        fun threadMergedContactAndMailboxMediator(): MediatorLiveData<Triple<Thread?, Map<String, Map<String, MergedContact>>?, Mailbox?>> {
+            return MediatorLiveData<Triple<Thread?, Map<String, Map<String, MergedContact>>?, Mailbox?>>().apply {
+                addSource(threadViewModel.threadLive(navigationArgs.threadUid)) {
+                    val second = value?.second
+                    val third = value?.third
+                    value = Triple(it, second, third)
+                }
+
+                addSource(mainViewModel.mergedContactsLive) {
+                    val first = value?.first
+                    val third = value?.third
+                    value = Triple(first, it, third)
+                }
+
+                addSource(mainViewModel.currentMailboxLive) {
+                    val first = value?.first
+                    val second = value?.second
+                    value = Triple(first, second, it)
+                }
+            }
+        }
+
+        threadMergedContactAndMailboxMediator().observe(viewLifecycleOwner) { (thread, mergedContacts, mailbox) ->
+            thread?.let { setSubject(thread, mergedContacts ?: emptyMap(), mailbox?.aliases ?: emptyList()) }
+        }
+    }
+
 
     private fun setupUi(threadUid: String) = with(binding) {
         toolbar.setNavigationOnClickListener { leaveThread() }
@@ -424,13 +457,7 @@ class ThreadFragment : Fragment() {
             return@with
         }
 
-        // TODO : If mergedContact live data is notified, do we want to recompute the subject to update the "external" tag? Like,
-        //  first time you ever login, if it takes long to get your contacts you might open a thread before it finished and have
-        //  no mergedContacts to compare against, therefore everyone will be considered external.
-        val (subject, spannedSubject) = computeSubject(thread)
-        threadSubject.text = spannedSubject
         threadSubject.movementMethod = LinkMovementMethod.getInstance()
-        toolbarSubject.text = subject
 
         iconFavorite.apply {
             setIconResource(if (thread.isFavorite) R.drawable.ic_star_filled else R.drawable.ic_star)
@@ -445,14 +472,28 @@ class ThreadFragment : Fragment() {
         isFavorite = thread.isFavorite
     }
 
-    private fun FragmentThreadBinding.computeSubject(thread: Thread): Pair<String, CharSequence> {
+    private fun setSubject(
+        thread: Thread,
+        emailDictionary: Map<String, Map<String, MergedContact>>,
+        aliases: List<String>,
+    ) = with(binding) {
+        val (subject, spannedSubject) = computeSubject(thread, emailDictionary, aliases)
+        threadSubject.text = spannedSubject
+        toolbarSubject.text = subject
+    }
+
+    private fun computeSubject(
+        thread: Thread,
+        emailDictionary: Map<String, Map<String, MergedContact>>,
+        aliases: List<String>,
+    ): Pair<String, CharSequence> = with(binding) {
         val subject = context.formatSubject(thread.subject)
 
-        val emailDictionary = mainViewModel.mergedContacts.value ?: run {
-            // TODO : Sentry could not check if recipient isExternal because no merged contacts
-            emptyMap()
-        }
-        val (externalRecipientEmail, externalRecipientQuantity) = UiUtils.findExternalRecipientsInThread(thread, emailDictionary)
+        val (externalRecipientEmail, externalRecipientQuantity) = UiUtils.findExternalRecipientsInThread(
+            thread,
+            emailDictionary,
+            aliases
+        )
         if (externalRecipientQuantity == 0) return subject to subject
 
         val externalPostfix = getString(R.string.externalTag)

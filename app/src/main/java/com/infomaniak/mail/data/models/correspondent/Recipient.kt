@@ -42,14 +42,14 @@ open class Recipient : EmbeddedRealmObject, Correspondent {
         return this
     }
 
-    fun isExternal(emailDictionary: Map<String, Map<String, MergedContact>>): Boolean {
-        // TODO : les domaines possibles de la mailbox courrante
+    fun isExternal(emailDictionary: Map<String, Map<String, MergedContact>>, aliases: List<String>): Boolean {
         val isUnknownContact = email !in emailDictionary
         val isMailerDaemon = """mailer-daemon@(?:.+\.)?infomaniak\.ch""".toRegex(RegexOption.IGNORE_CASE).matches(email)
         val trustedDomains = listOf("@infomaniak.com", "@infomaniak.event", "@swisstransfer.com")
         val isUntrustedDomain = email.isEmail() && trustedDomains.none { email.endsWith(it) }
+        val isAlias = aliases.any { email in aliases }
 
-        return isUnknownContact && !isMailerDaemon && isUntrustedDomain
+        return isUnknownContact && !isMailerDaemon && isUntrustedDomain && !isAlias
     }
 
     override fun toString(): String = "($email -> $name)"
