@@ -32,7 +32,7 @@ class LockedMailboxBottomSheetDialog : InformationBottomSheetDialog() {
 
         title.text = getString(R.string.blockedMailboxTitle, navigationArgs.lockedMailboxName)
         description.text = resources.getQuantityText(R.plurals.lockedMailboxDescription, 1)
-        illu.setBackgroundResource(R.drawable.ic_invalid_mailbox)
+        infoIllustration.setBackgroundResource(R.drawable.ic_invalid_mailbox)
 
         actionButton.apply {
             setText(R.string.buttonClose)

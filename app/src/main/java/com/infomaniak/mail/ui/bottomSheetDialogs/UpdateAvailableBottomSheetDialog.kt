@@ -39,7 +39,7 @@ class UpdateAvailableBottomSheetDialog : InformationBottomSheetDialog() {
 
         title.setText(RCore.string.updateAvailableTitle)
         description.text = resources.getString(RCore.string.updateAvailableDescription, context.getAppName())
-        illu.setBackgroundResource(R.drawable.ic_update_logo)
+        infoIllustration.setBackgroundResource(R.drawable.ic_update_logo)
 
         actionButton.apply {
             setText(RCore.string.buttonUpdate)

@@ -46,7 +46,7 @@ class NoMailboxActivity : BaseActivity() {
             noMailboxIconLayout.apply {
                 getAccentIndependentIlluColors().forEach(::changePathColor)
                 getAccentDependentIlluColors().forEach(::changePathColor)
-                setAnimation(R.raw.illu_no_mailbox)
+                setAnimation(R.raw.illustration_no_mailbox)
                 repeatFrame(42, 112)
             }
 
