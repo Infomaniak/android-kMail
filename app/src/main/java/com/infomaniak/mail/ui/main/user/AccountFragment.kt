@@ -104,19 +104,12 @@ class AccountFragment : Fragment(), MailboxListFragment {
             isFocusable = false
         }
 
-        observeNoMailboxActivityTriggers()
         observeAccountsLive()
     }
 
     private fun removeCurrentUser() = lifecycleScope.launch(ioDispatcher) {
         requireContext().trackAccountEvent("logOutConfirm")
         AccountUtils.removeUser(requireContext(), AccountUtils.currentUser!!, playServicesUtils)
-    }
-
-    private fun observeNoMailboxActivityTriggers() {
-        accountViewModel.shouldStartNoMailboxActivity.observe(viewLifecycleOwner) {
-            mainViewModel.shouldStartNoMailboxActivity.postValue(Unit)
-        }
     }
 
     private fun observeAccountsLive() {

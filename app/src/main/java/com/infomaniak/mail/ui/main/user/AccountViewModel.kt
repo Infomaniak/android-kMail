@@ -23,7 +23,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.models.ApiResponse
-import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.mailbox.MailboxLinkedResult
@@ -44,17 +43,11 @@ class AccountViewModel @Inject constructor(
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
-    val shouldStartNoMailboxActivity = SingleLiveEvent<Unit>()
-
     suspend fun updateMailboxes(): Boolean {
         val mailboxes = ApiRepository.getMailboxes(AccountUtils.getHttpClient(AccountUtils.currentUserId)).data ?: return false
         MailboxController.updateMailboxes(context, mailboxes)
 
-        return AccountUtils.manageMailboxesEdgeCases(
-            context = context,
-            mailboxes = mailboxes,
-            launchNoMailboxActivity = { shouldStartNoMailboxActivity.postValue(Unit) },
-        )
+        return AccountUtils.manageMailboxesEdgeCases(context, mailboxes)
     }
 
     fun attachNewMailbox(
@@ -66,8 +59,6 @@ class AccountViewModel @Inject constructor(
 
     fun switchToNewMailbox(newMailboxId: Int) = viewModelScope.launch(ioCoroutineContext) {
         val shouldStop = updateMailboxes()
-        if (shouldStop) return@launch
-
-        AccountUtils.switchToMailbox(newMailboxId)
+        if (!shouldStop) AccountUtils.switchToMailbox(newMailboxId)
     }
 }

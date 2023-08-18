@@ -83,15 +83,11 @@ object AccountUtils : CredentialManager() {
         reloadApp?.invoke()
     }
 
-    suspend fun manageMailboxesEdgeCases(
-        context: Context,
-        mailboxes: List<Mailbox>,
-        launchNoMailboxActivity: () -> Unit,
-    ): Boolean {
+    suspend fun manageMailboxesEdgeCases(context: Context, mailboxes: List<Mailbox>): Boolean {
 
         val shouldStop = when {
             mailboxes.isEmpty() -> {
-                launchNoMailboxActivity()
+                Dispatchers.Main { context.launchNoMailboxActivity(shouldStartLoginActivity = true) }
                 true
             }
             mailboxes.none { it.isValid } -> {

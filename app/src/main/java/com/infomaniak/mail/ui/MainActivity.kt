@@ -134,7 +134,6 @@ class MainActivity : BaseActivity() {
 
         observeNetworkStatus()
         observeDraftWorkerResults()
-        observeNoMailboxActivityTriggers()
         binding.drawerLayout.addDrawerListener(drawerListener)
         registerFirebaseBroadcastReceiver.initFirebaseBroadcastReceiver(this, mainViewModel)
 
@@ -404,12 +403,6 @@ class MainActivity : BaseActivity() {
         val intent = Intent(this, NewMessageActivity::class.java)
         args?.let(intent::putExtras)
         newMessageActivityResultLauncher.launch(intent)
-    }
-
-    private fun observeNoMailboxActivityTriggers() {
-        mainViewModel.shouldStartNoMailboxActivity.observe(this) {
-            launchNoMailboxActivity(shouldStartLoginActivity = true)
-        }
     }
 
     companion object {

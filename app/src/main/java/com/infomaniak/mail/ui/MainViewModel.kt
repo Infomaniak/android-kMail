@@ -86,7 +86,6 @@ class MainViewModel @Inject constructor(
     // First boolean is the download status, second boolean is if the LoadMore button should be displayed
     val isDownloadingChanges: MutableLiveData<Pair<Boolean, Boolean?>> = MutableLiveData(false to null)
     val isNewFolderCreated = SingleLiveEvent<Boolean>()
-    val shouldStartNoMailboxActivity = SingleLiveEvent<Unit>()
     val toggleLightThemeForMessage = SingleLiveEvent<Message>()
 
     val snackBarManager by lazy { SnackBarManager() }
@@ -233,12 +232,7 @@ class MainViewModel @Inject constructor(
                 if (isSuccess()) {
                     MailboxController.updateMailboxes(context, data!!)
 
-                    val shouldStop = AccountUtils.manageMailboxesEdgeCases(
-                        context = context,
-                        mailboxes = data!!,
-                        launchNoMailboxActivity = { shouldStartNoMailboxActivity.postValue(Unit) },
-                    )
-
+                    val shouldStop = AccountUtils.manageMailboxesEdgeCases(context, data!!)
                     if (shouldStop) return@launch
                 }
             }
