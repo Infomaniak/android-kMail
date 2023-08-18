@@ -313,7 +313,8 @@
     <string name="settingsDensityOptionNormal">Normale</string>
     <string name="settingsDisabled">Disabili</string>
     <string name="settingsEnabled">Abilitato</string>
-    <string name="settingsExternalContentTitle">Visualizzazione di contenuti esterni</string>
+    <string name="settingsExternalContentDescription">Visualizzare il contenuto esterno</string>
+    <string name="settingsExternalContentTitle">contenuto esterno</string>
     <string name="settingsInboxAlias">Alias</string>
     <string name="settingsInboxRedirect">Reindirizzamenti</string>
     <string name="settingsInboxRules">Regole</string>

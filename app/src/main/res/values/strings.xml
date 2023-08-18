@@ -320,7 +320,8 @@
     <string name="settingsDensityOptionNormal">Normal</string>
     <string name="settingsDisabled">Disabled</string>
     <string name="settingsEnabled">Enabled</string>
-    <string name="settingsExternalContentTitle">Display external content</string>
+    <string name="settingsExternalContentDescription">Display external content</string>
+    <string name="settingsExternalContentTitle">External content</string>
     <string name="settingsInboxAlias">Alias</string>
     <string name="settingsInboxRedirect">Redirections</string>
     <string name="settingsInboxRules">Rules</string>
