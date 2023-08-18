@@ -34,7 +34,7 @@
 
             <TextView
                 style="@style/SettingHeader"
-                android:text="@string/settingsSelectDisplayModeDescription" />
+                android:text="@string/settingsExternalContentDescription" />
 
             <com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
                 android:id="@+id/radioGroup"

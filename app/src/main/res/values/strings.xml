@@ -320,7 +320,8 @@
     <string name="settingsDensityOptionNormal">Normal</string>
     <string name="settingsDisabled">Disabled</string>
     <string name="settingsEnabled">Enabled</string>
-    <string name="settingsExternalContentTitle">Display external content</string>
+    <string name="settingsExternalContentDescription">Display external content</string>
+    <string name="settingsExternalContentTitle">External content</string>
     <string name="settingsInboxAlias">Alias</string>
     <string name="settingsInboxRedirect">Redirections</string>
     <string name="settingsInboxRules">Rules</string>
@@ -363,8 +364,8 @@
     <string name="settingsSwipeDescription">Swipe items in your inbox and get quick access to your most frequent actions</string>
     <string name="settingsSwipeLeft">Left swipe</string>
     <string name="settingsSwipeRight">Right swipe</string>
-    <string name="settingsTheme">Theme</string>
-    <string name="settingsThemeChoiceTitle">Theme choice</string>
+    <string name="settingsThemeDescription">Theme choice</string>
+    <string name="settingsThemeTitle">Theme</string>
     <string name="settingsThreadListDensityTitle">Thread list density</string>
     <string name="settingsThreadModeTitle">Message display mode</string>
     <string name="settingsThreadModeWarningDescription">Please note that changing this option will download all your messages again</string>
