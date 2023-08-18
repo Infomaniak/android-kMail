@@ -362,8 +362,8 @@
     <string name="settingsSwipeDescription">Balayez des éléments dans votre boîte de réception et accédez rapidement à vos actions les plus fréquentes</string>
     <string name="settingsSwipeLeft">Balayage vers la gauche</string>
     <string name="settingsSwipeRight">Balayage vers la droite</string>
-    <string name="settingsTheme">Thème</string>
-    <string name="settingsThemeChoiceTitle">Choix du thème</string>
+    <string name="settingsThemeDescription">Choix du thème</string>
+    <string name="settingsThemeTitle">Thème</string>
     <string name="settingsThreadListDensityTitle">Densité de la liste de conversation</string>
     <string name="settingsThreadModeTitle">Mode d’affichage des messages</string>
     <string name="settingsThreadModeWarningDescription">Attention, modifier cette option va télécharger à nouveau tous vos messages</string>

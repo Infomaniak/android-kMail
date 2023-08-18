@@ -356,8 +356,8 @@
     <string name="settingsSwipeDescription">Scorri gli elementi nella tua casella di posta e accedi rapidamente alle azioni più frequenti.</string>
     <string name="settingsSwipeLeft">Passaggio del dito a sinistra</string>
     <string name="settingsSwipeRight">Passaggio del dito a destra</string>
-    <string name="settingsTheme">Tema</string>
-    <string name="settingsThemeChoiceTitle">Scelta del tema</string>
+    <string name="settingsThemeDescription">Scelta del tema</string>
+    <string name="settingsThemeTitle">Tema</string>
     <string name="settingsThreadListDensityTitle">Densità dell’elenco delle discussioni</string>
     <string name="settingsThreadModeTitle">Modalità di visualizzazione dei messaggi</string>
     <string name="settingsThreadModeWarningDescription">Si noti che la modifica di questa opzione comporta un nuovo download di tutti i messaggi</string>

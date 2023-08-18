@@ -356,8 +356,8 @@
     <string name="settingsSwipeDescription">Desliza los elementos de tu bandeja de entrada y accede rápidamente a tus acciones más frecuentes</string>
     <string name="settingsSwipeLeft">Deslizar a la izquierda</string>
     <string name="settingsSwipeRight">Deslizar a la derecha</string>
-    <string name="settingsTheme">Tema</string>
-    <string name="settingsThemeChoiceTitle">Elección del tema</string>
+    <string name="settingsThemeDescription">Elección del tema</string>
+    <string name="settingsThemeTitle">Tema</string>
     <string name="settingsThreadListDensityTitle">Densidad de la lista de hilos</string>
     <string name="settingsThreadModeTitle">Modo de visualización de mensajes</string>
     <string name="settingsThreadModeWarningDescription">Ten en cuenta que al cambiar esta opción se descargarán de nuevo todos tus mensajes</string>

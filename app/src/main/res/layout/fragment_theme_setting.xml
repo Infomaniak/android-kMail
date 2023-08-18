@@ -20,7 +20,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:title="@string/settingsThemeChoiceTitle"
+    app:title="@string/settingsThemeTitle"
     tools:context=".ui.main.settings.ThemeSettingFragment">
 
     <androidx.core.widget.NestedScrollView
@@ -34,7 +34,7 @@
 
             <TextView
                 style="@style/SettingHeader"
-                android:text="@string/settingsTheme" />
+                android:text="@string/settingsThemeDescription" />
 
             <com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
                 android:id="@+id/radioGroup"

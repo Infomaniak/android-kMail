@@ -356,8 +356,8 @@
     <string name="settingsSwipeDescription">Streichen Sie über Elemente in Ihrem Posteingang und erhalten Sie schnellen Zugriff auf Ihre häufigsten Aktionen</string>
     <string name="settingsSwipeLeft">Links wischen</string>
     <string name="settingsSwipeRight">Rechts wischen</string>
-    <string name="settingsTheme">Thema</string>
-    <string name="settingsThemeChoiceTitle">Wahl des Themas</string>
+    <string name="settingsThemeDescription">Wahl des Themas</string>
+    <string name="settingsThemeTitle">Thema</string>
     <string name="settingsThreadListDensityTitle">Dichte der Fadenliste</string>
     <string name="settingsThreadModeTitle">Modus der Nachrichtenanzeige</string>
     <string name="settingsThreadModeWarningDescription">Achtung: Wenn Sie diese Option ändern, werden alle Ihre Nachrichten erneut heruntergeladen</string>
