@@ -90,7 +90,7 @@ class MainViewModel @Inject constructor(
     val shouldStartNoMailboxActivity = SingleLiveEvent<Unit>()
 
     // Explanation of this Map : Map<Email, Map<Name, MergedContact>>
-    val mergedContacts = MutableLiveData<Map<String, Map<String, MergedContact>>?>()
+    val mergedContactsLive = MutableLiveData<Map<String, Map<String, MergedContact>>?>()
 
     //region Multi selection
     val isMultiSelectOnLiveData = MutableLiveData(false)
@@ -354,7 +354,7 @@ class MainViewModel @Inject constructor(
 
     fun observeMergedContactsLive() = viewModelScope.launch(ioCoroutineContext) {
         mergedContactController.getMergedContactsAsync().collect { contacts ->
-            mergedContacts.postValue(arrangeMergedContacts(contacts.list.copyFromRealm()))
+            mergedContactsLive.postValue(arrangeMergedContacts(contacts.list.copyFromRealm()))
         }
     }
 
