@@ -106,6 +106,10 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.updateMailboxPassword(mailboxId), PUT, mapOf("password" to password))
     }
 
+    fun askMailboxPassword(mailboxHostingId: Int, mailboxName: String): ApiResponse<Boolean> {
+        return callApi(ApiRoutes.askMailboxPassword(mailboxHostingId, mailboxName), POST)
+    }
+
     fun getFolders(mailboxUuid: String): ApiResponse<List<Folder>> = callApi(ApiRoutes.folders(mailboxUuid), GET)
 
     fun createFolder(mailboxUuid: String, name: String): ApiResponse<Folder> {
