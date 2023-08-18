@@ -54,7 +54,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
     private val currentClassName: String by lazy { ThreadActionsBottomSheetDialog::class.java.name }
 
-    private val isSpamFolder = mainViewModel.isCurrentFolderRole(FolderRole.SPAM)
+    private val isSpamFolder by lazy { mainViewModel.isCurrentFolderRole(FolderRole.SPAM) }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(navigationArgs) {
         super.onViewCreated(view, savedInstanceState)
@@ -149,7 +149,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     mainViewModel.toggleThreadFavoriteStatus(threadUid)
                 }
 
-                override fun onReportJunk()  {
+                override fun onReportJunk() {
                     if (isSpamFolder) {
                         trackBottomSheetThreadActionsEvent(ACTION_SPAM_NAME, value = true)
                         mainViewModel.toggleThreadSpamStatus(threadUid)
