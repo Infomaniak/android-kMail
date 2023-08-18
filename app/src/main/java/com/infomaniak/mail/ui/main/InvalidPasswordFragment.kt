@@ -74,11 +74,7 @@ class InvalidPasswordFragment : Fragment() {
             setOnClickListener {
                 trackInvalidPasswordMailboxEvent("updatePassword")
                 showProgress()
-                invalidPasswordViewModel.updatePassword(
-                    navigationArgs.mailboxId,
-                    navigationArgs.mailboxObjectId,
-                    passwordInput.text?.trim().toString(),
-                )
+                invalidPasswordViewModel.updatePassword(passwordInput.text?.trim().toString())
             }
         }
 
@@ -89,7 +85,7 @@ class InvalidPasswordFragment : Fragment() {
                 description = getStringWithBoldArg(R.string.popupDetachMailboxDescription, navigationArgs.mailboxEmail),
                 onPositiveButtonClicked = {
                     trackInvalidPasswordMailboxEvent("detachMailboxConfirm")
-                    invalidPasswordViewModel.detachMailbox(navigationArgs.mailboxId)
+                    invalidPasswordViewModel.detachMailbox()
                 },
             ).show()
         }

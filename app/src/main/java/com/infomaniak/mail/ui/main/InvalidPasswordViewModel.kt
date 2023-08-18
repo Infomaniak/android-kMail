@@ -48,11 +48,11 @@ class InvalidPasswordViewModel @Inject constructor(
     val requestPasswordResult = SingleLiveEvent<Boolean>()
     val detachMailboxResult = SingleLiveEvent<Int>()
 
-    fun updatePassword(mailboxId: Int, mailboxObjectId: String, password: String) = viewModelScope.launch(ioCoroutineContext) {
-        val apiResponse = ApiRepository.updateMailboxPassword(mailboxId, password)
+    fun updatePassword(password: String) = viewModelScope.launch(ioCoroutineContext) {
+        val apiResponse = ApiRepository.updateMailboxPassword(mailbox.mailboxId, password)
         if (apiResponse.isSuccess()) {
             MailboxController.updateMailbox(mailboxObjectId) { it.isPasswordValid = true }
-            AccountUtils.switchToMailbox(mailboxId)
+            AccountUtils.switchToMailbox(mailbox.mailboxId)
         } else {
             updatePasswordResult.postValue(apiResponse.translateError())
         }
@@ -62,8 +62,8 @@ class InvalidPasswordViewModel @Inject constructor(
         requestPasswordResult.postValue(ApiRepository.requestMailboxPassword(mailbox.hostingId, mailbox.mailboxName).isSuccess())
     }
 
-    fun detachMailbox(mailboxId: Int) = viewModelScope.launch(ioCoroutineContext) {
-        val apiResponse = ApiRepository.detachMailbox(mailboxId)
+    fun detachMailbox() = viewModelScope.launch(ioCoroutineContext) {
+        val apiResponse = ApiRepository.detachMailbox(mailbox.mailboxId)
         if (apiResponse.isSuccess()) {
             AccountUtils.switchToMailbox(
                 MailboxController.getFirstValidMailbox(AccountUtils.currentUserId)?.mailboxId ?: AppSettings.DEFAULT_ID,
