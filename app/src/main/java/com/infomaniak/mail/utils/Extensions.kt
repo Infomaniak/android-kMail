@@ -563,11 +563,15 @@ fun Fragment.getStringWithBoldArg(@StringRes resId: Int, arg: String): Spanned {
     return Html.fromHtml(getString(resId, "<b>$coloredArg</b>"), Html.FROM_HTML_MODE_LEGACY)
 }
 
-fun Context.launchLoginActivity(shouldClearStack: Boolean = false, args: LoginActivityArgs? = null) {
-    Intent(this, LoginActivity::class.java).apply {
+fun Context.getLoginActivityIntent(args: LoginActivityArgs? = null, shouldClearStack: Boolean = false): Intent {
+    return Intent(this, LoginActivity::class.java).apply {
         if (shouldClearStack) clearStack()
         args?.toBundle()?.let(::putExtras)
-    }.also(::startActivity)
+    }
+}
+
+fun Context.launchLoginActivity(args: LoginActivityArgs? = null) {
+    getLoginActivityIntent(args).also(::startActivity)
 }
 
 fun Context.launchNoValidMailboxesActivity() {
@@ -577,8 +581,14 @@ fun Context.launchNoValidMailboxesActivity() {
 }
 
 fun Context.launchNoMailboxActivity(shouldStartLoginActivity: Boolean = false) {
-    if (shouldStartLoginActivity) launchLoginActivity(shouldClearStack = true)
-    startActivity(Intent(this, NoMailboxActivity::class.java))
+    val noMailboxAcctivityIntent = Intent(this, NoMailboxActivity::class.java)
+    val intentsArray = if (shouldStartLoginActivity) {
+        arrayOf(getLoginActivityIntent(shouldClearStack = true), noMailboxAcctivityIntent)
+    } else {
+        arrayOf(noMailboxAcctivityIntent)
+    }
+
+    startActivities(intentsArray)
 }
 
 fun TextInputLayout.setOnClearTextClickListener(trackerCallback: () -> Unit) {
