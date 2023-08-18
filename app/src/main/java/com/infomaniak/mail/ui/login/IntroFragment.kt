@@ -80,7 +80,7 @@ class IntroFragment : Fragment() {
                 setTabSelectedListener()
 
                 iconLayout.apply {
-                    setAnimation(R.raw.illu_onboarding_1)
+                    setAnimation(R.raw.illustration_onboarding_1)
                     repeatFrame(54, 138)
                 }
             }
@@ -89,7 +89,7 @@ class IntroFragment : Fragment() {
                 title.setText(R.string.onBoardingTitle2)
                 description.setText(R.string.onBoardingDescription2)
                 iconLayout.apply {
-                    setAnimation(R.raw.illu_onboarding_2)
+                    setAnimation(R.raw.illustration_onboarding_2)
                     repeatFrame(108, 253)
                 }
             }
@@ -98,7 +98,7 @@ class IntroFragment : Fragment() {
                 title.setText(R.string.onBoardingTitle3)
                 description.setText(R.string.onBoardingDescription3)
                 iconLayout.apply {
-                    setAnimation(R.raw.illu_onboarding_3)
+                    setAnimation(R.raw.illustration_onboarding_3)
                     repeatFrame(111, 187)
                 }
             }
@@ -107,7 +107,7 @@ class IntroFragment : Fragment() {
                 title.setText(R.string.onBoardingTitle4)
                 description.setText(R.string.onBoardingDescription4)
                 iconLayout.apply {
-                    setAnimation(R.raw.illu_onboarding_4)
+                    setAnimation(R.raw.illustration_onboarding_4)
                     repeatFrame(127, 236)
                 }
             }

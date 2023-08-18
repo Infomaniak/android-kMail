@@ -122,10 +122,10 @@
     <string name="buttonSeeAll">See all</string>
     <string name="buttonSelectAll">All</string>
     <string name="buttonShare">Share</string>
-    <string name="buttonStrikedThrough">Strike through</string>
+    <string name="buttonStrikeThrough">Strike through</string>
     <string name="buttonTextOptionsClose">Close text formatting</string>
     <string name="buttonTextOptionsOpen">Open text formatting</string>
-    <string name="buttonUnderlined">Underline</string>
+    <string name="buttonUnderline">Underline</string>
     <string name="buttonUnselectAll">None</string>
     <string name="buttonValid">Validate</string>
     <string name="ccTitle">Cc:</string>

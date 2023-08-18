@@ -80,7 +80,7 @@
         app:layout_constraintEnd_toStartOf="@id/end"
         app:layout_constraintStart_toEndOf="@id/start"
         app:lottie_autoPlay="true"
-        tools:lottie_rawRes="@raw/illu_1" />
+        tools:lottie_rawRes="@raw/illustration_1" />
 
     <TextView
         android:id="@+id/title"

@@ -115,10 +115,10 @@
     <string name="buttonSeeAll">Ver todos</string>
     <string name="buttonSelectAll">Todos</string>
     <string name="buttonShare">Compartir</string>
-    <string name="buttonStrikedThrough">Huelga a través de</string>
+    <string name="buttonStrikeThrough">Huelga a través de</string>
     <string name="buttonTextOptionsClose">Cerrar formato de texto</string>
     <string name="buttonTextOptionsOpen">Formato de texto abierto</string>
-    <string name="buttonUnderlined">Subraye</string>
+    <string name="buttonUnderline">Subraye</string>
     <string name="buttonUnselectAll">Ninguno</string>
     <string name="buttonValid">Validar</string>
     <string name="ccTitle">Cc:</string>
