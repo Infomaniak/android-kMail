@@ -243,7 +243,7 @@ class ThreadFragment : Fragment() {
 
         messagesList.adapter = threadAdapter.apply {
             stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
-            contacts = mainViewModel.mergedContacts.value ?: emptyMap()
+            contacts = mainViewModel.mergedContactsLive.value ?: emptyMap()
             onContactClicked = { contact ->
                 safeNavigate(ThreadFragmentDirections.actionThreadFragmentToDetailedContactBottomSheetDialog(contact))
             }
@@ -403,7 +403,7 @@ class ThreadFragment : Fragment() {
     }
 
     private fun observeContacts() {
-        mainViewModel.mergedContacts.observeNotNull(viewLifecycleOwner, threadAdapter::updateContacts)
+        mainViewModel.mergedContactsLive.observeNotNull(viewLifecycleOwner, threadAdapter::updateContacts)
     }
 
     private fun downloadAllAttachments(message: Message) {

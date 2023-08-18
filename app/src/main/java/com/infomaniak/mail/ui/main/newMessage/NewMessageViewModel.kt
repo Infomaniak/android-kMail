@@ -117,12 +117,6 @@ class NewMessageViewModel @Inject constructor(
         emit(list to arrangeMergedContacts(list))
     }
 
-    val mailboxes = liveData(ioCoroutineContext) {
-        val mailboxes = MailboxController.getMailboxes(AccountUtils.currentUserId)
-        val currentMailboxIndex = mailboxes.indexOfFirst { it.mailboxId == AccountUtils.currentMailboxId }
-        emit(mailboxes to currentMailboxIndex)
-    }
-
     fun initDraftAndViewModel(
         arrivedFromExistingDraft: Boolean,
         notificationId: Int,

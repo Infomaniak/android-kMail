@@ -223,7 +223,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         threadListAdapter(
             folderRole = mainViewModel.currentFolder.value?.role,
-            contacts = mainViewModel.mergedContacts.value ?: emptyMap(),
+            contacts = mainViewModel.mergedContactsLive.value ?: emptyMap(),
             onSwipeFinished = { threadListViewModel.isRecoveringFinished.value = true },
             multiSelection = object : MultiSelectionListener<Thread> {
                 override var isEnabled by mainViewModel::isMultiSelectOn
@@ -513,7 +513,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun observeContacts() {
-        mainViewModel.mergedContacts.observeNotNull(viewLifecycleOwner, threadListAdapter::updateContacts)
+        mainViewModel.mergedContactsLive.observeNotNull(viewLifecycleOwner, threadListAdapter::updateContacts)
     }
 
     private fun observerDraftsActionsCompletedWorks() {

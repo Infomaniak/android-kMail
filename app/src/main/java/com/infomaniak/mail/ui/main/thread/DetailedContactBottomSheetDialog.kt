@@ -49,7 +49,7 @@ class DetailedContactBottomSheetDialog : ActionsBottomSheetDialog() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
-        contactDetails.setRecipient(navigationArgs.recipient, mainViewModel.mergedContacts.value ?: emptyMap())
+        contactDetails.setRecipient(navigationArgs.recipient, mainViewModel.mergedContactsLive.value ?: emptyMap())
         setupListeners()
         observeContacts()
     }
@@ -74,7 +74,7 @@ class DetailedContactBottomSheetDialog : ActionsBottomSheetDialog() {
     }
 
     private fun observeContacts() {
-        mainViewModel.mergedContacts.observeNotNull(viewLifecycleOwner) {
+        mainViewModel.mergedContactsLive.observeNotNull(viewLifecycleOwner) {
             binding.contactDetails.updateAvatar(navigationArgs.recipient, it)
         }
     }
