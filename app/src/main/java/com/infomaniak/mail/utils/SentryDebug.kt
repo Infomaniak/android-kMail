@@ -76,6 +76,18 @@ object SentryDebug {
         addInfoBreadcrumb("ThreadsAlgo", message, data)
     }
 
+    fun addCursorBreadcrumb(message: String, folder: Folder, cursor: String?) {
+        addInfoBreadcrumb(
+            category = "Cursor",
+            message = message,
+            data = mapOf(
+                "folderName" to folder.name,
+                "previousFolderCursor" to "${folder.cursor}",
+                "newFolderCursor" to "$cursor",
+            ),
+        )
+    }
+
     private fun addInfoBreadcrumb(category: String, message: String? = null, data: Map<String, Any>? = null) {
         Sentry.addBreadcrumb(Breadcrumb().apply {
             this.category = category

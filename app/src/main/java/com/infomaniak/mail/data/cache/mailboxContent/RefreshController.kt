@@ -292,7 +292,10 @@ class RefreshController @Inject constructor(private val localSettings: LocalSett
                 }
             }
 
-            if (shouldUpdateCursor) it.cursor = newMessages.cursor
+            if (shouldUpdateCursor) {
+                SentryDebug.addCursorBreadcrumb("fetchOnePage", it, newMessages.cursor)
+                it.cursor = newMessages.cursor
+            }
         }
 
         sendSentryOrphans(folder)
@@ -329,6 +332,7 @@ class RefreshController @Inject constructor(private val localSettings: LocalSett
             FolderController.getFolder(folder.id, realm = this)?.let {
                 it.lastUpdatedAt = Date().toRealmInstant()
                 it.unreadCountRemote = activities.unreadCountRemote
+                SentryDebug.addCursorBreadcrumb("fetchActivities", it, activities.cursor)
                 it.cursor = activities.cursor
             }
         }
