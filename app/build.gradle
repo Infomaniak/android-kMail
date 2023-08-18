@@ -19,8 +19,8 @@ android {
         applicationId 'com.infomaniak.mail'
         minSdk 25
         targetSdk 34
-        versionCode 1_00_008_01
-        versionName '1.0.8'
+        versionCode 1_00_009_01
+        versionName '1.0.9'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 
         setProperty "archivesBaseName", "ikmail-$versionName ($versionCode)"
