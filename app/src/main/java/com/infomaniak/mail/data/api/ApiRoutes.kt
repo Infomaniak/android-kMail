@@ -58,7 +58,7 @@ object ApiRoutes {
         return "$MAIL_API/api/securedProxy/cache/invalidation/profile/workspace/mailbox/$mailboxId/update_password"
     }
 
-    fun askMailboxPassword(mailboxHostingId: Int, mailboxName: String): String {
+    fun requestMailboxPassword(mailboxHostingId: Int, mailboxName: String): String {
         return "${apiMailbox(mailboxHostingId, mailboxName)}/ask_password"
     }
 

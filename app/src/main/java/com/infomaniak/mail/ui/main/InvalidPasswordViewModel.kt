@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
@@ -33,10 +34,14 @@ import javax.inject.Inject
 
 @HiltViewModel
 class InvalidPasswordViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
+
+    private val mailboxObjectId = savedStateHandle.get<String>(InvalidPasswordFragmentArgs::mailboxObjectId.name)!!
+    val mailbox = MailboxController.getMailbox(mailboxObjectId)!!
 
     fun confirmPassword(mailboxId: Int, mailboxObjectId: String, password: String) = liveData(ioCoroutineContext) {
         val apiResponse = ApiRepository.updateMailboxPassword(mailboxId, password)
@@ -46,6 +51,10 @@ class InvalidPasswordViewModel @Inject constructor(
         } else {
             emit(apiResponse.translateError())
         }
+    }
+
+    fun requestMailboxPassword() = liveData(ioCoroutineContext) {
+        emit(ApiRepository.requestMailboxPassword(mailbox.hostingId, mailbox.mailboxName).isSuccess())
     }
 
     fun detachMailbox(mailboxId: Int) = liveData(ioCoroutineContext) {
