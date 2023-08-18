@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui
 
 import android.app.Application
-import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.models.ApiResponse
@@ -48,7 +47,6 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.SnackBarManager
 import com.infomaniak.mail.ui.main.SnackBarManager.UndoData
 import com.infomaniak.mail.ui.main.folder.ThreadListViewModel
-import com.infomaniak.mail.ui.noValidMailboxes.NoValidMailboxesActivity
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
@@ -213,7 +211,7 @@ class MainViewModel @Inject constructor(
     private fun switchToValidMailbox() = viewModelScope.launch(ioCoroutineContext) {
         MailboxController.getFirstValidMailbox(AccountUtils.currentUserId)?.let {
             AccountUtils.switchToMailbox(it.mailboxId)
-        } ?: context.startActivity(Intent(context, NoValidMailboxesActivity::class.java))
+        } ?: context.launchNoValidMailboxesActivity()
     }
 
     fun dismissCurrentMailboxNotifications() = viewModelScope.launch(ioCoroutineContext) {
