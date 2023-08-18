@@ -147,8 +147,6 @@ class MainActivity : BaseActivity() {
         mainViewModel.updateUserInfo()
         loadCurrentMailbox()
 
-        mainViewModel.observeMergedContactsLive()
-
         permissionUtils.requestMainPermissionsIfNeeded()
     }
 

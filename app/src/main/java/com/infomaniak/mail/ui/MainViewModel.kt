@@ -50,7 +50,6 @@ import com.infomaniak.mail.ui.main.SnackBarManager.UndoData
 import com.infomaniak.mail.ui.main.folder.ThreadListViewModel
 import com.infomaniak.mail.ui.noValidMailboxes.NoValidMailboxesActivity
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.NotificationUtils.cancelNotification
@@ -88,9 +87,11 @@ class MainViewModel @Inject constructor(
     val isDownloadingChanges: MutableLiveData<Pair<Boolean, Boolean?>> = MutableLiveData(false to null)
     val isNewFolderCreated = SingleLiveEvent<Boolean>()
     val shouldStartNoMailboxActivity = SingleLiveEvent<Unit>()
+    val toggleLightThemeForMessage = SingleLiveEvent<Message>()
 
-    // Explanation of this Map : Map<Email, Map<Name, MergedContact>>
-    val mergedContacts = MutableLiveData<Map<String, Map<String, MergedContact>>?>()
+    val snackBarManager by lazy { SnackBarManager() }
+
+    val mailboxesLive = MailboxController.getMailboxesAsync(AccountUtils.currentUserId).asLiveData(ioCoroutineContext)
 
     //region Multi selection
     val isMultiSelectOnLiveData = MutableLiveData(false)
@@ -106,12 +107,6 @@ class MainViewModel @Inject constructor(
 
     val isEverythingSelected get() = selectedThreads.count() == currentThreadsLive.value?.list?.count()
     //endregion
-
-    val snackBarManager by lazy { SnackBarManager() }
-
-    val toggleLightThemeForMessage = SingleLiveEvent<Message>()
-
-    val mailboxesLive = MailboxController.getMailboxesAsync(AccountUtils.currentUserId).asLiveData(ioCoroutineContext)
 
     //region Current Mailbox
     private val _currentMailboxObjectId = MutableStateFlow<String?>(null)
@@ -172,6 +167,14 @@ class MainViewModel @Inject constructor(
     }
 
     fun isCurrentFolderRole(role: FolderRole) = currentFolder.value?.role == role
+    //endregion
+
+    //region Merged Contacts
+    // Explanation of this Map: Map<Email, Map<Name, MergedContact>>
+    val mergedContactsLive: LiveData<Map<String, Map<String, MergedContact>>?> = mergedContactController
+        .getMergedContactsAsync()
+        .mapLatest { ContactUtils.arrangeMergedContacts(it.list.copyFromRealm()) }
+        .asLiveData(ioCoroutineContext)
     //endregion
 
     fun updateUserInfo() = viewModelScope.launch(ioCoroutineContext) {
@@ -349,12 +352,6 @@ class MainViewModel @Inject constructor(
             val phoneMergedContacts = getPhoneContacts(context)
             mergeApiContactsIntoPhoneContacts(apiContacts, phoneMergedContacts)
             mergedContactController.update(phoneMergedContacts.values.toList())
-        }
-    }
-
-    fun observeMergedContactsLive() = viewModelScope.launch(ioCoroutineContext) {
-        mergedContactController.getMergedContactsAsync().collect { contacts ->
-            mergedContacts.postValue(arrangeMergedContacts(contacts.list.copyFromRealm()))
         }
     }
 
