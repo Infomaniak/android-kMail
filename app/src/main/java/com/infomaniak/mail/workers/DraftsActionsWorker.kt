@@ -34,6 +34,7 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
+import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Attachment
@@ -44,6 +45,7 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.NotificationUtils.buildDraftActionsNotification
 import com.infomaniak.mail.utils.NotificationUtils.buildDraftErrorNotification
+import com.infomaniak.mail.utils.SharedUtils.Companion.updateAndGetSignatures
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import io.realm.kotlin.MutableRealm
@@ -325,7 +327,12 @@ class DraftsActionsWorker @AssistedInject constructor(
         val isSuccess: Boolean,
     )
 
-    private fun executeDraftAction(draft: Draft, mailboxUuid: String, okHttpClient: OkHttpClient): DraftActionResult {
+    private fun executeDraftAction(
+        draft: Draft,
+        mailboxUuid: String,
+        okHttpClient: OkHttpClient,
+        isFirstTime: Boolean = true,
+    ): DraftActionResult {
 
         var realmActionOnDraft: ((MutableRealm) -> Unit)? = null
         var scheduledDate: String? = null
@@ -368,7 +375,13 @@ class DraftsActionsWorker @AssistedInject constructor(
                     }
                     scheduledDate = dateFormatWithTimezone.format(Date())
                     savedDraftUuid = data.draftRemoteUuid
-                } ?: throwErrorAsException()
+                } ?: run {
+                    if (isFirstTime && error?.code == ErrorCode.IDENTITY_NOT_FOUND) {
+                        return updateSignaturesThenRetry(draft, mailboxUuid, okHttpClient)
+                    } else {
+                        throwErrorAsException()
+                    }
+                }
             }
             DraftAction.SEND -> with(ApiRepository.sendDraft(mailboxUuid, updatedDraft, okHttpClient)) {
                 when {
@@ -383,7 +396,13 @@ class DraftsActionsWorker @AssistedInject constructor(
                             Sentry.captureMessage("Return JSON for SendDraft API call was modified")
                         }
                     }
-                    else -> throwErrorAsException()
+                    else -> {
+                        if (isFirstTime && error?.code == ErrorCode.IDENTITY_NOT_FOUND) {
+                            return updateSignaturesThenRetry(draft, mailboxUuid, okHttpClient)
+                        } else {
+                            throwErrorAsException()
+                        }
+                    }
                 }
             }
             else -> Unit
@@ -396,6 +415,19 @@ class DraftsActionsWorker @AssistedInject constructor(
             savedDraftUuid = savedDraftUuid,
             isSuccess = true,
         )
+    }
+
+    private fun updateSignaturesThenRetry(draft: Draft, mailboxUuid: String, okHttpClient: OkHttpClient): DraftActionResult {
+
+        mailboxContentRealm.writeBlocking {
+            updateAndGetSignatures(mailbox)
+            val signature = SignatureController.getSignature(realm = mailboxContentRealm)
+            draftController.updateDraft(draft.localUuid, realm = this) {
+                it.identityId = signature.id.toString()
+            }
+        }
+
+        return executeDraftAction(draft, mailboxUuid, okHttpClient, isFirstTime = false)
     }
 
     private fun deleteDraftCallback(draft: Draft): (MutableRealm) -> Unit {
