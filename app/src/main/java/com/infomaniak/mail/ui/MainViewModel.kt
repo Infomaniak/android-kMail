@@ -168,7 +168,7 @@ class MainViewModel @Inject constructor(
 
     //region Merged Contacts
     // Explanation of this Map: Map<Email, Map<Name, MergedContact>>
-    val mergedContactsLive: LiveData<Map<String, Map<String, MergedContact>>?> = mergedContactController
+    val mergedContactsLive: LiveData<MergedContactDictionary?> = mergedContactController
         .getMergedContactsAsync()
         .mapLatest { ContactUtils.arrangeMergedContacts(it.list.copyFromRealm()) }
         .asLiveData(ioCoroutineContext)
