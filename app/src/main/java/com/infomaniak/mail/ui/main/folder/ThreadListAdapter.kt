@@ -85,7 +85,7 @@ class ThreadListAdapter @Inject constructor(
     var onLoadMoreClicked: (() -> Unit)? = null
 
     private var folderRole: FolderRole? = null
-    private lateinit var contacts: Map<String, Map<String, MergedContact>>
+    private lateinit var contacts: MergedContactDictionary
     private lateinit var onSwipeFinished: () -> Unit
     private var multiSelection: MultiSelectionListener<Thread>? = null
 
@@ -95,7 +95,7 @@ class ThreadListAdapter @Inject constructor(
 
     operator fun invoke(
         folderRole: FolderRole?,
-        contacts: Map<String, Map<String, MergedContact>>,
+        contacts: MergedContactDictionary,
         onSwipeFinished: () -> Unit,
         multiSelection: MultiSelectionListener<Thread>? = null,
     ) {
@@ -426,7 +426,7 @@ class ThreadListAdapter @Inject constructor(
         dataSet = formatList(itemList, recyclerView.context, folderRole, localSettings.threadDensity, isLoadMoreDisplayed)
     }
 
-    fun updateContacts(newContacts: Map<String, Map<String, MergedContact>>) {
+    fun updateContacts(newContacts: MergedContactDictionary) {
         contacts = newContacts
         notifyItemRangeChanged(0, itemCount, NotificationType.AVATAR)
     }

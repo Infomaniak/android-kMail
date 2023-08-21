@@ -33,6 +33,7 @@ import com.infomaniak.mail.data.models.correspondent.Correspondent
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ViewAvatarNameEmailBinding
+import com.infomaniak.mail.utils.MergedContactDictionary
 import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
 import com.infomaniak.mail.utils.getAttributeColor
 import com.google.android.material.R as RMaterial
@@ -64,7 +65,7 @@ class AvatarNameEmailView @JvmOverloads constructor(
         }
     }
 
-    fun setRecipient(recipient: Recipient, contacts: Map<String, Map<String, MergedContact>>) = with(binding) {
+    fun setRecipient(recipient: Recipient, contacts: MergedContactDictionary) = with(binding) {
         userAvatar.loadAvatar(recipient, contacts)
         setNameAndEmail(recipient)
     }
@@ -84,7 +85,7 @@ class AvatarNameEmailView @JvmOverloads constructor(
         userEmail.text = searchQuery
     }
 
-    fun updateAvatar(recipient: Recipient, contacts: Map<String, Map<String, MergedContact>>) {
+    fun updateAvatar(recipient: Recipient, contacts: MergedContactDictionary) {
         binding.userAvatar.loadAvatar(recipient, contacts)
     }
 
