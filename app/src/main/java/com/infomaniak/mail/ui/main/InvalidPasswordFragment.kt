@@ -63,19 +63,23 @@ class InvalidPasswordFragment : Fragment() {
                 isEnabled = false
                 passwordInput.text?.let(::manageButtonState)
             }
+        }
 
+        observeResults()
+        setupListeners()
+    }
+
+    private fun setupListeners() = with(binding) {
+
+        confirmButton.apply {
             setOnClickListener {
                 trackInvalidPasswordMailboxEvent("updatePassword")
                 showProgress()
-                invalidPasswordViewModel.confirmPassword(
+                invalidPasswordViewModel.updatePassword(
                     navigationArgs.mailboxId,
                     navigationArgs.mailboxObjectId,
                     passwordInput.text?.trim().toString(),
-                ).observe(viewLifecycleOwner) {
-                    passwordInputLayout.error = getString(it)
-                    passwordInput.text = null
-                    hideProgress(R.string.buttonConfirm)
-                }
+                )
             }
         }
 
@@ -86,17 +90,27 @@ class InvalidPasswordFragment : Fragment() {
                 description = getStringWithBoldArg(R.string.popupDetachMailboxDescription, navigationArgs.mailboxEmail),
                 onPositiveButtonClicked = {
                     trackInvalidPasswordMailboxEvent("detachMailboxConfirm")
-                    invalidPasswordViewModel.detachMailbox(navigationArgs.mailboxId).observe(viewLifecycleOwner) { error ->
-                        showSnackbar(error)
-                    }
+                    invalidPasswordViewModel.detachMailbox(navigationArgs.mailboxId)
                 },
             ).show()
         }
 
-        forgotPasswordButton.setOnClickListener {
-            invalidPasswordViewModel.requestMailboxPassword().observe(viewLifecycleOwner) { isSuccess ->
-                showSnackbar(if (isSuccess) R.string.snackbarMailboxPasswordRequested else RCore.string.anErrorHasOccurred)
-            }
+        requestPasswordButton.setOnClickListener { invalidPasswordViewModel.requestPassword() }
+    }
+
+    private fun observeResults() = with(binding) {
+        invalidPasswordViewModel.updatePasswordResult.observe(viewLifecycleOwner) { error ->
+            passwordInputLayout.error = getString(error)
+            passwordInput.text = null
+            confirmButton.hideProgress(R.string.buttonConfirm)
+        }
+
+        invalidPasswordViewModel.detachMailboxResult.observe(viewLifecycleOwner) { error ->
+            showSnackbar(error)
+        }
+
+        invalidPasswordViewModel.requestPasswordResult.observe(viewLifecycleOwner) { isSuccess ->
+            showSnackbar(if (isSuccess) R.string.snackbarMailboxPasswordRequested else RCore.string.anErrorHasOccurred)
         }
     }
 
