@@ -50,6 +50,7 @@ import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.NotificationUtils.cancelNotification
+import com.infomaniak.mail.utils.SharedUtils.Companion.updateSignatures
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.coroutines.*
@@ -85,6 +86,7 @@ class MainViewModel @Inject constructor(
     val isNewFolderCreated = SingleLiveEvent<Boolean>()
     val toggleLightThemeForMessage = SingleLiveEvent<Message>()
 
+    private val mailboxInfoRealm by lazy { RealmDatabase.newMailboxInfoInstance }
     val snackBarManager by lazy { SnackBarManager() }
 
     val mailboxesLive = MailboxController.getMailboxesAsync(AccountUtils.currentUserId).asLiveData(ioCoroutineContext)
@@ -906,6 +908,17 @@ class MainViewModel @Inject constructor(
                 realm = mailboxContentRealm(),
             )
         }
+    }
+
+    fun updateSignatures() = viewModelScope.launch(ioCoroutineContext) {
+
+        val mailbox = MailboxController.getMailbox(
+            userId = AccountUtils.currentUserId,
+            mailboxId = AccountUtils.currentMailboxId,
+            realm = mailboxInfoRealm,
+        ) ?: return@launch
+
+        mailboxContentRealm().writeBlocking { updateSignatures(mailbox) }
     }
 
     private companion object {
