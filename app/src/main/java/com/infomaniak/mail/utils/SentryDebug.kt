@@ -25,6 +25,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.draft.Draft
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import io.realm.kotlin.TypedRealm
 import io.sentry.Breadcrumb
@@ -95,6 +96,26 @@ object SentryDebug {
             data?.let { it.forEach { (key, value) -> this.data[key] = value } }
             this.level = SentryLevel.INFO
         })
+    }
+
+    fun sendFailedNotification(
+        reason: String,
+        userId: Int? = null,
+        mailboxId: Int? = null,
+        messageUid: String? = null,
+        mailbox: Mailbox? = null,
+    ) {
+        Sentry.withScope { scope ->
+            scope.level = SentryLevel.ERROR
+            scope.setExtra("reason", reason)
+            scope.setExtra("userId", "${userId?.toString()}")
+            scope.setExtra("currentMailboxEmail", "[${AccountUtils.currentUserId}]")
+            scope.setExtra("mailboxId", "${mailboxId?.toString()}")
+            scope.setExtra("mailbox.email", "[${mailbox?.email}]")
+            scope.setExtra("currentMailboxEmail", "[${AccountUtils.currentMailboxEmail}]")
+            scope.setExtra("messageUid", "$messageUid")
+            Sentry.captureMessage("We received a Notification, but we failed to show it")
+        }
     }
 
     fun sendAlreadyExistingMessage(folder: Folder, message: Message, threadMode: ThreadMode) {

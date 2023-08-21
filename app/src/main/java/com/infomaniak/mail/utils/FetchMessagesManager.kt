@@ -34,8 +34,6 @@ import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior
 import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior.NotificationType
 import com.infomaniak.mail.utils.NotificationUtils.showMessageNotification
 import io.realm.kotlin.Realm
-import io.sentry.Sentry
-import io.sentry.SentryLevel
 import okhttp3.OkHttpClient
 import javax.inject.Inject
 
@@ -49,11 +47,33 @@ class FetchMessagesManager @Inject constructor(
     suspend fun execute(userId: Int, mailbox: Mailbox, sentryMessageUid: String? = null, mailboxContentRealm: Realm? = null) {
 
         // Don't launch sync if the Mailbox's notifications have been disabled by the user
-        if (mailbox.notificationsIsDisabled(notificationManagerCompat)) return
+        if (mailbox.notificationsIsDisabled(notificationManagerCompat)) {
+            SentryDebug.sendFailedNotification(
+                "The notifications are disabled for this Mailbox",
+                userId,
+                mailbox.mailboxId,
+                sentryMessageUid,
+                mailbox,
+            )
+            return
+        }
 
         val realm = mailboxContentRealm ?: RealmDatabase.newMailboxContentInstance(userId, mailbox.mailboxId)
-        val folder = FolderController.getFolder(FolderRole.INBOX, realm) ?: return
-        if (folder.cursor == null) return
+        val folder = FolderController.getFolder(FolderRole.INBOX, realm) ?: run {
+            SentryDebug.sendFailedNotification(
+                "Can't find the Folder in Realm",
+                userId,
+                mailbox.mailboxId,
+                sentryMessageUid,
+                mailbox,
+            )
+            return
+        }
+
+        if (folder.cursor == null) {
+            SentryDebug.sendFailedNotification("Folder's cursor is null", userId, mailbox.mailboxId, sentryMessageUid, mailbox)
+            return
+        }
         val okHttpClient = AccountUtils.getHttpClient(userId)
 
         // Update Local with Remote
@@ -63,7 +83,10 @@ class FetchMessagesManager @Inject constructor(
             folder = folder,
             okHttpClient = okHttpClient,
             realm = realm,
-        ) ?: return
+        ) ?: run {
+            SentryDebug.sendFailedNotification("RefreshThreads failed", userId, mailbox.mailboxId, sentryMessageUid, mailbox)
+            return
+        }
 
         Log.d(TAG, "launchWork: ${mailbox.email} has ${newMessagesThreads.count()} Threads with new Messages")
 
@@ -97,23 +120,25 @@ class FetchMessagesManager @Inject constructor(
         threadController.fetchMessagesHeavyData(messages, mailbox, realm, okHttpClient)
 
         val message = MessageController.getThreadLastMessageInFolder(uid, realm) ?: run {
-            ThreadController.getThread(uid, realm)?.let { thread ->
-                Sentry.withScope { scope ->
-                    scope.level = SentryLevel.ERROR
-                    scope.setExtra("does Thread still exist ?", "[true]")
-                    scope.setExtra("currentMailboxEmail", "[${AccountUtils.currentMailboxEmail}]")
-                    scope.setExtra("mailbox.email", "[${mailbox.email}]")
-                    scope.setExtra("messageUid", "[$sentryMessageUid]")
-                    scope.setExtra("folderName", "[${thread.folder.name}]")
-                    scope.setExtra("threadUid", "[${thread.uid}]")
-                    scope.setExtra("messagesCount", "[${thread.messages.count()}]")
-                    scope.setExtra("messagesFolder", "[${thread.messages.map { "${it.folder.name} (${it.folderId})" }}]")
-                    Sentry.captureMessage("We are supposed to display a Notification, but we couldn't find the Message in the Thread.")
-                }
-            }
+            SentryDebug.sendFailedNotification(
+                "Can't find the Message in the Thread to show the Notification",
+                userId,
+                mailbox.mailboxId,
+                sentryMessageUid,
+                mailbox,
+            )
             return
         }
-        if (message.isSeen) return // Ignore if it has already been seen
+        if (message.isSeen) { // Ignore if it has already been seen
+            SentryDebug.sendFailedNotification(
+                "Message is already seen, so we don't show the Notification",
+                userId,
+                mailbox.mailboxId,
+                sentryMessageUid,
+                mailbox,
+            )
+            return
+        }
 
         val subject = appContext.formatSubject(message.subject)
         val preview = if (message.body?.value.isNullOrBlank()) {

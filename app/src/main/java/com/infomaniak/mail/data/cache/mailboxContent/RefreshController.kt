@@ -696,7 +696,6 @@ class RefreshController @Inject constructor(private val localSettings: LocalSett
         when (errorCode) {
             ErrorCode.FOLDER_DOES_NOT_EXIST -> Unit
             ErrorCode.MESSAGE_NOT_FOUND -> Sentry.withScope { scope ->
-                scope.level = SentryLevel.ERROR
                 scope.setExtra(ErrorCode.MESSAGE_NOT_FOUND, "isFirstTime = false")
                 scope.setExtra("folderCursor", "${folder.cursor}")
                 scope.setExtra("folderName", folder.name)
