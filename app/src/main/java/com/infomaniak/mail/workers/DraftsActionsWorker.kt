@@ -45,7 +45,7 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.NotificationUtils.buildDraftActionsNotification
 import com.infomaniak.mail.utils.NotificationUtils.buildDraftErrorNotification
-import com.infomaniak.mail.utils.SharedUtils.Companion.updateAndGetSignatures
+import com.infomaniak.mail.utils.SharedUtils.Companion.updateSignatures
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import io.realm.kotlin.MutableRealm
@@ -416,7 +416,7 @@ class DraftsActionsWorker @AssistedInject constructor(
     private fun updateSignaturesThenRetry(draft: Draft, mailboxUuid: String): DraftActionResult {
 
         mailboxContentRealm.writeBlocking {
-            updateAndGetSignatures(mailbox)
+            updateSignatures(mailbox)
             val signature = SignatureController.getSignature(realm = mailboxContentRealm)
             draftController.updateDraft(draft.localUuid, realm = this) {
                 it.identityId = signature.id.toString()
