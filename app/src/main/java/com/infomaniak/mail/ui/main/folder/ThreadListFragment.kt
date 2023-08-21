@@ -290,11 +290,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
 
         searchButton.setOnClickListener {
-            safeNavigate(
-                ThreadListFragmentDirections.actionThreadListFragmentToSearchFragment(
-                    dummyFolderId = mainViewModel.currentFolderId!!,
-                )
-            )
+            safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSearchFragment(mainViewModel.currentFolderId))
         }
 
         userAvatar.setOnClickListener {

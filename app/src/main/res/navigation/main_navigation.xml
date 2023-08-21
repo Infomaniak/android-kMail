@@ -143,7 +143,8 @@
         tools:layout="@layout/fragment_search">
         <argument
             android:name="dummyFolderId"
-            app:argType="string" />
+            app:argType="string"
+            app:nullable="true" />
         <action
             android:id="@+id/action_searchFragment_to_detailedContactBottomSheetDialog"
             app:destination="@id/detailedContactBottomSheetDialog" />
