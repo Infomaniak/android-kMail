@@ -170,7 +170,13 @@ class ThreadFragment : Fragment() {
         }
 
         threadMergedContactAndMailboxMediator().observe(viewLifecycleOwner) { (thread, mergedContacts, mailbox) ->
-            thread?.let { setSubject(thread, mergedContacts ?: emptyMap(), mailbox?.aliases ?: emptyList()) }
+            thread?.let {
+                val emailDictionary = mergedContacts ?: emptyMap()
+                val aliases = mailbox?.aliases ?: emptyList()
+                val externalMailFlagEnabled = mailbox?.externalMailFlagEnabled ?: false
+
+                setSubject(thread, emailDictionary, aliases, externalMailFlagEnabled)
+            }
         }
     }
 
@@ -476,8 +482,9 @@ class ThreadFragment : Fragment() {
         thread: Thread,
         emailDictionary: Map<String, Map<String, MergedContact>>,
         aliases: List<String>,
+        externalMailFlagEnabled: Boolean,
     ) = with(binding) {
-        val (subject, spannedSubject) = computeSubject(thread, emailDictionary, aliases)
+        val (subject, spannedSubject) = computeSubject(thread, emailDictionary, aliases, externalMailFlagEnabled)
         threadSubject.text = spannedSubject
         toolbarSubject.text = subject
     }
@@ -486,8 +493,10 @@ class ThreadFragment : Fragment() {
         thread: Thread,
         emailDictionary: Map<String, Map<String, MergedContact>>,
         aliases: List<String>,
+        externalMailFlagEnabled: Boolean,
     ): Pair<String, CharSequence> = with(binding) {
         val subject = context.formatSubject(thread.subject)
+        if (!externalMailFlagEnabled) return subject to subject
 
         val (externalRecipientEmail, externalRecipientQuantity) = UiUtils.findExternalRecipientsInThread(
             thread,

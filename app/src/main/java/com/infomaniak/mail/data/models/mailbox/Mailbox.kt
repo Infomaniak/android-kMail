@@ -58,6 +58,8 @@ class Mailbox : RealmObject {
     @SerialName("unseen_messages")
     var unreadCountRemote: Int = 0
     var aliases: RealmList<String> = realmListOf()
+    @SerialName("external_mail_flag_enabled")
+    var externalMailFlagEnabled: Boolean = false
     //endregion
 
     //region Local data (Transient)
