@@ -135,10 +135,11 @@ class NewMessageViewModel @Inject constructor(
     }
 
     fun initDraftAndViewModel(): LiveData<Pair<Boolean, List<Signature>>> = liveData(ioCoroutineContext) {
+
         val realm = mailboxContentRealm()
         val mailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
 
-        var signatures: List<Signature> = emptyList()
+        var signatures = emptyList<Signature>()
 
         val isSuccess = realm.writeBlocking {
             runCatching {
