@@ -48,7 +48,7 @@ open class Recipient : EmbeddedRealmObject, Correspondent {
         val isMailerDaemon = """mailer-daemon@(?:.+\.)?infomaniak\.ch""".toRegex(RegexOption.IGNORE_CASE).matches(email)
         val trustedDomains = listOf("@infomaniak.com", "@infomaniak.event", "@swisstransfer.com")
         val isUntrustedDomain = email.isEmail() && trustedDomains.none { email.endsWith(it) }
-        val isAlias = aliases.any { email in aliases }
+        val isAlias = email in aliases
 
         return isUnknownContact && !isMailerDaemon && isUntrustedDomain && !isAlias
     }
