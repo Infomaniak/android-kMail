@@ -107,7 +107,7 @@ object SentryDebug {
     ) {
         Sentry.withScope { scope ->
             scope.level = SentryLevel.ERROR
-            scope.setExtra("reason", reason)
+            scope.setTag("reason", reason)
             scope.setExtra("userId", "${userId?.toString()}")
             scope.setExtra("currentMailboxEmail", "[${AccountUtils.currentUserId}]")
             scope.setExtra("mailboxId", "${mailboxId?.toString()}")
