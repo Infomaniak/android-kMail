@@ -48,11 +48,13 @@ class SignatureSettingFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupAdapter(mailbox)
+
         runCatching {
             updateSignatures()
         }.onFailure {
             showSnackbar(RCore.string.anErrorHasOccurred)
         }
+
         observeSignatures()
         observeApiError()
     }
