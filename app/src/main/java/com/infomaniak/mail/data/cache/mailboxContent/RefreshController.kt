@@ -38,6 +38,7 @@ import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.query.RealmResults
 import io.sentry.Sentry
+import io.sentry.SentryLevel
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
 import java.util.Date
@@ -79,10 +80,16 @@ class RefreshController @Inject constructor(private val localSettings: LocalSett
             // If fetching the activities failed because of a not found Message, we should pause briefly
             // before trying again to retrieve activities, to ensure that the API is up-to-date.
             if (isFirstTime && it is ApiErrorException && it.errorCode == ErrorCode.MESSAGE_NOT_FOUND) {
-                Sentry.captureException(it)
+                Sentry.withScope { scope ->
+                    scope.level = SentryLevel.WARNING
+                    scope.setExtra(ErrorCode.MESSAGE_NOT_FOUND, "isFirstTime = true")
+                    scope.setExtra("folderCursor", "${folder.cursor}")
+                    scope.setExtra("folderName", folder.name)
+                    Sentry.captureException(it)
+                }
                 refreshWithRunCatching(job, isFirstTime = false)
             } else {
-                handleAllExceptions(it, stopped)
+                handleAllExceptions(it, stopped, folder)
             }
         }
 
@@ -285,7 +292,10 @@ class RefreshController @Inject constructor(private val localSettings: LocalSett
                 }
             }
 
-            if (shouldUpdateCursor) it.cursor = newMessages.cursor
+            if (shouldUpdateCursor) {
+                SentryDebug.addCursorBreadcrumb("fetchOnePage", it, newMessages.cursor)
+                it.cursor = newMessages.cursor
+            }
         }
 
         sendSentryOrphans(folder)
@@ -322,6 +332,7 @@ class RefreshController @Inject constructor(private val localSettings: LocalSett
             FolderController.getFolder(folder.id, realm = this)?.let {
                 it.lastUpdatedAt = Date().toRealmInstant()
                 it.unreadCountRemote = activities.unreadCountRemote
+                SentryDebug.addCursorBreadcrumb("fetchActivities", it, activities.cursor)
                 it.cursor = activities.cursor
             }
         }
@@ -345,9 +356,9 @@ class RefreshController @Inject constructor(private val localSettings: LocalSett
         val logMessage = "Added: ${uids.count()}"
         Log.d("API", "$logMessage | ${folder.name}")
 
-        if (uids.isEmpty()) return emptySet()
-
         addSentryBreadcrumbsForAddedUids(logMessage = logMessage, email = mailbox.email, folder = folder, uids = uids)
+
+        if (uids.isEmpty()) return emptySet()
 
         val impactedThreads = mutableSetOf<Thread>()
 
@@ -668,7 +679,7 @@ class RefreshController @Inject constructor(private val localSettings: LocalSett
     //endregion
 
     //region Handle errors
-    private fun handleAllExceptions(throwable: Throwable, stopped: (() -> Unit)?): Nothing? {
+    private fun handleAllExceptions(throwable: Throwable, stopped: (() -> Unit)?, folder: Folder): Nothing? {
 
         // We force-cancelled, so we need to call the `stopped` callback.
         if (throwable is ForcedCancellationException) stopped?.invoke()
@@ -676,14 +687,21 @@ class RefreshController @Inject constructor(private val localSettings: LocalSett
         // It failed, but not because we cancelled it. Something bad happened, so we call the `stopped` callback.
         if (throwable !is CancellationException) stopped?.invoke()
 
-        if (throwable is ApiErrorException) throwable.handleOtherApiErrors()
+        if (throwable is ApiErrorException) throwable.handleOtherApiErrors(folder)
 
         return null
     }
 
-    private fun ApiErrorException.handleOtherApiErrors() {
+    private fun ApiErrorException.handleOtherApiErrors(folder: Folder) {
         when (errorCode) {
             ErrorCode.FOLDER_DOES_NOT_EXIST -> Unit
+            ErrorCode.MESSAGE_NOT_FOUND -> Sentry.withScope { scope ->
+                scope.level = SentryLevel.ERROR
+                scope.setExtra(ErrorCode.MESSAGE_NOT_FOUND, "isFirstTime = false")
+                scope.setExtra("folderCursor", "${folder.cursor}")
+                scope.setExtra("folderName", folder.name)
+                Sentry.captureException(this)
+            }
             else -> Sentry.captureException(this)
         }
     }

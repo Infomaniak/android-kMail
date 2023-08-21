@@ -27,6 +27,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.UnreadDisplay
 import com.infomaniak.mail.utils.Utils
 import io.realm.kotlin.ext.backlinks
@@ -112,6 +113,7 @@ class Folder : RealmObject {
         isCollapsed: Boolean,
     ) {
         this.lastUpdatedAt = lastUpdatedAt
+        SentryDebug.addCursorBreadcrumb("initLocalValues", folder = this, cursor)
         this.cursor = cursor
         this.unreadCountLocal = unreadCount
         this.threads.addAll(threads)
