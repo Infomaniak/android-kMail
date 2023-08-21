@@ -54,14 +54,13 @@ class InvalidPasswordFragment : Fragment() {
 
         enterPasswordDescription2.text = getStringWithBoldArg(R.string.enterPasswordDescription2, navigationArgs.mailboxEmail)
 
-        passwordInput.showKeyboard()
+        confirmButton.isEnabled = false
 
-        confirmButton.apply {
-            isEnabled = false
-
-            passwordInput.doAfterTextChanged {
-                isEnabled = false
-                passwordInput.text?.let(::manageButtonState)
+        passwordInput.apply {
+            showKeyboard()
+            doAfterTextChanged {
+                confirmButton.isEnabled = false
+                text?.let(::manageButtonState)
             }
         }
 
@@ -99,6 +98,7 @@ class InvalidPasswordFragment : Fragment() {
     }
 
     private fun observeResults() = with(binding) {
+
         invalidPasswordViewModel.updatePasswordResult.observe(viewLifecycleOwner) { error ->
             passwordInputLayout.error = getString(error)
             passwordInput.text = null

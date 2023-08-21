@@ -42,12 +42,11 @@ class InvalidPasswordViewModel @Inject constructor(
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
     private val mailboxObjectId = savedStateHandle.get<String>(InvalidPasswordFragmentArgs::mailboxObjectId.name)!!
+    private val mailbox = MailboxController.getMailbox(mailboxObjectId)!!
 
     val updatePasswordResult = SingleLiveEvent<Int>()
     val requestPasswordResult = SingleLiveEvent<Boolean>()
     val detachMailboxResult = SingleLiveEvent<Int>()
-
-    val mailbox = MailboxController.getMailbox(mailboxObjectId)!!
 
     fun updatePassword(mailboxId: Int, mailboxObjectId: String, password: String) = viewModelScope.launch(ioCoroutineContext) {
         val apiResponse = ApiRepository.updateMailboxPassword(mailboxId, password)
