@@ -17,10 +17,11 @@
  */
 package com.infomaniak.mail.ui.main
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
+import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.AppSettings
@@ -29,33 +30,46 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class InvalidPasswordViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
-    fun confirmPassword(mailboxId: Int, mailboxObjectId: String, password: String) = liveData(ioCoroutineContext) {
+    private val mailboxObjectId = savedStateHandle.get<String>(InvalidPasswordFragmentArgs::mailboxObjectId.name)!!
+    private val mailbox = MailboxController.getMailbox(mailboxObjectId)!!
+
+    val updatePasswordResult = SingleLiveEvent<Int>()
+    val requestPasswordResult = SingleLiveEvent<Boolean>()
+    val detachMailboxResult = SingleLiveEvent<Int>()
+
+    fun updatePassword(mailboxId: Int, mailboxObjectId: String, password: String) = viewModelScope.launch(ioCoroutineContext) {
         val apiResponse = ApiRepository.updateMailboxPassword(mailboxId, password)
         if (apiResponse.isSuccess()) {
             MailboxController.updateMailbox(mailboxObjectId) { it.isPasswordValid = true }
             AccountUtils.switchToMailbox(mailboxId)
         } else {
-            emit(apiResponse.translateError())
+            updatePasswordResult.postValue(apiResponse.translateError())
         }
     }
 
-    fun detachMailbox(mailboxId: Int) = liveData(ioCoroutineContext) {
+    fun requestPassword() = viewModelScope.launch(ioCoroutineContext) {
+        requestPasswordResult.postValue(ApiRepository.requestMailboxPassword(mailbox.hostingId, mailbox.mailboxName).isSuccess())
+    }
+
+    fun detachMailbox(mailboxId: Int) = viewModelScope.launch(ioCoroutineContext) {
         val apiResponse = ApiRepository.detachMailbox(mailboxId)
         if (apiResponse.isSuccess()) {
             AccountUtils.switchToMailbox(
                 MailboxController.getFirstValidMailbox(AccountUtils.currentUserId)?.mailboxId ?: AppSettings.DEFAULT_ID,
             )
         } else {
-            emit(apiResponse.translateError())
+            detachMailboxResult.postValue(apiResponse.translateError())
         }
     }
 }

@@ -110,8 +110,8 @@
     <string name="buttonMore">Plus</string>
     <string name="buttonMoreStorage">Obtenir plus de stockage</string>
     <string name="buttonNewMessage">Nouveau message</string>
-    <string name="buttonPasswordForgotten">Mot de passe oublié ?</string>
     <string name="buttonRefuse">Refuser</string>
+    <string name="buttonRequestPassword">Demander le mot de passe</string>
     <string name="buttonRestoreEmails">Restaurer des e-mails</string>
     <string name="buttonSchedule">Programmer l’envoi de l’e-mail</string>
     <string name="buttonSeeAll">Voir tout</string>
@@ -385,6 +385,7 @@
     <string name="snackbarEmailSending">E-mail en cours d’envoi</string>
     <string name="snackbarEmailSent">E-mail envoyé</string>
     <string name="snackbarInvalidUrl">URL invalide</string>
+    <string name="snackbarMailboxPasswordRequested">Demande transmise à l’administrateur</string>
     <string name="snackbarMessageDeletedPermanently">Message supprimé</string>
     <string name="snackbarMessageMoved">Message déplacé vers %s</string>
     <string name="snackbarMoveCancelled">Déplacement annulé</string>
