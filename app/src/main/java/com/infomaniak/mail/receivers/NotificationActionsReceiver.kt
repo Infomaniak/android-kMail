@@ -24,6 +24,7 @@ import android.content.Intent
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationManagerCompat
 import com.infomaniak.lib.core.utils.serializableExtra
+import com.infomaniak.mail.MatomoMail.trackNotificationActionEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
@@ -77,17 +78,25 @@ class NotificationActionsReceiver : BroadcastReceiver() {
 
         // Undo action
         if (action == UNDO_ACTION) {
+            context.trackNotificationActionEvent("cancelClicked")
             executeUndoAction(context, payload)
             return
         }
 
         // Other actions
-        val (folderRole, undoNotificationTitle) = when (action) {
-            ARCHIVE_ACTION -> FolderRole.ARCHIVE to R.string.notificationTitleArchive
-            DELETE_ACTION -> FolderRole.TRASH to R.string.notificationTitleDelete
+        val (folderRole, undoNotificationTitle, matomoValue) = when (action) {
+            ARCHIVE_ACTION -> {
+                context.trackNotificationActionEvent("archiveClicked")
+                Triple(FolderRole.ARCHIVE, R.string.notificationTitleArchive, "archiveExecuted")
+            }
+            DELETE_ACTION -> {
+                context.trackNotificationActionEvent("deleteClicked")
+                Triple(FolderRole.TRASH, R.string.notificationTitleDelete, "deleteExecuted")
+            }
             else -> null
         } ?: return
-        executeAction(context, folderRole, undoNotificationTitle, payload)
+
+        executeAction(context, folderRole, undoNotificationTitle, matomoValue, payload)
     }
 
     private fun executeUndoAction(context: Context, payload: NotificationPayload) {
@@ -106,6 +115,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
         context: Context,
         folderRole: FolderRole,
         @StringRes undoNotificationTitle: Int,
+        matomoValue: String,
         payload: NotificationPayload,
     ) = with(payload) {
 
@@ -134,6 +144,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
             val destinationId = folderController.getFolder(folderRole)?.id ?: return@launch
 
             dismissNotification(context, mailbox, notificationId)
+            context.trackNotificationActionEvent(matomoValue)
             ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationId)
         }
 
