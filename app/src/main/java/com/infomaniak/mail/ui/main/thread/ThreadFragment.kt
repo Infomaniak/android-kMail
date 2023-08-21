@@ -35,7 +35,6 @@ import androidx.core.text.toSpannable
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.MediatorLiveData
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
@@ -61,9 +60,7 @@ import com.infomaniak.mail.data.LocalSettings.ExternalContent
 import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder.FolderRole
-import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
-import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadBinding
@@ -147,29 +144,10 @@ class ThreadFragment : Fragment() {
     }
 
     private fun observerSubjectUpdateTrigger() {
-        fun threadMergedContactAndMailboxMediator(): MediatorLiveData<Triple<Thread?, Map<String, Map<String, MergedContact>>?, Mailbox?>> {
-            return MediatorLiveData<Triple<Thread?, Map<String, Map<String, MergedContact>>?, Mailbox?>>().apply {
-                addSource(threadViewModel.threadLive(navigationArgs.threadUid)) {
-                    val second = value?.second
-                    val third = value?.third
-                    value = Triple(it, second, third)
-                }
-
-                addSource(mainViewModel.mergedContactsLive) {
-                    val first = value?.first
-                    val third = value?.third
-                    value = Triple(first, it, third)
-                }
-
-                addSource(mainViewModel.currentMailboxLive) {
-                    val first = value?.first
-                    val second = value?.second
-                    value = Triple(first, second, it)
-                }
-            }
-        }
-
-        threadMergedContactAndMailboxMediator().observe(viewLifecycleOwner) { (thread, mergedContacts, mailbox) ->
+        threadViewModel.threadMergedContactAndMailboxMediator(
+            mergedContactsLive = mainViewModel.mergedContactsLive,
+            currentMailboxLive = mainViewModel.currentMailboxLive,
+        ).observe(viewLifecycleOwner) { (thread, mergedContacts, mailbox) ->
             thread?.let {
                 val emailDictionary = mergedContacts ?: emptyMap()
                 val aliases = mailbox?.aliases ?: emptyList()
@@ -480,7 +458,7 @@ class ThreadFragment : Fragment() {
 
     private fun setSubject(
         thread: Thread,
-        emailDictionary: Map<String, Map<String, MergedContact>>,
+        emailDictionary: MergedContactDictionary,
         aliases: List<String>,
         externalMailFlagEnabled: Boolean,
     ) = with(binding) {
@@ -491,7 +469,7 @@ class ThreadFragment : Fragment() {
 
     private fun computeSubject(
         thread: Thread,
-        emailDictionary: Map<String, Map<String, MergedContact>>,
+        emailDictionary: MergedContactDictionary,
         aliases: List<String>,
         externalMailFlagEnabled: Boolean,
     ): Pair<String, CharSequence> = with(binding) {

@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.models.correspondent
 
 import android.os.Parcel
+import com.infomaniak.mail.utils.MergedContactDictionary
 import com.infomaniak.mail.utils.isEmail
 import io.realm.kotlin.types.EmbeddedRealmObject
 import io.realm.kotlin.types.annotations.Ignore
@@ -42,7 +43,7 @@ open class Recipient : EmbeddedRealmObject, Correspondent {
         return this
     }
 
-    fun isExternal(emailDictionary: Map<String, Map<String, MergedContact>>, aliases: List<String>): Boolean {
+    fun isExternal(emailDictionary: MergedContactDictionary, aliases: List<String>): Boolean {
         val isUnknownContact = email !in emailDictionary
         val isMailerDaemon = """mailer-daemon@(?:.+\.)?infomaniak\.ch""".toRegex(RegexOption.IGNORE_CASE).matches(email)
         val trustedDomains = listOf("@infomaniak.com", "@infomaniak.event", "@swisstransfer.com")

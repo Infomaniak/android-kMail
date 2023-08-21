@@ -140,7 +140,7 @@ object UiUtils {
      */
     fun findExternalRecipientsInThread(
         thread: Thread,
-        emailDictionary: Map<String, Map<String, MergedContact>>,
+        emailDictionary: MergedContactDictionary,
         aliases: List<String>,
     ): Pair<String?, Int> {
         var externalRecipientEmail: String? = null
@@ -161,7 +161,7 @@ object UiUtils {
     fun findExternalRecipientInDraft(
         draft: Draft,
         aliases: List<String>,
-        emailDictionary: Map<String, Map<String, MergedContact>>,
+        emailDictionary: MergedContactDictionary,
     ): Pair<String?, Int> {
         return findExternalRecipientInIterables(emailDictionary, aliases, draft.to, draft.cc, draft.bcc)
     }
@@ -170,7 +170,7 @@ object UiUtils {
      * Only returns a quantity of at most 2, used to differentiate between the singular or plural form of the dialog messages
      */
     private fun findExternalRecipientInIterables(
-        emailDictionary: Map<String, Map<String, MergedContact>>,
+        emailDictionary: MergedContactDictionary,
         aliases: List<String>,
         vararg recipientLists: Iterable<Recipient>,
     ): Pair<String?, Int> {

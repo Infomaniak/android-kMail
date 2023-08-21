@@ -378,7 +378,7 @@ class RecipientFieldView @JvmOverloads constructor(
     fun initRecipients(
         initialRecipients: List<Recipient>,
         shouldWarnForExternalContacts: Boolean,
-        emailDictionary: Map<String, Map<String, MergedContact>>,
+        emailDictionary: MergedContactDictionary,
         aliases: List<String>,
         otherFieldsAreAllEmpty: Boolean = true,
     ) {

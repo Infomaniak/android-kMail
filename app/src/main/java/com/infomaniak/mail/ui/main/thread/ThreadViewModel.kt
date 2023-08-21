@@ -18,10 +18,7 @@
 package com.infomaniak.mail.ui.main.thread
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.liveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.infomaniak.lib.core.utils.DownloadManagerUtils
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.trackUserInfo
@@ -34,11 +31,14 @@ import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -47,6 +47,7 @@ import kotlin.collections.set
 @HiltViewModel
 class ThreadViewModel @Inject constructor(
     application: Application,
+    private val savedStateHandle: SavedStateHandle,
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val messageController: MessageController,
     private val sharedUtils: SharedUtils,
@@ -62,12 +63,40 @@ class ThreadViewModel @Inject constructor(
 
     private val mailbox by lazy { MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
 
+    private inline val threadUid get() = savedStateHandle.get<String>(ThreadFragmentArgs::threadUid.name)!!
+
     fun threadLive(threadUid: String) = liveData(ioCoroutineContext) {
         emitSource(threadController.getThreadAsync(threadUid).map { it.obj }.asLiveData())
     }
 
     fun messagesLive(threadUid: String) = liveData(ioCoroutineContext) {
         messageController.getSortedMessages(threadUid)?.asFlow()?.asLiveData()?.let { emitSource(it) }
+    }
+
+    @OptIn(FlowPreview::class)
+    fun threadMergedContactAndMailboxMediator(
+        mergedContactsLive: LiveData<MergedContactDictionary?>,
+        currentMailboxLive: LiveData<Mailbox>,
+    ): LiveData<Triple<Thread?, MergedContactDictionary?, Mailbox?>> {
+        return MediatorLiveData<Triple<Thread?, MergedContactDictionary?, Mailbox?>>().apply {
+            addSource(threadLive(threadUid)) {
+                val second = value?.second
+                val third = value?.third
+                value = Triple(it, second, third)
+            }
+
+            addSource(mergedContactsLive) {
+                val first = value?.first
+                val third = value?.third
+                value = Triple(first, it, third)
+            }
+
+            addSource(currentMailboxLive) {
+                val first = value?.first
+                val second = value?.second
+                value = Triple(first, second, it)
+            }
+        }
     }
 
     fun openThread(threadUid: String) = liveData(ioCoroutineContext) {
