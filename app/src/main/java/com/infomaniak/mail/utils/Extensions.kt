@@ -68,6 +68,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
@@ -107,6 +108,10 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Scanner
 import com.infomaniak.lib.core.R as RCore
+
+//region Type alias
+typealias MergedContactDictionary = Map<String, Map<String, MergedContact>>
+//endregion
 
 fun Fragment.notYetImplemented(anchor: View? = null) = showSnackbar(getString(R.string.workInProgressTitle), anchor)
 
@@ -592,11 +597,15 @@ fun Fragment.getStringWithBoldArg(@StringRes resId: Int, arg: String): Spanned {
     return Html.fromHtml(getString(resId, "<b>$coloredArg</b>"), Html.FROM_HTML_MODE_LEGACY)
 }
 
-fun Context.launchLoginActivity(shouldClearStack: Boolean = false, args: LoginActivityArgs? = null) {
-    Intent(this, LoginActivity::class.java).apply {
+fun Context.getLoginActivityIntent(args: LoginActivityArgs? = null, shouldClearStack: Boolean = false): Intent {
+    return Intent(this, LoginActivity::class.java).apply {
         if (shouldClearStack) clearStack()
         args?.toBundle()?.let(::putExtras)
-    }.also(::startActivity)
+    }
+}
+
+fun Context.launchLoginActivity(args: LoginActivityArgs? = null) {
+    getLoginActivityIntent(args).also(::startActivity)
 }
 
 fun Context.launchNoValidMailboxesActivity() {
@@ -606,8 +615,14 @@ fun Context.launchNoValidMailboxesActivity() {
 }
 
 fun Context.launchNoMailboxActivity(shouldStartLoginActivity: Boolean = false) {
-    if (shouldStartLoginActivity) launchLoginActivity(shouldClearStack = true)
-    startActivity(Intent(this, NoMailboxActivity::class.java))
+    val noMailboxAcctivityIntent = Intent(this, NoMailboxActivity::class.java)
+    val intentsArray = if (shouldStartLoginActivity) {
+        arrayOf(getLoginActivityIntent(shouldClearStack = true), noMailboxAcctivityIntent)
+    } else {
+        arrayOf(noMailboxAcctivityIntent)
+    }
+
+    startActivities(intentsArray)
 }
 
 fun TextInputLayout.setOnClearTextClickListener(trackerCallback: () -> Unit) {

@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.login
 
 import android.os.Bundle
+import androidx.lifecycle.lifecycleScope
 import com.infomaniak.lib.core.utils.Utils.lockOrientationForSmallScreens
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.mail.BuildConfig.SHOP_URL
@@ -28,10 +29,20 @@ import com.infomaniak.mail.ui.login.IlluColors.Category
 import com.infomaniak.mail.ui.login.IlluColors.IlluColors
 import com.infomaniak.mail.ui.login.IlluColors.getPaletteFor
 import com.infomaniak.mail.ui.login.IlluColors.keyPath
+import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.PlayServicesUtils
 import com.infomaniak.mail.utils.changePathColor
 import com.infomaniak.mail.utils.repeatFrame
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class NoMailboxActivity : BaseActivity() {
+
+    @Inject
+    lateinit var playServicesUtils: PlayServicesUtils
 
     private val binding by lazy { ActivityNoMailboxBinding.inflate(layoutInflater) }
 
@@ -40,13 +51,24 @@ class NoMailboxActivity : BaseActivity() {
 
         super.onCreate(savedInstanceState)
 
+        AccountUtils.currentUser?.let {
+            lifecycleScope.launch(Dispatchers.IO) {
+                AccountUtils.removeUser(
+                    context = this@NoMailboxActivity,
+                    user = it,
+                    playServicesUtils = playServicesUtils,
+                    shouldReload = false,
+                )
+            }
+        }
+
         with(binding) {
             setContentView(root)
 
             noMailboxIconLayout.apply {
                 getAccentIndependentIlluColors().forEach(::changePathColor)
                 getAccentDependentIlluColors().forEach(::changePathColor)
-                setAnimation(R.raw.illu_no_mailbox)
+                setAnimation(R.raw.illustration_no_mailbox)
                 repeatFrame(42, 112)
             }
 

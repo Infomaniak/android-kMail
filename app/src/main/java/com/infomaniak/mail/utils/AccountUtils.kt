@@ -30,9 +30,11 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.appSettings.AppSettingsController
 import com.infomaniak.mail.data.models.AppSettings
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import io.sentry.Sentry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
 import io.sentry.protocol.User as SentryUser
 
@@ -81,6 +83,27 @@ object AccountUtils : CredentialManager() {
         reloadApp?.invoke()
     }
 
+    suspend fun manageMailboxesEdgeCases(context: Context, mailboxes: List<Mailbox>): Boolean {
+
+        val shouldStop = when {
+            mailboxes.isEmpty() -> {
+                Dispatchers.Main { context.launchNoMailboxActivity(shouldStartLoginActivity = true) }
+                true
+            }
+            mailboxes.none { it.isValid } -> {
+                Dispatchers.Main { context.launchNoValidMailboxesActivity() }
+                true
+            }
+            mailboxes.none { it.mailboxId == currentMailboxId } -> {
+                reloadApp?.invoke()
+                true
+            }
+            else -> false
+        }
+
+        return shouldStop
+    }
+
     suspend fun requestCurrentUser(): User? {
         return (getUserById(currentUserId) ?: userDatabase.userDao().getFirst()).also { currentUser = it }
     }
@@ -90,7 +113,7 @@ object AccountUtils : CredentialManager() {
         userDatabase.userDao().insert(user)
     }
 
-    suspend fun removeUser(context: Context, user: User, playServicesUtils: PlayServicesUtils) {
+    suspend fun removeUser(context: Context, user: User, playServicesUtils: PlayServicesUtils, shouldReload: Boolean = true) {
 
         fun logoutUserToken() {
             CoroutineScope(Dispatchers.IO).launch {
@@ -114,7 +137,7 @@ object AccountUtils : CredentialManager() {
                 resetSettings(context, localSettings)
                 playServicesUtils.deleteFirebaseToken()
             }
-            reloadApp?.invoke()
+            if (shouldReload) reloadApp?.invoke()
         }
     }
 

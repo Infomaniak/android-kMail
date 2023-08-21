@@ -45,6 +45,7 @@ import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ViewContactChipContextMenuBinding
 import com.infomaniak.mail.databinding.ViewRecipientFieldBinding
+import com.infomaniak.mail.utils.MergedContactDictionary
 import com.infomaniak.mail.utils.UiUtils.dividerDrawable
 import com.infomaniak.mail.utils.isEmail
 import com.infomaniak.mail.utils.toggleChevron
@@ -60,7 +61,7 @@ class RecipientFieldView @JvmOverloads constructor(
     private var contactAdapter: ContactAdapter
     private var contactChipAdapter: ContactChipAdapter
 
-    private var contactMap: Map<String, Map<String, MergedContact>> = emptyMap()
+    private var contactMap: MergedContactDictionary = emptyMap()
     private lateinit var popupRecipient: Recipient
     private var popupDeletesTheCollapsedChip = false
 
@@ -293,7 +294,7 @@ class RecipientFieldView @JvmOverloads constructor(
         textInput.isVisible = isTextInputAccessible
     }
 
-    fun updateContacts(allContacts: List<MergedContact>, newContactMap: Map<String, Map<String, MergedContact>>) {
+    fun updateContacts(allContacts: List<MergedContact>, newContactMap: MergedContactDictionary) {
         contactAdapter.updateContacts(allContacts)
         contactMap = newContactMap
     }

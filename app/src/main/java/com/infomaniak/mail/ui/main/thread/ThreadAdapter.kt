@@ -71,7 +71,7 @@ class ThreadAdapter(
     private val manuallyAllowedMessageUids = mutableSetOf<String>()
     var isExpandedMap = mutableMapOf<String, Boolean>()
     var isThemeTheSameMap = mutableMapOf<String, Boolean>()
-    var contacts: Map<String, Map<String, MergedContact>> = emptyMap()
+    var contacts: MergedContactDictionary = emptyMap()
 
     var onContactClicked: ((contact: Recipient) -> Unit)? = null
     var onDeleteDraftClicked: ((message: Message) -> Unit)? = null
@@ -449,7 +449,7 @@ class ThreadAdapter(
         return listOf(*to.toTypedArray(), *cc.toTypedArray(), *bcc.toTypedArray()).joinToString { it.displayedName(context) }
     }
 
-    fun updateContacts(newContacts: Map<String, Map<String, MergedContact>>) {
+    fun updateContacts(newContacts: MergedContactDictionary) {
         contacts = newContacts
         notifyItemRangeChanged(0, itemCount, NotificationType.AVATAR)
     }

@@ -37,6 +37,7 @@ import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ViewAvatarBinding
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.MergedContactDictionary
 
 class AvatarView @JvmOverloads constructor(
     context: Context,
@@ -66,7 +67,7 @@ class AvatarView @JvmOverloads constructor(
         )
     }
 
-    fun loadAvatar(recipient: Recipient?, contacts: Map<String, Map<String, MergedContact>>) {
+    fun loadAvatar(recipient: Recipient?, contacts: MergedContactDictionary) {
         if (recipient == null) {
             loadUnknownUserAvatar()
         } else {

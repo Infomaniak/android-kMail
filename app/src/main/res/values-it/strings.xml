@@ -115,10 +115,10 @@
     <string name="buttonSeeAll">Vedi tutti</string>
     <string name="buttonSelectAll">Tutti</string>
     <string name="buttonShare">Condividi</string>
-    <string name="buttonStrikedThrough">Sciopero attraverso</string>
+    <string name="buttonStrikeThrough">Sciopero attraverso</string>
     <string name="buttonTextOptionsClose">Chiudere la formattazione del testo</string>
     <string name="buttonTextOptionsOpen">Formattazione del testo aperto</string>
-    <string name="buttonUnderlined">Sottolineatura</string>
+    <string name="buttonUnderline">Sottolineatura</string>
     <string name="buttonUnselectAll">Nessuno</string>
     <string name="buttonValid">Convalidare</string>
     <string name="ccTitle">Cc:</string>

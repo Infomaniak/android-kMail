@@ -177,15 +177,15 @@
                     android:contentDescription="@string/buttonItalic"
                     app:icon="@drawable/ic_editor_italic"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/editorUnderlined"
+                    app:layout_constraintEnd_toStartOf="@+id/editorUnderline"
                     app:layout_constraintStart_toEndOf="@+id/editorBold"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <com.infomaniak.mail.ui.main.newMessage.ToggleableTextFormatterItemView
-                    android:id="@+id/editorUnderlined"
+                    android:id="@+id/editorUnderline"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:contentDescription="@string/buttonUnderlined"
+                    android:contentDescription="@string/buttonUnderline"
                     app:icon="@drawable/ic_editor_underline"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/editorStrikeThrough"
@@ -196,11 +196,11 @@
                     android:id="@+id/editorStrikeThrough"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:contentDescription="@string/buttonStrikedThrough"
+                    android:contentDescription="@string/buttonStrikeThrough"
                     app:icon="@drawable/ic_editor_strikethrough"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/editorList"
-                    app:layout_constraintStart_toEndOf="@+id/editorUnderlined"
+                    app:layout_constraintStart_toEndOf="@+id/editorUnderline"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <com.google.android.material.button.MaterialButton
@@ -231,7 +231,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:visibility="gone"
-                    app:constraint_referenced_ids="editorBold,editorItalic,editorUnderlined,editorStrikeThrough,editorList" />
+                    app:constraint_referenced_ids="editorBold,editorItalic,editorUnderline,editorStrikeThrough,editorList" />
 
                 <androidx.constraintlayout.widget.Group
                     android:id="@+id/editorActions"

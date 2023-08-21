@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui
 
 import android.app.Application
-import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.models.ApiResponse
@@ -48,7 +47,6 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.SnackBarManager
 import com.infomaniak.mail.ui.main.SnackBarManager.UndoData
 import com.infomaniak.mail.ui.main.folder.ThreadListViewModel
-import com.infomaniak.mail.ui.noValidMailboxes.NoValidMailboxesActivity
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
@@ -86,7 +84,6 @@ class MainViewModel @Inject constructor(
     // First boolean is the download status, second boolean is if the LoadMore button should be displayed
     val isDownloadingChanges: MutableLiveData<Pair<Boolean, Boolean?>> = MutableLiveData(false to null)
     val isNewFolderCreated = SingleLiveEvent<Boolean>()
-    val shouldStartNoMailboxActivity = SingleLiveEvent<Unit>()
     val toggleLightThemeForMessage = SingleLiveEvent<Message>()
 
     val snackBarManager by lazy { SnackBarManager() }
@@ -175,7 +172,7 @@ class MainViewModel @Inject constructor(
 
     //region Merged Contacts
     // Explanation of this Map: Map<Email, Map<Name, MergedContact>>
-    val mergedContactsLive: LiveData<Map<String, Map<String, MergedContact>>?> = mergedContactController
+    val mergedContactsLive: LiveData<MergedContactDictionary?> = mergedContactController
         .getMergedContactsAsync()
         .mapLatest { ContactUtils.arrangeMergedContacts(it.list.copyFromRealm()) }
         .asLiveData(ioCoroutineContext)
@@ -218,7 +215,7 @@ class MainViewModel @Inject constructor(
     private fun switchToValidMailbox() = viewModelScope.launch(ioCoroutineContext) {
         MailboxController.getFirstValidMailbox(AccountUtils.currentUserId)?.let {
             AccountUtils.switchToMailbox(it.mailboxId)
-        } ?: context.startActivity(Intent(context, NoValidMailboxesActivity::class.java))
+        } ?: context.launchNoValidMailboxesActivity()
     }
 
     fun dismissCurrentMailboxNotifications() = viewModelScope.launch(ioCoroutineContext) {
@@ -235,15 +232,10 @@ class MainViewModel @Inject constructor(
             Log.d(TAG, "Refresh mailboxes from remote")
             with(ApiRepository.getMailboxes()) {
                 if (isSuccess()) {
-                    when {
-                        data!!.isEmpty() -> {
-                            shouldStartNoMailboxActivity.postValue(Unit)
-                            return@launch
-                        }
-                        data!!.none { it.isValid } -> Dispatchers.Main { context.launchNoValidMailboxesActivity() }
-                    }
-                    val isCurrentMailboxDeleted = MailboxController.updateMailboxes(context, data!!)
-                    if (isCurrentMailboxDeleted) return@launch
+                    MailboxController.updateMailboxes(context, data!!)
+
+                    val shouldStop = AccountUtils.manageMailboxesEdgeCases(context, data!!)
+                    if (shouldStop) return@launch
                 }
             }
 
