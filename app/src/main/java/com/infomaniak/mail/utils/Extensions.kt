@@ -404,7 +404,7 @@ fun Fragment.createInputDialog(
     @StringRes hint: Int,
     @StringRes confirmButtonText: Int,
     onErrorCheck: suspend (CharSequence) -> String?,
-    onPositiveButtonClicked: (CharSequence?) -> Unit,
+    onPositiveButtonClicked: (String) -> Unit,
 ) = with(DialogInputBinding.inflate(layoutInflater)) {
 
     var errorJob: Job? = null
@@ -443,7 +443,7 @@ fun Fragment.createInputDialog(
 
     return@with MaterialAlertDialogBuilder(context)
         .setView(root)
-        .setPositiveButton(confirmButtonText) { _, _ -> onPositiveButtonClicked(textInput.text?.trim()) }
+        .setPositiveButton(confirmButtonText) { _, _ -> onPositiveButtonClicked(textInput.trim()) }
         .setNegativeButton(RCore.string.buttonCancel, null)
         .setOnDismissListener {
             errorJob?.cancel()
@@ -616,3 +616,5 @@ fun TextInputEditText.handleEditorSearchAction(searchCallback: (String) -> Unit)
 fun CharSequence.standardize(): String = toString().removeAccents().trim().lowercase()
 
 inline val AndroidViewModel.context: Context get() = getApplication()
+
+fun TextInputEditText.trim() = text?.trim().toString()

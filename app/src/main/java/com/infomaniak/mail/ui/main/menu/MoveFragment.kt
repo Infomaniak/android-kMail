@@ -127,7 +127,7 @@ class MoveFragment : MenuFoldersFragment() {
             onErrorCheck = { folderName -> checkForFolderCreationErrors(folderName) },
             onPositiveButtonClicked = { folderName ->
                 trackCreateFolderEvent("confirm")
-                mainViewModel.moveToNewFolder(folderName!!.toString(), threadsUids, messageUid)
+                mainViewModel.moveToNewFolder(folderName, threadsUids, messageUid)
             },
         )
     }
