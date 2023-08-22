@@ -22,7 +22,6 @@ import com.infomaniak.mail.utils.Utils.TEXT_PLAIN
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
-import org.jsoup.select.Elements
 
 object MessageBodyUtils {
 
@@ -34,7 +33,9 @@ object MessageBodyUtils {
     private const val QUOTE_DETECTION_SIZE_LIMIT = 1_000_000 // 1 Meg looks like a fine threshold
 
     private val quoteDescriptors = arrayOf(
-        "#divRplyFwdMsg", // Outlook
+        // Do not detect this quote as long as we can't detect siblings quotes or else a single reply will be missing among the
+        // many replies of an Outlook reply "chain", which is worst than simply ignoring it
+        // "#divRplyFwdMsg", // Outlook
         "#isForwardContent",
         "#isReplyContent",
         "#mailcontent:not(table)",
@@ -85,7 +86,7 @@ object MessageBodyUtils {
     private fun findFirstKnownParentQuoteDescriptor(htmlDocumentWithoutQuote: Document): String {
         var currentQuoteDescriptor = ""
         for (quoteDescriptor in quoteDescriptors) {
-            val quotedContentElement = htmlDocumentWithoutQuote.selectElementAndFollowingSiblings(quoteDescriptor)
+            val quotedContentElement = htmlDocumentWithoutQuote.select(quoteDescriptor)
             if (quotedContentElement.isNotEmpty()) {
                 quotedContentElement.remove()
                 currentQuoteDescriptor = quoteDescriptor
@@ -111,7 +112,7 @@ object MessageBodyUtils {
                 htmlDocumentWithQuote.toString() to blockquoteElement.toString()
             }
             currentQuoteDescriptor.isNotEmpty() -> {
-                val quotedContentElements = htmlDocumentWithQuote.selectElementAndFollowingSiblings(currentQuoteDescriptor)
+                val quotedContentElements = htmlDocumentWithQuote.select(currentQuoteDescriptor)
                 quotedContentElements.remove()
                 htmlDocumentWithQuote.toString() to quotedContentElements.toString()
             }
@@ -128,15 +129,6 @@ object MessageBodyUtils {
      * @return a new CSS query
      */
     private fun anyCssClassContaining(cssClass: String) = "[class*=$cssClass]"
-
-    /**
-     * Some Email clients add the Thread's History in a new block, at the same level as the previous one.
-     * So we match the current block, as well as all those that follow and that are at the same level.
-     * @return [Elements] which contains all the blocks that have been matched
-     */
-    private fun Document.selectElementAndFollowingSiblings(quoteDescriptor: String): Elements {
-        return select("$quoteDescriptor, $quoteDescriptor ~ *")
-    }
     //endregion
 
     data class MessageBodyQuote(
