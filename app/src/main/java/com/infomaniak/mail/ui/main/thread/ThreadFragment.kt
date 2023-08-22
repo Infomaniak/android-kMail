@@ -338,20 +338,17 @@ class ThreadFragment : Fragment() {
     }
 
     private fun observeThreadLive() {
-        threadViewModel.threadLive().observe(viewLifecycleOwner, ::onThreadUpdate)
+        threadViewModel.threadLive.observe(viewLifecycleOwner, ::onThreadUpdate)
     }
 
     private fun observeMessagesLive() {
-        threadViewModel
-            .messagesLive()
-            .bindResultsChangeToAdapter(viewLifecycleOwner, threadAdapter)
-            .apply {
-                beforeUpdateAdapter = ::onMessagesUpdate
-                afterUpdateAdapter = {
-                    val shouldScrollToFirstUnseenMessage = isFirstVisit.compareAndSet(true, false) && it.count() > 1
-                    if (shouldScrollToFirstUnseenMessage) onRecyclerViewLaidOut(::scrollToFirstUnseenMessage)
-                }
+        threadViewModel.messagesLive.bindResultsChangeToAdapter(viewLifecycleOwner, threadAdapter).apply {
+            beforeUpdateAdapter = ::onMessagesUpdate
+            afterUpdateAdapter = {
+                val shouldScrollToFirstUnseenMessage = isFirstVisit.compareAndSet(true, false) && it.count() > 1
+                if (shouldScrollToFirstUnseenMessage) onRecyclerViewLaidOut(::scrollToFirstUnseenMessage)
             }
+        }
     }
 
     private fun onRecyclerViewLaidOut(callback: () -> Unit) = with(binding) {

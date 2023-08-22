@@ -206,8 +206,7 @@ class NewMessageViewModel @Inject constructor(
      * If we are replying to a Message, we need to mark it as read.
      */
     private suspend fun markAsRead(mailbox: Mailbox, realm: TypedRealm) {
-        if (previousMessageUid == null) return
-        val message = MessageController.getMessage(previousMessageUid!!, realm) ?: return
+        val message = previousMessageUid?.let { MessageController.getMessage(it, realm) } ?: return
         if (message.isSeen) return
 
         sharedUtils.markAsSeen(

@@ -56,8 +56,8 @@ class SearchViewModel @Inject constructor(
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
-    /** It's simply used as a default value for the API. */
-    private val dummyFolderId = savedStateHandle.get<String>(SearchFragmentArgs::dummyFolderId.name)!!
+    /** Needed to pass API request's validation, but won't be used by the API */
+    private val dummyFolderId inline get() = savedStateHandle.get<String>(SearchFragmentArgs::dummyFolderId.name)!!
 
     var currentFolder: Folder? = null
         private set

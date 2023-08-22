@@ -62,11 +62,11 @@ class ThreadViewModel @Inject constructor(
 
     private val mailbox by lazy { MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
 
-    fun threadLive() = liveData(ioCoroutineContext) {
+    val threadLive = liveData(ioCoroutineContext) {
         emitSource(threadController.getThreadAsync(threadUid).map { it.obj }.asLiveData())
     }
 
-    fun messagesLive() = liveData(ioCoroutineContext) {
+    val messagesLive = liveData(ioCoroutineContext) {
         messageController.getSortedMessages(threadUid)?.asFlow()?.asLiveData()?.let { emitSource(it) }
     }
 
