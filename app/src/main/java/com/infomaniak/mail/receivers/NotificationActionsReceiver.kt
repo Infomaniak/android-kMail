@@ -23,6 +23,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationManagerCompat
+import com.infomaniak.lib.core.utils.serializableExtra
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
@@ -66,7 +67,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         globalCoroutineScope.launch(ioDispatcher) {
-            val payload = intent.getSerializableExtra(EXTRA_PAYLOAD) as? NotificationPayload ?: return@launch
+            val payload = intent.serializableExtra(EXTRA_PAYLOAD) as? NotificationPayload ?: return@launch
             val action = intent.action!!
             handleNotificationIntent(context, payload, action)
         }
