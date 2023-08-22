@@ -443,7 +443,7 @@ fun Fragment.createInputDialog(
 
     return@with MaterialAlertDialogBuilder(context)
         .setView(root)
-        .setPositiveButton(confirmButtonText) { _, _ -> onPositiveButtonClicked(textInput.trim()) }
+        .setPositiveButton(confirmButtonText) { _, _ -> onPositiveButtonClicked(textInput.trimmedText) }
         .setNegativeButton(RCore.string.buttonCancel, null)
         .setOnDismissListener {
             errorJob?.cancel()
@@ -617,4 +617,4 @@ fun CharSequence.standardize(): String = toString().removeAccents().trim().lower
 
 inline val AndroidViewModel.context: Context get() = getApplication()
 
-fun TextInputEditText.trim() = text?.trim().toString()
+val TextInputEditText.trimmedText inline get() = text?.trim().toString()

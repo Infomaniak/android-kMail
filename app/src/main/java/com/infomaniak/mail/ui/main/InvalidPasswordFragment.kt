@@ -35,7 +35,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentInvalidPasswordBinding
 import com.infomaniak.mail.utils.createDescriptionDialog
 import com.infomaniak.mail.utils.getStringWithBoldArg
-import com.infomaniak.mail.utils.trim
+import com.infomaniak.mail.utils.trimmedText
 import dagger.hilt.android.AndroidEntryPoint
 import com.infomaniak.lib.core.R as RCore
 
@@ -75,7 +75,7 @@ class InvalidPasswordFragment : Fragment() {
             setOnClickListener {
                 trackInvalidPasswordMailboxEvent("updatePassword")
                 showProgress()
-                invalidPasswordViewModel.updatePassword(passwordInput.trim())
+                invalidPasswordViewModel.updatePassword(passwordInput.trimmedText)
             }
         }
 
