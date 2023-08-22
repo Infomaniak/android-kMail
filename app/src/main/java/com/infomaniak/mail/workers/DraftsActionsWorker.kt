@@ -153,11 +153,7 @@ class DraftsActionsWorker @AssistedInject constructor(
 
             runCatching {
                 draft.uploadAttachments()
-                executeDraftAction(
-                    draft = draft,
-                    mailboxUuid = mailbox.uuid,
-                    okHttpClient = okHttpClient,
-                ).also { (realmActionOnDraft, scheduledDate, errorMessageResId, savedDraftUuid, isSuccess) ->
+                with(executeDraftAction(draft, mailbox.uuid)) {
                     if (isSuccess) {
                         if (isTargetDraft) {
                             remoteUuidOfTrackedDraft = savedDraftUuid
@@ -170,6 +166,7 @@ class DraftsActionsWorker @AssistedInject constructor(
                         isTrackedDraftSuccess = false
                         haveAllDraftsSucceeded = false
                     }
+                    return@with
                 }
             }.onFailure { exception ->
                 when (exception) {
@@ -327,12 +324,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         val isSuccess: Boolean,
     )
 
-    private fun executeDraftAction(
-        draft: Draft,
-        mailboxUuid: String,
-        okHttpClient: OkHttpClient,
-        isFirstTime: Boolean = true,
-    ): DraftActionResult {
+    private fun executeDraftAction(draft: Draft, mailboxUuid: String, isFirstTime: Boolean = true): DraftActionResult {
 
         var realmActionOnDraft: ((MutableRealm) -> Unit)? = null
         var scheduledDate: String? = null
@@ -376,11 +368,7 @@ class DraftsActionsWorker @AssistedInject constructor(
                     scheduledDate = dateFormatWithTimezone.format(Date())
                     savedDraftUuid = data.draftRemoteUuid
                 } ?: run {
-                    if (isFirstTime && error?.code == ErrorCode.IDENTITY_NOT_FOUND) {
-                        return updateSignaturesThenRetry(draft, mailboxUuid, okHttpClient)
-                    } else {
-                        throwErrorAsException()
-                    }
+                    retryWithNewIdentityOrThrow(draft, mailboxUuid, isFirstTime)
                 }
             }
             DraftAction.SEND -> with(ApiRepository.sendDraft(mailboxUuid, updatedDraft, okHttpClient)) {
@@ -397,11 +385,7 @@ class DraftsActionsWorker @AssistedInject constructor(
                         }
                     }
                     else -> {
-                        if (isFirstTime && error?.code == ErrorCode.IDENTITY_NOT_FOUND) {
-                            return updateSignaturesThenRetry(draft, mailboxUuid, okHttpClient)
-                        } else {
-                            throwErrorAsException()
-                        }
+                        retryWithNewIdentityOrThrow(draft, mailboxUuid, isFirstTime)
                     }
                 }
             }
@@ -417,7 +401,19 @@ class DraftsActionsWorker @AssistedInject constructor(
         )
     }
 
-    private fun updateSignaturesThenRetry(draft: Draft, mailboxUuid: String, okHttpClient: OkHttpClient): DraftActionResult {
+    private inline fun <reified T> ApiResponse<T>.retryWithNewIdentityOrThrow(
+        draft: Draft,
+        mailboxUuid: String,
+        isFirstTime: Boolean,
+    ): DraftActionResult {
+        if (isFirstTime && error?.code == ErrorCode.IDENTITY_NOT_FOUND) {
+            return updateSignaturesThenRetry(draft, mailboxUuid)
+        } else {
+            throwErrorAsException()
+        }
+    }
+
+    private fun updateSignaturesThenRetry(draft: Draft, mailboxUuid: String): DraftActionResult {
 
         mailboxContentRealm.writeBlocking {
             updateAndGetSignatures(mailbox)
@@ -427,7 +423,7 @@ class DraftsActionsWorker @AssistedInject constructor(
             }
         }
 
-        return executeDraftAction(draft, mailboxUuid, okHttpClient, isFirstTime = false)
+        return executeDraftAction(draft, mailboxUuid, isFirstTime = false)
     }
 
     private fun deleteDraftCallback(draft: Draft): (MutableRealm) -> Unit {
