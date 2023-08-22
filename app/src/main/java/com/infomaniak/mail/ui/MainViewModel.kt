@@ -37,7 +37,6 @@ import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.MoveResult
-import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
@@ -168,7 +167,7 @@ class MainViewModel @Inject constructor(
 
     //region Merged Contacts
     // Explanation of this Map: Map<Email, Map<Name, MergedContact>>
-    val mergedContactsLive: LiveData<Map<String, Map<String, MergedContact>>?> = mergedContactController
+    val mergedContactsLive: LiveData<MergedContactDictionary?> = mergedContactController
         .getMergedContactsAsync()
         .mapLatest { ContactUtils.arrangeMergedContacts(it.list.copyFromRealm()) }
         .asLiveData(ioCoroutineContext)

@@ -325,7 +325,7 @@ class NewMessageFragment : Fragment() {
 
     private fun updateRecipientFieldsContacts(
         sortedContactList: List<MergedContact>,
-        contactMap: Map<String, Map<String, MergedContact>>,
+        contactMap: MergedContactDictionary,
     ) = with(binding) {
         toField.updateContacts(sortedContactList, contactMap)
         ccField.updateContacts(sortedContactList, contactMap)

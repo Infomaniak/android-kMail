@@ -68,6 +68,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
@@ -107,6 +108,10 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Scanner
 import com.infomaniak.lib.core.R as RCore
+
+//region Type alias
+typealias MergedContactDictionary = Map<String, Map<String, MergedContact>>
+//endregion
 
 fun Fragment.notYetImplemented(anchor: View? = null) = showSnackbar(getString(R.string.workInProgressTitle), anchor)
 

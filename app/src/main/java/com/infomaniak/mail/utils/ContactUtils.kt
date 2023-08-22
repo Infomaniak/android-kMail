@@ -98,7 +98,7 @@ object ContactUtils {
         }
     }
 
-    fun arrangeMergedContacts(contacts: List<MergedContact>): Map<String, Map<String, MergedContact>> {
+    fun arrangeMergedContacts(contacts: List<MergedContact>): MergedContactDictionary {
         val contactMap = mutableMapOf<String, MutableMap<String, MergedContact>>()
 
         contacts.forEach { contact ->
