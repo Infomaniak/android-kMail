@@ -19,10 +19,7 @@ package com.infomaniak.mail.ui.main.search
 
 import android.app.Application
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.trackSearchEvent
@@ -48,6 +45,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     application: Application,
+    private val savedStateHandle: SavedStateHandle,
     private val globalCoroutineScope: CoroutineScope,
     private val searchUtils: SearchUtils,
     private val messageController: MessageController,
@@ -57,6 +55,9 @@ class SearchViewModel @Inject constructor(
 ) : AndroidViewModel(application) {
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
+
+    /** It's simply used as a default value for the API. */
+    private val dummyFolderId = savedStateHandle.get<String>(SearchFragmentArgs::dummyFolderId.name)!!
 
     var currentFolder: Folder? = null
         private set
@@ -72,19 +73,12 @@ class SearchViewModel @Inject constructor(
     val visibilityMode = MutableLiveData(VisibilityMode.RECENT_SEARCHES)
     val history = SingleLiveEvent<String>()
 
-    /** It's simply used as a default value for the API. */
-    private lateinit var dummyFolderId: String
-
     private var resourceNext: String? = null
     private var isFirstPage: Boolean = true
     private val isLastPage get() = resourceNext.isNullOrBlank()
 
     private var searchJob: Job? = null
     val searchResults = threadController.getSearchThreadsAsync().asLiveData(ioCoroutineContext)
-
-    fun init(dummyFolderId: String) {
-        this.dummyFolderId = dummyFolderId
-    }
 
     fun cancelSearch() {
         searchJob?.cancel()
