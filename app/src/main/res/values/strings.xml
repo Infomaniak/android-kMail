@@ -115,8 +115,8 @@
     <string name="buttonMore">More</string>
     <string name="buttonMoreStorage">Get more storage</string>
     <string name="buttonNewMessage">New message</string>
-    <string name="buttonPasswordForgotten">Forgot password?</string>
     <string name="buttonRefuse">Refuse</string>
+    <string name="buttonRequestPassword">Request password</string>
     <string name="buttonRestoreEmails">Restore emails</string>
     <string name="buttonSchedule">Schedule email to send later</string>
     <string name="buttonSeeAll">See all</string>
@@ -398,6 +398,7 @@
     <string name="snackbarEmailSending">Email sending in progress</string>
     <string name="snackbarEmailSent">Email sent</string>
     <string name="snackbarInvalidUrl">Invalid URL</string>
+    <string name="snackbarMailboxPasswordRequested">Request sent to administrator</string>
     <string name="snackbarMessageDeletedPermanently">Message deleted</string>
     <string name="snackbarMessageMoved">Message moved to %s</string>
     <string name="snackbarMoveCancelled">Move cancelled</string>

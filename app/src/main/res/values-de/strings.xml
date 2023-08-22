@@ -108,8 +108,8 @@
     <string name="buttonMore">Mehr</string>
     <string name="buttonMoreStorage">Mehr Speicherplatz erhalten</string>
     <string name="buttonNewMessage">Neue Nachricht</string>
-    <string name="buttonPasswordForgotten">Passwort vergessen?</string>
     <string name="buttonRefuse">Abfälle</string>
+    <string name="buttonRequestPassword">Passwort anfordern</string>
     <string name="buttonRestoreEmails">E-Mails wiederherstellen</string>
     <string name="buttonSchedule">Planen Sie den Versand von E-Mails für einen späteren Zeitpunkt</string>
     <string name="buttonSeeAll">Alle sehen</string>
@@ -391,6 +391,7 @@
     <string name="snackbarEmailSending">E-Mail-Versand im Gange</string>
     <string name="snackbarEmailSent">E-Mail gesendet</string>
     <string name="snackbarInvalidUrl">Ungültige URL</string>
+    <string name="snackbarMailboxPasswordRequested">Antrag an den Administrator weitergeleitet</string>
     <string name="snackbarMessageDeletedPermanently">Nachricht gelöscht</string>
     <string name="snackbarMessageMoved">Nachricht an %s verschoben</string>
     <string name="snackbarMoveCancelled">Umzug abgesagt</string>

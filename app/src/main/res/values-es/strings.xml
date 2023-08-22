@@ -108,8 +108,8 @@
     <string name="buttonMore">Más</string>
     <string name="buttonMoreStorage">Más espacio de almacenamiento</string>
     <string name="buttonNewMessage">Nuevo mensaje</string>
-    <string name="buttonPasswordForgotten">¿Ha olvidado su contraseña?</string>
     <string name="buttonRefuse">Desechos</string>
+    <string name="buttonRequestPassword">Solicitar contraseña</string>
     <string name="buttonRestoreEmails">Restaurar correos electrónicos</string>
     <string name="buttonSchedule">Programar un correo electrónico para enviarlo más tarde</string>
     <string name="buttonSeeAll">Ver todos</string>
@@ -391,6 +391,7 @@
     <string name="snackbarEmailSending">Envío de correo electrónico en curso</string>
     <string name="snackbarEmailSent">Correo electrónico enviado</string>
     <string name="snackbarInvalidUrl">URL no válida</string>
+    <string name="snackbarMailboxPasswordRequested">Solicitud enviada al administrador</string>
     <string name="snackbarMessageDeletedPermanently">Mensaje eliminado</string>
     <string name="snackbarMessageMoved">Mensaje trasladado a %s</string>
     <string name="snackbarMoveCancelled">Mudanza cancelada</string>
