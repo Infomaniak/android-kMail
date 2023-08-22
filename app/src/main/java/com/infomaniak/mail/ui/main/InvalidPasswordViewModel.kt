@@ -35,13 +35,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class InvalidPasswordViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
+    private val savedStateHandle: SavedStateHandle,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
-    private val mailboxObjectId = savedStateHandle.get<String>(InvalidPasswordFragmentArgs::mailboxObjectId.name)!!
+    private val mailboxObjectId inline get() = savedStateHandle.get<String>(InvalidPasswordFragmentArgs::mailboxObjectId.name)!!
     private val mailbox = MailboxController.getMailbox(mailboxObjectId)!!
 
     val updatePasswordResult = SingleLiveEvent<Int>()

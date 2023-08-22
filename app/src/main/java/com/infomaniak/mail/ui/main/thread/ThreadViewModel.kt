@@ -44,7 +44,7 @@ import kotlin.collections.set
 @HiltViewModel
 class ThreadViewModel @Inject constructor(
     application: Application,
-    savedStateHandle: SavedStateHandle,
+    private val savedStateHandle: SavedStateHandle,
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val messageController: MessageController,
     private val sharedUtils: SharedUtils,
@@ -56,7 +56,7 @@ class ThreadViewModel @Inject constructor(
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
     private var fetchMessagesJob: Job? = null
 
-    private val threadUid = savedStateHandle.get<String>(ThreadFragmentArgs::threadUid.name)!!
+    private val threadUid inline get() = savedStateHandle.get<String>(ThreadFragmentArgs::threadUid.name)!!
 
     val quickActionBarClicks = SingleLiveEvent<Pair<Message, Int>>()
 

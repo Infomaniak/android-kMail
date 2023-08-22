@@ -35,14 +35,15 @@ import javax.inject.Inject
 @HiltViewModel
 class DownloadAttachmentViewModel @Inject constructor(
     application: Application,
-    savedStateHandle: SavedStateHandle,
+    private val savedStateHandle: SavedStateHandle,
     private val attachmentController: AttachmentController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
-    private val attachmentResource = savedStateHandle.get<String>(DownloadAttachmentProgressDialogArgs::attachmentResource.name)!!
+    private val attachmentResource
+        inline get() = savedStateHandle.get<String>(DownloadAttachmentProgressDialogArgs::attachmentResource.name)!!
 
     /**
      * We keep the Attachment, in case the ViewModel is destroyed before it finishes downloading

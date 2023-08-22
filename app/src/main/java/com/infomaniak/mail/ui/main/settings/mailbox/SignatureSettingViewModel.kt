@@ -39,13 +39,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignatureSettingViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
+    private val savedStateHandle: SavedStateHandle,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     private val coroutineContext = viewModelScope.coroutineContext + ioDispatcher
 
-    private val mailboxObjectId = savedStateHandle.get<String>(SignatureSettingFragmentArgs::mailboxObjectId.name)!!
+    private val mailboxObjectId inline get() = savedStateHandle.get<String>(SignatureSettingFragmentArgs::mailboxObjectId.name)!!
     val mailbox = MailboxController.getMailbox(mailboxObjectId)!!
     private var customRealm = RealmDatabase.newMailboxContentInstance(AccountUtils.currentUserId, mailbox.mailboxId)
 

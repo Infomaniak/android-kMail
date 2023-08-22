@@ -36,7 +36,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MoveViewModel @Inject constructor(
     application: Application,
-    savedStateHandle: SavedStateHandle,
+    private val savedStateHandle: SavedStateHandle,
     private val messageController: MessageController,
     private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -46,8 +46,8 @@ class MoveViewModel @Inject constructor(
 
     private var filterJob: Job? = null
 
-    private val messageUid = savedStateHandle.get<String?>(MoveFragmentArgs::messageUid.name)
-    private val threadsUids = savedStateHandle.get<Array<String>>(MoveFragmentArgs::threadsUids.name)!!
+    private val messageUid inline get() = savedStateHandle.get<String?>(MoveFragmentArgs::messageUid.name)
+    private val threadsUids inline get() = savedStateHandle.get<Array<String>>(MoveFragmentArgs::threadsUids.name)!!
 
     var filterResults: MutableLiveData<List<Folder>> = MutableLiveData()
 
@@ -57,7 +57,7 @@ class MoveViewModel @Inject constructor(
 
     fun getFolderId() = liveData(ioCoroutineContext) {
         val folderId = messageUid?.let {
-            messageController.getMessage(messageUid)!!.folderId
+            messageController.getMessage(it)!!.folderId
         } ?: threadController.getThread(threadsUids.first())!!.folderId
 
         emit(folderId)
