@@ -284,7 +284,7 @@ fun Fragment.navigateToThread(thread: Thread, mainViewModel: MainViewModel) {
 //endregion
 
 //region API
-inline fun <reified T> ApiResponse<T>.throwErrorAsException(): Unit = throw getApiException()
+inline fun <reified T> ApiResponse<T>.throwErrorAsException(): Nothing = throw getApiException()
 
 inline fun <reified T> ApiResponse<T>.getApiException(): Exception {
     return error?.exception ?: ApiErrorException(ApiController.json.encodeToString(this))
