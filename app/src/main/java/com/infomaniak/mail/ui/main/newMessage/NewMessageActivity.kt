@@ -180,10 +180,10 @@ class NewMessageActivity : BaseActivity() {
         CAMERA("importFromCamera"),
         LINK("addLink"),
         CLOCK(ACTION_POSTPONE_NAME),
-        BOLD("bold"),
-        ITALIC("italic"),
-        UNDERLINE("underline"),
-        STRIKE_THROUGH("strikeThrough"),
-        UNORDERED_LIST("unorderedList"),
+        // BOLD("bold"),
+        // ITALIC("italic"),
+        // UNDERLINE("underline"),
+        // STRIKE_THROUGH("strikeThrough"),
+        // UNORDERED_LIST("unorderedList"),
     }
 }
