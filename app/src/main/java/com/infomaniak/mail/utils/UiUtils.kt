@@ -30,7 +30,6 @@ import androidx.core.graphics.toColorInt
 import androidx.core.view.isGone
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.Correspondent
-import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.thread.Thread

@@ -85,12 +85,19 @@ class RoundedBackgroundSpan(
         }
     }
 
-    override fun chooseHeight(text: CharSequence?, start: Int, end: Int, spanstartv: Int, lineHeight: Int, fm: FontMetricsInt?) {}
+    override fun chooseHeight(
+        text: CharSequence?,
+        start: Int,
+        end: Int,
+        spanstartv: Int,
+        lineHeight: Int,
+        fm: FontMetricsInt?,
+    ) = Unit
 
     private companion object {
         const val LEFT_MARGIN = 4
         const val PADDING = 16
         const val VERTICAL_OFFSET = 4
-        const val CORNER_RADIUS = 6f
+        const val CORNER_RADIUS = 6.0f
     }
 }
