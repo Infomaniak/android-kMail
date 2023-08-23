@@ -18,12 +18,12 @@
 package com.infomaniak.mail.ui.main.user
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.models.user.User
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.databinding.ItemSwitchUserAccountBinding
 import com.infomaniak.mail.ui.main.user.SwitchUserAdapter.SwitchUserAccountViewHolder
 import com.infomaniak.mail.utils.AccountUtils
@@ -73,7 +73,7 @@ class SwitchUserAdapter(
     fun initializeAccounts(newList: List<User>) {
 
         if (accounts.isNotEmpty()) {
-            Log.d("Users", "We received users more than one time, which should not happen.")
+            SentryLog.d("Users", "We received users more than one time, which should not happen.")
             Sentry.withScope { scope ->
                 scope.level = SentryLevel.ERROR
                 scope.setExtra("currentEmail", "${AccountUtils.currentMailboxEmail}")

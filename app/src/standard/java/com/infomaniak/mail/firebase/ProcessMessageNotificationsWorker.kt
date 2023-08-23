@@ -18,9 +18,9 @@
 package com.infomaniak.mail.firebase
 
 import android.content.Context
-import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.*
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
@@ -48,7 +48,7 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
     private val mailboxInfoRealm by lazy { RealmDatabase.newMailboxInfoInstance }
 
     override suspend fun launchWork(): Result = with(ioDispatcher) {
-        Log.i(TAG, "Work started")
+        SentryLog.i(TAG, "Work started")
 
         val userId = inputData.getIntOrNull(USER_ID_KEY) ?: run {
             SentryDebug.sendFailedNotification("No userId in Notification")
@@ -74,7 +74,7 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
         }
         fetchMessagesManager.execute(userId, mailbox, messageUid, mailboxContentRealm)
 
-        Log.i(TAG, "Work finished")
+        SentryLog.i(TAG, "Work finished")
         Result.success()
     }
 
@@ -86,7 +86,7 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
     class Scheduler @Inject constructor(private val workManager: WorkManager) {
 
         fun scheduleWork(userId: Int, mailboxId: Int, messageUid: String) {
-            Log.i(TAG, "Work scheduled")
+            SentryLog.i(TAG, "Work scheduled")
 
             val workName = workName(userId, mailboxId)
             val workData = workDataOf(USER_ID_KEY to userId, MAILBOX_ID_KEY to mailboxId, MESSAGE_UID_KEY to messageUid)

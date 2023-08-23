@@ -20,14 +20,10 @@ package com.infomaniak.mail.ui.main.newMessage
 import android.app.Application
 import android.content.ClipDescription
 import android.net.Uri
-import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.*
-import com.infomaniak.lib.core.utils.SingleLiveEvent
-import com.infomaniak.lib.core.utils.getFileNameAndSize
-import com.infomaniak.lib.core.utils.guessMimeType
-import com.infomaniak.lib.core.utils.showToast
+import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.MatomoMail.trackSendingDraftEvent
 import com.infomaniak.mail.R
@@ -495,7 +491,7 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private fun saveDraftToLocal(action: DraftAction) {
-        Log.d("Draft", "Save Draft to local")
+        SentryLog.d("Draft", "Save Draft to local")
 
         draft.body = draft.uiBody.textToHtml() + (draft.uiSignature ?: "") + (draft.uiQuote ?: "")
         draft.action = action

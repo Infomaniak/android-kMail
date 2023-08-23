@@ -18,12 +18,12 @@
 package com.infomaniak.mail
 
 import android.content.Context
-import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.firebase.messaging.FirebaseMessaging
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.di.IoDispatcher
@@ -67,7 +67,7 @@ class StandardPlayServicesUtils @Inject constructor(
         val registeredUsersIds = localSettings.firebaseRegisteredUsers.map { it.toInt() }.toSet()
         val noNeedUsersRegistration = AccountUtils.getAllUsersSync().map { it.id }.minus(registeredUsersIds).isEmpty()
 
-        Log.d("firebase", "checkFirebaseRegistration: (skip users registration): $noNeedUsersRegistration")
+        SentryLog.d("firebase", "checkFirebaseRegistration: (skip users registration): $noNeedUsersRegistration")
         if (noNeedUsersRegistration) return@launch
 
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
@@ -77,7 +77,7 @@ class StandardPlayServicesUtils @Inject constructor(
                     scope.setExtra("task.exception", task.exception.toString())
                     Sentry.captureMessage("Fetching FCM registration token failed")
                 }
-                Log.w("firebase", "Fetching FCM registration token failed", task.exception)
+                SentryLog.w("firebase", "Fetching FCM registration token failed", task.exception)
                 return@addOnCompleteListener
             }
             if (task.result == null) {
@@ -89,7 +89,7 @@ class StandardPlayServicesUtils @Inject constructor(
             }
 
             val token = task.result
-            Log.d("firebase", "checkFirebaseRegistration: token is different ${token != localSettings.firebaseToken}")
+            SentryLog.d("firebase", "checkFirebaseRegistration: token is different ${token != localSettings.firebaseToken}")
             if (token != localSettings.firebaseToken) localSettings.clearRegisteredFirebaseUsers()
 
             localSettings.firebaseToken = token

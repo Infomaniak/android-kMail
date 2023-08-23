@@ -18,9 +18,9 @@
 package com.infomaniak.mail.ui.main.search
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.models.ApiResponse
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.trackSearchEvent
 import com.infomaniak.mail.data.api.ApiRepository
@@ -144,7 +144,7 @@ class SearchViewModel @Inject constructor(
         cancelSearch()
         globalCoroutineScope.launch(ioDispatcher) {
             searchUtils.deleteRealmSearchData()
-            Log.i(TAG, "SearchViewModel>onCleared: called")
+            SentryLog.i(TAG, "SearchViewModel>onCleared: called")
         }
         super.onCleared()
     }
@@ -246,7 +246,7 @@ class SearchViewModel @Inject constructor(
 
     private companion object {
 
-        val TAG = SearchViewModel::class.simpleName
+        val TAG: String = SearchViewModel::class.java.simpleName
 
         /**
          * The minimum value allowed for a search query
