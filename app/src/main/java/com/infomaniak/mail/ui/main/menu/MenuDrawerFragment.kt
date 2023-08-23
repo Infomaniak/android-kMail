@@ -278,7 +278,7 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
         onErrorCheck = { folderName -> checkForFolderCreationErrors(folderName) },
         onPositiveButtonClicked = { folderName ->
             trackCreateFolderEvent("confirm")
-            mainViewModel.createNewFolder(folderName!!.toString())
+            mainViewModel.createNewFolder(folderName)
         },
     )
 }
