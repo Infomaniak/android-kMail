@@ -116,7 +116,6 @@ class RecipientFieldView @JvmOverloads constructor(
         set(value) {
             autoCompletedContacts.isVisible = value
             computeChevronVisibility()
-            binding.clearInputButton.isVisible = value
         }
 
     init {
@@ -189,8 +188,6 @@ class RecipientFieldView @JvmOverloads constructor(
             isEverythingCollapsed = !isEverythingCollapsed
             if (isSelfCollapsed) textInput.hideKeyboard()
         }
-
-        clearInputButton.setOnClickListener { textInput.text?.clear() }
 
         plusChip.setOnClickListener {
             expand()
@@ -294,7 +291,7 @@ class RecipientFieldView @JvmOverloads constructor(
         }
 
         transparentButton.isGone = isTextInputAccessible
-        textInput.isVisible = isTextInputAccessible
+        textInputLayout.isVisible = isTextInputAccessible
     }
 
     fun updateContacts(allContacts: List<MergedContact>, newContactMap: MergedContactDictionary) {
