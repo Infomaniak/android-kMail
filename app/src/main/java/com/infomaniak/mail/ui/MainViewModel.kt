@@ -18,10 +18,10 @@
 package com.infomaniak.mail.ui
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.R
@@ -50,6 +50,7 @@ import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.NotificationUtils.cancelNotification
+import com.infomaniak.mail.utils.SharedUtils.Companion.updateSignatures
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.coroutines.*
@@ -178,7 +179,7 @@ class MainViewModel @Inject constructor(
     //endregion
 
     fun updateUserInfo() = viewModelScope.launch(ioCoroutineContext) {
-        Log.d(TAG, "Update user info")
+        SentryLog.d(TAG, "Update user info")
         updateAddressBooks()
         updateContacts()
     }
@@ -188,7 +189,7 @@ class MainViewModel @Inject constructor(
     }
 
     private fun openMailbox(): Mailbox? {
-        Log.d(TAG, "Load current mailbox from local")
+        SentryLog.d(TAG, "Load current mailbox from local")
 
         val mailbox = MailboxController.getMailboxWithFallback(
             userId = AccountUtils.currentUserId,
@@ -228,7 +229,7 @@ class MainViewModel @Inject constructor(
         refreshMailboxesAndFoldersJob?.cancel()
         refreshMailboxesAndFoldersJob = viewModelScope.launch(ioCoroutineContext) {
 
-            Log.d(TAG, "Refresh mailboxes from remote")
+            SentryLog.d(TAG, "Refresh mailboxes from remote")
             with(ApiRepository.getMailboxes()) {
                 if (isSuccess()) {
                     MailboxController.updateMailboxes(context, data!!)
@@ -242,6 +243,7 @@ class MainViewModel @Inject constructor(
 
             updateQuotas(mailbox)
             updatePermissions(mailbox)
+            updateSignatures(mailbox)
             updateFolders(mailbox)
 
             (currentFolderId?.let(folderController::getFolder) ?: folderController.getFolder(DEFAULT_SELECTED_FOLDER))
@@ -256,7 +258,7 @@ class MainViewModel @Inject constructor(
 
     private fun selectMailbox(mailbox: Mailbox) {
         if (mailbox.objectId != _currentMailboxObjectId.value) {
-            Log.d(TAG, "Select mailbox: ${mailbox.email}")
+            SentryLog.d(TAG, "Select mailbox: ${mailbox.email}")
             if (mailbox.mailboxId != AccountUtils.currentMailboxId) AccountUtils.currentMailboxId = mailbox.mailboxId
             AccountUtils.currentMailboxEmail = mailbox.email
             _currentMailboxObjectId.value = mailbox.objectId
@@ -266,13 +268,13 @@ class MainViewModel @Inject constructor(
 
     private fun selectFolder(folderId: String) {
         if (folderId != currentFolderId) {
-            Log.d(TAG, "Select folder: $folderId")
+            SentryLog.d(TAG, "Select folder: $folderId")
             _currentFolderId.value = folderId
         }
     }
 
     private fun updateQuotas(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
-        Log.d(TAG, "Force refresh Quotas")
+        SentryLog.d(TAG, "Force refresh Quotas")
         if (mailbox.isLimited) with(ApiRepository.getQuotas(mailbox.hostingId, mailbox.mailboxName)) {
             if (isSuccess()) MailboxController.updateMailbox(mailbox.objectId) {
                 it.quotas = data
@@ -281,7 +283,7 @@ class MainViewModel @Inject constructor(
     }
 
     private fun updatePermissions(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
-        Log.d(TAG, "Force refresh Permissions")
+        SentryLog.d(TAG, "Force refresh Permissions")
         with(ApiRepository.getPermissions(mailbox.linkId, mailbox.hostingId)) {
             if (isSuccess()) MailboxController.updateMailbox(mailbox.objectId) {
                 it.permissions = data
@@ -289,8 +291,12 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    private fun updateSignatures(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
+        mailboxContentRealm().writeBlocking { updateSignatures(mailbox) }
+    }
+
     private fun updateFolders(mailbox: Mailbox) {
-        Log.d(TAG, "Force refresh Folders")
+        SentryLog.d(TAG, "Force refresh Folders")
         ApiRepository.getFolders(mailbox.uuid).data?.let { folders ->
             if (!mailboxContentRealm().isClosed()) folderController.update(folders, mailboxContentRealm())
         }
@@ -320,7 +326,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun forceRefreshThreads(showSwipeRefreshLayout: Boolean = true) = viewModelScope.launch(ioCoroutineContext) {
-        Log.d(TAG, "Force refresh threads")
+        SentryLog.d(TAG, "Force refresh threads")
         refreshThreads(showSwipeRefreshLayout = showSwipeRefreshLayout)
     }
 

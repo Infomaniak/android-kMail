@@ -22,6 +22,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDeepLinkBuilder
+import com.infomaniak.mail.MatomoMail.trackNotificationActionEvent
 import com.infomaniak.mail.MatomoMail.trackUserId
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.AppSettings
@@ -81,14 +82,16 @@ class LaunchActivity : AppCompatActivity() {
 
         when {
             openThreadUid != null -> {
+                applicationContext.trackNotificationActionEvent("open")
                 NavDeepLinkBuilder(this)
                     .setGraph(R.navigation.main_navigation)
-                    .setDestination(R.id.threadFragment, ThreadFragmentArgs(openThreadUid).toBundle())
+                    .setDestination(R.id.threadFragment, ThreadFragmentArgs(threadUid = openThreadUid).toBundle())
                     .setComponentName(MainActivity::class.java)
                     .createTaskStackBuilder()
                     .startActivities()
             }
             replyToMessageUid != null -> {
+                applicationContext.trackNotificationActionEvent("reply")
                 NavDeepLinkBuilder(this)
                     .setGraph(R.navigation.main_navigation)
                     .setDestination(

@@ -18,7 +18,6 @@
 package com.infomaniak.mail.workers
 
 import android.content.Context
-import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
 import androidx.lifecycle.LiveData
@@ -27,6 +26,7 @@ import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.networking.HttpUtils
 import com.infomaniak.lib.core.utils.FORMAT_DATE_WITH_TIMEZONE
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.isNetworkException
 import com.infomaniak.mail.MainApplication
 import com.infomaniak.mail.R
@@ -34,6 +34,7 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
+import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Attachment
@@ -44,6 +45,7 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.NotificationUtils.buildDraftActionsNotification
 import com.infomaniak.mail.utils.NotificationUtils.buildDraftErrorNotification
+import com.infomaniak.mail.utils.SharedUtils.Companion.updateSignatures
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import io.realm.kotlin.MutableRealm
@@ -88,7 +90,7 @@ class DraftsActionsWorker @AssistedInject constructor(
     private val dateFormatWithTimezone by lazy { SimpleDateFormat(FORMAT_DATE_WITH_TIMEZONE, Locale.ROOT) }
 
     override suspend fun launchWork(): Result = withContext(ioDispatcher) {
-        Log.d(TAG, "Work started")
+        SentryLog.d(TAG, "Work started")
 
         if (DraftController.getDraftsWithActionsCount(mailboxContentRealm) == 0L) return@withContext Result.success()
         if (AccountUtils.currentMailboxId == AppSettings.DEFAULT_ID) return@withContext Result.failure()
@@ -111,7 +113,7 @@ class DraftsActionsWorker @AssistedInject constructor(
     override fun onFinish() {
         mailboxContentRealm.close()
         mailboxInfoRealm.close()
-        Log.d(TAG, "Work finished")
+        SentryLog.d(TAG, "Work finished")
     }
 
     override suspend fun getForegroundInfo(): ForegroundInfo {
@@ -140,7 +142,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         var isTrackedDraftSuccess: Boolean? = null
 
         val drafts = draftController.getDraftsWithActions(mailboxContentRealm)
-        Log.d(TAG, "handleDraftsActions: ${drafts.count()} drafts to handle")
+        SentryLog.d(TAG, "handleDraftsActions: ${drafts.count()} drafts to handle")
         if (drafts.isEmpty()) return Result.failure()
 
         var haveAllDraftsSucceeded = true
@@ -151,11 +153,7 @@ class DraftsActionsWorker @AssistedInject constructor(
 
             runCatching {
                 draft.uploadAttachments()
-                executeDraftAction(
-                    draft = draft,
-                    mailboxUuid = mailbox.uuid,
-                    okHttpClient = okHttpClient,
-                ).also { (realmActionOnDraft, scheduledDate, errorMessageResId, savedDraftUuid, isSuccess) ->
+                with(executeDraftAction(draft, mailbox.uuid)) {
                     if (isSuccess) {
                         if (isTargetDraft) {
                             remoteUuidOfTrackedDraft = savedDraftUuid
@@ -168,6 +166,7 @@ class DraftsActionsWorker @AssistedInject constructor(
                         isTrackedDraftSuccess = false
                         haveAllDraftsSucceeded = false
                     }
+                    return@with
                 }
             }.onFailure { exception ->
                 when (exception) {
@@ -325,7 +324,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         val isSuccess: Boolean,
     )
 
-    private fun executeDraftAction(draft: Draft, mailboxUuid: String, okHttpClient: OkHttpClient): DraftActionResult {
+    private fun executeDraftAction(draft: Draft, mailboxUuid: String, isFirstTime: Boolean = true): DraftActionResult {
 
         var realmActionOnDraft: ((MutableRealm) -> Unit)? = null
         var scheduledDate: String? = null
@@ -368,7 +367,9 @@ class DraftsActionsWorker @AssistedInject constructor(
                     }
                     scheduledDate = dateFormatWithTimezone.format(Date())
                     savedDraftUuid = data.draftRemoteUuid
-                } ?: throwErrorAsException()
+                } ?: run {
+                    retryWithNewIdentityOrThrow(draft, mailboxUuid, isFirstTime)
+                }
             }
             DraftAction.SEND -> with(ApiRepository.sendDraft(mailboxUuid, updatedDraft, okHttpClient)) {
                 when {
@@ -383,7 +384,9 @@ class DraftsActionsWorker @AssistedInject constructor(
                             Sentry.captureMessage("Return JSON for SendDraft API call was modified")
                         }
                     }
-                    else -> throwErrorAsException()
+                    else -> {
+                        retryWithNewIdentityOrThrow(draft, mailboxUuid, isFirstTime)
+                    }
                 }
             }
             else -> Unit
@@ -396,6 +399,31 @@ class DraftsActionsWorker @AssistedInject constructor(
             savedDraftUuid = savedDraftUuid,
             isSuccess = true,
         )
+    }
+
+    private inline fun <reified T> ApiResponse<T>.retryWithNewIdentityOrThrow(
+        draft: Draft,
+        mailboxUuid: String,
+        isFirstTime: Boolean,
+    ): DraftActionResult {
+        if (isFirstTime && error?.code == ErrorCode.IDENTITY_NOT_FOUND) {
+            return updateSignaturesThenRetry(draft, mailboxUuid)
+        } else {
+            throwErrorAsException()
+        }
+    }
+
+    private fun updateSignaturesThenRetry(draft: Draft, mailboxUuid: String): DraftActionResult {
+
+        mailboxContentRealm.writeBlocking {
+            updateSignatures(mailbox)
+            val signature = SignatureController.getSignature(realm = mailboxContentRealm)
+            draftController.updateDraft(draft.localUuid, realm = this) {
+                it.identityId = signature.id.toString()
+            }
+        }
+
+        return executeDraftAction(draft, mailboxUuid, isFirstTime = false)
     }
 
     private fun deleteDraftCallback(draft: Draft): (MutableRealm) -> Unit {
@@ -412,7 +440,7 @@ class DraftsActionsWorker @AssistedInject constructor(
             if (AccountUtils.currentMailboxId == AppSettings.DEFAULT_ID) return
             if (draftController.getDraftsWithActionsCount() == 0L) return
 
-            Log.d(TAG, "Work scheduled")
+            SentryLog.d(TAG, "Work scheduled")
 
             val workData = workDataOf(
                 USER_ID_KEY to AccountUtils.currentUserId,

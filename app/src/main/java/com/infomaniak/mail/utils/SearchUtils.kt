@@ -17,7 +17,7 @@
  */
 package com.infomaniak.mail.utils
 
-import android.util.Log
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
@@ -76,7 +76,7 @@ class SearchUtils @Inject constructor(
 
     suspend fun deleteRealmSearchData() = withContext(ioDispatcher) {
         mailboxContentRealm().writeBlocking {
-            Log.i(TAG, "SearchUtils>deleteRealmSearchData: remove old search data")
+            SentryLog.i(TAG, "SearchUtils>deleteRealmSearchData: remove old search data")
             messageController.deleteSearchMessages(realm = this)
             threadController.deleteSearchThreads(realm = this)
             folderController.deleteSearchFolderData(realm = this)
@@ -84,7 +84,7 @@ class SearchUtils @Inject constructor(
     }
 
     companion object {
-        private val TAG = SearchUtils::class.simpleName
+        private val TAG = SearchUtils::class.java.simpleName
 
         fun List<Message>.convertToSearchThreads(): List<Thread> {
             return map { message ->

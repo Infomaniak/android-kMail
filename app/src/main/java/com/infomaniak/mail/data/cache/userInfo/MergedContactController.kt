@@ -17,7 +17,7 @@
  */
 package com.infomaniak.mail.data.cache.userInfo
 
-import android.util.Log
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.di.UserInfoRealm
@@ -52,7 +52,7 @@ class MergedContactController @Inject constructor(@UserInfoRealm private val use
 
     //region Edit data
     fun update(mergedContacts: List<MergedContact>) {
-        Log.d(RealmDatabase.TAG, "MergedContacts: Save new data")
+        SentryLog.d(RealmDatabase.TAG, "MergedContacts: Save new data")
         userInfoRealm.update<MergedContact>(mergedContacts)
     }
     //endregion

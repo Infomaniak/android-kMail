@@ -18,10 +18,10 @@
 package com.infomaniak.mail.firebase
 
 import android.content.Context
-import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.*
 import com.infomaniak.lib.core.api.ApiController
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
@@ -46,7 +46,7 @@ class RegisterUserDeviceWorker @AssistedInject constructor(
 
     override suspend fun launchWork(): Result = withContext(ioDispatcher) {
 
-        Log.i(TAG, "Work started")
+        SentryLog.i(TAG, "Work started")
 
         val firebaseToken = localSettings.firebaseToken!!
 
@@ -56,20 +56,20 @@ class RegisterUserDeviceWorker @AssistedInject constructor(
             val apiResponse = FirebaseApiRepository.registerForNotifications(registrationInfo, okHttpClient)
 
             if (apiResponse.isSuccess()) {
-                Log.i(TAG, "launchWork: ${user.id} has been registered")
+                SentryLog.i(TAG, "launchWork: ${user.id} has been registered")
                 localSettings.markUserAsRegisteredByFirebase(user.id)
             } else {
                 runCatching {
                     apiResponse.throwErrorAsException()
                 }.onFailure { exception ->
                     if (exception !is ApiController.NetworkException) Sentry.captureException(exception)
-                    Log.w(TAG, "launchWork: register ${user.id} failed", exception)
+                    SentryLog.w(TAG, "launchWork: register ${user.id} failed", exception)
                     return@withContext Result.retry()
                 }
             }
         }
 
-        Log.i(TAG, "Work finished")
+        SentryLog.i(TAG, "Work finished")
 
         Result.success()
     }
@@ -85,7 +85,7 @@ class RegisterUserDeviceWorker @AssistedInject constructor(
          * so when the app is relaunched several times, only the last relaunch is taken into account.
          */
         fun scheduleWork() {
-            Log.i(TAG, "work scheduled")
+            SentryLog.i(TAG, "work scheduled")
 
             val workRequest = OneTimeWorkRequestBuilder<RegisterUserDeviceWorker>()
                 .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())

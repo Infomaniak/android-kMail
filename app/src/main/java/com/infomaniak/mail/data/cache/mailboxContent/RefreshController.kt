@@ -17,7 +17,7 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
-import android.util.Log
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.api.ApiRepository
@@ -93,7 +93,7 @@ class RefreshController @Inject constructor(private val localSettings: LocalSett
             }
         }
 
-        Log.i("API", "Refresh threads with mode: $refreshMode | (${folder.name})")
+        SentryLog.i("API", "Refresh threads with mode: $refreshMode | (${folder.name})")
 
         refreshThreadsJob?.cancel()
         refreshThreadsJob = Job()
@@ -101,7 +101,7 @@ class RefreshController @Inject constructor(private val localSettings: LocalSett
         return refreshWithRunCatching(refreshThreadsJob!!).also {
             if (it != null) {
                 stopped?.invoke()
-                Log.d("API", "End of refreshing threads with mode: $refreshMode | (${folder.name})")
+                SentryLog.d("API", "End of refreshing threads with mode: $refreshMode | (${folder.name})")
             }
         }
     }
@@ -114,7 +114,7 @@ class RefreshController @Inject constructor(private val localSettings: LocalSett
         okHttpClient: OkHttpClient?,
     ): Set<Thread> {
 
-        Log.d("API", "Start of refreshing threads with mode: $refreshMode | (${folder.name})")
+        SentryLog.d("API", "Start of refreshing threads with mode: $refreshMode | (${folder.name})")
 
         return when (refreshMode) {
             REFRESH_FOLDER_WITH_ROLE -> refreshWithRoleConsideration(scope, mailbox, folder, okHttpClient)
@@ -315,9 +315,9 @@ class RefreshController @Inject constructor(private val localSettings: LocalSett
         scope.ensureActive()
 
         val logMessage = "Deleted: ${activities.deletedShortUids.count()} | Updated: ${activities.updatedMessages.count()}"
-        Log.d("API", "$logMessage | ${folder.name}")
+        SentryLog.d("API", "$logMessage | ${folder.name}")
 
-        addSentryBreadcrumbsForActivities(logMessage, mailbox.email, folder, activities)
+        addSentryBreadcrumbForActivities(logMessage, mailbox.email, folder, activities)
 
         writeBlocking {
             val impactedFoldersIds = mutableSetOf<String>().apply {
@@ -354,9 +354,9 @@ class RefreshController @Inject constructor(private val localSettings: LocalSett
     ): Set<Thread> {
 
         val logMessage = "Added: ${uids.count()}"
-        Log.d("API", "$logMessage | ${folder.name}")
+        SentryLog.d("API", "$logMessage | ${folder.name}")
 
-        addSentryBreadcrumbsForAddedUids(logMessage = logMessage, email = mailbox.email, folder = folder, uids = uids)
+        addSentryBreadcrumbForAddedUids(logMessage = logMessage, email = mailbox.email, folder = folder, uids = uids)
 
         if (uids.isEmpty()) return emptySet()
 
@@ -384,7 +384,7 @@ class RefreshController @Inject constructor(private val localSettings: LocalSett
                         val foldersIds = (if (isConversationMode) threads.map { it.folderId }.toSet() else emptySet()) + folder.id
                         foldersIds.forEach { FolderController.refreshUnreadCount(it, mailbox.objectId, realm = this) }
                     }
-                    Log.d("Realm", "Saved Messages: ${latestFolder.name} | ${latestFolder.messages.count()}")
+                    SentryLog.d("Realm", "Saved Messages: ${latestFolder.name} | ${latestFolder.messages.count()}")
 
                     impactedThreads += allImpactedThreads.filter { it.folderId == folder.id }
                 }
@@ -696,7 +696,6 @@ class RefreshController @Inject constructor(private val localSettings: LocalSett
         when (errorCode) {
             ErrorCode.FOLDER_DOES_NOT_EXIST -> Unit
             ErrorCode.MESSAGE_NOT_FOUND -> Sentry.withScope { scope ->
-                scope.level = SentryLevel.ERROR
                 scope.setExtra(ErrorCode.MESSAGE_NOT_FOUND, "isFirstTime = false")
                 scope.setExtra("folderCursor", "${folder.cursor}")
                 scope.setExtra("folderName", folder.name)
@@ -715,7 +714,7 @@ class RefreshController @Inject constructor(private val localSettings: LocalSett
         }
     }
 
-    private fun addSentryBreadcrumbsForActivities(
+    private fun addSentryBreadcrumbForActivities(
         logMessage: String,
         email: String,
         folder: Folder,
@@ -733,7 +732,7 @@ class RefreshController @Inject constructor(private val localSettings: LocalSett
         )
     }
 
-    private fun addSentryBreadcrumbsForAddedUids(
+    private fun addSentryBreadcrumbForAddedUids(
         logMessage: String,
         email: String,
         folder: Folder,

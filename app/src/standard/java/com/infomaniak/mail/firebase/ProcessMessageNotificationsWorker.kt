@@ -18,18 +18,18 @@
 package com.infomaniak.mail.firebase
 
 import android.content.Context
-import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.*
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.FetchMessagesManager
+import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.workers.BaseProcessMessageNotificationsWorker
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import io.sentry.Sentry
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -48,27 +48,33 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
     private val mailboxInfoRealm by lazy { RealmDatabase.newMailboxInfoInstance }
 
     override suspend fun launchWork(): Result = with(ioDispatcher) {
-        Log.i(TAG, "Work started")
-        val userId = inputData.getIntOrNull(USER_ID_KEY) ?: return@with Result.success()
-        val mailboxId = inputData.getIntOrNull(MAILBOX_ID_KEY) ?: return@with Result.success()
-        val messageUid = inputData.getString(MESSAGE_UID_KEY) ?: return@with Result.success()
+        SentryLog.i(TAG, "Work started")
+
+        val userId = inputData.getIntOrNull(USER_ID_KEY) ?: run {
+            SentryDebug.sendFailedNotification("No userId in Notification")
+            return@with Result.success()
+        }
+        val mailboxId = inputData.getIntOrNull(MAILBOX_ID_KEY) ?: run {
+            SentryDebug.sendFailedNotification("No mailboxId in Notification", userId)
+            return@with Result.success()
+        }
+        val messageUid = inputData.getString(MESSAGE_UID_KEY) ?: run {
+            SentryDebug.sendFailedNotification("No messageUid in Notification", userId, mailboxId)
+            return@with Result.success()
+        }
         val mailbox = MailboxController.getMailbox(userId, mailboxId, mailboxInfoRealm) ?: run {
-            val mailboxes = MailboxController.getMailboxes(realm = mailboxInfoRealm)
-            Sentry.withScope { scope ->
-                scope.setExtra("userId", userId.toString())
-                scope.setExtra("mailboxId", mailboxId.toString())
-                scope.setExtra("mailboxesId", "${mailboxes.map { "mailboxId:[${it.mailboxId}] (userId:[${it.userId}])" }}")
-                scope.setExtra("messageUid", messageUid)
-                Sentry.captureMessage("We should not have received this notification")
-            }
+            SentryDebug.sendFailedNotification("Received Notif: no Mailbox in Realm", userId, mailboxId, messageUid)
             return@with Result.success()
         }
 
         val mailboxContentRealm = RealmDatabase.newMailboxContentInstance(userId, mailbox.mailboxId)
-        MessageController.getMessage(messageUid, mailboxContentRealm)?.let { return@with Result.success() }
+        MessageController.getMessage(messageUid, mailboxContentRealm)?.let {
+            SentryDebug.sendFailedNotification("Message already in Realm", userId, mailboxId, messageUid, mailbox)
+            return@with Result.success()
+        }
         fetchMessagesManager.execute(userId, mailbox, messageUid, mailboxContentRealm)
 
-        Log.i(TAG, "Work finished")
+        SentryLog.i(TAG, "Work finished")
         Result.success()
     }
 
@@ -80,7 +86,7 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
     class Scheduler @Inject constructor(private val workManager: WorkManager) {
 
         fun scheduleWork(userId: Int, mailboxId: Int, messageUid: String) {
-            Log.i(TAG, "Work scheduled")
+            SentryLog.i(TAG, "Work scheduled")
 
             val workName = workName(userId, mailboxId)
             val workData = workDataOf(USER_ID_KEY to userId, MAILBOX_ID_KEY to mailboxId, MESSAGE_UID_KEY to messageUid)

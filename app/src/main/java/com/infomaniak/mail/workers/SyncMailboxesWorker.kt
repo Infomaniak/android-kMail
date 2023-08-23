@@ -18,10 +18,10 @@
 package com.infomaniak.mail.workers
 
 import android.content.Context
-import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.*
 import androidx.work.PeriodicWorkRequest.Companion.MIN_PERIODIC_INTERVAL_MILLIS
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.di.IoDispatcher
@@ -37,7 +37,8 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Routinely fetch Messages (when user doesn't have PlayServices).
+ * When user doesn't have PlayServices, we can't receive push notifications via
+ * `ProcessMessageNotificationsWorker`. So we have to routinely fetch Messages.
  */
 @HiltWorker
 class SyncMailboxesWorker @AssistedInject constructor(
@@ -50,7 +51,7 @@ class SyncMailboxesWorker @AssistedInject constructor(
     private val mailboxInfoRealm by lazy { RealmDatabase.newMailboxInfoInstance }
 
     override suspend fun launchWork(): Result = withContext(ioDispatcher) {
-        Log.d(TAG, "Work launched")
+        SentryLog.d(TAG, "Work launched")
 
         AccountUtils.getAllUsersSync().forEach { user ->
             MailboxController.getMailboxes(user.id, realm = mailboxInfoRealm).forEach { mailbox ->
@@ -58,7 +59,7 @@ class SyncMailboxesWorker @AssistedInject constructor(
             }
         }
 
-        Log.d(TAG, "Work finished")
+        SentryLog.d(TAG, "Work finished")
 
         Result.success()
     }
@@ -77,7 +78,7 @@ class SyncMailboxesWorker @AssistedInject constructor(
         suspend fun scheduleWorkIfNeeded() = withContext(ioDispatcher) {
 
             if (playServicesUtils.areGooglePlayServicesNotAvailable() && AccountUtils.getAllUsersCount() > 0) {
-                Log.d(TAG, "Work scheduled")
+                SentryLog.d(TAG, "Work scheduled")
 
                 val workRequest =
                     PeriodicWorkRequestBuilder<SyncMailboxesWorker>(MIN_PERIODIC_INTERVAL_MILLIS, TimeUnit.MILLISECONDS)
@@ -91,7 +92,7 @@ class SyncMailboxesWorker @AssistedInject constructor(
         }
 
         fun cancelWork() {
-            Log.d(TAG, "Work cancelled")
+            SentryLog.d(TAG, "Work cancelled")
             workManager.cancelUniqueWork(TAG)
         }
     }

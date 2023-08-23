@@ -18,7 +18,7 @@
 package com.infomaniak.mail.data.cache.mailboxInfo
 
 import android.content.Context
-import android.util.Log
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Quotas
@@ -168,15 +168,15 @@ object MailboxController {
     private fun update(remoteMailboxes: List<Mailbox>, userId: Int) {
 
         // Get current data
-        Log.d(RealmDatabase.TAG, "Mailboxes: Get current data")
+        SentryLog.d(RealmDatabase.TAG, "Mailboxes: Get current data")
         val localQuotasAndPermissions = getMailboxes(userId).associate { it.objectId to (it.quotas to it.permissions) }
 
         defaultRealm.writeBlocking {
 
-            Log.d(RealmDatabase.TAG, "Mailboxes: Save new data")
+            SentryLog.d(RealmDatabase.TAG, "Mailboxes: Save new data")
             upsertMailboxes(localQuotasAndPermissions, remoteMailboxes)
 
-            Log.d(RealmDatabase.TAG, "Mailboxes: Delete outdated data")
+            SentryLog.d(RealmDatabase.TAG, "Mailboxes: Delete outdated data")
             deleteOutdatedData(remoteMailboxes, userId)
         }
     }

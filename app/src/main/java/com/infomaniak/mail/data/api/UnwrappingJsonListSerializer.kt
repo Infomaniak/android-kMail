@@ -18,7 +18,6 @@
 package com.infomaniak.mail.data.api
 
 import io.sentry.Sentry
-import io.sentry.SentryLevel
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
@@ -28,7 +27,6 @@ object UnwrappingJsonListSerializer : JsonTransformingSerializer<String>(String.
     override fun transformDeserialize(element: JsonElement): JsonElement {
         return if (element is JsonArray) {
             Sentry.withScope { scope ->
-                scope.level = SentryLevel.INFO
                 scope.setExtra("inReplyToList", "ids: ${element.map { it }}")
                 Sentry.captureMessage("Found an array of inReplyTo")
             }

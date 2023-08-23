@@ -77,7 +77,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
     private fun setJunkUi() = binding.reportJunk.apply {
         val (text, icon) = if (isSpamFolder) {
-            R.string.actionNonSpam to R.drawable.ic_drawer_inbox
+            R.string.actionNonSpam to R.drawable.ic_non_spam
         } else {
             R.string.actionReportJunk to R.drawable.ic_report_junk
         }

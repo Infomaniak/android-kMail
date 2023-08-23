@@ -214,7 +214,6 @@ class Thread : RealmObject {
             return@runCatching message.from.firstOrNull()
         }.getOrElse { throwable ->
             Sentry.withScope { scope ->
-                scope.level = SentryLevel.ERROR
                 scope.setExtra("thread.folder.name", folder.name)
                 scope.setExtra("thread.folder.id", folder.id)
                 scope.setExtra("thread.uid", uid)

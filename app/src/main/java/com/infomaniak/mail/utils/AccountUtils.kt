@@ -19,13 +19,13 @@ package com.infomaniak.mail.utils
 
 import android.app.NotificationManager
 import android.content.Context
-import android.util.Log
 import androidx.work.WorkManager
 import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.auth.CredentialManager
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.room.UserDatabase
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.appSettings.AppSettingsController
@@ -120,7 +120,7 @@ object AccountUtils : CredentialManager() {
                 context.getInfomaniakLogin().deleteToken(
                     okHttpClient = HttpClient.okHttpClientNoTokenInterceptor,
                     token = user.apiToken,
-                    onError = { Log.e("DeleteTokenError", "API response error: $it") },
+                    onError = { SentryLog.e("DeleteTokenError", "API response error: $it") },
                 )
             }
         }
