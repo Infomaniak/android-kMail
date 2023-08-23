@@ -22,29 +22,17 @@ import io.realm.kotlin.migration.AutomaticSchemaMigration
 import io.realm.kotlin.migration.AutomaticSchemaMigration.MigrationContext
 
 val USER_INFO_MIGRATION = AutomaticSchemaMigration { migrationContext ->
-    SentryDebug.addMigrationBreadcrumb(
-        realmName = "UserInfo",
-        oldVersion = migrationContext.oldRealm.version().version,
-        newVersion = migrationContext.newRealm.version().version,
-    )
+    SentryDebug.addMigrationBreadcrumb(migrationContext)
     migrationContext.deleteRealmFromFirstMigration()
 }
 
 val MAILBOX_INFO_MIGRATION = AutomaticSchemaMigration { migrationContext ->
-    SentryDebug.addMigrationBreadcrumb(
-        realmName = "MailboxInfo",
-        oldVersion = migrationContext.oldRealm.version().version,
-        newVersion = migrationContext.newRealm.version().version,
-    )
+    SentryDebug.addMigrationBreadcrumb(migrationContext)
     migrationContext.deleteRealmFromFirstMigration()
 }
 
 val MAILBOX_CONTENT_MIGRATION = AutomaticSchemaMigration { migrationContext ->
-    SentryDebug.addMigrationBreadcrumb(
-        realmName = "MailboxContent",
-        oldVersion = migrationContext.oldRealm.version().version,
-        newVersion = migrationContext.newRealm.version().version,
-    )
+    SentryDebug.addMigrationBreadcrumb(migrationContext)
     migrationContext.deleteRealmFromFirstMigration()
 }
 

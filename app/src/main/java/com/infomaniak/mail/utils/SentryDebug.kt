@@ -28,6 +28,7 @@ import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import io.realm.kotlin.TypedRealm
+import io.realm.kotlin.migration.AutomaticSchemaMigration.MigrationContext
 import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -89,13 +90,13 @@ object SentryDebug {
         )
     }
 
-    fun addMigrationBreadcrumb(realmName: String, oldVersion: Long, newVersion: Long) {
+    fun addMigrationBreadcrumb(migrationContext: MigrationContext) = with(migrationContext) {
         addInfoBreadcrumb(
             category = "Migration",
             data = mapOf(
-                "realmName" to realmName,
-                "oldVersion" to oldVersion,
-                "newVersion" to newVersion,
+                "realmName" to oldRealm.configuration.name,
+                "oldVersion" to oldRealm.version().version,
+                "newVersion" to newRealm.version().version,
             ),
         )
     }
