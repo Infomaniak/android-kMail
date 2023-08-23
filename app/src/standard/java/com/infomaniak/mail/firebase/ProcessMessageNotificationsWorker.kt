@@ -51,25 +51,25 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
         Log.i(TAG, "Work started")
 
         val userId = inputData.getIntOrNull(USER_ID_KEY) ?: run {
-            SentryDebug.sendFailedNotification("There is no userId in the Notification")
+            SentryDebug.sendFailedNotification("No userId in Notification")
             return@with Result.success()
         }
         val mailboxId = inputData.getIntOrNull(MAILBOX_ID_KEY) ?: run {
-            SentryDebug.sendFailedNotification("There is no mailboxId in the Notification", userId)
+            SentryDebug.sendFailedNotification("No mailboxId in Notification", userId)
             return@with Result.success()
         }
         val messageUid = inputData.getString(MESSAGE_UID_KEY) ?: run {
-            SentryDebug.sendFailedNotification("There is no messageUid in the Notification", userId, mailboxId)
+            SentryDebug.sendFailedNotification("No messageUid in Notification", userId, mailboxId)
             return@with Result.success()
         }
         val mailbox = MailboxController.getMailbox(userId, mailboxId, mailboxInfoRealm) ?: run {
-            SentryDebug.sendFailedNotification("Can't find the Mailbox in Realm", userId, mailboxId, messageUid)
+            SentryDebug.sendFailedNotification("Received Notif: no Mailbox in Realm", userId, mailboxId, messageUid)
             return@with Result.success()
         }
 
         val mailboxContentRealm = RealmDatabase.newMailboxContentInstance(userId, mailbox.mailboxId)
         MessageController.getMessage(messageUid, mailboxContentRealm)?.let {
-            SentryDebug.sendFailedNotification("The Message is already present in Realm", userId, mailboxId, messageUid, mailbox)
+            SentryDebug.sendFailedNotification("Message already in Realm", userId, mailboxId, messageUid, mailbox)
             return@with Result.success()
         }
         fetchMessagesManager.execute(userId, mailbox, messageUid, mailboxContentRealm)

@@ -48,25 +48,13 @@ class FetchMessagesManager @Inject constructor(
 
         // Don't launch sync if the Mailbox's notifications have been disabled by the user
         if (mailbox.notificationsIsDisabled(notificationManagerCompat)) {
-            SentryDebug.sendFailedNotification(
-                "The notifications are disabled for this Mailbox",
-                userId,
-                mailbox.mailboxId,
-                sentryMessageUid,
-                mailbox,
-            )
+            SentryDebug.sendFailedNotification("Notifications are disabled", userId, mailbox.mailboxId, sentryMessageUid, mailbox)
             return
         }
 
         val realm = mailboxContentRealm ?: RealmDatabase.newMailboxContentInstance(userId, mailbox.mailboxId)
         val folder = FolderController.getFolder(FolderRole.INBOX, realm) ?: run {
-            SentryDebug.sendFailedNotification(
-                "Can't find the Folder in Realm",
-                userId,
-                mailbox.mailboxId,
-                sentryMessageUid,
-                mailbox,
-            )
+            SentryDebug.sendFailedNotification("No Folder in Realm", userId, mailbox.mailboxId, sentryMessageUid, mailbox)
             return
         }
 
@@ -120,23 +108,11 @@ class FetchMessagesManager @Inject constructor(
         threadController.fetchMessagesHeavyData(messages, mailbox, realm, okHttpClient)
 
         val message = MessageController.getThreadLastMessageInFolder(uid, realm) ?: run {
-            SentryDebug.sendFailedNotification(
-                "Can't find the Message in the Thread to show the Notification",
-                userId,
-                mailbox.mailboxId,
-                sentryMessageUid,
-                mailbox,
-            )
+            SentryDebug.sendFailedNotification("No Message in the Thread", userId, mailbox.mailboxId, sentryMessageUid, mailbox)
             return
         }
         if (message.isSeen) { // Ignore if it has already been seen
-            SentryDebug.sendFailedNotification(
-                "Message is already seen, so we don't show the Notification",
-                userId,
-                mailbox.mailboxId,
-                sentryMessageUid,
-                mailbox,
-            )
+            SentryDebug.sendFailedNotification("Message already seen", userId, mailbox.mailboxId, sentryMessageUid, mailbox)
             return
         }
 
