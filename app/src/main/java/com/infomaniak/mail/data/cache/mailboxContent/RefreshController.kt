@@ -317,7 +317,7 @@ class RefreshController @Inject constructor(private val localSettings: LocalSett
         val logMessage = "Deleted: ${activities.deletedShortUids.count()} | Updated: ${activities.updatedMessages.count()}"
         SentryLog.d("API", "$logMessage | ${folder.name}")
 
-        addSentryBreadcrumbsForActivities(logMessage, mailbox.email, folder, activities)
+        addSentryBreadcrumbForActivities(logMessage, mailbox.email, folder, activities)
 
         writeBlocking {
             val impactedFoldersIds = mutableSetOf<String>().apply {
@@ -356,7 +356,7 @@ class RefreshController @Inject constructor(private val localSettings: LocalSett
         val logMessage = "Added: ${uids.count()}"
         SentryLog.d("API", "$logMessage | ${folder.name}")
 
-        addSentryBreadcrumbsForAddedUids(logMessage = logMessage, email = mailbox.email, folder = folder, uids = uids)
+        addSentryBreadcrumbForAddedUids(logMessage = logMessage, email = mailbox.email, folder = folder, uids = uids)
 
         if (uids.isEmpty()) return emptySet()
 
@@ -714,7 +714,7 @@ class RefreshController @Inject constructor(private val localSettings: LocalSett
         }
     }
 
-    private fun addSentryBreadcrumbsForActivities(
+    private fun addSentryBreadcrumbForActivities(
         logMessage: String,
         email: String,
         folder: Folder,
@@ -732,7 +732,7 @@ class RefreshController @Inject constructor(private val localSettings: LocalSett
         )
     }
 
-    private fun addSentryBreadcrumbsForAddedUids(
+    private fun addSentryBreadcrumbForAddedUids(
         logMessage: String,
         email: String,
         folder: Folder,
