@@ -116,6 +116,7 @@ class RecipientFieldView @JvmOverloads constructor(
         set(value) {
             autoCompletedContacts.isVisible = value
             computeChevronVisibility()
+            binding.clearInputButton.isVisible = value
         }
 
     init {
@@ -188,6 +189,8 @@ class RecipientFieldView @JvmOverloads constructor(
             isEverythingCollapsed = !isEverythingCollapsed
             if (isSelfCollapsed) textInput.hideKeyboard()
         }
+
+        clearInputButton.setOnClickListener { textInput.text?.clear() }
 
         plusChip.setOnClickListener {
             expand()
