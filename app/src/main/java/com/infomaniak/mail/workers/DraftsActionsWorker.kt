@@ -27,6 +27,7 @@ import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.networking.HttpUtils
 import com.infomaniak.lib.core.utils.FORMAT_DATE_WITH_TIMEZONE
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.isNetworkException
 import com.infomaniak.mail.MainApplication
 import com.infomaniak.mail.R
@@ -90,7 +91,7 @@ class DraftsActionsWorker @AssistedInject constructor(
     private val dateFormatWithTimezone by lazy { SimpleDateFormat(FORMAT_DATE_WITH_TIMEZONE, Locale.ROOT) }
 
     override suspend fun launchWork(): Result = withContext(ioDispatcher) {
-        Log.d(TAG, "Work started")
+        SentryLog.d(TAG, "Work started")
 
         if (DraftController.getDraftsWithActionsCount(mailboxContentRealm) == 0L) return@withContext Result.success()
         if (AccountUtils.currentMailboxId == AppSettings.DEFAULT_ID) return@withContext Result.failure()
@@ -113,7 +114,7 @@ class DraftsActionsWorker @AssistedInject constructor(
     override fun onFinish() {
         mailboxContentRealm.close()
         mailboxInfoRealm.close()
-        Log.d(TAG, "Work finished")
+        SentryLog.d(TAG, "Work finished")
     }
 
     override suspend fun getForegroundInfo(): ForegroundInfo {
@@ -142,7 +143,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         var isTrackedDraftSuccess: Boolean? = null
 
         val drafts = draftController.getDraftsWithActions(mailboxContentRealm)
-        Log.d(TAG, "handleDraftsActions: ${drafts.count()} drafts to handle")
+        SentryLog.d(TAG, "handleDraftsActions: ${drafts.count()} drafts to handle")
         if (drafts.isEmpty()) return Result.failure()
 
         var haveAllDraftsSucceeded = true
@@ -440,7 +441,7 @@ class DraftsActionsWorker @AssistedInject constructor(
             if (AccountUtils.currentMailboxId == AppSettings.DEFAULT_ID) return
             if (draftController.getDraftsWithActionsCount() == 0L) return
 
-            Log.d(TAG, "Work scheduled")
+            SentryLog.d(TAG, "Work scheduled")
 
             val workData = workDataOf(
                 USER_ID_KEY to AccountUtils.currentUserId,
