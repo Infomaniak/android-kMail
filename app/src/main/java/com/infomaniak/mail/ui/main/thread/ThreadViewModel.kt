@@ -73,7 +73,6 @@ class ThreadViewModel @Inject constructor(
         messageController.getSortedMessages(threadUid)?.asFlow()?.asLiveData()?.let { emitSource(it) }
     }
 
-    @OptIn(FlowPreview::class)
     fun threadMergedContactAndMailboxMediator(
         mergedContactsLive: LiveData<MergedContactDictionary?>,
         currentMailboxLive: LiveData<Mailbox>,

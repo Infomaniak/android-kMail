@@ -83,7 +83,7 @@ class NewMessageActivity : BaseActivity() {
                 externalRecipientEmail,
             )
 
-            // TODO : Reuse instance?
+            // TODO : Reuse instance
             createInformationDialog(
                 title = getString(R.string.externalDialogTitleRecipient),
                 description = description,

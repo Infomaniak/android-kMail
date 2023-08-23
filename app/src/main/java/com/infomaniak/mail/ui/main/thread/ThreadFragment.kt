@@ -493,7 +493,7 @@ class ThreadFragment : Fragment() {
                     externalRecipientEmail,
                 )
 
-                // TODO : Reuse instance?
+                // TODO : Reuse instance
                 createInformationDialog(
                     title = getString(R.string.externalDialogTitleExpeditor),
                     description = description,
