@@ -113,7 +113,7 @@ class NewMessageViewModel @Inject constructor(
 
     private var isNewMessage = false
 
-    var aliases: List<String> = emptyList()
+    val currentMailbox by lazy { MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
 
     private val arrivedFromExistingDraft
         inline get() = savedStateHandle.get<Boolean>(NewMessageActivityArgs::arrivedFromExistingDraft.name) ?: false
@@ -139,7 +139,7 @@ class NewMessageViewModel @Inject constructor(
 
     fun initDraftAndViewModel(): LiveData<Pair<Boolean, List<Signature>>> = liveData(ioCoroutineContext) {
         val realm = mailboxContentRealm()
-        val mailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
+        val mailbox = currentMailbox
 
         var signatures: List<Signature> = emptyList()
 
@@ -190,7 +190,6 @@ class NewMessageViewModel @Inject constructor(
                 otherFieldsAreAllEmpty.postValue(false)
                 initializeFieldsAsOpen.postValue(true)
             }
-            aliases = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!.aliases
         }
 
         emit(isSuccess to signatures)

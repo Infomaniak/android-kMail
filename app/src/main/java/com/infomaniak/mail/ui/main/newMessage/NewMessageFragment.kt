@@ -197,13 +197,7 @@ class NewMessageFragment : Fragment() {
                 hideLoader()
                 showKeyboardInCorrectView()
                 populateViewModelWithExternalMailData()
-
-                // TODO : Read account setting telling us if the external content should be activated
-                val isExternalContentSettingActivated = true
-                val shouldWarnForExternalContacts = isExternalContentSettingActivated
-                        && (newMessageActivityArgs.draftMode == DraftMode.REPLY || newMessageActivityArgs.draftMode == DraftMode.REPLY_ALL)
-                populateUiWithViewModel(shouldWarnForExternalContacts)
-
+                populateUiWithViewModel()
                 setupFromField(signatures)
             } else {
                 requireActivity().apply {
@@ -349,17 +343,21 @@ class NewMessageFragment : Fragment() {
         newMessageViewModel.isAutoCompletionOpened = isAutoCompletionOpened
     }
 
-    private fun populateUiWithViewModel(shouldWarnForExternalContacts: Boolean) = with(binding) {
+    private fun populateUiWithViewModel() = with(binding) {
+        val draftMode = newMessageActivityArgs.draftMode
         val draft = newMessageViewModel.draft
-        val aliases = newMessageViewModel.aliases
+        val aliases = newMessageViewModel.currentMailbox.aliases
+
+        val externalMailFlagEnabled = newMessageViewModel.currentMailbox.externalMailFlagEnabled
+        val shouldWarnForExternal = externalMailFlagEnabled && (draftMode == DraftMode.REPLY || draftMode == DraftMode.REPLY_ALL)
 
         val ccAndBccFieldsAreEmpty = draft.cc.isEmpty() && draft.bcc.isEmpty()
         val emailDictionary = newMessageViewModel.mergedContacts.value?.second ?: emptyMap()
-        toField.initRecipients(draft.to, shouldWarnForExternalContacts, emailDictionary, aliases, ccAndBccFieldsAreEmpty)
-        ccField.initRecipients(draft.cc, shouldWarnForExternalContacts, emailDictionary, aliases)
-        bccField.initRecipients(draft.bcc, shouldWarnForExternalContacts, emailDictionary, aliases)
+        toField.initRecipients(draft.to, shouldWarnForExternal, emailDictionary, aliases, ccAndBccFieldsAreEmpty)
+        ccField.initRecipients(draft.cc, shouldWarnForExternal, emailDictionary, aliases)
+        bccField.initRecipients(draft.bcc, shouldWarnForExternal, emailDictionary, aliases)
 
-        if (shouldWarnForExternalContacts) {
+        if (shouldWarnForExternal) {
             val (externalRecipientEmail, externalRecipientQuantity) = UiUtils.findExternalRecipientInDraft(
                 draft,
                 aliases,
