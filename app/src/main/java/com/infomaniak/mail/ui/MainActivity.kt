@@ -258,8 +258,6 @@ class MainActivity : BaseActivity() {
         playServicesUtils.checkPlayServices(this)
 
         if (binding.drawerLayout.isOpen) colorSystemBarsWithMenuDrawer()
-
-        mainViewModel.updateSignatures()
     }
 
     private fun handleOnBackPressed() = with(binding) {
