@@ -89,6 +89,17 @@ object SentryDebug {
         )
     }
 
+    fun addMigrationBreadcrumb(realmName: String, oldVersion: Long, newVersion: Long) {
+        addInfoBreadcrumb(
+            category = "Migration",
+            data = mapOf(
+                "realmName" to realmName,
+                "oldVersion" to oldVersion,
+                "newVersion" to newVersion,
+            ),
+        )
+    }
+
     private fun addInfoBreadcrumb(category: String, message: String? = null, data: Map<String, Any>? = null) {
         Sentry.addBreadcrumb(Breadcrumb().apply {
             this.category = category

@@ -17,18 +17,34 @@
  */
 package com.infomaniak.mail.data.cache
 
+import com.infomaniak.mail.utils.SentryDebug
 import io.realm.kotlin.migration.AutomaticSchemaMigration
 import io.realm.kotlin.migration.AutomaticSchemaMigration.MigrationContext
 
 val USER_INFO_MIGRATION = AutomaticSchemaMigration { migrationContext ->
+    SentryDebug.addMigrationBreadcrumb(
+        realmName = "UserInfo",
+        oldVersion = migrationContext.oldRealm.version().version,
+        newVersion = migrationContext.newRealm.version().version,
+    )
     migrationContext.deleteRealmFromFirstMigration()
 }
 
 val MAILBOX_INFO_MIGRATION = AutomaticSchemaMigration { migrationContext ->
+    SentryDebug.addMigrationBreadcrumb(
+        realmName = "MailboxInfo",
+        oldVersion = migrationContext.oldRealm.version().version,
+        newVersion = migrationContext.newRealm.version().version,
+    )
     migrationContext.deleteRealmFromFirstMigration()
 }
 
 val MAILBOX_CONTENT_MIGRATION = AutomaticSchemaMigration { migrationContext ->
+    SentryDebug.addMigrationBreadcrumb(
+        realmName = "MailboxContent",
+        oldVersion = migrationContext.oldRealm.version().version,
+        newVersion = migrationContext.newRealm.version().version,
+    )
     migrationContext.deleteRealmFromFirstMigration()
 }
 
