@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.cache.userInfo
 
 import android.util.Log
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.addressBook.AddressBook
 import com.infomaniak.mail.di.UserInfoRealm
@@ -41,7 +42,7 @@ class AddressBookController @Inject constructor(@UserInfoRealm private val userI
 
     //region Edit data
     fun update(apiAddressBooks: List<AddressBook>) {
-        Log.d(RealmDatabase.TAG, "AddressBooks: Save new data")
+        SentryLog.d(RealmDatabase.TAG, "AddressBooks: Save new data")
         userInfoRealm.update<AddressBook>(apiAddressBooks)
     }
     //endregion
