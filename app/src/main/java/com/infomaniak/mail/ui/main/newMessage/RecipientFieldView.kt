@@ -49,6 +49,7 @@ import com.infomaniak.mail.utils.MergedContactDictionary
 import com.infomaniak.mail.utils.UiUtils.dividerDrawable
 import com.infomaniak.mail.utils.isEmail
 import com.infomaniak.mail.utils.toggleChevron
+import kotlinx.parcelize.Parcelize
 import kotlin.math.min
 
 class RecipientFieldView @JvmOverloads constructor(
@@ -443,7 +444,8 @@ class RecipientFieldView @JvmOverloads constructor(
         }
     }
 
-    class StyledRecipient(recipient: Recipient, val displayAsExternal: Boolean) : Recipient() {
+    @Parcelize
+    class StyledRecipient(val recipient: Recipient, val displayAsExternal: Boolean) : Recipient() {
         init {
             name = recipient.name
             email = recipient.email
