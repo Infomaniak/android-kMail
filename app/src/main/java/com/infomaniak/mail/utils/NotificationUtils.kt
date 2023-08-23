@@ -159,7 +159,10 @@ object NotificationUtils : NotificationUtilsCore() {
             return PendingIntent.getActivity(context, requestCode.hashCode(), intent, pendingIntentFlags)
         }
 
-        val mailbox = MailboxController.getMailbox(userId, mailboxId) ?: return@with
+        val mailbox = MailboxController.getMailbox(userId, mailboxId) ?: run {
+            SentryDebug.sendFailedNotification("Created Notif: no Mailbox in Realm", userId, mailboxId, messageUid)
+            return@with
+        }
 
         context.buildMessageNotification(mailbox.channelId, title, description).apply {
 

@@ -55,6 +55,7 @@ class WebViewUtils(context: Context) {
     }
 
     class JavascriptBridge {
+
         @JavascriptInterface
         fun reportOverScroll(clientWidth: Int, scrollWidth: Int, messageUid: String) {
             SentryDebug.sendOverScrolledMessage(clientWidth, scrollWidth, messageUid)
@@ -66,7 +67,7 @@ class WebViewUtils(context: Context) {
             errorMessage: String,
             errorStack: String,
             scriptFirstLine: String,
-            messageUid: String
+            messageUid: String,
         ) {
             val correctErrorStack = fixStackTraceLineNumber(errorStack, scriptFirstLine)
             SentryDebug.sendJavaScriptError(errorName, errorMessage, correctErrorStack, messageUid)
