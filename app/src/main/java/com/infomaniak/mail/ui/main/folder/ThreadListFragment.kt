@@ -292,7 +292,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         searchButton.setOnClickListener {
             safeNavigate(
                 ThreadListFragmentDirections.actionThreadListFragmentToSearchFragment(
-                    dummyFolderId = mainViewModel.currentFolderId!!,
+                    dummyFolderId = mainViewModel.currentFolderId ?: "eJzz9HPyjwAABGYBgQ--", // Hardcoded INBOX folder
                 )
             )
         }
