@@ -56,7 +56,6 @@ import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType
 import com.infomaniak.mail.ui.main.newMessage.NewMessageViewModel.SignatureScore.*
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
-import com.infomaniak.mail.utils.SharedUtils.Companion.updateAndGetSignatures
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
@@ -135,15 +134,16 @@ class NewMessageViewModel @Inject constructor(
     }
 
     fun initDraftAndViewModel(): LiveData<Pair<Boolean, List<Signature>>> = liveData(ioCoroutineContext) {
+
         val realm = mailboxContentRealm()
         val mailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
 
-        var signatures: List<Signature> = emptyList()
+        var signatures = emptyList<Signature>()
 
         val isSuccess = realm.writeBlocking {
             runCatching {
 
-                signatures = updateAndGetSignatures(mailbox) ?: SignatureController.getAllSignatures(realm)
+                signatures = SignatureController.getAllSignatures(realm)
                 if (signatures.isEmpty()) return@writeBlocking false
 
                 val isRecreated = activityCreationStatus == CreationStatus.RECREATED
