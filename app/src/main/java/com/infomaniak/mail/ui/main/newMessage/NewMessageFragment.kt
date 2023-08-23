@@ -28,7 +28,6 @@ import android.text.InputFilter
 import android.text.InputType
 import android.text.Spanned
 import android.transition.TransitionManager
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -541,7 +540,6 @@ class NewMessageFragment : Fragment() {
                 EditorAction.CAMERA -> notYetImplemented()
                 EditorAction.LINK -> notYetImplemented()
                 EditorAction.CLOCK -> notYetImplemented()
-                else -> Log.wtf("SelectedText", "Impossible action got triggered: $editorAction")
             }
         }
     }
