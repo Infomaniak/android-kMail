@@ -122,6 +122,10 @@ object MatomoMail : MatomoCore {
         trackEvent(category = "search", name = name, value = value?.toFloat())
     }
 
+    fun Context.trackNotificationActionEvent(name: String) {
+        trackEvent(category = "notificationAction", name = name)
+    }
+
     fun Fragment.trackNewMessageEvent(name: String) {
         context?.trackNewMessageEvent(name)
     }
