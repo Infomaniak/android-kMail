@@ -50,6 +50,7 @@ import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.NotificationUtils.cancelNotification
+import com.infomaniak.mail.utils.SharedUtils.Companion.updateSignatures
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.coroutines.*
@@ -238,6 +239,7 @@ class MainViewModel @Inject constructor(
 
             updateQuotas(mailbox)
             updatePermissions(mailbox)
+            updateSignatures(mailbox)
             updateFolders(mailbox)
 
             (currentFolderId?.let(folderController::getFolder) ?: folderController.getFolder(DEFAULT_SELECTED_FOLDER))
@@ -283,6 +285,10 @@ class MainViewModel @Inject constructor(
                 it.permissions = data
             }
         }
+    }
+
+    private fun updateSignatures(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
+        mailboxContentRealm().writeBlocking { updateSignatures(mailbox) }
     }
 
     private fun updateFolders(mailbox: Mailbox) {
