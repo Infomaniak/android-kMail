@@ -24,6 +24,7 @@ import androidx.annotation.*
 import androidx.appcompat.app.AppCompatDelegate
 import com.google.android.material.color.MaterialColors
 import com.infomaniak.lib.core.api.ApiController.json
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.lib.core.utils.transaction
 import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
@@ -255,7 +256,7 @@ class LocalSettings private constructor(context: Context) {
         private set(value) = sharedPreferences.transaction { putStringSet(FIREBASE_REGISTERED_USERS_KEY, value) }
 
     fun markUserAsRegisteredByFirebase(userId: Int) {
-        Log.i(TAG, "markUserAsRegisteredByFirebase: $userId has been registered")
+        SentryLog.i(TAG, "markUserAsRegisteredByFirebase: $userId has been registered")
         firebaseRegisteredUsers = firebaseRegisteredUsers.apply { add(userId.toString()) }
     }
 
@@ -264,7 +265,7 @@ class LocalSettings private constructor(context: Context) {
     }
 
     fun clearRegisteredFirebaseUsers() {
-        Log.i(TAG, "clearRegisteredFirebaseUsers: called")
+        SentryLog.i(TAG, "clearRegisteredFirebaseUsers: called")
         firebaseRegisteredUsers = mutableSetOf()
     }
     //endregion
@@ -281,7 +282,7 @@ class LocalSettings private constructor(context: Context) {
 
     companion object {
 
-        private val TAG = LocalSettings::class.simpleName
+        private val TAG = LocalSettings::class.java.simpleName
 
         //region Default values
         private const val DEFAULT_APP_LAUNCHES = 0
