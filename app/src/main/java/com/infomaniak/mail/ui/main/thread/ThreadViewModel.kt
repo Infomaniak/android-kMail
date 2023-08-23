@@ -59,17 +59,17 @@ class ThreadViewModel @Inject constructor(
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
     private var fetchMessagesJob: Job? = null
 
+    private val threadUid inline get() = savedStateHandle.get<String>(ThreadFragmentArgs::threadUid.name)!!
+
     val quickActionBarClicks = SingleLiveEvent<Pair<Message, Int>>()
 
     private val mailbox by lazy { MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
 
-    private inline val threadUid get() = savedStateHandle.get<String>(ThreadFragmentArgs::threadUid.name)!!
-
-    fun threadLive(threadUid: String) = liveData(ioCoroutineContext) {
+    val threadLive = liveData(ioCoroutineContext) {
         emitSource(threadController.getThreadAsync(threadUid).map { it.obj }.asLiveData())
     }
 
-    fun messagesLive(threadUid: String) = liveData(ioCoroutineContext) {
+    val messagesLive = liveData(ioCoroutineContext) {
         messageController.getSortedMessages(threadUid)?.asFlow()?.asLiveData()?.let { emitSource(it) }
     }
 
@@ -79,7 +79,7 @@ class ThreadViewModel @Inject constructor(
         currentMailboxLive: LiveData<Mailbox>,
     ): LiveData<Triple<Thread?, MergedContactDictionary?, Mailbox?>> {
         return MediatorLiveData<Triple<Thread?, MergedContactDictionary?, Mailbox?>>().apply {
-            addSource(threadLive(threadUid)) {
+            addSource(threadLive) {
                 val second = value?.second
                 val third = value?.third
                 value = Triple(it, second, third)
@@ -99,7 +99,7 @@ class ThreadViewModel @Inject constructor(
         }
     }
 
-    fun openThread(threadUid: String) = liveData(ioCoroutineContext) {
+    fun openThread() = liveData(ioCoroutineContext) {
 
         val thread = threadController.getThread(threadUid) ?: run {
             emit(null)
@@ -127,7 +127,7 @@ class ThreadViewModel @Inject constructor(
         }
     }
 
-    fun deleteDraft(message: Message, threadUid: String, mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
+    fun deleteDraft(message: Message, mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
         val thread = threadController.getThread(threadUid) ?: return@launch
         val messages = messageController.getMessageAndDuplicates(thread, message)
         val isSuccess = ApiRepository.deleteMessages(mailbox.uuid, messages.getUids()).isSuccess()
@@ -141,7 +141,7 @@ class ThreadViewModel @Inject constructor(
         }
     }
 
-    fun clickOnQuickActionBar(threadUid: String, menuId: Int) = viewModelScope.launch(ioCoroutineContext) {
+    fun clickOnQuickActionBar(menuId: Int) = viewModelScope.launch(ioCoroutineContext) {
         val thread = threadController.getThread(threadUid) ?: return@launch
         val message = messageController.getLastMessageToExecuteAction(thread)
         quickActionBarClicks.postValue(message to menuId)

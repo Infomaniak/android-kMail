@@ -31,7 +31,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
@@ -62,7 +61,6 @@ import javax.inject.Inject
 class SearchFragment : Fragment() {
 
     private lateinit var binding: FragmentSearchBinding
-    private val navigationArgs by navArgs<SearchFragmentArgs>()
     private val mainViewModel by activityViewModels<MainViewModel>()
     private val searchViewModel by viewModels<SearchViewModel>()
 
@@ -105,7 +103,6 @@ class SearchFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        searchViewModel.init(navigationArgs.dummyFolderId)
         searchViewModel.executePendingSearch()
 
         setupThreadListAdapter()

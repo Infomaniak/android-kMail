@@ -90,12 +90,8 @@ class MoveFragment : MenuFoldersFragment() {
         }
     }
 
-    private fun observeFolderId() = with(navigationArgs) {
-        messageUid?.let {
-            moveViewModel.getFolderIdByMessage(messageUid).observe(viewLifecycleOwner, ::setAdaptersFolders)
-        } ?: run {
-            moveViewModel.getFolderIdByThread(threadsUids.first()).observe(viewLifecycleOwner, ::setAdaptersFolders)
-        }
+    private fun observeFolderId() {
+        moveViewModel.getFolderId().observe(viewLifecycleOwner, ::setAdaptersFolders)
     }
 
     private fun setAdaptersFolders(folderId: String) {
@@ -131,7 +127,7 @@ class MoveFragment : MenuFoldersFragment() {
             onErrorCheck = { folderName -> checkForFolderCreationErrors(folderName) },
             onPositiveButtonClicked = { folderName ->
                 trackCreateFolderEvent("confirm")
-                mainViewModel.moveToNewFolder(folderName!!.toString(), threadsUids, messageUid)
+                mainViewModel.moveToNewFolder(folderName, threadsUids, messageUid)
             },
         )
     }

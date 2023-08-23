@@ -38,6 +38,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentAttachMailboxBinding
 import com.infomaniak.mail.utils.ErrorCode
 import com.infomaniak.mail.utils.isEmail
+import com.infomaniak.mail.utils.trimmedText
 import dagger.hilt.android.AndroidEntryPoint
 import com.infomaniak.lib.core.R as RCore
 
@@ -90,7 +91,7 @@ class AttachMailboxFragment : Fragment() {
         }
     }
 
-    private fun TextInputEditText.isEmail() = text?.trim().toString().isEmail()
+    private fun TextInputEditText.isEmail() = trimmedText.isEmail()
 
     private fun shouldEnableButton() = with(binding) {
         passwordInput.text?.isNotBlank() == true && mailInput.isEmail()
@@ -98,10 +99,9 @@ class AttachMailboxFragment : Fragment() {
 
     private fun attachMailbox() = with(binding) {
         accountViewModel.attachNewMailbox(
-            mailInput.text?.trim().toString(),
-            passwordInput.text?.trim().toString(),
+            mailInput.trimmedText,
+            passwordInput.trimmedText,
         ).observe(viewLifecycleOwner) { apiResponse ->
-
             when {
                 apiResponse.isSuccess() -> {
                     apiResponse.data?.mailboxId?.let(accountViewModel::switchToNewMailbox)

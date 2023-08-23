@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.main.thread.actions
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.cache.mailboxContent.AttachmentController
@@ -34,19 +35,23 @@ import javax.inject.Inject
 @HiltViewModel
 class DownloadAttachmentViewModel @Inject constructor(
     application: Application,
+    private val savedStateHandle: SavedStateHandle,
     private val attachmentController: AttachmentController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
+    private val attachmentResource
+        inline get() = savedStateHandle.get<String>(DownloadAttachmentProgressDialogArgs::attachmentResource.name)!!
+
     /**
      * We keep the Attachment, in case the ViewModel is destroyed before it finishes downloading
      */
     private var attachment: Attachment? = null
 
-    fun downloadAttachment(resource: String) = liveData(ioCoroutineContext) {
-        val attachment = attachmentController.getAttachment(resource).also { attachment = it }
+    fun downloadAttachment() = liveData(ioCoroutineContext) {
+        val attachment = attachmentController.getAttachment(attachmentResource).also { attachment = it }
         val attachmentFile = attachment.getCacheFile(context)
 
         if (attachment.hasUsableCache(context, attachmentFile)) {
@@ -55,7 +60,7 @@ class DownloadAttachmentViewModel @Inject constructor(
             return@liveData
         }
 
-        if (LocalStorageUtils.saveAttachmentToCache(resource, attachmentFile)) {
+        if (LocalStorageUtils.saveAttachmentToCache(attachmentResource, attachmentFile)) {
             emit(attachment.openWithIntent(context))
             this@DownloadAttachmentViewModel.attachment = null
         } else {

@@ -71,6 +71,7 @@ import javax.inject.Inject
 @HiltViewModel
 class NewMessageViewModel @Inject constructor(
     application: Application,
+    private val savedStateHandle: SavedStateHandle,
     private val draftController: DraftController,
     private val globalCoroutineScope: CoroutineScope,
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
@@ -113,21 +114,30 @@ class NewMessageViewModel @Inject constructor(
     private var isNewMessage = false
 
     var aliases: List<String> = emptyList()
+
+    private val arrivedFromExistingDraft
+        inline get() = savedStateHandle.get<Boolean>(NewMessageActivityArgs::arrivedFromExistingDraft.name) ?: false
+    private val notificationId
+        inline get() = savedStateHandle.get<Int>(NewMessageActivityArgs::notificationId.name) ?: -1
+    private val draftLocalUuid
+        inline get() = savedStateHandle.get<String?>(NewMessageActivityArgs::draftLocalUuid.name)
+    private val draftResource
+        inline get() = savedStateHandle.get<String?>(NewMessageActivityArgs::draftResource.name)
+    private val messageUid
+        inline get() = savedStateHandle.get<String?>(NewMessageActivityArgs::messageUid.name)
+    private val draftMode
+        inline get() = savedStateHandle.get<DraftMode>(NewMessageActivityArgs::draftMode.name) ?: DraftMode.NEW_MAIL
+    private val previousMessageUid
+        inline get() = savedStateHandle.get<String?>(NewMessageActivityArgs::previousMessageUid.name)
+    private val recipient
+        inline get() = savedStateHandle.get<Recipient?>(NewMessageActivityArgs::recipient.name)
+
     val mergedContacts = liveData(ioCoroutineContext) {
         val list = mergedContactController.getMergedContacts(sorted = true).copyFromRealm()
         emit(list to arrangeMergedContacts(list))
     }
 
-    fun initDraftAndViewModel(
-        arrivedFromExistingDraft: Boolean,
-        notificationId: Int,
-        draftLocalUuid: String?,
-        draftResource: String?,
-        messageUid: String?,
-        draftMode: DraftMode,
-        previousMessageUid: String?,
-        recipient: Recipient?,
-    ): LiveData<Pair<Boolean, List<Signature>>> = liveData(ioCoroutineContext) {
+    fun initDraftAndViewModel(): LiveData<Pair<Boolean, List<Signature>>> = liveData(ioCoroutineContext) {
         val realm = mailboxContentRealm()
         val mailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
 
@@ -155,12 +165,12 @@ class NewMessageViewModel @Inject constructor(
                             // so we can just reuse the already existing Draft.
                             draft
                         } else {
-                            fetchDraft(draftResource!!, messageUid!!)
+                            fetchDraft()
                         } ?: return@writeBlocking false
                     }
                 } else {
                     isNewMessage = true
-                    createDraft(draftMode, previousMessageUid, recipient, signatures) ?: return@writeBlocking false
+                    createDraft(signatures) ?: return@writeBlocking false
                 }
 
                 if (draft.identityId.isNullOrBlank()) draft.addMissingSignatureData(realm = this)
@@ -172,8 +182,8 @@ class NewMessageViewModel @Inject constructor(
         }
 
         if (isSuccess) {
-            dismissNotification(notificationId)
-            markAsRead(previousMessageUid, mailbox, realm)
+            dismissNotification()
+            markAsRead(mailbox, realm)
             selectedSignatureId = draft.identityId!!.toInt()
             saveDraftSnapshot()
             if (draft.cc.isNotEmpty() || draft.bcc.isNotEmpty()) {
@@ -190,7 +200,7 @@ class NewMessageViewModel @Inject constructor(
     /**
      * If we came from a Notification's action, we need to dismiss the Notification.
      */
-    private fun dismissNotification(notificationId: Int) {
+    private fun dismissNotification() {
         if (notificationId == -1) return
 
         notificationManagerCompat.cancel(notificationId)
@@ -199,13 +209,8 @@ class NewMessageViewModel @Inject constructor(
     /**
      * If we are replying to a Message, we need to mark it as read.
      */
-    private suspend fun markAsRead(
-        previousMessageUid: String?,
-        mailbox: Mailbox,
-        realm: TypedRealm,
-    ) {
-        if (previousMessageUid == null) return
-        val message = MessageController.getMessage(previousMessageUid, realm) ?: return
+    private suspend fun markAsRead(mailbox: Mailbox, realm: TypedRealm) {
+        val message = previousMessageUid?.let { MessageController.getMessage(it, realm) } ?: return
         if (message.isSeen) return
 
         sharedUtils.markAsSeen(
@@ -220,46 +225,38 @@ class NewMessageViewModel @Inject constructor(
         return draftLocalUuid?.let(draftController::getDraft)?.copyFromRealm()
     }
 
-    private fun fetchDraft(draftResource: String, messageUid: String): Draft? {
-        return ApiRepository.getDraft(draftResource).data?.also { draft ->
-            draft.initLocalValues(messageUid)
+    private fun fetchDraft(): Draft? {
+        return ApiRepository.getDraft(draftResource!!).data?.also { draft ->
+            draft.initLocalValues(messageUid!!)
         }
     }
 
-    private fun MutableRealm.createDraft(
-        draftMode: DraftMode,
-        previousMessageUid: String?,
-        recipient: Recipient?,
-        signatures: List<Signature>,
-    ): Draft? {
-        return Draft().apply {
+    private fun MutableRealm.createDraft(signatures: List<Signature>): Draft? = Draft().apply {
+        initLocalValues(mimeType = ClipDescription.MIMETYPE_TEXT_HTML)
 
-            initLocalValues(mimeType = ClipDescription.MIMETYPE_TEXT_HTML)
+        val shouldPreselectSignature = draftMode == DraftMode.REPLY || draftMode == DraftMode.REPLY_ALL
+        initSignature(realm = this@createDraft, addContent = !shouldPreselectSignature)
 
-            val shouldPreselectSignature = draftMode == DraftMode.REPLY || draftMode == DraftMode.REPLY_ALL
-            initSignature(realm = this@createDraft, addContent = !shouldPreselectSignature)
+        when (draftMode) {
+            DraftMode.NEW_MAIL -> recipient?.let { to = realmListOf(it) }
+            DraftMode.REPLY, DraftMode.REPLY_ALL, DraftMode.FORWARD -> {
+                previousMessageUid
+                    ?.let { uid -> MessageController.getMessage(uid, realm = this@createDraft) }
+                    ?.let { message ->
+                        val isSuccess = draftController.setPreviousMessage(
+                            draft = this,
+                            draftMode = draftMode,
+                            message = message,
+                            realm = this@createDraft,
+                        )
+                        if (!isSuccess) return null
 
-            when (draftMode) {
-                DraftMode.REPLY, DraftMode.REPLY_ALL, DraftMode.FORWARD -> {
-                    previousMessageUid
-                        ?.let { uid -> MessageController.getMessage(uid, realm = this@createDraft) }
-                        ?.let { message ->
-                            val isSuccess = draftController.setPreviousMessage(
-                                draft = this,
-                                draftMode = draftMode,
-                                message = message,
-                                realm = this@createDraft,
-                            )
-                            if (!isSuccess) return null
-
-                            if (shouldPreselectSignature) {
-                                val mostFittingSignature = guessMostFittingSignature(message, signatures)
-                                identityId = mostFittingSignature.id.toString()
-                                body += encapsulateSignatureContentWithInfomaniakClass(mostFittingSignature.content)
-                            }
+                        if (shouldPreselectSignature) {
+                            val mostFittingSignature = guessMostFittingSignature(message, signatures)
+                            identityId = mostFittingSignature.id.toString()
+                            body += encapsulateSignatureContentWithInfomaniakClass(mostFittingSignature.content)
                         }
-                }
-                DraftMode.NEW_MAIL -> recipient?.let { to = realmListOf(it) }
+                    }
             }
         }
     }

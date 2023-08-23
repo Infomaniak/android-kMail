@@ -35,6 +35,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentInvalidPasswordBinding
 import com.infomaniak.mail.utils.createDescriptionDialog
 import com.infomaniak.mail.utils.getStringWithBoldArg
+import com.infomaniak.mail.utils.trimmedText
 import dagger.hilt.android.AndroidEntryPoint
 import com.infomaniak.lib.core.R as RCore
 
@@ -74,11 +75,7 @@ class InvalidPasswordFragment : Fragment() {
             setOnClickListener {
                 trackInvalidPasswordMailboxEvent("updatePassword")
                 showProgress()
-                invalidPasswordViewModel.updatePassword(
-                    navigationArgs.mailboxId,
-                    navigationArgs.mailboxObjectId,
-                    passwordInput.text?.trim().toString(),
-                )
+                invalidPasswordViewModel.updatePassword(passwordInput.trimmedText)
             }
         }
 
@@ -89,7 +86,7 @@ class InvalidPasswordFragment : Fragment() {
                 description = getStringWithBoldArg(R.string.popupDetachMailboxDescription, navigationArgs.mailboxEmail),
                 onPositiveButtonClicked = {
                     trackInvalidPasswordMailboxEvent("detachMailboxConfirm")
-                    invalidPasswordViewModel.detachMailbox(navigationArgs.mailboxId)
+                    invalidPasswordViewModel.detachMailbox()
                 },
             ).show()
         }
