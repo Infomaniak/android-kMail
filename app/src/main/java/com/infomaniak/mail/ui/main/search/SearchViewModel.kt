@@ -24,13 +24,11 @@ import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.trackSearchEvent
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.data.models.thread.ThreadResult
 import com.infomaniak.mail.di.IoDispatcher
@@ -50,7 +48,6 @@ class SearchViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val globalCoroutineScope: CoroutineScope,
     private val searchUtils: SearchUtils,
-    private val folderController: FolderController,
     private val messageController: MessageController,
     private val refreshController: RefreshController,
     private val threadController: ThreadController,
@@ -60,7 +57,7 @@ class SearchViewModel @Inject constructor(
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
     /** Needed to pass API request's validation, but won't be used by the API */
-    private val dummyFolderId inline get() = savedStateHandle.get<String>(SearchFragmentArgs::dummyFolderId.name)
+    private val dummyFolderId inline get() = savedStateHandle.get<String>(SearchFragmentArgs::dummyFolderId.name)!!
 
     var currentFolder: Folder? = null
         private set
@@ -217,7 +214,7 @@ class SearchViewModel @Inject constructor(
         visibilityMode.postValue(VisibilityMode.LOADING)
 
         val currentMailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
-        val folderId = folder?.id ?: dummyFolderId ?: folderController.getFolder(FolderRole.INBOX)?.id!!
+        val folderId = folder?.id ?: dummyFolderId
         val resource = if (shouldGetNextPage) resourceNext else null
         val searchFilters = searchUtils.searchFilters(query, newFilters, resource)
         val apiResponse = ApiRepository.searchThreads(currentMailbox.uuid, folderId, searchFilters, resource)
