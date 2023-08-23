@@ -18,7 +18,6 @@
 package com.infomaniak.mail.data.cache.mailboxInfo
 
 import android.content.Context
-import android.util.Log
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.AppSettings

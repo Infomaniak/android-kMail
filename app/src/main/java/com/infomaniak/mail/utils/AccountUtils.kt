@@ -19,7 +19,6 @@ package com.infomaniak.mail.utils
 
 import android.app.NotificationManager
 import android.content.Context
-import android.util.Log
 import androidx.work.WorkManager
 import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.auth.CredentialManager

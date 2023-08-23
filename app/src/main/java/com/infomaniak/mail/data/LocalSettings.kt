@@ -18,7 +18,6 @@
 package com.infomaniak.mail.data
 
 import android.content.Context
-import android.util.Log
 import android.view.ContextThemeWrapper
 import androidx.annotation.*
 import androidx.appcompat.app.AppCompatDelegate

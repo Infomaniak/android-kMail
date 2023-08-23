@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.data.cache.userInfo
 
-import android.util.Log
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.correspondent.MergedContact

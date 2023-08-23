@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
-import android.util.Log
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ThreadMode
