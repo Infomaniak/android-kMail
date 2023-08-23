@@ -18,8 +18,8 @@
 package com.infomaniak.mail.utils
 
 import android.content.Context
-import android.util.Log
 import androidx.core.app.NotificationManagerCompat
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
@@ -76,7 +76,7 @@ class FetchMessagesManager @Inject constructor(
             return
         }
 
-        Log.d(TAG, "launchWork: ${mailbox.email} has ${newMessagesThreads.count()} Threads with new Messages")
+        SentryLog.d(TAG, "launchWork: ${mailbox.email} has ${newMessagesThreads.count()} Threads with new Messages")
 
         // Notify Threads with new Messages
         val unReadThreadsCount = ThreadController.getUnreadThreadsCount(folder)
@@ -169,6 +169,6 @@ class FetchMessagesManager @Inject constructor(
     }
 
     private companion object {
-        val TAG = FetchMessagesManager::class.simpleName
+        val TAG: String = FetchMessagesManager::class.java.simpleName
     }
 }
