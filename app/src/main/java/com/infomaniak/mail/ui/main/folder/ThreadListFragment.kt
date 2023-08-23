@@ -439,7 +439,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             recyclerView = binding.threadsList
             beforeUpdateAdapter = { threads ->
                 currentThreadsCount = threads.count()
-                Log.i("UI", "Received threads: $currentThreadsCount | (${mainViewModel.currentFolder.value?.name})")
+                SentryLog.i("UI", "Received threads: $currentThreadsCount | (${mainViewModel.currentFolder.value?.name})")
                 updateThreadsVisibility()
             }
             waitingBeforeNotifyAdapter = isRecoveringFinished
@@ -499,7 +499,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun observeCurrentFolderLive() = with(threadListViewModel) {
         mainViewModel.currentFolderLive.observe(viewLifecycleOwner) { folder ->
             currentFolderCursor = folder.cursor
-            Log.i("UI", "Received cursor: $currentFolderCursor | (${folder.name})")
+            SentryLog.i("UI", "Received cursor: $currentFolderCursor | (${folder.name})")
             updateThreadsVisibility()
             updateUnreadCount(folder.unreadCountLocal)
             checkLastUpdateDay()
@@ -559,7 +559,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun displayFolderName(folder: Folder) {
         val folderName = folder.getLocalizedName(binding.context)
-        Log.i("UI", "Received folder name: $folderName")
+        SentryLog.i("UI", "Received folder name: $folderName")
         binding.toolbar.title = folderName
     }
 

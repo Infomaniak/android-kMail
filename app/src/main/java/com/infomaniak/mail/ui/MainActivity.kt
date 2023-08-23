@@ -39,6 +39,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.work.Data
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.networking.LiveDataNetworkStatus
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.Utils.toEnumOrThrow
 import com.infomaniak.lib.stores.checkUpdateIsAvailable
@@ -294,7 +295,7 @@ class MainActivity : BaseActivity() {
 
     private fun observeNetworkStatus() {
         LiveDataNetworkStatus(this).distinctUntilChanged().observe(this) { isAvailable ->
-            Log.d("Internet availability", if (isAvailable) "Available" else "Unavailable")
+            SentryLog.d("Internet availability", if (isAvailable) "Available" else "Unavailable")
             Sentry.addBreadcrumb(Breadcrumb().apply {
                 category = "Network"
                 message = "Internet access is available : $isAvailable"
