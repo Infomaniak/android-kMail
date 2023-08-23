@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.cache.mailboxContent
 
 import android.util.Log
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.utils.update
@@ -61,7 +62,7 @@ object SignatureController {
 
     //region Edit data
     fun update(apiSignatures: List<Signature>, realm: MutableRealm) {
-        Log.d(RealmDatabase.TAG, "Signatures: Save new data")
+        SentryLog.d(RealmDatabase.TAG, "Signatures: Save new data")
         realm.update<Signature>(apiSignatures)
     }
     //endregion

@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.cache.mailboxContent
 
 import android.util.Log
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder
@@ -67,10 +68,10 @@ class FolderController @Inject constructor(private val mailboxContentRealm: Real
 
         realm.writeBlocking {
 
-            Log.d(RealmDatabase.TAG, "Folders: Delete outdated data")
+            SentryLog.d(RealmDatabase.TAG, "Folders: Delete outdated data")
             deleteOutdatedFolders(remoteFoldersWithChildren)
 
-            Log.d(RealmDatabase.TAG, "Folders: Save new data")
+            SentryLog.d(RealmDatabase.TAG, "Folders: Save new data")
             upsertFolders(remoteFoldersWithChildren)
         }
     }
