@@ -115,16 +115,15 @@ class ThreadFragment : Fragment() {
 
         observeThreadLive()
 
-        threadViewModel.openThread(navigationArgs.threadUid).observe(viewLifecycleOwner) { result ->
+        threadViewModel.openThread().observe(viewLifecycleOwner) { result ->
 
             if (result == null) {
                 leaveThread()
                 return@observe
             }
 
-            val threadUid = result.first.uid
-            setupUi(threadUid)
-            setupAdapter(threadUid)
+            setupUi()
+            setupAdapter()
             threadAdapter.isExpandedMap = result.second
             threadAdapter.isThemeTheSameMap = result.third
             observeMessagesLive()
@@ -137,7 +136,7 @@ class ThreadFragment : Fragment() {
         mainViewModel.toggleLightThemeForMessage.observe(viewLifecycleOwner, threadAdapter::toggleLightMode)
     }
 
-    private fun setupUi(threadUid: String) = with(binding) {
+    private fun setupUi() = with(binding) {
         toolbar.setNavigationOnClickListener { leaveThread() }
 
         val defaultTextColor = context.getColor(R.color.primaryTextColor)
@@ -161,7 +160,7 @@ class ThreadFragment : Fragment() {
 
         iconFavorite.setOnClickListener {
             trackThreadActionsEvent(ACTION_FAVORITE_NAME, isFavorite)
-            mainViewModel.toggleThreadFavoriteStatus(threadUid)
+            mainViewModel.toggleThreadFavoriteStatus(navigationArgs.threadUid)
         }
 
         if (mainViewModel.isCurrentFolderRole(FolderRole.ARCHIVE)) {
@@ -174,23 +173,23 @@ class ThreadFragment : Fragment() {
             when (menuId) {
                 R.id.quickActionReply -> {
                     trackThreadActionsEvent(ACTION_REPLY_NAME)
-                    threadViewModel.clickOnQuickActionBar(threadUid, menuId)
+                    threadViewModel.clickOnQuickActionBar(menuId)
                 }
                 R.id.quickActionForward -> {
                     trackThreadActionsEvent(ACTION_FORWARD_NAME)
-                    threadViewModel.clickOnQuickActionBar(threadUid, menuId)
+                    threadViewModel.clickOnQuickActionBar(menuId)
                 }
                 R.id.quickActionArchive -> with(mainViewModel) {
                     trackThreadActionsEvent(ACTION_ARCHIVE_NAME, isCurrentFolderRole(FolderRole.ARCHIVE))
-                    archiveThread(threadUid)
+                    archiveThread(navigationArgs.threadUid)
                 }
                 R.id.quickActionDelete -> {
                     trackThreadActionsEvent(ACTION_DELETE_NAME)
-                    mainViewModel.deleteThread(threadUid)
+                    mainViewModel.deleteThread(navigationArgs.threadUid)
                 }
                 R.id.quickActionMenu -> {
                     trackThreadActionsEvent(OPEN_ACTION_BOTTOM_SHEET)
-                    threadViewModel.clickOnQuickActionBar(threadUid, menuId)
+                    threadViewModel.clickOnQuickActionBar(menuId)
                 }
             }
         }
@@ -231,7 +230,7 @@ class ThreadFragment : Fragment() {
         getBackNavigationResult(DownloadAttachmentProgressDialog.OPEN_WITH, ::startActivity)
     }
 
-    private fun setupAdapter(threadUid: String) = with(binding) {
+    private fun setupAdapter() = with(binding) {
 
         messagesList.addItemDecoration(DividerItemDecorator(InsetDrawable(dividerDrawable(context), 0)))
         messagesList.recycledViewPool.setMaxRecycledViews(0, 0)
@@ -255,9 +254,7 @@ class ThreadFragment : Fragment() {
             }
             onDeleteDraftClicked = { message ->
                 trackMessageActionsEvent("deleteDraft")
-                mainViewModel.currentMailbox.value?.let { mailbox ->
-                    threadViewModel.deleteDraft(message, threadUid, mailbox)
-                }
+                mainViewModel.currentMailbox.value?.let { mailbox -> threadViewModel.deleteDraft(message, mailbox) }
             }
             onAttachmentClicked = { attachment ->
                 if (attachment.openWithIntent(requireContext()).hasSupportedApplications(requireContext())) {
@@ -341,20 +338,17 @@ class ThreadFragment : Fragment() {
     }
 
     private fun observeThreadLive() {
-        threadViewModel.threadLive(navigationArgs.threadUid).observe(viewLifecycleOwner, ::onThreadUpdate)
+        threadViewModel.threadLive.observe(viewLifecycleOwner, ::onThreadUpdate)
     }
 
     private fun observeMessagesLive() {
-        threadViewModel
-            .messagesLive(navigationArgs.threadUid)
-            .bindResultsChangeToAdapter(viewLifecycleOwner, threadAdapter)
-            .apply {
-                beforeUpdateAdapter = ::onMessagesUpdate
-                afterUpdateAdapter = {
-                    val shouldScrollToFirstUnseenMessage = isFirstVisit.compareAndSet(true, false) && it.count() > 1
-                    if (shouldScrollToFirstUnseenMessage) onRecyclerViewLaidOut(::scrollToFirstUnseenMessage)
-                }
+        threadViewModel.messagesLive.bindResultsChangeToAdapter(viewLifecycleOwner, threadAdapter).apply {
+            beforeUpdateAdapter = ::onMessagesUpdate
+            afterUpdateAdapter = {
+                val shouldScrollToFirstUnseenMessage = isFirstVisit.compareAndSet(true, false) && it.count() > 1
+                if (shouldScrollToFirstUnseenMessage) onRecyclerViewLaidOut(::scrollToFirstUnseenMessage)
             }
+        }
     }
 
     private fun onRecyclerViewLaidOut(callback: () -> Unit) = with(binding) {

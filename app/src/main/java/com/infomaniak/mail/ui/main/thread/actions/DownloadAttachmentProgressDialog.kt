@@ -58,11 +58,10 @@ class DownloadAttachmentProgressDialog : DialogFragment() {
             .create()
     }
 
-    private fun downloadAttachment() = with(navigationArgs) {
-        downloadAttachmentViewModel.downloadAttachment(attachmentResource)
-            .observe(this@DownloadAttachmentProgressDialog) { intent ->
-                if (intent == null) popBackStackWithError() else setBackNavigationResult(OPEN_WITH, intent)
-            }
+    private fun downloadAttachment() {
+        downloadAttachmentViewModel.downloadAttachment().observe(this@DownloadAttachmentProgressDialog) { intent ->
+            if (intent == null) popBackStackWithError() else setBackNavigationResult(OPEN_WITH, intent)
+        }
     }
 
     private fun popBackStackWithError() {

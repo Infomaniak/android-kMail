@@ -40,6 +40,7 @@ import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
+import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.main.menu.MoveFragmentArgs
 import com.infomaniak.mail.utils.animatedNavigation
 import com.infomaniak.mail.utils.notYetImplemented
@@ -56,10 +57,10 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
     private val isSpamFolder by lazy { mainViewModel.isCurrentFolderRole(FolderRole.SPAM) }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(navigationArgs) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(threadActionsViewModel) {
         super.onViewCreated(view, savedInstanceState)
 
-        threadActionsViewModel.threadLive(threadUid).observe(viewLifecycleOwner) { thread ->
+        threadLive.observe(viewLifecycleOwner) { thread ->
             setMarkAsReadUi(thread.unseenMessagesCount == 0)
             setFavoriteUi(thread.isFavorite)
         }
@@ -67,111 +68,10 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         binding.postpone.isGone = true
         setJunkUi()
 
-        threadActionsViewModel.getThreadAndMessageUidToReplyTo(
-            threadUid,
-            messageUidToReplyTo,
-        ).observe(viewLifecycleOwner) { result ->
-
-            if (result == null) {
-                findNavController().popBackStack()
-                return@observe
-            }
-
-            val thread = result.first
-            val messageUidToReply = result.second
-
-            initOnClickListener(object : OnActionClick {
-                //region Main actions
-                override fun onReply() {
-                    trackBottomSheetThreadActionsEvent(ACTION_REPLY_NAME)
-                    safeNavigateToNewMessageActivity(
-                        draftMode = DraftMode.REPLY,
-                        previousMessageUid = messageUidToReply,
-                        currentClassName = currentClassName,
-                        shouldLoadDistantResources = navigationArgs.shouldLoadDistantResources,
-                    )
-                }
-
-                override fun onReplyAll() {
-                    trackBottomSheetThreadActionsEvent(ACTION_REPLY_ALL_NAME)
-                    safeNavigateToNewMessageActivity(
-                        draftMode = DraftMode.REPLY_ALL,
-                        previousMessageUid = messageUidToReply,
-                        currentClassName = currentClassName,
-                        shouldLoadDistantResources = navigationArgs.shouldLoadDistantResources,
-                    )
-                }
-
-                override fun onForward() {
-                    trackBottomSheetThreadActionsEvent(ACTION_FORWARD_NAME)
-                    safeNavigateToNewMessageActivity(
-                        draftMode = DraftMode.FORWARD,
-                        previousMessageUid = messageUidToReply,
-                        currentClassName = currentClassName,
-                        shouldLoadDistantResources = navigationArgs.shouldLoadDistantResources,
-                    )
-                }
-
-                override fun onDelete() {
-                    trackBottomSheetThreadActionsEvent(ACTION_DELETE_NAME)
-                    mainViewModel.deleteThread(threadUid)
-                }
-                //endregion
-
-                //region Actions
-                override fun onArchive() = with(mainViewModel) {
-                    trackBottomSheetThreadActionsEvent(ACTION_ARCHIVE_NAME, isCurrentFolderRole(FolderRole.ARCHIVE))
-                    archiveThread(threadUid)
-                }
-
-                override fun onReadUnread() {
-                    trackBottomSheetThreadActionsEvent(ACTION_MARK_AS_SEEN_NAME, thread.unseenMessagesCount == 0)
-                    mainViewModel.toggleThreadSeenStatus(threadUid)
-                    findNavController().popBackStack(R.id.threadFragment, inclusive = true)
-                }
-
-                override fun onMove() {
-                    trackBottomSheetThreadActionsEvent(ACTION_MOVE_NAME)
-                    animatedNavigation(
-                        resId = R.id.moveFragment,
-                        args = MoveFragmentArgs(arrayOf(threadUid)).toBundle(),
-                        currentClassName = currentClassName,
-                    )
-                }
-
-                override fun onPostpone() {
-                    trackBottomSheetThreadActionsEvent(ACTION_POSTPONE_NAME)
-                    notYetImplemented()
-                }
-
-                override fun onFavorite() {
-                    trackBottomSheetThreadActionsEvent(ACTION_FAVORITE_NAME, thread.isFavorite)
-                    mainViewModel.toggleThreadFavoriteStatus(threadUid)
-                }
-
-                override fun onReportJunk() {
-                    if (isSpamFolder) {
-                        trackBottomSheetThreadActionsEvent(ACTION_SPAM_NAME, value = true)
-                        mainViewModel.toggleThreadSpamStatus(threadUid)
-                    } else {
-                        safeNavigate(
-                            resId = R.id.junkBottomSheetDialog,
-                            args = JunkBottomSheetDialogArgs(threadUid, messageUidToReply).toBundle(),
-                            currentClassName = currentClassName,
-                        )
-                    }
-                }
-
-                override fun onPrint() {
-                    trackBottomSheetThreadActionsEvent(ACTION_PRINT_NAME)
-                    notYetImplemented()
-                }
-
-                override fun onReportDisplayProblem() {
-                    notYetImplemented()
-                }
-                //endregion
-            })
+        threadActionsViewModel.getThreadAndMessageUidToReplyTo().observe(viewLifecycleOwner) { result ->
+            result?.let { (thread, messageUidToReply) ->
+                setupListeners(thread, messageUidToReply)
+            } ?: findNavController().popBackStack()
         }
     }
 
@@ -185,5 +85,96 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         setText(text)
         setIconResource(icon)
         isVisible = true
+    }
+
+    private fun setupListeners(thread: Thread, messageUidToReply: String) = with(navigationArgs) {
+        initOnClickListener(object : OnActionClick {
+            //region Main actions
+            override fun onReply() {
+                trackBottomSheetThreadActionsEvent(ACTION_REPLY_NAME)
+                safeNavigateToNewMessageActivity(
+                    draftMode = DraftMode.REPLY,
+                    previousMessageUid = messageUidToReply,
+                    currentClassName = currentClassName,
+                    shouldLoadDistantResources = shouldLoadDistantResources,
+                )
+            }
+
+            override fun onReplyAll() {
+                trackBottomSheetThreadActionsEvent(ACTION_REPLY_ALL_NAME)
+                safeNavigateToNewMessageActivity(
+                    draftMode = DraftMode.REPLY_ALL,
+                    previousMessageUid = messageUidToReply,
+                    currentClassName = currentClassName,
+                    shouldLoadDistantResources = shouldLoadDistantResources,
+                )
+            }
+
+            override fun onForward() {
+                trackBottomSheetThreadActionsEvent(ACTION_FORWARD_NAME)
+                safeNavigateToNewMessageActivity(
+                    draftMode = DraftMode.FORWARD,
+                    previousMessageUid = messageUidToReply,
+                    currentClassName = currentClassName,
+                    shouldLoadDistantResources = shouldLoadDistantResources,
+                )
+            }
+
+            override fun onDelete() {
+                trackBottomSheetThreadActionsEvent(ACTION_DELETE_NAME)
+                mainViewModel.deleteThread(threadUid)
+            }
+            //endregion
+
+            //region Actions
+            override fun onArchive() = with(mainViewModel) {
+                trackBottomSheetThreadActionsEvent(ACTION_ARCHIVE_NAME, isCurrentFolderRole(FolderRole.ARCHIVE))
+                archiveThread(threadUid)
+            }
+
+            override fun onReadUnread() {
+                trackBottomSheetThreadActionsEvent(ACTION_MARK_AS_SEEN_NAME, value = thread.unseenMessagesCount == 0)
+                mainViewModel.toggleThreadSeenStatus(threadUid)
+                findNavController().popBackStack(R.id.threadFragment, inclusive = true)
+            }
+
+            override fun onMove() {
+                trackBottomSheetThreadActionsEvent(ACTION_MOVE_NAME)
+                animatedNavigation(R.id.moveFragment, MoveFragmentArgs(arrayOf(threadUid)).toBundle(), currentClassName)
+            }
+
+            override fun onPostpone() {
+                trackBottomSheetThreadActionsEvent(ACTION_POSTPONE_NAME)
+                notYetImplemented()
+            }
+
+            override fun onFavorite() {
+                trackBottomSheetThreadActionsEvent(ACTION_FAVORITE_NAME, thread.isFavorite)
+                mainViewModel.toggleThreadFavoriteStatus(threadUid)
+            }
+
+            override fun onReportJunk() {
+                if (isSpamFolder) {
+                    trackBottomSheetThreadActionsEvent(ACTION_SPAM_NAME, value = true)
+                    mainViewModel.toggleThreadSpamStatus(threadUid)
+                } else {
+                    safeNavigate(
+                        resId = R.id.junkBottomSheetDialog,
+                        args = JunkBottomSheetDialogArgs(threadUid, messageUidToReply).toBundle(),
+                        currentClassName = currentClassName,
+                    )
+                }
+            }
+
+            override fun onPrint() {
+                trackBottomSheetThreadActionsEvent(ACTION_PRINT_NAME)
+                notYetImplemented()
+            }
+
+            override fun onReportDisplayProblem() {
+                notYetImplemented()
+            }
+            //endregion
+        })
     }
 }

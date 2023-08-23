@@ -191,17 +191,8 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun initDraftAndViewModel() = with(newMessageActivityArgs) {
-        newMessageViewModel.initDraftAndViewModel(
-            arrivedFromExistingDraft,
-            notificationId,
-            draftLocalUuid,
-            draftResource,
-            messageUid,
-            draftMode,
-            previousMessageUid,
-            recipient,
-        ).observe(viewLifecycleOwner) { (isSuccess, signatures) ->
+    private fun initDraftAndViewModel() {
+        newMessageViewModel.initDraftAndViewModel().observe(viewLifecycleOwner) { (isSuccess, signatures) ->
             if (isSuccess) {
                 hideLoader()
                 showKeyboardInCorrectView()
@@ -606,7 +597,7 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    fun closeAutoCompletion() = with(binding) {
+    private fun closeAutoCompletion() = with(binding) {
         toField.clearField()
         ccField.clearField()
         bccField.clearField()
