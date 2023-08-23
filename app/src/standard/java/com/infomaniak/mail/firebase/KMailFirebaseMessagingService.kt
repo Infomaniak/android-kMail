@@ -23,6 +23,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.MainApplication
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.RealmDatabase
@@ -55,7 +56,7 @@ class KMailFirebaseMessagingService : FirebaseMessagingService() {
     lateinit var registerUserDeviceWorkerScheduler: RegisterUserDeviceWorker.Scheduler
 
     override fun onNewToken(token: String) {
-        Log.i(TAG, "onNewToken: new token received")
+        SentryLog.i(TAG, "onNewToken: new token received")
         localSettings.apply {
             firebaseToken = token
             clearRegisteredFirebaseUsers()
@@ -64,7 +65,7 @@ class KMailFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
-        Log.i(TAG, "onMessageReceived: ${message.data}")
+        SentryLog.i(TAG, "onMessageReceived: ${message.data}")
 
         if (AccountUtils.currentUserId == AppSettings.DEFAULT_ID) {
             playServicesUtils.deleteFirebaseToken()
@@ -75,9 +76,9 @@ class KMailFirebaseMessagingService : FirebaseMessagingService() {
         val mailboxId = message.data["mailbox_id"]?.toInt() ?: return
         val messageUid = message.data["message_uid"] ?: return
 
-        Log.d(TAG, "onMessageReceived: userId=$userId")
-        Log.d(TAG, "onMessageReceived: mailboxId=$mailboxId")
-        Log.d(TAG, "onMessageReceived: messageUid=$messageUid")
+        SentryLog.d(TAG, "onMessageReceived: userId=$userId")
+        SentryLog.d(TAG, "onMessageReceived: mailboxId=$mailboxId")
+        SentryLog.d(TAG, "onMessageReceived: messageUid=$messageUid")
 
         if (mainApplication.isAppInBackground) {
             processMessageInBackground(userId, mailboxId, messageUid)
@@ -88,14 +89,14 @@ class KMailFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     private fun processMessageInForeground(userId: Int, mailboxId: Int) {
-        Log.i(TAG, "processMessageInForeground: called")
+        SentryLog.i(TAG, "processMessageInForeground: called")
         if (AccountUtils.currentUserId == userId && AccountUtils.currentMailboxId == mailboxId) {
             LocalBroadcastManager.getInstance(this).sendBroadcast(Intent(ACTION_MESSAGE_RECEIVED))
         }
     }
 
     private fun processMessageInBackground(userId: Int, mailboxId: Int, messageUid: String) {
-        Log.i(TAG, "processMessageInBackground: called")
+        SentryLog.i(TAG, "processMessageInBackground: called")
         MailboxController.getMailbox(userId, mailboxId, realmMailboxInfo)?.let { mailbox ->
             // Ignore if the Mailbox notification channel is blocked
             if (mailbox.notificationsIsDisabled(notificationManagerCompat)) return
