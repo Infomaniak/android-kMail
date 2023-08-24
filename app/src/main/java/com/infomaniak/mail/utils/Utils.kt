@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.utils
 
+import io.sentry.Sentry
 import okhttp3.internal.toHexString
 import java.nio.charset.StandardCharsets
 
@@ -35,6 +36,13 @@ object Utils {
     const val DELAY_BEFORE_FETCHING_ACTIVITIES_AGAIN = 500L
 
     fun colorToHexRepresentation(color: Int) = "#" + color.toHexString().substring(2 until 8)
+
+    inline fun <R> runCatchingRealm(block: () -> R): Result<R> {
+        return runCatching { block() }.onFailure { exception ->
+            if (!exception.shouldIgnoreRealmError()) Sentry.captureException(exception)
+            exception.printStackTrace()
+        }
+    }
 
     enum class MailboxErrorCode {
         NO_MAILBOX,
