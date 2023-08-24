@@ -55,8 +55,8 @@ class MailboxesAdapter(
         return MailboxesViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: MailboxesViewHolder, position: Int) = with(holder.binding) {
-        runCatchingRealm {
+    override fun onBindViewHolder(holder: MailboxesViewHolder, position: Int) = runCatchingRealm {
+        with(holder.binding) {
             val mailbox = mailboxes[position]
             val isCurrentMailbox = mailbox.mailboxId == AccountUtils.currentMailboxId
 
@@ -69,8 +69,8 @@ class MailboxesAdapter(
                 }
                 DisplayType.INVALID_MAILBOX.layout -> (this as ItemInvalidMailboxBinding).displayInvalidMailbox(mailbox)
             }
-        }.getOrDefault(Unit)
-    }
+        }
+    }.getOrDefault(Unit)
 
     private fun ItemSelectableMailboxBinding.displaySimpleMailbox(mailbox: Mailbox, isCurrentMailbox: Boolean) = with(root) {
         displayValidMailbox(mailbox, isCurrentMailbox) { context.trackAccountEvent(SWITCH_MAILBOX_NAME) }

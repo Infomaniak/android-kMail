@@ -103,13 +103,8 @@ class ThreadAdapter(
         )
     }
 
-    override fun onBindViewHolder(
-        holder: ThreadViewHolder,
-        position: Int,
-        payloads: MutableList<Any>
-    ): Unit = with(holder.binding) {
-
-        runCatchingRealm {
+    override fun onBindViewHolder(holder: ThreadViewHolder, position: Int, payloads: MutableList<Any>) = runCatchingRealm {
+        with(holder.binding) {
             val payload = payloads.firstOrNull()
             if (payload !is NotificationType) {
                 super.onBindViewHolder(holder, position, payloads)
@@ -127,7 +122,7 @@ class ThreadAdapter(
                 NotificationType.RE_RENDER -> if (bodyWebView.isVisible) bodyWebView.reload() else fullMessageWebView.reload()
             }
         }
-    }
+    }.getOrDefault(Unit)
 
     override fun onBindViewHolder(holder: ThreadViewHolder, position: Int) = with(holder) {
         val message = messages[position]
