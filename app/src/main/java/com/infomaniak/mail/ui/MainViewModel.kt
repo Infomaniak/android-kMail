@@ -116,6 +116,14 @@ class MainViewModel @Inject constructor(
         it?.let { folderController.getRootsFoldersAsync().map { results -> results.list.getMenuFolders() } } ?: emptyFlow()
     }.asLiveData(ioCoroutineContext)
 
+    val currentDefaultFoldersLive = _currentMailboxObjectId.flatMapLatest { objectId ->
+        objectId?.let { folderController.getDefaultFoldersAsync().map { it.list.getDefaultMenuFolders() } } ?: emptyFlow()
+    }.asLiveData(ioCoroutineContext)
+
+    val currentCustomFoldersLive = _currentMailboxObjectId.flatMapLatest { objectId ->
+        objectId?.let { folderController.getCustomFoldersAsync().map { it.list.getCustomMenuFolders() } } ?: emptyFlow()
+    }.asLiveData(ioCoroutineContext)
+
     val currentQuotasLive = _currentMailboxObjectId.flatMapLatest {
         it?.let(QuotasController::getQuotasAsync) ?: emptyFlow()
     }.asLiveData(ioCoroutineContext)
