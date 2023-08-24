@@ -113,7 +113,7 @@ class RecipientFieldView @JvmOverloads constructor(
         get() = autoCompletedContacts.isVisible
         set(value) {
             autoCompletedContacts.isVisible = value
-            binding.chevron.isGone = value || !shouldDisplayChevron()
+            computeChevronVisibility()
         }
 
     init {
@@ -162,7 +162,7 @@ class RecipientFieldView @JvmOverloads constructor(
 
     fun hideLoader() = with(binding) {
         textInput.isVisible = true
-        chevron.isVisible = shouldDisplayChevron()
+        computeChevronVisibility()
 
         loader.isGone = true
     }
@@ -271,7 +271,7 @@ class RecipientFieldView @JvmOverloads constructor(
 
     private fun updateCollapsedUiState(isCollapsed: Boolean) = with(binding) {
         updateCollapsedChipValues(isCollapsed)
-        chipsRecyclerView.isGone = isCollapsed
+        chipsRecyclerView.isGone = isCollapsed || contactChipAdapter.isEmpty()
     }
 
     private fun updateCollapsedChipValues(isCollapsed: Boolean) = with(binding) {
@@ -311,7 +311,10 @@ class RecipientFieldView @JvmOverloads constructor(
             return
         }
 
-        if (contactChipAdapter.isEmpty()) expand()
+        if (contactChipAdapter.isEmpty()) {
+            expand()
+            binding.chipsRecyclerView.isVisible = true
+        }
         val recipient = Recipient().initLocalValues(email, name)
         val recipientIsNew = contactAdapter.addUsedContact(email)
         if (recipientIsNew) {
@@ -399,10 +402,12 @@ class RecipientFieldView @JvmOverloads constructor(
 
     fun updateOtherFieldsVisibility(otherFieldsAreAllEmpty: Boolean) {
         this.otherFieldsAreAllEmpty = otherFieldsAreAllEmpty
-        binding.chevron.isVisible = otherFieldsAreAllEmpty
+        computeChevronVisibility()
     }
 
-    private fun shouldDisplayChevron(): Boolean = canCollapseEverything && otherFieldsAreAllEmpty
+    private fun computeChevronVisibility() {
+        binding.chevron.isVisible = canCollapseEverything && otherFieldsAreAllEmpty && !isAutoCompletionOpened
+    }
 
     private companion object {
         const val MAX_WIDTH_PERCENTAGE = 0.8
