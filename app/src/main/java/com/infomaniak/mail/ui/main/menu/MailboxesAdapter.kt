@@ -31,6 +31,7 @@ import com.infomaniak.mail.databinding.ItemMailboxMenuDrawerBinding
 import com.infomaniak.mail.databinding.ItemSelectableMailboxBinding
 import com.infomaniak.mail.ui.main.menu.MailboxesAdapter.MailboxesViewHolder
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.views.itemViews.DecoratedItemView.SelectionStyle
 import com.infomaniak.mail.views.itemViews.SelectableItemView
 
@@ -55,18 +56,20 @@ class MailboxesAdapter(
     }
 
     override fun onBindViewHolder(holder: MailboxesViewHolder, position: Int) = with(holder.binding) {
-        val mailbox = mailboxes[position]
-        val isCurrentMailbox = mailbox.mailboxId == AccountUtils.currentMailboxId
+        runCatchingRealm {
+            val mailbox = mailboxes[position]
+            val isCurrentMailbox = mailbox.mailboxId == AccountUtils.currentMailboxId
 
-        when (getItemViewType(position)) {
-            DisplayType.SIMPLE_MAILBOX.layout -> {
-                (this as ItemSelectableMailboxBinding).displaySimpleMailbox(mailbox, isCurrentMailbox)
+            when (getItemViewType(position)) {
+                DisplayType.SIMPLE_MAILBOX.layout -> {
+                    (this as ItemSelectableMailboxBinding).displaySimpleMailbox(mailbox, isCurrentMailbox)
+                }
+                DisplayType.MENU_DRAWER_MAILBOX.layout -> {
+                    (this as ItemMailboxMenuDrawerBinding).displayMenuDrawerMailbox(mailbox, isCurrentMailbox)
+                }
+                DisplayType.INVALID_MAILBOX.layout -> (this as ItemInvalidMailboxBinding).displayInvalidMailbox(mailbox)
             }
-            DisplayType.MENU_DRAWER_MAILBOX.layout -> {
-                (this as ItemMailboxMenuDrawerBinding).displayMenuDrawerMailbox(mailbox, isCurrentMailbox)
-            }
-            DisplayType.INVALID_MAILBOX.layout -> (this as ItemInvalidMailboxBinding).displayInvalidMailbox(mailbox)
-        }
+        }.getOrDefault(Unit)
     }
 
     private fun ItemSelectableMailboxBinding.displaySimpleMailbox(mailbox: Mailbox, isCurrentMailbox: Boolean) = with(root) {
@@ -114,15 +117,15 @@ class MailboxesAdapter(
         )
     }
 
-    override fun getItemViewType(position: Int): Int {
+    override fun getItemViewType(position: Int): Int = runCatchingRealm {
         return when {
             !mailboxes[position].isValid -> DisplayType.INVALID_MAILBOX.layout
             isInMenuDrawer -> DisplayType.MENU_DRAWER_MAILBOX.layout
             else -> DisplayType.SIMPLE_MAILBOX.layout
         }
-    }
+    }.getOrDefault(super.getItemViewType(position))
 
-    override fun getItemCount(): Int = mailboxes.count()
+    override fun getItemCount(): Int = runCatchingRealm { mailboxes.count() }.getOrDefault(0)
 
     fun setMailboxes(newMailboxes: List<Mailbox>) {
         mailboxes = newMailboxes
