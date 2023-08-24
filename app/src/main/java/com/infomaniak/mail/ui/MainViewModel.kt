@@ -112,10 +112,6 @@ class MainViewModel @Inject constructor(
         it?.let(MailboxController::getMailbox)
     }.asLiveData(ioCoroutineContext)
 
-    val currentFoldersLive = _currentMailboxObjectId.flatMapLatest {
-        it?.let { folderController.getRootsFoldersAsync().map { results -> results.list.getMenuFolders() } } ?: emptyFlow()
-    }.asLiveData(ioCoroutineContext)
-
     val currentDefaultFoldersLive = _currentMailboxObjectId.flatMapLatest { objectId ->
         objectId?.let { folderController.getDefaultFoldersAsync().map { it.list.getDefaultMenuFolders() } } ?: emptyFlow()
     }.asLiveData(ioCoroutineContext)

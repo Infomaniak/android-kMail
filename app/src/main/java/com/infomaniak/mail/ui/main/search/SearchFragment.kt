@@ -149,7 +149,7 @@ class SearchFragment : Fragment() {
             width = resources.getDimensionPixelSize(R.dimen.maxSearchChipWidth)
         }
 
-        mainViewModel.currentFoldersLive.observe(viewLifecycleOwner) { (defaultFolders, customFolders) ->
+        searchViewModel.currentFoldersLive.observe(viewLifecycleOwner) { (defaultFolders, customFolders) ->
 
             val folders = defaultFolders.toMutableList<Any>().apply {
                 add(0, SearchFolderElement.ALL_FOLDERS)
