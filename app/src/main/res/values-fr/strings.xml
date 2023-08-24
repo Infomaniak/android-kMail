@@ -218,10 +218,12 @@
     <plurals name="externalDialogDescriptionExpeditor">
         <item quantity="one">L’expéditeur %s ne fait pas partie de votre organisation ni de vos contacts. Soyez vigilant si vous partagez des informations sensibles.</item>
         <item quantity="other">Certains expéditeurs ne font pas partie de votre organisation ni de vos contacts. Soyez vigilant si vous partagez des informations sensibles.</item>
+        <item quantity="many">Certains expéditeurs ne font pas partie de votre organisation ni de vos contacts. Soyez vigilant si vous partagez des informations sensibles.</item>
     </plurals>
     <plurals name="externalDialogDescriptionRecipient">
         <item quantity="one">Le destinataire %s ne fait pas partie de votre organisation ni de vos contacts. Soyez vigilant si vous partagez des informations sensibles.</item>
         <item quantity="other">Certains destinataires ne font pas partie de votre organisation ni de vos contacts. Soyez vigilant si vous partagez des informations sensibles.</item>
+        <item quantity="many">Certains destinataires ne font pas partie de votre organisation ni de vos contacts. Soyez vigilant si vous partagez des informations sensibles.</item>
     </plurals>
     <string name="externalDialogTitleExpeditor">Expéditeur externe</string>
     <string name="externalDialogTitleRecipient">Destinataire externe</string>

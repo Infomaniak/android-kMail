@@ -78,7 +78,7 @@ class NewMessageActivity : BaseActivity() {
 
         informationButton.setOnClickListener {
             val description = resources.getQuantityString(
-                R.plurals.externalDialogDescriptionExpeditor,
+                R.plurals.externalDialogDescriptionRecipient,
                 externalRecipientQuantity,
                 externalRecipientEmail,
             )
