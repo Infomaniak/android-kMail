@@ -113,7 +113,7 @@ class RecipientFieldView @JvmOverloads constructor(
         get() = autoCompletedContacts.isVisible
         set(value) {
             autoCompletedContacts.isVisible = value
-            binding.chevron.isGone = value || !shouldDisplayChevron()
+            computeChevronVisibility()
         }
 
     init {
@@ -162,7 +162,7 @@ class RecipientFieldView @JvmOverloads constructor(
 
     fun hideLoader() = with(binding) {
         textInput.isVisible = true
-        chevron.isVisible = shouldDisplayChevron()
+        computeChevronVisibility()
 
         loader.isGone = true
     }
@@ -399,10 +399,13 @@ class RecipientFieldView @JvmOverloads constructor(
 
     fun updateOtherFieldsVisibility(otherFieldsAreAllEmpty: Boolean) {
         this.otherFieldsAreAllEmpty = otherFieldsAreAllEmpty
-        binding.chevron.isVisible = otherFieldsAreAllEmpty
+        computeChevronVisibility()
     }
 
-    private fun shouldDisplayChevron(): Boolean = canCollapseEverything && otherFieldsAreAllEmpty
+    private fun computeChevronVisibility() {
+        binding.chevron.isVisible = canCollapseEverything && otherFieldsAreAllEmpty && !isAutoCompletionOpened
+    }
+
 
     private companion object {
         const val MAX_WIDTH_PERCENTAGE = 0.8
