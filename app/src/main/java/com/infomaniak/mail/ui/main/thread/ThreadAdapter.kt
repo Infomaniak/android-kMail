@@ -92,7 +92,7 @@ class ThreadAdapter(
         super.onAttachedToRecyclerView(recyclerView)
     }
 
-    override fun getItemCount() = runCatchingRealm { messages.size }.getOrDefault(0)
+    override fun getItemCount(): Int = runCatchingRealm { messages.size }.getOrDefault(0)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ThreadViewHolder {
         return ThreadViewHolder(

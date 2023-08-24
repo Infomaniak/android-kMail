@@ -86,7 +86,7 @@ class FolderAdapter(
         return if (isInMenuDrawer) DisplayType.MENU_DRAWER.layout else DisplayType.SELECTABLE_FOLDER.layout
     }
 
-    override fun getItemCount() = runCatchingRealm { folders.size }.getOrDefault(0)
+    override fun getItemCount(): Int = runCatchingRealm { folders.size }.getOrDefault(0)
 
     private fun UnreadFolderItemView.displayMenuDrawerFolder(folder: Folder) {
         val unread = when (folder.role) {
