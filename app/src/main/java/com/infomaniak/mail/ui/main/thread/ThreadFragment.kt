@@ -141,7 +141,6 @@ class ThreadFragment : Fragment() {
     private fun observerSubjectUpdateTrigger() {
         threadViewModel.threadMergedContactAndMailboxMediator(
             mergedContactsLive = mainViewModel.mergedContactsLive,
-            currentMailboxLive = mainViewModel.currentMailboxLive,
         ).observe(viewLifecycleOwner) { (thread, mergedContacts, mailbox) ->
             thread?.let {
                 val emailDictionary = mergedContacts ?: emptyMap()

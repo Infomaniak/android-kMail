@@ -71,9 +71,13 @@ class ThreadViewModel @Inject constructor(
         messageController.getSortedMessages(threadUid)?.asFlow()?.asLiveData()?.let { emitSource(it) }
     }
 
+    private val currentMailboxLive = MailboxController.getMailboxAsync(
+        AccountUtils.currentUserId,
+        AccountUtils.currentMailboxId,
+    ).map { it.obj }.asLiveData(ioCoroutineContext)
+
     fun threadMergedContactAndMailboxMediator(
         mergedContactsLive: LiveData<MergedContactDictionary?>,
-        currentMailboxLive: LiveData<Mailbox>,
     ): LiveData<Triple<Thread?, MergedContactDictionary?, Mailbox?>> {
         return MediatorLiveData<Triple<Thread?, MergedContactDictionary?, Mailbox?>>().apply {
             addSource(threadLive) {

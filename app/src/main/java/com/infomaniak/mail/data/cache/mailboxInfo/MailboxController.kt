@@ -128,6 +128,10 @@ object MailboxController {
         return getMailboxQuery(objectId, defaultRealm).asFlow()
     }
 
+    fun getMailboxAsync(userId: Int, mailboxId: Int): Flow<SingleQueryChange<Mailbox>> {
+        return getMailboxQuery(userId, mailboxId, defaultRealm).asFlow()
+    }
+
     fun getInvalidPasswordMailboxes(userId: Int): Flow<RealmResults<Mailbox>> {
         return getInvalidPasswordMailboxesQuery(userId, defaultRealm).toMailboxesFlow()
     }
