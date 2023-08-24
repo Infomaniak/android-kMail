@@ -33,6 +33,7 @@ import com.infomaniak.mail.data.models.Folder.*
 import com.infomaniak.mail.databinding.*
 import com.infomaniak.mail.ui.main.menu.FolderAdapter.FolderViewHolder
 import com.infomaniak.mail.utils.UnreadDisplay
+import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.views.itemViews.*
 import kotlin.math.min
 
@@ -61,7 +62,7 @@ class FolderAdapter(
         return FolderViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: FolderViewHolder, position: Int, payloads: MutableList<Any>) {
+    override fun onBindViewHolder(holder: FolderViewHolder, position: Int, payloads: MutableList<Any>) = runCatchingRealm {
         if (payloads.firstOrNull() == Unit) {
             val folder = folders[position]
             if (getItemViewType(position) == DisplayType.SELECTABLE_FOLDER.layout) {
@@ -70,7 +71,7 @@ class FolderAdapter(
         } else {
             super.onBindViewHolder(holder, position, payloads)
         }
-    }
+    }.getOrDefault(Unit)
 
     override fun onBindViewHolder(holder: FolderViewHolder, position: Int) = with(holder.binding) {
         val folder = folders[position]
@@ -85,7 +86,7 @@ class FolderAdapter(
         return if (isInMenuDrawer) DisplayType.MENU_DRAWER.layout else DisplayType.SELECTABLE_FOLDER.layout
     }
 
-    override fun getItemCount() = folders.size
+    override fun getItemCount() = runCatchingRealm { folders.size }.getOrDefault(0)
 
     private fun UnreadFolderItemView.displayMenuDrawerFolder(folder: Folder) {
         val unread = when (folder.role) {

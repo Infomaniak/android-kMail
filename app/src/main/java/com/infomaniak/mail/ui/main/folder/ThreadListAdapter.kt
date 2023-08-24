@@ -123,22 +123,20 @@ class ThreadListAdapter @Inject constructor(
         return ThreadListViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: ThreadListViewHolder, position: Int, payloads: MutableList<Any>) {
-        runCatchingRealm {
-            val payload = payloads.firstOrNull()
-            if (payload is NotificationType && holder.itemViewType == DisplayType.THREAD.layout) {
-                val binding = holder.binding as CardviewThreadItemBinding
-                val thread = dataSet[position] as Thread
+    override fun onBindViewHolder(holder: ThreadListViewHolder, position: Int, payloads: MutableList<Any>) = runCatchingRealm {
+        val payload = payloads.firstOrNull()
+        if (payload is NotificationType && holder.itemViewType == DisplayType.THREAD.layout) {
+            val binding = holder.binding as CardviewThreadItemBinding
+            val thread = dataSet[position] as Thread
 
-                when (payload) {
-                    NotificationType.AVATAR -> binding.displayAvatar(thread)
-                    NotificationType.SELECTED_STATE -> binding.updateSelectedState(thread)
-                }
-            } else {
-                super.onBindViewHolder(holder, position, payloads)
+            when (payload) {
+                NotificationType.AVATAR -> binding.displayAvatar(thread)
+                NotificationType.SELECTED_STATE -> binding.updateSelectedState(thread)
             }
+        } else {
+            super.onBindViewHolder(holder, position, payloads)
         }
-    }
+    }.getOrDefault(Unit)
 
     override fun onBindViewHolder(item: Any, viewHolder: ThreadListViewHolder, position: Int) = with(viewHolder.binding) {
         when (getItemViewType(position)) {
