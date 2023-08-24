@@ -50,6 +50,7 @@ import com.infomaniak.mail.utils.UiUtils.getPrettyNameAndEmail
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.TEXT_HTML
 import com.infomaniak.mail.utils.Utils.TEXT_PLAIN
+import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupThreadWebViewSettings
 import com.infomaniak.mail.utils.WebViewUtils.Companion.toggleWebViewTheme
 import kotlinx.coroutines.CoroutineScope
@@ -91,7 +92,7 @@ class ThreadAdapter(
         super.onAttachedToRecyclerView(recyclerView)
     }
 
-    override fun getItemCount() = messages.size
+    override fun getItemCount() = runCatchingRealm { messages.size }.getOrDefault(0)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ThreadViewHolder {
         return ThreadViewHolder(
@@ -102,22 +103,29 @@ class ThreadAdapter(
         )
     }
 
-    override fun onBindViewHolder(holder: ThreadViewHolder, position: Int, payloads: MutableList<Any>) = with(holder.binding) {
-        val payload = payloads.firstOrNull()
-        if (payload !is NotificationType) {
-            super.onBindViewHolder(holder, position, payloads)
-            return
-        }
+    override fun onBindViewHolder(
+        holder: ThreadViewHolder,
+        position: Int,
+        payloads: MutableList<Any>
+    ): Unit = with(holder.binding) {
 
-        val message = messages[position]
-
-        when (payload) {
-            NotificationType.AVATAR -> if (!message.isDraft) userAvatar.loadAvatar(message.from.first(), contacts)
-            NotificationType.TOGGLE_LIGHT_MODE -> {
-                isThemeTheSameMap[message.uid] = !isThemeTheSameMap[message.uid]!!
-                holder.toggleBodyAndQuoteTheme(message)
+        runCatchingRealm {
+            val payload = payloads.firstOrNull()
+            if (payload !is NotificationType) {
+                super.onBindViewHolder(holder, position, payloads)
+                return
             }
-            NotificationType.RERENDER -> if (bodyWebView.isVisible) bodyWebView.reload() else fullMessageWebView.reload()
+
+            val message = messages[position]
+
+            when (payload) {
+                NotificationType.AVATAR -> if (!message.isDraft) userAvatar.loadAvatar(message.from.first(), contacts)
+                NotificationType.TOGGLE_LIGHT_MODE -> {
+                    isThemeTheSameMap[message.uid] = !isThemeTheSameMap[message.uid]!!
+                    holder.toggleBodyAndQuoteTheme(message)
+                }
+                NotificationType.RERENDER -> if (bodyWebView.isVisible) bodyWebView.reload() else fullMessageWebView.reload()
+            }
         }
     }
 
@@ -458,7 +466,7 @@ class ThreadAdapter(
         notifyItemChanged(index, NotificationType.TOGGLE_LIGHT_MODE)
     }
 
-    fun rerenderMails() {
+    fun reRenderMails() {
         notifyItemRangeChanged(0, itemCount, NotificationType.RERENDER)
     }
 
