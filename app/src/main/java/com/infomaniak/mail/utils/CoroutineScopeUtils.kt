@@ -35,20 +35,20 @@ val Job.handler
 /** Ignore errors due to forced Realm closure and notify Sentry when necessary */
 private fun handleException(exception: Throwable) {
 
-    /** Ignore all errors due to voluntary Realm closure
-     * @return true if the error is recognized, otherwise false
-     **/
-    fun shouldIgnoreRealmError(): Boolean = exception.message?.run {
-        return contains(ErrorCode.RLM_ERR_CLOSED_REALM.name)
-                || contains(ErrorCode.RLM_ERR_INVALIDATED_OBJECT.name)
-                || contains(ErrorCode.RLM_ERR_INVALID_TABLE_REF.name)
-                || contains(ErrorCode.RLM_ERR_STALE_ACCESSOR.name)
-    } ?: false
-
-    if (shouldIgnoreRealmError()) return
+    if (exception.shouldIgnoreRealmError()) return
 
     exception.printStackTrace()
     Sentry.captureException(exception)
 }
+
+/** Ignore all errors due to voluntary Realm closure
+ * @return true if the error is recognized, otherwise false
+ **/
+fun Throwable.shouldIgnoreRealmError(): Boolean = message?.run {
+    contains(ErrorCode.RLM_ERR_CLOSED_REALM.name)
+            || contains(ErrorCode.RLM_ERR_INVALIDATED_OBJECT.name)
+            || contains(ErrorCode.RLM_ERR_INVALID_TABLE_REF.name)
+            || contains(ErrorCode.RLM_ERR_STALE_ACCESSOR.name)
+} ?: false
 
 fun CoroutineScope.coroutineContext(dispatcher: CoroutineDispatcher): CoroutineContext = coroutineContext + handler + dispatcher
