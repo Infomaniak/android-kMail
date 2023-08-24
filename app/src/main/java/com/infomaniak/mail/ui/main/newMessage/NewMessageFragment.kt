@@ -65,6 +65,7 @@ import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.*
 import com.infomaniak.mail.ui.main.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipient
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
 import com.infomaniak.mail.workers.DraftsActionsWorker
@@ -256,11 +257,7 @@ class NewMessageFragment : Fragment() {
             autoComplete = autoCompleteTo,
             onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(TO, hasOpened) },
             onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, TO) },
-            onContactRemovedCallback = {
-                newMessageViewModel.removeRecipientFromField(it, TO)
-                updateBannerVisibility()
-
-            },
+            onContactRemovedCallback = { recipient -> recipient.removeInViewModelAndUpdateBannerVisibility(TO) },
             onCopyContactAddressCallback = ::copyRecipientEmailToClipboard,
             gotFocusCallback = { fieldGotFocus(TO) },
             onToggleEverythingCallback = ::openAdvancedFields,
@@ -271,10 +268,7 @@ class NewMessageFragment : Fragment() {
             autoComplete = autoCompleteCc,
             onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(CC, hasOpened) },
             onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, CC) },
-            onContactRemovedCallback = {
-                newMessageViewModel.removeRecipientFromField(it, CC)
-                updateBannerVisibility()
-            },
+            onContactRemovedCallback = { recipient -> recipient.removeInViewModelAndUpdateBannerVisibility(CC) },
             onCopyContactAddressCallback = ::copyRecipientEmailToClipboard,
             gotFocusCallback = { fieldGotFocus(CC) },
             setSnackBarCallback = ::setSnackBar,
@@ -284,10 +278,7 @@ class NewMessageFragment : Fragment() {
             autoComplete = autoCompleteBcc,
             onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(BCC, hasOpened) },
             onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, BCC) },
-            onContactRemovedCallback = {
-                newMessageViewModel.removeRecipientFromField(it, BCC)
-                updateBannerVisibility()
-            },
+            onContactRemovedCallback = { recipient -> recipient.removeInViewModelAndUpdateBannerVisibility(BCC) },
             onCopyContactAddressCallback = ::copyRecipientEmailToClipboard,
             gotFocusCallback = { fieldGotFocus(BCC) },
             setSnackBarCallback = ::setSnackBar,
@@ -342,6 +333,11 @@ class NewMessageFragment : Fragment() {
         newMessageViewModel.isAutoCompletionOpened = isAutoCompletionOpened
     }
 
+    private fun Recipient.removeInViewModelAndUpdateBannerVisibility(type: FieldType) {
+        newMessageViewModel.removeRecipientFromField(this, type)
+        updateBannerVisibility()
+    }
+
     private fun populateUiWithViewModel() = with(binding) {
         val draftMode = newMessageActivityArgs.draftMode
         val draft = newMessageViewModel.draft
@@ -357,11 +353,7 @@ class NewMessageFragment : Fragment() {
         bccField.initRecipients(draft.bcc, shouldWarnForExternal, emailDictionary, aliases)
 
         if (shouldWarnForExternal) {
-            val (externalRecipientEmail, externalRecipientQuantity) = UiUtils.findExternalRecipientInDraft(
-                draft,
-                aliases,
-                emailDictionary,
-            )
+            val (externalRecipientEmail, externalRecipientQuantity) = draft.findExternalRecipient(aliases, emailDictionary)
             newMessageViewModel.isExternalBannerVisible.value = externalRecipientEmail to externalRecipientQuantity
         }
 
@@ -424,9 +416,9 @@ class NewMessageFragment : Fragment() {
             if (externalRecipientQuantity > 1) {
                 newMessageViewModel.isExternalBannerVisible.value = null to 2
                 return
-            } else if (quantityForThisField == 1) {
-                externalRecipientEmail = singleEmail
             }
+
+            if (quantityForThisField == 1) externalRecipientEmail = singleEmail
         }
 
         newMessageViewModel.isExternalBannerVisible.value = externalRecipientEmail to externalRecipientQuantity
@@ -508,12 +500,12 @@ class NewMessageFragment : Fragment() {
         fun parseEmailWithName(recipient: String): Recipient? {
             val nameAndEmail = Regex("(.+)<(.+)>").find(recipient)?.destructured
 
-            return nameAndEmail?.let { (name, email) -> if (email.isEmail()) Recipient().initLocalValues(email, name) else null }
+            return nameAndEmail?.let { (name, email) -> if (email.isEmail()) Recipient(email, name) else null }
         }
 
         fun String.splitToRecipientList() = split(",", ";").mapNotNull {
             val email = it.trim()
-            if (email.isEmail()) Recipient().initLocalValues(email, email) else parseEmailWithName(email)
+            if (email.isEmail()) Recipient(email, email) else parseEmailWithName(email)
         }
 
         uri?.let { uri ->
@@ -523,10 +515,10 @@ class NewMessageFragment : Fragment() {
             val to = mailToIntent.to?.splitToRecipientList()
                 ?: emptyList()
             val cc = mailToIntent.cc?.splitToRecipientList()
-                ?: intent?.getStringArrayExtra(Intent.EXTRA_CC)?.map { Recipient().initLocalValues(it, it) }
+                ?: intent?.getStringArrayExtra(Intent.EXTRA_CC)?.map { Recipient(it, it) }
                 ?: emptyList()
             val bcc = mailToIntent.bcc?.splitToRecipientList()
-                ?: intent?.getStringArrayExtra(Intent.EXTRA_BCC)?.map { Recipient().initLocalValues(it, it) }
+                ?: intent?.getStringArrayExtra(Intent.EXTRA_BCC)?.map { Recipient(it, it) }
                 ?: emptyList()
 
             draft.to.addAll(to)

@@ -51,7 +51,7 @@ class RoundedBackgroundSpan(
         top: Int,
         y: Int,
         bottom: Int,
-        paint: Paint
+        paint: Paint,
     ) {
         paint.setGivenTextStyle()
         val width = paint.measureText(text, start, end)
@@ -60,7 +60,7 @@ class RoundedBackgroundSpan(
             /* left = */ LEFT_MARGIN + x,
             /* top = */ top.toFloat() + VERTICAL_OFFSET,
             /* right = */ LEFT_MARGIN + x + width + 2 * PADDING,
-            /* bottom = */ bottom.toFloat() - VERTICAL_OFFSET
+            /* bottom = */ bottom.toFloat() - VERTICAL_OFFSET,
         )
 
         paint.color = backgroundColor
@@ -73,7 +73,7 @@ class RoundedBackgroundSpan(
             /* end = */ end,
             /* x = */ LEFT_MARGIN + x + PADDING,
             /* y = */ y.toFloat() - VERTICAL_OFFSET,
-            /* paint = */ paint
+            /* paint = */ paint,
         )
     }
 

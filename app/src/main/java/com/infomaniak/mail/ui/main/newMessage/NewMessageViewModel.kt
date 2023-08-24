@@ -135,7 +135,6 @@ class NewMessageViewModel @Inject constructor(
     fun initDraftAndViewModel(): LiveData<Pair<Boolean, List<Signature>>> = liveData(ioCoroutineContext) {
 
         val realm = mailboxContentRealm()
-        val mailbox = currentMailbox
 
         var signatures = emptyList<Signature>()
 
@@ -179,7 +178,7 @@ class NewMessageViewModel @Inject constructor(
 
         if (isSuccess) {
             dismissNotification()
-            markAsRead(mailbox, realm)
+            markAsRead(currentMailbox, realm)
             selectedSignatureId = draft.identityId!!.toInt()
             saveDraftSnapshot()
             if (draft.cc.isNotEmpty() || draft.bcc.isNotEmpty()) {

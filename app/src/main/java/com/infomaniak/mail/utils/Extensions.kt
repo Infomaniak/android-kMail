@@ -368,27 +368,19 @@ fun Fragment.createInformationDialog(
     title: String,
     description: CharSequence,
     @StringRes confirmButtonText: Int,
-): AlertDialog {
-    return requireActivity().createInformationDialog(
-        title,
-        description,
-        confirmButtonText,
-    )
-}
+): AlertDialog = requireActivity().createInformationDialog(title, description, confirmButtonText)
 
 fun Activity.createInformationDialog(
     title: String,
     description: CharSequence,
     @StringRes confirmButtonText: Int,
-): AlertDialog {
-    return createDescriptionDialog(
-        title,
-        description,
-        confirmButtonText,
-        false,
-        onPositiveButtonClicked = {}
-    )
-}
+): AlertDialog = createDescriptionDialog(
+    title = title,
+    description = description,
+    confirmButtonText = confirmButtonText,
+    displayCancelButton = false,
+    onPositiveButtonClicked = {}
+)
 
 fun Fragment.createDescriptionDialog(
     title: String,
@@ -397,16 +389,14 @@ fun Fragment.createDescriptionDialog(
     displayCancelButton: Boolean = true,
     onPositiveButtonClicked: () -> Unit,
     onDismissed: (() -> Unit)? = null,
-): AlertDialog {
-    return requireActivity().createDescriptionDialog(
-        title,
-        description,
-        confirmButtonText,
-        displayCancelButton,
-        onPositiveButtonClicked,
-        onDismissed,
-    )
-}
+): AlertDialog = requireActivity().createDescriptionDialog(
+    title,
+    description,
+    confirmButtonText,
+    displayCancelButton,
+    onPositiveButtonClicked,
+    onDismissed,
+)
 
 fun Activity.createDescriptionDialog(
     title: String,

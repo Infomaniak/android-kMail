@@ -80,22 +80,16 @@ class ThreadViewModel @Inject constructor(
         mergedContactsLive: LiveData<MergedContactDictionary?>,
     ): LiveData<Triple<Thread?, MergedContactDictionary?, Mailbox?>> {
         return MediatorLiveData<Triple<Thread?, MergedContactDictionary?, Mailbox?>>().apply {
-            addSource(threadLive) {
-                val second = value?.second
-                val third = value?.third
-                value = Triple(it, second, third)
+            addSource(threadLive) { first ->
+                value = Triple(first, value?.second, value?.third)
             }
 
-            addSource(mergedContactsLive) {
-                val first = value?.first
-                val third = value?.third
-                value = Triple(first, it, third)
+            addSource(mergedContactsLive) { second ->
+                value = Triple(value?.first, second, value?.third)
             }
 
-            addSource(currentMailboxLive) {
-                val first = value?.first
-                val second = value?.second
-                value = Triple(first, second, it)
+            addSource(currentMailboxLive) { third ->
+                value = Triple(value?.first, value?.second, third)
             }
         }
     }

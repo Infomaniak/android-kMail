@@ -64,6 +64,7 @@ import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialog
 import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipients
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
 import com.infomaniak.mail.utils.UiUtils.dividerDrawable
 import dagger.hilt.android.AndroidEntryPoint
@@ -464,19 +465,14 @@ class ThreadFragment : Fragment() {
         val subject = context.formatSubject(thread.subject)
         if (!externalMailFlagEnabled) return subject to subject
 
-        val (externalRecipientEmail, externalRecipientQuantity) = UiUtils.findExternalRecipientsInThread(
-            thread,
-            emailDictionary,
-            aliases
-        )
+        val (externalRecipientEmail, externalRecipientQuantity) = thread.findExternalRecipients(emailDictionary, aliases)
         if (externalRecipientQuantity == 0) return subject to subject
 
         val externalPostfix = getString(R.string.externalTag)
-        val separator = " "
-        val postfixedSubject = "$subject$separator$externalPostfix"
+        val postfixedSubject = "$subject$EXTERNAL_TAG_SEPARATOR$externalPostfix"
 
         val spannedSubject = postfixedSubject.toSpannable().apply {
-            val startIndex = subject.length + separator.length
+            val startIndex = subject.length + EXTERNAL_TAG_SEPARATOR.length
             val endIndex = startIndex + externalPostfix.length
 
             setExternalTagSpan(startIndex, endIndex)
@@ -514,15 +510,11 @@ class ThreadFragment : Fragment() {
             ),
             startIndex,
             endIndex,
-            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
         )
     }
 
-    private fun Spannable.setClickableSpan(
-        startIndex: Int,
-        endIndex: Int,
-        onClick: () -> Unit,
-    ) {
+    private fun Spannable.setClickableSpan(startIndex: Int, endIndex: Int, onClick: () -> Unit) {
         // TODO : Currently, the clickable zone extends beyond the span up to the edge of the textview. This is the same
         //  comportment that Gmail has. See if we can find a fix for this later
         setSpan(
@@ -531,7 +523,7 @@ class ThreadFragment : Fragment() {
             },
             startIndex,
             endIndex,
-            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
         )
     }
 
@@ -557,6 +549,7 @@ class ThreadFragment : Fragment() {
     private companion object {
         const val COLLAPSE_TITLE_THRESHOLD = 0.5
         const val ARCHIVE_INDEX = 2
+        const val EXTERNAL_TAG_SEPARATOR = " "
 
         fun allAttachmentsFileName(subject: String) = "ikMail-attachments-$subject.zip"
     }

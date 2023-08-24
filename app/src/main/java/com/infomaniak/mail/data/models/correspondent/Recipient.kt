@@ -28,7 +28,11 @@ import kotlinx.serialization.Serializable
 
 @Parcelize
 @Serializable
-open class Recipient : EmbeddedRealmObject, Correspondent {
+open class Recipient() : EmbeddedRealmObject, Correspondent {
+    constructor(email: String, name: String) : this() {
+        initLocalValues(email, name)
+    }
+
     override var email: String = ""
     override var name: String = ""
 
@@ -68,7 +72,7 @@ open class Recipient : EmbeddedRealmObject, Correspondent {
             val email = parcel.readString()!!
             val name = parcel.readString()!!
 
-            return Recipient().initLocalValues(email, name)
+            return Recipient(email, name)
         }
 
         override fun Recipient.write(parcel: Parcel, flags: Int) {

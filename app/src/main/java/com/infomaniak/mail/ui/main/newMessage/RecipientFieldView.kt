@@ -317,10 +317,10 @@ class RecipientFieldView @JvmOverloads constructor(
         }
 
         if (contactChipAdapter.isEmpty()) expand()
-        val recipient = Recipient().initLocalValues(email, name)
         val recipientIsNew = contactAdapter.addUsedContact(email)
         if (recipientIsNew) {
-            contactChipAdapter.addChip(StyledRecipient(recipient, false))
+            val recipient = StyledRecipient(email, name, displayAsExternal = false)
+            contactChipAdapter.addChip(recipient)
             onContactAdded?.invoke(recipient)
             clearField()
         }
@@ -384,10 +384,10 @@ class RecipientFieldView @JvmOverloads constructor(
         otherFieldsAreAllEmpty: Boolean = true,
     ) {
 
-        initialRecipients.forEach {
-            val shouldDisplayAsExternal = shouldWarnForExternalContacts && it.isExternal(emailDictionary, aliases)
-            val styledRecipient = StyledRecipient(it, shouldDisplayAsExternal)
-            if (contactChipAdapter.addChip(styledRecipient)) contactAdapter.addUsedContact(it.email)
+        initialRecipients.forEach { recipient ->
+            val shouldDisplayAsExternal = shouldWarnForExternalContacts && recipient.isExternal(emailDictionary, aliases)
+            val styledRecipient = StyledRecipient(recipient, shouldDisplayAsExternal)
+            if (contactChipAdapter.addChip(styledRecipient)) contactAdapter.addUsedContact(recipient.email)
         }
 
         updateCollapsedChipValues(isSelfCollapsed)
@@ -427,7 +427,7 @@ class RecipientFieldView @JvmOverloads constructor(
         private const val MAX_WIDTH_PERCENTAGE = 0.8
         private const val MAX_ALLOWED_RECIPIENT = 99
         private const val EXTERNAL_CHIP_STROKE_WIDTH = 1
-        private const val NO_STROKE = 0f
+        private const val NO_STROKE = 0.0f
 
         fun Chip.setChipStyle(displayAsExternal: Boolean) {
             if (displayAsExternal) {
@@ -445,10 +445,12 @@ class RecipientFieldView @JvmOverloads constructor(
     }
 
     @Parcelize
-    class StyledRecipient(val recipient: Recipient, val displayAsExternal: Boolean) : Recipient() {
-        init {
-            name = recipient.name
-            email = recipient.email
-        }
+    class StyledRecipient(
+        private val inputEmail: String,
+        private val inputName: String,
+        val displayAsExternal: Boolean
+    ) : Recipient(inputEmail, inputName) {
+
+        constructor(recipient: Recipient, displayAsExternal: Boolean) : this(recipient.email, recipient.name, displayAsExternal)
     }
 }

@@ -25,7 +25,6 @@ import com.infomaniak.mail.databinding.ChipContactBinding
 import com.infomaniak.mail.ui.main.newMessage.RecipientFieldView.Companion.setChipStyle
 import com.infomaniak.mail.ui.main.newMessage.RecipientFieldView.StyledRecipient
 
-
 class ContactChipAdapter(
     val openContextMenu: (Recipient, BackspaceAwareChip) -> Unit,
     val onBackspace: (Recipient) -> Unit,
