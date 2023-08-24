@@ -422,9 +422,9 @@ class ThreadListAdapter @Inject constructor(
 
     override fun createDiffUtil(oldList: List<Any>, newList: List<Any>): DragDropSwipeDiffCallback<Any>? = null
 
-    override fun updateList(itemList: List<Thread>) {
+    override fun updateList(itemList: List<Thread>) = runCatchingRealm {
         dataSet = formatList(itemList, recyclerView.context, folderRole, localSettings.threadDensity, isLoadMoreDisplayed)
-    }
+    }.getOrDefault(Unit)
 
     fun updateContacts(newContacts: MergedContactDictionary) {
         contacts = newContacts
