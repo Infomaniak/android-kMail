@@ -124,7 +124,7 @@ class ThreadAdapter(
                     isThemeTheSameMap[message.uid] = !isThemeTheSameMap[message.uid]!!
                     holder.toggleBodyAndQuoteTheme(message)
                 }
-                NotificationType.RERENDER -> if (bodyWebView.isVisible) bodyWebView.reload() else fullMessageWebView.reload()
+                NotificationType.RE_RENDER -> if (bodyWebView.isVisible) bodyWebView.reload() else fullMessageWebView.reload()
             }
         }
     }
@@ -467,7 +467,7 @@ class ThreadAdapter(
     }
 
     fun reRenderMails() {
-        notifyItemRangeChanged(0, itemCount, NotificationType.RERENDER)
+        notifyItemRangeChanged(0, itemCount, NotificationType.RE_RENDER)
     }
 
     fun isMessageUidManuallyAllowed(messageUid: String) = manuallyAllowedMessageUids.contains(messageUid)
@@ -475,7 +475,7 @@ class ThreadAdapter(
     private enum class NotificationType {
         AVATAR,
         TOGGLE_LIGHT_MODE,
-        RERENDER,
+        RE_RENDER,
     }
 
     private companion object {
