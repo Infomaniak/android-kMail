@@ -271,7 +271,7 @@ class RecipientFieldView @JvmOverloads constructor(
 
     private fun updateCollapsedUiState(isCollapsed: Boolean) = with(binding) {
         updateCollapsedChipValues(isCollapsed)
-        chipsRecyclerView.isGone = isCollapsed
+        chipsRecyclerView.isGone = isCollapsed || contactChipAdapter.isEmpty()
     }
 
     private fun updateCollapsedChipValues(isCollapsed: Boolean) = with(binding) {
@@ -311,7 +311,10 @@ class RecipientFieldView @JvmOverloads constructor(
             return
         }
 
-        if (contactChipAdapter.isEmpty()) expand()
+        if (contactChipAdapter.isEmpty()) {
+            expand()
+            binding.chipsRecyclerView.isVisible = true
+        }
         val recipient = Recipient().initLocalValues(email, name)
         val recipientIsNew = contactAdapter.addUsedContact(email)
         if (recipientIsNew) {
@@ -405,7 +408,6 @@ class RecipientFieldView @JvmOverloads constructor(
     private fun computeChevronVisibility() {
         binding.chevron.isVisible = canCollapseEverything && otherFieldsAreAllEmpty && !isAutoCompletionOpened
     }
-
 
     private companion object {
         const val MAX_WIDTH_PERCENTAGE = 0.8
