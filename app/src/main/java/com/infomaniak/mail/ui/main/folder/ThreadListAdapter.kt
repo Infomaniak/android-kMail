@@ -57,8 +57,8 @@ import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import dagger.hilt.android.qualifiers.ActivityContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.math.abs
 import com.google.android.material.R as RMaterial
@@ -432,7 +432,7 @@ class ThreadListAdapter @Inject constructor(
             val formattedList = runCatchingRealm {
                 formatList(itemList, recyclerView.context, folderRole, localSettings.threadDensity, isLoadMoreDisplayed)
             }.getOrDefault(emptyList())
-            withContext(Dispatchers.Main) { dataSet = formattedList }
+            Dispatchers.Main { dataSet = formattedList }
         }
     }
 

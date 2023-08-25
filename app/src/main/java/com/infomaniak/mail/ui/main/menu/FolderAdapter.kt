@@ -184,7 +184,7 @@ class FolderAdapter @Inject constructor(
             val isFirstTime = hasCollapsableFolder == null
             val collapsableFolderExistenceHasChanged = newHasCollapsableFolder != hasCollapsableFolder
             if (!isFirstTime && collapsableFolderExistenceHasChanged) {
-                withContext(Dispatchers.Main) { notifyDataSetChanged() }
+                Dispatchers.Main { notifyDataSetChanged() }
             }
 
             hasCollapsableFolder = newHasCollapsableFolder
