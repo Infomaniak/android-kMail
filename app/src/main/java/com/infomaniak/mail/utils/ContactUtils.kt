@@ -21,17 +21,17 @@ import android.Manifest
 import android.content.Context
 import android.provider.ContactsContract.CommonDataKinds.Contactables
 import android.provider.ContactsContract.CommonDataKinds.Email
+import com.infomaniak.lib.core.utils.hasPermissions
 import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.models.correspondent.Contact
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import io.sentry.Sentry
-import io.sentry.android.core.internal.util.Permissions
 
 object ContactUtils {
 
     fun getPhoneContacts(context: Context): MutableMap<Recipient, MergedContact> {
-        if (!Permissions.hasPermission(context, Manifest.permission.READ_CONTACTS)) return mutableMapOf()
+        if (!context.hasPermissions(arrayOf(Manifest.permission.READ_CONTACTS))) return mutableMapOf()
 
         return runCatching {
             val emails = context.getLocalEmails()

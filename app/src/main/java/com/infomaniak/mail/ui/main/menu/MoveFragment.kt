@@ -51,7 +51,7 @@ class MoveFragment : MenuFoldersFragment() {
 
     private val createFolderDialog by lazy { initNewFolderDialog() }
 
-    private val searchResultsAdpater by lazy {
+    private val searchResultsAdapter by lazy {
         FolderAdapter(isInMenuDrawer, shouldIndent = false, onFolderClicked = ::onFolderSelected)
     }
 
@@ -133,7 +133,7 @@ class MoveFragment : MenuFoldersFragment() {
     }
 
     private fun setSearchBarUi(allFolders: List<Folder>) = with(binding) {
-        searchResultsList.adapter = searchResultsAdpater
+        searchResultsList.adapter = searchResultsAdapter
 
         searchInputLayout.setOnClearTextClickListener { trackMoveSearchEvent(SEARCH_DELETE_NAME) }
         searchTextInput.apply {
@@ -164,7 +164,7 @@ class MoveFragment : MenuFoldersFragment() {
 
     private fun observeSearchResults() {
         moveViewModel.filterResults.observe(viewLifecycleOwner) { folders ->
-            searchResultsAdpater.setFolders(folders, currentFolderId)
+            searchResultsAdapter.setFolders(folders, currentFolderId)
         }
     }
 }

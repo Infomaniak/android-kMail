@@ -53,6 +53,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.*
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter.ThreadListViewHolder
 import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import dagger.hilt.android.qualifiers.ActivityContext
 import javax.inject.Inject
 import kotlin.math.abs
@@ -122,7 +123,7 @@ class ThreadListAdapter @Inject constructor(
         return ThreadListViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: ThreadListViewHolder, position: Int, payloads: MutableList<Any>) {
+    override fun onBindViewHolder(holder: ThreadListViewHolder, position: Int, payloads: MutableList<Any>) = runCatchingRealm {
         val payload = payloads.firstOrNull()
         if (payload is NotificationType && holder.itemViewType == DisplayType.THREAD.layout) {
             val binding = holder.binding as CardviewThreadItemBinding
@@ -135,7 +136,7 @@ class ThreadListAdapter @Inject constructor(
         } else {
             super.onBindViewHolder(holder, position, payloads)
         }
-    }
+    }.getOrDefault(Unit)
 
     override fun onBindViewHolder(item: Any, viewHolder: ThreadListViewHolder, position: Int) = with(viewHolder.binding) {
         when (getItemViewType(position)) {
@@ -147,7 +148,7 @@ class ThreadListAdapter @Inject constructor(
         }
     }
 
-    override fun getItemViewType(position: Int): Int {
+    override fun getItemViewType(position: Int): Int = runCatchingRealm {
         val item = dataSet[position]
         return when {
             item is String -> DisplayType.DATE_SEPARATOR.layout
@@ -156,15 +157,15 @@ class ThreadListAdapter @Inject constructor(
             displaySeeAllButton -> DisplayType.SEE_ALL_BUTTON.layout
             else -> DisplayType.THREAD.layout
         }
-    }
+    }.getOrDefault(super.getItemViewType(position))
 
-    override fun getItemId(position: Int): Long {
+    override fun getItemId(position: Int): Long = runCatchingRealm {
         return when (val item = dataSet[position]) {
             is Thread -> item.uid.hashCode().toLong()
             is String -> item.hashCode().toLong()
             else -> super.getItemId(position)
         }
-    }
+    }.getOrDefault(super.getItemId(position))
 
     private fun CardviewThreadItemBinding.displayThread(thread: Thread) {
         setupThreadDensityDependentUi()
@@ -421,9 +422,9 @@ class ThreadListAdapter @Inject constructor(
 
     override fun createDiffUtil(oldList: List<Any>, newList: List<Any>): DragDropSwipeDiffCallback<Any>? = null
 
-    override fun updateList(itemList: List<Thread>) {
+    override fun updateList(itemList: List<Thread>) = runCatchingRealm {
         dataSet = formatList(itemList, recyclerView.context, folderRole, localSettings.threadDensity, isLoadMoreDisplayed)
-    }
+    }.getOrDefault(Unit)
 
     fun updateContacts(newContacts: MergedContactDictionary) {
         contacts = newContacts

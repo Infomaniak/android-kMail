@@ -1,11 +1,5 @@
 buildscript {
 
-    ext {
-        compileSdk = 33
-        minSdk = 25
-        targetSdk = 33
-    }
-
     dependencies {
         classpath libs.navigation.safeargs
         classpath libs.google.services

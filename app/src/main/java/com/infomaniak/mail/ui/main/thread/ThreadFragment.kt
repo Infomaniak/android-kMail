@@ -101,7 +101,7 @@ class ThreadFragment : Fragment() {
     private var isFirstTimeLeaving = AtomicBoolean(true)
 
     override fun onConfigurationChanged(newConfig: Configuration) {
-        threadAdapter.rerenderMails()
+        threadAdapter.reRenderMails()
         super.onConfigurationChanged(newConfig)
     }
 
