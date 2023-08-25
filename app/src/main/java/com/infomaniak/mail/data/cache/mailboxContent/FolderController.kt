@@ -61,12 +61,12 @@ class FolderController @Inject constructor(private val mailboxContentRealm: Real
         return getFolderQuery(Folder.rolePropertyName, role.name, mailboxContentRealm()).find()
     }
 
-    fun getFolderAsync(id: String): Flow<Folder> {
-        return getFolderQuery(Folder::id.name, id, mailboxContentRealm()).asFlow().mapNotNull { it.obj }
-    }
-
     fun getRootFolder(name: String) = with(mailboxContentRealm()) {
         query<Folder>("$isRootFolder AND ${Folder::name.name} == $0", name).first().find()
+    }
+
+    fun getFolderAsync(id: String): Flow<Folder> {
+        return getFolderQuery(Folder::id.name, id, mailboxContentRealm()).asFlow().mapNotNull { it.obj }
     }
     //endregion
 
