@@ -35,21 +35,38 @@ import com.infomaniak.mail.ui.main.menu.FolderAdapter.FolderViewHolder
 import com.infomaniak.mail.utils.UnreadDisplay
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.views.itemViews.*
+import kotlinx.coroutines.CoroutineScope
+import javax.inject.Inject
 import kotlin.math.min
 
-class FolderAdapter(
-    private val isInMenuDrawer: Boolean,
-    private var currentFolderId: String? = null,
-    private val shouldIndent: Boolean = true,
-    private val onFolderClicked: (folderId: String) -> Unit,
-    private val onCollapseClicked: ((folderId: String, shouldCollapse: Boolean) -> Unit)? = null,
+class FolderAdapter @Inject constructor(
+    private val globalCoroutineScope: CoroutineScope,
 ) : RecyclerView.Adapter<FolderViewHolder>() {
 
     private val foldersDiffer = AsyncListDiffer(this, FolderDiffCallback())
 
     private inline val folders get() = foldersDiffer.currentList
 
+    private var currentFolderId: String? = null
     private var hasCollapsableFolder: Boolean? = null
+
+    private var isInMenuDrawer: Boolean = true
+    private var shouldIndent: Boolean = true
+    private lateinit var onFolderClicked: (folderId: String) -> Unit
+    private var onCollapseClicked: ((folderId: String, shouldCollapse: Boolean) -> Unit)? = null
+
+    operator fun invoke(
+        isInMenuDrawer: Boolean,
+        shouldIndent: Boolean = true,
+        onFolderClicked: (folderId: String) -> Unit,
+        onCollapseClicked: ((folderId: String, shouldCollapse: Boolean) -> Unit)? = null,
+    ): FolderAdapter {
+        this.isInMenuDrawer = isInMenuDrawer
+        this.shouldIndent = shouldIndent
+        this.onFolderClicked = onFolderClicked
+        this.onCollapseClicked = onCollapseClicked
+        return this
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FolderViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)

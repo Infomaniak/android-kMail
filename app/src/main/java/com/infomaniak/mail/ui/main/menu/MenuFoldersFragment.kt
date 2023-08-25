@@ -31,6 +31,12 @@ import javax.inject.Inject
 @AndroidEntryPoint
 abstract class MenuFoldersFragment : Fragment() {
 
+    @Inject
+    lateinit var defaultFolderAdapter: FolderAdapter
+
+    @Inject
+    lateinit var customFolderAdapter: FolderAdapter
+
     protected val mainViewModel: MainViewModel by activityViewModels()
 
     protected abstract val defaultFoldersList: RecyclerView
@@ -39,11 +45,11 @@ abstract class MenuFoldersFragment : Fragment() {
     protected abstract val isInMenuDrawer: Boolean
 
     protected val defaultFoldersAdapter: FolderAdapter by lazy {
-        FolderAdapter(isInMenuDrawer, onFolderClicked = ::onFolderSelected)
+        defaultFolderAdapter(isInMenuDrawer, onFolderClicked = ::onFolderSelected)
     }
 
     protected val customFoldersAdapter: FolderAdapter by lazy {
-        FolderAdapter(isInMenuDrawer, onFolderClicked = ::onFolderSelected, onCollapseClicked = ::onFolderCollapse)
+        customFolderAdapter(isInMenuDrawer, onFolderClicked = ::onFolderSelected, onCollapseClicked = ::onFolderCollapse)
     }
 
     @Inject
