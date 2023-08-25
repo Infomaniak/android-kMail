@@ -28,6 +28,7 @@ import com.google.android.material.button.MaterialButton
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.ACTION_POSTPONE_NAME
 import com.infomaniak.mail.MatomoMail.trackEvent
+import com.infomaniak.mail.MatomoMail.trackExternalEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.AppSettings
@@ -72,11 +73,14 @@ class NewMessageActivity : BaseActivity() {
         var externalRecipientQuantity = 0
 
         closeButton.setOnClickListener {
+            trackExternalEvent("bannerManuallyClosed")
             manuallyClosed = true
             externalBanner.isGone = true
         }
 
         informationButton.setOnClickListener {
+            trackExternalEvent("bannerInfo")
+
             val description = resources.getQuantityString(
                 R.plurals.externalDialogDescriptionRecipient,
                 externalRecipientQuantity,
@@ -91,7 +95,7 @@ class NewMessageActivity : BaseActivity() {
             ).show()
         }
 
-        newMessageViewModel.isExternalBannerVisible.observe(this@NewMessageActivity) { (email, externalQuantity) ->
+        newMessageViewModel.externalRecipientCount.observe(this@NewMessageActivity) { (email, externalQuantity) ->
             externalBanner.isGone = manuallyClosed || externalQuantity == 0
             externalRecipientEmail = email
             externalRecipientQuantity = externalQuantity

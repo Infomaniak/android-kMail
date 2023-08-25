@@ -64,12 +64,28 @@ object MatomoMail : MatomoCore {
         trackScreen(displayName.substringAfter("${BuildConfig.APPLICATION_ID}:id"), label.toString())
     }
 
-    fun Context.trackSendingDraftEvent(action: DraftAction, draft: Draft) = with(draft) {
+    fun Context.trackSendingDraftEvent(
+        action: DraftAction,
+        draft: Draft,
+        externalMailFlagEnabled: Boolean,
+    ) = with(draft) {
         trackNewMessageEvent(action.matomoValue)
         if (action == DraftAction.SEND) {
             val trackerData = listOf("numberOfTo" to to, "numberOfCc" to cc, "numberOfBcc" to bcc)
             trackerData.forEach { (eventName, recipients) ->
                 trackNewMessageEvent(eventName, TrackerAction.DATA, recipients.size.toFloat())
+            }
+
+            if (externalMailFlagEnabled) {
+                var externalRecipientCount = 0
+                listOf(draft.to, draft.cc, draft.bcc).forEach { field ->
+                    field.forEach { recipient ->
+                        externalRecipientCount += if (recipient.displayAsExternal) 1 else 0
+                    }
+                }
+
+                trackExternalEvent("emailSentWithExternals", TrackerAction.DATA, externalRecipientCount > 0)
+                trackExternalEvent("emailSentExternalQuantity", TrackerAction.DATA, externalRecipientCount.toFloat())
             }
         }
     }
@@ -182,6 +198,18 @@ object MatomoMail : MatomoCore {
 
     fun Fragment.trackInvalidPasswordMailboxEvent(name: String) {
         trackEvent("invalidPasswordMailbox", name)
+    }
+
+    fun Fragment.trackExternalEvent(name: String, action: TrackerAction = TrackerAction.CLICK, value: Float? = null) {
+        context?.trackExternalEvent(name, action, value)
+    }
+
+    fun Context.trackExternalEvent(name: String, action: TrackerAction = TrackerAction.CLICK, value: Float? = null) {
+        trackEvent("externals", name, action, value)
+    }
+
+    fun Context.trackExternalEvent(name: String, action: TrackerAction = TrackerAction.CLICK, value: Boolean) {
+        trackEvent("externals", name, action, value.toFloat())
     }
 
     // We need to invert this logical value to keep a coherent value for analytics because actions
