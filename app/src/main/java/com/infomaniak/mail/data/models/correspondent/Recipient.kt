@@ -25,6 +25,7 @@ import io.realm.kotlin.types.annotations.Ignore
 import kotlinx.parcelize.Parceler
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 @Parcelize
 @Serializable
@@ -33,15 +34,27 @@ open class Recipient : EmbeddedRealmObject, Correspondent {
     override var email: String = ""
     override var name: String = ""
 
+    //region UI data (Transient & Ignore)
+    @Transient
+    @Ignore
+    var displayAsExternal: Boolean = false
+        private set
+    //endregion
+
     @delegate:Ignore
     override val initials by lazy { computeInitials() }
 
-    fun initLocalValues(email: String? = null, name: String? = null): Recipient {
+    fun initLocalValues(email: String? = null, name: String? = null, displayAsExternal: Boolean = false): Recipient {
 
         email?.let { this.email = it }
         name?.let { this.name = it }
+        initDisplayAsExternal(displayAsExternal)
 
         return this
+    }
+
+    fun initDisplayAsExternal(shouldDisplayAsExternal: Boolean) {
+        displayAsExternal = shouldDisplayAsExternal
     }
 
     fun isExternal(emailDictionary: MergedContactDictionary, aliases: List<String>): Boolean {

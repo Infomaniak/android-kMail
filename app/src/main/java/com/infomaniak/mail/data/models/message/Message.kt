@@ -122,12 +122,12 @@ class Message : RealmObject {
     var shortUid: Int = -1
     //endregion
 
-    //region UI data (Ignore & Transient)
-    @Ignore
+    //region UI data (Transient & Ignore)
     @Transient
+    @Ignore
     var detailsAreExpanded = false
-    @Ignore
     @Transient
+    @Ignore
     var hasQuote = false
     //endregion
 
