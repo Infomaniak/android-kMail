@@ -19,12 +19,14 @@ package com.infomaniak.mail.ui.main.menu
 
 import android.app.Application
 import androidx.lifecycle.*
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.coroutineContext
+import com.infomaniak.mail.utils.getCustomMenuFolders
 import com.infomaniak.mail.utils.standardize
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -37,6 +39,7 @@ import javax.inject.Inject
 class MoveViewModel @Inject constructor(
     application: Application,
     private val savedStateHandle: SavedStateHandle,
+    private val folderController: FolderController,
     private val messageController: MessageController,
     private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -55,12 +58,14 @@ class MoveViewModel @Inject constructor(
         filterJob?.cancel()
     }
 
-    fun getFolderId() = liveData(ioCoroutineContext) {
-        val folderId = messageUid?.let {
-            messageController.getMessage(it)!!.folderId
-        } ?: threadController.getThread(threadsUids.first())!!.folderId
+    fun getFolderIdAndCustomFolders() = liveData(ioCoroutineContext) {
 
-        emit(folderId)
+        val folderId = messageUid?.let { messageController.getMessage(it)!!.folderId }
+            ?: threadController.getThread(threadsUids.first())!!.folderId
+
+        val customFolders = folderController.getCustomFolders().getCustomMenuFolders()
+
+        emit(folderId to customFolders)
     }
 
     fun filterFolders(query: String, folders: List<Folder>, shouldDebounce: Boolean) = viewModelScope.launch(ioCoroutineContext) {

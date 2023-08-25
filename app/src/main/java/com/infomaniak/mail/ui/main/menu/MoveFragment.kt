@@ -75,7 +75,7 @@ class MoveFragment : MenuFoldersFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupListeners()
-        observeFolderId()
+        setupFolderAdapters()
         observeNewFolderCreation()
         observeSearchResults()
     }
@@ -94,22 +94,19 @@ class MoveFragment : MenuFoldersFragment() {
         }
     }
 
-    private fun observeFolderId() {
-        moveViewModel.getFolderId().observe(viewLifecycleOwner, ::setAdaptersFolders)
-    }
+    private fun setupFolderAdapters() {
+        moveViewModel.getFolderIdAndCustomFolders().observe(viewLifecycleOwner) { (folderId, customFolders) ->
 
-    private fun setAdaptersFolders(folderId: String) {
-        currentFolderId = folderId
+            currentFolderId = folderId
 
-        val defaultFoldersWithoutDraft = mainViewModel.currentDefaultFoldersLive.value!!.let { folders ->
-            folders.filterNot { it.role == FolderRole.DRAFT }
+            val defaultFoldersWithoutDraft = mainViewModel.currentDefaultFoldersLive.value!!.let { folders ->
+                folders.filterNot { it.role == FolderRole.DRAFT }
+            }
+
+            defaultFoldersAdapter.setFolders(defaultFoldersWithoutDraft, folderId)
+            customFoldersAdapter.setFolders(customFolders, folderId)
+            setSearchBarUi(allFolders = defaultFoldersWithoutDraft + customFolders)
         }
-
-        val customFolders = mainViewModel.currentCustomFoldersLive.value!!
-
-        defaultFoldersAdapter.setFolders(defaultFoldersWithoutDraft, folderId)
-        customFoldersAdapter.setFolders(customFolders, folderId)
-        setSearchBarUi(allFolders = defaultFoldersWithoutDraft + customFolders)
     }
 
     private fun observeNewFolderCreation() {
