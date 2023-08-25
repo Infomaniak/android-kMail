@@ -354,7 +354,7 @@ class NewMessageFragment : Fragment() {
 
         if (shouldWarnForExternal) {
             val (externalRecipientEmail, externalRecipientQuantity) = draft.findExternalRecipient(aliases, emailDictionary)
-            newMessageViewModel.isExternalBannerVisible.value = externalRecipientEmail to externalRecipientQuantity
+            newMessageViewModel.externalRecipientCount.value = externalRecipientEmail to externalRecipientQuantity
         }
 
         newMessageViewModel.updateIsSendingAllowed()
@@ -414,14 +414,14 @@ class NewMessageFragment : Fragment() {
             externalRecipientQuantity += quantityForThisField
 
             if (externalRecipientQuantity > 1) {
-                newMessageViewModel.isExternalBannerVisible.value = null to 2
+                newMessageViewModel.externalRecipientCount.value = null to 2
                 return
             }
 
             if (quantityForThisField == 1) externalRecipientEmail = singleEmail
         }
 
-        newMessageViewModel.isExternalBannerVisible.value = externalRecipientEmail to externalRecipientQuantity
+        newMessageViewModel.externalRecipientCount.value = externalRecipientEmail to externalRecipientQuantity
     }
 
     private fun WebView.loadContent(html: String, webViewGroup: Group) {
@@ -605,7 +605,12 @@ class NewMessageFragment : Fragment() {
             val isFinishing = requireActivity().isFinishing
             val isTaskRoot = requireActivity().isTaskRoot
             val action = if (shouldSendInsteadOfSave) DraftAction.SEND else DraftAction.SAVE
-            executeDraftActionWhenStopping(action, isFinishing, isTaskRoot, ::startWorker)
+            executeDraftActionWhenStopping(
+                action = action,
+                isFinishing = isFinishing,
+                isTaskRoot = isTaskRoot,
+                startWorkerCallback = ::startWorker
+            )
         } else {
             shouldExecuteDraftActionWhenStopping = true
         }

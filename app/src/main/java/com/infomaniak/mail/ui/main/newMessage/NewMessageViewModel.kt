@@ -24,6 +24,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.utils.*
+import com.infomaniak.mail.MatomoMail.trackExternalEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.MatomoMail.trackSendingDraftEvent
 import com.infomaniak.mail.R
@@ -98,7 +99,7 @@ class NewMessageViewModel @Inject constructor(
     val isInitSuccess = SingleLiveEvent<Boolean>()
     val importedAttachments = MutableLiveData<Pair<MutableList<Attachment>, ImportationResult>>()
     val isSendingAllowed = MutableLiveData(false)
-    val isExternalBannerVisible = MutableLiveData<Pair<String?, Int>>()
+    val externalRecipientCount = MutableLiveData<Pair<String?, Int>>()
 
     val snackBarManager by lazy { SnackBarManager() }
     var shouldExecuteDraftActionWhenStopping = true
@@ -415,6 +416,7 @@ class NewMessageViewModel @Inject constructor(
         updateIsSendingAllowed()
         saveDraftDebouncing()
         context.trackNewMessageEvent("deleteRecipient")
+        context.trackExternalEvent("deleteRecipient")
     }
 
     fun updateMailSubject(newSubject: String?) = with(draft) {
@@ -453,7 +455,7 @@ class NewMessageViewModel @Inject constructor(
             return@launch
         }
 
-        context.trackSendingDraftEvent(action, draft)
+        context.trackSendingDraftEvent(action, draft, currentMailbox.externalMailFlagEnabled)
         saveDraftToLocal(action)
         showDraftToastToUser(action, isFinishing, isTaskRoot)
         startWorkerCallback()
