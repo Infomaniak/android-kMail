@@ -49,7 +49,6 @@ import com.infomaniak.mail.utils.MergedContactDictionary
 import com.infomaniak.mail.utils.UiUtils.dividerDrawable
 import com.infomaniak.mail.utils.isEmail
 import com.infomaniak.mail.utils.toggleChevron
-import kotlinx.parcelize.Parcelize
 import kotlin.math.min
 
 class RecipientFieldView @JvmOverloads constructor(
@@ -282,9 +281,9 @@ class RecipientFieldView @JvmOverloads constructor(
 
         singleChip.root.apply {
             isGone = isTextInputAccessible
-            val styledRecipient = contactChipAdapter.getRecipients().firstOrNull()
-            text = styledRecipient?.getNameOrEmail() ?: ""
-            setChipStyle(styledRecipient?.displayAsExternal == true)
+            val recipient = contactChipAdapter.getRecipients().firstOrNull()
+            text = recipient?.getNameOrEmail() ?: ""
+            setChipStyle(recipient?.displayAsExternal == true)
         }
         plusChip.apply {
             isGone = !isCollapsed || contactChipAdapter.itemCount <= 1
@@ -322,7 +321,7 @@ class RecipientFieldView @JvmOverloads constructor(
         }
         val recipientIsNew = contactAdapter.addUsedContact(email)
         if (recipientIsNew) {
-            val recipient = StyledRecipient(email, name, displayAsExternal = false)
+            val recipient = Recipient().initLocalValues(email, name, displayAsExternal = false)
             contactChipAdapter.addChip(recipient)
             onContactAdded?.invoke(recipient)
             clearField()
@@ -389,8 +388,8 @@ class RecipientFieldView @JvmOverloads constructor(
 
         initialRecipients.forEach { recipient ->
             val shouldDisplayAsExternal = shouldWarnForExternalContacts && recipient.isExternal(emailDictionary, aliases)
-            val styledRecipient = StyledRecipient(recipient, shouldDisplayAsExternal)
-            if (contactChipAdapter.addChip(styledRecipient)) contactAdapter.addUsedContact(recipient.email)
+            recipient.initDisplayAsExternal(shouldDisplayAsExternal)
+            if (contactChipAdapter.addChip(recipient)) contactAdapter.addUsedContact(recipient.email)
         }
 
         updateCollapsedChipValues(isSelfCollapsed)
@@ -447,19 +446,5 @@ class RecipientFieldView @JvmOverloads constructor(
                 chipStrokeWidth = NO_STROKE
             }
         }
-    }
-
-    @Parcelize
-    class StyledRecipient(
-        private val inputEmail: String,
-        private val inputName: String,
-        val displayAsExternal: Boolean,
-    ) : Recipient() {
-
-        init {
-            initLocalValues(inputEmail, inputName)
-        }
-
-        constructor(recipient: Recipient, displayAsExternal: Boolean) : this(recipient.email, recipient.name, displayAsExternal)
     }
 }
