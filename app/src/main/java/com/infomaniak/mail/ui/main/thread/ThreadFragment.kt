@@ -21,11 +21,16 @@ import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
+import android.text.Spannable
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.ColorUtils
+import androidx.core.text.toSpannable
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -59,6 +64,7 @@ import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialog
 import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipients
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
 import com.infomaniak.mail.utils.UiUtils.dividerDrawable
 import dagger.hilt.android.AndroidEntryPoint
@@ -126,10 +132,25 @@ class ThreadFragment : Fragment() {
             observeContacts()
             observeQuickActionBarClicks()
             observeOpenAttachment()
+            observerSubjectUpdateTrigger()
         }
 
         permissionUtils.registerDownloadManagerPermission()
         mainViewModel.toggleLightThemeForMessage.observe(viewLifecycleOwner, threadAdapter::toggleLightMode)
+    }
+
+    private fun observerSubjectUpdateTrigger() {
+        threadViewModel.threadAndMergedContactAndMailboxMediator(
+            mergedContactsLive = mainViewModel.mergedContactsLive,
+        ).observe(viewLifecycleOwner) { (thread, mergedContacts, mailbox) ->
+            thread?.let {
+                val emailDictionary = mergedContacts ?: emptyMap()
+                val aliases = mailbox?.aliases ?: emptyList()
+                val externalMailFlagEnabled = mailbox?.externalMailFlagEnabled ?: false
+
+                setSubject(thread, emailDictionary, aliases, externalMailFlagEnabled)
+            }
+        }
     }
 
     private fun setupUi() = with(binding) {
@@ -409,9 +430,7 @@ class ThreadFragment : Fragment() {
             return@with
         }
 
-        val subject = context.formatSubject(thread.subject)
-        threadSubject.text = subject
-        toolbarSubject.text = subject
+        threadSubject.movementMethod = LinkMovementMethod.getInstance()
 
         iconFavorite.apply {
             setIconResource(if (thread.isFavorite) R.drawable.ic_star_filled else R.drawable.ic_star)
@@ -424,6 +443,88 @@ class ThreadFragment : Fragment() {
         }
 
         isFavorite = thread.isFavorite
+    }
+
+    private fun setSubject(
+        thread: Thread,
+        emailDictionary: MergedContactDictionary,
+        aliases: List<String>,
+        externalMailFlagEnabled: Boolean,
+    ) = with(binding) {
+        val (subject, spannedSubject) = computeSubject(thread, emailDictionary, aliases, externalMailFlagEnabled)
+        threadSubject.text = spannedSubject
+        toolbarSubject.text = subject
+    }
+
+    private fun computeSubject(
+        thread: Thread,
+        emailDictionary: MergedContactDictionary,
+        aliases: List<String>,
+        externalMailFlagEnabled: Boolean,
+    ): Pair<String, CharSequence> = with(binding) {
+        val subject = context.formatSubject(thread.subject)
+        if (!externalMailFlagEnabled) return subject to subject
+
+        val (externalRecipientEmail, externalRecipientQuantity) = thread.findExternalRecipients(emailDictionary, aliases)
+        if (externalRecipientQuantity == 0) return subject to subject
+
+        val externalPostfix = getString(R.string.externalTag)
+        val postfixedSubject = "${subject}${EXTERNAL_TAG_SEPARATOR}${externalPostfix}"
+
+        val spannedSubject = postfixedSubject.toSpannable().apply {
+            val startIndex = subject.length + EXTERNAL_TAG_SEPARATOR.length
+            val endIndex = startIndex + externalPostfix.length
+
+            setExternalTagSpan(startIndex, endIndex)
+
+            setClickableSpan(startIndex, endIndex) {
+                val description = resources.getQuantityString(
+                    R.plurals.externalDialogDescriptionExpeditor,
+                    externalRecipientQuantity,
+                    externalRecipientEmail,
+                )
+
+                // TODO : Reuse instance
+                createInformationDialog(
+                    title = getString(R.string.externalDialogTitleExpeditor),
+                    description = description,
+                    confirmButtonText = R.string.externalDialogConfirmButton,
+                ).show()
+            }
+        }
+
+        return subject to spannedSubject
+    }
+
+    private fun Spannable.setExternalTagSpan(startIndex: Int, endIndex: Int) = with(binding) {
+        val backgroundColor = context.getColor(R.color.externalTagBackground)
+        val textColor = context.getColor(R.color.externalTagOnBackground)
+        val textTypeface = ResourcesCompat.getFont(context, R.font.external_tag_font)!!
+        val textSize = resources.getDimensionPixelSize(R.dimen.externalTagTextSize).toFloat()
+        setSpan(
+            RoundedBackgroundSpan(
+                backgroundColor = backgroundColor,
+                textColor = textColor,
+                textTypeface = textTypeface,
+                fontSize = textSize,
+            ),
+            startIndex,
+            endIndex,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+        )
+    }
+
+    private fun Spannable.setClickableSpan(startIndex: Int, endIndex: Int, onClick: () -> Unit) {
+        // TODO : Currently, the clickable zone extends beyond the span up to the edge of the textview. This is the same
+        //  comportment that Gmail has. See if we can find a fix for this later
+        setSpan(
+            object : ClickableSpan() {
+                override fun onClick(widget: View) = onClick()
+            },
+            startIndex,
+            endIndex,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+        )
     }
 
     private fun onMessagesUpdate(messages: List<Message>) {
@@ -448,6 +549,7 @@ class ThreadFragment : Fragment() {
     private companion object {
         const val COLLAPSE_TITLE_THRESHOLD = 0.5
         const val ARCHIVE_INDEX = 2
+        const val EXTERNAL_TAG_SEPARATOR = " "
 
         fun allAttachmentsFileName(subject: String) = "ikMail-attachments-$subject.zip"
     }

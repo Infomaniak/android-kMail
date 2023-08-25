@@ -31,6 +31,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.*
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -68,6 +69,29 @@ class ThreadViewModel @Inject constructor(
 
     val messagesLive = liveData(ioCoroutineContext) {
         messageController.getSortedMessages(threadUid)?.asFlow()?.asLiveData()?.let { emitSource(it) }
+    }
+
+    private val currentMailboxLive = MailboxController.getMailboxAsync(
+        AccountUtils.currentUserId,
+        AccountUtils.currentMailboxId,
+    ).map { it.obj }.asLiveData(ioCoroutineContext)
+
+    fun threadAndMergedContactAndMailboxMediator(
+        mergedContactsLive: LiveData<MergedContactDictionary?>,
+    ): LiveData<Triple<Thread?, MergedContactDictionary?, Mailbox?>> {
+        return MediatorLiveData<Triple<Thread?, MergedContactDictionary?, Mailbox?>>().apply {
+            addSource(threadLive) { first ->
+                value = Triple(first, value?.second, value?.third)
+            }
+
+            addSource(mergedContactsLive) { second ->
+                value = Triple(value?.first, second, value?.third)
+            }
+
+            addSource(currentMailboxLive) { third ->
+                value = Triple(value?.first, value?.second, third)
+            }
+        }
     }
 
     fun openThread() = liveData(ioCoroutineContext) {

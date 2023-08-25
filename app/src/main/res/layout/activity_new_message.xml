@@ -37,6 +37,40 @@
             app:defaultNavHost="true"
             app:navGraph="@navigation/new_message_navigation" />
 
+        <LinearLayout
+            android:id="@+id/externalBanner"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@color/externalTagBackground"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <TextView
+                style="@style/BodySmall"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                android:layout_weight="1"
+                android:text="@string/externalDialogTitleRecipient" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/informationButton"
+                style="@style/IconButtonSmall"
+                android:layout_marginEnd="@dimen/marginStandardMedium"
+                app:icon="@drawable/ic_external_information"
+                app:iconTint="@color/externalTagOnBackground" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/closeButton"
+                style="@style/IconButtonSmall"
+                android:layout_marginEnd="@dimen/marginStandardSmall"
+                app:icon="@drawable/ic_close_small"
+                app:iconTint="@color/externalTagOnBackground" />
+
+        </LinearLayout>
+
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/editor"
             style="@style/CardViewMail"

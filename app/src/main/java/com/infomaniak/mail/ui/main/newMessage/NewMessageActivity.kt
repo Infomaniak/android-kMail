@@ -36,10 +36,7 @@ import com.infomaniak.mail.databinding.ActivityNewMessageBinding
 import com.infomaniak.mail.ui.BaseActivity
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.MainActivity
-import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.createDescriptionDialog
-import com.infomaniak.mail.utils.getAttributeColor
-import com.infomaniak.mail.utils.updateNavigationBarColor
+import com.infomaniak.mail.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 import com.google.android.material.R as RMaterial
 
@@ -63,8 +60,42 @@ class NewMessageActivity : BaseActivity() {
         setupSnackBar()
         setupSendButton()
         setupSystemBars()
+        setupExternalBanner()
 
         observeInitSuccess()
+    }
+
+    private fun setupExternalBanner() = with(binding) {
+        var manuallyClosed = false
+
+        var externalRecipientEmail: String? = null
+        var externalRecipientQuantity = 0
+
+        closeButton.setOnClickListener {
+            manuallyClosed = true
+            externalBanner.isGone = true
+        }
+
+        informationButton.setOnClickListener {
+            val description = resources.getQuantityString(
+                R.plurals.externalDialogDescriptionRecipient,
+                externalRecipientQuantity,
+                externalRecipientEmail,
+            )
+
+            // TODO : Reuse instance
+            createInformationDialog(
+                title = getString(R.string.externalDialogTitleRecipient),
+                description = description,
+                confirmButtonText = R.string.externalDialogConfirmButton,
+            ).show()
+        }
+
+        newMessageViewModel.isExternalBannerVisible.observe(this@NewMessageActivity) { (email, externalQuantity) ->
+            externalBanner.isGone = manuallyClosed || externalQuantity == 0
+            externalRecipientEmail = email
+            externalRecipientQuantity = externalQuantity
+        }
     }
 
     private fun isAuth(): Boolean {

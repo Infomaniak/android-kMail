@@ -219,6 +219,18 @@
     <string name="errorTooManyRecipients">Too many recipients</string>
     <string name="errorUnableToCreateFolder">Unable to create the folder</string>
     <string name="errorUnableToFlushFolder">Folder cannot be emptied</string>
+    <string name="externalDialogConfirmButton">I understand</string>
+    <plurals name="externalDialogDescriptionExpeditor">
+        <item quantity="one">The sender %s is not part of your organization or your contacts. Be careful if you are sharing sensitive information.</item>
+        <item quantity="other">Some senders are not part of your organization or your contacts. Be careful if you are sharing sensitive information.</item>
+    </plurals>
+    <plurals name="externalDialogDescriptionRecipient">
+        <item quantity="one">The recipient %s is not part of your organization or your contacts. Be careful if you are sharing sensitive information.</item>
+        <item quantity="other">Some recipients are not part of your organization or your contacts. Be careful if you are sharing sensitive information.</item>
+    </plurals>
+    <string name="externalDialogTitleExpeditor">External expeditor</string>
+    <string name="externalDialogTitleRecipient">External recipient</string>
+    <string name="externalTag">External</string>
     <string name="failToOpenDraft">Failed to open draft</string>
     <string name="favoritesFolder">Favorites</string>
     <string name="fromTitle">From:</string>

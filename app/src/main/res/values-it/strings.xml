@@ -212,6 +212,18 @@
     <string name="errorTooManyRecipients">Troppi destinatari</string>
     <string name="errorUnableToCreateFolder">Impossibile creare la cartella</string>
     <string name="errorUnableToFlushFolder">Impossibile svuotare la cartella</string>
+    <string name="externalDialogConfirmButton">Capisco</string>
+    <plurals name="externalDialogDescriptionExpeditor">
+        <item quantity="one">Il mittente %s non fa parte della vostra organizzazione o dei vostri contatti. Fate attenzione se state condividendo informazioni sensibili.</item>
+        <item quantity="other">Alcuni mittenti non fanno parte della vostra organizzazione o dei vostri contatti. Fate attenzione se state condividendo informazioni sensibili.</item>
+    </plurals>
+    <plurals name="externalDialogDescriptionRecipient">
+        <item quantity="one">Il destinatario %s non fa parte della vostra organizzazione o dei vostri contatti. Fate attenzione se state condividendo informazioni sensibili.</item>
+        <item quantity="other">Alcuni destinatari non fanno parte della vostra organizzazione o dei vostri contatti. Fate attenzione se condividete informazioni sensibili.</item>
+    </plurals>
+    <string name="externalDialogTitleExpeditor">Spedizioniere esterno</string>
+    <string name="externalDialogTitleRecipient">Destinatario esterno</string>
+    <string name="externalTag">Esterno</string>
     <string name="failToOpenDraft">Impossibile aprire la bozza</string>
     <string name="favoritesFolder">Preferiti</string>
     <string name="fromTitle">Da:</string>

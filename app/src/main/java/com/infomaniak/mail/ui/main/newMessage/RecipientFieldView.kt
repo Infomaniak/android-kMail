@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.newMessage
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.drawable.InsetDrawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -32,6 +33,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
+import com.google.android.material.chip.Chip
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.hideKeyboard
 import com.infomaniak.lib.core.utils.showKeyboard
@@ -47,6 +49,7 @@ import com.infomaniak.mail.utils.MergedContactDictionary
 import com.infomaniak.mail.utils.UiUtils.dividerDrawable
 import com.infomaniak.mail.utils.isEmail
 import com.infomaniak.mail.utils.toggleChevron
+import kotlinx.parcelize.Parcelize
 import kotlin.math.min
 
 class RecipientFieldView @JvmOverloads constructor(
@@ -279,7 +282,9 @@ class RecipientFieldView @JvmOverloads constructor(
 
         singleChip.root.apply {
             isGone = isTextInputAccessible
-            text = contactChipAdapter.getRecipients().firstOrNull()?.getNameOrEmail() ?: ""
+            val styledRecipient = contactChipAdapter.getRecipients().firstOrNull()
+            text = styledRecipient?.getNameOrEmail() ?: ""
+            setChipStyle(styledRecipient?.displayAsExternal == true)
         }
         plusChip.apply {
             isGone = !isCollapsed || contactChipAdapter.itemCount <= 1
@@ -315,9 +320,9 @@ class RecipientFieldView @JvmOverloads constructor(
             expand()
             binding.chipsRecyclerView.isVisible = true
         }
-        val recipient = Recipient().initLocalValues(email, name)
         val recipientIsNew = contactAdapter.addUsedContact(email)
         if (recipientIsNew) {
+            val recipient = StyledRecipient(email, name, displayAsExternal = false)
             contactChipAdapter.addChip(recipient)
             onContactAdded?.invoke(recipient)
             clearField()
@@ -374,10 +379,18 @@ class RecipientFieldView @JvmOverloads constructor(
         binding.textInput.setText("")
     }
 
-    fun initRecipients(initialRecipients: List<Recipient>, otherFieldsAreAllEmpty: Boolean = true) {
+    fun initRecipients(
+        initialRecipients: List<Recipient>,
+        shouldWarnForExternalContacts: Boolean,
+        emailDictionary: MergedContactDictionary,
+        aliases: List<String>,
+        otherFieldsAreAllEmpty: Boolean = true,
+    ) {
 
-        initialRecipients.forEach {
-            if (contactChipAdapter.addChip(it)) contactAdapter.addUsedContact(it.email)
+        initialRecipients.forEach { recipient ->
+            val shouldDisplayAsExternal = shouldWarnForExternalContacts && recipient.isExternal(emailDictionary, aliases)
+            val styledRecipient = StyledRecipient(recipient, shouldDisplayAsExternal)
+            if (contactChipAdapter.addChip(styledRecipient)) contactAdapter.addUsedContact(recipient.email)
         }
 
         updateCollapsedChipValues(isSelfCollapsed)
@@ -409,8 +422,44 @@ class RecipientFieldView @JvmOverloads constructor(
         binding.chevron.isVisible = canCollapseEverything && otherFieldsAreAllEmpty && !isAutoCompletionOpened
     }
 
-    private companion object {
-        const val MAX_WIDTH_PERCENTAGE = 0.8
-        const val MAX_ALLOWED_RECIPIENT = 99
+    fun findAlreadyExistingExternalRecipientsInFields(): Pair<String?, Int> {
+        val recipients = contactChipAdapter.getRecipients().filter { it.displayAsExternal }
+        val recipientCount = recipients.count()
+        return (if (recipientCount == 1) recipients.single().email else null) to recipientCount
+    }
+
+    companion object {
+        private const val MAX_WIDTH_PERCENTAGE = 0.8
+        private const val MAX_ALLOWED_RECIPIENT = 99
+        private const val EXTERNAL_CHIP_STROKE_WIDTH = 1
+        private const val NO_STROKE = 0.0f
+
+        fun Chip.setChipStyle(displayAsExternal: Boolean) {
+            if (displayAsExternal) {
+                chipBackgroundColor = context.getColorStateList(R.color.chip_contact_background_color_external)
+                setTextColor(context.getColorStateList(R.color.chip_contact_text_color_external))
+                chipStrokeColor = ColorStateList.valueOf(context.getColor(R.color.externalTagBackground))
+                chipStrokeWidth = EXTERNAL_CHIP_STROKE_WIDTH.toPx().toFloat()
+            } else {
+                chipBackgroundColor = context.getColorStateList(R.color.chip_contact_background_color)
+                setTextColor(context.getColorStateList(R.color.chip_contact_text_color))
+                chipStrokeColor = null
+                chipStrokeWidth = NO_STROKE
+            }
+        }
+    }
+
+    @Parcelize
+    class StyledRecipient(
+        private val inputEmail: String,
+        private val inputName: String,
+        val displayAsExternal: Boolean,
+    ) : Recipient() {
+
+        init {
+            initLocalValues(inputEmail, inputName)
+        }
+
+        constructor(recipient: Recipient, displayAsExternal: Boolean) : this(recipient.email, recipient.name, displayAsExternal)
     }
 }

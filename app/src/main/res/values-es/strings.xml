@@ -212,6 +212,18 @@
     <string name="errorTooManyRecipients">Demasiados destinatarios</string>
     <string name="errorUnableToCreateFolder">No se puede crear la carpeta</string>
     <string name="errorUnableToFlushFolder">Imposible vaciar la carpeta</string>
+    <string name="externalDialogConfirmButton">Comprendo</string>
+    <plurals name="externalDialogDescriptionExpeditor">
+        <item quantity="one">El remitente %s no forma parte de tu organización ni de tus contactos. Ten cuidado si compartes información sensible.</item>
+        <item quantity="other">Algunos remitentes no forman parte de tu organización ni de tus contactos. Ten cuidado si compartes información sensible.</item>
+    </plurals>
+    <plurals name="externalDialogDescriptionRecipient">
+        <item quantity="one">El destinatario %s no forma parte de tu organización ni de tus contactos. Ten cuidado si compartes información sensible.</item>
+        <item quantity="other">Algunos destinatarios no forman parte de tu organización ni de tus contactos. Ten cuidado si compartes información sensible.</item>
+    </plurals>
+    <string name="externalDialogTitleExpeditor">Expedidor externo</string>
+    <string name="externalDialogTitleRecipient">Receptor externo</string>
+    <string name="externalTag">Exterior</string>
     <string name="failToOpenDraft">No se ha podido abrir el borrador</string>
     <string name="favoritesFolder">Favoritos</string>
     <string name="fromTitle">De:</string>

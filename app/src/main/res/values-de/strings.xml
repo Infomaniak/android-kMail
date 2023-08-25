@@ -212,6 +212,18 @@
     <string name="errorTooManyRecipients">Zu viele Empfänger</string>
     <string name="errorUnableToCreateFolder">Ordner kann nicht erstellt werden</string>
     <string name="errorUnableToFlushFolder">Der Ordner kann nicht geleert werden</string>
+    <string name="externalDialogConfirmButton">Ich habe verstanden</string>
+    <plurals name="externalDialogDescriptionExpeditor">
+        <item quantity="one">Der Absender %s gehört nicht zu Ihrer Organisation oder Ihren Kontakten. Seien Sie vorsichtig, wenn Sie sensible Informationen weitergeben.</item>
+        <item quantity="other">Manche Absender gehören nicht zu Ihrer Organisation oder Ihren Kontakten. Seien Sie vorsichtig, wenn Sie sensible Informationen weitergeben.</item>
+    </plurals>
+    <plurals name="externalDialogDescriptionRecipient">
+        <item quantity="one">Der Empfänger %s gehört nicht zu Ihrer Organisation oder Ihren Kontakten. Seien Sie vorsichtig, wenn Sie sensible Informationen weitergeben.</item>
+        <item quantity="other">Einige Empfänger gehören nicht zu Ihrer Organisation oder Ihren Kontakten. Seien Sie vorsichtig, wenn Sie sensible Informationen weitergeben.</item>
+    </plurals>
+    <string name="externalDialogTitleExpeditor">Externer Spediteur</string>
+    <string name="externalDialogTitleRecipient">Externer Empfänger</string>
+    <string name="externalTag">Extern</string>
     <string name="failToOpenDraft">Öffnen des Entwurfs fehlgeschlagen</string>
     <string name="favoritesFolder">Favoriten</string>
     <string name="fromTitle">Von:</string>

@@ -15,17 +15,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+@file:UseSerializers(RealmListSerializer::class)
+
 package com.infomaniak.mail.data.models.mailbox
 
 import androidx.core.app.NotificationManagerCompat
+import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Quotas
 import com.infomaniak.mail.utils.UnreadDisplay
+import io.realm.kotlin.ext.realmListOf
+import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import kotlinx.serialization.UseSerializers
 
 @Serializable
 class Mailbox : RealmObject {
@@ -51,6 +57,9 @@ class Mailbox : RealmObject {
     var isLocked: Boolean = false
     @SerialName("unseen_messages")
     var unreadCountRemote: Int = 0
+    var aliases: RealmList<String> = realmListOf()
+    @SerialName("external_mail_flag_enabled")
+    var externalMailFlagEnabled: Boolean = false
     //endregion
 
     //region Local data (Transient)

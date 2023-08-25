@@ -364,26 +364,45 @@ fun List<Message>.getFoldersIds(exception: String? = null) = mapNotNull { if (it
 fun List<Message>.getUids(): List<String> = map { it.uid }
 //endregion
 
+fun Fragment.createInformationDialog(
+    title: String,
+    description: CharSequence,
+    @StringRes confirmButtonText: Int,
+): AlertDialog = requireActivity().createInformationDialog(title, description, confirmButtonText)
+
+fun Activity.createInformationDialog(
+    title: String,
+    description: CharSequence,
+    @StringRes confirmButtonText: Int,
+): AlertDialog = createDescriptionDialog(
+    title = title,
+    description = description,
+    confirmButtonText = confirmButtonText,
+    displayCancelButton = false,
+    onPositiveButtonClicked = {},
+)
+
 fun Fragment.createDescriptionDialog(
     title: String,
     description: CharSequence,
     @StringRes confirmButtonText: Int = R.string.buttonConfirm,
+    displayCancelButton: Boolean = true,
     onPositiveButtonClicked: () -> Unit,
     onDismissed: (() -> Unit)? = null,
-): AlertDialog {
-    return requireActivity().createDescriptionDialog(
-        title,
-        description,
-        confirmButtonText,
-        onPositiveButtonClicked,
-        onDismissed,
-    )
-}
+): AlertDialog = requireActivity().createDescriptionDialog(
+    title,
+    description,
+    confirmButtonText,
+    displayCancelButton,
+    onPositiveButtonClicked,
+    onDismissed,
+)
 
 fun Activity.createDescriptionDialog(
     title: String,
     description: CharSequence,
     @StringRes confirmButtonText: Int = R.string.buttonConfirm,
+    displayCancelButton: Boolean = true,
     onPositiveButtonClicked: () -> Unit,
     onDismissed: (() -> Unit)? = null,
 ) = with(DialogDescriptionBinding.inflate(layoutInflater)) {
@@ -394,7 +413,7 @@ fun Activity.createDescriptionDialog(
     MaterialAlertDialogBuilder(context)
         .setView(root)
         .setPositiveButton(confirmButtonText) { _, _ -> onPositiveButtonClicked() }
-        .setNegativeButton(RCore.string.buttonCancel, null)
+        .also { if (displayCancelButton) it.setNegativeButton(RCore.string.buttonCancel, null) }
         .setOnDismissListener { onDismissed?.invoke() }
         .create()
 }

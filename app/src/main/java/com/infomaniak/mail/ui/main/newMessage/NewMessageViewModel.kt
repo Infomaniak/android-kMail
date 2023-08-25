@@ -98,6 +98,7 @@ class NewMessageViewModel @Inject constructor(
     val isInitSuccess = SingleLiveEvent<Boolean>()
     val importedAttachments = MutableLiveData<Pair<MutableList<Attachment>, ImportationResult>>()
     val isSendingAllowed = MutableLiveData(false)
+    val isExternalBannerVisible = MutableLiveData<Pair<String?, Int>>()
 
     val snackBarManager by lazy { SnackBarManager() }
     var shouldExecuteDraftActionWhenStopping = true
@@ -106,6 +107,8 @@ class NewMessageViewModel @Inject constructor(
     private var snapshot: DraftSnapshot? = null
 
     private var isNewMessage = false
+
+    val currentMailbox by lazy { MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
 
     private val arrivedFromExistingDraft
         inline get() = savedStateHandle.get<Boolean>(NewMessageActivityArgs::arrivedFromExistingDraft.name) ?: false
@@ -132,7 +135,6 @@ class NewMessageViewModel @Inject constructor(
     fun initDraftAndViewModel(): LiveData<Pair<Boolean, List<Signature>>> = liveData(ioCoroutineContext) {
 
         val realm = mailboxContentRealm()
-        val mailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
 
         var signatures = emptyList<Signature>()
 
@@ -176,7 +178,7 @@ class NewMessageViewModel @Inject constructor(
 
         if (isSuccess) {
             dismissNotification()
-            markAsRead(mailbox, realm)
+            markAsRead(currentMailbox, realm)
             selectedSignatureId = draft.identityId!!.toInt()
             saveDraftSnapshot()
             if (draft.cc.isNotEmpty() || draft.bcc.isNotEmpty()) {

@@ -18,6 +18,8 @@
 package com.infomaniak.mail.data.models.correspondent
 
 import android.os.Parcel
+import com.infomaniak.mail.utils.MergedContactDictionary
+import com.infomaniak.mail.utils.isEmail
 import io.realm.kotlin.types.EmbeddedRealmObject
 import io.realm.kotlin.types.annotations.Ignore
 import kotlinx.parcelize.Parceler
@@ -26,7 +28,8 @@ import kotlinx.serialization.Serializable
 
 @Parcelize
 @Serializable
-class Recipient : EmbeddedRealmObject, Correspondent {
+open class Recipient : EmbeddedRealmObject, Correspondent {
+
     override var email: String = ""
     override var name: String = ""
 
@@ -39,6 +42,16 @@ class Recipient : EmbeddedRealmObject, Correspondent {
         name?.let { this.name = it }
 
         return this
+    }
+
+    fun isExternal(emailDictionary: MergedContactDictionary, aliases: List<String>): Boolean {
+        val isUnknownContact = email !in emailDictionary
+        val isMailerDaemon = """mailer-daemon@(?:.+\.)?infomaniak\.ch""".toRegex(RegexOption.IGNORE_CASE).matches(email)
+        val trustedDomains = listOf("@infomaniak.com", "@infomaniak.event", "@swisstransfer.com")
+        val isUntrustedDomain = email.isEmail() && trustedDomains.none { email.endsWith(it) }
+        val isAlias = email in aliases
+
+        return isUnknownContact && !isMailerDaemon && isUntrustedDomain && !isAlias
     }
 
     override fun toString(): String = "($email -> $name)"

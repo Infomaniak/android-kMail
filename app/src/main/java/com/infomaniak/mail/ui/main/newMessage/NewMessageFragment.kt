@@ -65,6 +65,7 @@ import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.*
 import com.infomaniak.mail.ui.main.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipient
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
 import com.infomaniak.mail.workers.DraftsActionsWorker
@@ -256,7 +257,7 @@ class NewMessageFragment : Fragment() {
             autoComplete = autoCompleteTo,
             onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(TO, hasOpened) },
             onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, TO) },
-            onContactRemovedCallback = { newMessageViewModel.removeRecipientFromField(it, TO) },
+            onContactRemovedCallback = { recipient -> recipient.removeInViewModelAndUpdateBannerVisibility(TO) },
             onCopyContactAddressCallback = ::copyRecipientEmailToClipboard,
             gotFocusCallback = { fieldGotFocus(TO) },
             onToggleEverythingCallback = ::openAdvancedFields,
@@ -267,7 +268,7 @@ class NewMessageFragment : Fragment() {
             autoComplete = autoCompleteCc,
             onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(CC, hasOpened) },
             onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, CC) },
-            onContactRemovedCallback = { newMessageViewModel.removeRecipientFromField(it, CC) },
+            onContactRemovedCallback = { recipient -> recipient.removeInViewModelAndUpdateBannerVisibility(CC) },
             onCopyContactAddressCallback = ::copyRecipientEmailToClipboard,
             gotFocusCallback = { fieldGotFocus(CC) },
             setSnackBarCallback = ::setSnackBar,
@@ -277,7 +278,7 @@ class NewMessageFragment : Fragment() {
             autoComplete = autoCompleteBcc,
             onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(BCC, hasOpened) },
             onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, BCC) },
-            onContactRemovedCallback = { newMessageViewModel.removeRecipientFromField(it, BCC) },
+            onContactRemovedCallback = { recipient -> recipient.removeInViewModelAndUpdateBannerVisibility(BCC) },
             onCopyContactAddressCallback = ::copyRecipientEmailToClipboard,
             gotFocusCallback = { fieldGotFocus(BCC) },
             setSnackBarCallback = ::setSnackBar,
@@ -332,13 +333,29 @@ class NewMessageFragment : Fragment() {
         newMessageViewModel.isAutoCompletionOpened = isAutoCompletionOpened
     }
 
+    private fun Recipient.removeInViewModelAndUpdateBannerVisibility(type: FieldType) {
+        newMessageViewModel.removeRecipientFromField(recipient = this, type)
+        updateBannerVisibility()
+    }
+
     private fun populateUiWithViewModel() = with(binding) {
+        val draftMode = newMessageActivityArgs.draftMode
         val draft = newMessageViewModel.draft
+        val aliases = newMessageViewModel.currentMailbox.aliases
+
+        val externalMailFlagEnabled = newMessageViewModel.currentMailbox.externalMailFlagEnabled
+        val shouldWarnForExternal = externalMailFlagEnabled && (draftMode == DraftMode.REPLY || draftMode == DraftMode.REPLY_ALL)
 
         val ccAndBccFieldsAreEmpty = draft.cc.isEmpty() && draft.bcc.isEmpty()
-        toField.initRecipients(draft.to, ccAndBccFieldsAreEmpty)
-        ccField.initRecipients(draft.cc)
-        bccField.initRecipients(draft.bcc)
+        val emailDictionary = newMessageViewModel.mergedContacts.value?.second ?: emptyMap()
+        toField.initRecipients(draft.to, shouldWarnForExternal, emailDictionary, aliases, ccAndBccFieldsAreEmpty)
+        ccField.initRecipients(draft.cc, shouldWarnForExternal, emailDictionary, aliases)
+        bccField.initRecipients(draft.bcc, shouldWarnForExternal, emailDictionary, aliases)
+
+        if (shouldWarnForExternal) {
+            val (externalRecipientEmail, externalRecipientQuantity) = draft.findExternalRecipient(aliases, emailDictionary)
+            newMessageViewModel.isExternalBannerVisible.value = externalRecipientEmail to externalRecipientQuantity
+        }
 
         newMessageViewModel.updateIsSendingAllowed()
 
@@ -386,6 +403,25 @@ class NewMessageFragment : Fragment() {
                 quoteGroup.isGone = true
             }
         }
+    }
+
+    private fun updateBannerVisibility() = with(binding) {
+        var externalRecipientEmail: String? = null
+        var externalRecipientQuantity = 0
+
+        listOf(toField, ccField, bccField).forEach { field ->
+            val (singleEmail, quantityForThisField) = field.findAlreadyExistingExternalRecipientsInFields()
+            externalRecipientQuantity += quantityForThisField
+
+            if (externalRecipientQuantity > 1) {
+                newMessageViewModel.isExternalBannerVisible.value = null to 2
+                return
+            }
+
+            if (quantityForThisField == 1) externalRecipientEmail = singleEmail
+        }
+
+        newMessageViewModel.isExternalBannerVisible.value = externalRecipientEmail to externalRecipientQuantity
     }
 
     private fun WebView.loadContent(html: String, webViewGroup: Group) {
