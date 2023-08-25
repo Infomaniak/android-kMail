@@ -449,7 +449,11 @@ class RecipientFieldView @JvmOverloads constructor(
         private val inputEmail: String,
         private val inputName: String,
         val displayAsExternal: Boolean
-    ) : Recipient(inputEmail, inputName) {
+    ) : Recipient() {
+
+        init {
+            initLocalValues(inputEmail, inputName)
+        }
 
         constructor(recipient: Recipient, displayAsExternal: Boolean) : this(recipient.email, recipient.name, displayAsExternal)
     }

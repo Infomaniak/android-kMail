@@ -500,12 +500,12 @@ class NewMessageFragment : Fragment() {
         fun parseEmailWithName(recipient: String): Recipient? {
             val nameAndEmail = Regex("(.+)<(.+)>").find(recipient)?.destructured
 
-            return nameAndEmail?.let { (name, email) -> if (email.isEmail()) Recipient(email, name) else null }
+            return nameAndEmail?.let { (name, email) -> if (email.isEmail()) Recipient().initLocalValues(email, name) else null }
         }
 
         fun String.splitToRecipientList() = split(",", ";").mapNotNull {
             val email = it.trim()
-            if (email.isEmail()) Recipient(email, email) else parseEmailWithName(email)
+            if (email.isEmail()) Recipient().initLocalValues(email, email) else parseEmailWithName(email)
         }
 
         uri?.let { uri ->
@@ -515,10 +515,10 @@ class NewMessageFragment : Fragment() {
             val to = mailToIntent.to?.splitToRecipientList()
                 ?: emptyList()
             val cc = mailToIntent.cc?.splitToRecipientList()
-                ?: intent?.getStringArrayExtra(Intent.EXTRA_CC)?.map { Recipient(it, it) }
+                ?: intent?.getStringArrayExtra(Intent.EXTRA_CC)?.map { Recipient().initLocalValues(it, it) }
                 ?: emptyList()
             val bcc = mailToIntent.bcc?.splitToRecipientList()
-                ?: intent?.getStringArrayExtra(Intent.EXTRA_BCC)?.map { Recipient(it, it) }
+                ?: intent?.getStringArrayExtra(Intent.EXTRA_BCC)?.map { Recipient().initLocalValues(it, it) }
                 ?: emptyList()
 
             draft.to.addAll(to)

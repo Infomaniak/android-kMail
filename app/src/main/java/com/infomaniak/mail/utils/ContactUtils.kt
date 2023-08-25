@@ -72,7 +72,7 @@ object ContactUtils {
                     val photoUri = cursor.getString(cursor.getColumnIndexOrThrow(Contactables.PHOTO_THUMBNAIL_URI))
 
                     emails[id]!!.forEach { email ->
-                        val key = Recipient(email, name)
+                        val key = Recipient().initLocalValues(email, name)
                         contacts[key] = MergedContact().initLocalValues(email, name, photoUri)
                     }
                 }
@@ -85,7 +85,7 @@ object ContactUtils {
     fun mergeApiContactsIntoPhoneContacts(apiContacts: List<Contact>, phoneMergedContacts: MutableMap<Recipient, MergedContact>) {
         apiContacts.forEach { apiContact ->
             apiContact.emails.forEach { email ->
-                val key = Recipient(email, apiContact.name)
+                val key = Recipient().initLocalValues(email, apiContact.name)
                 val contactAvatar = apiContact.avatar?.let { avatar -> ApiRoutes.resource(avatar) }
                 if (phoneMergedContacts.contains(key)) { // If we have already encountered this user
                     if (phoneMergedContacts[key]?.avatar == null) { // Only replace the avatar if we didn't have any before
