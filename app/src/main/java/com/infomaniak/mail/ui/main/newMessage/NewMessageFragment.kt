@@ -609,7 +609,7 @@ class NewMessageFragment : Fragment() {
                 action = action,
                 isFinishing = isFinishing,
                 isTaskRoot = isTaskRoot,
-                startWorkerCallback = ::startWorker
+                startWorkerCallback = ::startWorker,
             )
         } else {
             shouldExecuteDraftActionWhenStopping = true
