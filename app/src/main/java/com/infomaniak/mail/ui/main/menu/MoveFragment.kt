@@ -41,6 +41,7 @@ import com.infomaniak.mail.utils.createInputDialog
 import com.infomaniak.mail.utils.handleEditorSearchAction
 import com.infomaniak.mail.utils.setOnClearTextClickListener
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MoveFragment : MenuFoldersFragment() {
@@ -51,8 +52,11 @@ class MoveFragment : MenuFoldersFragment() {
 
     private val createFolderDialog by lazy { initNewFolderDialog() }
 
+    @Inject
+    lateinit var searchFolderAdapter: FolderAdapter
+
     private val searchResultsAdapter by lazy {
-        FolderAdapter(isInMenuDrawer, shouldIndent = false, onFolderClicked = ::onFolderSelected)
+        searchFolderAdapter(isInMenuDrawer, shouldIndent = false, onFolderClicked = ::onFolderSelected)
     }
 
     private var hasAlreadyTrackedFolderSearch = false
