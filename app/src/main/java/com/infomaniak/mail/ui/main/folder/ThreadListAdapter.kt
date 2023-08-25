@@ -55,6 +55,10 @@ import com.infomaniak.mail.ui.main.folder.ThreadListAdapter.ThreadListViewHolder
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import dagger.hilt.android.qualifiers.ActivityContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.math.abs
 import com.google.android.material.R as RMaterial
@@ -64,6 +68,7 @@ import com.infomaniak.lib.core.R as RCore
 class ThreadListAdapter @Inject constructor(
     @ActivityContext context: Context,
     private val localSettings: LocalSettings,
+    private val globalCoroutineScope: CoroutineScope,
 ) : DragDropSwipeAdapter<Any, ThreadListViewHolder>(mutableListOf()), RealmChangesBinding.OnRealmChanged<Thread> {
 
     private lateinit var recyclerView: RecyclerView
@@ -422,9 +427,14 @@ class ThreadListAdapter @Inject constructor(
 
     override fun createDiffUtil(oldList: List<Any>, newList: List<Any>): DragDropSwipeDiffCallback<Any>? = null
 
-    override fun updateList(itemList: List<Thread>) = runCatchingRealm {
-        dataSet = formatList(itemList, recyclerView.context, folderRole, localSettings.threadDensity, isLoadMoreDisplayed)
-    }.getOrDefault(Unit)
+    override fun updateList(itemList: List<Thread>) {
+        globalCoroutineScope.launch {
+            val formattedList = runCatchingRealm {
+                formatList(itemList, recyclerView.context, folderRole, localSettings.threadDensity, isLoadMoreDisplayed)
+            }.getOrDefault(emptyList())
+            withContext(Dispatchers.Main) { dataSet = formattedList }
+        }
+    }
 
     fun updateContacts(newContacts: MergedContactDictionary) {
         contacts = newContacts
