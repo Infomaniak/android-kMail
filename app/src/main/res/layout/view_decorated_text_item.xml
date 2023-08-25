@@ -21,21 +21,23 @@
     style="@style/RoundedDecoratedTextItem">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginStart="@dimen/marginStandardSmall"
+        android:layout_marginStart="@dimen/decoratedItemConstraintMarginStart"
         android:layout_marginEnd="@dimen/marginStandardMedium"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/collapseCustomFolderButton"
-            style="@style/IconButtonSmall"
-            android:layout_width="@dimen/folderCollapseButtonSize"
-            android:layout_height="@dimen/folderCollapseButtonSize"
+            style="@style/IconButton"
+            android:layout_width="@dimen/folderChevronSize"
+            android:layout_height="@dimen/folderChevronSize"
             android:visibility="gone"
             app:icon="@drawable/ic_chevron_down"
             app:iconSize="@dimen/chevronSize"
+            app:iconTint="@color/iconColor"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -46,7 +48,7 @@
             style="@style/BodyMedium"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_marginStart="@dimen/marginStandardSmall"
+            android:layout_marginStart="@dimen/decoratedItemTextMarginStart"
             android:layout_marginEnd="@dimen/marginStandardMedium"
             android:drawablePadding="@dimen/marginStandardMedium"
             android:ellipsize="end"
