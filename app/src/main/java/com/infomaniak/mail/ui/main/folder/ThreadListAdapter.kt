@@ -86,7 +86,7 @@ class ThreadListAdapter @Inject constructor(
 
     private var folderRole: FolderRole? = null
     private lateinit var contacts: MergedContactDictionary
-    private lateinit var onSwipeFinished: () -> Unit
+    private var onSwipeFinished: (() -> Unit)? = null
     private var multiSelection: MultiSelectionListener<Thread>? = null
 
     init {
@@ -96,7 +96,7 @@ class ThreadListAdapter @Inject constructor(
     operator fun invoke(
         folderRole: FolderRole?,
         contacts: MergedContactDictionary,
-        onSwipeFinished: () -> Unit,
+        onSwipeFinished: (() -> Unit)? = null,
         multiSelection: MultiSelectionListener<Thread>? = null,
     ) {
         this.folderRole = folderRole
@@ -393,7 +393,7 @@ class ThreadListAdapter @Inject constructor(
 
     override fun onSwipeAnimationFinished(viewHolder: ThreadListViewHolder) {
         viewHolder.isSwipedOverHalf = false
-        onSwipeFinished()
+        onSwipeFinished?.invoke()
         unblockOtherSwipes()
     }
 

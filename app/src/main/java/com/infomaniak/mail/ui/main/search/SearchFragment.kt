@@ -128,7 +128,6 @@ class SearchFragment : Fragment() {
         threadListAdapter(
             folderRole = null,
             contacts = mainViewModel.mergedContactsLive.value ?: emptyMap(),
-            onSwipeFinished = {},
         )
     }
 
