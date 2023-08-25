@@ -45,6 +45,14 @@ class FolderController @Inject constructor(private val mailboxContentRealm: Real
         return getFoldersQuery(mailboxContentRealm(), onlyRoots = true).asFlow()
     }
 
+    fun getDefaultFoldersAsync(): Flow<ResultsChange<Folder>> {
+        return getDefaultFoldersQuery(mailboxContentRealm()).asFlow()
+    }
+
+    fun getCustomFoldersAsync(): Flow<ResultsChange<Folder>> {
+        return getCustomFoldersQuery(mailboxContentRealm()).asFlow()
+    }
+
     fun getFolder(id: String): Folder? {
         return getFolderQuery(Folder::id.name, id, mailboxContentRealm()).find()
     }
@@ -130,6 +138,19 @@ class FolderController @Inject constructor(private val mailboxContentRealm: Real
             val rootsQuery = if (onlyRoots) " AND $isRootFolder" else ""
             return realm
                 .query<Folder>(isNotSearch + rootsQuery)
+                .sort(Folder::name.name, Sort.ASCENDING)
+                .sort(Folder::isFavorite.name, Sort.DESCENDING)
+        }
+
+        private fun getDefaultFoldersQuery(realm: TypedRealm): RealmQuery<Folder> {
+            val hasRole = "${Folder.rolePropertyName} != nil"
+            return realm.query("$isNotSearch AND $hasRole")
+        }
+
+        private fun getCustomFoldersQuery(realm: TypedRealm): RealmQuery<Folder> {
+            val hasNoRole = "${Folder.rolePropertyName} == nil"
+            return realm
+                .query<Folder>("$isNotSearch AND $isRootFolder AND $hasNoRole")
                 .sort(Folder::name.name, Sort.ASCENDING)
                 .sort(Folder::isFavorite.name, Sort.DESCENDING)
         }

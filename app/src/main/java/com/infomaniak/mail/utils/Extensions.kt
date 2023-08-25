@@ -333,6 +333,14 @@ fun List<Folder>.getMenuFolders(): Pair<List<Folder>, List<Folder>> {
     }
 }
 
+fun List<Folder>.getDefaultMenuFolders(): List<Folder> {
+    return sortedBy { it.role?.order }.flatMapFolderChildren()
+}
+
+fun List<Folder>.getCustomMenuFolders(): List<Folder> {
+    return flatMapFolderChildren()
+}
+
 fun List<Folder>.flatMapFolderChildren(): List<Folder> {
 
     if (isEmpty()) return this

@@ -24,6 +24,7 @@ import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.trackSearchEvent
 import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
@@ -33,13 +34,11 @@ import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.data.models.thread.ThreadResult
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.search.SearchFragment.VisibilityMode
-import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.SearchUtils
-import com.infomaniak.mail.utils.context
-import com.infomaniak.mail.utils.coroutineContext
+import com.infomaniak.mail.utils.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.sentry.Sentry
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 @HiltViewModel
@@ -48,6 +47,7 @@ class SearchViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val globalCoroutineScope: CoroutineScope,
     private val searchUtils: SearchUtils,
+    private val folderController: FolderController,
     private val messageController: MessageController,
     private val refreshController: RefreshController,
     private val threadController: ThreadController,
@@ -63,6 +63,10 @@ class SearchViewModel @Inject constructor(
         private set
     var currentSearchQuery: String = ""
         private set
+
+    val currentFoldersLive = folderController.getRootsFoldersAsync()
+        .map { it.list.getMenuFolders() }
+        .asLiveData(ioCoroutineContext)
 
     private var currentFilters = mutableSetOf<ThreadFilter>()
 

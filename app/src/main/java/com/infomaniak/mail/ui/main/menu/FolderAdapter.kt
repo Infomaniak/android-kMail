@@ -153,9 +153,10 @@ class FolderAdapter(
 
     @SuppressLint("NotifyDataSetChanged")
     fun setFolders(newFolders: List<Folder>, newCurrentFolderId: String? = null) {
-        newCurrentFolderId?.let { currentFolderId = it }
 
         foldersDiffer.submitList(newFolders)
+
+        newCurrentFolderId?.let { currentFolderId = it }
         val newHasCollapsableFolder = newFolders.any { it.canBeCollapsed }
 
         val isFirstTime = hasCollapsableFolder == null

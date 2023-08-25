@@ -97,9 +97,11 @@ class MoveFragment : MenuFoldersFragment() {
     private fun setAdaptersFolders(folderId: String) {
         currentFolderId = folderId
 
-        val (defaultFoldersWithoutDraft, customFolders) = mainViewModel.currentFoldersLive.value!!.let { foldersLists ->
-            foldersLists.first.filterNot { it.role == FolderRole.DRAFT } to foldersLists.second
+        val defaultFoldersWithoutDraft = mainViewModel.currentDefaultFoldersLive.value!!.let { folders ->
+            folders.filterNot { it.role == FolderRole.DRAFT }
         }
+
+        val customFolders = mainViewModel.currentCustomFoldersLive.value!!
 
         defaultFoldersAdapter.setFolders(defaultFoldersWithoutDraft, folderId)
         customFoldersAdapter.setFolders(customFolders, folderId)
