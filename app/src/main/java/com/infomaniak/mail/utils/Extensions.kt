@@ -337,11 +337,11 @@ fun List<Folder>.getDefaultMenuFolders(): List<Folder> {
     return sortedBy { it.role?.order }.flatMapFolderChildren()
 }
 
-fun List<Folder>.getCustomMenuFolders(): List<Folder> {
-    return flatMapFolderChildren()
+fun List<Folder>.getCustomMenuFolders(dismissHiddenChildren: Boolean = false): List<Folder> {
+    return flatMapFolderChildren(dismissHiddenChildren)
 }
 
-fun List<Folder>.flatMapFolderChildren(): List<Folder> {
+fun List<Folder>.flatMapFolderChildren(dismissHiddenChildren: Boolean = false): List<Folder> {
 
     if (isEmpty()) return this
 
@@ -351,12 +351,19 @@ fun List<Folder>.flatMapFolderChildren(): List<Folder> {
     ): List<Folder> {
 
         val folder = inputList.removeFirst()
+
         if (folder.isManaged()) {
             outputList.add(folder.copyFromRealm(1u))
-            inputList.addAll(0, folder.children.query().sort(Folder::name.name, Sort.ASCENDING).find())
+            val children = with(folder.children) {
+                (if (dismissHiddenChildren) query("${Folder::isHidden.name} == false") else query())
+                    .sort(Folder::name.name, Sort.ASCENDING)
+                    .find()
+            }
+            inputList.addAll(0, children)
         } else {
             outputList.add(folder)
-            inputList.addAll(folder.children)
+            val children = with(folder.children) { if (dismissHiddenChildren) filter { !it.isHidden } else this }
+            inputList.addAll(children)
         }
 
         return if (inputList.isEmpty()) outputList else formatFolderWithAllChildren(inputList, outputList)

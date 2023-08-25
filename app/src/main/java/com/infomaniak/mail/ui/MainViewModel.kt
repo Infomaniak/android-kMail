@@ -121,7 +121,9 @@ class MainViewModel @Inject constructor(
     }.asLiveData(ioCoroutineContext)
 
     val currentCustomFoldersLive = _currentMailboxObjectId.flatMapLatest { objectId ->
-        objectId?.let { folderController.getCustomFoldersAsync().map { it.list.getCustomMenuFolders() } } ?: emptyFlow()
+        objectId
+            ?.let { folderController.getCustomFoldersAsync().map { it.list.getCustomMenuFolders(dismissHiddenChildren = true) } }
+            ?: emptyFlow()
     }.asLiveData(ioCoroutineContext)
 
     val currentQuotasLive = _currentMailboxObjectId.flatMapLatest {
