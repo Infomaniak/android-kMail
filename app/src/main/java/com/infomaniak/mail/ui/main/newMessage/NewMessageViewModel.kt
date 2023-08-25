@@ -416,7 +416,7 @@ class NewMessageViewModel @Inject constructor(
         updateIsSendingAllowed()
         saveDraftDebouncing()
         context.trackNewMessageEvent("deleteRecipient")
-        if (currentMailbox.externalMailFlagEnabled) context.trackExternalEvent("deleteRecipient")
+        if (recipient.displayAsExternal) context.trackExternalEvent("deleteRecipient")
     }
 
     fun updateMailSubject(newSubject: String?) = with(draft) {

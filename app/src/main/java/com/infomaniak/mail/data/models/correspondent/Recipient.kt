@@ -37,6 +37,8 @@ open class Recipient : EmbeddedRealmObject, Correspondent {
     //region UI data (Transient & Ignore)
     @Transient
     @Ignore
+    // Only indicates how to display the recipient chip when in composing a new message. isExternal could return true event if
+    // this value is false
     var displayAsExternal: Boolean = false
         private set
     //endregion
@@ -57,6 +59,8 @@ open class Recipient : EmbeddedRealmObject, Correspondent {
         displayAsExternal = shouldDisplayAsExternal
     }
 
+    // Computes if the recipient is external according to the required conditions. Does not tell anything about how to display the
+    // recipient when composing an email
     fun isExternal(emailDictionary: MergedContactDictionary, aliases: List<String>): Boolean {
         val isUnknownContact = email !in emailDictionary
         val isMailerDaemon = """mailer-daemon@(?:.+\.)?infomaniak\.ch""".toRegex(RegexOption.IGNORE_CASE).matches(email)
