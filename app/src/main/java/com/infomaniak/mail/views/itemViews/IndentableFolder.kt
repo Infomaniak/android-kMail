@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.views.itemViews
 
-import androidx.core.content.res.getDimensionPixelSizeOrThrow
 import androidx.core.view.marginEnd
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.setMarginsRelative
@@ -30,18 +29,31 @@ interface IndentableFolder {
     val binding: ViewDecoratedTextItemBinding
 
     fun setIndent(indent: Int, hasCollapsableFolder: Boolean = false, canBeCollapsed: Boolean = false) {
-        val totalStartMargin = computeStartMargin(hasCollapsableFolder, canBeCollapsed) + computeIndent(indent)
-        binding.itemName.apply { setMarginsRelative(start = totalStartMargin, end = marginEnd) }
+        updateConstraintLayoutMarginStart(hasCollapsableFolder)
+        updateItemNameMarginStart(indent, hasCollapsableFolder, canBeCollapsed)
+    }
+
+    private fun updateConstraintLayoutMarginStart(hasCollapsableFolder: Boolean) = with(binding) {
+        val marginStart = if (hasCollapsableFolder) {
+            0
+        } else {
+            context.resources.getDimension(R.dimen.decoratedItemConstraintMarginStart).toInt()
+        }
+        constraintLayout.setMarginsRelative(start = marginStart)
+    }
+
+    private fun updateItemNameMarginStart(indent: Int, hasCollapsableFolder: Boolean, canBeCollapsed: Boolean) {
+        val totalMarginStart = computeMarginStart(hasCollapsableFolder, canBeCollapsed) + computeIndent(indent)
+        binding.itemName.apply { setMarginsRelative(start = totalMarginStart, end = marginEnd) }
+    }
+
+    private fun computeMarginStart(hasCollapsableFolder: Boolean, canBeCollapsed: Boolean): Int = with(binding.context) {
+        return when {
+            hasCollapsableFolder && !canBeCollapsed -> resources.getDimension(R.dimen.folderChevronSize).toInt()
+            hasCollapsableFolder -> 0
+            else -> resources.getDimension(R.dimen.decoratedItemTextMarginStart).toInt()
+        }
     }
 
     private fun computeIndent(indent: Int) = binding.context.resources.getDimension(RCore.dimen.marginStandard).toInt() * indent
-
-    private fun computeStartMargin(hasCollapsableFolder: Boolean, canBeCollapsed: Boolean): Int = with(binding.context) {
-        return if (hasCollapsableFolder && !canBeCollapsed) {
-            resources.getDimension(R.dimen.folderUncollapsableIndent).toInt()
-        } else {
-            val attrs = obtainStyledAttributes(R.style.RoundedDecoratedTextItem, intArrayOf(android.R.attr.layout_marginStart))
-            attrs.getDimensionPixelSizeOrThrow(0).also { attrs.recycle() }
-        }
-    }
 }

@@ -42,6 +42,9 @@
     <dimen name="decoratedItemViewHeight">48dp</dimen>
     <dimen name="folderUncollapsableIndent">36dp</dimen>
     <dimen name="folderCollapseButtonSize">28dp</dimen>
+    <dimen name="folderChevronSize">44dp</dimen>
+    <dimen name="decoratedItemConstraintMarginStart">@dimen/marginStandardSmall</dimen>
+    <dimen name="decoratedItemTextMarginStart">@dimen/marginStandardSmall</dimen>
 
     <!-- Settings -->
     <dimen name="dividerHorizontalPadding">16dp</dimen>

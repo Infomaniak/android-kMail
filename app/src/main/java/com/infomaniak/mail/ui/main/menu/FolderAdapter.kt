@@ -106,6 +106,7 @@ class FolderAdapter @Inject constructor(
     override fun getItemCount(): Int = runCatchingRealm { folders.size }.getOrDefault(0)
 
     private fun UnreadFolderItemView.displayMenuDrawerFolder(folder: Folder) {
+
         val unread = when (folder.role) {
             FolderRole.DRAFT -> UnreadDisplay(folder.threads.count())
             FolderRole.SENT, FolderRole.TRASH -> UnreadDisplay(0)
