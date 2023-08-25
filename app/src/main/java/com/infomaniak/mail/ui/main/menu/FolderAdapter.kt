@@ -36,6 +36,9 @@ import com.infomaniak.mail.utils.UnreadDisplay
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.views.itemViews.*
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.math.min
 
@@ -174,16 +177,18 @@ class FolderAdapter @Inject constructor(
 
         foldersDiffer.submitList(newFolders)
 
-        newCurrentFolderId?.let { currentFolderId = it }
-        val newHasCollapsableFolder = newFolders.any { it.canBeCollapsed }
+        globalCoroutineScope.launch {
+            newCurrentFolderId?.let { currentFolderId = it }
+            val newHasCollapsableFolder = newFolders.any { it.canBeCollapsed }
 
-        val isFirstTime = hasCollapsableFolder == null
-        val collapsableFolderExistenceHasChanged = newHasCollapsableFolder != hasCollapsableFolder
-        if (!isFirstTime && collapsableFolderExistenceHasChanged) {
-            notifyDataSetChanged()
+            val isFirstTime = hasCollapsableFolder == null
+            val collapsableFolderExistenceHasChanged = newHasCollapsableFolder != hasCollapsableFolder
+            if (!isFirstTime && collapsableFolderExistenceHasChanged) {
+                withContext(Dispatchers.Main) { notifyDataSetChanged() }
+            }
+
+            hasCollapsableFolder = newHasCollapsableFolder
         }
-
-        hasCollapsableFolder = newHasCollapsableFolder
     }
 
     fun updateSelectedState(newCurrentFolderId: String) {
