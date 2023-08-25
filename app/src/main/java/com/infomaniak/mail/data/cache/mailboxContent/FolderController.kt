@@ -144,7 +144,7 @@ class FolderController @Inject constructor(private val mailboxContentRealm: Real
 
         private fun getDefaultFoldersQuery(realm: TypedRealm): RealmQuery<Folder> {
             val hasRole = "${Folder.rolePropertyName} != nil"
-            return realm.query("$isNotSearch AND $isRootFolder AND $hasRole")
+            return realm.query("$isNotSearch AND $hasRole")
         }
 
         private fun getCustomFoldersQuery(realm: TypedRealm): RealmQuery<Folder> {
