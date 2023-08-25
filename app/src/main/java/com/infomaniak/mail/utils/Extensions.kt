@@ -379,7 +379,7 @@ fun Activity.createInformationDialog(
     description = description,
     confirmButtonText = confirmButtonText,
     displayCancelButton = false,
-    onPositiveButtonClicked = {}
+    onPositiveButtonClicked = {},
 )
 
 fun Fragment.createDescriptionDialog(

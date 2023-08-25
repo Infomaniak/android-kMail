@@ -140,7 +140,7 @@ class ThreadFragment : Fragment() {
     }
 
     private fun observerSubjectUpdateTrigger() {
-        threadViewModel.threadMergedContactAndMailboxMediator(
+        threadViewModel.threadAndMergedContactAndMailboxMediator(
             mergedContactsLive = mainViewModel.mergedContactsLive,
         ).observe(viewLifecycleOwner) { (thread, mergedContacts, mailbox) ->
             thread?.let {
@@ -469,7 +469,7 @@ class ThreadFragment : Fragment() {
         if (externalRecipientQuantity == 0) return subject to subject
 
         val externalPostfix = getString(R.string.externalTag)
-        val postfixedSubject = "$subject$EXTERNAL_TAG_SEPARATOR$externalPostfix"
+        val postfixedSubject = "${subject}${EXTERNAL_TAG_SEPARATOR}${externalPostfix}"
 
         val spannedSubject = postfixedSubject.toSpannable().apply {
             val startIndex = subject.length + EXTERNAL_TAG_SEPARATOR.length

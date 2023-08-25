@@ -448,7 +448,7 @@ class RecipientFieldView @JvmOverloads constructor(
     class StyledRecipient(
         private val inputEmail: String,
         private val inputName: String,
-        val displayAsExternal: Boolean
+        val displayAsExternal: Boolean,
     ) : Recipient() {
 
         init {

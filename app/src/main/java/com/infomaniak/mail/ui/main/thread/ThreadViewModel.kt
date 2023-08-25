@@ -76,7 +76,7 @@ class ThreadViewModel @Inject constructor(
         AccountUtils.currentMailboxId,
     ).map { it.obj }.asLiveData(ioCoroutineContext)
 
-    fun threadMergedContactAndMailboxMediator(
+    fun threadAndMergedContactAndMailboxMediator(
         mergedContactsLive: LiveData<MergedContactDictionary?>,
     ): LiveData<Triple<Thread?, MergedContactDictionary?, Mailbox?>> {
         return MediatorLiveData<Triple<Thread?, MergedContactDictionary?, Mailbox?>>().apply {

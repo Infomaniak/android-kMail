@@ -334,7 +334,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun Recipient.removeInViewModelAndUpdateBannerVisibility(type: FieldType) {
-        newMessageViewModel.removeRecipientFromField(this, type)
+        newMessageViewModel.removeRecipientFromField(recipient = this, type)
         updateBannerVisibility()
     }
 
