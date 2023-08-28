@@ -63,6 +63,11 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
             return@with Result.success()
         }
         val mailbox = MailboxController.getMailbox(userId, mailboxId, mailboxInfoRealm) ?: run {
+            // If the Mailbox doesn't exist in Realm, it's POSSIBLY because the user recently added
+            // this new Mailbox on its account, via the Infomaniak WebMail or somewhere else.
+            // We need to wait until the user opens the app again to fetch this new Mailbox.
+            // Then, we'll be able to handle Notifications for this Mailbox.
+            // Until then, we can leave safely.
             SentryDebug.sendFailedNotification("Received Notif: no Mailbox in Realm", userId, mailboxId, messageUid)
             return@with Result.success()
         }
