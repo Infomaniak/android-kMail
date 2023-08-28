@@ -17,9 +17,9 @@
  */
 
 function reportOverScroll(clientWidth, scrollWidth, messageUid) {
-    window.mail.reportOverScroll(clientWidth, scrollWidth, messageUid);
+    window.kmail.reportOverScroll(clientWidth, scrollWidth, messageUid);
 }
 
 function reportError(error, scriptFirstLine, messageUid) {
-    window.mail.reportError(error.name, error.message, error.stack, scriptFirstLine, messageUid);
+    window.kmail.reportError(error.name, error.message, error.stack, scriptFirstLine, messageUid);
 }

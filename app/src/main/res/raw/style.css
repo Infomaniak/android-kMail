@@ -12,7 +12,7 @@ body {
 blockquote {
     padding: 0.2em 1.2em !important;
     margin: 0 !important;
-    border: 3px solid var(--mail-primary-color) !important;
+    border: 3px solid var(--kmail-primary-color) !important;
     border-width: 0 0 0 3px !important;
 }
 
@@ -22,5 +22,5 @@ blockquote blockquote blockquote blockquote {
 }
 
 a:link, a:visited, a:hover, a:active {
-    color: var(--mail-primary-color);
+    color: var(--kmail-primary-color);
 }
