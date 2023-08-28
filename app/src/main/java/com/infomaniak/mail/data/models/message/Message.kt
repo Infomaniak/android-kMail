@@ -19,6 +19,7 @@
 
 package com.infomaniak.mail.data.models.message
 
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
@@ -153,7 +154,10 @@ class Message : RealmObject {
             }
         }
 
-    inline val sender get() = from.first()
+    inline val sender
+        get() = from.firstOrNull().also {
+            if (it == null) SentryLog.e("ThreadAdapter", "Message $uid has empty from")
+        }
 
     val dkimStatus: MessageDKIM get() = enumValueOfOrNull<MessageDKIM>(_dkimStatus) ?: MessageDKIM.VALID
 
