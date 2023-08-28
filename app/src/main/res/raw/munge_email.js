@@ -1,7 +1,7 @@
 const scriptFirstLine = new RegExp(/:([\d]+)/).exec(Error().stack)[1] // Android only
 
 /*
- * Infomaniak ikMail - Android
+ * Infomaniak Mail - Android
  * Copyright (C) 2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
