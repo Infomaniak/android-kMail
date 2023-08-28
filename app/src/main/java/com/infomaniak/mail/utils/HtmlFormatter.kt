@@ -85,12 +85,12 @@ class HtmlFormatter(private val html: String) {
     private fun Element.encapsulateElementInDiv() {
         val bodyContent = childNodesCopy()
         empty()
-        appendElement("div").id(IKMAIL_MESSAGE_ID).appendChildren(bodyContent)
+        appendElement("div").id(KMAIL_MESSAGE_ID).appendChildren(bodyContent)
     }
 
     companion object {
-        private const val PRIMARY_COLOR_CODE = "--ikmail-primary-color"
-        private const val IKMAIL_MESSAGE_ID = "ikmail-message-content"
+        private const val PRIMARY_COLOR_CODE = "--kmail-primary-color"
+        private const val KMAIL_MESSAGE_ID = "kmail-message-content"
 
         private fun Context.loadCss(@RawRes cssResId: Int, customColors: List<Pair<String, Int>> = emptyList()): String {
             var css = readRawResource(cssResId)
@@ -144,7 +144,7 @@ class HtmlFormatter(private val html: String) {
 
         fun Context.getResizeScript(): String = loadScript(
             R.raw.munge_email,
-            listOf("MESSAGE_SELECTOR" to "#$IKMAIL_MESSAGE_ID")
+            listOf("MESSAGE_SELECTOR" to "#$KMAIL_MESSAGE_ID")
         )
 
         fun Context.getFixStyleScript(): String {
