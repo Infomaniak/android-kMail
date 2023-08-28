@@ -1,19 +1,19 @@
-L'app ikMail nécessite que vos adresses mail soient chez Infomaniak.
+L'app Infomaniak Mail nécessite que vos adresses mail soient chez Infomaniak.
 Cette app vous permet de gérer vos adresses Infomaniak dans un environnement entièrement sécurisé.
 
-Avec l'app ikMail, vous pouvez :
+Avec l'app Infomaniak Mail, vous pouvez :
 
 - Créer une adresse gratuite @ik.me @etik.com ou @ikmail.com avec 20 Go de stockage, sans publicité et gérée en Suisse, dans le respect du RGPD.
 - Envoyer et recevoir des e-mails depuis vos adresses mail Infomaniak.
-- Définir ikMail comme application de messagerie par défaut.
+- Définir Infomaniak Mail comme application de messagerie par défaut.
 - Rechercher un message précis ou vos e-mails non lus, en favoris ou avec des pièces jointes.
 - Passer d'un compte à l'autre pour accéder à toutes vos adresses mail gérées chez Infomaniak.
 - Être notifié immédiatement de l'arrivée de nouveaux e-mails (push).
 - Organiser vos e-mails dans des dossiers personnalisés.
 - Balayer pour déplacer, archiver, supprimer des e-mails rapidement.
 - Personnaliser votre expérience (thème sombre/clair, couleur d'accentuation, densité de l'affichage, actions de balayage dans la boîte de réception, etc.).
-- Protéger l'accès à l'app ikMail (selon la méthode de verrouillage de votre appareil).
+- Protéger l'accès à l'app Infomaniak Mail (selon la méthode de verrouillage de votre appareil).
 
-Avec ikMail, vous gardez le contrôle total de vos données et vous communiquez dans un écosystème sécurisé, souverain et en constante évolution. L'app ikMail est développée par Infomaniak et son code est open source et disponible sur notre GitHub.
+Avec Infomaniak Mail, vous gardez le contrôle total de vos données et vous communiquez dans un écosystème sécurisé, souverain et en constante évolution. L'app Infomaniak Mail est développée par Infomaniak et son code est open source et disponible sur notre GitHub.
 
 Infomaniak est un prestataire cloud incontournable en Europe et le développeur leader de solutions de productivité en Suisse depuis plus de 29 ans. L'entreprise appartient exclusivement à ses employés et se démarque par son engagement pour la vie privée, l'économie locale et l'écologie.

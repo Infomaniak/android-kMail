@@ -280,7 +280,7 @@ object ApiRepository : ApiRepositoryCore() {
 
     /**
      * RealmLists cannot be null, so they have to be empty when there is no data.
-     * But the ikMail API doesn't support empty lists, so we have to replace them with a `null` value.
+     * But the Infomaniak Mail API doesn't support empty lists, so we have to replace them with a `null` value.
      */
     private fun String.removeEmptyRealmLists() = replace("[]", "null")
 }

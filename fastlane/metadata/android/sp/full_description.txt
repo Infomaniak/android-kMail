@@ -1,19 +1,19 @@
-La aplicación ikMail requiere que tus direcciones de correo estén con Infomaniak.
+La aplicación Infomaniak Mail requiere que tus direcciones de correo estén con Infomaniak.
 Esta aplicación te permite gestionar tus direcciones Infomaniak en un entorno completamente seguro.
 
-Con la aplicación ikMail, puedes:
+Con la aplicación Infomaniak Mail, puedes:
 
 - Crear una dirección gratuita @ik.me @etik.com o @ikmail.com con 20 GB de almacenamiento, sin publicidad y gestionada en Suiza, en cumplimiento del RGPD.
 - Enviar y recibir correos electrónicos desde tus direcciones de correo Infomaniak.
-- Establecer ikMail como aplicación de correo predeterminada.
+- Establecer Infomaniak Mail como aplicación de correo predeterminada.
 - Buscar un mensaje específico o tus correos no leídos, en favoritos o con adjuntos.
 - Cambiar de una cuenta a otra para acceder a todas tus direcciones de correo gestionadas en Infomaniak.
 - Ser notificado inmediatamente de la llegada de nuevos correos (push).
 - Organizar tus correos en carpetas personalizadas.
 - Deslizar para mover, archivar o eliminar correos rápidamente.
 - Personalizar tu experiencia (tema oscuro/claro, color de acento, densidad de visualización, acciones de deslizamiento en la bandeja de entrada, etc.).
-- Proteger el acceso a la aplicación ikMail (dependiendo de cómo esté bloqueado tu dispositivo).
+- Proteger el acceso a la aplicación Infomaniak Mail (dependiendo de cómo esté bloqueado tu dispositivo).
 
-Con ikMail, conservas el control total de tus datos y te comunicas en un ecosistema seguro, soberano y en constante evolución. La app ikMail está desarrollada por Infomaniak y su código es open source y está disponible en nuestro GitHub.
+Con Infomaniak Mail, conservas el control total de tus datos y te comunicas en un ecosistema seguro, soberano y en constante evolución. La app Infomaniak Mail está desarrollada por Infomaniak y su código es open source y está disponible en nuestro GitHub.
 
 Infomaniak es un proveedor cloud esencial en Europa y el desarrollador líder de soluciones de productividad en Suiza desde hace más de 29 años. La empresa es propiedad exclusiva de sus empleados y destaca por su compromiso con la privacidad, la economía local y la ecología.

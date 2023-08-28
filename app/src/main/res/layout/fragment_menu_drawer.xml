@@ -307,7 +307,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                tools:text="ikMail Android version XXX (xx)" />
+                tools:text="App version XXX (xx)" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
