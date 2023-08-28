@@ -114,7 +114,9 @@ class FetchMessagesManager @Inject constructor(
             SentryDebug.sendFailedNotification("No Message in the Thread", userId, mailbox.mailboxId, sentryMessageUid, mailbox)
             return
         }
-        if (message.isSeen) { // Ignore if it has already been seen
+        if (message.isSeen) {
+            // If the Message has already been seen before receiving the Notification, we don't want to display it.
+            // We can leave safely.
             SentryDebug.sendFailedNotification("Message already seen", userId, mailbox.mailboxId, sentryMessageUid, mailbox)
             return
         }
