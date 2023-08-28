@@ -23,7 +23,7 @@ android {
         versionName '1.0.10'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 
-        setProperty "archivesBaseName", "ikmail-$versionName ($versionCode)"
+        setProperty "archivesBaseName", "infomaniak-mail-$versionName ($versionCode)"
 
         buildConfigField 'String', 'CLIENT_ID', '"E90BC22D-67A8-452C-BE93-28DA33588CA4"'
         buildConfigField 'String', 'CREATE_ACCOUNT_URL', '"https://welcome.infomaniak.com/signup/ikmail?app=true"'
