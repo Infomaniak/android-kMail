@@ -116,9 +116,12 @@ object SentryDebug {
         mailboxId: Int? = null,
         messageUid: String? = null,
         mailbox: Mailbox? = null,
+        throwable: Throwable? = null,
     ) {
         Sentry.withScope { scope ->
+
             scope.level = SentryLevel.ERROR
+
             scope.setTag("reason", reason)
             scope.setExtra("userId", "${userId?.toString()}")
             scope.setExtra("currentUserId", "[${AccountUtils.currentUserId}]")
@@ -129,7 +132,15 @@ object SentryDebug {
             scope.setExtra("user displayName", "${AccountUtils.currentUser?.displayName}")
             scope.setExtra("user firstName", "${AccountUtils.currentUser?.firstname}")
             scope.setExtra("user lastName", "${AccountUtils.currentUser?.lastname}")
-            Sentry.captureMessage("We received a Notification, but we failed to show it")
+
+            val message = "We received a Notification, but we failed to show it"
+
+            throwable?.let {
+                scope.setExtra("message", message)
+                Sentry.captureException(it)
+            } ?: run {
+                Sentry.captureMessage(message)
+            }
         }
     }
 

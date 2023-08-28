@@ -64,9 +64,9 @@ class RefreshController @Inject constructor(private val localSettings: LocalSett
         realm: Realm,
         started: (() -> Unit)? = null,
         stopped: (() -> Unit)? = null,
-    ): List<Thread>? {
+    ): Pair<List<Thread>?, Throwable?> {
 
-        suspend fun refreshWithRunCatching(job: Job, isFirstTime: Boolean = true): List<Thread>? = runCatching {
+        suspend fun refreshWithRunCatching(job: Job, isFirstTime: Boolean = true): Pair<List<Thread>?, Throwable?> = runCatching {
             withContext(Dispatchers.IO + job) {
                 if (isFirstTime) {
                     started?.invoke()
@@ -74,7 +74,7 @@ class RefreshController @Inject constructor(private val localSettings: LocalSett
                     delay(Utils.DELAY_BEFORE_FETCHING_ACTIVITIES_AGAIN)
                     ensureActive()
                 }
-                realm.handleRefreshMode(refreshMode, scope = this, mailbox, folder, okHttpClient).toList()
+                realm.handleRefreshMode(refreshMode, scope = this, mailbox, folder, okHttpClient).toList() to null
             }
         }.getOrElse {
             // If fetching the activities failed because of a not found Message, we should pause briefly
@@ -99,7 +99,7 @@ class RefreshController @Inject constructor(private val localSettings: LocalSett
         refreshThreadsJob = Job()
 
         return refreshWithRunCatching(refreshThreadsJob!!).also {
-            if (it != null) {
+            it.first?.let {
                 stopped?.invoke()
                 SentryLog.d("API", "End of refreshing threads with mode: $refreshMode | (${folder.name})")
             }
@@ -679,7 +679,7 @@ class RefreshController @Inject constructor(private val localSettings: LocalSett
     //endregion
 
     //region Handle errors
-    private fun handleAllExceptions(throwable: Throwable, stopped: (() -> Unit)?, folder: Folder): Nothing? {
+    private fun handleAllExceptions(throwable: Throwable, stopped: (() -> Unit)?, folder: Folder): Pair<Nothing?, Throwable> {
 
         // We force-cancelled, so we need to call the `stopped` callback.
         if (throwable is ForcedCancellationException) stopped?.invoke()
@@ -689,7 +689,7 @@ class RefreshController @Inject constructor(private val localSettings: LocalSett
 
         if (throwable is ApiErrorException) throwable.handleOtherApiErrors(folder)
 
-        return null
+        return null to throwable
     }
 
     private fun ApiErrorException.handleOtherApiErrors(folder: Folder) {
