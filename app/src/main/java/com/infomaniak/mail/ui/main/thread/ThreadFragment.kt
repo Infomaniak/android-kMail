@@ -554,6 +554,6 @@ class ThreadFragment : Fragment() {
         const val ARCHIVE_INDEX = 2
         const val EXTERNAL_TAG_SEPARATOR = " "
 
-        fun allAttachmentsFileName(subject: String) = "ikMail-attachments-$subject.zip"
+        fun allAttachmentsFileName(subject: String) = "infomaniak-mail-attachments-$subject.zip"
     }
 }
