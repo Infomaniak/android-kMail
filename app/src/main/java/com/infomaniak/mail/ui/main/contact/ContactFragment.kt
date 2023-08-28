@@ -1,5 +1,5 @@
 /*
- * Infomaniak ikMail - Android
+ * Infomaniak Mail - Android
  * Copyright (C) 2022 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
