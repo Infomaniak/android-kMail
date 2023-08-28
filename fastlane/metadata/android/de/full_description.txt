@@ -1,19 +1,19 @@
-Die App ikMail kann nur mit von Infomaniak verwalteten E-Mail-Adressen verwendet werden.
+Die App Infomaniak Mail kann nur mit von Infomaniak verwalteten E-Mail-Adressen verwendet werden.
 Mit dieser App können Sie Ihre Infomaniak-Adressen in einer völlig sicheren Umgebung verwalten.
 
-Mit der App ikMail können Sie:
+Mit der App Infomaniak Mail können Sie:
 
 - Eine kostenlose @ik.me-, @etik.com- oder @ikmail.com-Adresse mit 20 GB Speicherplatz anlegen – werbefrei und mit Verwaltung in der Schweiz unter Beachtung der DSGVO.
 - E-Mails über Ihre Infomaniak-E-Mail-Adressen versenden und empfangen.
-- ikMail als Standard-E-Mail-Anwendung festlegen.
+- Infomaniak Mail als Standard-E-Mail-Anwendung festlegen.
 - Eine bestimmte Nachricht oder Ihre ungelesenen E-Mails suchen – in den Favoriten oder mit Dateianhängen.
 - Von einem Konto zum anderen wechseln und auf alle Ihre bei Infomaniak verwalteten E-Mail-Adressen zugreifen.
 - Bei Eingang neuer E-Mails unverzüglich benachrichtigt werden (Push-Benachrichtigung).
 - Ihre E-Mails in benutzerdefinierten Ordnern ablegen.
 - E-Mails durch Wischen schnell verschieben, archivieren und löschen.
 - Ihr Benutzererlebnis individuell anpassen (helles / dunkles Thema, Hervorhebungsfarbe, Anzeigedichte, Wischaktionen im Posteingang usw.).
-- Den Zugriff auf die App ikMail schützen (je nach dem Sperrverfahren Ihres Geräts).
+- Den Zugriff auf die App Infomaniak Mail schützen (je nach dem Sperrverfahren Ihres Geräts).
 
-Mit ikMail behalten Sie die vollständige Kontrolle über Ihre Daten und kommunizieren in einem sicheren, unabhängigen und sich ständig weiterentwickelnden Ökosystem. Die App ikMail wird von Infomaniak entwickelt, und der Code ist Open Source und in unserem GitHub einsehbar.
+Mit Infomaniak Mail behalten Sie die vollständige Kontrolle über Ihre Daten und kommunizieren in einem sicheren, unabhängigen und sich ständig weiterentwickelnden Ökosystem. Die App Infomaniak Mail wird von Infomaniak entwickelt, und der Code ist Open Source und in unserem GitHub einsehbar.
 
 Infomaniak zählt zu den bedeutendsten Cloud-Anbietern Europas und ist führender Entwickler von Produktivitätslösungen in der Schweiz – und das seit mehr als 29 Jahren. Das Unternehmen gehört ausschliesslich seinen Mitarbeitenden und hebt sich durch sein Engagement für Privatsphäre, die lokale Wirtschaft und Umweltschutz von Mitbewerbern ab.

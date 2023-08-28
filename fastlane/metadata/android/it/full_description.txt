@@ -1,19 +1,19 @@
-Per potere utilizzare l'app ikMail, i tuoi indirizzi e-mail devono essere gestiti da Infomaniak.
+Per potere utilizzare l'app Infomaniak Mail, i tuoi indirizzi e-mail devono essere gestiti da Infomaniak.
 Questa app ti consente di gestire i tuoi indirizzi Infomaniak in un ambiente completamente protetto.
 
-Con l'app ikMail, potrai:
+Con l'app Infomaniak Mail, potrai:
 
 - Creare un indirizzo e-mail gratuito @ik.me @etik.com o @ikmail.com con 20 GB di spazio di archiviazione, senza pubblicità e gestito in Svizzera nel rispetto del RGPD.
 - Inviare e ricevere e-mail dai tuoi indirizzi e-mail Infomaniak.
-- Impostare ikMail come applicazione di posta predefinita.
+- Impostare Infomaniak Mail come applicazione di posta predefinita.
 - Cercare un determinato messaggio o le tue e-mail non lette, preferite o con allegati.
 - Passare da un account all'altro per accedere a tutti i tuoi indirizzi gestiti da Infomaniak.
 - Ricevere notifiche immediate sull'arrivo di nuove e-mail (push).
 - Organizzare le tue e-mail in cartelle personalizzate.
 - Scorrere per spostare, archiviare ed eliminare le e-mail in tempi rapidi.
 - Personalizzare la tua esperienza (tema scuro/chiaro, colore principale, densità di visualizzazione, azioni di scorrimento nella posta in arrivo, ecc.).
-- Proteggere l'accesso all'app ikMail (a seconda del metodo di blocco del tuo dispositivo).
+- Proteggere l'accesso all'app Infomaniak Mail (a seconda del metodo di blocco del tuo dispositivo).
 
-Con ikMail, puoi mantenere il controllo totale dei tuoi dati e comunicare in un ecosistema sicuro, sovrano e in continua evoluzione. L'app ikMail è sviluppata da Infomaniak e il suo codice open source è disponibile sul nostro GitHub.
+Con Infomaniak Mail, puoi mantenere il controllo totale dei tuoi dati e comunicare in un ecosistema sicuro, sovrano e in continua evoluzione. L'app Infomaniak Mail è sviluppata da Infomaniak e il suo codice open source è disponibile sul nostro GitHub.
 
 Infomaniak è un provider cloud chiave operante in Europa e sviluppatore leader di soluzioni di produttività in Svizzera da oltre 29 anni. L'impresa è di proprietà esclusiva dei suoi fondatori e dei suoi addetti e si contraddistingue grazie al suo impegno a favore della privacy, dell'economia locale e dell'ecologia.
