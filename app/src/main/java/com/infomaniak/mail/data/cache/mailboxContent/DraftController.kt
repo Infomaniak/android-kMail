@@ -210,7 +210,7 @@ class DraftController @Inject constructor(
     }
 
     private fun Message.fromName(): String {
-        return from.firstOrNull()?.quotedDisplay() ?: appContext.getString(R.string.unknownRecipientTitle)
+        return sender?.quotedDisplay() ?: appContext.getString(R.string.unknownRecipientTitle)
     }
 
     private fun Recipient.quotedDisplay(): String = "${("$name ").ifBlank { "" }}&lt;$email&gt;"

@@ -114,7 +114,7 @@ class ThreadAdapter(
             val message = messages[position]
 
             when (payload) {
-                NotificationType.AVATAR -> if (!message.isDraft) userAvatar.loadAvatar(message.from.first(), contacts)
+                NotificationType.AVATAR -> if (!message.isDraft) userAvatar.loadAvatar(message.sender, contacts)
                 NotificationType.TOGGLE_LIGHT_MODE -> {
                     isThemeTheSameMap[message.uid] = !isThemeTheSameMap[message.uid]!!
                     holder.toggleBodyAndQuoteTheme(message)
@@ -233,7 +233,7 @@ class ThreadAdapter(
             }
             shortMessageDate.text = ""
         } else {
-            val firstSender = message.from.firstOrNull()
+            val firstSender = message.sender
             userAvatar.loadAvatar(firstSender, contacts)
             expeditorName.apply {
                 text = firstSender?.let { context.getPrettyNameAndEmail(it).first }
@@ -243,7 +243,7 @@ class ThreadAdapter(
             shortMessageDate.text = context.mailFormattedDate(messageDate)
         }
 
-        message.from.firstOrNull()?.let { recipient ->
+        message.sender?.let { recipient ->
             userAvatar.setOnClickListener {
                 context.trackMessageEvent("selectAvatar")
                 onContactClicked?.invoke(recipient)
