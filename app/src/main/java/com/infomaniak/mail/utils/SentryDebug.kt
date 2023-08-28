@@ -121,11 +121,14 @@ object SentryDebug {
             scope.level = SentryLevel.ERROR
             scope.setTag("reason", reason)
             scope.setExtra("userId", "${userId?.toString()}")
-            scope.setExtra("currentMailboxEmail", "[${AccountUtils.currentUserId}]")
+            scope.setExtra("currentUserId", "[${AccountUtils.currentUserId}]")
             scope.setExtra("mailboxId", "${mailboxId?.toString()}")
             scope.setExtra("mailbox.email", "[${mailbox?.email}]")
             scope.setExtra("currentMailboxEmail", "[${AccountUtils.currentMailboxEmail}]")
             scope.setExtra("messageUid", "$messageUid")
+            scope.setExtra("user displayName", "${AccountUtils.currentUser?.displayName}")
+            scope.setExtra("user firstName", "${AccountUtils.currentUser?.firstname}")
+            scope.setExtra("user lastName", "${AccountUtils.currentUser?.lastname}")
             Sentry.captureMessage("We received a Notification, but we failed to show it")
         }
     }
