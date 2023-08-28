@@ -113,8 +113,12 @@ class ThreadAdapter(
 
             val message = messages[position]
 
+            if (message.from.isEmpty()) {
+                SentryLog.e("ThreadAdapter", "Message ${message.uid} has empty from")
+            }
+
             when (payload) {
-                NotificationType.AVATAR -> if (!message.isDraft) userAvatar.loadAvatar(message.from.first(), contacts)
+                NotificationType.AVATAR -> if (!message.isDraft) userAvatar.loadAvatar(message.from.firstOrNull(), contacts)
                 NotificationType.TOGGLE_LIGHT_MODE -> {
                     isThemeTheSameMap[message.uid] = !isThemeTheSameMap[message.uid]!!
                     holder.toggleBodyAndQuoteTheme(message)
