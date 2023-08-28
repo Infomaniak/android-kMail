@@ -54,6 +54,9 @@ class FetchMessagesManager @Inject constructor(
 
         val realm = mailboxContentRealm ?: RealmDatabase.newMailboxContentInstance(userId, mailbox.mailboxId)
         val folder = FolderController.getFolder(FolderRole.INBOX, realm) ?: run {
+            // If we can't find the INBOX in Realm, it means the user never opened this Mailbox.
+            // We don't want to display Notifications in this case.
+            // We can leave safely.
             SentryDebug.sendFailedNotification("No Folder in Realm", userId, mailbox.mailboxId, sentryMessageUid, mailbox)
             return
         }
