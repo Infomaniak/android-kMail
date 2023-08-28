@@ -46,8 +46,9 @@ class FetchMessagesManager @Inject constructor(
 
     suspend fun execute(userId: Int, mailbox: Mailbox, sentryMessageUid: String? = null, mailboxContentRealm: Realm? = null) {
 
-        // Don't launch sync if the Mailbox's notifications have been disabled by the user
         if (mailbox.notificationsIsDisabled(notificationManagerCompat)) {
+            // If the user disabled Notifications for this Mailbox, we don't want to display any Notification.
+            // We can leave safely.
             SentryDebug.sendFailedNotification("Notifications are disabled", userId, mailbox.mailboxId, sentryMessageUid, mailbox)
             return
         }
