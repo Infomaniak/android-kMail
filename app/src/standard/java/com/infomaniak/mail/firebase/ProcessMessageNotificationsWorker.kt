@@ -68,10 +68,15 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
         }
 
         val mailboxContentRealm = RealmDatabase.newMailboxContentInstance(userId, mailbox.mailboxId)
+
         MessageController.getMessage(messageUid, mailboxContentRealm)?.let {
+            // If the Message is already in Realm, it means we already fetched it when we received a previous Notification.
+            // So we've already shown it in a previous batch of Notifications.
+            // We can leave safely.
             SentryDebug.sendFailedNotification("Message already in Realm", userId, mailboxId, messageUid, mailbox)
             return@with Result.success()
         }
+
         fetchMessagesManager.execute(userId, mailbox, messageUid, mailboxContentRealm)
 
         SentryLog.i(TAG, "Work finished")
