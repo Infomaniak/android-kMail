@@ -34,12 +34,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RestoreEmailsViewModel @Inject constructor(
+    private val mailboxController: MailboxController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
-    private val mailbox by lazy { MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
+    private val mailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
 
     fun getBackups(): LiveData<ApiResponse<BackupResult>> = liveData(ioCoroutineContext) {
         emit(ApiRepository.getBackups(mailbox.hostingId, mailbox.mailboxName))
