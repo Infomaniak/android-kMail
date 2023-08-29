@@ -38,6 +38,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AccountViewModel @Inject constructor(
     application: Application,
+    private val mailboxController: MailboxController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
@@ -45,7 +46,7 @@ class AccountViewModel @Inject constructor(
 
     suspend fun updateMailboxes(): Boolean {
         val mailboxes = ApiRepository.getMailboxes(AccountUtils.getHttpClient(AccountUtils.currentUserId)).data ?: return false
-        MailboxController.updateMailboxes(context, mailboxes)
+        mailboxController.updateMailboxes(context, mailboxes)
 
         return AccountUtils.manageMailboxesEdgeCases(context, mailboxes)
     }
