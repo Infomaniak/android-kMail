@@ -72,6 +72,7 @@ class MainViewModel @Inject constructor(
     private val folderController: FolderController,
     private val mergedContactController: MergedContactController,
     private val messageController: MessageController,
+    private val quotasController: QuotasController,
     private val refreshController: RefreshController,
     private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -121,7 +122,7 @@ class MainViewModel @Inject constructor(
     }.asLiveData(ioCoroutineContext)
 
     val currentQuotasLive = _currentMailboxObjectId.flatMapLatest {
-        it?.let(QuotasController::getQuotasAsync) ?: emptyFlow()
+        it?.let(quotasController::getQuotasAsync) ?: emptyFlow()
     }.asLiveData(ioCoroutineContext)
 
     val currentPermissionsLive = _currentMailboxObjectId.flatMapLatest {
