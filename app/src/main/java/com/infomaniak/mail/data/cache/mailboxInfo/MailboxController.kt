@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.data.cache.mailboxInfo
 
-import android.content.Context
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.AppSettings
@@ -26,7 +25,7 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
 import com.infomaniak.mail.di.MailboxInfoRealm
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.NotificationUtils.initMailNotificationChannel
+import com.infomaniak.mail.utils.NotificationUtils
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
@@ -42,6 +41,7 @@ import javax.inject.Singleton
 @Singleton
 class MailboxController @Inject constructor(
     @MailboxInfoRealm private val mailboxInfoRealm: Realm,
+    private val notificationUtils: NotificationUtils,
 ) {
 
     //region Get data
@@ -94,13 +94,9 @@ class MailboxController @Inject constructor(
     //endregion
 
     //region Edit data
-    fun updateMailboxes(
-        context: Context,
-        remoteMailboxes: List<Mailbox>,
-        userId: Int = AccountUtils.currentUserId,
-    ) {
+    fun updateMailboxes(remoteMailboxes: List<Mailbox>, userId: Int = AccountUtils.currentUserId) {
 
-        context.initMailNotificationChannel(remoteMailboxes)
+        notificationUtils.initMailNotificationChannel(remoteMailboxes)
 
         val mailboxes = mailboxInfoRealm.writeBlocking {
             return@writeBlocking remoteMailboxes.map { remoteMailbox ->

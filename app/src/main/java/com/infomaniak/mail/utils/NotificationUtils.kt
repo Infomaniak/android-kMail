@@ -26,14 +26,15 @@ import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.infomaniak.lib.core.utils.NotificationUtilsCore
+import com.infomaniak.lib.core.utils.NotificationUtilsCore.Companion.pendingIntentFlags
 import com.infomaniak.lib.core.utils.clearStack
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.di.MailboxInfoRealm
 import com.infomaniak.mail.receivers.NotificationActionsReceiver
 import com.infomaniak.mail.receivers.NotificationActionsReceiver.Companion.ARCHIVE_ACTION
 import com.infomaniak.mail.receivers.NotificationActionsReceiver.Companion.DELETE_ACTION
@@ -41,16 +42,20 @@ import com.infomaniak.mail.receivers.NotificationActionsReceiver.Companion.EXTRA
 import com.infomaniak.mail.receivers.NotificationActionsReceiver.Companion.UNDO_ACTION
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.LaunchActivityArgs
+import io.realm.kotlin.Realm
 import java.util.UUID
+import javax.inject.Inject
+import javax.inject.Singleton
 import com.infomaniak.lib.core.R as RCore
 
-object NotificationUtils : NotificationUtilsCore() {
+@Singleton
+class NotificationUtils @Inject constructor(
+    private val appContext: Context,
+    private val localSettings: LocalSettings,
+    @MailboxInfoRealm private val mailboxInfoRealm: Realm,
+) {
 
-    private const val DEFAULT_SMALL_ICON = R.drawable.ic_logo_notification
-
-    const val DRAFT_ACTIONS_ID = 1
-
-    fun Context.initNotificationChannel() {
+    fun initNotificationChannel() = with(appContext) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channelList = mutableListOf<NotificationChannel>()
 
@@ -79,7 +84,7 @@ object NotificationUtils : NotificationUtilsCore() {
         }
     }
 
-    fun Context.initMailNotificationChannel(mailboxes: List<Mailbox>) {
+    fun initMailNotificationChannel(mailboxes: List<Mailbox>) = with(appContext) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val groups = mutableListOf<NotificationChannelGroup>()
             val channels = mutableListOf<NotificationChannel>()
@@ -101,31 +106,25 @@ object NotificationUtils : NotificationUtilsCore() {
         }
     }
 
-    fun Context.deleteMailNotificationChannel(mailbox: List<Mailbox>) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            deleteNotificationChannels(mailbox.map { it.channelId })
-        }
-    }
-
-    fun Context.buildGeneralNotification(title: String, description: String? = null): NotificationCompat.Builder {
-        return buildNotification(
-            channelId = getString(R.string.notification_channel_id_general),
+    fun buildGeneralNotification(title: String, description: String? = null): NotificationCompat.Builder {
+        return appContext.buildNotification(
+            channelId = appContext.getString(R.string.notification_channel_id_general),
             icon = DEFAULT_SMALL_ICON,
             title = title,
             description = description,
         )
     }
 
-    private fun Context.buildMessageNotification(
+    private fun buildMessageNotification(
         channelId: String,
         title: String,
         description: String?,
     ): NotificationCompat.Builder {
-        return buildNotification(channelId, DEFAULT_SMALL_ICON, title, description)
+        return appContext.buildNotification(channelId, DEFAULT_SMALL_ICON, title, description)
             .setCategory(Notification.CATEGORY_EMAIL)
     }
 
-    fun Context.buildDraftActionsNotification(): NotificationCompat.Builder {
+    fun buildDraftActionsNotification(): NotificationCompat.Builder = with(appContext) {
         val channelId = getString(R.string.notification_channel_id_draft_service)
         return NotificationCompat.Builder(this, channelId)
             .setContentTitle(getString(R.string.notificationSyncDraftChannelName))
@@ -133,7 +132,10 @@ object NotificationUtils : NotificationUtilsCore() {
             .setProgress(100, 0, true)
     }
 
-    fun Context.buildDraftErrorNotification(@StringRes errorMessageRes: Int, action: DraftAction): NotificationCompat.Builder {
+    fun buildDraftErrorNotification(
+        @StringRes errorMessageRes: Int,
+        action: DraftAction,
+    ): NotificationCompat.Builder = with(appContext) {
         return buildGeneralNotification(
             title = getString(if (action == DraftAction.SEND) R.string.notificationTitleCouldNotSendDraft else R.string.notificationTitleCouldNotSaveDraft),
             description = getString(errorMessageRes),
@@ -141,7 +143,6 @@ object NotificationUtils : NotificationUtilsCore() {
     }
 
     fun showMessageNotification(
-        context: Context,
         notificationManagerCompat: NotificationManagerCompat,
         payload: NotificationPayload,
     ) = with(payload) {
@@ -149,7 +150,7 @@ object NotificationUtils : NotificationUtilsCore() {
         fun contentIntent(mailboxUuid: String, isSummary: Boolean, isUndo: Boolean): PendingIntent? {
             if (isUndo) return null
 
-            val intent = Intent(context, LaunchActivity::class.java).clearStack().putExtras(
+            val intent = Intent(appContext, LaunchActivity::class.java).clearStack().putExtras(
                 LaunchActivityArgs(
                     userId = userId,
                     mailboxId = mailboxId,
@@ -157,21 +158,21 @@ object NotificationUtils : NotificationUtilsCore() {
                 ).toBundle(),
             )
             val requestCode = if (isSummary) mailboxUuid else threadUid
-            return PendingIntent.getActivity(context, requestCode.hashCode(), intent, pendingIntentFlags)
+            return PendingIntent.getActivity(appContext, requestCode.hashCode(), intent, pendingIntentFlags)
         }
 
-        val mailbox = MailboxController.getMailbox(userId, mailboxId, RealmDatabase.mailboxInfo()) ?: run {
+        val mailbox = MailboxController.getMailbox(userId, mailboxId, mailboxInfoRealm) ?: run {
             SentryDebug.sendFailedNotification("Created Notif: no Mailbox in Realm", userId, mailboxId, messageUid)
             return@with
         }
 
-        context.buildMessageNotification(mailbox.channelId, title, description).apply {
+        buildMessageNotification(mailbox.channelId, title, description).apply {
 
             if (isSummary) {
                 setContentTitle(null)
                 setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
             } else {
-                addActions(context, payload)
+                addActions(payload)
             }
 
             setOnlyAlertOnce(true)
@@ -181,30 +182,30 @@ object NotificationUtils : NotificationUtilsCore() {
             setContentIntent(contentIntent(mailbox.uuid, isSummary, isUndo))
             setGroup(mailbox.notificationGroupKey)
             setGroupSummary(isSummary)
-            color = LocalSettings.getInstance(context).accentColor.getPrimary(context)
+            color = localSettings.accentColor.getPrimary(appContext)
 
             @Suppress("MissingPermission")
             notificationManagerCompat.notify(notificationId, build())
         }
     }
 
-    private fun NotificationCompat.Builder.addActions(context: Context, payload: NotificationPayload) {
+    private fun NotificationCompat.Builder.addActions(payload: NotificationPayload) {
 
         fun createBroadcastAction(@StringRes title: Int, intent: Intent): NotificationCompat.Action {
             val requestCode = UUID.randomUUID().hashCode()
-            val pendingIntent = PendingIntent.getBroadcast(context, requestCode, intent, pendingIntentFlags)
-            return NotificationCompat.Action(null, context.getString(title), pendingIntent)
+            val pendingIntent = PendingIntent.getBroadcast(appContext, requestCode, intent, pendingIntentFlags)
+            return NotificationCompat.Action(null, appContext.getString(title), pendingIntent)
         }
 
         fun createActivityAction(@StringRes title: Int, activity: Class<*>, args: Bundle): NotificationCompat.Action {
             val requestCode = UUID.randomUUID().hashCode()
-            val intent = Intent(context, activity).clearStack().putExtras(args)
-            val pendingIntent = PendingIntent.getActivity(context, requestCode, intent, pendingIntentFlags)
-            return NotificationCompat.Action(null, context.getString(title), pendingIntent)
+            val intent = Intent(appContext, activity).clearStack().putExtras(args)
+            val pendingIntent = PendingIntent.getActivity(appContext, requestCode, intent, pendingIntentFlags)
+            return NotificationCompat.Action(null, appContext.getString(title), pendingIntent)
         }
 
         fun createBroadcastIntent(notificationAction: String): Intent {
-            return Intent(context, NotificationActionsReceiver::class.java).apply {
+            return Intent(appContext, NotificationActionsReceiver::class.java).apply {
                 action = notificationAction
                 putExtra(EXTRA_PAYLOAD, payload)
             }
@@ -243,5 +244,17 @@ object NotificationUtils : NotificationUtilsCore() {
         addAction(archiveAction)
         addAction(deleteAction)
         addAction(replyAction)
+    }
+
+    companion object : NotificationUtilsCore() {
+        const val DRAFT_ACTIONS_ID = 1
+
+        private const val DEFAULT_SMALL_ICON = R.drawable.ic_logo_notification
+
+        fun Context.deleteMailNotificationChannel(mailbox: List<Mailbox>) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                deleteNotificationChannels(mailbox.map { it.channelId })
+            }
+        }
     }
 }

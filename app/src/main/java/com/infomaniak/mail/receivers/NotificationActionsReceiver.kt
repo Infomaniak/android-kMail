@@ -34,13 +34,9 @@ import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.di.IoDispatcher
-import com.infomaniak.mail.utils.NotificationPayload
+import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior
 import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior.NotificationType
-import com.infomaniak.mail.utils.NotificationUtils.showMessageNotification
-import com.infomaniak.mail.utils.SharedUtils
-import com.infomaniak.mail.utils.getApiException
-import com.infomaniak.mail.utils.getUids
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import kotlinx.coroutines.*
@@ -60,6 +56,9 @@ class NotificationActionsReceiver : BroadcastReceiver() {
 
     @Inject
     lateinit var notificationManagerCompat: NotificationManagerCompat
+
+    @Inject
+    lateinit var notificationUtils: NotificationUtils
 
     @Inject
     lateinit var sharedUtils: SharedUtils
@@ -84,7 +83,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
         // Undo action
         if (action == UNDO_ACTION) {
             context.trackNotificationActionEvent("cancelClicked")
-            executeUndoAction(context, payload)
+            executeUndoAction(payload)
             return
         }
 
@@ -104,13 +103,12 @@ class NotificationActionsReceiver : BroadcastReceiver() {
         executeAction(context, folderRole, undoNotificationTitle, matomoValue, payload)
     }
 
-    private fun executeUndoAction(context: Context, payload: NotificationPayload) {
+    private fun executeUndoAction(payload: NotificationPayload) {
 
         // Cancel action
         notificationJobsBus.unregister(payload.notificationId)
 
-        showMessageNotification(
-            context = context,
+        notificationUtils.showMessageNotification(
             notificationManagerCompat = notificationManagerCompat,
             payload = payload.apply { behavior = null },
         )
@@ -124,8 +122,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
         payload: NotificationPayload,
     ) = with(payload) {
 
-        showMessageNotification(
-            context = context,
+        notificationUtils.showMessageNotification(
             notificationManagerCompat = notificationManagerCompat,
             payload = payload.apply {
                 behavior = NotificationBehavior(
