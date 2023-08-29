@@ -330,7 +330,7 @@ class RefreshController @Inject constructor(
             }
 
             impactedFoldersIds.forEach { folderId ->
-                FolderController.refreshUnreadCount(folderId, mailbox.objectId, realm = this)
+                refreshUnreadCount(folderId, mailbox.objectId, realm = this)
             }
 
             FolderController.getFolder(folder.id, realm = this)?.let {
@@ -344,6 +344,20 @@ class RefreshController @Inject constructor(
         sendSentryOrphans(folder, previousCursor)
 
         return fetchAllNewPages(scope, mailbox, folder, okHttpClient)
+    }
+
+    private fun refreshUnreadCount(id: String, mailboxObjectId: String, realm: MutableRealm) {
+
+        val folder = FolderController.getFolder(id, realm) ?: return
+
+        val unreadCount = ThreadController.getUnreadThreadsCount(folder)
+        folder.unreadCountLocal = unreadCount
+
+        if (folder.role == FolderRole.INBOX) {
+            mailboxController.updateMailbox(mailboxObjectId) { mailbox ->
+                mailbox.unreadCountLocal = unreadCount
+            }
+        }
     }
     //endregion
 
@@ -386,7 +400,7 @@ class RefreshController @Inject constructor(
                     val isConversationMode = localSettings.threadMode == ThreadMode.CONVERSATION
                     val allImpactedThreads = createThreads(scope, latestFolder, messages, isConversationMode).also { threads ->
                         val foldersIds = (if (isConversationMode) threads.map { it.folderId }.toSet() else emptySet()) + folder.id
-                        foldersIds.forEach { FolderController.refreshUnreadCount(it, mailbox.objectId, realm = this) }
+                        foldersIds.forEach { refreshUnreadCount(it, mailbox.objectId, realm = this) }
                     }
                     SentryLog.d("Realm", "Saved Messages: ${latestFolder.name} | ${latestFolder.messages.count()}")
 

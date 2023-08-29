@@ -221,20 +221,6 @@ class FolderController @Inject constructor(
                 getFolder(id, realm = this)?.let { folder -> updateChildrenRecursively(mutableListOf(folder)) }
             }
         }
-
-        fun refreshUnreadCount(id: String, mailboxObjectId: String, realm: MutableRealm) {
-
-            val folder = getFolder(id, realm) ?: return
-
-            val unreadCount = ThreadController.getUnreadThreadsCount(folder)
-            folder.unreadCountLocal = unreadCount
-
-            if (folder.role == FolderRole.INBOX) {
-                MailboxController.updateMailbox(mailboxObjectId) { mailbox ->
-                    mailbox.unreadCountLocal = unreadCount
-                }
-            }
-        }
         //endregion
     }
 }
