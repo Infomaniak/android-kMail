@@ -24,9 +24,11 @@ import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Quotas
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
+import com.infomaniak.mail.di.MailboxInfoRealm
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.NotificationUtils.initMailNotificationChannel
 import io.realm.kotlin.MutableRealm
+import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
@@ -34,110 +36,56 @@ import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object MailboxController {
-
-    private inline val defaultRealm get() = RealmDatabase.mailboxInfo()
-
-    //region Queries
-    private fun checkHasUserId(userId: Int) = "${Mailbox::userId.name} == '$userId'"
-    private val isMailboxLocked = "${Mailbox::isLocked.name} == true"
-    private val hasValidPassword = "${Mailbox::isPasswordValid.name} == true"
-
-    private fun getMailboxesQuery(
-        userId: Int? = null,
-        exceptionMailboxIds: List<Int> = emptyList(),
-        realm: TypedRealm = defaultRealm,
-    ): RealmQuery<Mailbox> {
-
-        val query = if (userId == null) {
-            realm.query()
-        } else {
-            realm.query<Mailbox>(checkHasUserId(userId))
-        }
-
-        val sortedQuery = query
-            .sort(Mailbox::email.name, Sort.ASCENDING)
-            .sort(Mailbox::isPrimary.name, Sort.DESCENDING)
-
-        return if (exceptionMailboxIds.isEmpty()) {
-            sortedQuery
-        } else {
-            sortedQuery.query("NOT ${Mailbox::mailboxId.name} IN $0", exceptionMailboxIds)
-        }
-    }
-
-    private fun getValidMailboxesQuery(userId: Int, realm: TypedRealm): RealmQuery<Mailbox> {
-        return realm.query("${checkHasUserId(userId)} AND $hasValidPassword AND (NOT $isMailboxLocked)")
-    }
-
-    private fun getMailboxesCountQuery(userId: Int): RealmScalarQuery<Long> {
-        return getMailboxesQuery(userId).count()
-    }
-
-    private fun getMailboxQuery(objectId: String, realm: TypedRealm): RealmSingleQuery<Mailbox> {
-        return realm.query<Mailbox>("${Mailbox::objectId.name} == $0", objectId).first()
-    }
-
-    private fun getMailboxQuery(userId: Int, mailboxId: Int, realm: TypedRealm): RealmSingleQuery<Mailbox> {
-        val checkMailboxId = "${Mailbox::mailboxId.name} == $0"
-        return realm.query<Mailbox>("${checkHasUserId(userId)} AND $checkMailboxId", mailboxId).first()
-    }
-
-    private fun getInvalidPasswordMailboxesQuery(userId: Int, realm: TypedRealm): RealmQuery<Mailbox> {
-        return realm.query("${checkHasUserId(userId)} AND NOT ($hasValidPassword OR $isMailboxLocked)")
-    }
-
-    private fun getLockedMailboxesQuery(userId: Int, realm: TypedRealm): RealmQuery<Mailbox> {
-        return realm.query("${checkHasUserId(userId)} AND $isMailboxLocked")
-    }
-    //endregion
+@Singleton
+class MailboxController @Inject constructor(@MailboxInfoRealm private val mailboxInfoRealm: Realm) {
 
     //region Get data
     fun getMailboxes(
         userId: Int? = null,
         exceptionMailboxIds: List<Int> = emptyList(),
-        realm: TypedRealm = defaultRealm,
     ): RealmResults<Mailbox> {
-        return getMailboxesQuery(userId, exceptionMailboxIds, realm).find()
+        return getMailboxes(userId, exceptionMailboxIds, mailboxInfoRealm)
     }
 
-    fun getMailboxesCount(userId: Int): Flow<Long> = getMailboxesCountQuery(userId).asFlow()
+    fun getMailboxesCount(userId: Int): Flow<Long> = getMailboxesCountQuery(userId, mailboxInfoRealm).asFlow()
 
     fun getMailboxesAsync(userId: Int, exceptionMailboxIds: List<Int> = emptyList()): Flow<RealmResults<Mailbox>> {
-        return getMailboxesQuery(userId, exceptionMailboxIds).toMailboxesFlow()
+        return getMailboxesQuery(userId, exceptionMailboxIds, mailboxInfoRealm).toMailboxesFlow()
     }
 
-    fun getMailbox(objectId: String, realm: TypedRealm = defaultRealm): Mailbox? {
-        return getMailboxQuery(objectId, realm).find()
+    fun getMailbox(objectId: String): Mailbox? {
+        return getMailboxQuery(objectId, mailboxInfoRealm).find()
     }
 
-    fun getMailbox(userId: Int, mailboxId: Int, realm: TypedRealm = defaultRealm): Mailbox? {
-        return getMailboxQuery(userId, mailboxId, realm).find()
+    fun getMailbox(userId: Int, mailboxId: Int): Mailbox? {
+        return getMailbox(userId, mailboxId, mailboxInfoRealm)
     }
 
-    fun getMailboxWithFallback(userId: Int, mailboxId: Int, realm: TypedRealm = defaultRealm): Mailbox? {
-        return getMailbox(userId, mailboxId, realm) ?: getMailboxesQuery(userId, realm = realm).first().find()
+    fun getMailboxWithFallback(userId: Int, mailboxId: Int): Mailbox? {
+        return Companion.getMailboxWithFallback(userId, mailboxId, mailboxInfoRealm)
     }
 
-    fun getFirstValidMailbox(userId: Int, realm: TypedRealm = defaultRealm): Mailbox? {
-        return getValidMailboxesQuery(userId, realm).first().find()
+    fun getFirstValidMailbox(userId: Int): Mailbox? {
+        return getFirstValidMailbox(userId, mailboxInfoRealm)
     }
 
     fun getMailboxAsync(objectId: String): Flow<SingleQueryChange<Mailbox>> {
-        return getMailboxQuery(objectId, defaultRealm).asFlow()
+        return getMailboxQuery(objectId, mailboxInfoRealm).asFlow()
     }
 
     fun getMailboxAsync(userId: Int, mailboxId: Int): Flow<SingleQueryChange<Mailbox>> {
-        return getMailboxQuery(userId, mailboxId, defaultRealm).asFlow()
+        return getMailboxQuery(userId, mailboxId, mailboxInfoRealm).asFlow()
     }
 
     fun getInvalidPasswordMailboxes(userId: Int): Flow<RealmResults<Mailbox>> {
-        return getInvalidPasswordMailboxesQuery(userId, defaultRealm).toMailboxesFlow()
+        return getInvalidPasswordMailboxesQuery(userId, mailboxInfoRealm).toMailboxesFlow()
     }
 
     fun getLockedMailboxes(userId: Int): Flow<RealmResults<Mailbox>> {
-        return getLockedMailboxesQuery(userId, defaultRealm).toMailboxesFlow()
+        return getLockedMailboxesQuery(userId, mailboxInfoRealm).toMailboxesFlow()
     }
 
     private fun RealmQuery<Mailbox>.toMailboxesFlow() = asFlow().map { it.list }
@@ -152,7 +100,7 @@ object MailboxController {
 
         context.initMailNotificationChannel(remoteMailboxes)
 
-        val mailboxes = defaultRealm.writeBlocking {
+        val mailboxes = mailboxInfoRealm.writeBlocking {
             return@writeBlocking remoteMailboxes.map { remoteMailbox ->
                 remoteMailbox.also {
                     val localMailbox = getMailbox(userId, remoteMailbox.mailboxId, realm = this)
@@ -173,9 +121,11 @@ object MailboxController {
 
         // Get current data
         SentryLog.d(RealmDatabase.TAG, "Mailboxes: Get current data")
-        val localQuotasAndPermissions = getMailboxes(userId).associate { it.objectId to (it.quotas to it.permissions) }
+        val localQuotasAndPermissions = getMailboxes(userId, realm = mailboxInfoRealm).associate {
+            it.objectId to (it.quotas to it.permissions)
+        }
 
-        defaultRealm.writeBlocking {
+        mailboxInfoRealm.writeBlocking {
 
             SentryLog.d(RealmDatabase.TAG, "Mailboxes: Save new data")
             upsertMailboxes(localQuotasAndPermissions, remoteMailboxes)
@@ -210,7 +160,90 @@ object MailboxController {
     }
 
     fun updateMailbox(objectId: String, onUpdate: (mailbox: Mailbox) -> Unit) {
-        defaultRealm.writeBlocking { getMailbox(objectId, realm = this)?.let(onUpdate) }
+        mailboxInfoRealm.writeBlocking { getMailbox(objectId, realm = this)?.let(onUpdate) }
     }
     //endregion
+
+    companion object {
+
+        //region Queries
+        private fun checkHasUserId(userId: Int) = "${Mailbox::userId.name} == '$userId'"
+        private val isMailboxLocked = "${Mailbox::isLocked.name} == true"
+        private val hasValidPassword = "${Mailbox::isPasswordValid.name} == true"
+
+        private fun getMailboxesQuery(
+            userId: Int? = null,
+            exceptionMailboxIds: List<Int> = emptyList(),
+            realm: TypedRealm,
+        ): RealmQuery<Mailbox> {
+
+            val query = if (userId == null) {
+                realm.query()
+            } else {
+                realm.query<Mailbox>(checkHasUserId(userId))
+            }
+
+            val sortedQuery = query
+                .sort(Mailbox::email.name, Sort.ASCENDING)
+                .sort(Mailbox::isPrimary.name, Sort.DESCENDING)
+
+            return if (exceptionMailboxIds.isEmpty()) {
+                sortedQuery
+            } else {
+                sortedQuery.query("NOT ${Mailbox::mailboxId.name} IN $0", exceptionMailboxIds)
+            }
+        }
+
+        private fun getValidMailboxesQuery(userId: Int, realm: TypedRealm): RealmQuery<Mailbox> {
+            return realm.query("${checkHasUserId(userId)} AND $hasValidPassword AND (NOT $isMailboxLocked)")
+        }
+
+        private fun getMailboxesCountQuery(userId: Int, realm: TypedRealm): RealmScalarQuery<Long> {
+            return getMailboxesQuery(userId, realm = realm).count()
+        }
+
+        private fun getMailboxQuery(objectId: String, realm: TypedRealm): RealmSingleQuery<Mailbox> {
+            return realm.query<Mailbox>("${Mailbox::objectId.name} == $0", objectId).first()
+        }
+
+        private fun getMailboxQuery(userId: Int, mailboxId: Int, realm: TypedRealm): RealmSingleQuery<Mailbox> {
+            val checkMailboxId = "${Mailbox::mailboxId.name} == $0"
+            return realm.query<Mailbox>("${checkHasUserId(userId)} AND $checkMailboxId", mailboxId).first()
+        }
+
+        private fun getInvalidPasswordMailboxesQuery(userId: Int, realm: TypedRealm): RealmQuery<Mailbox> {
+            return realm.query("${checkHasUserId(userId)} AND NOT ($hasValidPassword OR $isMailboxLocked)")
+        }
+
+        private fun getLockedMailboxesQuery(userId: Int, realm: TypedRealm): RealmQuery<Mailbox> {
+            return realm.query("${checkHasUserId(userId)} AND $isMailboxLocked")
+        }
+        //endregion
+
+        //region Get data
+        fun getMailboxes(
+            userId: Int? = null,
+            exceptionMailboxIds: List<Int> = emptyList(),
+            realm: TypedRealm,
+        ): RealmResults<Mailbox> {
+            return getMailboxesQuery(userId, exceptionMailboxIds, realm).find()
+        }
+
+        fun getMailbox(objectId: String, realm: TypedRealm): Mailbox? {
+            return getMailboxQuery(objectId, realm).find()
+        }
+
+        fun getMailbox(userId: Int, mailboxId: Int, realm: TypedRealm): Mailbox? {
+            return getMailboxQuery(userId, mailboxId, realm).find()
+        }
+
+        fun getMailboxWithFallback(userId: Int, mailboxId: Int, realm: TypedRealm): Mailbox? {
+            return getMailbox(userId, mailboxId, realm) ?: getMailboxesQuery(userId, realm = realm).first().find()
+        }
+
+        fun getFirstValidMailbox(userId: Int, realm: TypedRealm): Mailbox? {
+            return getValidMailboxesQuery(userId, realm).first().find()
+        }
+        //endregion
+    }
 }
