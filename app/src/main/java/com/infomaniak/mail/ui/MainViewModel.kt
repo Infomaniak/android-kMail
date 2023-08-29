@@ -914,6 +914,8 @@ class MainViewModel @Inject constructor(
                 mailbox = currentMailbox.value!!,
                 folder = folder,
                 realm = mailboxContentRealm(),
+                started = ::startedDownload,
+                stopped = ::stoppedDownload,
             )
         }
     }
