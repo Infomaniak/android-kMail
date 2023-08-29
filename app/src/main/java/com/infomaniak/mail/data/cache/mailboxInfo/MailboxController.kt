@@ -67,7 +67,7 @@ class MailboxController @Inject constructor(
     }
 
     fun getMailboxWithFallback(userId: Int, mailboxId: Int): Mailbox? {
-        return Companion.getMailboxWithFallback(userId, mailboxId, mailboxInfoRealm)
+        return getMailboxWithFallback(userId, mailboxId, mailboxInfoRealm)
     }
 
     fun getFirstValidMailbox(userId: Int): Mailbox? {
