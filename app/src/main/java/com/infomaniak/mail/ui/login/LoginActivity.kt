@@ -106,7 +106,7 @@ class LoginActivity : AppCompatActivity() {
                     apiResponse.data?.let { mailboxes ->
                         context.trackUserInfo("nbMailboxes", mailboxes.count())
                         AccountUtils.addUser(user)
-                        mailboxController.updateMailboxes(context, mailboxes)
+                        mailboxController.updateMailboxes(mailboxes)
 
                         return@let if (mailboxes.none { it.isValid }) MailboxErrorCode.NO_VALID_MAILBOX else user
                     } ?: run {

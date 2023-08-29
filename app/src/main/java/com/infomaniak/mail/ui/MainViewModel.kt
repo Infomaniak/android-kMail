@@ -49,7 +49,7 @@ import com.infomaniak.mail.ui.main.folder.ThreadListViewModel
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
-import com.infomaniak.mail.utils.NotificationUtils.cancelNotification
+import com.infomaniak.mail.utils.NotificationUtils.Companion.cancelNotification
 import com.infomaniak.mail.utils.SharedUtils.Companion.updateSignatures
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.ext.copyFromRealm
@@ -72,6 +72,7 @@ class MainViewModel @Inject constructor(
     private val mailboxController: MailboxController,
     private val mergedContactController: MergedContactController,
     private val messageController: MessageController,
+    private val notificationUtils: NotificationUtils,
     private val permissionsController: PermissionsController,
     private val quotasController: QuotasController,
     private val refreshController: RefreshController,
@@ -235,7 +236,7 @@ class MainViewModel @Inject constructor(
             SentryLog.d(TAG, "Refresh mailboxes from remote")
             with(ApiRepository.getMailboxes()) {
                 if (isSuccess()) {
-                    mailboxController.updateMailboxes(context, data!!)
+                    mailboxController.updateMailboxes(data!!)
 
                     val shouldStop = AccountUtils.manageMailboxesEdgeCases(context, data!!)
                     if (shouldStop) return@launch
