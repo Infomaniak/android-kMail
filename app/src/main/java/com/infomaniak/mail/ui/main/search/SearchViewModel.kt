@@ -44,12 +44,13 @@ import javax.inject.Inject
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     application: Application,
-    private val savedStateHandle: SavedStateHandle,
+    folderController: FolderController,
     private val globalCoroutineScope: CoroutineScope,
-    private val searchUtils: SearchUtils,
-    private val folderController: FolderController,
+    private val mailboxController: MailboxController,
     private val messageController: MessageController,
     private val refreshController: RefreshController,
+    private val savedStateHandle: SavedStateHandle,
+    private val searchUtils: SearchUtils,
     private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
@@ -217,7 +218,7 @@ class SearchViewModel @Inject constructor(
 
         visibilityMode.postValue(VisibilityMode.LOADING)
 
-        val currentMailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
+        val currentMailbox = mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
         val folderId = folder?.id ?: dummyFolderId
         val resource = if (shouldGetNextPage) resourceNext else null
         val searchFilters = searchUtils.searchFilters(query, newFilters, resource)
