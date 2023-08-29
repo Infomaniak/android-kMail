@@ -75,9 +75,19 @@ class FetchMessagesManager @Inject constructor(
             folder = folder,
             okHttpClient = okHttpClient,
             realm = realm,
-        ) ?: run {
-            SentryDebug.sendFailedNotification("RefreshThreads failed", userId, mailbox.mailboxId, sentryMessageUid, mailbox)
-            return
+        ).let { (threads, throwable) ->
+            if (threads == null) {
+                SentryDebug.sendFailedNotification(
+                    reason = "RefreshThreads failed",
+                    userId = userId,
+                    mailboxId = mailbox.mailboxId,
+                    messageUid = sentryMessageUid,
+                    mailbox = mailbox,
+                    throwable = throwable,
+                )
+                return
+            }
+            return@let threads
         }
 
         SentryLog.d(TAG, "launchWork: ${mailbox.email} has ${newMessagesThreads.count()} Threads with new Messages")
