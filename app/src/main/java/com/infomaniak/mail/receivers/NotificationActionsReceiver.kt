@@ -50,16 +50,19 @@ import javax.inject.Inject
 class NotificationActionsReceiver : BroadcastReceiver() {
 
     @Inject
-    lateinit var notificationManagerCompat: NotificationManagerCompat
-
-    @Inject
     lateinit var folderController: FolderController
 
     @Inject
-    lateinit var sharedUtils: SharedUtils
+    lateinit var mailboxController: MailboxController
 
     @Inject
     lateinit var notificationJobsBus: NotificationJobsBus
+
+    @Inject
+    lateinit var notificationManagerCompat: NotificationManagerCompat
+
+    @Inject
+    lateinit var sharedUtils: SharedUtils
 
     @Inject
     @IoDispatcher
@@ -141,7 +144,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
             val message = MessageController.getMessage(messageUid!!, realm) ?: return@launch
             val threads = message.threads.filter { it.folderId == message.folderId }
 
-            val mailbox = MailboxController.getMailbox(userId, mailboxId) ?: return@launch
+            val mailbox = mailboxController.getMailbox(userId, mailboxId) ?: return@launch
             val messages = sharedUtils.getMessagesToMove(threads, message)
             val destinationId = folderController.getFolder(folderRole)?.id ?: return@launch
 
