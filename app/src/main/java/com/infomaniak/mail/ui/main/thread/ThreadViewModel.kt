@@ -45,11 +45,12 @@ import kotlin.collections.set
 @HiltViewModel
 class ThreadViewModel @Inject constructor(
     application: Application,
-    private val savedStateHandle: SavedStateHandle,
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
+    private val mailboxController: MailboxController,
     private val messageController: MessageController,
-    private val sharedUtils: SharedUtils,
     private val refreshController: RefreshController,
+    private val savedStateHandle: SavedStateHandle,
+    private val sharedUtils: SharedUtils,
     private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
@@ -61,7 +62,7 @@ class ThreadViewModel @Inject constructor(
 
     val quickActionBarClicks = SingleLiveEvent<Pair<Message, Int>>()
 
-    private val mailbox by lazy { MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
+    private val mailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
 
     val threadLive = liveData(ioCoroutineContext) {
         emitSource(threadController.getThreadAsync(threadUid).map { it.obj }.asLiveData())
@@ -71,7 +72,7 @@ class ThreadViewModel @Inject constructor(
         messageController.getSortedMessages(threadUid)?.asFlow()?.asLiveData()?.let { emitSource(it) }
     }
 
-    private val currentMailboxLive = MailboxController.getMailboxAsync(
+    private val currentMailboxLive = mailboxController.getMailboxAsync(
         AccountUtils.currentUserId,
         AccountUtils.currentMailboxId,
     ).map { it.obj }.asLiveData(ioCoroutineContext)
