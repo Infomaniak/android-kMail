@@ -42,6 +42,10 @@ class FolderController @Inject constructor(
 ) {
 
     //region Get data
+    fun getCustomFolders(): RealmResults<Folder> {
+        return getCustomFoldersQuery(mailboxContentRealm()).find()
+    }
+
     fun getRootsFoldersAsync(): Flow<ResultsChange<Folder>> {
         return getFoldersQuery(mailboxContentRealm(), onlyRoots = true).asFlow()
     }
