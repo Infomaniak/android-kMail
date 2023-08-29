@@ -83,7 +83,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
         // Undo action
         if (action == UNDO_ACTION) {
             context.trackNotificationActionEvent("cancelClicked")
-            executeUndoAction(context, payload)
+            executeUndoAction(payload)
             return
         }
 
@@ -103,7 +103,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
         executeAction(context, folderRole, undoNotificationTitle, matomoValue, payload)
     }
 
-    private fun executeUndoAction(context: Context, payload: NotificationPayload) {
+    private fun executeUndoAction(payload: NotificationPayload) {
 
         // Cancel action
         notificationJobsBus.unregister(payload.notificationId)
