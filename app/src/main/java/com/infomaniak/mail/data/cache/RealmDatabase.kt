@@ -35,7 +35,7 @@ import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.LocalStorageUtils
-import com.infomaniak.mail.utils.NotificationUtils.deleteMailNotificationChannel
+import com.infomaniak.mail.utils.NotificationUtils.Companion.deleteMailNotificationChannel
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
 import io.realm.kotlin.internal.platform.WeakReference
@@ -43,10 +43,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import javax.inject.Singleton
 
 @Suppress("ObjectPropertyName")
-@Singleton
 object RealmDatabase {
 
     val TAG: String = RealmDatabase::class.java.simpleName
