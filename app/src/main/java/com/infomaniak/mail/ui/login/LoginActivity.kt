@@ -83,7 +83,7 @@ class LoginActivity : AppCompatActivity() {
 
     companion object {
 
-        suspend fun authenticateUser(context: Context, apiToken: ApiToken): Any {
+        suspend fun authenticateUser(context: Context, apiToken: ApiToken, mailboxController: MailboxController): Any {
             if (AccountUtils.getUserById(apiToken.userId) != null) return getErrorResponse(RCore.string.errorUserAlreadyPresent)
 
             InfomaniakCore.bearerToken = apiToken.accessToken
@@ -106,7 +106,7 @@ class LoginActivity : AppCompatActivity() {
                     apiResponse.data?.let { mailboxes ->
                         context.trackUserInfo("nbMailboxes", mailboxes.count())
                         AccountUtils.addUser(user)
-                        MailboxController.updateMailboxes(context, mailboxes)
+                        mailboxController.updateMailboxes(context, mailboxes)
 
                         return@let if (mailboxes.none { it.isValid }) MailboxErrorCode.NO_VALID_MAILBOX else user
                     } ?: run {
