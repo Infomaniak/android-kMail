@@ -49,6 +49,7 @@ import javax.inject.Inject
 class DraftController @Inject constructor(
     private val appContext: Context,
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
+    private val mailboxController: MailboxController,
 ) {
 
     //region Get data
@@ -112,7 +113,7 @@ class DraftController @Inject constructor(
             DraftMode.FORWARD -> {
                 draft.forwardedUid = previousMessage.uid
 
-                val mailboxUuid = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!.uuid
+                val mailboxUuid = mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!.uuid
                 ApiRepository.attachmentsToForward(mailboxUuid, previousMessage).data?.attachments?.forEach { attachment ->
                     draft.attachments += attachment.apply {
                         resource = previousMessage.attachments.find { it.name == name }?.resource
