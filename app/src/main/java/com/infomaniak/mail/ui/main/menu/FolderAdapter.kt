@@ -35,7 +35,7 @@ import com.infomaniak.mail.ui.main.menu.FolderAdapter.FolderViewHolder
 import com.infomaniak.mail.utils.UnreadDisplay
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.views.itemViews.*
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.*
 import javax.inject.Inject
 import kotlin.math.min
 
@@ -54,6 +54,8 @@ class FolderAdapter @Inject constructor(
     private var shouldIndent: Boolean = true
     private lateinit var onFolderClicked: (folderId: String) -> Unit
     private var onCollapseClicked: ((folderId: String, shouldCollapse: Boolean) -> Unit)? = null
+
+    private var setFoldersJob: Job? = null
 
     operator fun invoke(
         isInMenuDrawer: Boolean,
@@ -174,16 +176,19 @@ class FolderAdapter @Inject constructor(
 
         foldersDiffer.submitList(newFolders)
 
-        newCurrentFolderId?.let { currentFolderId = it }
-        val newHasCollapsableFolder = newFolders.any { it.canBeCollapsed }
+        setFoldersJob?.cancel()
+        setFoldersJob = globalCoroutineScope.launch {
+            newCurrentFolderId?.let { currentFolderId = it }
+            val newHasCollapsableFolder = newFolders.any { it.canBeCollapsed }
 
-        val isFirstTime = hasCollapsableFolder == null
-        val collapsableFolderExistenceHasChanged = newHasCollapsableFolder != hasCollapsableFolder
-        if (!isFirstTime && collapsableFolderExistenceHasChanged) {
-            notifyDataSetChanged()
+            val isFirstTime = hasCollapsableFolder == null
+            val collapsableFolderExistenceHasChanged = newHasCollapsableFolder != hasCollapsableFolder
+            if (!isFirstTime && collapsableFolderExistenceHasChanged) {
+                withContext(Dispatchers.Main) { notifyDataSetChanged() }
+            }
+
+            hasCollapsableFolder = newHasCollapsableFolder
         }
-
-        hasCollapsableFolder = newHasCollapsableFolder
     }
 
     fun updateSelectedState(newCurrentFolderId: String) {
