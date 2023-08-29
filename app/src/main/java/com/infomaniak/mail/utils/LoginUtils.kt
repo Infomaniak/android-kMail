@@ -41,6 +41,7 @@ import javax.inject.Inject
 
 @ActivityScoped
 class LoginUtils @Inject constructor(
+    private val mailboxController: MailboxController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
 ) {
@@ -83,10 +84,10 @@ class LoginUtils @Inject constructor(
 
     private fun Fragment.onAuthenticateUserSuccess(apiToken: ApiToken) = lifecycleScope.launch(ioDispatcher) {
         val context = requireContext()
-        when (val returnValue = LoginActivity.authenticateUser(context, apiToken)) {
+        when (val returnValue = LoginActivity.authenticateUser(context, apiToken, mailboxController)) {
             is User -> {
                 context.trackAccountEvent("loggedIn")
-                MailboxController.getFirstValidMailbox(returnValue.id)?.mailboxId?.let { AccountUtils.currentMailboxId = it }
+                mailboxController.getFirstValidMailbox(returnValue.id)?.mailboxId?.let { AccountUtils.currentMailboxId = it }
                 AccountUtils.reloadApp?.invoke()
             }
             is MailboxErrorCode -> withContext(mainDispatcher) {
