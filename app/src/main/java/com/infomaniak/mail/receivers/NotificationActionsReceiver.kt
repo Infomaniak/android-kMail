@@ -39,8 +39,10 @@ import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior
 import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior.NotificationType
 import com.infomaniak.mail.utils.NotificationUtils.showMessageNotification
 import com.infomaniak.mail.utils.SharedUtils
+import com.infomaniak.mail.utils.getApiException
 import com.infomaniak.mail.utils.getUids
 import dagger.hilt.android.AndroidEntryPoint
+import io.sentry.Sentry
 import kotlinx.coroutines.*
 import javax.inject.Inject
 
@@ -145,7 +147,13 @@ class NotificationActionsReceiver : BroadcastReceiver() {
 
             dismissNotification(context, mailbox, notificationId)
             context.trackNotificationActionEvent(matomoValue)
-            ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationId)
+            with(ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationId)) {
+                if (!isSuccess()) Sentry.withScope { scope ->
+                    scope.setTag("reason", "Notif action fail because of API call")
+                    scope.setExtra("destination folder role", folderRole.name)
+                    Sentry.captureException(getApiException())
+                }
+            }
         }
 
         notificationJobsBus.register(notificationId, job)
