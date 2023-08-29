@@ -56,21 +56,21 @@ object NotificationUtils : NotificationUtilsCore() {
             val generalChannel = buildNotificationChannel(
                 getString(R.string.notification_channel_id_general),
                 getString(R.string.notificationGeneralChannelName),
-                NotificationManager.IMPORTANCE_DEFAULT
+                NotificationManager.IMPORTANCE_DEFAULT,
             )
             channelList.add(generalChannel)
 
             val draftChannel = buildNotificationChannel(
                 getString(R.string.notification_channel_id_draft_service),
                 getString(R.string.notificationSyncDraftChannelName),
-                NotificationManager.IMPORTANCE_MIN
+                NotificationManager.IMPORTANCE_MIN,
             )
             channelList.add(draftChannel)
 
             val syncMessagesChannel = buildNotificationChannel(
                 getString(R.string.notification_channel_id_sync_messages_service),
                 getString(R.string.notificationSyncMessagesChannelName),
-                NotificationManager.IMPORTANCE_MIN
+                NotificationManager.IMPORTANCE_MIN,
             )
             channelList.add(syncMessagesChannel)
 
@@ -173,6 +173,7 @@ object NotificationUtils : NotificationUtilsCore() {
                 addActions(context, payload)
             }
 
+            setOnlyAlertOnce(true)
             setSubText(mailbox.email)
             setContentText(content)
             setColorized(true)
