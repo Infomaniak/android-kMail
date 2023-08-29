@@ -46,14 +46,18 @@ class FetchMessagesManager @Inject constructor(
 
     suspend fun execute(userId: Int, mailbox: Mailbox, sentryMessageUid: String? = null, mailboxContentRealm: Realm? = null) {
 
-        // Don't launch sync if the Mailbox's notifications have been disabled by the user
         if (mailbox.notificationsIsDisabled(notificationManagerCompat)) {
+            // If the user disabled Notifications for this Mailbox, we don't want to display any Notification.
+            // We can leave safely.
             SentryDebug.sendFailedNotification("Notifications are disabled", userId, mailbox.mailboxId, sentryMessageUid, mailbox)
             return
         }
 
         val realm = mailboxContentRealm ?: RealmDatabase.newMailboxContentInstance(userId, mailbox.mailboxId)
         val folder = FolderController.getFolder(FolderRole.INBOX, realm) ?: run {
+            // If we can't find the INBOX in Realm, it means the user never opened this Mailbox.
+            // We don't want to display Notifications in this case.
+            // We can leave safely.
             SentryDebug.sendFailedNotification("No Folder in Realm", userId, mailbox.mailboxId, sentryMessageUid, mailbox)
             return
         }
@@ -111,7 +115,9 @@ class FetchMessagesManager @Inject constructor(
             SentryDebug.sendFailedNotification("No Message in the Thread", userId, mailbox.mailboxId, sentryMessageUid, mailbox)
             return
         }
-        if (message.isSeen) { // Ignore if it has already been seen
+        if (message.isSeen) {
+            // If the Message has already been seen before receiving the Notification, we don't want to display it.
+            // We can leave safely.
             SentryDebug.sendFailedNotification("Message already seen", userId, mailbox.mailboxId, sentryMessageUid, mailbox)
             return
         }
