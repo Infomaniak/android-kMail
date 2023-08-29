@@ -350,7 +350,7 @@ class NewMessageViewModel @Inject constructor(
             return if (index == -1) Int.MAX_VALUE else index
         }
 
-        val doc = Jsoup.parse(draft.body)
+        val doc = Jsoup.parse(draft.body).also { it.outputSettings().prettyPrint(false) }
 
         val (bodyWithQuote, signature) = doc.split(MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME, draft.body)
 
