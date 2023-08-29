@@ -20,10 +20,15 @@ package com.infomaniak.mail.data.cache.mailboxInfo
 import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object PermissionsController {
+@Singleton
+class PermissionsController @Inject constructor(
+    private val mailboxController: MailboxController,
+) {
 
     fun getPermissionsAsync(mailboxObjectId: String): Flow<MailboxPermissions?> {
-        return MailboxController.getMailboxAsync(mailboxObjectId).map { it.obj?.permissions }
+        return mailboxController.getMailboxAsync(mailboxObjectId).map { it.obj?.permissions }
     }
 }

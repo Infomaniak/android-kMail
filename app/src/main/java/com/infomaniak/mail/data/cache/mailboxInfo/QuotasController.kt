@@ -20,10 +20,15 @@ package com.infomaniak.mail.data.cache.mailboxInfo
 import com.infomaniak.mail.data.models.Quotas
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object QuotasController {
+@Singleton
+class QuotasController @Inject constructor(
+    private val mailboxController: MailboxController,
+) {
 
     fun getQuotasAsync(mailboxObjectId: String): Flow<Quotas?> {
-        return MailboxController.getMailboxAsync(mailboxObjectId).map { it.obj?.quotas }
+        return mailboxController.getMailboxAsync(mailboxObjectId).map { it.obj?.quotas }
     }
 }

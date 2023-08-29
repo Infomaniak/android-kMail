@@ -34,12 +34,13 @@ import javax.inject.Inject
 @HiltViewModel
 class MenuDrawerViewModel @Inject constructor(
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
+    mailboxController: MailboxController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
-    val otherMailboxesLive = MailboxController.getMailboxesAsync(
+    val otherMailboxesLive = mailboxController.getMailboxesAsync(
         userId = AccountUtils.currentUserId,
         exceptionMailboxIds = listOf(AccountUtils.currentMailboxId),
     ).asLiveData(ioCoroutineContext)

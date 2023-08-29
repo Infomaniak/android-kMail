@@ -30,6 +30,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ThreadModeSettingViewModel @Inject constructor(
+    private val mailboxController: MailboxController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -37,7 +38,7 @@ class ThreadModeSettingViewModel @Inject constructor(
 
         RealmDatabase.closeMailboxContent()
 
-        MailboxController.getMailboxes().forEach { mailbox ->
+        mailboxController.getMailboxes().forEach { mailbox ->
             RealmDatabase.deleteMailboxContent(mailbox.mailboxId, mailbox.userId)
         }
 

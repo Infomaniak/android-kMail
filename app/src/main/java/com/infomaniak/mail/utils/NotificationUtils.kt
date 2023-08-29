@@ -29,6 +29,7 @@ import com.infomaniak.lib.core.utils.NotificationUtilsCore
 import com.infomaniak.lib.core.utils.clearStack
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
@@ -159,7 +160,7 @@ object NotificationUtils : NotificationUtilsCore() {
             return PendingIntent.getActivity(context, requestCode.hashCode(), intent, pendingIntentFlags)
         }
 
-        val mailbox = MailboxController.getMailbox(userId, mailboxId) ?: run {
+        val mailbox = MailboxController.getMailbox(userId, mailboxId, RealmDatabase.mailboxInfo()) ?: run {
             SentryDebug.sendFailedNotification("Created Notif: no Mailbox in Realm", userId, mailboxId, messageUid)
             return@with
         }

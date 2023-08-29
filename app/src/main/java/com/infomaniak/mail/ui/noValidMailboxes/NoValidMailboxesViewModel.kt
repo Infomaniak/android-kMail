@@ -30,15 +30,16 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NoValidMailboxesViewModel @Inject constructor(
+    private val mailboxController: MailboxController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
-    val mailboxesCountLive = MailboxController.getMailboxesCount(AccountUtils.currentUserId).asLiveData(ioCoroutineContext)
+    val mailboxesCountLive = mailboxController.getMailboxesCount(AccountUtils.currentUserId).asLiveData(ioCoroutineContext)
 
-    val lockedMailboxesLive = MailboxController.getLockedMailboxes(AccountUtils.currentUserId).asLiveData(ioCoroutineContext)
+    val lockedMailboxesLive = mailboxController.getLockedMailboxes(AccountUtils.currentUserId).asLiveData(ioCoroutineContext)
 
-    val invalidPasswordMailboxesLive = MailboxController.getInvalidPasswordMailboxes(AccountUtils.currentUserId)
+    val invalidPasswordMailboxesLive = mailboxController.getInvalidPasswordMailboxes(AccountUtils.currentUserId)
         .asLiveData(ioCoroutineContext)
 }

@@ -19,7 +19,6 @@ package com.infomaniak.mail.data.cache.mailboxContent
 
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.utils.copyListToRealm
@@ -38,7 +37,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapNotNull
 import javax.inject.Inject
 
-class FolderController @Inject constructor(private val mailboxContentRealm: RealmDatabase.MailboxContent) {
+class FolderController @Inject constructor(
+    private val mailboxContentRealm: RealmDatabase.MailboxContent,
+) {
 
     //region Get data
     fun getRootsFoldersAsync(): Flow<ResultsChange<Folder>> {
@@ -218,20 +219,6 @@ class FolderController @Inject constructor(private val mailboxContentRealm: Real
 
             realm.writeBlocking {
                 getFolder(id, realm = this)?.let { folder -> updateChildrenRecursively(mutableListOf(folder)) }
-            }
-        }
-
-        fun refreshUnreadCount(id: String, mailboxObjectId: String, realm: MutableRealm) {
-
-            val folder = getFolder(id, realm) ?: return
-
-            val unreadCount = ThreadController.getUnreadThreadsCount(folder)
-            folder.unreadCountLocal = unreadCount
-
-            if (folder.role == FolderRole.INBOX) {
-                MailboxController.updateMailbox(mailboxObjectId) { mailbox ->
-                    mailbox.unreadCountLocal = unreadCount
-                }
             }
         }
         //endregion

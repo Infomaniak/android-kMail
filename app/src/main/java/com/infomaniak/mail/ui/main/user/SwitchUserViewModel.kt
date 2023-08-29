@@ -36,6 +36,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SwitchUserViewModel @Inject constructor(
     application: Application,
+    private val mailboxController: MailboxController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
@@ -48,7 +49,7 @@ class SwitchUserViewModel @Inject constructor(
             context.trackAccountEvent("switch")
             RealmDatabase.backUpPreviousRealms()
             AccountUtils.currentUser = user
-            AccountUtils.currentMailboxId = MailboxController.getFirstValidMailbox(user.id)?.mailboxId ?: AppSettings.DEFAULT_ID
+            AccountUtils.currentMailboxId = mailboxController.getFirstValidMailbox(user.id)?.mailboxId ?: AppSettings.DEFAULT_ID
             AccountUtils.reloadApp?.invoke()
         }
     }
