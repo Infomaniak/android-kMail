@@ -24,7 +24,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class PermissionsController @Inject constructor(private val mailboxController: MailboxController) {
+class PermissionsController @Inject constructor(
+    private val mailboxController: MailboxController,
+) {
 
     fun getPermissionsAsync(mailboxObjectId: String): Flow<MailboxPermissions?> {
         return mailboxController.getMailboxAsync(mailboxObjectId).map { it.obj?.permissions }

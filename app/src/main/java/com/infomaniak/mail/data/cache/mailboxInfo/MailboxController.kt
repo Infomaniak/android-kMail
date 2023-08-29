@@ -40,7 +40,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class MailboxController @Inject constructor(@MailboxInfoRealm private val mailboxInfoRealm: Realm) {
+class MailboxController @Inject constructor(
+    @MailboxInfoRealm private val mailboxInfoRealm: Realm,
+) {
 
     //region Get data
     fun getMailboxes(

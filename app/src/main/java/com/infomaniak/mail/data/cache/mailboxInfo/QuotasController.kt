@@ -24,7 +24,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class QuotasController @Inject constructor(private val mailboxController: MailboxController) {
+class QuotasController @Inject constructor(
+    private val mailboxController: MailboxController,
+) {
 
     fun getQuotasAsync(mailboxObjectId: String): Flow<Quotas?> {
         return mailboxController.getMailboxAsync(mailboxObjectId).map { it.obj?.quotas }
