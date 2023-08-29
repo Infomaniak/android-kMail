@@ -32,7 +32,6 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior
 import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior.NotificationType
-import com.infomaniak.mail.utils.NotificationUtils.showMessageNotification
 import io.realm.kotlin.Realm
 import okhttp3.OkHttpClient
 import javax.inject.Inject
@@ -40,6 +39,7 @@ import javax.inject.Inject
 class FetchMessagesManager @Inject constructor(
     private val appContext: Context,
     private val notificationManagerCompat: NotificationManagerCompat,
+    private val notificationUtils: NotificationUtils,
     private val refreshController: RefreshController,
     private val threadController: ThreadController,
 ) {
@@ -145,8 +145,7 @@ class FetchMessagesManager @Inject constructor(
         val description = "$subject$formattedPreview"
 
         // Show Message notification
-        showMessageNotification(
-            context = appContext,
+        notificationUtils.showMessageNotification(
             notificationManagerCompat = notificationManagerCompat,
             payload = NotificationPayload(
                 userId = userId,
@@ -167,8 +166,7 @@ class FetchMessagesManager @Inject constructor(
                 unReadThreadsCount,
                 unReadThreadsCount,
             )
-            showMessageNotification(
-                context = appContext,
+            notificationUtils.showMessageNotification(
                 notificationManagerCompat = notificationManagerCompat,
                 payload = NotificationPayload(
                     userId = userId,
