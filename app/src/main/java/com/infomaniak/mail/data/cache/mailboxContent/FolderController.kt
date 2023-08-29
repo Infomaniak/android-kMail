@@ -19,7 +19,6 @@ package com.infomaniak.mail.data.cache.mailboxContent
 
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.utils.copyListToRealm
@@ -38,7 +37,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapNotNull
 import javax.inject.Inject
 
-class FolderController @Inject constructor(private val mailboxContentRealm: RealmDatabase.MailboxContent) {
+class FolderController @Inject constructor(
+    private val mailboxContentRealm: RealmDatabase.MailboxContent,
+) {
 
     //region Get data
     fun getRootsFoldersAsync(): Flow<ResultsChange<Folder>> {
