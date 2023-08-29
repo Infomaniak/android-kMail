@@ -51,8 +51,7 @@ import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ErrorCode
-import com.infomaniak.mail.utils.NotificationUtils.buildGeneralNotification
-import com.infomaniak.mail.utils.NotificationUtils.initNotificationChannel
+import com.infomaniak.mail.utils.NotificationUtils
 import com.infomaniak.mail.utils.PlayServicesUtils
 import com.infomaniak.mail.workers.SyncMailboxesWorker
 import dagger.hilt.android.HiltAndroidApp
@@ -81,19 +80,22 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
         private set
 
     @Inject
-    lateinit var localSettings: LocalSettings
-
-    @Inject
     lateinit var workerFactory: HiltWorkerFactory
 
     @Inject
-    lateinit var syncMailboxesWorkerScheduler: SyncMailboxesWorker.Scheduler
+    lateinit var localSettings: LocalSettings
+
+    @Inject
+    lateinit var notificationUtils: NotificationUtils
 
     @Inject
     lateinit var notificationManagerCompat: NotificationManagerCompat
 
     @Inject
     lateinit var playServicesUtils: PlayServicesUtils
+
+    @Inject
+    lateinit var syncMailboxesWorkerScheduler: SyncMailboxesWorker.Scheduler
 
     @Inject
     @IoDispatcher
@@ -120,7 +122,7 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
         configureAccountUtils()
         configureAppReloading()
         configureInfomaniakCore()
-        initNotificationChannel()
+        notificationUtils.initNotificationChannel()
         configureHttpClient()
     }
 
@@ -218,7 +220,7 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
         val notificationText = getString(R.string.refreshTokenError)
 
         if (hasPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS))) {
-            val builder = buildGeneralNotification(notificationText).setContentIntent(pendingIntent)
+            val builder = notificationUtils.buildGeneralNotification(notificationText).setContentIntent(pendingIntent)
             @Suppress("MissingPermission")
             notificationManagerCompat.notify(UUID.randomUUID().hashCode(), builder.build())
         } else {
