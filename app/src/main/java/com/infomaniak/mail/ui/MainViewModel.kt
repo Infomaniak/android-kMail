@@ -65,16 +65,17 @@ import com.infomaniak.lib.core.R as RCore
 @HiltViewModel
 class MainViewModel @Inject constructor(
     application: Application,
-    private val mailboxContentRealm: RealmDatabase.MailboxContent,
-    private val sharedUtils: SharedUtils,
     private val addressBookController: AddressBookController,
     private val draftController: DraftController,
     private val folderController: FolderController,
+    private val mailboxContentRealm: RealmDatabase.MailboxContent,
+    private val mailboxController: MailboxController,
     private val mergedContactController: MergedContactController,
     private val messageController: MessageController,
     private val permissionsController: PermissionsController,
     private val quotasController: QuotasController,
     private val refreshController: RefreshController,
+    private val sharedUtils: SharedUtils,
     private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
@@ -90,7 +91,7 @@ class MainViewModel @Inject constructor(
 
     val snackBarManager by lazy { SnackBarManager() }
 
-    val mailboxesLive = MailboxController.getMailboxesAsync(AccountUtils.currentUserId).asLiveData(ioCoroutineContext)
+    val mailboxesLive = mailboxController.getMailboxesAsync(AccountUtils.currentUserId).asLiveData(ioCoroutineContext)
 
     //region Multi selection
     val isMultiSelectOnLiveData = MutableLiveData(false)
@@ -111,7 +112,7 @@ class MainViewModel @Inject constructor(
     private val _currentMailboxObjectId = MutableStateFlow<String?>(null)
 
     val currentMailbox = _currentMailboxObjectId.mapLatest {
-        it?.let(MailboxController::getMailbox)
+        it?.let(mailboxController::getMailbox)
     }.asLiveData(ioCoroutineContext)
 
     val currentDefaultFoldersLive = _currentMailboxObjectId.flatMapLatest { objectId ->
@@ -193,7 +194,7 @@ class MainViewModel @Inject constructor(
     private fun openMailbox(): Mailbox? {
         SentryLog.d(TAG, "Load current mailbox from local")
 
-        val mailbox = MailboxController.getMailboxWithFallback(
+        val mailbox = mailboxController.getMailboxWithFallback(
             userId = AccountUtils.currentUserId,
             mailboxId = AccountUtils.currentMailboxId,
         ) ?: return null
@@ -215,7 +216,7 @@ class MainViewModel @Inject constructor(
     }
 
     private fun switchToValidMailbox() = viewModelScope.launch(ioCoroutineContext) {
-        MailboxController.getFirstValidMailbox(AccountUtils.currentUserId)?.let {
+        mailboxController.getFirstValidMailbox(AccountUtils.currentUserId)?.let {
             AccountUtils.switchToMailbox(it.mailboxId)
         } ?: context.launchNoValidMailboxesActivity()
     }
@@ -234,7 +235,7 @@ class MainViewModel @Inject constructor(
             SentryLog.d(TAG, "Refresh mailboxes from remote")
             with(ApiRepository.getMailboxes()) {
                 if (isSuccess()) {
-                    MailboxController.updateMailboxes(context, data!!)
+                    mailboxController.updateMailboxes(context, data!!)
 
                     val shouldStop = AccountUtils.manageMailboxesEdgeCases(context, data!!)
                     if (shouldStop) return@launch
@@ -278,7 +279,7 @@ class MainViewModel @Inject constructor(
     private fun updateQuotas(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
         SentryLog.d(TAG, "Force refresh Quotas")
         if (mailbox.isLimited) with(ApiRepository.getQuotas(mailbox.hostingId, mailbox.mailboxName)) {
-            if (isSuccess()) MailboxController.updateMailbox(mailbox.objectId) {
+            if (isSuccess()) mailboxController.updateMailbox(mailbox.objectId) {
                 it.quotas = data
             }
         }
@@ -287,7 +288,7 @@ class MainViewModel @Inject constructor(
     private fun updatePermissions(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
         SentryLog.d(TAG, "Force refresh Permissions")
         with(ApiRepository.getPermissions(mailbox.linkId, mailbox.hostingId)) {
-            if (isSuccess()) MailboxController.updateMailbox(mailbox.objectId) {
+            if (isSuccess()) mailboxController.updateMailbox(mailbox.objectId) {
                 it.permissions = data
             }
         }
