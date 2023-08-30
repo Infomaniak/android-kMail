@@ -147,7 +147,7 @@ class Draft : RealmObject {
         private val draftJson = Json(ApiController.json) { encodeDefaults = true }
 
         fun encapsulateSignatureContentWithInfomaniakClass(signatureContent: String): String {
-            return """<div class="${MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME}">$signatureContent</div>"""
+            return """<div class="${MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME}" style="margin-top:16px;margin-bottom:16px;">$signatureContent</div>"""
         }
     }
 }
