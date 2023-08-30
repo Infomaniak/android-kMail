@@ -50,7 +50,6 @@ object RealmDatabase {
     //region Realms
     private var _appSettings: Realm? = null
     private var _userInfo: Realm? = null
-    private var _mailboxInfo: Realm? = null
     private var _mailboxContent: Realm? = null
 
     private var oldUserInfo = WeakReference<Realm?>(null)
@@ -77,12 +76,7 @@ object RealmDatabase {
         }
     }
 
-    val newMailboxInfoInstance get() = Realm.open(RealmConfig.mailboxInfo)
-    fun mailboxInfo(): Realm = runBlocking(Dispatchers.IO) {
-        mailboxInfoMutex.withLock {
-            _mailboxInfo ?: newMailboxInfoInstance.also { _mailboxInfo = it }
-        }
-    }
+    val mailboxInfo get() = Realm.open(RealmConfig.mailboxInfo)
 
     val newMailboxContentInstance get() = newMailboxContentInstance(AccountUtils.currentUserId, AccountUtils.currentMailboxId)
     fun newMailboxContentInstance(userId: Int, mailboxId: Int) = Realm.open(RealmConfig.mailboxContent(mailboxId, userId))

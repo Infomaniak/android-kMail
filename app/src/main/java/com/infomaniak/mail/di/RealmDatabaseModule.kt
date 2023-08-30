@@ -40,7 +40,7 @@ object RealmDatabaseModule {
     @Provides
     @Singleton
     @MailboxInfoRealm
-    fun providesMailboxInfoRealm() = RealmDatabase.mailboxInfo()
+    fun providesMailboxInfoRealm() = RealmDatabase.mailboxInfo
 
     @Provides
     @Singleton
