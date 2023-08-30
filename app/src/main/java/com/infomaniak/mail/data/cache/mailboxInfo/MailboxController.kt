@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.data.cache.mailboxInfo
 
+import android.content.Context
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.AppSettings
@@ -26,6 +27,7 @@ import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
 import com.infomaniak.mail.di.MailboxInfoRealm
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.NotificationUtils
+import com.infomaniak.mail.utils.NotificationUtils.Companion.deleteMailNotificationChannel
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
@@ -40,6 +42,7 @@ import javax.inject.Singleton
 
 @Singleton
 class MailboxController @Inject constructor(
+    private val appContext: Context,
     @MailboxInfoRealm private val mailboxInfoRealm: Realm,
     private val notificationUtils: NotificationUtils,
 ) {
@@ -159,6 +162,12 @@ class MailboxController @Inject constructor(
 
     fun updateMailbox(objectId: String, onUpdate: (mailbox: Mailbox) -> Unit) {
         mailboxInfoRealm.writeBlocking { getMailbox(objectId, realm = this)?.let(onUpdate) }
+    }
+
+    fun deleteUserMailboxes(userId: Int) = mailboxInfoRealm.writeBlocking {
+        val mailboxes = getMailboxes(userId, realm = this)
+        appContext.deleteMailNotificationChannel(mailboxes)
+        delete(mailboxes)
     }
     //endregion
 
