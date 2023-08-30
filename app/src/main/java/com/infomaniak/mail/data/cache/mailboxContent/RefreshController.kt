@@ -729,7 +729,10 @@ class RefreshController @Inject constructor(
                 SentryDebug.sendOrphanMessages(previousCursor, folder = it).also { orphans ->
                     MessageController.deleteMessages(orphans, realm = this)
                 }
-                SentryDebug.sendOrphanThreads(previousCursor, folder = it, realm = this)
+                SentryDebug.sendOrphanThreads(previousCursor, folder = it, realm = this).also { orphans ->
+                    orphans.forEach { thread -> MessageController.deleteMessages(thread.messages, realm = this) }
+                    delete(orphans)
+                }
             }
         }
     }
