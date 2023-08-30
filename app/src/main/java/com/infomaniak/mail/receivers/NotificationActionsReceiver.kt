@@ -149,7 +149,6 @@ class NotificationActionsReceiver : BroadcastReceiver() {
             context.trackNotificationActionEvent(matomoValue)
 
             with(ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationId, okHttpClient)) {
-
                 if (isSuccess()) {
                     dismissNotification(context, mailbox, notificationId)
                 } else {

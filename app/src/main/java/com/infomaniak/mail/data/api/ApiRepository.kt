@@ -188,7 +188,7 @@ object ApiRepository : ApiRepositoryCore() {
             url = ApiRoutes.moveMessages(mailboxUuid),
             method = POST,
             body = mapOf("uids" to messagesUids, "to" to destinationId),
-            okHttpClient = okHttpClient
+            okHttpClient = okHttpClient,
         )
     }
 
