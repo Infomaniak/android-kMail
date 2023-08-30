@@ -18,6 +18,7 @@
 package com.infomaniak.mail.utils
 
 import com.infomaniak.mail.data.models.message.Body
+import kotlinx.coroutines.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
@@ -29,7 +30,7 @@ object MessageBodyUtils {
     const val INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME = "forwardContentMessage"
 
     private const val BLOCKQUOTE = "blockquote"
-    private const val QUOTE_DETECTION_SIZE_LIMIT = 1_000_000 // 1 Meg looks like a fine threshold
+    private const val QUOTE_DETECTION_TIMEOUT = 2_000L
 
     private val quoteDescriptors = arrayOf(
         // Do not detect this quote as long as we can't detect siblings quotes or else a single reply will be missing among the
@@ -51,27 +52,32 @@ object MessageBodyUtils {
         "[name=\"quote\"]", // GMX
     )
 
-    fun splitContentAndQuote(body: Body): SplitBody {
+    fun splitContentAndQuote(body: Body): SplitBody = runBlocking(Dispatchers.IO) {
 
-        if (body.type == Utils.TEXT_PLAIN) return SplitBody(body.value)
+        if (body.type == Utils.TEXT_PLAIN) return@runBlocking SplitBody(body.value)
 
-        // Heuristic to give up on mail too large for "perfect" preprocessing.
-        if (body.value.toByteArray().size > QUOTE_DETECTION_SIZE_LIMIT) return SplitBody(body.value)
+        return@runBlocking runCatching {
 
-        // The original parsed html document in full
-        val originalHtmlDocument = Jsoup.parse(body.value)
-        // Initiated to the original document and it'll be processed by Jsoup to remove quotes.
-        val htmlDocumentWithoutQuote = originalHtmlDocument.clone()
+            withTimeout(QUOTE_DETECTION_TIMEOUT) {
 
-        // Find the last parent blockquote and delete it in htmlDocumentWithoutQuote
-        val blockquoteElement = findAndRemoveLastParentBlockquote(htmlDocumentWithoutQuote)
-        // Find the first known parent quote in the html and delete all known quotes descriptor
-        val currentQuoteDescriptor = findFirstKnownParentQuoteDescriptor(htmlDocumentWithoutQuote).ifEmpty {
-            if (blockquoteElement == null) "" else BLOCKQUOTE
+                // The original parsed HTML document in full
+                val originalHtmlDocument = Jsoup.parse(body.value)
+                // Initiated to the original document and it'll be processed by Jsoup to remove quotes
+                val htmlDocumentWithoutQuote = originalHtmlDocument.clone()
+
+                // Find the last parent blockquote and delete it in `htmlDocumentWithoutQuote`
+                val blockquoteElement = findAndRemoveLastParentBlockquote(htmlDocumentWithoutQuote)
+                // Find the first known parent quote in the HTML and delete all known quotes descriptor
+                val currentQuoteDescriptor = findFirstKnownParentQuoteDescriptor(htmlDocumentWithoutQuote, scope = this).ifEmpty {
+                    if (blockquoteElement == null) "" else BLOCKQUOTE
+                }
+
+                val (content, quote) = splitContentAndQuote(originalHtmlDocument, currentQuoteDescriptor, blockquoteElement)
+                if (quote.isNullOrBlank()) SplitBody(body.value) else SplitBody(content, body.value)
+            }
+        }.getOrElse {
+            SplitBody(body.value)
         }
-
-        val (content, quote) = splitContentAndQuote(originalHtmlDocument, currentQuoteDescriptor, blockquoteElement)
-        return if (quote.isNullOrBlank()) SplitBody(body.value) else SplitBody(content, body.value)
     }
 
     private fun findAndRemoveLastParentBlockquote(htmlDocumentWithoutQuote: Document): Element? {
@@ -82,9 +88,13 @@ object MessageBodyUtils {
         return htmlDocumentWithoutQuote.selectLastParentBlockquote()?.also { it.remove() }
     }
 
-    private fun findFirstKnownParentQuoteDescriptor(htmlDocumentWithoutQuote: Document): String {
+    private fun findFirstKnownParentQuoteDescriptor(htmlDocumentWithoutQuote: Document, scope: CoroutineScope): String {
+
         var currentQuoteDescriptor = ""
+
         for (quoteDescriptor in quoteDescriptors) {
+            scope.ensureActive()
+
             val quotedContentElement = htmlDocumentWithoutQuote.select(quoteDescriptor)
             if (quotedContentElement.isNotEmpty()) {
                 quotedContentElement.remove()
