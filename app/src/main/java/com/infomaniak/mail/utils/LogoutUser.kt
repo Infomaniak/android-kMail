@@ -26,6 +26,7 @@ import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.appSettings.AppSettingsController
+import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.di.IoDispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -38,6 +39,7 @@ class LogoutUser @Inject constructor(
     private val appContext: Context,
     private val globalCoroutineScope: CoroutineScope,
     private val localSettings: LocalSettings,
+    private val mailboxController: MailboxController,
     private val playServicesUtils: PlayServicesUtils,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
@@ -47,6 +49,7 @@ class LogoutUser @Inject constructor(
         user.logoutToken()
         AccountUtils.removeUser(user)
         RealmDatabase.removeUserData(appContext, user.id)
+        mailboxController.deleteUserMailboxes(user.id)
         localSettings.removeRegisteredFirebaseUser(userId = user.id)
 
         if (user.id == AccountUtils.currentUserId) {

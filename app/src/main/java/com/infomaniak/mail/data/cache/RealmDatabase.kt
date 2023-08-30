@@ -18,7 +18,6 @@
 package com.infomaniak.mail.data.cache
 
 import android.content.Context
-import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder
@@ -35,7 +34,6 @@ import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.LocalStorageUtils
-import com.infomaniak.mail.utils.NotificationUtils.Companion.deleteMailNotificationChannel
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
 import io.realm.kotlin.internal.platform.WeakReference
@@ -146,11 +144,6 @@ object RealmDatabase {
     fun removeUserData(context: Context, userId: Int) {
         closeMailboxContent()
         closeUserInfo()
-        mailboxInfo().writeBlocking {
-            val mailboxes = MailboxController.getMailboxes(userId, realm = this)
-            context.deleteMailNotificationChannel(mailboxes)
-            delete(mailboxes)
-        }
         deleteUserFiles(context, userId)
     }
 
