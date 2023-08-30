@@ -144,14 +144,21 @@ class NotificationActionsReceiver : BroadcastReceiver() {
             val mailbox = mailboxController.getMailbox(userId, mailboxId) ?: return@launch
             val messages = sharedUtils.getMessagesToMove(threads, message)
             val destinationId = folderController.getFolder(folderRole)?.id ?: return@launch
+            val okHttpClient = AccountUtils.getHttpClient(userId)
 
-            dismissNotification(context, mailbox, notificationId)
             context.trackNotificationActionEvent(matomoValue)
-            with(ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationId)) {
-                if (!isSuccess()) Sentry.withScope { scope ->
-                    scope.setTag("reason", "Notif action fail because of API call")
-                    scope.setExtra("destination folder role", folderRole.name)
-                    Sentry.captureException(getApiException())
+
+            with(ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationId, okHttpClient)) {
+
+                if (isSuccess()) {
+                    dismissNotification(context, mailbox, notificationId)
+                } else {
+                    executeUndoAction(payload)
+                    Sentry.withScope { scope ->
+                        scope.setTag("reason", "Notif action fail because of API call")
+                        scope.setExtra("destination folder role", folderRole.name)
+                        Sentry.captureException(getApiException())
+                    }
                 }
             }
         }
