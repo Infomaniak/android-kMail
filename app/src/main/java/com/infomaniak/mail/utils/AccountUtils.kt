@@ -17,25 +17,18 @@
  */
 package com.infomaniak.mail.utils
 
-import android.app.NotificationManager
 import android.content.Context
-import androidx.work.WorkManager
 import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.auth.CredentialManager
 import com.infomaniak.lib.core.models.user.User
-import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.room.UserDatabase
-import com.infomaniak.lib.core.utils.SentryLog
-import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.appSettings.AppSettingsController
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import io.sentry.Sentry
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.invoke
-import kotlinx.coroutines.launch
 import io.sentry.protocol.User as SentryUser
 
 object AccountUtils : CredentialManager() {
@@ -113,43 +106,8 @@ object AccountUtils : CredentialManager() {
         userDatabase.userDao().insert(user)
     }
 
-    suspend fun removeUser(context: Context, user: User, playServicesUtils: PlayServicesUtils, shouldReload: Boolean = true) {
-
-        fun logoutUserToken() {
-            CoroutineScope(Dispatchers.IO).launch {
-                context.getInfomaniakLogin().deleteToken(
-                    okHttpClient = HttpClient.okHttpClientNoTokenInterceptor,
-                    token = user.apiToken,
-                    onError = { SentryLog.e("DeleteTokenError", "API response error: $it") },
-                )
-            }
-        }
-
-        logoutUserToken()
-
+    suspend fun removeUser(user: User) {
         userDatabase.userDao().delete(user)
-        RealmDatabase.removeUserData(context, user.id)
-        val localSettings = LocalSettings.getInstance(context)
-        localSettings.removeRegisteredFirebaseUser(userId = user.id)
-
-        if (user.id == currentUserId) {
-            if (getAllUsersCount() == 0) {
-                resetSettings(context, localSettings)
-                playServicesUtils.deleteFirebaseToken()
-            }
-            if (shouldReload) reloadApp?.invoke()
-        }
-    }
-
-    private fun resetSettings(context: Context, localSettings: LocalSettings) {
-        AppSettingsController.removeAppSettings()
-        localSettings.removeSettings()
-        with(WorkManager.getInstance(context)) {
-            cancelAllWork()
-            pruneWork()
-        }
-        // Dismiss all current notifications
-        (context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).cancelAll()
     }
 
     fun getAllUsersSync(): List<User> = userDatabase.userDao().getAllSync()
