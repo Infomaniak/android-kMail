@@ -17,7 +17,6 @@
   -->
 <resources>
     <string name="appName" translatable="false">Infomaniak Mail</string>
-    <string name="appNameFull" translatable="false">Infomaniak Mail</string>
 
     <string name="notification_channel_id_draft_service" translatable="false">draft_service_channel_id</string>
     <string name="notification_channel_id_general" translatable="false">general_channel_id</string>
