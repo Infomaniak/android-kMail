@@ -56,7 +56,6 @@ class LogoutUser @Inject constructor(
             }
             if (shouldReload) AccountUtils.reloadApp?.invoke()
         }
-
     }
 
     private fun User.logoutToken() = globalCoroutineScope.launch(ioDispatcher) {
