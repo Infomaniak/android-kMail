@@ -726,7 +726,9 @@ class RefreshController @Inject constructor(
     private fun Realm.sendSentryOrphans(folder: Folder, previousCursor: String? = null) {
         writeBlocking {
             findLatest(folder)?.let {
-                SentryDebug.sendOrphanMessages(previousCursor, folder = it)
+                SentryDebug.sendOrphanMessages(previousCursor, folder = it).also { orphans ->
+                    MessageController.deleteMessages(orphans, realm = this)
+                }
                 SentryDebug.sendOrphanThreads(previousCursor, folder = it, realm = this)
             }
         }

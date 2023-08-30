@@ -180,17 +180,20 @@ object SentryDebug {
         }
     }
 
-    fun sendOrphanMessages(previousCursor: String?, folder: Folder) {
+    fun sendOrphanMessages(previousCursor: String?, folder: Folder): List<Message> {
         val orphanMessages = folder.messages.filter { it.isOrphan() }
         if (orphanMessages.isNotEmpty()) {
             Sentry.withScope { scope ->
                 scope.level = SentryLevel.ERROR
                 scope.setExtra("orphanMessages", "${orphanMessages.map { it.uid }}")
+                scope.setExtra("number of Messages", "${orphanMessages.count()}")
                 scope.setExtra("previousCursor", "$previousCursor")
                 scope.setExtra("newCursor", "${folder.cursor}")
+                scope.setExtra("folderName", folder.name)
                 Sentry.captureMessage("We found some orphan Messages.")
             }
         }
+        return orphanMessages
     }
 
     fun sendOrphanThreads(previousCursor: String?, folder: Folder, realm: TypedRealm) {
