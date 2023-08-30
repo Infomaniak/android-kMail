@@ -25,7 +25,6 @@ import com.google.firebase.messaging.RemoteMessage
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.MainApplication
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.utils.AccountUtils
@@ -37,10 +36,12 @@ import javax.inject.Inject
 class KMailFirebaseMessagingService : FirebaseMessagingService() {
 
     private val mainApplication by lazy { application as MainApplication }
-    private val realmMailboxInfo by lazy { RealmDatabase.newMailboxInfoInstance }
 
     @Inject
     lateinit var localSettings: LocalSettings
+
+    @Inject
+    lateinit var mailboxController: MailboxController
 
     @Inject
     lateinit var notificationManagerCompat: NotificationManagerCompat
@@ -96,17 +97,12 @@ class KMailFirebaseMessagingService : FirebaseMessagingService() {
 
     private fun processMessageInBackground(userId: Int, mailboxId: Int, messageUid: String) {
         SentryLog.i(TAG, "processMessageInBackground: called")
-        MailboxController.getMailbox(userId, mailboxId, realmMailboxInfo)?.let { mailbox ->
+        mailboxController.getMailbox(userId, mailboxId)?.let { mailbox ->
             // Ignore if the Mailbox notification channel is blocked
             if (mailbox.notificationsIsDisabled(notificationManagerCompat)) return
         }
 
         processMessageNotificationsScheduler.scheduleWork(userId, mailboxId, messageUid)
-    }
-
-    override fun onDestroy() {
-        realmMailboxInfo.close()
-        super.onDestroy()
     }
 
     companion object {

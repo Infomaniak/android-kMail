@@ -69,6 +69,7 @@ class DraftsActionsWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted params: WorkerParameters,
     private val draftController: DraftController,
+    private val mailboxController: MailboxController,
     private val mainApplication: MainApplication,
     private val notificationManagerCompat: NotificationManagerCompat,
     private val notificationUtils: NotificationUtils,
@@ -76,7 +77,6 @@ class DraftsActionsWorker @AssistedInject constructor(
 ) : BaseCoroutineWorker(appContext, params) {
 
     private val mailboxContentRealm by lazy { RealmDatabase.newMailboxContentInstance }
-    private val mailboxInfoRealm by lazy { RealmDatabase.newMailboxInfoInstance }
 
     private lateinit var okHttpClient: OkHttpClient
     private var mailboxId: Int = AppSettings.DEFAULT_ID
@@ -99,7 +99,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         draftLocalUuid = inputData.getString(DRAFT_LOCAL_UUID_KEY)
 
         userApiToken = AccountUtils.getUserById(userId)?.apiToken?.accessToken ?: return@withContext Result.failure()
-        mailbox = MailboxController.getMailbox(userId, mailboxId, mailboxInfoRealm) ?: return@withContext Result.failure()
+        mailbox = mailboxController.getMailbox(userId, mailboxId) ?: return@withContext Result.failure()
         okHttpClient = AccountUtils.getHttpClient(userId)
 
         isSnackBarFeedbackNeeded = !mainApplication.isAppInBackground
@@ -111,7 +111,6 @@ class DraftsActionsWorker @AssistedInject constructor(
 
     override fun onFinish() {
         mailboxContentRealm.close()
-        mailboxInfoRealm.close()
         SentryLog.d(TAG, "Work finished")
     }
 

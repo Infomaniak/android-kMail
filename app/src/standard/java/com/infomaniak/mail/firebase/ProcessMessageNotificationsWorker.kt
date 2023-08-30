@@ -42,10 +42,9 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted params: WorkerParameters,
     private val fetchMessagesManager: FetchMessagesManager,
+    private val mailboxController: MailboxController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : BaseProcessMessageNotificationsWorker(appContext, params) {
-
-    private val mailboxInfoRealm by lazy { RealmDatabase.newMailboxInfoInstance }
 
     override suspend fun launchWork(): Result = with(ioDispatcher) {
         SentryLog.i(TAG, "Work started")
@@ -62,7 +61,7 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
             SentryDebug.sendFailedNotification("No messageUid in Notification", userId, mailboxId)
             return@with Result.success()
         }
-        val mailbox = MailboxController.getMailbox(userId, mailboxId, mailboxInfoRealm) ?: run {
+        val mailbox = mailboxController.getMailbox(userId, mailboxId) ?: run {
             // If the Mailbox doesn't exist in Realm, it's POSSIBLY because the user recently added
             // this new Mailbox on its account, via the Infomaniak WebMail or somewhere else.
             // We need to wait until the user opens the app again to fetch this new Mailbox.
@@ -86,10 +85,6 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
 
         SentryLog.i(TAG, "Work finished")
         Result.success()
-    }
-
-    override fun onFinish() {
-        mailboxInfoRealm.close()
     }
 
     @Singleton
