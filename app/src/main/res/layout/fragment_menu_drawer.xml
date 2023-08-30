@@ -42,7 +42,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/marginStandard"
-                android:contentDescription="@string/appNameFull"
+                android:contentDescription="@string/appName"
                 android:src="@drawable/ic_logo_infomaniak_mail"
                 app:layout_constraintStart_toStartOf="parent" />
 
