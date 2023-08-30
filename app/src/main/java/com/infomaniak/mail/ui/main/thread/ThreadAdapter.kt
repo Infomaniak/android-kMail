@@ -20,17 +20,14 @@ package com.infomaniak.mail.ui.main.thread
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
-import android.view.LayoutInflater
-import android.view.ScaleGestureDetector
-import android.view.ViewConfiguration
-import android.view.ViewGroup
+import android.view.*
 import android.webkit.WebView
 import android.widget.FrameLayout
 import androidx.core.view.children
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
@@ -41,10 +38,9 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Attachment.*
 import com.infomaniak.mail.data.models.correspondent.Recipient
-import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.ItemMessageBinding
-import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadViewHolder
+import com.infomaniak.mail.ui.main.thread.ThreadAdapter.*
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.UiUtils.getPrettyNameAndEmail
 import com.infomaniak.mail.utils.Utils
@@ -62,11 +58,9 @@ import com.google.android.material.R as RMaterial
 
 class ThreadAdapter(
     private val shouldLoadDistantResources: Boolean,
-) : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBinding.OnRealmChanged<Message> {
+) : ListAdapter<Message, ThreadViewHolder>(MessageDiffCallback()) {
 
-    override val realmAsyncListDiffer = AsyncListDiffer(this, MessageDiffCallback())
-
-    inline val messages: MutableList<Message> get() = realmAsyncListDiffer.currentList
+    inline val messages: MutableList<Message> get() = currentList
 
     private val manuallyAllowedMessageUids = mutableSetOf<String>()
     var isExpandedMap = mutableMapOf<String, Boolean>()
@@ -155,9 +149,9 @@ class ThreadAdapter(
     private fun ThreadViewHolder.loadBodyAndQuote(message: Message) {
         message.body?.let { body ->
             if (binding.bodyWebView.isVisible) {
-                loadBodyInWebView(message.uid, splitBody!!, body.type)
+                loadBodyInWebView(message.uid, body.splitBody!!.content, body.type)
             } else if (binding.fullMessageWebView.isVisible) {
-                loadQuoteInWebView(message.uid, splitQuote, body.type)
+                loadQuoteInWebView(message.uid, body.splitBody!!.quote, body.type)
             }
         }
     }
@@ -381,17 +375,10 @@ class ThreadAdapter(
 
     private fun ThreadViewHolder.bindContent(message: Message) {
         binding.messageLoader.isVisible = message.body == null
-        message.body?.let { body -> bindBody(body, message) }
+        message.body?.let { body -> bindBody(message, hasQuote = body.splitBody?.quote != null) }
     }
 
-    private fun ThreadViewHolder.bindBody(body: Body, message: Message) = with(binding) {
-        if (splitBody == null) {
-            val (messageBody, messageQuote) = MessageBodyUtils.splitBodyAndQuote(body)
-            splitBody = messageBody
-            splitQuote = messageQuote
-
-            message.hasQuote = messageQuote != null
-        }
+    private fun ThreadViewHolder.bindBody(message: Message, hasQuote: Boolean) = with(binding) {
 
         quoteButton.apply {
             setOnClickListener {
@@ -407,7 +394,7 @@ class ThreadAdapter(
             text = context.getString(R.string.messageShowQuotedText)
         }
 
-        quoteButtonFrameLayout.isVisible = message.hasQuote
+        quoteButtonFrameLayout.isVisible = hasQuote
 
         initWebViewClientIfNeeded(message, navigateToNewMessageActivity)
 
@@ -508,9 +495,6 @@ class ThreadAdapter(
         private var _fullMessageWebViewClient: MessageWebViewClient? = null
         val bodyWebViewClient get() = _bodyWebViewClient!!
         val fullMessageWebViewClient get() = _fullMessageWebViewClient!!
-
-        var splitBody: String? = null
-        var splitQuote: String? = null
 
         init {
             with(binding) {

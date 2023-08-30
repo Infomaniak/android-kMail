@@ -137,7 +137,7 @@ class FetchMessagesManager @Inject constructor(
             ""
         } else {
             message.body
-                ?.let { "\n${MessageBodyUtils.splitBodyAndQuote(it).messageBody.htmlToText().trim()}" }
+                ?.let { "\n${MessageBodyUtils.splitContentAndQuote(it).content.htmlToText().trim()}" }
                 ?: message.preview.ifBlank { null }?.let { "\n${it.trim()}" }
                 ?: ""
         }

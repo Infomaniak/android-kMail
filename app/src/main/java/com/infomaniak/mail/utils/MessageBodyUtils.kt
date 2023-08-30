@@ -18,7 +18,6 @@
 package com.infomaniak.mail.utils
 
 import com.infomaniak.mail.data.models.message.Body
-import com.infomaniak.mail.utils.Utils.TEXT_PLAIN
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
@@ -52,15 +51,15 @@ object MessageBodyUtils {
         "[name=\"quote\"]", // GMX
     )
 
-    fun splitBodyAndQuote(initialBody: Body): MessageBodyQuote {
+    fun splitContentAndQuote(body: Body): SplitBody {
 
-        if (initialBody.type == TEXT_PLAIN) return MessageBodyQuote(initialBody.value)
+        if (body.type == Utils.TEXT_PLAIN) return SplitBody(body.value)
 
         // Heuristic to give up on mail too large for "perfect" preprocessing.
-        if (initialBody.value.toByteArray().size > QUOTE_DETECTION_SIZE_LIMIT) return MessageBodyQuote(initialBody.value)
+        if (body.value.toByteArray().size > QUOTE_DETECTION_SIZE_LIMIT) return SplitBody(body.value)
 
         // The original parsed html document in full
-        val originalHtmlDocument = Jsoup.parse(initialBody.value)
+        val originalHtmlDocument = Jsoup.parse(body.value)
         // Initiated to the original document and it'll be processed by Jsoup to remove quotes.
         val htmlDocumentWithoutQuote = originalHtmlDocument.clone()
 
@@ -71,8 +70,8 @@ object MessageBodyUtils {
             if (blockquoteElement == null) "" else BLOCKQUOTE
         }
 
-        val (body, quote) = splitBodyAndQuote(originalHtmlDocument, currentQuoteDescriptor, blockquoteElement)
-        return if (quote.isNullOrBlank()) MessageBodyQuote(initialBody.value) else MessageBodyQuote(body, initialBody.value)
+        val (content, quote) = splitContentAndQuote(originalHtmlDocument, currentQuoteDescriptor, blockquoteElement)
+        return if (quote.isNullOrBlank()) SplitBody(body.value) else SplitBody(content, body.value)
     }
 
     private fun findAndRemoveLastParentBlockquote(htmlDocumentWithoutQuote: Document): Element? {
@@ -96,7 +95,7 @@ object MessageBodyUtils {
         return currentQuoteDescriptor
     }
 
-    private fun splitBodyAndQuote(
+    private fun splitContentAndQuote(
         htmlDocumentWithQuote: Document,
         currentQuoteDescriptor: String,
         blockquoteElement: Element?,
@@ -131,8 +130,8 @@ object MessageBodyUtils {
     private fun anyCssClassContaining(cssClass: String) = "[class*=$cssClass]"
     //endregion
 
-    data class MessageBodyQuote(
-        val messageBody: String,
+    data class SplitBody(
+        val content: String,
         val quote: String? = null,
     )
 }

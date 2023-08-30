@@ -34,11 +34,14 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.MessageBodyUtils.SplitBody
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.collections.set
 
@@ -68,8 +71,27 @@ class ThreadViewModel @Inject constructor(
         emitSource(threadController.getThreadAsync(threadUid).map { it.obj }.asLiveData())
     }
 
+    private val splitBodies = mutableMapOf<String, SplitBody>()
+
     val messagesLive = liveData(ioCoroutineContext) {
-        messageController.getSortedMessages(threadUid)?.asFlow()?.asLiveData()?.let { emitSource(it) }
+
+        suspend fun splitBody(message: Message): Message = withContext(ioDispatcher) {
+            if (message.body == null) return@withContext message
+
+            return@withContext message.copyFromRealm().apply {
+                body?.let {
+                    val isNotAlreadySplit = !splitBodies.contains(message.uid)
+                    if (isNotAlreadySplit) splitBodies[message.uid] = MessageBodyUtils.splitContentAndQuote(it)
+                    it.splitBody = splitBodies[message.uid]!!
+                }
+            }
+        }
+
+        messageController.getSortedMessages(threadUid)
+            ?.asFlow()
+            ?.map { results -> results.list.map { splitBody(it) } }
+            ?.asLiveData()
+            ?.let { emitSource(it) }
     }
 
     private val currentMailboxLive = mailboxController.getMailboxAsync(
