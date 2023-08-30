@@ -36,10 +36,7 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.MailboxListFragment
 import com.infomaniak.mail.ui.main.menu.MailboxesAdapter
-import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.PlayServicesUtils
-import com.infomaniak.mail.utils.animatedNavigation
-import com.infomaniak.mail.utils.createDescriptionDialog
+import com.infomaniak.mail.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -63,6 +60,9 @@ class AccountFragment : Fragment(), MailboxListFragment {
         onLockedMailboxClicked = { mailboxEmail -> onLockedMailboxClicked(mailboxEmail) },
         onInvalidPasswordMailboxClicked = { mailbox -> onInvalidPasswordMailboxClicked(mailbox) },
     )
+
+    @Inject
+    lateinit var logoutUser: LogoutUser
 
     @Inject
     lateinit var playServicesUtils: PlayServicesUtils
@@ -109,7 +109,7 @@ class AccountFragment : Fragment(), MailboxListFragment {
 
     private fun removeCurrentUser() = lifecycleScope.launch(ioDispatcher) {
         requireContext().trackAccountEvent("logOutConfirm")
-        AccountUtils.removeUser(requireContext(), AccountUtils.currentUser!!, playServicesUtils)
+        logoutUser(user = AccountUtils.currentUser!!)
     }
 
     private fun observeAccountsLive() {

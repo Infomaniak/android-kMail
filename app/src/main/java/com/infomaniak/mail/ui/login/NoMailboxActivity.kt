@@ -24,27 +24,32 @@ import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.mail.BuildConfig.SHOP_URL
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ActivityNoMailboxBinding
+import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.BaseActivity
 import com.infomaniak.mail.ui.login.IlluColors.Category
 import com.infomaniak.mail.ui.login.IlluColors.IlluColors
 import com.infomaniak.mail.ui.login.IlluColors.getPaletteFor
 import com.infomaniak.mail.ui.login.IlluColors.keyPath
-import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.PlayServicesUtils
-import com.infomaniak.mail.utils.changePathColor
-import com.infomaniak.mail.utils.repeatFrame
+import com.infomaniak.mail.utils.*
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class NoMailboxActivity : BaseActivity() {
 
+    private val binding by lazy { ActivityNoMailboxBinding.inflate(layoutInflater) }
+
+    @Inject
+    lateinit var logoutUser: LogoutUser
+
     @Inject
     lateinit var playServicesUtils: PlayServicesUtils
 
-    private val binding by lazy { ActivityNoMailboxBinding.inflate(layoutInflater) }
+    @Inject
+    @IoDispatcher
+    lateinit var ioDispatcher: CoroutineDispatcher
 
     override fun onCreate(savedInstanceState: Bundle?) {
         lockOrientationForSmallScreens()
@@ -52,13 +57,8 @@ class NoMailboxActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
 
         AccountUtils.currentUser?.let {
-            lifecycleScope.launch(Dispatchers.IO) {
-                AccountUtils.removeUser(
-                    context = this@NoMailboxActivity,
-                    user = it,
-                    playServicesUtils = playServicesUtils,
-                    shouldReload = false,
-                )
+            lifecycleScope.launch(ioDispatcher) {
+                logoutUser(user = it, shouldReload = false)
             }
         }
 

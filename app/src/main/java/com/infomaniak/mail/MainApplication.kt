@@ -49,10 +49,7 @@ import com.infomaniak.mail.data.api.UrlTraceInterceptor
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.LaunchActivity
-import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.ErrorCode
-import com.infomaniak.mail.utils.NotificationUtils
-import com.infomaniak.mail.utils.PlayServicesUtils
+import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.workers.SyncMailboxesWorker
 import dagger.hilt.android.HiltAndroidApp
 import io.sentry.SentryEvent
@@ -83,7 +80,13 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
     lateinit var workerFactory: HiltWorkerFactory
 
     @Inject
+    lateinit var globalCoroutineScope: CoroutineScope
+
+    @Inject
     lateinit var localSettings: LocalSettings
+
+    @Inject
+    lateinit var logoutUser: LogoutUser
 
     @Inject
     lateinit var notificationUtils: NotificationUtils
@@ -224,10 +227,10 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
             @Suppress("MissingPermission")
             notificationManagerCompat.notify(UUID.randomUUID().hashCode(), builder.build())
         } else {
-            CoroutineScope(mainDispatcher).launch { showToast(notificationText) }
+            globalCoroutineScope.launch(mainDispatcher) { showToast(notificationText) }
         }
 
-        CoroutineScope(ioDispatcher).launch { AccountUtils.removeUser(this@MainApplication, user, playServicesUtils) }
+        globalCoroutineScope.launch(ioDispatcher) { logoutUser(user) }
     }
 
     private fun tokenInterceptorListener() = object : TokenInterceptorListener {
