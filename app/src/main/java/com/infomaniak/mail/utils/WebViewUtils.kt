@@ -31,18 +31,31 @@ import com.infomaniak.mail.utils.HtmlFormatter.Companion.getFixStyleScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getImproveRenderingStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getJsBridgeScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getResizeScript
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getSignatureMarginStyle
 
 class WebViewUtils(context: Context) {
 
     private val customDarkMode by lazy { context.getCustomDarkMode() }
     private val improveRenderingStyle by lazy { context.getImproveRenderingStyle() }
     private val customStyle by lazy { context.getCustomStyle() }
+    private val signatureVerticalMargin by lazy { context.getSignatureMarginStyle() }
 
     private val resizeScript by lazy { context.getResizeScript() }
     private val fixStyleScript by lazy { context.getFixStyleScript() }
     private val jsBridgeScript by lazy { context.getJsBridgeScript() }
 
     fun processHtmlForDisplay(html: String, isDisplayedInDarkMode: Boolean): String = with(HtmlFormatter(html)) {
+        addCommonDisplayContent(isDisplayedInDarkMode)
+        return@with inject()
+    }
+
+    fun processSignatureHtmlForDisplay(html: String, isDisplayedInDarkMode: Boolean): String = with(HtmlFormatter(html)) {
+        addCommonDisplayContent(isDisplayedInDarkMode)
+        registerCss(signatureVerticalMargin)
+        return@with inject()
+    }
+
+    private fun HtmlFormatter.addCommonDisplayContent(isDisplayedInDarkMode: Boolean) {
         if (isDisplayedInDarkMode) registerCss(customDarkMode, DARK_BACKGROUND_STYLE_ID)
         registerCss(improveRenderingStyle)
         registerCss(customStyle)
@@ -51,7 +64,6 @@ class WebViewUtils(context: Context) {
         registerScript(fixStyleScript)
         registerScript(jsBridgeScript)
         registerBodyEncapsulation()
-        return@with inject()
     }
 
     class JavascriptBridge {

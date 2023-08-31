@@ -371,7 +371,7 @@ class NewMessageFragment : Fragment() {
         draft.uiSignature?.let { html ->
             signatureWebView.apply {
                 settings.setupNewMessageWebViewSettings()
-                loadContent(html, signatureGroup)
+                loadSignatureContent(html, signatureGroup)
                 initWebViewClientAndBridge(
                     attachments = emptyList(),
                     messageUid = "SIGNATURE-${draft.messageUid}",
@@ -424,8 +424,17 @@ class NewMessageFragment : Fragment() {
         newMessageViewModel.externalRecipientCount.value = externalRecipientEmail to externalRecipientQuantity
     }
 
+    private fun WebView.loadSignatureContent(html: String, webViewGroup: Group) {
+        val processedHtml = webViewUtils.processSignatureHtmlForDisplay(html, context.isNightModeEnabled())
+        loadProcessedContent(processedHtml, webViewGroup)
+    }
+
     private fun WebView.loadContent(html: String, webViewGroup: Group) {
         val processedHtml = webViewUtils.processHtmlForDisplay(html, context.isNightModeEnabled())
+        loadProcessedContent(processedHtml, webViewGroup)
+    }
+
+    private fun WebView.loadProcessedContent(processedHtml: String, webViewGroup: Group) {
         webViewGroup.isVisible = processedHtml.isNotBlank()
         loadDataWithBaseURL("", processedHtml, ClipDescription.MIMETYPE_TEXT_HTML, Utils.UTF_8, "")
     }
@@ -466,7 +475,7 @@ class NewMessageFragment : Fragment() {
 
     private fun updateBodySignature(signatureContent: String) = with(binding) {
         newMessageViewModel.draft.uiSignature = encapsulateSignatureContentWithInfomaniakClass(signatureContent)
-        signatureWebView.loadContent(signatureContent, signatureGroup)
+        signatureWebView.loadSignatureContent(signatureContent, signatureGroup)
     }
 
     private fun updateSelectedSignatureFromField(signaturesCount: Int, signature: Signature) {
