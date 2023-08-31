@@ -170,7 +170,7 @@ class NewMessageViewModel @Inject constructor(
                     createDraft(signatures) ?: return@writeBlocking false
                 }
 
-                if (draft.identityId.isNullOrBlank()) draft.addMissingSignatureData(realm = this)
+                if (draft.identityId.isNullOrBlank()) draft.addMissingSignatureData(context, realm = this)
             }.onFailure {
                 return@writeBlocking false
             }
@@ -231,7 +231,7 @@ class NewMessageViewModel @Inject constructor(
         initLocalValues(mimeType = ClipDescription.MIMETYPE_TEXT_HTML)
 
         val shouldPreselectSignature = draftMode == DraftMode.REPLY || draftMode == DraftMode.REPLY_ALL
-        initSignature(realm = this@createDraft, addContent = !shouldPreselectSignature)
+        context.initSignature(realm = this@createDraft, addContent = !shouldPreselectSignature)
 
         when (draftMode) {
             DraftMode.NEW_MAIL -> recipient?.let { to = realmListOf(it) }
@@ -250,7 +250,7 @@ class NewMessageViewModel @Inject constructor(
                         if (shouldPreselectSignature) {
                             val mostFittingSignature = guessMostFittingSignature(message, signatures)
                             identityId = mostFittingSignature.id.toString()
-                            body += encapsulateSignatureContentWithInfomaniakClass(mostFittingSignature.content)
+                            body += context.encapsulateSignatureContentWithInfomaniakClass(mostFittingSignature.content)
                         }
                     }
             }

@@ -19,13 +19,16 @@
 
 package com.infomaniak.mail.data.models.draft
 
+import android.content.Context
 import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.utils.MessageBodyUtils
+import com.infomaniak.mail.utils.readRawResource
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.RealmList
@@ -110,11 +113,11 @@ class Draft : RealmObject {
         mimeType?.let { this.mimeType = it }
     }
 
-    fun addMissingSignatureData(realm: MutableRealm) {
-        initSignature(realm, addContent = false)
+    fun addMissingSignatureData(context: Context, realm: MutableRealm) {
+        context.initSignature(realm, addContent = false)
     }
 
-    fun initSignature(realm: MutableRealm, addContent: Boolean) {
+    fun Context.initSignature(realm: MutableRealm, addContent: Boolean) {
         val signature = SignatureController.getSignature(realm)
 
         identityId = signature.id.toString()
@@ -146,8 +149,14 @@ class Draft : RealmObject {
         val actionPropertyName get() = Draft::_action.name
         private val draftJson = Json(ApiController.json) { encodeDefaults = true }
 
-        fun encapsulateSignatureContentWithInfomaniakClass(signatureContent: String): String {
-            return """<div class="${MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME}" style="margin-top:16px;margin-bottom:16px;">$signatureContent</div>"""
+        fun Context.encapsulateSignatureContentWithInfomaniakClass(signatureContent: String): String {
+            val verticalMarginsCss = readRawResource(R.raw.signature_margins)
+            val verticalMarginAttributes = extractAttributesFromMarginCss(verticalMarginsCss)
+            return """<div class="${MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME}" style="$verticalMarginAttributes">$signatureContent</div>"""
+        }
+
+        private fun extractAttributesFromMarginCss(verticalMarginsCss: String): String {
+            return Regex("""\{(.*)\}""").find(verticalMarginsCss)!!.groupValues[1]
         }
     }
 }

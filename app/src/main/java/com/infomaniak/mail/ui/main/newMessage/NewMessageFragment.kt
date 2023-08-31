@@ -474,7 +474,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun updateBodySignature(signatureContent: String) = with(binding) {
-        newMessageViewModel.draft.uiSignature = encapsulateSignatureContentWithInfomaniakClass(signatureContent)
+        newMessageViewModel.draft.uiSignature = context.encapsulateSignatureContentWithInfomaniakClass(signatureContent)
         signatureWebView.loadSignatureContent(signatureContent, signatureGroup)
     }
 
