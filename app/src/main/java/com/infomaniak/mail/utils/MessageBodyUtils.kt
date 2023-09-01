@@ -18,6 +18,8 @@
 package com.infomaniak.mail.utils
 
 import com.infomaniak.mail.data.models.message.Body
+import io.sentry.Sentry
+import io.sentry.SentryLevel
 import kotlinx.coroutines.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -76,6 +78,14 @@ object MessageBodyUtils {
                 if (quote.isNullOrBlank()) SplitBody(body.value) else SplitBody(content, body.value)
             }
         }.getOrElse {
+            if (it is TimeoutCancellationException) {
+                Sentry.withScope { scope ->
+                    scope.level = SentryLevel.WARNING
+                    scope.setExtra("body size", "${body.value.toByteArray().size} bytes")
+                    scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
+                    Sentry.captureMessage("Timeout reached while displaying a Message's body")
+                }
+            }
             SplitBody(body.value)
         }
     }
