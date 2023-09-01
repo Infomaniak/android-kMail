@@ -142,6 +142,8 @@ class HtmlFormatter(private val html: String) {
             listOf(PRIMARY_COLOR_CODE to getAttributeColor(RMaterial.attr.colorPrimary)),
         )
 
+        fun Context.getSignatureMarginStyle(): String = loadCss(R.raw.signature_margins)
+
         fun Context.getResizeScript(): String = loadScript(
             R.raw.munge_email,
             listOf("MESSAGE_SELECTOR" to "#$KMAIL_MESSAGE_ID")

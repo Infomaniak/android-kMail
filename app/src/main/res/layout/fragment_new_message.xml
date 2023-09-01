@@ -282,10 +282,10 @@
                     android:id="@+id/bodyLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint=" "
                     app:boxBackgroundColor="@android:color/transparent"
                     app:boxBackgroundMode="none"
                     app:boxStrokeWidth="0dp"
+                    app:hintEnabled="false"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/attachmentsRecyclerView"
@@ -301,6 +301,7 @@
                         android:hint="@string/newMessagePlaceholderTitle"
                         android:inputType="textMultiLine|textCapSentences"
                         android:nextFocusUp="@id/subjectTextField"
+                        android:paddingBottom="0dp"
                         android:visibility="gone"
                         tools:visibility="visible" />
 
@@ -357,7 +358,7 @@
                     android:id="@+id/signatureWebView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginVertical="@dimen/marginStandardMedium"
+                    android:layout_marginBottom="@dimen/marginStandardMedium"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/bodyLayout" />

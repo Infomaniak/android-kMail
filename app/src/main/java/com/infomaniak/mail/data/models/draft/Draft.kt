@@ -22,11 +22,8 @@ package com.infomaniak.mail.data.models.draft
 import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.data.api.RealmListSerializer
-import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.correspondent.Recipient
-import com.infomaniak.mail.utils.MessageBodyUtils
-import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
@@ -110,20 +107,6 @@ class Draft : RealmObject {
         mimeType?.let { this.mimeType = it }
     }
 
-    fun addMissingSignatureData(realm: MutableRealm) {
-        initSignature(realm, addContent = false)
-    }
-
-    fun initSignature(realm: MutableRealm, addContent: Boolean) {
-        val signature = SignatureController.getSignature(realm)
-
-        identityId = signature.id.toString()
-
-        if (addContent && signature.content.isNotEmpty()) {
-            body += encapsulateSignatureContentWithInfomaniakClass(signature.content)
-        }
-    }
-
     fun getJsonRequestBody(): MutableMap<String, JsonElement> {
         return draftJson.encodeToJsonElement(this).jsonObject.toMutableMap().apply {
             this[Draft::attachments.name] = JsonArray(attachments.map { JsonPrimitive(it.uuid) })
@@ -145,9 +128,5 @@ class Draft : RealmObject {
     companion object {
         val actionPropertyName get() = Draft::_action.name
         private val draftJson = Json(ApiController.json) { encodeDefaults = true }
-
-        fun encapsulateSignatureContentWithInfomaniakClass(signatureContent: String): String {
-            return """<div class="${MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME}">$signatureContent</div>"""
-        }
     }
 }
