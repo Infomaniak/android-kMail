@@ -231,7 +231,7 @@ class NewMessageViewModel @Inject constructor(
         initLocalValues(mimeType = ClipDescription.MIMETYPE_TEXT_HTML)
 
         val shouldPreselectSignature = draftMode == DraftMode.REPLY || draftMode == DraftMode.REPLY_ALL
-        signatureUtils.initSignature(this, realm = this@createDraft, addContent = !shouldPreselectSignature)
+        signatureUtils.initSignature(draft = this, realm = this@createDraft, addContent = !shouldPreselectSignature)
 
         when (draftMode) {
             DraftMode.NEW_MAIL -> recipient?.let { to = realmListOf(it) }

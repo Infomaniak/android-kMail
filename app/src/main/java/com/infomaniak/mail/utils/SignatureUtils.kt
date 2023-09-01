@@ -27,6 +27,7 @@ import javax.inject.Singleton
 
 @Singleton
 class SignatureUtils @Inject constructor(appContext: Context) {
+
     private val signatureMargins by lazy { appContext.readRawResource(R.raw.signature_margins) }
 
     fun encapsulateSignatureContentWithInfomaniakClass(signatureContent: String): String {
