@@ -57,7 +57,6 @@ import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition.INLINE
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.*
-import com.infomaniak.mail.data.models.draft.Draft.Companion.encapsulateSignatureContentWithInfomaniakClass
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
@@ -100,6 +99,9 @@ class NewMessageFragment : Fragment() {
 
     @Inject
     lateinit var draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler
+
+    @Inject
+    lateinit var signatureUtils: SignatureUtils
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentNewMessageBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -474,7 +476,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun updateBodySignature(signatureContent: String) = with(binding) {
-        newMessageViewModel.draft.uiSignature = context.encapsulateSignatureContentWithInfomaniakClass(signatureContent)
+        newMessageViewModel.draft.uiSignature = signatureUtils.encapsulateSignatureContentWithInfomaniakClass(signatureContent)
         signatureWebView.loadSignatureContent(signatureContent, signatureGroup)
     }
 

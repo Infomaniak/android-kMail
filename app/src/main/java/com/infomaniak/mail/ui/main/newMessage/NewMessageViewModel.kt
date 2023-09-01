@@ -38,7 +38,6 @@ import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
-import com.infomaniak.mail.data.models.draft.Draft.Companion.encapsulateSignatureContentWithInfomaniakClass
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.mailbox.Mailbox
@@ -75,6 +74,7 @@ class NewMessageViewModel @Inject constructor(
     private val notificationManagerCompat: NotificationManagerCompat,
     private val savedStateHandle: SavedStateHandle,
     private val sharedUtils: SharedUtils,
+    private val signatureUtils: SignatureUtils,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
@@ -170,7 +170,7 @@ class NewMessageViewModel @Inject constructor(
                     createDraft(signatures) ?: return@writeBlocking false
                 }
 
-                if (draft.identityId.isNullOrBlank()) draft.addMissingSignatureData(context, realm = this)
+                if (draft.identityId.isNullOrBlank()) signatureUtils.addMissingSignatureData(draft, realm = this)
             }.onFailure {
                 return@writeBlocking false
             }
@@ -231,7 +231,7 @@ class NewMessageViewModel @Inject constructor(
         initLocalValues(mimeType = ClipDescription.MIMETYPE_TEXT_HTML)
 
         val shouldPreselectSignature = draftMode == DraftMode.REPLY || draftMode == DraftMode.REPLY_ALL
-        context.initSignature(realm = this@createDraft, addContent = !shouldPreselectSignature)
+        signatureUtils.initSignature(this, realm = this@createDraft, addContent = !shouldPreselectSignature)
 
         when (draftMode) {
             DraftMode.NEW_MAIL -> recipient?.let { to = realmListOf(it) }
@@ -250,7 +250,7 @@ class NewMessageViewModel @Inject constructor(
                         if (shouldPreselectSignature) {
                             val mostFittingSignature = guessMostFittingSignature(message, signatures)
                             identityId = mostFittingSignature.id.toString()
-                            body += context.encapsulateSignatureContentWithInfomaniakClass(mostFittingSignature.content)
+                            body += signatureUtils.encapsulateSignatureContentWithInfomaniakClass(mostFittingSignature.content)
                         }
                     }
             }
