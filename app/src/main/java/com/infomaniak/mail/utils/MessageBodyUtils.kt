@@ -54,7 +54,7 @@ object MessageBodyUtils {
         "[name=\"quote\"]", // GMX
     )
 
-    fun splitContentAndQuote(body: Body): SplitBody = runBlocking(Dispatchers.IO) {
+    fun splitContentAndQuote(body: Body): SplitBody = runBlocking {
 
         if (body.type == Utils.TEXT_PLAIN) return@runBlocking SplitBody(body.value)
 
