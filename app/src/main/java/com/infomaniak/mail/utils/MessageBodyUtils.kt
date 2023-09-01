@@ -30,7 +30,7 @@ object MessageBodyUtils {
     const val INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME = "forwardContentMessage"
 
     private const val BLOCKQUOTE = "blockquote"
-    private const val QUOTE_DETECTION_TIMEOUT = 2_000L
+    private const val QUOTE_DETECTION_TIMEOUT = 1_500L
 
     private val quoteDescriptors = arrayOf(
         // Do not detect this quote as long as we can't detect siblings quotes or else a single reply will be missing among the
