@@ -111,7 +111,7 @@ class ThreadAdapter(
                 NotificationType.AVATAR -> if (!message.isDraft) userAvatar.loadAvatar(message.sender, contacts)
                 NotificationType.TOGGLE_LIGHT_MODE -> {
                     isThemeTheSameMap[message.uid] = !isThemeTheSameMap[message.uid]!!
-                    holder.toggleBodyAndQuoteTheme(message)
+                    holder.toggleContentAndQuoteTheme(message)
                 }
                 NotificationType.RE_RENDER -> if (bodyWebView.isVisible) bodyWebView.reload() else fullMessageWebView.reload()
             }
@@ -139,19 +139,21 @@ class ThreadAdapter(
         if (isThemeTheSameMap[message.uid] == null) isThemeTheSameMap[message.uid] = true
     }
 
-    private fun ThreadViewHolder.toggleBodyAndQuoteTheme(message: Message) = with(binding) {
+    private fun ThreadViewHolder.toggleContentAndQuoteTheme(message: Message) = with(binding) {
         val isThemeTheSame = isThemeTheSameMap[message.uid]!!
         bodyWebView.toggleWebViewTheme(isThemeTheSame)
         fullMessageWebView.toggleWebViewTheme(isThemeTheSame)
         toggleQuoteButtonTheme(isThemeTheSame)
     }
 
-    private fun ThreadViewHolder.loadBodyAndQuote(message: Message) {
+    private fun ThreadViewHolder.loadContentAndQuote(message: Message) {
         message.body?.let { body ->
-            if (binding.bodyWebView.isVisible) {
-                loadBodyInWebView(message.uid, body.splitBody!!.content, body.type)
-            } else if (binding.fullMessageWebView.isVisible) {
-                loadQuoteInWebView(message.uid, body.splitBody!!.quote, body.type)
+            body.splitBody?.let { splitBody ->
+                if (binding.bodyWebView.isVisible) {
+                    loadBodyInWebView(message.uid, splitBody.content, body.type)
+                } else if (binding.fullMessageWebView.isVisible) {
+                    loadQuoteInWebView(message.uid, splitBody.quote, body.type)
+                }
             }
         }
     }
@@ -170,7 +172,7 @@ class ThreadAdapter(
         bodyWebView.isVisible = showStandardWebView
         fullMessageWebView.isVisible = !showStandardWebView
 
-        loadBodyAndQuote(message)
+        loadContentAndQuote(message)
     }
 
     private fun WebView.applyWebViewContent(uid: String, bodyWebView: String, type: String) {
@@ -374,8 +376,8 @@ class ThreadAdapter(
     }
 
     private fun ThreadViewHolder.bindContent(message: Message) {
-        binding.messageLoader.isVisible = message.body == null
-        message.body?.let { body -> bindBody(message, hasQuote = body.splitBody?.quote != null) }
+        binding.messageLoader.isVisible = message.body?.splitBody == null
+        message.body?.splitBody?.let { splitBody -> bindBody(message, hasQuote = splitBody.quote != null) }
     }
 
     private fun ThreadViewHolder.bindBody(message: Message, hasQuote: Boolean) = with(binding) {
@@ -412,7 +414,7 @@ class ThreadAdapter(
 
         setHeaderState(message, isExpanded)
         content.isVisible = isExpanded
-        if (isExpanded) loadBodyAndQuote(message)
+        if (isExpanded) loadContentAndQuote(message)
     }
 
     private fun ItemMessageBinding.setHeaderState(message: Message, isExpanded: Boolean) = with(message) {
@@ -473,6 +475,7 @@ class ThreadAdapter(
 
         override fun areContentsTheSame(oldMessage: Message, newMessage: Message): Boolean {
             return newMessage.body?.value == oldMessage.body?.value &&
+                    newMessage.body?.splitBody == oldMessage.body?.splitBody &&
                     newMessage.isSeen == oldMessage.isSeen &&
                     newMessage.isFavorite == oldMessage.isFavorite
         }

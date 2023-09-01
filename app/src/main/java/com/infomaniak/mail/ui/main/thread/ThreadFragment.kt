@@ -359,11 +359,17 @@ class ThreadFragment : Fragment() {
     }
 
     private fun observeMessagesLive() {
-        threadViewModel.messagesLive.observe(viewLifecycleOwner) { messages ->
+
+        fun onMessagesUpdate(messages: List<Message>) {
             SentryLog.i("UI", "Received ${messages.size} messages")
             threadViewModel.fetchMessagesHeavyData(messages)
             threadAdapter.submitList(messages)
             scrollToFirstUnseenMessage(messages)
+        }
+
+        threadViewModel.messages.observeNotNull(viewLifecycleOwner) { messages ->
+            onMessagesUpdate(messages)
+            threadViewModel.messagesLive.observe(viewLifecycleOwner, ::onMessagesUpdate)
         }
     }
 
