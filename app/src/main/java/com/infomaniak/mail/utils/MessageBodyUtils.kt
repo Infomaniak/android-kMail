@@ -85,6 +85,8 @@ object MessageBodyUtils {
                     scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
                     Sentry.captureMessage("Timeout reached while displaying a Message's body")
                 }
+            } else {
+                Sentry.captureException(it)
             }
             SplitBody(body.value)
         }
