@@ -51,6 +51,7 @@ import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.NotificationUtils.Companion.cancelNotification
 import com.infomaniak.mail.utils.SharedUtils.Companion.updateSignatures
+import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.coroutines.*
@@ -105,7 +106,8 @@ class MainViewModel @Inject constructor(
     inline val selectedThreads
         get() = selectedThreadsLiveData.value!!
 
-    val isEverythingSelected get() = selectedThreads.count() == currentThreadsLive.value?.list?.count()
+    val isEverythingSelected
+        get() = runCatchingRealm { selectedThreads.count() == currentThreadsLive.value?.list?.count() }.getOrDefault(false)
     //endregion
 
     //region Current Mailbox
