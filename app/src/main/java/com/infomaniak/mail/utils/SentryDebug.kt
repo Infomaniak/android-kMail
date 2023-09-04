@@ -37,6 +37,7 @@ import io.sentry.SentryLevel
 
 object SentryDebug {
 
+    //region Add Breadcrumb
     private var previousDestinationName: String = ""
 
     fun addNavigationBreadcrumb(name: String, arguments: Bundle?) {
@@ -110,6 +111,23 @@ object SentryDebug {
             data?.let { it.forEach { (key, value) -> this.data[key] = value } }
             this.level = SentryLevel.INFO
         })
+    }
+    //endregion
+
+    //region Send Sentry
+    // TODO: Added the 04/09/23. It's not supposed to be possible, but we never know…
+    //  If this doesn't trigger after a certain amount of time, you can remove it.
+    fun sendEmptyThread(thread: Thread) {
+        Sentry.withScope { scope ->
+            scope.level = SentryLevel.ERROR
+            scope.setExtra("currentUserId", "[${AccountUtils.currentUserId}]")
+            scope.setExtra("currentMailboxEmail", "[${AccountUtils.currentMailboxEmail}]")
+            scope.setExtra("folder.name", thread.folder.name)
+            scope.setExtra("folder.id", thread.folder.id)
+            scope.setExtra("thread.uid", "[${thread.uid}]")
+            scope.setExtra("thread.subject", "[${thread.subject}]")
+            Sentry.captureMessage("No Message in the Thread when opening it")
+        }
     }
 
     fun sendFailedNotification(
@@ -256,4 +274,5 @@ object SentryDebug {
             Sentry.captureMessage("JavaScript returned an error when displaying an email.")
         }
     }
+    //endregion
 }
