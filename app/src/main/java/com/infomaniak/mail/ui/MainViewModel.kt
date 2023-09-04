@@ -72,7 +72,6 @@ class MainViewModel @Inject constructor(
     private val mailboxController: MailboxController,
     private val mergedContactController: MergedContactController,
     private val messageController: MessageController,
-    private val notificationUtils: NotificationUtils,
     private val permissionsController: PermissionsController,
     private val quotasController: QuotasController,
     private val refreshController: RefreshController,
