@@ -89,6 +89,7 @@ import com.infomaniak.mail.ui.main.thread.MessageWebViewClient
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragmentArgs
 import com.infomaniak.mail.ui.noValidMailboxes.NoValidMailboxesActivity
+import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
@@ -264,7 +265,7 @@ fun Fragment.safeNavigateToNewMessageActivity(args: Bundle? = null, currentClass
     if (canNavigate(currentClassName)) (activity as MainActivity).navigateToNewMessageActivity(args)
 }
 
-fun Fragment.navigateToThread(thread: Thread, mainViewModel: MainViewModel) {
+fun Fragment.navigateToThread(thread: Thread, mainViewModel: MainViewModel) = runCatchingRealm {
     if (thread.isOnlyOneDraft) { // Directly go to NewMessage screen
         trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
         mainViewModel.navigateToSelectedDraft(thread.messages.first()).observe(viewLifecycleOwner) {
@@ -280,7 +281,7 @@ fun Fragment.navigateToThread(thread: Thread, mainViewModel: MainViewModel) {
     } else {
         safeNavigate(R.id.threadFragment, ThreadFragmentArgs(thread.uid).toBundle())
     }
-}
+}.getOrDefault(Unit)
 //endregion
 
 //region API
