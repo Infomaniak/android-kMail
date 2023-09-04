@@ -102,7 +102,15 @@ class ThreadViewModel @Inject constructor(
             return@liveData
         }
 
-        context.trackUserInfo("nbMessagesInThread", thread.messages.count())
+        val nbMessages = thread.messages.count()
+
+        context.trackUserInfo("nbMessagesInThread", nbMessages)
+
+        when (nbMessages) {
+            0 -> context.trackUserInfo("zeroMessagesInThread")
+            1 -> context.trackUserInfo("oneMessagesInThread")
+            else -> context.trackUserInfo("multipleMessagesInThread", nbMessages)
+        }
 
         val isExpandedMap = mutableMapOf<String, Boolean>()
         val isThemeTheSameMap = mutableMapOf<String, Boolean>()
