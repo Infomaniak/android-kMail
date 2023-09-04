@@ -102,7 +102,7 @@ class ThreadViewModel @Inject constructor(
             return@liveData
         }
 
-        sendRelevantMatomoAndSentry(thread)
+        sendMatomoAndSentryAboutThreadMessagesCount(thread)
 
         val isExpandedMap = mutableMapOf<String, Boolean>()
         val isThemeTheSameMap = mutableMapOf<String, Boolean>()
@@ -116,7 +116,7 @@ class ThreadViewModel @Inject constructor(
         if (thread.unseenMessagesCount > 0) sharedUtils.markAsSeen(mailbox, listOf(thread))
     }
 
-    private fun sendRelevantMatomoAndSentry(thread: Thread) {
+    private fun sendMatomoAndSentryAboutThreadMessagesCount(thread: Thread) {
 
         val nbMessages = thread.messages.count()
 

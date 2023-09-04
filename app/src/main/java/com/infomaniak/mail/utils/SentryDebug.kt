@@ -125,7 +125,6 @@ object SentryDebug {
             scope.setExtra("folder.name", thread.folder.name)
             scope.setExtra("folder.id", thread.folder.id)
             scope.setExtra("thread.uid", "[${thread.uid}]")
-            scope.setExtra("thread.subject", "[${thread.subject}]")
             Sentry.captureMessage("No Message in the Thread when opening it")
         }
     }
