@@ -215,18 +215,18 @@ class FolderAdapter @Inject constructor(
     class FolderViewHolder(val binding: ViewBinding) : RecyclerView.ViewHolder(binding.root)
 
     private class FolderDiffCallback : DiffUtil.ItemCallback<Folder>() {
-        override fun areItemsTheSame(oldFolder: Folder, newFolder: Folder): Boolean {
+        override fun areItemsTheSame(oldFolder: Folder, newFolder: Folder) = runCatchingRealm {
             return oldFolder.id == newFolder.id
-        }
+        }.getOrDefault(false)
 
-        override fun areContentsTheSame(oldFolder: Folder, newFolder: Folder): Boolean {
-            return oldFolder.name == newFolder.name &&
+        override fun areContentsTheSame(oldFolder: Folder, newFolder: Folder) = runCatchingRealm {
+            oldFolder.name == newFolder.name &&
                     oldFolder.isFavorite == newFolder.isFavorite &&
                     oldFolder.path == newFolder.path &&
                     oldFolder.unreadCountDisplay == newFolder.unreadCountDisplay &&
                     oldFolder.threads.count() == newFolder.threads.count() &&
                     oldFolder.isHidden == newFolder.isHidden &&
                     oldFolder.canBeCollapsed == newFolder.canBeCollapsed
-        }
+        }.getOrDefault(false)
     }
 }
