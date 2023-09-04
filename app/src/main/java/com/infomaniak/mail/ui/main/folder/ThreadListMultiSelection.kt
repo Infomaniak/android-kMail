@@ -38,6 +38,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.createDescriptionDialog
 import com.infomaniak.mail.utils.updateNavigationBarColor
 
@@ -177,10 +178,10 @@ class ThreadListMultiSelection {
         }
     }
 
-    private fun hideUnreadChip(isMultiSelectOn: Boolean) {
+    private fun hideUnreadChip(isMultiSelectOn: Boolean) = runCatchingRealm {
         val thereAreUnread = mainViewModel.currentFolderLive.value?.let { it.unreadCountLocal > 0 } == true
         binding.unreadCountChip.isVisible = thereAreUnread && !isMultiSelectOn
-    }
+    }.getOrDefault(Unit)
 
     private fun displayMultiSelectActions(isMultiSelectOn: Boolean) = with(binding) {
         newMessageFab.isGone = isMultiSelectOn
