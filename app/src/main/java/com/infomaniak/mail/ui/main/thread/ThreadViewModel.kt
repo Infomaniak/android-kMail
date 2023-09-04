@@ -102,7 +102,7 @@ class ThreadViewModel @Inject constructor(
             return@liveData
         }
 
-        context.trackUserInfo("nbMessagesInThread", thread.messages.count())
+        sendMatomoAndSentryAboutThreadMessagesCount(thread)
 
         val isExpandedMap = mutableMapOf<String, Boolean>()
         val isThemeTheSameMap = mutableMapOf<String, Boolean>()
@@ -114,6 +114,19 @@ class ThreadViewModel @Inject constructor(
         emit(Triple(thread, isExpandedMap, isThemeTheSameMap))
 
         if (thread.unseenMessagesCount > 0) sharedUtils.markAsSeen(mailbox, listOf(thread))
+    }
+
+    private fun sendMatomoAndSentryAboutThreadMessagesCount(thread: Thread) {
+
+        val nbMessages = thread.messages.count()
+
+        context.trackUserInfo("nbMessagesInThread", nbMessages)
+
+        when (nbMessages) {
+            0 -> SentryDebug.sendEmptyThread(thread)
+            1 -> context.trackUserInfo("oneMessagesInThread")
+            else -> context.trackUserInfo("multipleMessagesInThread", nbMessages)
+        }
     }
 
     fun fetchMessagesHeavyData(messages: List<Message>) {

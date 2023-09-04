@@ -176,8 +176,8 @@ object MatomoMail : MatomoCore {
         }
     }
 
-    fun Context.trackUserInfo(name: String, value: Int) {
-        trackEvent("userInfo", name, TrackerAction.DATA, value.toFloat())
+    fun Context.trackUserInfo(name: String, value: Int? = null) {
+        trackEvent("userInfo", name, TrackerAction.DATA, value?.toFloat())
     }
 
     fun Fragment.trackOnBoardingEvent(name: String) {
