@@ -347,7 +347,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun performSwipeActionOnThread(swipeAction: SwipeAction, threadUid: String): Boolean = with(mainViewModel) {
         trackEvent("swipeActions", swipeAction.matomoValue, TrackerAction.DRAG)
 
-        val shouldKeepItem = when (swipeAction) {
+        val shouldKeepItemBecauseOfAction = when (swipeAction) {
             SwipeAction.TUTORIAL -> {
                 setDefaultSwipeActions()
                 safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSettingsFragment())
@@ -394,7 +394,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             SwipeAction.NONE -> throw IllegalStateException("Cannot swipe on an action which is not set")
         }
 
-        return shouldKeepItem
+        val shouldKeepItemBecauseOfNoConnection = isInternetAvailable.value == false
+
+        return shouldKeepItemBecauseOfAction || shouldKeepItemBecauseOfNoConnection
     }
 
     private fun setDefaultSwipeActions() = with(localSettings) {
