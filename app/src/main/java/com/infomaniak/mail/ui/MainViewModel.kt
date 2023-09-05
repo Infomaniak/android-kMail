@@ -329,7 +329,8 @@ class MainViewModel @Inject constructor(
         if (isSuccess) {
             forceRefreshThreads()
         } else {
-            snackBarManager.postValue(context.getString(RCore.string.anErrorHasOccurred))
+            val title = context.getString(if (hasConnection) RCore.string.anErrorHasOccurred else R.string.noConnection)
+            snackBarManager.postValue(title)
         }
     }
 
