@@ -17,12 +17,9 @@
  */
 package com.infomaniak.mail.ui.main.settings.mailbox
 
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
-import com.infomaniak.lib.core.R
+import androidx.lifecycle.*
 import com.infomaniak.lib.core.utils.SingleLiveEvent
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
@@ -36,6 +33,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.infomaniak.lib.core.R as RCore
 
 @HiltViewModel
 class SignatureSettingViewModel @Inject constructor(
@@ -53,12 +51,12 @@ class SignatureSettingViewModel @Inject constructor(
     val signaturesLive = SignatureController.getSignaturesAsync(customRealm).asLiveData(coroutineContext)
     val showError = SingleLiveEvent<Int>() // StringRes
 
-    fun setDefaultSignature(signature: Signature) = viewModelScope.launch(ioDispatcher) {
+    fun setDefaultSignature(signature: Signature, hasConnection: Boolean) = viewModelScope.launch(ioDispatcher) {
         runCatching {
             val apiResponse = ApiRepository.setDefaultSignature(mailbox.hostingId, mailbox.mailboxName, signature)
             if (apiResponse.isSuccess()) updateSignatures() else apiResponse.throwErrorAsException()
         }.onFailure {
-            showError.postValue(R.string.anErrorHasOccurred)
+            showError.postValue(if (hasConnection) RCore.string.anErrorHasOccurred else R.string.noConnection)
         }
     }
 
