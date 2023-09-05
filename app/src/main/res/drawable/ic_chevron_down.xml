@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~ Copyright (C) 2022-2023 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -19,9 +19,12 @@
     android:width="12dp"
     android:height="12dp"
     android:tint="@color/iconColor"
-    android:viewportWidth="24"
-    android:viewportHeight="24">
+    android:viewportWidth="12"
+    android:viewportHeight="12">
     <path
-        android:fillColor="#000"
-        android:pathData="M11.972,19C12.634,19.001 13.264,18.717 13.701,18.22L23.512,7.068C24.157,6.3 24.07,5.157 23.317,4.494C22.564,3.832 21.419,3.892 20.739,4.629L12.16,14.381C12.113,14.436 12.044,14.467 11.972,14.467C11.9,14.467 11.832,14.436 11.784,14.381L3.205,4.629C2.525,3.892 1.381,3.832 0.627,4.494C-0.126,5.157 -0.213,6.3 0.432,7.068L10.24,18.216C10.678,18.714 11.309,19 11.972,19Z" />
+        android:pathData="M11.25,3.75L6.247,8.895C6.215,8.928 6.176,8.954 6.134,8.973C6.091,8.991 6.046,9 6,9C5.954,9 5.909,8.991 5.866,8.973C5.824,8.954 5.785,8.928 5.753,8.895L0.75,3.75"
+        android:strokeWidth="1.5"
+        android:strokeColor="#9F9F9F"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
 </vector>
