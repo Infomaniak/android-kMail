@@ -19,8 +19,11 @@
 
 package com.infomaniak.mail.data.models.message
 
+import com.infomaniak.mail.utils.MessageBodyUtils.SplitBody
 import io.realm.kotlin.types.EmbeddedRealmObject
+import io.realm.kotlin.types.annotations.Ignore
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
@@ -28,8 +31,11 @@ import kotlinx.serialization.json.JsonTransformingSerializer
 
 @Serializable
 class Body : EmbeddedRealmObject {
+
+    //region Remote data
     var value: String = ""
     var type: String = ""
+
     // TODO: Realm doesn't allow us to do that for now:
     //  | Caused by: io.realm.kotlin.internal.interop.RealmCoreLogicException: [18]: Schema validation failed due to the following errors:
     //  | - Cycles containing embedded objects are not currently supported: 'Body.subBody.body'
@@ -38,6 +44,13 @@ class Body : EmbeddedRealmObject {
     // TODO: In the meantime, we store the `subBody` as a JSON String, and we'll have to manually deserialize it when we want to use it.
     @Serializable(JsonAsStringSerializer::class)
     var subBody: String? = null
+    //endregion
+
+    //region UI data (Transient & Ignore)
+    @Transient
+    @Ignore
+    var splitBody: SplitBody? = null
+    //endregion
 }
 
 // @Serializable

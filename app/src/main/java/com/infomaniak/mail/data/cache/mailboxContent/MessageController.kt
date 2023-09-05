@@ -29,19 +29,26 @@ import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.query
+import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmSingleQuery
 import io.realm.kotlin.query.Sort
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class MessageController @Inject constructor(private val mailboxContentRealm: RealmDatabase.MailboxContent) {
 
-    fun getSortedMessages(threadUid: String): RealmQuery<Message>? {
+
+    //region Queries
+    private fun getSortedMessagesQuery(threadUid: String): RealmQuery<Message>? {
         return ThreadController.getThread(threadUid, mailboxContentRealm())
             ?.messages?.query()
             ?.sort(Message::date.name, Sort.ASCENDING)
     }
 
+    //endregion
+
+    //region Get data
     fun getMessage(uid: String): Message? {
         return getMessage(uid, mailboxContentRealm())
     }
@@ -124,6 +131,10 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
         } else {
             query<Message>(filtersQuery)
         }.find().copyFromRealm()
+    }
+
+    fun getSortedMessagesAsync(threadUid: String): Flow<ResultsChange<Message>>? {
+        return getSortedMessagesQuery(threadUid)?.asFlow()
     }
     //endregion
 

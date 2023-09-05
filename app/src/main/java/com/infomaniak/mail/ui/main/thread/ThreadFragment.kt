@@ -66,7 +66,6 @@ import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialog
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipients
-import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
 import com.infomaniak.mail.utils.UiUtils.dividerDrawable
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
@@ -360,13 +359,20 @@ class ThreadFragment : Fragment() {
     }
 
     private fun observeMessagesLive() {
-        threadViewModel.messagesLive.bindResultsChangeToAdapter(viewLifecycleOwner, threadAdapter).apply {
-            beforeUpdateAdapter = ::onMessagesUpdate
-            afterUpdateAdapter = {
-                val shouldScrollToFirstUnseenMessage = isFirstVisit.compareAndSet(true, false) && it.count() > 1
-                if (shouldScrollToFirstUnseenMessage) onRecyclerViewLaidOut(::scrollToFirstUnseenMessage)
-            }
+
+        fun onMessagesUpdate(messages: List<Message>) {
+            SentryLog.i("UI", "Received ${messages.size} messages")
+            threadViewModel.fetchMessagesHeavyData(messages)
+            threadAdapter.submitList(messages)
+            scrollToFirstUnseenMessage(messages)
         }
+
+        threadViewModel.messagesLive.observe(viewLifecycleOwner, ::onMessagesUpdate)
+    }
+
+    private fun scrollToFirstUnseenMessage(messages: List<Message>) {
+        val shouldScrollToFirstUnseenMessage = isFirstVisit.compareAndSet(true, false) && messages.count() > 1
+        if (shouldScrollToFirstUnseenMessage) onRecyclerViewLaidOut(::scrollToFirstUnseenMessage)
     }
 
     private fun onRecyclerViewLaidOut(callback: () -> Unit) = with(binding) {
@@ -528,11 +534,6 @@ class ThreadFragment : Fragment() {
             endIndex,
             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
         )
-    }
-
-    private fun onMessagesUpdate(messages: List<Message>) {
-        SentryLog.i("UI", "Received ${messages.size} messages")
-        threadViewModel.fetchMessagesHeavyData(messages)
     }
 
     private fun leaveThread() {

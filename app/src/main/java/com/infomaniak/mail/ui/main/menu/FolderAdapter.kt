@@ -215,6 +215,7 @@ class FolderAdapter @Inject constructor(
     class FolderViewHolder(val binding: ViewBinding) : RecyclerView.ViewHolder(binding.root)
 
     private class FolderDiffCallback : DiffUtil.ItemCallback<Folder>() {
+
         override fun areItemsTheSame(oldFolder: Folder, newFolder: Folder) = runCatchingRealm {
             return oldFolder.id == newFolder.id
         }.getOrDefault(false)
