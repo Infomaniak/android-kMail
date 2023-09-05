@@ -792,15 +792,15 @@ class MainViewModel @Inject constructor(
     fun blockUser(message: Message) = viewModelScope.launch(ioCoroutineContext) {
         val mailboxUuid = currentMailbox.value?.uuid!!
 
-        val apiResponse = ApiRepository.blockUser(mailboxUuid, message.folderId, message.shortUid)
+        val isSuccess = ApiRepository.blockUser(mailboxUuid, message.folderId, message.shortUid).isSuccess()
 
-        val snackbarTitle = if (apiResponse.isSuccess()) {
-            R.string.snackbarBlockUserConfirmation
-        } else {
-            RCore.string.anErrorHasOccurred
+        val title = when {
+            isSuccess -> R.string.snackbarBlockUserConfirmation
+            hasConnection -> RCore.string.anErrorHasOccurred
+            else -> R.string.noConnection
         }
 
-        snackBarManager.postValue(context.getString(snackbarTitle))
+        snackBarManager.postValue(context.getString(title))
     }
     //endregion
 
