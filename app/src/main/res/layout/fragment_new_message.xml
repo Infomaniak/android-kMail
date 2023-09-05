@@ -15,7 +15,7 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -30,6 +30,8 @@
         android:layout_height="?attr/actionBarSize"
         android:background="@color/newMessageBackgroundColor"
         app:contentInsetEnd="@dimen/marginStandardSmall"
+        app:layout_constraintBottom_toTopOf="@+id/compositionNestedScrollView"
+        app:layout_constraintTop_toTopOf="parent"
         app:navigationContentDescription="@string/buttonClose"
         app:navigationIcon="@drawable/ic_close_big"
         app:title="@string/buttonNewMessage"
@@ -40,7 +42,9 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:fillViewport="true">
+        android:fillViewport="true"
+        app:layout_constraintBottom_toTopOf="@+id/externalBanner"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -467,6 +471,8 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/editor"
+        app:layout_constraintTop_toBottomOf="@+id/compositionNestedScrollView"
         tools:visibility="visible">
 
         <TextView
@@ -500,7 +506,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:backgroundTint="@color/newMessageBackgroundColor"
-        app:cardElevation="10dp">
+        app:cardElevation="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/externalBanner">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -682,4 +690,31 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
 
-</LinearLayout>
+    <ImageView
+        android:id="@+id/scrim"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:importantForAccessibility="no"
+        android:src="#50000000"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.infomaniak.mail.ui.main.newMessage.AiPromptView
+        android:id="@+id/aiPrompt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:translationZ="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/aiPromptGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="scrim,aiPrompt" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
