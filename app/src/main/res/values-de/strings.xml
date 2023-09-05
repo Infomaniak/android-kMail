@@ -270,7 +270,6 @@
     </plurals>
     <string name="newMessagePlaceholderTitle">Geben Sie Ihre Nachricht ein</string>
     <string name="noBodyTitle">Diese Nachricht ist leer.</string>
-    <string name="noConnection">Keine Verbindung</string>
     <string name="noConversationSelected">Kein Gespräch in %s ausgewählt</string>
     <string name="noFolderTitle">Sie haben noch keinen Ordner…</string>
     <string name="noMailboxDescription">Sie haben noch keine E-Mail-Adresse, die mit Ihrem Infomaniak-Konto verknüpft ist. Um eine Adresse hinzuzufügen, tippen Sie auf die Schaltfläche unten.</string>
