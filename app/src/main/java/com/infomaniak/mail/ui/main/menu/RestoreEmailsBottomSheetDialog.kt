@@ -22,6 +22,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.doOnTextChanged
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -34,6 +35,7 @@ import com.infomaniak.lib.core.utils.format
 import com.infomaniak.mail.MatomoMail.trackRestoreMailsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetRestoreEmailsBinding
+import com.infomaniak.mail.ui.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -43,6 +45,7 @@ import com.infomaniak.lib.core.R as RCore
 class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
 
     private lateinit var binding: BottomSheetRestoreEmailsBinding
+    private val mainViewModel: MainViewModel by activityViewModels()
     private val restoreEmailViewModel: RestoreEmailsViewModel by viewModels()
 
     private val autoCompleteTextView by lazy { (binding.datePicker.editText as? MaterialAutoCompleteTextView)!! }
@@ -81,7 +84,8 @@ class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
                     hasLoaded(true)
                 }
             } else {
-                showSnackbar(RCore.string.anErrorHasOccurred)
+                val title = if (mainViewModel.hasConnection) RCore.string.anErrorHasOccurred else R.string.noConnection
+                showSnackbar(title)
                 findNavController().popBackStack()
             }
         }
