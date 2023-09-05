@@ -22,21 +22,25 @@ import android.os.Bundle
 import android.view.KeyEvent
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.infomaniak.lib.core.R
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.setBackNavigationResult
+import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.DialogDownloadProgressBinding
+import com.infomaniak.mail.ui.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import com.infomaniak.lib.core.R as RCore
 
 @AndroidEntryPoint
 class DownloadAttachmentProgressDialog : DialogFragment() {
 
     private val binding by lazy { DialogDownloadProgressBinding.inflate(layoutInflater) }
     private val navigationArgs: DownloadAttachmentProgressDialogArgs by navArgs()
+    private val mainViewModel: MainViewModel by activityViewModels()
     private val downloadAttachmentViewModel: DownloadAttachmentViewModel by viewModels()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -65,7 +69,7 @@ class DownloadAttachmentProgressDialog : DialogFragment() {
     }
 
     private fun popBackStackWithError() {
-        showSnackbar(R.string.anErrorHasOccurred)
+        showSnackbar(if (mainViewModel.hasConnection) RCore.string.anErrorHasOccurred else R.string.noConnection)
         findNavController().popBackStack()
     }
 
