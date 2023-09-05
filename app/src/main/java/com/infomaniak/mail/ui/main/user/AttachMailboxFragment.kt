@@ -24,6 +24,7 @@ import android.view.View.OnFocusChangeListener
 import android.view.ViewGroup
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
@@ -36,6 +37,9 @@ import com.infomaniak.lib.core.utils.showProgress
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentAttachMailboxBinding
+import com.infomaniak.mail.ui.MainActivity
+import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.noValidMailboxes.NoValidMailboxesViewModel
 import com.infomaniak.mail.utils.ErrorCode
 import com.infomaniak.mail.utils.isEmail
 import com.infomaniak.mail.utils.trimmedText
@@ -46,6 +50,8 @@ import com.infomaniak.lib.core.R as RCore
 class AttachMailboxFragment : Fragment() {
 
     private lateinit var binding: FragmentAttachMailboxBinding
+    private val mainViewModel: MainViewModel by activityViewModels()
+    private val noValidMailboxesViewModel: NoValidMailboxesViewModel by activityViewModels()
     private val accountViewModel: AccountViewModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -99,8 +105,8 @@ class AttachMailboxFragment : Fragment() {
 
     private fun attachMailbox() = with(binding) {
         accountViewModel.attachNewMailbox(
-            mailInput.trimmedText,
-            passwordInput.trimmedText,
+            address = mailInput.trimmedText,
+            password = passwordInput.trimmedText,
         ).observe(viewLifecycleOwner) { apiResponse ->
             when {
                 apiResponse.isSuccess() -> {
@@ -115,7 +121,14 @@ class AttachMailboxFragment : Fragment() {
                 else -> {
                     mailInputLayout.error = null
                     passwordInputLayout.error = null
-                    showSnackbar(RCore.string.anErrorHasOccurred, anchor = attachMailboxButton)
+
+                    val hasConnection = if (activity is MainActivity) {
+                        mainViewModel.hasConnection
+                    } else {
+                        noValidMailboxesViewModel.hasConnection
+                    }
+                    val title = if (hasConnection) RCore.string.anErrorHasOccurred else R.string.noConnection
+                    showSnackbar(title, anchor = attachMailboxButton)
                 }
             }
 
