@@ -270,6 +270,7 @@
     </plurals>
     <string name="newMessagePlaceholderTitle">Digitare il messaggio</string>
     <string name="noBodyTitle">Questo messaggio è vuoto.</string>
+    <string name="noConnection">Nessuna connessione</string>
     <string name="noConversationSelected">Nessuna conversazione selezionata in %s</string>
     <string name="noFolderTitle">Non hai ancora nessuna cartella…</string>
     <string name="noMailboxDescription">Non avete un indirizzo e-mail associato al vostro account Infomaniak. Per aggiungere un indirizzo, toccare il pulsante sottostante.</string>

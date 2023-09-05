@@ -276,6 +276,7 @@
     </plurals>
     <string name="newMessagePlaceholderTitle">Type your message</string>
     <string name="noBodyTitle">This message is empty.</string>
+    <string name="noConnection">No connection</string>
     <string name="noConversationSelected">No conversation selected in %s</string>
     <string name="noFolderTitle">You don’t have any folder yet…</string>
     <string name="noMailboxDescription">You do not have an email address associated with your Infomaniak account. To add an address, tap the button below.</string>
