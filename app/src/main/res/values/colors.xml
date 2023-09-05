@@ -90,6 +90,10 @@
     <color name="contacts_light">#9D66E1</color>
     <color name="contacts_dark">#C8AAEE</color>
 
+    <!--TODO : Use correct color for AI-->
+    <color name="ai_light">#9C62FF</color>
+    <color name="ai_dark">#9C62FF</color>
+
     <!-- Backgrounds -->
     <color name="searchBarBackgroundColor">@color/polar_bear</color>
     <color name="backgroundColor">@color/background_color_light</color>
@@ -141,6 +145,9 @@
     <color name="externalTagBackground">@color/favoriteYellow</color>
     <color name="externalTagOnBackground">@color/orca</color>
     <color name="externalChipBackground">@color/polar_bear</color>
+
+    <!-- Ai -->
+    <color name="aiColor">@color/ai_light</color>
 
     <!-- Swipe actions -->
     <color name="swipeDelete">@color/redDestructiveAction</color>

@@ -523,6 +523,9 @@ class NewMessageFragment : Fragment() {
                 EditorAction.CAMERA -> notYetImplemented()
                 EditorAction.LINK -> notYetImplemented()
                 EditorAction.CLOCK -> notYetImplemented()
+                EditorAction.AI -> {
+                    notYetImplemented()
+                }
             }
         }
     }
@@ -700,6 +703,7 @@ class NewMessageFragment : Fragment() {
         linkEditor(editorCamera, EditorAction.CAMERA)
         linkEditor(editorLink, EditorAction.LINK)
         linkEditor(editorClock, EditorAction.CLOCK)
+        linkEditor(editorAi, EditorAction.AI)
     }
 
     private fun setupEditorFormatActionsToggle() = with(binding) {
@@ -731,6 +735,7 @@ class NewMessageFragment : Fragment() {
         CAMERA("importFromCamera"),
         LINK("addLink"),
         CLOCK(MatomoMail.ACTION_POSTPONE_NAME),
+        AI("ai"),
         // BOLD("bold"),
         // ITALIC("italic"),
         // UNDERLINE("underline"),
