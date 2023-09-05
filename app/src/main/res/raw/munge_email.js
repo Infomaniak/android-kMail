@@ -69,13 +69,13 @@ function normalizeElementWidths(elements, webViewWidth, messageUid) {
         element.style.width = `${webViewWidth}px`;
         transformContent(element, webViewWidth, element.scrollWidth);
 
+        element.style.width = originalWidth;
+
         if (PREFERENCES.normalizeMessageWidths) {
             const newZoom = documentWidth / element.scrollWidth;
             logInfo(`Zoom updated: documentWidth / element.scrollWidth -> ${documentWidth} / ${element.scrollWidth} = ${newZoom}.`);
             element.style.zoom = newZoom;
         }
-
-        element.style.width = originalWidth;
 
         if (document.documentElement.scrollWidth > document.documentElement.clientWidth) {
             logInfo(`After zooming the mail it can still scroll: found clientWidth / scrollWidth -> ${document.documentElement.clientWidth} / ${document.documentElement.scrollWidth}`);
