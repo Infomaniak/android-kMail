@@ -30,7 +30,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NoValidMailboxesViewModel @Inject constructor(
-    private val mailboxController: MailboxController,
+    mailboxController: MailboxController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -42,4 +42,6 @@ class NoValidMailboxesViewModel @Inject constructor(
 
     val invalidPasswordMailboxesLive = mailboxController.getInvalidPasswordMailboxes(AccountUtils.currentUserId)
         .asLiveData(ioCoroutineContext)
+
+    var hasConnection: Boolean = false
 }

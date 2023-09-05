@@ -19,19 +19,27 @@ package com.infomaniak.mail.ui.noValidMailboxes
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import androidx.activity.viewModels
+import androidx.lifecycle.distinctUntilChanged
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
+import com.infomaniak.lib.core.networking.LiveDataNetworkStatus
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ActivityNoValidMailboxesBinding
 import com.infomaniak.mail.ui.BaseActivity
 import com.infomaniak.mail.utils.SentryDebug
 import dagger.hilt.android.AndroidEntryPoint
+import io.sentry.Breadcrumb
+import io.sentry.Sentry
+import io.sentry.SentryLevel
 
 @AndroidEntryPoint
 class NoValidMailboxesActivity : BaseActivity() {
 
     private val binding by lazy { ActivityNoValidMailboxesBinding.inflate(layoutInflater) }
+    private val noValidMailboxesViewModel: NoValidMailboxesViewModel by viewModels()
 
     private val navController by lazy {
         (supportFragmentManager.findFragmentById(R.id.hostFragment) as NavHostFragment).navController
@@ -41,7 +49,20 @@ class NoValidMailboxesActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(binding.root)
+        observeNetworkStatus()
         setupNavController()
+    }
+
+    private fun observeNetworkStatus() {
+        LiveDataNetworkStatus(context = this).distinctUntilChanged().observe(this) { isAvailable ->
+            SentryLog.d("Internet availability", if (isAvailable) "Available" else "Unavailable")
+            Sentry.addBreadcrumb(Breadcrumb().apply {
+                category = "Network"
+                message = "Internet access is available : $isAvailable"
+                level = if (isAvailable) SentryLevel.INFO else SentryLevel.WARNING
+            })
+            noValidMailboxesViewModel.hasConnection = isAvailable
+        }
     }
 
     private fun setupNavController() {
