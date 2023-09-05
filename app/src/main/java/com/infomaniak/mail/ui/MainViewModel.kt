@@ -809,15 +809,19 @@ class MainViewModel @Inject constructor(
         val mailbox = currentMailbox.value!!
         val (resource, foldersIds, destinationFolderId) = undoData
 
-        val snackbarTitle = if (ApiRepository.undoAction(resource).data == true) {
-            // Don't use `refreshFoldersAsync` here, it will make the Snackbars blink.
-            sharedUtils.refreshFolders(mailbox, foldersIds, destinationFolderId, ::startedDownload, ::stoppedDownload)
-            R.string.snackbarMoveCancelled
-        } else {
-            RCore.string.anErrorHasOccurred
+        val isSuccess = ApiRepository.undoAction(resource).data
+
+        val title = when {
+            isSuccess == true -> {
+                // Don't use `refreshFoldersAsync` here, it will make the Snackbars blink.
+                sharedUtils.refreshFolders(mailbox, foldersIds, destinationFolderId, ::startedDownload, ::stoppedDownload)
+                R.string.snackbarMoveCancelled
+            }
+            hasConnection -> RCore.string.anErrorHasOccurred
+            else -> R.string.noConnection
         }
 
-        snackBarManager.postValue(context.getString(snackbarTitle))
+        snackBarManager.postValue(context.getString(title))
     }
     //endregion
 
