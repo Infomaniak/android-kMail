@@ -41,7 +41,6 @@ import com.infomaniak.mail.utils.createDescriptionDialog
 import com.infomaniak.mail.utils.getStringWithBoldArg
 import com.infomaniak.mail.utils.trimmedText
 import dagger.hilt.android.AndroidEntryPoint
-import com.infomaniak.lib.core.R as RCore
 
 @AndroidEntryPoint
 class InvalidPasswordFragment : Fragment() {
@@ -113,17 +112,12 @@ class InvalidPasswordFragment : Fragment() {
         }
 
         invalidPasswordViewModel.requestPasswordResult.observe(viewLifecycleOwner) { isSuccess ->
-            val hasConnection = if (activity is MainActivity) {
-                mainViewModel.hasConnection
+            val errorOrNoConnectionStringRes = if (activity is MainActivity) {
+                mainViewModel.errorOrNoConnectionStringRes
             } else {
-                noValidMailboxesViewModel.hasConnection
+                noValidMailboxesViewModel.errorOrNoConnectionStringRes
             }
-            val title = when {
-                isSuccess -> R.string.snackbarMailboxPasswordRequested
-                hasConnection -> RCore.string.anErrorHasOccurred
-                else -> R.string.noConnection
-            }
-            showSnackbar(title)
+            showSnackbar(title = if (isSuccess) R.string.snackbarMailboxPasswordRequested else errorOrNoConnectionStringRes)
         }
     }
 

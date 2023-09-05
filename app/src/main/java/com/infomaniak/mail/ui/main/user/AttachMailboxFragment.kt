@@ -44,7 +44,6 @@ import com.infomaniak.mail.utils.ErrorCode
 import com.infomaniak.mail.utils.isEmail
 import com.infomaniak.mail.utils.trimmedText
 import dagger.hilt.android.AndroidEntryPoint
-import com.infomaniak.lib.core.R as RCore
 
 @AndroidEntryPoint
 class AttachMailboxFragment : Fragment() {
@@ -122,13 +121,12 @@ class AttachMailboxFragment : Fragment() {
                     mailInputLayout.error = null
                     passwordInputLayout.error = null
 
-                    val hasConnection = if (activity is MainActivity) {
-                        mainViewModel.hasConnection
+                    val errorOrNoConnectionStringRes = if (activity is MainActivity) {
+                        mainViewModel.errorOrNoConnectionStringRes
                     } else {
-                        noValidMailboxesViewModel.hasConnection
+                        noValidMailboxesViewModel.errorOrNoConnectionStringRes
                     }
-                    val title = if (hasConnection) RCore.string.anErrorHasOccurred else R.string.noConnection
-                    showSnackbar(title, anchor = attachMailboxButton)
+                    showSnackbar(title = errorOrNoConnectionStringRes, anchor = attachMailboxButton)
                 }
             }
 

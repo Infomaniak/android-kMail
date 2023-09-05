@@ -61,7 +61,7 @@ class NoValidMailboxesActivity : BaseActivity() {
                 message = "Internet access is available : $isAvailable"
                 level = if (isAvailable) SentryLevel.INFO else SentryLevel.WARNING
             })
-            noValidMailboxesViewModel.hasConnection = isAvailable
+            noValidMailboxesViewModel.isInternetAvailable = isAvailable
         }
     }
 

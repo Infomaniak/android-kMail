@@ -39,7 +39,6 @@ import com.infomaniak.mail.ui.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.Locale
-import com.infomaniak.lib.core.R as RCore
 
 @AndroidEntryPoint
 class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
@@ -84,8 +83,7 @@ class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
                     hasLoaded(true)
                 }
             } else {
-                val title = if (mainViewModel.hasConnection) RCore.string.anErrorHasOccurred else R.string.noConnection
-                showSnackbar(title)
+                showSnackbar(title = mainViewModel.errorOrNoConnectionStringRes)
                 findNavController().popBackStack()
             }
         }
@@ -96,10 +94,10 @@ class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
         val date = autoCompleteTextView.text.toString()
 
         restoreEmailViewModel.restoreEmails(formattedDates[date] ?: date).observe(viewLifecycleOwner) { apiResponse ->
-            val title = when {
-                apiResponse.isSuccess() -> R.string.snackbarRestorationLaunched
-                mainViewModel.hasConnection -> RCore.string.anErrorHasOccurred
-                else -> R.string.noConnection
+            val title = if (apiResponse.isSuccess()) {
+                R.string.snackbarRestorationLaunched
+            } else {
+                mainViewModel.errorOrNoConnectionStringRes
             }
             showSnackbar(title)
             findNavController().popBackStack()

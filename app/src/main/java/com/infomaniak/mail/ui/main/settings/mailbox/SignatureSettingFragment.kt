@@ -25,14 +25,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
-import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.databinding.FragmentSignatureSettingBinding
 import com.infomaniak.mail.ui.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import io.realm.kotlin.ext.copyFromRealm
-import com.infomaniak.lib.core.R as RCore
 
 @AndroidEntryPoint
 class SignatureSettingFragment : Fragment() {
@@ -56,7 +54,7 @@ class SignatureSettingFragment : Fragment() {
         runCatching {
             updateSignatures()
         }.onFailure {
-            showSnackbar(if (mainViewModel.hasConnection) RCore.string.anErrorHasOccurred else R.string.noConnection)
+            showSnackbar(title = mainViewModel.errorOrNoConnectionStringRes)
         }
 
         observeSignatures()
@@ -71,8 +69,8 @@ class SignatureSettingFragment : Fragment() {
     }
 
     private fun observeApiError() {
-        signatureSettingViewModel.showError.observe(viewLifecycleOwner) { stringRes ->
-            showSnackbar(stringRes)
+        signatureSettingViewModel.showError.observe(viewLifecycleOwner) { title ->
+            showSnackbar(title)
         }
     }
 
@@ -83,6 +81,6 @@ class SignatureSettingFragment : Fragment() {
     private fun onSignatureClicked(signature: Signature) = with(signatureSettingViewModel) {
         val newDefaultSignature = signature.copyFromRealm(UInt.MIN_VALUE).apply { isDefault = true }
 
-        setDefaultSignature(newDefaultSignature, mainViewModel.hasConnection)
+        setDefaultSignature(newDefaultSignature, mainViewModel.errorOrNoConnectionStringRes)
     }
 }
