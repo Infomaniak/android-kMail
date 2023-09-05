@@ -367,10 +367,7 @@ class ThreadFragment : Fragment() {
             scrollToFirstUnseenMessage(messages)
         }
 
-        threadViewModel.messages.observeNotNull(viewLifecycleOwner) { messages ->
-            onMessagesUpdate(messages)
-            threadViewModel.messagesLive.observe(viewLifecycleOwner, ::onMessagesUpdate)
-        }
+        threadViewModel.messagesLive.observe(viewLifecycleOwner, ::onMessagesUpdate)
     }
 
     private fun scrollToFirstUnseenMessage(messages: List<Message>) {

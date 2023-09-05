@@ -73,10 +73,6 @@ class ThreadViewModel @Inject constructor(
 
     private val splitBodies = mutableMapOf<String, SplitBody>()
 
-    val messages = liveData(ioCoroutineContext) {
-        emit(messageController.getSortedMessages(threadUid))
-    }
-
     val messagesLive = liveData(ioCoroutineContext) {
 
         suspend fun splitBody(message: Message): Message = withContext(ioDispatcher) {
