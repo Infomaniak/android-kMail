@@ -23,6 +23,7 @@ import android.content.ClipDescription
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Configuration
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
@@ -212,6 +213,8 @@ class NewMessageFragment : Fragment() {
 
         setupSendButton()
         setupExternalBanner()
+
+        aiPrompt.initListeners(::closeAiPrompt)
     }
 
     private fun initDraftAndViewModel() {
@@ -608,11 +611,40 @@ class NewMessageFragment : Fragment() {
                 EditorAction.CAMERA -> notYetImplemented()
                 EditorAction.LINK -> notYetImplemented()
                 EditorAction.CLOCK -> notYetImplemented()
-                EditorAction.AI -> {
-                    notYetImplemented()
-                }
+                EditorAction.AI -> openAiPrompt()
             }
         }
+    }
+
+    private fun openAiPrompt() {
+        setAiPromptVisibility(true)
+        binding.aiPrompt.focusPrompt()
+    }
+
+    private fun closeAiPrompt() {
+        binding.aiPrompt.hideKeyboard()
+        setAiPromptVisibility(false)
+    }
+
+    private fun setAiPromptVisibility(isVisible: Boolean) {
+        fun updateStatusBarColor(isVisible: Boolean) {
+            val backgroundColor = requireContext().getColor(R.color.backgroundColor)
+            requireActivity().window.statusBarColor = if (isVisible) {
+                // TODO : Extract to resources
+                UiUtils.pointBetweenColors(backgroundColor, Color.parseColor("#FF000000"), 80f / 255)
+            } else {
+                backgroundColor
+            }
+        }
+
+        fun updateNavigationBarColor(isVisible: Boolean) {
+            val backgroundColorRes = if (isVisible) R.color.backgroundColorSecondary else R.color.backgroundColor
+            requireActivity().window.navigationBarColor = requireContext().getColor(backgroundColorRes)
+        }
+
+        binding.aiPromptGroup.isVisible = isVisible
+        updateStatusBarColor(isVisible)
+        updateNavigationBarColor(isVisible)
     }
 
     private fun observeNewAttachments() = with(binding) {

@@ -231,10 +231,6 @@
         <item name="rippleColor">?android:attr/colorControlHighlight</item>
     </style>
 
-    <style name="AiButtonRippleTheme">
-        <item name="android:colorControlHighlight">@color/ai_color_translucent_ripple</item>
-    </style>
-
     <style name="QuickBottomActionBarButton" parent="Widget.Material3.Button.TextButton">
         <item name="android:background">?android:attr/selectableItemBackgroundBorderless</item>
         <item name="android:fontFamily">@font/suisseintl_medium</item>
@@ -491,6 +487,33 @@
         <item name="dividerInsetStart">@dimen/marginStandardSmall</item>
     </style>
 
+    <!-- Ai -->
+
+    <style name="AiButton" parent="Widget.Material3.Button.TextButton">
+        <item name="android:backgroundTint">@color/ai_color_disabled</item>
+        <item name="android:fontFamily">@font/suisseintl_medium</item>
+        <item name="android:paddingEnd">20dp</item>
+        <item name="android:paddingStart">20dp</item>
+        <item name="android:textColor">@color/on_ai_color_disabled</item>
+        <item name="cornerRadius">16dp</item>
+        <item name="rippleColor">#1E000000</item> <!--TODO : See what to do about this and move to correct place if we keep it-->
+    </style>
+
+    <style name="AiButtonRippleTheme">
+        <item name="android:colorControlHighlight">@color/ai_color_translucent_ripple</item>
+    </style>
+
+    <style name="AiCursorAndPrimaryColorTheme">
+        <item name="colorControlActivated">@color/aiColor</item>
+        <item name="colorPrimary">@color/aiColor</item>
+    </style>
+
+    <style name="AiCardView" parent="CardViewMail">
+        <item name="cardCornerRadius">@null</item>
+        <item name="cardBackgroundColor">@color/backgroundColorSecondary</item>
+        <item name="shapeAppearanceOverlay">@style/BottomSheetDialogThemeShapeAppearanceOverlay</item>
+    </style>
+
     <!-- Other -->
 
     <style name="ExtendedFloatingActionButtonStyle" parent="Widget.Material3.ExtendedFloatingActionButton.Icon.Primary">
@@ -533,6 +556,7 @@
         <item name="android:textColorHint">@color/tertiaryTextColor</item>
         <item name="boxStrokeColor">@color/text_input_layout_box_color</item>
         <item name="boxStrokeErrorColor">@color/redDestructiveAction</item>
+        <item name="boxBackgroundColor">@color/backgroundColorTertiary</item>
     </style>
 
     <style name="ListPopupMenuStyle" parent="Widget.Material3.PopupMenu.ListPopupWindow">
