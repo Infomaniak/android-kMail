@@ -96,7 +96,12 @@ class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
         val date = autoCompleteTextView.text.toString()
 
         restoreEmailViewModel.restoreEmails(formattedDates[date] ?: date).observe(viewLifecycleOwner) { apiResponse ->
-            showSnackbar(if (apiResponse.isSuccess()) R.string.snackbarRestorationLaunched else RCore.string.anErrorHasOccurred)
+            val title = when {
+                apiResponse.isSuccess() -> R.string.snackbarRestorationLaunched
+                mainViewModel.hasConnection -> RCore.string.anErrorHasOccurred
+                else -> R.string.noConnection
+            }
+            showSnackbar(title)
             findNavController().popBackStack()
         }
     }
