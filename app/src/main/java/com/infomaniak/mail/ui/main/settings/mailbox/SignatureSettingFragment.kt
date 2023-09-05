@@ -25,6 +25,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.databinding.FragmentSignatureSettingBinding
@@ -55,7 +56,7 @@ class SignatureSettingFragment : Fragment() {
         runCatching {
             updateSignatures()
         }.onFailure {
-            showSnackbar(RCore.string.anErrorHasOccurred)
+            showSnackbar(if (mainViewModel.hasConnection) RCore.string.anErrorHasOccurred else R.string.noConnection)
         }
 
         observeSignatures()
