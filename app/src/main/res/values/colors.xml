@@ -91,8 +91,8 @@
     <color name="contacts_dark">#C8AAEE</color>
 
     <!-- TODO: Use correct colors for AI -->
-    <color name="ai_light">#9C62FF</color>
-    <color name="ai_dark">#9C62FF</color>
+    <color name="ai_light">#8D4AFF</color>
+    <color name="ai_dark">#8D4AFF</color>
 
     <!-- Backgrounds -->
     <color name="searchBarBackgroundColor">@color/polar_bear</color>
@@ -148,6 +148,7 @@
 
     <!-- AI -->
     <color name="aiColor">@color/ai_light</color>
+    <color name="onAiColor">@color/onColorfulBackground</color> <!--TODO : Update when specs chose a color-->
 
     <!-- Swipe actions -->
     <color name="swipeDelete">@color/redDestructiveAction</color>
