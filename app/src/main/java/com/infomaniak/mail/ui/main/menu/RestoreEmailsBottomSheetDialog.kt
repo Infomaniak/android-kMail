@@ -76,7 +76,6 @@ class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
         restoreEmailViewModel.getBackups().observe(viewLifecycleOwner) { apiResponse ->
             if (apiResponse.isSuccess()) {
                 formattedDates = apiResponse.data!!.backups.associateBy { it.getUserFriendlyDate() }
-
                 autoCompleteTextView.apply {
                     setSimpleItems(formattedDates.keys.toTypedArray())
                     hasLoaded(true)

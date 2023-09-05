@@ -570,9 +570,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         val thereAreThreads = (threadListViewModel.currentThreadsCount ?: 0) > 0
         val filterIsEnabled = currentFilter.value != ThreadFilter.ALL
         val cursorIsNull = threadListViewModel.currentFolderCursor == null
-        val isNetworkConnected = isInternetAvailable.value == true
-        val isBooting = threadListViewModel.currentThreadsCount == null && !cursorIsNull && isNetworkConnected
-        val shouldDisplayThreadsView = isBooting || thereAreThreads || filterIsEnabled || (cursorIsNull && isNetworkConnected)
+        val isBooting = threadListViewModel.currentThreadsCount == null && !cursorIsNull && hasConnection
+        val shouldDisplayThreadsView = isBooting || thereAreThreads || filterIsEnabled || (cursorIsNull && hasConnection)
 
         when {
             shouldDisplayThreadsView -> binding.emptyStateView.isGone = true

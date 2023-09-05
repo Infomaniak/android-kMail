@@ -85,6 +85,7 @@ class MainViewModel @Inject constructor(
     private var refreshMailboxesAndFoldersJob: Job? = null
 
     val isInternetAvailable = MutableLiveData<Boolean>()
+    inline val hasConnection get() = isInternetAvailable.value ?: false
     // First boolean is the download status, second boolean is if the LoadMore button should be displayed
     val isDownloadingChanges: MutableLiveData<Pair<Boolean, Boolean?>> = MutableLiveData(false to null)
     val isNewFolderCreated = SingleLiveEvent<Boolean>()
