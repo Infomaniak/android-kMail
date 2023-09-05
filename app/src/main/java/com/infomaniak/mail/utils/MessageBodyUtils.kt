@@ -161,5 +161,11 @@ object MessageBodyUtils {
     data class SplitBody(
         val content: String,
         val quote: String? = null,
-    )
+    ) {
+        override fun equals(other: Any?): Boolean {
+            return other === this || (other is SplitBody && other.content == content && other.quote == quote)
+        }
+
+        override fun hashCode(): Int = 31 * content.hashCode() + quote.hashCode()
+    }
 }
