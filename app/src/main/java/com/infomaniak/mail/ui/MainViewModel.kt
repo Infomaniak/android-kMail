@@ -881,14 +881,16 @@ class MainViewModel @Inject constructor(
 
         val isSuccess = ApiRepository.addContact(addressBookController.getDefaultAddressBook().id, recipient).isSuccess()
 
-        val snackbarTitle = if (isSuccess) {
-            updateUserInfo()
-            R.string.snackbarContactSaved
-        } else {
-            RCore.string.anErrorHasOccurred
+        val title = when {
+            isSuccess -> {
+                updateUserInfo()
+                R.string.snackbarContactSaved
+            }
+            hasConnection -> RCore.string.anErrorHasOccurred
+            else -> R.string.noConnection
         }
 
-        snackBarManager.postValue(context.getString(snackbarTitle))
+        snackBarManager.postValue(context.getString(title))
     }
 
     fun getMessage(messageUid: String) = liveData(ioCoroutineContext) {
