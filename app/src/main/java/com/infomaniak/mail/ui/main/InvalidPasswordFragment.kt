@@ -112,12 +112,12 @@ class InvalidPasswordFragment : Fragment() {
         }
 
         invalidPasswordViewModel.requestPasswordResult.observe(viewLifecycleOwner) { isSuccess ->
-            val errorOrNoConnectionStringRes = if (activity is MainActivity) {
-                mainViewModel.errorOrNoConnectionStringRes
-            } else {
-                noValidMailboxesViewModel.errorOrNoConnectionStringRes
+            val title = when {
+                isSuccess -> R.string.snackbarMailboxPasswordRequested
+                activity is MainActivity -> mainViewModel.errorOrNoConnectionStringRes
+                else -> noValidMailboxesViewModel.errorOrNoConnectionStringRes
             }
-            showSnackbar(title = if (isSuccess) R.string.snackbarMailboxPasswordRequested else errorOrNoConnectionStringRes)
+            showSnackbar(title)
         }
     }
 
