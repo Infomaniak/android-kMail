@@ -523,6 +523,7 @@
                 app:icon="@drawable/ic_editor_text_options"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/editorAttachment"
+                app:layout_constraintHorizontal_bias="0"
                 app:layout_constraintHorizontal_chainStyle="packed"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -577,8 +578,23 @@
                 android:visibility="gone"
                 app:icon="@drawable/ic_editor_clock"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/editorBold"
+                app:layout_constraintEnd_toStartOf="@id/editorAi"
                 app:layout_constraintStart_toEndOf="@+id/editorLink"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:visibility="visible" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/editorAi"
+                style="@style/EditorIconButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/buttonSchedule"
+                android:theme="@style/AiButtonRippleTheme"
+                app:icon="@drawable/ic_ai_magic_wand"
+                app:iconTint="@color/aiColor"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/editorBold"
+                app:layout_constraintStart_toEndOf="@+id/editorClock"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:visibility="visible" />
 
@@ -590,7 +606,7 @@
                 app:icon="@drawable/ic_editor_bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/editorItalic"
-                app:layout_constraintStart_toEndOf="@+id/editorClock"
+                app:layout_constraintStart_toEndOf="@+id/editorAi"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <com.infomaniak.mail.ui.main.newMessage.ToggleableTextFormatterItemView
@@ -635,6 +651,7 @@
                 android:minWidth="0dp"
                 app:icon="@drawable/ic_editor_list"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/sendButton"
                 app:layout_constraintStart_toEndOf="@+id/editorStrikeThrough"
                 app:layout_constraintTop_toTopOf="parent" />
 

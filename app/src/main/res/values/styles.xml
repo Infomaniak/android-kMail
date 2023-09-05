@@ -231,6 +231,10 @@
         <item name="rippleColor">?android:attr/colorControlHighlight</item>
     </style>
 
+    <style name="AiButtonRippleTheme">
+        <item name="android:colorControlHighlight">@color/ai_color_translucent_ripple</item>
+    </style>
+
     <style name="QuickBottomActionBarButton" parent="Widget.Material3.Button.TextButton">
         <item name="android:background">?android:attr/selectableItemBackgroundBorderless</item>
         <item name="android:fontFamily">@font/suisseintl_medium</item>

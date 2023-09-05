@@ -51,7 +51,7 @@
         <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>
         <item name="collapsingToolbarLayoutStyle">@style/AppThemeCollapsingToolbarLayoutTheme</item>
         <item name="colorAccent">?attr/colorPrimary</item>
-        <item name="colorControlHighlight">@color/color_primary_transparent</item>
+        <item name="colorControlHighlight">@color/color_primary_translucent_ripple</item>
         <item name="colorError">@color/redDestructiveAction</item>
         <item name="colorOnSurfaceInverse">@color/snackbarTextColor</item>
         <item name="colorSurfaceInverse">@color/backgroundSnackbarColor</item>
