@@ -460,24 +460,24 @@ class MainViewModel @Inject constructor(
         numberOfImpactedThreads: Int,
     ) {
 
-        val snackbarTitle = if (isSuccess) {
-            val destination = context.getString(FolderRole.TRASH.folderNameRes)
-            when {
-                shouldPermanentlyDelete && message == null -> {
-                    context.resources.getQuantityString(R.plurals.snackbarThreadDeletedPermanently, numberOfImpactedThreads)
-                }
-                shouldPermanentlyDelete && message != null -> {
-                    context.resources.getString(R.string.snackbarMessageDeletedPermanently)
-                }
-                !shouldPermanentlyDelete && message == null -> {
-                    context.resources.getQuantityString(R.plurals.snackbarThreadMoved, numberOfImpactedThreads, destination)
-                }
-                else -> {
-                    context.resources.getString(R.string.snackbarMessageMoved, destination)
+        val snackbarTitle = when {
+            isSuccess -> {
+                val destination = context.getString(FolderRole.TRASH.folderNameRes)
+                when {
+                    shouldPermanentlyDelete && message == null -> {
+                        context.resources.getQuantityString(R.plurals.snackbarThreadDeletedPermanently, numberOfImpactedThreads)
+                    }
+                    shouldPermanentlyDelete && message != null -> {
+                        context.getString(R.string.snackbarMessageDeletedPermanently)
+                    }
+                    !shouldPermanentlyDelete && message == null -> {
+                        context.resources.getQuantityString(R.plurals.snackbarThreadMoved, numberOfImpactedThreads, destination)
+                    }
+                    else -> context.getString(R.string.snackbarMessageMoved, destination)
                 }
             }
-        } else {
-            context.getString(RCore.string.anErrorHasOccurred)
+            hasConnection -> context.getString(RCore.string.anErrorHasOccurred)
+            else -> context.getString(R.string.noConnection)
         }
 
         snackBarManager.postValue(snackbarTitle, undoResource?.let { UndoData(it, undoFoldersIds, undoDestinationId) })
