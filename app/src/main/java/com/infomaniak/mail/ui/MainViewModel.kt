@@ -547,9 +547,12 @@ class MainViewModel @Inject constructor(
         val destination = destinationFolder.getLocalizedName(context)
 
         val snackbarTitle = when {
-            !apiResponse.isSuccess() -> context.getString(RCore.string.anErrorHasOccurred)
-            message == null -> context.resources.getQuantityString(R.plurals.snackbarThreadMoved, threads.count(), destination)
-            else -> context.getString(R.string.snackbarMessageMoved, destination)
+            apiResponse.isSuccess() -> when (message) {
+                null -> context.resources.getQuantityString(R.plurals.snackbarThreadMoved, threads.count(), destination)
+                else -> context.getString(R.string.snackbarMessageMoved, destination)
+            }
+            hasConnection -> context.getString(RCore.string.anErrorHasOccurred)
+            else -> context.getString(R.string.noConnection)
         }
 
         val undoData = apiResponse.data?.undoResource?.let { UndoData(it, undoFoldersIds, undoDestinationId) }
