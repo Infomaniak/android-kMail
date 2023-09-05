@@ -773,16 +773,18 @@ class MainViewModel @Inject constructor(
     fun reportPhishing(threadUid: String, message: Message) = viewModelScope.launch(ioCoroutineContext) {
         val mailboxUuid = currentMailbox.value?.uuid!!
 
-        val apiResponse = ApiRepository.reportPhishing(mailboxUuid, message.folderId, message.shortUid)
+        val isSuccess = ApiRepository.reportPhishing(mailboxUuid, message.folderId, message.shortUid).isSuccess()
 
-        val snackbarTitle = if (apiResponse.isSuccess()) {
-            if (!isCurrentFolderRole(FolderRole.SPAM)) toggleMessageSpamStatus(threadUid, message)
-            R.string.snackbarReportPhishingConfirmation
-        } else {
-            RCore.string.anErrorHasOccurred
+        val title = when {
+            isSuccess -> {
+                if (!isCurrentFolderRole(FolderRole.SPAM)) toggleMessageSpamStatus(threadUid, message)
+                R.string.snackbarReportPhishingConfirmation
+            }
+            hasConnection -> RCore.string.anErrorHasOccurred
+            else -> R.string.noConnection
         }
 
-        snackBarManager.postValue(context.getString(snackbarTitle))
+        snackBarManager.postValue(context.getString(title))
     }
     //endregion
 
