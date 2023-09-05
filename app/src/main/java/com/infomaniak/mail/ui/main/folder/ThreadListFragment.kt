@@ -71,6 +71,7 @@ import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
 import com.infomaniak.mail.utils.UiUtils.formatUnreadCount
+import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
 import io.realm.kotlin.ext.isValid
@@ -116,7 +117,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         return FragmentThreadListBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = runCatchingRealm {
 
         navigateFromNotificationToNewMessage()
 
@@ -148,7 +149,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         observeUpdatedAtTriggers()
         observeContacts()
         observerDraftsActionsCompletedWorks()
-    }
+    }.getOrDefault(Unit)
 
     private fun navigateFromNotificationToNewMessage() {
         // Here, we use `arguments` instead of `navigationArgs` because we need mutable data.

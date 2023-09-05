@@ -26,6 +26,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.AttachmentController
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.LocalStorageUtils
+import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -68,9 +69,9 @@ class DownloadAttachmentViewModel @Inject constructor(
         }
     }
 
-    override fun onCleared() {
+    override fun onCleared() = runCatchingRealm {
         // If we end up with an incomplete cached Attachment, we delete it
         attachment?.getCacheFile(context)?.apply { if (exists()) delete() }
         super.onCleared()
-    }
+    }.getOrDefault(Unit)
 }

@@ -28,6 +28,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.databinding.ItemAttachmentBinding
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter.AttachmentViewHolder
+import com.infomaniak.mail.utils.Utils.runCatchingRealm
 
 class AttachmentAdapter(
     private val shouldDisplayCloseButton: Boolean = false,
@@ -39,6 +40,10 @@ class AttachmentAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AttachmentViewHolder {
         return AttachmentViewHolder(ItemAttachmentBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+    }
+
+    override fun onBindViewHolder(holder: AttachmentViewHolder, position: Int, payloads: MutableList<Any>) {
+        runCatchingRealm { super.onBindViewHolder(holder, position, payloads) }
     }
 
     override fun onBindViewHolder(holder: AttachmentViewHolder, position: Int): Unit = with(holder.binding) {
@@ -72,11 +77,11 @@ class AttachmentAdapter(
         }
     }
 
-    override fun getItemCount(): Int = attachments.count()
+    override fun getItemCount(): Int = runCatchingRealm { attachments.count() }.getOrDefault(0)
 
-    fun setAttachments(newList: List<Attachment>) {
+    fun setAttachments(newList: List<Attachment>) = runCatchingRealm {
         attachments = newList.toMutableList()
-    }
+    }.getOrDefault(Unit)
 
     fun addAll(newAttachments: List<Attachment>) {
         attachments.addAll(newAttachments)

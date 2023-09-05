@@ -31,6 +31,7 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.Utils
+import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import java.io.ByteArrayInputStream
 
 class MessageWebViewClient(
@@ -44,7 +45,7 @@ class MessageWebViewClient(
 
     private val emptyResource by lazy { WebResourceResponse("text/plain", "utf-8", ByteArrayInputStream(ByteArray(0))) }
 
-    override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
+    override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? = runCatchingRealm {
         val url = request.url
 
         if (url?.scheme.equals(CID_SCHEME, ignoreCase = true)) {
@@ -78,7 +79,7 @@ class MessageWebViewClient(
             onBlockedResourcesDetected?.invoke()
             emptyResource
         }
-    }
+    }.getOrDefault(super.shouldInterceptRequest(view, request))
 
     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
         request.url?.let { uri ->
