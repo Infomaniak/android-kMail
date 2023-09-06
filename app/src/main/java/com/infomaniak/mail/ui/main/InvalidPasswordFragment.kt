@@ -37,7 +37,6 @@ import com.infomaniak.mail.utils.createDescriptionDialog
 import com.infomaniak.mail.utils.getStringWithBoldArg
 import com.infomaniak.mail.utils.trimmedText
 import dagger.hilt.android.AndroidEntryPoint
-import com.infomaniak.lib.core.R as RCore
 
 @AndroidEntryPoint
 class InvalidPasswordFragment : Fragment() {
@@ -106,8 +105,8 @@ class InvalidPasswordFragment : Fragment() {
             showSnackbar(error)
         }
 
-        invalidPasswordViewModel.requestPasswordResult.observe(viewLifecycleOwner) { isSuccess ->
-            showSnackbar(if (isSuccess) R.string.snackbarMailboxPasswordRequested else RCore.string.anErrorHasOccurred)
+        invalidPasswordViewModel.requestPasswordResult.observe(viewLifecycleOwner) { apiResponse ->
+            showSnackbar(if (apiResponse.isSuccess()) R.string.snackbarMailboxPasswordRequested else apiResponse.translatedError)
         }
     }
 

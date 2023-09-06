@@ -293,7 +293,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun observeNetworkStatus() {
-        LiveDataNetworkStatus(this).distinctUntilChanged().observe(this) { isAvailable ->
+        LiveDataNetworkStatus(context = this).distinctUntilChanged().observe(this) { isAvailable ->
             SentryLog.d("Internet availability", if (isAvailable) "Available" else "Unavailable")
             Sentry.addBreadcrumb(Breadcrumb().apply {
                 category = "Network"

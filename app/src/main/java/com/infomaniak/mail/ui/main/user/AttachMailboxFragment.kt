@@ -40,7 +40,6 @@ import com.infomaniak.mail.utils.ErrorCode
 import com.infomaniak.mail.utils.isEmail
 import com.infomaniak.mail.utils.trimmedText
 import dagger.hilt.android.AndroidEntryPoint
-import com.infomaniak.lib.core.R as RCore
 
 @AndroidEntryPoint
 class AttachMailboxFragment : Fragment() {
@@ -99,8 +98,8 @@ class AttachMailboxFragment : Fragment() {
 
     private fun attachMailbox() = with(binding) {
         accountViewModel.attachNewMailbox(
-            mailInput.trimmedText,
-            passwordInput.trimmedText,
+            address = mailInput.trimmedText,
+            password = passwordInput.trimmedText,
         ).observe(viewLifecycleOwner) { apiResponse ->
             when {
                 apiResponse.isSuccess() -> {
@@ -115,7 +114,7 @@ class AttachMailboxFragment : Fragment() {
                 else -> {
                     mailInputLayout.error = null
                     passwordInputLayout.error = null
-                    showSnackbar(RCore.string.anErrorHasOccurred, anchor = attachMailboxButton)
+                    showSnackbar(title = apiResponse.translatedError, anchor = attachMailboxButton)
                 }
             }
 

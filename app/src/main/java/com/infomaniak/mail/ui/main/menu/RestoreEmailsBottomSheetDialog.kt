@@ -37,7 +37,6 @@ import com.infomaniak.mail.databinding.BottomSheetRestoreEmailsBinding
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.Locale
-import com.infomaniak.lib.core.R as RCore
 
 @AndroidEntryPoint
 class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
@@ -76,13 +75,12 @@ class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
         restoreEmailViewModel.getBackups().observe(viewLifecycleOwner) { apiResponse ->
             if (apiResponse.isSuccess()) {
                 formattedDates = apiResponse.data!!.backups.associateBy { it.getUserFriendlyDate() }
-
                 autoCompleteTextView.apply {
                     setSimpleItems(formattedDates.keys.toTypedArray())
                     hasLoaded(true)
                 }
             } else {
-                showSnackbar(RCore.string.anErrorHasOccurred)
+                showSnackbar(title = apiResponse.translatedError)
                 findNavController().popBackStack()
             }
         }
@@ -93,7 +91,7 @@ class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
         val date = autoCompleteTextView.text.toString()
 
         restoreEmailViewModel.restoreEmails(formattedDates[date] ?: date).observe(viewLifecycleOwner) { apiResponse ->
-            showSnackbar(if (apiResponse.isSuccess()) R.string.snackbarRestorationLaunched else RCore.string.anErrorHasOccurred)
+            showSnackbar(if (apiResponse.isSuccess()) R.string.snackbarRestorationLaunched else apiResponse.translatedError)
             findNavController().popBackStack()
         }
     }

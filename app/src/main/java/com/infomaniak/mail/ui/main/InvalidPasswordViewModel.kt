@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.main
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.api.ApiRepository
@@ -46,7 +47,7 @@ class InvalidPasswordViewModel @Inject constructor(
     private val mailbox = mailboxController.getMailbox(mailboxObjectId)!!
 
     val updatePasswordResult = SingleLiveEvent<Int>()
-    val requestPasswordResult = SingleLiveEvent<Boolean>()
+    val requestPasswordResult = SingleLiveEvent<ApiResponse<*>>()
     val detachMailboxResult = SingleLiveEvent<Int>()
 
     fun updatePassword(password: String) = viewModelScope.launch(ioCoroutineContext) {
@@ -60,7 +61,7 @@ class InvalidPasswordViewModel @Inject constructor(
     }
 
     fun requestPassword() = viewModelScope.launch(ioCoroutineContext) {
-        requestPasswordResult.postValue(ApiRepository.requestMailboxPassword(mailbox.hostingId, mailbox.mailboxName).isSuccess())
+        requestPasswordResult.postValue(ApiRepository.requestMailboxPassword(mailbox.hostingId, mailbox.mailboxName))
     }
 
     fun detachMailbox() = viewModelScope.launch(ioCoroutineContext) {

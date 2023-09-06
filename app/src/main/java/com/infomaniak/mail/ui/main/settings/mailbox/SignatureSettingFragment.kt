@@ -29,13 +29,11 @@ import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.databinding.FragmentSignatureSettingBinding
 import dagger.hilt.android.AndroidEntryPoint
 import io.realm.kotlin.ext.copyFromRealm
-import com.infomaniak.lib.core.R as RCore
 
 @AndroidEntryPoint
 class SignatureSettingFragment : Fragment() {
 
     private lateinit var binding: FragmentSignatureSettingBinding
-
     private val signatureSettingViewModel: SignatureSettingViewModel by viewModels()
 
     private lateinit var signatureAdapter: SignatureSettingAdapter
@@ -49,11 +47,7 @@ class SignatureSettingFragment : Fragment() {
 
         setupAdapter(mailbox)
 
-        runCatching {
-            updateSignatures()
-        }.onFailure {
-            showSnackbar(RCore.string.anErrorHasOccurred)
-        }
+        updateSignatures()
 
         observeSignatures()
         observeApiError()

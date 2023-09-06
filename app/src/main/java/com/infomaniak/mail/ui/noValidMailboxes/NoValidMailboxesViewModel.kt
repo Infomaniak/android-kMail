@@ -30,7 +30,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NoValidMailboxesViewModel @Inject constructor(
-    private val mailboxController: MailboxController,
+    mailboxController: MailboxController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
