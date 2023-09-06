@@ -18,8 +18,10 @@
 package com.infomaniak.mail.ui.main.newMessage
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.ClipDescription
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
@@ -36,6 +38,7 @@ import android.webkit.WebView
 import android.widget.ListPopupWindow
 import android.widget.PopupWindow
 import androidx.activity.addCallback
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.Group
 import androidx.core.net.MailTo
@@ -47,8 +50,12 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
+import com.google.android.material.button.MaterialButton
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
+import com.infomaniak.mail.MatomoMail
+import com.infomaniak.mail.MatomoMail.trackEvent
+import com.infomaniak.mail.MatomoMail.trackExternalEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -59,7 +66,7 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.*
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
-import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
+import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.*
 import com.infomaniak.mail.ui.main.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
@@ -72,6 +79,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import java.util.UUID
 import javax.inject.Inject
+import com.google.android.material.R as RMaterial
 
 @AndroidEntryPoint
 class NewMessageFragment : Fragment() {
@@ -136,6 +144,7 @@ class NewMessageFragment : Fragment() {
         observeNewAttachments()
         observeCcAndBccVisibility()
         observeDraftWorkerResults()
+        observeInitSuccess()
     }
 
     override fun onStart() {
@@ -191,6 +200,9 @@ class NewMessageFragment : Fragment() {
                 }
             })
         }
+
+        setupSendButton()
+        setupExternalBanner()
     }
 
     private fun initDraftAndViewModel() {
@@ -576,7 +588,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeEditorActions() {
-        newMessageViewModel.editorAction.observe(requireActivity()) { (editorAction, /*isToggled*/ _) ->
+        newMessageViewModel.editorAction.observe(viewLifecycleOwner) { (editorAction, /*isToggled*/ _) ->
             when (editorAction) {
                 EditorAction.ATTACHMENT -> {
                     filePicker.open { uris ->
@@ -663,6 +675,146 @@ class NewMessageFragment : Fragment() {
 
         draft.attachments[position].getUploadLocalFile(requireContext(), draft.localUuid).delete()
         draft.attachments.removeAt(position)
+    }
+
+    private fun setupExternalBanner() = with(binding) {
+        var manuallyClosed = false
+
+        var externalRecipientEmail: String? = null
+        var externalRecipientQuantity = 0
+
+        closeButton.setOnClickListener {
+            trackExternalEvent("bannerManuallyClosed")
+            manuallyClosed = true
+            externalBanner.isGone = true
+        }
+
+        informationButton.setOnClickListener {
+            trackExternalEvent("bannerInfo")
+
+            val description = resources.getQuantityString(
+                R.plurals.externalDialogDescriptionRecipient,
+                externalRecipientQuantity,
+                externalRecipientEmail,
+            )
+
+            // TODO: Reuse instance
+            createInformationDialog(
+                title = getString(R.string.externalDialogTitleRecipient),
+                description = description,
+                confirmButtonText = R.string.externalDialogConfirmButton,
+            ).show()
+        }
+
+        newMessageViewModel.externalRecipientCount.observe(viewLifecycleOwner) { (email, externalQuantity) ->
+            externalBanner.isGone = manuallyClosed || externalQuantity == 0
+            externalRecipientEmail = email
+            externalRecipientQuantity = externalQuantity
+        }
+    }
+
+    private fun setupSendButton() = with(binding) {
+        newMessageViewModel.isSendingAllowed.observe(viewLifecycleOwner) {
+            sendButton.isEnabled = it
+        }
+
+        sendButton.setOnClickListener { tryToSendEmail() }
+    }
+
+    private fun tryToSendEmail() {
+
+        fun setSnackBarActivityResult() {
+            val resultIntent = Intent()
+            resultIntent.putExtra(MainActivity.DRAFT_ACTION_KEY, DraftAction.SEND.name)
+            requireActivity().setResult(AppCompatActivity.RESULT_OK, resultIntent)
+        }
+
+        fun sendEmail() {
+            newMessageViewModel.shouldSendInsteadOfSave = true
+            setSnackBarActivityResult()
+            requireActivity().finishAppAndRemoveTaskIfNeeded()
+        }
+
+        if (newMessageViewModel.draft.subject.isNullOrBlank()) {
+            trackNewMessageEvent("sendWithoutSubject")
+            createDescriptionDialog(
+                title = getString(R.string.emailWithoutSubjectTitle),
+                description = getString(R.string.emailWithoutSubjectDescription),
+                confirmButtonText = R.string.buttonContinue,
+                onPositiveButtonClicked = {
+                    trackNewMessageEvent("sendWithoutSubjectConfirm")
+                    sendEmail()
+                },
+            ).show()
+        } else {
+            sendEmail()
+        }
+    }
+
+    private fun Activity.finishAppAndRemoveTaskIfNeeded() {
+        if (isTaskRoot) finishAndRemoveTask() else finish()
+    }
+
+    private fun observeInitSuccess() {
+        newMessageViewModel.isInitSuccess.observe(viewLifecycleOwner) { isSuccess ->
+            if (isSuccess) {
+                setupEditorActions()
+                setupEditorFormatActionsToggle()
+            }
+        }
+    }
+
+    private fun setupEditorActions() = with(binding) {
+
+        fun linkEditor(view: MaterialButton, action: EditorAction) {
+            view.setOnClickListener {
+                // TODO: Don't forget to add in this `if` all actions that make the app go to background.
+                if (action == EditorAction.ATTACHMENT) newMessageViewModel.shouldExecuteDraftActionWhenStopping = false
+                trackEvent("editorActions", action.matomoValue)
+                newMessageViewModel.editorAction.value = action to null
+            }
+        }
+
+        linkEditor(editorAttachment, EditorAction.ATTACHMENT)
+        linkEditor(editorCamera, EditorAction.CAMERA)
+        linkEditor(editorLink, EditorAction.LINK)
+        linkEditor(editorClock, EditorAction.CLOCK)
+    }
+
+    private fun setupEditorFormatActionsToggle() = with(binding) {
+        editorTextOptions.setOnClickListener {
+            newMessageViewModel.isEditorExpanded = !newMessageViewModel.isEditorExpanded
+            updateEditorVisibility(newMessageViewModel.isEditorExpanded)
+        }
+    }
+
+    private fun updateEditorVisibility(isEditorExpanded: Boolean) = with(binding) {
+        val color = if (isEditorExpanded) {
+            context.getAttributeColor(RMaterial.attr.colorPrimary)
+        } else {
+            context.getColor(R.color.iconColor)
+        }
+        val resId = if (isEditorExpanded) R.string.buttonTextOptionsClose else R.string.buttonTextOptionsOpen
+
+        editorTextOptions.apply {
+            iconTint = ColorStateList.valueOf(color)
+            contentDescription = getString(resId)
+        }
+
+        editorActions.isGone = isEditorExpanded
+        textEditing.isVisible = isEditorExpanded
+    }
+
+    enum class EditorAction(val matomoValue: String) {
+        ATTACHMENT("importFile"),
+        CAMERA("importFromCamera"),
+        LINK("addLink"),
+        CLOCK(MatomoMail.ACTION_POSTPONE_NAME),
+        // BOLD("bold"),
+        // ITALIC("italic"),
+        // UNDERLINE("underline"),
+        // STRIKE_THROUGH("strikeThrough"),
+        // UNORDERED_LIST("unorderedList"),
     }
 
     enum class FieldType {

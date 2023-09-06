@@ -38,7 +38,8 @@
     <androidx.core.widget.NestedScrollView
         android:id="@+id/compositionNestedScrollView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:fillViewport="true">
 
         <LinearLayout
@@ -467,4 +468,210 @@
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+
+    <LinearLayout
+        android:id="@+id/externalBanner"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@color/externalTagBackground"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <TextView
+            style="@style/BodySmall"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/marginStandardMedium"
+            android:layout_weight="1"
+            android:text="@string/externalDialogTitleRecipient" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/informationButton"
+            style="@style/IconButtonSmall"
+            android:layout_marginEnd="@dimen/marginStandardMedium"
+            app:icon="@drawable/ic_external_information"
+            app:iconTint="@color/externalTagOnBackground" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/closeButton"
+            style="@style/IconButtonSmall"
+            android:layout_marginEnd="@dimen/marginStandardSmall"
+            app:icon="@drawable/ic_close_small"
+            app:iconTint="@color/externalTagOnBackground" />
+
+    </LinearLayout>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/editor"
+        style="@style/CardViewMail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/newMessageBackgroundColor"
+        app:cardElevation="10dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                app:dividerColor="@color/backgroundColorTertiary"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/editorTextOptions"
+                style="@style/EditorIconButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/buttonTextOptionsOpen"
+                android:visibility="gone"
+                app:icon="@drawable/ic_editor_text_options"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/editorAttachment"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:visibility="visible" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/editorAttachment"
+                style="@style/EditorIconButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/buttonAttachment"
+                app:icon="@drawable/ic_attachment"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/editorCamera"
+                app:layout_constraintStart_toEndOf="@id/editorTextOptions"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/editorCamera"
+                style="@style/EditorIconButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/buttonCamera"
+                android:visibility="gone"
+                app:icon="@drawable/ic_editor_camera"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/editorLink"
+                app:layout_constraintStart_toEndOf="@+id/editorAttachment"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:visibility="visible" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/editorLink"
+                style="@style/EditorIconButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/buttonHyperlink"
+                android:visibility="gone"
+                app:icon="@drawable/ic_editor_link"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/editorClock"
+                app:layout_constraintStart_toEndOf="@+id/editorCamera"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:visibility="visible" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/editorClock"
+                style="@style/EditorIconButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/buttonSchedule"
+                android:visibility="gone"
+                app:icon="@drawable/ic_editor_clock"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/editorBold"
+                app:layout_constraintStart_toEndOf="@+id/editorLink"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:visibility="visible" />
+
+            <com.infomaniak.mail.ui.main.newMessage.ToggleableTextFormatterItemView
+                android:id="@+id/editorBold"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/buttonBold"
+                app:icon="@drawable/ic_editor_bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/editorItalic"
+                app:layout_constraintStart_toEndOf="@+id/editorClock"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.infomaniak.mail.ui.main.newMessage.ToggleableTextFormatterItemView
+                android:id="@+id/editorItalic"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/buttonItalic"
+                app:icon="@drawable/ic_editor_italic"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/editorUnderline"
+                app:layout_constraintStart_toEndOf="@+id/editorBold"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.infomaniak.mail.ui.main.newMessage.ToggleableTextFormatterItemView
+                android:id="@+id/editorUnderline"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/buttonUnderline"
+                app:icon="@drawable/ic_editor_underline"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/editorStrikeThrough"
+                app:layout_constraintStart_toEndOf="@+id/editorItalic"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.infomaniak.mail.ui.main.newMessage.ToggleableTextFormatterItemView
+                android:id="@+id/editorStrikeThrough"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/buttonStrikeThrough"
+                app:icon="@drawable/ic_editor_strikethrough"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/editorList"
+                app:layout_constraintStart_toEndOf="@+id/editorUnderline"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/editorList"
+                style="@style/EditorIconButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/buttonBulletPoint"
+                android:minWidth="0dp"
+                app:icon="@drawable/ic_editor_list"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/editorStrikeThrough"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/sendButton"
+                style="@style/IconButton"
+                android:layout_width="80dp"
+                android:layout_gravity="end"
+                android:contentDescription="@string/send"
+                app:icon="@drawable/ic_send"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/textEditing"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:constraint_referenced_ids="editorBold,editorItalic,editorUnderline,editorStrikeThrough,editorList" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/editorActions"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:constraint_referenced_ids="editorAttachment" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+
 </LinearLayout>
