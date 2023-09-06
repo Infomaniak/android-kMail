@@ -24,7 +24,6 @@ import android.view.View.OnFocusChangeListener
 import android.view.ViewGroup
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
@@ -37,8 +36,6 @@ import com.infomaniak.lib.core.utils.showProgress
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentAttachMailboxBinding
-import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.ui.noValidMailboxes.NoValidMailboxesViewModel
 import com.infomaniak.mail.utils.ErrorCode
 import com.infomaniak.mail.utils.isEmail
 import com.infomaniak.mail.utils.trimmedText
@@ -48,8 +45,6 @@ import dagger.hilt.android.AndroidEntryPoint
 class AttachMailboxFragment : Fragment() {
 
     private lateinit var binding: FragmentAttachMailboxBinding
-    private val mainViewModel: MainViewModel by activityViewModels()
-    private val noValidMailboxesViewModel: NoValidMailboxesViewModel by activityViewModels()
     private val accountViewModel: AccountViewModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {

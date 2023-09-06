@@ -61,8 +61,8 @@ import javax.inject.Inject
 class SearchFragment : Fragment() {
 
     private lateinit var binding: FragmentSearchBinding
-    private val mainViewModel by activityViewModels<MainViewModel>()
-    private val searchViewModel by viewModels<SearchViewModel>()
+    private val mainViewModel: MainViewModel by activityViewModels()
+    private val searchViewModel: SearchViewModel by viewModels()
 
     @Inject
     lateinit var localSettings: LocalSettings
