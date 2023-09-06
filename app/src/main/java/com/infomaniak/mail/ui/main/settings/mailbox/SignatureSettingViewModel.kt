@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.main.settings.mailbox
 
-import androidx.annotation.StringRes
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.api.ApiRepository
@@ -32,6 +31,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.infomaniak.lib.core.R as RCore
 
 @HiltViewModel
 class SignatureSettingViewModel @Inject constructor(
@@ -49,23 +49,20 @@ class SignatureSettingViewModel @Inject constructor(
     val signaturesLive = SignatureController.getSignaturesAsync(customRealm).asLiveData(coroutineContext)
     val showError = SingleLiveEvent<Int>() // StringRes
 
-    fun setDefaultSignature(
-        signature: Signature,
-        @StringRes errorOrNoConnectionStringRes: Int,
-    ) = viewModelScope.launch(ioDispatcher) {
+    fun setDefaultSignature(signature: Signature) = viewModelScope.launch(ioDispatcher) {
         with(ApiRepository.setDefaultSignature(mailbox.hostingId, mailbox.mailboxName, signature)) {
             if (isSuccess()) {
-                updateSignatures(errorOrNoConnectionStringRes)
+                updateSignatures()
             } else {
                 showError.postValue(translatedError)
             }
         }
     }
 
-    fun updateSignatures(@StringRes errorOrNoConnectionStringRes: Int) = viewModelScope.launch(ioDispatcher) {
+    fun updateSignatures() = viewModelScope.launch(ioDispatcher) {
         customRealm.writeBlocking {
             updateSignatures(mailbox)?.also { translatedError ->
-                val title = if (translatedError != 0) translatedError else errorOrNoConnectionStringRes
+                val title = if (translatedError == 0) RCore.string.anErrorHasOccurred else translatedError
                 showError.postValue(title)
             }
         }

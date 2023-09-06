@@ -22,13 +22,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.databinding.FragmentSignatureSettingBinding
-import com.infomaniak.mail.ui.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import io.realm.kotlin.ext.copyFromRealm
 
@@ -36,7 +34,6 @@ import io.realm.kotlin.ext.copyFromRealm
 class SignatureSettingFragment : Fragment() {
 
     private lateinit var binding: FragmentSignatureSettingBinding
-    private val mainViewModel: MainViewModel by activityViewModels()
     private val signatureSettingViewModel: SignatureSettingViewModel by viewModels()
 
     private lateinit var signatureAdapter: SignatureSettingAdapter
@@ -50,7 +47,7 @@ class SignatureSettingFragment : Fragment() {
 
         setupAdapter(mailbox)
 
-        updateSignatures(mainViewModel.errorOrNoConnectionStringRes)
+        updateSignatures()
 
         observeSignatures()
         observeApiError()
@@ -76,6 +73,6 @@ class SignatureSettingFragment : Fragment() {
     private fun onSignatureClicked(signature: Signature) = with(signatureSettingViewModel) {
         val newDefaultSignature = signature.copyFromRealm(UInt.MIN_VALUE).apply { isDefault = true }
 
-        setDefaultSignature(newDefaultSignature, mainViewModel.errorOrNoConnectionStringRes)
+        setDefaultSignature(newDefaultSignature)
     }
 }
