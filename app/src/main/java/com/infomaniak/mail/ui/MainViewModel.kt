@@ -60,6 +60,7 @@ import java.util.Date
 import javax.inject.Inject
 import kotlin.math.max
 import kotlin.math.min
+import com.infomaniak.lib.core.R as RCore
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -803,7 +804,7 @@ class MainViewModel @Inject constructor(
                 sharedUtils.refreshFolders(mailbox, foldersIds, destinationFolderId, ::startedDownload, ::stoppedDownload)
                 R.string.snackbarMoveCancelled
             } else {
-                translatedError
+                if (translatedError == 0) RCore.string.anErrorHasOccurred else translatedError
             }
 
             snackBarManager.postValue(context.getString(snackbarTitle))
