@@ -60,7 +60,6 @@ import java.util.Date
 import javax.inject.Inject
 import kotlin.math.max
 import kotlin.math.min
-import com.infomaniak.lib.core.R as RCore
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -82,15 +81,11 @@ class MainViewModel @Inject constructor(
 ) : AndroidViewModel(application) {
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
-
     private var refreshMailboxesAndFoldersJob: Job? = null
-
-    val isInternetAvailable = MutableLiveData<Boolean>()
-    inline val errorOrNoConnectionStringRes
-        get() = if (isInternetAvailable.value == true) RCore.string.anErrorHasOccurred else R.string.noConnection
 
     // First boolean is the download status, second boolean is if the LoadMore button should be displayed
     val isDownloadingChanges: MutableLiveData<Pair<Boolean, Boolean?>> = MutableLiveData(false to null)
+    val isInternetAvailable = MutableLiveData<Boolean>()
     val isNewFolderCreated = SingleLiveEvent<Boolean>()
     val toggleLightThemeForMessage = SingleLiveEvent<Message>()
 
@@ -323,16 +318,15 @@ class MainViewModel @Inject constructor(
     }
 
     fun flushFolder() = viewModelScope.launch(ioCoroutineContext) {
+        val mailboxUuid = currentMailbox.value?.uuid ?: return@launch
+        val folderId = currentFolderId ?: return@launch
 
-        val isSuccess = ApiRepository.flushFolder(
-            mailboxUuid = currentMailbox.value?.uuid ?: return@launch,
-            folderId = currentFolderId ?: return@launch,
-        ).isSuccess()
-
-        if (isSuccess) {
-            forceRefreshThreads()
-        } else {
-            snackBarManager.postValue(context.getString(errorOrNoConnectionStringRes))
+        with(ApiRepository.flushFolder(mailboxUuid, folderId)) {
+            if (isSuccess()) {
+                forceRefreshThreads()
+            } else {
+                snackBarManager.postValue(context.getString(translatedError))
+            }
         }
     }
 
@@ -420,16 +414,16 @@ class MainViewModel @Inject constructor(
         val messages = getMessagesToDelete(threads, message)
         val uids = messages.getUids()
 
-        val isSuccess = if (shouldPermanentlyDelete) {
-            ApiRepository.deleteMessages(mailbox.uuid, uids).isSuccess()
+        val apiResponse = if (shouldPermanentlyDelete) {
+            ApiRepository.deleteMessages(mailbox.uuid, uids)
         } else {
             trashId = folderController.getFolder(FolderRole.TRASH)!!.id
-            val apiResponse = ApiRepository.moveMessages(mailbox.uuid, uids, trashId)
-            undoResource = apiResponse.data?.undoResource
-            apiResponse.isSuccess()
+            ApiRepository.moveMessages(mailbox.uuid, uids, trashId).also {
+                undoResource = it.data?.undoResource
+            }
         }
 
-        if (isSuccess) {
+        if (apiResponse.isSuccess()) {
             refreshFoldersAsync(
                 mailbox = mailbox,
                 messagesFoldersIds = messages.getFoldersIds(exception = trashId),
@@ -442,7 +436,7 @@ class MainViewModel @Inject constructor(
         val undoDestinationId = message?.folderId ?: threads.first().folderId
         val undoFoldersIds = (messages.getFoldersIds(exception = undoDestinationId) + trashId).filterNotNull()
         showDeleteSnackbar(
-            isSuccess,
+            apiResponse,
             shouldPermanentlyDelete,
             message,
             undoResource,
@@ -453,7 +447,7 @@ class MainViewModel @Inject constructor(
     }
 
     private fun showDeleteSnackbar(
-        isSuccess: Boolean,
+        apiResponse: ApiResponse<*>,
         shouldPermanentlyDelete: Boolean,
         message: Message?,
         undoResource: String?,
@@ -462,7 +456,7 @@ class MainViewModel @Inject constructor(
         numberOfImpactedThreads: Int,
     ) {
 
-        val snackbarTitle = if (isSuccess) {
+        val snackbarTitle = if (apiResponse.isSuccess()) {
             val destination = context.getString(FolderRole.TRASH.folderNameRes)
             when {
                 shouldPermanentlyDelete && message == null -> {
@@ -477,7 +471,7 @@ class MainViewModel @Inject constructor(
                 else -> context.getString(R.string.snackbarMessageMoved, destination)
             }
         } else {
-            context.getString(errorOrNoConnectionStringRes)
+            context.getString(apiResponse.translatedError)
         }
 
         snackBarManager.postValue(snackbarTitle, undoResource?.let { UndoData(it, undoFoldersIds, undoDestinationId) })
@@ -547,7 +541,7 @@ class MainViewModel @Inject constructor(
         val destination = destinationFolder.getLocalizedName(context)
 
         val snackbarTitle = when {
-            !apiResponse.isSuccess() -> context.getString(errorOrNoConnectionStringRes)
+            !apiResponse.isSuccess() -> context.getString(apiResponse.translatedError)
             message == null -> context.resources.getQuantityString(R.plurals.snackbarThreadMoved, threads.count(), destination)
             else -> context.getString(R.string.snackbarMessageMoved, destination)
         }
@@ -770,16 +764,17 @@ class MainViewModel @Inject constructor(
     fun reportPhishing(threadUid: String, message: Message) = viewModelScope.launch(ioCoroutineContext) {
         val mailboxUuid = currentMailbox.value?.uuid!!
 
-        val isSuccess = ApiRepository.reportPhishing(mailboxUuid, message.folderId, message.shortUid).isSuccess()
+        with(ApiRepository.reportPhishing(mailboxUuid, message.folderId, message.shortUid)) {
 
-        val snackbarTitle = if (isSuccess) {
-            if (!isCurrentFolderRole(FolderRole.SPAM)) toggleMessageSpamStatus(threadUid, message)
-            R.string.snackbarReportPhishingConfirmation
-        } else {
-            errorOrNoConnectionStringRes
+            val snackbarTitle = if (isSuccess()) {
+                if (!isCurrentFolderRole(FolderRole.SPAM)) toggleMessageSpamStatus(threadUid, message)
+                R.string.snackbarReportPhishingConfirmation
+            } else {
+                translatedError
+            }
+
+            snackBarManager.postValue(context.getString(snackbarTitle))
         }
-
-        snackBarManager.postValue(context.getString(snackbarTitle))
     }
     //endregion
 
@@ -787,10 +782,12 @@ class MainViewModel @Inject constructor(
     fun blockUser(message: Message) = viewModelScope.launch(ioCoroutineContext) {
         val mailboxUuid = currentMailbox.value?.uuid!!
 
-        val isSuccess = ApiRepository.blockUser(mailboxUuid, message.folderId, message.shortUid).isSuccess()
+        with(ApiRepository.blockUser(mailboxUuid, message.folderId, message.shortUid)) {
 
-        val snackbarTitle = if (isSuccess) R.string.snackbarBlockUserConfirmation else errorOrNoConnectionStringRes
-        snackBarManager.postValue(context.getString(snackbarTitle))
+            val snackbarTitle = if (isSuccess()) R.string.snackbarBlockUserConfirmation else translatedError
+
+            snackBarManager.postValue(context.getString(snackbarTitle))
+        }
     }
     //endregion
 
@@ -799,17 +796,18 @@ class MainViewModel @Inject constructor(
         val mailbox = currentMailbox.value!!
         val (resource, foldersIds, destinationFolderId) = undoData
 
-        val isSuccess = ApiRepository.undoAction(resource).data
+        with(ApiRepository.undoAction(resource)) {
 
-        val snackbarTitle = if (isSuccess == true) {
-            // Don't use `refreshFoldersAsync` here, it will make the Snackbars blink.
-            sharedUtils.refreshFolders(mailbox, foldersIds, destinationFolderId, ::startedDownload, ::stoppedDownload)
-            R.string.snackbarMoveCancelled
-        } else {
-            errorOrNoConnectionStringRes
+            val snackbarTitle = if (data == true) {
+                // Don't use `refreshFoldersAsync` here, it will make the Snackbars blink.
+                sharedUtils.refreshFolders(mailbox, foldersIds, destinationFolderId, ::startedDownload, ::stoppedDownload)
+                R.string.snackbarMoveCancelled
+            } else {
+                translatedError
+            }
+
+            snackBarManager.postValue(context.getString(snackbarTitle))
         }
-
-        snackBarManager.postValue(context.getString(snackbarTitle))
     }
     //endregion
 
@@ -867,16 +865,17 @@ class MainViewModel @Inject constructor(
 
     fun addContact(recipient: Recipient) = viewModelScope.launch(ioCoroutineContext) {
 
-        val isSuccess = ApiRepository.addContact(addressBookController.getDefaultAddressBook().id, recipient).isSuccess()
+        with(ApiRepository.addContact(addressBookController.getDefaultAddressBook().id, recipient)) {
 
-        val snackbarTitle = if (isSuccess) {
-            updateUserInfo()
-            R.string.snackbarContactSaved
-        } else {
-            errorOrNoConnectionStringRes
+            val snackbarTitle = if (isSuccess()) {
+                updateUserInfo()
+                R.string.snackbarContactSaved
+            } else {
+                translatedError
+            }
+
+            snackBarManager.postValue(context.getString(snackbarTitle))
         }
-
-        snackBarManager.postValue(context.getString(snackbarTitle))
     }
 
     fun getMessage(messageUid: String) = liveData(ioCoroutineContext) {

@@ -83,7 +83,7 @@ class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
                     hasLoaded(true)
                 }
             } else {
-                showSnackbar(title = mainViewModel.errorOrNoConnectionStringRes)
+                showSnackbar(title = apiResponse.translatedError)
                 findNavController().popBackStack()
             }
         }
@@ -94,12 +94,7 @@ class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
         val date = autoCompleteTextView.text.toString()
 
         restoreEmailViewModel.restoreEmails(formattedDates[date] ?: date).observe(viewLifecycleOwner) { apiResponse ->
-            val title = if (apiResponse.isSuccess()) {
-                R.string.snackbarRestorationLaunched
-            } else {
-                mainViewModel.errorOrNoConnectionStringRes
-            }
-            showSnackbar(title)
+            showSnackbar(if (apiResponse.isSuccess()) R.string.snackbarRestorationLaunched else apiResponse.translatedError)
             findNavController().popBackStack()
         }
     }

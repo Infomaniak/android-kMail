@@ -37,7 +37,6 @@ import com.infomaniak.lib.core.utils.showProgress
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentAttachMailboxBinding
-import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.noValidMailboxes.NoValidMailboxesViewModel
 import com.infomaniak.mail.utils.ErrorCode
@@ -120,13 +119,7 @@ class AttachMailboxFragment : Fragment() {
                 else -> {
                     mailInputLayout.error = null
                     passwordInputLayout.error = null
-
-                    val errorOrNoConnectionStringRes = if (activity is MainActivity) {
-                        mainViewModel.errorOrNoConnectionStringRes
-                    } else {
-                        noValidMailboxesViewModel.errorOrNoConnectionStringRes
-                    }
-                    showSnackbar(title = errorOrNoConnectionStringRes, anchor = attachMailboxButton)
+                    showSnackbar(title = apiResponse.translatedError, anchor = attachMailboxButton)
                 }
             }
 

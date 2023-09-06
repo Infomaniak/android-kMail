@@ -20,7 +20,6 @@ package com.infomaniak.mail.ui.noValidMailboxes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
@@ -28,7 +27,6 @@ import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
-import com.infomaniak.lib.core.R as RCore
 
 @HiltViewModel
 class NoValidMailboxesViewModel @Inject constructor(
@@ -44,9 +42,4 @@ class NoValidMailboxesViewModel @Inject constructor(
 
     val invalidPasswordMailboxesLive = mailboxController.getInvalidPasswordMailboxes(AccountUtils.currentUserId)
         .asLiveData(ioCoroutineContext)
-
-    inline val errorOrNoConnectionStringRes
-        get() = if (isInternetAvailable) RCore.string.anErrorHasOccurred else R.string.noConnection
-
-    var isInternetAvailable: Boolean = false
 }

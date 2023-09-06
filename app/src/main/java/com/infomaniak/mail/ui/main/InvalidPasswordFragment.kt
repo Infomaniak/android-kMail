@@ -24,7 +24,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
@@ -34,9 +33,6 @@ import com.infomaniak.lib.core.utils.showProgress
 import com.infomaniak.mail.MatomoMail.trackInvalidPasswordMailboxEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentInvalidPasswordBinding
-import com.infomaniak.mail.ui.MainActivity
-import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.ui.noValidMailboxes.NoValidMailboxesViewModel
 import com.infomaniak.mail.utils.createDescriptionDialog
 import com.infomaniak.mail.utils.getStringWithBoldArg
 import com.infomaniak.mail.utils.trimmedText
@@ -47,8 +43,6 @@ class InvalidPasswordFragment : Fragment() {
 
     private lateinit var binding: FragmentInvalidPasswordBinding
     private val navigationArgs: InvalidPasswordFragmentArgs by navArgs()
-    private val mainViewModel: MainViewModel by activityViewModels()
-    private val noValidMailboxesViewModel: NoValidMailboxesViewModel by activityViewModels()
     private val invalidPasswordViewModel: InvalidPasswordViewModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -111,13 +105,8 @@ class InvalidPasswordFragment : Fragment() {
             showSnackbar(error)
         }
 
-        invalidPasswordViewModel.requestPasswordResult.observe(viewLifecycleOwner) { isSuccess ->
-            val title = when {
-                isSuccess -> R.string.snackbarMailboxPasswordRequested
-                activity is MainActivity -> mainViewModel.errorOrNoConnectionStringRes
-                else -> noValidMailboxesViewModel.errorOrNoConnectionStringRes
-            }
-            showSnackbar(title)
+        invalidPasswordViewModel.requestPasswordResult.observe(viewLifecycleOwner) { apiResponse ->
+            showSnackbar(if (apiResponse.isSuccess()) R.string.snackbarMailboxPasswordRequested else apiResponse.translatedError)
         }
     }
 
