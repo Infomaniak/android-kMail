@@ -485,7 +485,8 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/marginStandardMedium"
             android:layout_weight="1"
-            android:text="@string/externalDialogTitleRecipient" />
+            android:text="@string/externalDialogTitleRecipient"
+            android:textColor="@color/externalTagOnBackground" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/informationButton"
