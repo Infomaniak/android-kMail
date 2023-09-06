@@ -106,12 +106,14 @@ class SharedUtils @Inject constructor(
 
     companion object {
 
-        fun MutableRealm.updateSignatures(mailbox: Mailbox) {
-            with(ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName)) {
+        fun MutableRealm.updateSignatures(mailbox: Mailbox): Int? {
+            return with(ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName)) {
                 if (isSuccess() && !data?.signatures.isNullOrEmpty()) {
                     SignatureController.update(data!!.signatures, realm = this@updateSignatures)
+                    return@with null
                 } else {
                     Sentry.captureException(getApiException())
+                    return@with translatedError
                 }
             }
         }

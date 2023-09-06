@@ -36,7 +36,6 @@ import io.realm.kotlin.ext.copyFromRealm
 class SignatureSettingFragment : Fragment() {
 
     private lateinit var binding: FragmentSignatureSettingBinding
-
     private val mainViewModel: MainViewModel by activityViewModels()
     private val signatureSettingViewModel: SignatureSettingViewModel by viewModels()
 
@@ -51,11 +50,7 @@ class SignatureSettingFragment : Fragment() {
 
         setupAdapter(mailbox)
 
-        runCatching {
-            updateSignatures()
-        }.onFailure {
-            showSnackbar(title = mainViewModel.errorOrNoConnectionStringRes)
-        }
+        updateSignatures(mainViewModel.errorOrNoConnectionStringRes)
 
         observeSignatures()
         observeApiError()
@@ -69,8 +64,8 @@ class SignatureSettingFragment : Fragment() {
     }
 
     private fun observeApiError() {
-        signatureSettingViewModel.showError.observe(viewLifecycleOwner) { title ->
-            showSnackbar(title)
+        signatureSettingViewModel.showError.observe(viewLifecycleOwner) { stringRes ->
+            showSnackbar(stringRes)
         }
     }
 

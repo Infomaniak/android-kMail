@@ -28,7 +28,6 @@ import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SharedUtils.Companion.updateSignatures
-import com.infomaniak.mail.utils.throwErrorAsException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -54,16 +53,22 @@ class SignatureSettingViewModel @Inject constructor(
         signature: Signature,
         @StringRes errorOrNoConnectionStringRes: Int,
     ) = viewModelScope.launch(ioDispatcher) {
-        runCatching {
-            val apiResponse = ApiRepository.setDefaultSignature(mailbox.hostingId, mailbox.mailboxName, signature)
-            if (apiResponse.isSuccess()) updateSignatures() else apiResponse.throwErrorAsException()
-        }.onFailure {
-            showError.postValue(errorOrNoConnectionStringRes)
+        with(ApiRepository.setDefaultSignature(mailbox.hostingId, mailbox.mailboxName, signature)) {
+            if (isSuccess()) {
+                updateSignatures(errorOrNoConnectionStringRes)
+            } else {
+                showError.postValue(translatedError)
+            }
         }
     }
 
-    fun updateSignatures() = viewModelScope.launch(ioDispatcher) {
-        customRealm.writeBlocking { updateSignatures(mailbox) }
+    fun updateSignatures(@StringRes errorOrNoConnectionStringRes: Int) = viewModelScope.launch(ioDispatcher) {
+        customRealm.writeBlocking {
+            updateSignatures(mailbox)?.also { translatedError ->
+                val title = if (translatedError != 0) translatedError else errorOrNoConnectionStringRes
+                showError.postValue(title)
+            }
+        }
     }
 
     override fun onCleared() {
