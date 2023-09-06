@@ -60,6 +60,7 @@ import java.util.Date
 import javax.inject.Inject
 import kotlin.math.max
 import kotlin.math.min
+import com.infomaniak.lib.core.R as RCore
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -83,9 +84,12 @@ class MainViewModel @Inject constructor(
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
     private var refreshMailboxesAndFoldersJob: Job? = null
 
+    val isInternetAvailable = MutableLiveData<Boolean>()
+    inline val errorOrNoConnectionStringRes
+        get() = if (isInternetAvailable.value == true) RCore.string.anErrorHasOccurred else RCore.string.noConnection
+
     // First boolean is the download status, second boolean is if the LoadMore button should be displayed
     val isDownloadingChanges: MutableLiveData<Pair<Boolean, Boolean?>> = MutableLiveData(false to null)
-    val isInternetAvailable = MutableLiveData<Boolean>()
     val isNewFolderCreated = SingleLiveEvent<Boolean>()
     val toggleLightThemeForMessage = SingleLiveEvent<Message>()
 
