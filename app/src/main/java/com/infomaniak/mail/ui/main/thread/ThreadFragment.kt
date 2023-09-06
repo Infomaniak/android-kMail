@@ -493,7 +493,7 @@ class ThreadFragment : Fragment() {
                     externalRecipientEmail,
                 )
 
-                // TODO : Reuse instance
+                // TODO: Reuse instance
                 createInformationDialog(
                     title = getString(R.string.externalDialogTitleExpeditor),
                     description = description,
@@ -524,8 +524,9 @@ class ThreadFragment : Fragment() {
     }
 
     private fun Spannable.setClickableSpan(startIndex: Int, endIndex: Int, onClick: () -> Unit) {
-        // TODO : Currently, the clickable zone extends beyond the span up to the edge of the textview. This is the same
-        //  comportment that Gmail has. See if we can find a fix for this later
+        // TODO: Currently, the clickable zone extends beyond the span up to the edge of the textview.
+        //  This is the same comportment that Gmail has.
+        //  See if we can find a fix for this later.
         setSpan(
             object : ClickableSpan() {
                 override fun onClick(widget: View) = onClick()

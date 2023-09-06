@@ -86,7 +86,7 @@ class RefreshController @Inject constructor(
             if (isFirstTime && it is ApiErrorException && it.errorCode == ErrorCode.MESSAGE_NOT_FOUND) {
                 Sentry.withScope { scope ->
                     scope.level = SentryLevel.WARNING
-                    scope.setExtra(ErrorCode.MESSAGE_NOT_FOUND, "isFirstTime = true")
+                    scope.setTag("isFirstTime", "true")
                     scope.setExtra("folderCursor", "${folder.cursor}")
                     scope.setExtra("folderName", folder.name)
                     Sentry.captureException(it)
@@ -714,7 +714,7 @@ class RefreshController @Inject constructor(
         when (errorCode) {
             ErrorCode.FOLDER_DOES_NOT_EXIST -> Unit
             ErrorCode.MESSAGE_NOT_FOUND -> Sentry.withScope { scope ->
-                scope.setExtra(ErrorCode.MESSAGE_NOT_FOUND, "isFirstTime = false")
+                scope.setTag("isFirstTime", "false")
                 scope.setExtra("folderCursor", "${folder.cursor}")
                 scope.setExtra("folderName", folder.name)
                 Sentry.captureException(this)
