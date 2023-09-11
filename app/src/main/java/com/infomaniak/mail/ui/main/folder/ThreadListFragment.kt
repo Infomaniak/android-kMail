@@ -252,9 +252,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             onFlushClicked = { dialogTitle ->
 
                 val trackerName = when {
-                    mainViewModel.isCurrentFolderRole(FolderRole.TRASH) -> "emptyTrash"
-                    mainViewModel.isCurrentFolderRole(FolderRole.DRAFT) -> "emptyDraft"
-                    mainViewModel.isCurrentFolderRole(FolderRole.SPAM) -> "emptySpam"
+                    isCurrentFolderRole(FolderRole.TRASH) -> "emptyTrash"
+                    isCurrentFolderRole(FolderRole.DRAFT) -> "emptyDraft"
+                    isCurrentFolderRole(FolderRole.SPAM) -> "emptySpam"
                     else -> null
                 }
 
@@ -565,13 +565,13 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         binding.toolbar.title = folderName
     }
 
-    private fun updateThreadsVisibility() = with(mainViewModel) {
+    private fun updateThreadsVisibility() = with(threadListViewModel) {
 
-        val thereAreThreads = (threadListViewModel.currentThreadsCount ?: 0) > 0
-        val filterIsEnabled = currentFilter.value != ThreadFilter.ALL
-        val cursorIsNull = threadListViewModel.currentFolderCursor == null
-        val isNetworkConnected = isInternetAvailable.value == true
-        val isBooting = threadListViewModel.currentThreadsCount == null && !cursorIsNull && isNetworkConnected
+        val thereAreThreads = (currentThreadsCount ?: 0) > 0
+        val filterIsEnabled = mainViewModel.currentFilter.value != ThreadFilter.ALL
+        val cursorIsNull = currentFolderCursor == null
+        val isNetworkConnected = mainViewModel.isInternetAvailable.value == true
+        val isBooting = currentThreadsCount == null && !cursorIsNull && isNetworkConnected
         val shouldDisplayThreadsView = isBooting || thereAreThreads || filterIsEnabled || (cursorIsNull && isNetworkConnected)
 
         when {
@@ -600,6 +600,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun scrollToTop() = binding.threadsList.layoutManager?.scrollToPosition(0)
+
+    private fun isCurrentFolderRole(role: FolderRole) = mainViewModel.currentFolder.value?.role == role
 
     private enum class EmptyState(
         @DrawableRes val drawableId: Int,

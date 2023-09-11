@@ -173,8 +173,6 @@ class MainViewModel @Inject constructor(
     fun forceTriggerCurrentFolder() {
         currentFilter.apply { value = value }
     }
-
-    fun isCurrentFolderRole(role: FolderRole) = currentFolder.value?.role == role
     //endregion
 
     //region Merged Contacts
@@ -408,9 +406,8 @@ class MainViewModel @Inject constructor(
         var trashId: String? = null
         var undoResource: String? = null
 
-        val shouldPermanentlyDelete = isCurrentFolderRole(FolderRole.DRAFT)
-                || isCurrentFolderRole(FolderRole.SPAM)
-                || isCurrentFolderRole(FolderRole.TRASH)
+        val role = getActionFolderRole(threads, message)
+        val shouldPermanentlyDelete = role == FolderRole.DRAFT || role == FolderRole.SPAM || role == FolderRole.TRASH
 
         val messages = getMessagesToDelete(threads, message)
         val uids = messages.getUids()
@@ -572,9 +569,10 @@ class MainViewModel @Inject constructor(
         val mailbox = currentMailbox.value!!
         val threads = getActionThreads(threadsUids).ifEmpty { return@launch }
 
-        val isArchived = message?.let { it.folder.role == FolderRole.ARCHIVE } ?: isCurrentFolderRole(FolderRole.ARCHIVE)
+        val role = getActionFolderRole(threads, message)
+        val isFromArchive = role == FolderRole.ARCHIVE
 
-        val destinationFolderRole = if (isArchived) FolderRole.INBOX else FolderRole.ARCHIVE
+        val destinationFolderRole = if (isFromArchive) FolderRole.INBOX else FolderRole.ARCHIVE
         val destinationFolder = folderController.getFolder(destinationFolderRole)!!
 
         val messages = sharedUtils.getMessagesToMove(threads, message)
@@ -735,7 +733,11 @@ class MainViewModel @Inject constructor(
         val mailbox = currentMailbox.value!!
         val threads = getActionThreads(threadsUids).ifEmpty { return@launch }
 
-        val destinationFolderRole = if (isSpam(message)) FolderRole.INBOX else FolderRole.SPAM
+        val destinationFolderRole = if (getActionFolderRole(threads, message) == FolderRole.SPAM) {
+            FolderRole.INBOX
+        } else {
+            FolderRole.SPAM
+        }
         val destinationFolder = folderController.getFolder(destinationFolderRole)!!
 
         val messages = getMessagesToSpamOrHam(threads, message)
@@ -768,7 +770,7 @@ class MainViewModel @Inject constructor(
         with(ApiRepository.reportPhishing(mailboxUuid, message.folderId, message.shortUid)) {
 
             val snackbarTitle = if (isSuccess()) {
-                if (!isCurrentFolderRole(FolderRole.SPAM)) toggleMessageSpamStatus(threadUid, message)
+                if (getActionFolderRole(message.threads, message) != FolderRole.SPAM) toggleMessageSpamStatus(threadUid, message)
                 R.string.snackbarReportPhishingConfirmation
             } else {
                 translatedError
@@ -864,6 +866,34 @@ class MainViewModel @Inject constructor(
 
     private fun getActionThreads(threadsUids: List<String>): List<Thread> = threadsUids.mapNotNull(threadController::getThread)
 
+    fun getActionFolderRole(thread: Thread?): FolderRole? {
+        return getActionFolderRole(thread?.let(::listOf))
+    }
+
+    fun getActionFolderRole(message: Message): FolderRole? {
+        return getActionFolderRole(message.threads, message)
+    }
+
+    /**
+     * Get the FolderRole of a Message or a list of Threads.
+     *
+     * @param threads The list of Threads to find the FolderRole. They should ALL be from the same Folder. For now, it's
+     * always the case. But it could change in the future (for example, if the MultiSelect feature is added in the Search).
+     */
+    private fun getActionFolderRole(threads: List<Thread>?, message: Message? = null): FolderRole? {
+        return when {
+            message != null -> {
+                message.folder.role
+            }
+            threads?.firstOrNull()?.folder?.id == FolderController.SEARCH_FOLDER_ID -> {
+                folderController.getFolder(threads.first().folderId)?.role
+            }
+            else -> {
+                threads?.firstOrNull()?.folder?.role
+            }
+        }
+    }
+
     fun addContact(recipient: Recipient) = viewModelScope.launch(ioCoroutineContext) {
 
         with(ApiRepository.addContact(addressBookController.getDefaultAddressBook().id, recipient)) {
@@ -882,8 +912,6 @@ class MainViewModel @Inject constructor(
     fun getMessage(messageUid: String) = liveData(ioCoroutineContext) {
         emit(messageController.getMessage(messageUid)!!)
     }
-
-    private fun isSpam(message: Message?) = message?.isSpam ?: isCurrentFolderRole(FolderRole.SPAM)
 
     fun navigateToSelectedDraft(message: Message) = liveData(ioCoroutineContext) {
         val localUuid = draftController.getDraftByMessageUid(message.uid)?.localUuid
