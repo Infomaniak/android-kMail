@@ -56,12 +56,18 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     private val currentClassName: String by lazy { ThreadActionsBottomSheetDialog::class.java.name }
 
     private val isSpamFolder by lazy { mainViewModel.isCurrentFolderRole(FolderRole.SPAM) }
+    private var isFromArchive: Boolean = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(threadActionsViewModel) {
         super.onViewCreated(view, savedInstanceState)
 
         threadLive.observe(viewLifecycleOwner) { thread ->
+
+            val folderRole = mainViewModel.getActionFolderRole(thread)
+            isFromArchive = folderRole == FolderRole.ARCHIVE
+
             setMarkAsReadUi(thread.unseenMessagesCount == 0)
+            setArchiveUi(isFromArchive)
             setFavoriteUi(thread.isFavorite)
         }
 
@@ -128,7 +134,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
             //region Actions
             override fun onArchive() = with(mainViewModel) {
-                trackBottomSheetThreadActionsEvent(ACTION_ARCHIVE_NAME, isCurrentFolderRole(FolderRole.ARCHIVE))
+                trackBottomSheetThreadActionsEvent(ACTION_ARCHIVE_NAME, isFromArchive)
                 archiveThread(threadUid)
             }
 

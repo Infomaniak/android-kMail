@@ -54,6 +54,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         mainViewModel.getMessage(messageUid).observe(viewLifecycleOwner) { message ->
 
             setMarkAsReadUi(isSeen)
+            setArchiveUi(message)
             setFavoriteUi(isFavorite)
 
             if (requireContext().isNightModeEnabled()) {
