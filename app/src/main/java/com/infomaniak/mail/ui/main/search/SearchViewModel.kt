@@ -65,7 +65,7 @@ class SearchViewModel @Inject constructor(
     var currentSearchQuery: String = ""
         private set
 
-    val currentFoldersLive = folderController.getRootsFoldersAsync()
+    val foldersLive = folderController.getRootsFoldersAsync()
         .map { it.list.getMenuFolders() }
         .asLiveData(ioCoroutineContext)
 
