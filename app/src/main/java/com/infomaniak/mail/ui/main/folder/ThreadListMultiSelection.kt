@@ -219,9 +219,9 @@ class ThreadListMultiSelection {
             changeIcon(FAVORITE_INDEX, favoriteIcon)
 
             val isSelectionEmpty = selectedThreads.isEmpty()
-            val isInsideArchive = mainViewModel.isCurrentFolderRole(FolderRole.ARCHIVE)
+            val isFromArchive = mainViewModel.getActionFolderRole(selectedThreads.firstOrNull()) == FolderRole.ARCHIVE
             for (index in 0 until getButtonCount()) {
-                val shouldDisable = isSelectionEmpty || (isInsideArchive && index == ARCHIVE_INDEX)
+                val shouldDisable = isSelectionEmpty || (isFromArchive && index == ARCHIVE_INDEX)
                 if (shouldDisable) disable(index) else enable(index)
             }
         }
