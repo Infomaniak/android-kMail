@@ -43,6 +43,7 @@ import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.main.menu.MoveFragmentArgs
 import com.infomaniak.mail.utils.animatedNavigation
+import com.infomaniak.mail.utils.deleteWithConfirmationPopup
 import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -55,6 +56,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
     private val currentClassName: String by lazy { ThreadActionsBottomSheetDialog::class.java.name }
 
+    private var folderRole: FolderRole? = null
     private var isFromArchive: Boolean = false
     private var isFromSpam: Boolean = false
 
@@ -63,7 +65,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
         threadLive.observe(viewLifecycleOwner) { thread ->
 
-            val folderRole = mainViewModel.getActionFolderRole(thread)
+            folderRole = mainViewModel.getActionFolderRole(thread)
             isFromArchive = folderRole == FolderRole.ARCHIVE
             isFromSpam = folderRole == FolderRole.SPAM
 
@@ -75,7 +77,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
         binding.postpone.isGone = true
 
-        threadActionsViewModel.getThreadAndMessageUidToReplyTo().observe(viewLifecycleOwner) { result ->
+        getThreadAndMessageUidToReplyTo().observe(viewLifecycleOwner) { result ->
             result?.let { (thread, messageUidToReply) ->
                 setupListeners(thread, messageUidToReply)
             } ?: findNavController().popBackStack()
@@ -129,8 +131,13 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             }
 
             override fun onDelete() {
-                trackBottomSheetThreadActionsEvent(ACTION_DELETE_NAME)
-                mainViewModel.deleteThread(threadUid)
+                deleteWithConfirmationPopup(
+                    folderRole = folderRole,
+                    count = 1,
+                ) {
+                    trackBottomSheetThreadActionsEvent(ACTION_DELETE_NAME)
+                    mainViewModel.deleteThread(threadUid)
+                }
             }
             //endregion
 
