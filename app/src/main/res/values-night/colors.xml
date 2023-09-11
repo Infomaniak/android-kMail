@@ -80,6 +80,7 @@
     <!-- Ai -->
     <color name="aiColor">@color/ai_dark</color>
     <color name="aiBetaTagTextColor">@color/azur_dark</color>
+    <color name="betaTagBackground">@color/orca</color>
 
     <!-- Swipe actions -->
     <color name="swipeDelete">@color/redDestructiveAction</color>
