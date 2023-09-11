@@ -32,6 +32,7 @@ import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.*
 import android.view.WindowManager
 import android.webkit.WebView
 import android.widget.ListPopupWindow
@@ -534,11 +535,13 @@ class NewMessageFragment : Fragment() {
     private fun openAiPrompt() {
         setAiPromptVisibility(true)
         binding.aiPrompt.focusPrompt()
+        binding.newMessageConstraintLayout.descendantFocusability = FOCUS_BLOCK_DESCENDANTS
     }
 
     private fun closeAiPrompt() {
         binding.aiPrompt.hideKeyboard()
         setAiPromptVisibility(false)
+        binding.newMessageConstraintLayout.descendantFocusability = FOCUS_BEFORE_DESCENDANTS
     }
 
     private fun setAiPromptVisibility(isVisible: Boolean) {
