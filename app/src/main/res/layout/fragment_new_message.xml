@@ -694,12 +694,14 @@
         android:id="@+id/scrim"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:clickable="true"
         android:importantForAccessibility="no"
         android:src="#50000000"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="KeyboardInaccessibleWidget" />
 
     <com.infomaniak.mail.ui.main.newMessage.AiPromptView
         android:id="@+id/aiPrompt"
