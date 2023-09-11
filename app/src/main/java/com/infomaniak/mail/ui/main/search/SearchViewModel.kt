@@ -161,7 +161,7 @@ class SearchViewModel @Inject constructor(
         saveInHistory: Boolean = false,
         filters: Set<ThreadFilter> = currentFilters,
         folder: Folder? = currentFolder,
-        shouldGetNextPage: Boolean = false
+        shouldGetNextPage: Boolean = false,
     ) = withContext(ioCoroutineContext) {
         searchJob?.cancel()
         searchJob = launch {
