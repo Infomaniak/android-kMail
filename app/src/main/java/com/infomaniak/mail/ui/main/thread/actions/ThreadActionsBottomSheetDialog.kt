@@ -55,8 +55,8 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
     private val currentClassName: String by lazy { ThreadActionsBottomSheetDialog::class.java.name }
 
-    private val isSpamFolder by lazy { mainViewModel.isCurrentFolderRole(FolderRole.SPAM) }
     private var isFromArchive: Boolean = false
+    private var isFromSpam: Boolean = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(threadActionsViewModel) {
         super.onViewCreated(view, savedInstanceState)
@@ -65,14 +65,15 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
             val folderRole = mainViewModel.getActionFolderRole(thread)
             isFromArchive = folderRole == FolderRole.ARCHIVE
+            isFromSpam = folderRole == FolderRole.SPAM
 
             setMarkAsReadUi(thread.unseenMessagesCount == 0)
             setArchiveUi(isFromArchive)
             setFavoriteUi(thread.isFavorite)
+            setJunkUi()
         }
 
         binding.postpone.isGone = true
-        setJunkUi()
 
         threadActionsViewModel.getThreadAndMessageUidToReplyTo().observe(viewLifecycleOwner) { result ->
             result?.let { (thread, messageUidToReply) ->
@@ -82,7 +83,8 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     }
 
     private fun setJunkUi() = binding.reportJunk.apply {
-        val (text, icon) = if (isSpamFolder) {
+
+        val (text, icon) = if (isFromSpam) {
             R.string.actionNonSpam to R.drawable.ic_non_spam
         } else {
             R.string.actionReportJunk to R.drawable.ic_report_junk
@@ -160,7 +162,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             }
 
             override fun onReportJunk() {
-                if (isSpamFolder) {
+                if (isFromSpam) {
                     trackBottomSheetThreadActionsEvent(ACTION_SPAM_NAME, value = true)
                     mainViewModel.toggleThreadSpamStatus(threadUid)
                 } else {
