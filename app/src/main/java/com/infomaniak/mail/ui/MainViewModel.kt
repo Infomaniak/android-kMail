@@ -772,7 +772,7 @@ class MainViewModel @Inject constructor(
         with(ApiRepository.reportPhishing(mailboxUuid, message.folderId, message.shortUid)) {
 
             val snackbarTitle = if (isSuccess()) {
-                if (!isCurrentFolderRole(FolderRole.SPAM)) toggleMessageSpamStatus(threadUid, message)
+                if (getActionFolderRole(message.threads, message) != FolderRole.SPAM) toggleMessageSpamStatus(threadUid, message)
                 R.string.snackbarReportPhishingConfirmation
             } else {
                 translatedError
