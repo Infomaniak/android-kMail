@@ -733,7 +733,7 @@ class MainViewModel @Inject constructor(
         val mailbox = currentMailbox.value!!
         val threads = getActionThreads(threadsUids).ifEmpty { return@launch }
 
-        val destinationFolderRole = if (message?.isSpam == true || getActionFolderRole(threads, message) == FolderRole.SPAM) {
+        val destinationFolderRole = if (getActionFolderRole(threads, message) == FolderRole.SPAM) {
             FolderRole.INBOX
         } else {
             FolderRole.SPAM

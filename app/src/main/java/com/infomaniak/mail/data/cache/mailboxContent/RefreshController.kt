@@ -576,7 +576,6 @@ class RefreshController @Inject constructor(
         remoteMessage.initLocalValues(
             date = remoteMessage.date,
             isFullyDownloaded = false,
-            isSpam = folder.role == FolderRole.SPAM,
             isTrashed = folder.role == FolderRole.TRASH,
             isFromSearch = false,
             draftLocalUuid = null,

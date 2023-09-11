@@ -97,7 +97,6 @@ class ThreadController @Inject constructor(
                 remoteMessage.initLocalValues(
                     date = localMessage?.date ?: remoteMessage.date,
                     isFullyDownloaded = localMessage?.isFullyDownloaded() ?: false,
-                    isSpam = folderRole == FolderRole.SPAM,
                     isTrashed = folderRole == FolderRole.TRASH,
                     isFromSearch = localMessage == null,
                     draftLocalUuid = localMessage?.draftLocalUuid,
@@ -273,7 +272,6 @@ class ThreadController @Inject constructor(
                                 remoteMessage.initLocalValues(
                                     date = localMessage.date,
                                     isFullyDownloaded = true,
-                                    isSpam = localMessage.isSpam,
                                     isTrashed = localMessage.isTrashed,
                                     isFromSearch = localMessage.isFromSearch,
                                     draftLocalUuid = draftLocalUuid,

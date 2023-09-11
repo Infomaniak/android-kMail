@@ -26,6 +26,7 @@ import androidx.navigation.fragment.navArgs
 import com.infomaniak.mail.MatomoMail.ACTION_SPAM_NAME
 import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.BottomSheetJunkBinding
 import com.infomaniak.mail.ui.MainViewModel
@@ -54,7 +55,7 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
     private fun handleButtons(threadUid: String, message: Message) = with(binding) {
 
         spam.setClosingOnClickListener {
-            trackBottomSheetThreadActionsEvent(ACTION_SPAM_NAME, message.isSpam)
+            trackBottomSheetThreadActionsEvent(ACTION_SPAM_NAME, value = message.folder.role == FolderRole.SPAM)
             mainViewModel.toggleThreadSpamStatus(threadUid)
         }
 

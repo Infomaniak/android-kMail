@@ -110,8 +110,6 @@ class Message : RealmObject {
     @PersistedName("isFullyDownloaded")
     private var _isFullyDownloaded: Boolean = false
     @Transient
-    var isSpam: Boolean = false
-    @Transient
     var isTrashed: Boolean = false
     @Transient
     var messageIds: RealmSet<String> = realmSetOf()
@@ -179,7 +177,6 @@ class Message : RealmObject {
     fun initLocalValues(
         date: RealmInstant,
         isFullyDownloaded: Boolean,
-        isSpam: Boolean,
         isTrashed: Boolean,
         isFromSearch: Boolean,
         draftLocalUuid: String?,
@@ -187,7 +184,6 @@ class Message : RealmObject {
     ) {
         this.date = date
         this._isFullyDownloaded = isFullyDownloaded
-        this.isSpam = isSpam
         this.isTrashed = isTrashed
         draftLocalUuid?.let { this.draftLocalUuid = it }
         this.isFromSearch = isFromSearch
