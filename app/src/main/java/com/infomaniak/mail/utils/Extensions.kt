@@ -68,6 +68,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Folder.*
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
@@ -379,6 +380,21 @@ fun List<Message>.getFoldersIds(exception: String? = null) = mapNotNull { if (it
 
 fun List<Message>.getUids(): List<String> = map { it.uid }
 //endregion
+
+fun Fragment.deleteWithConfirmationPopup(folderRole: FolderRole?, count: Int, executeDelete: () -> Unit) {
+    when (folderRole) {
+        FolderRole.DRAFT, FolderRole.SPAM, FolderRole.TRASH -> {
+            createDescriptionDialog(
+                title = resources.getQuantityString(R.plurals.threadListDeletionConfirmationAlertTitle, count, count),
+                description = resources.getQuantityString(R.plurals.threadListDeletionConfirmationAlertDescription, count),
+                onPositiveButtonClicked = { executeDelete() },
+            ).show()
+        }
+        else -> {
+            executeDelete()
+        }
+    }
+}
 
 fun Fragment.createInformationDialog(
     title: String,
