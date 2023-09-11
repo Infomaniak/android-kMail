@@ -49,6 +49,25 @@
                 android:layout_height="wrap_content"
                 android:text="Assistant à la rédaction" />
 
+            <com.google.android.material.card.MaterialCardView
+                style="@style/CardViewMail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/marginStandardVerySmall"
+                app:cardBackgroundColor="@color/backgroundColorTertiary"
+                app:cardCornerRadius="6dp">
+
+                <TextView
+                    style="@style/LabelMedium"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
+                    android:layout_marginVertical="2dp"
+                    android:text="Beta"
+                    android:textColor="@color/aiBetaTagTextColor" />
+
+            </com.google.android.material.card.MaterialCardView>
+
             <Space
                 android:layout_width="0dp"
                 android:layout_height="0dp"
