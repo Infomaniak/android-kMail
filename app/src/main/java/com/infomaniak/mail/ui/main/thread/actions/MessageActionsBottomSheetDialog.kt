@@ -39,6 +39,7 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.ui.main.menu.MoveFragmentArgs
 import com.infomaniak.mail.utils.animatedNavigation
+import com.infomaniak.mail.utils.deleteWithConfirmationPopup
 import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 
@@ -48,13 +49,17 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
     private val currentClassName: String by lazy { MessageActionsBottomSheetDialog::class.java.name }
 
+    private var folderRole: FolderRole? = null
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(navigationArgs) {
         super.onViewCreated(view, savedInstanceState)
 
         mainViewModel.getMessage(messageUid).observe(viewLifecycleOwner) { message ->
 
+            folderRole = mainViewModel.getActionFolderRole(message)
+
             setMarkAsReadUi(isSeen)
-            setArchiveUi(message)
+            setArchiveUi(isFromArchive = folderRole == FolderRole.ARCHIVE)
             setFavoriteUi(isFavorite)
 
             if (requireContext().isNightModeEnabled()) {
@@ -98,8 +103,13 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 }
 
                 override fun onDelete() {
-                    trackBottomSheetMessageActionsEvent(ACTION_DELETE_NAME)
-                    mainViewModel.deleteMessage(threadUid, message)
+                    deleteWithConfirmationPopup(
+                        folderRole = folderRole,
+                        count = 1,
+                    ) {
+                        trackBottomSheetMessageActionsEvent(ACTION_DELETE_NAME)
+                        mainViewModel.deleteMessage(threadUid, message)
+                    }
                 }
                 //endregion
 
