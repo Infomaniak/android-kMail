@@ -571,7 +571,8 @@ class MainViewModel @Inject constructor(
         val mailbox = currentMailbox.value!!
         val threads = getActionThreads(threadsUids).ifEmpty { return@launch }
 
-        val isArchived = message?.let { it.folder.role == FolderRole.ARCHIVE } ?: isCurrentFolderRole(FolderRole.ARCHIVE)
+        val role = getActionFolderRole(threads, message)
+        val isArchived = role == FolderRole.ARCHIVE
 
         val destinationFolderRole = if (isArchived) FolderRole.INBOX else FolderRole.ARCHIVE
         val destinationFolder = folderController.getFolder(destinationFolderRole)!!
