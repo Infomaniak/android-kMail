@@ -71,9 +71,7 @@
         app:endIconMode="clear_text"
         app:hintEnabled="false"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/chevron"
-        app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/prefix"
         app:layout_constraintTop_toBottomOf="@id/chipsRecyclerView">
 
@@ -86,7 +84,7 @@
             android:inputType="textEmailAddress"
             android:lines="1"
             android:paddingVertical="0dp"
-            android:paddingStart="0dp"
+            android:paddingStart="@dimen/marginStandardVerySmall"
             tools:ignore="RtlSymmetry" />
     </com.infomaniak.lib.core.views.EndIconTextInputLayout>
 
@@ -145,7 +143,7 @@
     <com.google.android.material.button.MaterialButton
         android:id="@+id/chevron"
         style="@style/IconButtonSmall"
-        android:layout_marginEnd="@dimen/marginStandardMedium"
+        android:layout_marginEnd="@dimen/marginStandardSmall"
         android:contentDescription="@string/contentDescriptionButtonExpandHeader"
         android:visibility="gone"
         app:icon="@drawable/ic_chevron_down"
