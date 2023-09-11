@@ -173,8 +173,6 @@ class MainViewModel @Inject constructor(
     fun forceTriggerCurrentFolder() {
         currentFilter.apply { value = value }
     }
-
-    fun isCurrentFolderRole(role: FolderRole) = currentFolder.value?.role == role
     //endregion
 
     //region Merged Contacts
