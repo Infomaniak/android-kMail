@@ -408,9 +408,8 @@ class MainViewModel @Inject constructor(
         var trashId: String? = null
         var undoResource: String? = null
 
-        val shouldPermanentlyDelete = isCurrentFolderRole(FolderRole.DRAFT)
-                || isCurrentFolderRole(FolderRole.SPAM)
-                || isCurrentFolderRole(FolderRole.TRASH)
+        val role = getActionFolderRole(threads, message)
+        val shouldPermanentlyDelete = role == FolderRole.DRAFT || role == FolderRole.SPAM || role == FolderRole.TRASH
 
         val messages = getMessagesToDelete(threads, message)
         val uids = messages.getUids()
