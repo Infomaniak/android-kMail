@@ -864,6 +864,28 @@ class MainViewModel @Inject constructor(
 
     private fun getActionThreads(threadsUids: List<String>): List<Thread> = threadsUids.mapNotNull(threadController::getThread)
 
+    fun getActionFolderRole(thread: Thread?): FolderRole? {
+        return getActionFolderRole(thread?.let(::listOf))
+    }
+
+    fun getActionFolderRole(message: Message): FolderRole? {
+        return getActionFolderRole(message.threads, message)
+    }
+
+    private fun getActionFolderRole(threads: List<Thread>?, message: Message? = null): FolderRole? {
+        return when {
+            message != null -> {
+                message.folder.role
+            }
+            threads?.firstOrNull()?.folder?.id == FolderController.SEARCH_FOLDER_ID -> {
+                folderController.getFolder(threads.first().folderId)?.role
+            }
+            else -> {
+                threads?.firstOrNull()?.folder?.role
+            }
+        }
+    }
+
     fun addContact(recipient: Recipient) = viewModelScope.launch(ioCoroutineContext) {
 
         with(ApiRepository.addContact(addressBookController.getDefaultAddressBook().id, recipient)) {
