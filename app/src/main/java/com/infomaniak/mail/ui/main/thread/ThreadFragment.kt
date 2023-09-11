@@ -124,7 +124,9 @@ class ThreadFragment : Fragment() {
                 return@observe
             }
 
-            setupUi()
+            val isFromArchive = mainViewModel.getActionFolderRole(result.first) == FolderRole.ARCHIVE
+            setupUi(isFromArchive)
+
             setupAdapter()
             threadAdapter.isExpandedMap = result.second
             threadAdapter.isThemeTheSameMap = result.third
@@ -153,7 +155,7 @@ class ThreadFragment : Fragment() {
         }
     }
 
-    private fun setupUi() = with(binding) {
+    private fun setupUi(isFromArchive: Boolean) = with(binding) {
         toolbar.setNavigationOnClickListener { leaveThread() }
 
         val defaultTextColor = context.getColor(R.color.primaryTextColor)
@@ -180,7 +182,7 @@ class ThreadFragment : Fragment() {
             mainViewModel.toggleThreadFavoriteStatus(navigationArgs.threadUid)
         }
 
-        if (mainViewModel.isCurrentFolderRole(FolderRole.ARCHIVE)) {
+        if (isFromArchive) {
             quickActionBar.disable(ARCHIVE_INDEX)
         } else {
             quickActionBar.enable(ARCHIVE_INDEX)
@@ -197,7 +199,7 @@ class ThreadFragment : Fragment() {
                     threadViewModel.clickOnQuickActionBar(menuId)
                 }
                 R.id.quickActionArchive -> with(mainViewModel) {
-                    trackThreadActionsEvent(ACTION_ARCHIVE_NAME, isCurrentFolderRole(FolderRole.ARCHIVE))
+                    trackThreadActionsEvent(ACTION_ARCHIVE_NAME, isFromArchive)
                     archiveThread(navigationArgs.threadUid)
                 }
                 R.id.quickActionDelete -> {
