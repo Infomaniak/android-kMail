@@ -150,6 +150,7 @@
     <color name="aiColor">@color/ai_light</color>
     <color name="onAiColor">@color/onColorfulBackground</color> <!--TODO : Update when specs chose a color-->
     <color name="aiBetaTagTextColor">@color/azur_light</color>
+    <color name="betaTagBackground">@color/polar_bear</color>
 
     <!-- Swipe actions -->
     <color name="swipeDelete">@color/redDestructiveAction</color>
