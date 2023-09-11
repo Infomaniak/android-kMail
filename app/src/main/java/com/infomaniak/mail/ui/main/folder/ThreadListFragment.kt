@@ -60,6 +60,7 @@ import com.infomaniak.mail.data.LocalSettings.Companion.DEFAULT_SWIPE_ACTION_LEF
 import com.infomaniak.mail.data.LocalSettings.Companion.DEFAULT_SWIPE_ACTION_RIGHT
 import com.infomaniak.mail.data.LocalSettings.SwipeAction
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity.COMPACT
+import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.thread.Thread
@@ -97,6 +98,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     @Inject
     lateinit var threadListAdapter: ThreadListAdapter
+
+    @Inject
+    lateinit var threadController: ThreadController
 
     @Inject
     lateinit var draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler
@@ -359,8 +363,13 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 isCurrentFolderRole(FolderRole.ARCHIVE)
             }
             SwipeAction.DELETE -> {
-                deleteThread(threadUid)
-                false
+                val folderRole = threadController.getThread(threadUid)?.folder?.role
+                val shouldKeepItem = when (folderRole) {
+                    FolderRole.DRAFT, FolderRole.SPAM, FolderRole.TRASH -> true
+                    else -> false
+                }
+                deleteWithConfirmationPopup(folderRole = folderRole, count = 1) { deleteThread(threadUid) }
+                shouldKeepItem
             }
             SwipeAction.FAVORITE -> {
                 toggleThreadFavoriteStatus(threadUid)
