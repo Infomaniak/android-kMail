@@ -570,9 +570,9 @@ class MainViewModel @Inject constructor(
         val threads = getActionThreads(threadsUids).ifEmpty { return@launch }
 
         val role = getActionFolderRole(threads, message)
-        val isArchived = role == FolderRole.ARCHIVE
+        val isFromArchive = role == FolderRole.ARCHIVE
 
-        val destinationFolderRole = if (isArchived) FolderRole.INBOX else FolderRole.ARCHIVE
+        val destinationFolderRole = if (isFromArchive) FolderRole.INBOX else FolderRole.ARCHIVE
         val destinationFolder = folderController.getFolder(destinationFolderRole)!!
 
         val messages = sharedUtils.getMessagesToMove(threads, message)
