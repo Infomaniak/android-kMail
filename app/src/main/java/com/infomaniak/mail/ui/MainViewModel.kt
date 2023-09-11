@@ -735,7 +735,11 @@ class MainViewModel @Inject constructor(
         val mailbox = currentMailbox.value!!
         val threads = getActionThreads(threadsUids).ifEmpty { return@launch }
 
-        val destinationFolderRole = if (isSpam(message)) FolderRole.INBOX else FolderRole.SPAM
+        val destinationFolderRole = if (message?.isSpam == true || getActionFolderRole(threads, message) == FolderRole.SPAM) {
+            FolderRole.INBOX
+        } else {
+            FolderRole.SPAM
+        }
         val destinationFolder = folderController.getFolder(destinationFolderRole)!!
 
         val messages = getMessagesToSpamOrHam(threads, message)
@@ -904,8 +908,6 @@ class MainViewModel @Inject constructor(
     fun getMessage(messageUid: String) = liveData(ioCoroutineContext) {
         emit(messageController.getMessage(messageUid)!!)
     }
-
-    private fun isSpam(message: Message?) = message?.isSpam ?: isCurrentFolderRole(FolderRole.SPAM)
 
     fun navigateToSelectedDraft(message: Message) = liveData(ioCoroutineContext) {
         val localUuid = draftController.getDraftByMessageUid(message.uid)?.localUuid
