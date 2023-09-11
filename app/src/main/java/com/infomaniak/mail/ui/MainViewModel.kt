@@ -874,6 +874,12 @@ class MainViewModel @Inject constructor(
         return getActionFolderRole(message.threads, message)
     }
 
+    /**
+     * Get the FolderRole of a Message or a list of Threads.
+     *
+     * @param threads The list of Threads to find the FolderRole. They should ALL be from the same Folder. For now, it's
+     * always the case. But it could change in the future (for example, if the MultiSelect feature is added in the Search).
+     */
     private fun getActionFolderRole(threads: List<Thread>?, message: Message? = null): FolderRole? {
         return when {
             message != null -> {
