@@ -177,7 +177,11 @@ class NewMessageFragment : Fragment() {
 
     private fun handleOnBackPressed() = with(newMessageViewModel) {
         newMessageActivity.onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
-            if (isAutoCompletionOpened) closeAutoCompletion() else newMessageActivity.finishAppAndRemoveTaskIfNeeded()
+            when {
+                isAiPromptOpened -> closeAiPrompt()
+                isAutoCompletionOpened -> closeAutoCompletion()
+                else -> newMessageActivity.finishAppAndRemoveTaskIfNeeded()
+            }
         }
     }
 
