@@ -374,7 +374,7 @@ class RecipientFieldView @JvmOverloads constructor(
         setSnackBar = setSnackBarCallback
     }
 
-    fun clearField() = binding.textInput.clearComposingText()
+    fun clearField() = binding.textInput.setText("")
 
     fun initRecipients(
         initialRecipients: List<Recipient>,
