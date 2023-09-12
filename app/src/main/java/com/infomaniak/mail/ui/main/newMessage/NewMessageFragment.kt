@@ -100,6 +100,8 @@ class NewMessageFragment : Fragment() {
     private lateinit var addressListPopupWindow: ListPopupWindow
     private lateinit var filePicker: FilePicker
 
+    private val aiPromptFragment by lazy { AiPromptFragment() }
+
     private val attachmentAdapter = AttachmentAdapter(shouldDisplayCloseButton = true, onDelete = ::onDeleteAttachment)
 
     private val newMessageActivity by lazy { requireActivity() as NewMessageActivity }
@@ -215,7 +217,7 @@ class NewMessageFragment : Fragment() {
         setupSendButton()
         setupExternalBanner()
 
-        aiPrompt.initListeners(::closeAiPrompt)
+        // aiPrompt.initListeners(::closeAiPrompt)
     }
 
     private fun initDraftAndViewModel() {
@@ -618,14 +620,22 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun openAiPrompt() = with(binding) {
+        childFragmentManager
+            .beginTransaction()
+            .add(aiPromptFragmentContainer.id, aiPromptFragment)
+            .commit()
+
         setAiPromptVisibility(true)
-        aiPrompt.focusPrompt()
         newMessageConstraintLayout.descendantFocusability = FOCUS_BLOCK_DESCENDANTS
     }
 
-    private fun closeAiPrompt() = with(binding) {
+    fun closeAiPrompt() = with(binding) {
+        childFragmentManager
+            .beginTransaction()
+            .remove(aiPromptFragment)
+            .commit()
+
         setAiPromptVisibility(false)
-        aiPrompt.hideKeyboard()
         newMessageConstraintLayout.descendantFocusability = FOCUS_BEFORE_DESCENDANTS
     }
 
@@ -645,7 +655,7 @@ class NewMessageFragment : Fragment() {
             requireActivity().window.navigationBarColor = requireContext().getColor(backgroundColorRes)
         }
 
-        binding.aiPromptGroup.isVisible = isVisible
+        binding.aiPromptLayout.isVisible = isVisible
         updateStatusBarColor(isVisible)
         updateNavigationBarColor(isVisible)
     }
