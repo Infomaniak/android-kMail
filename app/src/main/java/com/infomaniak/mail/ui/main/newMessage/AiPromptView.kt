@@ -36,8 +36,6 @@ class AiPromptView @JvmOverloads constructor(
     private var onCloseCallback: (() -> Unit)? = null
 
     init {
-        setBackgroundColor(Color.TRANSPARENT)
-
         binding.closeButton.setOnClickListener { onCloseCallback?.invoke() }
     }
 
