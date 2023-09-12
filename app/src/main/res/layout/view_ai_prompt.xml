@@ -54,7 +54,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/marginStandardVerySmall"
-                app:cardBackgroundColor="@color/betaTagBackground"
+                app:cardBackgroundColor="@color/aiBetaTagBackground"
                 app:cardCornerRadius="6dp">
 
                 <TextView
