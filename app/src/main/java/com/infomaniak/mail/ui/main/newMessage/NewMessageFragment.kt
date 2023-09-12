@@ -532,16 +532,16 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun openAiPrompt() {
+    private fun openAiPrompt() = with(binding) {
         setAiPromptVisibility(true)
-        binding.aiPrompt.focusPrompt()
-        binding.newMessageConstraintLayout.descendantFocusability = FOCUS_BLOCK_DESCENDANTS
+        aiPrompt.focusPrompt()
+        newMessageConstraintLayout.descendantFocusability = FOCUS_BLOCK_DESCENDANTS
     }
 
-    private fun closeAiPrompt() {
-        binding.aiPrompt.hideKeyboard()
+    private fun closeAiPrompt() = with(binding) {
         setAiPromptVisibility(false)
-        binding.newMessageConstraintLayout.descendantFocusability = FOCUS_BEFORE_DESCENDANTS
+        aiPrompt.hideKeyboard()
+        newMessageConstraintLayout.descendantFocusability = FOCUS_BEFORE_DESCENDANTS
     }
 
     private fun setAiPromptVisibility(isVisible: Boolean) {

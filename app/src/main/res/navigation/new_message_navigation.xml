@@ -25,16 +25,6 @@
         android:id="@+id/newMessageFragment"
         android:name="com.infomaniak.mail.ui.main.newMessage.NewMessageFragment"
         android:label="fragment_new_message"
-        tools:layout="@layout/fragment_new_message">
-        <action
-            android:id="@+id/action_newMessageFragment_to_aiPromptBottomSheetDialog"
-            app:destination="@id/aiPromptBottomSheetDialog" />
-    </fragment>
-
-    <dialog
-        android:id="@+id/aiPromptBottomSheetDialog"
-        android:name="com.infomaniak.mail.ui.main.newMessage.AiPromptBottomSheetDialog"
-        android:label="AiPromptBottomSheetDialog"
-        tools:layout="@layout/view_ai_prompt" />
+        tools:layout="@layout/fragment_new_message" />
 
 </navigation>
