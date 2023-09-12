@@ -230,8 +230,9 @@ class Thread : RealmObject {
         }
     }
 
-    fun computeDisplayedRecipients(): RealmList<Recipient> {
-        return if (folder.role == FolderRole.DRAFT) to else from
+    fun computeDisplayedRecipients(): RealmList<Recipient> = when (folder.role) {
+        FolderRole.SENT, FolderRole.DRAFT -> to
+        else -> from
     }
 
     fun computePreview(): String {
