@@ -115,7 +115,7 @@ class RecipientFieldView @JvmOverloads constructor(
         get() = autoCompletedContacts.isVisible
         set(value) {
             autoCompletedContacts.isVisible = value
-            computeChevronVisibility()
+            computeEndIconVisibility()
         }
 
     init {
@@ -164,7 +164,7 @@ class RecipientFieldView @JvmOverloads constructor(
 
     fun hideLoader() = with(binding) {
         textInput.isVisible = true
-        computeChevronVisibility()
+        computeEndIconVisibility()
 
         loader.isGone = true
     }
@@ -291,7 +291,7 @@ class RecipientFieldView @JvmOverloads constructor(
         }
 
         transparentButton.isGone = isTextInputAccessible
-        textInput.isVisible = isTextInputAccessible
+        textInputLayout.isVisible = isTextInputAccessible
     }
 
     fun updateContacts(allContacts: List<MergedContact>, newContactMap: MergedContactDictionary) {
@@ -414,11 +414,13 @@ class RecipientFieldView @JvmOverloads constructor(
 
     fun updateOtherFieldsVisibility(otherFieldsAreAllEmpty: Boolean) {
         this.otherFieldsAreAllEmpty = otherFieldsAreAllEmpty
-        computeChevronVisibility()
+        computeEndIconVisibility()
     }
 
-    private fun computeChevronVisibility() {
-        binding.chevron.isVisible = canCollapseEverything && otherFieldsAreAllEmpty && !isAutoCompletionOpened
+    private fun computeEndIconVisibility() = with(binding) {
+        val shouldDisplayChevron = canCollapseEverything && otherFieldsAreAllEmpty && !isAutoCompletionOpened
+        chevron.isVisible = shouldDisplayChevron
+        textInputLayout.isEndIconVisible = !shouldDisplayChevron && !textInput.text.isNullOrEmpty()
     }
 
     fun findAlreadyExistingExternalRecipientsInFields(): Pair<String?, Int> {

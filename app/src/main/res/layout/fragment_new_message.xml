@@ -66,10 +66,9 @@
                 <FrameLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="@dimen/alternativeMargin"
+                    android:layout_marginEnd="@dimen/marginStandardSmall"
                     app:layout_constraintBottom_toBottomOf="@id/fromPrefix"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0"
                     app:layout_constraintStart_toEndOf="@id/fromPrefix"
                     app:layout_constraintTop_toTopOf="@id/fromPrefix">
 
@@ -83,6 +82,7 @@
                         android:focusable="false"
                         android:gravity="center_vertical"
                         android:maxLines="1"
+                        android:paddingHorizontal="@dimen/marginStandardSmall"
                         android:textColor="@color/primaryTextColor"
                         android:visibility="gone"
                         app:iconGravity="end"
