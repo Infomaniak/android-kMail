@@ -420,7 +420,7 @@ class RecipientFieldView @JvmOverloads constructor(
     private fun computeEndIconVisibility() = with(binding) {
         val shouldDisplayChevron = canCollapseEverything && otherFieldsAreAllEmpty && !isAutoCompletionOpened
         chevron.isVisible = shouldDisplayChevron
-        textInputLayout.isEndIconVisible = !shouldDisplayChevron && !textInput.text.isNullOrBlank()
+        textInputLayout.isEndIconVisible = !shouldDisplayChevron && !textInput.text.isNullOrEmpty()
     }
 
     fun findAlreadyExistingExternalRecipientsInFields(): Pair<String?, Int> {
