@@ -217,7 +217,7 @@ class NewMessageFragment : Fragment() {
         setupSendButton()
         setupExternalBanner()
 
-        // aiPrompt.initListeners(::closeAiPrompt)
+        if (newMessageViewModel.isAiPromptOpened) openAiPrompt()
     }
 
     private fun initDraftAndViewModel() {
@@ -620,6 +620,10 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun openAiPrompt() = with(binding) {
+        newMessageViewModel.isAiPromptOpened = true
+
+        // Keyboard is opened inside onCreate() of AiPromptFragment
+
         childFragmentManager
             .beginTransaction()
             .add(aiPromptFragmentContainer.id, aiPromptFragment)
@@ -630,8 +634,16 @@ class NewMessageFragment : Fragment() {
     }
 
     fun closeAiPrompt() = with(binding) {
+        newMessageViewModel.apply {
+            isAiPromptOpened = false
+            aiPrompt = ""
+        }
+
+        aiPromptFragmentContainer.hideKeyboard()
+
         childFragmentManager
             .beginTransaction()
+            .detach(aiPromptFragment)
             .remove(aiPromptFragment)
             .commit()
 
