@@ -54,10 +54,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.jsoup.Jsoup
 import java.util.*
+import javax.inject.Inject
 import com.google.android.material.R as RMaterial
 
-class ThreadAdapter(
-    private val shouldLoadDistantResources: Boolean,
+class ThreadAdapter @Inject constructor(
 ) : ListAdapter<Message, ThreadViewHolder>(MessageDiffCallback()) {
 
     inline val messages: MutableList<Message> get() = currentList
@@ -80,6 +80,13 @@ class ThreadAdapter(
     private val webViewUtils by lazy { WebViewUtils(recyclerView.context) }
 
     private val scaledTouchSlop by lazy { ViewConfiguration.get(recyclerView.context).scaledTouchSlop }
+
+    private var shouldLoadDistantResources: Boolean = false
+
+    operator fun invoke(shouldLoadDistantResources: Boolean): ThreadAdapter {
+        this.shouldLoadDistantResources = shouldLoadDistantResources
+        return this
+    }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         this.recyclerView = recyclerView
