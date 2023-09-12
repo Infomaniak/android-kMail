@@ -92,6 +92,9 @@ class NewMessageViewModel @Inject constructor(
         }
     var selectedSignatureId = -1
 
+    var isAiPromptOpened = false
+    var aiPrompt = ""
+
     var isAutoCompletionOpened = false
     var isEditorExpanded = false
     var shouldSendInsteadOfSave = false
