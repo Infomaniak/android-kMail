@@ -266,10 +266,18 @@ class DraftsActionsWorker @AssistedInject constructor(
     }
 
     private fun Draft.uploadAttachments(): Result {
-        getNotUploadedAttachments(draft = this).forEach { attachment ->
+        val attachmentsToUpload = getNotUploadedAttachments(draft = this)
+        val attachmentsToUploadCount = attachmentsToUpload.count()
+        if (attachmentsToUploadCount > 0) {
+            SentryLog.d(ATTACHMENT_TAG, "Uploading $attachmentsToUploadCount attachments")
+            SentryLog.d(ATTACHMENT_TAG, "Attachments Uuids to localUris : ${attachmentsToUpload.map { it.uuid to it.name }}}")
+        }
+
+        attachmentsToUpload.forEach { attachment ->
             runCatching {
                 attachment.startUpload(localUuid)
             }.onFailure { exception ->
+                SentryLog.d(TAG, "${exception.message}", exception)
                 if ((exception as Exception).isNetworkException()) throw ApiController.NetworkException()
                 throw exception
             }
@@ -283,7 +291,12 @@ class DraftsActionsWorker @AssistedInject constructor(
     }
 
     private fun Attachment.startUpload(localDraftUuid: String) {
-        val attachmentFile = getUploadLocalFile(applicationContext, localDraftUuid).also { if (!it.exists()) return }
+        val attachmentFile = getUploadLocalFile(applicationContext, localDraftUuid).also {
+            if (!it.exists()) {
+                SentryLog.d(ATTACHMENT_TAG, "No local folder for attachment $name")
+                return
+            }
+        }
         val headers = HttpUtils.getHeaders(contentType = null).newBuilder()
             .set("Authorization", "Bearer $userApiToken")
             .addUnsafeNonAscii("x-ws-attachment-filename", name)
@@ -302,6 +315,11 @@ class DraftsActionsWorker @AssistedInject constructor(
             updateLocalAttachment(localDraftUuid, apiResponse.data!!)
             attachmentFile.delete()
             LocalStorageUtils.deleteAttachmentsUploadsDirIfEmpty(applicationContext, localDraftUuid, userId, mailbox.mailboxId)
+        } else {
+            SentryLog.d(
+                tag = ATTACHMENT_TAG,
+                msg = "Upload failed for attachment $name - error : ${apiResponse.translatedError} - data : ${apiResponse.data}",
+            )
         }
     }
 
@@ -337,8 +355,12 @@ class DraftsActionsWorker @AssistedInject constructor(
                     scope.level = SentryLevel.ERROR
                     scope.setExtra("attachmentUuid", attachment.uuid)
                     scope.setExtra("attachmentsCount", "${updatedDraft.attachments.count()}")
-                    scope.setExtra("attachmentsUuids", "${updatedDraft.attachments.map { it.uuid }}")
+                    scope.setExtra(
+                        "attachmentsUuids to attachmentsLocalUris",
+                        "${updatedDraft.attachments.map { it.uuid to it.name }}",
+                    )
                     scope.setExtra("draftUuid", "${updatedDraft.remoteUuid}")
+                    scope.setExtra("draftLocalUuid", updatedDraft.localUuid)
                     scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
                     Sentry.captureMessage("We tried to [${updatedDraft.action?.name}] a Draft, but an Attachment didn't have its `uuid`.")
                 }
@@ -469,6 +491,8 @@ class DraftsActionsWorker @AssistedInject constructor(
     }
 
     companion object {
+        // TODO: Delete logs with this tag when Attachments' `uuid` problem will be resolved
+        private const val ATTACHMENT_TAG = "attachmentUpload"
         private const val TAG = "DraftsActionsWorker"
         private const val USER_ID_KEY = "userId"
         private const val MAILBOX_ID_KEY = "mailboxIdKey"
