@@ -23,7 +23,9 @@ import android.net.Uri
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.*
+import com.infomaniak.lib.core.MatomoCore.*
 import com.infomaniak.lib.core.utils.*
+import com.infomaniak.mail.MatomoMail.OPEN_LOCAL_DRAFT
 import com.infomaniak.mail.MatomoMail.trackExternalEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.MatomoMail.trackSendingDraftEvent
@@ -216,10 +218,13 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private fun getLatestDraft(draftLocalUuid: String?): Draft? {
-        return draftLocalUuid?.let(draftController::getDraft)?.copyFromRealm()
+        return draftLocalUuid?.let(draftController::getDraft)?.copyFromRealm()?.also {
+            context.trackNewMessageEvent(OPEN_LOCAL_DRAFT, TrackerAction.DATA, value = 1.0f)
+        }
     }
 
     private fun fetchDraft(): Draft? {
+        context.trackNewMessageEvent(OPEN_LOCAL_DRAFT, TrackerAction.DATA, value = 0.0f)
         return ApiRepository.getDraft(draftResource!!).data?.also { draft ->
             draft.initLocalValues(messageUid!!)
         }
