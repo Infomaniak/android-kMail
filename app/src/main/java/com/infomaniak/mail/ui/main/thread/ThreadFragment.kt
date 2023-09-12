@@ -204,10 +204,7 @@ class ThreadFragment : Fragment() {
                     trackThreadActionsEvent(ACTION_ARCHIVE_NAME, isFromArchive)
                     archiveThread(navigationArgs.threadUid)
                 }
-                R.id.quickActionDelete -> deleteWithConfirmationPopup(
-                    folderRole = folderRole,
-                    count = 1,
-                ) {
+                R.id.quickActionDelete -> deleteWithConfirmationPopup(folderRole, count = 1) {
                     trackThreadActionsEvent(ACTION_DELETE_NAME)
                     mainViewModel.deleteThread(navigationArgs.threadUid)
                 }

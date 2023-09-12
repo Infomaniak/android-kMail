@@ -131,10 +131,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             }
 
             override fun onDelete() {
-                deleteWithConfirmationPopup(
-                    folderRole = folderRole,
-                    count = 1,
-                ) {
+                deleteWithConfirmationPopup(folderRole, count = 1) {
                     trackBottomSheetThreadActionsEvent(ACTION_DELETE_NAME)
                     mainViewModel.deleteThread(threadUid)
                 }

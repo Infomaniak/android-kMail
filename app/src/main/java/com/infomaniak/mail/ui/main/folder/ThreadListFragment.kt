@@ -365,7 +365,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                     FolderRole.DRAFT, FolderRole.SPAM, FolderRole.TRASH -> true
                     else -> false
                 }
-                deleteWithConfirmationPopup(folderRole = folderRole, count = 1) { deleteThread(thread.uid) }
+                deleteWithConfirmationPopup(folderRole, count = 1) { deleteThread(thread.uid) }
                 shouldKeepItem
             }
             SwipeAction.FAVORITE -> {
