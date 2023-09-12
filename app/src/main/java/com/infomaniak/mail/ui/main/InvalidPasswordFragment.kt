@@ -90,7 +90,10 @@ class InvalidPasswordFragment : Fragment() {
             ).show()
         }
 
-        requestPasswordButton.setOnClickListener { invalidPasswordViewModel.requestPassword() }
+        requestPasswordButton.setOnClickListener {
+            trackInvalidPasswordMailboxEvent("requestPassword")
+            invalidPasswordViewModel.requestPassword()
+        }
     }
 
     private fun observeResults() = with(binding) {
