@@ -318,7 +318,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         } else {
             SentryLog.d(
                 tag = ATTACHMENT_TAG,
-                msg = "Upload failed for attachment $name - error : ${apiResponse.translatedError} - data : ${apiResponse.data}"
+                msg = "Upload failed for attachment $name - error : ${apiResponse.translatedError} - data : ${apiResponse.data}",
             )
         }
     }
@@ -357,7 +357,7 @@ class DraftsActionsWorker @AssistedInject constructor(
                     scope.setExtra("attachmentsCount", "${updatedDraft.attachments.count()}")
                     scope.setExtra(
                         "attachmentsUuids to attachmentsLocalUris",
-                        "${updatedDraft.attachments.map { it.uuid to it.name }}"
+                        "${updatedDraft.attachments.map { it.uuid to it.name }}",
                     )
                     scope.setExtra("draftUuid", "${updatedDraft.remoteUuid}")
                     scope.setExtra("draftLocalUuid", updatedDraft.localUuid)
@@ -491,7 +491,7 @@ class DraftsActionsWorker @AssistedInject constructor(
     }
 
     companion object {
-        // TODO: Delete logs with this tag when attachments uuid problem will be resolve
+        // TODO: Delete logs with this tag when Attachments' `uuid` problem will be resolved
         private const val ATTACHMENT_TAG = "attachmentUpload"
         private const val TAG = "DraftsActionsWorker"
         private const val USER_ID_KEY = "userId"
