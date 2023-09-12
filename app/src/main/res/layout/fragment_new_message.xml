@@ -699,7 +699,7 @@
 
 
     <FrameLayout
-        android:id="@+id/aiPromptGroup"
+        android:id="@+id/aiPromptLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone">
@@ -714,15 +714,12 @@
             android:src="#50000000"
             tools:ignore="KeyboardInaccessibleWidget" />
 
-        <com.infomaniak.mail.ui.main.newMessage.AiPromptView
-            android:id="@+id/aiPrompt"
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/aiPromptFragmentContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:translationZ="10dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            android:translationZ="10dp" />
 
     </FrameLayout>
 </FrameLayout>
