@@ -35,6 +35,7 @@
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/searchTextInput"
             style="@style/SearchTextInputEditTextStyle"
+            android:backgroundTint="@android:color/transparent"
             android:drawablePadding="@dimen/marginStandardSmall"
             android:hint="@string/searchFieldPlaceholder" />
     </com.google.android.material.textfield.TextInputLayout>
