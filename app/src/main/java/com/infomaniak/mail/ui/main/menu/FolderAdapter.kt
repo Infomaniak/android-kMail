@@ -157,7 +157,7 @@ class FolderAdapter @Inject constructor(
                 isHidden = folder.isHidden
                 isCollapsed = folder.isCollapsed
                 canBeCollapsed = folder.canBeCollapsed
-                setIndent(folderIndent, hasCollapsableFolder!!, canBeCollapsed)
+                setIndent(folderIndent, hasCollapsableFolder ?: false, canBeCollapsed)
                 setCollapsingButtonContentDescription(folderName)
             }
             is SelectableMailboxItemView, is UnreadItemView -> {
@@ -183,11 +183,11 @@ class FolderAdapter @Inject constructor(
 
             val isFirstTime = hasCollapsableFolder == null
             val collapsableFolderExistenceHasChanged = newHasCollapsableFolder != hasCollapsableFolder
+            hasCollapsableFolder = newHasCollapsableFolder
+
             if (!isFirstTime && collapsableFolderExistenceHasChanged) {
                 Dispatchers.Main { notifyDataSetChanged() }
             }
-
-            hasCollapsableFolder = newHasCollapsableFolder
         }
     }
 
