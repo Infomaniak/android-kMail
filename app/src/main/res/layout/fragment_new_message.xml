@@ -721,7 +721,8 @@
             android:layout_gravity="bottom"
             android:clickable="true"
             android:translationZ="10dp"
-            tools:ignore="KeyboardInaccessibleWidget" />
+            tools:ignore="KeyboardInaccessibleWidget"
+            tools:name="com.infomaniak.mail.ui.main.newMessage.AiPromptFragment" />
 
     </FrameLayout>
 </FrameLayout>
