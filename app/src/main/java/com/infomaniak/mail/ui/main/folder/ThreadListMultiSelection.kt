@@ -39,7 +39,7 @@ import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
-import com.infomaniak.mail.utils.createDescriptionDialog
+import com.infomaniak.mail.utils.deleteWithConfirmationPopup
 import com.infomaniak.mail.utils.updateNavigationBarColor
 
 class ThreadListMultiSelection {
@@ -95,31 +95,13 @@ class ThreadListMultiSelection {
                     toggleThreadsFavoriteStatus(selectedThreadsUids, shouldMultiselectFavorite)
                     isMultiSelectOn = false
                 }
-                R.id.quickActionDelete -> {
-
-                    fun multiSelectDelete() {
-                        threadListFragment.trackMultiSelectActionEvent(ACTION_DELETE_NAME, selectedThreadsCount)
-                        deleteThreads(selectedThreadsUids)
-                        isMultiSelectOn = false
-                    }
-
-                    fun confirmMultiSelectDelete() {
-                        val resources = threadListFragment.resources
-                        val titleId = R.plurals.threadListDeletionConfirmationAlertTitle
-                        threadListFragment.createDescriptionDialog(
-                            title = resources.getQuantityString(titleId, selectedThreadsCount, selectedThreadsCount),
-                            description = resources.getQuantityString(
-                                R.plurals.threadListDeletionConfirmationAlertDescription,
-                                selectedThreadsCount,
-                            ),
-                            onPositiveButtonClicked = { multiSelectDelete() },
-                        ).show()
-                    }
-
-                    when (currentFolder.value?.role) {
-                        FolderRole.DRAFT, FolderRole.SPAM, FolderRole.TRASH -> confirmMultiSelectDelete()
-                        else -> multiSelectDelete()
-                    }
+                R.id.quickActionDelete -> threadListFragment.deleteWithConfirmationPopup(
+                    folderRole = getActionFolderRole(selectedThreads.firstOrNull()),
+                    count = selectedThreadsCount,
+                ) {
+                    threadListFragment.trackMultiSelectActionEvent(ACTION_DELETE_NAME, selectedThreadsCount)
+                    deleteThreads(selectedThreadsUids)
+                    isMultiSelectOn = false
                 }
                 R.id.quickActionMenu -> {
                     threadListFragment.trackMultiSelectActionEvent(OPEN_ACTION_BOTTOM_SHEET, selectedThreadsCount)

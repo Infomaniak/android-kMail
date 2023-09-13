@@ -324,7 +324,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                     else -> throw IllegalStateException("Only SwipeDirection.LEFT_TO_RIGHT and SwipeDirection.RIGHT_TO_LEFT can be triggered")
                 }
 
-                val shouldKeepItem = performSwipeActionOnThread(swipeAction, item.uid)
+                val shouldKeepItem = performSwipeActionOnThread(swipeAction, item)
 
                 threadListAdapter.apply {
                     blockOtherSwipes()
@@ -344,8 +344,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
      * The boolean return value is used to know if we should keep the Thread in
      * the RecyclerView (true), or remove it when the swipe is done (false).
      */
-    private fun performSwipeActionOnThread(swipeAction: SwipeAction, threadUid: String): Boolean = with(mainViewModel) {
+    private fun performSwipeActionOnThread(swipeAction: SwipeAction, thread: Thread): Boolean = with(mainViewModel) {
         trackEvent("swipeActions", swipeAction.matomoValue, TrackerAction.DRAG)
+
+        val folderRole = thread.folder.role
 
         val shouldKeepItemBecauseOfAction = when (swipeAction) {
             SwipeAction.TUTORIAL -> {
@@ -355,36 +357,40 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 true
             }
             SwipeAction.ARCHIVE -> {
-                archiveThread(threadUid)
-                isCurrentFolderRole(FolderRole.ARCHIVE)
+                archiveThread(thread.uid)
+                folderRole == FolderRole.ARCHIVE
             }
             SwipeAction.DELETE -> {
-                deleteThread(threadUid)
-                false
+                val shouldKeepItem = when (folderRole) {
+                    FolderRole.DRAFT, FolderRole.SPAM, FolderRole.TRASH -> true
+                    else -> false
+                }
+                deleteWithConfirmationPopup(folderRole, count = 1) { deleteThread(thread.uid) }
+                shouldKeepItem
             }
             SwipeAction.FAVORITE -> {
-                toggleThreadFavoriteStatus(threadUid)
+                toggleThreadFavoriteStatus(thread.uid)
                 true
             }
             SwipeAction.MOVE -> {
-                animatedNavigation(ThreadListFragmentDirections.actionThreadListFragmentToMoveFragment(arrayOf(threadUid)))
+                animatedNavigation(ThreadListFragmentDirections.actionThreadListFragmentToMoveFragment(arrayOf(thread.uid)))
                 false
             }
             SwipeAction.QUICKACTIONS_MENU -> {
                 safeNavigate(
                     ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(
-                        threadUid = threadUid,
+                        threadUid = thread.uid,
                         shouldLoadDistantResources = false,
                     )
                 )
                 true
             }
             SwipeAction.READ_UNREAD -> {
-                toggleThreadSeenStatus(threadUid)
+                toggleThreadSeenStatus(thread.uid)
                 currentFilter.value != ThreadFilter.UNSEEN
             }
             SwipeAction.SPAM -> {
-                toggleThreadSpamStatus(threadUid)
+                toggleThreadSpamStatus(thread.uid)
                 false
             }
             SwipeAction.POSTPONE -> {

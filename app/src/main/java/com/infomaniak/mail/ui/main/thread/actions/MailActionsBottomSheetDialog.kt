@@ -23,8 +23,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.Folder.FolderRole
-import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.BottomSheetActionsMenuBinding
 import com.infomaniak.mail.ui.MainViewModel
 
@@ -104,10 +102,6 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         val (favoriteIconRes, favoriteText) = computeFavoriteStyle(isFavorite)
         setIconResource(favoriteIconRes)
         setText(favoriteText)
-    }
-
-    fun setArchiveUi(message: Message) {
-        setArchiveUi(isFromArchive = mainViewModel.getActionFolderRole(message) == FolderRole.ARCHIVE)
     }
 
     fun setArchiveUi(isFromArchive: Boolean) = with(binding.archive) {
