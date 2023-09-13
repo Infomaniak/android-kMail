@@ -151,11 +151,13 @@ class Message : RealmObject {
         }
 
     fun sender(folderRole: FolderRole? = null): Recipient? {
+
         val recipients = when (folderRole ?: folder.role) {
             FolderRole.SENT, FolderRole.DRAFT -> to
             else -> from
         }
-        return recipients.firstOrNull().also { if (it == null) SentryLog.e("ThreadAdapter", "Message $uid has empty from") }
+
+        return recipients.firstOrNull().also { if (it == null) SentryLog.e("ThreadAdapter", "Message $uid has empty sender") }
     }
 
     val dkimStatus: MessageDKIM get() = enumValueOfOrNull<MessageDKIM>(_dkimStatus) ?: MessageDKIM.VALID

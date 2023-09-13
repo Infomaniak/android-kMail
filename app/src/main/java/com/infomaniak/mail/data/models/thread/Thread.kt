@@ -211,22 +211,24 @@ class Thread : RealmObject {
         }
     }
 
-    fun computeAvatarRecipient(): Recipient? = runCatching {
-        val message = messages.lastOrNull { it.folder.role != FolderRole.DRAFT && it.folder.role != FolderRole.SENT }
-            ?: messages.last()
-        return@runCatching message.sender()
-    }.getOrElse { throwable ->
-        Sentry.withScope { scope ->
-            scope.setExtra("thread.folder.name", folder.name)
-            scope.setExtra("thread.folder.id", folder.id)
-            scope.setExtra("thread.uid", uid)
-            scope.setExtra("thread.messages.count", "${messages.count()}")
-            scope.setExtra("thread.duplicates.count", "${duplicates.count()}")
-            scope.setExtra("thread.isFromSearch", "$isFromSearch")
-            scope.setExtra("thread.hasDrafts", "$hasDrafts")
-            Sentry.captureException(throwable)
+    fun computeAvatarRecipient(): Recipient? {
+        return runCatching {
+            val message = messages.lastOrNull { it.folder.role != FolderRole.DRAFT && it.folder.role != FolderRole.SENT }
+            (message ?: messages.last()).sender()
+        }.getOrElse { throwable ->
+            Sentry.withScope { scope ->
+                scope.setExtra("thread.folder.name", folder.name)
+                scope.setExtra("thread.folder.id", folder.id)
+                scope.setExtra("thread.uid", uid)
+                scope.setExtra("thread.messages.count", "${messages.count()}")
+                scope.setExtra("thread.duplicates.count", "${duplicates.count()}")
+                scope.setExtra("thread.isFromSearch", "$isFromSearch")
+                scope.setExtra("thread.hasDrafts", "$hasDrafts")
+                Sentry.captureException(throwable)
+            }
+
+            null
         }
-        return@getOrElse null
     }
 
     fun computeDisplayedRecipients(): RealmList<Recipient> = when (folder.role) {
