@@ -225,6 +225,8 @@ class NewMessageFragment : Fragment() {
         setupExternalBanner()
 
         if (newMessageViewModel.isAiPromptOpened) openAiPrompt()
+
+        scrim.setOnClickListener { closeAiPrompt() }
     }
 
     private fun initDraftAndViewModel() {
