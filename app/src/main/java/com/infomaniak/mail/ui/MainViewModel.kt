@@ -156,6 +156,8 @@ class MainViewModel @Inject constructor(
         folder?.let { threadController.getThreadsAsync(it, filter) } ?: emptyFlow()
     }.asLiveData(ioCoroutineContext)
 
+    val createNewFolderResult = SingleLiveEvent<String?>(null)
+
     private fun observeFolderAndFilter() = MediatorLiveData<Pair<Folder?, ThreadFilter>>().apply {
         value = currentFolder.value to currentFilter.value!!
         addSource(currentFolder) { value = it to value!!.second }
@@ -830,7 +832,9 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun createNewFolder(name: String) = viewModelScope.launch(ioCoroutineContext) { createNewFolderSync(name) }
+    fun createNewFolder(name: String) = viewModelScope.launch(ioCoroutineContext) {
+        createNewFolderResult.postValue(createNewFolderSync(name))
+    }
 
     fun moveToNewFolder(
         name: String,

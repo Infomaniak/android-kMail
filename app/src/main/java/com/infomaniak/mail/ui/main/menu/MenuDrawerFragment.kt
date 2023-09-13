@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.menu
 
 import android.annotation.SuppressLint
+import android.content.DialogInterface.BUTTON_POSITIVE
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -31,10 +32,12 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.button.MaterialButton
 import com.infomaniak.lib.bugtracker.BugTrackerActivity
 import com.infomaniak.lib.bugtracker.BugTrackerActivityArgs
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.context
+import com.infomaniak.lib.core.utils.hideProgress
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackCreateFolderEvent
@@ -88,6 +91,7 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
         observeFoldersLive()
         observeQuotasLive()
         observePermissionsLive()
+        observeNewFolderCreation()
     }
 
     private fun setupListeners() = with(binding) {
@@ -253,6 +257,15 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
     private fun observePermissionsLive() {
         mainViewModel.currentPermissionsLive.observe(viewLifecycleOwner) { permissions ->
             binding.restoreMails.isVisible = permissions?.canRestoreEmails == true
+        }
+    }
+
+    private fun observeNewFolderCreation() {
+        mainViewModel.createNewFolderResult.observe(viewLifecycleOwner) {
+            createFolderDialog.apply {
+                (getButton(BUTTON_POSITIVE) as MaterialButton).hideProgress(R.string.buttonCreate)
+                dismiss()
+            }
         }
     }
 
