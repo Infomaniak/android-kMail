@@ -92,7 +92,7 @@
 
     <!-- TODO: Use correct colors for AI -->
     <color name="ai_light">#8D4AFF</color>
-    <color name="ai_dark">#8D4AFF</color>
+    <color name="ai_dark">#BF99FF</color>
 
     <!-- Backgrounds -->
     <color name="searchBarBackgroundColor">@color/polar_bear</color>
