@@ -87,7 +87,7 @@ class ThreadViewModel @Inject constructor(
             }
         }
 
-        messageController.getSortedMessagesAsync(threadUid)
+        messageController.getSortedAndNotHiddenMessagesAsync(threadUid)
             ?.map { results -> results.list.map { splitBody(it) } }
             ?.asLiveData()
             ?.let { emitSource(it) }
@@ -153,7 +153,7 @@ class ThreadViewModel @Inject constructor(
     fun fetchMessagesHeavyData(messages: List<Message>) {
         fetchMessagesJob?.cancel()
         fetchMessagesJob = viewModelScope.launch(ioCoroutineContext) {
-            threadController.fetchMessagesHeavyData(messages, mailbox, mailboxContentRealm())
+            threadController.fetchMessagesHeavyData(messages, mailboxContentRealm())
         }
     }
 

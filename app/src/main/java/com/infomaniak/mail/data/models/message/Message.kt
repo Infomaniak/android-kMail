@@ -120,6 +120,8 @@ class Message : RealmObject {
     var isFromSearch: Boolean = false
     @Transient
     var shortUid: Int = -1
+    @Transient
+    private var _hiddenReason: String? = null
     //endregion
 
     //region UI data (Transient & Ignore)
@@ -180,6 +182,17 @@ class Message : RealmObject {
         ACKNOWLEDGED,
     }
 
+    var hiddenReason: HiddenReason?
+        get() = enumValueOfOrNull<HiddenReason>(_hiddenReason)
+        set(value) {
+            _hiddenReason = value?.name
+        }
+
+    enum class HiddenReason {
+        DELETED,
+        OTHER,
+    }
+
     fun initLocalValues(
         date: RealmInstant,
         isFullyDownloaded: Boolean,
@@ -209,7 +222,13 @@ class Message : RealmObject {
 
     // We had a bug once where we lost the Attachments.
     // Since we only fetch sdfgsdfgsqdjkfgsqjkfgqsk
-    fun isFullyDownloaded(): Boolean = if (hasAttachments && attachments.isEmpty()) false else _isFullyDownloaded
+    fun isFullyDownloaded(): Boolean {
+        return when {
+            hasAttachments && attachments.isEmpty() -> false
+            hiddenReason != null -> true
+            else -> _isFullyDownloaded
+        }
+    }
 
     private inline fun <reified T : TypedRealmObject> RealmList<T>.detachedFromRealm(depth: UInt = UInt.MIN_VALUE): List<T> {
         return if (isManaged()) copyFromRealm(depth) else this
@@ -288,4 +307,8 @@ class Message : RealmObject {
     override fun equals(other: Any?) = other === this || (other is Message && other.uid == uid)
 
     override fun hashCode(): Int = uid.hashCode()
+
+    companion object {
+        val hiddenReasonPropertyName = Message::_hiddenReason.name
+    }
 }

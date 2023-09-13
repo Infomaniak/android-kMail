@@ -369,6 +369,12 @@ class ThreadFragment : Fragment() {
 
         fun onMessagesUpdate(messages: List<Message>) {
             SentryLog.i("UI", "Received ${messages.size} messages")
+
+            if (messages.isEmpty()) {
+                leaveThread()
+                return
+            }
+
             threadViewModel.fetchMessagesHeavyData(messages)
             threadAdapter.submitList(messages)
             scrollToFirstUnseenMessage(messages)
