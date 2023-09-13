@@ -166,6 +166,20 @@
         <item name="android:fontFamily">@font/suisseintl_medium</item>
     </style>
 
+    <style name="TextButtonPrimaryMedium" parent="TextButtonPrimary">
+        <item name="android:layout_height">@dimen/textButtonPrimaryMediumHeight</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:paddingLeft">20dp</item>
+        <item name="android:paddingRight">20dp</item>
+    </style>
+
+    <style name="TextButtonSecondaryMedium" parent="TextButtonSecondary">
+        <item name="android:layout_height">@dimen/textButtonPrimaryMediumHeight</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:paddingLeft">20dp</item>
+        <item name="android:paddingRight">20dp</item>
+    </style>
+
     <style name="TextButtonAlerts" parent="TextButtonSecondary">
         <item name="android:fontFamily">@font/suisseintl_regular</item>
         <item name="android:minHeight">0dp</item>
@@ -420,14 +434,10 @@
         <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlayDialogRounded</item>
     </style>
 
-    <style name="PositiveButtonStyle" parent="TextButtonPrimary">
-        <item name="android:minWidth">0dp</item>
-        <item name="android:padding">@dimen/marginStandardMedium</item>
-    </style>
+    <style name="PositiveButtonStyle" parent="TextButtonPrimaryMedium" />
 
-    <style name="DeletePositiveButtonStyle" parent="TextButtonSecondary">
-        <item name="android:minWidth">0dp</item>
-        <item name="android:padding">@dimen/marginStandardMedium</item>
+    <style name="DeletePositiveButtonStyle" parent="TextButtonSecondaryMedium">
+        <item name="android:layout_marginEnd">@dimen/marginStandardVerySmall</item>
     </style>
 
     <style name="ShapeAppearanceOverlayDialogRounded">

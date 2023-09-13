@@ -37,6 +37,7 @@
     <dimen name="maxSearchChipWidth">300dp</dimen>
     <dimen name="contactPopupMaxWidth">300dp</dimen>
     <dimen name="textButtonPrimaryHeight">56dp</dimen>
+    <dimen name="textButtonPrimaryMediumHeight">40dp</dimen>
 
     <!-- Menu Drawer -->
     <dimen name="decoratedItemViewHeight">48dp</dimen>
