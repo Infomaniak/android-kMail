@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.menu
 
 import android.annotation.SuppressLint
+import android.content.DialogInterface.BUTTON_NEGATIVE
 import android.content.DialogInterface.BUTTON_POSITIVE
 import android.content.Intent
 import android.os.Bundle
@@ -264,6 +265,7 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
         mainViewModel.createNewFolderResult.observe(viewLifecycleOwner) {
             createFolderDialog.apply {
                 (getButton(BUTTON_POSITIVE) as MaterialButton).hideProgress(R.string.buttonCreate)
+                (getButton(BUTTON_NEGATIVE) as MaterialButton).isEnabled = true
                 dismiss()
             }
         }

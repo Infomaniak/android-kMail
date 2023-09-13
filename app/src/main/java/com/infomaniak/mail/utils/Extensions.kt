@@ -50,6 +50,7 @@ import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.SimpleColorFilter
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
+import com.github.razir.progressbutton.DrawableButton.Companion.GRAVITY_CENTER
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.color.MaterialColors
@@ -477,7 +478,8 @@ fun Fragment.createInputDialog(
                 setOnClickListener {
                     onPositiveButtonClicked(textInput.trimmedText)
                     hideKeyboard()
-                    (this as MaterialButton).showProgress()
+                    (this as MaterialButton).showProgress(gravity = GRAVITY_CENTER)
+                    getButton(AlertDialog.BUTTON_NEGATIVE).isEnabled = false
                 }
                 setText(confirmButtonText)
                 isEnabled = false
@@ -499,8 +501,9 @@ fun Fragment.createInputDialog(
 
     return@with MaterialAlertDialogBuilder(context)
         .setView(root)
+        .setCancelable(false)
         .setPositiveButton(confirmButtonText, null)
-        .setNegativeButton(RCore.string.buttonCancel, null)
+        .setNegativeButton(RCore.string.buttonCancel) { dialog, _ -> dialog.dismiss() }
         .setOnDismissListener {
             errorJob?.cancel()
             textInput.text?.clear()
