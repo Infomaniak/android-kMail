@@ -49,6 +49,10 @@
     <string name="addUnknownRecipientAlreadyUsed">El correo electrónico ya está utilizado</string>
     <string name="addUnknownRecipientInvalidEmail">El correo electrónico no es válido</string>
     <string name="addUnknownRecipientTitle">Añadir un destinatario</string>
+    <string name="aiPromptPlaceholder">Dígale al asistente de redacción lo que quiere escribir. Por ejemplo, \"un correo electrónico de agradecimiento por un regalo de bienvenida\".</string>
+    <string name="aiPromptTag">Beta</string>
+    <string name="aiPromptTitle">Asistente de redacción</string>
+    <string name="aiPromptValidateButton">Genere</string>
     <string name="alertBlockedImagesDescription">Para su seguridad hemos bloqueado ciertos contenidos en su mensaje.</string>
     <string name="alertBlockedImagesDisplayContent">Mostrar el contenido</string>
     <string name="appSecurityDescription">Protege el acceso a tu aplicación activando el bloqueo del teléfono.</string>
