@@ -312,6 +312,9 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         val apiResponse = ApiController.json.decodeFromString<ApiResponse<Attachment>>(response.body?.string() ?: "")
         if (apiResponse.isSuccess() && apiResponse.data != null) {
+            if (apiResponse.data?.uuid == null) {
+                SentryLog.e(ATTACHMENT_TAG, "Attachment uuid null from API, this should not happen")
+            }
             updateLocalAttachment(localDraftUuid, apiResponse.data!!)
             attachmentFile.delete()
             LocalStorageUtils.deleteAttachmentsUploadsDirIfEmpty(applicationContext, localDraftUuid, userId, mailbox.mailboxId)
