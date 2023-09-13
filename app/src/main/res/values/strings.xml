@@ -55,6 +55,10 @@
     <string name="addUnknownRecipientAlreadyUsed">The email is already used</string>
     <string name="addUnknownRecipientInvalidEmail">The email is invalid</string>
     <string name="addUnknownRecipientTitle">Add a recipient</string>
+    <string name="aiPromptPlaceholder">Tell the writing assistant what you want to write. For example, \"a thank-you email for a welcome gift\".</string>
+    <string name="aiPromptTag">Beta</string>
+    <string name="aiPromptTitle">Writing assistant</string>
+    <string name="aiPromptValidateButton">Generate</string>
     <string name="alertBlockedImagesDescription">For your safety certain contents have been blocked from your message.</string>
     <string name="alertBlockedImagesDisplayContent">Display content</string>
     <string name="appSecurityDescription">Protect access to your app by enabling your phone lock.</string>
