@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.newMessage
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -25,13 +26,20 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.lib.core.utils.showKeyboard
+import com.infomaniak.lib.core.utils.toPx
 import com.infomaniak.mail.databinding.FragmentAiPromptBinding
+import com.google.android.material.R as RMaterial
+
 
 class AiPromptFragment : Fragment() {
 
     private lateinit var binding: FragmentAiPromptBinding
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
+
+    private val m3BottomSheetMaxWidthPx by lazy { requireContext().resources.getDimension(RMaterial.dimen.material_bottom_sheet_max_width) }
+
 
     private val promptTextWatcher by lazy {
         object : TextWatcher {
@@ -41,12 +49,28 @@ class AiPromptFragment : Fragment() {
         }
     }
 
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        setCorrectSheetMargins()
+    }
+
+    private fun setCorrectSheetMargins() = with(binding.root) {
+        val screenWidth = requireContext().resources.displayMetrics.widthPixels
+        val isScreenTooBig = screenWidth > m3BottomSheetMaxWidthPx
+        val horizontalMargin = if (isScreenTooBig) m3BottomSheetHorizontalMarginPx else NO_MARGIN
+
+        setMarginsRelative(start = horizontalMargin, end = horizontalMargin)
+    }
+
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentAiPromptBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
+
+        setCorrectSheetMargins()
 
         prompt.showKeyboard()
         closeButton.setOnClickListener {
@@ -72,5 +96,11 @@ class AiPromptFragment : Fragment() {
     private fun onPromptChanged(it: Editable?) = with(binding) {
         generateButton.isEnabled = it?.isNotEmpty() ?: false
         newMessageViewModel.aiPrompt = it.toString()
+
+    }
+
+    private companion object {
+        private const val NO_MARGIN = 0
+        private val m3BottomSheetHorizontalMarginPx by lazy { 56.toPx() }
     }
 }
