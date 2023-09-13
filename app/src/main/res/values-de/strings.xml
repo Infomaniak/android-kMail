@@ -49,6 +49,10 @@
     <string name="addUnknownRecipientAlreadyUsed">Die E-Mail wird bereits verwendet</string>
     <string name="addUnknownRecipientInvalidEmail">Die E-Mail ist ungültig</string>
     <string name="addUnknownRecipientTitle">Einen Empfänger hinzufügen</string>
+    <string name="aiPromptPlaceholder">Sagen Sie dem Schreibassistenten, was Sie schreiben wollen. Zum Beispiel: \"eine Dankes-E-Mail für ein Willkommensgeschenk\".</string>
+    <string name="aiPromptTag">Beta</string>
+    <string name="aiPromptTitle">Schreibassistent</string>
+    <string name="aiPromptValidateButton">Erzeugen Sie</string>
     <string name="alertBlockedImagesDescription">Bestimmte Inhalte Ihrer Nachricht wurden zu Ihrer Sicherheit blockiert.</string>
     <string name="alertBlockedImagesDisplayContent">Inhalt anzeigen</string>
     <string name="appSecurityDescription">Schützen Sie den Zugriff auf Ihre App, indem Sie Ihre Telefonsperre aktivieren.</string>
