@@ -15,101 +15,114 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    style="@style/AiCardView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".ui.main.newMessage.AiPromptView">
+    android:orientation="horizontal"
+    tools:context=".ui.main.newMessage.AiPromptFragment">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="@dimen/marginStandardMedium">
+    <com.google.android.material.card.MaterialCardView
+        style="@style/AiCardView"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:clickable="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_max="@dimen/material_bottom_sheet_max_width"
+        app:rippleColor="@android:color/transparent"
+        tools:ignore="KeyboardInaccessibleWidget">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/marginStandardMedium"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:orientation="vertical"
+            android:padding="@dimen/marginStandardMedium">
 
-            <ImageView
-                android:layout_width="@dimen/mediumIconSize"
-                android:layout_height="@dimen/mediumIconSize"
-                android:layout_marginEnd="@dimen/marginStandardSmall"
-                android:importantForAccessibility="no"
-                android:src="@drawable/ic_ai_magic_wand" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/aiPromptTitle" />
-
-            <com.google.android.material.card.MaterialCardView
-                style="@style/CardViewMail"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/marginStandardVerySmall"
-                app:cardBackgroundColor="@color/aiBetaTagBackground"
-                app:cardCornerRadius="6dp">
-
-                <TextView
-                    style="@style/LabelMedium"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
-                    android:layout_marginVertical="2dp"
-                    android:text="@string/aiPromptTag"
-                    android:textColor="@color/aiBetaTagTextColor" />
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/closeButton"
-                style="@style/IconButtonSmall"
-                android:theme="@style/AiCursorAndPrimaryColorTheme"
-                app:icon="@drawable/ic_close_small" />
-
-        </LinearLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginBottom="@dimen/marginStandardMedium"
-            android:layout_weight="1"
-            android:theme="@style/AiCursorAndPrimaryColorTheme"
-            app:hintEnabled="false">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/prompt"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="top|start"
-                android:hint="@string/aiPromptPlaceholder"
-                android:inputType="textMultiLine|textCapSentences|textAutoCorrect"
-                android:theme="@style/AiCursorAndPrimaryColorTheme" />
+                android:layout_marginBottom="@dimen/marginStandardMedium"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-        </com.google.android.material.textfield.TextInputLayout>
+                <ImageView
+                    android:layout_width="@dimen/mediumIconSize"
+                    android:layout_height="@dimen/mediumIconSize"
+                    android:layout_marginEnd="@dimen/marginStandardSmall"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_ai_magic_wand" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/generateButton"
-            style="@style/TextButtonPrimaryMedium"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:enabled="false"
-            android:text="@string/aiPromptValidateButton"
-            android:theme="@style/AiCursorAndPrimaryColorTheme"
-            tools:enabled="true" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/aiPromptTitle" />
 
-    </LinearLayout>
-</com.google.android.material.card.MaterialCardView>
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/CardViewMail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/marginStandardVerySmall"
+                    app:cardBackgroundColor="@color/aiBetaTagBackground"
+                    app:cardCornerRadius="6dp">
+
+                    <TextView
+                        style="@style/LabelMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
+                        android:layout_marginVertical="2dp"
+                        android:text="@string/aiPromptTag"
+                        android:textColor="@color/aiBetaTagTextColor" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/closeButton"
+                    style="@style/IconButtonSmall"
+                    android:theme="@style/AiCursorAndPrimaryColorTheme"
+                    app:icon="@drawable/ic_close_small" />
+
+            </LinearLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginBottom="@dimen/marginStandardMedium"
+                android:layout_weight="1"
+                android:theme="@style/AiCursorAndPrimaryColorTheme"
+                app:hintEnabled="false">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/prompt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="top|start"
+                    android:hint="@string/aiPromptPlaceholder"
+                    android:inputType="textMultiLine|textCapSentences|textAutoCorrect"
+                    android:theme="@style/AiCursorAndPrimaryColorTheme" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/generateButton"
+                style="@style/TextButtonPrimaryMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:enabled="false"
+                android:text="@string/aiPromptValidateButton"
+                android:theme="@style/AiCursorAndPrimaryColorTheme"
+                tools:enabled="true" />
+
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+</androidx.constraintlayout.widget.ConstraintLayout>
