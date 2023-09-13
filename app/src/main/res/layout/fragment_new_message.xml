@@ -711,7 +711,7 @@
             android:clickable="true"
             android:focusable="false"
             android:importantForAccessibility="no"
-            android:src="#50000000"
+            android:src="@color/scrim_translucent"
             tools:ignore="KeyboardInaccessibleWidget" />
 
         <androidx.fragment.app.FragmentContainerView
