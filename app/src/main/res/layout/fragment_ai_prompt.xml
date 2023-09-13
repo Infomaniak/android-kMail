@@ -47,7 +47,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Assistant à la rédaction" />
+                android:text="@string/aiPromptTitle" />
 
             <com.google.android.material.card.MaterialCardView
                 style="@style/CardViewMail"
@@ -63,7 +63,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
                     android:layout_marginVertical="2dp"
-                    android:text="Beta"
+                    android:text="@string/aiPromptTag"
                     android:textColor="@color/aiBetaTagTextColor" />
 
             </com.google.android.material.card.MaterialCardView>
@@ -94,7 +94,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="top|start"
-                android:hint="Dites à l’assistant de rédaction ce que vous souhaitez écrire. Par exemple “un mail de remerciement pour un cadeau de bienvenue”."
+                android:hint="@string/aiPromptPlaceholder"
                 android:inputType="textMultiLine|textCapSentences|textAutoCorrect"
                 android:theme="@style/AiCursorAndPrimaryColorTheme" />
 
@@ -107,7 +107,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:enabled="false"
-            android:text="Générer"
+            android:text="@string/aiPromptValidateButton"
             android:theme="@style/AiCursorAndPrimaryColorTheme"
             tools:enabled="true" />
 

@@ -49,6 +49,10 @@
     <string name="addUnknownRecipientAlreadyUsed">L’e-mail è già utilizzata</string>
     <string name="addUnknownRecipientInvalidEmail">L’e-mail non è valida</string>
     <string name="addUnknownRecipientTitle">Aggiungi un destinatario</string>
+    <string name="aiPromptPlaceholder">Comunica all’assistente di scrittura cosa vuoi scrivere. Ad esempio, \"un’e-mail di ringraziamento per un regalo gradito\".</string>
+    <string name="aiPromptTag">Beta</string>
+    <string name="aiPromptTitle">Assistente di scrittura</string>
+    <string name="aiPromptValidateButton">Genera</string>
     <string name="alertBlockedImagesDescription">Per la vostra sicurezza abbiamo bloccato alcuni contenuti del vostro messaggio.</string>
     <string name="alertBlockedImagesDisplayContent">Visualizza il contenuto</string>
     <string name="appSecurityDescription">Proteggete l’accesso alla vostra applicazione attivando il blocco del telefono.</string>
