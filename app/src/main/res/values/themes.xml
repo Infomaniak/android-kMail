@@ -42,7 +42,7 @@
         <item name="android:popupWindowStyle">@style/PopupWindowStyle</item>
         <item name="android:statusBarColor">@color/backgroundColor</item>
         <item name="android:textColor">@color/primaryTextColor</item>
-        <item name="android:textColorHighlight">@color/text_color_highlight</item>
+        <item name="android:textColorHighlight">@color/color_primary_translucent_text_highlight</item>
         <item name="android:textColorHint">@color/tertiaryTextColor</item>
         <item name="android:textSize">16sp</item>
         <item name="android:windowBackground">@color/backgroundColor</item>
