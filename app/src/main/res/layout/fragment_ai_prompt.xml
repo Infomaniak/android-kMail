@@ -76,8 +76,8 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/closeButton"
                 style="@style/IconButtonSmall"
-                app:icon="@drawable/ic_close_small"
-                app:rippleColor="@color/ai_color_translucent_ripple" />
+                android:theme="@style/AiCursorAndPrimaryColorTheme"
+                app:icon="@drawable/ic_close_small" />
 
         </LinearLayout>
 
@@ -96,18 +96,19 @@
                 android:gravity="top|start"
                 android:hint="Dites à l’assistant de rédaction ce que vous souhaitez écrire. Par exemple “un mail de remerciement pour un cadeau de bienvenue”."
                 android:inputType="textMultiLine|textCapSentences|textAutoCorrect"
-                android:textColorHighlight="@color/ai_color_translucent_text_highlight" />
+                android:theme="@style/AiCursorAndPrimaryColorTheme" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/generateButton"
-            style="@style/AiButton"
+            style="@style/TextButtonPrimaryMedium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:enabled="false"
             android:text="Générer"
+            android:theme="@style/AiCursorAndPrimaryColorTheme"
             tools:enabled="true" />
 
     </LinearLayout>

@@ -602,7 +602,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:contentDescription="@string/buttonSchedule"
-                    android:theme="@style/AiButtonRippleTheme"
+                    android:theme="@style/AiCursorAndPrimaryColorTheme"
                     app:icon="@drawable/ic_ai_magic_wand"
                     app:iconTint="@color/aiColor"
                     app:layout_constraintBottom_toBottomOf="parent"
