@@ -88,7 +88,8 @@ class MainViewModel @Inject constructor(
     // First boolean is the download status, second boolean is if the LoadMore button should be displayed
     val isDownloadingChanges: MutableLiveData<Pair<Boolean, Boolean?>> = MutableLiveData(false to null)
     val isInternetAvailable = MutableLiveData<Boolean>()
-    val isNewFolderCreated = SingleLiveEvent<Boolean>()
+    val newFolderResultTrigger = MutableLiveData<Unit>()
+    val isMovedToNewFolder = SingleLiveEvent<Boolean>()
     val toggleLightThemeForMessage = SingleLiveEvent<Message>()
     val deletedMessages = SingleLiveEvent<Set<String>>()
 
@@ -155,8 +156,6 @@ class MainViewModel @Inject constructor(
     val currentThreadsLive = observeFolderAndFilter().flatMapLatest { (folder, filter) ->
         folder?.let { threadController.getThreadsAsync(it, filter) } ?: emptyFlow()
     }.asLiveData(ioCoroutineContext)
-
-    val createNewFolderResult = SingleLiveEvent<String?>(null)
 
     private fun observeFolderAndFilter() = MediatorLiveData<Pair<Folder?, ThreadFilter>>().apply {
         value = currentFolder.value to currentFilter.value!!
@@ -823,6 +822,8 @@ class MainViewModel @Inject constructor(
         val mailbox = currentMailbox.value ?: return null
         val apiResponse = ApiRepository.createFolder(mailbox.uuid, name)
 
+        newFolderResultTrigger.postValue(Unit)
+
         return if (apiResponse.isSuccess()) {
             updateFolders(mailbox)
             apiResponse.data?.id
@@ -832,9 +833,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun createNewFolder(name: String) = viewModelScope.launch(ioCoroutineContext) {
-        createNewFolderResult.postValue(createNewFolderSync(name))
-    }
+    fun createNewFolder(name: String) = viewModelScope.launch(ioCoroutineContext) { createNewFolderSync(name) }
 
     fun moveToNewFolder(
         name: String,
@@ -843,7 +842,7 @@ class MainViewModel @Inject constructor(
     ) = viewModelScope.launch(ioCoroutineContext) {
         val newFolderId = createNewFolderSync(name) ?: return@launch
         moveThreadsOrMessageTo(newFolderId, threadsUids, messageUid)
-        isNewFolderCreated.postValue(true)
+        isMovedToNewFolder.postValue(true)
     }
     //endregion
 

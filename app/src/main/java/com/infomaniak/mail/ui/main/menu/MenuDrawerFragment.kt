@@ -35,7 +35,6 @@ import com.infomaniak.lib.bugtracker.BugTrackerActivity
 import com.infomaniak.lib.bugtracker.BugTrackerActivityArgs
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.context
-import com.infomaniak.lib.core.utils.hideProgress
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackCreateFolderEvent
@@ -259,13 +258,7 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
     }
 
     private fun observeNewFolderCreation() {
-        mainViewModel.createNewFolderResult.observe(viewLifecycleOwner) {
-            createFolderDialog.apply {
-                positiveButton.hideProgress(R.string.buttonCreate)
-                negativeButton.isEnabled = true
-                dismiss()
-            }
-        }
+        mainViewModel.newFolderResultTrigger.observe(viewLifecycleOwner) { createFolderDialog.resetAndDismiss() }
     }
 
     fun onDrawerOpened() {

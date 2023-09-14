@@ -507,6 +507,14 @@ fun Fragment.createInputDialog(
         .setupOnShowListener()
 }
 
+fun AlertDialog.resetAndDismiss() {
+    if (isShowing) {
+        positiveButton.hideProgress(R.string.buttonCreate)
+        negativeButton.isEnabled = true
+        dismiss()
+    }
+}
+
 inline val AlertDialog.positiveButton get() = (getButton(DialogInterface.BUTTON_POSITIVE) as MaterialButton)
 inline val AlertDialog.negativeButton get() = (getButton(DialogInterface.BUTTON_NEGATIVE) as MaterialButton)
 
