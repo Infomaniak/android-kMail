@@ -276,6 +276,17 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.flushFolder(mailboxUuid, folderId), POST)
     }
 
+    fun generateAiProposition(prompt: String): ApiResponse<AiResult> {
+        val message = mapOf(
+            "type" to "user",
+            "content" to prompt,
+        )
+
+        val body = mapOf("messages" to arrayOf(message))
+
+        return callApi(ApiRoutes.ai(), POST, body)
+    }
+
     fun downloadAttachment(resource: String): Response {
         val httpRequest = Request.Builder()
             .url(ApiRoutes.resource(resource))
