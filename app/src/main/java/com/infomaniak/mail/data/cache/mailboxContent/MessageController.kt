@@ -40,9 +40,9 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
 
 
     //region Queries
-    private fun getSortedMessagesQuery(threadUid: String): RealmQuery<Message>? {
+    private fun getSortedAndNotDeletedMessagesQuery(threadUid: String): RealmQuery<Message>? {
         return ThreadController.getThread(threadUid, mailboxContentRealm())
-            ?.messages?.query()
+            ?.messages?.query("${Message::isDeletedOnApi.name} == false")
             ?.sort(Message::date.name, Sort.ASCENDING)
     }
 
@@ -133,8 +133,8 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
         }.find().copyFromRealm()
     }
 
-    fun getSortedMessagesAsync(threadUid: String): Flow<ResultsChange<Message>>? {
-        return getSortedMessagesQuery(threadUid)?.asFlow()
+    fun getSortedAndNotDeletedMessagesAsync(threadUid: String): Flow<ResultsChange<Message>>? {
+        return getSortedAndNotDeletedMessagesQuery(threadUid)?.asFlow()
     }
     //endregion
 
