@@ -21,23 +21,28 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.lib.core.utils.showKeyboard
 import com.infomaniak.lib.core.utils.toPx
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentAiPromptBinding
 import com.infomaniak.mail.utils.postfixWithTag
+import dagger.hilt.android.AndroidEntryPoint
 import com.google.android.material.R as RMaterial
 
+@AndroidEntryPoint
 class AiPromptFragment : Fragment() {
 
     private lateinit var binding: FragmentAiPromptBinding
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
+    private val aiViewModel: AiViewModel by viewModels()
 
     private val m3BottomSheetMaxWidthPx by lazy { resources.getDimension(RMaterial.dimen.material_bottom_sheet_max_width) }
 
@@ -68,7 +73,11 @@ class AiPromptFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
+        setUi()
+        observeAiProposition()
+    }
 
+    private fun setUi() = with(binding) {
         setCorrectSheetMargins()
 
         aiPromptTitle.text = requireContext().postfixWithTag(
@@ -81,6 +90,16 @@ class AiPromptFragment : Fragment() {
         prompt.showKeyboard()
         closeButton.setOnClickListener {
             (parentFragment as NewMessageFragment).closeAiPrompt()
+        }
+
+        generateButton.setOnClickListener {
+            aiViewModel.generateAiProposition(newMessageViewModel.aiPrompt)
+        }
+    }
+
+    private fun observeAiProposition() {
+        aiViewModel.aiProposition.observe(viewLifecycleOwner) {
+            Log.e("gibran", "observeAiProposition - proposition: ${it}")
         }
     }
 
