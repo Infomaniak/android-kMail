@@ -29,7 +29,9 @@ import androidx.fragment.app.activityViewModels
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.lib.core.utils.showKeyboard
 import com.infomaniak.lib.core.utils.toPx
+import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentAiPromptBinding
+import com.infomaniak.mail.utils.postfixWithTag
 import com.google.android.material.R as RMaterial
 
 
@@ -71,6 +73,13 @@ class AiPromptFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setCorrectSheetMargins()
+
+        aiPromptTitle.text = requireContext().postfixWithTag(
+            getString(R.string.aiPromptTitle),
+            R.string.aiPromptTag,
+            R.color.aiBetaTagBackground,
+            R.color.aiBetaTagTextColor,
+        )
 
         prompt.showKeyboard()
         closeButton.setOnClickListener {
