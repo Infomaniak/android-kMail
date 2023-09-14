@@ -150,9 +150,9 @@ class Message : RealmObject {
             }
         }
 
-    fun sender(folderRole: FolderRole?): Recipient? {
+    fun sender(folderRole: FolderRole? = null): Recipient? {
 
-        val recipients = when (folderRole) {
+        val recipients = when (folderRole ?: folder.role) {
             FolderRole.SENT, FolderRole.DRAFT -> to
             else -> from
         }
