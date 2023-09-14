@@ -20,10 +20,7 @@ package com.infomaniak.mail.utils
 import android.animation.Animator
 import android.animation.ValueAnimator
 import android.app.Activity
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
-import android.content.Intent
+import android.content.*
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -474,12 +471,12 @@ fun Fragment.createInputDialog(
     fun AlertDialog.setupOnShowListener() = apply {
         setOnShowListener {
             showKeyboard()
-            getButton(AlertDialog.BUTTON_POSITIVE).apply {
+            positiveButton.apply {
                 setOnClickListener {
                     onPositiveButtonClicked(textInput.trimmedText)
                     hideKeyboard()
-                    (this as MaterialButton).showProgress(gravity = GRAVITY_CENTER)
-                    getButton(AlertDialog.BUTTON_NEGATIVE).isEnabled = false
+                    showProgress(gravity = GRAVITY_CENTER)
+                    negativeButton.isEnabled = false
                 }
                 setText(confirmButtonText)
                 isEnabled = false
@@ -511,6 +508,9 @@ fun Fragment.createInputDialog(
         .create()
         .setupOnShowListener()
 }
+
+inline val AlertDialog.positiveButton get() = (getButton(DialogInterface.BUTTON_POSITIVE) as MaterialButton)
+inline val AlertDialog.negativeButton get() = (getButton(DialogInterface.BUTTON_NEGATIVE) as MaterialButton)
 
 fun DragDropSwipeRecyclerView.addStickyDateDecoration(adapter: ThreadListAdapter, threadDensity: ThreadDensity) {
     addItemDecoration(HeaderItemDecoration(this, false) { position ->

@@ -18,8 +18,6 @@
 package com.infomaniak.mail.ui.main.menu
 
 import android.annotation.SuppressLint
-import android.content.DialogInterface.BUTTON_NEGATIVE
-import android.content.DialogInterface.BUTTON_POSITIVE
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -33,7 +31,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.button.MaterialButton
 import com.infomaniak.lib.bugtracker.BugTrackerActivity
 import com.infomaniak.lib.bugtracker.BugTrackerActivityArgs
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
@@ -264,8 +261,8 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
     private fun observeNewFolderCreation() {
         mainViewModel.createNewFolderResult.observe(viewLifecycleOwner) {
             createFolderDialog.apply {
-                (getButton(BUTTON_POSITIVE) as MaterialButton).hideProgress(R.string.buttonCreate)
-                (getButton(BUTTON_NEGATIVE) as MaterialButton).isEnabled = true
+                positiveButton.hideProgress(R.string.buttonCreate)
+                negativeButton.isEnabled = true
                 dismiss()
             }
         }
