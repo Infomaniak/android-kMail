@@ -592,7 +592,7 @@ fun Context.postfixWithTag(
         val endIndex = startIndex + tag.length
 
         setTagSpan(this@postfixWithTag, startIndex, endIndex, backgroundColorRes, textColorRes)
-        onClicked?.let { setClickableSpan(startIndex, endIndex) { it() } }
+        onClicked?.let { setClickableSpan(startIndex, endIndex, it) }
     }
 }
 
