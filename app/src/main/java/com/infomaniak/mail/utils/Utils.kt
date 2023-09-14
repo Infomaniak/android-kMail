@@ -36,6 +36,8 @@ object Utils {
     const val MAX_DELAY_BETWEEN_API_CALLS = 500L
     const val DELAY_BEFORE_FETCHING_ACTIVITIES_AGAIN = 500L
 
+    const val TAG_SEPARATOR = " "
+
     fun colorToHexRepresentation(color: Int) = "#" + color.toHexString().substring(2 until 8)
 
     fun isPermanentDeleteFolder(role: FolderRole?): Boolean {

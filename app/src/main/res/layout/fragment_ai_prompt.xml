@@ -57,28 +57,11 @@
                     android:src="@drawable/ic_ai_magic_wand" />
 
                 <TextView
+                    android:id="@+id/aiPromptTitle"
+                    style="@style/H2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/aiPromptTitle" />
-
-                <com.google.android.material.card.MaterialCardView
-                    style="@style/CardViewMail"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/marginStandardVerySmall"
-                    app:cardBackgroundColor="@color/aiBetaTagBackground"
-                    app:cardCornerRadius="6dp">
-
-                    <TextView
-                        style="@style/LabelMedium"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
-                        android:layout_marginVertical="2dp"
-                        android:text="@string/aiPromptTag"
-                        android:textColor="@color/aiBetaTagTextColor" />
-
-                </com.google.android.material.card.MaterialCardView>
+                    tools:text="@string/aiPromptTitle" />
 
                 <Space
                     android:layout_width="0dp"
