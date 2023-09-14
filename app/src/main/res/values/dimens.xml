@@ -54,7 +54,7 @@
     <!-- External tag -->
     <dimen name="externalTagTextSize">12sp</dimen>
 
-    <!-- Ai -->
+    <!-- AI -->
     <dimen name="scrimOpacity">0.32</dimen>
 
     <!-- Other -->

@@ -40,7 +40,6 @@ import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.Group
-import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
@@ -82,7 +81,6 @@ import kotlinx.coroutines.*
 import java.util.UUID
 import javax.inject.Inject
 import com.google.android.material.R as RMaterial
-import com.infomaniak.lib.core.R as RCore
 
 @AndroidEntryPoint
 class NewMessageFragment : Fragment() {
@@ -578,14 +576,8 @@ class NewMessageFragment : Fragment() {
 
     private fun setAiPromptVisibility(isVisible: Boolean) {
         fun updateStatusBarColor(isVisible: Boolean) {
-            val backgroundColor = requireContext().getColor(R.color.backgroundColor)
-            requireActivity().window.statusBarColor = if (isVisible) {
-                val black = requireContext().getColor(RCore.color.black)
-                val opacity = ResourcesCompat.getFloat(requireContext().resources, R.dimen.scrimOpacity)
-                UiUtils.pointBetweenColors(backgroundColor, black, opacity)
-            } else {
-                backgroundColor
-            }
+            val statusBarColorRes = if (isVisible) R.color.scrim_translucent else R.color.backgroundColor
+            requireActivity().window.statusBarColor = requireContext().getColor(statusBarColorRes)
         }
 
         fun updateNavigationBarColor(isVisible: Boolean) {
