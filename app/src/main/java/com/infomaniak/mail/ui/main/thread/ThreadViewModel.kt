@@ -67,6 +67,7 @@ class ThreadViewModel @Inject constructor(
     val quickActionBarClicks = SingleLiveEvent<Pair<Message, Int>>()
 
     var deletedMessagesUids = mutableSetOf<String>()
+    val failedMessagesUids = SingleLiveEvent<List<String>>()
 
     val threadLive = liveData(ioCoroutineContext) {
         emitSource(threadController.getThreadAsync(threadUid).map { it.obj }.asLiveData())
@@ -156,6 +157,7 @@ class ThreadViewModel @Inject constructor(
         fetchMessagesJob = viewModelScope.launch(ioCoroutineContext) {
             val (deleted, failed) = threadController.fetchMessagesHeavyData(messages, mailboxContentRealm())
             deletedMessagesUids.addAll(deleted)
+            failedMessagesUids.postValue(failed)
         }
     }
 

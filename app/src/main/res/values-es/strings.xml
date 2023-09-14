@@ -199,6 +199,7 @@
     <string name="errorInvalidCredentials">Correo electrónico o contraseña no válidos</string>
     <string name="errorInvalidEmailAddress">Dirección de correo electrónico no válida</string>
     <string name="errorInvalidMailboxPassword">Contraseña incorrecta para la dirección de correo electrónico</string>
+    <string name="errorLoadingMessage">Error al cargar el mensaje</string>
     <string name="errorLoginDescription">La conexión ha fallado.</string>
     <string name="errorLoginTitle">Error de inicio de sesión</string>
     <string name="errorMailboxLocked">Esta dirección de correo electrónico está bloqueada</string>

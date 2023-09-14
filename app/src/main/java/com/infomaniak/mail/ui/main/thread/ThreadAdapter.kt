@@ -40,6 +40,7 @@ import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Attachment.*
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.message.Message.*
 import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.*
 import com.infomaniak.mail.utils.*
@@ -125,6 +126,10 @@ class ThreadAdapter @Inject constructor(
                     holder.toggleContentAndQuoteTheme(message)
                 }
                 NotifyType.RE_RENDER -> if (bodyWebView.isVisible) bodyWebView.reload() else fullMessageWebView.reload()
+                NotifyType.FAILED_MESSAGE -> {
+                    messageLoader.isGone = true
+                    failedLoadingErrorMessage.isVisible = true
+                }
             }
         }
     }.getOrDefault(Unit)
@@ -465,6 +470,13 @@ class ThreadAdapter @Inject constructor(
 
     fun reRenderMails() {
         notifyItemRangeChanged(0, itemCount, NotifyType.RE_RENDER)
+    }
+
+    fun updateFailedMessages(uids: List<String>) {
+        uids.forEach { uid ->
+            val index = messages.indexOfFirst { it.uid == uid }
+            notifyItemChanged(index, NotifyType.FAILED_MESSAGE)
+        }
     }
 
     private enum class NotifyType {

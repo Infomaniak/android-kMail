@@ -468,6 +468,13 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/attachmentLayout">
 
+            <TextView
+                android:id="@+id/failedLoadingErrorMessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/errorLoadingMessage"
+                android:visibility="gone" />
+
             <!-- `focusableInTouchMode` is set to false to prevent the webview from automatically scrolling a small amount for no
             reason when long pressing it -->
             <WebView
