@@ -957,7 +957,24 @@ class MainViewModel @Inject constructor(
     }
 
     fun handleDeletedMessages(uids: Set<String>) = viewModelScope.launch(ioCoroutineContext) {
+
         snackBarManager.postValue(context.getString(R.string.snackbarDeletedConversation))
+
+        val mailbox = currentMailbox.value ?: return@launch
+        val realm = mailboxContentRealm()
+
+        val foldersToUpdate = realm.writeBlocking {
+            uids.mapNotNull { MessageController.getMessage(it, realm = this)?.folder?.copyFromRealm() }.toSet()
+        }
+
+        foldersToUpdate.forEach { folder ->
+            refreshController.refreshThreads(
+                refreshMode = RefreshMode.REFRESH_FOLDER,
+                mailbox = mailbox,
+                folder = folder,
+                realm = realm,
+            )
+        }
     }
 
     private companion object {
