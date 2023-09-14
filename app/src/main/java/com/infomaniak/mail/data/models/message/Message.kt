@@ -208,7 +208,7 @@ class Message : RealmObject {
     }
 
     // We had a bug once where we lost the Attachments.
-    // Since we only fetch sdfgsdfgsqdjkfgsqjkfgqsk
+    // So if it happens again, we need to fully download the Message again.
     fun isFullyDownloaded(): Boolean = if (hasAttachments && attachments.isEmpty()) false else _isFullyDownloaded
 
     private inline fun <reified T : TypedRealmObject> RealmList<T>.detachedFromRealm(depth: UInt = UInt.MIN_VALUE): List<T> {

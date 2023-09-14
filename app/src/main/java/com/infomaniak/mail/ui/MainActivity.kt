@@ -149,6 +149,18 @@ class MainActivity : BaseActivity() {
         permissionUtils.requestMainPermissionsIfNeeded()
     }
 
+    private fun observeNetworkStatus() {
+        LiveDataNetworkStatus(context = this).distinctUntilChanged().observe(this) { isAvailable ->
+            SentryLog.d("Internet availability", if (isAvailable) "Available" else "Unavailable")
+            Sentry.addBreadcrumb(Breadcrumb().apply {
+                category = "Network"
+                message = "Internet access is available : $isAvailable"
+                level = if (isAvailable) SentryLevel.INFO else SentryLevel.WARNING
+            })
+            mainViewModel.isInternetAvailable.value = isAvailable
+        }
+    }
+
     private fun observeDraftWorkerResults() {
         WorkerUtils.flushWorkersBefore(context = this, lifecycleOwner = this) {
             val treatedWorkInfoUuids = mutableSetOf<UUID>()
@@ -290,18 +302,6 @@ class MainActivity : BaseActivity() {
     override fun onDestroy() {
         binding.drawerLayout.removeDrawerListener(drawerListener)
         super.onDestroy()
-    }
-
-    private fun observeNetworkStatus() {
-        LiveDataNetworkStatus(context = this).distinctUntilChanged().observe(this) { isAvailable ->
-            SentryLog.d("Internet availability", if (isAvailable) "Available" else "Unavailable")
-            Sentry.addBreadcrumb(Breadcrumb().apply {
-                category = "Network"
-                message = "Internet access is available : $isAvailable"
-                level = if (isAvailable) SentryLevel.INFO else SentryLevel.WARNING
-            })
-            mainViewModel.isInternetAvailable.value = isAvailable
-        }
     }
 
     private fun setupSnackBar() {
