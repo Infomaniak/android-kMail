@@ -153,7 +153,7 @@ class ThreadViewModel @Inject constructor(
     fun fetchMessagesHeavyData(messages: List<Message>) {
         fetchMessagesJob?.cancel()
         fetchMessagesJob = viewModelScope.launch(ioCoroutineContext) {
-            threadController.fetchMessagesHeavyData(messages, mailbox, mailboxContentRealm())
+            val (deleted, failed) = threadController.fetchMessagesHeavyData(messages, mailboxContentRealm())
         }
     }
 

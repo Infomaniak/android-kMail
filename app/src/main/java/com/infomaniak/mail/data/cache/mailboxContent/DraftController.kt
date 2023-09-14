@@ -89,7 +89,8 @@ class DraftController @Inject constructor(
         val previousMessage = if (message.isFullyDownloaded()) {
             message
         } else {
-            isSuccess = ThreadController.fetchMessagesHeavyData(listOf(message), realm).isEmpty()
+            val (deleted, failed) = ThreadController.fetchMessagesHeavyData(listOf(message), realm)
+            isSuccess = deleted.isEmpty() && failed.isEmpty()
             MessageController.getMessage(message.uid, realm)!!
         }
 
