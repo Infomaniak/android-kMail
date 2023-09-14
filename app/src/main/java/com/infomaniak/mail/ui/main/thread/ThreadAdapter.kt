@@ -100,7 +100,7 @@ class ThreadAdapter(
     override fun onBindViewHolder(holder: ThreadViewHolder, position: Int, payloads: MutableList<Any>) = runCatchingRealm {
         with(holder.binding) {
             val payload = payloads.firstOrNull()
-            if (payload !is NotificationType) {
+            if (payload !is NotifyType) {
                 super.onBindViewHolder(holder, position, payloads)
                 return
             }
@@ -108,12 +108,12 @@ class ThreadAdapter(
             val message = messages[position]
 
             when (payload) {
-                NotificationType.AVATAR -> if (!message.isDraft) userAvatar.loadAvatar(message.sender, contacts)
-                NotificationType.TOGGLE_LIGHT_MODE -> {
+                NotifyType.AVATAR -> if (!message.isDraft) userAvatar.loadAvatar(message.sender, contacts)
+                NotifyType.TOGGLE_LIGHT_MODE -> {
                     isThemeTheSameMap[message.uid] = !isThemeTheSameMap[message.uid]!!
                     holder.toggleContentAndQuoteTheme(message)
                 }
-                NotificationType.RE_RENDER -> if (bodyWebView.isVisible) bodyWebView.reload() else fullMessageWebView.reload()
+                NotifyType.RE_RENDER -> if (bodyWebView.isVisible) bodyWebView.reload() else fullMessageWebView.reload()
             }
         }
     }.getOrDefault(Unit)
@@ -440,23 +440,23 @@ class ThreadAdapter(
         return listOf(*to.toTypedArray(), *cc.toTypedArray(), *bcc.toTypedArray()).joinToString { it.displayedName(context) }
     }
 
+    fun isMessageUidManuallyAllowed(messageUid: String) = manuallyAllowedMessageUids.contains(messageUid)
+
     fun updateContacts(newContacts: MergedContactDictionary) {
         contacts = newContacts
-        notifyItemRangeChanged(0, itemCount, NotificationType.AVATAR)
+        notifyItemRangeChanged(0, itemCount, NotifyType.AVATAR)
     }
 
     fun toggleLightMode(message: Message) {
         val index = messages.indexOf(message)
-        notifyItemChanged(index, NotificationType.TOGGLE_LIGHT_MODE)
+        notifyItemChanged(index, NotifyType.TOGGLE_LIGHT_MODE)
     }
 
     fun reRenderMails() {
-        notifyItemRangeChanged(0, itemCount, NotificationType.RE_RENDER)
+        notifyItemRangeChanged(0, itemCount, NotifyType.RE_RENDER)
     }
 
-    fun isMessageUidManuallyAllowed(messageUid: String) = manuallyAllowedMessageUids.contains(messageUid)
-
-    private enum class NotificationType {
+    private enum class NotifyType {
         AVATAR,
         TOGGLE_LIGHT_MODE,
         RE_RENDER,
