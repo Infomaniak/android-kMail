@@ -34,14 +34,12 @@ import com.infomaniak.mail.databinding.FragmentAiPromptBinding
 import com.infomaniak.mail.utils.postfixWithTag
 import com.google.android.material.R as RMaterial
 
-
 class AiPromptFragment : Fragment() {
 
     private lateinit var binding: FragmentAiPromptBinding
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
 
     private val m3BottomSheetMaxWidthPx by lazy { requireContext().resources.getDimension(RMaterial.dimen.material_bottom_sheet_max_width) }
-
 
     private val promptTextWatcher by lazy {
         object : TextWatcher {
@@ -108,7 +106,7 @@ class AiPromptFragment : Fragment() {
     }
 
     private companion object {
-        private const val NO_MARGIN = 0
-        private val m3BottomSheetHorizontalMarginPx by lazy { 56.toPx() }
+        const val NO_MARGIN = 0
+        val m3BottomSheetHorizontalMarginPx = 56.toPx()
     }
 }
