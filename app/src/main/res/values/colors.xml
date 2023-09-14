@@ -90,7 +90,6 @@
     <color name="contacts_light">#9D66E1</color>
     <color name="contacts_dark">#C8AAEE</color>
 
-    <!-- TODO: Use correct colors for AI -->
     <color name="ai_light">#8D4AFF</color>
     <color name="ai_dark">#BF99FF</color>
 
