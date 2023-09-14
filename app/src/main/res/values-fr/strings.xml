@@ -201,7 +201,7 @@
     <string name="errorInvalidCredentials">E-mail ou mot de passe invalide</string>
     <string name="errorInvalidEmailAddress">Adresse mail invalide</string>
     <string name="errorInvalidMailboxPassword">Mot de passe de l’adresse mail incorrect</string>
-    <string name="errorLoadingMessage">Erreur lors du chargement du message</string>
+    <string name="errorLoadingMessage">Ce message n’a pas pu être téléchargé depuis le serveur.</string>
     <string name="errorLoginDescription">La connexion a échoué.</string>
     <string name="errorLoginTitle">Erreur de connexion</string>
     <string name="errorMailboxLocked">Cette adresse est bloquée</string>
