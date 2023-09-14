@@ -554,7 +554,6 @@ inline val AndroidViewModel.context: Context get() = getApplication()
 
 val TextInputEditText.trimmedText inline get() = text?.trim().toString()
 
-
 fun Context.postfixWithTag(
     original: CharSequence,
     @StringRes tagRes: Int,
