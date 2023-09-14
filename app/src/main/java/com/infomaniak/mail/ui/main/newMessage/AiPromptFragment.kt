@@ -105,7 +105,6 @@ class AiPromptFragment : Fragment() {
     private fun onPromptChanged(it: Editable?) = with(binding) {
         generateButton.isEnabled = it?.isNotEmpty() ?: false
         newMessageViewModel.aiPrompt = it.toString()
-
     }
 
     private companion object {
