@@ -21,16 +21,12 @@ import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
-import android.text.Spannable
 import android.text.method.LinkMovementMethod
-import android.text.style.ClickableSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
-import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.ColorUtils
-import androidx.core.text.toSpannable
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -509,61 +505,24 @@ class ThreadFragment : Fragment() {
         val (externalRecipientEmail, externalRecipientQuantity) = thread.findExternalRecipients(emailDictionary, aliases)
         if (externalRecipientQuantity == 0) return subject to subject
 
-        val externalPostfix = getString(R.string.externalTag)
-        val postfixedSubject = "${subject}${EXTERNAL_TAG_SEPARATOR}${externalPostfix}"
+        val spannedSubject = requireContext().postfixWithTag(
+            subject,
+            R.string.externalTag,
+            R.color.externalTagBackground,
+            R.color.externalTagOnBackground,
+        ) {
+            trackExternalEvent("threadTag")
 
-        val spannedSubject = postfixedSubject.toSpannable().apply {
-            val startIndex = subject.length + EXTERNAL_TAG_SEPARATOR.length
-            val endIndex = startIndex + externalPostfix.length
+            val description = resources.getQuantityString(
+                R.plurals.externalDialogDescriptionExpeditor,
+                externalRecipientQuantity,
+                externalRecipientEmail,
+            )
 
-            setExternalTagSpan(startIndex, endIndex)
-
-            setClickableSpan(startIndex, endIndex) {
-                trackExternalEvent("threadTag")
-
-                val description = resources.getQuantityString(
-                    R.plurals.externalDialogDescriptionExpeditor,
-                    externalRecipientQuantity,
-                    externalRecipientEmail,
-                )
-
-                externalExpeditorInfoDialog.showWithDescription(description)
-            }
+            externalExpeditorInfoDialog.showWithDescription(description)
         }
 
         return subject to spannedSubject
-    }
-
-    private fun Spannable.setExternalTagSpan(startIndex: Int, endIndex: Int) = with(binding) {
-        val backgroundColor = context.getColor(R.color.externalTagBackground)
-        val textColor = context.getColor(R.color.externalTagOnBackground)
-        val textTypeface = ResourcesCompat.getFont(context, R.font.external_tag_font)!!
-        val textSize = resources.getDimensionPixelSize(R.dimen.externalTagTextSize).toFloat()
-        setSpan(
-            RoundedBackgroundSpan(
-                backgroundColor = backgroundColor,
-                textColor = textColor,
-                textTypeface = textTypeface,
-                fontSize = textSize,
-            ),
-            startIndex,
-            endIndex,
-            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
-        )
-    }
-
-    private fun Spannable.setClickableSpan(startIndex: Int, endIndex: Int, onClick: () -> Unit) {
-        // TODO: Currently, the clickable zone extends beyond the span up to the edge of the textview.
-        //  This is the same comportment that Gmail has.
-        //  See if we can find a fix for this later.
-        setSpan(
-            object : ClickableSpan() {
-                override fun onClick(widget: View) = onClick()
-            },
-            startIndex,
-            endIndex,
-            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
-        )
     }
 
     private fun leaveThread() {
@@ -583,7 +542,6 @@ class ThreadFragment : Fragment() {
     private companion object {
         const val COLLAPSE_TITLE_THRESHOLD = 0.5
         const val ARCHIVE_INDEX = 2
-        const val EXTERNAL_TAG_SEPARATOR = " "
 
         fun allAttachmentsFileName(subject: String) = "infomaniak-mail-attachments-$subject.zip"
     }
