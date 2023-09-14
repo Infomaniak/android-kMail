@@ -23,7 +23,9 @@ import android.net.Uri
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.*
+import com.infomaniak.lib.core.MatomoCore.*
 import com.infomaniak.lib.core.utils.*
+import com.infomaniak.mail.MatomoMail.OPEN_LOCAL_DRAFT
 import com.infomaniak.mail.MatomoMail.trackExternalEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.MatomoMail.trackSendingDraftEvent
@@ -149,7 +151,9 @@ class NewMessageViewModel @Inject constructor(
 
                 draft = if (draftExists) {
                     val uuid = draftLocalUuid ?: draft.localUuid
-                    getLatestDraft(uuid) ?: run {
+                    getLatestDraft(uuid)?.also {
+                        if (!isRecreated) context.trackNewMessageEvent(OPEN_LOCAL_DRAFT, TrackerAction.DATA, value = 1.0f)
+                    } ?: run {
                         if (isRecreated && (draftResource == null || messageUid == null)) {
                             // We arrive here if :
                             //    1. the user created a new Draft,
@@ -160,6 +164,7 @@ class NewMessageViewModel @Inject constructor(
                             // so we can just reuse the already existing Draft.
                             draft
                         } else {
+                            if (!isRecreated) context.trackNewMessageEvent(OPEN_LOCAL_DRAFT, TrackerAction.DATA, value = 0.0f)
                             fetchDraft()
                         } ?: return@writeBlocking false
                     }
@@ -215,9 +220,7 @@ class NewMessageViewModel @Inject constructor(
         )
     }
 
-    private fun getLatestDraft(draftLocalUuid: String?): Draft? {
-        return draftLocalUuid?.let(draftController::getDraft)?.copyFromRealm()
-    }
+    private fun getLatestDraft(draftLocalUuid: String?) = draftLocalUuid?.let(draftController::getDraft)?.copyFromRealm()
 
     private fun fetchDraft(): Draft? {
         return ApiRepository.getDraft(draftResource!!).data?.also { draft ->
