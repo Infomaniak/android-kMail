@@ -30,7 +30,9 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
+import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.di.IoDispatcher
@@ -38,6 +40,7 @@ import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior
 import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior.NotificationType
 import dagger.hilt.android.AndroidEntryPoint
+import io.realm.kotlin.Realm
 import io.sentry.Sentry
 import kotlinx.coroutines.*
 import javax.inject.Inject
@@ -59,6 +62,9 @@ class NotificationActionsReceiver : BroadcastReceiver() {
 
     @Inject
     lateinit var notificationUtils: NotificationUtils
+
+    @Inject
+    lateinit var refreshController: RefreshController
 
     @Inject
     lateinit var sharedUtils: SharedUtils
@@ -143,7 +149,8 @@ class NotificationActionsReceiver : BroadcastReceiver() {
 
             val mailbox = mailboxController.getMailbox(userId, mailboxId) ?: return@launch
             val messages = sharedUtils.getMessagesToMove(threads, message)
-            val destinationId = folderController.getFolder(folderRole)?.id ?: return@launch
+            val destinationFolder = folderController.getFolder(folderRole) ?: return@launch
+            val destinationId = destinationFolder.id
             val okHttpClient = AccountUtils.getHttpClient(userId)
 
             context.trackNotificationActionEvent(matomoValue)
@@ -151,6 +158,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
             with(ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationId, okHttpClient)) {
                 if (isSuccess()) {
                     dismissNotification(context, mailbox, notificationId)
+                    updateFolders(folders = listOf(message.folder, destinationFolder), mailbox, realm)
                 } else {
                     executeUndoAction(payload)
                     Sentry.withScope { scope ->
@@ -163,6 +171,21 @@ class NotificationActionsReceiver : BroadcastReceiver() {
         }
 
         notificationJobsBus.register(notificationId, job)
+    }
+
+    private suspend fun updateFolders(
+        folders: List<Folder>,
+        mailbox: Mailbox,
+        realm: Realm,
+    ) {
+        folders.forEach { folder ->
+            refreshController.refreshThreads(
+                refreshMode = RefreshController.RefreshMode.REFRESH_FOLDER,
+                mailbox = mailbox,
+                folder = folder,
+                realm = realm,
+            )
+        }
     }
 
     private fun dismissNotification(context: Context, mailbox: Mailbox, notificationId: Int) {
