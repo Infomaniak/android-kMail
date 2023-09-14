@@ -120,6 +120,8 @@ class Message : RealmObject {
     var isFromSearch: Boolean = false
     @Transient
     var shortUid: Int = -1
+    @Transient
+    var isDeletedOnApi: Boolean = false
     //endregion
 
     //region UI data (Transient & Ignore)

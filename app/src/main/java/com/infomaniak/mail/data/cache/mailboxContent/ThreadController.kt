@@ -235,6 +235,7 @@ class ThreadController @Inject constructor(
 
             fun handleFailure(uid: String, code: String? = null) {
                 if (code == ErrorCode.MESSAGE_NOT_FOUND) {
+                    MessageController.getMessage(uid, realm)?.isDeletedOnApi = true
                     deletedMessagesUids.add(uid)
                 } else {
                     failedMessagesUids.add(uid)

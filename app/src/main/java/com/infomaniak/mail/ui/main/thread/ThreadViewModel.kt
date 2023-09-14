@@ -87,7 +87,7 @@ class ThreadViewModel @Inject constructor(
             }
         }
 
-        messageController.getSortedMessagesAsync(threadUid)
+        messageController.getSortedAndNotDeletedMessagesAsync(threadUid)
             ?.map { results -> results.list.map { splitBody(it) } }
             ?.asLiveData()
             ?.let { emitSource(it) }
