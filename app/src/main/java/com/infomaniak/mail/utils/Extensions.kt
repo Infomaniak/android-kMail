@@ -25,7 +25,9 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.text.Html
+import android.text.Spannable
 import android.text.Spanned
+import android.text.style.ClickableSpan
 import android.util.Patterns
 import android.view.View
 import android.view.Window
@@ -34,6 +36,7 @@ import android.webkit.WebView
 import androidx.annotation.*
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.text.toSpannable
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -79,6 +82,7 @@ import com.infomaniak.mail.ui.main.folder.HeaderItemDecoration
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.ui.main.thread.MessageWebViewClient
+import com.infomaniak.mail.ui.main.thread.RoundedBackgroundSpan
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragmentArgs
 import com.infomaniak.mail.ui.noValidMailboxes.NoValidMailboxesActivity
@@ -562,3 +566,71 @@ fun CharSequence.standardize(): String = toString().removeAccents().trim().lower
 inline val AndroidViewModel.context: Context get() = getApplication()
 
 val TextInputEditText.trimmedText inline get() = text?.trim().toString()
+
+
+fun Context.postfixWithTag(
+    original: CharSequence,
+    @StringRes tagRes: Int,
+    @ColorRes backgroundColorRes: Int,
+    @ColorRes textColorRes: Int,
+    onClicked: (() -> Unit)? = null,
+) = postfixWithTag(original, getString(tagRes), backgroundColorRes, textColorRes, onClicked)
+
+/**
+ * Do not forget to set `movementMethod = LinkMovementMethod.getInstance()` on a TextView to make the tag clickable
+ */
+fun Context.postfixWithTag(
+    original: CharSequence,
+    tag: String,
+    @ColorRes backgroundColorRes: Int,
+    @ColorRes textColorRes: Int,
+    onClicked: (() -> Unit)? = null,
+): Spannable {
+    val postfixed = "${original}${Utils.TAG_SEPARATOR}${tag}"
+
+    return postfixed.toSpannable().apply {
+        val startIndex = original.length + Utils.TAG_SEPARATOR.length
+        val endIndex = startIndex + tag.length
+
+        setTagSpan(this@postfixWithTag, startIndex, endIndex, backgroundColorRes, textColorRes)
+        onClicked?.let { setClickableSpan(startIndex, endIndex) { it() } }
+    }
+}
+
+private fun Spannable.setTagSpan(
+    context: Context,
+    startIndex: Int,
+    endIndex: Int,
+    @ColorRes backgroundColorRes: Int,
+    @ColorRes textColorRes: Int,
+) {
+    val backgroundColor = context.getColor(backgroundColorRes)
+    val textColor = context.getColor(textColorRes)
+    val textTypeface = ResourcesCompat.getFont(context, R.font.tag_font)!!
+    val textSize = context.resources.getDimensionPixelSize(R.dimen.externalTagTextSize).toFloat()
+    setSpan(
+        RoundedBackgroundSpan(
+            backgroundColor = backgroundColor,
+            textColor = textColor,
+            textTypeface = textTypeface,
+            fontSize = textSize,
+        ),
+        startIndex,
+        endIndex,
+        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+    )
+}
+
+private fun Spannable.setClickableSpan(startIndex: Int, endIndex: Int, onClick: () -> Unit) {
+    // TODO: Currently, the clickable zone extends beyond the span up to the edge of the textview.
+    //  This is the same comportment that Gmail has.
+    //  See if we can find a fix for this later.
+    setSpan(
+        object : ClickableSpan() {
+            override fun onClick(widget: View) = onClick()
+        },
+        startIndex,
+        endIndex,
+        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+    )
+}
