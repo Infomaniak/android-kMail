@@ -213,8 +213,10 @@ class Thread : RealmObject {
 
     fun computeAvatarRecipient(): Recipient? {
         return runCatching {
-            val message = messages.lastOrNull { it.folder.role != FolderRole.DRAFT && it.folder.role != FolderRole.SENT }
-            (message ?: messages.last()).sender()
+            val message = messages
+                .lastOrNull { it.folder.role != FolderRole.DRAFT && it.folder.role != FolderRole.SENT }
+                ?: messages.last()
+            message.sender(message.folder.role)
         }.getOrElse { throwable ->
             Sentry.withScope { scope ->
                 scope.setExtra("thread.folder.name", folder.name)
