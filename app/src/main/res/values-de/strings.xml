@@ -199,6 +199,7 @@
     <string name="errorInvalidCredentials">E-Mail oder Passwort ungültig</string>
     <string name="errorInvalidEmailAddress">Ungültige E-Mail-Adresse</string>
     <string name="errorInvalidMailboxPassword">Falsches Passwort für die E-Mail-Adresse</string>
+    <string name="errorLoadingMessage">Fehler beim Laden der Nachricht</string>
     <string name="errorLoginDescription">Die Verbindung ist fehlgeschlagen.</string>
     <string name="errorLoginTitle">Login-Fehler</string>
     <string name="errorMailboxLocked">Diese Mailbox ist gesperrt</string>
