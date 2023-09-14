@@ -83,15 +83,12 @@ class ThreadFragment : Fragment() {
     @Inject
     lateinit var localSettings: LocalSettings
 
-    @Inject
-    lateinit var injectedThreadAdapter: ThreadAdapter
-
     private lateinit var binding: FragmentThreadBinding
     private val navigationArgs: ThreadFragmentArgs by navArgs()
     private val mainViewModel: MainViewModel by activityViewModels()
     private val threadViewModel: ThreadViewModel by viewModels()
 
-    private val threadAdapter by lazy { injectedThreadAdapter(shouldLoadDistantResources()) }
+    private val threadAdapter by lazy { ThreadAdapter(shouldLoadDistantResources()) }
     private val permissionUtils by lazy { PermissionUtils(this) }
     private val isNotInSpam by lazy { mainViewModel.currentFolder.value?.role != FolderRole.SPAM }
 

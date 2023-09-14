@@ -27,7 +27,6 @@ import com.infomaniak.mail.data.api.UnwrappingJsonListSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController.Companion.SEARCH_FOLDER_ID
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.data.models.Folder.*
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.getMessages.ActivitiesResult.MessageFlags
 import com.infomaniak.mail.data.models.thread.Thread
@@ -150,15 +149,10 @@ class Message : RealmObject {
             }
         }
 
-    fun sender(folderRole: FolderRole? = null): Recipient? {
-
-        val recipients = when (folderRole ?: folder.role) {
-            FolderRole.SENT, FolderRole.DRAFT -> to
-            else -> from
+    inline val sender
+        get() = from.firstOrNull().also {
+            if (it == null) SentryLog.e("ThreadAdapter", "Message $uid has empty from")
         }
-
-        return recipients.firstOrNull().also { if (it == null) SentryLog.e("ThreadAdapter", "Message $uid has empty sender") }
-    }
 
     val dkimStatus: MessageDKIM get() = enumValueOfOrNull<MessageDKIM>(_dkimStatus) ?: MessageDKIM.VALID
 
