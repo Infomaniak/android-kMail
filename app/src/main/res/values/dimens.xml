@@ -38,6 +38,7 @@
     <dimen name="contactPopupMaxWidth">300dp</dimen>
     <dimen name="textButtonPrimaryHeight">56dp</dimen>
     <dimen name="textButtonPrimaryMediumHeight">40dp</dimen>
+    <dimen name="mediumButtonHorizontalMargin">20dp</dimen>
 
     <!-- Menu Drawer -->
     <dimen name="decoratedItemViewHeight">48dp</dimen>

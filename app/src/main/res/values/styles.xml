@@ -169,15 +169,15 @@
     <style name="TextButtonPrimaryMedium" parent="TextButtonPrimary">
         <item name="android:layout_height">@dimen/textButtonPrimaryMediumHeight</item>
         <item name="android:minWidth">0dp</item>
-        <item name="android:paddingLeft">20dp</item>
-        <item name="android:paddingRight">20dp</item>
+        <item name="android:paddingLeft">@dimen/mediumButtonHorizontalMargin</item>
+        <item name="android:paddingRight">@dimen/mediumButtonHorizontalMargin</item>
     </style>
 
     <style name="TextButtonSecondaryMedium" parent="TextButtonSecondary">
         <item name="android:layout_height">@dimen/textButtonPrimaryMediumHeight</item>
         <item name="android:minWidth">0dp</item>
-        <item name="android:paddingLeft">20dp</item>
-        <item name="android:paddingRight">20dp</item>
+        <item name="android:paddingLeft">@dimen/mediumButtonHorizontalMargin</item>
+        <item name="android:paddingRight">@dimen/mediumButtonHorizontalMargin</item>
     </style>
 
     <style name="TextButtonAlerts" parent="TextButtonSecondary">
