@@ -99,16 +99,14 @@ import io.realm.kotlin.ext.query
 import io.realm.kotlin.query.Sort
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmObject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.invoke
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlinx.serialization.encodeToString
 import org.jsoup.Jsoup
 import java.util.Calendar
 import java.util.Date
 import java.util.Scanner
 import com.infomaniak.lib.core.R as RCore
+import com.infomaniak.lib.core.utils.Utils as CoreUtils
 
 //region Type alias
 typealias MergedContactDictionary = Map<String, Map<String, MergedContact>>
@@ -475,8 +473,8 @@ fun Fragment.createInputDialog(
                 setOnClickListener {
                     onPositiveButtonClicked(textInput.trimmedText)
                     hideKeyboard()
-                    showProgress(gravity = GRAVITY_CENTER)
                     negativeButton.isEnabled = false
+                    CoreUtils.createRefreshTimer { showProgress(gravity = GRAVITY_CENTER) }.start()
                 }
                 setText(confirmButtonText)
                 isEnabled = false
