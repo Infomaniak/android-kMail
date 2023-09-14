@@ -39,7 +39,7 @@ class AiPromptFragment : Fragment() {
     private lateinit var binding: FragmentAiPromptBinding
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
 
-    private val m3BottomSheetMaxWidthPx by lazy { requireContext().resources.getDimension(RMaterial.dimen.material_bottom_sheet_max_width) }
+    private val m3BottomSheetMaxWidthPx by lazy { resources.getDimension(RMaterial.dimen.material_bottom_sheet_max_width) }
 
     private val promptTextWatcher by lazy {
         object : TextWatcher {
@@ -55,13 +55,12 @@ class AiPromptFragment : Fragment() {
     }
 
     private fun setCorrectSheetMargins() = with(binding.root) {
-        val screenWidth = requireContext().resources.displayMetrics.widthPixels
+        val screenWidth = resources.displayMetrics.widthPixels
         val isScreenTooBig = screenWidth > m3BottomSheetMaxWidthPx
         val horizontalMargin = if (isScreenTooBig) m3BottomSheetHorizontalMarginPx else NO_MARGIN
 
         setMarginsRelative(start = horizontalMargin, end = horizontalMargin)
     }
-
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentAiPromptBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -100,9 +99,9 @@ class AiPromptFragment : Fragment() {
         super.onPause()
     }
 
-    private fun onPromptChanged(it: Editable?) = with(binding) {
-        generateButton.isEnabled = it?.isNotEmpty() ?: false
-        newMessageViewModel.aiPrompt = it.toString()
+    private fun onPromptChanged(prompt: Editable?) = with(binding) {
+        generateButton.isEnabled = prompt?.isNotEmpty() ?: false
+        newMessageViewModel.aiPrompt = prompt.toString()
     }
 
     private companion object {
