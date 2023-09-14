@@ -391,6 +391,7 @@
     <string name="settingsTransferInBody">Dans le corps du message</string>
     <string name="snackbarBlockUserConfirmation">L’expéditeur est maintenant bloqué</string>
     <string name="snackbarContactSaved">Nouveau contact enregistré avec succès</string>
+    <string name="snackbarDeletedConversation">La conversation n’existe plus</string>
     <string name="snackbarDisplayProblemReported">Problème d’affichage signalé</string>
     <string name="snackbarDownloadInProgress">Téléchargement en cours…</string>
     <string name="snackbarDraftDeleted">Brouillon supprimé</string>
