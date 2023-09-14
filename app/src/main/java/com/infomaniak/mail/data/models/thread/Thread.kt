@@ -211,27 +211,39 @@ class Thread : RealmObject {
         }
     }
 
-    fun computeAvatarRecipient(): Recipient? {
-        return runCatching {
-            val message = messages.lastOrNull { it.folder.role != FolderRole.SENT } ?: messages.last()
-            return@runCatching message.sender
-        }.getOrElse { throwable ->
-            Sentry.withScope { scope ->
-                scope.setExtra("thread.folder.name", folder.name)
-                scope.setExtra("thread.folder.id", folder.id)
-                scope.setExtra("thread.uid", uid)
-                scope.setExtra("thread.messages.count", "${messages.count()}")
-                scope.setExtra("thread.duplicates.count", "${duplicates.count()}")
-                scope.setExtra("thread.isFromSearch", "$isFromSearch")
-                scope.setExtra("thread.hasDrafts", "$hasDrafts")
-                Sentry.captureException(throwable)
-            }
-            return@getOrElse null
+    fun computeAvatarRecipient(): Recipient? = runCatching {
+
+        val message = messages
+            .lastOrNull { it.folder.role != FolderRole.SENT && it.folder.role != FolderRole.DRAFT }
+            ?: messages.last()
+
+        val recipients = when (message.folder.role) {
+            FolderRole.SENT, FolderRole.DRAFT -> message.to
+            else -> message.from
         }
+
+        recipients.firstOrNull().also {
+            if (it == null) SentryLog.e("ThreadAdapter", "Message $uid has empty from")
+        }
+
+    }.getOrElse { throwable ->
+        Sentry.withScope { scope ->
+            scope.setExtra("thread.folder.name", folder.name)
+            scope.setExtra("thread.folder.id", folder.id)
+            scope.setExtra("thread.uid", uid)
+            scope.setExtra("thread.messages.count", "${messages.count()}")
+            scope.setExtra("thread.duplicates.count", "${duplicates.count()}")
+            scope.setExtra("thread.isFromSearch", "$isFromSearch")
+            scope.setExtra("thread.hasDrafts", "$hasDrafts")
+            Sentry.captureException(throwable)
+        }
+
+        null
     }
 
-    fun computeDisplayedRecipients(): RealmList<Recipient> {
-        return if (folder.role == FolderRole.DRAFT) to else from
+    fun computeDisplayedRecipients(): RealmList<Recipient> = when (folder.role) {
+        FolderRole.SENT, FolderRole.DRAFT -> to
+        else -> from
     }
 
     fun computePreview(): String {
