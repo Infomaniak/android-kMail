@@ -151,7 +151,9 @@ class NewMessageViewModel @Inject constructor(
 
                 draft = if (draftExists) {
                     val uuid = draftLocalUuid ?: draft.localUuid
-                    getLatestDraft(uuid) ?: run {
+                    getLatestDraft(uuid)?.also {
+                        if (!isRecreated) context.trackNewMessageEvent(OPEN_LOCAL_DRAFT, TrackerAction.DATA, value = 1.0f)
+                    } ?: run {
                         if (isRecreated && (draftResource == null || messageUid == null)) {
                             // We arrive here if :
                             //    1. the user created a new Draft,
@@ -162,6 +164,7 @@ class NewMessageViewModel @Inject constructor(
                             // so we can just reuse the already existing Draft.
                             draft
                         } else {
+                            if (!isRecreated) context.trackNewMessageEvent(OPEN_LOCAL_DRAFT, TrackerAction.DATA, value = 0.0f)
                             fetchDraft()
                         } ?: return@writeBlocking false
                     }
@@ -217,14 +220,9 @@ class NewMessageViewModel @Inject constructor(
         )
     }
 
-    private fun getLatestDraft(draftLocalUuid: String?): Draft? {
-        return draftLocalUuid?.let(draftController::getDraft)?.copyFromRealm()?.also {
-            context.trackNewMessageEvent(OPEN_LOCAL_DRAFT, TrackerAction.DATA, value = 1.0f)
-        }
-    }
+    private fun getLatestDraft(draftLocalUuid: String?) = draftLocalUuid?.let(draftController::getDraft)?.copyFromRealm()
 
     private fun fetchDraft(): Draft? {
-        context.trackNewMessageEvent(OPEN_LOCAL_DRAFT, TrackerAction.DATA, value = 0.0f)
         return ApiRepository.getDraft(draftResource!!).data?.also { draft ->
             draft.initLocalValues(messageUid!!)
         }
