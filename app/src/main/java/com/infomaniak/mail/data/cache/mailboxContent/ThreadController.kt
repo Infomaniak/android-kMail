@@ -267,7 +267,7 @@ class ThreadController @Inject constructor(
                             isFullyDownloaded = true,
                             isTrashed = localMessage.isTrashed,
                             isFromSearch = localMessage.isFromSearch,
-                            draftLocalUuid = getDraftLocalUuid(remoteMessage, realm),
+                            draftLocalUuid = remoteMessage.getDraftLocalUuid(realm),
                             messageIds = localMessage.messageIds,
                         )
 
@@ -283,12 +283,8 @@ class ThreadController @Inject constructor(
 
         // If we've already got this Message's Draft beforehand, we need to save
         // its `draftLocalUuid`, otherwise we'll lose the link between them.
-        private fun getDraftLocalUuid(message: Message, realm: MutableRealm): String? {
-            return if (message.isDraft) {
-                DraftController.getDraftByMessageUid(message.uid, realm)?.localUuid
-            } else {
-                null
-            }
+        private fun Message.getDraftLocalUuid(realm: MutableRealm): String? {
+            return if (isDraft) DraftController.getDraftByMessageUid(uid, realm)?.localUuid else null
         }
         //endregion
     }
