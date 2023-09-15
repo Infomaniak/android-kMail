@@ -153,7 +153,7 @@ class FetchMessagesManager @Inject constructor(
                 threadUid = uid,
                 messageUid = message.uid,
                 notificationId = uid.hashCode(),
-                payloadTitle = message.sender(message.folder.role)?.displayedName(appContext),
+                payloadTitle = message.sender?.displayedName(appContext),
                 payloadContent = subject,
                 payloadDescription = description,
             )

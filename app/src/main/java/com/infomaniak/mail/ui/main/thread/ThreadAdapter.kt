@@ -35,7 +35,6 @@ import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.views.ViewHolder
 import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Attachment.*
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -55,11 +54,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.jsoup.Jsoup
 import java.util.*
-import javax.inject.Inject
 import com.google.android.material.R as RMaterial
 
-class ThreadAdapter @Inject constructor(
-    private val folderController: FolderController,
+class ThreadAdapter(
+    private val shouldLoadDistantResources: Boolean,
 ) : ListAdapter<Message, ThreadViewHolder>(MessageDiffCallback()) {
 
     inline val messages: MutableList<Message> get() = currentList
@@ -82,13 +80,6 @@ class ThreadAdapter @Inject constructor(
     private val webViewUtils by lazy { WebViewUtils(recyclerView.context) }
 
     private val scaledTouchSlop by lazy { ViewConfiguration.get(recyclerView.context).scaledTouchSlop }
-
-    private var shouldLoadDistantResources: Boolean = false
-
-    operator fun invoke(shouldLoadDistantResources: Boolean): ThreadAdapter {
-        this.shouldLoadDistantResources = shouldLoadDistantResources
-        return this
-    }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         this.recyclerView = recyclerView
@@ -117,9 +108,7 @@ class ThreadAdapter @Inject constructor(
             val message = messages[position]
 
             when (payload) {
-                NotificationType.AVATAR -> if (!message.isDraft) {
-                    userAvatar.loadAvatar(message.sender(folderController.getFolder(message.folderId)?.role), contacts)
-                }
+                NotificationType.AVATAR -> if (!message.isDraft) userAvatar.loadAvatar(message.sender, contacts)
                 NotificationType.TOGGLE_LIGHT_MODE -> {
                     isThemeTheSameMap[message.uid] = !isThemeTheSameMap[message.uid]!!
                     holder.toggleContentAndQuoteTheme(message)
@@ -231,7 +220,6 @@ class ThreadAdapter @Inject constructor(
 
     private fun ThreadViewHolder.bindHeader(message: Message) = with(binding) {
         val messageDate = message.date.toDate()
-        val messageSender = message.sender(folderController.getFolder(message.folderId)?.role)
 
         if (message.isDraft) {
             userAvatar.loadAvatar(AccountUtils.currentUser!!)
@@ -241,16 +229,17 @@ class ThreadAdapter @Inject constructor(
             }
             shortMessageDate.text = ""
         } else {
-            userAvatar.loadAvatar(messageSender, contacts)
+            val firstSender = message.sender
+            userAvatar.loadAvatar(firstSender, contacts)
             expeditorName.apply {
-                text = messageSender?.let { context.getPrettyNameAndEmail(it).first }
+                text = firstSender?.let { context.getPrettyNameAndEmail(it).first }
                     ?: run { context.getString(R.string.unknownRecipientTitle) }
                 setTextAppearance(R.style.BodyMedium)
             }
             shortMessageDate.text = context.mailFormattedDate(messageDate)
         }
 
-        messageSender?.let { recipient ->
+        message.sender?.let { recipient ->
             userAvatar.setOnClickListener {
                 context.trackMessageEvent("selectAvatar")
                 onContactClicked?.invoke(recipient)
