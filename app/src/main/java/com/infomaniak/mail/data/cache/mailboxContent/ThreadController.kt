@@ -266,6 +266,7 @@ class ThreadController @Inject constructor(
                     }
 
                 }.onFailure {
+                    // This `runCatching / onFailure` is here only to catch `OutOfMemoryError` when trying to deserialize very big Body
                     handleFailure(localMessage.uid)
                 }
             }
