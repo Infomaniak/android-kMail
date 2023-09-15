@@ -15,41 +15,41 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <com.google.android.material.appbar.AppBarLayout
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <com.google.android.material.appbar.MaterialToolbar
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:navigationIcon="@drawable/ic_close_big">
-
-            <TextView
-                android:id="@+id/toolbarTitle"
-                style="@style/H2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="@string/aiPromptTitle" />
-
-        </com.google.android.material.appbar.MaterialToolbar>
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <androidx.core.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingHorizontal="@dimen/marginStandardMedium"
-        android:paddingVertical="@dimen/marginStandard"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:layout_height="wrap_content"
+        app:navigationIcon="@drawable/ic_close_big">
 
         <TextView
+            android:id="@+id/toolbarTitle"
+            style="@style/H2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            tools:text="@string/aiPromptTitle" />
+
+    </com.google.android.material.appbar.MaterialToolbar>
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <TextView
+            android:id="@+id/propositionTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="@dimen/marginStandardMedium"
+            android:paddingVertical="@dimen/marginStandard"
+            android:textIsSelectable="true"
             tools:text="Objet : Candidature au poste de Manager de restaurant - \n\nCher(e) [Nom du responsable du recrutement],\n\nJ'ai le plaisir de vous envoyer mon CV en tant que candidat(e) au poste de Manager de restaurant au sein de votre établissement. Je suis convaincu(e) que mon expérience et mes compétences seraient un atout précieux pour votre équipe.\n\nJ'ai acquis une solide expérience dans la gestion d'équipe, le service client et l'optimisation des opérations dans l'industrie de la restauration.\n\nJe serais ravi(e) de discuter en détail de ma candidature lors d'un entretien avec vous. Vous trouverez mon CV en pièce jointe.\n\nMerci de votre attention.\nCordialement,\n[Votre nom]" />
 
     </androidx.core.widget.NestedScrollView>
@@ -93,4 +93,4 @@
 
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</LinearLayout>
