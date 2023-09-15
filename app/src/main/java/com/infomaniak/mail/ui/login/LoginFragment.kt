@@ -72,13 +72,8 @@ class LoginFragment : Fragment() {
     @Inject
     lateinit var loginUtils: LoginUtils
 
-    private lateinit var webViewLoginResultLauncher: ActivityResultLauncher<Intent>
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        webViewLoginResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
-            loginUtils.handleWebViewLoginResult(fragment = this, result, loginActivity.infomaniakLogin, ::resetLoginButtons)
-        }
+    private val webViewLoginResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
+        loginUtils.handleWebViewLoginResult(fragment = this, result, loginActivity.infomaniakLogin, ::resetLoginButtons)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {

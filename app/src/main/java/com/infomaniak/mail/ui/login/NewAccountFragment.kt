@@ -64,17 +64,12 @@ class NewAccountFragment : Fragment() {
     @Inject
     lateinit var loginUtils: LoginUtils
 
-    private lateinit var webViewLoginResultLauncher: ActivityResultLauncher<Intent>
-
     private val createAccountResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         result.handleCreateAccountActivityResult()
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        webViewLoginResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
-            loginUtils.handleWebViewLoginResult(fragment = this, result, loginActivity.infomaniakLogin, ::onFailedLogin)
-        }
+    private val webViewLoginResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
+        loginUtils.handleWebViewLoginResult(fragment = this, result, loginActivity.infomaniakLogin, ::onFailedLogin)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
