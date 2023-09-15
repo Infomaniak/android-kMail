@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak Mail - Android
+  ~ Copyright (C) 2023 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:navigationIcon="@drawable/ic_close_big">
+
+            <TextView
+                android:id="@+id/toolbarTitle"
+                style="@style/H2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="@string/aiPromptTitle" />
+
+        </com.google.android.material.appbar.MaterialToolbar>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingHorizontal="@dimen/marginStandardMedium"
+        android:paddingVertical="@dimen/marginStandard"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Objet : Candidature au poste de Manager de restaurant - \n\nCher(e) [Nom du responsable du recrutement],\n\nJ'ai le plaisir de vous envoyer mon CV en tant que candidat(e) au poste de Manager de restaurant au sein de votre établissement. Je suis convaincu(e) que mon expérience et mes compétences seraient un atout précieux pour votre équipe.\n\nJ'ai acquis une solide expérience dans la gestion d'équipe, le service client et l'optimisation des opérations dans l'industrie de la restauration.\n\nJe serais ravi(e) de discuter en détail de ma candidature lors d'un entretien avec vous. Vous trouverez mon CV en pièce jointe.\n\nMerci de votre attention.\nCordialement,\n[Votre nom]" />
+
+    </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.card.MaterialCardView
+        style="@style/CardViewMail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        app:cardElevation="10dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingHorizontal="@dimen/marginStandardMedium"
+            android:paddingVertical="@dimen/alternativeMargin">
+
+            <com.google.android.material.button.MaterialButton
+                style="@style/TextButtonSecondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/suisseintl_regular"
+                android:text="Ajuster"
+                android:textColor="@color/secondaryTextColor"
+                app:icon="@drawable/ic_filter"
+                app:iconTint="@color/iconColorSecondaryText" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <com.google.android.material.button.MaterialButton
+                style="@style/TextButtonPrimaryMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Insérer"
+                android:theme="@style/AiCursorAndPrimaryColorTheme"
+                app:icon="@drawable/ic_add" />
+
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
