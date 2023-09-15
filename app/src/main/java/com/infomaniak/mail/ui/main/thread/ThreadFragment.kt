@@ -91,6 +91,12 @@ class ThreadFragment : Fragment() {
     private val threadAdapter by lazy { ThreadAdapter(shouldLoadDistantResources()) }
     private val permissionUtils by lazy { PermissionUtils(this) }
     private val isNotInSpam by lazy { mainViewModel.currentFolder.value?.role != FolderRole.SPAM }
+    private val externalExpeditorInfoDialog by lazy {
+        createInformationDialog(
+            title = getString(R.string.externalDialogTitleExpeditor),
+            confirmButtonText = R.string.externalDialogConfirmButton
+        )
+    }
 
     private var isFavorite = false
 
@@ -507,12 +513,7 @@ class ThreadFragment : Fragment() {
                     externalRecipientEmail,
                 )
 
-                // TODO: Reuse instance
-                createInformationDialog(
-                    title = getString(R.string.externalDialogTitleExpeditor),
-                    description = description,
-                    confirmButtonText = R.string.externalDialogConfirmButton,
-                ).show()
+                externalExpeditorInfoDialog.showWithDescription(description)
             }
         }
 
