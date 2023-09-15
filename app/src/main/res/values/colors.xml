@@ -127,6 +127,7 @@
 
     <!-- Icons -->
     <color name="iconColorPrimaryText">@color/primaryTextColor</color>
+    <color name="iconColorSecondaryText">@color/secondaryTextColor</color>
     <color name="iconColor">@color/elephant</color>
     <color name="disabledIconColor">@color/shark</color>
     <color name="favoriteYellow">@color/yellow_light</color>
