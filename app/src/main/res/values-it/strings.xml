@@ -49,6 +49,7 @@
     <string name="addUnknownRecipientAlreadyUsed">L’e-mail è già utilizzata</string>
     <string name="addUnknownRecipientInvalidEmail">L’e-mail non è valida</string>
     <string name="addUnknownRecipientTitle">Aggiungi un destinatario</string>
+    <string name="aiPromptGenerationLoader">L’assistente sta scrivendo…</string>
     <string name="aiPromptPlaceholder">Comunica all’assistente di scrittura cosa vuoi scrivere. Ad esempio, \"un’e-mail di ringraziamento per un regalo gradito\".</string>
     <string name="aiPromptTag">Beta</string>
     <string name="aiPromptTitle">Assistente di scrittura</string>
