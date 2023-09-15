@@ -134,7 +134,7 @@
     <style name="TextButton" parent="Widget.Material3.Button.TextButton">
         <item name="android:letterSpacing">0</item>
         <item name="android:textAllCaps">false</item>
-        <item name="android:textColor">?android:attr/colorPrimary</item>
+        <item name="android:textColor">@color/primary_color_disabled</item>
         <item name="android:textSize">14sp</item>
         <item name="cornerRadius">10dp</item>
     </style>

@@ -88,6 +88,7 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
         observeFoldersLive()
         observeQuotasLive()
         observePermissionsLive()
+        observeNewFolderCreation()
     }
 
     private fun setupListeners() = with(binding) {
@@ -254,6 +255,10 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
         mainViewModel.currentPermissionsLive.observe(viewLifecycleOwner) { permissions ->
             binding.restoreMails.isVisible = permissions?.canRestoreEmails == true
         }
+    }
+
+    private fun observeNewFolderCreation() {
+        mainViewModel.newFolderResultTrigger.observe(viewLifecycleOwner) { createFolderDialog.resetAndDismiss() }
     }
 
     fun onDrawerOpened() {

@@ -20,10 +20,7 @@ package com.infomaniak.mail.utils
 import android.animation.Animator
 import android.animation.ValueAnimator
 import android.app.Activity
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
-import android.content.Intent
+import android.content.*
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -51,6 +48,7 @@ import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.SimpleColorFilter
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
@@ -100,16 +98,14 @@ import io.realm.kotlin.ext.query
 import io.realm.kotlin.query.Sort
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmObject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.invoke
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlinx.serialization.encodeToString
 import org.jsoup.Jsoup
 import java.util.Calendar
 import java.util.Date
 import java.util.Scanner
 import com.infomaniak.lib.core.R as RCore
+import com.infomaniak.lib.core.utils.Utils as UtilsCore
 
 //region Type alias
 typealias MergedContactDictionary = Map<String, Map<String, MergedContact>>
@@ -472,7 +468,14 @@ fun Fragment.createInputDialog(
     fun AlertDialog.setupOnShowListener() = apply {
         setOnShowListener {
             showKeyboard()
-            getButton(AlertDialog.BUTTON_POSITIVE).apply {
+            positiveButton.apply {
+                setOnClickListener {
+                    onPositiveButtonClicked(textInput.trimmedText)
+                    hideKeyboard()
+                    negativeButton.isEnabled = false
+                    UtilsCore.createRefreshTimer(onTimerFinish = ::showProgress).start()
+                }
+                setText(confirmButtonText)
                 isEnabled = false
                 textInput.doAfterTextChanged {
                     if (it.isNullOrBlank()) {
@@ -492,7 +495,8 @@ fun Fragment.createInputDialog(
 
     return@with MaterialAlertDialogBuilder(context)
         .setView(root)
-        .setPositiveButton(confirmButtonText) { _, _ -> onPositiveButtonClicked(textInput.trimmedText) }
+        .setCancelable(false)
+        .setPositiveButton(confirmButtonText, null)
         .setNegativeButton(RCore.string.buttonCancel, null)
         .setOnDismissListener {
             errorJob?.cancel()
@@ -501,6 +505,17 @@ fun Fragment.createInputDialog(
         .create()
         .setupOnShowListener()
 }
+
+fun AlertDialog.resetAndDismiss() {
+    if (isShowing) {
+        dismiss()
+        positiveButton.hideProgress(R.string.buttonCreate)
+        negativeButton.isEnabled = true
+    }
+}
+
+inline val AlertDialog.positiveButton get() = (getButton(DialogInterface.BUTTON_POSITIVE) as MaterialButton)
+inline val AlertDialog.negativeButton get() = (getButton(DialogInterface.BUTTON_NEGATIVE) as MaterialButton)
 
 fun DragDropSwipeRecyclerView.addStickyDateDecoration(adapter: ThreadListAdapter, threadDensity: ThreadDensity) {
     addItemDecoration(HeaderItemDecoration(this, false) { position ->

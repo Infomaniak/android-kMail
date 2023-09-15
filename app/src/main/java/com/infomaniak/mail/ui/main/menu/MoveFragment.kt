@@ -37,9 +37,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.FragmentMoveBinding
-import com.infomaniak.mail.utils.createInputDialog
-import com.infomaniak.mail.utils.handleEditorSearchAction
-import com.infomaniak.mail.utils.setOnClearTextClickListener
+import com.infomaniak.mail.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -109,8 +107,9 @@ class MoveFragment : MenuFoldersFragment() {
         }
     }
 
-    private fun observeNewFolderCreation() {
-        mainViewModel.isNewFolderCreated.observe(viewLifecycleOwner) { isFolderCreated ->
+    private fun observeNewFolderCreation() = with(mainViewModel) {
+        newFolderResultTrigger.observe(viewLifecycleOwner) { createFolderDialog.resetAndDismiss() }
+        isMovedToNewFolder.observe(viewLifecycleOwner) { isFolderCreated ->
             if (isFolderCreated) findNavController().popBackStack()
         }
     }
