@@ -22,6 +22,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.ui.main.newMessage.AiViewModel.PropositionStatus.*
+import com.infomaniak.mail.utils.ErrorCode.MAX_TOKEN_REACHED
 import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -29,22 +31,31 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class AiPromptViewModel @Inject constructor(@IoDispatcher private val ioDispatcher: CoroutineDispatcher) : ViewModel() {
+class AiViewModel @Inject constructor(@IoDispatcher private val ioDispatcher: CoroutineDispatcher) : ViewModel() {
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
     var aiPrompt = ""
     var isAiPromptOpened = false
 
-    val aiProposition = MutableLiveData<String>()
+    val aiProposition = MutableLiveData<Pair<PropositionStatus, String?>?>()
 
     fun generateAiProposition(prompt: String) = viewModelScope.launch(ioCoroutineContext) {
         with(ApiRepository.generateAiProposition(prompt)) {
-            if (isSuccess()) {
-                data?.content.let(aiProposition::postValue)
-            } else {
-                TODO()
-            }
+            aiProposition.postValue(
+                when {
+                    isSuccess() -> data?.content?.let { SUCCESS to it } ?: (MISSING_DATA to null)
+                    error?.code == MAX_TOKEN_REACHED -> TOO_LONG to null
+                    else -> ERROR to null
+                }
+            )
         }
+    }
+
+    enum class PropositionStatus {
+        SUCCESS,
+        ERROR,
+        TOO_LONG,
+        MISSING_DATA,
     }
 }
