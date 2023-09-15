@@ -125,7 +125,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:layout_marginEnd="@dimen/marginStandardMedium"
-                        android:text="L’assistant est entrain d’écrire..." />
+                        android:text="@string/aiPromptGenerationLoader" />
 
                     <ProgressBar
                         android:layout_width="@dimen/marginStandardMedium"
