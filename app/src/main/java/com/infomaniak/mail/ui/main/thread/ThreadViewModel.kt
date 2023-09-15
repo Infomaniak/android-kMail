@@ -37,11 +37,8 @@ import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.MessageBodyUtils.SplitBody
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.ext.copyFromRealm
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.collections.set
 
@@ -156,8 +153,11 @@ class ThreadViewModel @Inject constructor(
         fetchMessagesJob?.cancel()
         fetchMessagesJob = viewModelScope.launch(ioCoroutineContext) {
             val (deleted, failed) = threadController.fetchMessagesHeavyData(messages, mailboxContentRealm())
-            deletedMessagesUids.addAll(deleted)
-            failedMessagesUids.postValue(failed)
+            if (deleted.isNotEmpty() || failed.isNotEmpty()) {
+                delay(100L)
+                deletedMessagesUids.addAll(deleted)
+                failedMessagesUids.postValue(failed)
+            }
         }
     }
 
