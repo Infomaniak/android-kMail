@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~ Copyright (C) 2022-2023 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -25,5 +25,16 @@
         android:id="@+id/newMessageFragment"
         android:name="com.infomaniak.mail.ui.main.newMessage.NewMessageFragment"
         android:label="fragment_new_message"
-        tools:layout="@layout/fragment_new_message" />
+        tools:layout="@layout/fragment_new_message">
+        <action
+            android:id="@+id/action_newMessageFragment_to_aiPropositionFragment"
+            app:destination="@id/aiPropositionFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/aiPropositionFragment"
+        android:name="com.infomaniak.mail.ui.main.newMessage.AiPropositionFragment"
+        android:label="AiPropositionFragment"
+        tools:layout="@layout/fragment_ai_proposition" />
+
 </navigation>
