@@ -102,7 +102,7 @@ class NewMessageFragment : Fragment() {
     private val externalRecipientInfoDialog by lazy {
         createInformationDialog(
             title = getString(R.string.externalDialogTitleRecipient),
-            confirmButtonText = R.string.externalDialogConfirmButton
+            confirmButtonText = R.string.externalDialogConfirmButton,
         )
     }
 

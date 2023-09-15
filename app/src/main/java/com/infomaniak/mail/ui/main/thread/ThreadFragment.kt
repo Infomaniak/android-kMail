@@ -94,7 +94,7 @@ class ThreadFragment : Fragment() {
     private val externalExpeditorInfoDialog by lazy {
         createInformationDialog(
             title = getString(R.string.externalDialogTitleExpeditor),
-            confirmButtonText = R.string.externalDialogConfirmButton
+            confirmButtonText = R.string.externalDialogConfirmButton,
         )
     }
 
