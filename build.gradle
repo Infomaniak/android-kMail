@@ -17,4 +17,4 @@ plugins {
     alias(libs.plugins.realm.kotlin) apply false
 }
 
-task clean(type: Delete) { delete rootProject.buildDir }
+tasks.register('clean', Delete) { delete rootProject.buildDir }
