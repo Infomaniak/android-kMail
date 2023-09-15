@@ -150,12 +150,11 @@ class NotificationActionsReceiver : BroadcastReceiver() {
             val mailbox = mailboxController.getMailbox(userId, mailboxId) ?: return@launch
             val messages = sharedUtils.getMessagesToMove(threads, message)
             val destinationFolder = folderController.getFolder(folderRole) ?: return@launch
-            val destinationId = destinationFolder.id
             val okHttpClient = AccountUtils.getHttpClient(userId)
 
             context.trackNotificationActionEvent(matomoValue)
 
-            with(ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationId, okHttpClient)) {
+            with(ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id, okHttpClient)) {
                 if (isSuccess()) {
                     dismissNotification(context, mailbox, notificationId)
                     updateFolders(folders = listOf(message.folder, destinationFolder), mailbox, realm)
