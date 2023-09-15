@@ -21,10 +21,12 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isGone
+import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -93,13 +95,17 @@ class AiPromptFragment : Fragment() {
         }
 
         generateButton.setOnClickListener {
+            generationLoader.isVisible = true
+            generateButton.isInvisible = true
+
             aiViewModel.generateAiProposition(newMessageViewModel.aiPrompt)
         }
     }
 
-    private fun observeAiProposition() {
+    private fun observeAiProposition() = with(binding) {
         aiViewModel.aiProposition.observe(viewLifecycleOwner) {
-            Log.e("gibran", "observeAiProposition - proposition: ${it}")
+            generationLoader.isGone = true
+            generateButton.isVisible = true
         }
     }
 
