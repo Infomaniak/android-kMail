@@ -97,17 +97,45 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/generateButton"
-                style="@style/TextButtonPrimaryMedium"
+            <FrameLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:enabled="false"
-                android:text="@string/aiPromptValidateButton"
-                android:theme="@style/AiCursorAndPrimaryColorTheme"
-                tools:enabled="true" />
+                android:layout_gravity="end">
 
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/generateButton"
+                    style="@style/TextButtonPrimaryMedium"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:enabled="false"
+                    android:text="@string/aiPromptValidateButton"
+                    android:theme="@style/AiCursorAndPrimaryColorTheme"
+                    tools:enabled="true" />
+
+                <LinearLayout
+                    android:id="@+id/generationLoader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:visibility="gone">
+
+                    <TextView
+                        style="@style/BodyMedium.Tertiary"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginEnd="@dimen/marginStandardMedium"
+                        android:text="L’assistant est entrain d’écrire..." />
+
+                    <ProgressBar
+                        android:layout_width="@dimen/marginStandardMedium"
+                        android:layout_height="@dimen/marginStandardMedium"
+                        android:layout_gravity="center_vertical"
+                        android:indeterminate="true"
+                        android:theme="@style/AiCursorAndPrimaryColorTheme" />
+
+                </LinearLayout>
+            </FrameLayout>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 </androidx.constraintlayout.widget.ConstraintLayout>
