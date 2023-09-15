@@ -22,13 +22,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentAiPropositionBinding
+import com.infomaniak.mail.utils.changeToolbarColorOnScroll
 import com.infomaniak.mail.utils.postfixWithTag
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class AiPropositionFragment : Fragment() {
 
     private lateinit var binding: FragmentAiPropositionBinding
+    private val aiViewModel: AiViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentAiPropositionBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -37,6 +43,16 @@ class AiPropositionFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
+        setToolbar()
+
+        aiViewModel.aiProposition.observe(viewLifecycleOwner) { proposition ->
+            propositionTextView.text = proposition?.second
+        }
+    }
+
+    private fun FragmentAiPropositionBinding.setToolbar() {
+        changeToolbarColorOnScroll(toolbar, nestedScrollView)
+        toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
         toolbarTitle.text = requireContext().postfixWithTag(
             getString(R.string.aiPromptTitle),
             R.string.aiPromptTag,
