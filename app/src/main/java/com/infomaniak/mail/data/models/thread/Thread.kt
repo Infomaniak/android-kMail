@@ -223,7 +223,13 @@ class Thread : RealmObject {
         }
 
         recipients.firstOrNull().also {
-            if (it == null) SentryLog.e("ThreadAdapter", "Message $uid has empty from")
+            if (it == null) {
+                val recipientsString = when (message.folder.role) {
+                    FolderRole.SENT, FolderRole.DRAFT -> "to"
+                    else -> "from"
+                }
+                SentryLog.e("ThreadAdapter", "Message $uid has empty $recipientsString")
+            }
         }
 
     }.getOrElse { throwable ->
