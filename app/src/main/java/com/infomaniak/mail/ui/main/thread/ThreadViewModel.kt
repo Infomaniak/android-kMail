@@ -37,11 +37,8 @@ import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.MessageBodyUtils.SplitBody
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.ext.copyFromRealm
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.collections.set
 
@@ -156,8 +153,19 @@ class ThreadViewModel @Inject constructor(
         fetchMessagesJob?.cancel()
         fetchMessagesJob = viewModelScope.launch(ioCoroutineContext) {
             val (deleted, failed) = threadController.fetchMessagesHeavyData(messages, mailboxContentRealm())
-            deletedMessagesUids.addAll(deleted)
-            failedMessagesUids.postValue(failed)
+            if (deleted.isNotEmpty() || failed.isNotEmpty()) {
+
+                // TODO: A race condition exists between the two notify in the ThreadAdapter.
+                //  The 1st notify involves sending Messages to the adapter, while the 2nd notify entails retrieving
+                //  Messages' heavy data and subsequently notifying the adapter with the `uids` of failed Messages.
+                //  Ideally, the adapter should process the 1st notify before the 2nd one, but occasionally, the order is reversed.
+                //  Consequently, it appears that the adapter disregards the 2nd notify,
+                //  leading to an infinite shimmering effect that we cannot escape from.
+                delay(100L)
+
+                deletedMessagesUids.addAll(deleted)
+                failedMessagesUids.postValue(failed)
+            }
         }
     }
 
