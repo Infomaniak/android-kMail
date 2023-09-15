@@ -445,7 +445,7 @@ fun Activity.createDescriptionDialog(
                 onPositiveButtonClicked()
                 if (displayLoader) {
                     negativeButton.isEnabled = false
-                    CoreUtils.createRefreshTimer { positiveButton.showProgress() }.start()
+                    UtilsCore.createRefreshTimer { positiveButton.showProgress() }.start()
                 } else {
                     dismiss()
                 }
