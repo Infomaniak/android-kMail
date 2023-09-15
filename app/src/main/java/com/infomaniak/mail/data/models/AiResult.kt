@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.data.models
 
-import com.infomaniak.mail.data.models.message.Message
 import kotlinx.serialization.Serializable
 
 @Serializable
