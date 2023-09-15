@@ -44,7 +44,7 @@ class AiPromptFragment : Fragment() {
 
     private lateinit var binding: FragmentAiPromptBinding
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
-    private val aiViewModel: AiViewModel by viewModels()
+    private val aiPromptViewModel: AiPromptViewModel by viewModels()
 
     private val m3BottomSheetMaxWidthPx by lazy { resources.getDimension(RMaterial.dimen.material_bottom_sheet_max_width) }
 
@@ -98,12 +98,12 @@ class AiPromptFragment : Fragment() {
             generationLoader.isVisible = true
             generateButton.isInvisible = true
 
-            aiViewModel.generateAiProposition(newMessageViewModel.aiPrompt)
+            aiPromptViewModel.generateAiProposition(newMessageViewModel.aiPrompt)
         }
     }
 
     private fun observeAiProposition() = with(binding) {
-        aiViewModel.aiProposition.observe(viewLifecycleOwner) {
+        aiPromptViewModel.aiProposition.observe(viewLifecycleOwner) {
             generationLoader.isGone = true
             generateButton.isVisible = true
         }
