@@ -21,6 +21,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,12 +29,13 @@ import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.lib.core.utils.showKeyboard
 import com.infomaniak.lib.core.utils.toPx
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentAiPromptBinding
+import com.infomaniak.mail.ui.main.newMessage.AiViewModel.PropositionStatus
 import com.infomaniak.mail.utils.postfixWithTag
 import dagger.hilt.android.AndroidEntryPoint
 import com.google.android.material.R as RMaterial
@@ -42,7 +44,9 @@ import com.google.android.material.R as RMaterial
 class AiPromptFragment : Fragment() {
 
     private lateinit var binding: FragmentAiPromptBinding
-    private val aiPromptViewModel: AiPromptViewModel by viewModels()
+    private val aiViewModel: AiViewModel by activityViewModels()
+
+    private val newMessageFragment by lazy { parentFragment as NewMessageFragment }
 
     private val m3BottomSheetMaxWidthPx by lazy { resources.getDimension(RMaterial.dimen.material_bottom_sheet_max_width) }
 
@@ -88,28 +92,39 @@ class AiPromptFragment : Fragment() {
         )
 
         prompt.showKeyboard()
-        closeButton.setOnClickListener {
-            (parentFragment as NewMessageFragment).closeAiPrompt()
-        }
+        closeButton.setOnClickListener { newMessageFragment.closeAiPrompt() }
 
         generateButton.setOnClickListener {
             generationLoader.isVisible = true
             generateButton.isInvisible = true
 
-            aiPromptViewModel.generateAiProposition(aiPromptViewModel.aiPrompt)
+            aiViewModel.generateAiProposition(aiViewModel.aiPrompt)
         }
     }
 
     private fun observeAiProposition() = with(binding) {
-        aiPromptViewModel.aiProposition.observe(viewLifecycleOwner) {
-            generationLoader.isGone = true
-            generateButton.isVisible = true
+        aiViewModel.aiProposition.value = null
+
+        aiViewModel.aiProposition.observe(viewLifecycleOwner) { proposition ->
+            if (proposition == null) return@observe
+
+            val (status, body) = proposition
+
+            Log.e("gibran", "observeAiProposition - status: ${status}")
+            Log.e("gibran", "observeAiProposition - body: ${body}")
+            if (status == PropositionStatus.SUCCESS) {
+                if (aiViewModel.isAiPromptOpened) newMessageFragment.navigateToPropositionFragment()
+            } else {
+                // TODO
+                generationLoader.isGone = true
+                generateButton.isVisible = true
+            }
         }
     }
 
     override fun onStart() {
         super.onStart()
-        binding.prompt.setText(aiPromptViewModel.aiPrompt)
+        binding.prompt.setText(aiViewModel.aiPrompt)
     }
 
     override fun onResume() {
@@ -124,7 +139,7 @@ class AiPromptFragment : Fragment() {
 
     private fun onPromptChanged(prompt: Editable?) = with(binding) {
         generateButton.isEnabled = prompt?.isNotEmpty() ?: false
-        aiPromptViewModel.aiPrompt = prompt.toString()
+        aiViewModel.aiPrompt = prompt.toString()
     }
 
     private companion object {
