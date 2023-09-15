@@ -19,14 +19,13 @@ package com.infomaniak.mail.data.cache.mailboxContent
 
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
-import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.utils.ErrorCode
 import com.infomaniak.mail.utils.SearchUtils.Companion.convertToSearchThreads
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
@@ -138,37 +137,15 @@ class ThreadController @Inject constructor(
      * This function is deliberately present here as it relies on a method accessible solely through injection.
      *
      * @param messages List of messages for which heavy data needs to be fetched.
-     * @param mailbox The mailbox context within which the heavy data should be fetched.
      * @param realm The realm context in which the heavy data fetching and updates should occur.
      * @param okHttpClient An optional OkHttpClient instance to use for making network requests. If not provided, a default client will be used.
      */
-    suspend fun fetchMessagesHeavyData(
+    fun fetchMessagesHeavyData(
         messages: List<Message>,
-        mailbox: Mailbox,
         realm: Realm,
         okHttpClient: OkHttpClient? = null,
-    ) {
-        val failedFoldersIds = realm.writeBlocking { fetchMessagesHeavyData(messages, realm = this, okHttpClient) }
-        updateFailedFolders(failedFoldersIds, mailbox, realm, okHttpClient)
-    }
-
-    private suspend fun updateFailedFolders(
-        failedFoldersIds: Set<String>,
-        mailbox: Mailbox,
-        realm: Realm,
-        okHttpClient: OkHttpClient?,
-    ) {
-        failedFoldersIds.forEach { folderId ->
-            FolderController.getFolder(folderId, realm)?.let { folder ->
-                refreshController.refreshThreads(
-                    refreshMode = RefreshMode.REFRESH_FOLDER,
-                    mailbox = mailbox,
-                    folder = folder,
-                    okHttpClient = okHttpClient,
-                    realm = realm,
-                )
-            }
-        }
+    ): Pair<List<String>, List<String>> {
+        return realm.writeBlocking { fetchMessagesHeavyData(messages, realm = this, okHttpClient) }
     }
 
     fun saveThreads(searchMessages: List<Message>) {
@@ -251,34 +228,48 @@ class ThreadController @Inject constructor(
             messages: List<Message>,
             realm: MutableRealm,
             okHttpClient: OkHttpClient? = null,
-        ): Set<String> {
+        ): Pair<List<String>, List<String>> {
 
-            val failedFoldersIds = mutableSetOf<String>()
+            val deletedMessagesUids = mutableListOf<String>()
+            val failedMessagesUids = mutableListOf<String>()
 
-            messages.forEach { localMessage ->
-                if (localMessage.isFullyDownloaded()) return@forEach
-
-                val apiResponse = ApiRepository.getMessage(localMessage.resource, okHttpClient)
-
-                if (apiResponse.isSuccess()) {
-                    apiResponse.data?.also { remoteMessage ->
-                        remoteMessage.initLocalValues(
-                            date = localMessage.date,
-                            isFullyDownloaded = true,
-                            isTrashed = localMessage.isTrashed,
-                            isFromSearch = localMessage.isFromSearch,
-                            draftLocalUuid = remoteMessage.getDraftLocalUuid(realm),
-                            messageIds = localMessage.messageIds,
-                        )
-
-                        MessageController.upsertMessage(remoteMessage, realm)
-                    }
+            fun handleFailure(uid: String, code: String? = null) {
+                if (code == ErrorCode.MESSAGE_NOT_FOUND) {
+                    deletedMessagesUids.add(uid)
                 } else {
-                    failedFoldersIds.add(localMessage.folderId)
+                    failedMessagesUids.add(uid)
                 }
             }
 
-            return failedFoldersIds
+            messages.forEach { localMessage ->
+
+                if (localMessage.isFullyDownloaded()) return@forEach
+
+                runCatching {
+                    val apiResponse = ApiRepository.getMessage(localMessage.resource, okHttpClient)
+
+                    if (apiResponse.isSuccess()) {
+                        apiResponse.data?.also { remoteMessage ->
+                            remoteMessage.initLocalValues(
+                                date = localMessage.date,
+                                isFullyDownloaded = true,
+                                isTrashed = localMessage.isTrashed,
+                                isFromSearch = localMessage.isFromSearch,
+                                draftLocalUuid = remoteMessage.getDraftLocalUuid(realm),
+                                messageIds = localMessage.messageIds,
+                            )
+                            MessageController.upsertMessage(remoteMessage, realm)
+                        }
+                    } else {
+                        handleFailure(localMessage.uid, apiResponse.error?.code)
+                    }
+
+                }.onFailure {
+                    handleFailure(localMessage.uid)
+                }
+            }
+
+            return deletedMessagesUids to failedMessagesUids
         }
 
         // If we've already got this Message's Draft beforehand, we need to save

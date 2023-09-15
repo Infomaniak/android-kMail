@@ -119,7 +119,7 @@ class FetchMessagesManager @Inject constructor(
         okHttpClient: OkHttpClient,
     ) {
 
-        threadController.fetchMessagesHeavyData(messages, mailbox, realm, okHttpClient)
+        threadController.fetchMessagesHeavyData(messages, realm, okHttpClient)
 
         val message = MessageController.getThreadLastMessageInFolder(uid, realm) ?: run {
             SentryDebug.sendFailedNotification("No Message in the Thread", userId, mailbox.mailboxId, sentryMessageUid, mailbox)
