@@ -38,6 +38,10 @@
         <item name="android:textColor">?android:attr/colorPrimary</item>
     </style>
 
+    <style name="BodyMedium.Tertiary">
+        <item name="android:textColor">@color/tertiaryTextColor</item>
+    </style>
+
     <!-- BodyMedium.OnAccent is only used on FABs, see ExtendedFloatingActionButtonStyle -->
 
     <style name="BodyMedium.Error">
