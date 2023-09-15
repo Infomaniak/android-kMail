@@ -133,6 +133,7 @@ class MainActivity : BaseActivity() {
         handleOnBackPressed()
 
         observeNetworkStatus()
+        observeDeletedMessages()
         observeDraftWorkerResults()
         binding.drawerLayout.addDrawerListener(drawerListener)
         registerFirebaseBroadcastReceiver.initFirebaseBroadcastReceiver(this, mainViewModel)
@@ -158,6 +159,15 @@ class MainActivity : BaseActivity() {
                 level = if (isAvailable) SentryLevel.INFO else SentryLevel.WARNING
             })
             mainViewModel.isInternetAvailable.value = isAvailable
+        }
+    }
+
+    private fun observeDeletedMessages() = with(mainViewModel) {
+        deletedMessages.observe(owner = this@MainActivity) {
+            if (it.isNotEmpty()) {
+                handleDeletedMessages(it)
+                deletedMessages.value = emptySet()
+            }
         }
     }
 

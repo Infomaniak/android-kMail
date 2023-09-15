@@ -389,6 +389,7 @@
     <string name="settingsTransferInBody">In the message body</string>
     <string name="snackbarBlockUserConfirmation">Sender is now blocked</string>
     <string name="snackbarContactSaved">New contact successfully registered</string>
+    <string name="snackbarDeletedConversation">Conversation no longer exists</string>
     <string name="snackbarDisplayProblemReported">Display problem reported</string>
     <string name="snackbarDownloadInProgress">Download in progress…</string>
     <string name="snackbarDraftDeleted">Draft deleted</string>

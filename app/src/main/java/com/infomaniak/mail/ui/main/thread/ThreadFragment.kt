@@ -363,8 +363,16 @@ class ThreadFragment : Fragment() {
     }
 
     private fun observeMessagesLive() {
+
         threadViewModel.messagesLive.observe(viewLifecycleOwner) { messages ->
             SentryLog.i("UI", "Received ${messages.size} messages")
+
+            if (messages.isEmpty()) {
+                mainViewModel.deletedMessages.value = threadViewModel.deletedMessagesUids
+                leaveThread()
+                return@observe
+            }
+
             threadViewModel.fetchMessagesHeavyData(messages)
             threadAdapter.submitList(messages)
             scrollToFirstUnseenMessage(messages)

@@ -40,6 +40,7 @@ import com.infomaniak.mail.data.models.MoveResult
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.message.Message.*
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.di.IoDispatcher
@@ -89,6 +90,7 @@ class MainViewModel @Inject constructor(
     val isInternetAvailable = MutableLiveData<Boolean>()
     val isNewFolderCreated = SingleLiveEvent<Boolean>()
     val toggleLightThemeForMessage = SingleLiveEvent<Message>()
+    val deletedMessages = SingleLiveEvent<Set<String>>()
 
     val snackBarManager by lazy { SnackBarManager() }
 
@@ -950,6 +952,27 @@ class MainViewModel @Inject constructor(
                 realm = mailboxContentRealm(),
                 started = ::startedDownload,
                 stopped = ::stoppedDownload,
+            )
+        }
+    }
+
+    fun handleDeletedMessages(uids: Set<String>) = viewModelScope.launch(ioCoroutineContext) {
+
+        snackBarManager.postValue(context.getString(R.string.snackbarDeletedConversation))
+
+        val mailbox = currentMailbox.value ?: return@launch
+        val realm = mailboxContentRealm()
+
+        val foldersToUpdate = realm.writeBlocking {
+            uids.mapNotNull { MessageController.getMessage(it, realm = this)?.folder?.copyFromRealm() }.toSet()
+        }
+
+        foldersToUpdate.forEach { folder ->
+            refreshController.refreshThreads(
+                refreshMode = RefreshMode.REFRESH_FOLDER,
+                mailbox = mailbox,
+                folder = folder,
+                realm = realm,
             )
         }
     }

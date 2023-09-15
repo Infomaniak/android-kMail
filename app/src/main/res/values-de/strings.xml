@@ -383,6 +383,7 @@
     <string name="settingsTransferInBody">Im Nachrichtentext</string>
     <string name="snackbarBlockUserConfirmation">Absender ist jetzt blockiert</string>
     <string name="snackbarContactSaved">Neuer Kontakt erfolgreich registriert</string>
+    <string name="snackbarDeletedConversation">Das Gespräch existiert nicht mehr</string>
     <string name="snackbarDisplayProblemReported">Anzeigeproblem gemeldet</string>
     <string name="snackbarDownloadInProgress">Download läuft…</string>
     <string name="snackbarDraftDeleted">Entwurf gelöscht</string>
