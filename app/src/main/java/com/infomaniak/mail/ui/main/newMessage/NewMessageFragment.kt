@@ -92,7 +92,7 @@ class NewMessageFragment : Fragment() {
         requireActivity().intent?.extras?.let(NewMessageActivityArgs::fromBundle) ?: NewMessageActivityArgs()
     }
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
-    private val aiPromptViewModel: AiPromptViewModel by activityViewModels()
+    private val aiViewModel: AiViewModel by activityViewModels()
 
     private lateinit var addressListPopupWindow: ListPopupWindow
     private lateinit var filePicker: FilePicker
@@ -174,7 +174,7 @@ class NewMessageFragment : Fragment() {
     private fun handleOnBackPressed() {
         newMessageActivity.onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             when {
-                aiPromptViewModel.isAiPromptOpened -> closeAiPrompt()
+                aiViewModel.isAiPromptOpened -> closeAiPrompt()
                 newMessageViewModel.isAutoCompletionOpened -> closeAutoCompletion()
                 else -> newMessageActivity.finishAppAndRemoveTaskIfNeeded()
             }
@@ -211,7 +211,7 @@ class NewMessageFragment : Fragment() {
         setupSendButton()
         setupExternalBanner()
 
-        if (aiPromptViewModel.isAiPromptOpened) openAiPrompt()
+        if (aiViewModel.isAiPromptOpened) openAiPrompt()
 
         scrim.setOnClickListener { closeAiPrompt() }
     }
@@ -541,7 +541,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun openAiPrompt() = with(binding) {
-        aiPromptViewModel.isAiPromptOpened = true
+        aiViewModel.isAiPromptOpened = true
 
         // Keyboard is opened inside onCreate() of AiPromptFragment
 
@@ -555,7 +555,7 @@ class NewMessageFragment : Fragment() {
     }
 
     fun closeAiPrompt() = with(binding) {
-        aiPromptViewModel.apply {
+        aiViewModel.apply {
             isAiPromptOpened = false
             aiPrompt = ""
         }
@@ -792,6 +792,11 @@ class NewMessageFragment : Fragment() {
 
         editorActions.isGone = isEditorExpanded
         textEditing.isVisible = isEditorExpanded
+    }
+
+    fun navigateToPropositionFragment() {
+        closeAiPrompt()
+        safeNavigate(NewMessageFragmentDirections.actionNewMessageFragmentToAiPropositionFragment())
     }
 
     enum class EditorAction(val matomoValue: String) {
