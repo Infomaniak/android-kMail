@@ -32,6 +32,7 @@ import android.view.Window
 import android.view.inputmethod.EditorInfo
 import android.webkit.WebView
 import android.widget.Button
+import android.widget.TextView
 import androidx.annotation.*
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.res.ResourcesCompat
@@ -392,8 +393,8 @@ fun Fragment.deleteWithConfirmationPopup(folderRole: FolderRole?, count: Int, ca
 
 fun Fragment.createInformationDialog(
     title: String,
-    description: CharSequence,
-    @StringRes confirmButtonText: Int,
+    description: CharSequence = "",
+    @StringRes confirmButtonText: Int = R.string.buttonConfirm,
 ): AlertDialog = requireActivity().createInformationDialog(title, description, confirmButtonText)
 
 fun Activity.createInformationDialog(
@@ -512,6 +513,11 @@ fun AlertDialog.resetAndDismiss() {
         positiveButton.hideProgress(R.string.buttonCreate)
         negativeButton.isEnabled = true
     }
+}
+
+fun AlertDialog.showWithDescription(description: CharSequence) {
+    show()
+    findViewById<TextView>(R.id.dialogDescription)?.text = description
 }
 
 inline val AlertDialog.positiveButton get() = (getButton(DialogInterface.BUTTON_POSITIVE) as MaterialButton)

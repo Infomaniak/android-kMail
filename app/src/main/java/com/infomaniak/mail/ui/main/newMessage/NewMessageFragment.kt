@@ -99,6 +99,12 @@ class NewMessageFragment : Fragment() {
 
     private val newMessageActivity by lazy { requireActivity() as NewMessageActivity }
     private val webViewUtils by lazy { WebViewUtils(requireContext()) }
+    private val externalRecipientInfoDialog by lazy {
+        createInformationDialog(
+            title = getString(R.string.externalDialogTitleRecipient),
+            confirmButtonText = R.string.externalDialogConfirmButton,
+        )
+    }
 
     private var lastFieldToTakeFocus: FieldType? = TO
 
@@ -698,12 +704,7 @@ class NewMessageFragment : Fragment() {
                 externalRecipientEmail,
             )
 
-            // TODO: Reuse instance
-            createInformationDialog(
-                title = getString(R.string.externalDialogTitleRecipient),
-                description = description,
-                confirmButtonText = R.string.externalDialogConfirmButton,
-            ).show()
+            externalRecipientInfoDialog.showWithDescription(description)
         }
 
         newMessageViewModel.externalRecipientCount.observe(viewLifecycleOwner) { (email, externalQuantity) ->
