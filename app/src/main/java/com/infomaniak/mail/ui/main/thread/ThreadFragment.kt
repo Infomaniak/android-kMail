@@ -130,6 +130,7 @@ class ThreadFragment : Fragment() {
             threadAdapter.isExpandedMap = result.second
             threadAdapter.isThemeTheSameMap = result.third
             observeMessagesLive()
+            observeFailedMessages()
             observeContacts()
             observeQuickActionBarClicks()
             observeOpenAttachment()
@@ -377,6 +378,10 @@ class ThreadFragment : Fragment() {
             threadAdapter.submitList(messages)
             scrollToFirstUnseenMessage(messages)
         }
+    }
+
+    private fun observeFailedMessages() {
+        threadViewModel.failedMessagesUids.observe(viewLifecycleOwner, threadAdapter::updateFailedMessages)
     }
 
     private fun scrollToFirstUnseenMessage(messages: List<Message>) {
