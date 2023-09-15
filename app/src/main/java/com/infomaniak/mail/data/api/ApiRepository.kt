@@ -287,7 +287,7 @@ object ApiRepository : ApiRepositoryCore() {
             "output" to "mail",
         )
 
-        return callApi(ApiRoutes.ai(), POST, body)
+        return callApi(ApiRoutes.ai(), POST, body, HttpClient.okHttpClientLongTimeout)
     }
 
     fun downloadAttachment(resource: String): Response {

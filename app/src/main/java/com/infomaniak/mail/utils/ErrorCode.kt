@@ -85,6 +85,10 @@ object ErrorCode {
     const val MOVE_DESTINATION_NOT_FOUND = "mail__move_destination_folder_not_found"
     //endregion
 
+    //region Ai
+    const val MAX_TOKEN_REACHED = "max_token_reached"
+    //endregion
+
     val apiErrorCodes = listOf(
 
         // Global
