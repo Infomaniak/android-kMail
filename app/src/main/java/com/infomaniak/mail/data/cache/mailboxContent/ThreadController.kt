@@ -256,38 +256,35 @@ class ThreadController @Inject constructor(
             val failedFoldersIds = mutableSetOf<String>()
 
             messages.forEach { localMessage ->
-                if (!localMessage.isFullyDownloaded()) {
-                    with(ApiRepository.getMessage(localMessage.resource, okHttpClient)) {
-                        if (isSuccess()) {
-                            data?.also { remoteMessage ->
+                if (localMessage.isFullyDownloaded()) return@forEach
 
-                                // If we've already got this Message's Draft beforehand, we need to save
-                                // its `draftLocalUuid`, otherwise we'll lose the link between them.
-                                val draftLocalUuid = if (remoteMessage.isDraft) {
-                                    DraftController.getDraftByMessageUid(remoteMessage.uid, realm)?.localUuid
-                                } else {
-                                    null
-                                }
+                val apiResponse = ApiRepository.getMessage(localMessage.resource, okHttpClient)
 
-                                remoteMessage.initLocalValues(
-                                    date = localMessage.date,
-                                    isFullyDownloaded = true,
-                                    isTrashed = localMessage.isTrashed,
-                                    isFromSearch = localMessage.isFromSearch,
-                                    draftLocalUuid = draftLocalUuid,
-                                    messageIds = localMessage.messageIds,
-                                )
+                if (apiResponse.isSuccess()) {
+                    apiResponse.data?.also { remoteMessage ->
+                        remoteMessage.initLocalValues(
+                            date = localMessage.date,
+                            isFullyDownloaded = true,
+                            isTrashed = localMessage.isTrashed,
+                            isFromSearch = localMessage.isFromSearch,
+                            draftLocalUuid = remoteMessage.getDraftLocalUuid(realm),
+                            messageIds = localMessage.messageIds,
+                        )
 
-                                MessageController.upsertMessage(remoteMessage, realm)
-                            }
-                        } else {
-                            failedFoldersIds.add(localMessage.folderId)
-                        }
+                        MessageController.upsertMessage(remoteMessage, realm)
                     }
+                } else {
+                    failedFoldersIds.add(localMessage.folderId)
                 }
             }
 
             return failedFoldersIds
+        }
+
+        // If we've already got this Message's Draft beforehand, we need to save
+        // its `draftLocalUuid`, otherwise we'll lose the link between them.
+        private fun Message.getDraftLocalUuid(realm: MutableRealm): String? {
+            return if (isDraft) DraftController.getDraftByMessageUid(uid, realm)?.localUuid else null
         }
         //endregion
     }

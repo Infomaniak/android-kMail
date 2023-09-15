@@ -30,7 +30,7 @@ const PREFERENCES = {
 
 /**
  * Normalize the width of the mail displayed
- * @param webViewWidth Width of the webview
+ * @param webViewWidth Width of the WebView
  * @param messageUid Id of the displayed mail
  */
 function normalizeMessageWidth(webViewWidth, messageUid) {
@@ -48,7 +48,7 @@ function normalizeMessageWidth(webViewWidth, messageUid) {
  * Narrower elements are zoomed in, and wider elements are zoomed out.
  * This method is idempotent.
  * @param elements DOM elements to normalize
- * @param webViewWidth Width of the webview
+ * @param webViewWidth Width of the WebView
  * @param messageUid Id of the displayed mail
  */
 function normalizeElementWidths(elements, webViewWidth, messageUid) {
