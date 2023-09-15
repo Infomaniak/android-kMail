@@ -47,7 +47,6 @@ import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.SimpleColorFilter
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
-import com.github.razir.progressbutton.DrawableButton.Companion.GRAVITY_CENTER
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.color.MaterialColors
@@ -106,7 +105,7 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Scanner
 import com.infomaniak.lib.core.R as RCore
-import com.infomaniak.lib.core.utils.Utils as CoreUtils
+import com.infomaniak.lib.core.utils.Utils as UtilsCore
 
 //region Type alias
 typealias MergedContactDictionary = Map<String, Map<String, MergedContact>>
@@ -474,7 +473,7 @@ fun Fragment.createInputDialog(
                     onPositiveButtonClicked(textInput.trimmedText)
                     hideKeyboard()
                     negativeButton.isEnabled = false
-                    CoreUtils.createRefreshTimer { showProgress(gravity = GRAVITY_CENTER) }.start()
+                    UtilsCore.createRefreshTimer(onTimerFinish = ::showProgress).start()
                 }
                 setText(confirmButtonText)
                 isEnabled = false
@@ -498,7 +497,7 @@ fun Fragment.createInputDialog(
         .setView(root)
         .setCancelable(false)
         .setPositiveButton(confirmButtonText, null)
-        .setNegativeButton(RCore.string.buttonCancel) { dialog, _ -> dialog.dismiss() }
+        .setNegativeButton(RCore.string.buttonCancel, null)
         .setOnDismissListener {
             errorJob?.cancel()
             textInput.text?.clear()
@@ -509,9 +508,9 @@ fun Fragment.createInputDialog(
 
 fun AlertDialog.resetAndDismiss() {
     if (isShowing) {
+        dismiss()
         positiveButton.hideProgress(R.string.buttonCreate)
         negativeButton.isEnabled = true
-        dismiss()
     }
 }
 
