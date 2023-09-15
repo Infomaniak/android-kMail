@@ -40,7 +40,7 @@ object ApiRoutes {
         return "$MAIL_API/api/mailbox/permissions?user_mailbox_id=$linkId&product_id=$hostingId"
     }
 
-    // TODO : Waiting for final route
+    // TODO: Waiting for final route
     fun ai(): String = "$MAIL_API/api/ia"
 
     private fun apiMailbox(mailboxHostingId: Int, mailboxName: String): String {
