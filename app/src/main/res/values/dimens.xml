@@ -62,5 +62,6 @@
     <dimen name="angleViewNotRotated">0.0</dimen>
     <dimen name="angleViewRotated">180.0</dimen>
     <integer name="loginLayoutAnimationDuration">300</integer>
+    <dimen name="newMessageBottomBarElevation">10dp</dimen>
 
 </resources>

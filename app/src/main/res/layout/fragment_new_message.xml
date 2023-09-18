@@ -511,7 +511,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/newMessageBackgroundColor"
-            app:cardElevation="10dp"
+            app:cardElevation="@dimen/newMessageBottomBarElevation"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/externalBanner">
 
@@ -719,7 +719,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:translationZ="10dp"
+            android:translationZ="@dimen/newMessageBottomBarElevation"
             tools:name="com.infomaniak.mail.ui.main.newMessage.AiPromptFragment" />
 
     </FrameLayout>
