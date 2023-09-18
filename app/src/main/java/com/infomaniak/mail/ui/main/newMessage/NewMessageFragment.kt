@@ -184,6 +184,7 @@ class NewMessageFragment : Fragment() {
     private fun initUi() = with(binding) {
         addressListPopupWindow = ListPopupWindow(binding.root.context)
 
+        resetStatusBarColor()
         toolbar.setNavigationOnClickListener { activity?.onBackPressedDispatcher?.onBackPressed() }
         changeToolbarColorOnScroll(toolbar, compositionNestedScrollView)
 
@@ -214,6 +215,10 @@ class NewMessageFragment : Fragment() {
         if (aiViewModel.isAiPromptOpened) openAiPrompt()
 
         scrim.setOnClickListener { closeAiPrompt() }
+    }
+
+    private fun FragmentNewMessageBinding.resetStatusBarColor() {
+        requireActivity().window.statusBarColor = context.getColor(R.color.backgroundColor)
     }
 
     private fun initDraftAndViewModel() {

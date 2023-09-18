@@ -26,16 +26,10 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:navigationIcon="@drawable/ic_close_big">
-
-        <TextView
-            android:id="@+id/toolbarTitle"
-            style="@style/H2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="@string/aiPromptTitle" />
-
-    </com.google.android.material.appbar.MaterialToolbar>
+        app:navigationIcon="@drawable/ic_close_big"
+        app:titleCentered="true"
+        app:titleTextAppearance="@style/H2"
+        tools:title="@string/aiPromptTitle" />
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nestedScrollView"
