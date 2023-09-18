@@ -35,7 +35,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentInvalidPasswordBinding
 import com.infomaniak.mail.utils.createDescriptionDialog
 import com.infomaniak.mail.utils.getStringWithBoldArg
-import com.infomaniak.mail.utils.resetAndDismiss
+import com.infomaniak.mail.utils.resetLoadingAndDismiss
 import com.infomaniak.mail.utils.trimmedText
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -110,7 +110,7 @@ class InvalidPasswordFragment : Fragment() {
         }
 
         invalidPasswordViewModel.detachMailboxResult.observe(viewLifecycleOwner) { error ->
-            detachMailboxConfirmAlert.resetAndDismiss()
+            detachMailboxConfirmAlert.resetLoadingAndDismiss()
             showSnackbar(error)
         }
 

@@ -33,7 +33,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.BottomSheetJunkBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.createDescriptionDialog
-import com.infomaniak.mail.utils.resetAndDismiss
+import com.infomaniak.mail.utils.resetLoadingAndDismiss
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -61,7 +61,7 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
 
     fun observeReportPhishingResult() {
         mainViewModel.reportPhishingTrigger.observe(viewLifecycleOwner) {
-            reportPhishingDialog?.resetAndDismiss()
+            reportPhishingDialog?.resetLoadingAndDismiss()
             findNavController().popBackStack()
         }
     }

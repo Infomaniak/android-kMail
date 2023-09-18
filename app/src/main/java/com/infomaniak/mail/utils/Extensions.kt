@@ -444,12 +444,7 @@ fun Activity.createDescriptionDialog(
             // We are forced to override the ClickListener to prevent the default one to dismiss automatically the Alert
             positiveButton.setOnClickListener {
                 onPositiveButtonClicked()
-                if (displayLoader) {
-                    negativeButton.isEnabled = false
-                    UtilsCore.createRefreshTimer { positiveButton.showProgress() }.start()
-                } else {
-                    dismiss()
-                }
+                if (displayLoader) startLoading() else dismiss()
             }
         }
     }
@@ -498,8 +493,7 @@ fun Fragment.createInputDialog(
                 setOnClickListener {
                     onPositiveButtonClicked(textInput.trimmedText)
                     hideKeyboard()
-                    negativeButton.isEnabled = false
-                    UtilsCore.createRefreshTimer(onTimerFinish = ::showProgress).start()
+                    startLoading()
                 }
                 setText(confirmButtonText)
                 isEnabled = false
@@ -532,7 +526,12 @@ fun Fragment.createInputDialog(
         .setupOnShowListener()
 }
 
-fun AlertDialog.resetAndDismiss() {
+private fun AlertDialog.startLoading() {
+    negativeButton.isEnabled = false
+    UtilsCore.createRefreshTimer(onTimerFinish = positiveButton::showProgress).start()
+}
+
+fun AlertDialog.resetLoadingAndDismiss() {
     if (isShowing) {
         dismiss()
         positiveButton.hideProgress(R.string.buttonCreate)
