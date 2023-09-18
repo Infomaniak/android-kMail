@@ -385,6 +385,7 @@ fun Fragment.deleteWithConfirmationPopup(folderRole: FolderRole?, count: Int, ca
                 title = resources.getQuantityString(R.plurals.threadListDeletionConfirmationAlertTitle, count, count),
                 description = resources.getQuantityString(R.plurals.threadListDeletionConfirmationAlertDescription, count),
                 onPositiveButtonClicked = callback,
+                displayLoader = false
             ).show()
         }
         else -> callback()

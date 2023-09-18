@@ -529,7 +529,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun observeFlushFolderTrigger() {
-        mainViewModel.flushFolderResult.observe(viewLifecycleOwner) { flushFolderDialog?.resetAndDismiss() }
+        mainViewModel.flushFolderTrigger.observe(viewLifecycleOwner) { flushFolderDialog?.resetAndDismiss() }
     }
 
     private fun observerDraftsActionsCompletedWorks() {

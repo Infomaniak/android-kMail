@@ -21,7 +21,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.mail.MatomoMail.ACTION_SPAM_NAME
 import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
@@ -31,6 +33,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.BottomSheetJunkBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.createDescriptionDialog
+import com.infomaniak.mail.utils.resetAndDismiss
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -39,6 +42,8 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
     private lateinit var binding: BottomSheetJunkBinding
     private val navigationArgs: JunkBottomSheetDialogArgs by navArgs()
     private val mainViewModel: MainViewModel by activityViewModels()
+
+    private var reportPhishingDialog: AlertDialog? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetJunkBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -50,6 +55,15 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
         mainViewModel.getMessage(messageUid).observe(viewLifecycleOwner) { message ->
             handleButtons(threadUid, message)
         }
+
+        observeReportPhishingResult()
+    }
+
+    fun observeReportPhishingResult() {
+        mainViewModel.reportPhishingTrigger.observe(viewLifecycleOwner) {
+            reportPhishingDialog?.resetAndDismiss()
+            findNavController().popBackStack()
+        }
     }
 
     private fun handleButtons(threadUid: String, message: Message) = with(binding) {
@@ -59,13 +73,13 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
             mainViewModel.toggleThreadSpamStatus(threadUid)
         }
 
-        phishing.setClosingOnClickListener {
+        phishing.setOnClickListener {
             trackBottomSheetThreadActionsEvent("signalPhishing")
-            createDescriptionDialog(
+            reportPhishingDialog = createDescriptionDialog(
                 title = getString(R.string.reportPhishingTitle),
                 description = getString(R.string.reportPhishingDescription),
                 onPositiveButtonClicked = { mainViewModel.reportPhishing(threadUid, message) },
-            ).show()
+            ).also { it.show() }
         }
 
         blockSender.setClosingOnClickListener {
