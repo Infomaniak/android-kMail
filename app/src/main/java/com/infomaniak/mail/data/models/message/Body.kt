@@ -19,11 +19,8 @@
 
 package com.infomaniak.mail.data.models.message
 
-import com.infomaniak.mail.utils.MessageBodyUtils.SplitBody
 import io.realm.kotlin.types.EmbeddedRealmObject
-import io.realm.kotlin.types.annotations.Ignore
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
@@ -44,12 +41,6 @@ class Body : EmbeddedRealmObject {
     // TODO: In the meantime, we store the `subBody` as a JSON String, and we'll have to manually deserialize it when we want to use it.
     @Serializable(JsonAsStringSerializer::class)
     var subBody: String? = null
-    //endregion
-
-    //region UI data (Transient & Ignore)
-    @Transient
-    @Ignore
-    var splitBody: SplitBody? = null
     //endregion
 }
 
