@@ -87,7 +87,7 @@ class ThreadAdapter(
         super.onAttachedToRecyclerView(recyclerView)
     }
 
-    override fun getItemCount(): Int = runCatchingRealm { messages.size }.getOrDefault(0)
+    override fun getItemCount(): Int = runCatchingRealm { messages.count() }.getOrDefault(0)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ThreadViewHolder {
         return ThreadViewHolder(
@@ -112,7 +112,7 @@ class ThreadAdapter(
                 NotifyType.AVATAR -> if (!message.isDraft) userAvatar.loadAvatar(message.sender, contacts)
                 NotifyType.TOGGLE_LIGHT_MODE -> {
                     isThemeTheSameMap[message.uid] = !isThemeTheSameMap[message.uid]!!
-                    holder.toggleContentAndQuoteTheme(message)
+                    holder.toggleContentAndQuoteTheme(message.uid)
                 }
                 NotifyType.RE_RENDER -> if (bodyWebView.isVisible) bodyWebView.reload() else fullMessageWebView.reload()
                 NotifyType.FAILED_MESSAGE -> {
@@ -144,8 +144,8 @@ class ThreadAdapter(
         if (isThemeTheSameMap[message.uid] == null) isThemeTheSameMap[message.uid] = true
     }
 
-    private fun ThreadViewHolder.toggleContentAndQuoteTheme(message: Message) = with(binding) {
-        val isThemeTheSame = isThemeTheSameMap[message.uid]!!
+    private fun ThreadViewHolder.toggleContentAndQuoteTheme(messageUid: String) = with(binding) {
+        val isThemeTheSame = isThemeTheSameMap[messageUid]!!
         bodyWebView.toggleWebViewTheme(isThemeTheSame)
         fullMessageWebView.toggleWebViewTheme(isThemeTheSame)
         toggleQuoteButtonTheme(isThemeTheSame)
@@ -422,10 +422,10 @@ class ThreadAdapter(
         if (isExpanded) loadContentAndQuote(message)
     }
 
-    private fun ItemMessageBinding.setHeaderState(message: Message, isExpanded: Boolean) = with(message) {
+    private fun ItemMessageBinding.setHeaderState(message: Message, isExpanded: Boolean) {
         deleteDraftButton.apply {
-            isVisible = isDraft
-            setOnClickListener { onDeleteDraftClicked?.invoke(this@with) }
+            isVisible = message.isDraft
+            setOnClickListener { onDeleteDraftClicked?.invoke(message) }
         }
         replyButton.apply {
             isVisible = isExpanded
@@ -436,7 +436,7 @@ class ThreadAdapter(
             setOnClickListener { onMenuClicked?.invoke(message) }
         }
 
-        recipient.text = if (isExpanded) getAllRecipientsFormatted(message = this@with) else context.formatSubject(subject)
+        recipient.text = if (isExpanded) getAllRecipientsFormatted(message) else context.formatSubject(message.subject)
         recipientChevron.isVisible = isExpanded
         recipientOverlayedButton.isVisible = isExpanded
     }
