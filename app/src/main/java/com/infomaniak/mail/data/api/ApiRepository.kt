@@ -282,7 +282,10 @@ object ApiRepository : ApiRepositoryCore() {
             "content" to prompt,
         )
 
-        val body = mapOf("messages" to arrayOf(message))
+        val body = mapOf(
+            "messages" to arrayOf(message),
+            "output" to "mail",
+        )
 
         return callApi(ApiRoutes.ai(), POST, body)
     }
