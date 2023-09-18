@@ -52,12 +52,14 @@ class AiPropositionFragment : Fragment() {
 
     private fun FragmentAiPropositionBinding.setToolbar() {
         changeToolbarColorOnScroll(toolbar, nestedScrollView)
-        toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
-        toolbarTitle.text = requireContext().postfixWithTag(
-            getString(R.string.aiPromptTitle),
-            R.string.aiPromptTag,
-            R.color.aiBetaTagBackground,
-            R.color.aiBetaTagTextColor
-        )
+        toolbar.apply {
+            setNavigationOnClickListener { findNavController().popBackStack() }
+            title = requireContext().postfixWithTag(
+                getString(R.string.aiPromptTitle),
+                R.string.aiPromptTag,
+                R.color.aiBetaTagBackground,
+                R.color.aiBetaTagTextColor
+            )
+        }
     }
 }
