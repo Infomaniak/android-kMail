@@ -455,10 +455,7 @@ fun Activity.createDescriptionDialog(
     MaterialAlertDialogBuilder(context)
         .setView(root)
         .setPositiveButton(confirmButtonText, null)
-        .apply {
-            if (displayCancelButton) setNegativeButton(RCore.string.buttonCancel, null)
-            if (displayLoader) setCancelable(false)
-        }
+        .apply { if (displayCancelButton) setNegativeButton(RCore.string.buttonCancel, null) }
         .setOnDismissListener { onDismissed?.invoke() }
         .create()
         .setupOnShowListener()
@@ -515,7 +512,6 @@ fun Fragment.createInputDialog(
 
     return@with MaterialAlertDialogBuilder(context)
         .setView(root)
-        .setCancelable(false)
         .setPositiveButton(confirmButtonText, null)
         .setNegativeButton(RCore.string.buttonCancel, null)
         .setOnDismissListener {
@@ -527,6 +523,7 @@ fun Fragment.createInputDialog(
 }
 
 private fun AlertDialog.startLoading() {
+    setCancelable(false)
     negativeButton.isEnabled = false
     UtilsCore.createRefreshTimer(onTimerFinish = positiveButton::showProgress).start()
 }
@@ -534,6 +531,7 @@ private fun AlertDialog.startLoading() {
 fun AlertDialog.resetLoadingAndDismiss() {
     if (isShowing) {
         dismiss()
+        setCancelable(true)
         positiveButton.hideProgress(R.string.buttonCreate)
         negativeButton.isEnabled = true
     }
