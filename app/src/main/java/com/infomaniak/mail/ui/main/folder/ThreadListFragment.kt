@@ -70,6 +70,8 @@ import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.AlertDialogUtils.createDescriptionDialog
+import com.infomaniak.mail.utils.AlertDialogUtils.resetLoadingAndDismiss
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
 import com.infomaniak.mail.utils.UiUtils.formatUnreadCount
 import com.infomaniak.mail.utils.Utils.runCatchingRealm

@@ -30,7 +30,7 @@ import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.LocalSettings.ThreadMode.CONVERSATION
 import com.infomaniak.mail.data.LocalSettings.ThreadMode.MESSAGE
 import com.infomaniak.mail.databinding.FragmentThreadModeSettingBinding
-import com.infomaniak.mail.utils.createDescriptionDialog
+import com.infomaniak.mail.utils.AlertDialogUtils.createDescriptionDialog
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

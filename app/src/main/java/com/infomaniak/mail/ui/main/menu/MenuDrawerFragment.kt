@@ -45,6 +45,8 @@ import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
 import com.infomaniak.mail.ui.main.MailboxListFragment
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.AlertDialogUtils.createInputDialog
+import com.infomaniak.mail.utils.AlertDialogUtils.resetLoadingAndDismiss
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 

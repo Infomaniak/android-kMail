@@ -37,6 +37,7 @@ import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.MailboxListFragment
 import com.infomaniak.mail.ui.main.menu.MailboxesAdapter
 import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.AlertDialogUtils.createDescriptionDialog
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch

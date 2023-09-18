@@ -71,6 +71,9 @@ import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.*
 import com.infomaniak.mail.ui.main.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.AlertDialogUtils.createDescriptionDialog
+import com.infomaniak.mail.utils.AlertDialogUtils.createInformationDialog
+import com.infomaniak.mail.utils.AlertDialogUtils.showWithDescription
 import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipient
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings

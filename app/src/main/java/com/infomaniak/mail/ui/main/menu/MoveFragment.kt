@@ -38,6 +38,8 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.FragmentMoveBinding
 import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.AlertDialogUtils.createInputDialog
+import com.infomaniak.mail.utils.AlertDialogUtils.resetLoadingAndDismiss
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
