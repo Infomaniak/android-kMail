@@ -171,11 +171,11 @@ class ThreadViewModel @Inject constructor(
     }
 
     fun deleteDraft(message: Message, mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
-        val thread = threadController.getThread(threadUid) ?: return@launch
+        val realm = mailboxContentRealm()
+        val thread = ThreadController.getThread(threadUid, realm) ?: return@launch
         val messages = messageController.getMessageAndDuplicates(thread, message)
         val isSuccess = ApiRepository.deleteMessages(mailbox.uuid, messages.getUids()).isSuccess()
         if (isSuccess) {
-            val realm = mailboxContentRealm()
             val folder = FolderController.getFolder(message.folderId, realm) ?: return@launch
             refreshController.refreshThreads(
                 refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,

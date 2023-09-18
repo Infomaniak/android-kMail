@@ -372,7 +372,7 @@ class ThreadFragment : Fragment() {
     private fun observeMessagesLive() {
 
         threadViewModel.messagesLive.observe(viewLifecycleOwner) { messages ->
-            SentryLog.i("UI", "Received ${messages.size} messages")
+            SentryLog.i("UI", "Received ${messages.count()} messages")
 
             if (messages.isEmpty()) {
                 mainViewModel.deletedMessages.value = threadViewModel.deletedMessagesUids
@@ -382,7 +382,7 @@ class ThreadFragment : Fragment() {
 
             threadViewModel.fetchMessagesHeavyData(messages)
             threadAdapter.submitList(messages)
-            scrollToFirstUnseenMessage(messages)
+            scrollToFirstUnseenMessage(messages.count())
         }
     }
 
@@ -390,8 +390,8 @@ class ThreadFragment : Fragment() {
         threadViewModel.failedMessagesUids.observe(viewLifecycleOwner, threadAdapter::updateFailedMessages)
     }
 
-    private fun scrollToFirstUnseenMessage(messages: List<Message>) {
-        val shouldScrollToFirstUnseenMessage = isFirstVisit.compareAndSet(true, false) && messages.count() > 1
+    private fun scrollToFirstUnseenMessage(messagesCount: Int) {
+        val shouldScrollToFirstUnseenMessage = isFirstVisit.compareAndSet(true, false) && messagesCount > 1
         if (shouldScrollToFirstUnseenMessage) onRecyclerViewLaidOut(::scrollToFirstUnseenMessage)
     }
 
