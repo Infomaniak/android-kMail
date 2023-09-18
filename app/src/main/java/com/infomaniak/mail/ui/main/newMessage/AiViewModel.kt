@@ -44,8 +44,8 @@ class AiViewModel @Inject constructor(@IoDispatcher private val ioDispatcher: Co
         with(ApiRepository.generateAiProposition(prompt)) {
             aiProposition.postValue(
                 when {
-                    isSuccess() -> data?.content?.let { SUCCESS to it } ?: (MISSING_DATA to null)
-                    error?.code == MAX_TOKEN_REACHED -> TOO_LONG to null
+                    isSuccess() -> data?.content?.let { SUCCESS to it } ?: (MISSING_CONTENT to null)
+                    error?.code == MAX_TOKEN_REACHED -> MAX_TOKEN_EXCEEDED to null
                     else -> ERROR to null
                 }
             )
@@ -55,7 +55,8 @@ class AiViewModel @Inject constructor(@IoDispatcher private val ioDispatcher: Co
     enum class PropositionStatus {
         SUCCESS,
         ERROR,
-        TOO_LONG,
-        MISSING_DATA,
+        MAX_TOKEN_EXCEEDED,
+        RATE_LIMIT_EXCEEDED,
+        MISSING_CONTENT,
     }
 }
