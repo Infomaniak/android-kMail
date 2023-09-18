@@ -239,6 +239,8 @@ class MainViewModel @Inject constructor(
         refreshMailboxesAndFoldersJob?.cancel()
         refreshMailboxesAndFoldersJob = viewModelScope.launch(ioCoroutineContext) {
 
+            AccountUtils.updateCurrentUser()
+
             SentryLog.d(TAG, "Refresh mailboxes from remote")
             with(ApiRepository.getMailboxes()) {
                 if (isSuccess()) {
