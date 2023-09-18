@@ -21,7 +21,6 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,15 +34,19 @@ import com.infomaniak.lib.core.utils.showKeyboard
 import com.infomaniak.lib.core.utils.toPx
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentAiPromptBinding
-import com.infomaniak.mail.ui.main.newMessage.AiViewModel.PropositionStatus
+import com.infomaniak.mail.ui.main.newMessage.AiViewModel.PropositionStatus.*
 import com.infomaniak.mail.utils.postfixWithTag
 import dagger.hilt.android.AndroidEntryPoint
+import io.sentry.Sentry
+import io.sentry.SentryLevel
 import com.google.android.material.R as RMaterial
+import com.infomaniak.lib.core.R as RCore
 
 @AndroidEntryPoint
 class AiPromptFragment : Fragment() {
 
     private lateinit var binding: FragmentAiPromptBinding
+    private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
 
     private val newMessageFragment by lazy { parentFragment as NewMessageFragment }
@@ -108,16 +111,22 @@ class AiPromptFragment : Fragment() {
         aiViewModel.aiProposition.observe(viewLifecycleOwner) { proposition ->
             if (proposition == null) return@observe
 
-            val (status, body) = proposition
-
-            Log.e("gibran", "observeAiProposition - status: ${status}")
-            Log.e("gibran", "observeAiProposition - body: ${body}")
-            if (status == PropositionStatus.SUCCESS) {
-                if (aiViewModel.isAiPromptOpened) newMessageFragment.navigateToPropositionFragment()
-            } else {
-                // TODO
-                generationLoader.isGone = true
-                generateButton.isVisible = true
+            val (status, _) = proposition
+            when (status) {
+                SUCCESS -> if (aiViewModel.isAiPromptOpened) newMessageFragment.navigateToPropositionFragment()
+                ERROR -> {
+                    newMessageViewModel.snackBarManager.setValue(getString(RCore.string.anErrorHasOccurred))
+                    generationLoader.isGone = true
+                    generateButton.isVisible = true
+                }
+                MAX_TOKEN_EXCEEDED -> TODO()
+                RATE_LIMIT_EXCEEDED -> TODO()
+                MISSING_CONTENT -> {
+                    Sentry.withScope { scope ->
+                        scope.level = SentryLevel.ERROR
+                        Sentry.captureMessage("Ai call succeeded but no content returned")
+                    }
+                }
             }
         }
     }
