@@ -24,7 +24,6 @@ import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.trackUserInfo
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
@@ -37,7 +36,6 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.MessageBodyUtils.SplitBody
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -78,11 +76,11 @@ class ThreadViewModel @Inject constructor(
         suspend fun splitBody(message: Message): Message = withContext(ioDispatcher) {
             if (message.body == null) return@withContext message
 
-            return@withContext message.copyFromRealm().apply {
+            return@withContext message.apply {
                 body?.let {
                     val isNotAlreadySplit = !splitBodies.contains(message.uid)
                     if (isNotAlreadySplit) splitBodies[message.uid] = MessageBodyUtils.splitContentAndQuote(it)
-                    it.splitBody = splitBodies[message.uid]!!
+                    splitBody = splitBodies[message.uid]
                 }
             }
         }
@@ -176,11 +174,10 @@ class ThreadViewModel @Inject constructor(
         val messages = messageController.getMessageAndDuplicates(thread, message)
         val isSuccess = ApiRepository.deleteMessages(mailbox.uuid, messages.getUids()).isSuccess()
         if (isSuccess) {
-            val folder = FolderController.getFolder(message.folderId, realm) ?: return@launch
             refreshController.refreshThreads(
                 refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
                 mailbox = mailbox,
-                folder = folder,
+                folder = message.folder,
                 realm = realm,
             )
         }

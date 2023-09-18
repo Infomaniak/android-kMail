@@ -153,7 +153,7 @@ class ThreadAdapter(
 
     private fun ThreadViewHolder.loadContentAndQuote(message: Message) {
         message.body?.let { body ->
-            body.splitBody?.let { splitBody ->
+            message.splitBody?.let { splitBody ->
                 if (binding.bodyWebView.isVisible) {
                     loadBodyInWebView(message.uid, splitBody.content, body.type)
                 } else if (binding.fullMessageWebView.isVisible) {
@@ -381,8 +381,8 @@ class ThreadAdapter(
     }
 
     private fun ThreadViewHolder.bindContent(message: Message) {
-        binding.messageLoader.isVisible = message.body?.splitBody == null
-        message.body?.splitBody?.let { splitBody -> bindBody(message, hasQuote = splitBody.quote != null) }
+        binding.messageLoader.isVisible = message.splitBody == null
+        message.splitBody?.let { splitBody -> bindBody(message, hasQuote = splitBody.quote != null) }
     }
 
     private fun ThreadViewHolder.bindBody(message: Message, hasQuote: Boolean) = with(binding) {
@@ -488,7 +488,7 @@ class ThreadAdapter(
 
         override fun areContentsTheSame(oldMessage: Message, newMessage: Message): Boolean {
             return newMessage.body?.value == oldMessage.body?.value &&
-                    newMessage.body?.splitBody == oldMessage.body?.splitBody &&
+                    newMessage.splitBody == oldMessage.splitBody &&
                     newMessage.isSeen == oldMessage.isSeen &&
                     newMessage.isFavorite == oldMessage.isFavorite
         }
