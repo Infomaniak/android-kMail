@@ -20,6 +20,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:theme="@style/AiCursorAndPrimaryColorTheme"
     tools:context=".ui.main.newMessage.AiPromptFragment">
 
     <com.google.android.material.card.MaterialCardView
@@ -73,7 +74,6 @@
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/closeButton"
                     style="@style/IconButtonSmall"
-                    android:theme="@style/AiCursorAndPrimaryColorTheme"
                     app:icon="@drawable/ic_close_small" />
 
             </LinearLayout>
@@ -83,7 +83,6 @@
                 android:layout_height="0dp"
                 android:layout_marginBottom="@dimen/marginStandardMedium"
                 android:layout_weight="1"
-                android:theme="@style/AiCursorAndPrimaryColorTheme"
                 app:hintEnabled="false">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -92,8 +91,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="top|start"
                     android:hint="@string/aiPromptPlaceholder"
-                    android:inputType="textMultiLine|textCapSentences|textAutoCorrect"
-                    android:theme="@style/AiCursorAndPrimaryColorTheme" />
+                    android:inputType="textMultiLine|textCapSentences|textAutoCorrect" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -109,7 +107,6 @@
                     android:layout_height="wrap_content"
                     android:enabled="false"
                     android:text="@string/aiPromptValidateButton"
-                    android:theme="@style/AiCursorAndPrimaryColorTheme"
                     tools:enabled="true" />
 
                 <LinearLayout
@@ -131,8 +128,7 @@
                         android:layout_width="@dimen/marginStandardMedium"
                         android:layout_height="@dimen/marginStandardMedium"
                         android:layout_gravity="center_vertical"
-                        android:indeterminate="true"
-                        android:theme="@style/AiCursorAndPrimaryColorTheme" />
+                        android:indeterminate="true" />
 
                 </LinearLayout>
             </FrameLayout>
