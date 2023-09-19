@@ -28,7 +28,6 @@ import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.lib.core.utils.showKeyboard
@@ -43,7 +42,6 @@ import com.google.android.material.R as RMaterial
 class AiPromptFragment : Fragment() {
 
     private lateinit var binding: FragmentAiPromptBinding
-    private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiPromptViewModel: AiPromptViewModel by viewModels()
 
     private val m3BottomSheetMaxWidthPx by lazy { resources.getDimension(RMaterial.dimen.material_bottom_sheet_max_width) }
@@ -98,7 +96,7 @@ class AiPromptFragment : Fragment() {
             generationLoader.isVisible = true
             generateButton.isInvisible = true
 
-            aiPromptViewModel.generateAiProposition(newMessageViewModel.aiPrompt)
+            aiPromptViewModel.generateAiProposition(aiPromptViewModel.aiPrompt)
         }
     }
 
@@ -111,7 +109,7 @@ class AiPromptFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        binding.prompt.setText(newMessageViewModel.aiPrompt)
+        binding.prompt.setText(aiPromptViewModel.aiPrompt)
     }
 
     override fun onResume() {
@@ -126,7 +124,7 @@ class AiPromptFragment : Fragment() {
 
     private fun onPromptChanged(prompt: Editable?) = with(binding) {
         generateButton.isEnabled = prompt?.isNotEmpty() ?: false
-        newMessageViewModel.aiPrompt = prompt.toString()
+        aiPromptViewModel.aiPrompt = prompt.toString()
     }
 
     private companion object {
