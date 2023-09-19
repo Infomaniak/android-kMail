@@ -17,9 +17,8 @@
  */
 package com.infomaniak.mail.ui.main.newMessage
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.di.IoDispatcher
@@ -30,10 +29,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class AiPromptViewModel @Inject constructor(
-    application: Application,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-) : AndroidViewModel(application) {
+class AiPromptViewModel @Inject constructor(@IoDispatcher private val ioDispatcher: CoroutineDispatcher) : ViewModel() {
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
