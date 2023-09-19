@@ -19,8 +19,11 @@ package com.infomaniak.mail.ui.main.newMessage
 
 import android.app.Application
 import android.content.ClipDescription
+import android.content.Intent
 import android.net.Uri
+import android.os.Parcelable
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.net.MailTo
 import androidx.core.net.toUri
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.MatomoCore.*
@@ -134,7 +137,10 @@ class NewMessageViewModel @Inject constructor(
         emit(list to arrangeMergedContacts(list))
     }
 
-    fun initDraftAndViewModel(): LiveData<Boolean> = liveData(ioCoroutineContext) {
+    fun initDraftAndViewModel(
+        intent: Intent,
+        newMessageActivityArgs: NewMessageActivityArgs
+    ): LiveData<Boolean> = liveData(ioCoroutineContext) {
         val realm = mailboxContentRealm()
 
         var signatures = emptyList<Signature>()
@@ -189,10 +195,86 @@ class NewMessageViewModel @Inject constructor(
                 otherFieldsAreAllEmpty.postValue(false)
                 initializeFieldsAsOpen.postValue(true)
             }
+
+            populateViewModelWithExternalMailData(intent, newMessageActivityArgs)
         }
 
         emit(isSuccess)
         if (isSuccess) finishedInit.postValue(signatures)
+    }
+
+    private fun populateViewModelWithExternalMailData(intent: Intent, newMessageActivityArgs: NewMessageActivityArgs) {
+        when (intent.action) {
+            Intent.ACTION_SEND -> handleSingleSendIntent(intent)
+            Intent.ACTION_SEND_MULTIPLE -> handleMultipleSendIntent(intent)
+            Intent.ACTION_VIEW, Intent.ACTION_SENDTO -> handleMailTo(intent.data, intent)
+        }
+
+        if (newMessageActivityArgs.mailToUri != null) handleMailTo(newMessageActivityArgs.mailToUri)
+    }
+
+    /**
+     * Handle `MailTo` from [Intent.ACTION_VIEW] or [Intent.ACTION_SENDTO]
+     * Get [Intent.ACTION_VIEW] data with [MailTo] and [Intent.ACTION_SENDTO] with [Intent]
+     */
+    private fun handleMailTo(uri: Uri?, intent: Intent? = null) {
+
+        /**
+         * Mailto grammar accept 'name_of_recipient<email>' for recipients
+         */
+        fun parseEmailWithName(recipient: String): Recipient? {
+            val nameAndEmail = Regex("(.+)<(.+)>").find(recipient)?.destructured
+
+            return nameAndEmail?.let { (name, email) -> if (email.isEmail()) Recipient().initLocalValues(email, name) else null }
+        }
+
+        fun String.splitToRecipientList() = split(",", ";").mapNotNull {
+            val email = it.trim()
+            if (email.isEmail()) Recipient().initLocalValues(email, email) else parseEmailWithName(email)
+        }
+
+        uri?.let { uri ->
+            if (!MailTo.isMailTo(uri)) return
+
+            val mailToIntent = MailTo.parse(uri)
+            val to = mailToIntent.to?.splitToRecipientList()
+                ?: emptyList()
+            val cc = mailToIntent.cc?.splitToRecipientList()
+                ?: intent?.getStringArrayExtra(Intent.EXTRA_CC)?.map { Recipient().initLocalValues(it, it) }
+                ?: emptyList()
+            val bcc = mailToIntent.bcc?.splitToRecipientList()
+                ?: intent?.getStringArrayExtra(Intent.EXTRA_BCC)?.map { Recipient().initLocalValues(it, it) }
+                ?: emptyList()
+
+            draft.to.addAll(to)
+            draft.cc.addAll(cc)
+            draft.bcc.addAll(bcc)
+
+            draft.subject = mailToIntent.subject ?: intent?.getStringExtra(Intent.EXTRA_SUBJECT)
+            draft.uiBody = mailToIntent.body ?: intent?.getStringExtra(Intent.EXTRA_TEXT) ?: ""
+
+            saveDraftDebouncing()
+        }
+    }
+
+    private fun handleSingleSendIntent(intent: Intent) = with(intent) {
+        if (hasExtra(Intent.EXTRA_TEXT)) {
+            getStringExtra(Intent.EXTRA_SUBJECT)?.let { draft.subject = it }
+            getStringExtra(Intent.EXTRA_TEXT)?.let { draft.uiBody = it }
+        }
+
+        if (hasExtra(Intent.EXTRA_STREAM)) {
+            (parcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri)?.let { uri ->
+                importAttachments(listOf(uri))
+            }
+        }
+    }
+
+    private fun handleMultipleSendIntent(intent: Intent) {
+        intent
+            .parcelableArrayListExtra<Parcelable>(Intent.EXTRA_STREAM)
+            ?.filterIsInstance<Uri>()
+            ?.let(::importAttachments)
     }
 
     /**

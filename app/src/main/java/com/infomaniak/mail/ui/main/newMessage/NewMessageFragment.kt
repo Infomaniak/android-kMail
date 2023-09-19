@@ -23,9 +23,7 @@ import android.content.ClipDescription
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Configuration
-import android.net.Uri
 import android.os.Bundle
-import android.os.Parcelable
 import android.text.InputFilter
 import android.text.InputType
 import android.text.Spanned
@@ -41,7 +39,6 @@ import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.Group
-import androidx.core.net.MailTo
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
@@ -140,8 +137,7 @@ class NewMessageFragment : Fragment() {
 
         initUi()
 
-        val isFirst = newMessageViewModel.activityCreationStatus != CreationStatus.RECREATED
-        if (isFirst) initDraftAndViewModel()
+        if (newMessageViewModel.finishedInit.value == null) initDraftAndViewModel()
 
         handleOnBackPressed()
 
@@ -217,10 +213,12 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun initDraftAndViewModel() {
-        newMessageViewModel.initDraftAndViewModel().observe(viewLifecycleOwner) { isSuccess ->
+        newMessageViewModel.initDraftAndViewModel(
+            requireActivity().intent,
+            newMessageActivityArgs,
+        ).observe(viewLifecycleOwner) { isSuccess ->
             if (isSuccess) {
                 showKeyboardInCorrectView()
-                populateViewModelWithExternalMailData()
             } else {
                 requireActivity().apply {
                     showToast(R.string.failToOpenDraft)
@@ -507,80 +505,6 @@ class NewMessageFragment : Fragment() {
             signature.senderEmailIdn
         }
         binding.fromMailAddress.text = formattedExpeditor
-    }
-
-    private fun populateViewModelWithExternalMailData() = with(requireActivity()) {
-        when (intent?.action) {
-            Intent.ACTION_SEND -> handleSingleSendIntent()
-            Intent.ACTION_SEND_MULTIPLE -> handleMultipleSendIntent()
-            Intent.ACTION_VIEW, Intent.ACTION_SENDTO -> handleMailTo(intent.data, intent)
-        }
-
-        if (newMessageActivityArgs.mailToUri != null) handleMailTo(newMessageActivityArgs.mailToUri)
-    }
-
-    /**
-     * Handle `MailTo` from [Intent.ACTION_VIEW] or [Intent.ACTION_SENDTO]
-     * Get [Intent.ACTION_VIEW] data with [MailTo] and [Intent.ACTION_SENDTO] with [Intent]
-     */
-    private fun handleMailTo(uri: Uri?, intent: Intent? = null) = with(newMessageViewModel) {
-
-        /**
-         * Mailto grammar accept 'name_of_recipient<email>' for recipients
-         */
-        fun parseEmailWithName(recipient: String): Recipient? {
-            val nameAndEmail = Regex("(.+)<(.+)>").find(recipient)?.destructured
-
-            return nameAndEmail?.let { (name, email) -> if (email.isEmail()) Recipient().initLocalValues(email, name) else null }
-        }
-
-        fun String.splitToRecipientList() = split(",", ";").mapNotNull {
-            val email = it.trim()
-            if (email.isEmail()) Recipient().initLocalValues(email, email) else parseEmailWithName(email)
-        }
-
-        uri?.let { uri ->
-            if (!MailTo.isMailTo(uri)) return@with
-
-            val mailToIntent = MailTo.parse(uri)
-            val to = mailToIntent.to?.splitToRecipientList()
-                ?: emptyList()
-            val cc = mailToIntent.cc?.splitToRecipientList()
-                ?: intent?.getStringArrayExtra(Intent.EXTRA_CC)?.map { Recipient().initLocalValues(it, it) }
-                ?: emptyList()
-            val bcc = mailToIntent.bcc?.splitToRecipientList()
-                ?: intent?.getStringArrayExtra(Intent.EXTRA_BCC)?.map { Recipient().initLocalValues(it, it) }
-                ?: emptyList()
-
-            draft.to.addAll(to)
-            draft.cc.addAll(cc)
-            draft.bcc.addAll(bcc)
-
-            draft.subject = mailToIntent.subject ?: intent?.getStringExtra(Intent.EXTRA_SUBJECT)
-            draft.uiBody = mailToIntent.body ?: intent?.getStringExtra(Intent.EXTRA_TEXT) ?: ""
-
-            saveDraftDebouncing()
-        }
-    }
-
-    private fun handleSingleSendIntent() = with(requireActivity().intent) {
-        if (hasExtra(Intent.EXTRA_TEXT)) {
-            getStringExtra(Intent.EXTRA_SUBJECT)?.let { newMessageViewModel.draft.subject = it }
-            getStringExtra(Intent.EXTRA_TEXT)?.let { newMessageViewModel.draft.uiBody = it }
-        }
-
-        if (hasExtra(Intent.EXTRA_STREAM)) {
-            (parcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri)?.let { uri ->
-                newMessageViewModel.importAttachments(listOf(uri))
-            }
-        }
-    }
-
-    private fun handleMultipleSendIntent() {
-        requireActivity().intent
-            .parcelableArrayListExtra<Parcelable>(Intent.EXTRA_STREAM)
-            ?.filterIsInstance<Uri>()
-            ?.let(newMessageViewModel::importAttachments)
     }
 
     private fun doAfterSubjectChange() {
