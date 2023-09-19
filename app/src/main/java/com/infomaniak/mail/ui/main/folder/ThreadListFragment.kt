@@ -330,11 +330,20 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                     else -> throw IllegalStateException("Only SwipeDirection.LEFT_TO_RIGHT and SwipeDirection.RIGHT_TO_LEFT can be triggered")
                 }
 
-                val shouldKeepItem = performSwipeActionOnThread(swipeAction, item)
+                val isPermanentDeleteFolder = item.folder.role.let { role ->
+                    role == FolderRole.DRAFT || role == FolderRole.SPAM || role == FolderRole.TRASH
+                }
+
+                val shouldKeepItem = performSwipeActionOnThread(swipeAction, item, position, isPermanentDeleteFolder)
 
                 threadListAdapter.apply {
                     blockOtherSwipes()
-                    notifyItemChanged(position) // Animate the swiped element back to its original position
+
+                    if (swipeAction == SwipeAction.DELETE && isPermanentDeleteFolder) {
+                        Unit // The swiped Thread stay swiped all the way
+                    } else {
+                        notifyItemChanged(position) // Animate the swiped Thread back to its original position
+                    }
                 }
 
                 threadListViewModel.isRecoveringFinished.value = false
@@ -350,7 +359,12 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
      * The boolean return value is used to know if we should keep the Thread in
      * the RecyclerView (true), or remove it when the swipe is done (false).
      */
-    private fun performSwipeActionOnThread(swipeAction: SwipeAction, thread: Thread): Boolean = with(mainViewModel) {
+    private fun performSwipeActionOnThread(
+        swipeAction: SwipeAction,
+        thread: Thread,
+        position: Int,
+        isPermanentDeleteFolder: Boolean,
+    ): Boolean = with(mainViewModel) {
         trackEvent("swipeActions", swipeAction.matomoValue, TrackerAction.DRAG)
 
         val folderRole = thread.folder.role
@@ -367,12 +381,21 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 folderRole == FolderRole.ARCHIVE
             }
             SwipeAction.DELETE -> {
-                val shouldKeepItem = when (folderRole) {
-                    FolderRole.DRAFT, FolderRole.SPAM, FolderRole.TRASH -> true
-                    else -> false
-                }
-                deleteWithConfirmationPopup(folderRole, count = 1) { deleteThread(thread.uid) }
-                shouldKeepItem
+                deleteWithConfirmationPopup(
+                    folderRole = folderRole,
+                    count = 1,
+                    displayLoader = false,
+                    onDismiss = {
+                        if (threadListAdapter.dataSet.indexOfFirst { it is Thread && it.uid == thread.uid } == position) {
+                            threadListAdapter.notifyItemChanged(position)
+                        }
+                    },
+                    callback = {
+                        if (isPermanentDeleteFolder) threadListAdapter.removeItem(position)
+                        deleteThread(thread.uid, isSwipe = true)
+                    },
+                )
+                isPermanentDeleteFolder
             }
             SwipeAction.FAVORITE -> {
                 toggleThreadFavoriteStatus(thread.uid)
@@ -449,6 +472,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun observeCurrentThreads() = with(mainViewModel) {
+        reassignCurrentThreadsLive()
         currentThreadsLive.bindResultsChangeToAdapter(viewLifecycleOwner, threadListAdapter).apply {
             recyclerView = binding.threadsList
             beforeUpdateAdapter = { threads ->

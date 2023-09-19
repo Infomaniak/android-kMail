@@ -90,9 +90,9 @@ object AlertDialogUtils {
         fun AlertDialog.setupOnShowListener() = apply {
             setOnShowListener {
                 // We are forced to override the ClickListener to prevent the default one to dismiss automatically the Alert
-                positiveButton.setOnClickListener {
+                if (displayLoader) positiveButton.setOnClickListener {
                     onPositiveButtonClicked()
-                    if (displayLoader) startLoading() else dismiss()
+                    startLoading()
                 }
             }
         }
@@ -102,7 +102,7 @@ object AlertDialogUtils {
 
         MaterialAlertDialogBuilder(context)
             .setView(root)
-            .setPositiveButton(confirmButtonText, null)
+            .setPositiveButton(confirmButtonText) { _, _ -> onPositiveButtonClicked() }
             .apply { if (displayCancelButton) setNegativeButton(com.infomaniak.lib.core.R.string.buttonCancel, null) }
             .setOnDismissListener { onDismissed?.invoke() }
             .create()

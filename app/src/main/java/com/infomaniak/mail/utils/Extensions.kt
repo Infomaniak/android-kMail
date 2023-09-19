@@ -370,14 +370,21 @@ fun List<Message>.getFoldersIds(exception: String? = null) = mapNotNull { if (it
 fun List<Message>.getUids(): List<String> = map { it.uid }
 //endregion
 
-fun Fragment.deleteWithConfirmationPopup(folderRole: FolderRole?, count: Int, callback: () -> Unit) {
+fun Fragment.deleteWithConfirmationPopup(
+    folderRole: FolderRole?,
+    count: Int,
+    displayLoader: Boolean = true,
+    onDismiss: (() -> Unit)? = null,
+    callback: () -> Unit,
+) {
     when (folderRole) {
         FolderRole.DRAFT, FolderRole.SPAM, FolderRole.TRASH -> {
             createDescriptionDialog(
                 title = resources.getQuantityString(R.plurals.threadListDeletionConfirmationAlertTitle, count, count),
                 description = resources.getQuantityString(R.plurals.threadListDeletionConfirmationAlertDescription, count),
+                displayLoader = displayLoader,
                 onPositiveButtonClicked = callback,
-                displayLoader = false
+                onDismissed = onDismiss,
             ).show()
         }
         else -> callback()
