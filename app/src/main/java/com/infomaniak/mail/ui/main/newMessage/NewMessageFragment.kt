@@ -95,6 +95,7 @@ class NewMessageFragment : Fragment() {
         requireActivity().intent?.extras?.let(NewMessageActivityArgs::fromBundle) ?: NewMessageActivityArgs()
     }
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
+    private val aiPromptViewModel: AiPromptViewModel by activityViewModels()
 
     private lateinit var addressListPopupWindow: ListPopupWindow
     private lateinit var filePicker: FilePicker
@@ -174,11 +175,11 @@ class NewMessageFragment : Fragment() {
         super.onConfigurationChanged(newConfig)
     }
 
-    private fun handleOnBackPressed() = with(newMessageViewModel) {
+    private fun handleOnBackPressed() {
         newMessageActivity.onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             when {
-                isAiPromptOpened -> closeAiPrompt()
-                isAutoCompletionOpened -> closeAutoCompletion()
+                aiPromptViewModel.isAiPromptOpened -> closeAiPrompt()
+                newMessageViewModel.isAutoCompletionOpened -> closeAutoCompletion()
                 else -> newMessageActivity.finishAppAndRemoveTaskIfNeeded()
             }
         }
@@ -220,7 +221,7 @@ class NewMessageFragment : Fragment() {
         setupSendButton()
         setupExternalBanner()
 
-        if (newMessageViewModel.isAiPromptOpened) openAiPrompt()
+        if (aiPromptViewModel.isAiPromptOpened) openAiPrompt()
 
         scrim.setOnClickListener { closeAiPrompt() }
     }
@@ -625,7 +626,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun openAiPrompt() = with(binding) {
-        newMessageViewModel.isAiPromptOpened = true
+        aiPromptViewModel.isAiPromptOpened = true
 
         // Keyboard is opened inside onCreate() of AiPromptFragment
 
@@ -639,7 +640,7 @@ class NewMessageFragment : Fragment() {
     }
 
     fun closeAiPrompt() = with(binding) {
-        newMessageViewModel.apply {
+        aiPromptViewModel.apply {
             isAiPromptOpened = false
             aiPrompt = ""
         }
