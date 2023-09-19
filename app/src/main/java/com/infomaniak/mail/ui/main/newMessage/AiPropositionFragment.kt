@@ -24,7 +24,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.infomaniak.mail.R
+import com.infomaniak.mail.databinding.DialogAiReplaceContentBinding
 import com.infomaniak.mail.databinding.FragmentAiPropositionBinding
 import com.infomaniak.mail.utils.changeToolbarColorOnScroll
 import com.infomaniak.mail.utils.postfixWithTag
@@ -34,6 +36,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class AiPropositionFragment : Fragment() {
 
     private lateinit var binding: FragmentAiPropositionBinding
+    private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -50,8 +53,11 @@ class AiPropositionFragment : Fragment() {
         }
 
         insertPropositionButton.setOnClickListener {
-            aiViewModel.aiOutputToInsert.value = aiViewModel.aiProposition.value!!.second
-            findNavController().popBackStack()
+            if (newMessageViewModel.draft.uiBody.isBlank()) {
+                choosePropositionAndBack()
+            } else {
+                createReplaceContentDialog { choosePropositionAndBack() }.show()
+            }
         }
     }
 
@@ -66,5 +72,25 @@ class AiPropositionFragment : Fragment() {
                 R.color.aiBetaTagTextColor
             )
         }
+    }
+
+    private fun choosePropositionAndBack() {
+        aiViewModel.aiOutputToInsert.value = aiViewModel.aiProposition.value!!.second
+        findNavController().popBackStack()
+    }
+
+    private fun Fragment.createReplaceContentDialog(
+        onPositiveButtonClicked: () -> Unit,
+    ) = with(DialogAiReplaceContentBinding.inflate(layoutInflater)) {
+
+        dialogDescriptionLayout.dialogTitle.text = "Détection d’un contenu déjà existant" // TODO : String
+        dialogDescriptionLayout.dialogDescription.text =
+            "Voulez-vous remplacer le contenu existant par la proposition de l’assistant ?" // TODO : String
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setView(root)
+            .setPositiveButton("Remplacer") { _, _ -> onPositiveButtonClicked() } // TODO : String
+            .setNegativeButton(com.infomaniak.lib.core.R.string.buttonCancel, null)
+            .create()
     }
 }
