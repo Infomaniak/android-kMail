@@ -27,10 +27,8 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
-import com.infomaniak.lib.core.utils.FORMAT_DATE_WITH_TIMEZONE
-import com.infomaniak.lib.core.utils.FORMAT_EVENT_DATE
+import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
-import com.infomaniak.lib.core.utils.format
 import com.infomaniak.mail.MatomoMail.trackRestoreMailsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetRestoreEmailsBinding
@@ -62,7 +60,10 @@ class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
             restoreMailsButton.isEnabled = text?.isNotBlank() == true
         }
 
-        restoreMailsButton.setOnClickListener { restoreEmails() }
+        restoreMailsButton.setOnClickListener {
+            restoreMailsButton.showProgress()
+            restoreEmails()
+        }
     }
 
     private fun MaterialAutoCompleteTextView.hasLoaded(hasLoaded: Boolean) {
@@ -91,6 +92,7 @@ class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
         val date = autoCompleteTextView.text.toString()
 
         restoreEmailViewModel.restoreEmails(formattedDates[date] ?: date).observe(viewLifecycleOwner) { apiResponse ->
+            binding.restoreMailsButton.hideProgress(R.string.buttonConfirmRestoreEmails)
             showSnackbar(if (apiResponse.isSuccess()) R.string.snackbarRestorationLaunched else apiResponse.translatedError)
             findNavController().popBackStack()
         }
