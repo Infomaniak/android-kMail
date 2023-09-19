@@ -385,6 +385,7 @@ fun Fragment.deleteWithConfirmationPopup(folderRole: FolderRole?, count: Int, ca
                 title = resources.getQuantityString(R.plurals.threadListDeletionConfirmationAlertTitle, count, count),
                 description = resources.getQuantityString(R.plurals.threadListDeletionConfirmationAlertDescription, count),
                 onPositiveButtonClicked = callback,
+                displayLoader = false
             ).show()
         }
         else -> callback()
@@ -406,6 +407,7 @@ fun Activity.createInformationDialog(
     description = description,
     confirmButtonText = confirmButtonText,
     displayCancelButton = false,
+    displayLoader = false,
     onPositiveButtonClicked = {},
 )
 
@@ -414,6 +416,7 @@ fun Fragment.createDescriptionDialog(
     description: CharSequence,
     @StringRes confirmButtonText: Int = R.string.buttonConfirm,
     displayCancelButton: Boolean = true,
+    displayLoader: Boolean = true,
     onPositiveButtonClicked: () -> Unit,
     onDismissed: (() -> Unit)? = null,
 ): AlertDialog = requireActivity().createDescriptionDialog(
@@ -421,6 +424,7 @@ fun Fragment.createDescriptionDialog(
     description,
     confirmButtonText,
     displayCancelButton,
+    displayLoader,
     onPositiveButtonClicked,
     onDismissed,
 )
@@ -430,19 +434,31 @@ fun Activity.createDescriptionDialog(
     description: CharSequence,
     @StringRes confirmButtonText: Int = R.string.buttonConfirm,
     displayCancelButton: Boolean = true,
+    displayLoader: Boolean = true,
     onPositiveButtonClicked: () -> Unit,
     onDismissed: (() -> Unit)? = null,
 ) = with(DialogDescriptionBinding.inflate(layoutInflater)) {
+
+    fun AlertDialog.setupOnShowListener() = apply {
+        setOnShowListener {
+            // We are forced to override the ClickListener to prevent the default one to dismiss automatically the Alert
+            positiveButton.setOnClickListener {
+                onPositiveButtonClicked()
+                if (displayLoader) startLoading() else dismiss()
+            }
+        }
+    }
 
     dialogTitle.text = title
     dialogDescription.text = description
 
     MaterialAlertDialogBuilder(context)
         .setView(root)
-        .setPositiveButton(confirmButtonText) { _, _ -> onPositiveButtonClicked() }
-        .also { if (displayCancelButton) it.setNegativeButton(RCore.string.buttonCancel, null) }
+        .setPositiveButton(confirmButtonText, null)
+        .apply { if (displayCancelButton) setNegativeButton(RCore.string.buttonCancel, null) }
         .setOnDismissListener { onDismissed?.invoke() }
         .create()
+        .setupOnShowListener()
 }
 
 fun Fragment.createInputDialog(
@@ -470,11 +486,11 @@ fun Fragment.createInputDialog(
         setOnShowListener {
             showKeyboard()
             positiveButton.apply {
+                // We are forced to override the ClickListener to prevent the default one to dismiss automatically the Alert
                 setOnClickListener {
                     onPositiveButtonClicked(textInput.trimmedText)
                     hideKeyboard()
-                    negativeButton.isEnabled = false
-                    UtilsCore.createRefreshTimer(onTimerFinish = ::showProgress).start()
+                    startLoading()
                 }
                 setText(confirmButtonText)
                 isEnabled = false
@@ -496,7 +512,6 @@ fun Fragment.createInputDialog(
 
     return@with MaterialAlertDialogBuilder(context)
         .setView(root)
-        .setCancelable(false)
         .setPositiveButton(confirmButtonText, null)
         .setNegativeButton(RCore.string.buttonCancel, null)
         .setOnDismissListener {
@@ -507,9 +522,16 @@ fun Fragment.createInputDialog(
         .setupOnShowListener()
 }
 
-fun AlertDialog.resetAndDismiss() {
+private fun AlertDialog.startLoading() {
+    setCancelable(false)
+    negativeButton.isEnabled = false
+    UtilsCore.createRefreshTimer(onTimerFinish = positiveButton::showProgress).start()
+}
+
+fun AlertDialog.resetLoadingAndDismiss() {
     if (isShowing) {
         dismiss()
+        setCancelable(true)
         positiveButton.hideProgress(R.string.buttonCreate)
         negativeButton.isEnabled = true
     }

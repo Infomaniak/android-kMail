@@ -742,6 +742,7 @@ class NewMessageFragment : Fragment() {
                 title = getString(R.string.emailWithoutSubjectTitle),
                 description = getString(R.string.emailWithoutSubjectDescription),
                 confirmButtonText = R.string.buttonContinue,
+                displayLoader = false,
                 onPositiveButtonClicked = {
                     trackNewMessageEvent("sendWithoutSubjectConfirm")
                     sendEmail()

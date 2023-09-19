@@ -92,6 +92,8 @@ class MainViewModel @Inject constructor(
     val isMovedToNewFolder = SingleLiveEvent<Boolean>()
     val toggleLightThemeForMessage = SingleLiveEvent<Message>()
     val deletedMessages = SingleLiveEvent<Set<String>>()
+    val flushFolderTrigger = SingleLiveEvent<Unit>()
+    val reportPhishingTrigger = SingleLiveEvent<Unit>()
 
     val snackBarManager by lazy { SnackBarManager() }
 
@@ -324,6 +326,7 @@ class MainViewModel @Inject constructor(
         val folderId = currentFolderId ?: return@launch
 
         with(ApiRepository.flushFolder(mailboxUuid, folderId)) {
+            flushFolderTrigger.postValue(Unit)
             if (isSuccess()) {
                 forceRefreshThreads()
             } else {
@@ -779,6 +782,7 @@ class MainViewModel @Inject constructor(
                 translatedError
             }
 
+            reportPhishingTrigger.postValue(Unit)
             snackBarManager.postValue(context.getString(snackbarTitle))
         }
     }

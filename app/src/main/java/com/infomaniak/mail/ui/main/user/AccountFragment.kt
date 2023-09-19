@@ -120,6 +120,7 @@ class AccountFragment : Fragment(), MailboxListFragment {
     private fun initLogoutAlert() = createDescriptionDialog(
         title = getString(R.string.confirmLogoutTitle),
         description = AccountUtils.currentUser?.let { getString(R.string.confirmLogoutDescription, it.email) } ?: "",
+        displayLoader = false,
         onPositiveButtonClicked = ::removeCurrentUser,
     )
 }

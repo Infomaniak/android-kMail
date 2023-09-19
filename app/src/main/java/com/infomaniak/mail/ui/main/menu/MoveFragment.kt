@@ -108,7 +108,7 @@ class MoveFragment : MenuFoldersFragment() {
     }
 
     private fun observeNewFolderCreation() = with(mainViewModel) {
-        newFolderResultTrigger.observe(viewLifecycleOwner) { createFolderDialog.resetAndDismiss() }
+        newFolderResultTrigger.observe(viewLifecycleOwner) { createFolderDialog.resetLoadingAndDismiss() }
         isMovedToNewFolder.observe(viewLifecycleOwner) { isFolderCreated ->
             if (isFolderCreated) findNavController().popBackStack()
         }

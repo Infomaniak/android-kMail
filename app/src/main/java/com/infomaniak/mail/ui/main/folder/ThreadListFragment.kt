@@ -26,6 +26,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.isGone
@@ -113,6 +114,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private var canRefreshThreads = false
 
+    private var flushFolderDialog: AlertDialog? = null
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentThreadListBinding.inflate(inflater, container, false).also { binding = it }.root
     }
@@ -149,6 +152,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         observeUpdatedAtTriggers()
         observeContacts()
         observerDraftsActionsCompletedWorks()
+        observeFlushFolderTrigger()
     }.getOrDefault(Unit)
 
     private fun navigateFromNotificationToNewMessage() {
@@ -260,14 +264,14 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
                 trackerName?.let { trackThreadListEvent(it) }
 
-                createDescriptionDialog(
+                flushFolderDialog = createDescriptionDialog(
                     title = dialogTitle,
                     description = getString(R.string.threadListEmptyFolderAlertDescription),
                     onPositiveButtonClicked = {
                         trackThreadListEvent("${trackerName}Confirm")
                         mainViewModel.flushFolder()
                     },
-                ).show()
+                ).also { it.show() }
             }
 
             onLoadMoreClicked = { mainViewModel.getOnePageOfOldMessages() }
@@ -522,6 +526,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun observeContacts() {
         mainViewModel.mergedContactsLive.observeNotNull(viewLifecycleOwner, threadListAdapter::updateContacts)
+    }
+
+    private fun observeFlushFolderTrigger() {
+        mainViewModel.flushFolderTrigger.observe(viewLifecycleOwner) { flushFolderDialog?.resetLoadingAndDismiss() }
     }
 
     private fun observerDraftsActionsCompletedWorks() {

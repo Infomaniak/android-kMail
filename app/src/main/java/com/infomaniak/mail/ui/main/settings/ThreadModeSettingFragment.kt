@@ -62,6 +62,7 @@ class ThreadModeSettingFragment : Fragment() {
             createDescriptionDialog(
                 title = getString(R.string.settingsThreadModeWarningTitle, getString(threadMode.localisedNameRes)),
                 description = getString(R.string.settingsThreadModeWarningDescription),
+                displayLoader = false,
                 onPositiveButtonClicked = {
                     trackEvent("settingsThreadMode", threadMode.matomoValue)
                     localSettings.threadMode = threadMode

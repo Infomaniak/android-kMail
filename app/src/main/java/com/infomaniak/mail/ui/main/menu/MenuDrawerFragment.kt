@@ -258,7 +258,7 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
     }
 
     private fun observeNewFolderCreation() {
-        mainViewModel.newFolderResultTrigger.observe(viewLifecycleOwner) { createFolderDialog.resetAndDismiss() }
+        mainViewModel.newFolderResultTrigger.observe(viewLifecycleOwner) { createFolderDialog.resetLoadingAndDismiss() }
     }
 
     fun onDrawerOpened() {
