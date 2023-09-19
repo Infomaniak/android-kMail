@@ -50,7 +50,7 @@ class AiPropositionFragment : Fragment() {
         }
     }
 
-    private fun FragmentAiPropositionBinding.setToolbar() {
+    private fun setToolbar() = with(binding) {
         changeToolbarColorOnScroll(toolbar, nestedScrollView)
         toolbar.apply {
             setNavigationOnClickListener { findNavController().popBackStack() }
