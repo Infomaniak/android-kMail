@@ -38,7 +38,6 @@ import javax.inject.Inject
 
 class MessageController @Inject constructor(private val mailboxContentRealm: RealmDatabase.MailboxContent) {
 
-
     //region Queries
     private fun getSortedAndNotDeletedMessagesQuery(threadUid: String): RealmQuery<Message>? {
         return ThreadController.getThread(threadUid, mailboxContentRealm())

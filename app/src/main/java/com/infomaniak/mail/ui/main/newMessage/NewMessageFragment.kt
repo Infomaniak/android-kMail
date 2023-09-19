@@ -680,7 +680,6 @@ class NewMessageFragment : Fragment() {
             hideLoader()
             populateUiWithViewModel()
             setupFromField(signatures)
-
             setupEditorActions()
             setupEditorFormatActionsToggle()
         }

@@ -100,7 +100,10 @@ class NewMessageViewModel @Inject constructor(
 
     // Boolean: For toggleable actions, `false` if the formatting has been removed and `true` if the formatting has been applied.
     val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
-    val initResult = MutableLiveData<List<Signature>>() // Needs to trigger every time the Fragment is recreated
+
+    // Needs to trigger every time the Fragment is recreated
+    val initResult = MutableLiveData<List<Signature>>()
+
     val importedAttachments = MutableLiveData<Pair<MutableList<Attachment>, ImportationResult>>()
     val isSendingAllowed = MutableLiveData(false)
     val externalRecipientCount = MutableLiveData<Pair<String?, Int>>()
@@ -186,7 +189,7 @@ class NewMessageViewModel @Inject constructor(
         intent: Intent,
         newMessageActivityArgs: NewMessageActivityArgs,
         signatures: List<Signature>,
-        realm: Realm
+        realm: Realm,
     ): Draft? {
         isNewMessage = true
         return createDraft(signatures, realm)?.also {
@@ -195,11 +198,11 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private fun getLocalOrRemoteDraft(uuid: String): Draft? {
-        fun trackOpenLocal(draft: Draft) {
+        fun trackOpenLocal(unused: Draft) {
             context.trackNewMessageEvent(OPEN_LOCAL_DRAFT, TrackerAction.DATA, value = 1.0f)
         }
 
-        fun trackOpenRemote(draft: Draft) {
+        fun trackOpenRemote(unused: Draft) {
             context.trackNewMessageEvent(OPEN_LOCAL_DRAFT, TrackerAction.DATA, value = 0.0f)
         }
 

@@ -77,7 +77,6 @@ class MailboxesAdapter(
         setSelectedState(isCurrentMailbox)
     }
 
-
     private fun ItemMailboxMenuDrawerBinding.displayMenuDrawerMailbox(mailbox: Mailbox, isCurrentMailbox: Boolean) = with(root) {
         displayValidMailbox(mailbox, isCurrentMailbox) { context.trackMenuDrawerEvent(SWITCH_MAILBOX_NAME) }
 
