@@ -794,9 +794,7 @@ class NewMessageFragment : Fragment() {
 
     private fun observeAiOutput() {
         aiViewModel.aiOutputToInsert.observe(viewLifecycleOwner) { aiOutput ->
-            val previousText = binding.bodyText.text
-            val newText = listOf(previousText, aiOutput).filter { !it.isNullOrBlank() }.joinToString("\n\n")
-            binding.bodyText.setText(newText)
+            binding.bodyText.setText(aiOutput)
         }
     }
 
