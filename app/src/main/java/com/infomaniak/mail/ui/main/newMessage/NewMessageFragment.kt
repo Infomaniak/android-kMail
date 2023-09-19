@@ -96,10 +96,7 @@ class NewMessageFragment : Fragment() {
     private lateinit var addressListPopupWindow: ListPopupWindow
     private lateinit var filePicker: FilePicker
 
-    private val aiPromptFragment by lazy {
-        // TODO : Instance is recreated when NewMessageFragment in recreated. Why is that? Fix this
-        AiPromptFragment()
-    }
+    private val aiPromptFragment by lazy { AiPromptFragment() }
 
     private val attachmentAdapter = AttachmentAdapter(shouldDisplayCloseButton = true, onDelete = ::onDeleteAttachment)
 
