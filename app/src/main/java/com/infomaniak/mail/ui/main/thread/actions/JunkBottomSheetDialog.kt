@@ -32,8 +32,8 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.BottomSheetJunkBinding
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.utils.createDescriptionDialog
-import com.infomaniak.mail.utils.resetLoadingAndDismiss
+import com.infomaniak.mail.utils.AlertDialogUtils.createDescriptionDialog
+import com.infomaniak.mail.utils.AlertDialogUtils.resetLoadingAndDismiss
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

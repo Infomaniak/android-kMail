@@ -65,6 +65,8 @@ import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialog
 import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.AlertDialogUtils.createInformationDialog
+import com.infomaniak.mail.utils.AlertDialogUtils.showWithDescription
 import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipients
 import com.infomaniak.mail.utils.UiUtils.dividerDrawable
 import dagger.hilt.android.AndroidEntryPoint
