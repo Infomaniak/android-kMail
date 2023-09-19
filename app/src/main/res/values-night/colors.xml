@@ -77,7 +77,7 @@
     <!-- External tag -->
     <color name="externalChipBackground">@color/orca</color>
 
-    <!-- Ai -->
+    <!-- AI -->
     <color name="aiColor">@color/ai_dark</color>
 
     <!-- Swipe actions -->

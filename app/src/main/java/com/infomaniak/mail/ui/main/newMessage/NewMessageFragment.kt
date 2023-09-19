@@ -33,6 +33,7 @@ import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.*
 import android.view.WindowManager
 import android.webkit.WebView
 import android.widget.ListPopupWindow
@@ -97,6 +98,8 @@ class NewMessageFragment : Fragment() {
 
     private lateinit var addressListPopupWindow: ListPopupWindow
     private lateinit var filePicker: FilePicker
+
+    private val aiPromptFragment by lazy { AiPromptFragment() }
 
     private val attachmentAdapter = AttachmentAdapter(shouldDisplayCloseButton = true, onDelete = ::onDeleteAttachment)
 
@@ -173,7 +176,11 @@ class NewMessageFragment : Fragment() {
 
     private fun handleOnBackPressed() = with(newMessageViewModel) {
         newMessageActivity.onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
-            if (isAutoCompletionOpened) closeAutoCompletion() else newMessageActivity.finishAppAndRemoveTaskIfNeeded()
+            when {
+                isAiPromptOpened -> closeAiPrompt()
+                isAutoCompletionOpened -> closeAutoCompletion()
+                else -> newMessageActivity.finishAppAndRemoveTaskIfNeeded()
+            }
         }
     }
 
@@ -212,6 +219,10 @@ class NewMessageFragment : Fragment() {
 
         setupSendButton()
         setupExternalBanner()
+
+        if (newMessageViewModel.isAiPromptOpened) openAiPrompt()
+
+        scrim.setOnClickListener { closeAiPrompt() }
     }
 
     private fun initDraftAndViewModel() {
@@ -608,11 +619,57 @@ class NewMessageFragment : Fragment() {
                 EditorAction.CAMERA -> notYetImplemented()
                 EditorAction.LINK -> notYetImplemented()
                 EditorAction.CLOCK -> notYetImplemented()
-                EditorAction.AI -> {
-                    notYetImplemented()
-                }
+                EditorAction.AI -> openAiPrompt()
             }
         }
+    }
+
+    private fun openAiPrompt() = with(binding) {
+        newMessageViewModel.isAiPromptOpened = true
+
+        // Keyboard is opened inside onCreate() of AiPromptFragment
+
+        childFragmentManager
+            .beginTransaction()
+            .add(aiPromptFragmentContainer.id, aiPromptFragment)
+            .commit()
+
+        setAiPromptVisibility(true)
+        newMessageConstraintLayout.descendantFocusability = FOCUS_BLOCK_DESCENDANTS
+    }
+
+    fun closeAiPrompt() = with(binding) {
+        newMessageViewModel.apply {
+            isAiPromptOpened = false
+            aiPrompt = ""
+        }
+
+        aiPromptFragmentContainer.hideKeyboard()
+
+        childFragmentManager
+            .beginTransaction()
+            .detach(aiPromptFragment)
+            .remove(aiPromptFragment)
+            .commit()
+
+        setAiPromptVisibility(false)
+        newMessageConstraintLayout.descendantFocusability = FOCUS_BEFORE_DESCENDANTS
+    }
+
+    private fun setAiPromptVisibility(isVisible: Boolean) {
+        fun updateStatusBarColor(isVisible: Boolean) {
+            val statusBarColorRes = if (isVisible) R.color.scrim_translucent else R.color.backgroundColor
+            requireActivity().window.statusBarColor = requireContext().getColor(statusBarColorRes)
+        }
+
+        fun updateNavigationBarColor(isVisible: Boolean) {
+            val backgroundColorRes = if (isVisible) R.color.backgroundColorSecondary else R.color.backgroundColor
+            requireActivity().window.navigationBarColor = requireContext().getColor(backgroundColorRes)
+        }
+
+        binding.aiPromptLayout.isVisible = isVisible
+        updateStatusBarColor(isVisible)
+        updateNavigationBarColor(isVisible)
     }
 
     private fun observeNewAttachments() = with(binding) {

@@ -231,10 +231,6 @@
         <item name="rippleColor">?android:attr/colorControlHighlight</item>
     </style>
 
-    <style name="AiButtonRippleTheme">
-        <item name="android:colorControlHighlight">@color/ai_color_translucent_ripple</item>
-    </style>
-
     <style name="QuickBottomActionBarButton" parent="Widget.Material3.Button.TextButton">
         <item name="android:background">?android:attr/selectableItemBackgroundBorderless</item>
         <item name="android:fontFamily">@font/suisseintl_medium</item>
@@ -491,6 +487,21 @@
         <item name="dividerInsetStart">@dimen/marginStandardSmall</item>
     </style>
 
+    <!-- AI -->
+
+    <style name="AiCursorAndPrimaryColorTheme">
+        <item name="colorControlActivated">@color/aiColor</item>
+        <item name="colorOnPrimary">@color/onAiColor</item>
+        <item name="colorPrimary">@color/aiColor</item>
+    </style>
+
+    <style name="AiCardView" parent="CardViewMail">
+        <item name="cardBackgroundColor">@color/backgroundColorSecondary</item>
+        <item name="cardCornerRadius">@null</item>
+        <item name="cardPreventCornerOverlap">false</item>
+        <item name="shapeAppearanceOverlay">@style/BottomSheetDialogThemeShapeAppearanceOverlay</item>
+    </style>
+
     <!-- Other -->
 
     <style name="ExtendedFloatingActionButtonStyle" parent="Widget.Material3.ExtendedFloatingActionButton.Icon.Primary">
@@ -533,6 +544,7 @@
         <item name="android:textColorHint">@color/tertiaryTextColor</item>
         <item name="boxStrokeColor">@color/text_input_layout_box_color</item>
         <item name="boxStrokeErrorColor">@color/redDestructiveAction</item>
+        <item name="boxBackgroundColor">@color/backgroundColorTertiary</item>
     </style>
 
     <style name="ListPopupMenuStyle" parent="Widget.Material3.PopupMenu.ListPopupWindow">
