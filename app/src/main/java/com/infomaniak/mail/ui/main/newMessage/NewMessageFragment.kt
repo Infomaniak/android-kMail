@@ -139,7 +139,9 @@ class NewMessageFragment : Fragment() {
         filePicker = FilePicker(this@NewMessageFragment)
 
         initUi()
-        initDraftAndViewModel()
+
+        val isFirst = newMessageViewModel.activityCreationStatus != CreationStatus.RECREATED
+        if (isFirst) initDraftAndViewModel()
 
         handleOnBackPressed()
 
@@ -215,13 +217,10 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun initDraftAndViewModel() {
-        newMessageViewModel.initDraftAndViewModel().observe(viewLifecycleOwner) { (isSuccess, signatures) ->
+        newMessageViewModel.initDraftAndViewModel().observe(viewLifecycleOwner) { isSuccess ->
             if (isSuccess) {
-                hideLoader()
                 showKeyboardInCorrectView()
                 populateViewModelWithExternalMailData()
-                populateUiWithViewModel()
-                setupFromField(signatures)
             } else {
                 requireActivity().apply {
                     showToast(R.string.failToOpenDraft)
@@ -761,11 +760,13 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeInitSuccess() {
-        newMessageViewModel.isInitSuccess.observe(viewLifecycleOwner) { isSuccess ->
-            if (isSuccess) {
-                setupEditorActions()
-                setupEditorFormatActionsToggle()
-            }
+        newMessageViewModel.finishedInit.observe(viewLifecycleOwner) { signatures ->
+            hideLoader()
+            populateUiWithViewModel()
+            setupFromField(signatures)
+
+            setupEditorActions()
+            setupEditorFormatActionsToggle()
         }
     }
 

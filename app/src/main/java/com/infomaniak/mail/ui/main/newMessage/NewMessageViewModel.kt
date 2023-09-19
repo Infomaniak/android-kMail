@@ -97,7 +97,7 @@ class NewMessageViewModel @Inject constructor(
 
     // Boolean: For toggleable actions, `false` if the formatting has been removed and `true` if the formatting has been applied.
     val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
-    val isInitSuccess = SingleLiveEvent<Boolean>()
+    val finishedInit = MutableLiveData<List<Signature>>()
     val importedAttachments = MutableLiveData<Pair<MutableList<Attachment>, ImportationResult>>()
     val isSendingAllowed = MutableLiveData(false)
     val externalRecipientCount = MutableLiveData<Pair<String?, Int>>()
@@ -134,8 +134,7 @@ class NewMessageViewModel @Inject constructor(
         emit(list to arrangeMergedContacts(list))
     }
 
-    fun initDraftAndViewModel(): LiveData<Pair<Boolean, List<Signature>>> = liveData(ioCoroutineContext) {
-
+    fun initDraftAndViewModel(): LiveData<Boolean> = liveData(ioCoroutineContext) {
         val realm = mailboxContentRealm()
 
         var signatures = emptyList<Signature>()
@@ -192,8 +191,8 @@ class NewMessageViewModel @Inject constructor(
             }
         }
 
-        emit(isSuccess to signatures)
-        isInitSuccess.postValue(isSuccess)
+        emit(isSuccess)
+        if (isSuccess) finishedInit.postValue(signatures)
     }
 
     /**
