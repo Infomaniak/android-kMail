@@ -217,8 +217,8 @@ class NewMessageFragment : Fragment() {
         scrim.setOnClickListener { closeAiPrompt() }
     }
 
-    private fun FragmentNewMessageBinding.resetStatusBarColor() {
-        requireActivity().window.statusBarColor = context.getColor(R.color.backgroundColor)
+    private fun resetStatusBarColor() {
+        requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundColor)
     }
 
     private fun initDraftAndViewModel() {
