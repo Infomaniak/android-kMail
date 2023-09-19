@@ -33,6 +33,9 @@ class AiPromptViewModel @Inject constructor(@IoDispatcher private val ioDispatch
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
+    var aiPrompt = ""
+    var isAiPromptOpened = false
+
     val aiProposition = MutableLiveData<String>()
 
     fun generateAiProposition(prompt: String) = viewModelScope.launch(ioCoroutineContext) {
