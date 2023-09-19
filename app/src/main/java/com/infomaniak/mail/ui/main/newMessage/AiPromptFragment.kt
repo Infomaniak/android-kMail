@@ -124,7 +124,7 @@ class AiPromptFragment : Fragment() {
                 MISSING_CONTENT -> {
                     Sentry.withScope { scope ->
                         scope.level = SentryLevel.ERROR
-                        Sentry.captureMessage("Ai call succeeded but no content returned")
+                        Sentry.captureMessage("AI call succeeded but no content returned")
                     }
                 }
             }
