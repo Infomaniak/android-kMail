@@ -448,20 +448,20 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun observeCurrentThreads() = with(threadListViewModel) {
-        mainViewModel.currentThreadsLive.bindResultsChangeToAdapter(viewLifecycleOwner, threadListAdapter).apply {
+    private fun observeCurrentThreads() = with(mainViewModel) {
+        currentThreadsLive.bindResultsChangeToAdapter(viewLifecycleOwner, threadListAdapter).apply {
             recyclerView = binding.threadsList
             beforeUpdateAdapter = { threads ->
-                currentThreadsCount = threads.count()
-                SentryLog.i("UI", "Received threads: $currentThreadsCount | (${mainViewModel.currentFolder.value?.name})")
+                threadListViewModel.currentThreadsCount = threads.count()
+                SentryLog.i("UI", "Received threads: ${threadListViewModel.currentThreadsCount} | (${currentFolder.value?.name})")
                 updateThreadsVisibility()
             }
-            waitingBeforeNotifyAdapter = isRecoveringFinished
+            waitingBeforeNotifyAdapter = threadListViewModel.isRecoveringFinished
             afterUpdateAdapter = { threads ->
                 if (hasSwitchedToAnotherFolder()) scrollToTop()
 
-                if (mainViewModel.currentFilter.value == ThreadFilter.UNSEEN && threads.isEmpty()) {
-                    mainViewModel.currentFilter.value = ThreadFilter.ALL
+                if (currentFilter.value == ThreadFilter.UNSEEN && threads.isEmpty()) {
+                    currentFilter.value = ThreadFilter.ALL
                 }
             }
         }

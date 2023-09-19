@@ -230,7 +230,7 @@ class MainActivity : BaseActivity() {
         mainViewModel.snackBarManager.setValue(
             title = getString(R.string.snackbarDraftSaved),
             buttonTitle = R.string.actionDelete,
-            customBehaviour = {
+            customBehavior = {
                 trackEvent("snackbar", "deleteDraft")
                 mainViewModel.deleteDraft(associatedMailboxUuid, remoteDraftUuid)
             },
