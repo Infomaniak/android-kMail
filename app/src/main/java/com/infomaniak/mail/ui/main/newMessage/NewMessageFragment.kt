@@ -24,9 +24,7 @@ import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.os.Bundle
-import android.text.InputFilter
-import android.text.InputType
-import android.text.Spanned
+import android.text.*
 import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
@@ -154,6 +152,7 @@ class NewMessageFragment : Fragment() {
         observeCcAndBccVisibility()
         observeDraftWorkerResults()
         observeInitResult()
+        observeAiOutput()
     }
 
     override fun onStart() {
@@ -797,6 +796,14 @@ class NewMessageFragment : Fragment() {
 
         editorActions.isGone = isEditorExpanded
         textEditing.isVisible = isEditorExpanded
+    }
+
+    private fun observeAiOutput() {
+        aiViewModel.aiOutputToInsert.observe(viewLifecycleOwner) { aiOutput ->
+            val previousText = binding.bodyText.text
+            val newText = listOf(previousText, aiOutput).filter { !it.isNullOrBlank() }.joinToString("\n\n")
+            binding.bodyText.setText(newText)
+        }
     }
 
     fun navigateToPropositionFragment() {
