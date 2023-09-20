@@ -83,13 +83,12 @@ class AiPropositionFragment : Fragment() {
         onPositiveButtonClicked: () -> Unit,
     ) = with(DialogAiReplaceContentBinding.inflate(layoutInflater)) {
 
-        dialogDescriptionLayout.dialogTitle.text = "Détection d’un contenu déjà existant" // TODO : String
-        dialogDescriptionLayout.dialogDescription.text =
-            "Voulez-vous remplacer le contenu existant par la proposition de l’assistant ?" // TODO : String
+        dialogDescriptionLayout.dialogTitle.text = getString(R.string.aiReplacementDialogTitle)
+        dialogDescriptionLayout.dialogDescription.text = getString(R.string.aiReplacementDialogDescription)
 
         MaterialAlertDialogBuilder(requireContext(), R.style.AiCursorAndPrimaryColorTheme)
             .setView(root)
-            .setPositiveButton("Remplacer") { _, _ -> onPositiveButtonClicked() } // TODO : String
+            .setPositiveButton(R.string.aiReplacementDialogPositiveButton) { _, _ -> onPositiveButtonClicked() }
             .setNegativeButton(com.infomaniak.lib.core.R.string.buttonCancel, null)
             .create()
     }
