@@ -48,6 +48,11 @@ class AiPropositionFragment : Fragment() {
         aiViewModel.aiProposition.observe(viewLifecycleOwner) { proposition ->
             propositionTextView.text = proposition?.second
         }
+
+        insertPropositionButton.setOnClickListener {
+            aiViewModel.aiOutputToInsert.value = aiViewModel.aiProposition.value!!.second
+            findNavController().popBackStack()
+        }
     }
 
     private fun setToolbar() = with(binding) {
