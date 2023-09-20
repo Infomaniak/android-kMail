@@ -57,11 +57,15 @@
     <string name="addUnknownRecipientTitle">Add a recipient</string>
     <string name="aiButtonAdjust">Adjust</string>
     <string name="aiButtonInsert">Insert</string>
-    <string name="aiPromptGenerationLoader">The assistant is writing…</string>
+    <string name="aiPromptGenerationLoader">The assistant is writing</string>
     <string name="aiPromptPlaceholder">Tell the writing assistant what you want to write. For example, \"a thank-you email for a welcome gift\".</string>
     <string name="aiPromptTag">Beta</string>
     <string name="aiPromptTitle">Writing assistant</string>
     <string name="aiPromptValidateButton">Generate</string>
+    <string name="aiReplacementDialogDescription">Do you want to replace existing content by the assistant’s proposition?</string>
+    <string name="aiReplacementDialogDoNotShowAgain">Do not show this again</string>
+    <string name="aiReplacementDialogPositiveButton">Replace</string>
+    <string name="aiReplacementDialogTitle">Replace already existing content?</string>
     <string name="alertBlockedImagesDescription">For your safety certain contents have been blocked from your message.</string>
     <string name="alertBlockedImagesDisplayContent">Display content</string>
     <string name="appSecurityDescription">Protect access to your app by enabling your phone lock.</string>
