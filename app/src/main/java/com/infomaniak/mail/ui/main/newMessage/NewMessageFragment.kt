@@ -131,8 +131,6 @@ class NewMessageFragment : Fragment() {
             arguments = newMessageActivityArgs.toBundle(),
         )
 
-        updateCreationStatus()
-
         filePicker = FilePicker(this@NewMessageFragment)
 
         initUi()
@@ -172,12 +170,6 @@ class NewMessageFragment : Fragment() {
     private fun handleOnBackPressed() = with(newMessageViewModel) {
         newMessageActivity.onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             if (isAutoCompletionOpened) closeAutoCompletion() else newMessageActivity.finishAppAndRemoveTaskIfNeeded()
-        }
-    }
-
-    private fun updateCreationStatus() = with(newMessageViewModel) {
-        activityCreationStatus.next()?.let {
-            activityCreationStatus = it
         }
     }
 

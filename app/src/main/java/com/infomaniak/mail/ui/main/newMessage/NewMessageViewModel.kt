@@ -107,7 +107,6 @@ class NewMessageViewModel @Inject constructor(
 
     val snackBarManager by lazy { SnackBarManager() }
     var shouldExecuteDraftActionWhenStopping = true
-    var activityCreationStatus = CreationStatus.NOT_YET_CREATED
 
     private var snapshot: DraftSnapshot? = null
 
@@ -151,9 +150,7 @@ class NewMessageViewModel @Inject constructor(
                 signatures = SignatureController.getAllSignatures(realm)
                 if (signatures.isEmpty()) return@writeBlocking false
 
-                val isRecreated = activityCreationStatus == CreationStatus.RECREATED
-                val draftExists = arrivedFromExistingDraft || isRecreated
-
+                val draftExists = arrivedFromExistingDraft
                 draft = if (draftExists) {
                     val uuid = draftLocalUuid ?: draft.localUuid
                     getLocalOrRemoteDraft(uuid) ?: return@writeBlocking false
