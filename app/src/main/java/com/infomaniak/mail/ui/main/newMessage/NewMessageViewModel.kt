@@ -138,10 +138,9 @@ class NewMessageViewModel @Inject constructor(
 
     fun initDraftAndViewModel(
         intent: Intent,
-        newMessageActivityArgs: NewMessageActivityArgs
+        newMessageActivityArgs: NewMessageActivityArgs,
     ): LiveData<Boolean> = liveData(ioCoroutineContext) {
         val realm = mailboxContentRealm()
-
         var signatures = emptyList<Signature>()
 
         val isSuccess = runCatching {
@@ -151,15 +150,9 @@ class NewMessageViewModel @Inject constructor(
 
             val draftExists = arrivedFromExistingDraft
             draft = if (draftExists) {
-                val uuid = draftLocalUuid ?: draft.localUuid
-                getLocalOrRemoteDraft(uuid)?.also {
-                    if (it.identityId.isNullOrBlank()) signatureUtils.addMissingSignatureData(it, realm)
-                } ?: return@runCatching false
+                getExistingDraft(realm) ?: return@runCatching false
             } else {
-                isNewMessage = true
-                createDraft(signatures, realm)?.also {
-                    it.populateWithExternalMailDataIfNeeded(intent, newMessageActivityArgs)
-                } ?: return@runCatching false
+                getNewDraft(intent, newMessageActivityArgs, signatures, realm) ?: return@runCatching false
             }
 
             true
@@ -180,6 +173,25 @@ class NewMessageViewModel @Inject constructor(
 
         emit(isSuccess)
         if (isSuccess) initResult.postValue(signatures)
+    }
+
+    private fun getExistingDraft(realm: Realm): Draft? {
+        val uuid = draftLocalUuid ?: draft.localUuid
+        return getLocalOrRemoteDraft(uuid)?.also {
+            if (it.identityId.isNullOrBlank()) signatureUtils.addMissingSignatureData(it, realm)
+        }
+    }
+
+    private fun getNewDraft(
+        intent: Intent,
+        newMessageActivityArgs: NewMessageActivityArgs,
+        signatures: List<Signature>,
+        realm: Realm
+    ): Draft? {
+        isNewMessage = true
+        return createDraft(signatures, realm)?.also {
+            it.populateWithExternalMailDataIfNeeded(intent, newMessageActivityArgs)
+        }
     }
 
     private fun getLocalOrRemoteDraft(uuid: String): Draft? {
