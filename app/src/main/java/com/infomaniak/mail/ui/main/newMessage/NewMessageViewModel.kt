@@ -155,8 +155,11 @@ class NewMessageViewModel @Inject constructor(
             draft = if (draftExists) {
                 getExistingDraft(realm) ?: return@runCatching false
             } else {
-                getNewDraft(intent, navArgs, signatures, realm) ?: return@runCatching false
+                getNewDraft(signatures, realm) ?: return@runCatching false
             }
+
+            // We need `draft` to be assigned before calling this function (because `saveDraftToLocal()` needs it)
+            if (!draftExists) draft.populateWithExternalMailDataIfNeeded(intent, navArgs)
 
             true
         }.getOrElse {
@@ -186,16 +189,9 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    private fun getNewDraft(
-        intent: Intent,
-        navArgs: NewMessageActivityArgs,
-        signatures: List<Signature>,
-        realm: Realm,
-    ): Draft? {
+    private fun getNewDraft(signatures: List<Signature>, realm: Realm): Draft? {
         isNewMessage = true
-        return createDraft(signatures, realm)?.also {
-            it.populateWithExternalMailDataIfNeeded(intent, navArgs)
-        }
+        return createDraft(signatures, realm)
     }
 
     private fun getLocalOrRemoteDraft(uuid: String): Draft? {
