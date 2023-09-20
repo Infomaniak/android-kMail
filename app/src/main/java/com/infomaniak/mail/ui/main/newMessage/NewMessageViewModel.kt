@@ -100,7 +100,7 @@ class NewMessageViewModel @Inject constructor(
 
     // Boolean: For toggleable actions, `false` if the formatting has been removed and `true` if the formatting has been applied.
     val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
-    val finishedInit = MutableLiveData<List<Signature>>()
+    val initResult = MutableLiveData<List<Signature>>()
     val importedAttachments = MutableLiveData<Pair<MutableList<Attachment>, ImportationResult>>()
     val isSendingAllowed = MutableLiveData(false)
     val externalRecipientCount = MutableLiveData<Pair<String?, Int>>()
@@ -182,7 +182,7 @@ class NewMessageViewModel @Inject constructor(
         }
 
         emit(isSuccess)
-        if (isSuccess) finishedInit.postValue(signatures)
+        if (isSuccess) initResult.postValue(signatures)
     }
 
     private fun getLocalOrRemoteDraft(uuid: String): Draft? {

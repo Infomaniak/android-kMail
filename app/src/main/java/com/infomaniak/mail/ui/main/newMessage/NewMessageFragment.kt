@@ -135,7 +135,7 @@ class NewMessageFragment : Fragment() {
 
         initUi()
 
-        if (newMessageViewModel.finishedInit.value == null) initDraftAndViewModel()
+        if (newMessageViewModel.initResult.value == null) initDraftAndViewModel()
 
         handleOnBackPressed()
 
@@ -149,7 +149,7 @@ class NewMessageFragment : Fragment() {
         observeNewAttachments()
         observeCcAndBccVisibility()
         observeDraftWorkerResults()
-        observeInitSuccess()
+        observeInitResult()
     }
 
     override fun onStart() {
@@ -675,8 +675,8 @@ class NewMessageFragment : Fragment() {
         if (isTaskRoot) finishAndRemoveTask() else finish()
     }
 
-    private fun observeInitSuccess() {
-        newMessageViewModel.finishedInit.observe(viewLifecycleOwner) { signatures ->
+    private fun observeInitResult() {
+        newMessageViewModel.initResult.observe(viewLifecycleOwner) { signatures ->
             hideLoader()
             populateUiWithViewModel()
             setupFromField(signatures)
