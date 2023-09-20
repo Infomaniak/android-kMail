@@ -33,6 +33,7 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.MessageBodyUtils
 import com.infomaniak.mail.utils.toDate
 import io.realm.kotlin.MutableRealm
+import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
@@ -82,7 +83,7 @@ class DraftController @Inject constructor(
     //endregion
 
     //region Open Draft
-    fun setPreviousMessage(draft: Draft, draftMode: DraftMode, message: Message, realm: MutableRealm): Boolean {
+    fun setPreviousMessage(draft: Draft, draftMode: DraftMode, message: Message, realm: Realm): Boolean {
 
         var isSuccess = true
 

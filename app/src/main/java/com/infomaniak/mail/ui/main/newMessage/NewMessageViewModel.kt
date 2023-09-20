@@ -56,7 +56,7 @@ import com.infomaniak.mail.ui.main.newMessage.NewMessageViewModel.SignatureScore
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.realm.kotlin.MutableRealm
+import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.realmListOf
@@ -144,29 +144,27 @@ class NewMessageViewModel @Inject constructor(
 
         var signatures = emptyList<Signature>()
 
-        val isSuccess = realm.writeBlocking {
-            runCatching {
+        val isSuccess = runCatching {
 
-                signatures = SignatureController.getAllSignatures(realm = this)
-                if (signatures.isEmpty()) return@writeBlocking false
+            signatures = SignatureController.getAllSignatures(realm)
+            if (signatures.isEmpty()) return@runCatching false
 
-                val draftExists = arrivedFromExistingDraft
-                draft = if (draftExists) {
-                    val uuid = draftLocalUuid ?: draft.localUuid
-                    getLocalOrRemoteDraft(uuid)?.also {
-                        if (it.identityId.isNullOrBlank()) signatureUtils.addMissingSignatureData(it, realm = this)
-                    } ?: return@writeBlocking false
-                } else {
-                    isNewMessage = true
-                    createDraft(signatures)?.also {
-                        it.populateWithExternalMailDataIfNeeded(intent, newMessageActivityArgs)
-                    } ?: return@writeBlocking false
-                }
-            }.onFailure {
-                return@writeBlocking false
+            val draftExists = arrivedFromExistingDraft
+            draft = if (draftExists) {
+                val uuid = draftLocalUuid ?: draft.localUuid
+                getLocalOrRemoteDraft(uuid)?.also {
+                    if (it.identityId.isNullOrBlank()) signatureUtils.addMissingSignatureData(it, realm)
+                } ?: return@runCatching false
+            } else {
+                isNewMessage = true
+                createDraft(signatures, realm)?.also {
+                    it.populateWithExternalMailDataIfNeeded(intent, newMessageActivityArgs)
+                } ?: return@runCatching false
             }
 
-            return@writeBlocking true
+            true
+        }.getOrElse {
+            false
         }
 
         if (isSuccess) {
@@ -302,23 +300,23 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    private fun MutableRealm.createDraft(signatures: List<Signature>): Draft? = Draft().apply {
+    private fun createDraft(signatures: List<Signature>, realm: Realm): Draft? = Draft().apply {
         initLocalValues(mimeType = ClipDescription.MIMETYPE_TEXT_HTML)
 
         val shouldPreselectSignature = draftMode == DraftMode.REPLY || draftMode == DraftMode.REPLY_ALL
-        signatureUtils.initSignature(draft = this, realm = this@createDraft, addContent = !shouldPreselectSignature)
+        signatureUtils.initSignature(draft = this, realm, addContent = !shouldPreselectSignature)
 
         when (draftMode) {
             DraftMode.NEW_MAIL -> recipient?.let { to = realmListOf(it) }
             DraftMode.REPLY, DraftMode.REPLY_ALL, DraftMode.FORWARD -> {
                 previousMessageUid
-                    ?.let { uid -> MessageController.getMessage(uid, realm = this@createDraft) }
+                    ?.let { uid -> MessageController.getMessage(uid, realm) }
                     ?.let { message ->
                         val isSuccess = draftController.setPreviousMessage(
                             draft = this,
                             draftMode = draftMode,
                             message = message,
-                            realm = this@createDraft,
+                            realm = realm,
                         )
                         if (!isSuccess) return null
 
