@@ -87,7 +87,7 @@ class AiPropositionFragment : Fragment() {
         dialogDescriptionLayout.dialogDescription.text =
             "Voulez-vous remplacer le contenu existant par la proposition de l’assistant ?" // TODO : String
 
-        MaterialAlertDialogBuilder(requireContext())
+        MaterialAlertDialogBuilder(requireContext(), R.style.AiCursorAndPrimaryColorTheme)
             .setView(root)
             .setPositiveButton("Remplacer") { _, _ -> onPositiveButtonClicked() } // TODO : String
             .setNegativeButton(com.infomaniak.lib.core.R.string.buttonCancel, null)
