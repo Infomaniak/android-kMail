@@ -159,9 +159,12 @@ class NewMessageViewModel @Inject constructor(
                     getLocalOrRemoteDraft(uuid) ?: return@writeBlocking false
                 } else {
                     isNewMessage = true
-                    createDraft(signatures) ?: return@writeBlocking false
+                    createDraft(signatures)?.also {
+                        populateViewModelWithExternalMailDataIfNeeded(intent, newMessageActivityArgs)
+                    } ?: return@writeBlocking false
                 }
 
+                // TODO : Move inside getLocalOrRemoteDraft case only?
                 if (draft.identityId.isNullOrBlank()) signatureUtils.addMissingSignatureData(draft, realm = this)
             }.onFailure {
                 return@writeBlocking false
@@ -179,8 +182,6 @@ class NewMessageViewModel @Inject constructor(
                 otherFieldsAreAllEmpty.postValue(false)
                 initializeFieldsAsOpen.postValue(true)
             }
-
-            populateViewModelWithExternalMailData(intent, newMessageActivityArgs)
         }
 
         emit(isSuccess)
@@ -199,7 +200,7 @@ class NewMessageViewModel @Inject constructor(
         return getLatestLocalDraft(uuid)?.also(::trackOpenLocal) ?: fetchDraft()?.also(::trackOpenRemote)
     }
 
-    private fun populateViewModelWithExternalMailData(intent: Intent, newMessageActivityArgs: NewMessageActivityArgs) {
+    private fun populateViewModelWithExternalMailDataIfNeeded(intent: Intent, newMessageActivityArgs: NewMessageActivityArgs) {
         when (intent.action) {
             Intent.ACTION_SEND -> handleSingleSendIntent(intent)
             Intent.ACTION_SEND_MULTIPLE -> handleMultipleSendIntent(intent)
