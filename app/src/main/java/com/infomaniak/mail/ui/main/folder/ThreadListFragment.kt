@@ -157,7 +157,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         observeContacts()
         observerDraftsActionsCompletedWorks()
         observeFlushFolderTrigger()
-        observeDeleteThreadsTrigger()
     }.getOrDefault(Unit)
 
     private fun navigateFromNotificationToNewMessage() {
@@ -559,10 +558,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun observeFlushFolderTrigger() {
         mainViewModel.flushFolderTrigger.observe(viewLifecycleOwner) { flushFolderDialog?.resetLoadingAndDismiss() }
-    }
-
-    private fun observeDeleteThreadsTrigger() {
-        mainViewModel.deleteThreadsTrigger.observe(viewLifecycleOwner) { deleteThreadDialog?.resetLoadingAndDismiss() }
     }
 
     private fun observerDraftsActionsCompletedWorks() {

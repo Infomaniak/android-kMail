@@ -38,6 +38,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.utils.AlertDialogUtils.deleteThreadDialog
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.deleteWithConfirmationPopup
 import com.infomaniak.mail.utils.updateNavigationBarColor
@@ -95,12 +96,12 @@ class ThreadListMultiSelection {
                     toggleThreadsFavoriteStatus(selectedThreadsUids, shouldMultiselectFavorite)
                     isMultiSelectOn = false
                 }
-                R.id.quickActionDelete -> {
-                    threadListFragment.deleteThreadDialog = threadListFragment.deleteWithConfirmationPopup(
+                R.id.quickActionDelete -> threadListFragment.apply {
+                    requireActivity().deleteThreadDialog = deleteWithConfirmationPopup(
                         folderRole = getActionFolderRole(selectedThreads.firstOrNull()),
                         count = selectedThreadsCount,
                     ) {
-                        threadListFragment.trackMultiSelectActionEvent(ACTION_DELETE_NAME, selectedThreadsCount)
+                        trackMultiSelectActionEvent(ACTION_DELETE_NAME, selectedThreadsCount)
                         deleteThreads(selectedThreadsUids)
                         isMultiSelectOn = false
                     }

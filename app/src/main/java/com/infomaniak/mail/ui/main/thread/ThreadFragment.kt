@@ -67,6 +67,7 @@ import com.infomaniak.mail.ui.main.thread.ThreadViewModel.OpenThreadResult
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialog
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.AlertDialogUtils.createInformationDialog
+import com.infomaniak.mail.utils.AlertDialogUtils.deleteThreadDialog
 import com.infomaniak.mail.utils.AlertDialogUtils.showWithDescription
 import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipients
 import com.infomaniak.mail.utils.UiUtils.dividerDrawable
@@ -211,9 +212,11 @@ class ThreadFragment : Fragment() {
                     trackThreadActionsEvent(ACTION_ARCHIVE_NAME, isFromArchive)
                     archiveThread(navigationArgs.threadUid)
                 }
-                R.id.quickActionDelete -> deleteWithConfirmationPopup(folderRole, count = 1) {
-                    trackThreadActionsEvent(ACTION_DELETE_NAME)
-                    mainViewModel.deleteThread(navigationArgs.threadUid)
+                R.id.quickActionDelete -> {
+                    requireActivity().deleteThreadDialog = deleteWithConfirmationPopup(folderRole, count = 1) {
+                        trackThreadActionsEvent(ACTION_DELETE_NAME)
+                        mainViewModel.deleteThread(navigationArgs.threadUid)
+                    }
                 }
                 R.id.quickActionMenu -> {
                     trackThreadActionsEvent(OPEN_ACTION_BOTTOM_SHEET)

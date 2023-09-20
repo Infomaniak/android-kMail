@@ -28,6 +28,7 @@ import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts.*
 import androidx.activity.viewModels
 import androidx.annotation.FloatRange
+import androidx.appcompat.app.AlertDialog
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Lifecycle.State
 import androidx.lifecycle.distinctUntilChanged
@@ -53,6 +54,7 @@ import com.infomaniak.mail.firebase.RegisterFirebaseBroadcastReceiver
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity
 import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.AlertDialogUtils.resetLoadingAndDismiss
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Breadcrumb
@@ -97,6 +99,8 @@ class MainActivity : BaseActivity() {
     @Inject
     lateinit var playServicesUtils: PlayServicesUtils
 
+    var deleteThreadDialog: AlertDialog? = null
+
     private val drawerListener = object : DrawerLayout.DrawerListener {
 
         var hasDragged = false
@@ -134,6 +138,7 @@ class MainActivity : BaseActivity() {
 
         observeNetworkStatus()
         observeDeletedMessages()
+        observeDeleteThreadTrigger()
         observeDraftWorkerResults()
         binding.drawerLayout.addDrawerListener(drawerListener)
         registerFirebaseBroadcastReceiver.initFirebaseBroadcastReceiver(this, mainViewModel)
@@ -169,6 +174,10 @@ class MainActivity : BaseActivity() {
                 deletedMessages.value = emptySet()
             }
         }
+    }
+
+    private fun observeDeleteThreadTrigger() {
+        mainViewModel.deleteThreadsTrigger.observe(this) { deleteThreadDialog?.resetLoadingAndDismiss() }
     }
 
     private fun observeDraftWorkerResults() {
@@ -307,6 +316,11 @@ class MainActivity : BaseActivity() {
                 else -> popBack()
             }
         }
+    }
+
+    override fun onStop() {
+        deleteThreadDialog?.resetLoadingAndDismiss()
+        super.onStop()
     }
 
     override fun onDestroy() {

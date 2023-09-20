@@ -33,6 +33,7 @@ import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.DialogDescriptionBinding
 import com.infomaniak.mail.databinding.DialogInputBinding
+import com.infomaniak.mail.ui.MainActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.invoke
@@ -192,4 +193,10 @@ object AlertDialogUtils {
 
     private inline val AlertDialog.positiveButton get() = (getButton(DialogInterface.BUTTON_POSITIVE) as MaterialButton)
     private inline val AlertDialog.negativeButton get() = (getButton(DialogInterface.BUTTON_NEGATIVE) as MaterialButton)
+
+    inline var Activity.deleteThreadDialog
+        get() = (this as? MainActivity)?.deleteThreadDialog
+        set(value) {
+            (this as? MainActivity)?.deleteThreadDialog = value
+        }
 }

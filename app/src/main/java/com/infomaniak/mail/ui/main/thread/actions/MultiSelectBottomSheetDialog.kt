@@ -36,6 +36,7 @@ import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection.Companion.getReadIconAndShortText
+import com.infomaniak.mail.utils.AlertDialogUtils.deleteThreadDialog
 import com.infomaniak.mail.utils.animatedNavigation
 import com.infomaniak.mail.utils.deleteWithConfirmationPopup
 import dagger.hilt.android.AndroidEntryPoint
@@ -80,12 +81,14 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                     trackMultiSelectActionEvent(ACTION_ARCHIVE_NAME, selectedThreadsCount, isFromBottomSheet = true)
                     archiveThreads(selectedThreadsUids)
                 }
-                R.id.actionDelete -> deleteWithConfirmationPopup(
-                    folderRole = getActionFolderRole(selectedThreads.firstOrNull()),
-                    count = selectedThreadsCount,
-                ) {
-                    trackMultiSelectActionEvent(ACTION_DELETE_NAME, selectedThreadsCount, isFromBottomSheet = true)
-                    deleteThreads(selectedThreadsUids)
+                R.id.actionDelete -> {
+                    requireActivity().deleteThreadDialog = deleteWithConfirmationPopup(
+                        folderRole = getActionFolderRole(selectedThreads.firstOrNull()),
+                        count = selectedThreadsCount,
+                    ) {
+                        trackMultiSelectActionEvent(ACTION_DELETE_NAME, selectedThreadsCount, isFromBottomSheet = true)
+                        deleteThreads(selectedThreadsUids)
+                    }
                 }
             }
             isMultiSelectOn = false
