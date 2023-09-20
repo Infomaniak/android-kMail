@@ -41,7 +41,6 @@ class FetchMessagesManager @Inject constructor(
     private val notificationManagerCompat: NotificationManagerCompat,
     private val notificationUtils: NotificationUtils,
     private val refreshController: RefreshController,
-    private val threadController: ThreadController,
 ) {
 
     suspend fun execute(userId: Int, mailbox: Mailbox, sentryMessageUid: String? = null, mailboxContentRealm: Realm? = null) {
