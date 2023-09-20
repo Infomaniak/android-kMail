@@ -51,11 +51,15 @@
     <string name="addUnknownRecipientTitle">Añadir un destinatario</string>
     <string name="aiButtonAdjust">Ajustar</string>
     <string name="aiButtonInsert">Inserte</string>
-    <string name="aiPromptGenerationLoader">El asistente está escribiendo…</string>
+    <string name="aiPromptGenerationLoader">El asistente está escribiendo</string>
     <string name="aiPromptPlaceholder">Dígale al asistente de redacción lo que quiere escribir. Por ejemplo, \"un correo electrónico de agradecimiento por un regalo de bienvenida\".</string>
     <string name="aiPromptTag">Beta</string>
     <string name="aiPromptTitle">Asistente de redacción</string>
     <string name="aiPromptValidateButton">Genere</string>
+    <string name="aiReplacementDialogDescription">¿Desea sustituir el contenido existente por la propuesta del asistente?</string>
+    <string name="aiReplacementDialogDoNotShowAgain">No volver a mostrar este mensaje</string>
+    <string name="aiReplacementDialogPositiveButton">Sustituir</string>
+    <string name="aiReplacementDialogTitle">¿Reemplazar el contenido existente?</string>
     <string name="alertBlockedImagesDescription">Para su seguridad hemos bloqueado ciertos contenidos en su mensaje.</string>
     <string name="alertBlockedImagesDisplayContent">Mostrar el contenido</string>
     <string name="appSecurityDescription">Protege el acceso a tu aplicación activando el bloqueo del teléfono.</string>
