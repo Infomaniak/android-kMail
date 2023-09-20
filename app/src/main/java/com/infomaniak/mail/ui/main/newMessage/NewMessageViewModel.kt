@@ -147,7 +147,7 @@ class NewMessageViewModel @Inject constructor(
         val isSuccess = realm.writeBlocking {
             runCatching {
 
-                signatures = SignatureController.getAllSignatures(realm)
+                signatures = SignatureController.getAllSignatures(realm = this)
                 if (signatures.isEmpty()) return@writeBlocking false
 
                 val draftExists = arrivedFromExistingDraft
