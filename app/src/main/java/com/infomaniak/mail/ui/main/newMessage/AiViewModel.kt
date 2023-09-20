@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.main.newMessage
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.newMessage.AiViewModel.PropositionStatus.*
@@ -39,6 +40,7 @@ class AiViewModel @Inject constructor(@IoDispatcher private val ioDispatcher: Co
     var isAiPromptOpened = false
 
     val aiProposition = MutableLiveData<Pair<PropositionStatus, String?>?>()
+    val aiOutputToInsert = SingleLiveEvent<String>()
 
     fun generateAiProposition(prompt: String) = viewModelScope.launch(ioCoroutineContext) {
         with(ApiRepository.generateAiProposition(prompt)) {
