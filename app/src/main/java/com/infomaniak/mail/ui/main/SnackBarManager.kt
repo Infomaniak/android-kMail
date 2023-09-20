@@ -37,11 +37,11 @@ class SnackBarManager {
         getAnchor: (() -> View?)? = null,
         onUndoData: ((data: UndoData) -> Unit)? = null,
     ) {
-        snackBarFeedback.observe(activity) { (title, undoData, buttonTitleRes, customBehaviour) ->
+        snackBarFeedback.observe(activity) { (title, undoData, buttonTitleRes, customBehavior) ->
             val action: (() -> Unit)? = if (undoData != null) {
                 { onUndoData?.invoke(undoData) }
             } else {
-                customBehaviour
+                customBehavior
             }
             val safeAction = getSafeAction(action)
 
@@ -64,19 +64,19 @@ class SnackBarManager {
         }
     }
 
-    fun setValue(title: String, undoData: UndoData? = null, buttonTitle: Int? = null, customBehaviour: (() -> Unit)? = null) {
-        snackBarFeedback.value = SnackBarData(title, undoData, buttonTitle, customBehaviour)
+    fun setValue(title: String, undoData: UndoData? = null, buttonTitle: Int? = null, customBehavior: (() -> Unit)? = null) {
+        snackBarFeedback.value = SnackBarData(title, undoData, buttonTitle, customBehavior)
     }
 
-    fun postValue(title: String, undoData: UndoData? = null, buttonTitle: Int? = null, customBehaviour: (() -> Unit)? = null) {
-        snackBarFeedback.postValue(SnackBarData(title, undoData, buttonTitle, customBehaviour))
+    fun postValue(title: String, undoData: UndoData? = null, buttonTitle: Int? = null, customBehavior: (() -> Unit)? = null) {
+        snackBarFeedback.postValue(SnackBarData(title, undoData, buttonTitle, customBehavior))
     }
 
     private data class SnackBarData(
         val title: String,
         val undoData: UndoData?,
         @StringRes val buttonTitle: Int?,
-        val customBehaviour: (() -> Unit)?,
+        val customBehavior: (() -> Unit)?,
     )
 
     data class UndoData(
