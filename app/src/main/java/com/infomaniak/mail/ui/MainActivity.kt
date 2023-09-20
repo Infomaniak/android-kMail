@@ -177,7 +177,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun observeDeleteThreadTrigger() {
-        mainViewModel.deleteThreadsTrigger.observe(this) { deleteThreadDialog?.resetLoadingAndDismiss() }
+        mainViewModel.deleteThreadOrMessageTrigger.observe(this) { deleteThreadDialog?.resetLoadingAndDismiss() }
     }
 
     private fun observeDraftWorkerResults() {

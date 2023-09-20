@@ -92,7 +92,7 @@ class MainViewModel @Inject constructor(
     val isMovedToNewFolder = SingleLiveEvent<Boolean>()
     val toggleLightThemeForMessage = SingleLiveEvent<Message>()
     val deletedMessages = SingleLiveEvent<Set<String>>()
-    val deleteThreadsTrigger = MutableLiveData<Unit>()
+    val deleteThreadOrMessageTrigger = SingleLiveEvent<Unit>()
     val flushFolderTrigger = SingleLiveEvent<Unit>()
     val newFolderResultTrigger = MutableLiveData<Unit>()
     val reportPhishingTrigger = SingleLiveEvent<Unit>()
@@ -446,7 +446,7 @@ class MainViewModel @Inject constructor(
             }
         }
 
-        deleteThreadsTrigger.postValue(Unit)
+        deleteThreadOrMessageTrigger.postValue(Unit)
         if (apiResponse.isSuccess()) {
             refreshFoldersAsync(
                 mailbox = mailbox,
@@ -456,7 +456,7 @@ class MainViewModel @Inject constructor(
                 stopped = ::stoppedDownload,
             )
         } else if (isSwipe) {
-            // We need to make the swiped Thread come back, so we reassign the LiveData
+            // We need to make the swiped Thread come back, so we reassign the LiveData with Realm values
             reassignCurrentThreadsLive()
         }
 

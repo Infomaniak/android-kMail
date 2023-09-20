@@ -33,7 +33,6 @@ import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.DialogDescriptionBinding
 import com.infomaniak.mail.databinding.DialogInputBinding
-import com.infomaniak.mail.ui.MainActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.invoke
@@ -91,7 +90,7 @@ object AlertDialogUtils {
         fun AlertDialog.setupOnShowListener() = apply {
             setOnShowListener {
                 // We are forced to override the ClickListener to prevent the default one to dismiss automatically the Alert
-                if (displayLoader) positiveButton.setOnClickListener {
+                positiveButton.setOnClickListener {
                     onPositiveButtonClicked()
                     startLoading()
                 }
@@ -107,7 +106,7 @@ object AlertDialogUtils {
             .apply { if (displayCancelButton) setNegativeButton(com.infomaniak.lib.core.R.string.buttonCancel, null) }
             .setOnDismissListener { onDismissed?.invoke() }
             .create()
-            .setupOnShowListener()
+            .apply { if (displayLoader) setupOnShowListener() }
     }
 
     fun Fragment.createInputDialog(
@@ -193,10 +192,4 @@ object AlertDialogUtils {
 
     private inline val AlertDialog.positiveButton get() = (getButton(DialogInterface.BUTTON_POSITIVE) as MaterialButton)
     private inline val AlertDialog.negativeButton get() = (getButton(DialogInterface.BUTTON_NEGATIVE) as MaterialButton)
-
-    inline var Activity.deleteThreadDialog
-        get() = (this as? MainActivity)?.deleteThreadDialog
-        set(value) {
-            (this as? MainActivity)?.deleteThreadDialog = value
-        }
 }

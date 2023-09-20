@@ -393,6 +393,12 @@ fun Fragment.deleteWithConfirmationPopup(
     }
 }
 
+inline var Fragment.deleteThreadDialog
+    get() = (activity as? MainActivity)?.deleteThreadDialog
+    set(value) {
+        (activity as? MainActivity)?.deleteThreadDialog = value
+    }
+
 fun DragDropSwipeRecyclerView.addStickyDateDecoration(adapter: ThreadListAdapter, threadDensity: ThreadDensity) {
     addItemDecoration(HeaderItemDecoration(this, false) { position ->
         return@HeaderItemDecoration position >= 0 && adapter.dataSet[position] is String

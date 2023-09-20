@@ -118,8 +118,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private var flushFolderDialog: AlertDialog? = null
 
-    var deleteThreadDialog: AlertDialog? = null
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentThreadListBinding.inflate(inflater, container, false).also { binding = it }.root
     }
@@ -388,6 +386,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                     count = 1,
                     displayLoader = false,
                     onDismiss = {
+                        // Notify only if the user cancelled the popup (e.g. the thread is not deleted),
+                        // otherwise it will notify the next item in the list and make it slightly blink
                         if (threadListAdapter.dataSet.indexOfFirst { it is Thread && it.uid == thread.uid } == position) {
                             threadListAdapter.notifyItemChanged(position)
                         }
