@@ -41,7 +41,6 @@ class FetchMessagesManager @Inject constructor(
     private val notificationManagerCompat: NotificationManagerCompat,
     private val notificationUtils: NotificationUtils,
     private val refreshController: RefreshController,
-    private val threadController: ThreadController,
 ) {
 
     suspend fun execute(userId: Int, mailbox: Mailbox, sentryMessageUid: String? = null, mailboxContentRealm: Realm? = null) {
@@ -119,7 +118,7 @@ class FetchMessagesManager @Inject constructor(
         okHttpClient: OkHttpClient,
     ) {
 
-        threadController.fetchMessagesHeavyData(messages, realm, okHttpClient)
+        ThreadController.fetchMessagesHeavyData(messages, realm, okHttpClient)
 
         val message = MessageController.getThreadLastMessageInFolder(uid, realm) ?: run {
             SentryDebug.sendFailedNotification("No Message in the Thread", userId, mailbox.mailboxId, sentryMessageUid, mailbox)

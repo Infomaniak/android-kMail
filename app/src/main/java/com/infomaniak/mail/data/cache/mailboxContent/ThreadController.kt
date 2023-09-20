@@ -128,26 +128,6 @@ class ThreadController @Inject constructor(
         delete(query<Thread>("${Thread::isFromSearch.name} == true").find())
     }
 
-    /**
-     * Asynchronously fetches heavy data for a list of messages within a given mailbox and realm.
-     *
-     * This function fetches heavy data associated with the provided list of messages, such as attachments
-     * or other resource-intensive content. It operates within the given realm and mailbox context.
-     *
-     * This function is deliberately present here as it relies on a method accessible solely through injection.
-     *
-     * @param messages List of messages for which heavy data needs to be fetched.
-     * @param realm The realm context in which the heavy data fetching and updates should occur.
-     * @param okHttpClient An optional OkHttpClient instance to use for making network requests. If not provided, a default client will be used.
-     */
-    fun fetchMessagesHeavyData(
-        messages: List<Message>,
-        realm: Realm,
-        okHttpClient: OkHttpClient? = null,
-    ): Pair<List<String>, List<String>> {
-        return realm.writeBlocking { fetchMessagesHeavyData(messages, realm = this, okHttpClient) }
-    }
-
     fun saveThreads(searchMessages: List<Message>) {
         mailboxContentRealm().writeBlocking {
             FolderController.getOrCreateSearchFolder(realm = this).apply {
@@ -224,9 +204,21 @@ class ThreadController @Inject constructor(
         //region Edit data
         fun upsertThread(thread: Thread, realm: MutableRealm): Thread = realm.copyToRealm(thread, UpdatePolicy.ALL)
 
+        /**
+         * Asynchronously fetches heavy data for a list of messages within a given mailbox and realm.
+         *
+         * This function fetches heavy data associated with the provided list of messages, such as attachments
+         * or other resource-intensive content. It operates within the given realm and mailbox context.
+         *
+         * This function is deliberately present here as it relies on a method accessible solely through injection.
+         *
+         * @param messages List of messages for which heavy data needs to be fetched.
+         * @param realm The realm context in which the heavy data fetching and updates should occur.
+         * @param okHttpClient An optional OkHttpClient instance to use for making network requests. If not provided, a default client will be used.
+         */
         fun fetchMessagesHeavyData(
             messages: List<Message>,
-            realm: MutableRealm,
+            realm: Realm,
             okHttpClient: OkHttpClient? = null,
         ): Pair<List<String>, List<String>> {
 
@@ -242,32 +234,34 @@ class ThreadController @Inject constructor(
                 }
             }
 
-            messages.forEach { localMessage ->
+            realm.writeBlocking {
+                messages.forEach { localMessage ->
 
-                if (localMessage.isFullyDownloaded()) return@forEach
+                    if (localMessage.isFullyDownloaded()) return@forEach
 
-                runCatching {
-                    val apiResponse = ApiRepository.getMessage(localMessage.resource, okHttpClient)
+                    runCatching {
+                        val apiResponse = ApiRepository.getMessage(localMessage.resource, okHttpClient)
 
-                    if (apiResponse.isSuccess()) {
-                        apiResponse.data?.also { remoteMessage ->
-                            remoteMessage.initLocalValues(
-                                date = localMessage.date,
-                                isFullyDownloaded = true,
-                                isTrashed = localMessage.isTrashed,
-                                isFromSearch = localMessage.isFromSearch,
-                                draftLocalUuid = remoteMessage.getDraftLocalUuid(realm),
-                                messageIds = localMessage.messageIds,
-                            )
-                            MessageController.upsertMessage(remoteMessage, realm)
+                        if (apiResponse.isSuccess()) {
+                            apiResponse.data?.also { remoteMessage ->
+                                remoteMessage.initLocalValues(
+                                    date = localMessage.date,
+                                    isFullyDownloaded = true,
+                                    isTrashed = localMessage.isTrashed,
+                                    isFromSearch = localMessage.isFromSearch,
+                                    draftLocalUuid = remoteMessage.getDraftLocalUuid(realm),
+                                    messageIds = localMessage.messageIds,
+                                )
+                                MessageController.upsertMessage(remoteMessage, realm = this)
+                            }
+                        } else {
+                            handleFailure(localMessage.uid, apiResponse.error?.code)
                         }
-                    } else {
-                        handleFailure(localMessage.uid, apiResponse.error?.code)
-                    }
 
-                }.onFailure {
-                    // This `runCatching / onFailure` is here only to catch `OutOfMemoryError` when trying to deserialize very big Body
-                    handleFailure(localMessage.uid)
+                    }.onFailure {
+                        // This `runCatching / onFailure` is here only to catch `OutOfMemoryError` when trying to deserialize very big Body
+                        handleFailure(localMessage.uid)
+                    }
                 }
             }
 
@@ -276,7 +270,7 @@ class ThreadController @Inject constructor(
 
         // If we've already got this Message's Draft beforehand, we need to save
         // its `draftLocalUuid`, otherwise we'll lose the link between them.
-        private fun Message.getDraftLocalUuid(realm: MutableRealm): String? {
+        private fun Message.getDraftLocalUuid(realm: TypedRealm): String? {
             return if (isDraft) DraftController.getDraftByMessageUid(uid, realm)?.localUuid else null
         }
         //endregion

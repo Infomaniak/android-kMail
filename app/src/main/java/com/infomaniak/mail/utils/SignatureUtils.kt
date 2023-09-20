@@ -21,7 +21,7 @@ import android.content.Context
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.models.draft.Draft
-import io.realm.kotlin.MutableRealm
+import io.realm.kotlin.TypedRealm
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -40,11 +40,11 @@ class SignatureUtils @Inject constructor(appContext: Context) {
         return Regex("""\{(.*)\}""").find(verticalMarginsCss)!!.groupValues[1]
     }
 
-    fun addMissingSignatureData(draft: Draft, realm: MutableRealm) {
+    fun addMissingSignatureData(draft: Draft, realm: TypedRealm) {
         initSignature(draft, realm, addContent = false)
     }
 
-    fun initSignature(draft: Draft, realm: MutableRealm, addContent: Boolean) = with(draft) {
+    fun initSignature(draft: Draft, realm: TypedRealm, addContent: Boolean) = with(draft) {
         val signature = SignatureController.getSignature(realm)
 
         identityId = signature.id.toString()
