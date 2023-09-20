@@ -517,7 +517,7 @@ class NewMessageFragment : Fragment() {
                 EditorAction.ATTACHMENT -> {
                     filePicker.open { uris ->
                         requireActivity().window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-                        newMessageViewModel.importAttachments(uris)
+                        newMessageViewModel.importAttachmentsToCurrentDraft(uris)
                     }
                 }
                 EditorAction.CAMERA -> notYetImplemented()
