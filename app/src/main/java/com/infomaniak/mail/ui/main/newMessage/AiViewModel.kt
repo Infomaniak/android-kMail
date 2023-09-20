@@ -46,6 +46,7 @@ class AiViewModel @Inject constructor(@IoDispatcher private val ioDispatcher: Co
                 when {
                     isSuccess() -> data?.content?.let { SUCCESS to it } ?: (MISSING_CONTENT to null)
                     error?.code == MAX_TOKEN_REACHED -> MAX_TOKEN_EXCEEDED to null
+                    // TODO : Detect RATE_LIMIT_EXCEEDED
                     else -> ERROR to null
                 }
             )
