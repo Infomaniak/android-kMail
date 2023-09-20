@@ -25,6 +25,7 @@ import com.infomaniak.lib.core.R
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.networking.HttpClient
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
@@ -76,31 +77,41 @@ class LoginUtils @Inject constructor(
             infomaniakLogin.getToken(
                 okHttpClient = HttpClient.okHttpClientNoTokenInterceptor,
                 code = authCode,
-                onSuccess = { onAuthenticateUserSuccess(it) },
+                onSuccess = { onAuthenticateUserSuccess(it, infomaniakLogin) },
                 onError = { onAuthenticateUserError(it) },
             )
         }
     }
 
-    private fun Fragment.onAuthenticateUserSuccess(apiToken: ApiToken) = lifecycleScope.launch(ioDispatcher) {
-        val context = requireContext()
-        when (val returnValue = LoginActivity.authenticateUser(context, apiToken, mailboxController)) {
-            is User -> {
+    private fun Fragment.onAuthenticateUserSuccess(apiToken: ApiToken, infomaniakLogin: InfomaniakLogin) {
+        lifecycleScope.launch(ioDispatcher) {
+            val context = requireContext()
+            val returnValue = LoginActivity.authenticateUser(context, apiToken, mailboxController)
+            if (returnValue is User) {
                 context.trackAccountEvent("loggedIn")
                 mailboxController.getFirstValidMailbox(returnValue.id)?.mailboxId?.let { AccountUtils.currentMailboxId = it }
                 AccountUtils.reloadApp?.invoke()
-            }
-            is MailboxErrorCode -> withContext(mainDispatcher) {
+            } else {
                 when (returnValue) {
-                    MailboxErrorCode.NO_MAILBOX -> context.launchNoMailboxActivity()
-                    MailboxErrorCode.NO_VALID_MAILBOX -> context.launchNoValidMailboxesActivity()
+                    is MailboxErrorCode -> withContext(mainDispatcher) {
+                        when (returnValue) {
+                            MailboxErrorCode.NO_MAILBOX -> context.launchNoMailboxActivity()
+                            MailboxErrorCode.NO_VALID_MAILBOX -> context.launchNoValidMailboxesActivity()
+                        }
+                    }
+                    is ApiResponse<*> -> withContext(mainDispatcher) {
+                        showError(context.getString(returnValue.translatedError))
+                    }
+                    else -> withContext(mainDispatcher) {
+                        showError(context.getString(R.string.anErrorHasOccurred))
+                    }
                 }
-            }
-            is ApiResponse<*> -> withContext(mainDispatcher) {
-                showError(context.getString(returnValue.translatedError))
-            }
-            else -> withContext(mainDispatcher) {
-                showError(context.getString(R.string.anErrorHasOccurred))
+
+                infomaniakLogin.deleteToken(
+                    okHttpClient = HttpClient.okHttpClientNoTokenInterceptor,
+                    token = apiToken,
+                    onError = { SentryLog.e("DeleteTokenError", "API response error: $it") },
+                )
             }
         }
     }
