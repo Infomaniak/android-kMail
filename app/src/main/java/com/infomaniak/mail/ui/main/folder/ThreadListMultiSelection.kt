@@ -95,13 +95,15 @@ class ThreadListMultiSelection {
                     toggleThreadsFavoriteStatus(selectedThreadsUids, shouldMultiselectFavorite)
                     isMultiSelectOn = false
                 }
-                R.id.quickActionDelete -> threadListFragment.deleteWithConfirmationPopup(
-                    folderRole = getActionFolderRole(selectedThreads.firstOrNull()),
-                    count = selectedThreadsCount,
-                ) {
-                    threadListFragment.trackMultiSelectActionEvent(ACTION_DELETE_NAME, selectedThreadsCount)
-                    deleteThreads(selectedThreadsUids)
-                    isMultiSelectOn = false
+                R.id.quickActionDelete -> {
+                    threadListFragment.deleteThreadDialog = threadListFragment.deleteWithConfirmationPopup(
+                        folderRole = getActionFolderRole(selectedThreads.firstOrNull()),
+                        count = selectedThreadsCount,
+                    ) {
+                        threadListFragment.trackMultiSelectActionEvent(ACTION_DELETE_NAME, selectedThreadsCount)
+                        deleteThreads(selectedThreadsUids)
+                        isMultiSelectOn = false
+                    }
                 }
                 R.id.quickActionMenu -> {
                     threadListFragment.trackMultiSelectActionEvent(OPEN_ACTION_BOTTOM_SHEET, selectedThreadsCount)

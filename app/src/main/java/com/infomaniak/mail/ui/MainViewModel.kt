@@ -89,11 +89,12 @@ class MainViewModel @Inject constructor(
     // First boolean is the download status, second boolean is if the LoadMore button should be displayed
     val isDownloadingChanges: MutableLiveData<Pair<Boolean, Boolean?>> = MutableLiveData(false to null)
     val isInternetAvailable = MutableLiveData<Boolean>()
-    val newFolderResultTrigger = MutableLiveData<Unit>()
     val isMovedToNewFolder = SingleLiveEvent<Boolean>()
     val toggleLightThemeForMessage = SingleLiveEvent<Message>()
     val deletedMessages = SingleLiveEvent<Set<String>>()
+    val deleteThreadsTrigger = MutableLiveData<Unit>()
     val flushFolderTrigger = SingleLiveEvent<Unit>()
+    val newFolderResultTrigger = MutableLiveData<Unit>()
     val reportPhishingTrigger = SingleLiveEvent<Unit>()
 
     val snackBarManager by lazy { SnackBarManager() }
@@ -445,6 +446,7 @@ class MainViewModel @Inject constructor(
             }
         }
 
+        deleteThreadsTrigger.postValue(Unit)
         if (apiResponse.isSuccess()) {
             refreshFoldersAsync(
                 mailbox = mailbox,

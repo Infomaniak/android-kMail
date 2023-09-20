@@ -32,6 +32,7 @@ import android.view.Window
 import android.view.inputmethod.EditorInfo
 import android.webkit.WebView
 import androidx.annotation.*
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
@@ -376,18 +377,19 @@ fun Fragment.deleteWithConfirmationPopup(
     displayLoader: Boolean = true,
     onDismiss: (() -> Unit)? = null,
     callback: () -> Unit,
-) {
-    when (folderRole) {
-        FolderRole.DRAFT, FolderRole.SPAM, FolderRole.TRASH -> {
-            createDescriptionDialog(
-                title = resources.getQuantityString(R.plurals.threadListDeletionConfirmationAlertTitle, count, count),
-                description = resources.getQuantityString(R.plurals.threadListDeletionConfirmationAlertDescription, count),
-                displayLoader = displayLoader,
-                onPositiveButtonClicked = callback,
-                onDismissed = onDismiss,
-            ).show()
-        }
-        else -> callback()
+): AlertDialog? = when (folderRole) {
+    FolderRole.DRAFT, FolderRole.SPAM, FolderRole.TRASH -> {
+        createDescriptionDialog(
+            title = resources.getQuantityString(R.plurals.threadListDeletionConfirmationAlertTitle, count, count),
+            description = resources.getQuantityString(R.plurals.threadListDeletionConfirmationAlertDescription, count),
+            displayLoader = displayLoader,
+            onPositiveButtonClicked = callback,
+            onDismissed = onDismiss,
+        ).also { it.show() }
+    }
+    else -> {
+        callback()
+        null
     }
 }
 
