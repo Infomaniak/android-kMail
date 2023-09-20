@@ -157,17 +157,6 @@ class NewMessageViewModel @Inject constructor(
                 draft = if (draftExists) {
                     val uuid = draftLocalUuid ?: draft.localUuid
                     getLocalOrRemoteDraft(uuid) ?: return@writeBlocking false
-
-                    // getLatestDraft(uuid)?.also {
-                    //     context.trackNewMessageEvent(OPEN_LOCAL_DRAFT, TrackerAction.DATA, value = 1.0f)
-                    // } ?: fetchDraft()?.also {
-                    //     context.trackNewMessageEvent(OPEN_LOCAL_DRAFT, TrackerAction.DATA, value = 0.0f)
-                    // } ?: return@writeBlocking false
-
-                    // run {
-                    //     context.trackNewMessageEvent(OPEN_LOCAL_DRAFT, TrackerAction.DATA, value = 0.0f)
-                    //     fetchDraft() ?: return@writeBlocking false
-                    // }
                 } else {
                     isNewMessage = true
                     createDraft(signatures) ?: return@writeBlocking false
@@ -209,10 +198,6 @@ class NewMessageViewModel @Inject constructor(
 
         return getLatestLocalDraft(uuid)?.also(::trackOpenLocal) ?: fetchDraft()?.also(::trackOpenRemote)
     }
-
-    // private fun getLocalOrRemoteDraft(uuid: String): Draft? {
-    //     return getLatestLocalDraft(uuid) ?: fetchDraft()
-    // }
 
     private fun populateViewModelWithExternalMailData(intent: Intent, newMessageActivityArgs: NewMessageActivityArgs) {
         when (intent.action) {
