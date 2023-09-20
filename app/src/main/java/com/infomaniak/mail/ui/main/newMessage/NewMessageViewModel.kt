@@ -172,10 +172,11 @@ class NewMessageViewModel @Inject constructor(
                 otherFieldsAreAllEmpty.postValue(false)
                 initializeFieldsAsOpen.postValue(true)
             }
+
+            initResult.postValue(signatures)
         }
 
         emit(isSuccess)
-        if (isSuccess) initResult.postValue(signatures)
     }
 
     private fun getExistingDraft(realm: Realm): Draft? {
