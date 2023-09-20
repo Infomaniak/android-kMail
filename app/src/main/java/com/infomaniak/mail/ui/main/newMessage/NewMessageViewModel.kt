@@ -153,16 +153,15 @@ class NewMessageViewModel @Inject constructor(
                 val draftExists = arrivedFromExistingDraft
                 draft = if (draftExists) {
                     val uuid = draftLocalUuid ?: draft.localUuid
-                    getLocalOrRemoteDraft(uuid) ?: return@writeBlocking false
+                    getLocalOrRemoteDraft(uuid)?.also {
+                        if (it.identityId.isNullOrBlank()) signatureUtils.addMissingSignatureData(it, realm = this)
+                    } ?: return@writeBlocking false
                 } else {
                     isNewMessage = true
-                    createDraft(signatures)?.also { draft ->
-                        draft.populateWithExternalMailDataIfNeeded(intent, newMessageActivityArgs)
+                    createDraft(signatures)?.also {
+                        it.populateWithExternalMailDataIfNeeded(intent, newMessageActivityArgs)
                     } ?: return@writeBlocking false
                 }
-
-                // TODO : Move inside getLocalOrRemoteDraft case only?
-                if (draft.identityId.isNullOrBlank()) signatureUtils.addMissingSignatureData(draft, realm = this)
             }.onFailure {
                 return@writeBlocking false
             }
