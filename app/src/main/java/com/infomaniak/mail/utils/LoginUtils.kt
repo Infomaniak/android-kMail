@@ -83,37 +83,39 @@ class LoginUtils @Inject constructor(
         }
     }
 
-    private fun Fragment.onAuthenticateUserSuccess(apiToken: ApiToken, infomaniakLogin: InfomaniakLogin) {
-        lifecycleScope.launch(ioDispatcher) {
-            val context = requireContext()
-            val returnValue = LoginActivity.authenticateUser(context, apiToken, mailboxController)
-            if (returnValue is User) {
+    private fun Fragment.onAuthenticateUserSuccess(
+        apiToken: ApiToken,
+        infomaniakLogin: InfomaniakLogin,
+    ) = lifecycleScope.launch(ioDispatcher) {
+
+        val context = requireContext()
+
+        when (val returnValue = LoginActivity.authenticateUser(context, apiToken, mailboxController)) {
+            is User -> {
                 context.trackAccountEvent("loggedIn")
                 mailboxController.getFirstValidMailbox(returnValue.id)?.mailboxId?.let { AccountUtils.currentMailboxId = it }
                 AccountUtils.reloadApp?.invoke()
-            } else {
+                return@launch
+            }
+            is MailboxErrorCode -> withContext(mainDispatcher) {
                 when (returnValue) {
-                    is MailboxErrorCode -> withContext(mainDispatcher) {
-                        when (returnValue) {
-                            MailboxErrorCode.NO_MAILBOX -> context.launchNoMailboxActivity()
-                            MailboxErrorCode.NO_VALID_MAILBOX -> context.launchNoValidMailboxesActivity()
-                        }
-                    }
-                    is ApiResponse<*> -> withContext(mainDispatcher) {
-                        showError(context.getString(returnValue.translatedError))
-                    }
-                    else -> withContext(mainDispatcher) {
-                        showError(context.getString(R.string.anErrorHasOccurred))
-                    }
+                    MailboxErrorCode.NO_MAILBOX -> context.launchNoMailboxActivity()
+                    MailboxErrorCode.NO_VALID_MAILBOX -> context.launchNoValidMailboxesActivity()
                 }
-
-                infomaniakLogin.deleteToken(
-                    okHttpClient = HttpClient.okHttpClientNoTokenInterceptor,
-                    token = apiToken,
-                    onError = { SentryLog.e("DeleteTokenError", "API response error: $it") },
-                )
+            }
+            is ApiResponse<*> -> withContext(mainDispatcher) {
+                showError(context.getString(returnValue.translatedError))
+            }
+            else -> withContext(mainDispatcher) {
+                showError(context.getString(R.string.anErrorHasOccurred))
             }
         }
+
+        infomaniakLogin.deleteToken(
+            okHttpClient = HttpClient.okHttpClientNoTokenInterceptor,
+            token = apiToken,
+            onError = { SentryLog.e("DeleteTokenError", "API response error: $it") },
+        )
     }
 
     private fun Fragment.onAuthenticateUserError(errorStatus: InfomaniakLogin.ErrorStatus) {
