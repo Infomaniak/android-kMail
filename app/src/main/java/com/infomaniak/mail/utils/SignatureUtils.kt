@@ -21,7 +21,6 @@ import android.content.Context
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.models.draft.Draft
-import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
 import javax.inject.Inject
 import javax.inject.Singleton

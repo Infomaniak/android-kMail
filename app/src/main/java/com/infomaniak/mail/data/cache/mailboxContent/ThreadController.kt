@@ -234,32 +234,34 @@ class ThreadController @Inject constructor(
                 }
             }
 
-            messages.forEach { localMessage ->
+            realm.writeBlocking {
+                messages.forEach { localMessage ->
 
-                if (localMessage.isFullyDownloaded()) return@forEach
+                    if (localMessage.isFullyDownloaded()) return@forEach
 
-                runCatching {
-                    val apiResponse = ApiRepository.getMessage(localMessage.resource, okHttpClient)
+                    runCatching {
+                        val apiResponse = ApiRepository.getMessage(localMessage.resource, okHttpClient)
 
-                    if (apiResponse.isSuccess()) {
-                        apiResponse.data?.also { remoteMessage ->
-                            remoteMessage.initLocalValues(
-                                date = localMessage.date,
-                                isFullyDownloaded = true,
-                                isTrashed = localMessage.isTrashed,
-                                isFromSearch = localMessage.isFromSearch,
-                                draftLocalUuid = remoteMessage.getDraftLocalUuid(realm),
-                                messageIds = localMessage.messageIds,
-                            )
-                            realm.writeBlocking { MessageController.upsertMessage(remoteMessage, realm = this) }
+                        if (apiResponse.isSuccess()) {
+                            apiResponse.data?.also { remoteMessage ->
+                                remoteMessage.initLocalValues(
+                                    date = localMessage.date,
+                                    isFullyDownloaded = true,
+                                    isTrashed = localMessage.isTrashed,
+                                    isFromSearch = localMessage.isFromSearch,
+                                    draftLocalUuid = remoteMessage.getDraftLocalUuid(realm),
+                                    messageIds = localMessage.messageIds,
+                                )
+                                MessageController.upsertMessage(remoteMessage, realm = this)
+                            }
+                        } else {
+                            handleFailure(localMessage.uid, apiResponse.error?.code)
                         }
-                    } else {
-                        handleFailure(localMessage.uid, apiResponse.error?.code)
-                    }
 
-                }.onFailure {
-                    // This `runCatching / onFailure` is here only to catch `OutOfMemoryError` when trying to deserialize very big Body
-                    handleFailure(localMessage.uid)
+                    }.onFailure {
+                        // This `runCatching / onFailure` is here only to catch `OutOfMemoryError` when trying to deserialize very big Body
+                        handleFailure(localMessage.uid)
+                    }
                 }
             }
 
