@@ -113,7 +113,10 @@ class AiPromptFragment : Fragment() {
 
             val (status, _) = proposition
             when (status) {
-                SUCCESS -> if (aiViewModel.isAiPromptOpened) newMessageFragment.navigateToPropositionFragment()
+                SUCCESS -> if (aiViewModel.isAiPromptOpened) {
+                    newMessageViewModel.shouldExecuteDraftActionWhenStopping = false
+                    newMessageFragment.navigateToPropositionFragment()
+                }
                 ERROR -> {
                     newMessageViewModel.snackBarManager.setValue(getString(RCore.string.anErrorHasOccurred))
                     generationLoader.isGone = true
