@@ -141,7 +141,7 @@ class NewMessageViewModel @Inject constructor(
 
     fun initDraftAndViewModel(
         intent: Intent,
-        newMessageActivityArgs: NewMessageActivityArgs,
+        navArgs: NewMessageActivityArgs,
     ): LiveData<Boolean> = liveData(ioCoroutineContext) {
         val realm = mailboxContentRealm()
         var signatures = emptyList<Signature>()
@@ -155,7 +155,7 @@ class NewMessageViewModel @Inject constructor(
             draft = if (draftExists) {
                 getExistingDraft(realm) ?: return@runCatching false
             } else {
-                getNewDraft(intent, newMessageActivityArgs, signatures, realm) ?: return@runCatching false
+                getNewDraft(intent, navArgs, signatures, realm) ?: return@runCatching false
             }
 
             true
@@ -187,13 +187,13 @@ class NewMessageViewModel @Inject constructor(
 
     private fun getNewDraft(
         intent: Intent,
-        newMessageActivityArgs: NewMessageActivityArgs,
+        navArgs: NewMessageActivityArgs,
         signatures: List<Signature>,
         realm: Realm,
     ): Draft? {
         isNewMessage = true
         return createDraft(signatures, realm)?.also {
-            it.populateWithExternalMailDataIfNeeded(intent, newMessageActivityArgs)
+            it.populateWithExternalMailDataIfNeeded(intent, navArgs)
         }
     }
 
@@ -209,14 +209,14 @@ class NewMessageViewModel @Inject constructor(
         return getLatestLocalDraft(uuid)?.also(::trackOpenLocal) ?: fetchDraft()?.also(::trackOpenRemote)
     }
 
-    private fun Draft.populateWithExternalMailDataIfNeeded(intent: Intent, newMessageActivityArgs: NewMessageActivityArgs) {
+    private fun Draft.populateWithExternalMailDataIfNeeded(intent: Intent, navArgs: NewMessageActivityArgs) {
         when (intent.action) {
             Intent.ACTION_SEND -> handleSingleSendIntent(intent)
             Intent.ACTION_SEND_MULTIPLE -> handleMultipleSendIntent(intent)
             Intent.ACTION_VIEW, Intent.ACTION_SENDTO -> handleMailTo(intent.data, intent)
         }
 
-        if (newMessageActivityArgs.mailToUri != null) handleMailTo(newMessageActivityArgs.mailToUri)
+        if (navArgs.mailToUri != null) handleMailTo(navArgs.mailToUri)
     }
 
     /**

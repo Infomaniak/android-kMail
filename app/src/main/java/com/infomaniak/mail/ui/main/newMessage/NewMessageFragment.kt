@@ -206,8 +206,8 @@ class NewMessageFragment : Fragment() {
 
     private fun initDraftAndViewModel() {
         newMessageViewModel.initDraftAndViewModel(
-            requireActivity().intent,
-            newMessageActivityArgs,
+            intent = requireActivity().intent,
+            navArgs = newMessageActivityArgs,
         ).observe(viewLifecycleOwner) { isSuccess ->
             if (isSuccess) {
                 showKeyboardInCorrectView()
