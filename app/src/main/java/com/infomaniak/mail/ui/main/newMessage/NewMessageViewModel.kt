@@ -156,23 +156,18 @@ class NewMessageViewModel @Inject constructor(
 
                 draft = if (draftExists) {
                     val uuid = draftLocalUuid ?: draft.localUuid
-                    getLatestDraft(uuid)?.also {
-                        if (!isRecreated) context.trackNewMessageEvent(OPEN_LOCAL_DRAFT, TrackerAction.DATA, value = 1.0f)
-                    } ?: run {
-                        if (isRecreated && (draftResource == null || messageUid == null)) {
-                            // We arrive here if :
-                            //    1. the user created a new Draft,
-                            //    2. didn't write anything in it,
-                            //    3. then recreated the activity.
-                            // In this case, we do not have any data in Realm nor from the API,
-                            // hence the null `draftResource` & `messageUid`,
-                            // so we can just reuse the already existing Draft.
-                            draft
-                        } else {
-                            if (!isRecreated) context.trackNewMessageEvent(OPEN_LOCAL_DRAFT, TrackerAction.DATA, value = 0.0f)
-                            fetchDraft()
-                        } ?: return@writeBlocking false
-                    }
+                    getLocalOrRemoteDraft(uuid) ?: return@writeBlocking false
+
+                    // getLatestDraft(uuid)?.also {
+                    //     context.trackNewMessageEvent(OPEN_LOCAL_DRAFT, TrackerAction.DATA, value = 1.0f)
+                    // } ?: fetchDraft()?.also {
+                    //     context.trackNewMessageEvent(OPEN_LOCAL_DRAFT, TrackerAction.DATA, value = 0.0f)
+                    // } ?: return@writeBlocking false
+
+                    // run {
+                    //     context.trackNewMessageEvent(OPEN_LOCAL_DRAFT, TrackerAction.DATA, value = 0.0f)
+                    //     fetchDraft() ?: return@writeBlocking false
+                    // }
                 } else {
                     isNewMessage = true
                     createDraft(signatures) ?: return@writeBlocking false
@@ -202,6 +197,22 @@ class NewMessageViewModel @Inject constructor(
         emit(isSuccess)
         if (isSuccess) finishedInit.postValue(signatures)
     }
+
+    private fun getLocalOrRemoteDraft(uuid: String): Draft? {
+        fun trackOpenLocal(draft: Draft) {
+            context.trackNewMessageEvent(OPEN_LOCAL_DRAFT, TrackerAction.DATA, value = 1.0f)
+        }
+
+        fun trackOpenRemote(draft: Draft) {
+            context.trackNewMessageEvent(OPEN_LOCAL_DRAFT, TrackerAction.DATA, value = 0.0f)
+        }
+
+        return getLatestLocalDraft(uuid)?.also(::trackOpenLocal) ?: fetchDraft()?.also(::trackOpenRemote)
+    }
+
+    // private fun getLocalOrRemoteDraft(uuid: String): Draft? {
+    //     return getLatestLocalDraft(uuid) ?: fetchDraft()
+    // }
 
     private fun populateViewModelWithExternalMailData(intent: Intent, newMessageActivityArgs: NewMessageActivityArgs) {
         when (intent.action) {
@@ -301,7 +312,7 @@ class NewMessageViewModel @Inject constructor(
         )
     }
 
-    private fun getLatestDraft(draftLocalUuid: String?) = draftLocalUuid?.let(draftController::getDraft)?.copyFromRealm()
+    private fun getLatestLocalDraft(draftLocalUuid: String?) = draftLocalUuid?.let(draftController::getDraft)?.copyFromRealm()
 
     private fun fetchDraft(): Draft? {
         return ApiRepository.getDraft(draftResource!!).data?.also { draft ->
