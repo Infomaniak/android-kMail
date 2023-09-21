@@ -248,7 +248,7 @@ class MainActivity : BaseActivity() {
 
             lifecycleScope.launch {
                 repeatOnLifecycle(State.STARTED) {
-                    mainViewModel.refreshMailboxesFromRemote()
+                    mainViewModel.refreshEverything()
                 }
             }
 

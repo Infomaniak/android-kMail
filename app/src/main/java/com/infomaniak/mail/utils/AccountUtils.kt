@@ -20,8 +20,12 @@ package com.infomaniak.mail.utils
 import android.content.Context
 import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.auth.CredentialManager
+import com.infomaniak.lib.core.auth.TokenAuthenticator
+import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.models.user.User
+import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.room.UserDatabase
+import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.appSettings.AppSettingsController
 import com.infomaniak.mail.data.models.AppSettings
@@ -29,6 +33,8 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import io.sentry.Sentry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.invoke
+import kotlinx.coroutines.sync.withLock
+import okhttp3.OkHttpClient
 import io.sentry.protocol.User as SentryUser
 
 object AccountUtils : CredentialManager() {
@@ -106,6 +112,23 @@ object AccountUtils : CredentialManager() {
     suspend fun addUser(user: User) {
         currentUser = user
         userDatabase.userDao().insert(user)
+    }
+
+    suspend fun updateCurrentUser(okHttpClient: OkHttpClient = HttpClient.okHttpClient) {
+        with(ApiRepository.getUserProfile(okHttpClient)) {
+            if (result != ApiResponse.Status.ERROR) requestUser(remoteUser = data ?: return)
+        }
+    }
+
+    private suspend fun requestUser(remoteUser: User) {
+        TokenAuthenticator.mutex.withLock {
+            if (remoteUser.id == currentUserId) {
+                remoteUser.organizations = arrayListOf()
+                requestCurrentUser()?.let { localUser ->
+                    setUserToken(remoteUser, localUser.apiToken)
+                }
+            }
+        }
     }
 
     suspend fun removeUser(user: User) {
