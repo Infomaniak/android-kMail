@@ -269,12 +269,12 @@ class LocalSettings private constructor(context: Context) {
     }
     //endregion
 
-    //region Ai replacement dialog
-    var showAiReplacementDialog: ShowAiReplacementDialog
-        get() = getEnum(SHOW_AI_DIALOG_KEY, DEFAULT_SHOW_AI_REPLACEMENT_DIALOG)
-        set(value) = putEnum(SHOW_AI_DIALOG_KEY, value)
+    //region AI replacement dialog
+    var aiReplacementDialogVisibility: AiReplacementDialogVisibility
+        get() = getEnum(AI_REPLACEMENT_DIALOG_VISIBILITY_KEY, DEFAULT_AI_REPLACEMENT_DIALOG_VISIBILITY)
+        set(value) = putEnum(AI_REPLACEMENT_DIALOG_VISIBILITY_KEY, value)
 
-    enum class ShowAiReplacementDialog { // TODO : Matomo
+    enum class AiReplacementDialogVisibility { // TODO: Matomo
         SHOW,
         HIDE,
     }
@@ -314,7 +314,7 @@ class LocalSettings private constructor(context: Context) {
         private const val DEFAULT_RECENT_SEARCHES = "[]"
         private val DEFAULT_FIREBASE_TOKEN = null
         private val DEFAULT_FIREBASE_REGISTERED_USERS = emptySet<String>()
-        private val DEFAULT_SHOW_AI_REPLACEMENT_DIALOG = ShowAiReplacementDialog.SHOW
+        private val DEFAULT_AI_REPLACEMENT_DIALOG_VISIBILITY = AiReplacementDialogVisibility.SHOW
         //endregion
 
         //region Keys
@@ -337,7 +337,7 @@ class LocalSettings private constructor(context: Context) {
         private const val RECENT_SEARCHES_KEY = "recentSearchesKey"
         private const val FIREBASE_TOKEN_KEY = "firebaseTokenKey"
         private const val FIREBASE_REGISTERED_USERS_KEY = "firebaseRegisteredUsersKey"
-        private const val SHOW_AI_DIALOG_KEY = "showAiDialogKey"
+        private const val AI_REPLACEMENT_DIALOG_VISIBILITY_KEY = "aiReplacementDialogVisibilityKey"
         //endregion
 
         @Volatile
