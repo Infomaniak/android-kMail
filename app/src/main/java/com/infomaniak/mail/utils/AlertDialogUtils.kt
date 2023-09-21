@@ -37,6 +37,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
+import com.infomaniak.lib.core.R as RCore
 
 object AlertDialogUtils {
 
@@ -103,7 +104,7 @@ object AlertDialogUtils {
         MaterialAlertDialogBuilder(context)
             .setView(root)
             .setPositiveButton(confirmButtonText, null)
-            .apply { if (displayCancelButton) setNegativeButton(com.infomaniak.lib.core.R.string.buttonCancel, null) }
+            .apply { if (displayCancelButton) setNegativeButton(RCore.string.buttonCancel, null) }
             .setOnDismissListener { onDismissed?.invoke() }
             .create()
             .setupOnShowListener()
@@ -161,7 +162,7 @@ object AlertDialogUtils {
         return@with MaterialAlertDialogBuilder(context)
             .setView(root)
             .setPositiveButton(confirmButtonText, null)
-            .setNegativeButton(com.infomaniak.lib.core.R.string.buttonCancel, null)
+            .setNegativeButton(RCore.string.buttonCancel, null)
             .setOnDismissListener {
                 errorJob?.cancel()
                 textInput.text?.clear()
