@@ -31,6 +31,7 @@ import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewDecoratedTextItemBinding
+import com.infomaniak.lib.core.R as RCore
 
 sealed class DecoratedItemView @JvmOverloads constructor(
     context: Context,
@@ -40,8 +41,8 @@ sealed class DecoratedItemView @JvmOverloads constructor(
 
     val binding by lazy { ViewDecoratedTextItemBinding.inflate(LayoutInflater.from(context), this, true) }
 
-    private val regular by lazy { ResourcesCompat.getFont(context, com.infomaniak.lib.core.R.font.suisseintl_regular) }
-    private val medium by lazy { ResourcesCompat.getFont(context, com.infomaniak.lib.core.R.font.suisseintl_medium) }
+    private val regular by lazy { ResourcesCompat.getFont(context, RCore.font.suisseintl_regular) }
+    private val medium by lazy { ResourcesCompat.getFont(context, RCore.font.suisseintl_medium) }
 
     var icon: Drawable? = null
         set(value) {
