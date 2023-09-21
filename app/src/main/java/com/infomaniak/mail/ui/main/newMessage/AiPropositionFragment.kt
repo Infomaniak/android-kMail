@@ -27,7 +27,7 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.LocalSettings.ShowAiReplacementDialog
+import com.infomaniak.mail.data.LocalSettings.AiReplacementDialogVisibility
 import com.infomaniak.mail.databinding.DialogAiReplaceContentBinding
 import com.infomaniak.mail.databinding.FragmentAiPropositionBinding
 import com.infomaniak.mail.utils.changeToolbarColorOnScroll
@@ -62,7 +62,7 @@ class AiPropositionFragment : Fragment() {
         }
 
         insertPropositionButton.setOnClickListener {
-            val doNotAskAgain = localSettings.showAiReplacementDialog == ShowAiReplacementDialog.HIDE
+            val doNotAskAgain = localSettings.aiReplacementDialogVisibility == AiReplacementDialogVisibility.HIDE
             val body = newMessageViewModel.draft.uiBody
 
             if (doNotAskAgain || body.isBlank()) choosePropositionAndBack() else replacementDialog.show()
@@ -96,12 +96,12 @@ class AiPropositionFragment : Fragment() {
         }
 
         checkbox.apply {
-            isChecked = localSettings.showAiReplacementDialog == ShowAiReplacementDialog.HIDE
+            isChecked = localSettings.aiReplacementDialogVisibility == AiReplacementDialogVisibility.HIDE
             setOnCheckedChangeListener { _, isChecked ->
-                localSettings.showAiReplacementDialog = if (isChecked) {
-                    ShowAiReplacementDialog.HIDE
+                localSettings.aiReplacementDialogVisibility = if (isChecked) {
+                    AiReplacementDialogVisibility.HIDE
                 } else {
-                    ShowAiReplacementDialog.SHOW
+                    AiReplacementDialogVisibility.SHOW
                 }
             }
         }
