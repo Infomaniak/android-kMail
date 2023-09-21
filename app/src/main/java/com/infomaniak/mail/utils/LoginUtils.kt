@@ -98,10 +98,7 @@ class LoginUtils @Inject constructor(
                 return@launch
             }
             is MailboxErrorCode -> withContext(mainDispatcher) {
-                when (returnValue) {
-                    MailboxErrorCode.NO_MAILBOX -> context.launchNoMailboxActivity()
-                    MailboxErrorCode.NO_VALID_MAILBOX -> context.launchNoValidMailboxesActivity()
-                }
+                if (returnValue == MailboxErrorCode.NO_VALID_MAILBOX) context.launchNoValidMailboxesActivity()
             }
             is ApiResponse<*> -> withContext(mainDispatcher) {
                 showError(context.getString(returnValue.translatedError))

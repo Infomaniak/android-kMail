@@ -81,6 +81,7 @@ import com.infomaniak.mail.ui.main.thread.MessageWebViewClient
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragmentArgs
 import com.infomaniak.mail.ui.noValidMailboxes.NoValidMailboxesActivity
+import com.infomaniak.mail.utils.AccountUtils.NO_MAILBOX_USER_ID_KEY
 import com.infomaniak.mail.utils.AlertDialogUtils.createDescriptionDialog
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import io.realm.kotlin.MutableRealm
@@ -515,8 +516,8 @@ fun Context.launchNoValidMailboxesActivity() {
     }.also(::startActivity)
 }
 
-fun Context.launchNoMailboxActivity(shouldStartLoginActivity: Boolean = false) {
-    val noMailboxActivityIntent = Intent(this, NoMailboxActivity::class.java)
+fun Context.launchNoMailboxActivity(userId: Int = AccountUtils.currentUserId, shouldStartLoginActivity: Boolean = false) {
+    val noMailboxActivityIntent = Intent(this, NoMailboxActivity::class.java).putExtra(NO_MAILBOX_USER_ID_KEY, userId)
     val intentsArray = if (shouldStartLoginActivity) {
         arrayOf(getLoginActivityIntent(shouldClearStack = true), noMailboxActivityIntent)
     } else {
