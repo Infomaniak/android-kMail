@@ -28,6 +28,7 @@ import com.infomaniak.mail.utils.ErrorCode.MAX_TOKEN_REACHED
 import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -44,6 +45,7 @@ class AiViewModel @Inject constructor(@IoDispatcher private val ioDispatcher: Co
 
     fun generateAiProposition() = viewModelScope.launch(ioCoroutineContext) {
         with(ApiRepository.generateAiProposition(aiPrompt)) {
+            ensureActive()
             aiProposition.postValue(
                 when {
                     isSuccess() -> data?.content?.let { SUCCESS to it } ?: (MISSING_CONTENT to null)
