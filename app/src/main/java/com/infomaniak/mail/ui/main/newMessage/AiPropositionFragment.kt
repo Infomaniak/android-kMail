@@ -26,11 +26,14 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.LocalSettings.ShowAiReplacementDialog
 import com.infomaniak.mail.databinding.DialogAiReplaceContentBinding
 import com.infomaniak.mail.databinding.FragmentAiPropositionBinding
 import com.infomaniak.mail.utils.changeToolbarColorOnScroll
 import com.infomaniak.mail.utils.postfixWithTag
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class AiPropositionFragment : Fragment() {
@@ -38,6 +41,9 @@ class AiPropositionFragment : Fragment() {
     private lateinit var binding: FragmentAiPropositionBinding
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
+
+    @Inject
+    lateinit var localSettings: LocalSettings
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentAiPropositionBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -53,7 +59,8 @@ class AiPropositionFragment : Fragment() {
         }
 
         insertPropositionButton.setOnClickListener {
-            if (newMessageViewModel.draft.uiBody.isBlank()) {
+            val doNotAskAgain = localSettings.showAiReplacementDialog == ShowAiReplacementDialog.HIDE
+            if (doNotAskAgain || newMessageViewModel.draft.uiBody.isBlank()) {
                 choosePropositionAndBack()
             } else {
                 createReplaceContentDialog { choosePropositionAndBack() }.show()
@@ -82,9 +89,21 @@ class AiPropositionFragment : Fragment() {
     private fun Fragment.createReplaceContentDialog(
         onPositiveButtonClicked: () -> Unit,
     ) = with(DialogAiReplaceContentBinding.inflate(layoutInflater)) {
+        dialogDescriptionLayout.apply {
+            dialogTitle.text = getString(R.string.aiReplacementDialogTitle)
+            dialogDescription.text = getString(R.string.aiReplacementDialogDescription)
+        }
 
-        dialogDescriptionLayout.dialogTitle.text = getString(R.string.aiReplacementDialogTitle)
-        dialogDescriptionLayout.dialogDescription.text = getString(R.string.aiReplacementDialogDescription)
+        checkbox.apply {
+            isChecked = localSettings.showAiReplacementDialog == ShowAiReplacementDialog.HIDE
+            setOnCheckedChangeListener { _, isChecked ->
+                localSettings.showAiReplacementDialog = if (isChecked) {
+                    ShowAiReplacementDialog.HIDE
+                } else {
+                    ShowAiReplacementDialog.SHOW
+                }
+            }
+        }
 
         MaterialAlertDialogBuilder(requireContext(), R.style.AiCursorAndPrimaryColorTheme)
             .setView(root)
