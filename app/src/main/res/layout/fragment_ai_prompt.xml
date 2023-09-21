@@ -109,29 +109,6 @@
                     android:text="@string/aiPromptValidateButton"
                     tools:enabled="true" />
 
-                <LinearLayout
-                    android:id="@+id/generationLoader"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:visibility="gone">
-
-                    <TextView
-                        style="@style/BodyMedium.Tertiary"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginEnd="@dimen/marginStandardMedium"
-                        android:text="@string/aiPromptGenerationLoader" />
-
-                    <ProgressBar
-                        android:layout_width="@dimen/marginStandardMedium"
-                        android:layout_height="@dimen/marginStandardMedium"
-                        android:layout_gravity="center_vertical"
-                        android:indeterminate="true" />
-
-                </LinearLayout>
             </FrameLayout>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
