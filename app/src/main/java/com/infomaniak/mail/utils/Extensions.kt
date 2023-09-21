@@ -516,11 +516,11 @@ fun Context.launchNoValidMailboxesActivity() {
 }
 
 fun Context.launchNoMailboxActivity(shouldStartLoginActivity: Boolean = false) {
-    val noMailboxAcctivityIntent = Intent(this, NoMailboxActivity::class.java)
+    val noMailboxActivityIntent = Intent(this, NoMailboxActivity::class.java)
     val intentsArray = if (shouldStartLoginActivity) {
-        arrayOf(getLoginActivityIntent(shouldClearStack = true), noMailboxAcctivityIntent)
+        arrayOf(getLoginActivityIntent(shouldClearStack = true), noMailboxActivityIntent)
     } else {
-        arrayOf(noMailboxAcctivityIntent)
+        arrayOf(noMailboxActivityIntent)
     }
 
     startActivities(intentsArray)
