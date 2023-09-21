@@ -33,6 +33,8 @@ import io.sentry.protocol.User as SentryUser
 
 object AccountUtils : CredentialManager() {
 
+    const val NO_MAILBOX_USER_ID_KEY = "noMailboxUserId"
+
     override lateinit var userDatabase: UserDatabase
 
     var reloadApp: (suspend () -> Unit)? = null
@@ -80,7 +82,7 @@ object AccountUtils : CredentialManager() {
 
         val shouldStop = when {
             mailboxes.isEmpty() -> {
-                Dispatchers.Main { context.launchNoMailboxActivity(shouldStartLoginActivity = true) }
+                Dispatchers.Main { context.launchNoMailboxActivity(currentUserId, shouldStartLoginActivity = true) }
                 true
             }
             mailboxes.none { it.isValid } -> {
