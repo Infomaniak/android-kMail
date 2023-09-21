@@ -516,7 +516,7 @@ fun Context.launchNoValidMailboxesActivity() {
     }.also(::startActivity)
 }
 
-fun Context.launchNoMailboxActivity(userId: Int = AccountUtils.currentUserId, shouldStartLoginActivity: Boolean = false) {
+fun Context.launchNoMailboxActivity(userId: Int? = null, shouldStartLoginActivity: Boolean = false) {
     val noMailboxActivityIntent = Intent(this, NoMailboxActivity::class.java).putExtra(NO_MAILBOX_USER_ID_KEY, userId)
     val intentsArray = if (shouldStartLoginActivity) {
         arrayOf(getLoginActivityIntent(shouldClearStack = true), noMailboxActivityIntent)

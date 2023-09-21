@@ -39,8 +39,7 @@ import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.databinding.ActivityLoginBinding
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SentryDebug
-import com.infomaniak.mail.utils.Utils.MailboxError
-import com.infomaniak.mail.utils.Utils.MailboxError.*
+import com.infomaniak.mail.utils.Utils.MailboxErrorCode
 import com.infomaniak.mail.utils.getInfomaniakLogin
 import dagger.hilt.android.AndroidEntryPoint
 import com.infomaniak.lib.core.R as RCore
@@ -102,13 +101,13 @@ class LoginActivity : AppCompatActivity() {
 
             return when {
                 !apiResponse.isSuccess() -> apiResponse
-                apiResponse.data?.isEmpty() == true -> MailboxError(MailboxErrorCode.NO_MAILBOX, user.id)
+                apiResponse.data?.isEmpty() == true -> MailboxErrorCode.NO_MAILBOX
                 else -> {
                     apiResponse.data?.let { mailboxes ->
                         context.trackUserInfo("nbMailboxes", mailboxes.count())
                         AccountUtils.addUser(user)
                         mailboxController.updateMailboxes(mailboxes)
-                        return@let if (mailboxes.none { it.isValid }) MailboxError(MailboxErrorCode.NO_VALID_MAILBOX) else user
+                        return@let if (mailboxes.none { it.isValid }) MailboxErrorCode.NO_VALID_MAILBOX else user
                     } ?: run {
                         getErrorResponse(RCore.string.serverError)
                     }

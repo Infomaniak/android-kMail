@@ -59,7 +59,7 @@ class NoMailboxActivity : BaseActivity() {
 
         AccountUtils.currentUser?.let { currentUser ->
             if (savedInstanceState?.getInt(NO_MAILBOX_USER_ID_KEY) == currentUser.id) {
-                lifecycleScope.launch(ioDispatcher) { logoutUser(user = currentUser, shouldReload = false) }
+                lifecycleScope.launch(ioDispatcher) { logoutUser(currentUser, shouldReload = false) }
             }
         }
 

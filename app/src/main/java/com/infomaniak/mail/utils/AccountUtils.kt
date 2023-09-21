@@ -82,7 +82,7 @@ object AccountUtils : CredentialManager() {
 
         val shouldStop = when {
             mailboxes.isEmpty() -> {
-                Dispatchers.Main { context.launchNoMailboxActivity(shouldStartLoginActivity = true) }
+                Dispatchers.Main { context.launchNoMailboxActivity(currentUserId, shouldStartLoginActivity = true) }
                 true
             }
             mailboxes.none { it.isValid } -> {
