@@ -42,6 +42,8 @@ class AiPropositionFragment : Fragment() {
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
 
+    private val replacementDialog by lazy { createReplaceContentDialog(onPositiveButtonClicked = ::choosePropositionAndBack) }
+
     @Inject
     lateinit var localSettings: LocalSettings
 
@@ -60,11 +62,9 @@ class AiPropositionFragment : Fragment() {
 
         insertPropositionButton.setOnClickListener {
             val doNotAskAgain = localSettings.showAiReplacementDialog == ShowAiReplacementDialog.HIDE
-            if (doNotAskAgain || newMessageViewModel.draft.uiBody.isBlank()) {
-                choosePropositionAndBack()
-            } else {
-                createReplaceContentDialog { choosePropositionAndBack() }.show()
-            }
+            val body = newMessageViewModel.draft.uiBody
+
+            if (doNotAskAgain || body.isBlank()) choosePropositionAndBack() else replacementDialog.show()
         }
     }
 
