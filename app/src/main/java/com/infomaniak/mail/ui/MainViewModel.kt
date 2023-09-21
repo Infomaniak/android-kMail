@@ -83,7 +83,7 @@ class MainViewModel @Inject constructor(
 ) : AndroidViewModel(application) {
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
-    private var refreshMailboxesAndFoldersJob: Job? = null
+    private var refreshEverythingJob: Job? = null
 
     // First boolean is the download status, second boolean is if the LoadMore button should be displayed
     val isDownloadingChanges: MutableLiveData<Pair<Boolean, Boolean?>> = MutableLiveData(false to null)
@@ -234,13 +234,15 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun refreshMailboxesFromRemote() {
+    fun refreshEverything() {
 
-        refreshMailboxesAndFoldersJob?.cancel()
-        refreshMailboxesAndFoldersJob = viewModelScope.launch(ioCoroutineContext) {
+        refreshEverythingJob?.cancel()
+        refreshEverythingJob = viewModelScope.launch(ioCoroutineContext) {
 
+            // Refresh User
             AccountUtils.updateCurrentUser()
 
+            // Refresh Mailboxes
             SentryLog.d(TAG, "Refresh mailboxes from remote")
             with(ApiRepository.getMailboxes()) {
                 if (isSuccess()) {
@@ -251,13 +253,14 @@ class MainViewModel @Inject constructor(
                 }
             }
 
+            // Refresh Mailbox content
             val mailbox = currentMailbox.value ?: openMailbox() ?: return@launch
-
             updateQuotas(mailbox)
             updatePermissions(mailbox)
             updateSignatures(mailbox)
             updateFolders(mailbox)
 
+            // Refresh Threads
             (currentFolderId?.let(folderController::getFolder) ?: folderController.getFolder(DEFAULT_SELECTED_FOLDER))
                 ?.let { folder ->
                     selectFolder(folder.id)
