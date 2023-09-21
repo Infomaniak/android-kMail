@@ -799,9 +799,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeAiOutput() {
-        aiViewModel.aiOutputToInsert.observe(viewLifecycleOwner) { aiOutput ->
-            binding.bodyText.setText(aiOutput)
-        }
+        aiViewModel.aiOutputToInsert.observe(viewLifecycleOwner, binding.bodyText::setText)
     }
 
     fun navigateToPropositionFragment() {
