@@ -49,6 +49,8 @@ class AiPropositionFragment : Fragment() {
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
 
+    var requestJob: Job? = null
+
     private val replacementDialog by lazy { createReplaceContentDialog(onPositiveButtonClicked = ::choosePropositionAndBack) }
 
     @Inject
@@ -64,8 +66,13 @@ class AiPropositionFragment : Fragment() {
         setUi()
 
         resetAiProposition()
-        aiViewModel.generateAiProposition()
+        requestJob = aiViewModel.generateAiProposition()
         observeAiProposition()
+    }
+
+    override fun onDestroy() {
+        requestJob?.cancel()
+        super.onDestroy()
     }
 
     private fun setUi() = with(binding) {
