@@ -21,6 +21,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,6 +30,7 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.lib.core.utils.showKeyboard
 import com.infomaniak.lib.core.utils.toPx
@@ -81,7 +83,6 @@ class AiPromptFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
         setUi()
-        observeAiProposition()
     }
 
     private fun setUi() = with(binding) {
@@ -98,39 +99,8 @@ class AiPromptFragment : Fragment() {
         closeButton.setOnClickListener { newMessageFragment.closeAiPrompt() }
 
         generateButton.setOnClickListener {
-            generationLoader.isVisible = true
-            generateButton.isInvisible = true
-
-            aiViewModel.generateAiProposition(aiViewModel.aiPrompt)
-        }
-    }
-
-    private fun observeAiProposition() = with(binding) {
-        aiViewModel.aiProposition.value = null
-
-        aiViewModel.aiProposition.observe(viewLifecycleOwner) { proposition ->
-            if (proposition == null) return@observe
-
-            val (status, _) = proposition
-            when (status) {
-                SUCCESS -> if (aiViewModel.isAiPromptOpened) {
-                    newMessageViewModel.shouldExecuteDraftActionWhenStopping = false
-                    newMessageFragment.navigateToPropositionFragment()
-                }
-                ERROR -> {
-                    newMessageViewModel.snackBarManager.setValue(getString(RCore.string.anErrorHasOccurred))
-                    generationLoader.isGone = true
-                    generateButton.isVisible = true
-                }
-                MAX_TOKEN_EXCEEDED -> TODO()
-                RATE_LIMIT_EXCEEDED -> TODO()
-                MISSING_CONTENT -> {
-                    Sentry.withScope { scope ->
-                        scope.level = SentryLevel.ERROR
-                        Sentry.captureMessage("AI call succeeded but no content returned")
-                    }
-                }
-            }
+            newMessageViewModel.shouldExecuteDraftActionWhenStopping = false
+            newMessageFragment.navigateToPropositionFragment()
         }
     }
 
