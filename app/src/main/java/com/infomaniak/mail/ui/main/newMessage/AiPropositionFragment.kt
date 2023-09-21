@@ -34,6 +34,7 @@ import com.infomaniak.mail.utils.changeToolbarColorOnScroll
 import com.infomaniak.mail.utils.postfixWithTag
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import com.infomaniak.lib.core.R as RCore
 
 @AndroidEntryPoint
 class AiPropositionFragment : Fragment() {
@@ -108,7 +109,7 @@ class AiPropositionFragment : Fragment() {
         MaterialAlertDialogBuilder(requireContext(), R.style.AiCursorAndPrimaryColorTheme)
             .setView(root)
             .setPositiveButton(R.string.aiReplacementDialogPositiveButton) { _, _ -> onPositiveButtonClicked() }
-            .setNegativeButton(com.infomaniak.lib.core.R.string.buttonCancel, null)
+            .setNegativeButton(RCore.string.buttonCancel, null)
             .create()
     }
 }
