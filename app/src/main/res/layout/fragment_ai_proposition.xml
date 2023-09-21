@@ -37,14 +37,31 @@
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <TextView
-            android:id="@+id/propositionTextView"
-            android:layout_width="wrap_content"
+        <FrameLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingHorizontal="@dimen/marginStandardMedium"
-            android:paddingVertical="@dimen/marginStandard"
-            android:textIsSelectable="true"
-            tools:text="Objet : Candidature au poste de Manager de restaurant - \n\nCher(e) [Nom du responsable du recrutement],\n\nJ'ai le plaisir de vous envoyer mon CV en tant que candidat(e) au poste de Manager de restaurant au sein de votre établissement. Je suis convaincu(e) que mon expérience et mes compétences seraient un atout précieux pour votre équipe.\n\nJ'ai acquis une solide expérience dans la gestion d'équipe, le service client et l'optimisation des opérations dans l'industrie de la restauration.\n\nJe serais ravi(e) de discuter en détail de ma candidature lors d'un entretien avec vous. Vous trouverez mon CV en pièce jointe.\n\nMerci de votre attention.\nCordialement,\n[Votre nom]" />
+            android:paddingVertical="@dimen/marginStandard">
+
+            <TextView
+                android:id="@+id/propositionTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textIsSelectable="true"
+                android:visibility="gone"
+                tools:text="Objet : Candidature au poste de Manager de restaurant - \n\nCher(e) [Nom du responsable du recrutement],\n\nJ'ai le plaisir de vous envoyer mon CV en tant que candidat(e) au poste de Manager de restaurant au sein de votre établissement. Je suis convaincu(e) que mon expérience et mes compétences seraient un atout précieux pour votre équipe.\n\nJ'ai acquis une solide expérience dans la gestion d'équipe, le service client et l'optimisation des opérations dans l'industrie de la restauration.\n\nJe serais ravi(e) de discuter en détail de ma candidature lors d'un entretien avec vous. Vous trouverez mon CV en pièce jointe.\n\nMerci de votre attention.\nCordialement,\n[Votre nom]"
+                tools:visibility="visible" />
+
+            <TextView
+                android:id="@+id/promptPreview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/tertiaryTextColor"
+                android:textIsSelectable="true"
+                tools:text="J’ai un entretien pour une position de manager au sein d’un restaurant. Peux-tu écrire un mail qui accompagnerait mon CV ?"
+                tools:visibility="gone" />
+
+        </FrameLayout>
 
     </androidx.core.widget.NestedScrollView>
 
@@ -55,37 +72,70 @@
         android:layout_gravity="bottom"
         app:cardElevation="@dimen/newMessageBottomBarElevation">
 
-        <LinearLayout
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:paddingHorizontal="@dimen/marginStandardMedium"
             android:paddingVertical="@dimen/alternativeMargin">
 
-            <com.google.android.material.button.MaterialButton
-                style="@style/TextButtonSecondary"
+            <LinearLayout
+                android:id="@+id/buttonLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="invisible"
+                tools:visibility="visible">
+
+                <com.google.android.material.button.MaterialButton
+                    style="@style/TextButtonSecondary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/suisseintl_regular"
+                    android:paddingHorizontal="@dimen/mediumButtonHorizontalMargin"
+                    android:text="@string/aiButtonAdjust"
+                    android:textColor="@color/secondaryTextColor"
+                    app:icon="@drawable/ic_filter"
+                    app:iconTint="@color/iconColorSecondaryText" />
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/insertPropositionButton"
+                    style="@style/TextButtonPrimaryMedium"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/aiButtonInsert"
+                    app:icon="@drawable/ic_add" />
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/generationLoader"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/suisseintl_regular"
-                android:paddingHorizontal="@dimen/mediumButtonHorizontalMargin"
-                android:text="@string/aiButtonAdjust"
-                android:textColor="@color/secondaryTextColor"
-                app:icon="@drawable/ic_filter"
-                app:iconTint="@color/iconColorSecondaryText" />
+                android:layout_gravity="center_vertical|end"
+                android:orientation="horizontal"
+                tools:visibility="gone">
 
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
+                <TextView
+                    style="@style/BodyMedium.Tertiary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginEnd="@dimen/marginStandardMedium"
+                    android:text="@string/aiPromptGenerationLoader" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/insertPropositionButton"
-                style="@style/TextButtonPrimaryMedium"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/aiButtonInsert"
-                app:icon="@drawable/ic_add" />
+                <ProgressBar
+                    android:layout_width="@dimen/marginStandardMedium"
+                    android:layout_height="@dimen/marginStandardMedium"
+                    android:layout_gravity="center_vertical"
+                    android:indeterminate="true" />
 
-        </LinearLayout>
+            </LinearLayout>
+        </FrameLayout>
     </com.google.android.material.card.MaterialCardView>
 </LinearLayout>
