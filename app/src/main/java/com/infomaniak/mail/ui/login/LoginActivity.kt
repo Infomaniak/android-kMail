@@ -101,11 +101,13 @@ class LoginActivity : AppCompatActivity() {
 
             return when {
                 !apiResponse.isSuccess() -> apiResponse
-                apiResponse.data?.isEmpty() == true -> MailboxErrorCode.NO_MAILBOX
                 else -> {
                     apiResponse.data?.let { mailboxes ->
-                        context.trackUserInfo("nbMailboxes", mailboxes.count())
                         AccountUtils.addUser(user)
+
+                        if (mailboxes.isEmpty()) return@let MailboxErrorCode.NO_MAILBOX
+
+                        context.trackUserInfo("nbMailboxes", mailboxes.count())
                         mailboxController.updateMailboxes(mailboxes)
 
                         return@let if (mailboxes.none { it.isValid }) MailboxErrorCode.NO_VALID_MAILBOX else user
