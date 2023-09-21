@@ -49,7 +49,7 @@ class AiPropositionFragment : Fragment() {
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
 
-    var requestJob: Job? = null
+    private var requestJob: Job? = null
 
     private val replacementDialog by lazy { createReplaceContentDialog(onPositiveButtonClicked = ::choosePropositionAndBack) }
 
