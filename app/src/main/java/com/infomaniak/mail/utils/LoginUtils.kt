@@ -33,7 +33,8 @@ import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.login.LoginActivity
-import com.infomaniak.mail.utils.Utils.MailboxErrorCode
+import com.infomaniak.mail.utils.Utils.MailboxError
+import com.infomaniak.mail.utils.Utils.MailboxError.MailboxErrorCode
 import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -97,8 +98,11 @@ class LoginUtils @Inject constructor(
                 AccountUtils.reloadApp?.invoke()
                 return@launch
             }
-            is MailboxErrorCode -> withContext(mainDispatcher) {
-                if (returnValue == MailboxErrorCode.NO_VALID_MAILBOX) context.launchNoValidMailboxesActivity()
+            is MailboxError -> withContext(mainDispatcher) {
+                when (returnValue.code) {
+                    MailboxErrorCode.NO_MAILBOX -> context.launchNoMailboxActivity(returnValue.userId!!)
+                    MailboxErrorCode.NO_VALID_MAILBOX -> context.launchNoValidMailboxesActivity()
+                }
             }
             is ApiResponse<*> -> withContext(mainDispatcher) {
                 showError(context.getString(returnValue.translatedError))

@@ -44,8 +44,11 @@ object Utils {
         }
     }
 
-    enum class MailboxErrorCode {
-        NO_MAILBOX,
-        NO_VALID_MAILBOX,
+    data class MailboxError(val code: MailboxErrorCode, val userId: Int? = null) {
+
+        enum class MailboxErrorCode {
+            NO_MAILBOX,
+            NO_VALID_MAILBOX,
+        }
     }
 }
