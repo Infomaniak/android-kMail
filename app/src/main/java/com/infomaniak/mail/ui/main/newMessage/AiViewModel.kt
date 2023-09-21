@@ -42,8 +42,8 @@ class AiViewModel @Inject constructor(@IoDispatcher private val ioDispatcher: Co
     val aiProposition = MutableLiveData<Pair<PropositionStatus, String?>?>()
     val aiOutputToInsert = SingleLiveEvent<String>()
 
-    fun generateAiProposition(prompt: String) = viewModelScope.launch(ioCoroutineContext) {
-        with(ApiRepository.generateAiProposition(prompt)) {
+    fun generateAiProposition() = viewModelScope.launch(ioCoroutineContext) {
+        with(ApiRepository.generateAiProposition(aiPrompt)) {
             aiProposition.postValue(
                 when {
                     isSuccess() -> data?.content?.let { SUCCESS to it } ?: (MISSING_CONTENT to null)
