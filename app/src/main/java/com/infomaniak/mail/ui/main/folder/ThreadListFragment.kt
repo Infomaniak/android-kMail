@@ -74,6 +74,7 @@ import com.infomaniak.mail.utils.AlertDialogUtils.createDescriptionDialog
 import com.infomaniak.mail.utils.AlertDialogUtils.resetLoadingAndDismiss
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
 import com.infomaniak.mail.utils.UiUtils.formatUnreadCount
+import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
@@ -330,9 +331,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                     else -> throw IllegalStateException("Only SwipeDirection.LEFT_TO_RIGHT and SwipeDirection.RIGHT_TO_LEFT can be triggered")
                 }
 
-                val isPermanentDeleteFolder = item.folder.role.let { role ->
-                    role == FolderRole.DRAFT || role == FolderRole.SPAM || role == FolderRole.TRASH
-                }
+                val isPermanentDeleteFolder = isPermanentDeleteFolder(item.folder.role)
 
                 val shouldKeepItem = performSwipeActionOnThread(swipeAction, item, position, isPermanentDeleteFolder)
 
@@ -388,9 +387,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                     onDismiss = {
                         // Notify only if the user cancelled the popup (e.g. the thread is not deleted),
                         // otherwise it will notify the next item in the list and make it slightly blink
-                        if (threadListAdapter.dataSet.indexOfFirst { it is Thread && it.uid == thread.uid } == position) {
-                            threadListAdapter.notifyItemChanged(position)
-                        }
+                        if (threadListAdapter.dataSet.indexOf(thread) == position) threadListAdapter.notifyItemChanged(position)
                     },
                     callback = {
                         if (isPermanentDeleteFolder) threadListAdapter.removeItem(position)

@@ -84,6 +84,7 @@ import com.infomaniak.mail.ui.main.thread.ThreadFragmentArgs
 import com.infomaniak.mail.ui.noValidMailboxes.NoValidMailboxesActivity
 import com.infomaniak.mail.utils.AccountUtils.NO_MAILBOX_USER_ID_KEY
 import com.infomaniak.mail.utils.AlertDialogUtils.createDescriptionDialog
+import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
@@ -377,20 +378,17 @@ fun Fragment.deleteWithConfirmationPopup(
     displayLoader: Boolean = true,
     onDismiss: (() -> Unit)? = null,
     callback: () -> Unit,
-): AlertDialog? = when (folderRole) {
-    FolderRole.DRAFT, FolderRole.SPAM, FolderRole.TRASH -> {
-        createDescriptionDialog(
-            title = resources.getQuantityString(R.plurals.threadListDeletionConfirmationAlertTitle, count, count),
-            description = resources.getQuantityString(R.plurals.threadListDeletionConfirmationAlertDescription, count),
-            displayLoader = displayLoader,
-            onPositiveButtonClicked = callback,
-            onDismissed = onDismiss,
-        ).also { it.show() }
-    }
-    else -> {
-        callback()
-        null
-    }
+): AlertDialog? = if (isPermanentDeleteFolder(folderRole)) {
+    createDescriptionDialog(
+        title = resources.getQuantityString(R.plurals.threadListDeletionConfirmationAlertTitle, count, count),
+        description = resources.getQuantityString(R.plurals.threadListDeletionConfirmationAlertDescription, count),
+        displayLoader = displayLoader,
+        onPositiveButtonClicked = callback,
+        onDismissed = onDismiss,
+    ).also { it.show() }
+} else {
+    callback()
+    null
 }
 
 inline var Fragment.deleteThreadDialog

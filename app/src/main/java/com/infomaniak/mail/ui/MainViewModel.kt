@@ -52,6 +52,7 @@ import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.NotificationUtils.Companion.cancelNotification
 import com.infomaniak.mail.utils.SharedUtils.Companion.updateSignatures
+import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.ext.copyFromRealm
@@ -426,13 +427,12 @@ class MainViewModel @Inject constructor(
         message: Message? = null,
         isSwipe: Boolean = false,
     ) = viewModelScope.launch(ioCoroutineContext) {
+
         val mailbox = currentMailbox.value!!
         val threads = getActionThreads(threadsUids).ifEmpty { return@launch }
         var trashId: String? = null
         var undoResource: String? = null
-
-        val role = getActionFolderRole(threads, message)
-        val shouldPermanentlyDelete = role == FolderRole.DRAFT || role == FolderRole.SPAM || role == FolderRole.TRASH
+        val shouldPermanentlyDelete = isPermanentDeleteFolder(getActionFolderRole(threads, message))
 
         val messages = getMessagesToDelete(threads, message)
         val uids = messages.getUids()
