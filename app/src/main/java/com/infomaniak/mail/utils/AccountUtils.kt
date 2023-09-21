@@ -115,13 +115,8 @@ object AccountUtils : CredentialManager() {
     }
 
     suspend fun updateCurrentUser(okHttpClient: OkHttpClient = HttpClient.okHttpClient) {
-
-        val (userResult, user) = with(ApiRepository.getUserProfile(okHttpClient)) {
-            result to (data ?: return)
-        }
-
-        if (userResult != ApiResponse.Status.ERROR) {
-            requestUser(user)
+        with(ApiRepository.getUserProfile(okHttpClient)) {
+            if (result != ApiResponse.Status.ERROR) requestUser(remoteUser = data ?: return)
         }
     }
 
