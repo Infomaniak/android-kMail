@@ -545,7 +545,10 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun openAiPrompt() = with(binding) {
-        aiViewModel.isAiPromptOpened = true
+        aiViewModel.apply {
+            isAiPromptOpened = true
+            aiPrompt = ""
+        }
 
         // Keyboard is opened inside onCreate() of AiPromptFragment
 
@@ -559,16 +562,12 @@ class NewMessageFragment : Fragment() {
     }
 
     fun closeAiPrompt() = with(binding) {
-        aiViewModel.apply {
-            isAiPromptOpened = false
-            aiPrompt = ""
-        }
+        aiViewModel.isAiPromptOpened = false
 
         aiPromptFragmentContainer.hideKeyboard()
 
         childFragmentManager
             .beginTransaction()
-            .detach(aiPromptFragment)
             .remove(aiPromptFragment)
             .commit()
 
