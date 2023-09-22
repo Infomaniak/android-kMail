@@ -76,7 +76,7 @@
             android:configChanges="orientation|screenSize"
             android:exported="true"
             android:noHistory="true"
-            android:theme="@style/AppTheme.Launcher">
+            android:theme="@style/AppThemeLauncher">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -87,7 +87,7 @@
             android:name=".ui.login.LoginActivity"
             android:configChanges="orientation|screenSize"
             android:exported="false"
-            android:theme="@style/AppTheme.Login" />
+            android:theme="@style/AppThemeLogin" />
 
         <activity
             android:name="com.infomaniak.lib.login.WebViewCreateAccountActivity"
@@ -102,7 +102,7 @@
         <activity
             android:name="com.infomaniak.lib.applock.LockActivity"
             android:exported="false"
-            android:theme="@style/AppTheme.Lock" />
+            android:theme="@style/AppThemeLock" />
 
         <activity
             android:name=".ui.login.NoMailboxActivity"

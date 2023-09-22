@@ -17,12 +17,12 @@
   -->
 <resources>
 
-    <style name="AppTheme.Launcher" parent="AppTheme.LauncherBase" />
+    <style name="AppThemeLauncher" parent="AppTheme.LauncherBase" />
 
     <style name="AppTheme" parent="AppThemeBase">
         <item name="android:navigationBarColor">@color/backgroundColor</item>
     </style>
 
-    <style name="AppTheme.Login" parent="AppTheme.LoginBase" />
+    <style name="AppThemeLogin" parent="AppThemeLoginBase" />
 
 </resources>
