@@ -101,7 +101,7 @@ class AvatarNameEmailView @JvmOverloads constructor(
     private fun TextView.highlight(
         startIndex: Int,
         endIndex: Int,
-        @ColorInt color: Int = context.getAttributeColor(RMaterial.attr.colorPrimary)
+        @ColorInt color: Int = context.getAttributeColor(RMaterial.attr.colorPrimary),
     ) {
         val highlightedText = text.toSpannable()
         highlightedText.setSpan(ForegroundColorSpan(color), startIndex, endIndex, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)

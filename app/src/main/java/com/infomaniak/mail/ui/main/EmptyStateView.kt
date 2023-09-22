@@ -31,7 +31,7 @@ import com.infomaniak.mail.databinding.ViewEmptyStateBinding
 class EmptyStateView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     private val binding: ViewEmptyStateBinding by lazy { ViewEmptyStateBinding.inflate(LayoutInflater.from(context), this, true) }
