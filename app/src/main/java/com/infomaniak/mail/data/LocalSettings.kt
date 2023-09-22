@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data
 
 import android.content.Context
+import android.os.Build
 import android.view.ContextThemeWrapper
 import androidx.annotation.*
 import androidx.appcompat.app.AppCompatDelegate
@@ -293,7 +294,7 @@ class LocalSettings private constructor(context: Context) {
         private const val DEFAULT_IS_APP_LOCKED = false
         private const val DEFAULT_UPDATE_LATER = false
         private val DEFAULT_THREAD_DENSITY = ThreadDensity.LARGE
-        private val DEFAULT_THEME = Theme.SYSTEM
+        private val DEFAULT_THEME = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) Theme.LIGHT else Theme.SYSTEM
         private val DEFAULT_ACCENT_COLOR = AccentColor.PINK
         private val INITIAL_SWIPE_ACTION = SwipeAction.TUTORIAL
         val DEFAULT_SWIPE_ACTION_RIGHT = SwipeAction.READ_UNREAD

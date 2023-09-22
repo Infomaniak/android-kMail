@@ -17,11 +17,13 @@
  */
 package com.infomaniak.mail.ui.main.settings
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode
+import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
@@ -47,6 +49,8 @@ class ThemeSettingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding.radioGroup) {
         super.onViewCreated(view, savedInstanceState)
 
+        setSystemThemeVisibility()
+
         initBijectionTable(
             R.id.systemTheme to SYSTEM,
             R.id.lightTheme to LIGHT,
@@ -59,6 +63,10 @@ class ThemeSettingFragment : Fragment() {
             chooseTheme(theme as Theme)
             trackEvent("settingsTheme", theme.toString())
         }
+    }
+
+    private fun setSystemThemeVisibility() {
+        binding.systemTheme.isGone = Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
     }
 
     private fun chooseTheme(theme: Theme) {

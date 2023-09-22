@@ -50,7 +50,7 @@ class AccentColorSettingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding.radioGroup) {
         super.onViewCreated(view, savedInstanceState)
 
-        setSystemSettingUi()
+        setSystemAccentUi()
 
         initBijectionTable(
             R.id.pinkRadioButton to PINK,
@@ -66,7 +66,7 @@ class AccentColorSettingFragment : Fragment() {
         }
     }
 
-    private fun setSystemSettingUi() = with(binding) {
+    private fun setSystemAccentUi() = with(binding) {
         if (!DynamicColors.isDynamicColorAvailable()) {
             systemRadioButton.isGone = true
             return@with
