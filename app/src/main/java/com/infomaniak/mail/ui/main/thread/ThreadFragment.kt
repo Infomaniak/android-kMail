@@ -141,23 +141,22 @@ class ThreadFragment : Fragment() {
             observeContacts()
             observeQuickActionBarClicks()
             observeOpenAttachment()
-            observerSubjectUpdateTrigger()
+            observerSubjectUpdateTriggers()
         }
 
         permissionUtils.registerDownloadManagerPermission()
         mainViewModel.toggleLightThemeForMessage.observe(viewLifecycleOwner, threadAdapter::toggleLightMode)
     }
 
-    private fun observerSubjectUpdateTrigger() {
-        threadViewModel.threadAndMergedContactAndMailboxMediator(
-            mergedContactsLive = mainViewModel.mergedContactsLive,
-        ).observe(viewLifecycleOwner) { (thread, mergedContacts, mailbox) ->
-            thread?.let {
-                val emailDictionary = mergedContacts ?: emptyMap()
-                val aliases = mailbox?.aliases ?: emptyList()
-                val externalMailFlagEnabled = mailbox?.externalMailFlagEnabled ?: false
-
-                setSubject(thread, emailDictionary, aliases, externalMailFlagEnabled)
+    private fun observerSubjectUpdateTriggers() {
+        threadViewModel.assembleSubjectData(mainViewModel.mergedContactsLive).observe(viewLifecycleOwner) { result ->
+            result.thread?.let {
+                setSubject(
+                    thread = it,
+                    emailDictionary = result.mergedContacts ?: emptyMap(),
+                    aliases = result.mailbox?.aliases ?: emptyList(),
+                    externalMailFlagEnabled = result.mailbox?.externalMailFlagEnabled ?: false,
+                )
             }
         }
     }
