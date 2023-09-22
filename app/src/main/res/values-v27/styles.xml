@@ -17,11 +17,11 @@
   -->
 <resources>
 
-    <style name="BottomSheetDialogTheme" parent="BottomSheetDialogTheme.Base">
+    <style name="BottomSheetDialogTheme" parent="BottomSheetDialogThemeBase">
         <item name="android:navigationBarColor">@color/backgroundColorSecondary</item>
     </style>
 
-    <style name="SearchTextInputEditTextStyle" parent="BaseSearchTextInputEditTextStyle">
+    <style name="SearchTextInputEditTextStyle" parent="SearchTextInputEditTextStyleBase">
         <item name="android:importantForAutofill">no</item>
     </style>
 </resources>
