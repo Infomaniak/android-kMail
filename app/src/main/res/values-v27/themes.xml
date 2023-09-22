@@ -17,23 +17,15 @@
   -->
 <resources>
 
-    <style name="AppThemeLauncherBase27" parent="AppTheme.LauncherBase">
-        <item name="android:windowLightNavigationBar">true</item>
-    </style>
-
-    <style name="AppThemeLauncher" parent="AppThemeLauncherBase27" />
-
     <style name="AppTheme" parent="AppThemeBase">
         <item name="android:navigationBarColor">@color/backgroundColor</item>
         <item name="android:windowLightNavigationBar">true</item>
     </style>
 
-    <style name="AppThemeLogin" parent="AppThemeLoginBase">
-        <item name="android:windowLightNavigationBar">true</item>
+    <style name="AppThemeLoginBase27" parent="AppThemeLoginBase">
+        <item name="android:navigationBarColor">@color/backgroundOnBoardingColor</item>
     </style>
 
-    <style name="AppThemeLock" parent="AppThemeLockBase">
-        <item name="android:windowLightNavigationBar">true</item>
-    </style>
+    <style name="AppThemeLogin" parent="AppThemeLoginBase27" />
 
 </resources>

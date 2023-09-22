@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~ Copyright (C) 2023 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -17,8 +17,10 @@
   -->
 <resources>
 
-    <style name="AppTheme" parent="AppThemeBase">
-        <item name="android:navigationBarColor">@color/backgroundColor</item>
-    </style>
+    <style name="AppThemeLauncher" parent="AppTheme.LauncherBase" />
+
+    <style name="AppThemeLogin" parent="AppThemeLoginBase27" />
+
+    <style name="AppThemeLock" parent="AppThemeLockBase" />
 
 </resources>
