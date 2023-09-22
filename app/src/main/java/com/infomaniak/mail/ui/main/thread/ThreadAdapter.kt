@@ -123,6 +123,7 @@ class ThreadAdapter(
                 NotifyType.FAILED_MESSAGE -> {
                     messageLoader.isGone = true
                     failedLoadingErrorMessage.isVisible = true
+                    if (isExpandedMap[message.uid] == true) onExpandedMessageLoaded(message.uid)
                 }
             }
         }
