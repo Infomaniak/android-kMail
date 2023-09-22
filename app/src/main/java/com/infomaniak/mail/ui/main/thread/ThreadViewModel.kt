@@ -96,21 +96,20 @@ class ThreadViewModel @Inject constructor(
         AccountUtils.currentMailboxId,
     ).map { it.obj }.asLiveData(ioCoroutineContext)
 
-    fun threadAndMergedContactAndMailboxMediator(
+    fun assembleSubjectData(
         mergedContactsLive: LiveData<MergedContactDictionary?>,
-    ): LiveData<Triple<Thread?, MergedContactDictionary?, Mailbox?>> {
-        return MediatorLiveData<Triple<Thread?, MergedContactDictionary?, Mailbox?>>().apply {
-            addSource(threadLive) { first ->
-                value = Triple(first, value?.second, value?.third)
-            }
+    ): LiveData<SubjectDataResult> = MediatorLiveData<SubjectDataResult>().apply {
 
-            addSource(mergedContactsLive) { second ->
-                value = Triple(value?.first, second, value?.third)
-            }
+        addSource(threadLive) { thread ->
+            value = SubjectDataResult(thread, value?.mergedContacts, value?.mailbox)
+        }
 
-            addSource(currentMailboxLive) { third ->
-                value = Triple(value?.first, value?.second, third)
-            }
+        addSource(mergedContactsLive) { mergedContacts ->
+            value = SubjectDataResult(value?.thread, mergedContacts, value?.mailbox)
+        }
+
+        addSource(currentMailboxLive) { mailbox ->
+            value = SubjectDataResult(value?.thread, value?.mergedContacts, mailbox)
         }
     }
 
@@ -130,7 +129,7 @@ class ThreadViewModel @Inject constructor(
             isThemeTheSameMap[message.uid] = true
         }
 
-        emit(Triple(thread, isExpandedMap, isThemeTheSameMap))
+        emit(OpenThreadResult(thread, isExpandedMap, isThemeTheSameMap))
 
         if (thread.unseenMessagesCount > 0) sharedUtils.markAsSeen(mailbox, listOf(thread))
     }
@@ -194,4 +193,16 @@ class ThreadViewModel @Inject constructor(
             DownloadManagerUtils.scheduleDownload(context, downloadUrl, filename)
         }
     }
+
+    data class SubjectDataResult(
+        val thread: Thread?,
+        val mergedContacts: MergedContactDictionary?,
+        val mailbox: Mailbox?,
+    )
+
+    data class OpenThreadResult(
+        val thread: Thread,
+        val isExpandedMap: MutableMap<String, Boolean>,
+        val isThemeTheSameMap: MutableMap<String, Boolean>,
+    )
 }
