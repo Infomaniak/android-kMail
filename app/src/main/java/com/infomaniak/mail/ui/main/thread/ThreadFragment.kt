@@ -25,7 +25,6 @@ import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewTreeObserver
 import androidx.core.graphics.ColorUtils
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -61,7 +60,7 @@ import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
-import com.infomaniak.mail.ui.main.thread.ThreadViewModel.OpenThreadResult
+import com.infomaniak.mail.ui.main.thread.ThreadViewModel.*
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialog
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipients
@@ -99,9 +98,6 @@ class ThreadFragment : Fragment() {
 
     private var isFavorite = false
 
-    // When opening the Thread, we want to scroll to the last Message, but only once.
-    private var isFirstVisit = AtomicBoolean(true)
-
     // TODO: Remove this when Realm doesn't broadcast twice when deleting a Thread anymore.
     private var isFirstTimeLeaving = AtomicBoolean(true)
 
@@ -137,14 +133,14 @@ class ThreadFragment : Fragment() {
             observeContacts()
             observeQuickActionBarClicks()
             observeOpenAttachment()
-            observerSubjectUpdateTriggers()
+            observeSubjectUpdateTriggers()
         }
 
         permissionUtils.registerDownloadManagerPermission()
         mainViewModel.toggleLightThemeForMessage.observe(viewLifecycleOwner, threadAdapter::toggleLightMode)
     }
 
-    private fun observerSubjectUpdateTriggers() {
+    private fun observeSubjectUpdateTriggers() {
         threadViewModel.assembleSubjectData(mainViewModel.mergedContactsLive).observe(viewLifecycleOwner) { result ->
             result.thread?.let {
                 setSubject(
@@ -264,6 +260,7 @@ class ThreadFragment : Fragment() {
         messagesList.adapter = threadAdapter.apply {
 
             isExpandedMap = result.isExpandedMap
+            initialSetOfExpandedMessagesUids = result.initialSetOfExpandedMessagesUids
             isThemeTheSameMap = result.isThemeTheSameMap
 
             stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
@@ -318,6 +315,10 @@ class ThreadFragment : Fragment() {
 
             navigateToNewMessageActivity = { uri ->
                 safeNavigateToNewMessageActivity(NewMessageActivityArgs(mailToUri = uri).toBundle())
+            }
+
+            onAllExpandedMessagesLoaded = {
+                messagesListNestedScrollView.post(::scrollToFirstUnseenMessage)
             }
         }
     }
@@ -394,7 +395,6 @@ class ThreadFragment : Fragment() {
 
             threadViewModel.fetchMessagesHeavyData(messages)
             threadAdapter.submitList(messages)
-            scrollToFirstUnseenMessage(messages.count())
         }
     }
 
@@ -402,23 +402,12 @@ class ThreadFragment : Fragment() {
         threadViewModel.failedMessagesUids.observe(viewLifecycleOwner, threadAdapter::updateFailedMessages)
     }
 
-    private fun scrollToFirstUnseenMessage(messagesCount: Int) {
-        val shouldScrollToFirstUnseenMessage = isFirstVisit.compareAndSet(true, false) && messagesCount > 1
-        if (shouldScrollToFirstUnseenMessage) onRecyclerViewLaidOut(::scrollToFirstUnseenMessage)
-    }
-
-    private fun onRecyclerViewLaidOut(callback: () -> Unit) = with(binding) {
-        messagesList.viewTreeObserver.addOnGlobalLayoutListener(
-            object : ViewTreeObserver.OnGlobalLayoutListener {
-                override fun onGlobalLayout() {
-                    callback()
-                    messagesList.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                }
-            }
-        )
-    }
-
     private fun scrollToFirstUnseenMessage() = with(binding) {
+
+        fun scrollToBottom() {
+            messagesListNestedScrollView.scrollY = messagesListNestedScrollView.maxScrollAmount
+        }
+
         val indexToScroll = threadAdapter.messages.indexOfFirst { threadAdapter.isExpandedMap[it.uid] == true }
 
         // If no Message is expanded (e.g. the last Message of the Thread is a Draft),
@@ -441,10 +430,6 @@ class ThreadFragment : Fragment() {
                 messagesListNestedScrollView.scrollY = targetChild.top
             }
         }
-    }
-
-    private fun scrollToBottom() = with(binding) {
-        messagesListNestedScrollView.scrollY = messagesListNestedScrollView.maxScrollAmount
     }
 
     private fun observeContacts() {

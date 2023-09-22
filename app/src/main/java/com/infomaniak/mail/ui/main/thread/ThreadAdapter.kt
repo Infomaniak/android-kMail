@@ -63,8 +63,12 @@ class ThreadAdapter(
 
     inline val messages: MutableList<Message> get() = currentList
 
-    private val manuallyAllowedMessageUids = mutableSetOf<String>()
     var isExpandedMap = mutableMapOf<String, Boolean>()
+    var initialSetOfExpandedMessagesUids = setOf<String>()
+    private val currentSetOfLoadedExpandedMessagesUids = mutableSetOf<String>()
+    private var hasNotScrolledYet = true
+
+    private val manuallyAllowedMessageUids = mutableSetOf<String>()
     var isThemeTheSameMap = mutableMapOf<String, Boolean>()
     var contacts: MergedContactDictionary = emptyMap()
 
@@ -76,6 +80,7 @@ class ThreadAdapter(
     var onReplyClicked: ((Message) -> Unit)? = null
     var onMenuClicked: ((Message) -> Unit)? = null
     var navigateToNewMessageActivity: ((Uri) -> Unit)? = null
+    var onAllExpandedMessagesLoaded: (() -> Unit)? = null
 
     private lateinit var recyclerView: RecyclerView
     private val webViewUtils by lazy { WebViewUtils(recyclerView.context) }
@@ -417,7 +422,13 @@ class ThreadAdapter(
     }
 
     private fun onExpandedMessageLoaded(messageUid: String) {
-        // TODO: scroll
+        if (hasNotScrolledYet) {
+            currentSetOfLoadedExpandedMessagesUids.add(messageUid)
+            if (currentSetOfLoadedExpandedMessagesUids.containsAll(initialSetOfExpandedMessagesUids)) {
+                hasNotScrolledYet = false
+                onAllExpandedMessagesLoaded?.invoke()
+            }
+        }
     }
 
     private fun ThreadViewHolder.onExpandOrCollapseMessage(message: Message, shouldTrack: Boolean = true) = with(binding) {
