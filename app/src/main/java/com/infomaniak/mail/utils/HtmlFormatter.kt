@@ -110,7 +110,7 @@ class HtmlFormatter(private val html: String) {
 
         private fun Context.loadScript(
             @RawRes scriptResId: Int,
-            customVariablesDeclaration: List<Pair<String, Any>> = emptyList()
+            customVariablesDeclaration: List<Pair<String, Any>> = emptyList(),
         ): String {
             var script = readRawResource(scriptResId)
             customVariablesDeclaration.forEach { (variableName, value) ->

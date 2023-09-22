@@ -181,7 +181,7 @@ class SearchViewModel @Inject constructor(
     private suspend fun computeSearchFilters(
         folder: Folder?,
         filters: Set<ThreadFilter>,
-        query: String?
+        query: String?,
     ): Set<ThreadFilter>? {
 
         val newFilters = if (folder == null) filters else (filters + ThreadFilter.FOLDER)

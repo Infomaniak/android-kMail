@@ -609,7 +609,7 @@ class RefreshController @Inject constructor(
         existingThreads: RealmResults<Thread>,
         remoteMessage: Message,
         scope: CoroutineScope,
-        impactedThreadsManaged: MutableSet<Thread>
+        impactedThreadsManaged: MutableSet<Thread>,
     ) {
         if (existingThreads.isEmpty()) return
 

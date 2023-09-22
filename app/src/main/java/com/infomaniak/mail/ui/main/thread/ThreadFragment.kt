@@ -266,11 +266,14 @@ class ThreadFragment : Fragment() {
         messagesList.recycledViewPool.setMaxRecycledViews(0, 0)
 
         messagesList.adapter = threadAdapter.apply {
+
             stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
             contacts = mainViewModel.mergedContactsLive.value ?: emptyMap()
+
             onContactClicked = { contact ->
                 safeNavigate(ThreadFragmentDirections.actionThreadFragmentToDetailedContactBottomSheetDialog(contact))
             }
+
             onDraftClicked = { message ->
                 trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
                 safeNavigateToNewMessageActivity(
@@ -282,10 +285,12 @@ class ThreadFragment : Fragment() {
                     ).toBundle(),
                 )
             }
+
             onDeleteDraftClicked = { message ->
                 trackMessageActionsEvent("deleteDraft")
                 mainViewModel.currentMailbox.value?.let { mailbox -> threadViewModel.deleteDraft(message, mailbox) }
             }
+
             onAttachmentClicked = { attachment ->
                 if (attachment.openWithIntent(requireContext()).hasSupportedApplications(requireContext())) {
                     trackAttachmentActionsEvent("open")
@@ -296,16 +301,22 @@ class ThreadFragment : Fragment() {
                     scheduleDownloadManager(attachment.downloadUrl, attachment.name)
                 }
             }
+
             onDownloadAllClicked = { message ->
                 trackAttachmentActionsEvent("downloadAll")
                 mainViewModel.snackBarManager.setValue(getString(R.string.snackbarDownloadInProgress))
                 downloadAllAttachments(message)
             }
+
             onReplyClicked = { message ->
                 trackMessageActionsEvent(ACTION_REPLY_NAME)
                 replyTo(message)
             }
-            onMenuClicked = { message -> message.navigateToActionsBottomSheet() }
+
+            onMenuClicked = { message ->
+                message.navigateToActionsBottomSheet()
+            }
+
             navigateToNewMessageActivity = { uri ->
                 safeNavigateToNewMessageActivity(NewMessageActivityArgs(mailToUri = uri).toBundle())
             }
@@ -411,8 +422,8 @@ class ThreadFragment : Fragment() {
     private fun scrollToFirstUnseenMessage() = with(binding) {
         val indexToScroll = threadAdapter.messages.indexOfFirst { threadAdapter.isExpandedMap[it.uid] == true }
 
-        // If no message is expanded (e.g. the last message of the thread is a draft) we want to automatically scroll to the very
-        // bottom.
+        // If no Message is expanded (e.g. the last Message of the Thread is a Draft),
+        // we want to automatically scroll to the very bottom.
         if (indexToScroll == -1) {
             scrollToBottom()
         } else {
