@@ -33,6 +33,7 @@ import com.infomaniak.mail.data.LocalSettings.AiReplacementDialogVisibility
 import com.infomaniak.mail.databinding.DialogAiReplaceContentBinding
 import com.infomaniak.mail.databinding.FragmentAiPropositionBinding
 import com.infomaniak.mail.ui.main.newMessage.AiViewModel.PropositionStatus
+import com.infomaniak.mail.utils.SimpleIconPopupMenu
 import com.infomaniak.mail.utils.changeToolbarColorOnScroll
 import com.infomaniak.mail.utils.postfixWithTag
 import dagger.hilt.android.AndroidEntryPoint
@@ -50,6 +51,10 @@ class AiPropositionFragment : Fragment() {
     private val aiViewModel: AiViewModel by activityViewModels()
 
     private var requestJob: Job? = null
+
+    private val refinePopupMenu by lazy {
+        SimpleIconPopupMenu(requireContext(), R.menu.ai_refining_options, binding.refineButton)
+    }
 
     private val replacementDialog by lazy { createReplaceContentDialog(onPositiveButtonClicked = ::choosePropositionAndBack) }
 
@@ -85,6 +90,8 @@ class AiPropositionFragment : Fragment() {
 
             if (doNotAskAgain || body.isBlank()) choosePropositionAndBack() else replacementDialog.show()
         }
+
+        refineButton.setOnClickListener { refinePopupMenu.show() }
     }
 
     private fun setToolbar() = with(binding) {
