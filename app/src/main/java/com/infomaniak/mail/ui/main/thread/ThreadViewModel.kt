@@ -130,7 +130,7 @@ class ThreadViewModel @Inject constructor(
             isThemeTheSameMap[message.uid] = true
         }
 
-        emit(Triple(thread, isExpandedMap, isThemeTheSameMap))
+        emit(OpenThreadResult(thread, isExpandedMap, isThemeTheSameMap))
 
         if (thread.unseenMessagesCount > 0) sharedUtils.markAsSeen(mailbox, listOf(thread))
     }
@@ -194,4 +194,10 @@ class ThreadViewModel @Inject constructor(
             DownloadManagerUtils.scheduleDownload(context, downloadUrl, filename)
         }
     }
+
+    data class OpenThreadResult(
+        val thread: Thread,
+        val isExpandedMap: MutableMap<String, Boolean>,
+        val isThemeTheSameMap: MutableMap<String, Boolean>,
+    )
 }

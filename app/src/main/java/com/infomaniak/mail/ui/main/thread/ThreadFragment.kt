@@ -63,6 +63,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
+import com.infomaniak.mail.ui.main.thread.ThreadViewModel.OpenThreadResult
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialog
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.AlertDialogUtils.createInformationDialog
@@ -132,11 +133,9 @@ class ThreadFragment : Fragment() {
                 return@observe
             }
 
-            setupUi(folderRole = mainViewModel.getActionFolderRole(result.first))
+            setupUi(folderRole = mainViewModel.getActionFolderRole(result.thread))
+            setupAdapter(result)
 
-            setupAdapter()
-            threadAdapter.isExpandedMap = result.second
-            threadAdapter.isThemeTheSameMap = result.third
             observeMessagesLive()
             observeFailedMessages()
             observeContacts()
@@ -260,12 +259,15 @@ class ThreadFragment : Fragment() {
         getBackNavigationResult(DownloadAttachmentProgressDialog.OPEN_WITH, ::startActivity)
     }
 
-    private fun setupAdapter() = with(binding) {
+    private fun setupAdapter(result: OpenThreadResult) = with(binding) {
 
         messagesList.addItemDecoration(DividerItemDecorator(InsetDrawable(dividerDrawable(context), 0)))
         messagesList.recycledViewPool.setMaxRecycledViews(0, 0)
 
         messagesList.adapter = threadAdapter.apply {
+
+            isExpandedMap = result.isExpandedMap
+            isThemeTheSameMap = result.isThemeTheSameMap
 
             stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
             contacts = mainViewModel.mergedContactsLive.value ?: emptyMap()
