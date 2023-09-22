@@ -49,7 +49,7 @@ class ThemeSettingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding.radioGroup) {
         super.onViewCreated(view, savedInstanceState)
 
-        setSystemSettingUi()
+        setSystemThemeVisibility()
 
         initBijectionTable(
             R.id.systemTheme to SYSTEM,
@@ -65,7 +65,7 @@ class ThemeSettingFragment : Fragment() {
         }
     }
 
-    private fun setSystemSettingUi() {
+    private fun setSystemThemeVisibility() {
         binding.systemTheme.isGone = Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
     }
 
