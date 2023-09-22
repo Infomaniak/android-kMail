@@ -200,6 +200,7 @@ fun WebView.initWebViewClientAndBridge(
     shouldLoadDistantResources: Boolean,
     onBlockedResourcesDetected: (() -> Unit)? = null,
     navigateToNewMessageActivity: ((Uri) -> Unit)?,
+    onPageFinished: (() -> Unit)? = null,
 ): MessageWebViewClient {
 
     addJavascriptInterface(WebViewUtils.jsBridge, "kmail")
@@ -217,6 +218,7 @@ fun WebView.initWebViewClientAndBridge(
         shouldLoadDistantResources,
         onBlockedResourcesDetected,
         navigateToNewMessageActivity,
+        onPageFinished,
     ).also {
         webViewClient = it
     }

@@ -403,13 +403,21 @@ class ThreadAdapter(
 
         quoteButtonFrameLayout.isVisible = hasQuote
 
-        initWebViewClientIfNeeded(message, navigateToNewMessageActivity)
+        initWebViewClientIfNeeded(
+            message,
+            navigateToNewMessageActivity,
+            onPageFinished = { onExpandedMessageLoaded(message.uid) },
+        )
 
         // If the view holder got recreated while the fragment is not destroyed, keep the user's choice effective
         if (isMessageUidManuallyAllowed(message.uid)) {
             bodyWebViewClient.unblockDistantResources()
             fullMessageWebViewClient.unblockDistantResources()
         }
+    }
+
+    private fun onExpandedMessageLoaded(messageUid: String) {
+        // TODO: scroll
     }
 
     private fun ThreadViewHolder.onExpandOrCollapseMessage(message: Message, shouldTrack: Boolean = true) = with(binding) {
@@ -522,7 +530,11 @@ class ThreadAdapter(
             }
         }
 
-        fun initWebViewClientIfNeeded(message: Message, navigateToNewMessageActivity: ((Uri) -> Unit)?) {
+        fun initWebViewClientIfNeeded(
+            message: Message,
+            navigateToNewMessageActivity: ((Uri) -> Unit)?,
+            onPageFinished: () -> Unit,
+        ) {
 
             fun promptUserForDistantImages() {
                 binding.promptUserForDistantImages()
@@ -535,6 +547,7 @@ class ThreadAdapter(
                     shouldLoadDistantResources = shouldLoadDistantResources,
                     onBlockedResourcesDetected = ::promptUserForDistantImages,
                     navigateToNewMessageActivity = navigateToNewMessageActivity,
+                    onPageFinished = onPageFinished,
                 )
                 _fullMessageWebViewClient = binding.fullMessageWebView.initWebViewClientAndBridge(
                     attachments = message.attachments,
