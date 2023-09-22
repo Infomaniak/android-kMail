@@ -501,6 +501,12 @@
         <item name="colorPrimary">@color/aiColor</item>
     </style>
 
+    <style name="AiRefineMenu">
+        <item name="colorControlHighlight">@color/color_ai_translucent_ripple</item>
+        <item name="colorPrimary">@color/backgroundColorTertiary</item>
+        <item name="colorSurface">@color/backgroundColorTertiary</item>
+    </style>
+
     <style name="AiCardView" parent="CardViewMail">
         <item name="cardBackgroundColor">@color/backgroundColorSecondary</item>
         <item name="cardCornerRadius">@null</item>
