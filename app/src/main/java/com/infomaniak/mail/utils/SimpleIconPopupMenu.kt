@@ -27,10 +27,13 @@ import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.widget.PopupMenu
 import com.infomaniak.lib.core.utils.toPx
 import com.infomaniak.mail.R
+import com.infomaniak.lib.core.R as RCore
 
 class SimpleIconPopupMenu(val context: Context, @MenuRes menuRes: Int, anchor: View) {
 
-    private val horizontalIconMargin by lazy { 4.toPx() }
+    private val horizontalIconMargin by lazy {
+        context.resources.getDimensionPixelSize(RCore.dimen.marginStandardVerySmall).toPx()
+    }
 
     private val popupMenu: PopupMenu
 
