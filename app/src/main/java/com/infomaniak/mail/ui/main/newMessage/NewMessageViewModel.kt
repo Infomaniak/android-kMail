@@ -107,6 +107,7 @@ class NewMessageViewModel @Inject constructor(
     val importedAttachments = MutableLiveData<Pair<MutableList<Attachment>, ImportationResult>>()
     val isSendingAllowed = MutableLiveData(false)
     val externalRecipientCount = MutableLiveData<Pair<String?, Int>>()
+    val aiFeatureFlagUpdated = SingleLiveEvent<Unit>()
 
     val snackBarManager by lazy { SnackBarManager() }
     var shouldExecuteDraftActionWhenStopping = true
@@ -637,6 +638,11 @@ class NewMessageViewModel @Inject constructor(
                 val mimeType = file.path.guessMimeType()
                 Attachment().apply { initLocalValues(file.name, file.length(), mimeType, file.toUri().toString()) } to false
             } ?: (null to false)
+    }
+
+    fun updateFeatureFlag() = viewModelScope.launch(ioCoroutineContext) {
+        sharedUtils.updateAiFeatureFlag()
+        aiFeatureFlagUpdated.postValue(Unit)
     }
 
     override fun onCleared() {
