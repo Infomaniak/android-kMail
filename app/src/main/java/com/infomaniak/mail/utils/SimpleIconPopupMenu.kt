@@ -28,7 +28,7 @@ import com.infomaniak.lib.core.utils.toPx
 import com.infomaniak.mail.R
 import com.infomaniak.lib.core.R as RCore
 
-class SimpleIconPopupMenu(val context: Context, @MenuRes menuRes: Int, anchor: View) {
+class SimpleIconPopupMenu(val context: Context, @MenuRes menuRes: Int, anchor: View, onMenuItemClicked: (Int) -> Unit) {
 
     private val horizontalIconMargin by lazy {
         context.resources.getDimensionPixelSize(RCore.dimen.marginStandardVerySmall).toPx()
@@ -41,6 +41,10 @@ class SimpleIconPopupMenu(val context: Context, @MenuRes menuRes: Int, anchor: V
         popupMenu = PopupMenu(refineMenuThemedContext, anchor).also {
             it.menuInflater.inflate(menuRes, it.menu)
             showIconsAndDividers(it)
+            it.setOnMenuItemClickListener { menuItem ->
+                onMenuItemClicked(menuItem.itemId)
+                true
+            }
         }
     }
 

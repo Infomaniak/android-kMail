@@ -15,11 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models
+package com.infomaniak.mail.data.models.ai
 
-import kotlinx.serialization.Serializable
-
-@Serializable
-data class AiResult(
-    val content: String,
-)
+class AssistantMessage(content: String) : AiMessage(content) {
+    override val type = "assistant"
+}
