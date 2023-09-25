@@ -290,6 +290,11 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.ai(), POST, body, HttpClient.okHttpClientLongTimeout)
     }
 
+    fun checkAiFeatureFlag(): ApiResponse<FeatureFlagResult> {
+        val body = mapOf("name" to "ai")
+        return callApi(ApiRoutes.featureFlag(), POST, body)
+    }
+
     fun downloadAttachment(resource: String): Response {
         val httpRequest = Request.Builder()
             .url(ApiRoutes.resource(resource))
