@@ -525,11 +525,10 @@ class ThreadFragment : Fragment() {
                     externalRecipientEmail,
                 )
 
-                externalExpeditorInfoDialog.showDialog(
-                    title = getString(R.string.externalDialogTitleExpeditor),
+                externalExpeditorInfoDialog.show(
+                    title = R.string.externalDialogTitleExpeditor,
                     description = description,
                     confirmButtonText = R.string.externalDialogConfirmButton,
-                    displayCancelButton = false,
                 )
             }
         }

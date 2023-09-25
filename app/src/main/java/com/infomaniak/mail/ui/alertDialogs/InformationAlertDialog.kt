@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.alertDialogs
 
 import android.content.Context
+import androidx.annotation.StringRes
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
@@ -26,4 +27,12 @@ import javax.inject.Inject
 class InformationAlertDialog @Inject constructor(
     @ActivityContext private val activityContext: Context,
 ) : BaseAlertDialog(activityContext) {
+
+    fun show(@StringRes title: Int, description: CharSequence?, @StringRes confirmButtonText: Int?) = showDialog(
+        title = activityContext.getString(title),
+        description = description,
+        confirmButtonText = confirmButtonText,
+        displayCancelButton = false,
+        displayLoader = false,
+    )
 }

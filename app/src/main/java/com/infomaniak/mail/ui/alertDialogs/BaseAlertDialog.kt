@@ -56,7 +56,7 @@ abstract class BaseAlertDialog(@ActivityContext private val activityContext: Con
             .create()
     }
 
-    fun showDialog(
+    protected fun showDialog(
         title: String? = null,
         description: CharSequence? = null,
         @StringRes confirmButtonText: Int? = null,
@@ -64,7 +64,7 @@ abstract class BaseAlertDialog(@ActivityContext private val activityContext: Con
         displayLoader: Boolean = true,
         onPositiveButtonClicked: (() -> Unit)? = null,
         onDismissed: (() -> Unit)? = null,
-    ) = with(binding) {
+    ): Unit = with(binding) {
         alertDialog.show()
 
         title?.let(dialogTitle::setText)

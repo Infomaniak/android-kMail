@@ -618,11 +618,10 @@ class NewMessageFragment : Fragment() {
                 externalRecipientEmail,
             )
 
-            externalRecipientInfoDialog.showDialog(
-                title = getString(R.string.externalDialogTitleRecipient),
+            externalRecipientInfoDialog.show(
+                title = R.string.externalDialogTitleRecipient,
                 description = description,
                 confirmButtonText = R.string.externalDialogConfirmButton,
-                displayCancelButton = false,
             )
         }
 
