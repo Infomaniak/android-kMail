@@ -21,12 +21,14 @@ import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
 import androidx.annotation.StringRes
+import androidx.core.view.isVisible
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.DialogDescriptionBinding
 import dagger.hilt.android.qualifiers.ActivityContext
+import com.infomaniak.lib.core.R as RCore
 
 abstract class BaseAlertDialog(@ActivityContext private val activityContext: Context) {
 
@@ -49,7 +51,28 @@ abstract class BaseAlertDialog(@ActivityContext private val activityContext: Con
         MaterialAlertDialogBuilder(context)
             .setView(root)
             .setPositiveButton(confirmButtonText, null)
+            .setNegativeButton(RCore.string.buttonCancel, null)
             .setOnDismissListener { onDismissed?.invoke() }
             .create()
+    }
+
+    fun showDialog(
+        title: String? = null,
+        description: CharSequence? = null,
+        @StringRes confirmButtonText: Int? = null,
+        displayCancelButton: Boolean = true,
+        displayLoader: Boolean = true,
+        onPositiveButtonClicked: (() -> Unit)? = null,
+        onDismissed: (() -> Unit)? = null,
+    ) = with(binding) {
+        alertDialog.show()
+
+        title?.let(dialogTitle::setText)
+        description?.let(dialogDescription::setText)
+        negativeButton.isVisible = displayCancelButton
+        positiveButton.apply {
+            confirmButtonText?.let(::setText)
+            onPositiveButtonClicked?.let { setOnClickListener { it() } }
+        }
     }
 }
