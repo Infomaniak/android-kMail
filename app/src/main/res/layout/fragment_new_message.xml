@@ -603,6 +603,7 @@
                     android:layout_height="match_parent"
                     android:contentDescription="@string/buttonSchedule"
                     android:theme="@style/AiCursorAndPrimaryColorTheme"
+                    android:visibility="gone"
                     app:icon="@drawable/ic_ai_magic_wand"
                     app:iconTint="@color/aiColor"
                     app:layout_constraintBottom_toBottomOf="parent"

@@ -17,6 +17,8 @@
  */
 package com.infomaniak.mail.utils
 
+import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.LocalSettings.FeatureFlag
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
@@ -36,6 +38,7 @@ class SharedUtils @Inject constructor(
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val refreshController: RefreshController,
     private val messageController: MessageController,
+    private val localSettings: LocalSettings,
 ) {
 
     /**
@@ -100,6 +103,14 @@ class SharedUtils @Inject constructor(
                     started = started,
                     stopped = stopped,
                 )
+            }
+        }
+    }
+
+    fun updateAiFeatureFlag() {
+        with(ApiRepository.checkAiFeatureFlag()) {
+            if (isSuccess()) {
+                localSettings.aiFeatureFlag = if (data?.state == true) FeatureFlag.ENABLED else FeatureFlag.DISABLED
             }
         }
     }
