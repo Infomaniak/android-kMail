@@ -153,6 +153,7 @@ class NewMessageFragment : Fragment() {
         observeDraftWorkerResults()
         observeInitResult()
         observeAiOutput()
+        observeAiFeatureFragmentUpdates()
     }
 
     override fun onStart() {
@@ -210,6 +211,8 @@ class NewMessageFragment : Fragment() {
 
         setupSendButton()
         setupExternalBanner()
+
+        updateAiEditorButtonWithLocalSettings()
 
         if (aiViewModel.isAiPromptOpened) openAiPrompt()
 
@@ -799,6 +802,16 @@ class NewMessageFragment : Fragment() {
 
     private fun observeAiOutput() {
         aiViewModel.aiOutputToInsert.observe(viewLifecycleOwner, binding.bodyText::setText)
+    }
+
+    private fun observeAiFeatureFragmentUpdates() {
+        newMessageViewModel.aiFeatureFlagUpdated.observe(viewLifecycleOwner) {
+            updateAiEditorButtonWithLocalSettings()
+        }
+    }
+
+    private fun updateAiEditorButtonWithLocalSettings() {
+        binding.editorAi.isVisible = localSettings.aiFeatureFlag == FeatureFlag.ENABLED
     }
 
     fun navigateToPropositionFragment() {
