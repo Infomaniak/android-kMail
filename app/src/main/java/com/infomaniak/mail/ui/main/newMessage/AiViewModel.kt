@@ -17,16 +17,22 @@
  */
 package com.infomaniak.mail.ui.main.newMessage
 
+import androidx.annotation.IdRes
 import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.userInfo.FeatureFlagController
 import com.infomaniak.mail.data.models.FeatureFlag.FeatureFlagType
+import com.infomaniak.mail.data.models.ai.AiMessage
+import com.infomaniak.mail.data.models.ai.AiResult
+import com.infomaniak.mail.data.models.ai.AssistantMessage
+import com.infomaniak.mail.data.models.ai.UserMessage
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.newMessage.AiViewModel.PropositionStatus.*
 import com.infomaniak.mail.utils.ErrorCode.MAX_SYNTAX_TOKENS_REACHED
@@ -49,22 +55,40 @@ class AiViewModel @Inject constructor(
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
     var aiPrompt = ""
+    private var history = mutableListOf<AiMessage>()
+    private var conversationContextId: String? = null
     var isAiPromptOpened = false
 
     val aiProposition = MutableLiveData<Pair<PropositionStatus, String?>?>()
     val aiOutputToInsert = SingleLiveEvent<String>()
 
     fun generateAiProposition() = viewModelScope.launch(ioCoroutineContext) {
-        with(ApiRepository.generateAiProposition(aiPrompt)) {
+        with(ApiRepository.generateNewAiProposition(aiPrompt)) {
             ensureActive()
-            aiProposition.postValue(
-                when {
-                    isSuccess() -> data?.content?.let { SUCCESS to it } ?: (MISSING_CONTENT to null)
-                    error?.code == MAX_SYNTAX_TOKENS_REACHED -> PROMPT_TOO_LONG to null
-                    error?.code == TOO_MANY_REQUESTS -> RATE_LIMIT_EXCEEDED to null
-                    else -> ERROR to null
-                }
-            )
+            handleAiResult(this, aiPrompt)
+        }
+    }
+
+    private fun handleAiResult(apiResponse: ApiResponse<AiResult>, prompt: String) = with(apiResponse) {
+        aiProposition.postValue(
+            when {
+                isSuccess() -> data?.let { aiResult ->
+                    aiResult.contextId?.let { conversationContextId = it }
+                    history += UserMessage(prompt)
+                    history += AssistantMessage(aiResult.content)
+                    SUCCESS to aiResult.content
+                } ?: (MISSING_CONTENT to null)
+                error?.code == MAX_SYNTAX_TOKENS_REACHED -> PROMPT_TOO_LONG to null
+                error?.code == TOO_MANY_REQUESTS -> RATE_LIMIT_EXCEEDED to null
+                else -> ERROR to null
+            }
+        )
+    }
+
+    fun performShortcut(shortcut: Shortcut) = viewModelScope.launch(ioCoroutineContext) {
+        with(ApiRepository.updateExistingAiProposition(conversationContextId!!, shortcut.associatedPrompt, history.toList())) {
+            ensureActive()
+            handleAiResult(this, shortcut.associatedPrompt)
         }
     }
 
@@ -72,6 +96,10 @@ class AiViewModel @Inject constructor(
 
     fun updateFeatureFlag() = viewModelScope.launch(ioCoroutineContext) {
         sharedUtils.updateAiFeatureFlag()
+    }
+
+    enum class Shortcut(@IdRes val menuId: Int, val associatedPrompt: String) {
+        REGENERATE(R.id.regenerate, "Reformule ce texte") // TODO
     }
 
     enum class PropositionStatus(@StringRes val errorRes: Int?) {

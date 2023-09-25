@@ -34,8 +34,10 @@ import com.infomaniak.mail.data.LocalSettings.AiReplacementDialogVisibility
 import com.infomaniak.mail.databinding.DialogAiReplaceContentBinding
 import com.infomaniak.mail.databinding.FragmentAiPropositionBinding
 import com.infomaniak.mail.ui.main.newMessage.AiViewModel.PropositionStatus
+import com.infomaniak.mail.ui.main.newMessage.AiViewModel.Shortcut
 import com.infomaniak.mail.utils.SimpleIconPopupMenu
 import com.infomaniak.mail.utils.changeToolbarColorOnScroll
+import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.utils.postfixWithTag
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
@@ -51,10 +53,10 @@ class AiPropositionFragment : Fragment() {
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
 
-    private var requestJob: Job? = null
+    private var currentRequestJob: Job? = null
 
     private val refinePopupMenu by lazy {
-        SimpleIconPopupMenu(requireContext(), R.menu.ai_refining_options, binding.refineButton)
+        SimpleIconPopupMenu(requireContext(), R.menu.ai_refining_options, binding.refineButton, ::onMenuItemClicked)
     }
 
     private val replacementDialog by lazy { createReplaceContentDialog(onPositiveButtonClicked = ::choosePropositionAndBack) }
@@ -71,19 +73,19 @@ class AiPropositionFragment : Fragment() {
 
         setUi()
 
-        if (aiViewModel.aiProposition.value == null) requestJob = aiViewModel.generateAiProposition()
+        if (aiViewModel.aiProposition.value == null) currentRequestJob = aiViewModel.generateAiProposition()
         observeAiProposition()
     }
 
     override fun onDestroy() {
-        requestJob?.cancel()
+        currentRequestJob?.cancel()
         super.onDestroy()
     }
 
     private fun setUi() = with(binding) {
         setToolbar()
 
-        promptPreview.text = aiViewModel.aiPrompt
+        loadingPlaceholder.text = aiViewModel.aiPrompt
 
         insertPropositionButton.setOnClickListener {
             val doNotAskAgain = localSettings.aiReplacementDialogVisibility == AiReplacementDialogVisibility.HIDE
@@ -116,6 +118,17 @@ class AiPropositionFragment : Fragment() {
     private fun choosePropositionAndBack() {
         aiViewModel.aiOutputToInsert.value = aiViewModel.aiProposition.value!!.second
         findNavController().popBackStack()
+    }
+
+    private fun onMenuItemClicked(menuItemId: Int) {
+        val shortcut = Shortcut.values().find { it.menuId == menuItemId } ?: run {
+            notYetImplemented()
+            return
+        }
+
+        binding.loadingPlaceholder.text = aiViewModel.aiProposition.value!!.second
+        aiViewModel.aiProposition.value = null
+        currentRequestJob = aiViewModel.performShortcut(shortcut)
     }
 
     private fun Fragment.createReplaceContentDialog(
@@ -156,7 +169,10 @@ class AiPropositionFragment : Fragment() {
         }
 
         aiViewModel.aiProposition.observe(viewLifecycleOwner) { proposition ->
-            if (proposition == null) return@observe
+            if (proposition == null) {
+                setUiVisibilityState(UiState.LOADING)
+                return@observe
+            }
 
             val (status, body) = proposition
 
@@ -194,7 +210,7 @@ class AiPropositionFragment : Fragment() {
     }
 
     private fun displayLoadingVisibility() = with(binding) {
-        promptPreview.isVisible = true
+        loadingPlaceholder.isVisible = true
         generationLoader.isVisible = true
 
         propositionTextView.isGone = true
@@ -205,7 +221,7 @@ class AiPropositionFragment : Fragment() {
     }
 
     private fun displayPropositionVisibility() = with(binding) {
-        promptPreview.isGone = true
+        loadingPlaceholder.isGone = true
         generationLoader.isGone = true
 
         propositionTextView.isVisible = true
@@ -238,7 +254,7 @@ class AiPropositionFragment : Fragment() {
             disableNominalFlowUi()
         }
 
-        promptPreview.isGone = true
+        loadingPlaceholder.isGone = true
         generationLoader.isGone = true
 
         propositionTextView.isGone = true

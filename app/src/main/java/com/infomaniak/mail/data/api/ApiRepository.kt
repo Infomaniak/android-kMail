@@ -28,6 +28,9 @@ import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition
 import com.infomaniak.mail.data.models.FeatureFlag.FeatureFlagType
 import com.infomaniak.mail.data.models.addressBook.AddressBooksResult
+import com.infomaniak.mail.data.models.ai.AiMessage
+import com.infomaniak.mail.data.models.ai.AiResult
+import com.infomaniak.mail.data.models.ai.UserMessage
 import com.infomaniak.mail.data.models.correspondent.Contact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
@@ -43,6 +46,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.data.models.signature.SignaturesResult
 import com.infomaniak.mail.data.models.thread.ThreadResult
+import com.infomaniak.mail.utils.ErrorCode.OBJECT_NOT_FOUND
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
@@ -277,18 +281,38 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.flushFolder(mailboxUuid, folderId), POST)
     }
 
-    fun generateAiProposition(prompt: String): ApiResponse<AiResult> {
-        val message = mapOf(
-            "type" to "user",
-            "content" to prompt,
-        )
+    private fun getBodyFromMessages(messages: List<AiMessage>) = mapOf(
+        "messages" to messages.map { it.getApiRepresentation() },
+        "output" to "mail",
+    )
 
-        val body = mapOf(
-            "messages" to arrayOf(message),
-            "output" to "mail",
-        )
-
+    private fun startNewConversation(body: Map<String, Any>): ApiResponse<AiResult> {
         return callApi(ApiRoutes.ai(), POST, body, HttpClient.okHttpClientLongTimeout)
+    }
+
+    fun generateNewAiProposition(prompt: String): ApiResponse<AiResult> {
+        val message = UserMessage(prompt)
+        val body = getBodyFromMessages(listOf(message))
+        return startNewConversation(body)
+    }
+
+    private fun continueConversation(body: Map<String, Any>, contextId: String): ApiResponse<AiResult> {
+        return callApi(ApiRoutes.aiContext(contextId), PATCH, body, HttpClient.okHttpClientLongTimeout)
+    }
+
+    fun updateExistingAiProposition(contextId: String, shortcut: String, history: List<AiMessage>): ApiResponse<AiResult> {
+        val shortcutMessage = UserMessage(shortcut)
+        val body = getBodyFromMessages(listOf(shortcutMessage))
+
+        val response = continueConversation(body, contextId)
+        val isContextExpired = response.error?.code == OBJECT_NOT_FOUND
+
+        return if (isContextExpired) {
+            val reconstructedBody = getBodyFromMessages(history + shortcutMessage)
+            startNewConversation(reconstructedBody)
+        } else {
+            response
+        }
     }
 
     fun checkFeatureFlag(featureFlagType: FeatureFlagType): ApiResponse<Boolean> {
