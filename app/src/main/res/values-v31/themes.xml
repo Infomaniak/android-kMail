@@ -17,7 +17,7 @@
   -->
 <resources>
 
-    <style name="AppThemeLauncher31" parent="AppThemeLauncherBase27">
+    <style name="AppThemeLauncher31" parent="AppTheme.LauncherBase">
         <item name="android:windowSplashScreenAnimatedIcon">@drawable/splashscreen_animated_icon</item>
         <item name="android:windowSplashScreenBackground">@color/backgroundColor</item>
         <item name="android:windowSplashScreenBrandingImage">@drawable/splashscreen_branding_image</item>
