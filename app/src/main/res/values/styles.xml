@@ -317,14 +317,14 @@
 
     <!-- Chips -->
 
-    <style name="BaseChipNoCheckedIcon" parent="Widget.Material3.Chip.Input">
+    <style name="ChipNoCheckedIconBase" parent="Widget.Material3.Chip.Input">
         <item name="checkedIcon">@null</item>
         <item name="checkedIconEnabled">false</item>
         <item name="chipCornerRadius">@dimen/roundCornerRadius</item>
         <item name="chipStrokeWidth">0dp</item>
     </style>
 
-    <style name="ChipNoIcons" parent="BaseChipNoCheckedIcon">
+    <style name="ChipNoIcons" parent="ChipNoCheckedIconBase">
         <item name="closeIcon">@null</item>
         <item name="closeIconEnabled">false</item>
     </style>
@@ -351,7 +351,7 @@
         <item name="strokeColor">?attr/colorPrimary</item>
     </style>
 
-    <style name="UnreadChip" parent="BaseChipNoCheckedIcon">
+    <style name="UnreadChip" parent="ChipNoCheckedIconBase">
         <item name="android:textColor">@color/chip_unread_text_color</item>
         <item name="android:textSize">14sp</item>
         <item name="chipBackgroundColor">@color/chip_unread_background</item>
@@ -363,13 +363,13 @@
 
     <!-- Bottom sheet -->
 
-    <style name="BottomSheetDialogTheme.Base" parent="ThemeOverlay.Material3.BottomSheetDialog">
+    <style name="BottomSheetDialogThemeBase" parent="ThemeOverlay.Material3.BottomSheetDialog">
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowIsFloating">false</item>
         <item name="bottomSheetStyle">@style/BottomSheetDialogThemeModalStyle</item>
     </style>
 
-    <style name="BottomSheetDialogTheme" parent="BottomSheetDialogTheme.Base" />
+    <style name="BottomSheetDialogTheme" parent="BottomSheetDialogThemeBase" />
 
     <style name="BottomSheetDialogThemeModalStyle" parent="Widget.Material3.BottomSheet">
         <item name="backgroundTint">@color/backgroundColorSecondary</item>
@@ -457,7 +457,7 @@
         <item name="hintEnabled">false</item>
     </style>
 
-    <style name="BaseSearchTextInputEditTextStyle">
+    <style name="SearchTextInputEditTextStyleBase">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:drawableStart">@drawable/ic_search_small</item>
@@ -468,7 +468,7 @@
         <item name="android:textColorHint">@color/tertiaryTextColor</item>
     </style>
 
-    <style name="SearchTextInputEditTextStyle" parent="BaseSearchTextInputEditTextStyle" />
+    <style name="SearchTextInputEditTextStyle" parent="SearchTextInputEditTextStyleBase" />
 
     <!-- Divider -->
 
@@ -503,7 +503,7 @@
         <item name="materialThemeOverlay">@style/FloatingActionButtonThemeOverlay</item>
     </style>
 
-    <style name="FloatingActionButtonThemeOverlay" parent="">
+    <style name="FloatingActionButtonThemeOverlay">
         <item name="colorContainer">?android:attr/colorPrimary</item>
         <item name="colorOnContainer">?attr/colorOnPrimary</item>
     </style>

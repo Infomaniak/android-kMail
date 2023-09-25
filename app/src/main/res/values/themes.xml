@@ -26,7 +26,7 @@
         <item name="android:windowLightStatusBar">?attr/isLightTheme</item>
     </style>
 
-    <style name="AppTheme.Launcher" parent="AppTheme.LauncherBase" />
+    <style name="AppThemeLauncher" parent="AppTheme.LauncherBase" />
 
     <style name="Theme.Material3.DynamicColors.DayNight.NoActionBar">
         <item name="windowActionBar">false</item>
@@ -95,27 +95,26 @@
 
     <!-- AppLock -->
 
-    <style name="AppTheme.LockBase" parent="AppTheme.Pink">
+    <style name="AppThemeLockBase" parent="AppTheme.Pink">
         <item name="appIcon">@drawable/ic_logo_infomaniak_mail</item>
         <item name="primaryButtonStyle">@style/TextButtonPrimary</item>
         <item name="titleStyle">@style/H2</item>
     </style>
 
-    <style name="AppTheme.Lock" parent="AppTheme.LockBase" />
+    <style name="AppThemeLock" parent="AppThemeLockBase" />
 
     <!-- Login -->
 
-    <!-- TODO: Doesn't work, can't inherit from both parents at the same time -->
-    <style name="AppTheme.LoginBase" parent="AppTheme.Pink">
+    <style name="AppThemeLoginBase" parent="AppTheme.Pink">
         <item name="android:navigationBarColor">@color/backgroundOnBoardingColor</item>
         <item name="android:windowBackground">@color/backgroundOnBoardingColor</item>
         <item name="android:windowLightStatusBar">?attr/isLightTheme</item>
         <item name="appBarLayoutStyle">@style/LoginAppBarTheme</item>
     </style>
 
-    <style name="AppTheme.Login" parent="AppTheme.LoginBase" />
+    <style name="AppThemeLogin" parent="AppThemeLoginBase" />
 
-    <style name="WebViewThemeBase" parent="AppTheme.Login">
+    <style name="WebViewThemeBase" parent="AppThemeLogin">
         <item name="android:statusBarColor">@color/backgroundLoginWebviewColor</item>
         <item name="colorAccent">@color/accent</item>
         <item name="colorCloseIcon">@color/title</item>
