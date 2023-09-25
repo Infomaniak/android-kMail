@@ -65,8 +65,7 @@ class AiPropositionFragment : Fragment() {
 
         setUi()
 
-        resetAiProposition()
-        requestJob = aiViewModel.generateAiProposition()
+        if (aiViewModel.aiProposition.value == null) requestJob = aiViewModel.generateAiProposition()
         observeAiProposition()
     }
 
@@ -130,10 +129,6 @@ class AiPropositionFragment : Fragment() {
             .setPositiveButton(R.string.aiReplacementDialogPositiveButton) { _, _ -> onPositiveButtonClicked() }
             .setNegativeButton(RCore.string.buttonCancel, null)
             .create()
-    }
-
-    private fun resetAiProposition() {
-        aiViewModel.aiProposition.value = null
     }
 
     private fun observeAiProposition() = with(binding) {

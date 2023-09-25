@@ -803,7 +803,12 @@ class NewMessageFragment : Fragment() {
 
     fun navigateToPropositionFragment() {
         closeAiPrompt()
+        resetAiProposition()
         safeNavigate(NewMessageFragmentDirections.actionNewMessageFragmentToAiPropositionFragment())
+    }
+
+    private fun resetAiProposition() {
+        aiViewModel.aiProposition.value = null
     }
 
     enum class EditorAction(val matomoValue: String) {
