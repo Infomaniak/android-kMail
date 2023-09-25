@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.utils
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.drawable.InsetDrawable
 import android.view.ContextThemeWrapper
@@ -45,15 +44,13 @@ class SimpleIconPopupMenu(val context: Context, @MenuRes menuRes: Int, anchor: V
         }
     }
 
-    private fun showIconsAndDividers(it: PopupMenu) {
-        @SuppressLint("RestrictedApi")
-        if (it.menu is MenuBuilder) {
-            val menuBuilder = (it.menu as MenuBuilder).apply {
-                setOptionalIconsVisible(true)
-                isGroupDividerEnabled = true
-            }
+    private fun showIconsAndDividers(popupMenu: PopupMenu) {
+        @Suppress("RestrictedApi")
+        (popupMenu.menu as? MenuBuilder)?.apply {
+            setOptionalIconsVisible(true)
+            isGroupDividerEnabled = true
 
-            for (item in menuBuilder.visibleItems) {
+            visibleItems.forEach { item ->
                 if (item.icon != null) {
                     item.icon = InsetDrawable(item.icon, horizontalIconMargin, 0, horizontalIconMargin, 0).also {
                         it.setTint(context.getColor(R.color.iconColorPrimaryText))
