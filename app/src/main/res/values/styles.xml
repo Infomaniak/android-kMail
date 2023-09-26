@@ -157,6 +157,7 @@
         <item name="backgroundTint">@color/primary_color_disabled</item>
         <item name="cornerRadius">@dimen/textButtonCornerRadius</item>
         <item name="fontFamily">@font/suisseintl_medium</item>
+        <item name="iconTint">@color/on_primary_color_disabled</item>
         <item name="layout_constraintWidth_max">500dp</item>
     </style>
 
