@@ -99,7 +99,7 @@ class MainActivity : BaseActivity() {
     @Inject
     lateinit var playServicesUtils: PlayServicesUtils
 
-    var deleteThreadDialog: AlertDialog? = null
+    var descriptionDialog: AlertDialog? = null
 
     private val drawerListener = object : DrawerLayout.DrawerListener {
 
@@ -177,7 +177,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun observeDeleteThreadTrigger() {
-        mainViewModel.deleteThreadOrMessageTrigger.observe(this) { deleteThreadDialog?.resetLoadingAndDismiss() }
+        mainViewModel.deleteThreadOrMessageTrigger.observe(this) { descriptionDialog?.resetLoadingAndDismiss() }
     }
 
     private fun observeDraftWorkerResults() {
@@ -319,7 +319,7 @@ class MainActivity : BaseActivity() {
     }
 
     override fun onStop() {
-        deleteThreadDialog?.resetLoadingAndDismiss()
+        descriptionDialog?.resetLoadingAndDismiss()
         super.onStop()
     }
 

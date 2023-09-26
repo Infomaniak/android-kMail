@@ -379,7 +379,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 folderRole == FolderRole.ARCHIVE
             }
             SwipeAction.DELETE -> {
-                deleteWithConfirmationPopup(
+                descriptionDialog.deleteWithConfirmationPopup(
                     folderRole = folderRole,
                     count = 1,
                     displayLoader = false,

@@ -55,4 +55,25 @@ class DescriptionAlertDialog @Inject constructor(
         }
     }
 
+    fun showDeletePermanentlyDialog(
+        deletedCount: Int,
+        displayLoader: Boolean,
+        onPositiveButtonClicked: () -> Unit,
+        onDismissed: (() -> Unit)? = null
+    ) {
+        show(
+            title = activityContext.resources.getQuantityString(
+                R.plurals.threadListDeletionConfirmationAlertTitle,
+                deletedCount,
+                deletedCount
+            ),
+            description = activityContext.resources.getQuantityString(
+                R.plurals.threadListDeletionConfirmationAlertDescription,
+                deletedCount
+            ),
+            displayLoader = displayLoader,
+            onPositiveButtonClicked = onPositiveButtonClicked,
+            onDismissed = onDismissed,
+        )
+    }
 }

@@ -62,6 +62,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.OpenThreadResult
@@ -96,6 +97,9 @@ class ThreadFragment : Fragment() {
 
     @Inject
     lateinit var externalExpeditorInfoDialog: InformationAlertDialog
+
+    @Inject
+    lateinit var descriptionDialog: DescriptionAlertDialog
 
     private var isFavorite = false
 
@@ -208,7 +212,7 @@ class ThreadFragment : Fragment() {
                     archiveThread(navigationArgs.threadUid)
                 }
                 R.id.quickActionDelete -> {
-                    deleteThreadDialog = deleteWithConfirmationPopup(folderRole, count = 1) {
+                    descriptionDialog.deleteWithConfirmationPopup(folderRole, count = 1) {
                         trackThreadActionsEvent(ACTION_DELETE_NAME)
                         mainViewModel.deleteThread(navigationArgs.threadUid)
                     }

@@ -33,13 +33,14 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.BottomSheetMultiSelectBinding
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection.Companion.getReadIconAndShortText
 import com.infomaniak.mail.utils.animatedNavigation
-import com.infomaniak.mail.utils.deleteThreadDialog
 import com.infomaniak.mail.utils.deleteWithConfirmationPopup
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
@@ -48,6 +49,9 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
     private val mainViewModel: MainViewModel by activityViewModels()
 
     private val currentClassName: String by lazy { MultiSelectBottomSheetDialog::class.java.name }
+
+    @Inject
+    lateinit var descriptionDialog: DescriptionAlertDialog
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetMultiSelectBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -82,7 +86,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                     archiveThreads(selectedThreadsUids)
                 }
                 R.id.actionDelete -> {
-                    deleteThreadDialog = deleteWithConfirmationPopup(
+                    descriptionDialog.deleteWithConfirmationPopup(
                         folderRole = getActionFolderRole(selectedThreads.firstOrNull()),
                         count = selectedThreadsCount,
                     ) {
