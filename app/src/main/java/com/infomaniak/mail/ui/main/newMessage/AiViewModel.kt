@@ -29,6 +29,7 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.newMessage.AiViewModel.PropositionStatus.*
 import com.infomaniak.mail.utils.ErrorCode.MAX_SYNTAX_TOKENS_REACHED
 import com.infomaniak.mail.utils.ErrorCode.TOO_MANY_REQUESTS
+import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -40,6 +41,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AiViewModel @Inject constructor(
     private val featureFlagController: FeatureFlagController,
+    private val sharedUtils: SharedUtils,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
@@ -67,6 +69,10 @@ class AiViewModel @Inject constructor(
 
     fun aiFeatureFlag(): LiveData<FeatureFlag?> {
         return featureFlagController.getFeatureFlagAsync(FeatureFlagType.AI).map { it.obj }.asLiveData()
+    }
+
+    fun updateFeatureFlag() = viewModelScope.launch(ioCoroutineContext) {
+        sharedUtils.updateAiFeatureFlag()
     }
 
     enum class PropositionStatus(@StringRes val errorRes: Int?) {
