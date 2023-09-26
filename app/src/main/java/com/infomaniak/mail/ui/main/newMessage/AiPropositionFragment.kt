@@ -22,6 +22,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isGone
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -146,29 +147,79 @@ class AiPropositionFragment : Fragment() {
 
             when (status) {
                 PropositionStatus.SUCCESS -> {
-                    propositionTextView.apply {
-                        text = body
-                        isVisible = true
-                    }
-                    promptPreview.isGone = true
-
-                    buttonLayout.isVisible = true
-                    generationLoader.isGone = true
+                    propositionTextView.text = body
+                    setUiVisibilityState(UiState.PROPOSITION)
                 }
-                PropositionStatus.ERROR -> {
-                    // TODO
-                    newMessageViewModel.snackBarManager.setValue(getString(RCore.string.anErrorHasOccurred))
+                PropositionStatus.ERROR,
+                PropositionStatus.MAX_TOKEN_EXCEEDED,
+                PropositionStatus.RATE_LIMIT_EXCEEDED -> {
+                    errorMessage.setText(status.errorRes!!)
+                    setUiVisibilityState(UiState.ERROR, status)
                 }
-                PropositionStatus.MAX_TOKEN_EXCEEDED -> TODO()
-                PropositionStatus.RATE_LIMIT_EXCEEDED -> TODO()
                 PropositionStatus.MISSING_CONTENT -> {
                     Sentry.withScope { scope ->
                         scope.level = SentryLevel.ERROR
                         Sentry.captureMessage("AI call succeeded but no content returned")
                     }
-                    // TODO
+                    errorMessage.setText(status.errorRes!!)
+                    setUiVisibilityState(UiState.ERROR, status)
                 }
             }
         }
+    }
+
+    private fun setUiVisibilityState(state: UiState, errorType: PropositionStatus? = null) = with(binding) {
+        fun setAdditionalErrorStyle() {
+            val displayRetryButton = errorType == PropositionStatus.MAX_TOKEN_EXCEEDED
+
+            retryButton.isVisible = displayRetryButton
+            buttonLayout.isGone = displayRetryButton
+            if (!displayRetryButton) {
+                insertPropositionButton.isEnabled = false
+                refineButton.isGone = true
+            }
+        }
+
+        when (state) {
+            UiState.LOADING -> {
+                promptPreview.isVisible = true
+                generationLoader.isVisible = true
+
+                propositionTextView.isGone = true
+                buttonLayout.isInvisible = true
+
+                errorMessage.isGone = true
+                retryButton.isGone = true
+            }
+            UiState.PROPOSITION -> {
+                promptPreview.isGone = true
+                generationLoader.isGone = true
+
+                propositionTextView.isVisible = true
+                buttonLayout.isVisible = true
+
+                errorMessage.isGone = true
+                retryButton.isGone = true
+
+                insertPropositionButton.isEnabled = true
+                refineButton.isVisible = true
+            }
+            UiState.ERROR -> {
+                promptPreview.isGone = true
+                generationLoader.isGone = true
+
+                propositionTextView.isGone = true
+
+                errorMessage.isVisible = true
+
+                setAdditionalErrorStyle()
+            }
+        }
+    }
+
+    enum class UiState {
+        LOADING,
+        PROPOSITION,
+        ERROR,
     }
 }
