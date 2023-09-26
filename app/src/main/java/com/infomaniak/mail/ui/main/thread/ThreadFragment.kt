@@ -211,9 +211,11 @@ class ThreadFragment : Fragment() {
                     trackThreadActionsEvent(ACTION_ARCHIVE_NAME, isFromArchive)
                     archiveThread(navigationArgs.threadUid)
                 }
-                R.id.quickActionDelete -> deleteWithConfirmationPopup(folderRole, count = 1) {
-                    trackThreadActionsEvent(ACTION_DELETE_NAME)
-                    mainViewModel.deleteThread(navigationArgs.threadUid)
+                R.id.quickActionDelete -> {
+                    deleteThreadDialog = deleteWithConfirmationPopup(folderRole, count = 1) {
+                        trackThreadActionsEvent(ACTION_DELETE_NAME)
+                        mainViewModel.deleteThread(navigationArgs.threadUid)
+                    }
                 }
                 R.id.quickActionMenu -> {
                     trackThreadActionsEvent(OPEN_ACTION_BOTTOM_SHEET)

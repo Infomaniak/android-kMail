@@ -52,9 +52,11 @@ import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.NotificationUtils.Companion.cancelNotification
 import com.infomaniak.mail.utils.SharedUtils.Companion.updateSignatures
+import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.ext.copyFromRealm
+import io.realm.kotlin.notifications.ResultsChange
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.util.Date
@@ -88,11 +90,12 @@ class MainViewModel @Inject constructor(
     // First boolean is the download status, second boolean is if the LoadMore button should be displayed
     val isDownloadingChanges: MutableLiveData<Pair<Boolean, Boolean?>> = MutableLiveData(false to null)
     val isInternetAvailable = MutableLiveData<Boolean>()
-    val newFolderResultTrigger = MutableLiveData<Unit>()
     val isMovedToNewFolder = SingleLiveEvent<Boolean>()
     val toggleLightThemeForMessage = SingleLiveEvent<Message>()
     val deletedMessages = SingleLiveEvent<Set<String>>()
+    val deleteThreadOrMessageTrigger = SingleLiveEvent<Unit>()
     val flushFolderTrigger = SingleLiveEvent<Unit>()
+    val newFolderResultTrigger = MutableLiveData<Unit>()
     val reportPhishingTrigger = SingleLiveEvent<Unit>()
 
     val snackBarManager by lazy { SnackBarManager() }
@@ -155,14 +158,25 @@ class MainViewModel @Inject constructor(
 
     val currentFilter = SingleLiveEvent(ThreadFilter.ALL)
 
-    val currentThreadsLive = observeFolderAndFilter().flatMapLatest { (folder, filter) ->
-        folder?.let { threadController.getThreadsAsync(it, filter) } ?: emptyFlow()
-    }.asLiveData(ioCoroutineContext)
+    val currentThreadsLive = MutableLiveData<ResultsChange<Thread>>()
+
+    private var currentThreadsLiveJob: Job? = null
+
+    fun reassignCurrentThreadsLive() {
+        currentThreadsLiveJob?.cancel()
+        currentThreadsLiveJob = viewModelScope.launch(ioCoroutineContext) {
+            observeFolderAndFilter()
+                .flatMapLatest { (folder, filter) ->
+                    folder?.let { threadController.getThreadsAsync(it, filter) } ?: emptyFlow()
+                }
+                .collect(currentThreadsLive::postValue)
+        }
+    }
 
     private fun observeFolderAndFilter() = MediatorLiveData<Pair<Folder?, ThreadFilter>>().apply {
-        value = currentFolder.value to currentFilter.value!!
-        addSource(currentFolder) { value = it to value!!.second }
-        addSource(currentFilter) { value = value?.first to it }
+        postValue(currentFolder.value to currentFilter.value!!)
+        addSource(currentFolder) { postValue(it to value!!.second) }
+        addSource(currentFilter) { postValue(value?.first to it) }
     }.asFlow()
 
     override fun onCleared() {
@@ -400,8 +414,8 @@ class MainViewModel @Inject constructor(
         deleteThreadsOrMessage(threadsUids = listOf(threadUid), message = message)
     }
 
-    fun deleteThread(threadUid: String) {
-        deleteThreadsOrMessage(threadsUids = listOf(threadUid))
+    fun deleteThread(threadUid: String, isSwipe: Boolean = false) {
+        deleteThreadsOrMessage(threadsUids = listOf(threadUid), isSwipe = isSwipe)
     }
 
     fun deleteThreads(threadsUids: List<String>) {
@@ -411,14 +425,14 @@ class MainViewModel @Inject constructor(
     private fun deleteThreadsOrMessage(
         threadsUids: List<String>,
         message: Message? = null,
+        isSwipe: Boolean = false,
     ) = viewModelScope.launch(ioCoroutineContext) {
+
         val mailbox = currentMailbox.value!!
         val threads = getActionThreads(threadsUids).ifEmpty { return@launch }
         var trashId: String? = null
         var undoResource: String? = null
-
-        val role = getActionFolderRole(threads, message)
-        val shouldPermanentlyDelete = role == FolderRole.DRAFT || role == FolderRole.SPAM || role == FolderRole.TRASH
+        val shouldPermanentlyDelete = isPermanentDeleteFolder(getActionFolderRole(threads, message))
 
         val messages = getMessagesToDelete(threads, message)
         val uids = messages.getUids()
@@ -432,6 +446,7 @@ class MainViewModel @Inject constructor(
             }
         }
 
+        deleteThreadOrMessageTrigger.postValue(Unit)
         if (apiResponse.isSuccess()) {
             refreshFoldersAsync(
                 mailbox = mailbox,
@@ -440,6 +455,9 @@ class MainViewModel @Inject constructor(
                 started = ::startedDownload,
                 stopped = ::stoppedDownload,
             )
+        } else if (isSwipe) {
+            // We need to make the swiped Thread come back, so we reassign the LiveData with Realm values
+            reassignCurrentThreadsLive()
         }
 
         val undoDestinationId = message?.folderId ?: threads.first().folderId

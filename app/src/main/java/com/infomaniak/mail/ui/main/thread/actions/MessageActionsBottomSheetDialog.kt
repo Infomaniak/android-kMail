@@ -38,10 +38,8 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.ui.main.menu.MoveFragmentArgs
-import com.infomaniak.mail.utils.animatedNavigation
-import com.infomaniak.mail.utils.deleteWithConfirmationPopup
-import com.infomaniak.mail.utils.notYetImplemented
-import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
+import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.deleteThreadDialog
 
 class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
@@ -103,7 +101,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 }
 
                 override fun onDelete() {
-                    deleteWithConfirmationPopup(folderRole, count = 1) {
+                    deleteThreadDialog = deleteWithConfirmationPopup(folderRole, count = 1) {
                         trackBottomSheetMessageActionsEvent(ACTION_DELETE_NAME)
                         mainViewModel.deleteMessage(threadUid, message)
                     }
