@@ -21,8 +21,8 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.infomaniak.lib.core.R
 import com.infomaniak.lib.core.utils.SingleLiveEvent
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.newMessage.AiViewModel.PropositionStatus.*
@@ -62,9 +62,9 @@ class AiViewModel @Inject constructor(@IoDispatcher private val ioDispatcher: Co
 
     enum class PropositionStatus(@StringRes val errorRes: Int?) {
         SUCCESS(null),
-        ERROR(R.string.anErrorHasOccurred),
-        MAX_TOKEN_EXCEEDED(R.string.anErrorHasOccurred),
-        RATE_LIMIT_EXCEEDED(R.string.anErrorHasOccurred),
-        MISSING_CONTENT(R.string.anErrorHasOccurred),
+        ERROR(R.string.aiErrorUnknown),
+        MAX_TOKEN_EXCEEDED(R.string.aiErrorMaxTokenReached),
+        RATE_LIMIT_EXCEEDED(R.string.aiErrorTooManyRequests),
+        MISSING_CONTENT(R.string.aiErrorUnknown),
     }
 }

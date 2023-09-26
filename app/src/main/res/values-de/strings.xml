@@ -51,6 +51,10 @@
     <string name="addUnknownRecipientTitle">Einen Empfänger hinzufügen</string>
     <string name="aiButtonInsert">Einfügen</string>
     <string name="aiButtonRefine">Verfeinern</string>
+    <string name="aiButtonRetry">Wiederholen</string>
+    <string name="aiErrorMaxTokenReached">Ihre Anfrage ist zu lang, bitte versuchen Sie es noch einmal in einem kürzeren Format.</string>
+    <string name="aiErrorTooManyRequests">Es scheint, dass Sie in kurzer Zeit zu viele Suchanfragen gestellt haben. \n\nBitte haben Sie einen Moment Geduld.</string>
+    <string name="aiErrorUnknown">Es ist ein Fehler aufgetreten. Wenn dieser Fehler weiterhin auftritt, wenden Sie sich bitte an unseren Support.\n\nVielen Dank für Ihre Geduld.</string>
     <string name="aiPromptGenerationLoader">Der Assistent schreibt</string>
     <string name="aiPromptPlaceholder">Sagen Sie dem Schreibassistenten, was Sie schreiben wollen. Zum Beispiel: \"eine Dankes-E-Mail für ein Willkommensgeschenk\".</string>
     <string name="aiPromptTag">Beta</string>
