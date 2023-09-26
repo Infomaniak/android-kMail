@@ -87,7 +87,7 @@ object ErrorCode {
 
     //region AI
     const val MAX_TOKEN_REACHED = "max_token_reached"
-    const val TOO_MANY_REQUEST = "too_many_request"
+    const val TOO_MANY_REQUESTS = "too_many_request"
     //endregion
 
     val apiErrorCodes = listOf(
