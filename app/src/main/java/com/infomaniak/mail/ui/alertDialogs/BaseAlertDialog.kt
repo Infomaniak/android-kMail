@@ -40,7 +40,6 @@ abstract class BaseAlertDialog(@ActivityContext private val activityContext: Con
     var title: String = ""
     @StringRes
     var confirmButtonText = R.string.buttonConfirm
-    var onDismissed: (() -> Unit)? = null
 
     protected val alertDialog = initDialog()
 
@@ -52,7 +51,6 @@ abstract class BaseAlertDialog(@ActivityContext private val activityContext: Con
             .setView(root)
             .setPositiveButton(confirmButtonText, null)
             .setNegativeButton(RCore.string.buttonCancel, null)
-            .setOnDismissListener { onDismissed?.invoke() }
             .create()
     }
 
@@ -61,17 +59,12 @@ abstract class BaseAlertDialog(@ActivityContext private val activityContext: Con
         description: CharSequence? = null,
         @StringRes confirmButtonText: Int? = null,
         displayCancelButton: Boolean = true,
-        onPositiveButtonClicked: (() -> Unit)? = null,
-        onDismissed: (() -> Unit)? = null,
     ): Unit = with(binding) {
         alertDialog.show()
 
         title?.let(dialogTitle::setText)
         description?.let(dialogDescription::setText)
+        confirmButtonText?.let(positiveButton::setText)
         negativeButton.isVisible = displayCancelButton
-        positiveButton.apply {
-            confirmButtonText?.let(::setText)
-            onPositiveButtonClicked?.let { setOnClickListener { it() } }
-        }
     }
 }

@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.alertDialogs
 
 import android.content.Context
+import android.content.DialogInterface.OnDismissListener
 import androidx.annotation.StringRes
 import com.infomaniak.lib.core.utils.hideProgress
 import com.infomaniak.mail.R
@@ -31,29 +32,24 @@ class DescriptionAlertDialog @Inject constructor(
     @ActivityContext private val activityContext: Context,
 ) : BaseAlertDialog(activityContext) {
 
+    var onDismissed: OnDismissListener? = null
+
     fun show(
         title: String,
         description: CharSequence?,
-        @StringRes confirmButtonText: Int? = null,
+        @StringRes confirmButtonText: Int? = R.string.buttonConfirm,
         displayCancelButton: Boolean = true,
         displayLoader: Boolean = true,
         onPositiveButtonClicked: () -> Unit,
-        onDismissed: (() -> Unit)? = null,
-    ) {
-        showDialog(
-            title,
-            description,
-            confirmButtonText,
-            displayCancelButton,
-            onPositiveButtonClicked,
-            onDismissed,
-        )
+        onDismissed: OnDismissListener? = null,
+    ) = with(alertDialog) {
+        showDialog(title, description, confirmButtonText, displayCancelButton)
 
-        if (displayLoader) {
-            positiveButton.setOnClickListener {
-                onPositiveButtonClicked()
-                alertDialog.startLoading()
-            }
+        onDismissed?.let(::setOnDismissListener)
+
+        positiveButton.setOnClickListener {
+            onPositiveButtonClicked()
+            if (displayLoader) startLoading() else dismiss()
         }
     }
 
@@ -61,7 +57,7 @@ class DescriptionAlertDialog @Inject constructor(
         if (isShowing) {
             dismiss()
             setCancelable(true)
-            positiveButton.hideProgress(R.string.buttonCreate)
+            positiveButton.hideProgress(R.string.buttonConfirm)
             negativeButton.isEnabled = true
         }
     }
@@ -70,21 +66,19 @@ class DescriptionAlertDialog @Inject constructor(
         deletedCount: Int,
         displayLoader: Boolean,
         onPositiveButtonClicked: () -> Unit,
-        onDismissed: (() -> Unit)? = null
-    ) {
-        show(
-            title = activityContext.resources.getQuantityString(
-                R.plurals.threadListDeletionConfirmationAlertTitle,
-                deletedCount,
-                deletedCount
-            ),
-            description = activityContext.resources.getQuantityString(
-                R.plurals.threadListDeletionConfirmationAlertDescription,
-                deletedCount
-            ),
-            displayLoader = displayLoader,
-            onPositiveButtonClicked = onPositiveButtonClicked,
-            onDismissed = onDismissed,
-        )
-    }
+        onDismissed: OnDismissListener? = null
+    ) = show(
+        title = activityContext.resources.getQuantityString(
+            R.plurals.threadListDeletionConfirmationAlertTitle,
+            deletedCount,
+            deletedCount
+        ),
+        description = activityContext.resources.getQuantityString(
+            R.plurals.threadListDeletionConfirmationAlertDescription,
+            deletedCount
+        ),
+        displayLoader = displayLoader,
+        onPositiveButtonClicked = onPositiveButtonClicked,
+        onDismissed = onDismissed,
+    )
 }

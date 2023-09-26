@@ -28,7 +28,7 @@ class InformationAlertDialog @Inject constructor(
     @ActivityContext private val activityContext: Context,
 ) : BaseAlertDialog(activityContext) {
 
-    fun show(@StringRes title: Int, description: CharSequence?, @StringRes confirmButtonText: Int?) = showDialog(
+    fun show(@StringRes title: Int, description: CharSequence?, @StringRes confirmButtonText: Int) = showDialog(
         title = activityContext.getString(title),
         description = description,
         confirmButtonText = confirmButtonText,
