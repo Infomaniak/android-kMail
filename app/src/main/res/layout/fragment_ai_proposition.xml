@@ -82,80 +82,92 @@
         android:layout_gravity="bottom"
         app:cardElevation="@dimen/newMessageBottomBarElevation">
 
-        <FrameLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingHorizontal="@dimen/marginStandardMedium"
-            android:paddingVertical="@dimen/alternativeMargin">
+            android:orientation="vertical">
 
-            <LinearLayout
-                android:id="@+id/buttonLayout"
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                app:dividerColor="@color/backgroundColorTertiary"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:visibility="invisible"
-                tools:visibility="visible">
+                android:paddingHorizontal="@dimen/marginStandardMedium"
+                android:paddingVertical="@dimen/alternativeMargin">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/refineButton"
-                    style="@style/TextButtonSecondary"
+                <LinearLayout
+                    android:id="@+id/buttonLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:visibility="invisible"
+                    tools:visibility="visible">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/refineButton"
+                        style="@style/TextButtonSecondary"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/suisseintl_regular"
+                        android:paddingHorizontal="@dimen/mediumButtonHorizontalMargin"
+                        android:text="@string/aiButtonRefine"
+                        android:textColor="@color/secondaryTextColor"
+                        app:icon="@drawable/ic_contact_action_write"
+                        app:iconTint="@color/iconColorSecondaryText" />
+
+                    <Space
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/insertPropositionButton"
+                        style="@style/TextButtonPrimaryMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/aiButtonInsert"
+                        app:icon="@drawable/ic_add" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/generationLoader"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/suisseintl_regular"
-                    android:paddingHorizontal="@dimen/mediumButtonHorizontalMargin"
-                    android:text="@string/aiButtonRefine"
-                    android:textColor="@color/secondaryTextColor"
-                    app:icon="@drawable/ic_contact_action_write"
-                    app:iconTint="@color/iconColorSecondaryText" />
+                    android:layout_gravity="center_vertical|end"
+                    android:orientation="horizontal"
+                    tools:visibility="gone">
 
-                <Space
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" />
+                    <TextView
+                        style="@style/BodyMedium.Tertiary"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginEnd="@dimen/marginStandardMedium"
+                        android:text="@string/aiPromptGenerationLoader" />
+
+                    <ProgressBar
+                        android:layout_width="@dimen/marginStandardMedium"
+                        android:layout_height="@dimen/marginStandardMedium"
+                        android:layout_gravity="center_vertical"
+                        android:indeterminate="true" />
+
+                </LinearLayout>
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/insertPropositionButton"
+                    android:id="@+id/retryButton"
                     style="@style/TextButtonPrimaryMedium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/aiButtonInsert"
-                    app:icon="@drawable/ic_add" />
+                    android:layout_gravity="end"
+                    android:text="Réessayer"
+                    android:visibility="gone" />
 
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/generationLoader"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical|end"
-                android:orientation="horizontal"
-                tools:visibility="gone">
-
-                <TextView
-                    style="@style/BodyMedium.Tertiary"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginEnd="@dimen/marginStandardMedium"
-                    android:text="@string/aiPromptGenerationLoader" />
-
-                <ProgressBar
-                    android:layout_width="@dimen/marginStandardMedium"
-                    android:layout_height="@dimen/marginStandardMedium"
-                    android:layout_gravity="center_vertical"
-                    android:indeterminate="true" />
-
-            </LinearLayout>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/retryButton"
-                style="@style/TextButtonPrimaryMedium"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:text="Réessayer"
-                android:visibility="gone" />
-
-        </FrameLayout>
+            </FrameLayout>
+        </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 </LinearLayout>
