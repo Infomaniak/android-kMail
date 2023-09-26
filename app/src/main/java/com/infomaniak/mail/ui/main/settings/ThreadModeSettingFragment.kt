@@ -30,7 +30,7 @@ import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.LocalSettings.ThreadMode.CONVERSATION
 import com.infomaniak.mail.data.LocalSettings.ThreadMode.MESSAGE
 import com.infomaniak.mail.databinding.FragmentThreadModeSettingBinding
-import com.infomaniak.mail.utils.AlertDialogUtils.createDescriptionDialog
+import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -39,6 +39,9 @@ class ThreadModeSettingFragment : Fragment() {
 
     @Inject
     lateinit var localSettings: LocalSettings
+
+    @Inject
+    lateinit var descriptionDialog: DescriptionAlertDialog
 
     private lateinit var binding: FragmentThreadModeSettingBinding
     private val threadModeSettingViewModel: ThreadModeSettingViewModel by viewModels()
@@ -59,7 +62,7 @@ class ThreadModeSettingFragment : Fragment() {
 
         onItemCheckedListener { _, _, enum ->
             val threadMode = enum as ThreadMode
-            createDescriptionDialog(
+            descriptionDialog.show(
                 title = getString(R.string.settingsThreadModeWarningTitle, getString(threadMode.localisedNameRes)),
                 description = getString(R.string.settingsThreadModeWarningDescription),
                 displayLoader = false,
@@ -69,7 +72,7 @@ class ThreadModeSettingFragment : Fragment() {
                     threadModeSettingViewModel.dropAllMailboxesContentThenReloadApp()
                 },
                 onDismissed = { check(localSettings.threadMode) },
-            ).show()
+            )
         }
     }
 }
