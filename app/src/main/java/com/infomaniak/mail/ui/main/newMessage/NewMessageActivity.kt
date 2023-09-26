@@ -50,12 +50,6 @@ class NewMessageActivity : BaseActivity() {
 
         setupSnackBar()
         setupSystemBars()
-
-        updateAiFeatureFlag()
-    }
-
-    private fun updateAiFeatureFlag() {
-        newMessageViewModel.updateFeatureFlag()
     }
 
     private fun isAuth(): Boolean {

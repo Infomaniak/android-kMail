@@ -645,10 +645,6 @@ class NewMessageViewModel @Inject constructor(
             } ?: (null to false)
     }
 
-    fun updateFeatureFlag() = viewModelScope.launch(ioCoroutineContext) {
-        sharedUtils.updateAiFeatureFlag()
-    }
-
     override fun onCleared() {
         LocalStorageUtils.deleteAttachmentsUploadsDirIfEmpty(context, draft.localUuid)
         autoSaveJob?.cancel()
