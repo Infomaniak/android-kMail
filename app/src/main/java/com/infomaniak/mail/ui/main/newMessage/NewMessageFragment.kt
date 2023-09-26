@@ -96,7 +96,7 @@ class NewMessageFragment : Fragment() {
     private lateinit var addressListPopupWindow: ListPopupWindow
     private lateinit var filePicker: FilePicker
 
-    private val aiPromptFragment by lazy { AiPromptFragment() }
+    private var aiPromptFragment: AiPromptFragment? = null
 
     private val attachmentAdapter = AttachmentAdapter(shouldDisplayCloseButton = true, onDelete = ::onDeleteAttachment)
 
@@ -566,10 +566,17 @@ class NewMessageFragment : Fragment() {
 
         // Keyboard is opened inside onCreate() of AiPromptFragment
 
-        childFragmentManager
-            .beginTransaction()
-            .add(aiPromptFragmentContainer.id, aiPromptFragment)
-            .commit()
+        val foundFragment = childFragmentManager.findFragmentByTag(AI_PROMPT_FRAGMENT_TAG) as? AiPromptFragment
+        if (aiPromptFragment == null) {
+            aiPromptFragment = foundFragment ?: AiPromptFragment()
+        }
+
+        if (foundFragment == null) {
+            childFragmentManager
+                .beginTransaction()
+                .add(aiPromptFragmentContainer.id, aiPromptFragment!!, AI_PROMPT_FRAGMENT_TAG)
+                .commitNow()
+        }
 
         setAiPromptVisibility(true)
         newMessageConstraintLayout.descendantFocusability = FOCUS_BLOCK_DESCENDANTS
@@ -582,8 +589,8 @@ class NewMessageFragment : Fragment() {
 
         childFragmentManager
             .beginTransaction()
-            .remove(aiPromptFragment)
-            .commit()
+            .remove(aiPromptFragment!!)
+            .commitNow()
 
         setAiPromptVisibility(false)
         newMessageConstraintLayout.descendantFocusability = FOCUS_BEFORE_DESCENDANTS
@@ -864,5 +871,9 @@ class NewMessageFragment : Fragment() {
                 RECREATED -> null
             }
         }
+    }
+
+    private companion object {
+        const val AI_PROMPT_FRAGMENT_TAG = "aiPromptFragmentTag"
     }
 }
