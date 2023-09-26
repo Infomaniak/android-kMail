@@ -26,6 +26,7 @@ import com.infomaniak.lib.core.networking.HttpUtils
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.PaginationInfo
 import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition
+import com.infomaniak.mail.data.models.FeatureFlag.FeatureFlagType
 import com.infomaniak.mail.data.models.addressBook.AddressBooksResult
 import com.infomaniak.mail.data.models.correspondent.Contact
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -290,9 +291,13 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.ai(), POST, body, HttpClient.okHttpClientLongTimeout)
     }
 
-    fun checkAiFeatureFlag(): ApiResponse<FeatureFlagResult> {
-        val body = mapOf("name" to "ai")
+    private fun checkFeatureFlag(featureFlagType: FeatureFlagType): ApiResponse<FeatureFlagResult> {
+        val body = mapOf("name" to featureFlagType.apiName)
         return callApi(ApiRoutes.featureFlag(), POST, body)
+    }
+
+    fun checkAiFeatureFlag(): ApiResponse<FeatureFlagResult> {
+        return checkFeatureFlag(FeatureFlagType.AI)
     }
 
     fun downloadAttachment(resource: String): Response {
