@@ -63,6 +63,14 @@
                 tools:text="J’ai un entretien pour une position de manager au sein d’un restaurant. Peux-tu écrire un mail qui accompagnerait mon CV ?"
                 tools:visibility="gone" />
 
+            <TextView
+                android:id="@+id/errorMessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textIsSelectable="true"
+                android:visibility="gone"
+                tools:text="Votre demande est trop longue, veuillez réessayer sous un format plus court." />
+
         </FrameLayout>
 
     </androidx.core.widget.NestedScrollView>
@@ -115,7 +123,6 @@
 
             </LinearLayout>
 
-
             <LinearLayout
                 android:id="@+id/generationLoader"
                 android:layout_width="wrap_content"
@@ -139,6 +146,16 @@
                     android:indeterminate="true" />
 
             </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/retryButton"
+                style="@style/TextButtonPrimaryMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:text="Réessayer"
+                android:visibility="gone" />
+
         </FrameLayout>
     </com.google.android.material.card.MaterialCardView>
 </LinearLayout>
