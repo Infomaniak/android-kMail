@@ -138,7 +138,10 @@ class NewMessageFragment : Fragment() {
 
         initUi()
 
-        if (newMessageViewModel.initResult.value == null) initDraftAndViewModel()
+        if (newMessageViewModel.initResult.value == null) {
+            initDraftAndViewModel()
+            updateFeatureFlagIfMailTo()
+        }
 
         handleOnBackPressed()
 
@@ -274,6 +277,18 @@ class NewMessageFragment : Fragment() {
 
     private fun FragmentNewMessageBinding.focusToField() {
         toField.showKeyboardInTextInput()
+    }
+
+    private fun updateFeatureFlagIfMailTo() {
+        val isMailTo = when (requireActivity().intent.action) {
+            Intent.ACTION_SEND,
+            Intent.ACTION_SEND_MULTIPLE,
+            Intent.ACTION_VIEW,
+            Intent.ACTION_SENDTO -> true
+            else -> false
+        }
+
+        if (isMailTo) aiViewModel.updateFeatureFlag()
     }
 
     private fun setOnFocusChangedListeners() = with(binding) {
