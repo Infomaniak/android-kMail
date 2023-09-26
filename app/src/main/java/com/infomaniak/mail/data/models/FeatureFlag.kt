@@ -25,4 +25,15 @@ class FeatureFlag : RealmObject {
     @PrimaryKey
     var id: String? = null
     var isEnabled: Boolean = false
+
+    constructor()
+
+    constructor(type: FeatureFlagType, isEnabled: Boolean) {
+        this.id = type.key
+        this.isEnabled = isEnabled
+    }
+
+    enum class FeatureFlagType(val key: String) {
+        AI("ai")
+    }
 }

@@ -17,8 +17,6 @@
  */
 package com.infomaniak.mail.utils
 
-import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.LocalSettings.FeatureFlag
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
@@ -26,6 +24,9 @@ import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
+import com.infomaniak.mail.data.cache.userInfo.FeatureFlagController
+import com.infomaniak.mail.data.models.FeatureFlag
+import com.infomaniak.mail.data.models.FeatureFlag.FeatureFlagType
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
@@ -38,7 +39,7 @@ class SharedUtils @Inject constructor(
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val refreshController: RefreshController,
     private val messageController: MessageController,
-    private val localSettings: LocalSettings,
+    private val featureFlagController: FeatureFlagController,
 ) {
 
     /**
@@ -110,7 +111,7 @@ class SharedUtils @Inject constructor(
     fun updateAiFeatureFlag() {
         with(ApiRepository.checkAiFeatureFlag()) {
             if (isSuccess()) {
-                localSettings.aiFeatureFlag = if (data?.state == true) FeatureFlag.ENABLED else FeatureFlag.DISABLED
+                featureFlagController.upsertFeatureFlag(FeatureFlag(FeatureFlagType.AI, data?.state == true))
             }
         }
     }
