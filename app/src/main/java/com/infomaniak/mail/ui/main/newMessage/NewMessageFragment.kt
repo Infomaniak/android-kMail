@@ -57,6 +57,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.*
 import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition.INLINE
+import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.*
@@ -211,8 +212,6 @@ class NewMessageFragment : Fragment() {
 
         setupSendButton()
         setupExternalBanner()
-
-        updateAiEditorButtonWithLocalSettings()
 
         if (aiViewModel.isAiPromptOpened) openAiPrompt()
 
@@ -799,13 +798,13 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeAiFeatureFragmentUpdates() {
-        newMessageViewModel.aiFeatureFlagUpdated.observe(viewLifecycleOwner) {
-            updateAiEditorButtonWithLocalSettings()
+        aiViewModel.aiFeatureFlag().observe(viewLifecycleOwner) { featureFlag ->
+            featureFlag?.let { updateAiEditorButton(it) }
         }
     }
 
-    private fun updateAiEditorButtonWithLocalSettings() {
-        binding.editorAi.isVisible = localSettings.aiFeatureFlag == FeatureFlag.ENABLED
+    private fun updateAiEditorButton(aiFeatureFlag: FeatureFlag) {
+        binding.editorAi.isVisible = aiFeatureFlag.isEnabled
     }
 
     fun navigateToPropositionFragment() {
