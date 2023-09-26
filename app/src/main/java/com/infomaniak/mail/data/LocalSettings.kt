@@ -279,15 +279,6 @@ class LocalSettings private constructor(context: Context) {
         SHOW,
         HIDE,
     }
-
-    var aiFeatureFlag: FeatureFlag
-        get() = getEnum(AI_FEATURE_FLAG_KEY, DEFAULT_AI_FEATURE_FLAG)
-        set(value) = putEnum(AI_FEATURE_FLAG_KEY, value)
-
-    enum class FeatureFlag {
-        ENABLED,
-        DISABLED
-    }
     //endregion
 
     //region Utils
@@ -325,7 +316,6 @@ class LocalSettings private constructor(context: Context) {
         private val DEFAULT_FIREBASE_TOKEN = null
         private val DEFAULT_FIREBASE_REGISTERED_USERS = emptySet<String>()
         private val DEFAULT_AI_REPLACEMENT_DIALOG_VISIBILITY = AiReplacementDialogVisibility.SHOW
-        private val DEFAULT_AI_FEATURE_FLAG = FeatureFlag.DISABLED
         //endregion
 
         //region Keys
@@ -349,7 +339,6 @@ class LocalSettings private constructor(context: Context) {
         private const val FIREBASE_TOKEN_KEY = "firebaseTokenKey"
         private const val FIREBASE_REGISTERED_USERS_KEY = "firebaseRegisteredUsersKey"
         private const val AI_REPLACEMENT_DIALOG_VISIBILITY_KEY = "aiReplacementDialogVisibilityKey"
-        private const val AI_FEATURE_FLAG_KEY = "aiFeatureFlagKey"
         //endregion
 
         @Volatile

@@ -18,12 +18,13 @@
 package com.infomaniak.mail.ui.main.newMessage
 
 import androidx.annotation.StringRes
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.userInfo.FeatureFlagController
+import com.infomaniak.mail.data.models.FeatureFlag
+import com.infomaniak.mail.data.models.FeatureFlag.FeatureFlagType
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.newMessage.AiViewModel.PropositionStatus.*
 import com.infomaniak.mail.utils.ErrorCode.MAX_SYNTAX_TOKENS_REACHED
@@ -32,11 +33,15 @@ import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class AiViewModel @Inject constructor(@IoDispatcher private val ioDispatcher: CoroutineDispatcher) : ViewModel() {
+class AiViewModel @Inject constructor(
+    private val featureFlagController: FeatureFlagController,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
+) : ViewModel() {
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
@@ -58,6 +63,10 @@ class AiViewModel @Inject constructor(@IoDispatcher private val ioDispatcher: Co
                 }
             )
         }
+    }
+
+    fun aiFeatureFlag(): LiveData<FeatureFlag?> {
+        return featureFlagController.getFeatureFlagAsync(FeatureFlagType.AI).map { it.obj }.asLiveData()
     }
 
     enum class PropositionStatus(@StringRes val errorRes: Int?) {
