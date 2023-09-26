@@ -93,6 +93,11 @@ class AiPropositionFragment : Fragment() {
         }
 
         refineButton.setOnClickListener { refinePopupMenu.show() }
+
+        retryButton.setOnClickListener {
+            aiViewModel.isAiPromptOpened = true
+            findNavController().popBackStack()
+        }
     }
 
     private fun setToolbar() = with(binding) {
