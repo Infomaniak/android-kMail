@@ -144,7 +144,17 @@ class AiPropositionFragment : Fragment() {
             .create()
     }
 
-    private fun observeAiProposition() = with(binding) {
+    private fun observeAiProposition() {
+
+        fun sendMissingContentSentry(status: PropositionStatus) {
+            if (status == PropositionStatus.MISSING_CONTENT) {
+                Sentry.withScope { scope ->
+                    scope.level = SentryLevel.ERROR
+                    Sentry.captureMessage("AI call succeeded but no content returned")
+                }
+            }
+        }
+
         aiViewModel.aiProposition.observe(viewLifecycleOwner) { proposition ->
             if (proposition == null) return@observe
 
@@ -152,28 +162,64 @@ class AiPropositionFragment : Fragment() {
 
             when (status) {
                 PropositionStatus.SUCCESS -> {
-                    propositionTextView.text = body
-                    setUiVisibilityState(UiState.PROPOSITION)
+                    displaySuccess(body)
                 }
                 PropositionStatus.ERROR,
                 PropositionStatus.PROMPT_TOO_LONG,
-                PropositionStatus.RATE_LIMIT_EXCEEDED -> {
-                    errorMessage.setText(status.errorRes!!)
-                    setUiVisibilityState(UiState.ERROR, status)
-                }
+                PropositionStatus.RATE_LIMIT_EXCEEDED,
                 PropositionStatus.MISSING_CONTENT -> {
-                    Sentry.withScope { scope ->
-                        scope.level = SentryLevel.ERROR
-                        Sentry.captureMessage("AI call succeeded but no content returned")
-                    }
-                    errorMessage.setText(status.errorRes!!)
-                    setUiVisibilityState(UiState.ERROR, status)
+                    sendMissingContentSentry(status)
+                    displayError(status)
                 }
             }
         }
     }
 
-    private fun setUiVisibilityState(state: UiState, errorType: PropositionStatus? = null) = with(binding) {
+    private fun displaySuccess(body: String?) {
+        binding.propositionTextView.text = body
+        setUiVisibilityState(UiState.PROPOSITION)
+    }
+
+    private fun displayError(status: PropositionStatus) {
+        binding.errorMessage.setText(status.errorRes!!)
+        setUiVisibilityState(UiState.ERROR, status)
+    }
+
+    private fun setUiVisibilityState(state: UiState, errorType: PropositionStatus? = null) {
+        when (state) {
+            UiState.LOADING -> displayLoadingVisibility()
+            UiState.PROPOSITION -> displayPropositionVisibility()
+            UiState.ERROR -> displayErrorVisibility(errorType)
+        }
+    }
+
+    private fun displayLoadingVisibility() = with(binding) {
+        promptPreview.isVisible = true
+        generationLoader.isVisible = true
+
+        propositionTextView.isGone = true
+        buttonLayout.isInvisible = true
+
+        errorMessage.isGone = true
+        retryButton.isGone = true
+    }
+
+    private fun displayPropositionVisibility() = with(binding) {
+        promptPreview.isGone = true
+        generationLoader.isGone = true
+
+        propositionTextView.isVisible = true
+        buttonLayout.isVisible = true
+
+        errorMessage.isGone = true
+        retryButton.isGone = true
+
+        insertPropositionButton.isEnabled = true
+        refineButton.isVisible = true
+    }
+
+    private fun displayErrorVisibility(errorType: PropositionStatus?) = with(binding) {
+
         fun setAdditionalErrorStyle() {
             val displayRetryButton = errorType == PropositionStatus.PROMPT_TOO_LONG
 
@@ -185,41 +231,14 @@ class AiPropositionFragment : Fragment() {
             }
         }
 
-        when (state) {
-            UiState.LOADING -> {
-                promptPreview.isVisible = true
-                generationLoader.isVisible = true
+        promptPreview.isGone = true
+        generationLoader.isGone = true
 
-                propositionTextView.isGone = true
-                buttonLayout.isInvisible = true
+        propositionTextView.isGone = true
 
-                errorMessage.isGone = true
-                retryButton.isGone = true
-            }
-            UiState.PROPOSITION -> {
-                promptPreview.isGone = true
-                generationLoader.isGone = true
+        errorMessage.isVisible = true
 
-                propositionTextView.isVisible = true
-                buttonLayout.isVisible = true
-
-                errorMessage.isGone = true
-                retryButton.isGone = true
-
-                insertPropositionButton.isEnabled = true
-                refineButton.isVisible = true
-            }
-            UiState.ERROR -> {
-                promptPreview.isGone = true
-                generationLoader.isGone = true
-
-                propositionTextView.isGone = true
-
-                errorMessage.isVisible = true
-
-                setAdditionalErrorStyle()
-            }
-        }
+        setAdditionalErrorStyle()
     }
 
     enum class UiState {
