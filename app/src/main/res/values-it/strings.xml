@@ -51,6 +51,10 @@
     <string name="addUnknownRecipientTitle">Aggiungi un destinatario</string>
     <string name="aiButtonInsert">Inserisci</string>
     <string name="aiButtonRefine">Affinare</string>
+    <string name="aiButtonRetry">Riprova</string>
+    <string name="aiErrorMaxTokenReached">La richiesta è troppo lunga. Riprovare con un formato più breve.</string>
+    <string name="aiErrorTooManyRequests">Sembra che abbiate fatto troppe richieste in un breve lasso di tempo. \n\nLa preghiamo di attendere qualche istante.</string>
+    <string name="aiErrorUnknown">Si è verificato un errore. Se l’errore persiste, contattare il nostro helpdesk.\n\nGrazie per la pazienza.</string>
     <string name="aiPromptGenerationLoader">L’assistente sta scrivendo</string>
     <string name="aiPromptPlaceholder">Comunica all’assistente di scrittura cosa vuoi scrivere. Ad esempio, \"un’e-mail di ringraziamento per un regalo gradito\".</string>
     <string name="aiPromptTag">Beta</string>

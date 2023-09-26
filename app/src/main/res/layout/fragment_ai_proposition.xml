@@ -69,7 +69,7 @@
                 android:layout_height="wrap_content"
                 android:textIsSelectable="true"
                 android:visibility="gone"
-                tools:text="Votre demande est trop longue, veuillez réessayer sous un format plus court." />
+                tools:text="@string/aiErrorUnknown" />
 
         </FrameLayout>
 
@@ -164,7 +164,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
-                    android:text="Réessayer"
+                    android:text="@string/aiButtonRetry"
                     android:visibility="gone" />
 
             </FrameLayout>
