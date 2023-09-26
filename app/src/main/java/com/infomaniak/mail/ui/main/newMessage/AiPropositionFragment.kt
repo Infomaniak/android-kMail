@@ -156,7 +156,7 @@ class AiPropositionFragment : Fragment() {
                     setUiVisibilityState(UiState.PROPOSITION)
                 }
                 PropositionStatus.ERROR,
-                PropositionStatus.MAX_TOKEN_EXCEEDED,
+                PropositionStatus.PROMPT_TOO_LONG,
                 PropositionStatus.RATE_LIMIT_EXCEEDED -> {
                     errorMessage.setText(status.errorRes!!)
                     setUiVisibilityState(UiState.ERROR, status)
@@ -175,7 +175,7 @@ class AiPropositionFragment : Fragment() {
 
     private fun setUiVisibilityState(state: UiState, errorType: PropositionStatus? = null) = with(binding) {
         fun setAdditionalErrorStyle() {
-            val displayRetryButton = errorType == PropositionStatus.MAX_TOKEN_EXCEEDED
+            val displayRetryButton = errorType == PropositionStatus.PROMPT_TOO_LONG
 
             retryButton.isVisible = displayRetryButton
             buttonLayout.isGone = displayRetryButton
