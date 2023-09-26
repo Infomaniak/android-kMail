@@ -31,7 +31,7 @@ import javax.inject.Inject
 class FeatureFlagController @Inject constructor(@UserInfoRealm private val userInfoRealm: Realm) {
 
     private fun getFeatureFlagQuery(featureFlagType: FeatureFlagType): RealmSingleQuery<FeatureFlag> {
-        return userInfoRealm.query<FeatureFlag>("${FeatureFlag::id.name} == $0", featureFlagType.key).first()
+        return userInfoRealm.query<FeatureFlag>("${FeatureFlag::id.name} == $0", featureFlagType.apiName).first()
     }
 
     fun getFeatureFlagAsync(featureFlagType: FeatureFlagType): Flow<SingleQueryChange<FeatureFlag>> {
