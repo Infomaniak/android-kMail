@@ -86,7 +86,7 @@ object ErrorCode {
     //endregion
 
     //region AI
-    const val MAX_TOKEN_REACHED = "max_token_reached"
+    const val MAX_SYNTAX_TOKENS_REACHED = "max_token_reached"
     const val TOO_MANY_REQUESTS = "too_many_request"
     //endregion
 
