@@ -33,6 +33,5 @@ class InformationAlertDialog @Inject constructor(
         description = description,
         confirmButtonText = confirmButtonText,
         displayCancelButton = false,
-        displayLoader = false,
     )
 }

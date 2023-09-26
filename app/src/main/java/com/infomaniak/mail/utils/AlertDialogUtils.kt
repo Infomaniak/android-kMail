@@ -170,7 +170,7 @@ object AlertDialogUtils {
             .setupOnShowListener()
     }
 
-    private fun AlertDialog.startLoading() {
+    fun AlertDialog.startLoading() {
         setCancelable(false)
         negativeButton.isEnabled = false
         Utils.createRefreshTimer(onTimerFinish = positiveButton::showProgress).start()

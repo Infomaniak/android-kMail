@@ -61,7 +61,6 @@ abstract class BaseAlertDialog(@ActivityContext private val activityContext: Con
         description: CharSequence? = null,
         @StringRes confirmButtonText: Int? = null,
         displayCancelButton: Boolean = true,
-        displayLoader: Boolean = true,
         onPositiveButtonClicked: (() -> Unit)? = null,
         onDismissed: (() -> Unit)? = null,
     ): Unit = with(binding) {

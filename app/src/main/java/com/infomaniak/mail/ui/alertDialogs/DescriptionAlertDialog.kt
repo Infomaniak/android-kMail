@@ -21,9 +21,12 @@ import android.content.Context
 import androidx.annotation.StringRes
 import com.infomaniak.lib.core.utils.hideProgress
 import com.infomaniak.mail.R
+import com.infomaniak.mail.utils.AlertDialogUtils.startLoading
 import dagger.hilt.android.qualifiers.ActivityContext
+import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
 
+@ActivityScoped
 class DescriptionAlertDialog @Inject constructor(
     @ActivityContext private val activityContext: Context,
 ) : BaseAlertDialog(activityContext) {
@@ -36,15 +39,23 @@ class DescriptionAlertDialog @Inject constructor(
         displayLoader: Boolean = true,
         onPositiveButtonClicked: () -> Unit,
         onDismissed: (() -> Unit)? = null,
-    ) = showDialog(
-        title,
-        description,
-        confirmButtonText,
-        displayCancelButton,
-        displayLoader,
-        onPositiveButtonClicked,
-        onDismissed,
-    )
+    ) {
+        showDialog(
+            title,
+            description,
+            confirmButtonText,
+            displayCancelButton,
+            onPositiveButtonClicked,
+            onDismissed,
+        )
+
+        if (displayLoader) {
+            positiveButton.setOnClickListener {
+                onPositiveButtonClicked()
+                alertDialog.startLoading()
+            }
+        }
+    }
 
     fun resetLoadingAndDismiss() = with(alertDialog) {
         if (isShowing) {
