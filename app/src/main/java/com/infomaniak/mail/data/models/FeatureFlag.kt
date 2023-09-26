@@ -29,11 +29,11 @@ class FeatureFlag : RealmObject {
     constructor()
 
     constructor(type: FeatureFlagType, isEnabled: Boolean) {
-        this.id = type.key
+        this.id = type.apiName
         this.isEnabled = isEnabled
     }
 
-    enum class FeatureFlagType(val key: String) {
+    enum class FeatureFlagType(val apiName: String) {
         AI("ai")
     }
 }
