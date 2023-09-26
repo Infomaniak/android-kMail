@@ -26,7 +26,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.newMessage.AiViewModel.PropositionStatus.*
-import com.infomaniak.mail.utils.ErrorCode.MAX_TOKEN_REACHED
+import com.infomaniak.mail.utils.ErrorCode.MAX_SYNTAX_TOKENS_REACHED
 import com.infomaniak.mail.utils.ErrorCode.TOO_MANY_REQUESTS
 import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -52,7 +52,7 @@ class AiViewModel @Inject constructor(@IoDispatcher private val ioDispatcher: Co
             aiProposition.postValue(
                 when {
                     isSuccess() -> data?.content?.let { SUCCESS to it } ?: (MISSING_CONTENT to null)
-                    error?.code == MAX_TOKEN_REACHED -> MAX_TOKEN_EXCEEDED to null
+                    error?.code == MAX_SYNTAX_TOKENS_REACHED -> PROMPT_TOO_LONG to null
                     error?.code == TOO_MANY_REQUESTS -> RATE_LIMIT_EXCEEDED to null
                     else -> ERROR to null
                 }
@@ -63,7 +63,7 @@ class AiViewModel @Inject constructor(@IoDispatcher private val ioDispatcher: Co
     enum class PropositionStatus(@StringRes val errorRes: Int?) {
         SUCCESS(null),
         ERROR(R.string.aiErrorUnknown),
-        MAX_TOKEN_EXCEEDED(R.string.aiErrorMaxTokenReached),
+        PROMPT_TOO_LONG(R.string.aiErrorMaxTokenReached),
         RATE_LIMIT_EXCEEDED(R.string.aiErrorTooManyRequests),
         MISSING_CONTENT(R.string.aiErrorUnknown),
     }
