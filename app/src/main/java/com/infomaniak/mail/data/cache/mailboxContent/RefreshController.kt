@@ -72,9 +72,9 @@ class RefreshController @Inject constructor(
         realm: Realm,
         started: (() -> Unit)? = null,
         stopped: (() -> Unit)? = null,
-    ): Pair<List<Thread>?, Throwable?> {
+    ): Pair<Set<Thread>?, Throwable?> {
 
-        suspend fun refreshWithRunCatching(job: Job, isFirstTime: Boolean = true): Pair<List<Thread>?, Throwable?> = runCatching {
+        suspend fun refreshWithRunCatching(job: Job, isFirstTime: Boolean = true): Pair<Set<Thread>?, Throwable?> = runCatching {
             withContext(Dispatchers.IO + job) {
                 if (isFirstTime) {
                     started?.invoke()
@@ -82,7 +82,7 @@ class RefreshController @Inject constructor(
                     delay(Utils.DELAY_BEFORE_FETCHING_ACTIVITIES_AGAIN)
                     ensureActive()
                 }
-                realm.handleRefreshMode(refreshMode, scope = this, mailbox, folder, okHttpClient).toList() to null
+                realm.handleRefreshMode(refreshMode, scope = this, mailbox, folder, okHttpClient) to null
             }
         }.getOrElse {
             // If fetching the activities failed because of a not found Message, we should pause briefly
