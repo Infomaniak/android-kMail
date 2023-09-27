@@ -297,7 +297,7 @@ object ApiRepository : ApiRepositoryCore() {
     }
 
     private fun continueConversation(contextId: String, shortcut: Shortcut): ApiResponse<AiResult> {
-        return callApi(ApiRoutes.aiContext(contextId, shortcut.apiRoute), PATCH, okHttpClient = HttpClient.okHttpClientLongTimeout)
+        return callApi(ApiRoutes.aiContext(contextId, shortcut.apiRoute!!), PATCH, okHttpClient = HttpClient.okHttpClientLongTimeout)
     }
 
     fun continueExistingAiConversation(contextId: String, shortcut: Shortcut, history: List<AiMessage>): ApiResponse<AiResult> {
