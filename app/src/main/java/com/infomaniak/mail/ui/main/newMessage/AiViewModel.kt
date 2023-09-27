@@ -100,7 +100,11 @@ class AiViewModel @Inject constructor(
     }
 
     enum class Shortcut(@IdRes val menuId: Int, val apiRoute: String) {
-        REGENERATE(R.id.regenerate, "redraw")
+        REGENERATE(R.id.regenerate, "redraw"),
+        SHORTEN(R.id.shorten, "shorten"),
+        LENGTHEN(R.id.lengthen, "develop"),
+        SERIOUS_TONE(R.id.seriousTone, "tune-professional"),
+        FRIENDLY_TONE(R.id.friendlyTone, "tune-friendly"),
     }
 
     enum class PropositionStatus(@StringRes val errorRes: Int?) {
