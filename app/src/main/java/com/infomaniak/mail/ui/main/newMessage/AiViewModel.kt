@@ -42,7 +42,7 @@ import javax.inject.Inject
 class AiViewModel @Inject constructor(
     private val featureFlagController: FeatureFlagController,
     private val sharedUtils: SharedUtils,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
