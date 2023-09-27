@@ -149,10 +149,9 @@ class MainActivity : BaseActivity() {
 
         handleUpdates()
 
-        mainViewModel.apply {
-            updateUserInfo()
-            updateFeatureFlag()
-        }
+        mainViewModel.updateUserInfo()
+        mainViewModel.updateFeatureFlag()
+
         loadCurrentMailbox()
 
         permissionUtils.requestMainPermissionsIfNeeded()
