@@ -23,7 +23,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
-class ApiErrorException(override val message: String?) : Exception() {
+open class ApiErrorException(override val message: String?) : Exception() {
 
     private val apiErrorKey = ApiResponse<Any>::error.name
     private val errorCodeKey = ApiError::code.name
