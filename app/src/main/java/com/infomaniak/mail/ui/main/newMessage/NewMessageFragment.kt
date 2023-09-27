@@ -810,7 +810,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun updateAiEditorButton(aiFeatureFlag: FeatureFlag) {
-        binding.editorAi.isVisible = aiFeatureFlag.isEnabled
+        binding.editorAi.isVisible = true
     }
 
     fun navigateToPropositionFragment() {
