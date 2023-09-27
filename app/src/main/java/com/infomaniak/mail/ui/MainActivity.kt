@@ -177,7 +177,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun observeDeleteThreadTrigger() {
-        mainViewModel.deleteThreadOrMessageTrigger.observe(this) { descriptionDialog?.resetLoadingAndDismiss() }
+        mainViewModel.deleteThreadOrMessageTrigger.observe(this) { descriptionDialog.resetLoadingAndDismiss() }
     }
 
     private fun observeDraftWorkerResults() {
@@ -319,7 +319,7 @@ class MainActivity : BaseActivity() {
     }
 
     override fun onStop() {
-        descriptionDialog?.resetLoadingAndDismiss()
+        descriptionDialog.resetLoadingAndDismiss()
         super.onStop()
     }
 

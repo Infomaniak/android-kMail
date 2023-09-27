@@ -20,8 +20,8 @@ package com.infomaniak.mail.ui.alertDialogs
 import android.content.Context
 import android.content.DialogInterface.OnDismissListener
 import androidx.annotation.StringRes
-import com.infomaniak.lib.core.utils.hideProgress
 import com.infomaniak.mail.R
+import com.infomaniak.mail.utils.AlertDialogUtils.resetLoadingAndDismiss
 import com.infomaniak.mail.utils.AlertDialogUtils.startLoading
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
@@ -53,14 +53,7 @@ class DescriptionAlertDialog @Inject constructor(
         }
     }
 
-    fun resetLoadingAndDismiss() = with(alertDialog) {
-        if (isShowing) {
-            dismiss()
-            setCancelable(true)
-            positiveButton.hideProgress(R.string.buttonConfirm)
-            negativeButton.isEnabled = true
-        }
-    }
+    fun resetLoadingAndDismiss() = alertDialog.resetLoadingAndDismiss()
 
     fun showDeletePermanentlyDialog(
         deletedCount: Int,
