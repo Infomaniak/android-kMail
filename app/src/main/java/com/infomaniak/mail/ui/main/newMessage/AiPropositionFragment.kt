@@ -220,15 +220,22 @@ class AiPropositionFragment : Fragment() {
 
     private fun displayErrorVisibility(errorType: PropositionStatus?) = with(binding) {
 
-        fun setAdditionalErrorStyle() {
-            val displayRetryButton = errorType == PropositionStatus.PROMPT_TOO_LONG
+        fun displayRetryUi() {
+            retryButton.isVisible = true
+            buttonLayout.isGone = true
+        }
 
-            retryButton.isVisible = displayRetryButton
-            buttonLayout.isGone = displayRetryButton
-            if (!displayRetryButton) {
-                insertPropositionButton.isEnabled = false
-                refineButton.isGone = true
-            }
+        fun disableNominalFlowUi() {
+            retryButton.isGone = true
+            buttonLayout.isVisible = true
+            insertPropositionButton.isEnabled = false
+            refineButton.isGone = true
+        }
+
+        if (errorType == PropositionStatus.PROMPT_TOO_LONG) {
+            displayRetryUi()
+        } else {
+            disableNominalFlowUi()
         }
 
         promptPreview.isGone = true
@@ -237,8 +244,6 @@ class AiPropositionFragment : Fragment() {
         propositionTextView.isGone = true
 
         errorMessage.isVisible = true
-
-        setAdditionalErrorStyle()
     }
 
     enum class UiState {
