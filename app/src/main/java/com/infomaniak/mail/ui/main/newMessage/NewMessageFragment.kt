@@ -558,10 +558,10 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun openAiPrompt() = with(binding) {
+    private fun openAiPrompt(resetPrompt: Boolean = true) = with(binding) {
         aiViewModel.apply {
             isAiPromptOpened = true
-            aiPrompt = ""
+            if (resetPrompt) aiPrompt = ""
         }
 
         // Keyboard is opened inside onCreate() of AiPromptFragment

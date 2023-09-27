@@ -121,14 +121,16 @@ class AiPropositionFragment : Fragment() {
     }
 
     private fun onMenuItemClicked(menuItemId: Int) {
-        val shortcut = Shortcut.values().find { it.menuId == menuItemId } ?: run {
-            notYetImplemented()
-            return
+        val shortcut = Shortcut.values().find { it.menuId == menuItemId }!!
+        if (shortcut == Shortcut.MODIFY) {
+            aiViewModel.isAiPromptOpened = true
+            findNavController().popBackStack()
+        } else {
+            binding.loadingPlaceholder.text = aiViewModel.aiProposition.value!!.second
+            aiViewModel.aiProposition.value = null
+            currentRequestJob = aiViewModel.performShortcut(shortcut)
         }
 
-        binding.loadingPlaceholder.text = aiViewModel.aiProposition.value!!.second
-        aiViewModel.aiProposition.value = null
-        currentRequestJob = aiViewModel.performShortcut(shortcut)
     }
 
     private fun Fragment.createReplaceContentDialog(

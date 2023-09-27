@@ -99,7 +99,8 @@ class AiViewModel @Inject constructor(
         sharedUtils.updateAiFeatureFlag()
     }
 
-    enum class Shortcut(@IdRes val menuId: Int, val apiRoute: String) {
+    enum class Shortcut(@IdRes val menuId: Int, val apiRoute: String?) {
+        MODIFY(R.id.modify, null),
         REGENERATE(R.id.regenerate, "redraw"),
         SHORTEN(R.id.shorten, "shorten"),
         LENGTHEN(R.id.lengthen, "develop"),
