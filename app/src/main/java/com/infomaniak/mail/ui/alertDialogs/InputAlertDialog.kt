@@ -97,6 +97,10 @@ class InputAlertDialog @Inject constructor(@ActivityContext private val activity
             .setView(root)
             .setPositiveButton(R.string.buttonCreate, null)
             .setNegativeButton(RCore.string.buttonCancel, null)
+            .setOnDismissListener {
+                errorJob?.cancel()
+                binding.textInput.text?.clear()
+            }
             .create()
             .setupOnShowListener()
     }
@@ -114,8 +118,5 @@ class InputAlertDialog @Inject constructor(@ActivityContext private val activity
         this.onErrorCheck = onErrorCheck
     }
 
-    fun resetLoadingAndDismiss() {
-        binding.textInput.text = null
-        alertDialog.resetLoadingAndDismiss()
-    }
+    fun resetLoadingAndDismiss() = alertDialog.resetLoadingAndDismiss()
 }
