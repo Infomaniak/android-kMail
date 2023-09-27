@@ -19,14 +19,14 @@ package com.infomaniak.mail.ui.alertDialogs
 
 import android.app.Activity
 import android.content.Context
-import android.content.DialogInterface
 import androidx.annotation.StringRes
 import androidx.core.view.isVisible
-import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.DialogDescriptionBinding
+import com.infomaniak.mail.utils.AlertDialogUtils.negativeButton
+import com.infomaniak.mail.utils.AlertDialogUtils.positiveButton
 import dagger.hilt.android.qualifiers.ActivityContext
 import com.infomaniak.lib.core.R as RCore
 
@@ -35,16 +35,12 @@ abstract class BaseAlertDialog(@ActivityContext private val activityContext: Con
     protected val activity = activityContext as Activity
     protected val binding by lazy { DialogDescriptionBinding.inflate(activity.layoutInflater) }
 
-
     var description: CharSequence = ""
     var title: String = ""
     @StringRes
     var confirmButtonText = R.string.buttonConfirm
 
     protected val alertDialog = initDialog()
-
-    protected inline val positiveButton get() = (alertDialog.getButton(DialogInterface.BUTTON_POSITIVE) as MaterialButton)
-    protected inline val negativeButton get() = (alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE) as MaterialButton)
 
     private fun initDialog() = with(binding) {
         MaterialAlertDialogBuilder(context)
@@ -59,11 +55,11 @@ abstract class BaseAlertDialog(@ActivityContext private val activityContext: Con
         description: CharSequence? = null,
         @StringRes confirmButtonText: Int? = null,
         displayCancelButton: Boolean = true,
-    ): Unit = with(binding) {
-        alertDialog.show()
+    ): Unit = with(alertDialog) {
+        show()
 
-        title?.let(dialogTitle::setText)
-        description?.let(dialogDescription::setText)
+        title?.let(binding.dialogTitle::setText)
+        description?.let(binding.dialogDescription::setText)
         confirmButtonText?.let(positiveButton::setText)
         negativeButton.isVisible = displayCancelButton
     }

@@ -50,7 +50,7 @@ class MoveFragment : MenuFoldersFragment() {
     private val moveViewModel: MoveViewModel by viewModels()
 
     @Inject
-    lateinit var inputDialog: InputAlertDialog
+    lateinit var createFolderInputDialog: InputAlertDialog
 
     @Inject
     lateinit var searchFolderAdapter: FolderAdapter
@@ -90,14 +90,14 @@ class MoveFragment : MenuFoldersFragment() {
         toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
         iconAddFolder.setOnClickListener {
             trackCreateFolderEvent("fromMove")
-            inputDialog.show(
+            createFolderInputDialog.show(
                 title = R.string.newFolderDialogTitle,
                 hint = R.string.newFolderDialogHint,
                 confirmButtonText = R.string.newFolderDialogMovePositiveButton
             )
         }
 
-        inputDialog.setCallbacks(
+        createFolderInputDialog.setCallbacks(
             onErrorCheck = { folderName -> checkForFolderCreationErrors(folderName) },
             onPositiveButtonClicked = { folderName ->
                 trackCreateFolderEvent("confirm")
@@ -122,7 +122,7 @@ class MoveFragment : MenuFoldersFragment() {
     }
 
     private fun observeNewFolderCreation() = with(mainViewModel) {
-        newFolderResultTrigger.observe(viewLifecycleOwner) { inputDialog.resetLoadingAndDismiss() }
+        newFolderResultTrigger.observe(viewLifecycleOwner) { createFolderInputDialog.resetLoadingAndDismiss() }
         isMovedToNewFolder.observe(viewLifecycleOwner) { isFolderCreated ->
             if (isFolderCreated) findNavController().popBackStack()
         }
