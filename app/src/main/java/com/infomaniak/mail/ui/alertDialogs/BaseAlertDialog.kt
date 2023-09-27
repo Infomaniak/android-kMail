@@ -20,7 +20,6 @@ package com.infomaniak.mail.ui.alertDialogs
 import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.viewbinding.ViewBinding
 import com.google.android.material.button.MaterialButton
@@ -37,12 +36,13 @@ abstract class BaseAlertDialog(@ActivityContext private val activityContext: Con
     protected abstract val binding: ViewBinding
     protected abstract val alertDialog: AlertDialog
 
-    var description: CharSequence = ""
-    var title: String = ""
-    @StringRes
-    var confirmButtonText = R.string.buttonConfirm
+    protected abstract fun initDialog(): AlertDialog
 
-    abstract fun initDialog(): AlertDialog
+    fun startLoading() {
+        alertDialog.setCancelable(false)
+        negativeButton.isEnabled = false
+        Utils.createRefreshTimer(onTimerFinish = positiveButton::showProgress).start()
+    }
 
     fun resetLoadingAndDismiss() = with(alertDialog) {
         if (isShowing) {
@@ -51,12 +51,6 @@ abstract class BaseAlertDialog(@ActivityContext private val activityContext: Con
             positiveButton.hideProgress(R.string.buttonCreate)
             negativeButton.isEnabled = true
         }
-    }
-
-    fun startLoading() {
-        alertDialog.setCancelable(false)
-        negativeButton.isEnabled = false
-        Utils.createRefreshTimer(onTimerFinish = positiveButton::showProgress).start()
     }
 
     protected inline val positiveButton get() = (alertDialog.getButton(DialogInterface.BUTTON_POSITIVE) as MaterialButton)

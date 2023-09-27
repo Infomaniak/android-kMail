@@ -42,12 +42,10 @@ open class DescriptionAlertDialog @Inject constructor(
     final override fun initDialog() = with(binding) {
         MaterialAlertDialogBuilder(context)
             .setView(root)
-            .setPositiveButton(confirmButtonText, null)
+            .setPositiveButton(R.string.buttonConfirm, null)
             .setNegativeButton(RCore.string.buttonCancel, null)
             .create()
     }
-
-    var onDismissed: OnDismissListener? = null
 
     fun show(
         title: String,
@@ -93,8 +91,8 @@ open class DescriptionAlertDialog @Inject constructor(
         description: CharSequence? = null,
         @StringRes confirmButtonText: Int? = null,
         displayCancelButton: Boolean = true,
-    ): Unit = with(alertDialog) {
-        show()
+    ): Unit = with(binding) {
+        alertDialog.show()
 
         title?.let(binding.dialogTitle::setText)
         description?.let(binding.dialogDescription::setText)

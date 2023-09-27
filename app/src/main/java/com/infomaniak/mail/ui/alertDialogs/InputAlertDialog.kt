@@ -38,15 +38,12 @@ import com.infomaniak.lib.core.R as RCore
 
 @ActivityScoped
 class InputAlertDialog @Inject constructor(
-    @ActivityContext private val activityContext: Context
+    @ActivityContext private val activityContext: Context,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : BaseAlertDialog(activityContext) {
 
     override val binding by lazy { DialogInputBinding.inflate(activity.layoutInflater) }
     override var alertDialog: AlertDialog = initDialog()
-
-    @Inject
-    @IoDispatcher
-    lateinit var ioDispatcher: CoroutineDispatcher
 
     private var errorJob: Job? = null
     private var onErrorCheck: (suspend (CharSequence) -> String?)? = null

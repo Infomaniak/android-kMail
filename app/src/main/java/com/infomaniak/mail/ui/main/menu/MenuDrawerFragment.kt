@@ -84,6 +84,7 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
 
         displayVersion()
         setupListeners()
+        setupInputDialog()
 
         observeCurrentMailbox()
         observeMailboxesLive()
@@ -164,7 +165,9 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
             trackMenuDrawerEvent("restoreEmails")
             safeNavigate(R.id.restoreEmailsBottomSheetDialog, currentClassName = currentClassName)
         }
+    }
 
+    private fun setupInputDialog() {
         createFolderInputDialog.setCallbacks(
             onErrorCheck = { folderName -> checkForFolderCreationErrors(folderName) },
             onPositiveButtonClicked = { folderName ->

@@ -76,6 +76,7 @@ class MoveFragment : MenuFoldersFragment() {
         super.onViewCreated(view, savedInstanceState)
         setupListeners()
         setupFolderAdapters()
+        setupInputDialog()
         observeNewFolderCreation()
         observeSearchResults()
     }
@@ -96,7 +97,9 @@ class MoveFragment : MenuFoldersFragment() {
                 confirmButtonText = R.string.newFolderDialogMovePositiveButton
             )
         }
+    }
 
+    private fun setupInputDialog() {
         createFolderInputDialog.setCallbacks(
             onErrorCheck = { folderName -> checkForFolderCreationErrors(folderName) },
             onPositiveButtonClicked = { folderName ->
