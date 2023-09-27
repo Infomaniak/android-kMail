@@ -17,6 +17,14 @@
   -->
 <network-security-config xmlns:tools="http://schemas.android.com/tools">
 
+    <debug-overrides>
+        <trust-anchors>
+            <!-- Trust user added CAs while debuggable only -->
+            <certificates src="user" />
+            <certificates src="system" />
+        </trust-anchors>
+    </debug-overrides>
+
     <base-config
         cleartextTrafficPermitted="true"
         tools:ignore="InsecureBaseConfiguration" />
