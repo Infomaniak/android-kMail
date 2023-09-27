@@ -46,6 +46,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.data.models.signature.SignaturesResult
 import com.infomaniak.mail.data.models.thread.ThreadResult
+import com.infomaniak.mail.ui.main.newMessage.AiViewModel.Shortcut
 import com.infomaniak.mail.utils.ErrorCode.OBJECT_NOT_FOUND
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -282,7 +283,7 @@ object ApiRepository : ApiRepositoryCore() {
     }
 
     private fun getBodyFromMessages(messages: List<AiMessage>) = mapOf(
-        "messages" to messages.map { it.getApiRepresentation() },
+        "messages" to messages,
         "output" to "mail",
     )
 
@@ -290,25 +291,21 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.ai(), POST, body, HttpClient.okHttpClientLongTimeout)
     }
 
-    fun generateNewAiProposition(prompt: String): ApiResponse<AiResult> {
-        val message = UserMessage(prompt)
+    fun generateNewAiProposition(message: UserMessage): ApiResponse<AiResult> {
         val body = getBodyFromMessages(listOf(message))
         return startNewConversation(body)
     }
 
-    private fun continueConversation(body: Map<String, Any>, contextId: String): ApiResponse<AiResult> {
-        return callApi(ApiRoutes.aiContext(contextId), PATCH, body, HttpClient.okHttpClientLongTimeout)
+    private fun continueConversation(contextId: String, shortcut: Shortcut): ApiResponse<AiResult> {
+        return callApi(ApiRoutes.aiContext(contextId, shortcut.apiRoute), PATCH, okHttpClient = HttpClient.okHttpClientLongTimeout)
     }
 
-    fun updateExistingAiProposition(contextId: String, shortcut: String, history: List<AiMessage>): ApiResponse<AiResult> {
-        val shortcutMessage = UserMessage(shortcut)
-        val body = getBodyFromMessages(listOf(shortcutMessage))
-
-        val response = continueConversation(body, contextId)
+    fun continueExistingAiConversation(contextId: String, shortcut: Shortcut, history: List<AiMessage>): ApiResponse<AiResult> {
+        val response = continueConversation(contextId, shortcut)
         val isContextExpired = response.error?.code == OBJECT_NOT_FOUND
 
         return if (isContextExpired) {
-            val reconstructedBody = getBodyFromMessages(history + shortcutMessage)
+            val reconstructedBody = getBodyFromMessages(history)
             startNewConversation(reconstructedBody)
         } else {
             response

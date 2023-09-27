@@ -25,4 +25,6 @@ data class AiResult(
     val content: String,
     @SerialName("context_id")
     val contextId: String? = null,
+    @SerialName("action")
+    val promptMessage: AiMessage? = null,
 )

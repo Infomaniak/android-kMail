@@ -17,11 +17,7 @@
  */
 package com.infomaniak.mail.data.models.ai
 
-abstract class AiMessage(var content: String) {
-    abstract val type: String
+import kotlinx.serialization.Serializable
 
-    fun getApiRepresentation(): Map<String, String> = mapOf(
-        "type" to type,
-        "content" to content,
-    )
-}
+@Serializable
+open class AiMessage(var content: String, val type: String)
