@@ -111,7 +111,7 @@ class SharedUtils @Inject constructor(
     fun updateAiFeatureFlag() {
         with(ApiRepository.checkAiFeatureFlag()) {
             if (isSuccess()) {
-                featureFlagController.upsertFeatureFlag(FeatureFlag(FeatureFlagType.AI, data?.state == true))
+                featureFlagController.upsertFeatureFlag(FeatureFlag(FeatureFlagType.AI, data == true))
             }
         }
     }
