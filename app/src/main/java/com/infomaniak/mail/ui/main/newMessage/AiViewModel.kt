@@ -63,18 +63,19 @@ class AiViewModel @Inject constructor(
     val aiOutputToInsert = SingleLiveEvent<String>()
 
     fun generateAiProposition() = viewModelScope.launch(ioCoroutineContext) {
-        with(ApiRepository.generateNewAiProposition(aiPrompt)) {
+        val userMessage = UserMessage(aiPrompt)
+        with(ApiRepository.generateNewAiProposition(userMessage)) {
             ensureActive()
-            handleAiResult(this, aiPrompt)
+            handleAiResult(apiResponse = this, userMessage)
         }
     }
 
-    private fun handleAiResult(apiResponse: ApiResponse<AiResult>, prompt: String) = with(apiResponse) {
+    private fun handleAiResult(apiResponse: ApiResponse<AiResult>, promptMessage: AiMessage) = with(apiResponse) {
         aiProposition.postValue(
             when {
                 isSuccess() -> data?.let { aiResult ->
                     aiResult.contextId?.let { conversationContextId = it }
-                    history += UserMessage(prompt)
+                    history += promptMessage
                     history += AssistantMessage(aiResult.content)
                     SUCCESS to aiResult.content
                 } ?: (MISSING_CONTENT to null)
@@ -86,9 +87,9 @@ class AiViewModel @Inject constructor(
     }
 
     fun performShortcut(shortcut: Shortcut) = viewModelScope.launch(ioCoroutineContext) {
-        with(ApiRepository.updateExistingAiProposition(conversationContextId!!, shortcut.associatedPrompt, history.toList())) {
+        with(ApiRepository.continueExistingAiConversation(conversationContextId!!, shortcut, history.toList())) {
             ensureActive()
-            handleAiResult(this, shortcut.associatedPrompt)
+            handleAiResult(apiResponse = this, data?.promptMessage!!)
         }
     }
 
@@ -98,8 +99,8 @@ class AiViewModel @Inject constructor(
         sharedUtils.updateAiFeatureFlag()
     }
 
-    enum class Shortcut(@IdRes val menuId: Int, val associatedPrompt: String) {
-        REGENERATE(R.id.regenerate, "Reformule ce texte") // TODO
+    enum class Shortcut(@IdRes val menuId: Int, val apiRoute: String) {
+        REGENERATE(R.id.regenerate, "redraw")
     }
 
     enum class PropositionStatus(@StringRes val errorRes: Int?) {

@@ -17,6 +17,4 @@
  */
 package com.infomaniak.mail.data.models.ai
 
-class AssistantMessage(content: String) : AiMessage(content) {
-    override val type = "assistant"
-}
+class AssistantMessage(content: String) : AiMessage(content, "assistant")

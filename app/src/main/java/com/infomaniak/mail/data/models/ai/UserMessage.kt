@@ -17,6 +17,4 @@
  */
 package com.infomaniak.mail.data.models.ai
 
-class UserMessage(content: String) : AiMessage(content) {
-    override val type = "user"
-}
+class UserMessage(content: String) : AiMessage(content, "user")
