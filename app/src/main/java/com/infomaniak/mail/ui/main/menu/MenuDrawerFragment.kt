@@ -57,7 +57,7 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
     private val menuDrawerViewModel: MenuDrawerViewModel by viewModels()
 
     @Inject
-    lateinit var createFolderInputDialog: InputAlertDialog
+    lateinit var inputDialog: InputAlertDialog
 
     var exitDrawer: (() -> Unit)? = null
 
@@ -84,7 +84,7 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
 
         displayVersion()
         setupListeners()
-        setupInputDialog()
+        setupCreateFolderDialog()
 
         observeCurrentMailbox()
         observeMailboxesLive()
@@ -121,7 +121,7 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
 
         customFolders.setOnActionClickListener {
             trackCreateFolderEvent("fromMenuDrawer")
-            createFolderInputDialog.show(R.string.newFolderDialogTitle, R.string.newFolderDialogHint, R.string.buttonCreate)
+            inputDialog.show(R.string.newFolderDialogTitle, R.string.newFolderDialogHint, R.string.buttonCreate)
         }
 
         feedback.setOnClickListener {
@@ -167,8 +167,8 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
         }
     }
 
-    private fun setupInputDialog() {
-        createFolderInputDialog.setCallbacks(
+    private fun setupCreateFolderDialog() {
+        inputDialog.setCallbacks(
             onErrorCheck = { folderName -> checkForFolderCreationErrors(folderName) },
             onPositiveButtonClicked = { folderName ->
                 trackCreateFolderEvent("confirm")
@@ -272,7 +272,7 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
     }
 
     private fun observeNewFolderCreation() {
-        mainViewModel.newFolderResultTrigger.observe(viewLifecycleOwner) { createFolderInputDialog.resetLoadingAndDismiss() }
+        mainViewModel.newFolderResultTrigger.observe(viewLifecycleOwner) { inputDialog.resetLoadingAndDismiss() }
     }
 
     fun onDrawerOpened() {

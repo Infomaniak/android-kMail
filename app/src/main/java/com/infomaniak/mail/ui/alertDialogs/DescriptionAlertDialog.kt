@@ -70,16 +70,16 @@ open class DescriptionAlertDialog @Inject constructor(
         deletedCount: Int,
         displayLoader: Boolean,
         onPositiveButtonClicked: () -> Unit,
-        onDismissed: OnDismissListener? = null
+        onDismissed: OnDismissListener? = null,
     ) = show(
         title = activityContext.resources.getQuantityString(
             R.plurals.threadListDeletionConfirmationAlertTitle,
             deletedCount,
-            deletedCount
+            deletedCount,
         ),
         description = activityContext.resources.getQuantityString(
             R.plurals.threadListDeletionConfirmationAlertDescription,
-            deletedCount
+            deletedCount,
         ),
         displayLoader = displayLoader,
         onPositiveButtonClicked = onPositiveButtonClicked,

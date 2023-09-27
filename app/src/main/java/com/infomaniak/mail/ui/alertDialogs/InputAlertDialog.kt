@@ -39,7 +39,7 @@ import com.infomaniak.lib.core.R as RCore
 @ActivityScoped
 class InputAlertDialog @Inject constructor(
     @ActivityContext private val activityContext: Context,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : BaseAlertDialog(activityContext) {
 
     override val binding by lazy { DialogInputBinding.inflate(activity.layoutInflater) }
@@ -76,7 +76,7 @@ class InputAlertDialog @Inject constructor(
                             checkValidation(it.trim())
                         }
                     }
-                    // We are forced to override the ClickListener to prevent the default one to dismiss automatically the Alert
+                    // We are forced to override the ClickListener to prevent the default one to automatically dismiss the Alert
                     setOnClickListener {
                         onPositiveButtonClicked?.invoke(binding.textInput.trimmedText)
                         positiveButton.hideKeyboard()

@@ -108,7 +108,7 @@ class NewMessageFragment : Fragment() {
     lateinit var draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler
 
     @Inject
-    lateinit var externalRecipientInfoDialog: InformationAlertDialog
+    lateinit var informationDialog: InformationAlertDialog
 
     @Inject
     lateinit var signatureUtils: SignatureUtils
@@ -621,7 +621,7 @@ class NewMessageFragment : Fragment() {
                 externalRecipientEmail,
             )
 
-            externalRecipientInfoDialog.show(
+            informationDialog.show(
                 title = R.string.externalDialogTitleRecipient,
                 description = description,
                 confirmButtonText = R.string.externalDialogConfirmButton,

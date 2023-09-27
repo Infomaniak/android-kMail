@@ -96,7 +96,7 @@ class ThreadFragment : Fragment() {
     private val isNotInSpam by lazy { mainViewModel.currentFolder.value?.role != FolderRole.SPAM }
 
     @Inject
-    lateinit var externalExpeditorInfoDialog: InformationAlertDialog
+    lateinit var informationDialog: InformationAlertDialog
 
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog
@@ -529,7 +529,7 @@ class ThreadFragment : Fragment() {
                     externalRecipientEmail,
                 )
 
-                externalExpeditorInfoDialog.show(
+                informationDialog.show(
                     title = R.string.externalDialogTitleExpeditor,
                     description = description,
                     confirmButtonText = R.string.externalDialogConfirmButton,

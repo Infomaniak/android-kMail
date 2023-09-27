@@ -50,7 +50,7 @@ class MoveFragment : MenuFoldersFragment() {
     private val moveViewModel: MoveViewModel by viewModels()
 
     @Inject
-    lateinit var createFolderInputDialog: InputAlertDialog
+    lateinit var inputDialog: InputAlertDialog
 
     @Inject
     lateinit var searchFolderAdapter: FolderAdapter
@@ -76,7 +76,7 @@ class MoveFragment : MenuFoldersFragment() {
         super.onViewCreated(view, savedInstanceState)
         setupListeners()
         setupFolderAdapters()
-        setupInputDialog()
+        setupCreateFolderDialog()
         observeNewFolderCreation()
         observeSearchResults()
     }
@@ -91,16 +91,16 @@ class MoveFragment : MenuFoldersFragment() {
         toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
         iconAddFolder.setOnClickListener {
             trackCreateFolderEvent("fromMove")
-            createFolderInputDialog.show(
+            inputDialog.show(
                 title = R.string.newFolderDialogTitle,
                 hint = R.string.newFolderDialogHint,
-                confirmButtonText = R.string.newFolderDialogMovePositiveButton
+                confirmButtonText = R.string.newFolderDialogMovePositiveButton,
             )
         }
     }
 
-    private fun setupInputDialog() {
-        createFolderInputDialog.setCallbacks(
+    private fun setupCreateFolderDialog() {
+        inputDialog.setCallbacks(
             onErrorCheck = { folderName -> checkForFolderCreationErrors(folderName) },
             onPositiveButtonClicked = { folderName ->
                 trackCreateFolderEvent("confirm")
@@ -125,7 +125,7 @@ class MoveFragment : MenuFoldersFragment() {
     }
 
     private fun observeNewFolderCreation() = with(mainViewModel) {
-        newFolderResultTrigger.observe(viewLifecycleOwner) { createFolderInputDialog.resetLoadingAndDismiss() }
+        newFolderResultTrigger.observe(viewLifecycleOwner) { inputDialog.resetLoadingAndDismiss() }
         isMovedToNewFolder.observe(viewLifecycleOwner) { isFolderCreated ->
             if (isFolderCreated) findNavController().popBackStack()
         }
