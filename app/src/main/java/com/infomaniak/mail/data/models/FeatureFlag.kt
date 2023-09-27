@@ -32,6 +32,7 @@ class FeatureFlag : RealmObject {
         this.isEnabled = isEnabled
     }
 
+    // BEWARE ! The `apiName` is used as a Realm primary key for the `FeatureFlag` model. So it cannot change. Ever.
     enum class FeatureFlagType(val apiName: String) {
         AI("ai-mail-composer")
     }
