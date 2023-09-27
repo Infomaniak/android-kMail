@@ -22,6 +22,7 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode.*
+import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RetryStrategy.Iteration
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
@@ -39,7 +40,6 @@ import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.query.RealmResults
 import io.sentry.Sentry
-import io.sentry.SentryLevel
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
 import java.util.Date
@@ -54,6 +54,7 @@ class RefreshController @Inject constructor(
 ) {
 
     private var refreshThreadsJob: Job? = null
+    private var endOfMessagesReached: Boolean = false
 
     //region Fetch Messages
     fun cancelRefresh() {
@@ -74,44 +75,184 @@ class RefreshController @Inject constructor(
         stopped: (() -> Unit)? = null,
     ): Pair<Set<Thread>?, Throwable?> {
 
-        suspend fun refreshWithRunCatching(job: Job, isFirstTime: Boolean = true): Pair<Set<Thread>?, Throwable?> = runCatching {
-            withContext(Dispatchers.IO + job) {
-                if (isFirstTime) {
-                    started?.invoke()
-                } else {
-                    delay(Utils.DELAY_BEFORE_FETCHING_ACTIVITIES_AGAIN)
-                    ensureActive()
-                }
-                realm.handleRefreshMode(refreshMode, scope = this, mailbox, folder, okHttpClient) to null
-            }
-        }.getOrElse {
-            // If fetching the activities failed because of a not found Message, we should pause briefly
-            // before trying again to retrieve activities, to ensure that the API is up-to-date.
-            if (isFirstTime && it is MessageNotFoundException) {
-                Sentry.withScope { scope ->
-                    scope.level = SentryLevel.WARNING
-                    scope.setTag("isFirstTime", "true")
-                    scope.setExtra("folderCursor", "${folder.cursor}")
-                    scope.setExtra("folderName", folder.name)
-                    Sentry.captureException(it)
-                }
-                refreshWithRunCatching(job, isFirstTime = false)
-            } else {
-                handleAllExceptions(it, stopped, folder)
-            }
-        }
-
         SentryLog.i("API", "Refresh threads with mode: $refreshMode | (${folder.name})")
+
+        endOfMessagesReached = false
 
         refreshThreadsJob?.cancel()
         refreshThreadsJob = Job()
 
-        return refreshWithRunCatching(refreshThreadsJob!!).also {
-            it.first?.let {
-                stopped?.invoke()
-                SentryLog.d("API", "End of refreshing threads with mode: $refreshMode | (${folder.name})")
+        return refreshWithRunCatching(refreshThreadsJob!!, refreshMode, mailbox, folder, okHttpClient, realm, started, stopped)
+            .also {
+                it.first?.let {
+                    stopped?.invoke()
+                    SentryLog.d("API", "End of refreshing threads with mode: $refreshMode | (${folder.name})")
+                }
+            }
+    }
+
+    private suspend fun refreshWithRunCatching(
+        job: Job,
+        refreshMode: RefreshMode,
+        mailbox: Mailbox,
+        folder: Folder,
+        okHttpClient: OkHttpClient?,
+        realm: Realm,
+        started: (() -> Unit)?,
+        stopped: (() -> Unit)?,
+    ): Pair<Set<Thread>?, Throwable?> = runCatching {
+        withContext(Dispatchers.IO + job) {
+            started?.invoke()
+            realm.handleRefreshMode(
+                refreshMode = refreshMode,
+                scope = this,
+                mailbox = mailbox,
+                folder = folder,
+                okHttpClient = okHttpClient,
+            ) to null
+        }
+    }.getOrElse {
+        handleRefreshFailure(it, job, mailbox, folder, okHttpClient, realm, started, stopped)
+    }
+
+    private suspend fun handleRefreshFailure(
+        throwable: Throwable,
+        job: Job,
+        mailbox: Mailbox,
+        folder: Folder,
+        okHttpClient: OkHttpClient?,
+        realm: Realm,
+        started: (() -> Unit)?,
+        stopped: (() -> Unit)?,
+        retryStrategy: RetryStrategy = RetryStrategy(),
+    ): Pair<Set<Thread>?, Throwable?> {
+        return if (throwable is MessageNotFoundException) {
+            handleMessageNotFound(
+                throwable,
+                job,
+                mailbox,
+                throwable.folder,
+                okHttpClient,
+                realm,
+                started,
+                stopped,
+                retryStrategy,
+                throwable.direction,
+                isSameFolder = throwable.folder.id == folder.id,
+            )
+        } else {
+            handleAllExceptions(throwable, stopped)
+        }
+    }
+
+    private suspend fun handleMessageNotFound(
+        throwable: Throwable,
+        job: Job,
+        mailbox: Mailbox,
+        folder: Folder,
+        okHttpClient: OkHttpClient?,
+        realm: Realm,
+        started: (() -> Unit)?,
+        stopped: (() -> Unit)?,
+        strategy: RetryStrategy,
+        direction: Direction,
+        isSameFolder: Boolean,
+    ): Pair<Set<Thread>?, Throwable?> {
+
+        fun sendMessageNotFoundSentry(throwable: Throwable, folder: Folder, strategy: RetryStrategy) {
+            Sentry.withScope { scope ->
+                scope.setTag("iteration", strategy.iteration.name)
+                scope.setTag("fibonacci", "${strategy.fibonacci}")
+                scope.setTag("direction", direction.name)
+                scope.setExtra("iteration", strategy.iteration.name)
+                scope.setExtra("fibonacci", "${strategy.fibonacci}")
+                scope.setExtra("folderCursor", "${folder.cursor}")
+                scope.setExtra("folderName", folder.name)
+                Sentry.captureException(throwable)
             }
         }
+
+        suspend fun retry(retryStrategy: RetryStrategy) = retryWithRunCatching(
+            job,
+            mailbox,
+            folder,
+            okHttpClient,
+            realm,
+            started,
+            stopped,
+            retryStrategy,
+            isSameFolder,
+        )
+
+        sendMessageNotFoundSentry(throwable, folder, strategy)
+
+        return when (strategy.iteration) {
+            Iteration.FIRST_TIME -> {
+                strategy.iteration = Iteration.SECOND_TIME
+                retry(strategy)
+            }
+            Iteration.SECOND_TIME -> {
+                strategy.apply {
+                    iteration = Iteration.FIBONACCI_TIME
+                    fibonacci = FIBONACCI_SEQUENCE.first()
+                }
+                retry(strategy)
+            }
+            Iteration.FIBONACCI_TIME -> {
+                val nextFibonacci = FIBONACCI_SEQUENCE.firstOrNull { it > strategy.fibonacci }
+                if (nextFibonacci == null || endOfMessagesReached) {
+                    realm.writeBlocking {
+                        FolderController.getFolder(folder.id, realm = this)?.apply {
+                            delete(messages)
+                            delete(threads)
+                            lastUpdatedAt = null
+                            cursor = null
+                            unreadCountLocal = 0
+                            remainingOldMessagesToFetch = Folder.DEFAULT_REMAINING_OLD_MESSAGES_TO_FETCH
+                            isHistoryComplete = Folder.DEFAULT_IS_HISTORY_COMPLETE
+                        }
+                    }
+                    strategy.iteration = Iteration.ABORT_MISSION
+                    retry(strategy)
+                } else {
+                    strategy.fibonacci = nextFibonacci
+                    retry(strategy)
+                }
+            }
+            Iteration.ABORT_MISSION -> {
+                handleAllExceptions(throwable, stopped)
+            }
+        }
+    }
+
+    private suspend fun retryWithRunCatching(
+        job: Job,
+        mailbox: Mailbox,
+        folder: Folder,
+        okHttpClient: OkHttpClient?,
+        realm: Realm,
+        started: (() -> Unit)?,
+        stopped: (() -> Unit)?,
+        retryStrategy: RetryStrategy,
+        isSameFolder: Boolean,
+    ): Pair<Set<Thread>?, Throwable?> = runCatching {
+        withContext(Dispatchers.IO + job) {
+
+            // If fetching the Activities failed because of a not found Message, we should pause briefly
+            // before trying again to retrieve new Messages, to ensure that the API is up-to-date.
+            delay(Utils.DELAY_BEFORE_FETCHING_ACTIVITIES_AGAIN)
+            ensureActive()
+
+            val (_, threads) = if (retryStrategy.iteration == Iteration.ABORT_MISSION) {
+                realm.fetchOneNewPage(scope = this, mailbox, folder, okHttpClient, shouldUpdateCursor = true)
+            } else {
+                realm.fetchOneNewPage(scope = this, mailbox, folder, okHttpClient, retryStrategy.fibonacci)
+            }
+
+            (if (isSameFolder) threads else null) to null
+        }
+    }.getOrElse {
+        handleRefreshFailure(it, job, mailbox, folder, okHttpClient, realm, started, stopped, retryStrategy)
     }
 
     private suspend fun Realm.handleRefreshMode(
@@ -194,9 +335,10 @@ class RefreshController @Inject constructor(
         mailbox: Mailbox,
         folder: Folder,
         okHttpClient: OkHttpClient?,
+        fibonacci: Int = 1,
         shouldUpdateCursor: Boolean = false,
     ): Pair<Int, Set<Thread>> {
-        return fetchOnePage(scope, mailbox, folder, okHttpClient, Direction.TO_THE_FUTURE, shouldUpdateCursor)
+        return fetchOnePage(scope, mailbox, folder, okHttpClient, Direction.TO_THE_FUTURE, shouldUpdateCursor, fibonacci)
     }
 
     private suspend fun Realm.fetchAllOldPages(
@@ -246,6 +388,7 @@ class RefreshController @Inject constructor(
         okHttpClient: OkHttpClient?,
         direction: Direction,
         shouldUpdateCursor: Boolean,
+        fibonacci: Int = 1,
     ): Pair<Int, Set<Thread>> {
 
         fun Folder.theEndIsReached() {
@@ -265,7 +408,9 @@ class RefreshController @Inject constructor(
         } else {
             when (direction) {
                 Direction.IN_THE_PAST -> MessageController.getOldestMessage(folder.id, realm = this)
-                Direction.TO_THE_FUTURE -> MessageController.getNewestMessage(folder.id, realm = this)
+                Direction.TO_THE_FUTURE -> MessageController.getNewestMessage(folder.id, fibonacci, realm = this) {
+                    endOfMessagesReached = true
+                }
             }?.shortUid?.let { offsetUid ->
                 PaginationInfo(offsetUid, direction.apiCallValue)
             }
@@ -275,7 +420,7 @@ class RefreshController @Inject constructor(
             getMessagesUids(mailbox.uuid, folder.id, okHttpClient, paginationInfo)!!
         }.getOrElse {
             throw if (it is ApiErrorException && it.errorCode == ErrorCode.MESSAGE_NOT_FOUND) {
-                MessageNotFoundException(it.message)
+                MessageNotFoundException(it.message, folder, direction)
             } else {
                 it
             }
@@ -712,7 +857,7 @@ class RefreshController @Inject constructor(
     //endregion
 
     //region Handle errors
-    private fun handleAllExceptions(throwable: Throwable, stopped: (() -> Unit)?, folder: Folder): Pair<Nothing?, Throwable> {
+    private fun handleAllExceptions(throwable: Throwable, stopped: (() -> Unit)?): Pair<Nothing?, Throwable> {
 
         // We force-cancelled, so we need to call the `stopped` callback.
         if (throwable is ForcedCancellationException) stopped?.invoke()
@@ -720,20 +865,15 @@ class RefreshController @Inject constructor(
         // It failed, but not because we cancelled it. Something bad happened, so we call the `stopped` callback.
         if (throwable !is CancellationException) stopped?.invoke()
 
-        if (throwable is ApiErrorException) throwable.handleOtherApiErrors(folder)
+        if (throwable is ApiErrorException) throwable.handleOtherApiErrors()
 
         return null to throwable
     }
 
-    private fun ApiErrorException.handleOtherApiErrors(folder: Folder) {
+    private fun ApiErrorException.handleOtherApiErrors() {
         when (errorCode) {
             ErrorCode.FOLDER_DOES_NOT_EXIST -> Unit // Here, we want to fail silently. We are just outdated, it will be ok.
-            ErrorCode.MESSAGE_NOT_FOUND -> Sentry.withScope { scope ->
-                scope.setTag("isFirstTime", "false")
-                scope.setExtra("folderCursor", "${folder.cursor}")
-                scope.setExtra("folderName", folder.name)
-                Sentry.captureException(this)
-            }
+            ErrorCode.MESSAGE_NOT_FOUND -> Unit // This Sentry is already sent via `sendMessageNotFoundSentry()`
             else -> Sentry.captureException(this)
         }
     }
@@ -806,5 +946,25 @@ class RefreshController @Inject constructor(
 
     private class ForcedCancellationException : CancellationException()
 
-    private class MessageNotFoundException(override val message: String?) : ApiErrorException(message)
+    private class MessageNotFoundException(
+        override val message: String?,
+        val folder: Folder,
+        val direction: Direction,
+    ) : ApiErrorException(message)
+
+    private data class RetryStrategy(
+        var iteration: Iteration = Iteration.FIRST_TIME,
+        var fibonacci: Int = 1,
+    ) {
+        enum class Iteration {
+            FIRST_TIME,
+            SECOND_TIME,
+            FIBONACCI_TIME,
+            ABORT_MISSION,
+        }
+    }
+
+    private companion object {
+        val FIBONACCI_SEQUENCE = arrayOf(2, 8, 34, 144)
+    }
 }
