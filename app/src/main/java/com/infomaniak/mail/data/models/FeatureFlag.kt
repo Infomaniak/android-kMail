@@ -34,6 +34,6 @@ class FeatureFlag : RealmObject {
     }
 
     enum class FeatureFlagType(val apiName: String) {
-        AI("ai")
+        AI("ai-mail-composer")
     }
 }
