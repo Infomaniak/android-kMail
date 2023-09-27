@@ -291,12 +291,11 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.ai(), POST, body, HttpClient.okHttpClientLongTimeout)
     }
 
-    private fun checkFeatureFlag(featureFlagType: FeatureFlagType): ApiResponse<FeatureFlagResult> {
-        val body = mapOf("name" to featureFlagType.apiName)
-        return callApi(ApiRoutes.featureFlag(), POST, body)
+    private fun checkFeatureFlag(featureFlagType: FeatureFlagType): ApiResponse<Boolean> {
+        return callApi(ApiRoutes.featureFlag(featureFlagType.apiName), GET)
     }
 
-    fun checkAiFeatureFlag(): ApiResponse<FeatureFlagResult> {
+    fun checkAiFeatureFlag(): ApiResponse<Boolean> {
         return checkFeatureFlag(FeatureFlagType.AI)
     }
 
