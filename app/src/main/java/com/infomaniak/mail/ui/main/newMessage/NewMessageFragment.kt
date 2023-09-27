@@ -819,9 +819,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeAiFeatureFragmentUpdates() {
-        aiViewModel.aiFeatureFlag().observe(viewLifecycleOwner) { featureFlag ->
-            featureFlag?.let { updateAiEditorButton(it) }
-        }
+        aiViewModel.aiFeatureFlag().observeNotNull(viewLifecycleOwner, ::updateAiEditorButton)
     }
 
     private fun updateAiEditorButton(aiFeatureFlag: FeatureFlag) {
