@@ -45,7 +45,6 @@ import javax.inject.Inject
 
 class ThreadController @Inject constructor(
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
-    private val refreshController: RefreshController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
 
