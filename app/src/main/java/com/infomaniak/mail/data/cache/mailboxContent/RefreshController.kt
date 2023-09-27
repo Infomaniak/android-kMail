@@ -727,7 +727,7 @@ class RefreshController @Inject constructor(
 
     private fun ApiErrorException.handleOtherApiErrors(folder: Folder) {
         when (errorCode) {
-            ErrorCode.FOLDER_DOES_NOT_EXIST -> Unit
+            ErrorCode.FOLDER_DOES_NOT_EXIST -> Unit // Here, we want to fail silently. We are just outdated, it will be ok.
             ErrorCode.MESSAGE_NOT_FOUND -> Sentry.withScope { scope ->
                 scope.setTag("isFirstTime", "false")
                 scope.setExtra("folderCursor", "${folder.cursor}")
