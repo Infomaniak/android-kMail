@@ -53,7 +53,7 @@
     <string name="aiButtonRefine">Afinar</string>
     <string name="aiButtonRetry">Reintentar</string>
     <string name="aiErrorMaxTokenReached">Su solicitud es demasiado larga. Por favor, inténtelo de nuevo en un formato más corto.</string>
-    <string name="aiErrorTooManyRequests">Parece que ha realizado demasiadas solicitudes en un corto espacio de tiempo. \n\nPor favor, espere unos momentos.</string>
+    <string name="aiErrorTooManyRequests">Parece que ha realizado demasiadas solicitudes en un corto espacio de tiempo.\n\nPor favor, espere unos momentos.</string>
     <string name="aiErrorUnknown">Se ha producido un error. Si este error persiste, póngase en contacto con nuestro servicio de asistencia.\n\nGracias por su paciencia.</string>
     <string name="aiPromptGenerationLoader">El asistente está escribiendo</string>
     <string name="aiPromptPlaceholder">Dígale al asistente de redacción lo que quiere escribir. Por ejemplo, \"un correo electrónico de agradecimiento por un regalo de bienvenida\".</string>
