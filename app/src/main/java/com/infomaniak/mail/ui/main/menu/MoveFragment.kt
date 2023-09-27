@@ -37,9 +37,8 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.FragmentMoveBinding
+import com.infomaniak.mail.ui.alertDialogs.InputAlertDialog
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.AlertDialogUtils.createInputDialog
-import com.infomaniak.mail.utils.AlertDialogUtils.resetLoadingAndDismiss
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -50,7 +49,8 @@ class MoveFragment : MenuFoldersFragment() {
     private val navigationArgs: MoveFragmentArgs by navArgs()
     private val moveViewModel: MoveViewModel by viewModels()
 
-    private val createFolderDialog by lazy { initNewFolderDialog() }
+    @Inject
+    lateinit var inputDialog: InputAlertDialog
 
     @Inject
     lateinit var searchFolderAdapter: FolderAdapter
@@ -90,8 +90,20 @@ class MoveFragment : MenuFoldersFragment() {
         toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
         iconAddFolder.setOnClickListener {
             trackCreateFolderEvent("fromMove")
-            createFolderDialog.show()
+            inputDialog.show(
+                title = R.string.newFolderDialogTitle,
+                hint = R.string.newFolderDialogHint,
+                confirmButtonText = R.string.newFolderDialogMovePositiveButton
+            )
         }
+
+        inputDialog.setCallbacks(
+            onErrorCheck = { folderName -> checkForFolderCreationErrors(folderName) },
+            onPositiveButtonClicked = { folderName ->
+                trackCreateFolderEvent("confirm")
+                mainViewModel.moveToNewFolder(folderName, navigationArgs.threadsUids, navigationArgs.messageUid)
+            },
+        )
     }
 
     private fun setupFolderAdapters() {
@@ -110,7 +122,7 @@ class MoveFragment : MenuFoldersFragment() {
     }
 
     private fun observeNewFolderCreation() = with(mainViewModel) {
-        newFolderResultTrigger.observe(viewLifecycleOwner) { createFolderDialog.resetLoadingAndDismiss() }
+        newFolderResultTrigger.observe(viewLifecycleOwner) { inputDialog.resetLoadingAndDismiss() }
         isMovedToNewFolder.observe(viewLifecycleOwner) { isFolderCreated ->
             if (isFolderCreated) findNavController().popBackStack()
         }
@@ -122,19 +134,6 @@ class MoveFragment : MenuFoldersFragment() {
     }
 
     override fun onFolderCollapse(folderId: String, shouldCollapse: Boolean) = Unit
-
-    private fun initNewFolderDialog() = with(navigationArgs) {
-        createInputDialog(
-            title = R.string.newFolderDialogTitle,
-            hint = R.string.newFolderDialogHint,
-            confirmButtonText = R.string.newFolderDialogMovePositiveButton,
-            onErrorCheck = { folderName -> checkForFolderCreationErrors(folderName) },
-            onPositiveButtonClicked = { folderName ->
-                trackCreateFolderEvent("confirm")
-                mainViewModel.moveToNewFolder(folderName, threadsUids, messageUid)
-            },
-        )
-    }
 
     private fun setSearchBarUi(allFolders: List<Folder>) = with(binding) {
         searchResultsList.adapter = searchResultsAdapter

@@ -114,5 +114,8 @@ class InputAlertDialog @Inject constructor(@ActivityContext private val activity
         this.onErrorCheck = onErrorCheck
     }
 
-    fun resetLoadingAndDismiss() = alertDialog.resetLoadingAndDismiss()
+    fun resetLoadingAndDismiss() {
+        binding.textInput.text = null
+        alertDialog.resetLoadingAndDismiss()
+    }
 }
