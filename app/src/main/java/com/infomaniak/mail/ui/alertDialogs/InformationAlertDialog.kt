@@ -26,9 +26,9 @@ import javax.inject.Inject
 @ActivityScoped
 class InformationAlertDialog @Inject constructor(
     @ActivityContext private val activityContext: Context,
-) : BaseAlertDialog(activityContext) {
+) : DescriptionAlertDialog(activityContext) {
 
-    fun show(@StringRes title: Int, description: CharSequence?, @StringRes confirmButtonText: Int) = showDialog(
+    fun show(@StringRes title: Int, description: CharSequence?, @StringRes confirmButtonText: Int) = showDialogWithBasicInfo(
         title = activityContext.getString(title),
         description = description,
         confirmButtonText = confirmButtonText,

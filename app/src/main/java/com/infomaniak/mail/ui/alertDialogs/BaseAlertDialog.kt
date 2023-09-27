@@ -19,48 +19,46 @@ package com.infomaniak.mail.ui.alertDialogs
 
 import android.app.Activity
 import android.content.Context
+import android.content.DialogInterface
 import androidx.annotation.StringRes
-import androidx.core.view.isVisible
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.infomaniak.lib.core.utils.context
+import androidx.appcompat.app.AlertDialog
+import androidx.viewbinding.ViewBinding
+import com.google.android.material.button.MaterialButton
+import com.infomaniak.lib.core.utils.Utils
+import com.infomaniak.lib.core.utils.hideProgress
+import com.infomaniak.lib.core.utils.showProgress
 import com.infomaniak.mail.R
-import com.infomaniak.mail.databinding.DialogDescriptionBinding
-import com.infomaniak.mail.utils.AlertDialogUtils.negativeButton
-import com.infomaniak.mail.utils.AlertDialogUtils.positiveButton
 import dagger.hilt.android.qualifiers.ActivityContext
-import com.infomaniak.lib.core.R as RCore
 
 abstract class BaseAlertDialog(@ActivityContext private val activityContext: Context) {
 
     protected val activity = activityContext as Activity
-    protected val binding by lazy { DialogDescriptionBinding.inflate(activity.layoutInflater) }
+
+    protected abstract val binding: ViewBinding
+    protected abstract val alertDialog: AlertDialog
 
     var description: CharSequence = ""
     var title: String = ""
     @StringRes
     var confirmButtonText = R.string.buttonConfirm
 
-    protected val alertDialog = initDialog()
+    abstract fun initDialog(): AlertDialog
 
-    private fun initDialog() = with(binding) {
-        MaterialAlertDialogBuilder(context)
-            .setView(root)
-            .setPositiveButton(confirmButtonText, null)
-            .setNegativeButton(RCore.string.buttonCancel, null)
-            .create()
+    fun resetLoadingAndDismiss() = with(alertDialog) {
+        if (isShowing) {
+            dismiss()
+            setCancelable(true)
+            positiveButton.hideProgress(R.string.buttonCreate)
+            negativeButton.isEnabled = true
+        }
     }
 
-    protected fun showDialog(
-        title: String? = null,
-        description: CharSequence? = null,
-        @StringRes confirmButtonText: Int? = null,
-        displayCancelButton: Boolean = true,
-    ): Unit = with(alertDialog) {
-        show()
-
-        title?.let(binding.dialogTitle::setText)
-        description?.let(binding.dialogDescription::setText)
-        confirmButtonText?.let(positiveButton::setText)
-        negativeButton.isVisible = displayCancelButton
+    fun startLoading() {
+        alertDialog.setCancelable(false)
+        negativeButton.isEnabled = false
+        Utils.createRefreshTimer(onTimerFinish = positiveButton::showProgress).start()
     }
+
+    protected inline val positiveButton get() = (alertDialog.getButton(DialogInterface.BUTTON_POSITIVE) as MaterialButton)
+    protected inline val negativeButton get() = (alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE) as MaterialButton)
 }

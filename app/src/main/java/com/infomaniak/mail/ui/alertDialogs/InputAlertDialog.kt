@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.alertDialogs
 
-import android.app.Activity
 import android.content.Context
 import android.widget.Button
 import androidx.annotation.StringRes
@@ -30,9 +29,6 @@ import com.infomaniak.lib.core.utils.showKeyboard
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.DialogInputBinding
 import com.infomaniak.mail.di.IoDispatcher
-import com.infomaniak.mail.utils.AlertDialogUtils.positiveButton
-import com.infomaniak.mail.utils.AlertDialogUtils.resetLoadingAndDismiss
-import com.infomaniak.mail.utils.AlertDialogUtils.startLoading
 import com.infomaniak.mail.utils.trimmedText
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
@@ -41,22 +37,22 @@ import javax.inject.Inject
 import com.infomaniak.lib.core.R as RCore
 
 @ActivityScoped
-class InputAlertDialog @Inject constructor(@ActivityContext private val activityContext: Context) {
+class InputAlertDialog @Inject constructor(
+    @ActivityContext private val activityContext: Context
+) : BaseAlertDialog(activityContext) {
+
+    override val binding by lazy { DialogInputBinding.inflate(activity.layoutInflater) }
+    override var alertDialog: AlertDialog = initDialog()
 
     @Inject
     @IoDispatcher
     lateinit var ioDispatcher: CoroutineDispatcher
 
-    private val activity = activityContext as Activity
-    private val binding by lazy { DialogInputBinding.inflate(activity.layoutInflater) }
     private var errorJob: Job? = null
-
-    private var alertDialog: AlertDialog = initDialog()
-
     private var onErrorCheck: (suspend (CharSequence) -> String?)? = null
     private var onPositiveButtonClicked: ((String) -> Unit)? = null
 
-    private fun initDialog() = with(binding) {
+    override fun initDialog() = with(binding) {
 
         fun Button.checkValidation(text: CharSequence) {
             errorJob?.cancel()
@@ -110,13 +106,11 @@ class InputAlertDialog @Inject constructor(@ActivityContext private val activity
 
         dialogTitle.setText(title)
         textInputLayout.setHint(hint)
-        alertDialog.positiveButton.setText(confirmButtonText)
+        positiveButton.setText(confirmButtonText)
     }
 
     fun setCallbacks(onPositiveButtonClicked: (String) -> Unit, onErrorCheck: suspend (CharSequence) -> String?) {
         this.onPositiveButtonClicked = onPositiveButtonClicked
         this.onErrorCheck = onErrorCheck
     }
-
-    fun resetLoadingAndDismiss() = alertDialog.resetLoadingAndDismiss()
 }

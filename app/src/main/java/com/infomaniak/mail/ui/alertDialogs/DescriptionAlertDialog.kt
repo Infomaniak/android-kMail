@@ -20,17 +20,32 @@ package com.infomaniak.mail.ui.alertDialogs
 import android.content.Context
 import android.content.DialogInterface.OnDismissListener
 import androidx.annotation.StringRes
+import androidx.core.view.isVisible
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.R
-import com.infomaniak.mail.utils.AlertDialogUtils.resetLoadingAndDismiss
-import com.infomaniak.mail.utils.AlertDialogUtils.startLoading
+import com.infomaniak.mail.databinding.DialogDescriptionBinding
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
+import com.infomaniak.lib.core.R as RCore
 
 @ActivityScoped
-class DescriptionAlertDialog @Inject constructor(
+open class DescriptionAlertDialog @Inject constructor(
     @ActivityContext private val activityContext: Context,
 ) : BaseAlertDialog(activityContext) {
+
+    override val binding: DialogDescriptionBinding by lazy { DialogDescriptionBinding.inflate(activity.layoutInflater) }
+
+    override val alertDialog = initDialog()
+
+    final override fun initDialog() = with(binding) {
+        MaterialAlertDialogBuilder(context)
+            .setView(root)
+            .setPositiveButton(confirmButtonText, null)
+            .setNegativeButton(RCore.string.buttonCancel, null)
+            .create()
+    }
 
     var onDismissed: OnDismissListener? = null
 
@@ -43,7 +58,7 @@ class DescriptionAlertDialog @Inject constructor(
         onPositiveButtonClicked: () -> Unit,
         onDismissed: OnDismissListener? = null,
     ) = with(alertDialog) {
-        showDialog(title, description, confirmButtonText, displayCancelButton)
+        showDialogWithBasicInfo(title, description, confirmButtonText, displayCancelButton)
 
         onDismissed?.let(::setOnDismissListener)
 
@@ -52,8 +67,6 @@ class DescriptionAlertDialog @Inject constructor(
             if (displayLoader) startLoading() else dismiss()
         }
     }
-
-    fun resetLoadingAndDismiss() = alertDialog.resetLoadingAndDismiss()
 
     fun showDeletePermanentlyDialog(
         deletedCount: Int,
@@ -74,4 +87,18 @@ class DescriptionAlertDialog @Inject constructor(
         onPositiveButtonClicked = onPositiveButtonClicked,
         onDismissed = onDismissed,
     )
+
+    protected fun showDialogWithBasicInfo(
+        title: String? = null,
+        description: CharSequence? = null,
+        @StringRes confirmButtonText: Int? = null,
+        displayCancelButton: Boolean = true,
+    ): Unit = with(alertDialog) {
+        show()
+
+        title?.let(binding.dialogTitle::setText)
+        description?.let(binding.dialogDescription::setText)
+        confirmButtonText?.let(positiveButton::setText)
+        negativeButton.isVisible = displayCancelButton
+    }
 }
