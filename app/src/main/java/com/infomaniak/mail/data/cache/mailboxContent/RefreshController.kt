@@ -60,6 +60,10 @@ class RefreshController @Inject constructor(
         refreshThreadsJob?.cancel(ForcedCancellationException())
     }
 
+    // TODO: Find another way to get the list of impacted Threads that are used to display Notifications.
+    //  Currently, it conflicts with the Thread retrieval algorithm.
+    //  Handling MESSAGE_NOT_FOUND error prevents us from retrieving this list.
+    //  As soon as it throws, we lose the information.
     suspend fun refreshThreads(
         refreshMode: RefreshMode,
         mailbox: Mailbox,
