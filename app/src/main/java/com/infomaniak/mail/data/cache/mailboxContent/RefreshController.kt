@@ -83,7 +83,7 @@ class RefreshController @Inject constructor(
         }.getOrElse {
             // If fetching the activities failed because of a not found Message, we should pause briefly
             // before trying again to retrieve activities, to ensure that the API is up-to-date.
-            if (isFirstTime && it is ApiErrorException && it.errorCode == ErrorCode.MESSAGE_NOT_FOUND) {
+            if (isFirstTime && it is MessageNotFoundException) {
                 Sentry.withScope { scope ->
                     scope.level = SentryLevel.WARNING
                     scope.setTag("isFirstTime", "true")
@@ -263,7 +263,15 @@ class RefreshController @Inject constructor(
             PaginationInfo(offsetUid, direction.apiCallValue)
         }
 
-        val newMessages = getMessagesUids(mailbox.uuid, folder.id, okHttpClient, paginationInfo)!!
+        val newMessages = runCatching {
+            getMessagesUids(mailbox.uuid, folder.id, okHttpClient, paginationInfo)!!
+        }.getOrElse {
+            throw if (it is ApiErrorException && it.errorCode == ErrorCode.MESSAGE_NOT_FOUND) {
+                MessageNotFoundException(it.message)
+            } else {
+                it
+            }
+        }
         val uidsCount = newMessages.addedShortUids.count()
         scope.ensureActive()
 
@@ -789,4 +797,6 @@ class RefreshController @Inject constructor(
     )
 
     private class ForcedCancellationException : CancellationException()
+
+    private class MessageNotFoundException(override val message: String?) : ApiErrorException(message)
 }
