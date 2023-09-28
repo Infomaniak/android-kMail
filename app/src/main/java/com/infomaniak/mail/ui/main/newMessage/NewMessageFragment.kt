@@ -138,6 +138,7 @@ class NewMessageFragment : Fragment() {
         filePicker = FilePicker(this@NewMessageFragment)
 
         initUi()
+        navigateToDiscoveryBottomSheetIfNeeded()
 
         if (newMessageViewModel.initResult.value == null) {
             initDraftAndViewModel()
@@ -160,6 +161,12 @@ class NewMessageFragment : Fragment() {
         observeAiOutput()
         observeAiPromptStatus()
         observeAiFeatureFragmentUpdates()
+    }
+
+    private fun navigateToDiscoveryBottomSheetIfNeeded() {
+        if (localSettings.showAiDiscoveryBottomSheet) {
+            safeNavigate(NewMessageFragmentDirections.actionNewMessageFragmentToAiDiscoveryBottomSheetDialog())
+        }
     }
 
     override fun onStart() {
