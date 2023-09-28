@@ -59,6 +59,7 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.*
 import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition.INLINE
 import com.infomaniak.mail.data.models.FeatureFlag
+import com.infomaniak.mail.data.models.ai.AiPromptStatus
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.*
@@ -157,6 +158,7 @@ class NewMessageFragment : Fragment() {
         observeDraftWorkerResults()
         observeInitResult()
         observeAiOutput()
+        observeAiPromptStatus()
         observeAiFeatureFragmentUpdates()
     }
 
@@ -178,7 +180,7 @@ class NewMessageFragment : Fragment() {
     private fun handleOnBackPressed() {
         newMessageActivity.onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             when {
-                aiViewModel.isAiPromptOpened -> closeAiPrompt()
+                aiViewModel.aiPromptStatus.value?.isOpened == true -> closeAiPrompt()
                 newMessageViewModel.isAutoCompletionOpened -> closeAutoCompletion()
                 else -> newMessageActivity.finishAppAndRemoveTaskIfNeeded()
             }
@@ -215,8 +217,6 @@ class NewMessageFragment : Fragment() {
 
         setupSendButton()
         setupExternalBanner()
-
-        if (aiViewModel.isAiPromptOpened) openAiPrompt()
 
         scrim.setOnClickListener { closeAiPrompt() }
     }
@@ -558,60 +558,12 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun openAiPrompt(resetPrompt: Boolean = true) = with(binding) {
-        aiViewModel.apply {
-            isAiPromptOpened = true
-            if (resetPrompt) aiPrompt = ""
-        }
-
-        // Keyboard is opened inside onCreate() of AiPromptFragment
-
-        val foundFragment = childFragmentManager.findFragmentByTag(AI_PROMPT_FRAGMENT_TAG) as? AiPromptFragment
-        if (aiPromptFragment == null) {
-            aiPromptFragment = foundFragment ?: AiPromptFragment()
-        }
-
-        if (foundFragment == null) {
-            childFragmentManager
-                .beginTransaction()
-                .add(aiPromptFragmentContainer.id, aiPromptFragment!!, AI_PROMPT_FRAGMENT_TAG)
-                .commitNow()
-        }
-
-        setAiPromptVisibility(true)
-        newMessageConstraintLayout.descendantFocusability = FOCUS_BLOCK_DESCENDANTS
+    private fun openAiPrompt() {
+        aiViewModel.aiPromptStatus.value = AiPromptStatus(true)
     }
 
-    fun closeAiPrompt() = with(binding) {
-        aiViewModel.isAiPromptOpened = false
-
-        aiPromptFragmentContainer.hideKeyboard()
-
-        aiPromptFragment?.let {
-            childFragmentManager
-                .beginTransaction()
-                .remove(it)
-                .commitNow()
-        }
-
-        setAiPromptVisibility(false)
-        newMessageConstraintLayout.descendantFocusability = FOCUS_BEFORE_DESCENDANTS
-    }
-
-    private fun setAiPromptVisibility(isVisible: Boolean) {
-        fun updateStatusBarColor(isVisible: Boolean) {
-            val statusBarColorRes = if (isVisible) R.color.scrim_translucent else R.color.backgroundColor
-            requireActivity().window.statusBarColor = requireContext().getColor(statusBarColorRes)
-        }
-
-        fun updateNavigationBarColor(isVisible: Boolean) {
-            val backgroundColorRes = if (isVisible) R.color.backgroundColorSecondary else R.color.backgroundColor
-            requireActivity().window.navigationBarColor = requireContext().getColor(backgroundColorRes)
-        }
-
-        binding.aiPromptLayout.isVisible = isVisible
-        updateStatusBarColor(isVisible)
-        updateNavigationBarColor(isVisible)
+    fun closeAiPrompt() {
+        aiViewModel.aiPromptStatus.value = AiPromptStatus(false)
     }
 
     private fun observeNewAttachments() = with(binding) {
@@ -822,6 +774,63 @@ class NewMessageFragment : Fragment() {
 
     private fun observeAiOutput() {
         aiViewModel.aiOutputToInsert.observe(viewLifecycleOwner, binding.bodyText::setText)
+    }
+
+    private fun observeAiPromptStatus() {
+        aiViewModel.aiPromptStatus.observe(viewLifecycleOwner) { (shouldDisplay, shouldResetContent) ->
+            if (shouldDisplay) onAiPromptOpened(shouldResetContent) else onAiPromptClosed()
+        }
+    }
+
+    private fun onAiPromptOpened(resetPrompt: Boolean = true) = with(binding) {
+        if (resetPrompt) aiViewModel.aiPrompt = ""
+
+        // Keyboard is opened inside onCreate() of AiPromptFragment
+
+        val foundFragment = childFragmentManager.findFragmentByTag(AI_PROMPT_FRAGMENT_TAG) as? AiPromptFragment
+        if (aiPromptFragment == null) {
+            aiPromptFragment = foundFragment ?: AiPromptFragment()
+        }
+
+        if (foundFragment == null) {
+            childFragmentManager
+                .beginTransaction()
+                .add(aiPromptFragmentContainer.id, aiPromptFragment!!, AI_PROMPT_FRAGMENT_TAG)
+                .commitNow()
+        }
+
+        setAiPromptVisibility(true)
+        newMessageConstraintLayout.descendantFocusability = FOCUS_BLOCK_DESCENDANTS
+    }
+
+    private fun onAiPromptClosed() = with(binding) {
+        aiPromptFragmentContainer.hideKeyboard()
+
+        aiPromptFragment?.let {
+            childFragmentManager
+                .beginTransaction()
+                .remove(it)
+                .commitNow()
+        }
+
+        setAiPromptVisibility(false)
+        newMessageConstraintLayout.descendantFocusability = FOCUS_BEFORE_DESCENDANTS
+    }
+
+    private fun setAiPromptVisibility(isVisible: Boolean) {
+        fun updateStatusBarColor(isVisible: Boolean) {
+            val statusBarColorRes = if (isVisible) R.color.scrim_translucent else R.color.backgroundColor
+            requireActivity().window.statusBarColor = requireContext().getColor(statusBarColorRes)
+        }
+
+        fun updateNavigationBarColor(isVisible: Boolean) {
+            val backgroundColorRes = if (isVisible) R.color.backgroundColorSecondary else R.color.backgroundColor
+            requireActivity().window.navigationBarColor = requireContext().getColor(backgroundColorRes)
+        }
+
+        binding.aiPromptLayout.isVisible = isVisible
+        updateStatusBarColor(isVisible)
+        updateNavigationBarColor(isVisible)
     }
 
     private fun observeAiFeatureFragmentUpdates() {

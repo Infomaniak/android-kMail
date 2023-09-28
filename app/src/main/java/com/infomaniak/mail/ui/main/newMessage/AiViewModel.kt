@@ -29,10 +29,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.userInfo.FeatureFlagController
 import com.infomaniak.mail.data.models.FeatureFlag.FeatureFlagType
-import com.infomaniak.mail.data.models.ai.AiMessage
-import com.infomaniak.mail.data.models.ai.AiResult
-import com.infomaniak.mail.data.models.ai.AssistantMessage
-import com.infomaniak.mail.data.models.ai.UserMessage
+import com.infomaniak.mail.data.models.ai.*
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.newMessage.AiViewModel.PropositionStatus.*
 import com.infomaniak.mail.utils.ErrorCode.MAX_SYNTAX_TOKENS_REACHED
@@ -57,7 +54,7 @@ class AiViewModel @Inject constructor(
     var aiPrompt = ""
     private var history = mutableListOf<AiMessage>()
     private var conversationContextId: String? = null
-    var isAiPromptOpened = false
+    var aiPromptStatus = MutableLiveData<AiPromptStatus>()
 
     val aiProposition = MutableLiveData<Pair<PropositionStatus, String?>?>()
     val aiOutputToInsert = SingleLiveEvent<String>()
