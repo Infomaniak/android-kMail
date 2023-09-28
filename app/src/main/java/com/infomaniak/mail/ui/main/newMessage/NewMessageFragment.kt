@@ -280,15 +280,12 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun updateFeatureFlagIfMailTo() {
-        val isMailTo = when (requireActivity().intent.action) {
+        when (requireActivity().intent.action) {
             Intent.ACTION_SEND,
             Intent.ACTION_SEND_MULTIPLE,
             Intent.ACTION_VIEW,
-            Intent.ACTION_SENDTO -> true
-            else -> false
+            Intent.ACTION_SENDTO -> aiViewModel.updateFeatureFlag()
         }
-
-        if (isMailTo) aiViewModel.updateFeatureFlag()
     }
 
     private fun setOnFocusChangedListeners() = with(binding) {
@@ -819,7 +816,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeAiFeatureFragmentUpdates() {
-        aiViewModel.aiFeatureFlag().observeNotNull(viewLifecycleOwner, ::updateAiEditorButton)
+        aiViewModel.aiFeatureFlag.observe(viewLifecycleOwner, ::updateAiEditorButton)
     }
 
     private fun updateAiEditorButton(aiFeatureFlag: FeatureFlag) {
