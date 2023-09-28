@@ -256,11 +256,15 @@ class RefreshController @Inject constructor(
 
         val impactedThreads = mutableSetOf<Thread>()
 
-        val paginationInfo = when (direction) {
-            Direction.IN_THE_PAST -> MessageController.getOldestMessage(folder.id, realm = this)
-            Direction.TO_THE_FUTURE -> MessageController.getNewestMessage(folder.id, realm = this)
-        }?.shortUid?.let { offsetUid ->
-            PaginationInfo(offsetUid, direction.apiCallValue)
+        val paginationInfo = if (shouldUpdateCursor) {
+            null
+        } else {
+            when (direction) {
+                Direction.IN_THE_PAST -> MessageController.getOldestMessage(folder.id, realm = this)
+                Direction.TO_THE_FUTURE -> MessageController.getNewestMessage(folder.id, realm = this)
+            }?.shortUid?.let { offsetUid ->
+                PaginationInfo(offsetUid, direction.apiCallValue)
+            }
         }
 
         val newMessages = runCatching {
