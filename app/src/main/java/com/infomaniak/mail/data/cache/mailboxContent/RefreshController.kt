@@ -83,8 +83,8 @@ class RefreshController @Inject constructor(
         refreshThreadsJob = Job()
 
         return refreshWithRunCatching(refreshThreadsJob!!, refreshMode, mailbox, folder, okHttpClient, realm, started, stopped)
-            .also {
-                it.first?.let {
+            .also { (threads, _) ->
+                if (threads != null) {
                     stopped?.invoke()
                     SentryLog.d("API", "End of refreshing threads with mode: $refreshMode | (${folder.name})")
                 }
@@ -103,13 +103,7 @@ class RefreshController @Inject constructor(
     ): Pair<Set<Thread>?, Throwable?> = runCatching {
         withContext(Dispatchers.IO + job) {
             started?.invoke()
-            realm.handleRefreshMode(
-                refreshMode = refreshMode,
-                scope = this,
-                mailbox = mailbox,
-                folder = folder,
-                okHttpClient = okHttpClient,
-            ) to null
+            realm.handleRefreshMode(refreshMode, scope = this, mailbox, folder, okHttpClient) to null
         }
     }.getOrElse {
         handleRefreshFailure(it, job, mailbox, folder, okHttpClient, realm, started, stopped)
@@ -142,6 +136,7 @@ class RefreshController @Inject constructor(
             )
         } else {
             handleAllExceptions(throwable, stopped)
+            null to throwable
         }
     }
 
@@ -159,7 +154,7 @@ class RefreshController @Inject constructor(
         isSameFolder: Boolean,
     ): Pair<Set<Thread>?, Throwable?> {
 
-        fun sendMessageNotFoundSentry(throwable: Throwable, folder: Folder, strategy: RetryStrategy) {
+        fun sendMessageNotFoundSentry() {
             Sentry.withScope { scope ->
                 scope.setTag("iteration", strategy.iteration.name)
                 scope.setTag("fibonacci", "${strategy.fibonacci}")
@@ -172,31 +167,21 @@ class RefreshController @Inject constructor(
             }
         }
 
-        suspend fun retry(retryStrategy: RetryStrategy) = retryWithRunCatching(
-            job,
-            mailbox,
-            folder,
-            okHttpClient,
-            realm,
-            started,
-            stopped,
-            retryStrategy,
-            isSameFolder,
-        )
+        suspend fun retry(retryStrategy: RetryStrategy): Pair<Set<Thread>?, Throwable?> {
+            return retryWithRunCatching(job, mailbox, folder, okHttpClient, realm, started, stopped, retryStrategy, isSameFolder)
+        }
 
-        sendMessageNotFoundSentry(throwable, folder, strategy)
+        sendMessageNotFoundSentry()
 
-        return when (strategy.iteration) {
+        when (strategy.iteration) {
             Iteration.FIRST_TIME -> {
                 strategy.iteration = Iteration.SECOND_TIME
-                retry(strategy)
             }
             Iteration.SECOND_TIME -> {
                 strategy.apply {
                     iteration = Iteration.FIBONACCI_TIME
                     fibonacci = FIBONACCI_SEQUENCE.first()
                 }
-                retry(strategy)
             }
             Iteration.FIBONACCI_TIME -> {
                 val nextFibonacci = FIBONACCI_SEQUENCE.firstOrNull { it > strategy.fibonacci }
@@ -213,16 +198,17 @@ class RefreshController @Inject constructor(
                         }
                     }
                     strategy.iteration = Iteration.ABORT_MISSION
-                    retry(strategy)
                 } else {
                     strategy.fibonacci = nextFibonacci
-                    retry(strategy)
                 }
             }
             Iteration.ABORT_MISSION -> {
                 handleAllExceptions(throwable, stopped)
+                return null to throwable
             }
         }
+
+        return retry(strategy)
     }
 
     private suspend fun retryWithRunCatching(
@@ -857,7 +843,7 @@ class RefreshController @Inject constructor(
     //endregion
 
     //region Handle errors
-    private fun handleAllExceptions(throwable: Throwable, stopped: (() -> Unit)?): Pair<Nothing?, Throwable> {
+    private fun handleAllExceptions(throwable: Throwable, stopped: (() -> Unit)?) {
 
         // We force-cancelled, so we need to call the `stopped` callback.
         if (throwable is ForcedCancellationException) stopped?.invoke()
@@ -866,8 +852,6 @@ class RefreshController @Inject constructor(
         if (throwable !is CancellationException) stopped?.invoke()
 
         if (throwable is ApiErrorException) throwable.handleOtherApiErrors()
-
-        return null to throwable
     }
 
     private fun ApiErrorException.handleOtherApiErrors() {

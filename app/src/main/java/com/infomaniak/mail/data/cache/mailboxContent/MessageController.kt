@@ -154,8 +154,10 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
             realm: TypedRealm,
             fibonacci: Int = 1,
         ): RealmQuery<Message> {
+
             val byFolderId = "${Message::folderId.name} == $0"
             val isNotFromSearch = "${Message::isFromSearch.name} == false"
+
             return realm.query<Message>("$byFolderId AND $isNotFromSearch", folderId)
                 .sort(Message::shortUid.name, sort)
                 .limit(fibonacci)
@@ -181,9 +183,10 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
         }
 
         fun getNewestMessage(folderId: String, fibonacci: Int, realm: TypedRealm, endOfMessagesReached: () -> Unit): Message? {
-            val result = getOldestOrNewestMessagesQuery(folderId, Sort.DESCENDING, realm, fibonacci).find()
-            if (result.count() < fibonacci) endOfMessagesReached()
-            return result.lastOrNull()
+            return getOldestOrNewestMessagesQuery(folderId, Sort.DESCENDING, realm, fibonacci)
+                .find()
+                .also { if (it.count() < fibonacci) endOfMessagesReached() }
+                .lastOrNull()
         }
         //endregion
 
