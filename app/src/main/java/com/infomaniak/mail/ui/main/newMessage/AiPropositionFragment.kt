@@ -31,6 +31,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.AiReplacementDialogVisibility
+import com.infomaniak.mail.data.models.ai.AiPromptStatus
 import com.infomaniak.mail.databinding.DialogAiReplaceContentBinding
 import com.infomaniak.mail.databinding.FragmentAiPropositionBinding
 import com.infomaniak.mail.ui.main.newMessage.AiViewModel.PropositionStatus
@@ -97,7 +98,7 @@ class AiPropositionFragment : Fragment() {
         refineButton.setOnClickListener { refinePopupMenu.show() }
 
         retryButton.setOnClickListener {
-            aiViewModel.isAiPromptOpened = true
+            aiViewModel.aiPromptStatus.value = AiPromptStatus(true)
             findNavController().popBackStack()
         }
     }
@@ -123,7 +124,7 @@ class AiPropositionFragment : Fragment() {
     private fun onMenuItemClicked(menuItemId: Int) {
         val shortcut = Shortcut.values().find { it.menuId == menuItemId }!!
         if (shortcut == Shortcut.MODIFY) {
-            aiViewModel.isAiPromptOpened = true
+            aiViewModel.aiPromptStatus.value = AiPromptStatus(true, shouldResetPrompt = false)
             findNavController().popBackStack()
         } else {
             binding.loadingPlaceholder.text = aiViewModel.aiProposition.value!!.second
