@@ -60,6 +60,10 @@ class RefreshController @Inject constructor(
         refreshThreadsJob?.cancel(ForcedCancellationException())
     }
 
+    // TODO: Find another way to get the list of impacted Threads that are used to display Notifications.
+    //  Currently, it conflicts with the Thread retrieval algorithm.
+    //  Handling MESSAGE_NOT_FOUND error prevents us from retrieving this list.
+    //  As soon as it throws, we lose the information.
     suspend fun refreshThreads(
         refreshMode: RefreshMode,
         mailbox: Mailbox,
@@ -68,9 +72,9 @@ class RefreshController @Inject constructor(
         realm: Realm,
         started: (() -> Unit)? = null,
         stopped: (() -> Unit)? = null,
-    ): Pair<List<Thread>?, Throwable?> {
+    ): Pair<Set<Thread>?, Throwable?> {
 
-        suspend fun refreshWithRunCatching(job: Job, isFirstTime: Boolean = true): Pair<List<Thread>?, Throwable?> = runCatching {
+        suspend fun refreshWithRunCatching(job: Job, isFirstTime: Boolean = true): Pair<Set<Thread>?, Throwable?> = runCatching {
             withContext(Dispatchers.IO + job) {
                 if (isFirstTime) {
                     started?.invoke()
@@ -78,7 +82,7 @@ class RefreshController @Inject constructor(
                     delay(Utils.DELAY_BEFORE_FETCHING_ACTIVITIES_AGAIN)
                     ensureActive()
                 }
-                realm.handleRefreshMode(refreshMode, scope = this, mailbox, folder, okHttpClient).toList() to null
+                realm.handleRefreshMode(refreshMode, scope = this, mailbox, folder, okHttpClient) to null
             }
         }.getOrElse {
             // If fetching the activities failed because of a not found Message, we should pause briefly
@@ -723,7 +727,7 @@ class RefreshController @Inject constructor(
 
     private fun ApiErrorException.handleOtherApiErrors(folder: Folder) {
         when (errorCode) {
-            ErrorCode.FOLDER_DOES_NOT_EXIST -> Unit
+            ErrorCode.FOLDER_DOES_NOT_EXIST -> Unit // Here, we want to fail silently. We are just outdated, it will be ok.
             ErrorCode.MESSAGE_NOT_FOUND -> Sentry.withScope { scope ->
                 scope.setTag("isFirstTime", "false")
                 scope.setExtra("folderCursor", "${folder.cursor}")

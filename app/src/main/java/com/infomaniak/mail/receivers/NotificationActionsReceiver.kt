@@ -31,6 +31,7 @@ import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
+import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
@@ -179,7 +180,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
     ) {
         folders.forEach { folder ->
             refreshController.refreshThreads(
-                refreshMode = RefreshController.RefreshMode.REFRESH_FOLDER,
+                refreshMode = RefreshMode.REFRESH_FOLDER,
                 mailbox = mailbox,
                 folder = folder,
                 realm = realm,
