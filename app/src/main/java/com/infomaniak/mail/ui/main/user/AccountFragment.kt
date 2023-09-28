@@ -34,10 +34,10 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentAccountBinding
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.MailboxListFragment
 import com.infomaniak.mail.ui.main.menu.MailboxesAdapter
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.AlertDialogUtils.createDescriptionDialog
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -49,8 +49,6 @@ class AccountFragment : Fragment(), MailboxListFragment {
     private lateinit var binding: FragmentAccountBinding
     private val mainViewModel: MainViewModel by activityViewModels()
     private val accountViewModel: AccountViewModel by viewModels()
-
-    private val logoutAlert by lazy { initLogoutAlert() }
 
     override val hasValidMailboxes = true
     override val currentClassName: String = AccountFragment::class.java.name
@@ -71,6 +69,9 @@ class AccountFragment : Fragment(), MailboxListFragment {
     @Inject
     @IoDispatcher
     lateinit var ioDispatcher: CoroutineDispatcher
+
+    @Inject
+    lateinit var descriptionDialog: DescriptionAlertDialog
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentAccountBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -97,7 +98,12 @@ class AccountFragment : Fragment(), MailboxListFragment {
 
         disconnectAccountButton.setOnClickListener {
             context.trackAccountEvent("logOut")
-            logoutAlert.show()
+            descriptionDialog.show(
+                title = getString(R.string.confirmLogoutTitle),
+                description = AccountUtils.currentUser?.let { getString(R.string.confirmLogoutDescription, it.email) } ?: "",
+                displayLoader = false,
+                onPositiveButtonClicked = ::removeCurrentUser,
+            )
         }
 
         mailboxesRecyclerView.apply {
@@ -117,11 +123,4 @@ class AccountFragment : Fragment(), MailboxListFragment {
         mainViewModel.mailboxesLive.observe(viewLifecycleOwner, mailboxesAdapter::setMailboxes)
         lifecycleScope.launch(ioDispatcher) { accountViewModel.updateMailboxes() }
     }
-
-    private fun initLogoutAlert() = createDescriptionDialog(
-        title = getString(R.string.confirmLogoutTitle),
-        description = AccountUtils.currentUser?.let { getString(R.string.confirmLogoutDescription, it.email) } ?: "",
-        displayLoader = false,
-        onPositiveButtonClicked = ::removeCurrentUser,
-    )
 }

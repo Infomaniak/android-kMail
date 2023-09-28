@@ -26,7 +26,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.isGone
@@ -68,10 +67,9 @@ import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.AlertDialogUtils.createDescriptionDialog
-import com.infomaniak.mail.utils.AlertDialogUtils.resetLoadingAndDismiss
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
 import com.infomaniak.mail.utils.UiUtils.formatUnreadCount
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
@@ -117,7 +115,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private var canRefreshThreads = false
 
-    private var flushFolderDialog: AlertDialog? = null
+    @Inject
+    lateinit var descriptionDialog: DescriptionAlertDialog
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentThreadListBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -267,14 +266,14 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
                 trackerName?.let { trackThreadListEvent(it) }
 
-                flushFolderDialog = createDescriptionDialog(
+                descriptionDialog.show(
                     title = dialogTitle,
                     description = getString(R.string.threadListEmptyFolderAlertDescription),
                     onPositiveButtonClicked = {
                         trackThreadListEvent("${trackerName}Confirm")
                         mainViewModel.flushFolder()
                     },
-                ).also { it.show() }
+                )
             }
 
             onLoadMoreClicked = { mainViewModel.getOnePageOfOldMessages() }
@@ -380,7 +379,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 folderRole == FolderRole.ARCHIVE
             }
             SwipeAction.DELETE -> {
-                deleteWithConfirmationPopup(
+                descriptionDialog.deleteWithConfirmationPopup(
                     folderRole = folderRole,
                     count = 1,
                     displayLoader = false,
@@ -554,7 +553,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun observeFlushFolderTrigger() {
-        mainViewModel.flushFolderTrigger.observe(viewLifecycleOwner) { flushFolderDialog?.resetLoadingAndDismiss() }
+        mainViewModel.flushFolderTrigger.observe(viewLifecycleOwner) { descriptionDialog.resetLoadingAndDismiss() }
     }
 
     private fun observerDraftsActionsCompletedWorks() {

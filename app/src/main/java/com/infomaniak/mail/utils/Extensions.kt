@@ -21,6 +21,7 @@ import android.animation.Animator
 import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.*
+import android.content.DialogInterface.OnDismissListener
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -32,7 +33,6 @@ import android.view.Window
 import android.view.inputmethod.EditorInfo
 import android.webkit.WebView
 import androidx.annotation.*
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
@@ -70,6 +70,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.login.IlluColors.IlluColors
 import com.infomaniak.mail.ui.login.LoginActivity
 import com.infomaniak.mail.ui.login.LoginActivityArgs
@@ -83,7 +84,6 @@ import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragmentArgs
 import com.infomaniak.mail.ui.noValidMailboxes.NoValidMailboxesActivity
 import com.infomaniak.mail.utils.AccountUtils.NO_MAILBOX_USER_ID_KEY
-import com.infomaniak.mail.utils.AlertDialogUtils.createDescriptionDialog
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import io.realm.kotlin.MutableRealm
@@ -372,30 +372,17 @@ fun List<Message>.getFoldersIds(exception: String? = null) = mapNotNull { if (it
 fun List<Message>.getUids(): List<String> = map { it.uid }
 //endregion
 
-fun Fragment.deleteWithConfirmationPopup(
+fun DescriptionAlertDialog.deleteWithConfirmationPopup(
     folderRole: FolderRole?,
     count: Int,
     displayLoader: Boolean = true,
-    onDismiss: (() -> Unit)? = null,
+    onDismiss: OnDismissListener? = null,
     callback: () -> Unit,
-): AlertDialog? = if (isPermanentDeleteFolder(folderRole)) {
-    createDescriptionDialog(
-        title = resources.getQuantityString(R.plurals.threadListDeletionConfirmationAlertTitle, count, count),
-        description = resources.getQuantityString(R.plurals.threadListDeletionConfirmationAlertDescription, count),
-        displayLoader = displayLoader,
-        onPositiveButtonClicked = callback,
-        onDismissed = onDismiss,
-    ).also { it.show() }
+) = if (isPermanentDeleteFolder(folderRole)) {
+    showDeletePermanentlyDialog(count, displayLoader, callback, onDismiss)
 } else {
     callback()
-    null
 }
-
-inline var Fragment.deleteThreadDialog
-    get() = (activity as? MainActivity)?.deleteThreadDialog
-    set(value) {
-        (activity as? MainActivity)?.deleteThreadDialog = value
-    }
 
 fun DragDropSwipeRecyclerView.addStickyDateDecoration(adapter: ThreadListAdapter, threadDensity: ThreadDensity) {
     addItemDecoration(HeaderItemDecoration(this, false) { position ->

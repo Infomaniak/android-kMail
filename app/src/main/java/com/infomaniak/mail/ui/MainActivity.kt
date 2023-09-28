@@ -28,7 +28,6 @@ import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts.*
 import androidx.activity.viewModels
 import androidx.annotation.FloatRange
-import androidx.appcompat.app.AlertDialog
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Lifecycle.State
 import androidx.lifecycle.distinctUntilChanged
@@ -51,10 +50,10 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.*
 import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.firebase.RegisterFirebaseBroadcastReceiver
+import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.AlertDialogUtils.resetLoadingAndDismiss
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Breadcrumb
@@ -99,7 +98,8 @@ class MainActivity : BaseActivity() {
     @Inject
     lateinit var playServicesUtils: PlayServicesUtils
 
-    var deleteThreadDialog: AlertDialog? = null
+    @Inject
+    lateinit var descriptionDialog: DescriptionAlertDialog
 
     private val drawerListener = object : DrawerLayout.DrawerListener {
 
@@ -177,7 +177,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun observeDeleteThreadTrigger() {
-        mainViewModel.deleteThreadOrMessageTrigger.observe(this) { deleteThreadDialog?.resetLoadingAndDismiss() }
+        mainViewModel.deleteThreadOrMessageTrigger.observe(this) { descriptionDialog.resetLoadingAndDismiss() }
     }
 
     private fun observeDraftWorkerResults() {
@@ -319,7 +319,7 @@ class MainActivity : BaseActivity() {
     }
 
     override fun onStop() {
-        deleteThreadDialog?.resetLoadingAndDismiss()
+        descriptionDialog.resetLoadingAndDismiss()
         super.onStop()
     }
 

@@ -42,13 +42,13 @@ import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
+import com.infomaniak.mail.ui.alertDialogs.InputAlertDialog
 import com.infomaniak.mail.ui.main.MailboxListFragment
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.AlertDialogUtils.createInputDialog
-import com.infomaniak.mail.utils.AlertDialogUtils.resetLoadingAndDismiss
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
@@ -56,7 +56,8 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
     private lateinit var binding: FragmentMenuDrawerBinding
     private val menuDrawerViewModel: MenuDrawerViewModel by viewModels()
 
-    private val createFolderDialog by lazy { initNewFolderDialog() }
+    @Inject
+    lateinit var inputDialog: InputAlertDialog
 
     var exitDrawer: (() -> Unit)? = null
 
@@ -83,6 +84,7 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
 
         displayVersion()
         setupListeners()
+        setupCreateFolderDialog()
 
         observeCurrentMailbox()
         observeMailboxesLive()
@@ -119,7 +121,7 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
 
         customFolders.setOnActionClickListener {
             trackCreateFolderEvent("fromMenuDrawer")
-            createFolderDialog.show()
+            inputDialog.show(R.string.newFolderDialogTitle, R.string.newFolderDialogHint, R.string.buttonCreate)
         }
 
         feedback.setOnClickListener {
@@ -163,6 +165,16 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
             trackMenuDrawerEvent("restoreEmails")
             safeNavigate(R.id.restoreEmailsBottomSheetDialog, currentClassName = currentClassName)
         }
+    }
+
+    private fun setupCreateFolderDialog() {
+        inputDialog.setCallbacks(
+            onErrorCheck = { folderName -> checkForFolderCreationErrors(folderName) },
+            onPositiveButtonClicked = { folderName ->
+                trackCreateFolderEvent("confirm")
+                mainViewModel.createNewFolder(folderName)
+            },
+        )
     }
 
     override fun setupAdapters() {
@@ -260,7 +272,7 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
     }
 
     private fun observeNewFolderCreation() {
-        mainViewModel.newFolderResultTrigger.observe(viewLifecycleOwner) { createFolderDialog.resetLoadingAndDismiss() }
+        mainViewModel.newFolderResultTrigger.observe(viewLifecycleOwner) { inputDialog.resetLoadingAndDismiss() }
     }
 
     fun onDrawerOpened() {
@@ -280,15 +292,4 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
         advancedActionsLayout.isGone = true
         advancedActions.isCollapsed = true
     }
-
-    private fun initNewFolderDialog() = createInputDialog(
-        title = R.string.newFolderDialogTitle,
-        hint = R.string.newFolderDialogHint,
-        confirmButtonText = R.string.buttonCreate,
-        onErrorCheck = { folderName -> checkForFolderCreationErrors(folderName) },
-        onPositiveButtonClicked = { folderName ->
-            trackCreateFolderEvent("confirm")
-            mainViewModel.createNewFolder(folderName)
-        },
-    )
 }

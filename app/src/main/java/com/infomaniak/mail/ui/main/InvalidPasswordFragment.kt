@@ -33,11 +33,11 @@ import com.infomaniak.lib.core.utils.showProgress
 import com.infomaniak.mail.MatomoMail.trackInvalidPasswordMailboxEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentInvalidPasswordBinding
-import com.infomaniak.mail.utils.AlertDialogUtils.createDescriptionDialog
-import com.infomaniak.mail.utils.AlertDialogUtils.resetLoadingAndDismiss
+import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.utils.getStringWithBoldArg
 import com.infomaniak.mail.utils.trimmedText
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class InvalidPasswordFragment : Fragment() {
@@ -46,16 +46,8 @@ class InvalidPasswordFragment : Fragment() {
     private val navigationArgs: InvalidPasswordFragmentArgs by navArgs()
     private val invalidPasswordViewModel: InvalidPasswordViewModel by viewModels()
 
-    private val detachMailboxConfirmAlert by lazy {
-        createDescriptionDialog(
-            title = getString(R.string.popupDetachMailboxTitle),
-            description = getStringWithBoldArg(R.string.popupDetachMailboxDescription, navigationArgs.mailboxEmail),
-            onPositiveButtonClicked = {
-                trackInvalidPasswordMailboxEvent("detachMailboxConfirm")
-                invalidPasswordViewModel.detachMailbox()
-            },
-        )
-    }
+    @Inject
+    lateinit var descriptionDialog: DescriptionAlertDialog
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentInvalidPasswordBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -92,7 +84,14 @@ class InvalidPasswordFragment : Fragment() {
 
         detachMailbox.setOnClickListener {
             trackInvalidPasswordMailboxEvent("detachMailbox")
-            detachMailboxConfirmAlert.show()
+            descriptionDialog.show(
+                title = getString(R.string.popupDetachMailboxTitle),
+                description = getStringWithBoldArg(R.string.popupDetachMailboxDescription, navigationArgs.mailboxEmail),
+                onPositiveButtonClicked = {
+                    trackInvalidPasswordMailboxEvent("detachMailboxConfirm")
+                    invalidPasswordViewModel.detachMailbox()
+                },
+            )
         }
 
         requestPasswordButton.setOnClickListener {
@@ -110,7 +109,7 @@ class InvalidPasswordFragment : Fragment() {
         }
 
         invalidPasswordViewModel.detachMailboxResult.observe(viewLifecycleOwner) { error ->
-            detachMailboxConfirmAlert.resetLoadingAndDismiss()
+            descriptionDialog.resetLoadingAndDismiss()
             showSnackbar(error)
         }
 

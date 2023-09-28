@@ -21,7 +21,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -32,9 +31,9 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.BottomSheetJunkBinding
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.utils.AlertDialogUtils.createDescriptionDialog
-import com.infomaniak.mail.utils.AlertDialogUtils.resetLoadingAndDismiss
+import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
@@ -43,7 +42,8 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
     private val navigationArgs: JunkBottomSheetDialogArgs by navArgs()
     private val mainViewModel: MainViewModel by activityViewModels()
 
-    private var reportPhishingDialog: AlertDialog? = null
+    @Inject
+    lateinit var descriptionDialog: DescriptionAlertDialog
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetJunkBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -61,7 +61,7 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
 
     fun observeReportPhishingResult() {
         mainViewModel.reportPhishingTrigger.observe(viewLifecycleOwner) {
-            reportPhishingDialog?.resetLoadingAndDismiss()
+            descriptionDialog.resetLoadingAndDismiss()
             findNavController().popBackStack()
         }
     }
@@ -75,11 +75,11 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
 
         phishing.setOnClickListener {
             trackBottomSheetThreadActionsEvent("signalPhishing")
-            reportPhishingDialog = createDescriptionDialog(
+            descriptionDialog.show(
                 title = getString(R.string.reportPhishingTitle),
                 description = getString(R.string.reportPhishingDescription),
                 onPositiveButtonClicked = { mainViewModel.reportPhishing(threadUid, message) },
-            ).also { it.show() }
+            )
         }
 
         blockSender.setClosingOnClickListener {

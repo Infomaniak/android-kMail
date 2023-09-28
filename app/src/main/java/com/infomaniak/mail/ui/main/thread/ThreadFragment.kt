@@ -62,12 +62,12 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
+import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.OpenThreadResult
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialog
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.AlertDialogUtils.createInformationDialog
-import com.infomaniak.mail.utils.AlertDialogUtils.showWithDescription
 import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipients
 import com.infomaniak.mail.utils.UiUtils.dividerDrawable
 import dagger.hilt.android.AndroidEntryPoint
@@ -94,12 +94,12 @@ class ThreadFragment : Fragment() {
     private val threadAdapter by lazy { ThreadAdapter(shouldLoadDistantResources()) }
     private val permissionUtils by lazy { PermissionUtils(this) }
     private val isNotInSpam by lazy { mainViewModel.currentFolder.value?.role != FolderRole.SPAM }
-    private val externalExpeditorInfoDialog by lazy {
-        createInformationDialog(
-            title = getString(R.string.externalDialogTitleExpeditor),
-            confirmButtonText = R.string.externalDialogConfirmButton,
-        )
-    }
+
+    @Inject
+    lateinit var informationDialog: InformationAlertDialog
+
+    @Inject
+    lateinit var descriptionDialog: DescriptionAlertDialog
 
     private var isFavorite = false
 
@@ -212,7 +212,7 @@ class ThreadFragment : Fragment() {
                     archiveThread(navigationArgs.threadUid)
                 }
                 R.id.quickActionDelete -> {
-                    deleteThreadDialog = deleteWithConfirmationPopup(folderRole, count = 1) {
+                    descriptionDialog.deleteWithConfirmationPopup(folderRole, count = 1) {
                         trackThreadActionsEvent(ACTION_DELETE_NAME)
                         mainViewModel.deleteThread(navigationArgs.threadUid)
                     }
@@ -529,7 +529,11 @@ class ThreadFragment : Fragment() {
                     externalRecipientEmail,
                 )
 
-                externalExpeditorInfoDialog.showWithDescription(description)
+                informationDialog.show(
+                    title = R.string.externalDialogTitleExpeditor,
+                    description = description,
+                    confirmButtonText = R.string.externalDialogConfirmButton,
+                )
             }
         }
 

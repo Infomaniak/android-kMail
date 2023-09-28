@@ -64,13 +64,12 @@ import com.infomaniak.mail.data.models.draft.Draft.*
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.MainActivity
+import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
+import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
 import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.*
 import com.infomaniak.mail.ui.main.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.AlertDialogUtils.createDescriptionDialog
-import com.infomaniak.mail.utils.AlertDialogUtils.createInformationDialog
-import com.infomaniak.mail.utils.AlertDialogUtils.showWithDescription
 import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipient
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
@@ -99,12 +98,6 @@ class NewMessageFragment : Fragment() {
 
     private val newMessageActivity by lazy { requireActivity() as NewMessageActivity }
     private val webViewUtils by lazy { WebViewUtils(requireContext()) }
-    private val externalRecipientInfoDialog by lazy {
-        createInformationDialog(
-            title = getString(R.string.externalDialogTitleRecipient),
-            confirmButtonText = R.string.externalDialogConfirmButton,
-        )
-    }
 
     private var lastFieldToTakeFocus: FieldType? = TO
 
@@ -115,7 +108,13 @@ class NewMessageFragment : Fragment() {
     lateinit var draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler
 
     @Inject
+    lateinit var informationDialog: InformationAlertDialog
+
+    @Inject
     lateinit var signatureUtils: SignatureUtils
+
+    @Inject
+    lateinit var descriptionDialog: DescriptionAlertDialog
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentNewMessageBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -622,7 +621,11 @@ class NewMessageFragment : Fragment() {
                 externalRecipientEmail,
             )
 
-            externalRecipientInfoDialog.showWithDescription(description)
+            informationDialog.show(
+                title = R.string.externalDialogTitleRecipient,
+                description = description,
+                confirmButtonText = R.string.externalDialogConfirmButton,
+            )
         }
 
         newMessageViewModel.externalRecipientCount.observe(viewLifecycleOwner) { (email, externalQuantity) ->
@@ -656,7 +659,7 @@ class NewMessageFragment : Fragment() {
 
         if (newMessageViewModel.draft.subject.isNullOrBlank()) {
             trackNewMessageEvent("sendWithoutSubject")
-            createDescriptionDialog(
+            descriptionDialog.show(
                 title = getString(R.string.emailWithoutSubjectTitle),
                 description = getString(R.string.emailWithoutSubjectDescription),
                 confirmButtonText = R.string.buttonContinue,
@@ -665,7 +668,7 @@ class NewMessageFragment : Fragment() {
                     trackNewMessageEvent("sendWithoutSubjectConfirm")
                     sendEmail()
                 },
-            ).show()
+            )
         } else {
             sendEmail()
         }

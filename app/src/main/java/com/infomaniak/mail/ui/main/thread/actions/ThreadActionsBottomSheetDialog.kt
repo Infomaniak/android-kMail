@@ -41,13 +41,14 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.menu.MoveFragmentArgs
 import com.infomaniak.mail.utils.animatedNavigation
-import com.infomaniak.mail.utils.deleteThreadDialog
 import com.infomaniak.mail.utils.deleteWithConfirmationPopup
 import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
@@ -56,6 +57,9 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     private val threadActionsViewModel: ThreadActionsViewModel by viewModels()
 
     private val currentClassName: String by lazy { ThreadActionsBottomSheetDialog::class.java.name }
+
+    @Inject
+    lateinit var descriptionDialog: DescriptionAlertDialog
 
     private var folderRole: FolderRole? = null
     private var isFromArchive: Boolean = false
@@ -132,7 +136,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             }
 
             override fun onDelete() {
-                deleteThreadDialog = deleteWithConfirmationPopup(folderRole, count = 1) {
+                descriptionDialog.deleteWithConfirmationPopup(folderRole, count = 1) {
                     trackBottomSheetThreadActionsEvent(ACTION_DELETE_NAME)
                     mainViewModel.deleteThread(threadUid)
                 }
