@@ -61,6 +61,12 @@
     <string name="aiErrorMaxTokenReached">Your request is too long, please try again in a shorter format.</string>
     <string name="aiErrorTooManyRequests">It seems you’ve made too many requests in a short amount of time.\n\nPlease wait a few moments.</string>
     <string name="aiErrorUnknown">An error has occurred. If this error persists, please contact our helpdesk.\n\nThank you for your patience.</string>
+    <string name="aiMenuEditRequest">Edit my request</string>
+    <string name="aiMenuExpand">Expand</string>
+    <string name="aiMenuFriendlyWriting">Friendly writing</string>
+    <string name="aiMenuRegenerate">Regenerate a response</string>
+    <string name="aiMenuSeriousWriting">Serious writing</string>
+    <string name="aiMenuShorten">Shorten</string>
     <string name="aiPromptGenerationLoader">The assistant is writing</string>
     <string name="aiPromptPlaceholder">Tell the writing assistant what you want to write. For example, \"a thank-you email for a welcome gift\".</string>
     <string name="aiPromptTag">Beta</string>
