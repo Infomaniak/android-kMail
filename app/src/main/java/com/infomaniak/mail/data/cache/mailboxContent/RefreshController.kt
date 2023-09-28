@@ -377,6 +377,55 @@ class RefreshController @Inject constructor(
         fibonacci: Int = 1,
     ): Pair<Int, Set<Thread>> {
 
+        fun Realm.getPaginationInfo(): PaginationInfo? {
+            return if (shouldUpdateCursor) {
+                null
+            } else {
+                when (direction) {
+                    Direction.IN_THE_PAST -> MessageController.getOldestMessage(folder.id, realm = this)
+                    Direction.TO_THE_FUTURE -> MessageController.getNewestMessage(folder.id, fibonacci, realm = this) {
+                        endOfMessagesReached = true
+                    }
+                }?.shortUid?.let { offsetUid ->
+                    PaginationInfo(offsetUid, direction.apiCallValue)
+                }
+            }
+        }
+
+        fun getNewMessages(paginationInfo: PaginationInfo?): NewMessagesResult {
+            return runCatching {
+                getMessagesUids(mailbox.uuid, folder.id, okHttpClient, paginationInfo)!!
+            }.getOrElse {
+                throw if (it is ApiErrorException && it.errorCode == ErrorCode.MESSAGE_NOT_FOUND) {
+                    MessageNotFoundException(it.message, folder, direction)
+                } else {
+                    it
+                }
+            }
+        }
+
+        val impactedThreads = mutableSetOf<Thread>()
+        val paginationInfo = getPaginationInfo()
+        val newMessages = getNewMessages(paginationInfo)
+        val uidsCount = newMessages.addedShortUids.count()
+        scope.ensureActive()
+
+        impactedThreads += handleAddedUids(scope, mailbox, folder, okHttpClient, newMessages.addedShortUids, newMessages.cursor)
+        updateFolder(folder.id, direction, uidsCount, paginationInfo, shouldUpdateCursor, newMessages.cursor)
+        sendSentryOrphans(folder)
+
+        return uidsCount to impactedThreads
+    }
+
+    private fun Realm.updateFolder(
+        folderId: String,
+        direction: Direction,
+        uidsCount: Int,
+        paginationInfo: PaginationInfo?,
+        shouldUpdateCursor: Boolean,
+        cursor: String,
+    ) {
+
         fun Folder.theEndIsReached() {
             remainingOldMessagesToFetch = 0
             isHistoryComplete = true
@@ -387,36 +436,7 @@ class RefreshController @Inject constructor(
             isHistoryComplete = Folder.DEFAULT_IS_HISTORY_COMPLETE
         }
 
-        val impactedThreads = mutableSetOf<Thread>()
-
-        val paginationInfo = if (shouldUpdateCursor) {
-            null
-        } else {
-            when (direction) {
-                Direction.IN_THE_PAST -> MessageController.getOldestMessage(folder.id, realm = this)
-                Direction.TO_THE_FUTURE -> MessageController.getNewestMessage(folder.id, fibonacci, realm = this) {
-                    endOfMessagesReached = true
-                }
-            }?.shortUid?.let { offsetUid ->
-                PaginationInfo(offsetUid, direction.apiCallValue)
-            }
-        }
-
-        val newMessages = runCatching {
-            getMessagesUids(mailbox.uuid, folder.id, okHttpClient, paginationInfo)!!
-        }.getOrElse {
-            throw if (it is ApiErrorException && it.errorCode == ErrorCode.MESSAGE_NOT_FOUND) {
-                MessageNotFoundException(it.message, folder, direction)
-            } else {
-                it
-            }
-        }
-        val uidsCount = newMessages.addedShortUids.count()
-        scope.ensureActive()
-
-        impactedThreads += handleAddedUids(scope, mailbox, folder, okHttpClient, newMessages.addedShortUids, newMessages.cursor)
-
-        FolderController.updateFolder(folder.id, realm = this) {
+        FolderController.updateFolder(folderId, realm = this) {
 
             when (direction) {
                 Direction.IN_THE_PAST -> {
@@ -444,14 +464,10 @@ class RefreshController @Inject constructor(
             }
 
             if (shouldUpdateCursor) {
-                SentryDebug.addCursorBreadcrumb("fetchOnePage", it, newMessages.cursor)
-                it.cursor = newMessages.cursor
+                SentryDebug.addCursorBreadcrumb("fetchOnePage", it, cursor)
+                it.cursor = cursor
             }
         }
-
-        sendSentryOrphans(folder)
-
-        return uidsCount to impactedThreads
     }
 
     private suspend fun Realm.fetchActivities(
