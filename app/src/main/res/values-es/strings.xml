@@ -55,6 +55,12 @@
     <string name="aiErrorMaxTokenReached">Su solicitud es demasiado larga. Por favor, inténtelo de nuevo en un formato más corto.</string>
     <string name="aiErrorTooManyRequests">Parece que ha realizado demasiadas solicitudes en un corto espacio de tiempo.\n\nPor favor, espere unos momentos.</string>
     <string name="aiErrorUnknown">Se ha producido un error. Si este error persiste, póngase en contacto con nuestro servicio de asistencia.\n\nGracias por su paciencia.</string>
+    <string name="aiMenuEditRequest">Editar mi solicitud</string>
+    <string name="aiMenuExpand">Ampliar</string>
+    <string name="aiMenuFriendlyWriting">Escritura amistosa</string>
+    <string name="aiMenuRegenerate">Regenerar una respuesta</string>
+    <string name="aiMenuSeriousWriting">Escritura seria</string>
+    <string name="aiMenuShorten">Acortar</string>
     <string name="aiPromptGenerationLoader">El asistente está escribiendo</string>
     <string name="aiPromptPlaceholder">Dígale al asistente de redacción lo que quiere escribir. Por ejemplo, \"un correo electrónico de agradecimiento por un regalo de bienvenida\".</string>
     <string name="aiPromptTag">Beta</string>

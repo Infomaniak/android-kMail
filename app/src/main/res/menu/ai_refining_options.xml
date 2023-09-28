@@ -20,30 +20,30 @@
         <item
             android:id="@+id/modify"
             android:icon="@drawable/ic_contact_action_write"
-            android:title="Modifier ma demande" />
+            android:title="@string/aiMenuEditRequest" />
         <item
             android:id="@+id/regenerate"
             android:icon="@drawable/ic_ai_regenerate"
-            android:title="Regénérer une réponse" />
+            android:title="@string/aiMenuRegenerate" />
     </group>
     <group android:id="@+id/group2">
         <item
             android:id="@+id/shorten"
             android:icon="@drawable/ic_ai_shorten"
-            android:title="Raccourcir" />
+            android:title="@string/aiMenuShorten" />
         <item
             android:id="@+id/lengthen"
             android:icon="@drawable/ic_ai_lengthen"
-            android:title="Rallonger" />
+            android:title="@string/aiMenuExpand" />
     </group>
     <group android:id="@+id/group3">
         <item
             android:id="@+id/seriousTone"
             android:icon="@drawable/ic_ai_formal"
-            android:title="Rédaction sérieuse" />
+            android:title="@string/aiMenuSeriousWriting" />
         <item
             android:id="@+id/amicalTone"
             android:icon="@drawable/ic_ai_amical"
-            android:title="Rédaction amicale" />
+            android:title="@string/aiMenuFriendlyWriting" />
     </group>
 </menu>
