@@ -291,12 +291,8 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.ai(), POST, body, HttpClient.okHttpClientLongTimeout)
     }
 
-    private fun checkFeatureFlag(featureFlagType: FeatureFlagType): ApiResponse<Boolean> {
+    fun checkFeatureFlag(featureFlagType: FeatureFlagType): ApiResponse<Boolean> {
         return callApi(ApiRoutes.featureFlag(featureFlagType.apiName), GET)
-    }
-
-    fun checkAiFeatureFlag(): ApiResponse<Boolean> {
-        return checkFeatureFlag(FeatureFlagType.AI)
     }
 
     fun downloadAttachment(resource: String): Response {

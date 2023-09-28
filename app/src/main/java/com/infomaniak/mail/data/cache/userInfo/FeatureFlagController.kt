@@ -23,9 +23,9 @@ import com.infomaniak.mail.di.UserInfoRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
-import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.RealmSingleQuery
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.mapNotNull
 import javax.inject.Inject
 
 class FeatureFlagController @Inject constructor(@UserInfoRealm private val userInfoRealm: Realm) {
@@ -34,8 +34,8 @@ class FeatureFlagController @Inject constructor(@UserInfoRealm private val userI
         return userInfoRealm.query<FeatureFlag>("${FeatureFlag::id.name} == $0", featureFlagType.apiName).first()
     }
 
-    fun getFeatureFlagAsync(featureFlagType: FeatureFlagType): Flow<SingleQueryChange<FeatureFlag>> {
-        return getFeatureFlagQuery(featureFlagType).asFlow()
+    fun getFeatureFlagAsync(featureFlagType: FeatureFlagType): Flow<FeatureFlag> {
+        return getFeatureFlagQuery(featureFlagType).asFlow().mapNotNull { it.obj }
     }
 
     fun upsertFeatureFlag(featureFlag: FeatureFlag) {
