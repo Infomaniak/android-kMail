@@ -600,6 +600,7 @@ class NewMessageFragment : Fragment() {
 
         draft.attachments[position].getUploadLocalFile(requireContext(), draft.localUuid).delete()
         draft.attachments.removeAt(position)
+        newMessageViewModel.saveDraftWithoutDebouncing()
     }
 
     private fun setupExternalBanner() = with(binding) {

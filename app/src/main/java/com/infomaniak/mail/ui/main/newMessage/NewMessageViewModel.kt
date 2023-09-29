@@ -529,6 +529,11 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
+    fun saveDraftWithoutDebouncing() = viewModelScope.launch(ioCoroutineContext) {
+        autoSaveJob?.cancel()
+        saveDraftToLocal(DraftAction.SAVE)
+    }
+
     fun executeDraftActionWhenStopping(
         action: DraftAction,
         isFinishing: Boolean,
@@ -589,7 +594,7 @@ class NewMessageViewModel @Inject constructor(
 
         mailboxContentRealm().writeBlocking {
             draftController.upsertDraft(draft, realm = this)
-            draft.messageUid?.let { MessageController.getMessage(it, realm = this)?.draftLocalUuid = draft.localUuid }
+            draft.messageUid?.let { MessageController.getMessage(uid = it, realm = this)?.draftLocalUuid = draft.localUuid }
         }
     }
 
