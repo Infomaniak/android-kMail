@@ -73,7 +73,7 @@ class AiPropositionFragment : Fragment() {
 
         setUi()
 
-        if (aiViewModel.aiProposition.value == null) currentRequestJob = aiViewModel.generateAiProposition()
+        if (aiViewModel.aiProposition.value == null) currentRequestJob = aiViewModel.generateNewAiProposition()
         observeAiProposition()
     }
 
