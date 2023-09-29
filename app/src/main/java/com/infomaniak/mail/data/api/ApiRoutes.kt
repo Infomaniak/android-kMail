@@ -134,8 +134,12 @@ object ApiRoutes {
         return "${getMessages(mailboxUuid, folderId)}/messages?uids=${uids.joinToString(",")}"
     }
 
-    fun aiContext(contextId: String, action: String): String {
+    fun aiShortcutContext(contextId: String, action: String): String {
         return "${ai()}/mobile/$contextId/$action"
+    }
+
+    fun aiShortcutNoContext(action: String): String {
+        return "${ai()}/mobile/$action"
     }
 
     private fun getMessages(mailboxUuid: String, folderId: String): String {
