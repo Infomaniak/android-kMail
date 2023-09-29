@@ -102,20 +102,20 @@ class RefreshController @Inject constructor(
             realm.handleRefreshMode(refreshMode, scope = this, mailbox, folder, okHttpClient) to null
         }
     }.getOrElse {
-        handleRefreshFailure(throwable = it, job, mailbox, folder, okHttpClient, realm, started, stopped)
+        handleRefreshFailure(throwable = it, job, mailbox, okHttpClient, realm, started, stopped, folderId = folder.id)
     }
 
     private suspend fun handleRefreshFailure(
         throwable: Throwable,
         job: Job,
         mailbox: Mailbox,
-        folder: Folder,
         okHttpClient: OkHttpClient?,
         realm: Realm,
         started: (() -> Unit)?,
         stopped: (() -> Unit)?,
         retryStrategy: RetryStrategy = RetryStrategy(),
         returnThreadsFromParameters: Set<Thread>? = null,
+        folderId: String? = null,
     ): Pair<Set<Thread>?, Throwable?> {
 
         val (returnThreadsFromException, exception) = if (throwable is ReturnThreadsException) {
@@ -139,7 +139,7 @@ class RefreshController @Inject constructor(
                 retryStrategy,
                 exception.direction,
                 returnThreads,
-                isSameFolder = exception.folder.id == folder.id,
+                isSameFolder = exception.folder.id == folderId,
             )
         } else {
             handleAllExceptions(exception, stopped)
@@ -256,7 +256,7 @@ class RefreshController @Inject constructor(
             (if (isSameFolder) threads else returnThreads) to null
         }
     }.getOrElse {
-        handleRefreshFailure(it, job, mailbox, folder, okHttpClient, realm, started, stopped, retryStrategy, returnThreads)
+        handleRefreshFailure(it, job, mailbox, okHttpClient, realm, started, stopped, retryStrategy, returnThreads)
     }
 
     private suspend fun Realm.handleRefreshMode(
