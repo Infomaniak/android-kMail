@@ -34,7 +34,7 @@ object LocalStorageUtils {
     private inline val Context.attachmentsCacheRootDir get() = File(cacheDir, ATTACHMENTS_CACHE_DIR)
     private inline val Context.attachmentsUploadRootDir get() = File(filesDir, ATTACHMENTS_UPLOAD_DIR)
 
-    private inline val File.hasEmptyFiles get() = listFiles().isNullOrEmpty()
+    private inline val File.hasNoChildren get() = listFiles().isNullOrEmpty()
 
     fun getAttachmentsCacheDir(
         context: Context,
@@ -84,9 +84,9 @@ object LocalStorageUtils {
 
     fun saveUploadAttachment(context: Context, uri: Uri, fileName: String, localDraftUuid: String): File? {
         return context.contentResolver.openInputStream(uri)?.use { inputStream ->
-            val attachmentsCacheDir = getAttachmentsUploadDir(context, localDraftUuid)
-            if (!attachmentsCacheDir.exists()) attachmentsCacheDir.mkdirs()
-            File(attachmentsCacheDir, fileName).also { file ->
+            val attachmentsUploadDir = getAttachmentsUploadDir(context, localDraftUuid)
+            if (!attachmentsUploadDir.exists()) attachmentsUploadDir.mkdirs()
+            File(attachmentsUploadDir, fileName).also { file ->
                 FileOutputStream(file).use(inputStream::copyTo)
             }
         } ?: run {
@@ -113,10 +113,10 @@ object LocalStorageUtils {
         val userDir = mailboxDir.parentFile ?: return
         val attachmentsRootDir = userDir.parentFile ?: return
 
-        if (attachmentsDir.hasEmptyFiles) attachmentsDir.delete()
-        if (mailboxDir.hasEmptyFiles) mailboxDir.delete()
-        if (userDir.hasEmptyFiles) userDir.delete()
-        if (attachmentsRootDir.hasEmptyFiles) attachmentsRootDir.delete()
+        if (attachmentsDir.hasNoChildren) attachmentsDir.delete()
+        if (mailboxDir.hasNoChildren) mailboxDir.delete()
+        if (userDir.hasNoChildren) userDir.delete()
+        if (attachmentsRootDir.hasNoChildren) attachmentsRootDir.delete()
     }
 
     fun deleteUserData(context: Context, userId: Int) {

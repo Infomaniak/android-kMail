@@ -51,6 +51,7 @@ import com.google.android.material.button.MaterialButton
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.MatomoMail
+import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackExternalEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
@@ -589,6 +590,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun onDeleteAttachment(position: Int, itemCountLeft: Int) = with(binding) {
+        trackAttachmentActionsEvent("delete")
         val draft = newMessageViewModel.draft
 
         if (itemCountLeft == 0) {
@@ -598,6 +600,7 @@ class NewMessageFragment : Fragment() {
 
         draft.attachments[position].getUploadLocalFile(requireContext(), draft.localUuid).delete()
         draft.attachments.removeAt(position)
+        newMessageViewModel.saveDraftWithoutDebouncing()
     }
 
     private fun setupExternalBanner() = with(binding) {

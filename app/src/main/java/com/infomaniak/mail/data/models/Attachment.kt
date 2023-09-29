@@ -106,8 +106,8 @@ class Attachment : EmbeddedRealmObject {
         userId: Int = AccountUtils.currentUserId,
         mailboxId: Int = AccountUtils.currentMailboxId,
     ): File {
-        val cacheFolder = LocalStorageUtils.getAttachmentsUploadDir(context, localDraftUuid, userId, mailboxId)
-        return File(cacheFolder, name)
+        val uploadFolder = LocalStorageUtils.getAttachmentsUploadDir(context, localDraftUuid, userId, mailboxId)
+        return File(uploadFolder, name)
     }
 
     fun openWithIntent(context: Context): Intent {

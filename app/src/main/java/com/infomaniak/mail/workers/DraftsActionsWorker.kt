@@ -293,7 +293,7 @@ class DraftsActionsWorker @AssistedInject constructor(
     private fun Attachment.startUpload(localDraftUuid: String) {
         val attachmentFile = getUploadLocalFile(applicationContext, localDraftUuid).also {
             if (!it.exists()) {
-                SentryLog.d(ATTACHMENT_TAG, "No local folder for attachment $name")
+                SentryLog.d(ATTACHMENT_TAG, "No local file for attachment $name")
                 return
             }
         }
