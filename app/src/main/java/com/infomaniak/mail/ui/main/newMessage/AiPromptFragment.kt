@@ -25,24 +25,17 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isGone
-import androidx.core.view.isInvisible
-import androidx.core.view.isVisible
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.lib.core.utils.showKeyboard
 import com.infomaniak.lib.core.utils.toPx
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentAiPromptBinding
-import com.infomaniak.mail.ui.main.newMessage.AiViewModel.PropositionStatus.*
 import com.infomaniak.mail.utils.postfixWithTag
 import dagger.hilt.android.AndroidEntryPoint
-import io.sentry.Sentry
-import io.sentry.SentryLevel
 import com.google.android.material.R as RMaterial
-import com.infomaniak.lib.core.R as RCore
 
 @AndroidEntryPoint
 class AiPromptFragment : Fragment() {
@@ -102,6 +95,16 @@ class AiPromptFragment : Fragment() {
             newMessageViewModel.shouldExecuteDraftActionWhenStopping = false
             newMessageFragment.navigateToPropositionFragment()
         }
+
+        prompt.doAfterTextChanged {
+            // Doing it inside onPromptChanged() is not enough because the enabled state is not recomputed when the app is
+            // recreated or the prompt is opened because because we came back from AiPropositionFragment 
+            updateButtonEnabledState(it)
+        }
+    }
+
+    private fun updateButtonEnabledState(prompt: Editable?) = with(binding) {
+        generateButton.isEnabled = prompt?.isNotEmpty() ?: false
     }
 
     override fun onStart() {
@@ -120,7 +123,6 @@ class AiPromptFragment : Fragment() {
     }
 
     private fun onPromptChanged(prompt: Editable?) = with(binding) {
-        generateButton.isEnabled = prompt?.isNotEmpty() ?: false
         aiViewModel.aiPrompt = prompt.toString()
     }
 

@@ -782,8 +782,13 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun onAiPromptOpened(resetPrompt: Boolean = true) = with(binding) {
-        if (resetPrompt) aiViewModel.aiPrompt = ""
+    private fun onAiPromptOpened(resetPrompt: Boolean) = with(binding) {
+        if (resetPrompt) {
+            aiViewModel.apply {
+                aiPrompt = ""
+                aiPromptStatus.value?.shouldResetPrompt = false
+            }
+        }
 
         // Keyboard is opened inside onCreate() of AiPromptFragment
 
