@@ -22,23 +22,14 @@ import android.view.View
 import androidx.fragment.app.activityViewModels
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.ai.AiPromptOpeningStatus
-import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.ui.main.newMessage.AiViewModel
-import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
-@AndroidEntryPoint
 class AiDiscoveryBottomSheetDialog : InformationBottomSheetDialog() {
 
     private val aiViewModel: AiViewModel by activityViewModels()
 
-    @Inject
-    lateinit var localSettings: LocalSettings
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
-
-        localSettings.showAiDiscoveryBottomSheet = false
 
         infoIllustration.setBackgroundResource(R.drawable.illustration_discover_ai)
         title.setText(R.string.aiDiscoveryTitle)
