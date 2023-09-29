@@ -29,10 +29,7 @@ import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.getCustomMenuFolders
 import com.infomaniak.mail.utils.standardize
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -71,7 +68,10 @@ class MoveViewModel @Inject constructor(
     fun filterFolders(query: String, folders: List<Folder>, shouldDebounce: Boolean) = viewModelScope.launch(ioCoroutineContext) {
         filterJob?.cancel()
         filterJob = launch {
-            if (shouldDebounce) delay(FILTER_DEBOUNCE_DURATION)
+            if (shouldDebounce) {
+                delay(FILTER_DEBOUNCE_DURATION)
+                ensureActive()
+            }
             val filteredFolders = folders.filter { folder ->
                 val folderName = folder.role?.folderNameRes?.let(context::getString) ?: folder.name
                 folderName.standardize().contains(query.standardize())

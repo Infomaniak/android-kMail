@@ -25,10 +25,7 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.SearchUtils
 import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -51,6 +48,7 @@ class ThreadListViewModel @Inject constructor(
         updatedAtJob = viewModelScope.launch(ioCoroutineContext) {
             while (true) {
                 delay(DateUtils.MINUTE_IN_MILLIS)
+                ensureActive()
                 updatedAtTrigger.postValue(Unit)
             }
         }

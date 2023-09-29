@@ -524,6 +524,7 @@ class NewMessageViewModel @Inject constructor(
         autoSaveJob?.cancel()
         autoSaveJob = viewModelScope.launch(ioCoroutineContext) {
             delay(DELAY_BEFORE_AUTO_SAVING_DRAFT)
+            ensureActive()
             saveDraftToLocal(DraftAction.SAVE)
         }
     }
