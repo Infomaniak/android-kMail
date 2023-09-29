@@ -282,6 +282,11 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.flushFolder(mailboxUuid, folderId), POST)
     }
 
+    fun generateNewAiProposition(message: UserMessage): ApiResponse<AiResult> {
+        val body = getBodyFromMessages(listOf(message))
+        return startNewConversation(body)
+    }
+
     private fun getBodyFromMessages(messages: List<AiMessage>) = mapOf(
         "messages" to messages,
         "output" to "mail",
@@ -291,25 +296,29 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.ai(), POST, body, HttpClient.okHttpClientLongTimeout)
     }
 
-    fun generateNewAiProposition(message: UserMessage): ApiResponse<AiResult> {
-        val body = getBodyFromMessages(listOf(message))
-        return startNewConversation(body)
-    }
+    fun applyShortcutOnExistingConversation(
+        contextId: String,
+        shortcut: Shortcut,
+        history: List<AiMessage>,
+    ): ApiResponse<AiResult> {
+        val response = applyShortcutOnExistingConversation(contextId, shortcut)
+        val hasConversationExpired = response.error?.code == OBJECT_NOT_FOUND
 
-    private fun continueConversation(contextId: String, shortcut: Shortcut): ApiResponse<AiResult> {
-        return callApi(ApiRoutes.aiContext(contextId, shortcut.apiRoute!!), PATCH, okHttpClient = HttpClient.okHttpClientLongTimeout)
-    }
-
-    fun continueExistingAiConversation(contextId: String, shortcut: Shortcut, history: List<AiMessage>): ApiResponse<AiResult> {
-        val response = continueConversation(contextId, shortcut)
-        val isContextExpired = response.error?.code == OBJECT_NOT_FOUND
-
-        return if (isContextExpired) {
+        return if (hasConversationExpired) {
             val reconstructedBody = getBodyFromMessages(history)
-            startNewConversation(reconstructedBody)
+            applyShortcutOnNewConversation(reconstructedBody, shortcut)
         } else {
             response
         }
+    }
+
+    private fun applyShortcutOnExistingConversation(contextId: String, shortcut: Shortcut): ApiResponse<AiResult> {
+        val action = shortcut.apiRoute!!
+        return callApi(ApiRoutes.aiShortcutContext(contextId, action), PATCH, okHttpClient = HttpClient.okHttpClientLongTimeout)
+    }
+
+    private fun applyShortcutOnNewConversation(body: Map<String, Any>, shortcut: Shortcut): ApiResponse<AiResult> {
+        return callApi(ApiRoutes.aiShortcutNoContext(shortcut.apiRoute!!), POST, body, HttpClient.okHttpClientLongTimeout)
     }
 
     fun checkFeatureFlag(featureFlagType: FeatureFlagType): ApiResponse<Boolean> {

@@ -38,7 +38,6 @@ import com.infomaniak.mail.ui.main.newMessage.AiViewModel.PropositionStatus
 import com.infomaniak.mail.ui.main.newMessage.AiViewModel.Shortcut
 import com.infomaniak.mail.utils.SimpleIconPopupMenu
 import com.infomaniak.mail.utils.changeToolbarColorOnScroll
-import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.utils.postfixWithTag
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
