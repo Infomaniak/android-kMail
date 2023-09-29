@@ -84,9 +84,9 @@ object LocalStorageUtils {
 
     fun saveUploadAttachment(context: Context, uri: Uri, fileName: String, localDraftUuid: String): File? {
         return context.contentResolver.openInputStream(uri)?.use { inputStream ->
-            val attachmentsCacheDir = getAttachmentsUploadDir(context, localDraftUuid)
-            if (!attachmentsCacheDir.exists()) attachmentsCacheDir.mkdirs()
-            File(attachmentsCacheDir, fileName).also { file ->
+            val attachmentsUploadDir = getAttachmentsUploadDir(context, localDraftUuid)
+            if (!attachmentsUploadDir.exists()) attachmentsUploadDir.mkdirs()
+            File(attachmentsUploadDir, fileName).also { file ->
                 FileOutputStream(file).use(inputStream::copyTo)
             }
         } ?: run {
