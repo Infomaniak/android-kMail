@@ -67,12 +67,12 @@ class AiViewModel @Inject constructor(
         }
     }
 
-    private fun handleAiResult(apiResponse: ApiResponse<AiResult>, promptMessage: AiMessage) = with(apiResponse) {
+    private fun handleAiResult(apiResponse: ApiResponse<AiResult>, promptMessage: AiMessage?) = with(apiResponse) {
         aiProposition.postValue(
             when {
                 isSuccess() -> data?.let { aiResult ->
                     aiResult.contextId?.let { conversationContextId = it }
-                    history += promptMessage
+                    history += promptMessage!!
                     history += AssistantMessage(aiResult.content)
                     SUCCESS to aiResult.content
                 } ?: (MISSING_CONTENT to null)
@@ -84,9 +84,9 @@ class AiViewModel @Inject constructor(
     }
 
     fun performShortcut(shortcut: Shortcut) = viewModelScope.launch(ioCoroutineContext) {
-        with(ApiRepository.continueExistingAiConversation(conversationContextId!!, shortcut, history.toList())) {
+        with(ApiRepository.applyShortcutOnExistingConversation(conversationContextId!!, shortcut, history.toList())) {
             ensureActive()
-            handleAiResult(apiResponse = this, data?.promptMessage!!)
+            handleAiResult(apiResponse = this, data?.promptMessage)
         }
     }
 
