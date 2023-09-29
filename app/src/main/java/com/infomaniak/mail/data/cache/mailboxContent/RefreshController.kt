@@ -123,6 +123,34 @@ class RefreshController @Inject constructor(
         handleRefreshFailure(job, throwable = it)
     }
 
+    private suspend fun retryWithRunCatching(
+        job: Job,
+        failedFolder: Folder,
+        retryStrategy: RetryStrategy,
+        returnThreads: Set<Thread>?,
+    ): Pair<Set<Thread>?, Throwable?> = runCatching {
+        withContext(Dispatchers.IO + job) {
+
+            // If fetching the Activities failed because of a not found Message, we should pause briefly
+            // before trying again to retrieve new Messages, to ensure that the API is up-to-date.
+            delay(Utils.DELAY_BEFORE_FETCHING_ACTIVITIES_AGAIN)
+            ensureActive()
+
+            val (_, threads) = if (retryStrategy.iteration == Iteration.ABORT_MISSION) {
+                realm.fetchOneNewPage(scope = this, failedFolder, shouldUpdateCursor = true)
+            } else {
+                realm.fetchOneNewPage(scope = this, failedFolder, retryStrategy.fibonacci)
+            }
+
+            val isSameFolder = failedFolder.id == initialFolder.id
+            val impactedThreads = if (isSameFolder) threads else returnThreads
+
+            impactedThreads to null
+        }
+    }.getOrElse {
+        handleRefreshFailure(job, throwable = it, retryStrategy, returnThreads)
+    }
+
     private suspend fun handleRefreshFailure(
         job: Job,
         throwable: Throwable,
@@ -210,34 +238,6 @@ class RefreshController @Inject constructor(
         }
 
         return retry(failedFolder, strategy)
-    }
-
-    private suspend fun retryWithRunCatching(
-        job: Job,
-        failedFolder: Folder,
-        retryStrategy: RetryStrategy,
-        returnThreads: Set<Thread>?,
-    ): Pair<Set<Thread>?, Throwable?> = runCatching {
-        withContext(Dispatchers.IO + job) {
-
-            // If fetching the Activities failed because of a not found Message, we should pause briefly
-            // before trying again to retrieve new Messages, to ensure that the API is up-to-date.
-            delay(Utils.DELAY_BEFORE_FETCHING_ACTIVITIES_AGAIN)
-            ensureActive()
-
-            val (_, threads) = if (retryStrategy.iteration == Iteration.ABORT_MISSION) {
-                realm.fetchOneNewPage(scope = this, failedFolder, shouldUpdateCursor = true)
-            } else {
-                realm.fetchOneNewPage(scope = this, failedFolder, retryStrategy.fibonacci)
-            }
-
-            val isSameFolder = failedFolder.id == initialFolder.id
-            val impactedThreads = if (isSameFolder) threads else returnThreads
-
-            impactedThreads to null
-        }
-    }.getOrElse {
-        handleRefreshFailure(job, throwable = it, retryStrategy, returnThreads)
     }
 
     private suspend fun Realm.handleRefreshMode(scope: CoroutineScope): Set<Thread> {
