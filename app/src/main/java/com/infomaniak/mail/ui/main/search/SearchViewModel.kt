@@ -166,6 +166,7 @@ class SearchViewModel @Inject constructor(
         searchJob?.cancel()
         searchJob = launch {
             delay(SEARCH_DEBOUNCE_DURATION)
+            ensureActive()
 
             refreshController.cancelRefresh()
 
