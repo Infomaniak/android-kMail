@@ -163,8 +163,9 @@ class NewMessageFragment : Fragment() {
         observeAiFeatureFragmentUpdates()
     }
 
-    private fun navigateToDiscoveryBottomSheetIfNeeded() {
-        if (localSettings.showAiDiscoveryBottomSheet) {
+    private fun navigateToDiscoveryBottomSheetIfNeeded() = with(localSettings) {
+        if (showAiDiscoveryBottomSheet) {
+            showAiDiscoveryBottomSheet = false
             safeNavigate(NewMessageFragmentDirections.actionNewMessageFragmentToAiDiscoveryBottomSheetDialog())
         }
     }
