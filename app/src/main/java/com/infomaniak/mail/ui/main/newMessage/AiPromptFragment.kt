@@ -28,6 +28,8 @@ import android.view.ViewGroup
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.withStarted
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.lib.core.utils.showKeyboard
 import com.infomaniak.lib.core.utils.toPx
@@ -35,6 +37,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentAiPromptBinding
 import com.infomaniak.mail.utils.postfixWithTag
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import com.google.android.material.R as RMaterial
 
 @AndroidEntryPoint
@@ -89,6 +92,7 @@ class AiPromptFragment : Fragment() {
         )
 
         prompt.showKeyboard()
+        initPromptText()
         closeButton.setOnClickListener { newMessageFragment.closeAiPrompt() }
 
         generateButton.setOnClickListener {
@@ -103,13 +107,16 @@ class AiPromptFragment : Fragment() {
         }
     }
 
-    private fun updateButtonEnabledState(prompt: Editable?) = with(binding) {
-        generateButton.isEnabled = prompt?.isNotEmpty() ?: false
+    private fun initPromptText() = with(binding) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.withStarted {
+                prompt.setText(aiViewModel.aiPrompt)
+            }
+        }
     }
 
-    override fun onStart() {
-        super.onStart()
-        binding.prompt.setText(aiViewModel.aiPrompt)
+    private fun updateButtonEnabledState(prompt: Editable?) = with(binding) {
+        generateButton.isEnabled = prompt?.isNotEmpty() ?: false
     }
 
     override fun onResume() {
