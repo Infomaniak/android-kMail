@@ -128,7 +128,7 @@ class ContactAdapter(
         publishResults(performFiltering(text))
     }
 
-    fun removeUsedEmail(email: String) = usedContacts.remove(email.standardize())
+    fun removeUsedEmail(email: String) = usedContacts.remove(email.standardize()).also { notifyDataSetChanged() }
 
     fun addUsedContact(email: String) = usedContacts.add(email.standardize())
 
