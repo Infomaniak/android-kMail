@@ -148,10 +148,19 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
         private val isNotScheduled = "${Message::isScheduled.name} == false"
 
         //region Queries
-        private fun getOldestOrNewestMessageQuery(folderId: String, sort: Sort, realm: TypedRealm): RealmSingleQuery<Message> {
+        private fun getOldestOrNewestMessagesQuery(
+            folderId: String,
+            sort: Sort,
+            realm: TypedRealm,
+            fibonacci: Int = 1,
+        ): RealmQuery<Message> {
+
             val byFolderId = "${Message::folderId.name} == $0"
             val isNotFromSearch = "${Message::isFromSearch.name} == false"
-            return realm.query<Message>("$byFolderId AND $isNotFromSearch", folderId).sort(Message::shortUid.name, sort).first()
+
+            return realm.query<Message>("$byFolderId AND $isNotFromSearch", folderId)
+                .sort(Message::shortUid.name, sort)
+                .limit(fibonacci)
         }
 
         private fun getMessageQuery(uid: String, realm: TypedRealm): RealmSingleQuery<Message> {
@@ -170,11 +179,14 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
         }
 
         fun getOldestMessage(folderId: String, realm: TypedRealm): Message? {
-            return getOldestOrNewestMessageQuery(folderId, Sort.ASCENDING, realm).find()
+            return getOldestOrNewestMessagesQuery(folderId, Sort.ASCENDING, realm).first().find()
         }
 
-        fun getNewestMessage(folderId: String, realm: TypedRealm): Message? {
-            return getOldestOrNewestMessageQuery(folderId, Sort.DESCENDING, realm).find()
+        fun getNewestMessage(folderId: String, fibonacci: Int, realm: TypedRealm, endOfMessagesReached: () -> Unit): Message? {
+            return getOldestOrNewestMessagesQuery(folderId, Sort.DESCENDING, realm, fibonacci)
+                .find()
+                .also { if (it.count() < fibonacci) endOfMessagesReached() }
+                .lastOrNull()
         }
         //endregion
 
