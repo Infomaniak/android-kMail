@@ -61,10 +61,6 @@ class RefreshController @Inject constructor(
         refreshThreadsJob?.cancel(ForcedCancellationException())
     }
 
-    // TODO: Find another way to get the list of impacted Threads that are used to display Notifications.
-    //  Currently, it conflicts with the Thread retrieval algorithm.
-    //  Handling MESSAGE_NOT_FOUND error prevents us from retrieving this list.
-    //  As soon as it throws, we lose the information.
     suspend fun refreshThreads(
         refreshMode: RefreshMode,
         mailbox: Mailbox,
@@ -106,42 +102,53 @@ class RefreshController @Inject constructor(
             realm.handleRefreshMode(refreshMode, scope = this, mailbox, folder, okHttpClient) to null
         }
     }.getOrElse {
-        handleRefreshFailure(it, job, mailbox, folder, okHttpClient, realm, started, stopped)
+        handleRefreshFailure(throwable = it, job, mailbox, okHttpClient, realm, started, stopped, folderId = folder.id)
     }
 
     private suspend fun handleRefreshFailure(
         throwable: Throwable,
         job: Job,
         mailbox: Mailbox,
-        folder: Folder,
         okHttpClient: OkHttpClient?,
         realm: Realm,
         started: (() -> Unit)?,
         stopped: (() -> Unit)?,
         retryStrategy: RetryStrategy = RetryStrategy(),
+        returnThreadsFromParameters: Set<Thread>? = null,
+        folderId: String? = null,
     ): Pair<Set<Thread>?, Throwable?> {
-        return if (throwable is MessageNotFoundException) {
+
+        val (returnThreadsFromException, exception) = if (throwable is ReturnThreadsException) {
+            throwable.threads to throwable.exception
+        } else {
+            null to throwable
+        }
+
+        val returnThreads = returnThreadsFromParameters ?: returnThreadsFromException
+
+        return if (exception is MessageNotFoundException) {
             handleMessageNotFound(
-                throwable,
+                exception,
                 job,
                 mailbox,
-                throwable.folder,
+                exception.folder,
                 okHttpClient,
                 realm,
                 started,
                 stopped,
                 retryStrategy,
-                throwable.direction,
-                isSameFolder = throwable.folder.id == folder.id,
+                exception.direction,
+                returnThreads,
+                isSameFolder = exception.folder.id == folderId,
             )
         } else {
-            handleAllExceptions(throwable, stopped)
-            null to throwable
+            handleAllExceptions(exception, stopped)
+            returnThreads to exception
         }
     }
 
     private suspend fun handleMessageNotFound(
-        throwable: Throwable,
+        exception: MessageNotFoundException,
         job: Job,
         mailbox: Mailbox,
         folder: Folder,
@@ -151,6 +158,7 @@ class RefreshController @Inject constructor(
         stopped: (() -> Unit)?,
         strategy: RetryStrategy,
         direction: Direction,
+        returnThreads: Set<Thread>?,
         isSameFolder: Boolean,
     ): Pair<Set<Thread>?, Throwable?> {
 
@@ -163,13 +171,22 @@ class RefreshController @Inject constructor(
                 scope.setExtra("fibonacci", "${strategy.fibonacci}")
                 scope.setExtra("folderCursor", "${folder.cursor}")
                 scope.setExtra("folderName", folder.name)
-                Sentry.captureException(throwable)
+                Sentry.captureException(exception)
             }
         }
 
-        suspend fun retry(retryStrategy: RetryStrategy): Pair<Set<Thread>?, Throwable?> {
-            return retryWithRunCatching(job, mailbox, folder, okHttpClient, realm, started, stopped, retryStrategy, isSameFolder)
-        }
+        suspend fun retry(retryStrategy: RetryStrategy): Pair<Set<Thread>?, Throwable?> = retryWithRunCatching(
+            job,
+            mailbox,
+            folder,
+            okHttpClient,
+            realm,
+            started,
+            stopped,
+            retryStrategy,
+            returnThreads,
+            isSameFolder,
+        )
 
         sendMessageNotFoundSentry()
 
@@ -203,8 +220,8 @@ class RefreshController @Inject constructor(
                 }
             }
             Iteration.ABORT_MISSION -> {
-                handleAllExceptions(throwable, stopped)
-                return null to throwable
+                handleAllExceptions(exception, stopped)
+                return returnThreads to exception
             }
         }
 
@@ -220,6 +237,7 @@ class RefreshController @Inject constructor(
         started: (() -> Unit)?,
         stopped: (() -> Unit)?,
         retryStrategy: RetryStrategy,
+        returnThreads: Set<Thread>?,
         isSameFolder: Boolean,
     ): Pair<Set<Thread>?, Throwable?> = runCatching {
         withContext(Dispatchers.IO + job) {
@@ -235,10 +253,10 @@ class RefreshController @Inject constructor(
                 realm.fetchOneNewPage(scope = this, mailbox, folder, okHttpClient, retryStrategy.fibonacci)
             }
 
-            (if (isSameFolder) threads else null) to null
+            (if (isSameFolder) threads else returnThreads) to null
         }
     }.getOrElse {
-        handleRefreshFailure(it, job, mailbox, folder, okHttpClient, realm, started, stopped, retryStrategy)
+        handleRefreshFailure(it, job, mailbox, okHttpClient, realm, started, stopped, retryStrategy, returnThreads)
     }
 
     private suspend fun Realm.handleRefreshMode(
@@ -278,8 +296,12 @@ class RefreshController @Inject constructor(
         }.forEach { role ->
             scope.ensureActive()
 
-            FolderController.getFolder(role, realm = this)?.let {
-                refresh(scope, mailbox, it, okHttpClient)
+            runCatching {
+                FolderController.getFolder(role, realm = this)?.let {
+                    refresh(scope, mailbox, folder = it, okHttpClient)
+                }
+            }.onFailure {
+                throw ReturnThreadsException(impactedThreads, exception = it)
             }
         }
 
@@ -943,6 +965,8 @@ class RefreshController @Inject constructor(
         val offsetUid: Int,
         val direction: String,
     )
+
+    private class ReturnThreadsException(val threads: Set<Thread>, val exception: Throwable) : Exception()
 
     private class ForcedCancellationException : CancellationException()
 
