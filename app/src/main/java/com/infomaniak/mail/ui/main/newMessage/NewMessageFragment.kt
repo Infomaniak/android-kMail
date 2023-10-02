@@ -26,6 +26,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.text.*
 import android.transition.TransitionManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -43,6 +44,7 @@ import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
@@ -130,6 +132,8 @@ class NewMessageFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
+        Log.i("gibran", "NewMessageFragment onViewCreated: ", );
+
         SentryDebug.addNavigationBreadcrumb(
             name = findNavController().currentDestination?.displayName ?: "newMessageFragment",
             arguments = newMessageActivityArgs.toBundle(),
@@ -163,6 +167,7 @@ class NewMessageFragment : Fragment() {
     }
 
     override fun onStart() {
+        Log.i("gibran", "NewMessageFragment onStart: ", );
         super.onStart()
         newMessageViewModel.updateDraftInLocalIfRemoteHasChanged()
     }
@@ -778,7 +783,11 @@ class NewMessageFragment : Fragment() {
 
     private fun observeAiPromptStatus() {
         aiViewModel.aiPromptStatus.observe(viewLifecycleOwner) { (shouldDisplay, shouldResetContent) ->
-            if (shouldDisplay) onAiPromptOpened(shouldResetContent) else onAiPromptClosed()
+            Log.e("gibran", "observeAiPromptStatus - shouldDisplay: ${shouldDisplay}")
+            Log.e("gibran", "observeAiPromptStatus - shouldResetContent: ${shouldResetContent}")
+            viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
+                if (shouldDisplay) onAiPromptOpened(shouldResetContent) else onAiPromptClosed()
+            }
         }
     }
 
@@ -803,6 +812,8 @@ class NewMessageFragment : Fragment() {
                 .add(aiPromptFragmentContainer.id, aiPromptFragment!!, AI_PROMPT_FRAGMENT_TAG)
                 .commitNow()
         }
+
+        // aiPromptFragment.showKeyboard()
 
         setAiPromptVisibility(true)
         newMessageConstraintLayout.descendantFocusability = FOCUS_BLOCK_DESCENDANTS

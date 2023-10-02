@@ -29,6 +29,7 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.withResumed
 import androidx.lifecycle.withStarted
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.lib.core.utils.showKeyboard
@@ -38,6 +39,8 @@ import com.infomaniak.mail.databinding.FragmentAiPromptBinding
 import com.infomaniak.mail.utils.postfixWithTag
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import kotlin.concurrent.timerTask
+import kotlin.system.measureTimeMillis
 import com.google.android.material.R as RMaterial
 
 @AndroidEntryPoint
@@ -78,6 +81,7 @@ class AiPromptFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
+        Log.e("gibran", "AiPromptFragment onViewCreated: ");
         setUi()
     }
 
@@ -91,7 +95,7 @@ class AiPromptFragment : Fragment() {
             R.color.aiBetaTagTextColor,
         )
 
-        prompt.showKeyboard()
+        prompt.post { prompt.showKeyboard() }
         initPromptText()
         closeButton.setOnClickListener { newMessageFragment.closeAiPrompt() }
 
@@ -120,6 +124,7 @@ class AiPromptFragment : Fragment() {
     }
 
     override fun onResume() {
+        Log.e("gibran", "AiPromptFragment onResume: ");
         super.onResume()
         binding.prompt.addTextChangedListener(promptTextWatcher)
     }
