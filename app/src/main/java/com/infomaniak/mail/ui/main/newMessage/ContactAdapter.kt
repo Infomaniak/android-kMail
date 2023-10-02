@@ -128,7 +128,15 @@ class ContactAdapter(
         publishResults(performFiltering(text))
     }
 
-    fun removeUsedEmail(email: String) = usedContacts.remove(email.standardize())
+    fun removeUsedEmail(email: String): Boolean {
+        return usedContacts.remove(email.standardize()).also { isSuccess ->
+            if (isSuccess) {
+                matchedContacts.forEachIndexed { index, matchedContact ->
+                    if (matchedContact.contact.email == email) notifyItemChanged(index)
+                }
+            }
+        }
+    }
 
     fun addUsedContact(email: String) = usedContacts.add(email.standardize())
 
