@@ -56,7 +56,8 @@ object MessageBodyUtils {
 
     suspend fun splitContentAndQuote(body: Body): SplitBody {
 
-        if (body.type == Utils.TEXT_PLAIN) return SplitBody(body.value)
+        val bodyContent = body.value
+        if (body.type == Utils.TEXT_PLAIN) return SplitBody(bodyContent)
 
         return runCatching {
             withTimeout(QUOTE_DETECTION_TIMEOUT) {
@@ -65,7 +66,7 @@ object MessageBodyUtils {
 
                 CoroutineScope(Dispatchers.Default).launch {
                     // The original parsed HTML document in full
-                    val originalHtmlDocument = Jsoup.parse(body.value)
+                    val originalHtmlDocument = Jsoup.parse(bodyContent)
                     // Initiated to the original document and it'll be processed by Jsoup to remove quotes
                     val htmlDocumentWithoutQuote = originalHtmlDocument.clone()
 
@@ -78,7 +79,9 @@ object MessageBodyUtils {
                         }
 
                     val (content, quote) = splitContentAndQuote(originalHtmlDocument, currentQuoteDescriptor, blockquoteElement)
-                    splitBody = if (quote.isNullOrBlank()) SplitBody(body.value) else SplitBody(content, body.value)
+                    ensureActive()
+                    splitBody = if (quote.isNullOrBlank()) SplitBody(bodyContent) else SplitBody(content, bodyContent)
+
                 }.join()
 
                 splitBody!!
@@ -87,14 +90,14 @@ object MessageBodyUtils {
             if (it is TimeoutCancellationException) {
                 Sentry.withScope { scope ->
                     scope.level = SentryLevel.WARNING
-                    scope.setExtra("body size", "${body.value.toByteArray().size} bytes")
+                    scope.setExtra("body size", "${bodyContent.toByteArray().size} bytes")
                     scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
                     Sentry.captureMessage("Timeout reached while displaying a Message's body")
                 }
             } else {
                 Sentry.captureException(it)
             }
-            SplitBody(body.value)
+            SplitBody(bodyContent)
         }
     }
 
