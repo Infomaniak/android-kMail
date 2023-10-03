@@ -43,8 +43,6 @@ class AiDiscoveryBottomSheetDialog : InformationBottomSheetDialog() {
             }
         }
 
-        secondaryActionButton.setOnClickListener {
-            dismiss()
-        }
+        secondaryActionButton.setOnClickListener { dismiss() }
     }
 }
