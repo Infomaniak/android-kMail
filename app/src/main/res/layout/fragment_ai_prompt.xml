@@ -53,8 +53,8 @@
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:layout_width="@dimen/mediumIconSize"
-                    android:layout_height="@dimen/mediumIconSize"
+                    android:layout_width="@dimen/standardIconSize"
+                    android:layout_height="@dimen/standardIconSize"
                     android:layout_marginEnd="@dimen/marginStandardSmall"
                     android:importantForAccessibility="no"
                     android:src="@drawable/ic_ai_magic_wand" />
