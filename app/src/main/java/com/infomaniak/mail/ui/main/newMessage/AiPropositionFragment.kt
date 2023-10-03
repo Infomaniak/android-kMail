@@ -42,7 +42,7 @@ import com.infomaniak.mail.utils.postfixWithTag
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Job
 import javax.inject.Inject
 import com.infomaniak.lib.core.R as RCore
 
@@ -115,20 +115,20 @@ class AiPropositionFragment : Fragment() {
         }
     }
 
-    private fun choosePropositionAndBack() {
-        aiViewModel.aiOutputToInsert.value = aiViewModel.aiProposition.value!!.second
+    private fun choosePropositionAndBack() = with(aiViewModel) {
+        aiOutputToInsert.value = aiProposition.value!!.second
         findNavController().popBackStack()
     }
 
-    private fun onMenuItemClicked(menuItemId: Int) {
+    private fun onMenuItemClicked(menuItemId: Int) = with(aiViewModel) {
         val shortcut = Shortcut.values().find { it.menuId == menuItemId }!!
         if (shortcut == Shortcut.MODIFY) {
-            aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(true, shouldResetPrompt = false)
+            aiPromptOpeningStatus.value = AiPromptOpeningStatus(true, shouldResetPrompt = false)
             findNavController().popBackStack()
         } else {
-            binding.loadingPlaceholder.text = aiViewModel.aiProposition.value!!.second
-            aiViewModel.aiProposition.value = null
-            currentRequestJob = aiViewModel.performShortcut(shortcut)
+            binding.loadingPlaceholder.text = aiProposition.value!!.second
+            aiProposition.value = null
+            currentRequestJob = performShortcut(shortcut)
         }
     }
 

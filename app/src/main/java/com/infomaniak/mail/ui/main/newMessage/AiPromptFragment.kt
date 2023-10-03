@@ -36,6 +36,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentAiPromptBinding
 import com.infomaniak.mail.utils.postfixWithTag
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import com.google.android.material.R as RMaterial
 
@@ -108,17 +109,17 @@ class AiPromptFragment : Fragment() {
         }
     }
 
-    private fun initPromptText() = with(binding) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.withStarted {
-                prompt.setText(aiViewModel.aiPrompt)
-                prompt.setSelection(prompt.length())
+    private fun initPromptText() = viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
+        viewLifecycleOwner.withStarted {
+            with(binding.prompt) {
+                setText(aiViewModel.aiPrompt)
+                setSelection(length())
             }
         }
     }
 
-    private fun updateButtonEnabledState(prompt: Editable?) = with(binding) {
-        generateButton.isEnabled = prompt?.isNotEmpty() ?: false
+    private fun updateButtonEnabledState(prompt: Editable?) {
+        binding.generateButton.isEnabled = prompt?.isNotEmpty() ?: false
     }
 
     override fun onResume() {
@@ -131,7 +132,7 @@ class AiPromptFragment : Fragment() {
         super.onPause()
     }
 
-    private fun onPromptChanged(prompt: Editable?) = with(binding) {
+    private fun onPromptChanged(prompt: Editable?) {
         aiViewModel.aiPrompt = prompt.toString()
     }
 
