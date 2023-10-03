@@ -304,7 +304,7 @@ object ApiRepository : ApiRepositoryCore() {
         "output" to "mail",
     )
 
-    fun checkFeatureFlag(featureFlagType: FeatureFlagType): ApiResponse<Boolean> {
+    fun checkFeatureFlag(featureFlagType: FeatureFlagType): ApiResponse<Map<String, Boolean>> {
         return callApi(ApiRoutes.featureFlag(featureFlagType.apiName), GET)
     }
 
