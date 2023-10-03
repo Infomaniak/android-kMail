@@ -92,7 +92,7 @@ class AiPromptFragment : Fragment() {
         )
 
         prompt.post(prompt::showKeyboard)
-        initPromptText()
+        initPromptTextAndPlaceholder()
         closeButton.setOnClickListener { newMessageFragment.closeAiPrompt() }
 
         generateButton.setOnClickListener {
@@ -107,11 +107,14 @@ class AiPromptFragment : Fragment() {
         prompt.doAfterTextChanged(::updateButtonEnabledState)
     }
 
-    private fun initPromptText() = viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
-        viewLifecycleOwner.withStarted {
-            with(binding.prompt) {
+    private fun initPromptTextAndPlaceholder() = with(binding.prompt) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.withStarted {
                 setText(aiViewModel.aiPrompt)
                 setSelection(length())
+
+                val promptExample = getString(promptExamples.random())
+                hint = getString(R.string.aiPromptPlaceholder, promptExample)
             }
         }
     }
@@ -137,5 +140,13 @@ class AiPromptFragment : Fragment() {
     private companion object {
         const val NO_MARGIN = 0
         val m3BottomSheetHorizontalMarginPx = 56.toPx()
+
+        val promptExamples = listOf(
+            R.string.aiPromptExample1,
+            R.string.aiPromptExample2,
+            R.string.aiPromptExample3,
+            R.string.aiPromptExample4,
+            R.string.aiPromptExample5,
+        )
     }
 }

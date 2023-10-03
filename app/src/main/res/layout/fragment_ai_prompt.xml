@@ -90,8 +90,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="top|start"
-                    android:hint="@string/aiPromptPlaceholder"
-                    android:inputType="textMultiLine|textCapSentences|textAutoCorrect" />
+                    android:inputType="textMultiLine|textCapSentences|textAutoCorrect"
+                    tools:hint="@string/aiPromptPlaceholder" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
