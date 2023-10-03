@@ -112,6 +112,7 @@ class AiPromptFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.withStarted {
                 prompt.setText(aiViewModel.aiPrompt)
+                prompt.setSelection(prompt.length())
             }
         }
     }
