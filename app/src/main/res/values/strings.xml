@@ -69,8 +69,13 @@
     <string name="aiMenuRegenerate">Regenerate a response</string>
     <string name="aiMenuSeriousWriting">Serious writing</string>
     <string name="aiMenuShorten">Shorten</string>
+    <string name="aiPromptExample1">a thank-you email for a welcome gift</string>
+    <string name="aiPromptExample2">an email confirming your hotel reservation</string>
+    <string name="aiPromptExample3">a thank-you email for an invitation to an event</string>
+    <string name="aiPromptExample4">an invitation to a company event</string>
+    <string name="aiPromptExample5">an email requesting an appointment with an important customer</string>
     <string name="aiPromptGenerationLoader">The assistant is writing</string>
-    <string name="aiPromptPlaceholder">Tell the writing assistant what you want to write. For example, \"a thank-you email for a welcome gift\".</string>
+    <string name="aiPromptPlaceholder">Tell the writing assistant what you want to write. For example, \"%s\".</string>
     <string name="aiPromptTag">Beta</string>
     <string name="aiPromptTitle">Writing assistant</string>
     <string name="aiPromptValidateButton">Generate</string>
