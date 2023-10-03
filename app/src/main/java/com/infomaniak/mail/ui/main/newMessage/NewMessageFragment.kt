@@ -587,10 +587,12 @@ class NewMessageFragment : Fragment() {
 
         aiPromptFragmentContainer.hideKeyboard()
 
-        childFragmentManager
-            .beginTransaction()
-            .remove(aiPromptFragment!!)
-            .commitNow()
+        aiPromptFragment?.let {
+            childFragmentManager
+                .beginTransaction()
+                .remove(aiPromptFragment!!)
+                .commitNow()
+        }
 
         setAiPromptVisibility(false)
         newMessageConstraintLayout.descendantFocusability = FOCUS_BEFORE_DESCENDANTS
