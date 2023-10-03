@@ -259,7 +259,7 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
             storageDivider.isVisible = isLimited
 
             if (isLimited) {
-                storageText.text = quotas!!.getText(context)
+                storageText.text = quotas!!.getText(context, mainViewModel.currentMailbox.value?.email)
                 storageIndicator.progress = quotas.getProgress()
             }
         }
