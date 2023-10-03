@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak Mail - Android
+  ~ Copyright (C) 2023 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:id="@+id/group1">
+        <item
+            android:id="@+id/modify"
+            android:icon="@drawable/ic_contact_action_write"
+            android:title="@string/aiMenuEditRequest" />
+        <item
+            android:id="@+id/regenerate"
+            android:icon="@drawable/ic_ai_regenerate"
+            android:title="@string/aiMenuRegenerate" />
+    </group>
+    <group android:id="@+id/group2">
+        <item
+            android:id="@+id/shorten"
+            android:icon="@drawable/ic_ai_shorten"
+            android:title="@string/aiMenuShorten" />
+        <item
+            android:id="@+id/lengthen"
+            android:icon="@drawable/ic_ai_lengthen"
+            android:title="@string/aiMenuExpand" />
+    </group>
+    <group android:id="@+id/group3">
+        <item
+            android:id="@+id/seriousTone"
+            android:icon="@drawable/ic_ai_formal"
+            android:title="@string/aiMenuSeriousWriting" />
+        <item
+            android:id="@+id/friendlyTone"
+            android:icon="@drawable/ic_ai_amical"
+            android:title="@string/aiMenuFriendlyWriting" />
+    </group>
+</menu>

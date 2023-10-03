@@ -24,6 +24,9 @@ import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
+import com.infomaniak.mail.data.cache.userInfo.FeatureFlagController
+import com.infomaniak.mail.data.models.FeatureFlag
+import com.infomaniak.mail.data.models.FeatureFlag.FeatureFlagType
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
@@ -36,6 +39,7 @@ class SharedUtils @Inject constructor(
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val refreshController: RefreshController,
     private val messageController: MessageController,
+    private val featureFlagController: FeatureFlagController,
 ) {
 
     /**
@@ -101,6 +105,12 @@ class SharedUtils @Inject constructor(
                     stopped = stopped,
                 )
             }
+        }
+    }
+
+    fun updateAiFeatureFlag() {
+        with(ApiRepository.checkFeatureFlag(FeatureFlagType.AI)) {
+            if (isSuccess()) featureFlagController.upsertFeatureFlag(FeatureFlag(FeatureFlagType.AI, isEnabled = data?.get("is_enabled") == true))
         }
     }
 

@@ -270,6 +270,21 @@ class LocalSettings private constructor(context: Context) {
     }
     //endregion
 
+    //region AI
+    var aiReplacementDialogVisibility: AiReplacementDialogVisibility
+        get() = getEnum(AI_REPLACEMENT_DIALOG_VISIBILITY_KEY, DEFAULT_AI_REPLACEMENT_DIALOG_VISIBILITY)
+        set(value) = putEnum(AI_REPLACEMENT_DIALOG_VISIBILITY_KEY, value)
+
+    enum class AiReplacementDialogVisibility { // TODO: Matomo
+        SHOW,
+        HIDE,
+    }
+
+    var showAiDiscoveryBottomSheet: Boolean
+        get() = sharedPreferences.getBoolean(SHOW_AI_DISCOVERY_BOTTOM_SHEET_KEY, DEFAULT_SHOW_AI_DISCOVERY_BOTTOM_SHEET)
+        set(value) = sharedPreferences.transaction { putBoolean(SHOW_AI_DISCOVERY_BOTTOM_SHEET_KEY, value) }
+    //endregion
+
     //region Utils
     private inline fun <reified T : Enum<T>> getEnum(key: String, default: T): T {
         return enumValueOfOrNull<T>(sharedPreferences.getString(key, default.name)) ?: default
@@ -304,6 +319,8 @@ class LocalSettings private constructor(context: Context) {
         private const val DEFAULT_RECENT_SEARCHES = "[]"
         private val DEFAULT_FIREBASE_TOKEN = null
         private val DEFAULT_FIREBASE_REGISTERED_USERS = emptySet<String>()
+        private val DEFAULT_AI_REPLACEMENT_DIALOG_VISIBILITY = AiReplacementDialogVisibility.SHOW
+        private const val DEFAULT_SHOW_AI_DISCOVERY_BOTTOM_SHEET = true
         //endregion
 
         //region Keys
@@ -326,6 +343,8 @@ class LocalSettings private constructor(context: Context) {
         private const val RECENT_SEARCHES_KEY = "recentSearchesKey"
         private const val FIREBASE_TOKEN_KEY = "firebaseTokenKey"
         private const val FIREBASE_REGISTERED_USERS_KEY = "firebaseRegisteredUsersKey"
+        private const val AI_REPLACEMENT_DIALOG_VISIBILITY_KEY = "aiReplacementDialogVisibilityKey"
+        private const val SHOW_AI_DISCOVERY_BOTTOM_SHEET_KEY = "showAiDiscoveryBottomSheetKey"
         //endregion
 
         @Volatile

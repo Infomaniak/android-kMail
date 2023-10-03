@@ -38,6 +38,10 @@
         <item name="android:textColor">?android:attr/colorPrimary</item>
     </style>
 
+    <style name="BodyMedium.Tertiary">
+        <item name="android:textColor">@color/tertiaryTextColor</item>
+    </style>
+
     <!-- BodyMedium.OnAccent is only used on FABs, see ExtendedFloatingActionButtonStyle -->
 
     <style name="BodyMedium.Error">
@@ -136,7 +140,8 @@
         <item name="android:textAllCaps">false</item>
         <item name="android:textColor">@color/primary_color_disabled</item>
         <item name="android:textSize">14sp</item>
-        <item name="cornerRadius">10dp</item>
+        <item name="cornerRadius">@dimen/textButtonCornerRadius</item>
+        <item name="iconPadding">@dimen/marginStandardSmall</item>
     </style>
 
     <style name="TextButtonPrimary" parent="Widget.Material3.Button">
@@ -150,8 +155,9 @@
         <item name="android:textAllCaps">false</item>
         <item name="android:textColor">@color/on_primary_color_disabled</item>
         <item name="backgroundTint">@color/primary_color_disabled</item>
-        <item name="cornerRadius">16dp</item>
+        <item name="cornerRadius">@dimen/textButtonCornerRadius</item>
         <item name="fontFamily">@font/suisseintl_medium</item>
+        <item name="iconTint">@color/on_primary_color_disabled</item>
         <item name="layout_constraintWidth_max">500dp</item>
     </style>
 
@@ -487,6 +493,28 @@
         <item name="dividerInsetStart">@dimen/marginStandardSmall</item>
     </style>
 
+    <!-- AI -->
+
+    <style name="AiCursorAndPrimaryColorTheme">
+        <item name="colorAccent">@color/aiColor</item> <!-- For MaterialCheckBox -->
+        <item name="colorControlActivated">@color/aiColor</item>
+        <item name="colorOnPrimary">@color/onAiColor</item>
+        <item name="colorPrimary">@color/aiColor</item>
+    </style>
+
+    <style name="AiRefineMenu">
+        <item name="colorControlHighlight">@color/color_ai_translucent_ripple</item>
+        <item name="colorPrimary">@color/backgroundColorTertiary</item>
+        <item name="colorSurface">@color/backgroundColorTertiary</item>
+    </style>
+
+    <style name="AiCardView" parent="CardViewMail">
+        <item name="cardBackgroundColor">@color/backgroundColorSecondary</item>
+        <item name="cardCornerRadius">@null</item>
+        <item name="cardPreventCornerOverlap">false</item>
+        <item name="shapeAppearanceOverlay">@style/BottomSheetDialogThemeShapeAppearanceOverlay</item>
+    </style>
+
     <!-- Other -->
 
     <style name="ExtendedFloatingActionButtonStyle" parent="Widget.Material3.ExtendedFloatingActionButton.Icon.Primary">
@@ -529,6 +557,7 @@
         <item name="android:textColorHint">@color/tertiaryTextColor</item>
         <item name="boxStrokeColor">@color/text_input_layout_box_color</item>
         <item name="boxStrokeErrorColor">@color/redDestructiveAction</item>
+        <item name="boxBackgroundColor">@color/backgroundColorTertiary</item>
     </style>
 
     <style name="ListPopupMenuStyle" parent="Widget.Material3.PopupMenu.ListPopupWindow">

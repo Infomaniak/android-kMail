@@ -24,13 +24,12 @@ import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.os.Bundle
-import android.text.InputFilter
-import android.text.InputType
-import android.text.Spanned
+import android.text.*
 import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.*
 import android.view.WindowManager
 import android.webkit.WebView
 import android.widget.ListPopupWindow
@@ -59,6 +58,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.*
 import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition.INLINE
+import com.infomaniak.mail.data.models.ai.AiPromptOpeningStatus
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.*
@@ -91,9 +91,12 @@ class NewMessageFragment : Fragment() {
         requireActivity().intent?.extras?.let(NewMessageActivityArgs::fromBundle) ?: NewMessageActivityArgs()
     }
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
+    private val aiViewModel: AiViewModel by activityViewModels()
 
     private lateinit var addressListPopupWindow: ListPopupWindow
     private lateinit var filePicker: FilePicker
+
+    private var aiPromptFragment: AiPromptFragment? = null
 
     private val attachmentAdapter = AttachmentAdapter(shouldDisplayCloseButton = true, onDelete = ::onDeleteAttachment)
 
@@ -135,7 +138,10 @@ class NewMessageFragment : Fragment() {
 
         initUi()
 
-        if (newMessageViewModel.initResult.value == null) initDraftAndViewModel()
+        if (newMessageViewModel.initResult.value == null) {
+            initDraftAndViewModel()
+            updateFeatureFlagIfMailTo()
+        }
 
         handleOnBackPressed()
 
@@ -150,6 +156,16 @@ class NewMessageFragment : Fragment() {
         observeCcAndBccVisibility()
         observeDraftWorkerResults()
         observeInitResult()
+        observeAiOutput()
+        observeAiPromptStatus()
+        observeAiFeatureFragmentUpdates()
+    }
+
+    private fun navigateToDiscoveryBottomSheetIfFirstTime() = with(localSettings) {
+        if (showAiDiscoveryBottomSheet) {
+            showAiDiscoveryBottomSheet = false
+            safeNavigate(NewMessageFragmentDirections.actionNewMessageFragmentToAiDiscoveryBottomSheetDialog())
+        }
     }
 
     override fun onStart() {
@@ -167,15 +183,20 @@ class NewMessageFragment : Fragment() {
         super.onConfigurationChanged(newConfig)
     }
 
-    private fun handleOnBackPressed() = with(newMessageViewModel) {
+    private fun handleOnBackPressed() {
         newMessageActivity.onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
-            if (isAutoCompletionOpened) closeAutoCompletion() else newMessageActivity.finishAppAndRemoveTaskIfNeeded()
+            when {
+                aiViewModel.aiPromptOpeningStatus.value?.isOpened == true -> closeAiPrompt()
+                newMessageViewModel.isAutoCompletionOpened -> closeAutoCompletion()
+                else -> newMessageActivity.finishAppAndRemoveTaskIfNeeded()
+            }
         }
     }
 
     private fun initUi() = with(binding) {
         addressListPopupWindow = ListPopupWindow(binding.root.context)
 
+        resetStatusBarColor()
         toolbar.setNavigationOnClickListener { activity?.onBackPressedDispatcher?.onBackPressed() }
         changeToolbarColorOnScroll(toolbar, compositionNestedScrollView)
 
@@ -202,6 +223,12 @@ class NewMessageFragment : Fragment() {
 
         setupSendButton()
         setupExternalBanner()
+
+        scrim.setOnClickListener { closeAiPrompt() }
+    }
+
+    private fun resetStatusBarColor() {
+        requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundColor)
     }
 
     private fun initDraftAndViewModel() {
@@ -256,6 +283,15 @@ class NewMessageFragment : Fragment() {
 
     private fun FragmentNewMessageBinding.focusToField() {
         toField.showKeyboardInTextInput()
+    }
+
+    private fun updateFeatureFlagIfMailTo() {
+        when (requireActivity().intent.action) {
+            Intent.ACTION_SEND,
+            Intent.ACTION_SEND_MULTIPLE,
+            Intent.ACTION_VIEW,
+            Intent.ACTION_SENDTO -> aiViewModel.updateFeatureFlag()
+        }
     }
 
     private fun setOnFocusChangedListeners() = with(binding) {
@@ -523,8 +559,17 @@ class NewMessageFragment : Fragment() {
                 EditorAction.CAMERA -> notYetImplemented()
                 EditorAction.LINK -> notYetImplemented()
                 EditorAction.CLOCK -> notYetImplemented()
+                EditorAction.AI -> openAiPrompt()
             }
         }
+    }
+
+    private fun openAiPrompt() {
+        aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(true)
+    }
+
+    fun closeAiPrompt() {
+        aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(false)
     }
 
     private fun observeNewAttachments() = with(binding) {
@@ -706,6 +751,7 @@ class NewMessageFragment : Fragment() {
         linkEditor(editorCamera, EditorAction.CAMERA)
         linkEditor(editorLink, EditorAction.LINK)
         linkEditor(editorClock, EditorAction.CLOCK)
+        linkEditor(editorAi, EditorAction.AI)
     }
 
     private fun setupEditorFormatActionsToggle() = with(binding) {
@@ -732,11 +778,96 @@ class NewMessageFragment : Fragment() {
         textEditing.isVisible = isEditorExpanded
     }
 
+    private fun observeAiOutput() {
+        aiViewModel.aiOutputToInsert.observe(viewLifecycleOwner, binding.bodyText::setText)
+    }
+
+    private fun observeAiPromptStatus() {
+        aiViewModel.aiPromptOpeningStatus.observe(viewLifecycleOwner) { (shouldDisplay, shouldResetContent) ->
+            if (shouldDisplay) onAiPromptOpened(shouldResetContent) else onAiPromptClosed()
+        }
+    }
+
+    private fun onAiPromptOpened(resetPrompt: Boolean) = with(binding) {
+        if (resetPrompt) {
+            aiViewModel.apply {
+                aiPrompt = ""
+                aiPromptOpeningStatus.value?.shouldResetPrompt = false
+            }
+        }
+
+        // Keyboard is opened inside onCreate() of AiPromptFragment
+
+        val foundFragment = childFragmentManager.findFragmentByTag(AI_PROMPT_FRAGMENT_TAG) as? AiPromptFragment
+        if (aiPromptFragment == null) {
+            aiPromptFragment = foundFragment ?: AiPromptFragment()
+        }
+
+        if (foundFragment == null) {
+            childFragmentManager
+                .beginTransaction()
+                .add(aiPromptFragmentContainer.id, aiPromptFragment!!, AI_PROMPT_FRAGMENT_TAG)
+                .commitNow()
+        }
+
+        setAiPromptVisibility(true)
+        newMessageConstraintLayout.descendantFocusability = FOCUS_BLOCK_DESCENDANTS
+    }
+
+    private fun onAiPromptClosed() = with(binding) {
+        aiPromptFragmentContainer.hideKeyboard()
+
+        aiPromptFragment?.let {
+            childFragmentManager
+                .beginTransaction()
+                .remove(it)
+                .commitNow()
+        }
+
+        setAiPromptVisibility(false)
+        newMessageConstraintLayout.descendantFocusability = FOCUS_BEFORE_DESCENDANTS
+    }
+
+    private fun setAiPromptVisibility(isVisible: Boolean) {
+
+        fun updateStatusBarColor() {
+            val statusBarColorRes = if (isVisible) R.color.scrim_translucent else R.color.backgroundColor
+            requireActivity().window.statusBarColor = requireContext().getColor(statusBarColorRes)
+        }
+
+        fun updateNavigationBarColor() {
+            val backgroundColorRes = if (isVisible) R.color.backgroundColorSecondary else R.color.backgroundColor
+            requireActivity().window.navigationBarColor = requireContext().getColor(backgroundColorRes)
+        }
+
+        binding.aiPromptLayout.isVisible = isVisible
+        updateStatusBarColor()
+        updateNavigationBarColor()
+    }
+
+    private fun observeAiFeatureFragmentUpdates() {
+        aiViewModel.aiFeatureFlag.observe(viewLifecycleOwner) { aiFeatureFlag ->
+            binding.editorAi.isVisible = aiFeatureFlag.isEnabled
+            if (aiFeatureFlag.isEnabled) navigateToDiscoveryBottomSheetIfFirstTime()
+        }
+    }
+
+    fun navigateToPropositionFragment() {
+        closeAiPrompt()
+        resetAiProposition()
+        safeNavigate(NewMessageFragmentDirections.actionNewMessageFragmentToAiPropositionFragment())
+    }
+
+    private fun resetAiProposition() {
+        aiViewModel.aiProposition.value = null
+    }
+
     enum class EditorAction(val matomoValue: String) {
         ATTACHMENT("importFile"),
         CAMERA("importFromCamera"),
         LINK("addLink"),
         CLOCK(MatomoMail.ACTION_POSTPONE_NAME),
+        AI("aiWriter"),
         // BOLD("bold"),
         // ITALIC("italic"),
         // UNDERLINE("underline"),
@@ -762,5 +893,9 @@ class NewMessageFragment : Fragment() {
                 RECREATED -> null
             }
         }
+    }
+
+    private companion object {
+        const val AI_PROMPT_FRAGMENT_TAG = "aiPromptFragmentTag"
     }
 }

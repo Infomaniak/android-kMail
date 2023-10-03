@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak Mail - Android
+  ~ Copyright (C) 2023 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="225dp"
+    android:height="51dp"
+    android:viewportWidth="225"
+    android:viewportHeight="51">
+    <path
+        android:fillColor="#362B45"
+        android:pathData="M4,0L221,0A4,4 0,0 1,225 4L225,39A4,4 0,0 1,221 43L4,43A4,4 0,0 1,0 39L0,4A4,4 0,0 1,4 0z" />
+    <path
+        android:fillColor="#8068A1"
+        android:pathData="M35,8h172v6h-172z" />
+    <path
+        android:fillColor="#A897BE"
+        android:pathData="M35,18h172v6h-172z" />
+    <path
+        android:fillColor="#C2B7D2"
+        android:pathData="M35,28h137v6h-137z" />
+    <path
+        android:fillColor="#BF99FF"
+        android:pathData="M183,35L214,35A2,2 0,0 1,216 37L216,49A2,2 0,0 1,214 51L183,51A2,2 0,0 1,181 49L181,37A2,2 0,0 1,183 35z" />
+    <path
+        android:fillColor="#1A1A1A"
+        android:pathData="M186.3,38.3H189.57C191.16,38.3 192.71,38.73 192.71,40.52C192.71,41.34 192.25,42.07 191.73,42.38C192.45,42.7 193.04,43.27 193.04,44.42C193.04,46.29 191.57,47 189.79,47H186.3V38.3ZM187.82,41.94H189.72C190.61,41.94 191.16,41.54 191.16,40.69C191.16,39.92 190.58,39.52 189.72,39.52H187.82V41.94ZM187.82,45.78H189.85C190.93,45.78 191.47,45.28 191.47,44.42C191.47,43.53 190.93,43.1 189.77,43.1H187.82V45.78ZM195.48,44.18C195.58,45.38 196.42,45.97 197.24,45.97C197.98,45.97 198.57,45.67 198.82,45.07H200.22C199.92,46.1 198.96,47.16 197.3,47.16C195.22,47.16 194.03,45.57 194.03,43.72C194.03,41.78 195.36,40.4 197.2,40.4C199.18,40.4 200.42,42.01 200.3,44.18H195.48ZM195.48,43.14H198.84C198.81,42.13 198.04,41.52 197.2,41.52C196.53,41.52 195.6,41.91 195.48,43.14ZM201.68,38.84H203.1V40.54H204.4V41.58H203.1V45.09C203.1,45.75 203.26,45.91 203.87,45.91H204.39V47H203.33C201.95,47 201.68,46.63 201.68,45.31V41.58H200.72V40.54H201.68V38.84ZM205.17,45.22C205.17,43.62 207.15,43.21 209.51,42.97V42.85C209.51,41.74 208.87,41.41 208.17,41.41C207.45,41.41 206.91,41.79 206.87,42.57H205.47C205.56,41.25 206.65,40.35 208.21,40.35C209.76,40.35 210.97,41.06 210.94,43.12C210.94,43.45 210.91,44.2 210.91,44.79C210.91,45.61 210.99,46.46 211.11,47H209.8C209.75,46.72 209.7,46.57 209.68,46.12C209.27,46.82 208.5,47.16 207.55,47.16C206.15,47.16 205.17,46.4 205.17,45.22ZM209.55,43.96C207.51,44.16 206.68,44.44 206.68,45.19C206.68,45.75 207.15,46.09 207.87,46.09C208.92,46.09 209.55,45.55 209.55,44.46V43.96Z" />
+    <path
+        android:pathData="M25.25,9.07C25.25,10.55 26.45,11.75 27.93,11.75C26.45,11.75 25.25,12.95 25.25,14.43C25.25,12.95 24.05,11.75 22.57,11.75C24.05,11.75 25.25,10.55 25.25,9.07Z"
+        android:strokeWidth="1.5"
+        android:strokeColor="#BF99FF"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M20,11.75H10.25C9.42,11.75 8.75,12.42 8.75,13.25V26.75C8.75,27.58 9.42,28.25 10.25,28.25H23.75C24.58,28.25 25.25,27.58 25.25,26.75V17"
+        android:strokeWidth="1.5"
+        android:strokeColor="#BF99FF"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M19.25,16.25L19.25,19.25"
+        android:strokeWidth="1.8"
+        android:strokeColor="#BF99FF"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M14.75,16.25L14.75,19.25"
+        android:strokeWidth="1.8"
+        android:strokeColor="#BF99FF"
+        android:strokeLineCap="round" />
+    <path
+        android:fillColor="#BF99FF"
+        android:pathData="M13.18,22.25H17H20.82C20.82,24.28 19.17,25.93 17.14,25.93H16.86C14.83,25.93 13.18,24.28 13.18,22.25Z" />
+    <path
+        android:fillColor="#BF99FF"
+        android:pathData="M23.3,21.5C23.3,22 22.9,22.4 22.4,22.4C21.9,22.4 21.5,22 21.5,21.5C21.5,21 21.9,20.6 22.4,20.6C22.9,20.6 23.3,21 23.3,21.5Z" />
+    <path
+        android:fillColor="#BF99FF"
+        android:pathData="M12.5,21.5C12.5,22 12.1,22.4 11.6,22.4C11.1,22.4 10.7,22 10.7,21.5C10.7,21 11.1,20.6 11.6,20.6C12.1,20.6 12.5,21 12.5,21.5Z" />
+</vector>

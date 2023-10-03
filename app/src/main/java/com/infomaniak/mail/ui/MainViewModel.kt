@@ -1007,6 +1007,8 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    fun updateFeatureFlag() = viewModelScope.launch(ioCoroutineContext) { sharedUtils.updateAiFeatureFlag() }
+
     private companion object {
         val TAG: String = MainViewModel::class.java.simpleName
 

@@ -90,6 +90,9 @@
     <color name="contacts_light">#9D66E1</color>
     <color name="contacts_dark">#C8AAEE</color>
 
+    <color name="ai_light">#8D4AFF</color>
+    <color name="ai_dark">#BF99FF</color>
+
     <!-- Backgrounds -->
     <color name="searchBarBackgroundColor">@color/polar_bear</color>
     <color name="backgroundColor">@color/background_color_light</color>
@@ -124,6 +127,7 @@
 
     <!-- Icons -->
     <color name="iconColorPrimaryText">@color/primaryTextColor</color>
+    <color name="iconColorSecondaryText">@color/secondaryTextColor</color>
     <color name="iconColor">@color/elephant</color>
     <color name="disabledIconColor">@color/shark</color>
     <color name="favoriteYellow">@color/yellow_light</color>
@@ -141,6 +145,12 @@
     <color name="externalTagBackground">@color/favoriteYellow</color>
     <color name="externalTagOnBackground">@color/orca</color>
     <color name="externalChipBackground">@color/polar_bear</color>
+
+    <!-- AI -->
+    <color name="aiColor">@color/ai_light</color>
+    <color name="onAiColor">@color/onColorfulBackground</color>
+    <color name="aiBetaTagTextColor">@color/onAiColor</color>
+    <color name="aiBetaTagBackground">@color/aiColor</color>
 
     <!-- Swipe actions -->
     <color name="swipeDelete">@color/redDestructiveAction</color>

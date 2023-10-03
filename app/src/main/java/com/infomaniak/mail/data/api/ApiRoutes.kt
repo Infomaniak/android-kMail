@@ -40,6 +40,10 @@ object ApiRoutes {
         return "$MAIL_API/api/mailbox/permissions?user_mailbox_id=$linkId&product_id=$hostingId"
     }
 
+    fun ai(): String = "$MAIL_API/api/ai"
+
+    fun featureFlag(featureName: String): String = "$MAIL_API/api/feature-flag/check/$featureName"
+
     private fun apiMailbox(mailboxHostingId: Int, mailboxName: String): String {
         return "$INFOMANIAK_API_V1/mail_hostings/$mailboxHostingId/mailboxes/$mailboxName"
     }
@@ -70,9 +74,8 @@ object ApiRoutes {
 
     fun flushFolder(mailboxUuid: String, folderId: String) = "${folder(mailboxUuid, folderId)}/flush"
 
-    fun quotas(mailboxHostingId: Int, mailboxName: String): String {
-        return "$MAIL_API/api/mailbox/quotas?mailbox=$mailboxName&product_id=$mailboxHostingId"
-    }
+    fun quotas(mailboxHostingId: Int, mailboxName: String): String =
+        "$MAIL_API/api/mailbox/quotas?mailbox=$mailboxName&product_id=$mailboxHostingId"
 
     private fun messages(mailboxUuid: String) = "$MAIL_API/api/mail/$mailboxUuid/message"
 
@@ -129,6 +132,10 @@ object ApiRoutes {
     fun getMessagesByUids(mailboxUuid: String, folderId: String, uids: List<Int>): String {
         return "${getMessages(mailboxUuid, folderId)}/messages?uids=${uids.joinToString(",")}"
     }
+
+    fun aiShortcutWithContext(contextId: String, action: String): String = "${ai()}/mobile/$contextId/$action"
+
+    fun aiShortcutNoContext(action: String): String = "${ai()}/mobile/$action"
 
     private fun getMessages(mailboxUuid: String, folderId: String): String {
         return "$MAIL_API/api/mail/${mailboxUuid}/folder/${folderId}/mobile"
