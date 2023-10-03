@@ -32,6 +32,7 @@ import com.infomaniak.mail.data.models.FeatureFlag.FeatureFlagType
 import com.infomaniak.mail.data.models.ai.*
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.newMessage.AiViewModel.PropositionStatus.*
+import com.infomaniak.mail.utils.ErrorCode
 import com.infomaniak.mail.utils.ErrorCode.MAX_SYNTAX_TOKENS_REACHED
 import com.infomaniak.mail.utils.ErrorCode.TOO_MANY_REQUESTS
 import com.infomaniak.mail.utils.SharedUtils
@@ -62,7 +63,7 @@ class AiViewModel @Inject constructor(
     fun generateNewAiProposition() = viewModelScope.launch(ioCoroutineContext) {
         history.clear()
         val userMessage = UserMessage(aiPrompt)
-        with(ApiRepository.generateNewAiProposition(userMessage)) {
+        with(ApiRepository.startNewConversation(userMessage)) {
             ensureActive()
             handleAiResult(apiResponse = this, userMessage)
         }
@@ -85,10 +86,17 @@ class AiViewModel @Inject constructor(
     }
 
     fun performShortcut(shortcut: Shortcut) = viewModelScope.launch(ioCoroutineContext) {
-        with(ApiRepository.applyShortcutOnExistingConversation(conversationContextId!!, shortcut, history.toList())) {
+
+        var apiResponse = ApiRepository.aiShortcutWithContext(conversationContextId!!, shortcut)
+        ensureActive()
+
+        val hasConversationExpired = apiResponse.error?.code == ErrorCode.OBJECT_NOT_FOUND
+        if (hasConversationExpired) {
+            apiResponse = ApiRepository.aiShortcutNoContext(shortcut, history.toList())
             ensureActive()
-            handleAiResult(apiResponse = this, data?.promptMessage)
         }
+
+        handleAiResult(apiResponse = apiResponse, apiResponse.data?.promptMessage)
     }
 
     val aiFeatureFlag = featureFlagController.getFeatureFlagAsync(FeatureFlagType.AI).asLiveData()
