@@ -91,7 +91,7 @@ class AiPromptFragment : Fragment() {
             R.color.aiBetaTagTextColor,
         )
 
-        prompt.post { prompt.showKeyboard() }
+        prompt.post(prompt::showKeyboard)
         initPromptText()
         closeButton.setOnClickListener { newMessageFragment.closeAiPrompt() }
 
@@ -100,13 +100,11 @@ class AiPromptFragment : Fragment() {
             newMessageFragment.navigateToPropositionFragment()
         }
 
-        prompt.doAfterTextChanged {
-            // When the app is recreated or the prompt is opened when coming back from AiPropositionFragment, the enabled state of
-            // the button is not recomputed when using onPromptChanged(). This means that the button may remain disabled even
-            // though it should be enabled based on the current prompt. onPromptChanged() is not enough which is why it's done in
-            // doAfterTextChanged()
-            updateButtonEnabledState(it)
-        }
+        // When the app is recreated or the prompt is opened when coming back from AiPropositionFragment,
+        // the enabled state of the button is not recomputed when using `onPromptChanged()`. This means
+        // that the button may remain disabled even though it should be enabled based on the current
+        // prompt. `onPromptChanged()` is not enough which is why it's done in `doAfterTextChanged()`.
+        prompt.doAfterTextChanged(::updateButtonEnabledState)
     }
 
     private fun initPromptText() = viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
