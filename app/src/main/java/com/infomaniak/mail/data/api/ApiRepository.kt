@@ -47,7 +47,6 @@ import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.data.models.signature.SignaturesResult
 import com.infomaniak.mail.data.models.thread.ThreadResult
 import com.infomaniak.mail.ui.main.newMessage.AiViewModel.Shortcut
-import com.infomaniak.mail.utils.ErrorCode.OBJECT_NOT_FOUND
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
@@ -282,44 +281,28 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.flushFolder(mailboxUuid, folderId), POST)
     }
 
-    fun generateNewAiProposition(message: UserMessage): ApiResponse<AiResult> {
-        val body = getBodyFromMessages(listOf(message))
-        return startNewConversation(body)
-    }
-
-    private fun getBodyFromMessages(messages: List<AiMessage>) = mapOf(
-        "messages" to messages,
-        "output" to "mail",
-    )
-
-    private fun startNewConversation(body: Map<String, Any>): ApiResponse<AiResult> {
+    fun startNewConversation(message: UserMessage): ApiResponse<AiResult> {
+        val body = getAiBodyFromMessages(listOf(message))
         return callApi(ApiRoutes.ai(), POST, body, HttpClient.okHttpClientLongTimeout)
     }
 
-    fun applyShortcutOnExistingConversation(
-        contextId: String,
-        shortcut: Shortcut,
-        history: List<AiMessage>,
-    ): ApiResponse<AiResult> {
-        val response = applyShortcutOnExistingConversation(contextId, shortcut)
-        val hasConversationExpired = response.error?.code == OBJECT_NOT_FOUND
-
-        return if (hasConversationExpired) {
-            val reconstructedBody = getBodyFromMessages(history)
-            applyShortcutOnNewConversation(reconstructedBody, shortcut)
-        } else {
-            response
-        }
+    fun aiShortcutWithContext(contextId: String, shortcut: Shortcut): ApiResponse<AiResult> {
+        return callApi(
+            url = ApiRoutes.aiShortcutWithContext(contextId, action = shortcut.apiRoute!!),
+            method = PATCH,
+            okHttpClient = HttpClient.okHttpClientLongTimeout,
+        )
     }
 
-    private fun applyShortcutOnExistingConversation(contextId: String, shortcut: Shortcut): ApiResponse<AiResult> {
-        val action = shortcut.apiRoute!!
-        return callApi(ApiRoutes.aiShortcutContext(contextId, action), PATCH, okHttpClient = HttpClient.okHttpClientLongTimeout)
-    }
-
-    private fun applyShortcutOnNewConversation(body: Map<String, Any>, shortcut: Shortcut): ApiResponse<AiResult> {
+    fun aiShortcutNoContext(shortcut: Shortcut, history: List<AiMessage>): ApiResponse<AiResult> {
+        val body = getAiBodyFromMessages(history)
         return callApi(ApiRoutes.aiShortcutNoContext(shortcut.apiRoute!!), POST, body, HttpClient.okHttpClientLongTimeout)
     }
+
+    private fun getAiBodyFromMessages(messages: List<AiMessage>) = mapOf(
+        "messages" to messages,
+        "output" to "mail",
+    )
 
     fun checkFeatureFlag(featureFlagType: FeatureFlagType): ApiResponse<Boolean> {
         return callApi(ApiRoutes.featureFlag(featureFlagType.apiName), GET)
