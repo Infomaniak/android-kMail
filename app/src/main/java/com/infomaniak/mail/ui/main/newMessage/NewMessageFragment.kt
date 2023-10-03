@@ -847,7 +847,7 @@ class NewMessageFragment : Fragment() {
         CAMERA("importFromCamera"),
         LINK("addLink"),
         CLOCK(MatomoMail.ACTION_POSTPONE_NAME),
-        AI("ai"),
+        AI("aiWriter"),
         // BOLD("bold"),
         // ITALIC("italic"),
         // UNDERLINE("underline"),
