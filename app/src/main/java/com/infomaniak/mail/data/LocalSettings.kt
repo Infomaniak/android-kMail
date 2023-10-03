@@ -281,8 +281,8 @@ class LocalSettings private constructor(context: Context) {
     }
 
     var showAiDiscoveryBottomSheet: Boolean
-        get() = sharedPreferences.getBoolean(SHOW_AI_DISCOVERY_BOTTOM_SHEET, DEFAULT_SHOW_AI_DISCOVERY_BOTTOM_SHEET)
-        set(value) = sharedPreferences.transaction { putBoolean(SHOW_AI_DISCOVERY_BOTTOM_SHEET, value) }
+        get() = sharedPreferences.getBoolean(SHOW_AI_DISCOVERY_BOTTOM_SHEET_KEY, DEFAULT_SHOW_AI_DISCOVERY_BOTTOM_SHEET)
+        set(value) = sharedPreferences.transaction { putBoolean(SHOW_AI_DISCOVERY_BOTTOM_SHEET_KEY, value) }
     //endregion
 
     //region Utils
@@ -344,7 +344,7 @@ class LocalSettings private constructor(context: Context) {
         private const val FIREBASE_TOKEN_KEY = "firebaseTokenKey"
         private const val FIREBASE_REGISTERED_USERS_KEY = "firebaseRegisteredUsersKey"
         private const val AI_REPLACEMENT_DIALOG_VISIBILITY_KEY = "aiReplacementDialogVisibilityKey"
-        private const val SHOW_AI_DISCOVERY_BOTTOM_SHEET = "showAiDiscoveryBottomSheet"
+        private const val SHOW_AI_DISCOVERY_BOTTOM_SHEET_KEY = "showAiDiscoveryBottomSheetKey"
         //endregion
 
         @Volatile
