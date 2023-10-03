@@ -79,7 +79,7 @@
     <string name="aiPromptTag">Beta</string>
     <string name="aiPromptTitle">Writing assistant</string>
     <string name="aiPromptValidateButton">Generate</string>
-    <string name="aiReplacementDialogDescription">Do you want to replace existing content by the assistant’s proposition?</string>
+    <string name="aiReplacementDialogDescription">By clicking on \"Replace\", pre-existing content will be lost.</string>
     <string name="aiReplacementDialogDoNotShowAgain">Do not show this again</string>
     <string name="aiReplacementDialogPositiveButton">Replace</string>
     <string name="aiReplacementDialogTitle">Replace already existing content?</string>

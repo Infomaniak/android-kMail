@@ -73,7 +73,7 @@
     <string name="aiPromptTag">Beta</string>
     <string name="aiPromptTitle">Schreibassistent</string>
     <string name="aiPromptValidateButton">Erzeugen</string>
-    <string name="aiReplacementDialogDescription">Möchten Sie den vorhandenen Inhalt durch den Vorschlag des Assistenten ersetzen?</string>
+    <string name="aiReplacementDialogDescription">Wenn Sie auf \"Ersetzen\" klicken, geht der bereits vorhandene Inhalt verloren.</string>
     <string name="aiReplacementDialogDoNotShowAgain">Diese Nachricht nicht mehr anzeigen</string>
     <string name="aiReplacementDialogPositiveButton">Ersetzen</string>
     <string name="aiReplacementDialogTitle">Bestehende Inhalte ersetzen?</string>
