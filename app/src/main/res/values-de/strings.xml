@@ -63,8 +63,13 @@
     <string name="aiMenuRegenerate">Eine Antwort neu generieren</string>
     <string name="aiMenuSeriousWriting">Seriöses Schreiben</string>
     <string name="aiMenuShorten">Kürzen</string>
+    <string name="aiPromptExample1">eine Dankesmail für ein Willkommensgeschenk</string>
+    <string name="aiPromptExample2">eine E-Mail mit der Bestätigung der Hotelbuchung</string>
+    <string name="aiPromptExample3">eine Dankesmail für eine Einladung zu einer Veranstaltung</string>
+    <string name="aiPromptExample4">eine Einladungsmail zu einer Firmenveranstaltung</string>
+    <string name="aiPromptExample5">eine E-Mail mit der Bitte um einen Termin mit einem wichtigen Kunden</string>
     <string name="aiPromptGenerationLoader">Der Assistent schreibt</string>
-    <string name="aiPromptPlaceholder">Sagen Sie dem Schreibassistenten, was Sie schreiben wollen. Zum Beispiel: \"eine Dankes-E-Mail für ein Willkommensgeschenk\".</string>
+    <string name="aiPromptPlaceholder">Sagen Sie dem Schreibassistenten, was Sie schreiben wollen. Zum Beispiel: \"%s\".</string>
     <string name="aiPromptTag">Beta</string>
     <string name="aiPromptTitle">Schreibassistent</string>
     <string name="aiPromptValidateButton">Erzeugen</string>
