@@ -21,7 +21,6 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,7 +28,6 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.withResumed
 import androidx.lifecycle.withStarted
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.lib.core.utils.showKeyboard
@@ -39,8 +37,6 @@ import com.infomaniak.mail.databinding.FragmentAiPromptBinding
 import com.infomaniak.mail.utils.postfixWithTag
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import kotlin.concurrent.timerTask
-import kotlin.system.measureTimeMillis
 import com.google.android.material.R as RMaterial
 
 @AndroidEntryPoint
@@ -81,7 +77,6 @@ class AiPromptFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
-        Log.e("gibran", "AiPromptFragment onViewCreated: ");
         setUi()
     }
 
@@ -105,8 +100,10 @@ class AiPromptFragment : Fragment() {
         }
 
         prompt.doAfterTextChanged {
-            // Doing it inside onPromptChanged() is not enough because the enabled state is not recomputed when the app is
-            // recreated or the prompt is opened because because we came back from AiPropositionFragment 
+            // When the app is recreated or the prompt is opened when coming back from AiPropositionFragment, the enabled state of
+            // the button is not recomputed when using onPromptChanged(). This means that the button may remain disabled even
+            // though it should be enabled based on the current prompt. onPromptChanged() is not enough which is why it's done in
+            // doAfterTextChanged()
             updateButtonEnabledState(it)
         }
     }
@@ -124,7 +121,6 @@ class AiPromptFragment : Fragment() {
     }
 
     override fun onResume() {
-        Log.e("gibran", "AiPromptFragment onResume: ");
         super.onResume()
         binding.prompt.addTextChangedListener(promptTextWatcher)
     }

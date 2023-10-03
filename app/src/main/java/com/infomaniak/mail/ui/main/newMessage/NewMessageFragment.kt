@@ -26,7 +26,6 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.text.*
 import android.transition.TransitionManager
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -61,7 +60,7 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.*
 import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition.INLINE
 import com.infomaniak.mail.data.models.FeatureFlag
-import com.infomaniak.mail.data.models.ai.AiPromptStatus
+import com.infomaniak.mail.data.models.ai.AiPromptOpeningStatus
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.*
@@ -132,8 +131,6 @@ class NewMessageFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
-        Log.i("gibran", "NewMessageFragment onViewCreated: ", );
-
         SentryDebug.addNavigationBreadcrumb(
             name = findNavController().currentDestination?.displayName ?: "newMessageFragment",
             arguments = newMessageActivityArgs.toBundle(),
@@ -167,7 +164,6 @@ class NewMessageFragment : Fragment() {
     }
 
     override fun onStart() {
-        Log.i("gibran", "NewMessageFragment onStart: ", );
         super.onStart()
         newMessageViewModel.updateDraftInLocalIfRemoteHasChanged()
     }
@@ -185,7 +181,7 @@ class NewMessageFragment : Fragment() {
     private fun handleOnBackPressed() {
         newMessageActivity.onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             when {
-                aiViewModel.aiPromptStatus.value?.isOpened == true -> closeAiPrompt()
+                aiViewModel.aiPromptOpeningStatus.value?.isOpened == true -> closeAiPrompt()
                 newMessageViewModel.isAutoCompletionOpened -> closeAutoCompletion()
                 else -> newMessageActivity.finishAppAndRemoveTaskIfNeeded()
             }
@@ -564,11 +560,11 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun openAiPrompt() {
-        aiViewModel.aiPromptStatus.value = AiPromptStatus(true)
+        aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(true)
     }
 
     fun closeAiPrompt() {
-        aiViewModel.aiPromptStatus.value = AiPromptStatus(false)
+        aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(false)
     }
 
     private fun observeNewAttachments() = with(binding) {
@@ -782,9 +778,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeAiPromptStatus() {
-        aiViewModel.aiPromptStatus.observe(viewLifecycleOwner) { (shouldDisplay, shouldResetContent) ->
-            Log.e("gibran", "observeAiPromptStatus - shouldDisplay: ${shouldDisplay}")
-            Log.e("gibran", "observeAiPromptStatus - shouldResetContent: ${shouldResetContent}")
+        aiViewModel.aiPromptOpeningStatus.observe(viewLifecycleOwner) { (shouldDisplay, shouldResetContent) ->
             viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
                 if (shouldDisplay) onAiPromptOpened(shouldResetContent) else onAiPromptClosed()
             }
@@ -795,7 +789,7 @@ class NewMessageFragment : Fragment() {
         if (resetPrompt) {
             aiViewModel.apply {
                 aiPrompt = ""
-                aiPromptStatus.value?.shouldResetPrompt = false
+                aiPromptOpeningStatus.value?.shouldResetPrompt = false
             }
         }
 
@@ -812,8 +806,6 @@ class NewMessageFragment : Fragment() {
                 .add(aiPromptFragmentContainer.id, aiPromptFragment!!, AI_PROMPT_FRAGMENT_TAG)
                 .commitNow()
         }
-
-        // aiPromptFragment.showKeyboard()
 
         setAiPromptVisibility(true)
         newMessageConstraintLayout.descendantFocusability = FOCUS_BLOCK_DESCENDANTS

@@ -24,7 +24,6 @@ import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
-import androidx.core.view.postDelayed
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -32,7 +31,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.AiReplacementDialogVisibility
-import com.infomaniak.mail.data.models.ai.AiPromptStatus
+import com.infomaniak.mail.data.models.ai.AiPromptOpeningStatus
 import com.infomaniak.mail.databinding.DialogAiReplaceContentBinding
 import com.infomaniak.mail.databinding.FragmentAiPropositionBinding
 import com.infomaniak.mail.ui.main.newMessage.AiViewModel.PropositionStatus
@@ -98,7 +97,7 @@ class AiPropositionFragment : Fragment() {
         refineButton.setOnClickListener { refinePopupMenu.show() }
 
         retryButton.setOnClickListener {
-            aiViewModel.aiPromptStatus.value = AiPromptStatus(true)
+            aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(true)
             findNavController().popBackStack()
         }
     }
@@ -124,7 +123,7 @@ class AiPropositionFragment : Fragment() {
     private fun onMenuItemClicked(menuItemId: Int) {
         val shortcut = Shortcut.values().find { it.menuId == menuItemId }!!
         if (shortcut == Shortcut.MODIFY) {
-            aiViewModel.aiPromptStatus.value = AiPromptStatus(true, shouldResetPrompt = false)
+            aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(true, shouldResetPrompt = false)
             findNavController().popBackStack()
         } else {
             binding.loadingPlaceholder.text = aiViewModel.aiProposition.value!!.second

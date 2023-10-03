@@ -54,7 +54,7 @@ class AiViewModel @Inject constructor(
     var aiPrompt = ""
     private var history = mutableListOf<AiMessage>()
     private var conversationContextId: String? = null
-    var aiPromptStatus = MutableLiveData<AiPromptStatus>()
+    var aiPromptOpeningStatus = MutableLiveData<AiPromptOpeningStatus>()
 
     val aiProposition = MutableLiveData<Pair<PropositionStatus, String?>?>()
     val aiOutputToInsert = SingleLiveEvent<String>()
