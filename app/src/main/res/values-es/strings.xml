@@ -73,7 +73,7 @@
     <string name="aiPromptTag">Beta</string>
     <string name="aiPromptTitle">Asistente de redacción</string>
     <string name="aiPromptValidateButton">Genere</string>
-    <string name="aiReplacementDialogDescription">¿Desea sustituir el contenido existente por la propuesta del asistente?</string>
+    <string name="aiReplacementDialogDescription">Al pulsar \"Sustituir\", se perderá el contenido preexistente.</string>
     <string name="aiReplacementDialogDoNotShowAgain">No volver a mostrar este mensaje</string>
     <string name="aiReplacementDialogPositiveButton">Sustituir</string>
     <string name="aiReplacementDialogTitle">¿Reemplazar el contenido existente?</string>
