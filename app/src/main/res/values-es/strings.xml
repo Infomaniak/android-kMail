@@ -52,6 +52,8 @@
     <string name="aiButtonInsert">Inserte</string>
     <string name="aiButtonRefine">Afinar</string>
     <string name="aiButtonRetry">Reintentar</string>
+    <string name="aiDiscoveryDescription">Simplifique la redacción de sus mensajes con Inteligencia Artificial.</string>
+    <string name="aiDiscoveryTitle">Escriba sus correos electrónicos utilizando IA</string>
     <string name="aiErrorMaxTokenReached">Su solicitud es demasiado larga. Por favor, inténtelo de nuevo en un formato más corto.</string>
     <string name="aiErrorTooManyRequests">Parece que ha realizado demasiadas solicitudes en un corto espacio de tiempo.\n\nPor favor, espere unos momentos.</string>
     <string name="aiErrorUnknown">Se ha producido un error. Si este error persiste, póngase en contacto con nuestro servicio de asistencia.\n\nGracias por su paciencia.</string>
@@ -140,6 +142,7 @@
     <string name="buttonStrikeThrough">Huelga a través de</string>
     <string name="buttonTextOptionsClose">Cerrar formato de texto</string>
     <string name="buttonTextOptionsOpen">Formato de texto abierto</string>
+    <string name="buttonTry">Pruebe</string>
     <string name="buttonUnderline">Subraye</string>
     <string name="buttonUnselectAll">Ninguno</string>
     <string name="buttonValid">Validar</string>
