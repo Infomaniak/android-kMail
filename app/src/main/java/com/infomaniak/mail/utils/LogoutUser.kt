@@ -56,8 +56,16 @@ class LogoutUser @Inject constructor(
             if (AccountUtils.getAllUsersCount() == 0) {
                 resetSettings()
                 playServicesUtils.deleteFirebaseToken()
+            } else {
+                updateCurrentMailboxId()
             }
             if (shouldReload) AccountUtils.reloadApp?.invoke()
+        }
+    }
+
+    private suspend fun updateCurrentMailboxId() {
+        mailboxController.getFirstValidMailbox(AccountUtils.requestCurrentUser()!!.id)?.mailboxId?.let {
+            AccountUtils.currentMailboxId = it
         }
     }
 
