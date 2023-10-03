@@ -37,6 +37,7 @@ import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.MoveResult
+import com.infomaniak.mail.data.models.Quotas
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
@@ -57,6 +58,8 @@ import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.notifications.ResultsChange
+import io.sentry.Sentry
+import io.sentry.SentryLevel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.util.Date
@@ -305,9 +308,23 @@ class MainViewModel @Inject constructor(
     private fun updateQuotas(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
         SentryLog.d(TAG, "Force refresh Quotas")
         if (mailbox.isLimited) with(ApiRepository.getQuotas(mailbox.hostingId, mailbox.mailboxName)) {
-            if (isSuccess()) mailboxController.updateMailbox(mailbox.objectId) {
-                it.quotas = data
+            if (isSuccess()) {
+                data?.let { sendQuotasSentry(quotas = it, mailbox) }
+                mailboxController.updateMailbox(mailbox.objectId) {
+                    it.quotas = data
+                }
             }
+        }
+    }
+
+    private fun sendQuotasSentry(quotas: Quotas, mailbox: Mailbox) {
+        val quotasSize = quotas.getSizeForSentry()
+        Sentry.withScope {
+            it.level = SentryLevel.WARNING
+            it.setTag("isNegative", "${quotasSize < 0}")
+            it.setExtra("quotas raw size", "$quotasSize")
+            it.setExtra("mailbox", mailbox.email)
+            Sentry.captureMessage("Quotas: API return")
         }
     }
 

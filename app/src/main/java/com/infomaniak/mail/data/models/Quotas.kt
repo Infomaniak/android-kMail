@@ -21,6 +21,8 @@ import android.content.Context
 import com.infomaniak.lib.core.utils.FormatterFileSize
 import com.infomaniak.mail.R
 import io.realm.kotlin.types.EmbeddedRealmObject
+import io.sentry.Sentry
+import io.sentry.SentryLevel
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.math.ceil
@@ -34,9 +36,21 @@ class Quotas : EmbeddedRealmObject {
     private val size: Int
         get() = _size * FormatterFileSize.KIBI_BYTE
 
-    fun getText(context: Context): String {
+    fun getSizeForSentry() = _size
+
+    fun getText(context: Context, email: String?): String {
         val formattedUsedSize = FormatterFileSize.formatShortFileSize(context, size.toLong())
         val formattedMaxSize = FormatterFileSize.formatShortFileSize(context, QUOTAS_MAX_SIZE)
+
+        if (_size < 0 || formattedUsedSize.toLong() < 0) {
+            Sentry.withScope {
+                it.level = SentryLevel.WARNING
+                it.setExtra("mailbox", "$email")
+                it.setExtra("quotas raw size", "$_size")
+                it.setExtra("quotas display size", formattedUsedSize)
+                Sentry.captureMessage("Quotas: Something is negative when trying to display")
+            }
+        }
 
         return context.getString(R.string.menuDrawerMailboxStorage, formattedUsedSize, formattedMaxSize)
     }
