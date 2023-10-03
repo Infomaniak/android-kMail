@@ -107,9 +107,9 @@ class AiPromptFragment : Fragment() {
         prompt.doAfterTextChanged(::updateButtonEnabledState)
     }
 
-    private fun initPromptTextAndPlaceholder() = with(binding.prompt) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.withStarted {
+    private fun initPromptTextAndPlaceholder() = viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
+        viewLifecycleOwner.withStarted {
+            with(binding.prompt) {
                 setText(aiViewModel.aiPrompt)
                 setSelection(length())
 
