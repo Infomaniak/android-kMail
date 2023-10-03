@@ -58,7 +58,6 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.*
 import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition.INLINE
-import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.ai.AiPromptOpeningStatus
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -138,7 +137,6 @@ class NewMessageFragment : Fragment() {
         filePicker = FilePicker(this@NewMessageFragment)
 
         initUi()
-        navigateToDiscoveryBottomSheetIfNeeded()
 
         if (newMessageViewModel.initResult.value == null) {
             initDraftAndViewModel()
@@ -163,7 +161,7 @@ class NewMessageFragment : Fragment() {
         observeAiFeatureFragmentUpdates()
     }
 
-    private fun navigateToDiscoveryBottomSheetIfNeeded() = with(localSettings) {
+    private fun navigateToDiscoveryBottomSheetIfFirstTime() = with(localSettings) {
         if (showAiDiscoveryBottomSheet) {
             showAiDiscoveryBottomSheet = false
             safeNavigate(NewMessageFragmentDirections.actionNewMessageFragmentToAiDiscoveryBottomSheetDialog())
@@ -848,11 +846,10 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeAiFeatureFragmentUpdates() {
-        aiViewModel.aiFeatureFlag.observe(viewLifecycleOwner, ::updateAiEditorButton)
-    }
-
-    private fun updateAiEditorButton(aiFeatureFlag: FeatureFlag) {
-        binding.editorAi.isVisible = aiFeatureFlag.isEnabled
+        aiViewModel.aiFeatureFlag.observe(viewLifecycleOwner) { aiFeatureFlag ->
+            binding.editorAi.isVisible = aiFeatureFlag.isEnabled
+            if (aiFeatureFlag.isEnabled) navigateToDiscoveryBottomSheetIfFirstTime()
+        }
     }
 
     fun navigateToPropositionFragment() {
