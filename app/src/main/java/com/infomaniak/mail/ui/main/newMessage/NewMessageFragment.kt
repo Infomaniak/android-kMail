@@ -43,7 +43,6 @@ import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
@@ -779,9 +778,7 @@ class NewMessageFragment : Fragment() {
 
     private fun observeAiPromptStatus() {
         aiViewModel.aiPromptOpeningStatus.observe(viewLifecycleOwner) { (shouldDisplay, shouldResetContent) ->
-            viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
-                if (shouldDisplay) onAiPromptOpened(shouldResetContent) else onAiPromptClosed()
-            }
+            if (shouldDisplay) onAiPromptOpened(shouldResetContent) else onAiPromptClosed()
         }
     }
 
@@ -826,19 +823,20 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun setAiPromptVisibility(isVisible: Boolean) {
-        fun updateStatusBarColor(isVisible: Boolean) {
+
+        fun updateStatusBarColor() {
             val statusBarColorRes = if (isVisible) R.color.scrim_translucent else R.color.backgroundColor
             requireActivity().window.statusBarColor = requireContext().getColor(statusBarColorRes)
         }
 
-        fun updateNavigationBarColor(isVisible: Boolean) {
+        fun updateNavigationBarColor() {
             val backgroundColorRes = if (isVisible) R.color.backgroundColorSecondary else R.color.backgroundColor
             requireActivity().window.navigationBarColor = requireContext().getColor(backgroundColorRes)
         }
 
         binding.aiPromptLayout.isVisible = isVisible
-        updateStatusBarColor(isVisible)
-        updateNavigationBarColor(isVisible)
+        updateStatusBarColor()
+        updateNavigationBarColor()
     }
 
     private fun observeAiFeatureFragmentUpdates() {
