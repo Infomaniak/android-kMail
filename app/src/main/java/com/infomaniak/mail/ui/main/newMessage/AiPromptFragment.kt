@@ -21,28 +21,24 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isGone
-import androidx.core.view.isInvisible
-import androidx.core.view.isVisible
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import com.infomaniak.lib.core.utils.safeNavigate
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.withStarted
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.lib.core.utils.showKeyboard
 import com.infomaniak.lib.core.utils.toPx
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentAiPromptBinding
-import com.infomaniak.mail.ui.main.newMessage.AiViewModel.PropositionStatus.*
 import com.infomaniak.mail.utils.postfixWithTag
 import dagger.hilt.android.AndroidEntryPoint
-import io.sentry.Sentry
-import io.sentry.SentryLevel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import com.google.android.material.R as RMaterial
-import com.infomaniak.lib.core.R as RCore
 
 @AndroidEntryPoint
 class AiPromptFragment : Fragment() {
@@ -95,18 +91,33 @@ class AiPromptFragment : Fragment() {
             R.color.aiBetaTagTextColor,
         )
 
-        prompt.showKeyboard()
+        prompt.post(prompt::showKeyboard)
+        initPromptText()
         closeButton.setOnClickListener { newMessageFragment.closeAiPrompt() }
 
         generateButton.setOnClickListener {
             newMessageViewModel.shouldExecuteDraftActionWhenStopping = false
             newMessageFragment.navigateToPropositionFragment()
         }
+
+        // When the app is recreated or the prompt is opened when coming back from AiPropositionFragment,
+        // the enabled state of the button is not recomputed when using `onPromptChanged()`. This means
+        // that the button may remain disabled even though it should be enabled based on the current
+        // prompt. `onPromptChanged()` is not enough which is why it's done in `doAfterTextChanged()`.
+        prompt.doAfterTextChanged(::updateButtonEnabledState)
     }
 
-    override fun onStart() {
-        super.onStart()
-        binding.prompt.setText(aiViewModel.aiPrompt)
+    private fun initPromptText() = viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
+        viewLifecycleOwner.withStarted {
+            with(binding.prompt) {
+                setText(aiViewModel.aiPrompt)
+                setSelection(length())
+            }
+        }
+    }
+
+    private fun updateButtonEnabledState(prompt: Editable?) {
+        binding.generateButton.isEnabled = prompt?.isNotEmpty() ?: false
     }
 
     override fun onResume() {
@@ -119,8 +130,7 @@ class AiPromptFragment : Fragment() {
         super.onPause()
     }
 
-    private fun onPromptChanged(prompt: Editable?) = with(binding) {
-        generateButton.isEnabled = prompt?.isNotEmpty() ?: false
+    private fun onPromptChanged(prompt: Editable?) {
         aiViewModel.aiPrompt = prompt.toString()
     }
 

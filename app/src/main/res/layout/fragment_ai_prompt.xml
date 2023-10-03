@@ -19,14 +19,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:theme="@style/AiCursorAndPrimaryColorTheme"
     tools:context=".ui.main.newMessage.AiPromptFragment">
 
     <com.google.android.material.card.MaterialCardView
         style="@style/AiCardView"
         android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:clickable="true"
         android:foregroundTint="@android:color/transparent"
         app:layout_constraintBottom_toBottomOf="parent"

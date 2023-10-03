@@ -17,18 +17,22 @@
  */
 package com.infomaniak.mail.ui.main.newMessage
 
+import androidx.annotation.IdRes
 import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.userInfo.FeatureFlagController
 import com.infomaniak.mail.data.models.FeatureFlag.FeatureFlagType
+import com.infomaniak.mail.data.models.ai.*
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.newMessage.AiViewModel.PropositionStatus.*
+import com.infomaniak.mail.utils.ErrorCode
 import com.infomaniak.mail.utils.ErrorCode.MAX_SYNTAX_TOKENS_REACHED
 import com.infomaniak.mail.utils.ErrorCode.TOO_MANY_REQUESTS
 import com.infomaniak.mail.utils.SharedUtils
@@ -49,29 +53,65 @@ class AiViewModel @Inject constructor(
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
     var aiPrompt = ""
-    var isAiPromptOpened = false
+    private var history = mutableListOf<AiMessage>()
+    private var conversationContextId: String? = null
+    var aiPromptOpeningStatus = MutableLiveData<AiPromptOpeningStatus>()
 
     val aiProposition = MutableLiveData<Pair<PropositionStatus, String?>?>()
     val aiOutputToInsert = SingleLiveEvent<String>()
 
-    fun generateAiProposition() = viewModelScope.launch(ioCoroutineContext) {
-        with(ApiRepository.generateAiProposition(aiPrompt)) {
+    fun generateNewAiProposition() = viewModelScope.launch(ioCoroutineContext) {
+        history.clear()
+        val userMessage = UserMessage(aiPrompt)
+        with(ApiRepository.startNewConversation(userMessage)) {
             ensureActive()
-            aiProposition.postValue(
-                when {
-                    isSuccess() -> data?.content?.let { SUCCESS to it } ?: (MISSING_CONTENT to null)
-                    error?.code == MAX_SYNTAX_TOKENS_REACHED -> PROMPT_TOO_LONG to null
-                    error?.code == TOO_MANY_REQUESTS -> RATE_LIMIT_EXCEEDED to null
-                    else -> ERROR to null
-                }
-            )
+            handleAiResult(apiResponse = this, userMessage)
         }
+    }
+
+    private fun handleAiResult(apiResponse: ApiResponse<AiResult>, promptMessage: AiMessage?) = with(apiResponse) {
+        aiProposition.postValue(
+            when {
+                isSuccess() -> data?.let { aiResult ->
+                    aiResult.contextId?.let { conversationContextId = it }
+                    history += promptMessage!!
+                    history += AssistantMessage(aiResult.content)
+                    SUCCESS to aiResult.content
+                } ?: (MISSING_CONTENT to null)
+                error?.code == MAX_SYNTAX_TOKENS_REACHED -> PROMPT_TOO_LONG to null
+                error?.code == TOO_MANY_REQUESTS -> RATE_LIMIT_EXCEEDED to null
+                else -> ERROR to null
+            }
+        )
+    }
+
+    fun performShortcut(shortcut: Shortcut) = viewModelScope.launch(ioCoroutineContext) {
+
+        var apiResponse = ApiRepository.aiShortcutWithContext(conversationContextId!!, shortcut)
+        ensureActive()
+
+        val hasConversationExpired = apiResponse.error?.code == ErrorCode.OBJECT_NOT_FOUND
+        if (hasConversationExpired) {
+            apiResponse = ApiRepository.aiShortcutNoContext(shortcut, history.toList())
+            ensureActive()
+        }
+
+        handleAiResult(apiResponse = apiResponse, apiResponse.data?.promptMessage)
     }
 
     val aiFeatureFlag = featureFlagController.getFeatureFlagAsync(FeatureFlagType.AI).asLiveData()
 
     fun updateFeatureFlag() = viewModelScope.launch(ioCoroutineContext) {
         sharedUtils.updateAiFeatureFlag()
+    }
+
+    enum class Shortcut(@IdRes val menuId: Int, val apiRoute: String?) {
+        MODIFY(R.id.modify, null),
+        REGENERATE(R.id.regenerate, "redraw"),
+        SHORTEN(R.id.shorten, "shorten"),
+        LENGTHEN(R.id.lengthen, "develop"),
+        SERIOUS_TONE(R.id.seriousTone, "tune-professional"),
+        FRIENDLY_TONE(R.id.friendlyTone, "tune-friendly"),
     }
 
     enum class PropositionStatus(@StringRes val errorRes: Int?) {

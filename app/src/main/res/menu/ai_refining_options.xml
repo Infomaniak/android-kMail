@@ -42,7 +42,7 @@
             android:icon="@drawable/ic_ai_formal"
             android:title="@string/aiMenuSeriousWriting" />
         <item
-            android:id="@+id/amicalTone"
+            android:id="@+id/friendlyTone"
             android:icon="@drawable/ic_ai_amical"
             android:title="@string/aiMenuFriendlyWriting" />
     </group>

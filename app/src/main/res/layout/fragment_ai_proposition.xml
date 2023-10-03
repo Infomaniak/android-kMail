@@ -55,7 +55,7 @@
                 tools:visibility="visible" />
 
             <TextView
-                android:id="@+id/promptPreview"
+                android:id="@+id/loadingPlaceholder"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@color/tertiaryTextColor"

@@ -74,9 +74,8 @@ object ApiRoutes {
 
     fun flushFolder(mailboxUuid: String, folderId: String) = "${folder(mailboxUuid, folderId)}/flush"
 
-    fun quotas(mailboxHostingId: Int, mailboxName: String): String {
-        return "$MAIL_API/api/mailbox/quotas?mailbox=$mailboxName&product_id=$mailboxHostingId"
-    }
+    fun quotas(mailboxHostingId: Int, mailboxName: String): String =
+        "$MAIL_API/api/mailbox/quotas?mailbox=$mailboxName&product_id=$mailboxHostingId"
 
     private fun messages(mailboxUuid: String) = "$MAIL_API/api/mail/$mailboxUuid/message"
 
@@ -133,6 +132,10 @@ object ApiRoutes {
     fun getMessagesByUids(mailboxUuid: String, folderId: String, uids: List<Int>): String {
         return "${getMessages(mailboxUuid, folderId)}/messages?uids=${uids.joinToString(",")}"
     }
+
+    fun aiShortcutWithContext(contextId: String, action: String): String = "${ai()}/mobile/$contextId/$action"
+
+    fun aiShortcutNoContext(action: String): String = "${ai()}/mobile/$action"
 
     private fun getMessages(mailboxUuid: String, folderId: String): String {
         return "$MAIL_API/api/mail/${mailboxUuid}/folder/${folderId}/mobile"

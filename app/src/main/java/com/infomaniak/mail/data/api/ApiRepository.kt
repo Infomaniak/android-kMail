@@ -28,6 +28,9 @@ import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition
 import com.infomaniak.mail.data.models.FeatureFlag.FeatureFlagType
 import com.infomaniak.mail.data.models.addressBook.AddressBooksResult
+import com.infomaniak.mail.data.models.ai.AiMessage
+import com.infomaniak.mail.data.models.ai.AiResult
+import com.infomaniak.mail.data.models.ai.UserMessage
 import com.infomaniak.mail.data.models.correspondent.Contact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
@@ -43,6 +46,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.data.models.signature.SignaturesResult
 import com.infomaniak.mail.data.models.thread.ThreadResult
+import com.infomaniak.mail.ui.main.newMessage.AiViewModel.Shortcut
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
@@ -277,19 +281,28 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.flushFolder(mailboxUuid, folderId), POST)
     }
 
-    fun generateAiProposition(prompt: String): ApiResponse<AiResult> {
-        val message = mapOf(
-            "type" to "user",
-            "content" to prompt,
-        )
-
-        val body = mapOf(
-            "messages" to arrayOf(message),
-            "output" to "mail",
-        )
-
+    fun startNewConversation(message: UserMessage): ApiResponse<AiResult> {
+        val body = getAiBodyFromMessages(listOf(message))
         return callApi(ApiRoutes.ai(), POST, body, HttpClient.okHttpClientLongTimeout)
     }
+
+    fun aiShortcutWithContext(contextId: String, shortcut: Shortcut): ApiResponse<AiResult> {
+        return callApi(
+            url = ApiRoutes.aiShortcutWithContext(contextId, action = shortcut.apiRoute!!),
+            method = PATCH,
+            okHttpClient = HttpClient.okHttpClientLongTimeout,
+        )
+    }
+
+    fun aiShortcutNoContext(shortcut: Shortcut, history: List<AiMessage>): ApiResponse<AiResult> {
+        val body = getAiBodyFromMessages(history)
+        return callApi(ApiRoutes.aiShortcutNoContext(shortcut.apiRoute!!), POST, body, HttpClient.okHttpClientLongTimeout)
+    }
+
+    private fun getAiBodyFromMessages(messages: List<AiMessage>) = mapOf(
+        "messages" to messages,
+        "output" to "mail",
+    )
 
     fun checkFeatureFlag(featureFlagType: FeatureFlagType): ApiResponse<Boolean> {
         return callApi(ApiRoutes.featureFlag(featureFlagType.apiName), GET)
