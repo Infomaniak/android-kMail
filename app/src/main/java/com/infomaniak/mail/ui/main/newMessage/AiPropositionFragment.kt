@@ -100,7 +100,12 @@ class AiPropositionFragment : Fragment() {
             val doNotAskAgain = localSettings.aiReplacementDialogVisibility == AiReplacementDialogVisibility.HIDE
             val body = newMessageViewModel.draft.uiBody
 
-            if (doNotAskAgain || body.isBlank()) choosePropositionAndBack() else replacementDialog.show()
+            if (doNotAskAgain || body.isBlank()) {
+                choosePropositionAndBack()
+            } else {
+                trackAiWriterEvent("replacePropositionConfirmation")
+                replacementDialog.show()
+            }
         }
 
         refineButton.setOnClickListener { refinePopupMenu.show() }
