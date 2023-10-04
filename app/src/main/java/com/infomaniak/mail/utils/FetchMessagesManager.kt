@@ -89,7 +89,7 @@ class FetchMessagesManager @Inject constructor(
             return@let threads.toList()
         }
 
-        SentryLog.d(TAG, "launchWork: ${mailbox.email} has ${newMessagesThreads.count()} Threads with new Messages")
+        SentryLog.d(TAG, "LaunchWork: ${mailbox.email} has ${newMessagesThreads.count()} Threads with new Messages")
 
         if (newMessagesThreads.isEmpty()) {
             SentryDebug.sendFailedNotification(

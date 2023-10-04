@@ -85,7 +85,7 @@ class RegisterUserDeviceWorker @AssistedInject constructor(
          * so when the app is relaunched several times, only the last relaunch is taken into account.
          */
         fun scheduleWork() {
-            SentryLog.i(TAG, "work scheduled")
+            SentryLog.i(TAG, "Work scheduled")
 
             val workRequest = OneTimeWorkRequestBuilder<RegisterUserDeviceWorker>()
                 .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
