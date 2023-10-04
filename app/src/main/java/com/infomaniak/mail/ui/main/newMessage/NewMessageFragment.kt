@@ -572,7 +572,9 @@ class NewMessageFragment : Fragment() {
     }
 
     fun closeAiPrompt(becauseOfGeneration: Boolean = false) {
-        if (!becauseOfGeneration) trackAiWriterEvent("dismissPromptWithoutGenerating")
+        val eventName = if (becauseOfGeneration) "generate" else "dismissPromptWithoutGenerating"
+        trackAiWriterEvent(eventName)
+
         aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(false)
     }
 
