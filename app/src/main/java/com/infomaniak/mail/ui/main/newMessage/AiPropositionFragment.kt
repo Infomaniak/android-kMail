@@ -109,7 +109,10 @@ class AiPropositionFragment : Fragment() {
             }
         }
 
-        refineButton.setOnClickListener { refinePopupMenu.show() }
+        refineButton.setOnClickListener {
+            trackAiWriterEvent("refine")
+            refinePopupMenu.show()
+        }
 
         retryButton.setOnClickListener {
             aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(true)
