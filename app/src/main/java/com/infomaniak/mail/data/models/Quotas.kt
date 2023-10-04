@@ -42,7 +42,7 @@ class Quotas : EmbeddedRealmObject {
         val formattedUsedSize = FormatterFileSize.formatShortFileSize(context, size.toLong())
         val formattedMaxSize = FormatterFileSize.formatShortFileSize(context, QUOTAS_MAX_SIZE)
 
-        if (_size < 0 || formattedUsedSize.toLong() < 0) {
+        if (_size < 0 || formattedUsedSize.firstOrNull() == '-') {
             Sentry.withScope {
                 it.level = SentryLevel.WARNING
                 it.setExtra("mailbox", "$email")
