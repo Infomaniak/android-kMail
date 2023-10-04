@@ -458,12 +458,13 @@ class ThreadListAdapter @Inject constructor(
 
         isLoadMoreDisplayed = shouldDisplayLoadMore
 
+        val lastItem = dataSet.lastOrNull()
         if (shouldDisplayLoadMore) {
-            if (dataSet.lastOrNull() !is Unit) {
+            if (lastItem != null && lastItem !is Unit) {
                 dataSet = dataSet.toMutableList().apply { add(Unit) }
             }
         } else {
-            if (dataSet.lastOrNull() is Unit) {
+            if (lastItem is Unit) {
                 dataSet = dataSet.toMutableList().apply { removeIf { it is Unit } }
             }
         }
