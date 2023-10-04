@@ -90,7 +90,7 @@ class FetchMessagesManager @Inject constructor(
         val okHttpClient = AccountUtils.getHttpClient(userId)
 
         // Update Local with Remote
-        val newMessagesThreads = refreshController.refreshThreads(
+        val threadsWithNewMessages = refreshController.refreshThreads(
             refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
             mailbox = mailbox,
             folder = folder,
@@ -112,9 +112,9 @@ class FetchMessagesManager @Inject constructor(
             return@let threads.toList()
         }
 
-        SentryLog.d(TAG, "LaunchWork: ${mailbox.email} has ${newMessagesThreads.count()} Threads with new Messages")
+        SentryLog.d(TAG, "LaunchWork: ${mailbox.email} has ${threadsWithNewMessages.count()} Threads with new Messages")
 
-        if (newMessagesThreads.isEmpty()) {
+        if (threadsWithNewMessages.isEmpty()) {
             SentryDebug.sendFailedNotification(
                 reason = "No new Message",
                 sentryLevel = SentryLevel.WARNING,
@@ -128,13 +128,13 @@ class FetchMessagesManager @Inject constructor(
 
         // Notify Threads with new Messages
         val unReadThreadsCount = ThreadController.getUnreadThreadsCount(folder)
-        newMessagesThreads.forEachIndexed { index, thread ->
+        threadsWithNewMessages.forEachIndexed { index, thread ->
             thread.showThreadNotification(
                 userId = userId,
                 mailbox = mailbox,
                 realm = realm,
                 unReadThreadsCount = unReadThreadsCount,
-                isLastMessage = index == newMessagesThreads.lastIndex,
+                isLastMessage = index == threadsWithNewMessages.lastIndex,
                 sentryMessageUid = sentryMessageUid,
                 okHttpClient = okHttpClient,
             )
