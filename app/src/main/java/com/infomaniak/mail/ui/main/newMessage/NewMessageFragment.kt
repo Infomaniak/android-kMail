@@ -34,7 +34,6 @@ import android.view.WindowManager
 import android.webkit.WebView
 import android.widget.ListPopupWindow
 import android.widget.PopupWindow
-import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.Group
@@ -184,7 +183,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun handleOnBackPressed() {
-        newMessageActivity.onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+        onBack(viewLifecycleOwner) {
             when {
                 aiViewModel.aiPromptOpeningStatus.value?.isOpened == true -> closeAiPrompt()
                 newMessageViewModel.isAutoCompletionOpened -> closeAutoCompletion()

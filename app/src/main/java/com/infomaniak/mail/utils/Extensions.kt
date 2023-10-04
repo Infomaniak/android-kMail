@@ -34,6 +34,9 @@ import android.view.View
 import android.view.Window
 import android.view.inputmethod.EditorInfo
 import android.webkit.WebView
+import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.addCallback
 import androidx.annotation.*
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.text.toSpannable
@@ -619,4 +622,12 @@ private fun Spannable.setClickableSpan(startIndex: Int, endIndex: Int, onClick: 
         endIndex,
         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
     )
+}
+
+fun Fragment.onBack(owner: LifecycleOwner? = null, block: OnBackPressedCallback.() -> Unit) {
+    requireActivity().onBack(owner) { block() }
+}
+
+fun ComponentActivity.onBack(owner: LifecycleOwner? = null, block: OnBackPressedCallback.() -> Unit) {
+    onBackPressedDispatcher.addCallback(owner) { block() }
 }

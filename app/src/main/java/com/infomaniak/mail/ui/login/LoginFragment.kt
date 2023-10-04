@@ -23,7 +23,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.os.bundleOf
 import androidx.core.view.isInvisible
@@ -45,6 +44,7 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.utils.LoginUtils
 import com.infomaniak.mail.utils.UiUtils
+import com.infomaniak.mail.utils.onBack
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
@@ -134,7 +134,7 @@ class LoginFragment : Fragment() {
     }
 
     private fun handleOnBackPressed() = with(requireActivity()) {
-        onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+        onBack(viewLifecycleOwner) {
             if (getViewPagerCurrentItem() == 0) finish() else goBackAPage()
         }
     }

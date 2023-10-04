@@ -24,7 +24,6 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.View
 import android.webkit.WebView
-import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts.*
 import androidx.activity.viewModels
 import androidx.annotation.FloatRange
@@ -311,7 +310,7 @@ class MainActivity : BaseActivity() {
             }
         }
 
-        onBackPressedDispatcher.addCallback(this@MainActivity) {
+        onBack(this@MainActivity) {
             when {
                 drawerLayout.isOpen -> closeDrawer()
                 mainViewModel.isMultiSelectOn -> closeMultiSelect()
