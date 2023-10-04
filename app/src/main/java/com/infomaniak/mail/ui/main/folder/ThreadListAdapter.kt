@@ -429,9 +429,14 @@ class ThreadListAdapter @Inject constructor(
 
     override fun updateList(itemList: List<Thread>) {
         globalCoroutineScope.launch {
+
             val formattedList = runCatchingRealm {
-                formatList(itemList, recyclerView.context, folderRole, localSettings.threadDensity, isLoadMoreDisplayed)
+                formatList(itemList, recyclerView.context, folderRole, localSettings.threadDensity).apply {
+                    // Add "Load more" button
+                    if (isLoadMoreDisplayed) add(Unit)
+                }
             }.getOrDefault(emptyList())
+
             Dispatchers.Main { dataSet = formattedList }
         }
     }
@@ -491,7 +496,6 @@ class ThreadListAdapter @Inject constructor(
             context: Context,
             folderRole: FolderRole?,
             threadDensity: ThreadDensity,
-            isLoadMoreDisplayed: Boolean,
         ) = mutableListOf<Any>().apply {
 
             if ((folderRole == FolderRole.TRASH || folderRole == FolderRole.SPAM) && threads.isNotEmpty()) {
@@ -514,9 +518,6 @@ class ThreadListAdapter @Inject constructor(
                     add(thread)
                 }
             }
-
-            // Add "Load more" button
-            if (isLoadMoreDisplayed) add(Unit)
         }
 
         fun Thread.getSectionTitle(context: Context): String = with(date.toDate()) {
