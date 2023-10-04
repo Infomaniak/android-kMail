@@ -27,6 +27,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.infomaniak.lib.core.utils.NotificationUtilsCore
 import com.infomaniak.lib.core.utils.NotificationUtilsCore.Companion.pendingIntentFlags
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.clearStack
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -184,6 +185,8 @@ class NotificationUtils @Inject constructor(
             setGroupSummary(isSummary)
             color = localSettings.accentColor.getPrimary(appContext)
 
+            SentryLog.i(TAG, "Display notification | Email: ${mailbox.email} | MessageUid: $messageUid")
+
             @Suppress("MissingPermission")
             notificationManagerCompat.notify(notificationId, build())
         }
@@ -247,6 +250,9 @@ class NotificationUtils @Inject constructor(
     }
 
     companion object : NotificationUtilsCore() {
+
+        private val TAG: String = NotificationUtils::class.java.simpleName
+
         const val DRAFT_ACTIONS_ID = 1
 
         private const val DEFAULT_SMALL_ICON = R.drawable.ic_logo_notification
