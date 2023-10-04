@@ -105,13 +105,13 @@ class AiViewModel @Inject constructor(
         sharedUtils.updateAiFeatureFlag()
     }
 
-    enum class Shortcut(@IdRes val menuId: Int, val apiRoute: String?) {
-        MODIFY(R.id.modify, null),
-        REGENERATE(R.id.regenerate, "redraw"),
-        SHORTEN(R.id.shorten, "shorten"),
-        LENGTHEN(R.id.lengthen, "develop"),
-        SERIOUS_TONE(R.id.seriousTone, "tune-professional"),
-        FRIENDLY_TONE(R.id.friendlyTone, "tune-friendly"),
+    enum class Shortcut(@IdRes val menuId: Int, val apiRoute: String?, val matomoValue: String) {
+        MODIFY(R.id.modify, null, "edit"),
+        REGENERATE(R.id.regenerate, "redraw", "regenarate"),
+        SHORTEN(R.id.shorten, "shorten", "shorten"),
+        LENGTHEN(R.id.lengthen, "develop", "expand"),
+        SERIOUS_TONE(R.id.seriousTone, "tune-professional", "seriousWriting"),
+        FRIENDLY_TONE(R.id.friendlyTone, "tune-friendly", "friendlyWriting"),
     }
 
     enum class PropositionStatus(@StringRes val errorRes: Int?) {

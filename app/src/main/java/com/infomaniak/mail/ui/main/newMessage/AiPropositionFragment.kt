@@ -148,6 +148,8 @@ class AiPropositionFragment : Fragment() {
 
     private fun onMenuItemClicked(menuItemId: Int) = with(aiViewModel) {
         val shortcut = Shortcut.values().find { it.menuId == menuItemId }!!
+        trackAiWriterEvent(shortcut.matomoValue)
+
         if (shortcut == Shortcut.MODIFY) {
             aiPromptOpeningStatus.value = AiPromptOpeningStatus(true, shouldResetPrompt = false)
             findNavController().popBackStack()
