@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.addCallback
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
@@ -28,6 +29,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.infomaniak.mail.MatomoMail.trackAiWriterEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.AiReplacementDialogVisibility
@@ -71,6 +73,7 @@ class AiPropositionFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
+        handleBackDispatcher()
         setUi()
 
         if (aiViewModel.aiProposition.value == null) currentRequestJob = aiViewModel.generateNewAiProposition()
@@ -80,6 +83,12 @@ class AiPropositionFragment : Fragment() {
     override fun onDestroy() {
         currentRequestJob?.cancel()
         super.onDestroy()
+    }
+
+    private fun handleBackDispatcher() {
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            dismissMatomoAndBack()
+        }
     }
 
     private fun setUi() = with(binding) {
@@ -105,7 +114,7 @@ class AiPropositionFragment : Fragment() {
     private fun setToolbar() = with(binding) {
         changeToolbarColorOnScroll(toolbar, nestedScrollView)
         toolbar.apply {
-            setNavigationOnClickListener { findNavController().popBackStack() }
+            setNavigationOnClickListener { dismissMatomoAndBack() }
             title = requireContext().postfixWithTag(
                 getString(R.string.aiPromptTitle),
                 R.string.aiPromptTag,
@@ -113,6 +122,11 @@ class AiPropositionFragment : Fragment() {
                 R.color.aiBetaTagTextColor
             )
         }
+    }
+
+    private fun dismissMatomoAndBack() {
+        trackAiWriterEvent("dismissProposition")
+        findNavController().popBackStack()
     }
 
     private fun choosePropositionAndBack() = with(aiViewModel) {
