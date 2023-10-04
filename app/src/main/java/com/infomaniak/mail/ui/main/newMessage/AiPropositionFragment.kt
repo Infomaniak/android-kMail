@@ -115,6 +115,7 @@ class AiPropositionFragment : Fragment() {
         }
 
         retryButton.setOnClickListener {
+            trackAiWriterEvent("retry")
             aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(true)
             findNavController().popBackStack()
         }
