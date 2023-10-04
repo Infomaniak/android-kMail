@@ -20,4 +20,4 @@ package com.infomaniak.mail.data.models.ai
 import kotlinx.serialization.Serializable
 
 @Serializable
-abstract class AiMessage(var content: String, val type: String)
+open class AiMessage(var content: String, val type: String)
