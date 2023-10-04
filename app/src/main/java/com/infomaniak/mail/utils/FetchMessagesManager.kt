@@ -89,7 +89,18 @@ class FetchMessagesManager @Inject constructor(
             return@let threads.toList()
         }
 
-        SentryLog.d(TAG, "launchWork: ${mailbox.email} has ${newMessagesThreads.count()} Threads with new Messages")
+        SentryLog.d(TAG, "LaunchWork: ${mailbox.email} has ${newMessagesThreads.count()} Threads with new Messages")
+
+        if (newMessagesThreads.isEmpty()) {
+            SentryDebug.sendFailedNotification(
+                reason = "No new Message",
+                userId = userId,
+                mailboxId = mailbox.mailboxId,
+                messageUid = sentryMessageUid,
+                mailbox = mailbox,
+            )
+            return
+        }
 
         // Notify Threads with new Messages
         val unReadThreadsCount = ThreadController.getUnreadThreadsCount(folder)
