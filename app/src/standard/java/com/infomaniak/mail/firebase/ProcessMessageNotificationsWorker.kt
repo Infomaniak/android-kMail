@@ -30,6 +30,7 @@ import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.workers.BaseProcessMessageNotificationsWorker
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -50,15 +51,15 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
         SentryLog.i(TAG, "Work started")
 
         val userId = inputData.getIntOrNull(USER_ID_KEY) ?: run {
-            SentryDebug.sendFailedNotification("No userId in Notification")
+            SentryDebug.sendFailedNotification("No userId in Notification", SentryLevel.ERROR)
             return@with Result.success()
         }
         val mailboxId = inputData.getIntOrNull(MAILBOX_ID_KEY) ?: run {
-            SentryDebug.sendFailedNotification("No mailboxId in Notification", userId)
+            SentryDebug.sendFailedNotification("No mailboxId in Notification", SentryLevel.ERROR, userId)
             return@with Result.success()
         }
         val messageUid = inputData.getString(MESSAGE_UID_KEY) ?: run {
-            SentryDebug.sendFailedNotification("No messageUid in Notification", userId, mailboxId)
+            SentryDebug.sendFailedNotification("No messageUid in Notification", SentryLevel.ERROR, userId, mailboxId)
             return@with Result.success()
         }
         val mailbox = mailboxController.getMailbox(userId, mailboxId) ?: run {
@@ -67,7 +68,13 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
             // We need to wait until the user opens the app again to fetch this new Mailbox.
             // Then, we'll be able to handle Notifications for this Mailbox.
             // Until then, we can leave safely.
-            SentryDebug.sendFailedNotification("Received Notif: no Mailbox in Realm", userId, mailboxId, messageUid)
+            SentryDebug.sendFailedNotification(
+                reason = "Received Notif: no Mailbox in Realm",
+                sentryLevel = SentryLevel.ERROR,
+                userId = userId,
+                mailboxId = mailboxId,
+                messageUid = messageUid,
+            )
             return@with Result.success()
         }
 
@@ -77,7 +84,14 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
             // If the Message is already in Realm, it means we already fetched it when we received a previous Notification.
             // So we've already shown it in a previous batch of Notifications.
             // We can leave safely.
-            SentryDebug.sendFailedNotification("Message already in Realm", userId, mailboxId, messageUid, mailbox)
+            SentryDebug.sendFailedNotification(
+                reason = "Message already in Realm",
+                sentryLevel = SentryLevel.WARNING,
+                userId = userId,
+                mailboxId = mailboxId,
+                messageUid = messageUid,
+                mailbox = mailbox,
+            )
             return@with Result.success()
         }
 

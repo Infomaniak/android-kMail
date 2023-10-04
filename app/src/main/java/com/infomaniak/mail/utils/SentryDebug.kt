@@ -131,6 +131,7 @@ object SentryDebug {
 
     fun sendFailedNotification(
         reason: String,
+        sentryLevel: SentryLevel,
         userId: Int? = null,
         mailboxId: Int? = null,
         messageUid: String? = null,
@@ -139,7 +140,7 @@ object SentryDebug {
     ) {
         Sentry.withScope { scope ->
 
-            scope.level = SentryLevel.ERROR
+            scope.level = sentryLevel
 
             scope.setTag("reason", reason)
             scope.setExtra("userId", "${userId?.toString()}")
