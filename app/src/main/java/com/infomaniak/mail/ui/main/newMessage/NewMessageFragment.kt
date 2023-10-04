@@ -492,6 +492,8 @@ class NewMessageFragment : Fragment() {
         updateSelectedSignatureFromField(signatures.count(), selectedSignature)
 
         val adapter = SignatureAdapter(signatures, newMessageViewModel.selectedSignatureId) { newSelectedSignature ->
+            trackNewMessageEvent("switchIdentity")
+
             updateSelectedSignatureFromField(signatures.count(), newSelectedSignature)
             updateBodySignature(newSelectedSignature.content)
 
