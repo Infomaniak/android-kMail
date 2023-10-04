@@ -213,6 +213,14 @@ object MatomoMail : MatomoCore {
         trackEvent("externals", name, action, value.toFloat())
     }
 
+    fun Fragment.trackAiWriterEvent(name: String, action: TrackerAction = TrackerAction.CLICK) {
+        context?.trackAiWriterEvent(name, action)
+    }
+
+    fun Context.trackAiWriterEvent(name: String, action: TrackerAction = TrackerAction.CLICK) {
+        trackEvent("aiWriter", name, action)
+    }
+
     // We need to invert this logical value to keep a coherent value for analytics because actions
     // conditions are inverted (ex: if the condition is `message.isSpam`, then we want to unspam)
     private fun Boolean.toMailActionValue() = (!this).toFloat()
