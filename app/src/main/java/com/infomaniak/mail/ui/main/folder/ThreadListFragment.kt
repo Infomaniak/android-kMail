@@ -276,7 +276,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 )
             }
 
-            onLoadMoreClicked = { mainViewModel.getOnePageOfOldMessages() }
+            onLoadMoreClicked = {
+                trackThreadListEvent("loadMore")
+                mainViewModel.getOnePageOfOldMessages()
+            }
         }
     }
 
