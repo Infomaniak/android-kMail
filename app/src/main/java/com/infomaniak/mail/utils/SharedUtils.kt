@@ -22,6 +22,7 @@ import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
+import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshCallbacks
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.cache.userInfo.FeatureFlagController
@@ -55,8 +56,7 @@ class SharedUtils @Inject constructor(
         mailbox: Mailbox,
         threads: List<Thread>,
         message: Message? = null,
-        started: (() -> Unit)? = null,
-        stopped: (() -> Unit)? = null,
+        callbacks: RefreshCallbacks? = null,
         shouldRefreshThreads: Boolean = true,
     ) {
 
@@ -71,8 +71,7 @@ class SharedUtils @Inject constructor(
             refreshFolders(
                 mailbox = mailbox,
                 messagesFoldersIds = messages.getFoldersIds(),
-                started = started,
-                stopped = stopped,
+                callbacks = callbacks,
             )
         }
     }
@@ -86,8 +85,7 @@ class SharedUtils @Inject constructor(
         mailbox: Mailbox,
         messagesFoldersIds: List<String>,
         destinationFolderId: String? = null,
-        started: (() -> Unit)? = null,
-        stopped: (() -> Unit)? = null,
+        callbacks: RefreshCallbacks? = null,
     ) {
 
         // We always want to refresh the `destinationFolder` last, to avoid any blink on the UI.
@@ -101,8 +99,7 @@ class SharedUtils @Inject constructor(
                     mailbox = mailbox,
                     folder = folder,
                     realm = mailboxContentRealm(),
-                    started = started,
-                    stopped = stopped,
+                    callbacks = callbacks,
                 )
             }
         }

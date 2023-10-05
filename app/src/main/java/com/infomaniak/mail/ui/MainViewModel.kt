@@ -28,7 +28,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.*
-import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
+import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.*
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.mailboxInfo.PermissionsController
 import com.infomaniak.mail.data.cache.mailboxInfo.QuotasController
@@ -385,8 +385,7 @@ class MainViewModel @Inject constructor(
             mailbox = currentMailbox.value!!,
             folder = currentFolder.value!!,
             realm = mailboxContentRealm(),
-            started = ::startedDownload,
-            stopped = ::stoppedDownload,
+            callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop),
         )
     }
 
@@ -410,19 +409,14 @@ class MainViewModel @Inject constructor(
         if (mailbox == null || folderId == null) return
         val folder = folderController.getFolder(folderId) ?: return
 
-        val (started, stopped) = if (showSwipeRefreshLayout) {
-            ::startedDownload to ::stoppedDownload
-        } else {
-            null to null
-        }
+        val callbacks = if (showSwipeRefreshLayout) RefreshCallbacks(::onDownloadStart, ::onDownloadStop) else null
 
         refreshController.refreshThreads(
             refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
             mailbox = mailbox,
             folder = folder,
             realm = mailboxContentRealm(),
-            started = started,
-            stopped = stopped,
+            callbacks = callbacks,
         )
     }
 
@@ -469,8 +463,7 @@ class MainViewModel @Inject constructor(
                 mailbox = mailbox,
                 messagesFoldersIds = messages.getFoldersIds(exception = trashId),
                 destinationFolderId = trashId,
-                started = ::startedDownload,
-                stopped = ::stoppedDownload,
+                callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop),
             )
         } else if (isSwipe) {
             // We need to make the swiped Thread come back, so we reassign the LiveData with Realm values
@@ -564,8 +557,7 @@ class MainViewModel @Inject constructor(
                 mailbox = mailbox,
                 messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id),
                 destinationFolderId = destinationFolder.id,
-                started = ::startedDownload,
-                stopped = ::stoppedDownload,
+                callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop),
             )
         }
 
@@ -631,8 +623,7 @@ class MainViewModel @Inject constructor(
                 mailbox = mailbox,
                 messagesFoldersIds = messagesFoldersIds,
                 destinationFolderId = destinationFolder.id,
-                started = ::startedDownload,
-                stopped = ::stoppedDownload,
+                callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop),
             )
         }
 
@@ -670,7 +661,7 @@ class MainViewModel @Inject constructor(
         if (isSeen) {
             markAsUnseen(mailbox, threads, message)
         } else {
-            sharedUtils.markAsSeen(mailbox, threads, message, ::startedDownload, ::stoppedDownload)
+            sharedUtils.markAsSeen(mailbox, threads, message, RefreshCallbacks(::onDownloadStart, ::onDownloadStop))
         }
     }
 
@@ -685,8 +676,7 @@ class MainViewModel @Inject constructor(
             refreshFoldersAsync(
                 mailbox = mailbox,
                 messagesFoldersIds = messages.getFoldersIds(),
-                started = ::startedDownload,
-                stopped = ::stoppedDownload,
+                callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop),
             )
         }
     }
@@ -741,8 +731,7 @@ class MainViewModel @Inject constructor(
             refreshFoldersAsync(
                 mailbox = mailbox,
                 messagesFoldersIds = messages.getFoldersIds(),
-                started = ::startedDownload,
-                stopped = ::stoppedDownload,
+                callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop),
             )
         }
     }
@@ -795,8 +784,7 @@ class MainViewModel @Inject constructor(
                 mailbox = mailbox,
                 messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id),
                 destinationFolderId = destinationFolder.id,
-                started = ::startedDownload,
-                stopped = ::stoppedDownload,
+                callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop),
             )
         }
 
@@ -850,7 +838,12 @@ class MainViewModel @Inject constructor(
 
             val snackbarTitle = if (data == true) {
                 // Don't use `refreshFoldersAsync` here, it will make the Snackbars blink.
-                sharedUtils.refreshFolders(mailbox, foldersIds, destinationFolderId, ::startedDownload, ::stoppedDownload)
+                sharedUtils.refreshFolders(
+                    mailbox = mailbox,
+                    messagesFoldersIds = foldersIds,
+                    destinationFolderId = destinationFolderId,
+                    callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop),
+                )
                 R.string.snackbarMoveCancelled
             } else {
                 if (translatedError == 0) RCore.string.anErrorHasOccurred else translatedError
@@ -894,17 +887,16 @@ class MainViewModel @Inject constructor(
         mailbox: Mailbox,
         messagesFoldersIds: List<String>,
         destinationFolderId: String? = null,
-        started: (() -> Unit)? = null,
-        stopped: (() -> Unit)? = null,
+        callbacks: RefreshCallbacks? = null,
     ) = viewModelScope.launch(ioCoroutineContext) {
-        sharedUtils.refreshFolders(mailbox, messagesFoldersIds, destinationFolderId, started, stopped)
+        sharedUtils.refreshFolders(mailbox, messagesFoldersIds, destinationFolderId, callbacks)
     }
 
-    private fun startedDownload() {
+    private fun onDownloadStart() {
         isDownloadingChanges.postValue(true to null)
     }
 
-    private fun stoppedDownload() {
+    private fun onDownloadStop() {
 
         val shouldDisplayLoadMore = currentFolderId?.let(folderController::getFolder)
             ?.let { it.cursor != null && !it.isHistoryComplete }
@@ -997,8 +989,7 @@ class MainViewModel @Inject constructor(
                 mailbox = currentMailbox.value!!,
                 folder = folder,
                 realm = mailboxContentRealm(),
-                started = ::startedDownload,
-                stopped = ::stoppedDownload,
+                callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop),
             )
         }
     }
