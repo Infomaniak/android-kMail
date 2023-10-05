@@ -146,7 +146,11 @@ class AiPropositionFragment : Fragment() {
 
     private fun choosePropositionAndBack() = with(aiViewModel) {
         val willReplace = newMessageViewModel.draft.uiBody.isNotBlank()
-        if (willReplace) trackAiWriterEvent("replaceProposition") else trackAiWriterEvent("insertProposition")
+        if (willReplace) {
+            trackAiWriterEvent("replaceProposition", TrackerAction.DATA)
+        } else {
+            trackAiWriterEvent("insertProposition", TrackerAction.DATA)
+        }
 
         aiOutputToInsert.value = aiProposition.value!!.second
         findNavController().popBackStack()
