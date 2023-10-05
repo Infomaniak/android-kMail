@@ -181,11 +181,12 @@ class RefreshController @Inject constructor(
 
         fun sendMessageNotFoundSentry(failedFolder: Folder) {
             Sentry.withScope { scope ->
+                val fibonacci = if (strategy.iteration == Iteration.ABORT_MISSION) -1 else strategy.fibonacci
                 scope.setTag("iteration", strategy.iteration.name)
-                scope.setTag("fibonacci", "${strategy.fibonacci}")
+                scope.setTag("fibonacci", "$fibonacci")
                 scope.setTag("direction", exception.direction.name)
                 scope.setExtra("iteration", strategy.iteration.name)
-                scope.setExtra("fibonacci", "${strategy.fibonacci}")
+                scope.setExtra("fibonacci", "$fibonacci")
                 scope.setExtra("folderCursor", "${failedFolder.cursor}")
                 scope.setExtra("folderName", failedFolder.name)
                 Sentry.captureException(exception)
