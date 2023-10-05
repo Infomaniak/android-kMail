@@ -107,7 +107,7 @@ class AiViewModel @Inject constructor(
 
     enum class Shortcut(@IdRes val menuId: Int, val apiRoute: String?, val matomoValue: String) {
         MODIFY(R.id.modify, null, "edit"),
-        REGENERATE(R.id.regenerate, "redraw", "regenarate"),
+        REGENERATE(R.id.regenerate, "redraw", "regenerate"),
         SHORTEN(R.id.shorten, "shorten", "shorten"),
         LENGTHEN(R.id.lengthen, "develop", "expand"),
         SERIOUS_TONE(R.id.seriousTone, "tune-professional", "seriousWriting"),

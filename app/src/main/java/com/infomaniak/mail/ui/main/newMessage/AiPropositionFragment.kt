@@ -65,7 +65,7 @@ class AiPropositionFragment : Fragment() {
     private val replacementDialog by lazy {
         createReplaceContentDialog(onPositiveButtonClicked = {
             trackAiWriterEvent("replacePropositionConfirm")
-            choosePropositionAndBack()
+            choosePropositionAndPopBack()
         })
     }
 
@@ -92,9 +92,7 @@ class AiPropositionFragment : Fragment() {
     }
 
     private fun handleBackDispatcher() {
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
-            dismissMatomoAndBack()
-        }
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) { trackDismissalAndPopBack() }
     }
 
     private fun setUi() = with(binding) {
@@ -107,7 +105,7 @@ class AiPropositionFragment : Fragment() {
             val body = newMessageViewModel.draft.uiBody
 
             if (doNotAskAgain || body.isBlank()) {
-                choosePropositionAndBack()
+                choosePropositionAndPopBack()
             } else {
                 trackAiWriterEvent("replacePropositionDialog")
                 replacementDialog.show()
@@ -129,7 +127,7 @@ class AiPropositionFragment : Fragment() {
     private fun setToolbar() = with(binding) {
         changeToolbarColorOnScroll(toolbar, nestedScrollView)
         toolbar.apply {
-            setNavigationOnClickListener { dismissMatomoAndBack() }
+            setNavigationOnClickListener { trackDismissalAndPopBack() }
             title = requireContext().postfixWithTag(
                 getString(R.string.aiPromptTitle),
                 R.string.aiPromptTag,
@@ -139,12 +137,12 @@ class AiPropositionFragment : Fragment() {
         }
     }
 
-    private fun dismissMatomoAndBack() {
+    private fun trackDismissalAndPopBack() {
         trackAiWriterEvent("dismissProposition")
         findNavController().popBackStack()
     }
 
-    private fun choosePropositionAndBack() = with(aiViewModel) {
+    private fun choosePropositionAndPopBack() = with(aiViewModel) {
         val willReplace = newMessageViewModel.draft.uiBody.isNotBlank()
         if (willReplace) {
             trackAiWriterEvent("replaceProposition", TrackerAction.DATA)
