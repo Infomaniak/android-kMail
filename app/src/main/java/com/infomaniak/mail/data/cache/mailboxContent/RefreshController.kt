@@ -60,8 +60,8 @@ class RefreshController @Inject constructor(
     private lateinit var initialFolder: Folder
     private lateinit var realm: Realm
     private var okHttpClient: OkHttpClient? = null
-    private var startCallback: (() -> Unit)? = null
-    private var stopCallback: (() -> Unit)? = null
+    private var onStart: (() -> Unit)? = null
+    private var onStop: (() -> Unit)? = null
     private var endOfMessagesReached: Boolean = false
 
     //region Fetch Messages
@@ -75,8 +75,7 @@ class RefreshController @Inject constructor(
         folder: Folder,
         okHttpClient: OkHttpClient? = null,
         realm: Realm,
-        started: (() -> Unit)? = null,
-        stopped: (() -> Unit)? = null,
+        callbacks: RefreshCallbacks? = null,
     ): Pair<Set<Thread>?, Throwable?> {
 
         SentryLog.i("API", "Refresh threads with mode: $refreshMode | (${folder.name})")
@@ -84,12 +83,12 @@ class RefreshController @Inject constructor(
         refreshThreadsJob?.cancel()
         refreshThreadsJob = Job()
 
-        setupConfiguration(refreshMode, mailbox, folder, realm, okHttpClient, started, stopped)
+        setupConfiguration(refreshMode, mailbox, folder, realm, okHttpClient, callbacks)
 
         return refreshWithRunCatching(refreshThreadsJob!!)
             .also { (threads, _) ->
                 if (threads != null) {
-                    stopCallback?.invoke()
+                    onStop?.invoke()
                     SentryLog.d("API", "End of refreshing threads with mode: $refreshMode | (${folder.name})")
                 }
             }
@@ -101,22 +100,21 @@ class RefreshController @Inject constructor(
         initialFolder: Folder,
         realm: Realm,
         okHttpClient: OkHttpClient?,
-        started: (() -> Unit)?,
-        stopped: (() -> Unit)?,
+        callbacks: RefreshCallbacks? = null,
     ) {
         this.refreshMode = refreshMode
         this.mailbox = mailbox
         this.initialFolder = initialFolder
         this.realm = realm
         this.okHttpClient = okHttpClient
-        this.startCallback = started
-        this.stopCallback = stopped
-        this.endOfMessagesReached = false
+        onStart = callbacks?.onStart
+        onStop = callbacks?.onStop
+        endOfMessagesReached = false
     }
 
     private suspend fun refreshWithRunCatching(job: Job): Pair<Set<Thread>?, Throwable?> = runCatching {
         withContext(Dispatchers.IO + job) {
-            startCallback?.invoke()
+            onStart?.invoke()
             realm.handleRefreshMode(scope = this) to null
         }
     }.getOrElse {
@@ -812,10 +810,10 @@ class RefreshController @Inject constructor(
     private fun handleAllExceptions(throwable: Throwable) {
 
         // We force-cancelled, so we need to call the `stopped` callback.
-        if (throwable is ForcedCancellationException) stopCallback?.invoke()
+        if (throwable is ForcedCancellationException) onStop?.invoke()
 
         // It failed, but not because we cancelled it. Something bad happened, so we call the `stopped` callback.
-        if (throwable !is CancellationException) stopCallback?.invoke()
+        if (throwable !is CancellationException) onStop?.invoke()
 
         if (throwable is ApiErrorException) throwable.handleOtherApiErrors()
     }
@@ -915,6 +913,11 @@ class RefreshController @Inject constructor(
             ABORT_MISSION,
         }
     }
+
+    data class RefreshCallbacks(
+        val onStart: (() -> Unit),
+        val onStop: (() -> Unit),
+    )
 
     private companion object {
         val FIBONACCI_SEQUENCE = arrayOf(2, 8, 34, 144)
