@@ -62,7 +62,12 @@ class AiPropositionFragment : Fragment() {
         SimpleIconPopupMenu(requireContext(), R.menu.ai_refining_options, binding.refineButton, ::onMenuItemClicked)
     }
 
-    private val replacementDialog by lazy { createReplaceContentDialog(onPositiveButtonClicked = ::choosePropositionAndBack) }
+    private val replacementDialog by lazy {
+        createReplaceContentDialog(onPositiveButtonClicked = {
+            trackAiWriterEvent("replacePropositionConfirm")
+            choosePropositionAndBack()
+        })
+    }
 
     @Inject
     lateinit var localSettings: LocalSettings
