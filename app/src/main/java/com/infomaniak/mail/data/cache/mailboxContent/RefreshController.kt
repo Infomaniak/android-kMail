@@ -107,8 +107,10 @@ class RefreshController @Inject constructor(
         this.initialFolder = initialFolder
         this.realm = realm
         this.okHttpClient = okHttpClient
-        onStart = callbacks?.onStart
-        onStop = callbacks?.onStop
+        callbacks?.let {
+            onStart = it.onStart
+            onStop = it.onStop
+        }
         endOfMessagesReached = false
     }
 
