@@ -275,7 +275,7 @@ class LocalSettings private constructor(context: Context) {
         get() = getEnum(AI_REPLACEMENT_DIALOG_VISIBILITY_KEY, DEFAULT_AI_REPLACEMENT_DIALOG_VISIBILITY)
         set(value) = putEnum(AI_REPLACEMENT_DIALOG_VISIBILITY_KEY, value)
 
-    enum class AiReplacementDialogVisibility { // TODO: Matomo
+    enum class AiReplacementDialogVisibility {
         SHOW,
         HIDE,
     }

@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.addCallback
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
@@ -28,6 +29,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.infomaniak.lib.core.MatomoCore.TrackerAction
+import com.infomaniak.mail.MatomoMail.trackAiWriterEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.AiReplacementDialogVisibility
@@ -59,7 +62,12 @@ class AiPropositionFragment : Fragment() {
         SimpleIconPopupMenu(requireContext(), R.menu.ai_refining_options, binding.refineButton, ::onMenuItemClicked)
     }
 
-    private val replacementDialog by lazy { createReplaceContentDialog(onPositiveButtonClicked = ::choosePropositionAndBack) }
+    private val replacementDialog by lazy {
+        createReplaceContentDialog(onPositiveButtonClicked = {
+            trackAiWriterEvent("replacePropositionConfirm")
+            choosePropositionAndPopBack()
+        })
+    }
 
     @Inject
     lateinit var localSettings: LocalSettings
@@ -71,6 +79,7 @@ class AiPropositionFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
+        handleBackDispatcher()
         setUi()
 
         if (aiViewModel.aiProposition.value == null) currentRequestJob = aiViewModel.generateNewAiProposition()
@@ -82,6 +91,10 @@ class AiPropositionFragment : Fragment() {
         super.onDestroy()
     }
 
+    private fun handleBackDispatcher() {
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) { trackDismissalAndPopBack() }
+    }
+
     private fun setUi() = with(binding) {
         setToolbar()
 
@@ -91,12 +104,21 @@ class AiPropositionFragment : Fragment() {
             val doNotAskAgain = localSettings.aiReplacementDialogVisibility == AiReplacementDialogVisibility.HIDE
             val body = newMessageViewModel.draft.uiBody
 
-            if (doNotAskAgain || body.isBlank()) choosePropositionAndBack() else replacementDialog.show()
+            if (doNotAskAgain || body.isBlank()) {
+                choosePropositionAndPopBack()
+            } else {
+                trackAiWriterEvent("replacePropositionDialog")
+                replacementDialog.show()
+            }
         }
 
-        refineButton.setOnClickListener { refinePopupMenu.show() }
+        refineButton.setOnClickListener {
+            trackAiWriterEvent("refine")
+            refinePopupMenu.show()
+        }
 
         retryButton.setOnClickListener {
+            trackAiWriterEvent("retry")
             aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(true)
             findNavController().popBackStack()
         }
@@ -105,7 +127,7 @@ class AiPropositionFragment : Fragment() {
     private fun setToolbar() = with(binding) {
         changeToolbarColorOnScroll(toolbar, nestedScrollView)
         toolbar.apply {
-            setNavigationOnClickListener { findNavController().popBackStack() }
+            setNavigationOnClickListener { trackDismissalAndPopBack() }
             title = requireContext().postfixWithTag(
                 getString(R.string.aiPromptTitle),
                 R.string.aiPromptTag,
@@ -115,13 +137,27 @@ class AiPropositionFragment : Fragment() {
         }
     }
 
-    private fun choosePropositionAndBack() = with(aiViewModel) {
+    private fun trackDismissalAndPopBack() {
+        trackAiWriterEvent("dismissProposition")
+        findNavController().popBackStack()
+    }
+
+    private fun choosePropositionAndPopBack() = with(aiViewModel) {
+        val willReplace = newMessageViewModel.draft.uiBody.isNotBlank()
+        if (willReplace) {
+            trackAiWriterEvent("replaceProposition", TrackerAction.DATA)
+        } else {
+            trackAiWriterEvent("insertProposition", TrackerAction.DATA)
+        }
+
         aiOutputToInsert.value = aiProposition.value!!.second
         findNavController().popBackStack()
     }
 
     private fun onMenuItemClicked(menuItemId: Int) = with(aiViewModel) {
         val shortcut = Shortcut.values().find { it.menuId == menuItemId }!!
+        trackAiWriterEvent(shortcut.matomoValue)
+
         if (shortcut == Shortcut.MODIFY) {
             aiPromptOpeningStatus.value = AiPromptOpeningStatus(true, shouldResetPrompt = false)
             findNavController().popBackStack()
@@ -155,6 +191,7 @@ class AiPropositionFragment : Fragment() {
             .setView(root)
             .setPositiveButton(R.string.aiReplacementDialogPositiveButton) { _, _ -> onPositiveButtonClicked() }
             .setNegativeButton(RCore.string.buttonCancel, null)
+            .setOnDismissListener { if (checkbox.isChecked) trackAiWriterEvent("doNotShowAgain", TrackerAction.DATA) }
             .create()
     }
 

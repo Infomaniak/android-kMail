@@ -17,9 +17,11 @@
  */
 package com.infomaniak.mail.ui.bottomSheetDialogs
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.activityViewModels
+import com.infomaniak.mail.MatomoMail.trackAiWriterEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.ai.AiPromptOpeningStatus
 import com.infomaniak.mail.ui.main.newMessage.AiViewModel
@@ -27,6 +29,8 @@ import com.infomaniak.mail.ui.main.newMessage.AiViewModel
 class AiDiscoveryBottomSheetDialog : InformationBottomSheetDialog() {
 
     private val aiViewModel: AiViewModel by activityViewModels()
+
+    private var clickedOnTry = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
@@ -38,11 +42,17 @@ class AiDiscoveryBottomSheetDialog : InformationBottomSheetDialog() {
         actionButton.apply {
             setText(R.string.buttonTry)
             setOnClickListener {
+                clickedOnTry = true
                 aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(true)
                 dismiss()
             }
         }
 
         secondaryActionButton.setOnClickListener { dismiss() }
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        if (clickedOnTry) trackAiWriterEvent("discoverTry") else trackAiWriterEvent("discoverLater")
+        super.onDismiss(dialog)
     }
 }

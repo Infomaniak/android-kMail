@@ -50,6 +50,7 @@ import com.google.android.material.button.MaterialButton
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.MatomoMail
+import com.infomaniak.mail.MatomoMail.trackAiWriterEvent
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackExternalEvent
@@ -570,7 +571,8 @@ class NewMessageFragment : Fragment() {
         aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(true)
     }
 
-    fun closeAiPrompt() {
+    fun closeAiPrompt(becauseOfGeneration: Boolean = false) {
+        trackAiWriterEvent(name = if (becauseOfGeneration) "generate" else "dismissPromptWithoutGenerating")
         aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(false)
     }
 
@@ -855,7 +857,7 @@ class NewMessageFragment : Fragment() {
     }
 
     fun navigateToPropositionFragment() {
-        closeAiPrompt()
+        closeAiPrompt(becauseOfGeneration = true)
         resetAiProposition()
         safeNavigate(NewMessageFragmentDirections.actionNewMessageFragmentToAiPropositionFragment())
     }

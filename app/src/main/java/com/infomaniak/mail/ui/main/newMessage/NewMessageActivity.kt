@@ -17,17 +17,22 @@
  */
 package com.infomaniak.mail.ui.main.newMessage
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.webkit.WebView
 import androidx.activity.viewModels
+import androidx.navigation.NavDestination
+import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.mail.BuildConfig
+import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.databinding.ActivityNewMessageBinding
 import com.infomaniak.mail.ui.BaseActivity
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.updateNavigationBarColor
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -36,6 +41,10 @@ class NewMessageActivity : BaseActivity() {
 
     private val binding by lazy { ActivityNewMessageBinding.inflate(layoutInflater) }
     private val newMessageViewModel: NewMessageViewModel by viewModels()
+
+    private val navController by lazy {
+        (supportFragmentManager.findFragmentById(R.id.fragmentContainer) as NavHostFragment).navController
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,6 +59,8 @@ class NewMessageActivity : BaseActivity() {
 
         setupSnackBar()
         setupSystemBars()
+
+        setupNavController()
     }
 
     private fun isAuth(): Boolean {
@@ -70,5 +81,18 @@ class NewMessageActivity : BaseActivity() {
             statusBarColor = backgroundColor
             updateNavigationBarColor(backgroundColor)
         }
+    }
+
+    private fun setupNavController() {
+        navController.addOnDestinationChangedListener { _, destination, arguments ->
+            onDestinationChanged(destination, arguments)
+        }
+    }
+
+    // This `SuppressLint` seems useless, but it's for the CI. Don't remove it.
+    @SuppressLint("RestrictedApi")
+    private fun onDestinationChanged(destination: NavDestination, arguments: Bundle?) {
+        SentryDebug.addNavigationBreadcrumb(destination.displayName, arguments)
+        trackDestination(destination)
     }
 }
