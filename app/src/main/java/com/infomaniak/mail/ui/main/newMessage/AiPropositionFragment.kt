@@ -104,7 +104,7 @@ class AiPropositionFragment : Fragment() {
             if (doNotAskAgain || body.isBlank()) {
                 choosePropositionAndBack()
             } else {
-                trackAiWriterEvent("replacePropositionConfirmation")
+                trackAiWriterEvent("replacePropositionDialog")
                 replacementDialog.show()
             }
         }
