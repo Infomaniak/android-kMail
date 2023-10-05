@@ -18,6 +18,8 @@
 package com.infomaniak.mail.ui.main.newMessage
 
 import android.os.Bundle
+import android.transition.AutoTransition
+import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -230,6 +232,10 @@ class AiPropositionFragment : Fragment() {
     }
 
     private fun displaySuccess(body: String?) {
+        val autoTransition = AutoTransition()
+        autoTransition.duration = REPLACEMENT_DURATION
+        TransitionManager.beginDelayedTransition(binding.contentLayout, autoTransition)
+
         binding.propositionTextView.text = body
         setUiVisibilityState(UiState.PROPOSITION)
     }
@@ -304,5 +310,9 @@ class AiPropositionFragment : Fragment() {
         LOADING,
         PROPOSITION,
         ERROR,
+    }
+
+    private companion object {
+        const val REPLACEMENT_DURATION: Long = 150
     }
 }
