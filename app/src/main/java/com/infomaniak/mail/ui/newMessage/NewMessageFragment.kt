@@ -113,6 +113,10 @@ class NewMessageFragment : Fragment() {
 
     private var aiPromptFragment: AiPromptFragment? = null
 
+    private var quoteWebView: WebView? = null
+    private var signatureWebView: WebView? = null
+
+
     private val attachmentAdapter inline get() = binding.attachmentsRecyclerView.adapter as AttachmentAdapter
 
     private val newMessageActivity by lazy { requireActivity() as NewMessageActivity }
@@ -144,6 +148,7 @@ class NewMessageFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
+
         SentryDebug.addNavigationBreadcrumb(
             name = findNavController().currentDestination?.displayName ?: "newMessageFragment",
             arguments = newMessageActivityArgs.toBundle(),
@@ -152,6 +157,7 @@ class NewMessageFragment : Fragment() {
         filePicker = FilePicker(this@NewMessageFragment)
         bindAlertToViewLifecycle(descriptionDialog)
 
+        setWebViewReference()
         initUi()
 
         if (newMessageViewModel.initResult.value == null) {
@@ -184,6 +190,11 @@ class NewMessageFragment : Fragment() {
         }
     }
 
+    private fun setWebViewReference() {
+        quoteWebView = binding.quoteWebView
+        signatureWebView = binding.signatureWebView
+    }
+
     override fun onStart() {
         super.onStart()
         newMessageViewModel.updateDraftInLocalIfRemoteHasChanged()
@@ -197,6 +208,14 @@ class NewMessageFragment : Fragment() {
             binding.quoteWebView.reload()
         }
         super.onConfigurationChanged(newConfig)
+    }
+
+    override fun onDestroyView() {
+        quoteWebView?.destroy()
+        quoteWebView = null
+        signatureWebView?.destroy()
+        signatureWebView = null
+        super.onDestroyView()
     }
 
     private fun handleOnBackPressed() {
