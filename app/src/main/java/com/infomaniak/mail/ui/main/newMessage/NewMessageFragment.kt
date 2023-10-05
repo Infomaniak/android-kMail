@@ -388,12 +388,11 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun populateUiWithViewModel() = with(binding) {
-        val draftMode = newMessageActivityArgs.draftMode
         val draft = newMessageViewModel.draft
         val aliases = newMessageViewModel.currentMailbox.aliases
 
         val externalMailFlagEnabled = newMessageViewModel.currentMailbox.externalMailFlagEnabled
-        val shouldWarnForExternal = externalMailFlagEnabled && (draftMode == DraftMode.REPLY || draftMode == DraftMode.REPLY_ALL)
+        val shouldWarnForExternal = externalMailFlagEnabled && !newMessageActivityArgs.arrivedFromExistingDraft
 
         val ccAndBccFieldsAreEmpty = draft.cc.isEmpty() && draft.bcc.isEmpty()
         val emailDictionary = newMessageViewModel.mergedContacts.value?.second ?: emptyMap()
