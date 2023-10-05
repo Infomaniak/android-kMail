@@ -60,8 +60,8 @@ class RefreshController @Inject constructor(
     private lateinit var initialFolder: Folder
     private lateinit var realm: Realm
     private var okHttpClient: OkHttpClient? = null
-    private var started: (() -> Unit)? = null
-    private var stopped: (() -> Unit)? = null
+    private var startCallback: (() -> Unit)? = null
+    private var stopCallback: (() -> Unit)? = null
     private var endOfMessagesReached: Boolean = false
 
     //region Fetch Messages
@@ -89,7 +89,7 @@ class RefreshController @Inject constructor(
         return refreshWithRunCatching(refreshThreadsJob!!)
             .also { (threads, _) ->
                 if (threads != null) {
-                    stopped?.invoke()
+                    stopCallback?.invoke()
                     SentryLog.d("API", "End of refreshing threads with mode: $refreshMode | (${folder.name})")
                 }
             }
@@ -109,14 +109,14 @@ class RefreshController @Inject constructor(
         this.initialFolder = initialFolder
         this.realm = realm
         this.okHttpClient = okHttpClient
-        this.started = started
-        this.stopped = stopped
-        endOfMessagesReached = false
+        this.startCallback = started
+        this.stopCallback = stopped
+        this.endOfMessagesReached = false
     }
 
     private suspend fun refreshWithRunCatching(job: Job): Pair<Set<Thread>?, Throwable?> = runCatching {
         withContext(Dispatchers.IO + job) {
-            started?.invoke()
+            startCallback?.invoke()
             realm.handleRefreshMode(scope = this) to null
         }
     }.getOrElse {
@@ -812,10 +812,10 @@ class RefreshController @Inject constructor(
     private fun handleAllExceptions(throwable: Throwable) {
 
         // We force-cancelled, so we need to call the `stopped` callback.
-        if (throwable is ForcedCancellationException) stopped?.invoke()
+        if (throwable is ForcedCancellationException) stopCallback?.invoke()
 
         // It failed, but not because we cancelled it. Something bad happened, so we call the `stopped` callback.
-        if (throwable !is CancellationException) stopped?.invoke()
+        if (throwable !is CancellationException) stopCallback?.invoke()
 
         if (throwable is ApiErrorException) throwable.handleOtherApiErrors()
     }
