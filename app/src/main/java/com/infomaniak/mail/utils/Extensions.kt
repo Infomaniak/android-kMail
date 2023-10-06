@@ -321,24 +321,24 @@ fun List<Folder>.getMenuFolders(): Pair<List<Folder>, List<Folder>> {
         val defaultFolders = list
             .filter { it.role != null }
             .sortedBy { it.role?.order }
-            .flatMapFolderChildren()
+            .flattenFolderChildren()
             .also(list::removeAll)
 
-        val customFolders = list.flatMapFolderChildren()
+        val customFolders = list.flattenFolderChildren()
 
         defaultFolders to customFolders
     }
 }
 
 fun List<Folder>.getDefaultMenuFolders(): List<Folder> {
-    return sortedBy { it.role?.order }.flatMapFolderChildren()
+    return sortedBy { it.role?.order }.flattenFolderChildren()
 }
 
 fun List<Folder>.getCustomMenuFolders(dismissHiddenChildren: Boolean = false): List<Folder> {
-    return flatMapFolderChildren(dismissHiddenChildren)
+    return flattenFolderChildren(dismissHiddenChildren)
 }
 
-fun List<Folder>.flatMapFolderChildren(dismissHiddenChildren: Boolean = false): List<Folder> {
+fun List<Folder>.flattenFolderChildren(dismissHiddenChildren: Boolean = false): List<Folder> {
 
     if (isEmpty()) return this
 
