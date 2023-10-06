@@ -27,15 +27,11 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
-import com.infomaniak.lib.core.utils.FORMAT_DATE_WITH_TIMEZONE
-import com.infomaniak.lib.core.utils.FORMAT_EVENT_DATE
+import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
-import com.infomaniak.lib.core.utils.format
-import com.infomaniak.lib.core.utils.hideProgress
 import com.infomaniak.mail.MatomoMail.trackRestoreMailsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetRestoreEmailsBinding
-import com.infomaniak.mail.utils.showProgressAfterTimer
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -47,6 +43,10 @@ class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
     private val restoreEmailViewModel: RestoreEmailsViewModel by viewModels()
 
     private val autoCompleteTextView by lazy { (binding.datePicker.editText as? MaterialAutoCompleteTextView)!! }
+    private val restoreEmailsButtonProgressTimer by lazy {
+        Utils.createRefreshTimer(onTimerFinish = binding.restoreMailsButton::showProgress)
+    }
+
     private lateinit var formattedDates: Map<String, String>
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -65,9 +65,14 @@ class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
         }
 
         restoreMailsButton.setOnClickListener {
-            restoreMailsButton.showProgressAfterTimer()
+            restoreEmailsButtonProgressTimer.start()
             restoreEmails()
         }
+    }
+
+    override fun onDestroyView() {
+        restoreEmailsButtonProgressTimer.cancel()
+        super.onDestroyView()
     }
 
     private fun MaterialAutoCompleteTextView.hasLoaded(hasLoaded: Boolean) {

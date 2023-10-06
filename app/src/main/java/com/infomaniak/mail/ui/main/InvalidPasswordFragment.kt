@@ -27,14 +27,15 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
+import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.hideProgress
 import com.infomaniak.lib.core.utils.showKeyboard
+import com.infomaniak.lib.core.utils.showProgress
 import com.infomaniak.mail.MatomoMail.trackInvalidPasswordMailboxEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentInvalidPasswordBinding
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.utils.getStringWithBoldArg
-import com.infomaniak.mail.utils.showProgressAfterTimer
 import com.infomaniak.mail.utils.trimmedText
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -45,6 +46,10 @@ class InvalidPasswordFragment : Fragment() {
     private lateinit var binding: FragmentInvalidPasswordBinding
     private val navigationArgs: InvalidPasswordFragmentArgs by navArgs()
     private val invalidPasswordViewModel: InvalidPasswordViewModel by viewModels()
+
+    private val updatePasswordButtonProgressTimer by lazy {
+        Utils.createRefreshTimer(onTimerFinish = binding.confirmButton::showProgress)
+    }
 
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog
@@ -77,7 +82,7 @@ class InvalidPasswordFragment : Fragment() {
         confirmButton.apply {
             setOnClickListener {
                 trackInvalidPasswordMailboxEvent("updatePassword")
-                showProgressAfterTimer()
+                updatePasswordButtonProgressTimer.start()
                 invalidPasswordViewModel.updatePassword(passwordInput.trimmedText)
             }
         }
@@ -116,6 +121,11 @@ class InvalidPasswordFragment : Fragment() {
         invalidPasswordViewModel.requestPasswordResult.observe(viewLifecycleOwner) { apiResponse ->
             showSnackbar(if (apiResponse.isSuccess()) R.string.snackbarMailboxPasswordRequested else apiResponse.translatedError)
         }
+    }
+
+    override fun onDestroyView() {
+        updatePasswordButtonProgressTimer.cancel()
+        super.onDestroyView()
     }
 
     private fun manageButtonState(password: Editable) = with(binding) {

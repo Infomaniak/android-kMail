@@ -49,7 +49,6 @@ import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.SimpleColorFilter
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.button.MaterialButton
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -106,7 +105,6 @@ import org.jsoup.Jsoup
 import java.util.Calendar
 import java.util.Date
 import java.util.Scanner
-import com.infomaniak.lib.core.utils.Utils as RUtils
 
 //region Type alias
 typealias MergedContactDictionary = Map<String, Map<String, MergedContact>>
@@ -621,8 +619,4 @@ private fun Spannable.setClickableSpan(startIndex: Int, endIndex: Int, onClick: 
         endIndex,
         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
     )
-}
-
-fun MaterialButton.showProgressAfterTimer() {
-    RUtils.createRefreshTimer(onTimerFinish = ::showProgress).start()
 }

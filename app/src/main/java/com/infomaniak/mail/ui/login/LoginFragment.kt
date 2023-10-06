@@ -33,10 +33,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.infomaniak.lib.core.R
+import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
-import com.infomaniak.lib.core.utils.hideProgress
-import com.infomaniak.lib.core.utils.initProgress
-import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.databinding.FragmentLoginBinding
@@ -44,7 +42,6 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.utils.LoginUtils
 import com.infomaniak.mail.utils.UiUtils
-import com.infomaniak.mail.utils.showProgressAfterTimer
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
@@ -57,6 +54,10 @@ class LoginFragment : Fragment() {
     private val introViewModel: IntroViewModel by activityViewModels()
 
     private val loginActivity by lazy { requireActivity() as LoginActivity }
+
+    private val connectButtonProgressTimer by lazy {
+        Utils.createRefreshTimer(onTimerFinish = binding.connectButton::showProgress)
+    }
 
     @Inject
     @IoDispatcher
@@ -116,7 +117,7 @@ class LoginFragment : Fragment() {
             initProgress(viewLifecycleOwner)
             setOnClickListener {
                 signInButton.isEnabled = false
-                showProgressAfterTimer()
+                connectButtonProgressTimer.start()
                 requireContext().trackAccountEvent("openLoginWebview")
                 loginActivity.infomaniakLogin.startWebViewLogin(webViewLoginResultLauncher)
             }
@@ -131,6 +132,11 @@ class LoginFragment : Fragment() {
         }
 
         handleOnBackPressed()
+    }
+
+    override fun onDestroyView() {
+        connectButtonProgressTimer.cancel()
+        super.onDestroyView()
     }
 
     private fun handleOnBackPressed() = with(requireActivity()) {
