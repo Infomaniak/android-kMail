@@ -620,7 +620,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeNewAttachments() = with(binding) {
-        newMessageViewModel.importedAttachments.observe(requireActivity()) { (attachments, importationResult) ->
+        newMessageViewModel.importedAttachments.observe(viewLifecycleOwner) { (attachments, importationResult) ->
             attachmentAdapter.addAll(attachments)
             attachmentsRecyclerView.isGone = attachmentAdapter.itemCount == 0
 
