@@ -32,12 +32,12 @@ import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.hideProgress
 import com.infomaniak.lib.core.utils.showKeyboard
-import com.infomaniak.lib.core.utils.showProgress
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentAttachMailboxBinding
 import com.infomaniak.mail.utils.ErrorCode
 import com.infomaniak.mail.utils.isEmail
+import com.infomaniak.mail.utils.showProgressAfterTimer
 import com.infomaniak.mail.utils.trimmedText
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -68,7 +68,7 @@ class AttachMailboxFragment : Fragment() {
 
             setOnClickListener {
                 context.trackAccountEvent("addMailboxConfirm")
-                showProgress()
+                showProgressAfterTimer()
                 attachMailbox()
             }
         }

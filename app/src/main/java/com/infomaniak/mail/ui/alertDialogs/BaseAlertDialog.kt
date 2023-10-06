@@ -23,10 +23,10 @@ import android.content.DialogInterface
 import androidx.appcompat.app.AlertDialog
 import androidx.viewbinding.ViewBinding
 import com.google.android.material.button.MaterialButton
-import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.hideProgress
 import com.infomaniak.lib.core.utils.showProgress
 import com.infomaniak.mail.R
+import com.infomaniak.mail.utils.showProgressAfterTimer
 import dagger.hilt.android.qualifiers.ActivityContext
 
 abstract class BaseAlertDialog(@ActivityContext private val activityContext: Context) {
@@ -41,7 +41,7 @@ abstract class BaseAlertDialog(@ActivityContext private val activityContext: Con
     fun startLoading() {
         alertDialog.setCancelable(false)
         negativeButton.isEnabled = false
-        Utils.createRefreshTimer(onTimerFinish = positiveButton::showProgress).start()
+        positiveButton.showProgressAfterTimer()
     }
 
     fun resetLoadingAndDismiss() = with(alertDialog) {

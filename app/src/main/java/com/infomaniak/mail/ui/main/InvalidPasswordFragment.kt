@@ -29,12 +29,12 @@ import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.hideProgress
 import com.infomaniak.lib.core.utils.showKeyboard
-import com.infomaniak.lib.core.utils.showProgress
 import com.infomaniak.mail.MatomoMail.trackInvalidPasswordMailboxEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentInvalidPasswordBinding
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.utils.getStringWithBoldArg
+import com.infomaniak.mail.utils.showProgressAfterTimer
 import com.infomaniak.mail.utils.trimmedText
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -77,7 +77,7 @@ class InvalidPasswordFragment : Fragment() {
         confirmButton.apply {
             setOnClickListener {
                 trackInvalidPasswordMailboxEvent("updatePassword")
-                showProgress()
+                showProgressAfterTimer()
                 invalidPasswordViewModel.updatePassword(passwordInput.trimmedText)
             }
         }

@@ -37,7 +37,6 @@ import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.hideProgress
 import com.infomaniak.lib.core.utils.initProgress
 import com.infomaniak.lib.core.utils.safeNavigate
-import com.infomaniak.lib.core.utils.showProgress
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.databinding.FragmentLoginBinding
@@ -45,6 +44,7 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.utils.LoginUtils
 import com.infomaniak.mail.utils.UiUtils
+import com.infomaniak.mail.utils.showProgressAfterTimer
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
@@ -116,7 +116,7 @@ class LoginFragment : Fragment() {
             initProgress(viewLifecycleOwner)
             setOnClickListener {
                 signInButton.isEnabled = false
-                showProgress()
+                showProgressAfterTimer()
                 requireContext().trackAccountEvent("openLoginWebview")
                 loginActivity.infomaniakLogin.startWebViewLogin(webViewLoginResultLauncher)
             }
