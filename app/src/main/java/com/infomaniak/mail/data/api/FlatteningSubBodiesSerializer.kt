@@ -54,8 +54,8 @@ object FlatteningSubBodiesSerializer : JsonTransformingSerializer<RealmList<SubB
                     remoteSubBody?.get("from")?.let { put("from", it) }
                     remoteSubBody?.get("to")?.let { put("to", it) }
                     remoteSubBody?.get("part_id")?.let { put("part_id", it) }
-                    remoteBody?.get("value")?.let { put("bodyValue", it) }
-                    remoteBody?.get("type")?.let { put("bodyType", it) }
+                    remoteBody?.get("value")?.let { put("body_value", it) }
+                    remoteBody?.get("type")?.let { put("body_type", it) }
                 },
             )
 

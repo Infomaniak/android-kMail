@@ -15,8 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-@file:UseSerializers(FlatteningSubBodiesSerializer::class)
-
 package com.infomaniak.mail.data.models.message
 
 import com.infomaniak.mail.data.api.FlatteningSubBodiesSerializer
@@ -32,6 +30,8 @@ class Body : EmbeddedRealmObject {
     //region Remote data
     var value: String = ""
     var type: String = ""
+
+    @Serializable(FlatteningSubBodiesSerializer::class)
     @SerialName("subBody")
     var subBodies: RealmList<SubBody> = realmListOf()
     //endregion

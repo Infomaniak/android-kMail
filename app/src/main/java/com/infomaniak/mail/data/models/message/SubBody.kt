@@ -45,7 +45,9 @@ class SubBody : EmbeddedRealmObject {
     var to: RealmList<Recipient> = realmListOf()
     @SerialName("part_id")
     var partId: String? = null
+    @SerialName("body_value")
     var bodyValue: String? = null
+    @SerialName("body_type")
     var bodyType: String? = null
     //endregion
 }
