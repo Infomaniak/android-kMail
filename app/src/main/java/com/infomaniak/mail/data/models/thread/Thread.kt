@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-@file:UseSerializers(RealmListSerializer::class, RealmInstantSerializer::class)
+@file:UseSerializers(RealmListKSerializer::class, RealmInstantSerializer::class)
 
 package com.infomaniak.mail.data.models.thread
 
@@ -25,7 +25,6 @@ import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.MatomoMail.SEARCH_FOLDER_FILTER_NAME
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.RealmInstantSerializer
-import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -38,6 +37,7 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.*
 import io.realm.kotlin.internal.getRealm
+import io.realm.kotlin.serializers.RealmListKSerializer
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject

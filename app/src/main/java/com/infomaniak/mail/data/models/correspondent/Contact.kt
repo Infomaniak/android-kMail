@@ -15,12 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-@file:UseSerializers(RealmListSerializer::class)
+@file:UseSerializers(RealmListKSerializer::class)
 
 package com.infomaniak.mail.data.models.correspondent
 
-import com.infomaniak.mail.data.api.RealmListSerializer
 import io.realm.kotlin.ext.realmListOf
+import io.realm.kotlin.serializers.RealmListKSerializer
 import io.realm.kotlin.types.RealmList
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
