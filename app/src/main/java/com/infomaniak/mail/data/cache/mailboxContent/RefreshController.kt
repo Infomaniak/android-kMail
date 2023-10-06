@@ -93,6 +93,11 @@ class RefreshController @Inject constructor(
         }
     }
 
+    fun clearCallbacks() {
+        onStart = null
+        onStop = null
+    }
+
     private fun setupConfiguration(
         refreshMode: RefreshMode,
         mailbox: Mailbox,
