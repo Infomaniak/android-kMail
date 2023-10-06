@@ -61,6 +61,7 @@ class Thread : RealmObject {
     @PrimaryKey
     var uid: String = ""
     var messages: RealmList<Message> = realmListOf()
+    // This is hardcoded by default to `now`, because the mail protocol allows a date to be null 🤷
     var date: RealmInstant = Date().toRealmInstant()
     @SerialName("unseen_messages")
     var unseenMessagesCount: Int = 0

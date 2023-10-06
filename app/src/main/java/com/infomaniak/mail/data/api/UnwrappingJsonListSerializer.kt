@@ -24,6 +24,7 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonTransformingSerializer
 
 object UnwrappingJsonListSerializer : JsonTransformingSerializer<String>(String.serializer()) {
+
     override fun transformDeserialize(element: JsonElement): JsonElement {
         return if (element is JsonArray) {
             Sentry.withScope { scope ->
