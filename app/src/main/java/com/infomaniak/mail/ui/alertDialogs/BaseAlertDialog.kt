@@ -25,6 +25,7 @@ import androidx.viewbinding.ViewBinding
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.hideProgress
+import com.infomaniak.lib.core.utils.initProgress
 import com.infomaniak.lib.core.utils.showProgress
 import com.infomaniak.mail.R
 import dagger.hilt.android.qualifiers.ActivityContext
@@ -35,6 +36,8 @@ abstract class BaseAlertDialog(@ActivityContext private val activityContext: Con
 
     protected abstract val binding: ViewBinding
     protected abstract val alertDialog: AlertDialog
+
+    private var isProgressInitialized = false
 
     protected abstract fun initDialog(): AlertDialog
 
@@ -50,6 +53,15 @@ abstract class BaseAlertDialog(@ActivityContext private val activityContext: Con
             setCancelable(true)
             positiveButton.hideProgress(R.string.buttonCreate)
             negativeButton.isEnabled = true
+        }
+    }
+
+    protected fun initProgress() = with(alertDialog) {
+        // We need the dialog to be shown to access the positive button
+        // But as the component is activity scoped, we only want to bind the progress the first time it is shown
+        if (!isProgressInitialized && isShowing) {
+            positiveButton.initProgress(activity)
+            isProgressInitialized = true
         }
     }
 

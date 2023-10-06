@@ -67,6 +67,7 @@ class InputAlertDialog @Inject constructor(
             setOnShowListener {
                 showKeyboard()
                 positiveButton.apply {
+                    initProgress()
                     isEnabled = false
                     textInput.doAfterTextChanged {
                         if (it.isNullOrBlank()) {

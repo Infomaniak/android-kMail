@@ -58,6 +58,8 @@ open class DescriptionAlertDialog @Inject constructor(
     ) = with(alertDialog) {
         showDialogWithBasicInfo(title, description, confirmButtonText, displayCancelButton)
 
+        if (displayLoader) initProgress()
+
         onDismissed?.let(::setOnDismissListener)
 
         positiveButton.setOnClickListener {
