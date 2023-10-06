@@ -30,8 +30,6 @@ class AiDiscoveryBottomSheetDialog : InformationBottomSheetDialog() {
 
     private val aiViewModel: AiViewModel by activityViewModels()
 
-    private var clickedOnTry = false
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -42,17 +40,21 @@ class AiDiscoveryBottomSheetDialog : InformationBottomSheetDialog() {
         actionButton.apply {
             setText(R.string.buttonTry)
             setOnClickListener {
-                clickedOnTry = true
+                trackAiWriterEvent("discoverTry")
                 aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(true)
                 dismiss()
             }
         }
 
-        secondaryActionButton.setOnClickListener { dismiss() }
+        secondaryActionButton.setOnClickListener {
+            trackAiWriterEvent("discoverLater")
+            dismiss()
+        }
+
     }
 
-    override fun onDismiss(dialog: DialogInterface) {
-        if (clickedOnTry) trackAiWriterEvent("discoverTry") else trackAiWriterEvent("discoverLater")
-        super.onDismiss(dialog)
+    override fun onCancel(dialog: DialogInterface) {
+        trackAiWriterEvent("discoverLater")
+        super.onCancel(dialog)
     }
 }
