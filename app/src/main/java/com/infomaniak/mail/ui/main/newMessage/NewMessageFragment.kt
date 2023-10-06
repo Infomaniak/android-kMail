@@ -17,6 +17,8 @@
  */
 package com.infomaniak.mail.ui.main.newMessage
 
+import android.animation.FloatEvaluator
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ClipDescription
@@ -25,6 +27,7 @@ import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.os.Bundle
 import android.text.*
+import android.transition.Slide
 import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
@@ -38,6 +41,7 @@ import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.Group
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
@@ -80,7 +84,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import java.util.UUID
 import javax.inject.Inject
+import kotlin.math.roundToInt
 import com.google.android.material.R as RMaterial
+import com.infomaniak.lib.core.R as RCore
+
 
 @AndroidEntryPoint
 class NewMessageFragment : Fragment() {
@@ -93,6 +100,11 @@ class NewMessageFragment : Fragment() {
     }
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
+
+    private val animationDuration by lazy { resources.getInteger(R.integer.aiPromptAnimationDuration).toLong() }
+    private val backgroundColor by lazy { requireContext().getColor(R.color.backgroundColor) }
+    private val scrimOpacity by lazy { ResourcesCompat.getFloat(requireContext().resources, R.dimen.scrimOpacity) }
+    private val black by lazy { requireContext().getColor(RCore.color.black) }
 
     private lateinit var addressListPopupWindow: ListPopupWindow
     private lateinit var filePicker: FilePicker
@@ -813,6 +825,12 @@ class NewMessageFragment : Fragment() {
                 .commitNow()
         }
 
+        val slidingTransition = Slide()
+            .excludeTarget(binding.scrim, true)
+            .setDuration(animationDuration)
+
+        TransitionManager.beginDelayedTransition(binding.root, slidingTransition)
+
         setAiPromptVisibility(true)
         newMessageConstraintLayout.descendantFocusability = FOCUS_BLOCK_DESCENDANTS
     }
@@ -833,9 +851,23 @@ class NewMessageFragment : Fragment() {
 
     private fun setAiPromptVisibility(isVisible: Boolean) {
 
+        fun animateScrimAndStatusBarColor() {
+            if (isVisible) {
+                ValueAnimator.ofObject(FloatEvaluator(), 0, scrimOpacity).apply {
+                    setDuration(animationDuration)
+                    addUpdateListener { animator ->
+                        val alpha = ((animator.animatedValue as Float) * 256).roundToInt() / 256f
+
+                        binding.scrim.alpha = alpha
+                        requireActivity().window.statusBarColor = UiUtils.pointBetweenColors(backgroundColor, black, alpha)
+                    }
+                    start()
+                }
+            }
+        }
+
         fun updateStatusBarColor() {
-            val statusBarColorRes = if (isVisible) R.color.scrim_translucent else R.color.backgroundColor
-            requireActivity().window.statusBarColor = requireContext().getColor(statusBarColorRes)
+            if (!isVisible) requireActivity().window.statusBarColor = backgroundColor
         }
 
         fun updateNavigationBarColor() {
@@ -844,6 +876,10 @@ class NewMessageFragment : Fragment() {
         }
 
         binding.aiPromptLayout.isVisible = isVisible
+        binding.scrim.isVisible = isVisible
+
+        animateScrimAndStatusBarColor()
+
         updateStatusBarColor()
         updateNavigationBarColor()
     }
