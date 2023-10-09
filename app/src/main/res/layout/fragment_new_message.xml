@@ -709,10 +709,11 @@
             android:id="@+id/scrim"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:alpha="@dimen/scrimOpacity"
             android:clickable="true"
             android:focusable="false"
             android:importantForAccessibility="no"
-            android:src="@color/scrim_translucent"
+            android:src="@color/black"
             tools:ignore="KeyboardInaccessibleWidget" />
 
         <androidx.fragment.app.FragmentContainerView
