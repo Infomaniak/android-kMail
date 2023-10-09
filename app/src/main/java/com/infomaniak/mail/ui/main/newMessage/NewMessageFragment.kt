@@ -47,6 +47,7 @@ import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
@@ -584,7 +585,7 @@ class NewMessageFragment : Fragment() {
 
     fun closeAiPrompt(becauseOfGeneration: Boolean = false) {
         trackAiWriterEvent(name = if (becauseOfGeneration) "generate" else "dismissPromptWithoutGenerating")
-        aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(false)
+        aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(false, becauseOfGeneration = becauseOfGeneration)
     }
 
     private fun observeNewAttachments() = with(binding) {
@@ -798,8 +799,8 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeAiPromptStatus() {
-        aiViewModel.aiPromptOpeningStatus.observe(viewLifecycleOwner) { (shouldDisplay, shouldResetContent) ->
-            if (shouldDisplay) onAiPromptOpened(shouldResetContent) else onAiPromptClosed()
+        aiViewModel.aiPromptOpeningStatus.observe(viewLifecycleOwner) { (shouldDisplay, shouldResetContent, becauseOfGeneration) ->
+            if (shouldDisplay) onAiPromptOpened(shouldResetContent) else onAiPromptClosed(becauseOfGeneration)
         }
     }
 
@@ -825,24 +826,30 @@ class NewMessageFragment : Fragment() {
                 .commitNow()
         }
 
-        val slidingTransition = Slide()
-            .excludeTarget(binding.scrim, true)
-            .setDuration(animationDuration)
-
-        TransitionManager.beginDelayedTransition(binding.root, slidingTransition)
-
         setAiPromptVisibility(true)
         newMessageConstraintLayout.descendantFocusability = FOCUS_BLOCK_DESCENDANTS
     }
 
-    private fun onAiPromptClosed() = with(binding) {
+    private fun onAiPromptClosed(withoutTransition: Boolean) = with(binding) {
+
+        fun removeFragment() {
+            aiPromptFragment?.let {
+                childFragmentManager
+                    .beginTransaction()
+                    .remove(it)
+                    .commitNow()
+            }
+        }
+
         aiPromptFragmentContainer.hideKeyboard()
 
-        aiPromptFragment?.let {
-            childFragmentManager
-                .beginTransaction()
-                .remove(it)
-                .commitNow()
+        if (withoutTransition) {
+            removeFragment()
+        } else {
+            viewLifecycleOwner.lifecycleScope.launch {
+                delay(animationDuration)
+                removeFragment()
+            }
         }
 
         setAiPromptVisibility(false)
@@ -874,6 +881,12 @@ class NewMessageFragment : Fragment() {
             val backgroundColorRes = if (isVisible) R.color.backgroundColorSecondary else R.color.backgroundColor
             requireActivity().window.navigationBarColor = requireContext().getColor(backgroundColorRes)
         }
+
+        val slidingTransition = Slide()
+            .addTarget(binding.aiPromptLayout)
+            .setDuration(animationDuration)
+
+        TransitionManager.beginDelayedTransition(binding.root, slidingTransition)
 
         binding.aiPromptLayout.isVisible = isVisible
         binding.scrim.isVisible = isVisible

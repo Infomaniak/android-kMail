@@ -20,4 +20,5 @@ package com.infomaniak.mail.data.models.ai
 data class AiPromptOpeningStatus(
     val isOpened: Boolean,
     var shouldResetPrompt: Boolean = true,
+    var becauseOfGeneration: Boolean = false,
 )
