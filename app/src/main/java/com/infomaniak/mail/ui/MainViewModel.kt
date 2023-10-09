@@ -338,7 +338,7 @@ class MainViewModel @Inject constructor(
     }
 
     private fun updateSignatures(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
-        mailboxContentRealm().writeBlocking { updateSignatures(mailbox) }
+        updateSignatures(mailbox, mailboxContentRealm())
     }
 
     private fun updateFolders(mailbox: Mailbox) {

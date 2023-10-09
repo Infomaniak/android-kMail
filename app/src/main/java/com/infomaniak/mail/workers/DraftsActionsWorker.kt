@@ -438,12 +438,10 @@ class DraftsActionsWorker @AssistedInject constructor(
 
     private fun updateSignaturesThenRetry(draft: Draft, mailboxUuid: String): DraftActionResult {
 
+        updateSignatures(mailbox, mailboxContentRealm)
+        val signature = SignatureController.getSignature(realm = mailboxContentRealm)
         mailboxContentRealm.writeBlocking {
-            updateSignatures(mailbox)
-            val signature = SignatureController.getSignature(realm = mailboxContentRealm)
-            draftController.updateDraft(draft.localUuid, realm = this) {
-                it.identityId = signature.id.toString()
-            }
+            draftController.updateDraft(draft.localUuid, realm = this) { it.identityId = signature.id.toString() }
         }
 
         return executeDraftAction(draft, mailboxUuid, isFirstTime = false)
