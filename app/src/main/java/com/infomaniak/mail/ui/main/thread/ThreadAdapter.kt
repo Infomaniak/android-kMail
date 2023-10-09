@@ -40,7 +40,6 @@ import com.infomaniak.mail.data.models.Attachment.*
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.message.Message.*
-import com.infomaniak.mail.data.models.message.SubBody
 import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.*
 import com.infomaniak.mail.utils.*
@@ -51,7 +50,6 @@ import com.infomaniak.mail.utils.Utils.TEXT_PLAIN
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupThreadWebViewSettings
 import com.infomaniak.mail.utils.WebViewUtils.Companion.toggleWebViewTheme
-import io.realm.kotlin.types.RealmList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -165,7 +163,7 @@ class ThreadAdapter(
                 if (binding.bodyWebView.isVisible) {
                     loadBodyInWebView(
                         uid = message.uid,
-                        body = splitBody.content + subBodiesContent(body.subBodies),
+                        body = splitBody.content + UiUtils.formatSubBodiesContent(body.subBodies),
                         type = body.type,
                     )
                 } else if (binding.fullMessageWebView.isVisible) {
@@ -173,17 +171,6 @@ class ThreadAdapter(
                 }
             }
         }
-    }
-
-    private fun subBodiesContent(subBodies: RealmList<SubBody>): String {
-        var subBodiesContent = ""
-        subBodies.forEach { subBody ->
-            subBody.bodyValue?.let {
-                if (subBodiesContent.isNotEmpty()) subBodiesContent += "<br/>"
-                subBodiesContent += "<blockquote>${it}</blockquote>"
-            }
-        }
-        return subBodiesContent
     }
 
     private fun ThreadViewHolder.loadBodyInWebView(uid: String, body: String, type: String) = with(binding) {

@@ -31,6 +31,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.ui.main.thread.MessageWebViewClient.Companion.CID_SCHEME
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.MessageBodyUtils
+import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.toDate
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
@@ -148,11 +149,14 @@ class DraftController @Inject constructor(
             return@let document.outerHtml()
         } ?: ""
 
+        val subBodiesContent = message.body?.subBodies?.let(UiUtils::formatSubBodiesContent) ?: ""
+
         return """
             <div id=\"answerContentMessage\" class="${MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME}" >
             <div>$messageReplyHeader</div>
             <blockquote class=\"ws-ng-quote\">
             $previousBody
+            $subBodiesContent
             </blockquote>
         </div>
         """.trimIndent()
@@ -189,6 +193,8 @@ class DraftController @Inject constructor(
             ""
         }
 
+        val subBodiesContent = message.body?.subBodies?.let(UiUtils::formatSubBodiesContent) ?: ""
+
         return """
             <div class="${MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME}">
             <div>---------- $messageForwardHeader ---------<br></div>
@@ -200,6 +206,7 @@ class DraftController @Inject constructor(
             <div><br></div>
             <div><br></div>
             $previousBody
+            $subBodiesContent
             </div>
         """.trimIndent()
     }
