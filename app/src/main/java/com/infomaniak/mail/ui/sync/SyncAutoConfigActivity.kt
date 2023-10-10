@@ -37,7 +37,7 @@ class SyncAutoConfigActivity : BaseActivity() {
         setContentView(binding.root)
 
         binding.startFab.setOnClickListener {
-            syncAutoConfigViewModel.getCredentials { intent ->
+            syncAutoConfigViewModel.fetchCredentials { intent ->
                 startActivity(intent)
 
                 setResult(RESULT_OK, Intent().putExtra(SettingsFragment.SYNC_AUTO_CONFIG_KEY, true))
