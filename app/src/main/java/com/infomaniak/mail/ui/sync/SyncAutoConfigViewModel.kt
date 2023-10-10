@@ -25,7 +25,6 @@ import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -44,7 +43,7 @@ class SyncAutoConfigViewModel @Inject constructor(
 
     private var credentialsJob: Job? = null
 
-    fun getCredentials() {
+    fun getCredentials(onSuccess: (Intent) -> Unit) {
 
         credentialsJob?.cancel()
         credentialsJob = viewModelScope.launch(ioCoroutineContext) {
@@ -62,7 +61,7 @@ class SyncAutoConfigViewModel @Inject constructor(
                     action = "syncAutoConfig"
                     putExtra("login", infomaniakLogin)
                     putExtra("password", infomaniakPassword)
-                }.also(context::startActivity)
+                }.also(onSuccess)
             }
         }
     }
