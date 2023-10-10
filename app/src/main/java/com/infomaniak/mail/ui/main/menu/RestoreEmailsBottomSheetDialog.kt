@@ -21,7 +21,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -53,13 +52,13 @@ class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
-        autoCompleteTextView.hasLoaded(false)
+        toggleLoadedState(false)
 
         observeBackups()
 
-        datePickerText.doOnTextChanged { text, _, _, _ ->
+        datePickerText.setOnItemClickListener { _, _, _, _ ->
             trackRestoreMailsEvent("selectDate", TrackerAction.INPUT)
-            restoreMailsButton.isEnabled = text?.isNotBlank() == true
+            binding.restoreMailsButton.isEnabled = true
         }
 
         restoreMailsButton.setOnClickListener {
@@ -73,22 +72,33 @@ class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
         super.onDestroyView()
     }
 
-    private fun MaterialAutoCompleteTextView.hasLoaded(hasLoaded: Boolean) {
-        isEnabled = hasLoaded
-        isClickable = hasLoaded
-        if (hasLoaded) text = null else setText(R.string.loadingText)
+    private fun toggleLoadedState(hasLoaded: Boolean) {
+        binding.datePicker.isEnabled = hasLoaded
+
+        autoCompleteTextView.apply {
+            isEnabled = hasLoaded
+            isClickable = hasLoaded
+            if (hasLoaded) text = null else setText(R.string.loadingText)
+        }
     }
 
     private fun observeBackups() {
         restoreEmailViewModel.getBackups().observe(viewLifecycleOwner) { apiResponse ->
             if (apiResponse.isSuccess()) {
-                formattedDates = apiResponse.data!!.backups.associateBy { it.getUserFriendlyDate() }
-                autoCompleteTextView.apply {
-                    setSimpleItems(formattedDates.keys.toTypedArray())
-                    hasLoaded(true)
+                toggleLoadedState(true)
+
+                val backups = apiResponse.data!!.backups
+                val pickerText = if (backups.isEmpty()) {
+                    R.string.restoreEmailsNoBackup
+                } else {
+                    formattedDates = backups.associateBy { it.getUserFriendlyDate() }
+                    autoCompleteTextView.setSimpleItems(formattedDates.keys.toTypedArray())
+                    R.string.pickerNoSelection
                 }
+
+                autoCompleteTextView.setText(pickerText)
             } else {
-                showSnackbar(title = apiResponse.translatedError)
+                showSnackbar(apiResponse.translatedError)
                 findNavController().popBackStack()
             }
         }
