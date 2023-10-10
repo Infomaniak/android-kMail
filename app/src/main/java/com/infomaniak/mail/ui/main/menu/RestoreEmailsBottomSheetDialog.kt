@@ -44,7 +44,7 @@ class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
     private val autoCompleteTextView by lazy { (binding.datePicker.editText as? MaterialAutoCompleteTextView)!! }
     private val restoreEmailsButtonProgressTimer by lazy { Utils.createRefreshTimer(onTimerFinish = ::startProgress) }
 
-    private lateinit var formattedDates: Map<String, String>
+    private var formattedDates: Map<String, String>? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetRestoreEmailsBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -92,7 +92,7 @@ class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
                     R.string.restoreEmailsNoBackup
                 } else {
                     formattedDates = backups.associateBy { it.getUserFriendlyDate() }
-                    autoCompleteTextView.setSimpleItems(formattedDates.keys.toTypedArray())
+                    autoCompleteTextView.setSimpleItems(formattedDates!!.keys.toTypedArray())
                     R.string.pickerNoSelection
                 }
 
@@ -108,7 +108,7 @@ class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
         trackRestoreMailsEvent("restore", TrackerAction.CLICK)
         val date = autoCompleteTextView.text.toString()
 
-        restoreEmailViewModel.restoreEmails(formattedDates[date] ?: date).observe(viewLifecycleOwner) { apiResponse ->
+        restoreEmailViewModel.restoreEmails(formattedDates?.get(date) ?: date).observe(viewLifecycleOwner) { apiResponse ->
             binding.restoreMailsButton.hideProgress(R.string.buttonConfirmRestoreEmails)
             showSnackbar(if (apiResponse.isSuccess()) R.string.snackbarRestorationLaunched else apiResponse.translatedError)
             findNavController().popBackStack()
