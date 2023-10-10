@@ -17,10 +17,12 @@
  */
 package com.infomaniak.mail.ui.sync
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import com.infomaniak.mail.databinding.ActivitySyncAutoConfigBinding
 import com.infomaniak.mail.ui.BaseActivity
+import com.infomaniak.mail.ui.main.settings.SettingsFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -35,7 +37,12 @@ class SyncAutoConfigActivity : BaseActivity() {
         setContentView(binding.root)
 
         binding.startFab.setOnClickListener {
-            syncAutoConfigViewModel.getCredentials()
+            syncAutoConfigViewModel.getCredentials { intent ->
+                startActivity(intent)
+
+                setResult(RESULT_OK, Intent().putExtra(SettingsFragment.SYNC_AUTO_CONFIG_KEY, true))
+                finish()
+            }
         }
     }
 }

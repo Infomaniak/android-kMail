@@ -22,9 +22,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts.*
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.applock.Utils.isKeyguardSecure
 import com.infomaniak.lib.applock.Utils.silentlyReverseSwitch
 import com.infomaniak.lib.core.utils.openAppNotificationSettings
@@ -58,6 +60,11 @@ class SettingsFragment : Fragment() {
                 context?.showToast(R.string.errorMailboxLocked)
             }
         }
+    }
+
+    private val syncAutoConfigResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
+        val shouldPopBack = result.data?.getBooleanExtra(SYNC_AUTO_CONFIG_KEY, false) ?: false
+        if (shouldPopBack) findNavController().popBackStack()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -103,7 +110,7 @@ class SettingsFragment : Fragment() {
         }
 
         settingsSyncAutoConfig.setOnClickListener {
-            startActivity(Intent(context, SyncAutoConfigActivity::class.java))
+            syncAutoConfigResultLauncher.launch(Intent(context, SyncAutoConfigActivity::class.java))
         }
 
         settingsSend.setOnClickListener {
@@ -143,5 +150,9 @@ class SettingsFragment : Fragment() {
         settingsExternalContent.setOnClickListener {
             animatedNavigation(SettingsFragmentDirections.actionSettingsToExternalContentSetting())
         }
+    }
+
+    companion object {
+        const val SYNC_AUTO_CONFIG_KEY = "syncAutoConfig"
     }
 }
