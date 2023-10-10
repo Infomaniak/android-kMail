@@ -45,6 +45,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
 import com.infomaniak.mail.ui.main.MailboxListFragment
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
+import com.infomaniak.mail.ui.sync.SyncAutoConfigActivity
 import com.infomaniak.mail.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -149,6 +150,11 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
         advancedActions.setOnClickListener {
             trackMenuDrawerEvent("advancedActions", !advancedActions.isCollapsed)
             advancedActionsLayout.isGone = advancedActions.isCollapsed
+        }
+
+        syncAutoConfig.setOnClickListener {
+            startActivity(Intent(context, SyncAutoConfigActivity::class.java))
+            closeDrawer()
         }
 
         importMails.setOnClickListener {
