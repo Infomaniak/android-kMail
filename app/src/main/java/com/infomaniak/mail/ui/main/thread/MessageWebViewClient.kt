@@ -41,6 +41,7 @@ class MessageWebViewClient(
     private var shouldLoadDistantResources: Boolean,
     private val onBlockedResourcesDetected: (() -> Unit)? = null,
     private val navigateToNewMessageActivity: ((Uri) -> Unit)?,
+    private val onPageFinished: (() -> Unit)? = null,
 ) : WebViewClient() {
 
     private val emptyResource by lazy { WebResourceResponse("text/plain", "utf-8", ByteArrayInputStream(ByteArray(0))) }
@@ -101,6 +102,7 @@ class MessageWebViewClient(
     override fun onPageFinished(webView: WebView, url: String?) {
         webView.loadUrl("javascript:removeAllProperties(); normalizeMessageWidth(${webView.width.toDp()}, '$messageUid')")
         super.onPageFinished(webView, url)
+        onPageFinished?.invoke()
     }
 
     fun unblockDistantResources() {

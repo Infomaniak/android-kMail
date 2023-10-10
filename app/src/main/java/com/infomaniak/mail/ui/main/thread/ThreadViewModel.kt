@@ -96,20 +96,21 @@ class ThreadViewModel @Inject constructor(
         AccountUtils.currentMailboxId,
     ).map { it.obj }.asLiveData(ioCoroutineContext)
 
-    fun assembleSubjectData(
-        mergedContactsLive: LiveData<MergedContactDictionary?>,
-    ): LiveData<SubjectDataResult> = MediatorLiveData<SubjectDataResult>().apply {
+    fun assembleSubjectData(mergedContactsLive: LiveData<MergedContactDictionary?>): LiveData<SubjectDataResult> {
 
-        addSource(threadLive) { thread ->
-            value = SubjectDataResult(thread, value?.mergedContacts, value?.mailbox)
-        }
+        return MediatorLiveData<SubjectDataResult>().apply {
 
-        addSource(mergedContactsLive) { mergedContacts ->
-            value = SubjectDataResult(value?.thread, mergedContacts, value?.mailbox)
-        }
+            addSource(threadLive) { thread ->
+                value = SubjectDataResult(thread, value?.mergedContacts, value?.mailbox)
+            }
 
-        addSource(currentMailboxLive) { mailbox ->
-            value = SubjectDataResult(value?.thread, value?.mergedContacts, mailbox)
+            addSource(mergedContactsLive) { mergedContacts ->
+                value = SubjectDataResult(value?.thread, mergedContacts, value?.mailbox)
+            }
+
+            addSource(currentMailboxLive) { mailbox ->
+                value = SubjectDataResult(value?.thread, value?.mergedContacts, mailbox)
+            }
         }
     }
 
@@ -124,12 +125,15 @@ class ThreadViewModel @Inject constructor(
 
         val isExpandedMap = mutableMapOf<String, Boolean>()
         val isThemeTheSameMap = mutableMapOf<String, Boolean>()
+        val initialSetOfExpandedMessagesUids = mutableSetOf<String>()
         thread.messages.forEachIndexed { index, message ->
-            isExpandedMap[message.uid] = message.shouldBeExpanded(index, thread.messages.lastIndex)
+            isExpandedMap[message.uid] = message.shouldBeExpanded(index, thread.messages.lastIndex).also {
+                if (it) initialSetOfExpandedMessagesUids.add(message.uid)
+            }
             isThemeTheSameMap[message.uid] = true
         }
 
-        emit(OpenThreadResult(thread, isExpandedMap, isThemeTheSameMap))
+        emit(OpenThreadResult(thread, isExpandedMap, initialSetOfExpandedMessagesUids, isThemeTheSameMap))
 
         if (thread.unseenMessagesCount > 0) sharedUtils.markAsSeen(mailbox, listOf(thread))
     }
@@ -203,6 +207,7 @@ class ThreadViewModel @Inject constructor(
     data class OpenThreadResult(
         val thread: Thread,
         val isExpandedMap: MutableMap<String, Boolean>,
+        val initialSetOfExpandedMessagesUids: Set<String>,
         val isThemeTheSameMap: MutableMap<String, Boolean>,
     )
 }

@@ -63,8 +63,12 @@ class ThreadAdapter(
 
     inline val messages: MutableList<Message> get() = currentList
 
-    private val manuallyAllowedMessageUids = mutableSetOf<String>()
     var isExpandedMap = mutableMapOf<String, Boolean>()
+    var initialSetOfExpandedMessagesUids = setOf<String>()
+    private val currentSetOfLoadedExpandedMessagesUids = mutableSetOf<String>()
+    private var hasNotScrolledYet = true
+
+    private val manuallyAllowedMessageUids = mutableSetOf<String>()
     var isThemeTheSameMap = mutableMapOf<String, Boolean>()
     var contacts: MergedContactDictionary = emptyMap()
 
@@ -76,6 +80,7 @@ class ThreadAdapter(
     var onReplyClicked: ((Message) -> Unit)? = null
     var onMenuClicked: ((Message) -> Unit)? = null
     var navigateToNewMessageActivity: ((Uri) -> Unit)? = null
+    var onAllExpandedMessagesLoaded: (() -> Unit)? = null
 
     private lateinit var recyclerView: RecyclerView
     private val webViewUtils by lazy { WebViewUtils(recyclerView.context) }
@@ -118,6 +123,7 @@ class ThreadAdapter(
                 NotifyType.FAILED_MESSAGE -> {
                     messageLoader.isGone = true
                     failedLoadingErrorMessage.isVisible = true
+                    if (isExpandedMap[message.uid] == true) onExpandedMessageLoaded(message.uid)
                 }
             }
         }
@@ -403,12 +409,26 @@ class ThreadAdapter(
 
         quoteButtonFrameLayout.isVisible = hasQuote
 
-        initWebViewClientIfNeeded(message, navigateToNewMessageActivity)
+        initWebViewClientIfNeeded(
+            message,
+            navigateToNewMessageActivity,
+            onPageFinished = { onExpandedMessageLoaded(message.uid) },
+        )
 
         // If the view holder got recreated while the fragment is not destroyed, keep the user's choice effective
         if (isMessageUidManuallyAllowed(message.uid)) {
             bodyWebViewClient.unblockDistantResources()
             fullMessageWebViewClient.unblockDistantResources()
+        }
+    }
+
+    private fun onExpandedMessageLoaded(messageUid: String) {
+        if (hasNotScrolledYet) {
+            currentSetOfLoadedExpandedMessagesUids.add(messageUid)
+            if (currentSetOfLoadedExpandedMessagesUids.containsAll(initialSetOfExpandedMessagesUids)) {
+                hasNotScrolledYet = false
+                onAllExpandedMessagesLoaded?.invoke()
+            }
         }
     }
 
@@ -522,7 +542,11 @@ class ThreadAdapter(
             }
         }
 
-        fun initWebViewClientIfNeeded(message: Message, navigateToNewMessageActivity: ((Uri) -> Unit)?) {
+        fun initWebViewClientIfNeeded(
+            message: Message,
+            navigateToNewMessageActivity: ((Uri) -> Unit)?,
+            onPageFinished: () -> Unit,
+        ) {
 
             fun promptUserForDistantImages() {
                 binding.promptUserForDistantImages()
@@ -535,6 +559,7 @@ class ThreadAdapter(
                     shouldLoadDistantResources = shouldLoadDistantResources,
                     onBlockedResourcesDetected = ::promptUserForDistantImages,
                     navigateToNewMessageActivity = navigateToNewMessageActivity,
+                    onPageFinished = onPageFinished,
                 )
                 _fullMessageWebViewClient = binding.fullMessageWebView.initWebViewClientAndBridge(
                     attachments = message.attachments,
