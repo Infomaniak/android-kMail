@@ -43,7 +43,7 @@ class SyncAutoConfigViewModel @Inject constructor(
 
     private var credentialsJob: Job? = null
 
-    fun getCredentials(onSuccess: (Intent) -> Unit) {
+    fun fetchCredentials(onSuccess: (Intent) -> Unit) {
 
         credentialsJob?.cancel()
         credentialsJob = viewModelScope.launch(ioCoroutineContext) {
