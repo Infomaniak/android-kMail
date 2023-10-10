@@ -22,6 +22,7 @@ import android.widget.Button
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.doAfterTextChanged
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.hideKeyboard
@@ -53,7 +54,7 @@ class InputAlertDialog @Inject constructor(
 
         fun Button.checkValidation(text: CharSequence) {
             errorJob?.cancel()
-            errorJob = CoroutineScope(ioDispatcher).launch {
+            errorJob = activity.lifecycleScope.launch(ioDispatcher) {
                 val error = onErrorCheck?.invoke(text.trim())
                 if (errorJob?.isActive == true) Dispatchers.Main {
                     textInputLayout.error = error

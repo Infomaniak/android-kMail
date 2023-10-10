@@ -17,10 +17,10 @@
  */
 package com.infomaniak.mail.ui.alertDialogs
 
-import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.viewbinding.ViewBinding
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.lib.core.utils.Utils
@@ -31,7 +31,7 @@ import dagger.hilt.android.qualifiers.ActivityContext
 
 abstract class BaseAlertDialog(@ActivityContext private val activityContext: Context) {
 
-    protected val activity = activityContext as Activity
+    protected val activity = activityContext as AppCompatActivity
 
     protected abstract val binding: ViewBinding
     protected abstract val alertDialog: AlertDialog

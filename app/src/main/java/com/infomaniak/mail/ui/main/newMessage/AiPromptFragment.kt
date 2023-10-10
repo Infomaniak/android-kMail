@@ -76,7 +76,7 @@ class AiPromptFragment : Fragment() {
         return FragmentAiPromptBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setUi()
     }
