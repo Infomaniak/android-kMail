@@ -29,6 +29,8 @@ import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -40,21 +42,28 @@ class SyncAutoConfigViewModel @Inject constructor(
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
-    fun getCredentials() = viewModelScope.launch(ioCoroutineContext) {
+    private var credentialsJob: Job? = null
 
-        val apiResponse = ApiRepository.getCredentialsPassword()
+    fun getCredentials() {
 
-        val infomaniakLogin = AccountUtils.currentUser?.login
-        val infomaniakPassword = apiResponse.data?.password
+        credentialsJob?.cancel()
+        credentialsJob = viewModelScope.launch(ioCoroutineContext) {
 
-        if (infomaniakLogin?.isNotEmpty() == true && infomaniakPassword?.isNotEmpty() == true) {
-            Intent().apply {
-                component = ComponentName("com.infomaniak.sync", "at.bitfire.davdroid.ui.setup.LoginActivity")
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                action = "syncAutoConfig"
-                putExtra("login", infomaniakLogin)
-                putExtra("password", infomaniakPassword)
-            }.also(context::startActivity)
+            val apiResponse = ApiRepository.getCredentialsPassword()
+            ensureActive()
+
+            val infomaniakLogin = AccountUtils.currentUser?.login
+            val infomaniakPassword = apiResponse.data?.password
+
+            if (infomaniakLogin?.isNotEmpty() == true && infomaniakPassword?.isNotEmpty() == true) {
+                Intent().apply {
+                    component = ComponentName("com.infomaniak.sync", "at.bitfire.davdroid.ui.setup.LoginActivity")
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    action = "syncAutoConfig"
+                    putExtra("login", infomaniakLogin)
+                    putExtra("password", infomaniakPassword)
+                }.also(context::startActivity)
+            }
         }
     }
 }
