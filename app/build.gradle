@@ -9,6 +9,9 @@ plugins {
     alias(libs.plugins.realm.kotlin)
 }
 
+def javaVersion = JavaVersion.VERSION_17
+def enableLeakCanary = false
+
 android {
 
     namespace 'com.infomaniak.mail'
@@ -50,8 +53,6 @@ android {
         }
     }
 
-    def javaVersion = JavaVersion.VERSION_17
-
     compileOptions {
         sourceCompatibility javaVersion
         targetCompatibility javaVersion
@@ -61,9 +62,7 @@ android {
 
     buildFeatures { viewBinding true }
 
-    androidResources {
-        generateLocaleConfig true
-    }
+    androidResources { generateLocaleConfig true }
 
     flavorDimensions += 'distribution'
 
@@ -113,5 +112,5 @@ dependencies {
     testRuntimeOnly libs.junit.jupiter.engine
 
     // Debug
-    debugImplementation libs.leakcanary.android
+    if (enableLeakCanary) debugImplementation libs.leakcanary.android
 }
