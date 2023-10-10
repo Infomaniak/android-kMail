@@ -112,4 +112,9 @@ class InputAlertDialog @Inject constructor(
         this.onPositiveButtonClicked = onPositiveButtonClicked
         this.onErrorCheck = onErrorCheck
     }
+
+    fun resetCallbacks() {
+        onPositiveButtonClicked = null
+        onErrorCheck = null
+    }
 }

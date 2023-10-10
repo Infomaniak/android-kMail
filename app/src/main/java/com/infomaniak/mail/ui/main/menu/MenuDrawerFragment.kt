@@ -96,6 +96,11 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
         observeNewFolderCreation()
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        inputDialog.resetCallbacks()
+    }
+
     private fun setupListeners() = with(binding) {
 
         settingsButton.setOnClickListener {

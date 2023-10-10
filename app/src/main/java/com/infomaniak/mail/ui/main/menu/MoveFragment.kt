@@ -89,6 +89,11 @@ class MoveFragment : MenuFoldersFragment() {
         super.onStop()
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        inputDialog.resetCallbacks()
+    }
+
     private fun setupListeners() = with(binding) {
         toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
         iconAddFolder.setOnClickListener {
