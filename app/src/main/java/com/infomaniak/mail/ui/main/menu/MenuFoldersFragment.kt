@@ -40,6 +40,9 @@ abstract class MenuFoldersFragment : Fragment() {
     lateinit var customFolderAdapter: FolderAdapter
 
     @Inject
+    lateinit var folderController: FolderController
+
+	@Inject
     lateinit var inputDialog: InputAlertDialog
 
     protected val mainViewModel: MainViewModel by activityViewModels()
@@ -56,9 +59,6 @@ abstract class MenuFoldersFragment : Fragment() {
     protected val customFoldersAdapter: FolderAdapter by lazy {
         customFolderAdapter(isInMenuDrawer, onFolderClicked = ::onFolderSelected, onCollapseClicked = ::onFolderCollapse)
     }
-
-    @Inject
-    lateinit var folderController: FolderController
 
     protected abstract fun onFolderSelected(folderId: String)
 
@@ -79,13 +79,11 @@ abstract class MenuFoldersFragment : Fragment() {
      * Asynchronously validate folder name locally
      * @return error string, otherwise null
      */
-    protected fun checkForFolderCreationErrors(folderName: CharSequence): String? {
-        return when {
-            folderName.length > 255 -> getString(R.string.errorNewFolderNameTooLong)
-            folderName.contains(Regex(INVALID_CHARACTERS_PATTERN)) -> getString(R.string.errorNewFolderInvalidCharacter)
-            folderController.getRootFolder(folderName.toString()) != null -> context?.getString(R.string.errorNewFolderAlreadyExists)
-            else -> null
-        }
+    protected fun checkForFolderCreationErrors(folderName: CharSequence): String? = when {
+        folderName.length > 255 -> getString(R.string.errorNewFolderNameTooLong)
+        folderName.contains(Regex(INVALID_CHARACTERS_PATTERN)) -> getString(R.string.errorNewFolderInvalidCharacter)
+        folderController.getRootFolder(folderName.toString()) != null -> context?.getString(R.string.errorNewFolderAlreadyExists)
+        else -> null
     }
 
     private companion object {

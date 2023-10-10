@@ -99,11 +99,11 @@ class MoveFragment : MenuFoldersFragment() {
 
     private fun setupCreateFolderDialog() {
         inputDialog.setCallbacks(
-            onErrorCheck = { folderName -> checkForFolderCreationErrors(folderName) },
             onPositiveButtonClicked = { folderName ->
                 trackCreateFolderEvent("confirm")
                 mainViewModel.moveToNewFolder(folderName, navigationArgs.threadsUids, navigationArgs.messageUid)
             },
+            onErrorCheck = ::checkForFolderCreationErrors,
         )
     }
 
