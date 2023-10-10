@@ -698,23 +698,23 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <ImageView
+        android:id="@+id/scrim"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="@dimen/scrimOpacity"
+        android:clickable="true"
+        android:focusable="false"
+        android:importantForAccessibility="no"
+        android:src="@color/black"
+        android:visibility="gone"
+        tools:ignore="KeyboardInaccessibleWidget" />
 
     <FrameLayout
         android:id="@+id/aiPromptLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone">
-
-        <ImageView
-            android:id="@+id/scrim"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:alpha="@dimen/scrimOpacity"
-            android:clickable="true"
-            android:focusable="false"
-            android:importantForAccessibility="no"
-            android:src="@color/black"
-            tools:ignore="KeyboardInaccessibleWidget" />
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/aiPromptFragmentContainer"
