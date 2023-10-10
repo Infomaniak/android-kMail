@@ -31,7 +31,7 @@ import com.infomaniak.mail.data.models.FeatureFlag.FeatureFlagType
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
-import io.realm.kotlin.MutableRealm
+import io.realm.kotlin.Realm
 import io.sentry.Sentry
 import javax.inject.Inject
 
@@ -116,10 +116,10 @@ class SharedUtils @Inject constructor(
 
     companion object {
 
-        fun MutableRealm.updateSignatures(mailbox: Mailbox): Int? {
+        fun updateSignatures(mailbox: Mailbox, customRealm: Realm): Int? {
             return with(ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName)) {
-                if (isSuccess() && !data?.signatures.isNullOrEmpty()) {
-                    SignatureController.update(data!!.signatures, realm = this@updateSignatures)
+                if (isSuccess() && data?.signatures?.isNotEmpty() == true) {
+                    customRealm.writeBlocking { SignatureController.update(data!!.signatures, realm = this) }
                     return@with null
                 } else {
                     Sentry.captureException(getApiException())

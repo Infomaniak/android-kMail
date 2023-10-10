@@ -60,11 +60,9 @@ class SignatureSettingViewModel @Inject constructor(
     }
 
     fun updateSignatures() = viewModelScope.launch(ioDispatcher) {
-        customRealm.writeBlocking {
-            updateSignatures(mailbox)?.also { translatedError ->
-                val title = if (translatedError == 0) RCore.string.anErrorHasOccurred else translatedError
-                showError.postValue(title)
-            }
+        updateSignatures(mailbox, customRealm)?.also { translatedError ->
+            val title = if (translatedError == 0) RCore.string.anErrorHasOccurred else translatedError
+            showError.postValue(title)
         }
     }
 
