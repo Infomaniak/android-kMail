@@ -145,6 +145,7 @@
     <string name="buttonShare">Teilen Sie</string>
     <string name="buttonStart">Anfangen</string>
     <string name="buttonStrikeThrough">Durchstreichen</string>
+    <string name="buttonSyncCalendarsAndContacts">Synchronisierung von Kalender und Kontakten</string>
     <string name="buttonTextOptionsClose">Textformatierung schliessen</string>
     <string name="buttonTextOptionsOpen">Offene Textformatierung</string>
     <string name="buttonTry">Probieren</string>

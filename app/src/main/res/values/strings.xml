@@ -151,6 +151,7 @@
     <string name="buttonShare">Share</string>
     <string name="buttonStart">Start</string>
     <string name="buttonStrikeThrough">Strike through</string>
+    <string name="buttonSyncCalendarsAndContacts">Calendar and contact synchronization</string>
     <string name="buttonTextOptionsClose">Close text formatting</string>
     <string name="buttonTextOptionsOpen">Open text formatting</string>
     <string name="buttonTry">Try</string>
