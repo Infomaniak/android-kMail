@@ -42,7 +42,7 @@ class AiDiscoveryBottomSheetDialog : InformationBottomSheetDialog() {
             setText(R.string.buttonTry)
             setOnClickListener {
                 trackAiWriterEvent("discoverTry")
-                aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(true)
+                aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(isOpened = true)
                 dismiss()
             }
         }

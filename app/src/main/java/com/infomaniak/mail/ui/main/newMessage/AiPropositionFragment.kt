@@ -122,7 +122,7 @@ class AiPropositionFragment : Fragment() {
 
         retryButton.setOnClickListener {
             trackAiWriterEvent("retry")
-            aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(true)
+            aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(isOpened = true)
             findNavController().popBackStack()
         }
     }
@@ -162,7 +162,7 @@ class AiPropositionFragment : Fragment() {
         trackAiWriterEvent(shortcut.matomoValue)
 
         if (shortcut == Shortcut.MODIFY) {
-            aiPromptOpeningStatus.value = AiPromptOpeningStatus(true, shouldResetPrompt = false)
+            aiPromptOpeningStatus.value = AiPromptOpeningStatus(isOpened = true, shouldResetPrompt = false)
             findNavController().popBackStack()
         } else {
             binding.loadingPlaceholder.text = aiProposition.value!!.second

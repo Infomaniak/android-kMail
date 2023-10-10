@@ -89,7 +89,6 @@ import kotlin.math.roundToInt
 import com.google.android.material.R as RMaterial
 import com.infomaniak.lib.core.R as RCore
 
-
 @AndroidEntryPoint
 class NewMessageFragment : Fragment() {
 
@@ -103,8 +102,8 @@ class NewMessageFragment : Fragment() {
     private val aiViewModel: AiViewModel by activityViewModels()
 
     private val animationDuration by lazy { resources.getInteger(R.integer.aiPromptAnimationDuration).toLong() }
-    private val backgroundColor by lazy { requireContext().getColor(R.color.backgroundColor) }
     private val scrimOpacity by lazy { ResourcesCompat.getFloat(requireContext().resources, R.dimen.scrimOpacity) }
+    private val backgroundColor by lazy { requireContext().getColor(R.color.backgroundColor) }
     private val black by lazy { requireContext().getColor(RCore.color.black) }
 
     private lateinit var addressListPopupWindow: ListPopupWindow
@@ -583,12 +582,13 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun openAiPrompt() {
-        aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(true)
+        aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(isOpened = true)
     }
 
     fun closeAiPrompt(becauseOfGeneration: Boolean = false) {
         trackAiWriterEvent(name = if (becauseOfGeneration) "generate" else "dismissPromptWithoutGenerating")
-        aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(false, becauseOfGeneration = becauseOfGeneration)
+        aiViewModel.aiPromptOpeningStatus.value =
+            AiPromptOpeningStatus(isOpened = false, becauseOfGeneration = becauseOfGeneration)
     }
 
     private fun observeNewAttachments() = with(binding) {
@@ -869,19 +869,19 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun animateAiPrompt(isVisible: Boolean) = with(binding) {
+
         val slidingTransition = Slide()
             .addTarget(aiPromptLayout)
             .setDuration(animationDuration)
 
         TransitionManager.beginDelayedTransition(root, slidingTransition)
 
-        val (startOpacity, endOpacity) = if (isVisible) 0f to scrimOpacity else scrimOpacity to 0f
+        val (startOpacity, endOpacity) = if (isVisible) 0.0f to scrimOpacity else scrimOpacity to 0.0f
 
         ValueAnimator.ofObject(FloatEvaluator(), startOpacity, endOpacity).apply {
-            setDuration(animationDuration)
+            duration = animationDuration
             addUpdateListener { animator ->
-                val alpha = ((animator.animatedValue as Float) * 256).roundToInt() / 256f
-
+                val alpha = ((animator.animatedValue as Float) * 256.0f).roundToInt() / 256.0f
                 scrim.alpha = alpha
                 requireActivity().window.statusBarColor = UiUtils.pointBetweenColors(backgroundColor, black, alpha)
             }
@@ -890,6 +890,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun setAiPromptVisibility(isVisible: Boolean) {
+
         fun updateNavigationBarColor() {
             val backgroundColorRes = if (isVisible) R.color.backgroundColorSecondary else R.color.backgroundColor
             requireActivity().window.navigationBarColor = requireContext().getColor(backgroundColorRes)
