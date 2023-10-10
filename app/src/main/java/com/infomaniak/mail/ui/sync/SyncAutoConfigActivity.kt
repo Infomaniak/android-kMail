@@ -33,5 +33,9 @@ class SyncAutoConfigActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(binding.root)
+
+        binding.startFab.setOnClickListener {
+            syncAutoConfigViewModel.getCredentials()
+        }
     }
 }
