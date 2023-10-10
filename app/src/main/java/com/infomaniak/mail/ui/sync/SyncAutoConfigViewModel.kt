@@ -34,4 +34,15 @@ class SyncAutoConfigViewModel @Inject constructor(
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
+    fun getCredentials() = viewModelScope.launch(ioCoroutineContext) {
+
+        val apiResponse = ApiRepository.getCredentialsPassword()
+
+        val infomaniakLogin = AccountUtils.currentUser?.login
+        val infomaniakPassword = apiResponse.data?.password
+
+        if (infomaniakLogin?.isNotEmpty() == true && infomaniakPassword?.isNotEmpty() == true) {
+            TODO()
+        }
+    }
 }
