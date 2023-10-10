@@ -30,6 +30,7 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
+import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.hideProgress
 import com.infomaniak.lib.core.utils.showKeyboard
 import com.infomaniak.lib.core.utils.showProgress
@@ -46,6 +47,11 @@ class AttachMailboxFragment : Fragment() {
 
     private lateinit var binding: FragmentAttachMailboxBinding
     private val accountViewModel: AccountViewModel by viewModels()
+
+    private val attachMailboxButtonProgressTimer by lazy {
+        Utils.createRefreshTimer(onTimerFinish = binding.attachMailboxButton::showProgress)
+    }
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentAttachMailboxBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -68,10 +74,15 @@ class AttachMailboxFragment : Fragment() {
 
             setOnClickListener {
                 context.trackAccountEvent("addMailboxConfirm")
-                showProgress()
+                attachMailboxButtonProgressTimer.start()
                 attachMailbox()
             }
         }
+    }
+
+    override fun onDestroyView() {
+        attachMailboxButtonProgressTimer.cancel()
+        super.onDestroyView()
     }
 
     private fun TextInputEditText.manageEmailErrorOnFocusChange(hasFocus: Boolean) = with(binding) {

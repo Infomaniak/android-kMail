@@ -43,6 +43,10 @@ class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
     private val restoreEmailViewModel: RestoreEmailsViewModel by viewModels()
 
     private val autoCompleteTextView by lazy { (binding.datePicker.editText as? MaterialAutoCompleteTextView)!! }
+    private val restoreEmailsButtonProgressTimer by lazy {
+        Utils.createRefreshTimer(onTimerFinish = binding.restoreMailsButton::showProgress)
+    }
+
     private lateinit var formattedDates: Map<String, String>
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -61,9 +65,14 @@ class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
         }
 
         restoreMailsButton.setOnClickListener {
-            restoreMailsButton.showProgress()
+            restoreEmailsButtonProgressTimer.start()
             restoreEmails()
         }
+    }
+
+    override fun onDestroyView() {
+        restoreEmailsButtonProgressTimer.cancel()
+        super.onDestroyView()
     }
 
     private fun MaterialAutoCompleteTextView.hasLoaded(hasLoaded: Boolean) {

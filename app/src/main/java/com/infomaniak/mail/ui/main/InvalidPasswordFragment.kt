@@ -27,6 +27,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
+import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.hideProgress
 import com.infomaniak.lib.core.utils.showKeyboard
 import com.infomaniak.lib.core.utils.showProgress
@@ -45,6 +46,10 @@ class InvalidPasswordFragment : Fragment() {
     private lateinit var binding: FragmentInvalidPasswordBinding
     private val navigationArgs: InvalidPasswordFragmentArgs by navArgs()
     private val invalidPasswordViewModel: InvalidPasswordViewModel by viewModels()
+
+    private val updatePasswordButtonProgressTimer by lazy {
+        Utils.createRefreshTimer(onTimerFinish = binding.confirmButton::showProgress)
+    }
 
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog
@@ -77,7 +82,7 @@ class InvalidPasswordFragment : Fragment() {
         confirmButton.apply {
             setOnClickListener {
                 trackInvalidPasswordMailboxEvent("updatePassword")
-                showProgress()
+                updatePasswordButtonProgressTimer.start()
                 invalidPasswordViewModel.updatePassword(passwordInput.trimmedText)
             }
         }
@@ -116,6 +121,11 @@ class InvalidPasswordFragment : Fragment() {
         invalidPasswordViewModel.requestPasswordResult.observe(viewLifecycleOwner) { apiResponse ->
             showSnackbar(if (apiResponse.isSuccess()) R.string.snackbarMailboxPasswordRequested else apiResponse.translatedError)
         }
+    }
+
+    override fun onDestroyView() {
+        updatePasswordButtonProgressTimer.cancel()
+        super.onDestroyView()
     }
 
     private fun manageButtonState(password: Editable) = with(binding) {
