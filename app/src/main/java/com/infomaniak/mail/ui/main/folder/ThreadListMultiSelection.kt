@@ -35,7 +35,6 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
@@ -44,10 +43,8 @@ import com.infomaniak.mail.utils.updateNavigationBarColor
 
 class ThreadListMultiSelection {
 
-    lateinit var binding: FragmentThreadListBinding
     lateinit var mainViewModel: MainViewModel
     lateinit var threadListFragment: ThreadListFragment
-    lateinit var threadListAdapter: ThreadListAdapter
     lateinit var unlockSwipeActionsIfSet: () -> Unit
     lateinit var localSettings: LocalSettings
 
@@ -55,17 +52,13 @@ class ThreadListMultiSelection {
     private var shouldMultiselectFavorite: Boolean = true
 
     fun initMultiSelection(
-        binding: FragmentThreadListBinding,
         mainViewModel: MainViewModel,
         threadListFragment: ThreadListFragment,
-        threadListAdapter: ThreadListAdapter,
         unlockSwipeActionsIfSet: () -> Unit,
         localSettings: LocalSettings,
     ) {
-        this.binding = binding
         this.mainViewModel = mainViewModel
         this.threadListFragment = threadListFragment
-        this.threadListAdapter = threadListAdapter
         this.unlockSwipeActionsIfSet = unlockSwipeActionsIfSet
         this.localSettings = localSettings
 
@@ -75,7 +68,7 @@ class ThreadListMultiSelection {
     }
 
     private fun setupMultiSelectionActions() = with(mainViewModel) {
-        binding.quickActionBar.setOnItemClickListener { menuId ->
+        threadListFragment.binding.quickActionBar.setOnItemClickListener { menuId ->
             val selectedThreadsUids = selectedThreads.map { it.uid }
             val selectedThreadsCount = selectedThreadsUids.count()
 
@@ -122,10 +115,10 @@ class ThreadListMultiSelection {
         }
     }
 
-    private fun observerMultiSelection() = with(binding) {
-        mainViewModel.isMultiSelectOnLiveData.observe(threadListFragment.viewLifecycleOwner) { isMultiSelectOn ->
+    private fun observerMultiSelection() = with(threadListFragment) {
+        mainViewModel.isMultiSelectOnLiveData.observe(viewLifecycleOwner) { isMultiSelectOn ->
             threadListAdapter.updateSelection()
-            if (localSettings.threadDensity != ThreadDensity.LARGE) TransitionManager.beginDelayedTransition(threadsList)
+            if (localSettings.threadDensity != ThreadDensity.LARGE) TransitionManager.beginDelayedTransition(binding.threadsList)
             if (!isMultiSelectOn) mainViewModel.selectedThreads.clear()
 
             displaySelectionToolbar(isMultiSelectOn)
@@ -134,14 +127,14 @@ class ThreadListMultiSelection {
             displayMultiSelectActions(isMultiSelectOn)
         }
 
-        mainViewModel.selectedThreadsLiveData.observe(threadListFragment.viewLifecycleOwner) { selectedThreads ->
+        mainViewModel.selectedThreadsLiveData.observe(viewLifecycleOwner) { selectedThreads ->
             updateSelectedCount(selectedThreads)
             updateSelectAllLabel()
             updateMultiSelectActionsStatus(selectedThreads)
         }
     }
 
-    private fun displaySelectionToolbar(isMultiSelectOn: Boolean) = with(binding) {
+    private fun displaySelectionToolbar(isMultiSelectOn: Boolean) = with(threadListFragment.binding) {
         val autoTransition = AutoTransition()
         autoTransition.duration = TOOLBAR_FADE_DURATION
         TransitionManager.beginDelayedTransition(toolbarLayout, autoTransition)
@@ -150,10 +143,10 @@ class ThreadListMultiSelection {
         toolbarSelection.isVisible = isMultiSelectOn
     }
 
-    private fun lockDrawerAndSwipe(isMultiSelectOn: Boolean) = with(binding) {
-        (threadListFragment.activity as MainActivity).setDrawerLockMode(!isMultiSelectOn)
+    private fun lockDrawerAndSwipe(isMultiSelectOn: Boolean) = with(threadListFragment) {
+        (activity as MainActivity).setDrawerLockMode(!isMultiSelectOn)
         if (isMultiSelectOn) {
-            threadsList.apply {
+            binding.threadsList.apply {
                 disableSwipeDirection(DirectionFlag.LEFT)
                 disableSwipeDirection(DirectionFlag.RIGHT)
             }
@@ -164,10 +157,10 @@ class ThreadListMultiSelection {
 
     private fun hideUnreadChip(isMultiSelectOn: Boolean) = runCatchingRealm {
         val thereAreUnread = mainViewModel.currentFolderLive.value?.let { it.unreadCountLocal > 0 } == true
-        binding.unreadCountChip.isVisible = thereAreUnread && !isMultiSelectOn
+        threadListFragment.binding.unreadCountChip.isVisible = thereAreUnread && !isMultiSelectOn
     }.getOrDefault(Unit)
 
-    private fun displayMultiSelectActions(isMultiSelectOn: Boolean) = with(binding) {
+    private fun displayMultiSelectActions(isMultiSelectOn: Boolean) = with(threadListFragment.binding) {
         newMessageFab.isGone = isMultiSelectOn
         quickActionBar.isVisible = isMultiSelectOn
         val navBarColor = context.getColor(if (isMultiSelectOn) R.color.elevatedBackground else R.color.backgroundColor)
@@ -176,7 +169,7 @@ class ThreadListMultiSelection {
 
     private fun updateSelectedCount(selectedThreads: MutableSet<Thread>) {
         val threadCount = selectedThreads.count()
-        binding.selectedCount.text = threadListFragment.resources.getQuantityString(
+        threadListFragment.binding.selectedCount.text = threadListFragment.resources.getQuantityString(
             R.plurals.multipleSelectionCount,
             threadCount,
             threadCount
@@ -185,7 +178,7 @@ class ThreadListMultiSelection {
 
     private fun updateSelectAllLabel() {
         val selectAllLabel = if (mainViewModel.isEverythingSelected) R.string.buttonUnselectAll else R.string.buttonSelectAll
-        binding.selectAll.setText(selectAllLabel)
+        threadListFragment.binding.selectAll.setText(selectAllLabel)
     }
 
     private fun updateMultiSelectActionsStatus(selectedThreads: MutableSet<Thread>) {
@@ -194,7 +187,7 @@ class ThreadListMultiSelection {
             shouldMultiselectFavorite = shouldFavorite
         }
 
-        binding.quickActionBar.apply {
+        threadListFragment.binding.quickActionBar.apply {
             val (readIcon, readText) = getReadIconAndShortText(shouldMultiselectRead)
             changeIcon(READ_UNREAD_INDEX, readIcon)
             changeText(READ_UNREAD_INDEX, readText)
