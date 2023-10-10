@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.settings
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -35,6 +36,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentSettingsBinding
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.sync.SyncAutoConfigActivity
 import com.infomaniak.mail.utils.animatedNavigation
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -98,6 +100,10 @@ class SettingsFragment : Fragment() {
         settingsNotifications.setOnClickListener {
             trackEvent("settingsNotifications", "openNotificationSettings")
             requireContext().openAppNotificationSettings()
+        }
+
+        settingsSyncAutoConfig.setOnClickListener {
+            startActivity(Intent(context, SyncAutoConfigActivity::class.java))
         }
 
         settingsSend.setOnClickListener {
