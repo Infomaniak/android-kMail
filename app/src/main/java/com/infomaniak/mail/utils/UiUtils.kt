@@ -132,14 +132,18 @@ object UiUtils {
 
     fun dividerDrawable(context: Context) = AppCompatResources.getDrawable(context, R.drawable.divider)
 
-    fun formatSubBodiesContent(subBodies: List<SubBody>): String {
+    fun formatSubBodiesContent(subBodies: List<SubBody>, messageUid: String): String {
         var subBodiesContent = ""
+
         subBodies.forEach { subBody ->
             subBody.bodyValue?.let {
                 if (subBodiesContent.isNotEmpty()) subBodiesContent += "<br/>"
                 subBodiesContent += "<blockquote>${it}</blockquote>"
             }
         }
+
+        if (subBodiesContent.isNotEmpty()) SentryDebug.sendSubBodiesTrigger(messageUid)
+
         return subBodiesContent
     }
 }

@@ -163,7 +163,7 @@ class ThreadAdapter(
                 if (binding.bodyWebView.isVisible) {
                     loadBodyInWebView(
                         uid = message.uid,
-                        body = splitBody.content + UiUtils.formatSubBodiesContent(body.subBodies),
+                        body = splitBody.content + UiUtils.formatSubBodiesContent(body.subBodies, message.uid),
                         type = body.type,
                     )
                 } else if (binding.fullMessageWebView.isVisible) {

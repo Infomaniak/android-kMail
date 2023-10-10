@@ -149,7 +149,7 @@ class DraftController @Inject constructor(
             return@let document.outerHtml()
         } ?: ""
 
-        val subBodiesContent = message.body?.subBodies?.let(UiUtils::formatSubBodiesContent) ?: ""
+        val subBodiesContent = message.body?.subBodies?.let { UiUtils.formatSubBodiesContent(subBodies = it, message.uid) } ?: ""
 
         return """
             <div id=\"answerContentMessage\" class="${MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME}" >
@@ -193,7 +193,7 @@ class DraftController @Inject constructor(
             ""
         }
 
-        val subBodiesContent = message.body?.subBodies?.let(UiUtils::formatSubBodiesContent) ?: ""
+        val subBodiesContent = message.body?.subBodies?.let { UiUtils.formatSubBodiesContent(subBodies = it, message.uid) } ?: ""
 
         return """
             <div class="${MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME}">

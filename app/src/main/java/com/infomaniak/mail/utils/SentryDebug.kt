@@ -274,5 +274,14 @@ object SentryDebug {
             Sentry.captureMessage("JavaScript returned an error when displaying an email.")
         }
     }
+
+    fun sendSubBodiesTrigger(messageUid: String) {
+        Sentry.withScope { scope ->
+            scope.level = SentryLevel.INFO
+            scope.setExtra("email", "${AccountUtils.currentMailboxEmail}")
+            scope.setExtra("messageUid", messageUid)
+            Sentry.captureMessage("Received an email with SubBodies!!")
+        }
+    }
     //endregion
 }
