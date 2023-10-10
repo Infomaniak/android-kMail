@@ -238,7 +238,10 @@ class NewMessageFragment : Fragment() {
         setupSendButton()
         setupExternalBanner()
 
-        scrim.setOnClickListener { closeAiPrompt() }
+        scrim.setOnClickListener {
+            scrim.isClickable = false
+            closeAiPrompt()
+        }
     }
 
     private fun resetStatusBarColor() {
@@ -826,74 +829,73 @@ class NewMessageFragment : Fragment() {
                 .commitNow()
         }
 
+        scrim.apply {
+            isVisible = true
+            isClickable = true
+        }
+
+        animateAiPrompt(true)
         setAiPromptVisibility(true)
         newMessageConstraintLayout.descendantFocusability = FOCUS_BLOCK_DESCENDANTS
     }
 
     private fun onAiPromptClosed(withoutTransition: Boolean) = with(binding) {
 
-        fun removeFragment() {
+        fun removeFragmentAndHideScrim() {
             aiPromptFragment?.let {
                 childFragmentManager
                     .beginTransaction()
                     .remove(it)
                     .commitNow()
             }
+
+            scrim.isGone = true
         }
 
         aiPromptFragmentContainer.hideKeyboard()
 
         if (withoutTransition) {
-            removeFragment()
+            removeFragmentAndHideScrim()
         } else {
             viewLifecycleOwner.lifecycleScope.launch {
                 delay(animationDuration)
-                removeFragment()
+                removeFragmentAndHideScrim()
             }
         }
 
+        animateAiPrompt(false)
         setAiPromptVisibility(false)
         newMessageConstraintLayout.descendantFocusability = FOCUS_BEFORE_DESCENDANTS
     }
 
-    private fun setAiPromptVisibility(isVisible: Boolean) {
+    private fun animateAiPrompt(isVisible: Boolean) = with(binding) {
+        val slidingTransition = Slide()
+            .addTarget(aiPromptLayout)
+            .setDuration(animationDuration)
 
-        fun animateScrimAndStatusBarColor() {
-            if (isVisible) {
-                ValueAnimator.ofObject(FloatEvaluator(), 0, scrimOpacity).apply {
-                    setDuration(animationDuration)
-                    addUpdateListener { animator ->
-                        val alpha = ((animator.animatedValue as Float) * 256).roundToInt() / 256f
+        TransitionManager.beginDelayedTransition(root, slidingTransition)
 
-                        binding.scrim.alpha = alpha
-                        requireActivity().window.statusBarColor = UiUtils.pointBetweenColors(backgroundColor, black, alpha)
-                    }
-                    start()
-                }
+        val (startOpacity, endOpacity) = if (isVisible) 0f to scrimOpacity else scrimOpacity to 0f
+
+        ValueAnimator.ofObject(FloatEvaluator(), startOpacity, endOpacity).apply {
+            setDuration(animationDuration)
+            addUpdateListener { animator ->
+                val alpha = ((animator.animatedValue as Float) * 256).roundToInt() / 256f
+
+                scrim.alpha = alpha
+                requireActivity().window.statusBarColor = UiUtils.pointBetweenColors(backgroundColor, black, alpha)
             }
+            start()
         }
+    }
 
-        fun updateStatusBarColor() {
-            if (!isVisible) requireActivity().window.statusBarColor = backgroundColor
-        }
-
+    private fun setAiPromptVisibility(isVisible: Boolean) {
         fun updateNavigationBarColor() {
             val backgroundColorRes = if (isVisible) R.color.backgroundColorSecondary else R.color.backgroundColor
             requireActivity().window.navigationBarColor = requireContext().getColor(backgroundColorRes)
         }
 
-        val slidingTransition = Slide()
-            .addTarget(binding.aiPromptLayout)
-            .setDuration(animationDuration)
-
-        TransitionManager.beginDelayedTransition(binding.root, slidingTransition)
-
         binding.aiPromptLayout.isVisible = isVisible
-        binding.scrim.isVisible = isVisible
-
-        animateScrimAndStatusBarColor()
-
-        updateStatusBarColor()
         updateNavigationBarColor()
     }
 
