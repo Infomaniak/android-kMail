@@ -22,6 +22,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_DELETE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_FAVORITE_NAME
@@ -45,7 +46,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
-    private lateinit var binding: BottomSheetMultiSelectBinding
+    private var binding: BottomSheetMultiSelectBinding by safeBinding()
     private val mainViewModel: MainViewModel by activityViewModels()
 
     private val currentClassName: String by lazy { MultiSelectBottomSheetDialog::class.java.name }

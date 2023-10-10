@@ -26,6 +26,7 @@ import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
 import com.google.android.material.color.DynamicColors
 import com.infomaniak.lib.core.utils.context
+import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -38,7 +39,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class AccentColorSettingFragment : Fragment() {
 
-    private lateinit var binding: FragmentAccentColorSettingBinding
+    private var binding: FragmentAccentColorSettingBinding by safeBinding()
 
     @Inject
     lateinit var localSettings: LocalSettings

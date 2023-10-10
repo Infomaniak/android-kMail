@@ -25,6 +25,7 @@ import androidx.annotation.StringRes
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentSwipeActionsSettingsBinding
@@ -35,7 +36,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class SwipeActionsSettingsFragment : Fragment() {
 
-    private lateinit var binding: FragmentSwipeActionsSettingsBinding
+    private var binding: FragmentSwipeActionsSettingsBinding by safeBinding()
 
     @Inject
     lateinit var localSettings: LocalSettings

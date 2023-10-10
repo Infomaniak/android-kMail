@@ -49,7 +49,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class LoginFragment : Fragment() {
 
-    private lateinit var binding: FragmentLoginBinding
+    private var binding: FragmentLoginBinding by safeBinding()
     private val navigationArgs by lazy { LoginActivityArgs.fromBundle(requireActivity().intent.extras ?: bundleOf()) }
     private val introViewModel: IntroViewModel by activityViewModels()
 

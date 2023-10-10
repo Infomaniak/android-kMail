@@ -85,7 +85,7 @@ import com.google.android.material.R as RMaterial
 @AndroidEntryPoint
 class NewMessageFragment : Fragment() {
 
-    private lateinit var binding: FragmentNewMessageBinding
+    private var binding: FragmentNewMessageBinding by safeBinding()
     private val newMessageActivityArgs by lazy {
         // When opening this fragment via deeplink, it can happen that the navigation
         // extras aren't yet initialized, so we don't use the `navArgs` here.

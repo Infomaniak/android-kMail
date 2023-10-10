@@ -25,6 +25,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode
 import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
+import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -37,7 +38,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class ThemeSettingFragment : Fragment() {
 
-    private lateinit var binding: FragmentThemeSettingBinding
+    private var binding: FragmentThemeSettingBinding by safeBinding()
 
     @Inject
     lateinit var localSettings: LocalSettings

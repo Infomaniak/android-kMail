@@ -26,11 +26,8 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
-import com.infomaniak.lib.core.utils.Utils
-import com.infomaniak.lib.core.utils.hideProgress
-import com.infomaniak.lib.core.utils.showKeyboard
-import com.infomaniak.lib.core.utils.showProgress
 import com.infomaniak.mail.MatomoMail.trackInvalidPasswordMailboxEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentInvalidPasswordBinding
@@ -43,7 +40,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class InvalidPasswordFragment : Fragment() {
 
-    private lateinit var binding: FragmentInvalidPasswordBinding
+    private var binding: FragmentInvalidPasswordBinding by safeBinding()
     private val navigationArgs: InvalidPasswordFragmentArgs by navArgs()
     private val invalidPasswordViewModel: InvalidPasswordViewModel by viewModels()
 

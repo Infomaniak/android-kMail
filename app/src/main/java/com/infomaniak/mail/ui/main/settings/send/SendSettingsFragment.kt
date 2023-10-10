@@ -22,6 +22,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentSendSettingsBinding
@@ -33,7 +34,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class SendSettingsFragment : Fragment() {
 
-    private lateinit var binding: FragmentSendSettingsBinding
+    private var binding: FragmentSendSettingsBinding by safeBinding()
 
     @Inject
     lateinit var localSettings: LocalSettings

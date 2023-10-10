@@ -31,6 +31,7 @@ import com.google.android.material.color.DynamicColors
 import com.google.android.material.tabs.TabLayout
 import com.infomaniak.lib.core.utils.capitalizeFirstChar
 import com.infomaniak.lib.core.utils.context
+import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.trackOnBoardingEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -50,7 +51,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class IntroFragment : Fragment() {
 
-    private lateinit var binding: FragmentIntroBinding
+    private var binding: FragmentIntroBinding by safeBinding()
     private val navigationArgs: IntroFragmentArgs by navArgs()
     private val introViewModel: IntroViewModel by activityViewModels()
 

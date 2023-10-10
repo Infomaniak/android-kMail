@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentMailboxSettingsBinding
 import com.infomaniak.mail.ui.main.settings.ItemSettingView
@@ -31,7 +32,7 @@ import com.infomaniak.mail.utils.notYetImplemented
 
 class MailboxSettingsFragment : Fragment() {
 
-    private lateinit var binding: FragmentMailboxSettingsBinding
+    private var binding: FragmentMailboxSettingsBinding by safeBinding()
     private val navigationArgs: MailboxSettingsFragmentArgs by navArgs()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {

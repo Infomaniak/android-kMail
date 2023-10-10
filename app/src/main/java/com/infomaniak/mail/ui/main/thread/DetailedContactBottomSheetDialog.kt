@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.trackContactActionsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetDetailedContactBinding
@@ -37,7 +38,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class DetailedContactBottomSheetDialog : ActionsBottomSheetDialog() {
 
-    private lateinit var binding: BottomSheetDetailedContactBinding
+    private var binding: BottomSheetDetailedContactBinding by safeBinding()
     private val navigationArgs: DetailedContactBottomSheetDialogArgs by navArgs()
     private val mainViewModel: MainViewModel by activityViewModels()
 

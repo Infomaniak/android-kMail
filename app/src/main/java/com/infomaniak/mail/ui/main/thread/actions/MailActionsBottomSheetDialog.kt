@@ -22,13 +22,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetActionsMenuBinding
 import com.infomaniak.mail.ui.MainViewModel
 
 abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
-    protected lateinit var binding: BottomSheetActionsMenuBinding
+    protected var binding: BottomSheetActionsMenuBinding by safeBinding()
     protected val mainViewModel: MainViewModel by activityViewModels()
 
     private var onClickListener: OnActionClick = object : OnActionClick {

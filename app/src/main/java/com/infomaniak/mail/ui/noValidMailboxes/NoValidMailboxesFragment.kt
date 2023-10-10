@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.MatomoMail.ADD_MAILBOX_NAME
 import com.infomaniak.mail.MatomoMail.trackNoValidMailboxesEvent
@@ -36,7 +37,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
 
-    private lateinit var binding: FragmentNoValidMailboxesBinding
+    private var binding: FragmentNoValidMailboxesBinding by safeBinding()
     private val noValidMailboxesViewModel: NoValidMailboxesViewModel by activityViewModels()
 
     private val isInMenuDrawer = false

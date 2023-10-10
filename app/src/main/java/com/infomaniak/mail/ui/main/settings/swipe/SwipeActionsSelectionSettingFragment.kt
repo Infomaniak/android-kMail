@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.toFloat
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
@@ -37,7 +38,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class SwipeActionsSelectionSettingFragment : Fragment() {
 
-    private lateinit var binding: FragmentSwipeActionsSelectionSettingBinding
+    private var binding: FragmentSwipeActionsSelectionSettingBinding by safeBinding()
     private val navigationArgs: SwipeActionsSelectionSettingFragmentArgs by navArgs()
 
     @Inject
