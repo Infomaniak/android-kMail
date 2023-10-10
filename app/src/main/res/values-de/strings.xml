@@ -324,6 +324,7 @@
     <string name="onBoardingTitle3">Drücken Sie einige Sekunden auf eine Nachricht, um mehrere auszuwählen</string>
     <string name="onBoardingTitle4">Los geht’s!</string>
     <string name="pendingMessagesFolder">Anhängige Nachrichten</string>
+    <string name="pickerNoSelection">Keine Auswahl</string>
     <string name="popupDetachMailboxDescription">Sind Sie sicher, dass Sie die Adresse %s lösen möchten?</string>
     <string name="popupDetachMailboxTitle">Adresse abtrennen</string>
     <string name="recentSearchesTitle">Letzte Suchen</string>
@@ -333,6 +334,7 @@
     <string name="reportPhishingDescription">Wenn diese Nachricht versucht, vertrauliche Informationen (Passwort, Bankdaten usw.) zu stehlen und/oder sich als eine anerkannte Identität ausgibt, handelt es sich um Phishing.\n\nIndem Sie uns diese Nachricht melden, können Sie die Erkennung gefährlicher Nachrichten für alle unsere Nutzer beschleunigen.\n\nDie Meldung wird an unser Sicherheitsteam weitergeleitet, das sie analysiert und Massnahmen ergreift. Die E-Mail wird ausserdem automatisch in Ihren Spam-Ordner verschoben.</string>
     <string name="reportPhishingTitle">Einen Phishing-Versuch melden</string>
     <string name="restoreEmailsBackupDate">Datum der Sicherung</string>
+    <string name="restoreEmailsNoBackup">Kein Backup gefunden</string>
     <string name="restoreEmailsText">Alle E-Mails werden wieder in Ihrem Posteingang landen.</string>
     <string name="restoreEmailsTitle">Wiederherstellung Ihrer E-Mails</string>
     <string name="scheduledMessagesFolder">Geplante Nachrichten</string>
