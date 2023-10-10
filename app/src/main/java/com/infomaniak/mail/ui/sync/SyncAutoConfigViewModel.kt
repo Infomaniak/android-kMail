@@ -18,12 +18,18 @@
 package com.infomaniak.mail.ui.sync
 
 import android.app.Application
+import android.content.ComponentName
+import android.content.Intent
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -42,7 +48,13 @@ class SyncAutoConfigViewModel @Inject constructor(
         val infomaniakPassword = apiResponse.data?.password
 
         if (infomaniakLogin?.isNotEmpty() == true && infomaniakPassword?.isNotEmpty() == true) {
-            TODO()
+            Intent().apply {
+                component = ComponentName("com.infomaniak.sync", "at.bitfire.davdroid.ui.setup.LoginActivity")
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                action = "syncAutoConfig"
+                putExtra("login", infomaniakLogin)
+                putExtra("password", infomaniakPassword)
+            }.also(context::startActivity)
         }
     }
 }
