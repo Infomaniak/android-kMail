@@ -11,6 +11,7 @@ jsoup = "1.16.1"
 junitJupiterEngine = "5.10.0"
 kapt = "1.8.22"
 kotlin = "1.8.22"
+leakcanaryAndroid = "2.12"
 lifecycleProcess = "2.6.2"
 lottie = "6.1.0"
 navigation = "2.6.0"
@@ -31,6 +32,7 @@ hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hil
 hilt-compiler-androidx = { module = "androidx.hilt:hilt-compiler", version.ref = "hiltAndroidx" }
 hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "hiltAndroidx" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
+leakcanary-android = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanaryAndroid" }
 lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "lifecycleProcess" }
 lottie = { module = "com.airbnb.android:lottie", version.ref = "lottie" }
 navigation-safeargs = { module = "androidx.navigation:navigation-safe-args-gradle-plugin", version.ref = "navigation" }
