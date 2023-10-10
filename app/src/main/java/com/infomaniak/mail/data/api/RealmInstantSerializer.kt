@@ -36,11 +36,11 @@ object RealmInstantSerializer : KSerializer<RealmInstant> {
 
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("RealmInstant", PrimitiveKind.STRING)
 
-    override fun serialize(encoder: Encoder, value: RealmInstant) {
-        value.toDate().let(simpleDateFormat::format).let(encoder::encodeString)
-    }
-
     override fun deserialize(decoder: Decoder): RealmInstant {
         return simpleDateFormat.parse(decoder.decodeString())?.toRealmInstant() ?: RealmInstant.MAX
+    }
+
+    override fun serialize(encoder: Encoder, value: RealmInstant) {
+        value.toDate().let(simpleDateFormat::format).let(encoder::encodeString)
     }
 }
