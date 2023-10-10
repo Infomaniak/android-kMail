@@ -140,4 +140,6 @@ object ApiRoutes {
     private fun getMessages(mailboxUuid: String, folderId: String): String {
         return "$MAIL_API/api/mail/${mailboxUuid}/folder/${folderId}/mobile"
     }
+
+    fun getCredentialsPassword(): String = "$INFOMANIAK_API_V1/profile/password"
 }
