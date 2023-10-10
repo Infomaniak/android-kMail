@@ -32,6 +32,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
+import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.trackAiWriterEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -54,7 +55,7 @@ import com.infomaniak.lib.core.R as RCore
 @AndroidEntryPoint
 class AiPropositionFragment : Fragment() {
 
-    private lateinit var binding: FragmentAiPropositionBinding
+    private var binding: FragmentAiPropositionBinding by safeBinding()
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
 

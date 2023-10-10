@@ -35,6 +35,7 @@ import com.infomaniak.lib.bugtracker.BugTrackerActivity
 import com.infomaniak.lib.bugtracker.BugTrackerActivityArgs
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.context
+import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackCreateFolderEvent
@@ -53,7 +54,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
 
-    private lateinit var binding: FragmentMenuDrawerBinding
+    private var binding: FragmentMenuDrawerBinding by safeBinding()
     private val menuDrawerViewModel: MenuDrawerViewModel by viewModels()
 
     @Inject

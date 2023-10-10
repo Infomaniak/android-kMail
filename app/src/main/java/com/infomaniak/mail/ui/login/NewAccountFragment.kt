@@ -29,6 +29,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.context
+import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
@@ -45,7 +46,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class NewAccountFragment : Fragment() {
 
-    private lateinit var binding: FragmentNewAccountBinding
+    private var binding: FragmentNewAccountBinding by safeBinding()
     private val introViewModel: IntroViewModel by activityViewModels()
 
     private val loginActivity by lazy { requireActivity() as LoginActivity }

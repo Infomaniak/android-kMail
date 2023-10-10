@@ -81,7 +81,7 @@ class ThreadFragment : Fragment() {
     @Inject
     lateinit var localSettings: LocalSettings
 
-    private lateinit var binding: FragmentThreadBinding
+    private var binding: FragmentThreadBinding by safeBinding()
     private val navigationArgs: ThreadFragmentArgs by navArgs()
     private val mainViewModel: MainViewModel by activityViewModels()
     private val threadViewModel: ThreadViewModel by viewModels()

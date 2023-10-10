@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
+import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.databinding.FragmentSignatureSettingBinding
@@ -33,7 +34,7 @@ import io.realm.kotlin.ext.copyFromRealm
 @AndroidEntryPoint
 class SignatureSettingFragment : Fragment() {
 
-    private lateinit var binding: FragmentSignatureSettingBinding
+    private var binding: FragmentSignatureSettingBinding by safeBinding()
     private val signatureSettingViewModel: SignatureSettingViewModel by viewModels()
 
     private lateinit var signatureAdapter: SignatureSettingAdapter

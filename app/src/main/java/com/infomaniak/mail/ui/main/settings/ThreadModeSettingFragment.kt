@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -43,7 +44,7 @@ class ThreadModeSettingFragment : Fragment() {
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog
 
-    private lateinit var binding: FragmentThreadModeSettingBinding
+    private var binding: FragmentThreadModeSettingBinding by safeBinding()
     private val threadModeSettingViewModel: ThreadModeSettingViewModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {

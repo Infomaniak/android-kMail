@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.ACTION_SPAM_NAME
 import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
 import com.infomaniak.mail.R
@@ -38,7 +39,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
 
-    private lateinit var binding: BottomSheetJunkBinding
+    private var binding: BottomSheetJunkBinding by safeBinding()
     private val navigationArgs: JunkBottomSheetDialogArgs by navArgs()
     private val mainViewModel: MainViewModel by activityViewModels()
 

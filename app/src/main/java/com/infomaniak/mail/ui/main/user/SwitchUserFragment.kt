@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.infomaniak.lib.core.utils.context
+import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.databinding.FragmentSwitchUserBinding
 import com.infomaniak.mail.utils.AccountUtils
@@ -33,7 +34,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class SwitchUserFragment : Fragment() {
 
-    private lateinit var binding: FragmentSwitchUserBinding
+    private var binding: FragmentSwitchUserBinding by safeBinding()
     private val switchUserViewModel: SwitchUserViewModel by viewModels()
 
     private val accountsAdapter = SwitchUserAdapter(AccountUtils.currentUserId) { user ->

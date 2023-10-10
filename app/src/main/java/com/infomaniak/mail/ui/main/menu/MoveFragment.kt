@@ -29,6 +29,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.utils.hideKeyboard
+import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.SEARCH_DELETE_NAME
 import com.infomaniak.mail.MatomoMail.SEARCH_VALIDATE_NAME
 import com.infomaniak.mail.MatomoMail.trackCreateFolderEvent
@@ -45,7 +46,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MoveFragment : MenuFoldersFragment() {
 
-    private lateinit var binding: FragmentMoveBinding
+    private var binding: FragmentMoveBinding by safeBinding()
     private val navigationArgs: MoveFragmentArgs by navArgs()
     private val moveViewModel: MoveViewModel by viewModels()
 

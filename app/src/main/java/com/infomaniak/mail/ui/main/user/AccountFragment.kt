@@ -27,6 +27,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.infomaniak.lib.core.utils.context
+import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.MatomoMail.ADD_MAILBOX_NAME
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
@@ -46,7 +47,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class AccountFragment : Fragment(), MailboxListFragment {
 
-    private lateinit var binding: FragmentAccountBinding
+    private var binding: FragmentAccountBinding by safeBinding()
     private val mainViewModel: MainViewModel by activityViewModels()
     private val accountViewModel: AccountViewModel by viewModels()
 

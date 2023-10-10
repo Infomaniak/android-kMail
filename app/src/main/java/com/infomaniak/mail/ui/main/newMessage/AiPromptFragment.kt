@@ -29,6 +29,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.withStarted
+import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.lib.core.utils.showKeyboard
 import com.infomaniak.lib.core.utils.toPx
@@ -43,7 +44,7 @@ import com.google.android.material.R as RMaterial
 @AndroidEntryPoint
 class AiPromptFragment : Fragment() {
 
-    private lateinit var binding: FragmentAiPromptBinding
+    private var binding: FragmentAiPromptBinding by safeBinding()
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
 

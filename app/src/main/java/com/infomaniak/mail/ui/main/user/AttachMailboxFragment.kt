@@ -28,12 +28,9 @@ import androidx.fragment.app.viewModels
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
-import com.infomaniak.lib.core.utils.Utils
-import com.infomaniak.lib.core.utils.hideProgress
-import com.infomaniak.lib.core.utils.showKeyboard
-import com.infomaniak.lib.core.utils.showProgress
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentAttachMailboxBinding
@@ -45,7 +42,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class AttachMailboxFragment : Fragment() {
 
-    private lateinit var binding: FragmentAttachMailboxBinding
+    private var binding: FragmentAttachMailboxBinding by safeBinding()
     private val accountViewModel: AccountViewModel by viewModels()
 
     private val attachMailboxButtonProgressTimer by lazy {

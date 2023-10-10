@@ -22,11 +22,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.databinding.BottomSheetInformationBinding
 
 open class InformationBottomSheetDialog : BottomSheetDialogFragment() {
 
-    protected lateinit var binding: BottomSheetInformationBinding
+    protected var binding: BottomSheetInformationBinding by safeBinding()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetInformationBinding.inflate(inflater, container, false).also { binding = it }.root

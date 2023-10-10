@@ -40,6 +40,7 @@ import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListen
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollState
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.hideKeyboard
+import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.showKeyboard
 import com.infomaniak.mail.MatomoMail.SEARCH_DELETE_NAME
 import com.infomaniak.mail.MatomoMail.SEARCH_VALIDATE_NAME
@@ -60,7 +61,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class SearchFragment : Fragment() {
 
-    private lateinit var binding: FragmentSearchBinding
+    private var binding: FragmentSearchBinding by safeBinding()
     private val mainViewModel: MainViewModel by activityViewModels()
     private val searchViewModel: SearchViewModel by viewModels()
 

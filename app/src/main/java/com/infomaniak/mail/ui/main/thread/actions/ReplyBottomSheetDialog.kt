@@ -22,6 +22,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.ACTION_REPLY_ALL_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_REPLY_NAME
 import com.infomaniak.mail.MatomoMail.trackEvent
@@ -32,7 +33,7 @@ import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 
 open class ReplyBottomSheetDialog : ActionsBottomSheetDialog() {
 
-    private lateinit var binding: BottomSheetReplyBinding
+    private var binding: BottomSheetReplyBinding by safeBinding()
     private val navigationArgs: ReplyBottomSheetDialogArgs by navArgs()
 
     private val currentClassName: String by lazy { ReplyBottomSheetDialog::class.java.name }

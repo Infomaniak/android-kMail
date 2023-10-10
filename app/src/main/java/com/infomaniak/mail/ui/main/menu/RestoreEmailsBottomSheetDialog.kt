@@ -39,7 +39,7 @@ import java.util.Locale
 @AndroidEntryPoint
 class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
 
-    private lateinit var binding: BottomSheetRestoreEmailsBinding
+    private var binding: BottomSheetRestoreEmailsBinding by safeBinding()
     private val restoreEmailViewModel: RestoreEmailsViewModel by viewModels()
 
     private val autoCompleteTextView by lazy { (binding.datePicker.editText as? MaterialAutoCompleteTextView)!! }

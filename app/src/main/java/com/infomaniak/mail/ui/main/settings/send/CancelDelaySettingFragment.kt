@@ -22,6 +22,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentCancelDelaySettingBinding
@@ -32,7 +33,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class CancelDelaySettingFragment : Fragment() {
 
-    private lateinit var binding: FragmentCancelDelaySettingBinding
+    private var binding: FragmentCancelDelaySettingBinding by safeBinding()
 
     @Inject
     lateinit var localSettings: LocalSettings

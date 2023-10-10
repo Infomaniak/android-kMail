@@ -84,7 +84,7 @@ import com.infomaniak.lib.core.R as RCore
 @AndroidEntryPoint
 class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
-    private lateinit var binding: FragmentThreadListBinding
+    private var binding: FragmentThreadListBinding by safeBinding()
     private val navigationArgs: ThreadListFragmentArgs by navArgs()
     private val mainViewModel: MainViewModel by activityViewModels()
     private val threadListViewModel: ThreadListViewModel by viewModels()
