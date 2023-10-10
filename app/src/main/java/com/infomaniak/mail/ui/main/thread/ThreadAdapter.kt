@@ -161,7 +161,11 @@ class ThreadAdapter(
         message.body?.let { body ->
             message.splitBody?.let { splitBody ->
                 if (binding.bodyWebView.isVisible) {
-                    loadBodyInWebView(message.uid, splitBody.content, body.type)
+                    loadBodyInWebView(
+                        uid = message.uid,
+                        body = splitBody.content + UiUtils.formatSubBodiesContent(body.subBodies),
+                        type = body.type,
+                    )
                 } else if (binding.fullMessageWebView.isVisible) {
                     loadQuoteInWebView(message.uid, splitBody.quote, body.type)
                 }

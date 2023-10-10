@@ -30,6 +30,7 @@ import androidx.core.graphics.toColorInt
 import androidx.core.view.isGone
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.Correspondent
+import com.infomaniak.mail.data.models.message.SubBody
 
 object UiUtils {
 
@@ -130,4 +131,15 @@ object UiUtils {
     }
 
     fun dividerDrawable(context: Context) = AppCompatResources.getDrawable(context, R.drawable.divider)
+
+    fun formatSubBodiesContent(subBodies: List<SubBody>): String {
+        var subBodiesContent = ""
+        subBodies.forEach { subBody ->
+            subBody.bodyValue?.let {
+                if (subBodiesContent.isNotEmpty()) subBodiesContent += "<br/>"
+                subBodiesContent += "<blockquote>${it}</blockquote>"
+            }
+        }
+        return subBodiesContent
+    }
 }
