@@ -150,6 +150,11 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".ui.sync.SyncAutoConfigActivity"
+            android:configChanges="orientation|screenSize"
+            android:windowSoftInputMode="adjustResize" />
+
         <receiver
             android:name=".receivers.RebootReceiver"
             android:exported="false">
