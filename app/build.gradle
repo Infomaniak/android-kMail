@@ -73,6 +73,8 @@ android {
         }
         fdroid { dimension 'distribution' }
     }
+
+    sourceSets { main { java { srcDirs += 'build/generated/source/navigation-args' } } }
 }
 
 dependencies {
