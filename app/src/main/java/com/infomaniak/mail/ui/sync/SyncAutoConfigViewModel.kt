@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.sync
 
+import android.accounts.AccountManager
 import android.app.Application
 import android.content.ComponentName
 import android.content.Intent
@@ -24,13 +25,12 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.ui.main.SnackBarManager
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -41,12 +41,22 @@ class SyncAutoConfigViewModel @Inject constructor(
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
+    val snackBarManager by lazy { SnackBarManager() }
+
     private var credentialsJob: Job? = null
 
     fun fetchCredentials(onSuccess: (Intent) -> Unit) {
 
         credentialsJob?.cancel()
         credentialsJob = viewModelScope.launch(ioCoroutineContext) {
+
+            val accountManager = AccountManager.get(context)
+            val accounts = accountManager.getAccountsByType(ACCOUNTS_TYPE)
+            val account = accounts.find { accountManager.getUserData(it, USER_NAME_KEY) == AccountUtils.currentUser?.login }
+            if (account != null) {
+                withContext(Dispatchers.Main) { snackBarManager.setValue("User is already synchronized") }
+                return@launch
+            }
 
             val apiResponse = ApiRepository.getCredentialsPassword()
             ensureActive()
@@ -56,13 +66,24 @@ class SyncAutoConfigViewModel @Inject constructor(
 
             if (infomaniakLogin?.isNotEmpty() == true && infomaniakPassword?.isNotEmpty() == true) {
                 Intent().apply {
-                    component = ComponentName("com.infomaniak.sync", "at.bitfire.davdroid.ui.setup.LoginActivity")
+                    component = ComponentName(SYNC_PACKAGE, SYNC_CLASS)
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    action = "syncAutoConfig"
-                    putExtra("login", infomaniakLogin)
-                    putExtra("password", infomaniakPassword)
+                    action = SYNC_ACTION
+                    putExtra(SYNC_LOGIN_KEY, infomaniakLogin)
+                    putExtra(SYNC_PASSWORD_KEY, infomaniakPassword)
                 }.also(onSuccess)
             }
         }
+    }
+
+    private companion object {
+        const val ACCOUNTS_TYPE = "infomaniak.com.sync"
+        const val USER_NAME_KEY = "user_name"
+
+        const val SYNC_PACKAGE = "com.infomaniak.sync"
+        const val SYNC_CLASS = "at.bitfire.davdroid.ui.setup.LoginActivity"
+        const val SYNC_ACTION = "syncAutoConfig"
+        const val SYNC_LOGIN_KEY = "login"
+        const val SYNC_PASSWORD_KEY = "password"
     }
 }
