@@ -45,10 +45,7 @@ class AttachMailboxFragment : Fragment() {
     private var binding: FragmentAttachMailboxBinding by safeBinding()
     private val accountViewModel: AccountViewModel by viewModels()
 
-    private val attachMailboxButtonProgressTimer by lazy {
-        Utils.createRefreshTimer(onTimerFinish = binding.attachMailboxButton::showProgress)
-    }
-
+    private val attachMailboxButtonProgressTimer by lazy { Utils.createRefreshTimer(onTimerFinish = ::startProgress) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentAttachMailboxBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -129,5 +126,11 @@ class AttachMailboxFragment : Fragment() {
             passwordInput.text = null
             attachMailboxButton.hideProgress(R.string.buttonAttachMailbox)
         }
+    }
+
+    // It is mandatory to encapsulate this call in a function otherwise the timer cancellation in `onDestroyView()`
+    // will produce an NPE, because the binding reference is `null` (this is because of safeBinding extension).
+    private fun startProgress() {
+        binding.attachMailboxButton.showProgress()
     }
 }

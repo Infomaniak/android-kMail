@@ -55,9 +55,7 @@ class LoginFragment : Fragment() {
 
     private val loginActivity by lazy { requireActivity() as LoginActivity }
 
-    private val connectButtonProgressTimer by lazy {
-        Utils.createRefreshTimer(onTimerFinish = binding.connectButton::showProgress)
-    }
+    private val connectButtonProgressTimer by lazy { Utils.createRefreshTimer(onTimerFinish = ::startProgress) }
 
     @Inject
     @IoDispatcher
@@ -193,5 +191,11 @@ class LoginFragment : Fragment() {
 
     private fun goBackAPage() {
         binding.introViewpager.currentItem -= 1
+    }
+
+    // It is mandatory to encapsulate this call in a function otherwise the timer cancellation in `onDestroyView()`
+    // will produce an NPE, because the binding reference is `null` (this is because of safeBinding extension).
+    private fun startProgress() {
+        binding.connectButton.showProgress()
     }
 }

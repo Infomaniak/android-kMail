@@ -71,9 +71,7 @@ class SearchFragment : Fragment() {
     @Inject
     lateinit var threadListAdapter: ThreadListAdapter
 
-    private val showLoadingTimer: CountDownTimer by lazy {
-        Utils.createRefreshTimer { binding.swipeRefreshLayout.isRefreshing = true }
-    }
+    private val showLoadingTimer: CountDownTimer by lazy { Utils.createRefreshTimer(onTimerFinish = ::showRefreshLayout) }
 
     private val recentSearchAdapter by lazy {
         RecentSearchAdapter(
@@ -341,6 +339,12 @@ class SearchFragment : Fragment() {
     private fun updateHistoryEmptyStateVisibility(isThereHistory: Boolean) = with(binding) {
         recentSearches.isVisible = isThereHistory
         noHistory.isGone = isThereHistory
+    }
+
+    // It is mandatory to encapsulate this call in a function otherwise the timer cancellation in `onDestroyView()`
+    // will produce an NPE, because the binding reference is `null` (this is because of safeBinding extension).
+    private fun showRefreshLayout() {
+        binding.swipeRefreshLayout.isRefreshing = true
     }
 
     enum class VisibilityMode {

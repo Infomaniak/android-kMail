@@ -309,11 +309,11 @@ object ApiRepository : ApiRepositoryCore() {
     }
 
     fun downloadAttachment(resource: String): Response {
-        val httpRequest = Request.Builder()
+        val request = Request.Builder()
             .url(ApiRoutes.resource(resource))
             .headers(HttpUtils.getHeaders(contentType = null))
             .build()
-        return HttpClient.okHttpClient.newBuilder().build().newCall(httpRequest).execute()
+        return HttpClient.okHttpClient.newBuilder().build().newCall(request).execute()
     }
 
     /**

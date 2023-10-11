@@ -43,9 +43,7 @@ class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
     private val restoreEmailViewModel: RestoreEmailsViewModel by viewModels()
 
     private val autoCompleteTextView by lazy { (binding.datePicker.editText as? MaterialAutoCompleteTextView)!! }
-    private val restoreEmailsButtonProgressTimer by lazy {
-        Utils.createRefreshTimer(onTimerFinish = binding.restoreMailsButton::showProgress)
-    }
+    private val restoreEmailsButtonProgressTimer by lazy { Utils.createRefreshTimer(onTimerFinish = ::startProgress) }
 
     private lateinit var formattedDates: Map<String, String>
 
@@ -110,5 +108,11 @@ class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
     private fun String.getUserFriendlyDate(): String {
         val backupDateFormat = FORMAT_DATE_WITH_TIMEZONE.dropLast(1)
         return SimpleDateFormat(backupDateFormat, Locale.getDefault()).parse(this)?.format(FORMAT_EVENT_DATE) ?: this
+    }
+
+    // It is mandatory to encapsulate this call in a function otherwise the timer cancellation in `onDestroyView()`
+    // will produce an NPE, because the binding reference is `null` (this is because of safeBinding extension).
+    private fun startProgress() {
+        binding.restoreMailsButton.showProgress()
     }
 }

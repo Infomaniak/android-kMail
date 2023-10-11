@@ -44,9 +44,7 @@ class InvalidPasswordFragment : Fragment() {
     private val navigationArgs: InvalidPasswordFragmentArgs by navArgs()
     private val invalidPasswordViewModel: InvalidPasswordViewModel by viewModels()
 
-    private val updatePasswordButtonProgressTimer by lazy {
-        Utils.createRefreshTimer(onTimerFinish = binding.confirmButton::showProgress)
-    }
+    private val updatePasswordButtonProgressTimer by lazy { Utils.createRefreshTimer(onTimerFinish = ::startProgress) }
 
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog
@@ -136,5 +134,11 @@ class InvalidPasswordFragment : Fragment() {
 
     private companion object {
         val PASSWORD_LENGTH_RANGE = 6..80
+    }
+
+    // It is mandatory to encapsulate this call in a function otherwise the timer cancellation in `onDestroyView()`
+    // will produce an NPE, because the binding reference is `null` (this is because of safeBinding extension).
+    private fun startProgress() {
+        binding.confirmButton.showProgress()
     }
 }
