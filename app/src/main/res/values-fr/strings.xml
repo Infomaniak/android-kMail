@@ -332,6 +332,7 @@
     <string name="onBoardingTitle3">Appuyez quelques secondes sur un message pour en sélectionner plusieurs</string>
     <string name="onBoardingTitle4">Lancez vous !</string>
     <string name="pendingMessagesFolder">Messages en attente</string>
+    <string name="pickerNoSelection">Aucune sélection</string>
     <string name="popupDetachMailboxDescription">Êtes-vous sûr de vouloir détacher l’adresse %s ?</string>
     <string name="popupDetachMailboxTitle">Détacher l’adresse</string>
     <string name="recentSearchesTitle">Recherches récentes</string>
@@ -341,6 +342,7 @@
     <string name="reportPhishingDescription">Si ce message tente de dérober des informations sensibles (mot de passe, données bancaires, etc.) et/ou s’il usurpe une identité reconnue, alors il s’agit d’hameçonnage.\n\nEn nous le signalant, vous accélérez la détection de messages dangereux pour l’ensemble de nos utilisateurs.\n\nLe signalement sera envoyé à notre équipe sécurité pour analyse afin de prendre les mesures nécessaires. L’e-mail sera également déplacé automatiquement dans vos spams.</string>
     <string name="reportPhishingTitle">Signaler une tentative d’hameçonnage</string>
     <string name="restoreEmailsBackupDate">Date de sauvegarde</string>
+    <string name="restoreEmailsNoBackup">Aucune sauvegarde trouvée</string>
     <string name="restoreEmailsText">Tous les e-mails reviendront dans votre boîte de réception.</string>
     <string name="restoreEmailsTitle">Restaurer vos e-mails</string>
     <string name="scheduledMessagesFolder">Messages programmés</string>

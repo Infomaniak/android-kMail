@@ -324,6 +324,7 @@
     <string name="onBoardingTitle3">Pulse un mensaje durante unos segundos para seleccionar varios mensajes</string>
     <string name="onBoardingTitle4">¡Póngase en marcha!</string>
     <string name="pendingMessagesFolder">Mensajes pendientes</string>
+    <string name="pickerNoSelection">Sin selección</string>
     <string name="popupDetachMailboxDescription">¿Estás seguro de que quieres separar la dirección %s?</string>
     <string name="popupDetachMailboxTitle">Separar dirección</string>
     <string name="recentSearchesTitle">Búsquedas recientes</string>
@@ -333,6 +334,7 @@
     <string name="reportPhishingDescription">Si este mensaje intenta robar información sensible (contraseña, datos bancarios, etc.) y/o suplanta una identidad reconocida, entonces se trata de phishing.\n\nInformándonos de ello, aceleras la detección de mensajes peligrosos para todos nuestros usuarios.\n\nEl informe se enviará a nuestro equipo de seguridad para que lo analice y actúe en consecuencia. Además, el mensaje se moverá automáticamente a la carpeta de spam.</string>
     <string name="reportPhishingTitle">Informar de un intento de phishing</string>
     <string name="restoreEmailsBackupDate">Fecha de respaldo</string>
+    <string name="restoreEmailsNoBackup">No se ha encontrado copia de seguridad</string>
     <string name="restoreEmailsText">Todos los correos electrónicos volverán a tu bandeja de entrada.</string>
     <string name="restoreEmailsTitle">Restaura tus correos electrónicos</string>
     <string name="scheduledMessagesFolder">Mensajes programados</string>

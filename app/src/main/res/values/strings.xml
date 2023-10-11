@@ -330,6 +330,7 @@
     <string name="onBoardingTitle3">Press a message for a few seconds to select multiple messages</string>
     <string name="onBoardingTitle4">Get started!</string>
     <string name="pendingMessagesFolder">Pending messages</string>
+    <string name="pickerNoSelection">No selection</string>
     <string name="popupDetachMailboxDescription">Are you sure you want to detach the %s address?</string>
     <string name="popupDetachMailboxTitle">Detach mailbox</string>
     <string name="recentSearchesTitle">Recent searches</string>
@@ -339,6 +340,7 @@
     <string name="reportPhishingDescription">If this message attempts to steal sensitive information (password, bank details, etc.) and/or impersonates a recognised identity then it is phishing.\n\nBy reporting it to us, you speed up the detection of dangerous messages for all our users.\n\nThe report will be sent to our security team for analysis and action. The email will also be automatically moved to your spam folder.</string>
     <string name="reportPhishingTitle">Report a phishing attempt</string>
     <string name="restoreEmailsBackupDate">Backup date</string>
+    <string name="restoreEmailsNoBackup">No backup found</string>
     <string name="restoreEmailsText">All emails will come back to your inbox.</string>
     <string name="restoreEmailsTitle">Restore your emails</string>
     <string name="scheduledMessagesFolder">Scheduled messages</string>

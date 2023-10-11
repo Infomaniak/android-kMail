@@ -21,7 +21,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -45,7 +44,7 @@ class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
     private val autoCompleteTextView by lazy { (binding.datePicker.editText as? MaterialAutoCompleteTextView)!! }
     private val restoreEmailsButtonProgressTimer by lazy { Utils.createRefreshTimer(onTimerFinish = ::startProgress) }
 
-    private lateinit var formattedDates: Map<String, String>
+    private var formattedDates: Map<String, String>? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetRestoreEmailsBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -53,13 +52,13 @@ class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
-        autoCompleteTextView.hasLoaded(false)
+        toggleLoadedState(false)
 
         observeBackups()
 
-        datePickerText.doOnTextChanged { text, _, _, _ ->
+        datePickerText.setOnItemClickListener { _, _, _, _ ->
             trackRestoreMailsEvent("selectDate", TrackerAction.INPUT)
-            restoreMailsButton.isEnabled = text?.isNotBlank() == true
+            restoreMailsButton.isEnabled = true
         }
 
         restoreMailsButton.setOnClickListener {
@@ -73,22 +72,33 @@ class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
         super.onDestroyView()
     }
 
-    private fun MaterialAutoCompleteTextView.hasLoaded(hasLoaded: Boolean) {
-        isEnabled = hasLoaded
-        isClickable = hasLoaded
-        if (hasLoaded) text = null else setText(R.string.loadingText)
+    private fun toggleLoadedState(hasLoaded: Boolean) {
+        binding.datePicker.isEnabled = hasLoaded
+
+        autoCompleteTextView.apply {
+            isEnabled = hasLoaded
+            isClickable = hasLoaded
+            if (hasLoaded) text = null else setText(R.string.loadingText)
+        }
     }
 
     private fun observeBackups() {
         restoreEmailViewModel.getBackups().observe(viewLifecycleOwner) { apiResponse ->
             if (apiResponse.isSuccess()) {
-                formattedDates = apiResponse.data!!.backups.associateBy { it.getUserFriendlyDate() }
-                autoCompleteTextView.apply {
-                    setSimpleItems(formattedDates.keys.toTypedArray())
-                    hasLoaded(true)
+                toggleLoadedState(true)
+
+                val backups = apiResponse.data!!.backups
+                if (backups.isEmpty()) {
+                    autoCompleteTextView.setText(R.string.restoreEmailsNoBackup)
+                } else {
+                    autoCompleteTextView.apply {
+                        setText(R.string.pickerNoSelection)
+                        formattedDates = backups.associateBy { it.getUserFriendlyDate() }
+                        setSimpleItems(formattedDates!!.keys.toTypedArray())
+                    }
                 }
             } else {
-                showSnackbar(title = apiResponse.translatedError)
+                showSnackbar(apiResponse.translatedError)
                 findNavController().popBackStack()
             }
         }
@@ -96,9 +106,10 @@ class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
 
     private fun restoreEmails() {
         trackRestoreMailsEvent("restore", TrackerAction.CLICK)
-        val date = autoCompleteTextView.text.toString()
 
-        restoreEmailViewModel.restoreEmails(formattedDates[date] ?: date).observe(viewLifecycleOwner) { apiResponse ->
+        val date = autoCompleteTextView.text.toString()
+        val formattedDate = formattedDates?.get(date) ?: date
+        restoreEmailViewModel.restoreEmails(formattedDate).observe(viewLifecycleOwner) { apiResponse ->
             binding.restoreMailsButton.hideProgress(R.string.buttonConfirmRestoreEmails)
             showSnackbar(if (apiResponse.isSuccess()) R.string.snackbarRestorationLaunched else apiResponse.translatedError)
             findNavController().popBackStack()
