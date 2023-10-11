@@ -43,9 +43,7 @@ class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
     private val restoreEmailViewModel: RestoreEmailsViewModel by viewModels()
 
     private val autoCompleteTextView by lazy { (binding.datePicker.editText as? MaterialAutoCompleteTextView)!! }
-    private val restoreEmailsButtonProgressTimer by lazy {
-        Utils.createRefreshTimer(onTimerFinish = binding.restoreMailsButton::showProgress)
-    }
+    private val restoreEmailsButtonProgressTimer by lazy { Utils.createRefreshTimer(onTimerFinish = ::startProgress) }
 
     private lateinit var formattedDates: Map<String, String>
 
@@ -110,5 +108,9 @@ class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
     private fun String.getUserFriendlyDate(): String {
         val backupDateFormat = FORMAT_DATE_WITH_TIMEZONE.dropLast(1)
         return SimpleDateFormat(backupDateFormat, Locale.getDefault()).parse(this)?.format(FORMAT_EVENT_DATE) ?: this
+    }
+
+    private fun startProgress() {
+        binding.restoreMailsButton.showProgress()
     }
 }
