@@ -29,9 +29,6 @@ object FlatteningSubBodiesSerializer : JsonTransformingSerializer<RealmList<SubB
 
     override fun transformDeserialize(element: JsonElement): JsonElement = element.jsonArray.flattenSubBodies()
 
-    // TODO: Implement this if we need to send `subBodies` back to the API.
-    override fun transformSerialize(element: JsonElement): JsonElement = super.transformSerialize(element)
-
     private fun List<JsonElement>.flattenSubBodies(): JsonElement {
 
         if (isEmpty()) return JsonArray(emptyList())

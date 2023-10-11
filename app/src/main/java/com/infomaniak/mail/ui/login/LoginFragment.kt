@@ -193,9 +193,9 @@ class LoginFragment : Fragment() {
         binding.introViewpager.currentItem -= 1
     }
 
+    // It is mandatory to encapsulate this call in a function otherwise the timer cancellation in `onDestroyView()`
+    // will produce an NPE, because the binding reference is `null` (this is because of safeBinding extension).
     private fun startProgress() {
-        // It is mandatory to encapsulate this call in a function otherwise the timer cancellation in onDestroyView will produce
-        // an NPE because the binding reference is null (this is because of safeBinding extension)
         binding.connectButton.showProgress()
     }
 }
