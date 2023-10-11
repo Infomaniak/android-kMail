@@ -109,9 +109,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     @Inject
     lateinit var playServicesUtils: PlayServicesUtils
 
-    private val showLoadingTimer: CountDownTimer by lazy {
-        Utils.createRefreshTimer { binding.swipeRefreshLayout.isRefreshing = true }
-    }
+    private val showLoadingTimer: CountDownTimer by lazy { Utils.createRefreshTimer(onTimerFinish = ::showRefreshLayout) }
 
     private var canRefreshThreads = false
 
@@ -201,6 +199,11 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         behindSwipedItemIconSecondaryDrawableId = localSettings.swipeRight.iconRes
 
         unlockSwipeActionsIfSet()
+    }
+
+    override fun onDestroyView() {
+        showLoadingTimer.cancel()
+        super.onDestroyView()
     }
 
     private fun unlockSwipeActionsIfSet() = with(binding.threadsList) {
@@ -643,6 +646,12 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun scrollToTop() = binding.threadsList.layoutManager?.scrollToPosition(0)
 
     private fun isCurrentFolderRole(role: FolderRole) = mainViewModel.currentFolder.value?.role == role
+
+    private fun showRefreshLayout() {
+        // It is mandatory to encapsulate this call in a function otherwise the timer cancellation in onDestroyView will produce
+        // an NPE because the binding reference is null (this is because of safeBinding extension)
+        binding.swipeRefreshLayout.isRefreshing = true
+    }
 
     private enum class EmptyState(
         @DrawableRes val drawableId: Int,
