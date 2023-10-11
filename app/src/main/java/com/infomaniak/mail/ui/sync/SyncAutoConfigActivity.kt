@@ -18,8 +18,10 @@
 package com.infomaniak.mail.ui.sync
 
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.viewModels
+import com.infomaniak.lib.core.utils.goToPlayStore
 import com.infomaniak.mail.databinding.ActivitySyncAutoConfigBinding
 import com.infomaniak.mail.ui.BaseActivity
 import com.infomaniak.mail.ui.main.settings.SettingsFragment
@@ -33,19 +35,40 @@ class SyncAutoConfigActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(binding.root)
-
         setupSnackBar()
+    }
 
-        binding.startFab.setOnClickListener { onFabClicked() }
+    override fun onResume() {
+        super.onResume()
+        updateButtonClickListeners()
     }
 
     private fun setupSnackBar() {
         syncAutoConfigViewModel.snackBarManager.setup(view = binding.root, activity = this)
     }
 
-    private fun onFabClicked() = with(syncAutoConfigViewModel) {
+    // TODO: Add all Matomo in SyncAutoConfig feature
+    private fun updateButtonClickListeners() = with(binding) {
+        if (isSyncAppInstalled()) {
+            installButton.isEnabled = false
+            startButton.isEnabled = true
+            startButton.setOnClickListener { onSyncAutoConfigClicked() }
+        } else {
+            startButton.isEnabled = false
+            installButton.isEnabled = true
+            installButton.setOnClickListener { goToPlayStore(SyncAutoConfigViewModel.SYNC_PACKAGE) }
+        }
+    }
+
+    private fun isSyncAppInstalled(): Boolean = runCatching {
+        packageManager.getPackageInfo(SyncAutoConfigViewModel.SYNC_PACKAGE, PackageManager.GET_ACTIVITIES)
+        true
+    }.getOrElse {
+        false
+    }
+
+    private fun onSyncAutoConfigClicked() = with(syncAutoConfigViewModel) {
         fetchCredentials { intent ->
             startActivity(intent)
             setResult(RESULT_OK, Intent().putExtra(SettingsFragment.SYNC_AUTO_CONFIG_SUCCESS_KEY, true))

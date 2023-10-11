@@ -135,6 +135,7 @@
     <string name="buttonHelp">Help</string>
     <string name="buttonHyperlink">Add a hyperlink</string>
     <string name="buttonImportEmails">Import emails</string>
+    <string name="buttonInstall">Install</string>
     <string name="buttonItalic">Italic</string>
     <string name="buttonLoadMore">Load more conversations</string>
     <string name="buttonLogInDifferentAccount">Log in with another account</string>

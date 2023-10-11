@@ -129,6 +129,7 @@
     <string name="buttonHelp">Hilfe</string>
     <string name="buttonHyperlink">Einen Hyperlink hinzufügen</string>
     <string name="buttonImportEmails">E-Mails importieren</string>
+    <string name="buttonInstall">Installieren</string>
     <string name="buttonItalic">Kursiv</string>
     <string name="buttonLoadMore">Mehr Unterhaltungen laden</string>
     <string name="buttonLogInDifferentAccount">Mit einem anderen Konto anmelden</string>

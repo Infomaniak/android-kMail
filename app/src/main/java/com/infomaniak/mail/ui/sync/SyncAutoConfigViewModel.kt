@@ -76,14 +76,14 @@ class SyncAutoConfigViewModel @Inject constructor(
         }
     }
 
-    private companion object {
-        const val ACCOUNTS_TYPE = "infomaniak.com.sync"
-        const val USER_NAME_KEY = "user_name"
+    companion object {
+        private const val ACCOUNTS_TYPE = "infomaniak.com.sync"
+        private const val USER_NAME_KEY = "user_name"
 
         const val SYNC_PACKAGE = "com.infomaniak.sync"
-        const val SYNC_CLASS = "at.bitfire.davdroid.ui.setup.LoginActivity"
-        const val SYNC_ACTION = "infomaniakSyncAutoConfig"
-        const val SYNC_LOGIN_KEY = "infomaniakLogin"
-        const val SYNC_PASSWORD_KEY = "infomaniakPassword"
+        private const val SYNC_CLASS = "at.bitfire.davdroid.ui.setup.LoginActivity"
+        private const val SYNC_ACTION = "infomaniakSyncAutoConfig"
+        private const val SYNC_LOGIN_KEY = "infomaniakLogin"
+        private const val SYNC_PASSWORD_KEY = "infomaniakPassword"
     }
 }
