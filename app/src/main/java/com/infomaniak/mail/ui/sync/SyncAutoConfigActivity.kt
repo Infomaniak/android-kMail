@@ -48,7 +48,7 @@ class SyncAutoConfigActivity : BaseActivity() {
     private fun onFabClicked() = with(syncAutoConfigViewModel) {
         fetchCredentials { intent ->
             startActivity(intent)
-            setResult(RESULT_OK, Intent().putExtra(SettingsFragment.SYNC_AUTO_CONFIG_KEY, true))
+            setResult(RESULT_OK, Intent().putExtra(SettingsFragment.SYNC_AUTO_CONFIG_SUCCESS_KEY, true))
             finish()
         }
     }
