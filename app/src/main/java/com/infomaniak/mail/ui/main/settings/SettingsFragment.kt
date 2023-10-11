@@ -53,7 +53,7 @@ class SettingsFragment : Fragment() {
     lateinit var localSettings: LocalSettings
 
     private val syncAutoConfigResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
-        val shouldPopBack = result.data?.getBooleanExtra(SYNC_AUTO_CONFIG_KEY, false) ?: false
+        val shouldPopBack = result.data?.getBooleanExtra(SYNC_AUTO_CONFIG_SUCCESS_KEY, false) ?: false
         if (shouldPopBack) findNavController().popBackStack()
     }
 
@@ -153,6 +153,6 @@ class SettingsFragment : Fragment() {
     }
 
     companion object {
-        const val SYNC_AUTO_CONFIG_KEY = "syncAutoConfig"
+        const val SYNC_AUTO_CONFIG_SUCCESS_KEY = "syncAutoConfigSuccessKey"
     }
 }
