@@ -36,13 +36,20 @@ class SyncAutoConfigActivity : BaseActivity() {
 
         setContentView(binding.root)
 
-        binding.startFab.setOnClickListener {
-            syncAutoConfigViewModel.fetchCredentials { intent ->
-                startActivity(intent)
+        setupSnackBar()
 
-                setResult(RESULT_OK, Intent().putExtra(SettingsFragment.SYNC_AUTO_CONFIG_KEY, true))
-                finish()
-            }
+        binding.startFab.setOnClickListener { onFabClicked() }
+    }
+
+    private fun setupSnackBar() {
+        syncAutoConfigViewModel.snackBarManager.setup(view = binding.root, activity = this)
+    }
+
+    private fun onFabClicked() = with(syncAutoConfigViewModel) {
+        fetchCredentials { intent ->
+            startActivity(intent)
+            setResult(RESULT_OK, Intent().putExtra(SettingsFragment.SYNC_AUTO_CONFIG_KEY, true))
+            finish()
         }
     }
 }
