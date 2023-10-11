@@ -131,6 +131,7 @@
     <string name="buttonHelp">Aide</string>
     <string name="buttonHyperlink">Ajouter un lien hypertexte</string>
     <string name="buttonImportEmails">Importer des e-mails</string>
+    <string name="buttonInstall">Installer</string>
     <string name="buttonItalic">Italique</string>
     <string name="buttonLoadMore">Charger plus de conversations</string>
     <string name="buttonLogInDifferentAccount">Me connecter avec un autre compte</string>

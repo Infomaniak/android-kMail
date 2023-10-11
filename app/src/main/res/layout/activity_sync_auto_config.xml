@@ -25,19 +25,29 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clipChildren="false"
-        android:orientation="vertical">
+        android:clipChildren="false">
 
-        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-            android:id="@+id/startFab"
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/installButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/marginStandard"
-            android:layout_marginBottom="@dimen/marginStandard"
+            android:enabled="false"
+            android:text="@string/buttonInstall"
+            app:layout_constraintBottom_toTopOf="@id/startButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/startButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:enabled="false"
             android:text="@string/buttonStart"
-            app:iconSize="@dimen/mediumIconSize"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/installButton" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
