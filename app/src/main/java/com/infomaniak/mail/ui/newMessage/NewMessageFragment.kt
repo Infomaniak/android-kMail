@@ -662,8 +662,13 @@ class NewMessageFragment : Fragment() {
             attachmentsRecyclerView.isGone = true
         }
 
-        draft.attachments[position].getUploadLocalFile(requireContext(), draft.localUuid).delete()
-        draft.attachments.removeAt(position)
+        runCatching {
+            draft.attachments[position].getUploadLocalFile(requireContext(), draft.localUuid).delete()
+            draft.attachments.removeAt(position)
+        }.onFailure { exception ->
+            SentryLog.e(TAG, " Attachment $position doesn't exist", exception)
+        }
+
         newMessageViewModel.saveDraftWithoutDebouncing()
     }
 
@@ -951,6 +956,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private companion object {
+        val TAG = NewMessageFragment::class.java.simpleName
         const val AI_PROMPT_FRAGMENT_TAG = "aiPromptFragmentTag"
     }
 }
