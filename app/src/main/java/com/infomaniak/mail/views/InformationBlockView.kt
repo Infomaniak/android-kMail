@@ -35,6 +35,8 @@ class InformationBlockView @JvmOverloads constructor(
 
     private val binding by lazy { ViewInformationBlockBinding.inflate(LayoutInflater.from(context), this, true) }
 
+    private var onCloseClicked: (() -> Unit)? = null
+
     var text: CharSequence?
         get() = binding.informationText.text
         set(value) {
@@ -51,7 +53,14 @@ class InformationBlockView @JvmOverloads constructor(
         attrs?.getAttributes(context, R.styleable.InformationBlockView) {
             text = getString(R.styleable.InformationBlockView_text)
             icon = getDrawable(R.styleable.InformationBlockView_icon)
-            binding.closeButton.isVisible = getBoolean(R.styleable.InformationBlockView_showCloseIcon, false)
+            binding.closeButton.apply {
+                isVisible = getBoolean(R.styleable.InformationBlockView_showCloseIcon, false)
+                setOnClickListener { onCloseClicked?.invoke() }
+            }
         }
+    }
+
+    fun setOnCloseListener(listener: () -> Unit) {
+        onCloseClicked = listener
     }
 }

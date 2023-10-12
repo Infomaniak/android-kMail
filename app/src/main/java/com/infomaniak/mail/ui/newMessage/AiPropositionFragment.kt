@@ -125,6 +125,10 @@ class AiPropositionFragment : Fragment() {
             aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(isOpened = true)
             findNavController().popBackStack()
         }
+
+        errorBlock.setOnCloseListener {
+            errorBlock.isGone = true
+        }
     }
 
     private fun setToolbar() = with(binding) {
