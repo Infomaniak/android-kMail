@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.sync
 
-import android.accounts.AccountManager
 import android.app.Application
 import android.content.ComponentName
 import android.content.Intent
@@ -42,10 +41,8 @@ class SyncAutoConfigViewModel @Inject constructor(
 ) : AndroidViewModel(application) {
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
-
-    val snackBarManager by lazy { SnackBarManager() }
-
     private var credentialsJob: Job? = null
+    val snackBarManager by lazy { SnackBarManager() }
 
     fun isSyncAppInstalled(): Boolean = runCatching {
         context.packageManager.getPackageInfo(SYNC_PACKAGE, PackageManager.GET_ACTIVITIES)
@@ -59,14 +56,6 @@ class SyncAutoConfigViewModel @Inject constructor(
 
         credentialsJob?.cancel()
         credentialsJob = viewModelScope.launch(ioCoroutineContext) {
-
-            val accountManager = AccountManager.get(context)
-            val accounts = accountManager.getAccountsByType(ACCOUNTS_TYPE)
-            val account = accounts.find { accountManager.getUserData(it, USER_NAME_KEY) == AccountUtils.currentUser?.login }
-            if (account != null) {
-                withContext(Dispatchers.Main) { snackBarManager.setValue(context.getString(R.string.errorUserAlreadySynchronized)) }
-                return@launch
-            }
 
             val apiResponse = ApiRepository.getCredentialsPassword()
             ensureActive()
@@ -92,9 +81,6 @@ class SyncAutoConfigViewModel @Inject constructor(
     }
 
     companion object {
-        private const val ACCOUNTS_TYPE = "infomaniak.com.sync"
-        private const val USER_NAME_KEY = "user_name"
-
         const val SYNC_PACKAGE = "com.infomaniak.sync"
         private const val SYNC_CLASS = "at.bitfire.davdroid.ui.setup.LoginActivity"
         private const val SYNC_ACTION = "infomaniakSyncAutoConfig"
