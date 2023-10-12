@@ -52,7 +52,7 @@ import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.firebase.RegisterFirebaseBroadcastReceiver
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
-import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity
+import com.infomaniak.mail.ui.newMessage.NewMessageActivity
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint

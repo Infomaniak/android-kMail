@@ -23,7 +23,7 @@
 
     <fragment
         android:id="@+id/newMessageFragment"
-        android:name="com.infomaniak.mail.ui.main.newMessage.NewMessageFragment"
+        android:name="com.infomaniak.mail.ui.newMessage.NewMessageFragment"
         android:label="NewMessageFragment"
         tools:layout="@layout/fragment_new_message">
         <action
@@ -36,7 +36,7 @@
 
     <fragment
         android:id="@+id/aiPropositionFragment"
-        android:name="com.infomaniak.mail.ui.main.newMessage.AiPropositionFragment"
+        android:name="com.infomaniak.mail.ui.newMessage.AiPropositionFragment"
         android:label="AiPropositionFragment"
         tools:layout="@layout/fragment_ai_proposition" />
 

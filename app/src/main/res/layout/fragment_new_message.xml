@@ -20,7 +20,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.main.newMessage.NewMessageFragment">
+    tools:context=".ui.newMessage.NewMessageFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/newMessageConstraintLayout"
@@ -129,7 +129,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <com.infomaniak.mail.ui.main.newMessage.RecipientFieldView
+                    <com.infomaniak.mail.ui.newMessage.RecipientFieldView
                         android:id="@+id/toField"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -154,7 +154,7 @@
                     android:visibility="gone"
                     tools:visibility="visible">
 
-                    <com.infomaniak.mail.ui.main.newMessage.RecipientFieldView
+                    <com.infomaniak.mail.ui.newMessage.RecipientFieldView
                         android:id="@+id/ccField"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -179,7 +179,7 @@
                     android:visibility="gone"
                     tools:visibility="visible">
 
-                    <com.infomaniak.mail.ui.main.newMessage.RecipientFieldView
+                    <com.infomaniak.mail.ui.newMessage.RecipientFieldView
                         android:id="@+id/bccField"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -610,7 +610,7 @@
                     app:layout_constraintTop_toTopOf="parent"
                     tools:visibility="visible" />
 
-                <com.infomaniak.mail.ui.main.newMessage.ToggleableTextFormatterItemView
+                <com.infomaniak.mail.ui.newMessage.ToggleableTextFormatterItemView
                     android:id="@+id/editorBold"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
@@ -621,7 +621,7 @@
                     app:layout_constraintStart_toEndOf="@+id/editorAi"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <com.infomaniak.mail.ui.main.newMessage.ToggleableTextFormatterItemView
+                <com.infomaniak.mail.ui.newMessage.ToggleableTextFormatterItemView
                     android:id="@+id/editorItalic"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
@@ -632,7 +632,7 @@
                     app:layout_constraintStart_toEndOf="@+id/editorBold"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <com.infomaniak.mail.ui.main.newMessage.ToggleableTextFormatterItemView
+                <com.infomaniak.mail.ui.newMessage.ToggleableTextFormatterItemView
                     android:id="@+id/editorUnderline"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
@@ -643,7 +643,7 @@
                     app:layout_constraintStart_toEndOf="@+id/editorItalic"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <com.infomaniak.mail.ui.main.newMessage.ToggleableTextFormatterItemView
+                <com.infomaniak.mail.ui.newMessage.ToggleableTextFormatterItemView
                     android:id="@+id/editorStrikeThrough"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
@@ -720,7 +720,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:translationZ="@dimen/newMessageBottomBarElevation"
-            tools:name="com.infomaniak.mail.ui.main.newMessage.AiPromptFragment" />
+            tools:name="com.infomaniak.mail.ui.newMessage.AiPromptFragment" />
 
     </FrameLayout>
 </FrameLayout>

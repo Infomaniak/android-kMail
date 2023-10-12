@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.newMessage
+package com.infomaniak.mail.ui.newMessage
 
 import android.os.Bundle
 import android.transition.AutoTransition
@@ -40,8 +40,8 @@ import com.infomaniak.mail.data.LocalSettings.AiReplacementDialogVisibility
 import com.infomaniak.mail.data.models.ai.AiPromptOpeningStatus
 import com.infomaniak.mail.databinding.DialogAiReplaceContentBinding
 import com.infomaniak.mail.databinding.FragmentAiPropositionBinding
-import com.infomaniak.mail.ui.main.newMessage.AiViewModel.PropositionStatus
-import com.infomaniak.mail.ui.main.newMessage.AiViewModel.Shortcut
+import com.infomaniak.mail.ui.newMessage.AiViewModel.PropositionStatus
+import com.infomaniak.mail.ui.newMessage.AiViewModel.Shortcut
 import com.infomaniak.mail.utils.SimpleIconPopupMenu
 import com.infomaniak.mail.utils.changeToolbarColorOnScroll
 import com.infomaniak.mail.utils.postfixWithTag

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.newMessage
+package com.infomaniak.mail.ui.newMessage
 
 import android.app.Application
 import android.content.ClipDescription
@@ -51,9 +51,10 @@ import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.main.SnackBarManager
-import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.EditorAction
-import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType
-import com.infomaniak.mail.ui.main.newMessage.NewMessageViewModel.SignatureScore.*
+import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
+import com.infomaniak.mail.ui.newMessage.NewMessageFragment.EditorAction
+import com.infomaniak.mail.ui.newMessage.NewMessageFragment.FieldType
+import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.SignatureScore.*
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
 import dagger.hilt.android.lifecycle.HiltViewModel

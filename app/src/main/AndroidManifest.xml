@@ -127,7 +127,7 @@
             android:windowSoftInputMode="adjustResize" />
 
         <activity
-            android:name=".ui.main.newMessage.NewMessageActivity"
+            android:name=".ui.newMessage.NewMessageActivity"
             android:configChanges="orientation|screenSize"
             android:exported="true"
             android:windowSoftInputMode="adjustResize">

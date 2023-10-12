@@ -28,8 +28,8 @@ import com.infomaniak.mail.MatomoMail.trackContactActionsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetDetailedContactBinding
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.ui.main.thread.actions.ActionsBottomSheetDialog
+import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.copyRecipientEmailToClipboard
 import com.infomaniak.mail.utils.observeNotNull
 import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity

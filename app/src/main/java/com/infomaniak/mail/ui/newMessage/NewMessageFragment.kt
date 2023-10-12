@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.newMessage
+package com.infomaniak.mail.ui.newMessage
 
 import android.animation.FloatEvaluator
 import android.animation.ValueAnimator
@@ -73,9 +73,9 @@ import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
-import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.*
-import com.infomaniak.mail.ui.main.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
+import com.infomaniak.mail.ui.newMessage.NewMessageFragment.FieldType.*
+import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipient
 import com.infomaniak.mail.utils.Utils

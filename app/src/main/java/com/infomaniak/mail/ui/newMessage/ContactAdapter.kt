@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.newMessage
+package com.infomaniak.mail.ui.newMessage
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
@@ -27,8 +27,8 @@ import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.databinding.ItemContactBinding
-import com.infomaniak.mail.ui.main.newMessage.ContactAdapter.ContactType.*
-import com.infomaniak.mail.ui.main.newMessage.ContactAdapter.ContactViewHolder
+import com.infomaniak.mail.ui.newMessage.ContactAdapter.ContactType.*
+import com.infomaniak.mail.ui.newMessage.ContactAdapter.ContactViewHolder
 import com.infomaniak.mail.utils.standardize
 
 @SuppressLint("NotifyDataSetChanged")

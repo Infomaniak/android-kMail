@@ -15,14 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.newMessage
+package com.infomaniak.mail.ui.newMessage
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ChipContactBinding
-import com.infomaniak.mail.ui.main.newMessage.RecipientFieldView.Companion.setChipStyle
+import com.infomaniak.mail.ui.newMessage.RecipientFieldView.Companion.setChipStyle
 
 class ContactChipAdapter(
     val openContextMenu: (Recipient, BackspaceAwareChip) -> Unit,
