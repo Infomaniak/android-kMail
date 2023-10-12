@@ -123,6 +123,11 @@ class SearchFragment : Fragment() {
         super.onStop()
     }
 
+    override fun onDestroyView() {
+        showLoadingTimer.cancel()
+        super.onDestroyView()
+    }
+
     private fun setupThreadListAdapter() {
         threadListAdapter(
             folderRole = null,
