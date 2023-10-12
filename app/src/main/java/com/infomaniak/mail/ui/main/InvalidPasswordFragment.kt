@@ -105,6 +105,7 @@ class InvalidPasswordFragment : Fragment() {
         invalidPasswordViewModel.updatePasswordResult.observe(viewLifecycleOwner) { error ->
             passwordInputLayout.error = getString(error)
             passwordInput.text = null
+            updatePasswordButtonProgressTimer.cancel()
             confirmButton.hideProgress(R.string.buttonConfirm)
         }
 

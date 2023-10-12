@@ -124,6 +124,7 @@ class AttachMailboxFragment : Fragment() {
             }
 
             passwordInput.text = null
+            attachMailboxButtonProgressTimer.cancel()
             attachMailboxButton.hideProgress(R.string.buttonAttachMailbox)
         }
     }

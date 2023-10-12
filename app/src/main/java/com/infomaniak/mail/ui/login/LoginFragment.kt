@@ -179,6 +179,7 @@ class LoginFragment : Fragment() {
     }
 
     private fun resetLoginButtons() = with(binding) {
+        connectButtonProgressTimer.cancel()
         connectButton.hideProgress(R.string.connect)
         signInButton.isEnabled = true
     }
