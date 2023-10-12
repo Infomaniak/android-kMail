@@ -127,6 +127,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         super.onViewCreated(view, savedInstanceState)
 
         threadListViewModel.deleteSearchData()
+        descriptionDialog.bindAlertToLifecycle(viewLifecycleOwner)
+
         setupDensityDependentUi()
         setupOnRefresh()
         setupAdapter()

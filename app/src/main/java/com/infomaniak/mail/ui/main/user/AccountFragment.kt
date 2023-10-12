@@ -115,6 +115,8 @@ class AccountFragment : Fragment(), MailboxListFragment {
             isFocusable = false
         }
 
+        descriptionDialog.bindAlertToLifecycle(viewLifecycleOwner)
+
         observeAccountsLive()
     }
 

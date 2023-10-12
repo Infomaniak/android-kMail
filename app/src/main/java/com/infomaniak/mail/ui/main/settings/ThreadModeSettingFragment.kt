@@ -75,5 +75,7 @@ class ThreadModeSettingFragment : Fragment() {
                 onDismiss = { check(localSettings.threadMode) },
             )
         }
+
+        descriptionDialog.bindAlertToLifecycle(viewLifecycleOwner)
     }
 }
