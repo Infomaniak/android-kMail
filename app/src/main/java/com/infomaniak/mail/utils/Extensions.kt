@@ -20,8 +20,11 @@ package com.infomaniak.mail.utils
 import android.animation.Animator
 import android.animation.ValueAnimator
 import android.app.Activity
-import android.content.*
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.DialogInterface.OnDismissListener
+import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -65,7 +68,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.data.models.Folder.*
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
@@ -99,7 +102,6 @@ import io.realm.kotlin.ext.query
 import io.realm.kotlin.query.Sort
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmObject
-import kotlinx.coroutines.*
 import kotlinx.serialization.encodeToString
 import org.jsoup.Jsoup
 import java.util.Calendar

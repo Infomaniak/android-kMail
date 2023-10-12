@@ -24,7 +24,7 @@
     <fragment
         android:id="@+id/newMessageFragment"
         android:name="com.infomaniak.mail.ui.main.newMessage.NewMessageFragment"
-        android:label="FragmentNewMessage"
+        android:label="NewMessageFragment"
         tools:layout="@layout/fragment_new_message">
         <action
             android:id="@+id/action_newMessageFragment_to_aiPropositionFragment"

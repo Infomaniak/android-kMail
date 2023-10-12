@@ -60,7 +60,7 @@ import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
-import com.infomaniak.mail.ui.main.thread.ThreadViewModel.*
+import com.infomaniak.mail.ui.main.thread.ThreadViewModel.OpenThreadResult
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialog
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipients

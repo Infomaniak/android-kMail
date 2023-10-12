@@ -521,7 +521,7 @@
     <activity
         android:id="@+id/loginActivity"
         android:name="com.infomaniak.mail.ui.login.LoginActivity"
-        android:label="activity_login"
+        android:label="LoginActivity"
         tools:layout="@layout/activity_login">
         <argument
             android:name="isFirstAccount"
@@ -532,7 +532,7 @@
     <fragment
         android:id="@+id/introFragment"
         android:name="com.infomaniak.mail.ui.login.IntroFragment"
-        android:label="fragment_intro"
+        android:label="IntroFragment"
         tools:layout="@layout/fragment_intro">
         <argument
             android:name="isFirstAccount"
@@ -577,7 +577,7 @@
     <dialog
         android:id="@+id/restoreEmailsBottomSheetDialog"
         android:name="com.infomaniak.mail.ui.main.menu.RestoreEmailsBottomSheetDialog"
-        android:label="ResoreEmailsBottomSheetDialog"
+        android:label="RestoreEmailsBottomSheetDialog"
         tools:layout="@layout/bottom_sheet_restore_emails" />
 
     <dialog
