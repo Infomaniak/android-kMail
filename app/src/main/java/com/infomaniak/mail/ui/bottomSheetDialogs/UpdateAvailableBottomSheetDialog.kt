@@ -21,7 +21,7 @@ import android.os.Bundle
 import android.view.View
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.getAppName
-import com.infomaniak.lib.core.utils.goToPlaystore
+import com.infomaniak.lib.core.utils.goToPlayStore
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import dagger.hilt.android.AndroidEntryPoint
@@ -45,7 +45,7 @@ class UpdateAvailableBottomSheetDialog : InformationBottomSheetDialog() {
             setText(RCore.string.buttonUpdate)
             setOnClickListener {
                 localSettings.updateLater = false
-                requireContext().goToPlaystore()
+                requireContext().goToPlayStore()
                 dismiss()
             }
         }
