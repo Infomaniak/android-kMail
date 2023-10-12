@@ -68,6 +68,8 @@ class InvalidPasswordFragment : Fragment() {
             }
         }
 
+        descriptionDialog.bindAlertToLifecycle(viewLifecycleOwner)
+
         observeResults()
         setupListeners()
     }
