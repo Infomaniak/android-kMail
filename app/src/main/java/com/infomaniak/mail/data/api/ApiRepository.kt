@@ -46,7 +46,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.data.models.signature.SignaturesResult
 import com.infomaniak.mail.data.models.thread.ThreadResult
-import com.infomaniak.mail.ui.main.newMessage.AiViewModel.Shortcut
+import com.infomaniak.mail.ui.newMessage.AiViewModel.Shortcut
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient

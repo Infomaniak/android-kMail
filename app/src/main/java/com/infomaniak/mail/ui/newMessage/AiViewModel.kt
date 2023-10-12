@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.newMessage
+package com.infomaniak.mail.ui.newMessage
 
 import androidx.annotation.IdRes
 import androidx.annotation.StringRes
@@ -31,7 +31,7 @@ import com.infomaniak.mail.data.cache.userInfo.FeatureFlagController
 import com.infomaniak.mail.data.models.FeatureFlag.FeatureFlagType
 import com.infomaniak.mail.data.models.ai.*
 import com.infomaniak.mail.di.IoDispatcher
-import com.infomaniak.mail.ui.main.newMessage.AiViewModel.PropositionStatus.*
+import com.infomaniak.mail.ui.newMessage.AiViewModel.PropositionStatus.*
 import com.infomaniak.mail.utils.ErrorCode
 import com.infomaniak.mail.utils.ErrorCode.MAX_SYNTAX_TOKENS_REACHED
 import com.infomaniak.mail.utils.ErrorCode.TOO_MANY_REQUESTS

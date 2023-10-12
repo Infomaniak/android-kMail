@@ -73,7 +73,7 @@
 
     <activity
         android:id="@+id/newMessageActivity"
-        android:name="com.infomaniak.mail.ui.main.newMessage.NewMessageActivity"
+        android:name="com.infomaniak.mail.ui.newMessage.NewMessageActivity"
         android:label="NewMessageActivity"
         tools:layout="@layout/activity_new_message">
 

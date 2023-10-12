@@ -25,7 +25,7 @@ import androidx.fragment.app.activityViewModels
 import com.infomaniak.mail.MatomoMail.trackAiWriterEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.ai.AiPromptOpeningStatus
-import com.infomaniak.mail.ui.main.newMessage.AiViewModel
+import com.infomaniak.mail.ui.newMessage.AiViewModel
 
 class AiDiscoveryBottomSheetDialog : InformationBottomSheetDialog() {
 
