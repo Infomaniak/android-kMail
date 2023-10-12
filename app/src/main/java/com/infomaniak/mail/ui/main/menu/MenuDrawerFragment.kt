@@ -43,22 +43,17 @@ import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
-import com.infomaniak.mail.ui.alertDialogs.InputAlertDialog
 import com.infomaniak.mail.ui.main.MailboxListFragment
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
 
     private var binding: FragmentMenuDrawerBinding by safeBinding()
     private val menuDrawerViewModel: MenuDrawerViewModel by viewModels()
-
-    @Inject
-    lateinit var inputDialog: InputAlertDialog
 
     var exitDrawer: (() -> Unit)? = null
 
@@ -94,11 +89,6 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
         observeQuotasLive()
         observePermissionsLive()
         observeNewFolderCreation()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        inputDialog.resetCallbacks()
     }
 
     private fun setupListeners() = with(binding) {

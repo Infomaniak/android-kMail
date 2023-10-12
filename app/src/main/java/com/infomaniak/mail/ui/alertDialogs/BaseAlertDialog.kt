@@ -21,6 +21,9 @@ import android.content.Context
 import android.content.DialogInterface
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
 import androidx.viewbinding.ViewBinding
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.lib.core.utils.Utils
@@ -30,7 +33,7 @@ import com.infomaniak.lib.core.utils.showProgress
 import com.infomaniak.mail.R
 import dagger.hilt.android.qualifiers.ActivityContext
 
-abstract class BaseAlertDialog(@ActivityContext private val activityContext: Context) {
+abstract class BaseAlertDialog(@ActivityContext private val activityContext: Context) : DefaultLifecycleObserver {
 
     protected val activity = activityContext as AppCompatActivity
 
@@ -38,10 +41,12 @@ abstract class BaseAlertDialog(@ActivityContext private val activityContext: Con
     protected abstract val alertDialog: AlertDialog
 
     private var isProgressInitialized = false
+    private var fragmentLifecycle: Lifecycle? = null
+
 
     protected abstract fun initDialog(): AlertDialog
 
-    abstract fun resetCallbacks()
+    protected abstract fun resetCallbacks()
 
     fun startLoading() {
         alertDialog.setCancelable(false)
@@ -58,6 +63,19 @@ abstract class BaseAlertDialog(@ActivityContext private val activityContext: Con
         }
     }
 
+    /**
+     * This method needs to be called to avoid memory leaks for any use of callback
+     *
+     * This object is activity scoped but the callback are given by fragments, hence the need to clear them at the end of the
+     * fragments' viewLifecycle
+     *
+     * @param viewLifecycleOwner The viewLifecycle of the Fragment
+     */
+    fun bindAlertToLifecycle(viewLifecycleOwner: LifecycleOwner) {
+        fragmentLifecycle = viewLifecycleOwner.lifecycle
+        fragmentLifecycle?.addObserver(this)
+    }
+
     protected fun initProgress() = with(alertDialog) {
         // We need the dialog to be shown to access the positive button
         // But as the component is activity scoped, we only want to bind the progress the first time it is shown
@@ -69,4 +87,10 @@ abstract class BaseAlertDialog(@ActivityContext private val activityContext: Con
 
     protected inline val positiveButton get() = (alertDialog.getButton(DialogInterface.BUTTON_POSITIVE) as MaterialButton)
     protected inline val negativeButton get() = (alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE) as MaterialButton)
+
+    override fun onDestroy(owner: LifecycleOwner) {
+        super.onDestroy(owner)
+        resetCallbacks()
+        fragmentLifecycle?.removeObserver(this)
+    }
 }

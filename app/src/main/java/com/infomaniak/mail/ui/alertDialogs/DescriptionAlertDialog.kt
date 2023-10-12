@@ -20,9 +20,6 @@ package com.infomaniak.mail.ui.alertDialogs
 import android.content.Context
 import androidx.annotation.StringRes
 import androidx.core.view.isVisible
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.R
@@ -35,7 +32,7 @@ import com.infomaniak.lib.core.R as RCore
 @ActivityScoped
 open class DescriptionAlertDialog @Inject constructor(
     @ActivityContext private val activityContext: Context,
-) : BaseAlertDialog(activityContext), DefaultLifecycleObserver {
+) : BaseAlertDialog(activityContext) {
 
     override val binding: DialogDescriptionBinding by lazy { DialogDescriptionBinding.inflate(activity.layoutInflater) }
 
@@ -44,33 +41,12 @@ open class DescriptionAlertDialog @Inject constructor(
     private var onPositiveButtonClicked: (() -> Unit)? = null
     private var onDismissed: (() -> Unit)? = null
 
-    private var lifecycle: Lifecycle? = null
-
     final override fun initDialog() = with(binding) {
         MaterialAlertDialogBuilder(context)
             .setView(root)
             .setPositiveButton(R.string.buttonConfirm, null)
             .setNegativeButton(RCore.string.buttonCancel, null)
             .create()
-    }
-
-    /**
-     * This method needs to be called to avoid memory leaks for any use of callback
-     *
-     * This object is activity scoped but the callback are given by fragments, hence the need to clear them at the end of the
-     * fragments' viewLifecycle
-     *
-     * @param viewLifecycleOwner The viewLifecycle of the Fragment
-     */
-    fun bindAlertToLifecycle(viewLifecycleOwner: LifecycleOwner) {
-        lifecycle = viewLifecycleOwner.lifecycle
-        lifecycle?.addObserver(this)
-    }
-
-    override fun onDestroy(owner: LifecycleOwner) {
-        super.onDestroy(owner)
-        resetCallbacks()
-        lifecycle?.removeObserver(this)
     }
 
     final override fun resetCallbacks() {
