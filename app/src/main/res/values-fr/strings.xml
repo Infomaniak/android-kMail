@@ -228,6 +228,7 @@
     <string name="errorDraftNotFound">Brouillon introuvable</string>
     <string name="errorEditScheduledMessage">Impossible de modifier un message planifié ou envoyé</string>
     <string name="errorFolderDoesNotExist">Le dossier n’existe pas</string>
+    <string name="errorGetCredentials">Impossible d’obtenir les informations d’identification</string>
     <string name="errorInvalidAttachment">Pièce jointe non valide</string>
     <string name="errorInvalidCredentials">E-mail ou mot de passe invalide</string>
     <string name="errorInvalidEmailAddress">Adresse mail invalide</string>
@@ -247,6 +248,7 @@
     <string name="errorTooManyRecipients">Trop de destinataires</string>
     <string name="errorUnableToCreateFolder">Impossible de créer le dossier</string>
     <string name="errorUnableToFlushFolder">Impossible de vider le dossier</string>
+    <string name="errorUserAlreadySynchronized">L’utilisateur est déjà synchronisé</string>
     <string name="externalDialogConfirmButton">J’ai compris</string>
     <plurals name="externalDialogDescriptionExpeditor">
         <item quantity="one">L’expéditeur %s ne fait pas partie de votre organisation ni de vos contacts. Soyez vigilant si vous partagez des informations sensibles.</item>

@@ -232,6 +232,7 @@
     <string name="errorDraftNotFound">Draft cannot be found</string>
     <string name="errorEditScheduledMessage">Scheduled or sent messages cannot be edited</string>
     <string name="errorFolderDoesNotExist">The folder does not exist</string>
+    <string name="errorGetCredentials">Couldn’t get credentials</string>
     <string name="errorInvalidAttachment">Invalid attachment</string>
     <string name="errorInvalidCredentials">Invalid email or password</string>
     <string name="errorInvalidEmailAddress">Invalid mail address</string>
@@ -251,6 +252,7 @@
     <string name="errorTooManyRecipients">Too many recipients</string>
     <string name="errorUnableToCreateFolder">Unable to create the folder</string>
     <string name="errorUnableToFlushFolder">Folder cannot be emptied</string>
+    <string name="errorUserAlreadySynchronized">User is already synchronized</string>
     <string name="externalDialogConfirmButton">I understand</string>
     <plurals name="externalDialogDescriptionExpeditor">
         <item quantity="one">The sender %s is not part of your organization or your contacts. Be careful if you are sharing sensitive information.</item>
