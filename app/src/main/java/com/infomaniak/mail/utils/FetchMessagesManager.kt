@@ -19,6 +19,7 @@ package com.infomaniak.mail.utils
 
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
+import com.infomaniak.html.cleaner.HtmlSanitizer
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.RealmDatabase
@@ -185,7 +186,12 @@ class FetchMessagesManager @Inject constructor(
             ""
         } else {
             message.body
-                ?.let { "\n${MessageBodyUtils.splitContentAndQuote(it).content.htmlToText().trim()}" }
+                ?.let {
+                    val content = MessageBodyUtils.splitContentAndQuote(it).content
+                    val dirtyDocument = content.removeLineBreaksFromHtml()
+                    val cleanedDocument = HtmlSanitizer.getInstance().sanitize(dirtyDocument)
+                    return@let "\n${cleanedDocument.wholeText().trim()}"
+                }
                 ?: message.preview.ifBlank { null }?.let { "\n${it.trim()}" }
                 ?: ""
         }

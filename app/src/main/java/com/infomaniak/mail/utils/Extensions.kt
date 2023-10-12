@@ -104,6 +104,7 @@ import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmObject
 import kotlinx.serialization.encodeToString
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import java.util.Calendar
 import java.util.Date
 import java.util.Scanner
@@ -118,7 +119,9 @@ fun Activity.notYetImplemented(anchor: View? = null) = showSnackbar(getString(R.
 
 fun String.isEmail(): Boolean = Patterns.EMAIL_ADDRESS.matcher(this).matches()
 
-fun String.htmlToText(): String = Jsoup.parse(replace("\r", "").replace("\n", "")).wholeText()
+fun String.removeLineBreaksFromHtml(): Document = Jsoup.parse(replace("\r", "").replace("\n", ""))
+
+fun String.htmlToText(): String = removeLineBreaksFromHtml().wholeText()
 
 fun String.textToHtml(): String = replace("\n", "<br>")
 
