@@ -26,8 +26,7 @@
         android:layout_height="match_parent"
         android:layout_marginStart="@dimen/decoratedItemConstraintMarginStart"
         android:layout_marginEnd="@dimen/marginStandardMedium"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:gravity="center_vertical">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/collapseCustomFolderButton"

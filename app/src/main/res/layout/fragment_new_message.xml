@@ -26,8 +26,7 @@
         android:id="@+id/newMessageConstraintLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/newMessageBackgroundColor"
-        android:orientation="vertical">
+        android:background="@color/newMessageBackgroundColor">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
@@ -517,8 +516,7 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:layout_height="wrap_content">
 
                 <com.google.android.material.divider.MaterialDivider
                     android:layout_width="match_parent"
