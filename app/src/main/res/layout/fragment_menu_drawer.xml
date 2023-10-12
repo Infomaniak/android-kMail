@@ -216,6 +216,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:icon="@drawable/ic_synchronize"
+                    app:maxLines="2"
                     app:text="@string/buttonSyncCalendarsAndContacts" />
 
                 <com.infomaniak.mail.views.itemViews.SimpleMenuDrawerItemView

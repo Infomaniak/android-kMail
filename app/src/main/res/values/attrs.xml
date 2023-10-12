@@ -32,6 +32,7 @@
             <enum name="menuDrawer" value="0" />
             <enum name="other" value="1" />
         </attr>
+        <attr name="maxLines" format="integer" />
         <attr name="text" />
         <attr name="textWeight" format="enum">
             <enum name="regular" value="0" />
