@@ -139,7 +139,7 @@ class ThreadFragment : Fragment() {
         permissionUtils.registerDownloadManagerPermission()
         mainViewModel.toggleLightThemeForMessage.observe(viewLifecycleOwner, threadAdapter::toggleLightMode)
 
-        descriptionDialog.bindAlertToLifecycle(viewLifecycleOwner)
+        bindAlertToViewLifecycle(descriptionDialog)
     }
 
     private fun observeSubjectUpdateTriggers() {

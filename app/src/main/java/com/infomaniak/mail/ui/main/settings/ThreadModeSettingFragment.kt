@@ -32,6 +32,7 @@ import com.infomaniak.mail.data.LocalSettings.ThreadMode.CONVERSATION
 import com.infomaniak.mail.data.LocalSettings.ThreadMode.MESSAGE
 import com.infomaniak.mail.databinding.FragmentThreadModeSettingBinding
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
+import com.infomaniak.mail.utils.bindAlertToViewLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -76,6 +77,6 @@ class ThreadModeSettingFragment : Fragment() {
             )
         }
 
-        descriptionDialog.bindAlertToLifecycle(viewLifecycleOwner)
+        bindAlertToViewLifecycle(descriptionDialog)
     }
 }
