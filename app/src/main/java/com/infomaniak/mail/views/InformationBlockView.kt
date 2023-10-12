@@ -22,6 +22,7 @@ import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
+import androidx.annotation.StringRes
 import androidx.core.view.isVisible
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.mail.R
@@ -62,5 +63,9 @@ class InformationBlockView @JvmOverloads constructor(
 
     fun setOnCloseListener(listener: () -> Unit) {
         onCloseClicked = listener
+    }
+
+    fun setText(@StringRes textRes: Int) {
+        text = context.getText(textRes)
     }
 }

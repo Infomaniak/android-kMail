@@ -246,7 +246,7 @@ class AiPropositionFragment : Fragment() {
     }
 
     private fun displayError(status: PropositionStatus) {
-        binding.errorMessage.setText(status.errorRes!!)
+        binding.errorBlock.setText(status.errorRes!!)
         setUiVisibilityState(UiState.ERROR, status)
     }
 
@@ -265,7 +265,7 @@ class AiPropositionFragment : Fragment() {
         propositionTextView.isGone = true
         buttonLayout.isInvisible = true
 
-        errorMessage.isGone = true
+        errorBlock.isGone = true
         retryButton.isGone = true
     }
 
@@ -276,7 +276,7 @@ class AiPropositionFragment : Fragment() {
         propositionTextView.isVisible = true
         buttonLayout.isVisible = true
 
-        errorMessage.isGone = true
+        errorBlock.isGone = true
         retryButton.isGone = true
 
         insertPropositionButton.isEnabled = true
@@ -308,7 +308,7 @@ class AiPropositionFragment : Fragment() {
 
         propositionTextView.isGone = true
 
-        errorMessage.isVisible = true
+        errorBlock.isVisible = true
     }
 
     enum class UiState {
