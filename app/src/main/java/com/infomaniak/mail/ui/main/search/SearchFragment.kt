@@ -123,6 +123,11 @@ class SearchFragment : Fragment() {
         super.onStop()
     }
 
+    override fun onDestroyView() {
+        showLoadingTimer.cancel()
+        super.onDestroyView()
+    }
+
     private fun setupThreadListAdapter() {
         threadListAdapter(
             folderRole = null,
@@ -341,8 +346,6 @@ class SearchFragment : Fragment() {
         noHistory.isGone = isThereHistory
     }
 
-    // It is mandatory to encapsulate this call in a function otherwise the timer cancellation in `onDestroyView()`
-    // will produce an NPE, because the binding reference is `null` (this is because of safeBinding extension).
     private fun showRefreshLayout() {
         binding.swipeRefreshLayout.isRefreshing = true
     }
