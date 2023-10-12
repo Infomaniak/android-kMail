@@ -52,6 +52,7 @@
             android:drawablePadding="@dimen/marginStandardMedium"
             android:ellipsize="end"
             android:gravity="start|center_vertical"
+            android:maxLines="1"
             app:drawableStartCompat="@drawable/ic_folder"
             app:drawableTint="?android:attr/colorPrimary"
             app:layout_constraintEnd_toStartOf="@id/endIconLayout"
