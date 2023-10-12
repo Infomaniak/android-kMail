@@ -105,6 +105,10 @@ class AiViewModel @Inject constructor(
         sharedUtils.updateAiFeatureFlag()
     }
 
+    fun isHistoryEmpty(): Boolean = history.isEmpty()
+
+    fun getLastMessage(): String = history.last().content
+
     enum class Shortcut(@IdRes val menuId: Int, val apiRoute: String?, val matomoValue: String) {
         MODIFY(R.id.modify, null, "edit"),
         REGENERATE(R.id.regenerate, "redraw", "regenerate"),

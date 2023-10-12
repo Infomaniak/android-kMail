@@ -157,7 +157,7 @@ class AiPropositionFragment : Fragment() {
             trackAiWriterEvent("insertProposition", TrackerAction.DATA)
         }
 
-        aiOutputToInsert.value = aiProposition.value!!.second
+        aiOutputToInsert.value = getLastMessage()
         findNavController().popBackStack()
     }
 
@@ -169,7 +169,7 @@ class AiPropositionFragment : Fragment() {
             aiPromptOpeningStatus.value = AiPromptOpeningStatus(isOpened = true, shouldResetPrompt = false)
             findNavController().popBackStack()
         } else {
-            binding.loadingPlaceholder.text = aiProposition.value!!.second
+            binding.loadingPlaceholder.text = getLastMessage()
             aiProposition.value = null
             currentRequestJob = performShortcut(shortcut)
         }
@@ -247,14 +247,14 @@ class AiPropositionFragment : Fragment() {
 
     private fun displayError(status: PropositionStatus) {
         binding.errorBlock.setText(status.errorRes!!)
-        setUiVisibilityState(UiState.ERROR, status)
+        setUiVisibilityState(UiState.ERROR)
     }
 
-    private fun setUiVisibilityState(state: UiState, errorType: PropositionStatus? = null) {
+    private fun setUiVisibilityState(state: UiState) {
         when (state) {
             UiState.LOADING -> displayLoadingVisibility()
             UiState.PROPOSITION -> displayPropositionVisibility()
-            UiState.ERROR -> displayErrorVisibility(errorType)
+            UiState.ERROR -> displayErrorVisibility()
         }
     }
 
@@ -278,35 +278,25 @@ class AiPropositionFragment : Fragment() {
 
         errorBlock.isGone = true
         retryButton.isGone = true
-
-        insertPropositionButton.isEnabled = true
-        refineButton.isVisible = true
     }
 
-    private fun displayErrorVisibility(errorType: PropositionStatus?) = with(binding) {
+    private fun displayErrorVisibility() = with(binding) {
+        val isFirstTry = aiViewModel.isHistoryEmpty()
+        if (isFirstTry) {
+            loadingPlaceholder.isVisible = true
+            propositionTextView.isGone = true
 
-        fun displayRetryUi() {
+            buttonLayout.isInvisible = true
             retryButton.isVisible = true
-            buttonLayout.isGone = true
-        }
-
-        fun disableNominalFlowUi() {
-            retryButton.isGone = true
-            buttonLayout.isVisible = true
-            insertPropositionButton.isEnabled = false
-            refineButton.isGone = true
-        }
-
-        if (errorType == PropositionStatus.PROMPT_TOO_LONG) {
-            displayRetryUi()
         } else {
-            disableNominalFlowUi()
+            loadingPlaceholder.isGone = true
+            propositionTextView.isVisible = true
+
+            buttonLayout.isVisible = true
+            retryButton.isGone = true
         }
 
-        loadingPlaceholder.isGone = true
         generationLoader.isGone = true
-
-        propositionTextView.isGone = true
 
         errorBlock.isVisible = true
     }
