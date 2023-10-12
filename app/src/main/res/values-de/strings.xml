@@ -226,6 +226,7 @@
     <string name="errorDraftNotFound">Entwurf unauffindbar</string>
     <string name="errorEditScheduledMessage">Geplante oder versendete Nachrichten können nicht geändert werden</string>
     <string name="errorFolderDoesNotExist">Der Ordner besteht nicht</string>
+    <string name="errorGetCredentials">Konnte keine Anmeldeinformationen erhalten</string>
     <string name="errorInvalidAttachment">Dateianhang ungültig</string>
     <string name="errorInvalidCredentials">E-Mail oder Passwort ungültig</string>
     <string name="errorInvalidEmailAddress">Ungültige E-Mail-Adresse</string>
@@ -245,6 +246,7 @@
     <string name="errorTooManyRecipients">Zu viele Empfänger</string>
     <string name="errorUnableToCreateFolder">Ordner kann nicht erstellt werden</string>
     <string name="errorUnableToFlushFolder">Der Ordner kann nicht geleert werden</string>
+    <string name="errorUserAlreadySynchronized">Benutzer ist bereits synchronisiert</string>
     <string name="externalDialogConfirmButton">Ich habe verstanden</string>
     <plurals name="externalDialogDescriptionExpeditor">
         <item quantity="one">Der Absender %s gehört nicht zu Ihrer Organisation oder Ihren Kontakten. Seien Sie vorsichtig, wenn Sie sensible Informationen weitergeben.</item>

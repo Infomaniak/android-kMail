@@ -226,6 +226,7 @@
     <string name="errorDraftNotFound">Bozza non trovata</string>
     <string name="errorEditScheduledMessage">Impossibile modificare un messaggio pianificato o inviato</string>
     <string name="errorFolderDoesNotExist">La cartella è inesistente</string>
+    <string name="errorGetCredentials">Non è stato possibile ottenere le credenziali</string>
     <string name="errorInvalidAttachment">Allegato non valido</string>
     <string name="errorInvalidCredentials">Email o password non valide</string>
     <string name="errorInvalidEmailAddress">Indirizzo e-mail non valido</string>
@@ -245,6 +246,7 @@
     <string name="errorTooManyRecipients">Troppi destinatari</string>
     <string name="errorUnableToCreateFolder">Impossibile creare la cartella</string>
     <string name="errorUnableToFlushFolder">Impossibile svuotare la cartella</string>
+    <string name="errorUserAlreadySynchronized">L’utente è già sincronizzato</string>
     <string name="externalDialogConfirmButton">Capisco</string>
     <plurals name="externalDialogDescriptionExpeditor">
         <item quantity="one">Il mittente %s non fa parte della vostra organizzazione o dei vostri contatti. Fate attenzione se state condividendo informazioni sensibili.</item>
