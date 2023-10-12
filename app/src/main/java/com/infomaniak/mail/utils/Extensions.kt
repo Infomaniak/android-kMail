@@ -387,7 +387,7 @@ fun DescriptionAlertDialog.deleteWithConfirmationPopup(
     folderRole: FolderRole?,
     count: Int,
     displayLoader: Boolean = true,
-    onDismiss: OnDismissListener? = null,
+    onDismiss: (() -> Unit)? = null,
     callback: () -> Unit,
 ) = if (isPermanentDeleteFolder(folderRole)) {
     showDeletePermanentlyDialog(count, displayLoader, callback, onDismiss)

@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui.alertDialogs
 
 import android.content.Context
-import android.content.DialogInterface.OnDismissListener
 import androidx.annotation.StringRes
 import androidx.core.view.isVisible
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -39,12 +38,20 @@ open class DescriptionAlertDialog @Inject constructor(
 
     override val alertDialog = initDialog()
 
+    private var onPositiveButtonClicked: (() -> Unit)? = null
+    private var onDismissed: (() -> Unit)? = null
+
     final override fun initDialog() = with(binding) {
         MaterialAlertDialogBuilder(context)
             .setView(root)
             .setPositiveButton(R.string.buttonConfirm, null)
             .setNegativeButton(RCore.string.buttonCancel, null)
             .create()
+    }
+
+    final override fun resetCallbacks() {
+        onPositiveButtonClicked = null
+        onDismissed = null
     }
 
     fun show(
@@ -54,16 +61,21 @@ open class DescriptionAlertDialog @Inject constructor(
         displayCancelButton: Boolean = true,
         displayLoader: Boolean = true,
         onPositiveButtonClicked: () -> Unit,
-        onDismissed: OnDismissListener? = null,
+        onDismiss: (() -> Unit)? = null,
     ) = with(alertDialog) {
         showDialogWithBasicInfo(title, description, confirmButtonText, displayCancelButton)
 
         if (displayLoader) initProgress()
 
-        onDismissed?.let(::setOnDismissListener)
+        onDismiss?.let {
+            onDismissed = it
+            setOnDismissListener { onDismissed?.invoke() }
+        }
+
+        this@DescriptionAlertDialog.onPositiveButtonClicked = onPositiveButtonClicked
 
         positiveButton.setOnClickListener {
-            onPositiveButtonClicked()
+            this@DescriptionAlertDialog.onPositiveButtonClicked?.invoke()
             if (displayLoader) startLoading() else dismiss()
         }
     }
@@ -72,7 +84,7 @@ open class DescriptionAlertDialog @Inject constructor(
         deletedCount: Int,
         displayLoader: Boolean,
         onPositiveButtonClicked: () -> Unit,
-        onDismissed: OnDismissListener? = null,
+        onDismissed: (() -> Unit)? = null,
     ) = show(
         title = activityContext.resources.getQuantityString(
             R.plurals.threadListDeletionConfirmationAlertTitle,
@@ -85,7 +97,7 @@ open class DescriptionAlertDialog @Inject constructor(
         ),
         displayLoader = displayLoader,
         onPositiveButtonClicked = onPositiveButtonClicked,
-        onDismissed = onDismissed,
+        onDismiss = onDismissed,
     )
 
     protected fun showDialogWithBasicInfo(

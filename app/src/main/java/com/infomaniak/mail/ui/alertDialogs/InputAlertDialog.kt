@@ -100,6 +100,11 @@ class InputAlertDialog @Inject constructor(
             .setupOnShowListener()
     }
 
+    override fun resetCallbacks() {
+        onPositiveButtonClicked = null
+        onErrorCheck = null
+    }
+
     fun show(@StringRes title: Int, @StringRes hint: Int, @StringRes confirmButtonText: Int) = with(binding) {
         alertDialog.show()
 
@@ -111,10 +116,5 @@ class InputAlertDialog @Inject constructor(
     fun setCallbacks(onPositiveButtonClicked: (String) -> Unit, onErrorCheck: suspend (CharSequence) -> String?) {
         this.onPositiveButtonClicked = onPositiveButtonClicked
         this.onErrorCheck = onErrorCheck
-    }
-
-    fun resetCallbacks() {
-        onPositiveButtonClicked = null
-        onErrorCheck = null
     }
 }

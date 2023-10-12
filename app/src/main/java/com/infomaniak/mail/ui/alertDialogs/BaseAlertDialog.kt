@@ -41,6 +41,8 @@ abstract class BaseAlertDialog(@ActivityContext private val activityContext: Con
 
     protected abstract fun initDialog(): AlertDialog
 
+    abstract fun resetCallbacks()
+
     fun startLoading() {
         alertDialog.setCancelable(false)
         negativeButton.isEnabled = false
