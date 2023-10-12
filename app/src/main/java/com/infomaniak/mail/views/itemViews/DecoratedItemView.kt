@@ -73,6 +73,12 @@ sealed class DecoratedItemView @JvmOverloads constructor(
             }
         }
 
+    var maxLines: Int = DEFAULT_MAX_LINES
+        set(value) {
+            field = value
+            binding.itemName.maxLines = value
+        }
+
     var text: CharSequence? = null
         set(value) {
             field = value
@@ -89,6 +95,7 @@ sealed class DecoratedItemView @JvmOverloads constructor(
         attrs?.getAttributes(context, R.styleable.DecoratedItemView) {
             icon = getDrawable(R.styleable.DecoratedItemView_icon)
             itemStyle = SelectionStyle.values()[getInteger(R.styleable.DecoratedItemView_itemStyle, 0)]
+            maxLines = getInteger(R.styleable.DecoratedItemView_maxLines, DEFAULT_MAX_LINES)
             text = getString(R.styleable.DecoratedItemView_text)
             textWeight = TextWeight.values()[getInteger(R.styleable.DecoratedItemView_textWeight, 0)]
         }
@@ -114,5 +121,9 @@ sealed class DecoratedItemView @JvmOverloads constructor(
     enum class TextWeight {
         REGULAR,
         MEDIUM,
+    }
+
+    private companion object {
+        const val DEFAULT_MAX_LINES = 1
     }
 }
