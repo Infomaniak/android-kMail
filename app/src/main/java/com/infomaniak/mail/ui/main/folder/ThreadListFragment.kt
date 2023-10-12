@@ -488,8 +488,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             }
             waitingBeforeNotifyAdapter = threadListViewModel.isRecoveringFinished
             afterUpdateAdapter = { threads ->
-                if (hasSwitchedToAnotherFolder()) scrollToTop()
-
                 if (currentFilter.value == ThreadFilter.UNSEEN && threads.isEmpty()) {
                     currentFilter.value = ThreadFilter.ALL
                 }
@@ -533,7 +531,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
             threadListAdapter.apply {
                 updateFolderRole(folder.role)
-                if (hasSwitchedToAnotherFolder()) updateLoadMore(shouldDisplayLoadMore = false)
+                if (hasSwitchedToAnotherFolder()) {
+                    updateLoadMore(shouldDisplayLoadMore = false)
+                    scrollToTop()
+                }
             }
 
             binding.newMessageFab.extend()
