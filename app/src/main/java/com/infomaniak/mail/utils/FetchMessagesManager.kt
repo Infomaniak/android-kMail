@@ -190,8 +190,7 @@ class FetchMessagesManager @Inject constructor(
                     val content = MessageBodyUtils.splitContentAndQuote(it).content
                     val dirtyDocument = content.removeLineBreaksFromHtml()
                     val cleanedDocument = HtmlSanitizer.getInstance().sanitize(dirtyDocument)
-                    val wholeText = cleanedDocument.wholeText().trim()
-                    "\n${wholeText}"
+                    return@let "\n${cleanedDocument.wholeText().trim()}"
                 }
                 ?: message.preview.ifBlank { null }?.let { "\n${it.trim()}" }
                 ?: ""
