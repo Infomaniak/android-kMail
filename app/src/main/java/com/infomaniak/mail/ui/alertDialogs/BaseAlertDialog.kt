@@ -43,7 +43,6 @@ abstract class BaseAlertDialog(@ActivityContext private val activityContext: Con
     private var isProgressInitialized = false
     private var fragmentLifecycle: Lifecycle? = null
 
-
     protected abstract fun initDialog(): AlertDialog
 
     protected abstract fun resetCallbacks()
