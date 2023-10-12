@@ -48,16 +48,6 @@ class SettingsFragment : Fragment() {
     @Inject
     lateinit var localSettings: LocalSettings
 
-    private val mailboxesAdapter = SettingsMailboxesAdapter { selectedMailbox ->
-        with(selectedMailbox) {
-            if (isValid) {
-                animatedNavigation(SettingsFragmentDirections.actionSettingsToMailboxSettings(objectId, email))
-            } else {
-                context?.showToast(R.string.errorMailboxLocked)
-            }
-        }
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentSettingsBinding.inflate(inflater, container, false).also { binding = it }.root
     }
@@ -75,6 +65,16 @@ class SettingsFragment : Fragment() {
     }
 
     private fun setupMailboxesAdapter() {
+        val mailboxesAdapter = SettingsMailboxesAdapter { selectedMailbox ->
+            with(selectedMailbox) {
+                if (isValid) {
+                    animatedNavigation(SettingsFragmentDirections.actionSettingsToMailboxSettings(objectId, email))
+                } else {
+                    context?.showToast(R.string.errorMailboxLocked)
+                }
+            }
+        }
+
         binding.mailboxesList.adapter = mailboxesAdapter
         mainViewModel.mailboxesLive.observe(viewLifecycleOwner, mailboxesAdapter::setMailboxes)
     }
