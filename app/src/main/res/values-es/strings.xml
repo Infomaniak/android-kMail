@@ -226,6 +226,7 @@
     <string name="errorDraftNotFound">No se puede encontrar el borrador</string>
     <string name="errorEditScheduledMessage">Imposible modificar un mensaje programado o enviado</string>
     <string name="errorFolderDoesNotExist">La carpeta no existe</string>
+    <string name="errorGetCredentials">No se han podido obtener las credenciales</string>
     <string name="errorInvalidAttachment">El adjunto no es válido</string>
     <string name="errorInvalidCredentials">Correo electrónico o contraseña no válidos</string>
     <string name="errorInvalidEmailAddress">Dirección de correo electrónico no válida</string>
@@ -245,6 +246,7 @@
     <string name="errorTooManyRecipients">Demasiados destinatarios</string>
     <string name="errorUnableToCreateFolder">No se puede crear la carpeta</string>
     <string name="errorUnableToFlushFolder">Imposible vaciar la carpeta</string>
+    <string name="errorUserAlreadySynchronized">El usuario ya está sincronizado</string>
     <string name="externalDialogConfirmButton">Comprendo</string>
     <plurals name="externalDialogDescriptionExpeditor">
         <item quantity="one">El remitente %s no forma parte de tu organización ni de tus contactos. Ten cuidado si compartes información sensible.</item>

@@ -23,6 +23,7 @@ import android.content.ComponentName
 import android.content.Intent
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.SnackBarManager
@@ -54,12 +55,17 @@ class SyncAutoConfigViewModel @Inject constructor(
             val accounts = accountManager.getAccountsByType(ACCOUNTS_TYPE)
             val account = accounts.find { accountManager.getUserData(it, USER_NAME_KEY) == AccountUtils.currentUser?.login }
             if (account != null) {
-                withContext(Dispatchers.Main) { snackBarManager.setValue("User is already synchronized") }
+                withContext(Dispatchers.Main) { snackBarManager.setValue(context.getString(R.string.errorUserAlreadySynchronized)) }
                 return@launch
             }
 
             val apiResponse = ApiRepository.getCredentialsPassword()
             ensureActive()
+
+            if (!apiResponse.isSuccess()) {
+                withContext(Dispatchers.Main) { snackBarManager.setValue(context.getString(R.string.errorGetCredentials)) }
+                return@launch
+            }
 
             val infomaniakLogin = AccountUtils.currentUser?.login
             val infomaniakPassword = apiResponse.data?.password
