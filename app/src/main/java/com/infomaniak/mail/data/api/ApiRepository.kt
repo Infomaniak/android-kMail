@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.api
 
 import com.infomaniak.lib.core.InfomaniakCore
+import com.infomaniak.lib.core.R
 import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.api.ApiController.ApiMethod.*
 import com.infomaniak.lib.core.api.ApiRepositoryCore
@@ -313,7 +314,7 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.featureFlag(featureFlagType.apiName), GET)
     }
 
-    fun getCredentialsPassword(): ApiResponse<InfomaniakPassword> {
+    fun getCredentialsPassword(): ApiResponse<InfomaniakPassword> = runCatching {
 
         val headers = HttpUtils.getHeaders(contentType = null)
             .newBuilder()
@@ -333,6 +334,9 @@ object ApiRepository : ApiRepositoryCore() {
         val response = HttpClient.okHttpClient.newCall(request).execute()
 
         return ApiController.json.decodeFromString(response.body?.string() ?: "")
+
+    }.getOrElse {
+        return ApiResponse(result = ApiResponse.Status.ERROR, translatedError = R.string.anErrorHasOccurred)
     }
 
     fun downloadAttachment(resource: String): Response {
