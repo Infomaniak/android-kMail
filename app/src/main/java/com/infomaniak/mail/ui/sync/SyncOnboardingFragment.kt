@@ -42,13 +42,11 @@ class SyncOnboardingFragment : Fragment() {
     }
 
     private fun setupClickListener() {
-
         val direction = if (syncAutoConfigViewModel.isSyncAppInstalled()) {
             SyncOnboardingFragmentDirections.actionSyncOnboardingFragmentToSyncStartFragment()
         } else {
             SyncOnboardingFragmentDirections.actionSyncOnboardingFragmentToSyncInstallFragment()
         }
-
         binding.continueButton.setOnClickListener { safeNavigate(direction) }
     }
 }
