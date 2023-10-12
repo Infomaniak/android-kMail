@@ -26,7 +26,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.MailTo
 import androidx.core.net.toUri
 import androidx.lifecycle.*
-import com.infomaniak.lib.core.MatomoCore.*
+import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.MatomoMail.OPEN_LOCAL_DRAFT
 import com.infomaniak.mail.MatomoMail.trackExternalEvent
@@ -51,7 +51,8 @@ import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.main.SnackBarManager
-import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.*
+import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.EditorAction
+import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType
 import com.infomaniak.mail.ui.main.newMessage.NewMessageViewModel.SignatureScore.*
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
