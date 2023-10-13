@@ -28,7 +28,7 @@
         android:layout_height="match_parent">
 
         <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/hostFragment"
+            android:id="@+id/mainHostFragment"
             android:name="androidx.navigation.fragment.NavHostFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -44,7 +44,7 @@
             app:drawerLayoutCornerSize="0dp">
 
             <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/menuDrawerFragment"
+                android:id="@+id/menuDrawerFragmentContainer"
                 android:name="com.infomaniak.mail.ui.main.menu.MenuDrawerFragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />

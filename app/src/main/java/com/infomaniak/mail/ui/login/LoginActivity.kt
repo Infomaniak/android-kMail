@@ -50,7 +50,7 @@ class LoginActivity : AppCompatActivity() {
     private val binding by lazy { ActivityLoginBinding.inflate(layoutInflater) }
 
     private val navController by lazy {
-        (supportFragmentManager.findFragmentById(R.id.hostFragment) as NavHostFragment).navController
+        (supportFragmentManager.findFragmentById(R.id.loginHostFragment) as NavHostFragment).navController
     }
 
     lateinit var infomaniakLogin: InfomaniakLogin
