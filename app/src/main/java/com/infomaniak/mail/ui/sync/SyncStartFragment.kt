@@ -26,7 +26,9 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentSyncStartBinding
 import com.infomaniak.mail.ui.main.settings.SettingsFragment
@@ -49,9 +51,11 @@ class SyncStartFragment : Fragment() {
     private fun setupClickListener() = with(syncAutoConfigViewModel) {
         binding.startButton.setOnClickListener {
             if (isUserAlreadySynchronized()) {
+                trackSyncAutoConfigEvent("alreadySynchronized", TrackerAction.DATA)
                 snackBarManager.setValue(requireContext().getString(R.string.errorUserAlreadySynchronized))
                 goBackToThreadList()
             } else {
+                trackSyncAutoConfigEvent("openSyncApp")
                 fetchCredentials { intent ->
                     startActivity(intent)
                     goBackToThreadList()

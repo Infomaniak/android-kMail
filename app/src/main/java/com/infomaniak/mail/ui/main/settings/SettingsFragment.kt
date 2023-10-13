@@ -34,6 +34,7 @@ import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.mail.MatomoMail.toFloat
 import com.infomaniak.mail.MatomoMail.trackEvent
+import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentSettingsBinding
@@ -110,6 +111,7 @@ class SettingsFragment : Fragment() {
         }
 
         settingsSyncAutoConfig.setOnClickListener {
+            trackSyncAutoConfigEvent("openFromSettings")
             syncAutoConfigResultLauncher.launch(Intent(context, SyncAutoConfigActivity::class.java))
         }
 
