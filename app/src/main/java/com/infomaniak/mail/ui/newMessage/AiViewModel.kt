@@ -57,7 +57,7 @@ class AiViewModel @Inject constructor(
     private var conversationContextId: String? = null
     var aiPromptOpeningStatus = MutableLiveData<AiPromptOpeningStatus>()
 
-    val aiProposition = MutableLiveData<Pair<PropositionStatus, String?>?>()
+    val aiPropositionStatusLiveData = MutableLiveData<PropositionStatus>()
     val aiOutputToInsert = SingleLiveEvent<String>()
 
     fun generateNewAiProposition() = viewModelScope.launch(ioCoroutineContext) {
@@ -70,17 +70,17 @@ class AiViewModel @Inject constructor(
     }
 
     private fun handleAiResult(apiResponse: ApiResponse<AiResult>, promptMessage: AiMessage?) = with(apiResponse) {
-        aiProposition.postValue(
+        aiPropositionStatusLiveData.postValue(
             when {
                 isSuccess() -> data?.let { aiResult ->
                     aiResult.contextId?.let { conversationContextId = it }
                     history += promptMessage!!
                     history += AssistantMessage(aiResult.content)
-                    SUCCESS to aiResult.content
-                } ?: (MISSING_CONTENT to null)
-                error?.code == MAX_SYNTAX_TOKENS_REACHED -> PROMPT_TOO_LONG to null
-                error?.code == TOO_MANY_REQUESTS -> RATE_LIMIT_EXCEEDED to null
-                else -> ERROR to null
+                    SUCCESS
+                } ?: MISSING_CONTENT
+                error?.code == MAX_SYNTAX_TOKENS_REACHED -> PROMPT_TOO_LONG
+                error?.code == TOO_MANY_REQUESTS -> RATE_LIMIT_EXCEEDED
+                else -> ERROR
             }
         )
     }

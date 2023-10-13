@@ -85,7 +85,7 @@ class AiPropositionFragment : Fragment() {
         handleBackDispatcher()
         setUi()
 
-        if (aiViewModel.aiProposition.value == null) currentRequestJob = aiViewModel.generateNewAiProposition()
+        if (aiViewModel.aiPropositionStatusLiveData.value == null) currentRequestJob = aiViewModel.generateNewAiProposition()
         observeAiProposition()
     }
 
@@ -170,7 +170,7 @@ class AiPropositionFragment : Fragment() {
             findNavController().popBackStack()
         } else {
             binding.loadingPlaceholder.text = getLastMessage()
-            aiProposition.value = null
+            aiPropositionStatusLiveData.value = null
             currentRequestJob = performShortcut(shortcut)
         }
     }
@@ -213,35 +213,33 @@ class AiPropositionFragment : Fragment() {
             }
         }
 
-        aiViewModel.aiProposition.observe(viewLifecycleOwner) { proposition ->
-            if (proposition == null) {
+        aiViewModel.aiPropositionStatusLiveData.observe(viewLifecycleOwner) { propositionStatus ->
+            if (propositionStatus == null) {
                 setUiVisibilityState(UiState.LOADING)
                 return@observe
             }
 
-            val (status, body) = proposition
-
-            when (status) {
+            when (propositionStatus) {
                 PropositionStatus.SUCCESS -> {
-                    displaySuccess(body)
+                    displaySuccess()
                 }
                 PropositionStatus.ERROR,
                 PropositionStatus.PROMPT_TOO_LONG,
                 PropositionStatus.RATE_LIMIT_EXCEEDED,
                 PropositionStatus.MISSING_CONTENT -> {
-                    sendMissingContentSentry(status)
-                    displayError(status)
+                    sendMissingContentSentry(propositionStatus)
+                    displayError(propositionStatus)
                 }
             }
         }
     }
 
-    private fun displaySuccess(body: String?) {
+    private fun displaySuccess() {
         val autoTransition = AutoTransition()
         autoTransition.duration = REPLACEMENT_DURATION
         TransitionManager.beginDelayedTransition(binding.contentLayout, autoTransition)
 
-        binding.propositionTextView.text = body
+        binding.propositionTextView.text = aiViewModel.getLastMessage()
         setUiVisibilityState(UiState.PROPOSITION)
     }
 
