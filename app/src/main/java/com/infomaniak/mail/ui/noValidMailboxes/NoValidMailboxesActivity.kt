@@ -34,7 +34,7 @@ class NoValidMailboxesActivity : BaseActivity() {
     private val binding by lazy { ActivityNoValidMailboxesBinding.inflate(layoutInflater) }
 
     private val navController by lazy {
-        (supportFragmentManager.findFragmentById(R.id.hostFragment) as NavHostFragment).navController
+        (supportFragmentManager.findFragmentById(R.id.noValidMailboxesHostFragment) as NavHostFragment).navController
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
