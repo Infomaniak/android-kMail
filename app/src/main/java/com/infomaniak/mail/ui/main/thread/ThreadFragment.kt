@@ -86,7 +86,7 @@ class ThreadFragment : Fragment() {
     private val mainViewModel: MainViewModel by activityViewModels()
     private val threadViewModel: ThreadViewModel by viewModels()
 
-    private val threadAdapter by lazy { ThreadAdapter(shouldLoadDistantResources()) }
+    private val threadAdapter get() = binding.messagesList.adapter as ThreadAdapter
     private val permissionUtils by lazy { PermissionUtils(this) }
     private val isNotInSpam by lazy { mainViewModel.currentFolder.value?.role != FolderRole.SPAM }
 
@@ -115,6 +115,8 @@ class ThreadFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        initAdapter()
 
         observeThreadLive()
 
@@ -252,6 +254,10 @@ class ThreadFragment : Fragment() {
 
     private fun observeOpenAttachment() {
         getBackNavigationResult(DownloadAttachmentProgressDialog.OPEN_WITH, ::startActivity)
+    }
+
+    private fun initAdapter() {
+        binding.messagesList.adapter = ThreadAdapter(shouldLoadDistantResources())
     }
 
     private fun setupAdapter(result: OpenThreadResult) = with(binding) {
