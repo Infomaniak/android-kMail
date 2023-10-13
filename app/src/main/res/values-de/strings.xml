@@ -451,6 +451,7 @@
     <string name="socialNetworksFolder">Soziale Netzwerke</string>
     <string name="spamFolder">Spam</string>
     <string name="subjectTitle">Thema:</string>
+    <string name="syncTutorialWelcomeTitle">Anzeigen Ihrer Infomaniak-Kalender und -Kontakte auf Ihrem Gerät</string>
     <plurals name="threadListDeletionConfirmationAlertDescription">
         <item quantity="one">Sind Sie sicher, dass Sie diese Nachricht endgültig löschen wollen?</item>
         <item quantity="other">Sind Sie sicher, dass Sie diese Nachrichten endgültig löschen wollen?</item>

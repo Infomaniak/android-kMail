@@ -22,20 +22,13 @@
     android:layout_height="match_parent"
     tools:context=".ui.sync.SyncAutoConfigActivity">
 
-    <LinearLayout
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/syncAutoConfigHostFragment"
+        android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clipChildren="false"
-        android:orientation="vertical">
+        app:defaultNavHost="true"
+        app:navGraph="@navigation/sync_auto_config_navigation" />
 
-        <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/syncAutoConfigHostFragment"
-            android:name="androidx.navigation.fragment.NavHostFragment"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            app:defaultNavHost="true"
-            app:navGraph="@navigation/sync_auto_config_navigation" />
-
-    </LinearLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
