@@ -57,7 +57,7 @@ class SyncInstallFragment : Fragment() {
     }
 
     private fun navigateToStartIfNeeded() {
-        if (syncAutoConfigViewModel.isSyncAppInstalled()) {
+        if (syncAutoConfigViewModel.isSyncAppUpToDate()) {
             safeNavigate(SyncInstallFragmentDirections.actionSyncInstallFragmentToSyncStartFragment())
         }
     }

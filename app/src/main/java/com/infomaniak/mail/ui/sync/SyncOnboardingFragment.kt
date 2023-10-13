@@ -43,7 +43,7 @@ class SyncOnboardingFragment : Fragment() {
     }
 
     private fun setupClickListener() {
-        val (direction, trackerName) = if (syncAutoConfigViewModel.isSyncAppInstalled()) {
+        val (direction, trackerName) = if (syncAutoConfigViewModel.isSyncAppUpToDate()) {
             SyncOnboardingFragmentDirections.actionSyncOnboardingFragmentToSyncStartFragment() to "openStart"
         } else {
             SyncOnboardingFragmentDirections.actionSyncOnboardingFragmentToSyncInstallFragment() to "openInstall"
