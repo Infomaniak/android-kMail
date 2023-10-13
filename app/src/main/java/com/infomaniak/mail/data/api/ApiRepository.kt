@@ -24,6 +24,8 @@ import com.infomaniak.lib.core.api.ApiRepositoryCore
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.networking.HttpUtils
+import com.infomaniak.lib.core.utils.FORMAT_FULL_DATE_WITH_HOUR
+import com.infomaniak.lib.core.utils.format
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.PaginationInfo
 import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition
@@ -54,9 +56,7 @@ import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
-import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.Locale
 
 object ApiRepository : ApiRepositoryCore() {
 
@@ -320,11 +320,9 @@ object ApiRepository : ApiRepositoryCore() {
             .set("Authorization", "Bearer ${InfomaniakCore.bearerToken}")
             .build()
 
-        val formatter = SimpleDateFormat("EEEE MMM d yyyy HH:mm:ss", Locale.getDefault())
-
         val formBuilder = MultipartBody.Builder()
             .setType(MultipartBody.FORM)
-            .addFormDataPart("name", "Infomaniak Sync - " + formatter.format(Date()))
+            .addFormDataPart("name", "Infomaniak Sync - ${Date().format(FORMAT_FULL_DATE_WITH_HOUR)}")
 
         val request = Request.Builder()
             .url(ApiRoutes.getCredentialsPassword())

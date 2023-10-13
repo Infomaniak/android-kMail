@@ -58,7 +58,7 @@ class SyncAutoConfigViewModel @Inject constructor(
             if (infomaniakLogin?.isNotEmpty() == true && infomaniakPassword?.isNotEmpty() == true) {
                 Intent().apply {
                     component = ComponentName("com.infomaniak.sync", "at.bitfire.davdroid.ui.setup.LoginActivity")
-                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
                     action = "syncAutoConfig"
                     putExtra("login", infomaniakLogin)
                     putExtra("password", infomaniakPassword)
