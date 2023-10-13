@@ -53,7 +53,7 @@
                 android:visibility="gone"
                 app:icon="@drawable/ic_warning"
                 app:showCloseIcon="true"
-                app:text="Trop de requêtes ont été effectuées en un court laps de temps. Veuillez patienter."
+                tools:text="@string/aiErrorTooManyRequests"
                 tools:visibility="visible" />
 
             <FrameLayout

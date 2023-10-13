@@ -54,9 +54,9 @@
     <string name="aiButtonRetry">Reintentar</string>
     <string name="aiDiscoveryDescription">Simplifique la redacción de sus mensajes con Inteligencia Artificial.</string>
     <string name="aiDiscoveryTitle">Escriba sus correos electrónicos utilizando IA</string>
-    <string name="aiErrorMaxTokenReached">Su solicitud es demasiado larga. Por favor, inténtelo de nuevo en un formato más corto.</string>
-    <string name="aiErrorTooManyRequests">Parece que ha realizado demasiadas solicitudes en un corto espacio de tiempo.\n\nPor favor, espere unos momentos.</string>
-    <string name="aiErrorUnknown">Se ha producido un error. Si este error persiste, póngase en contacto con nuestro servicio de asistencia.\n\nGracias por su paciencia.</string>
+    <string name="aiErrorMaxTokenReached">Su solicitud es demasiado larga, por favor acórtela.</string>
+    <string name="aiErrorTooManyRequests">Se han hecho demasiadas peticiones en un corto espacio de tiempo. Le rogamos que tenga paciencia.</string>
+    <string name="aiErrorUnknown">Se ha producido un error. Si este error persiste, póngase en contacto con nuestro servicio de asistencia.\nGracias por su paciencia.</string>
     <string name="aiMenuEditRequest">Editar mi solicitud</string>
     <string name="aiMenuExpand">Ampliar</string>
     <string name="aiMenuFriendlyWriting">Escritura amistosa</string>

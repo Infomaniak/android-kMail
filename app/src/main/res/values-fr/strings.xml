@@ -54,9 +54,9 @@
     <string name="aiButtonRetry">Réessayer</string>
     <string name="aiDiscoveryDescription">Simplifier la rédaction de vos messages à l’aide de l’Intelligence Artificielle.</string>
     <string name="aiDiscoveryTitle">Rédiger vos e-mails avec l’IA</string>
-    <string name="aiErrorMaxTokenReached">Votre demande est trop longue, veuillez réessayer sous un format plus court.</string>
-    <string name="aiErrorTooManyRequests">Il semblerait que vous avez effectué trop de requêtes en un court laps de temps.\n\nVeuillez patienter quelques instants.</string>
-    <string name="aiErrorUnknown">Une erreur s’est produite. Si cette erreur persiste, veuillez contacter notre service d’assistance.\n\nMerci pour votre patience.</string>
+    <string name="aiErrorMaxTokenReached">Votre demande est trop longue, veuillez la raccourcir.</string>
+    <string name="aiErrorTooManyRequests">Trop de requêtes ont été effectuées en un court laps de temps. Veuillez patienter.</string>
+    <string name="aiErrorUnknown">Une erreur s’est produite. Si cette erreur persiste, veuillez contacter notre service d’assistance.\nMerci pour votre patience.</string>
     <string name="aiMenuEditRequest">Modifier ma demande</string>
     <string name="aiMenuExpand">Rallonger</string>
     <string name="aiMenuFriendlyWriting">Rédaction amicale</string>

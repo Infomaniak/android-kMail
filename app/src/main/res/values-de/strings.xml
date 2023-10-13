@@ -54,9 +54,9 @@
     <string name="aiButtonRetry">Wiederholen</string>
     <string name="aiDiscoveryDescription">Vereinfachen Sie das Schreiben von Nachrichten mit künstlicher Intelligenz.</string>
     <string name="aiDiscoveryTitle">Schreiben Sie Ihre E-Mails mit KI</string>
-    <string name="aiErrorMaxTokenReached">Ihre Anfrage ist zu lang, bitte versuchen Sie es noch einmal in einem kürzeren Format.</string>
-    <string name="aiErrorTooManyRequests">Es scheint, dass Sie in kurzer Zeit zu viele Suchanfragen gestellt haben.\n\nBitte haben Sie einen Moment Geduld.</string>
-    <string name="aiErrorUnknown">Es ist ein Fehler aufgetreten. Wenn dieser Fehler weiterhin auftritt, wenden Sie sich bitte an unseren Support.\n\nVielen Dank für Ihre Geduld.</string>
+    <string name="aiErrorMaxTokenReached">Ihre Anfrage ist zu lang, bitte kürzen Sie sie.</string>
+    <string name="aiErrorTooManyRequests">In kurzer Zeit wurden zu viele Anfragen gestellt. Bitte haben Sie etwas Geduld.</string>
+    <string name="aiErrorUnknown">Es ist ein Fehler aufgetreten. Wenn dieser Fehler weiterhin besteht, wenden Sie sich bitte an unseren Support.\nVielen Dank für Ihre Geduld.</string>
     <string name="aiMenuEditRequest">Meine Anfrage bearbeiten</string>
     <string name="aiMenuExpand">Erweitern</string>
     <string name="aiMenuFriendlyWriting">Freundliches Schreiben</string>

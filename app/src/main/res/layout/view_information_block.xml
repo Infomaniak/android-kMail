@@ -48,7 +48,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/alternativeMargin"
-                tools:text="Trop de requêtes ont été effectuées en un court laps de temps. Veuillez patienter." />
+                tools:text="@string/aiErrorTooManyRequests" />
 
         </LinearLayout>
 

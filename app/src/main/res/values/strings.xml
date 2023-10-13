@@ -60,9 +60,9 @@
     <string name="aiButtonRetry">Retry</string>
     <string name="aiDiscoveryDescription">Simplify your message writing with Artificial Intelligence.</string>
     <string name="aiDiscoveryTitle">Write your emails using AI</string>
-    <string name="aiErrorMaxTokenReached">Your request is too long, please try again in a shorter format.</string>
-    <string name="aiErrorTooManyRequests">It seems you’ve made too many requests in a short amount of time.\n\nPlease wait a few moments.</string>
-    <string name="aiErrorUnknown">An error has occurred. If this error persists, please contact our helpdesk.\n\nThank you for your patience.</string>
+    <string name="aiErrorMaxTokenReached">Your request is too long, please shorten it.</string>
+    <string name="aiErrorTooManyRequests">Too many requests in a short time. Please wait.</string>
+    <string name="aiErrorUnknown">An error has occurred. If this error persists, please contact our helpdesk.\nThank you for your patience.</string>
     <string name="aiMenuEditRequest">Edit my request</string>
     <string name="aiMenuExpand">Expand</string>
     <string name="aiMenuFriendlyWriting">Friendly writing</string>
