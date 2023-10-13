@@ -21,6 +21,7 @@ import android.accounts.AccountManager
 import android.app.Application
 import android.content.ComponentName
 import android.content.Intent
+import android.content.pm.PackageManager
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.R
@@ -46,6 +47,14 @@ class SyncAutoConfigViewModel @Inject constructor(
 
     private var credentialsJob: Job? = null
 
+    fun isSyncAppInstalled(): Boolean = runCatching {
+        context.packageManager.getPackageInfo(SYNC_PACKAGE, PackageManager.GET_ACTIVITIES)
+        true
+    }.getOrElse {
+        false
+    }
+
+    // TODO: Add all Matomo in SyncAutoConfig feature
     fun fetchCredentials(onSuccess: (Intent) -> Unit) {
 
         credentialsJob?.cancel()
