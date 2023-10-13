@@ -31,10 +31,7 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -54,31 +51,37 @@ class SyncAutoConfigViewModel @Inject constructor(
         false
     }
 
-    fun fetchCredentials(onSuccess: (Intent) -> Unit) {
-
+    fun configureUserAutoSync(onSuccess: (Intent) -> Unit) {
         credentialsJob?.cancel()
         credentialsJob = viewModelScope.launch(ioCoroutineContext) {
-
-            val apiResponse = ApiRepository.getCredentialsPassword()
-            ensureActive()
-
-            if (!apiResponse.isSuccess()) {
-                snackBarManager.postValue(context.getString(R.string.errorGetCredentials))
-                return@launch
+            fetchCredentials(scope = this)?.let { password ->
+                autoSync(password, onSuccess)
             }
+        }
+    }
 
-            val infomaniakLogin = AccountUtils.currentUser?.login
-            val infomaniakPassword = apiResponse.data?.password
+    private fun fetchCredentials(scope: CoroutineScope): String? {
 
-            if (infomaniakLogin?.isNotEmpty() == true && infomaniakPassword?.isNotEmpty() == true) {
-                Intent().apply {
-                    component = ComponentName(SYNC_PACKAGE, SYNC_CLASS)
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    action = SYNC_ACTION
-                    putExtra(SYNC_LOGIN_KEY, infomaniakLogin)
-                    putExtra(SYNC_PASSWORD_KEY, infomaniakPassword)
-                }.also(onSuccess)
-            }
+        val apiResponse = ApiRepository.getCredentialsPassword()
+        scope.ensureActive()
+
+        return apiResponse.data?.password.also { password ->
+            if (password == null) snackBarManager.postValue(context.getString(R.string.errorGetCredentials))
+        }
+    }
+
+    private fun autoSync(infomaniakPassword: String, onSuccess: (Intent) -> Unit) {
+
+        val infomaniakLogin = AccountUtils.currentUser?.login
+
+        if (infomaniakLogin?.isNotEmpty() == true && infomaniakPassword.isNotEmpty()) {
+            Intent().apply {
+                component = ComponentName(SYNC_PACKAGE, SYNC_CLASS)
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                action = SYNC_ACTION
+                putExtra(SYNC_LOGIN_KEY, infomaniakLogin)
+                putExtra(SYNC_PASSWORD_KEY, infomaniakPassword)
+            }.also(onSuccess)
         }
     }
 
