@@ -18,8 +18,7 @@
 package com.infomaniak.mail.ui.newMessage
 
 import android.os.Bundle
-import android.transition.AutoTransition
-import android.transition.TransitionManager
+import android.transition.*
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -127,6 +126,7 @@ class AiPropositionFragment : Fragment() {
         }
 
         errorBlock.setOnCloseListener {
+            TransitionManager.beginDelayedTransition(nestedScrollView, ChangeBounds())
             errorBlock.isGone = true
         }
     }
@@ -279,6 +279,13 @@ class AiPropositionFragment : Fragment() {
     }
 
     private fun displayErrorVisibility() = with(binding) {
+        val transition = TransitionSet()
+            .setOrdering(TransitionSet.ORDERING_SEQUENTIAL)
+            .addTransition(ChangeBounds())
+            .addTransition(Fade(Fade.IN).addTarget(errorBlock))
+
+        TransitionManager.beginDelayedTransition(nestedScrollView, transition)
+
         val isFirstTry = aiViewModel.isHistoryEmpty()
         if (isFirstTry) {
             loadingPlaceholder.isVisible = true
