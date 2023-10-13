@@ -21,11 +21,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
+import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentSyncOnboardingBinding
 
 class SyncOnboardingFragment : Fragment() {
@@ -39,6 +42,10 @@ class SyncOnboardingFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        requireActivity().window.statusBarColor = requireContext().getColor(R.color.onboarding_secondary_background)
+        binding.toolbar.setNavigationOnClickListener { requireActivity().finish() }
+
         setupClickListener()
     }
 
