@@ -145,6 +145,7 @@
     <string name="buttonSelectAll">Alle</string>
     <string name="buttonShare">Teilen Sie</string>
     <string name="buttonStart">Anfangen</string>
+    <string name="buttonStartSync">Start der Synchronisierung</string>
     <string name="buttonStrikeThrough">Durchstreichen</string>
     <string name="buttonSyncCalendarsAndContacts">Synchronisierung von Kalender und Kontakten</string>
     <string name="buttonTextOptionsClose">Textformatierung schliessen</string>
