@@ -27,6 +27,7 @@ import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.goToPlayStore
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
 import com.infomaniak.mail.databinding.FragmentSyncInstallBinding
 
 class SyncInstallFragment : Fragment() {
@@ -49,7 +50,10 @@ class SyncInstallFragment : Fragment() {
     }
 
     private fun setupClickListener() = with(binding) {
-        installButton.setOnClickListener { context.goToPlayStore(SyncAutoConfigViewModel.SYNC_PACKAGE) }
+        installButton.setOnClickListener {
+            trackSyncAutoConfigEvent("openPlayStore")
+            context.goToPlayStore(SyncAutoConfigViewModel.SYNC_PACKAGE)
+        }
     }
 
     private fun navigateToStartIfNeeded() {

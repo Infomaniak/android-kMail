@@ -124,7 +124,7 @@ object MatomoMail : MatomoCore {
     }
 
     fun Fragment.trackSearchEvent(name: String, value: Boolean? = null) {
-        requireContext().trackSearchEvent(name, value)
+        context?.trackSearchEvent(name, value)
     }
 
     fun Fragment.trackMoveSearchEvent(name: String) {
@@ -219,6 +219,10 @@ object MatomoMail : MatomoCore {
 
     fun Context.trackAiWriterEvent(name: String, action: TrackerAction = TrackerAction.CLICK) {
         trackEvent("aiWriter", name, action)
+    }
+
+    fun Fragment.trackSyncAutoConfigEvent(name: String, action: TrackerAction = TrackerAction.CLICK) {
+        context?.trackEvent("syncAutoConfig", name, action)
     }
 
     // We need to invert this logical value to keep a coherent value for analytics because actions
