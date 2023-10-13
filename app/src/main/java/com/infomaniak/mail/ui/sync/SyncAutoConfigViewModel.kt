@@ -31,7 +31,10 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -61,7 +64,7 @@ class SyncAutoConfigViewModel @Inject constructor(
             ensureActive()
 
             if (!apiResponse.isSuccess()) {
-                withContext(Dispatchers.Main) { snackBarManager.setValue(context.getString(R.string.errorGetCredentials)) }
+                snackBarManager.postValue(context.getString(R.string.errorGetCredentials))
                 return@launch
             }
 
