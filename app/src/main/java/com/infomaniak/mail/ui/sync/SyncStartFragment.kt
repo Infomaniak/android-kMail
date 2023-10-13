@@ -29,9 +29,8 @@ import androidx.fragment.app.activityViewModels
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
-import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentSyncStartBinding
-import com.infomaniak.mail.ui.main.settings.SettingsFragment
+import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.utils.AccountUtils
 
 class SyncStartFragment : Fragment() {
@@ -52,13 +51,12 @@ class SyncStartFragment : Fragment() {
         binding.startButton.setOnClickListener {
             if (isUserAlreadySynchronized()) {
                 trackSyncAutoConfigEvent("alreadySynchronized", TrackerAction.DATA)
-                snackBarManager.setValue(requireContext().getString(R.string.errorUserAlreadySynchronized))
-                goBackToThreadList()
+                goBackToThreadList(MainActivity.SYNC_AUTO_CONFIG_ALREADY_SYNC)
             } else {
                 trackSyncAutoConfigEvent("openSyncApp")
                 configureUserAutoSync { intent ->
                     startActivity(intent)
-                    goBackToThreadList()
+                    goBackToThreadList(MainActivity.SYNC_AUTO_CONFIG_SUCCESS)
                 }
             }
         }
@@ -72,8 +70,8 @@ class SyncStartFragment : Fragment() {
         return account != null
     }
 
-    private fun goBackToThreadList() = with(requireActivity()) {
-        setResult(AppCompatActivity.RESULT_OK, Intent().putExtra(SettingsFragment.SYNC_AUTO_CONFIG_SUCCESS_KEY, true))
+    private fun goBackToThreadList(reason: String) = with(requireActivity()) {
+        setResult(AppCompatActivity.RESULT_OK, Intent().putExtra(MainActivity.SYNC_AUTO_CONFIG_KEY, reason))
         finish()
     }
 
