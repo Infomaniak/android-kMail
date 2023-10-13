@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.goToPlayStore
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.safeNavigate
@@ -47,8 +48,8 @@ class SyncInstallFragment : Fragment() {
         navigateToStartIfNeeded()
     }
 
-    private fun setupClickListener() {
-        binding.installButton.setOnClickListener { requireContext().goToPlayStore(SyncAutoConfigViewModel.SYNC_PACKAGE) }
+    private fun setupClickListener() = with(binding) {
+        installButton.setOnClickListener { context.goToPlayStore(SyncAutoConfigViewModel.SYNC_PACKAGE) }
     }
 
     private fun navigateToStartIfNeeded() {

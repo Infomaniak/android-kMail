@@ -64,6 +64,7 @@ class SyncStartFragment : Fragment() {
         val accountManager = AccountManager.get(requireContext())
         val accounts = accountManager.getAccountsByType(ACCOUNTS_TYPE)
         val account = accounts.find { accountManager.getUserData(it, USER_NAME_KEY) == AccountUtils.currentUser?.login }
+
         return account != null
     }
 
