@@ -283,5 +283,26 @@ object SentryDebug {
             Sentry.captureMessage("Received an email with SubBodies!!")
         }
     }
+
+    fun sendCredentialsIssue(infomaniakLogin: String?, infomaniakPassword: String) {
+        Sentry.withScope {
+            it.level = SentryLevel.ERROR
+            it.setExtra("email", "${AccountUtils.currentUser?.email}")
+            val loginStatus = when {
+                infomaniakLogin == null -> "is null"
+                infomaniakLogin.isEmpty() -> "is empty"
+                infomaniakLogin.isBlank() -> "is blank"
+                else -> "is ok"
+            }
+            it.setExtra("infomaniakLogin status", loginStatus)
+            val passwordStatus = when {
+                infomaniakPassword.isEmpty() -> "is empty"
+                infomaniakPassword.isBlank() -> "is blank"
+                else -> "is ok"
+            }
+            it.setExtra("infomaniakPassword status", passwordStatus)
+            Sentry.captureMessage("Credentials issue when trying to auto-sync user")
+        }
+    }
     //endregion
 }
