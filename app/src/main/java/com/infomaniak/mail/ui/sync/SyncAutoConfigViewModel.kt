@@ -28,11 +28,13 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.SnackBarManager
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import javax.inject.Inject
+import com.infomaniak.lib.core.R as RCore
 
 @HiltViewModel
 class SyncAutoConfigViewModel @Inject constructor(
@@ -82,6 +84,9 @@ class SyncAutoConfigViewModel @Inject constructor(
                 putExtra(SYNC_LOGIN_KEY, infomaniakLogin)
                 putExtra(SYNC_PASSWORD_KEY, infomaniakPassword)
             }.also(launchAutoSyncIntent)
+        } else {
+            snackBarManager.postValue(context.getString(RCore.string.anErrorHasOccurred))
+            SentryDebug.sendCredentialsIssue(infomaniakLogin, infomaniakPassword)
         }
     }
 
