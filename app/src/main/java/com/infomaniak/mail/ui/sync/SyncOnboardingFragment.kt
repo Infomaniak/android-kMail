@@ -25,6 +25,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
 import com.infomaniak.mail.databinding.FragmentSyncOnboardingBinding
 
 class SyncOnboardingFragment : Fragment() {
@@ -42,11 +43,14 @@ class SyncOnboardingFragment : Fragment() {
     }
 
     private fun setupClickListener() {
-        val direction = if (syncAutoConfigViewModel.isSyncAppInstalled()) {
-            SyncOnboardingFragmentDirections.actionSyncOnboardingFragmentToSyncStartFragment()
+        val (direction, trackerName) = if (syncAutoConfigViewModel.isSyncAppInstalled()) {
+            SyncOnboardingFragmentDirections.actionSyncOnboardingFragmentToSyncStartFragment() to "openStart"
         } else {
-            SyncOnboardingFragmentDirections.actionSyncOnboardingFragmentToSyncInstallFragment()
+            SyncOnboardingFragmentDirections.actionSyncOnboardingFragmentToSyncInstallFragment() to "openInstall"
         }
-        binding.continueButton.setOnClickListener { safeNavigate(direction) }
+        binding.continueButton.setOnClickListener {
+            trackSyncAutoConfigEvent(trackerName)
+            safeNavigate(direction)
+        }
     }
 }
