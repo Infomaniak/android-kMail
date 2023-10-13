@@ -35,9 +35,9 @@ import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentSettingsBinding
-import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.animatedNavigation
+import com.infomaniak.mail.utils.launchSyncAutoConfigActivityForResult
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -104,7 +104,7 @@ class SettingsFragment : Fragment() {
 
         settingsSyncAutoConfig.setOnClickListener {
             trackSyncAutoConfigEvent("openFromSettings")
-            (activity as MainActivity).navigateToSyncAutoConfigActivity()
+            requireActivity().launchSyncAutoConfigActivityForResult()
         }
 
         settingsSend.setOnClickListener {

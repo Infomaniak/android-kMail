@@ -44,7 +44,6 @@ import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
-import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.main.MailboxListFragment
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.utils.*
@@ -149,7 +148,7 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
 
         syncAutoConfig.setOnClickListener {
             trackSyncAutoConfigEvent("openFromMenuDrawer")
-            (activity as MainActivity).navigateToSyncAutoConfigActivity()
+            requireActivity().launchSyncAutoConfigActivityForResult()
             closeDrawer()
         }
 
