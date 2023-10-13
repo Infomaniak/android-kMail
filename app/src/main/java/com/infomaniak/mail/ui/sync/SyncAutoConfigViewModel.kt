@@ -21,6 +21,7 @@ import android.app.Application
 import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.R
@@ -46,9 +47,16 @@ class SyncAutoConfigViewModel @Inject constructor(
     private var credentialsJob: Job? = null
     val snackBarManager by lazy { SnackBarManager() }
 
-    fun isSyncAppInstalled(): Boolean = runCatching {
-        context.packageManager.getPackageInfo(SYNC_PACKAGE, PackageManager.GET_ACTIVITIES)
-        true
+    fun isSyncAppUpToDate(): Boolean = runCatching {
+        val packageInfo = context.packageManager.getPackageInfo(SYNC_PACKAGE, PackageManager.GET_ACTIVITIES)
+
+        val versionCode = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+            packageInfo.versionCode.toLong()
+        } else {
+            packageInfo.longVersionCode
+        }
+
+        versionCode >= SYNC_MINIMUM_VERSION
     }.getOrElse {
         false
     }
@@ -92,6 +100,7 @@ class SyncAutoConfigViewModel @Inject constructor(
 
     companion object {
         const val SYNC_PACKAGE = "com.infomaniak.sync"
+        private const val SYNC_MINIMUM_VERSION = 4_03_08_00_00L
         private const val SYNC_CLASS = "at.bitfire.davdroid.ui.setup.LoginActivity"
         private const val SYNC_ACTION = "infomaniakSyncAutoConfig"
         private const val SYNC_LOGIN_KEY = "infomaniakLogin"
