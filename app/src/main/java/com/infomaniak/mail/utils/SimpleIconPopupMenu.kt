@@ -23,6 +23,7 @@ import android.view.ContextThemeWrapper
 import android.view.View
 import androidx.annotation.MenuRes
 import androidx.appcompat.view.menu.MenuBuilder
+import androidx.appcompat.view.menu.MenuItemImpl
 import androidx.appcompat.widget.PopupMenu
 import com.infomaniak.lib.core.utils.toPx
 import com.infomaniak.mail.R
@@ -55,16 +56,43 @@ class SimpleIconPopupMenu(val context: Context, @MenuRes menuRes: Int, anchor: V
             isGroupDividerEnabled = true
 
             visibleItems.forEach { item ->
-                if (item.icon != null) {
-                    item.icon = InsetDrawable(item.icon, horizontalIconMargin, 0, horizontalIconMargin, 0).also {
-                        it.setTint(context.getColor(R.color.iconColorPrimaryText))
-                    }
-                }
+                item.setIconStyle(DEFAULT_ICON_COLOR, horizontalIconMargin)
+            }
+        }
+    }
+
+    private fun MenuItemImpl.setIconStyle(iconColorRes: Int, margin: Int) {
+        @Suppress("RestrictedApi")
+        if (icon != null) {
+            icon = InsetDrawable(icon, margin, 0, margin, 0).also {
+                it.setTint(context.getColor(iconColorRes))
             }
         }
     }
 
     fun show() {
         popupMenu.show()
+    }
+
+    fun disableAllItemButModify() {
+        setEnabledItems(setOf(R.id.modify))
+    }
+
+    fun enableAllItems() {
+        setEnabledItems()
+    }
+
+    private fun setEnabledItems(enabledItems: Set<Int>? = null) {
+        @Suppress("RestrictedApi")
+        (popupMenu.menu as? MenuBuilder)?.visibleItems?.forEach { item ->
+            val shouldStayEnabled = enabledItems?.contains(item.itemId) ?: true
+            item.isEnabled = shouldStayEnabled
+            item.setIconStyle(if (shouldStayEnabled) DEFAULT_ICON_COLOR else DISABLED_ICON_COLOR, 0)
+        }
+    }
+
+    private companion object {
+        val DEFAULT_ICON_COLOR = R.color.iconColorSecondaryText
+        val DISABLED_ICON_COLOR = R.color.iconColorTertiaryText
     }
 }

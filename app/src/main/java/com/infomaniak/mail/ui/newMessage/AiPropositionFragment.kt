@@ -268,6 +268,8 @@ class AiPropositionFragment : Fragment() {
 
         errorBlock.isGone = true
         retryButton.isGone = true
+
+        refinePopupMenu.enableAllItems()
     }
 
     private fun displayPropositionVisibility() = with(binding) {
@@ -279,6 +281,8 @@ class AiPropositionFragment : Fragment() {
 
         errorBlock.isGone = true
         retryButton.isGone = true
+
+        refinePopupMenu.enableAllItems()
     }
 
     private fun displayErrorVisibility() = with(binding) {
@@ -307,6 +311,8 @@ class AiPropositionFragment : Fragment() {
         generationLoader.isGone = true
 
         errorBlock.isVisible = true
+
+        refinePopupMenu.disableAllItemButModify()
     }
 
     enum class UiState {

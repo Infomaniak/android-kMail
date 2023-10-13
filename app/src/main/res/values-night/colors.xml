@@ -57,6 +57,7 @@
     <color name="staffOnlyColor">@color/prince_dark</color>
     <color name="onColorfulBackground">@color/bat</color>
     <color name="textDisabledPrimaryButton">@color/bat</color>
+    <color name="secondaryTextColorDisabled">@color/elephant</color>
 
     <!-- Dividers -->
     <color name="dividerColor">@color/orca</color>

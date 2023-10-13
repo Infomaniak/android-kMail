@@ -121,6 +121,7 @@
     <color name="staffOnlyColor">@color/prince_light</color>
     <color name="onColorfulBackground">@color/white</color>
     <color name="textDisabledPrimaryButton">@color/white</color>
+    <color name="secondaryTextColorDisabled">@color/shark</color>
 
     <!-- Dividers -->
     <color name="dividerColor">@color/mouse</color>
@@ -129,6 +130,7 @@
     <!-- Icons -->
     <color name="iconColorPrimaryText">@color/primaryTextColor</color>
     <color name="iconColorSecondaryText">@color/secondaryTextColor</color>
+    <color name="iconColorTertiaryText">@color/tertiaryTextColor</color>
     <color name="iconColor">@color/elephant</color>
     <color name="disabledIconColor">@color/shark</color>
     <color name="favoriteYellow">@color/yellow_light</color>
