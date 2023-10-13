@@ -252,7 +252,10 @@ class AiPropositionFragment : Fragment() {
         when (state) {
             UiState.LOADING -> displayLoadingVisibility()
             UiState.PROPOSITION -> displayPropositionVisibility()
-            UiState.ERROR -> displayErrorVisibility()
+            UiState.ERROR -> {
+                binding.nestedScrollView.smoothScrollTo(0, 0)
+                displayErrorVisibility()
+            }
         }
     }
 
