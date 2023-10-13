@@ -28,7 +28,9 @@ class QuotasController @Inject constructor(
     private val mailboxController: MailboxController,
 ) {
 
+    //region Get data
     fun getQuotasAsync(mailboxObjectId: String): Flow<Quotas?> {
         return mailboxController.getMailboxAsync(mailboxObjectId).map { it.obj?.quotas }
     }
+    //endregion
 }

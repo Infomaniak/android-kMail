@@ -17,52 +17,22 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
-import com.infomaniak.lib.core.utils.SentryLog
-import com.infomaniak.mail.data.cache.RealmDatabase
+import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.signature.Signature
-import com.infomaniak.mail.utils.update
-import io.realm.kotlin.MutableRealm
-import io.realm.kotlin.TypedRealm
-import io.realm.kotlin.ext.query
-import io.realm.kotlin.query.RealmQuery
-import io.realm.kotlin.query.RealmResults
+import io.realm.kotlin.types.RealmList
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object SignatureController {
-
-    //region Queries
-    private fun getDefaultSignatureQuery(realm: TypedRealm): RealmQuery<Signature> {
-        return realm.query("${Signature::isDefault.name} == true")
-    }
-
-    private fun getAllSignaturesQuery(realm: TypedRealm): RealmQuery<Signature> {
-        return realm.query()
-    }
-    //endregion
+@Singleton
+class SignatureController @Inject constructor(
+    private val mailboxController: MailboxController,
+) {
 
     //region Get data
-    private fun getDefaultSignature(realm: TypedRealm): Signature? {
-        return getDefaultSignatureQuery(realm).first().find()
-    }
-
-    fun getSignature(realm: TypedRealm): Signature {
-        return getDefaultSignature(realm) ?: getAllSignaturesQuery(realm).first().find()!!
-    }
-
-    fun getSignaturesAsync(realm: TypedRealm): Flow<RealmResults<Signature>> {
-        return getAllSignaturesQuery(realm).asFlow().map { it.list }
-    }
-
-    fun getAllSignatures(realm: TypedRealm): RealmResults<Signature> {
-        return getAllSignaturesQuery(realm).find()
-    }
-    //endregion
-
-    //region Edit data
-    fun update(apiSignatures: List<Signature>, realm: MutableRealm) {
-        SentryLog.d(RealmDatabase.TAG, "Signatures: Save new data")
-        realm.update<Signature>(apiSignatures)
+    fun getSignaturesAsync(mailboxObjectId: String): Flow<RealmList<Signature>> {
+        return mailboxController.getMailboxAsync(mailboxObjectId).mapNotNull { it.obj?.signatures }
     }
     //endregion
 }

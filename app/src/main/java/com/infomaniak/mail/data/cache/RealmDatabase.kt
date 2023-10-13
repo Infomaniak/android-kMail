@@ -57,7 +57,6 @@ object RealmDatabase {
     //region Realms' mutexes
     private val appSettingsMutex = Mutex()
     private val userInfoMutex = Mutex()
-    private val mailboxInfoMutex = Mutex()
     private val mailboxContentMutex = Mutex()
     //endregion
 
@@ -179,6 +178,7 @@ object RealmDatabase {
             Mailbox::class,
             MailboxPermissions::class,
             Quotas::class,
+            Signature::class,
         )
         val mailboxContentSet = setOf(
             Folder::class,
@@ -189,7 +189,6 @@ object RealmDatabase {
             Body::class,
             SubBody::class,
             Attachment::class,
-            Signature::class,
         )
         //endregion
 

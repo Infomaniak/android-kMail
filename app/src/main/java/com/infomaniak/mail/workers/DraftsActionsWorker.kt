@@ -34,7 +34,6 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
-import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Attachment
@@ -455,7 +454,7 @@ class DraftsActionsWorker @AssistedInject constructor(
     private fun updateSignaturesThenRetry(draft: Draft, mailboxUuid: String): DraftActionResult {
 
         updateSignatures(mailbox, mailboxContentRealm)
-        val signature = SignatureController.getSignature(realm = mailboxContentRealm)
+        val signature = mailbox.getDefaultSignature()
         mailboxContentRealm.writeBlocking {
             draftController.updateDraft(draft.localUuid, realm = this) { it.identityId = signature.id.toString() }
         }
