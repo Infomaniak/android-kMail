@@ -98,9 +98,7 @@ class MainActivity : BaseActivity() {
             if (reason == SYNC_AUTO_CONFIG_ALREADY_SYNC) {
                 mainViewModel.snackBarManager.setValue(getString(R.string.errorUserAlreadySynchronized))
             }
-            if (navController.currentDestination?.id != R.id.threadListFragment) {
-                navController.popBackStack()
-            }
+            navController.popBackStack(destinationId = R.id.threadListFragment, inclusive = false)
         }
     }
 
