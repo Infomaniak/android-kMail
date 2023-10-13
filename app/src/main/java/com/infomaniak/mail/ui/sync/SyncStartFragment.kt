@@ -56,7 +56,7 @@ class SyncStartFragment : Fragment() {
                 goBackToThreadList()
             } else {
                 trackSyncAutoConfigEvent("openSyncApp")
-                fetchCredentials { intent ->
+                configureUserAutoSync { intent ->
                     startActivity(intent)
                     goBackToThreadList()
                 }
