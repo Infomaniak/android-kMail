@@ -75,9 +75,9 @@
         android:importantForAccessibility="no"
         android:src="@drawable/illustration_discover_sync"
         app:layout_constraintBottom_toBottomOf="@id/bottomWave"
-        app:layout_constraintEnd_toStartOf="@id/end"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_max="250dp"
-        app:layout_constraintStart_toEndOf="@id/start"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
     <TextView
