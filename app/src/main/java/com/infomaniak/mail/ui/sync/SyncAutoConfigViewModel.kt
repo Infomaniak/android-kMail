@@ -51,11 +51,11 @@ class SyncAutoConfigViewModel @Inject constructor(
         false
     }
 
-    fun configureUserAutoSync(onSuccess: (Intent) -> Unit) {
+    fun configureUserAutoSync(launchAutoSyncIntent: (Intent) -> Unit) {
         credentialsJob?.cancel()
         credentialsJob = viewModelScope.launch(ioCoroutineContext) {
             fetchCredentials(scope = this)?.let { password ->
-                autoSync(password, onSuccess)
+                setupAutoSyncIntent(password, launchAutoSyncIntent)
             }
         }
     }
@@ -70,7 +70,7 @@ class SyncAutoConfigViewModel @Inject constructor(
         }
     }
 
-    private fun autoSync(infomaniakPassword: String, onSuccess: (Intent) -> Unit) {
+    private fun setupAutoSyncIntent(infomaniakPassword: String, launchAutoSyncIntent: (Intent) -> Unit) {
 
         val infomaniakLogin = AccountUtils.currentUser?.login
 
@@ -81,7 +81,7 @@ class SyncAutoConfigViewModel @Inject constructor(
                 action = SYNC_ACTION
                 putExtra(SYNC_LOGIN_KEY, infomaniakLogin)
                 putExtra(SYNC_PASSWORD_KEY, infomaniakPassword)
-            }.also(onSuccess)
+            }.also(launchAutoSyncIntent)
         }
     }
 
