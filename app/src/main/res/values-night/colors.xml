@@ -48,7 +48,6 @@
     <color name="backgroundSelectedSignature">@color/elephant</color>
     <color name="informationBlockBackground">@color/orca</color>
 
-
     <!-- Texts -->
     <color name="primaryTextColor">@color/rabbit</color>
     <color name="secondaryTextColor">@color/shark</color>

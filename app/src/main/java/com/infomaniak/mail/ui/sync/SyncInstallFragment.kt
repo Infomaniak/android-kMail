@@ -23,11 +23,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.goToPlayStore
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
+import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentSyncInstallBinding
 
 class SyncInstallFragment : Fragment() {
@@ -41,6 +43,10 @@ class SyncInstallFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundColor)
+        binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
+
         setupClickListener()
     }
 
