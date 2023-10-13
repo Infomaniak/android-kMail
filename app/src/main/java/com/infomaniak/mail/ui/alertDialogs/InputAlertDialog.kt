@@ -67,6 +67,7 @@ class InputAlertDialog @Inject constructor(
             setOnShowListener {
                 showKeyboard()
                 positiveButton.apply {
+                    initProgress()
                     isEnabled = false
                     textInput.doAfterTextChanged {
                         if (it.isNullOrBlank()) {
@@ -97,6 +98,11 @@ class InputAlertDialog @Inject constructor(
             }
             .create()
             .setupOnShowListener()
+    }
+
+    override fun resetCallbacks() {
+        onPositiveButtonClicked = null
+        onErrorCheck = null
     }
 
     fun show(@StringRes title: Int, @StringRes hint: Int, @StringRes confirmButtonText: Int) = with(binding) {

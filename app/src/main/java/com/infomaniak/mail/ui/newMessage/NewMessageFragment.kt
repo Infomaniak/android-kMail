@@ -148,6 +148,7 @@ class NewMessageFragment : Fragment() {
         )
 
         filePicker = FilePicker(this@NewMessageFragment)
+        bindAlertToViewLifecycle(descriptionDialog)
 
         initUi()
 

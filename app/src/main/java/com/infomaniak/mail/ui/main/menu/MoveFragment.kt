@@ -38,7 +38,6 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.FragmentMoveBinding
-import com.infomaniak.mail.ui.alertDialogs.InputAlertDialog
 import com.infomaniak.mail.utils.handleEditorSearchAction
 import com.infomaniak.mail.utils.setOnClearTextClickListener
 import dagger.hilt.android.AndroidEntryPoint
@@ -50,9 +49,6 @@ class MoveFragment : MenuFoldersFragment() {
     private var binding: FragmentMoveBinding by safeBinding()
     private val navigationArgs: MoveFragmentArgs by navArgs()
     private val moveViewModel: MoveViewModel by viewModels()
-
-    @Inject
-    lateinit var inputDialog: InputAlertDialog
 
     @Inject
     lateinit var searchFolderAdapter: FolderAdapter

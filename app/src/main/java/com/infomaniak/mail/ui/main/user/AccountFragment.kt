@@ -38,10 +38,7 @@ import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.MailboxListFragment
 import com.infomaniak.mail.ui.main.menu.MailboxesAdapter
-import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.LogoutUser
-import com.infomaniak.mail.utils.PlayServicesUtils
-import com.infomaniak.mail.utils.animatedNavigation
+import com.infomaniak.mail.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -114,6 +111,8 @@ class AccountFragment : Fragment(), MailboxListFragment {
             adapter = mailboxesAdapter
             isFocusable = false
         }
+
+        bindAlertToViewLifecycle(descriptionDialog)
 
         observeAccountsLive()
     }

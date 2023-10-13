@@ -25,6 +25,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.alertDialogs.InputAlertDialog
+import com.infomaniak.mail.utils.bindAlertToViewLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -36,6 +38,9 @@ abstract class MenuFoldersFragment : Fragment() {
 
     @Inject
     lateinit var customFolderAdapter: FolderAdapter
+
+    @Inject
+    lateinit var inputDialog: InputAlertDialog
 
     protected val mainViewModel: MainViewModel by activityViewModels()
 
@@ -62,6 +67,7 @@ abstract class MenuFoldersFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupAdapters()
+        bindAlertToViewLifecycle(inputDialog)
     }
 
     open fun setupAdapters() {

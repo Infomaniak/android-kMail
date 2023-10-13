@@ -23,7 +23,6 @@ import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import android.content.DialogInterface.OnDismissListener
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -76,6 +75,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.alertDialogs.BaseAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.login.IlluColors.IlluColors
 import com.infomaniak.mail.ui.login.LoginActivity
@@ -387,7 +387,7 @@ fun DescriptionAlertDialog.deleteWithConfirmationPopup(
     folderRole: FolderRole?,
     count: Int,
     displayLoader: Boolean = true,
-    onDismiss: OnDismissListener? = null,
+    onDismiss: (() -> Unit)? = null,
     callback: () -> Unit,
 ) = if (isPermanentDeleteFolder(folderRole)) {
     showDeletePermanentlyDialog(count, displayLoader, callback, onDismiss)
@@ -626,4 +626,8 @@ private fun Spannable.setClickableSpan(startIndex: Int, endIndex: Int, onClick: 
         endIndex,
         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
     )
+}
+
+fun Fragment.bindAlertToViewLifecycle(alertDialog: BaseAlertDialog) {
+    alertDialog.bindAlertToLifecycle(viewLifecycleOwner)
 }
