@@ -39,40 +39,50 @@
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <FrameLayout
-            android:id="@+id/contentLayout"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingHorizontal="@dimen/marginStandardMedium"
-            android:paddingVertical="@dimen/marginStandard">
+            android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/propositionTextView"
+            <com.infomaniak.mail.views.InformationBlockView
+                android:id="@+id/errorBlock"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textIsSelectable="true"
+                android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                android:layout_marginTop="@dimen/marginStandardMedium"
                 android:visibility="gone"
-                tools:text="Objet : Candidature au poste de Manager de restaurant - \n\nCher(e) [Nom du responsable du recrutement],\n\nJ'ai le plaisir de vous envoyer mon CV en tant que candidat(e) au poste de Manager de restaurant au sein de votre établissement. Je suis convaincu(e) que mon expérience et mes compétences seraient un atout précieux pour votre équipe.\n\nJ'ai acquis une solide expérience dans la gestion d'équipe, le service client et l'optimisation des opérations dans l'industrie de la restauration.\n\nJe serais ravi(e) de discuter en détail de ma candidature lors d'un entretien avec vous. Vous trouverez mon CV en pièce jointe.\n\nMerci de votre attention.\nCordialement,\n[Votre nom]"
+                app:icon="@drawable/ic_warning"
+                app:showCloseIcon="true"
+                tools:text="@string/aiErrorTooManyRequests"
                 tools:visibility="visible" />
 
-            <TextView
-                android:id="@+id/loadingPlaceholder"
+            <FrameLayout
+                android:id="@+id/contentLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/tertiaryTextColor"
-                android:textIsSelectable="true"
-                tools:text="J’ai un entretien pour une position de manager au sein d’un restaurant. Peux-tu écrire un mail qui accompagnerait mon CV ?"
-                tools:visibility="gone" />
+                android:paddingHorizontal="@dimen/marginStandardMedium"
+                android:paddingVertical="@dimen/marginStandard">
 
-            <TextView
-                android:id="@+id/errorMessage"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textIsSelectable="true"
-                android:visibility="gone"
-                tools:text="@string/aiErrorUnknown" />
+                <TextView
+                    android:id="@+id/propositionTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textIsSelectable="true"
+                    android:visibility="gone"
+                    tools:text="Objet : Candidature au poste de Manager de restaurant - \n\nCher(e) [Nom du responsable du recrutement],\n\nJ'ai le plaisir de vous envoyer mon CV en tant que candidat(e) au poste de Manager de restaurant au sein de votre établissement. Je suis convaincu(e) que mon expérience et mes compétences seraient un atout précieux pour votre équipe.\n\nJ'ai acquis une solide expérience dans la gestion d'équipe, le service client et l'optimisation des opérations dans l'industrie de la restauration.\n\nJe serais ravi(e) de discuter en détail de ma candidature lors d'un entretien avec vous. Vous trouverez mon CV en pièce jointe.\n\nMerci de votre attention.\nCordialement,\n[Votre nom]"
+                    tools:visibility="visible" />
 
-        </FrameLayout>
+                <TextView
+                    android:id="@+id/loadingPlaceholder"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/tertiaryTextColor"
+                    android:textIsSelectable="true"
+                    tools:text="J’ai un entretien pour une position de manager au sein d’un restaurant. Peux-tu écrire un mail qui accompagnerait mon CV ?"
+                    tools:visibility="gone" />
+
+            </FrameLayout>
+        </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
 

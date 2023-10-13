@@ -18,8 +18,7 @@
 package com.infomaniak.mail.ui.newMessage
 
 import android.os.Bundle
-import android.transition.AutoTransition
-import android.transition.TransitionManager
+import android.transition.*
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -85,7 +84,7 @@ class AiPropositionFragment : Fragment() {
         handleBackDispatcher()
         setUi()
 
-        if (aiViewModel.aiProposition.value == null) currentRequestJob = aiViewModel.generateNewAiProposition()
+        if (aiViewModel.aiPropositionStatusLiveData.value == null) currentRequestJob = aiViewModel.generateNewAiProposition()
         observeAiProposition()
     }
 
@@ -125,6 +124,11 @@ class AiPropositionFragment : Fragment() {
             aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(isOpened = true)
             findNavController().popBackStack()
         }
+
+        errorBlock.setOnCloseListener {
+            TransitionManager.beginDelayedTransition(nestedScrollView, ChangeBounds())
+            errorBlock.isGone = true
+        }
     }
 
     private fun setToolbar() = with(binding) {
@@ -153,7 +157,7 @@ class AiPropositionFragment : Fragment() {
             trackAiWriterEvent("insertProposition", TrackerAction.DATA)
         }
 
-        aiOutputToInsert.value = aiProposition.value!!.second
+        aiOutputToInsert.value = getLastMessage()
         findNavController().popBackStack()
     }
 
@@ -165,8 +169,8 @@ class AiPropositionFragment : Fragment() {
             aiPromptOpeningStatus.value = AiPromptOpeningStatus(isOpened = true, shouldResetPrompt = false)
             findNavController().popBackStack()
         } else {
-            binding.loadingPlaceholder.text = aiProposition.value!!.second
-            aiProposition.value = null
+            binding.loadingPlaceholder.text = getLastMessage()
+            aiPropositionStatusLiveData.value = null
             currentRequestJob = performShortcut(shortcut)
         }
     }
@@ -209,48 +213,49 @@ class AiPropositionFragment : Fragment() {
             }
         }
 
-        aiViewModel.aiProposition.observe(viewLifecycleOwner) { proposition ->
-            if (proposition == null) {
+        aiViewModel.aiPropositionStatusLiveData.observe(viewLifecycleOwner) { propositionStatus ->
+            if (propositionStatus == null) {
                 setUiVisibilityState(UiState.LOADING)
                 return@observe
             }
 
-            val (status, body) = proposition
-
-            when (status) {
+            when (propositionStatus) {
                 PropositionStatus.SUCCESS -> {
-                    displaySuccess(body)
+                    displaySuccess()
                 }
                 PropositionStatus.ERROR,
                 PropositionStatus.PROMPT_TOO_LONG,
                 PropositionStatus.RATE_LIMIT_EXCEEDED,
                 PropositionStatus.MISSING_CONTENT -> {
-                    sendMissingContentSentry(status)
-                    displayError(status)
+                    sendMissingContentSentry(propositionStatus)
+                    displayError(propositionStatus)
                 }
             }
         }
     }
 
-    private fun displaySuccess(body: String?) {
+    private fun displaySuccess() {
         val autoTransition = AutoTransition()
         autoTransition.duration = REPLACEMENT_DURATION
         TransitionManager.beginDelayedTransition(binding.contentLayout, autoTransition)
 
-        binding.propositionTextView.text = body
+        binding.propositionTextView.text = aiViewModel.getLastMessage()
         setUiVisibilityState(UiState.PROPOSITION)
     }
 
     private fun displayError(status: PropositionStatus) {
-        binding.errorMessage.setText(status.errorRes!!)
-        setUiVisibilityState(UiState.ERROR, status)
+        binding.errorBlock.setText(status.errorRes!!)
+        setUiVisibilityState(UiState.ERROR)
     }
 
-    private fun setUiVisibilityState(state: UiState, errorType: PropositionStatus? = null) {
+    private fun setUiVisibilityState(state: UiState) {
         when (state) {
             UiState.LOADING -> displayLoadingVisibility()
             UiState.PROPOSITION -> displayPropositionVisibility()
-            UiState.ERROR -> displayErrorVisibility(errorType)
+            UiState.ERROR -> {
+                binding.nestedScrollView.smoothScrollTo(0, 0)
+                displayErrorVisibility()
+            }
         }
     }
 
@@ -261,8 +266,10 @@ class AiPropositionFragment : Fragment() {
         propositionTextView.isGone = true
         buttonLayout.isInvisible = true
 
-        errorMessage.isGone = true
+        errorBlock.isGone = true
         retryButton.isGone = true
+
+        refinePopupMenu.enableAllItems()
     }
 
     private fun displayPropositionVisibility() = with(binding) {
@@ -272,39 +279,40 @@ class AiPropositionFragment : Fragment() {
         propositionTextView.isVisible = true
         buttonLayout.isVisible = true
 
-        errorMessage.isGone = true
+        errorBlock.isGone = true
         retryButton.isGone = true
 
-        insertPropositionButton.isEnabled = true
-        refineButton.isVisible = true
+        refinePopupMenu.enableAllItems()
     }
 
-    private fun displayErrorVisibility(errorType: PropositionStatus?) = with(binding) {
+    private fun displayErrorVisibility() = with(binding) {
+        val transition = TransitionSet()
+            .setOrdering(TransitionSet.ORDERING_SEQUENTIAL)
+            .addTransition(ChangeBounds())
+            .addTransition(Fade(Fade.IN).addTarget(errorBlock))
 
-        fun displayRetryUi() {
+        TransitionManager.beginDelayedTransition(nestedScrollView, transition)
+
+        val isFirstTry = aiViewModel.isHistoryEmpty()
+        if (isFirstTry) {
+            loadingPlaceholder.isVisible = true
+            propositionTextView.isGone = true
+
+            buttonLayout.isInvisible = true
             retryButton.isVisible = true
-            buttonLayout.isGone = true
-        }
-
-        fun disableNominalFlowUi() {
-            retryButton.isGone = true
-            buttonLayout.isVisible = true
-            insertPropositionButton.isEnabled = false
-            refineButton.isGone = true
-        }
-
-        if (errorType == PropositionStatus.PROMPT_TOO_LONG) {
-            displayRetryUi()
         } else {
-            disableNominalFlowUi()
+            loadingPlaceholder.isGone = true
+            propositionTextView.isVisible = true
+
+            buttonLayout.isVisible = true
+            retryButton.isGone = true
         }
 
-        loadingPlaceholder.isGone = true
         generationLoader.isGone = true
 
-        propositionTextView.isGone = true
+        errorBlock.isVisible = true
 
-        errorMessage.isVisible = true
+        refinePopupMenu.disableAllItemButModify()
     }
 
     enum class UiState {

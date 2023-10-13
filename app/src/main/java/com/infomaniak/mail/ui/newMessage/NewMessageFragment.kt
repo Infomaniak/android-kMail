@@ -920,7 +920,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun resetAiProposition() {
-        aiViewModel.aiProposition.value = null
+        aiViewModel.aiPropositionStatusLiveData.value = null
     }
 
     enum class EditorAction(val matomoValue: String) {

@@ -132,4 +132,10 @@
         <attr name="description" />
         <attr name="icon" />
     </declare-styleable>
+
+    <declare-styleable name="InformationBlockView">
+        <attr name="text" />
+        <attr name="icon" />
+        <attr name="showCloseIcon" format="boolean" />
+    </declare-styleable>
 </resources>
