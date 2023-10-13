@@ -53,6 +53,7 @@ import com.infomaniak.mail.firebase.RegisterFirebaseBroadcastReceiver
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.ui.newMessage.NewMessageActivity
+import com.infomaniak.mail.ui.sync.SyncAutoConfigActivity
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
@@ -90,6 +91,17 @@ class MainActivity : BaseActivity() {
     private val newMessageActivityResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         val draftAction = result.data?.getStringExtra(DRAFT_ACTION_KEY)?.let(DraftAction::valueOf)
         if (draftAction == DraftAction.SEND) showSendingSnackBarTimer.start()
+    }
+
+    private val syncAutoConfigActivityResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
+        result.data?.getStringExtra(SYNC_AUTO_CONFIG_KEY)?.let { reason ->
+            if (reason == SYNC_AUTO_CONFIG_ALREADY_SYNC) {
+                mainViewModel.snackBarManager.setValue(getString(R.string.errorUserAlreadySynchronized))
+            }
+            if (navController.currentDestination?.id != R.id.threadListFragment) {
+                navController.popBackStack()
+            }
+        }
     }
 
     @Inject
@@ -431,8 +443,15 @@ class MainActivity : BaseActivity() {
         newMessageActivityResultLauncher.launch(intent)
     }
 
+    fun navigateToSyncAutoConfigActivity() {
+        syncAutoConfigActivityResultLauncher.launch(Intent(this, SyncAutoConfigActivity::class.java))
+    }
+
     companion object {
         private const val FULLY_SLID = 1.0f
         const val DRAFT_ACTION_KEY = "draftAction"
+        const val SYNC_AUTO_CONFIG_KEY = "syncAutoConfigKey"
+        const val SYNC_AUTO_CONFIG_SUCCESS = "syncAutoConfigSuccess"
+        const val SYNC_AUTO_CONFIG_ALREADY_SYNC = "syncAutoConfigAlreadySync"
     }
 }
