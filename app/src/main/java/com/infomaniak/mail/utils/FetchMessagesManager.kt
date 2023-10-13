@@ -181,9 +181,9 @@ class FetchMessagesManager @Inject constructor(
             return
         }
 
-        val subject = appContext.formatSubject(message.subject)
-        val preview = if (message.body?.value.isNullOrBlank()) {
-            ""
+        val formattedPreview = message.preview.ifBlank { null }?.let { "\n${it.trim()}" } ?: ""
+        val body = if (message.body?.value.isNullOrBlank()) {
+            formattedPreview
         } else {
             message.body
                 ?.let {
@@ -192,11 +192,12 @@ class FetchMessagesManager @Inject constructor(
                     val cleanedDocument = HtmlSanitizer.getInstance().sanitize(dirtyDocument)
                     return@let "\n${cleanedDocument.wholeText().trim()}"
                 }
-                ?: message.preview.ifBlank { null }?.let { "\n${it.trim()}" }
-                ?: ""
+                ?: formattedPreview
         }
-        val formattedPreview = preview.replace("\\n+\\s*".toRegex(), "\n") // Ignore multiple/start whitespaces
-        val description = "$subject$formattedPreview"
+
+        val subject = appContext.formatSubject(message.subject)
+        val formattedBody = body.replace("\\n+\\s*".toRegex(), "\n") // Ignore multiple/start whitespaces
+        val description = "$subject$formattedBody"
 
         // Show Message notification
         notificationUtils.showMessageNotification(
