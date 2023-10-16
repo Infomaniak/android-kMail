@@ -63,13 +63,7 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
 
     override val hasValidMailboxes = true
     override val currentClassName: String = MenuDrawerFragment::class.java.name
-    override val mailboxesAdapter = MailboxesAdapter(
-        isInMenuDrawer = isInMenuDrawer,
-        hasValidMailboxes = hasValidMailboxes,
-        onValidMailboxClicked = { mailboxId -> onValidMailboxClicked(mailboxId) },
-        onLockedMailboxClicked = { mailboxEmail -> onLockedMailboxClicked(mailboxEmail) },
-        onInvalidPasswordMailboxClicked = { mailbox -> onInvalidPasswordMailboxClicked(mailbox) },
-    )
+    override val mailboxesAdapter get() = binding.mailboxList.adapter as MailboxesAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentMenuDrawerBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -175,7 +169,13 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
 
     override fun setupAdapters() {
         super.setupAdapters()
-        binding.mailboxList.adapter = mailboxesAdapter
+        binding.mailboxList.adapter = MailboxesAdapter(
+            isInMenuDrawer = isInMenuDrawer,
+            hasValidMailboxes = hasValidMailboxes,
+            onValidMailboxClicked = { mailboxId -> onValidMailboxClicked(mailboxId) },
+            onLockedMailboxClicked = { mailboxEmail -> onLockedMailboxClicked(mailboxEmail) },
+            onInvalidPasswordMailboxClicked = { mailbox -> onInvalidPasswordMailboxClicked(mailbox) },
+        )
     }
 
     override fun onFolderSelected(folderId: String) {

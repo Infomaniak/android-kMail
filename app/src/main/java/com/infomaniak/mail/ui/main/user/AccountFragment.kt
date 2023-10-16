@@ -53,13 +53,7 @@ class AccountFragment : Fragment(), MailboxListFragment {
 
     override val hasValidMailboxes = true
     override val currentClassName: String = AccountFragment::class.java.name
-    override val mailboxesAdapter = MailboxesAdapter(
-        isInMenuDrawer = false,
-        hasValidMailboxes = hasValidMailboxes,
-        onValidMailboxClicked = { mailboxId -> onValidMailboxClicked(mailboxId) },
-        onLockedMailboxClicked = { mailboxEmail -> onLockedMailboxClicked(mailboxEmail) },
-        onInvalidPasswordMailboxClicked = { mailbox -> onInvalidPasswordMailboxClicked(mailbox) },
-    )
+    override val mailboxesAdapter get() = binding.mailboxesRecyclerView.adapter as MailboxesAdapter
 
     @Inject
     lateinit var logoutUser: LogoutUser
@@ -108,7 +102,13 @@ class AccountFragment : Fragment(), MailboxListFragment {
         }
 
         mailboxesRecyclerView.apply {
-            adapter = mailboxesAdapter
+            adapter = MailboxesAdapter(
+                isInMenuDrawer = false,
+                hasValidMailboxes = hasValidMailboxes,
+                onValidMailboxClicked = { mailboxId -> onValidMailboxClicked(mailboxId) },
+                onLockedMailboxClicked = { mailboxEmail -> onLockedMailboxClicked(mailboxEmail) },
+                onInvalidPasswordMailboxClicked = { mailbox -> onInvalidPasswordMailboxClicked(mailbox) },
+            )
             isFocusable = false
         }
 

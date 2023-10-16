@@ -45,16 +45,9 @@ class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
     override val currentClassName: String = NoValidMailboxesFragment::class.java.name
     override val hasValidMailboxes = false
 
-    override val mailboxesAdapter = MailboxesAdapter(
-        isInMenuDrawer = isInMenuDrawer,
-        hasValidMailboxes = hasValidMailboxes,
-    )
+    override val mailboxesAdapter get() = binding.lockedMailboxesRecyclerView.adapter as MailboxesAdapter
 
-    private val invalidPasswordMailboxesAdapter = MailboxesAdapter(
-        isInMenuDrawer = isInMenuDrawer,
-        hasValidMailboxes = hasValidMailboxes,
-        onInvalidPasswordMailboxClicked = { mailbox -> onInvalidPasswordMailboxClicked(mailbox) },
-    )
+    private val invalidPasswordMailboxesAdapter get() = binding.invalidPasswordMailboxesRecyclerView.adapter as MailboxesAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentNoValidMailboxesBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -70,8 +63,15 @@ class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
     }
 
     private fun setupAdapters() = with(binding) {
-        lockedMailboxesRecyclerView.adapter = mailboxesAdapter
-        invalidPasswordMailboxesRecyclerView.adapter = invalidPasswordMailboxesAdapter
+        lockedMailboxesRecyclerView.adapter = MailboxesAdapter(
+            isInMenuDrawer = isInMenuDrawer,
+            hasValidMailboxes = hasValidMailboxes,
+        )
+        invalidPasswordMailboxesRecyclerView.adapter = MailboxesAdapter(
+            isInMenuDrawer = isInMenuDrawer,
+            hasValidMailboxes = hasValidMailboxes,
+            onInvalidPasswordMailboxClicked = { mailbox -> onInvalidPasswordMailboxClicked(mailbox) },
+        )
     }
 
     private fun setupListeners() = with(binding) {
