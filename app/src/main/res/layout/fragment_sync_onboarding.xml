@@ -68,7 +68,6 @@
         app:layout_constraintGuide_end="@dimen/marginStandard" />
 
     <ImageView
-
         android:id="@+id/iconLayout"
         android:layout_width="0dp"
         android:layout_height="0dp"
