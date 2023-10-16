@@ -72,7 +72,27 @@ class AccountFragment : Fragment(), MailboxListFragment {
         return FragmentAccountBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+        initUi()
+        setupListeners()
+        observeAccountsLive()
+
+        bindAlertToViewLifecycle(descriptionDialog)
+    }
+
+    private fun initUi() = with(binding) {
+        mailboxesRecyclerView.apply {
+            adapter = MailboxesAdapter(
+                isInMenuDrawer = false,
+                hasValidMailboxes = hasValidMailboxes,
+                onValidMailboxClicked = { mailboxId -> onValidMailboxClicked(mailboxId) },
+                onLockedMailboxClicked = { mailboxEmail -> onLockedMailboxClicked(mailboxEmail) },
+                onInvalidPasswordMailboxClicked = { mailbox -> onInvalidPasswordMailboxClicked(mailbox) },
+            )
+            isFocusable = false
+        }
+
         AccountUtils.currentUser?.let { user ->
             avatar.loadAvatar(user)
             name.apply {
@@ -81,7 +101,9 @@ class AccountFragment : Fragment(), MailboxListFragment {
             }
             mail.text = user.email
         }
+    }
 
+    private fun setupListeners() = with(binding) {
         changeAccountButton.setOnClickListener {
             animatedNavigation(AccountFragmentDirections.actionAccountFragmentToSwitchUserFragment())
         }
@@ -100,21 +122,6 @@ class AccountFragment : Fragment(), MailboxListFragment {
                 onPositiveButtonClicked = ::removeCurrentUser,
             )
         }
-
-        mailboxesRecyclerView.apply {
-            adapter = MailboxesAdapter(
-                isInMenuDrawer = false,
-                hasValidMailboxes = hasValidMailboxes,
-                onValidMailboxClicked = { mailboxId -> onValidMailboxClicked(mailboxId) },
-                onLockedMailboxClicked = { mailboxEmail -> onLockedMailboxClicked(mailboxEmail) },
-                onInvalidPasswordMailboxClicked = { mailbox -> onInvalidPasswordMailboxClicked(mailbox) },
-            )
-            isFocusable = false
-        }
-
-        bindAlertToViewLifecycle(descriptionDialog)
-
-        observeAccountsLive()
     }
 
     private fun removeCurrentUser() = lifecycleScope.launch(ioDispatcher) {
