@@ -104,7 +104,7 @@ class SettingsFragment : Fragment() {
 
         settingsSyncAutoConfig.setOnClickListener {
             trackSyncAutoConfigEvent("openFromSettings")
-            requireActivity().launchSyncAutoConfigActivityForResult()
+            launchSyncAutoConfigActivityForResult()
         }
 
         settingsSend.setOnClickListener {
