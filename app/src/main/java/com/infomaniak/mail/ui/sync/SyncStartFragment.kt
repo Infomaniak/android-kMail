@@ -58,7 +58,7 @@ class SyncStartFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        navigateToStartIfNeeded()
+        updateStatusIfNeeded()
     }
 
     private fun setupClickListener() = with(syncAutoConfigViewModel) {
@@ -94,7 +94,7 @@ class SyncStartFragment : Fragment() {
         finish()
     }
 
-    private fun navigateToStartIfNeeded() {
+    private fun updateStatusIfNeeded() {
         setVisibilityState(if (syncAutoConfigViewModel.isSyncAppUpToDate()) State.START else State.INSTALL)
     }
 
