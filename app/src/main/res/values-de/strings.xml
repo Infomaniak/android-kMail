@@ -451,6 +451,10 @@
     <string name="socialNetworksFolder">Soziale Netzwerke</string>
     <string name="spamFolder">Spam</string>
     <string name="subjectTitle">Thema:</string>
+    <string name="syncFragmentTitle">Synchronisieren Sie Ihre Kalender und Kontakte</string>
+    <string name="syncInstallDescription">Um die kSync-App aus dem Play Store herunterladen zu können, klicken Sie auf \"Installieren\" und kehren Sie dann zu Ihrer Mail-App zurück.</string>
+    <string name="syncInstalled">Installierte</string>
+    <string name="syncStartDescription">Aktivieren Sie die Kalender und Adressbücher in kSync, die Sie mit Ihrem Telefon synchronisieren möchten.</string>
     <string name="syncTutorialWelcomeTitle">Anzeigen Ihrer Infomaniak-Kalender und -Kontakte auf Ihrem Gerät</string>
     <plurals name="threadListDeletionConfirmationAlertDescription">
         <item quantity="one">Sind Sie sicher, dass Sie diese Nachricht endgültig löschen wollen?</item>
