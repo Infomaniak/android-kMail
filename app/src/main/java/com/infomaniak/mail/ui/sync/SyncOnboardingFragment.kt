@@ -21,10 +21,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
@@ -50,14 +48,10 @@ class SyncOnboardingFragment : Fragment() {
     }
 
     private fun setupClickListener() {
-        val (direction, trackerName) = if (syncAutoConfigViewModel.isSyncAppUpToDate()) {
-            SyncOnboardingFragmentDirections.actionSyncOnboardingFragmentToSyncStartFragment() to "openStart"
-        } else {
-            SyncOnboardingFragmentDirections.actionSyncOnboardingFragmentToSyncInstallFragment() to "openInstall"
-        }
+        val trackerName = if (syncAutoConfigViewModel.isSyncAppUpToDate()) "openStart" else "openInstall"
         binding.continueButton.setOnClickListener {
             trackSyncAutoConfigEvent(trackerName)
-            safeNavigate(direction)
+            safeNavigate(SyncOnboardingFragmentDirections.actionSyncOnboardingFragmentToSyncInstallFragment())
         }
     }
 }
