@@ -126,6 +126,7 @@ class AiPropositionFragment : Fragment() {
         }
 
         errorBlock.setOnCloseListener {
+            trackAiWriterEvent("dismissError")
             TransitionManager.beginDelayedTransition(nestedScrollView, ChangeBounds())
             errorBlock.isGone = true
         }
