@@ -29,7 +29,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import com.infomaniak.lib.core.MatomoCore
+import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.utils.goToPlayStore
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
@@ -69,7 +69,7 @@ class SyncStartFragment : Fragment() {
 
         binding.startButton.setOnClickListener {
             if (isUserAlreadySynchronized()) {
-                trackSyncAutoConfigEvent("alreadySynchronized", MatomoCore.TrackerAction.DATA)
+                trackSyncAutoConfigEvent("alreadySynchronized", TrackerAction.DATA)
                 goBackToThreadList(MainActivity.SYNC_AUTO_CONFIG_ALREADY_SYNC)
             } else {
                 trackSyncAutoConfigEvent("openSyncApp")
