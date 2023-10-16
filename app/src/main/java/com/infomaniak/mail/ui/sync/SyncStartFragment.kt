@@ -34,17 +34,17 @@ import com.infomaniak.lib.core.utils.goToPlayStore
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
 import com.infomaniak.mail.R
-import com.infomaniak.mail.databinding.FragmentSyncInstallBinding
+import com.infomaniak.mail.databinding.FragmentSyncStartBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.utils.AccountUtils
 
-class SyncInstallFragment : Fragment() {
+class SyncStartFragment : Fragment() {
 
-    private var binding: FragmentSyncInstallBinding by safeBinding()
+    private var binding: FragmentSyncStartBinding by safeBinding()
     private val syncAutoConfigViewModel: SyncAutoConfigViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return FragmentSyncInstallBinding.inflate(inflater, container, false).also { binding = it }.root
+        return FragmentSyncStartBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
