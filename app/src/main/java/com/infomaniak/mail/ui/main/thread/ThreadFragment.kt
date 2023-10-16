@@ -326,7 +326,17 @@ class ThreadFragment : Fragment() {
             }
 
             onAllExpandedMessagesLoaded = {
-                messagesListNestedScrollView.post(::scrollToFirstUnseenMessage)
+                messagesListNestedScrollView.post {
+                    runCatching {
+                        scrollToFirstUnseenMessage()
+                    }.onFailure {
+                        Sentry.withScope { scope ->
+                            scope.level = SentryLevel.INFO
+                            scope.setExtra("Number of emails in thread", itemCount.toString())
+                            Sentry.captureException(it)
+                        }
+                    }
+                }
             }
         }
     }
