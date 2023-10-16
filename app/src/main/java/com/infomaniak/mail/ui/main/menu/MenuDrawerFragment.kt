@@ -154,7 +154,7 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
 
         syncAutoConfig.setOnClickListener {
             trackSyncAutoConfigEvent("openFromMenuDrawer")
-            requireActivity().launchSyncAutoConfigActivityForResult()
+            launchSyncAutoConfigActivityForResult()
             closeDrawer()
         }
 
