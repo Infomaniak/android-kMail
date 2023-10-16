@@ -37,7 +37,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/marginStandard"
         android:gravity="center_horizontal"
-        android:text="Synchroniser vos calendriers et contacts"
+        android:text="@string/syncFragmentTitle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar" />
@@ -68,7 +68,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/marginStandard"
-                android:text="Pour pouvoir télécharger l’application kSync sur le Play Store, cliquez sur “Installer” puis revenez sur votre application Mail."
+                android:text="@string/syncInstallDescription"
                 tools:visibility="gone" />
 
             <LinearLayout
@@ -83,7 +83,8 @@
                     android:drawablePadding="@dimen/marginStandardSmall"
                     android:gravity="center_vertical"
                     android:text="kSync"
-                    app:drawableStartCompat="@drawable/ic_logo_ksync" />
+                    app:drawableStartCompat="@drawable/ic_logo_ksync"
+                    tools:ignore="HardcodedText" />
 
                 <Space
                     android:layout_width="0dp"
@@ -108,7 +109,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:drawablePadding="@dimen/marginStandardSmall"
-                        android:text="Installée"
+                        android:text="@string/syncInstalled"
                         android:visibility="gone"
                         app:drawableStartCompat="@drawable/ic_check_rounded"
                         app:drawableTint="@color/green_success"
@@ -125,10 +126,12 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/marginStandard"
         android:layout_marginTop="@dimen/marginLarge"
-        android:text="Activer les calendriers et carnets d’adresses dans kSync, que vous souhaitez synchroniser sur votre téléphone."
+        android:text="@string/syncStartDescription"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cardView" />
+        app:layout_constraintTop_toBottomOf="@id/cardView"
+        tools:visibility="visible" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/bottomGuideLine"
