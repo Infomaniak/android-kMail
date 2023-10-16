@@ -92,7 +92,7 @@ class SimpleIconPopupMenu(val context: Context, @MenuRes menuRes: Int, anchor: V
     }
 
     private companion object {
-        val DEFAULT_ICON_COLOR = R.color.iconColorSecondaryText
+        val DEFAULT_ICON_COLOR = R.color.iconColorPrimaryText
         val DISABLED_ICON_COLOR = R.color.iconColorTertiaryText
     }
 }

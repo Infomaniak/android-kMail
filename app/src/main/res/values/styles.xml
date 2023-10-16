@@ -503,7 +503,7 @@
     </style>
 
     <style name="AiRefineMenu">
-        <item name="android:textColor">@color/secondary_text_color_disabled</item>
+        <item name="android:textColor">@color/primary_text_color_disabled</item>
         <item name="colorControlHighlight">@color/color_ai_translucent_ripple</item>
         <item name="colorPrimary">@color/backgroundColorTertiary</item>
         <item name="colorSurface">@color/backgroundColorTertiary</item>
