@@ -30,6 +30,7 @@
     <color name="blueOnboardingSecondaryBackground">@color/bat</color>
 
     <!-- Context / errors -->
+    <color name="greenSuccess">@color/grass_dark</color>
     <color name="orangeWarning">@color/orange_dark</color>
     <color name="redDestructiveAction">@color/red_dark</color>
     <color name="redDestructiveActionTransparent">#1EFC8878</color>

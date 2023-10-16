@@ -30,6 +30,7 @@
     <color name="blueOnboardingSecondaryBackground">@color/blueMailContainer</color>
 
     <!-- Context / errors -->
+    <color name="greenSuccess">@color/grass_light</color>
     <color name="orangeWarning">@color/orange_light</color>
     <color name="redDestructiveAction">@color/red_light</color>
     <color name="redDestructiveActionTransparent">#1EF44336</color>

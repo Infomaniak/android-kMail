@@ -103,6 +103,7 @@ class SyncStartFragment : Fragment() {
 
         startButton.isVisible = isStart
         installedTextView.isVisible = isStart
+        startDescription.isVisible = isStart
 
         installDescription.isGone = isStart
         installButton.isGone = isStart
