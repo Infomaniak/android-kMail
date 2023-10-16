@@ -29,25 +29,12 @@
         <action
             android:id="@+id/action_syncOnboardingFragment_to_syncInstallFragment"
             app:destination="@id/syncInstallFragment" />
-        <action
-            android:id="@+id/action_syncOnboardingFragment_to_syncStartFragment"
-            app:destination="@id/syncStartFragment" />
     </fragment>
 
     <fragment
         android:id="@+id/syncInstallFragment"
         android:name="com.infomaniak.mail.ui.sync.SyncInstallFragment"
         android:label="SyncInstallFragment"
-        tools:layout="@layout/fragment_sync_install">
-        <action
-            android:id="@+id/action_syncInstallFragment_to_syncStartFragment"
-            app:destination="@id/syncStartFragment" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/syncStartFragment"
-        android:name="com.infomaniak.mail.ui.sync.SyncStartFragment"
-        android:label="SyncStartFragment"
-        tools:layout="@layout/fragment_sync_start" />
+        tools:layout="@layout/fragment_sync_install" />
 
 </navigation>

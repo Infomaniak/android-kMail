@@ -17,20 +17,26 @@
  */
 package com.infomaniak.mail.ui.sync
 
+import android.accounts.AccountManager
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import com.infomaniak.lib.core.utils.context
+import com.infomaniak.lib.core.MatomoCore
 import com.infomaniak.lib.core.utils.goToPlayStore
 import com.infomaniak.lib.core.utils.safeBinding
-import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentSyncInstallBinding
+import com.infomaniak.mail.ui.MainActivity
+import com.infomaniak.mail.utils.AccountUtils
 
 class SyncInstallFragment : Fragment() {
 
@@ -55,16 +61,60 @@ class SyncInstallFragment : Fragment() {
         navigateToStartIfNeeded()
     }
 
-    private fun setupClickListener() = with(binding) {
-        installButton.setOnClickListener {
+    private fun setupClickListener() = with(syncAutoConfigViewModel) {
+        binding.installButton.setOnClickListener {
             trackSyncAutoConfigEvent("openPlayStore")
-            context.goToPlayStore(SyncAutoConfigViewModel.SYNC_PACKAGE)
+            requireContext().goToPlayStore(SyncAutoConfigViewModel.SYNC_PACKAGE)
+        }
+
+        binding.startButton.setOnClickListener {
+            if (isUserAlreadySynchronized()) {
+                trackSyncAutoConfigEvent("alreadySynchronized", MatomoCore.TrackerAction.DATA)
+                goBackToThreadList(MainActivity.SYNC_AUTO_CONFIG_ALREADY_SYNC)
+            } else {
+                trackSyncAutoConfigEvent("openSyncApp")
+                configureUserAutoSync { intent ->
+                    startActivity(intent)
+                    goBackToThreadList(MainActivity.SYNC_AUTO_CONFIG_SUCCESS)
+                }
+            }
         }
     }
 
+    private fun isUserAlreadySynchronized(): Boolean {
+        val accountManager = AccountManager.get(requireContext())
+        val accounts = accountManager.getAccountsByType(ACCOUNTS_TYPE)
+        val account = accounts.find { accountManager.getUserData(it, USER_NAME_KEY) == AccountUtils.currentUser?.login }
+
+        return account != null
+    }
+
+    private fun goBackToThreadList(reason: String) = with(requireActivity()) {
+        setResult(AppCompatActivity.RESULT_OK, Intent().putExtra(MainActivity.SYNC_AUTO_CONFIG_KEY, reason))
+        finish()
+    }
+
     private fun navigateToStartIfNeeded() {
-        if (syncAutoConfigViewModel.isSyncAppUpToDate()) {
-            safeNavigate(SyncInstallFragmentDirections.actionSyncInstallFragmentToSyncStartFragment())
-        }
+        setVisibilityState(if (syncAutoConfigViewModel.isSyncAppUpToDate()) State.START else State.INSTALL)
+    }
+
+    private fun setVisibilityState(state: State) = with(binding) {
+        val isStart = state == State.START
+
+        startButton.isVisible = isStart
+        installedTextView.isVisible = isStart
+
+        installDescription.isGone = isStart
+        installButton.isGone = isStart
+    }
+
+    private enum class State {
+        INSTALL,
+        START,
+    }
+
+    private companion object {
+        const val ACCOUNTS_TYPE = "infomaniak.com.sync"
+        const val USER_NAME_KEY = "user_name"
     }
 }
