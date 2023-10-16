@@ -147,10 +147,20 @@
         android:layout_marginHorizontal="@dimen/marginStandard"
         android:text="@string/buttonStartSync"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/dummyButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/bottomGuideLine"
         tools:visibility="visible" />
+
+    <View
+        android:id="@+id/dummyButton"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/textButtonPrimaryHeight"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/startButton" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
