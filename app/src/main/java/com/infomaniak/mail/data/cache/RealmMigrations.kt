@@ -23,19 +23,28 @@ import io.realm.kotlin.migration.AutomaticSchemaMigration.MigrationContext
 
 val USER_INFO_MIGRATION = AutomaticSchemaMigration { migrationContext ->
     SentryDebug.addMigrationBreadcrumb(migrationContext)
-    migrationContext.deleteRealmFromFirstMigration()
+    migrationContext.deleteAllRealm()
 }
 
 val MAILBOX_INFO_MIGRATION = AutomaticSchemaMigration { migrationContext ->
     SentryDebug.addMigrationBreadcrumb(migrationContext)
-    migrationContext.deleteRealmFromFirstMigration()
+    migrationContext.deleteAllRealm()
 }
 
 val MAILBOX_CONTENT_MIGRATION = AutomaticSchemaMigration { migrationContext ->
     SentryDebug.addMigrationBreadcrumb(migrationContext)
-    migrationContext.deleteRealmFromFirstMigration()
+    migrationContext.deleteAllRealm()
+    migrationContext.deleteSignatureTable()
 }
 
-private fun MigrationContext.deleteRealmFromFirstMigration() {
-    if (oldRealm.schemaVersion() == 0L) newRealm.deleteAll()
+// Migrate to version #1
+private fun MigrationContext.deleteAllRealm() {
+    if (oldRealm.schemaVersion() < 1L) newRealm.deleteAll()
+}
+
+// Migrate to version #9
+private fun MigrationContext.deleteSignatureTable() {
+    if (oldRealm.schemaVersion() < 9L && newRealm.schemaVersion() >= 9L) {
+        runCatching { newRealm.delete("Signature") }
+    }
 }
