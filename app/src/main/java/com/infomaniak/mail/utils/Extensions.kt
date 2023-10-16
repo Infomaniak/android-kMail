@@ -538,6 +538,10 @@ fun Context.launchNoMailboxActivity(userId: Int? = null, shouldStartLoginActivit
     startActivities(intentsArray)
 }
 
+fun Fragment.launchSyncAutoConfigActivityForResult() {
+    (requireActivity() as MainActivity).navigateToSyncAutoConfigActivity()
+}
+
 fun TextInputLayout.setOnClearTextClickListener(trackerCallback: () -> Unit) {
     setEndIconOnClickListener {
         editText?.text?.clear()
