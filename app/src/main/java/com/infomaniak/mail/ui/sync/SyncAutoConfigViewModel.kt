@@ -54,7 +54,6 @@ class SyncAutoConfigViewModel @Inject constructor(
         false
     }
 
-    // TODO: Add all Matomo in SyncAutoConfig feature
     fun fetchCredentials(onSuccess: (Intent) -> Unit) {
 
         credentialsJob?.cancel()
