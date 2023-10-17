@@ -29,7 +29,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.withStarted
-import com.infomaniak.lib.core.utils.*
+import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.lib.core.utils.setMarginsRelative
+import com.infomaniak.lib.core.utils.showKeyboard
+import com.infomaniak.lib.core.utils.toPx
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentAiPromptBinding
 import com.infomaniak.mail.utils.postfixWithTag
@@ -89,7 +92,7 @@ class AiPromptFragment : Fragment() {
             R.color.aiBetaTagTextColor,
         )
 
-        prompt.safePost(prompt::showKeyboard)
+        prompt.showKeyboard()
         initPromptTextAndPlaceholder()
         closeButton.setOnClickListener { newMessageFragment.closeAiPrompt() }
 
