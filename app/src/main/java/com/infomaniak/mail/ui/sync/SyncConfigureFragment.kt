@@ -96,23 +96,23 @@ class SyncConfigureFragment : Fragment() {
     }
 
     private fun updateStatusIfNeeded() {
-        setVisibilityState(if (syncAutoConfigViewModel.isSyncAppUpToDate()) State.START else State.INSTALL)
+        setVisibilityState(state = if (syncAutoConfigViewModel.isSyncAppUpToDate()) State.READY else State.INSTALL)
     }
 
     private fun setVisibilityState(state: State) = with(binding) {
-        val isStart = state == State.START
+        val isReady = state == State.READY
 
-        startButton.isVisible = isStart
-        installedTextView.isVisible = isStart
-        startDescription.isVisible = isStart
+        startButton.isVisible = isReady
+        installedTextView.isVisible = isReady
+        startDescription.isVisible = isReady
 
-        installDescription.isGone = isStart
-        installButton.isGone = isStart
+        installDescription.isGone = isReady
+        installButton.isGone = isReady
     }
 
     private enum class State {
         INSTALL,
-        START,
+        READY,
     }
 
     private companion object {
