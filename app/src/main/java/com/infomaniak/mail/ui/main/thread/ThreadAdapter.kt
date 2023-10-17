@@ -59,6 +59,15 @@ import com.google.android.material.R as RMaterial
 
 class ThreadAdapter(
     private val shouldLoadDistantResources: Boolean,
+    onContactClicked: (contact: Recipient) -> Unit,
+    onDeleteDraftClicked: (message: Message) -> Unit,
+    onDraftClicked: (message: Message) -> Unit,
+    onAttachmentClicked: (attachment: Attachment) -> Unit,
+    onDownloadAllClicked: (message: Message) -> Unit,
+    onReplyClicked: (Message) -> Unit,
+    onMenuClicked: (Message) -> Unit,
+    navigateToNewMessageActivity: (Uri) -> Unit,
+    onAllExpandedMessagesLoaded: () -> Unit,
 ) : ListAdapter<Message, ThreadViewHolder>(MessageDiffCallback()) {
 
     inline val messages: MutableList<Message> get() = currentList
@@ -72,20 +81,26 @@ class ThreadAdapter(
     var isThemeTheSameMap = mutableMapOf<String, Boolean>()
     var contacts: MergedContactDictionary = emptyMap()
 
-    var onContactClicked: ((contact: Recipient) -> Unit)? = null
-    var onDeleteDraftClicked: ((message: Message) -> Unit)? = null
-    var onDraftClicked: ((message: Message) -> Unit)? = null
-    var onAttachmentClicked: ((attachment: Attachment) -> Unit)? = null
-    var onDownloadAllClicked: ((message: Message) -> Unit)? = null
-    var onReplyClicked: ((Message) -> Unit)? = null
-    var onMenuClicked: ((Message) -> Unit)? = null
-    var navigateToNewMessageActivity: ((Uri) -> Unit)? = null
-    var onAllExpandedMessagesLoaded: (() -> Unit)? = null
+    private var threadAdapterCallbacks: ThreadAdapterCallbacks? = null
 
     private lateinit var recyclerView: RecyclerView
     private val webViewUtils by lazy { WebViewUtils(recyclerView.context) }
 
     private val scaledTouchSlop by lazy { ViewConfiguration.get(recyclerView.context).scaledTouchSlop }
+
+    init {
+        threadAdapterCallbacks = ThreadAdapterCallbacks(
+            onContactClicked,
+            onDeleteDraftClicked,
+            onDraftClicked,
+            onAttachmentClicked,
+            onDownloadAllClicked,
+            onReplyClicked,
+            onMenuClicked,
+            navigateToNewMessageActivity,
+            onAllExpandedMessagesLoaded,
+        )
+    }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         this.recyclerView = recyclerView
@@ -98,8 +113,8 @@ class ThreadAdapter(
         return ThreadViewHolder(
             ItemMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false),
             shouldLoadDistantResources,
-            onContactClicked,
-            onAttachmentClicked,
+            threadAdapterCallbacks?.onContactClicked,
+            threadAdapterCallbacks?.onAttachmentClicked,
         )
     }
 
@@ -257,7 +272,7 @@ class ThreadAdapter(
         message.sender?.let { recipient ->
             userAvatar.setOnClickListener {
                 context.trackMessageEvent("selectAvatar")
-                onContactClicked?.invoke(recipient)
+                threadAdapterCallbacks?.onContactClicked?.invoke(recipient)
             }
         }
 
@@ -307,7 +322,7 @@ class ThreadAdapter(
                 onExpandOrCollapseMessage(message)
             } else {
                 if (message.isDraft) {
-                    onDraftClicked?.invoke(message)
+                    threadAdapterCallbacks?.onDraftClicked?.invoke(message)
                 } else {
                     isExpandedMap[message.uid] = true
                     onExpandOrCollapseMessage(message)
@@ -376,7 +391,9 @@ class ThreadAdapter(
             attachments.size,
         ) + " ($fileSize)"
         attachmentAdapter.setAttachments(attachments)
-        attachmentLayout.attachmentsDownloadAllButton.setOnClickListener { onDownloadAllClicked?.invoke(message) }
+        attachmentLayout.attachmentsDownloadAllButton.setOnClickListener {
+            threadAdapterCallbacks?.onDownloadAllClicked?.invoke(message)
+        }
         attachmentLayout.root.isVisible = message.attachments.isNotEmpty()
     }
 
@@ -415,7 +432,7 @@ class ThreadAdapter(
 
         initWebViewClientIfNeeded(
             message,
-            navigateToNewMessageActivity,
+            threadAdapterCallbacks?.navigateToNewMessageActivity,
             onPageFinished = { onExpandedMessageLoaded(message.uid) },
         )
 
@@ -431,7 +448,7 @@ class ThreadAdapter(
             currentSetOfLoadedExpandedMessagesUids.add(messageUid)
             if (currentSetOfLoadedExpandedMessagesUids.containsAll(initialSetOfExpandedMessagesUids)) {
                 hasNotScrolledYet = false
-                onAllExpandedMessagesLoaded?.invoke()
+                threadAdapterCallbacks?.onAllExpandedMessagesLoaded?.invoke()
             }
         }
     }
@@ -449,15 +466,15 @@ class ThreadAdapter(
     private fun ItemMessageBinding.setHeaderState(message: Message, isExpanded: Boolean) {
         deleteDraftButton.apply {
             isVisible = message.isDraft
-            setOnClickListener { onDeleteDraftClicked?.invoke(message) }
+            setOnClickListener { threadAdapterCallbacks?.onDeleteDraftClicked?.invoke(message) }
         }
         replyButton.apply {
             isVisible = isExpanded
-            setOnClickListener { onReplyClicked?.invoke(message) }
+            setOnClickListener { threadAdapterCallbacks?.onReplyClicked?.invoke(message) }
         }
         menuButton.apply {
             isVisible = isExpanded
-            setOnClickListener { onMenuClicked?.invoke(message) }
+            setOnClickListener { threadAdapterCallbacks?.onMenuClicked?.invoke(message) }
         }
 
         recipient.text = if (isExpanded) getAllRecipientsFormatted(message) else context.formatSubject(message.subject)
@@ -493,15 +510,7 @@ class ThreadAdapter(
     }
 
     fun resetCallbacks() {
-        onContactClicked = null
-        onDeleteDraftClicked = null
-        onDraftClicked = null
-        onAttachmentClicked = null
-        onDownloadAllClicked = null
-        onReplyClicked = null
-        onMenuClicked = null
-        navigateToNewMessageActivity = null
-        onAllExpandedMessagesLoaded = null
+        threadAdapterCallbacks = null
     }
 
     private enum class NotifyType {
@@ -596,4 +605,16 @@ class ThreadAdapter(
             }
         }
     }
+
+    private data class ThreadAdapterCallbacks(
+        var onContactClicked: (contact: Recipient) -> Unit,
+        var onDeleteDraftClicked: (message: Message) -> Unit,
+        var onDraftClicked: (message: Message) -> Unit,
+        var onAttachmentClicked: (attachment: Attachment) -> Unit,
+        var onDownloadAllClicked: (message: Message) -> Unit,
+        var onReplyClicked: (Message) -> Unit,
+        var onMenuClicked: (Message) -> Unit,
+        var navigateToNewMessageActivity: (Uri) -> Unit,
+        var onAllExpandedMessagesLoaded: () -> Unit,
+    )
 }
