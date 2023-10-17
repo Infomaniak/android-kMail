@@ -53,7 +53,7 @@ class SyncOnboardingFragment : Fragment() {
         val trackerName = if (syncAutoConfigViewModel.isSyncAppUpToDate()) "configureReady" else "configureInstall"
         binding.continueButton.setOnClickListener {
             trackSyncAutoConfigEvent(trackerName)
-            safeNavigate(SyncOnboardingFragmentDirections.actionSyncOnboardingFragmentToSyncInstallFragment())
+            safeNavigate(SyncOnboardingFragmentDirections.actionSyncOnboardingFragmentToSyncConfigureFragment())
         }
     }
 }

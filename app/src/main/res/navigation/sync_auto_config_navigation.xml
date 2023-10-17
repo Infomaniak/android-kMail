@@ -27,14 +27,14 @@
         android:label="SyncOnboardingFragment"
         tools:layout="@layout/fragment_sync_onboarding">
         <action
-            android:id="@+id/action_syncOnboardingFragment_to_syncInstallFragment"
-            app:destination="@id/syncInstallFragment" />
+            android:id="@+id/action_syncOnboardingFragment_to_syncConfigureFragment"
+            app:destination="@id/syncConfigureFragment" />
     </fragment>
 
     <fragment
-        android:id="@+id/syncInstallFragment"
-        android:name="com.infomaniak.mail.ui.sync.SyncStartFragment"
-        android:label="SyncInstallFragment"
-        tools:layout="@layout/fragment_sync_start" />
+        android:id="@+id/syncConfigureFragment"
+        android:name="com.infomaniak.mail.ui.sync.SyncConfigureFragment"
+        android:label="SyncConfigureFragment"
+        tools:layout="@layout/fragment_sync_configure" />
 
 </navigation>
