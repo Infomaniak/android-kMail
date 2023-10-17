@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.bottomSheetDialogs
 
-import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
@@ -27,36 +26,22 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.ai.AiPromptOpeningStatus
 import com.infomaniak.mail.ui.newMessage.AiViewModel
 
-class AiDiscoveryBottomSheetDialog : InformationBottomSheetDialog() {
+class AiDiscoveryBottomSheetDialog : DiscoveryBottomSheetDialog() {
 
     private val aiViewModel: AiViewModel by activityViewModels()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
+    override val titleRes = R.string.aiDiscoveryTitle
+    override val descriptionRes = R.string.aiDiscoveryDescription
+    override val illustrationRes = R.drawable.illustration_discover_ai
+    override val positiveButtonRes = R.string.buttonTry
+    override val trackMatomoWithCategory: (name: String) -> Unit = { trackAiWriterEvent(it) }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        infoIllustration.setBackgroundResource(R.drawable.illustration_discover_ai)
-        title.setText(R.string.aiDiscoveryTitle)
-        description.setText(R.string.aiDiscoveryDescription)
-
-        actionButton.apply {
-            setText(R.string.buttonTry)
-            setOnClickListener {
-                trackAiWriterEvent("discoverTry")
-                aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(isOpened = true)
-                dismiss()
-            }
-        }
-
-        secondaryActionButton.setOnClickListener {
-            trackAiWriterEvent("discoverLater")
-            dismiss()
-        }
-
         dialog?.window?.setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE)
     }
 
-    override fun onCancel(dialog: DialogInterface) {
-        trackAiWriterEvent("discoverLater")
-        super.onCancel(dialog)
+    override fun onPositiveButtonClicked() {
+        aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(isOpened = true)
     }
 }
