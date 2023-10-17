@@ -86,7 +86,7 @@ class ThreadFragment : Fragment() {
     private val mainViewModel: MainViewModel by activityViewModels()
     private val threadViewModel: ThreadViewModel by viewModels()
 
-    private val threadAdapter get() = binding.messagesList.adapter as ThreadAdapter
+    private val threadAdapter inline get() = binding.messagesList.adapter as ThreadAdapter
     private val permissionUtils by lazy { PermissionUtils(this) }
     private val isNotInSpam by lazy { mainViewModel.currentFolder.value?.role != FolderRole.SPAM }
 

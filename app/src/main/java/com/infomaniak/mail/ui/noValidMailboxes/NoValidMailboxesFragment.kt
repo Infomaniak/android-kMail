@@ -47,7 +47,8 @@ class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
 
     override val mailboxesAdapter get() = binding.lockedMailboxesRecyclerView.adapter as MailboxesAdapter
 
-    private val invalidPasswordMailboxesAdapter get() = binding.invalidPasswordMailboxesRecyclerView.adapter as MailboxesAdapter
+    private val invalidPasswordMailboxesAdapter
+        inline get() = binding.invalidPasswordMailboxesRecyclerView.adapter as MailboxesAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentNoValidMailboxesBinding.inflate(inflater, container, false).also { binding = it }.root

@@ -111,7 +111,7 @@ class NewMessageFragment : Fragment() {
 
     private var aiPromptFragment: AiPromptFragment? = null
 
-    private val attachmentAdapter get() = binding.attachmentsRecyclerView.adapter as AttachmentAdapter
+    private val attachmentAdapter inline get() = binding.attachmentsRecyclerView.adapter as AttachmentAdapter
 
     private val newMessageActivity by lazy { requireActivity() as NewMessageActivity }
     private val webViewUtils by lazy { WebViewUtils(requireContext()) }

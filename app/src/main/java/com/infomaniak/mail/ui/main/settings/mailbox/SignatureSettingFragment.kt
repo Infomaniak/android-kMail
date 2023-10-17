@@ -37,7 +37,7 @@ class SignatureSettingFragment : Fragment() {
     private var binding: FragmentSignatureSettingBinding by safeBinding()
     private val signatureSettingViewModel: SignatureSettingViewModel by viewModels()
 
-    private val signatureAdapter get() = binding.signatureList.adapter as SignatureSettingAdapter
+    private val signatureAdapter inline get() = binding.signatureList.adapter as SignatureSettingAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentSignatureSettingBinding.inflate(inflater, container, false).also { binding = it }.root
