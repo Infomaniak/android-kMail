@@ -22,7 +22,6 @@
     android:layout_height="match_parent"
     tools:context=".ui.sync.SyncAutoConfigActivity">
 
-
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/syncAutoConfigHostFragment"
         android:name="androidx.navigation.fragment.NavHostFragment"
