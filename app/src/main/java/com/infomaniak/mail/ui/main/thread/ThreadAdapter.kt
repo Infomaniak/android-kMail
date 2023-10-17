@@ -492,6 +492,18 @@ class ThreadAdapter(
         }
     }
 
+    fun resetCallbacks() {
+        onContactClicked = null
+        onDeleteDraftClicked = null
+        onDraftClicked = null
+        onAttachmentClicked = null
+        onDownloadAllClicked = null
+        onReplyClicked = null
+        onMenuClicked = null
+        navigateToNewMessageActivity = null
+        onAllExpandedMessagesLoaded = null
+    }
+
     private enum class NotifyType {
         AVATAR,
         TOGGLE_LIGHT_MODE,

@@ -144,6 +144,11 @@ class ThreadFragment : Fragment() {
         bindAlertToViewLifecycle(descriptionDialog)
     }
 
+    override fun onDestroyView() {
+        threadAdapter.resetCallbacks()
+        super.onDestroyView()
+    }
+
     private fun observeSubjectUpdateTriggers() {
         threadViewModel.assembleSubjectData(mainViewModel.mergedContactsLive).observe(viewLifecycleOwner) { result ->
             result.thread?.let {
@@ -325,15 +330,7 @@ class ThreadFragment : Fragment() {
                 safeNavigateToNewMessageActivity(NewMessageActivityArgs(mailToUri = uri).toBundle())
             }
 
-            onAllExpandedMessagesLoaded = {
-                messagesListNestedScrollView.safePost(::scrollToFirstUnseenMessage) {
-                    Sentry.withScope { scope ->
-                        scope.level = SentryLevel.INFO
-                        scope.setExtra("Number of emails in thread", itemCount.toString())
-                        Sentry.captureException(it)
-                    }
-                }
-            }
+            onAllExpandedMessagesLoaded = ::scrollToFirstUnseenMessage
         }
     }
 
