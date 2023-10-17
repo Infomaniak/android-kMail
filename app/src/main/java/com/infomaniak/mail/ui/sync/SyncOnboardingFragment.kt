@@ -41,8 +41,10 @@ class SyncOnboardingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        requireActivity().window.statusBarColor = requireContext().getColor(R.color.onboarding_secondary_background)
-        binding.toolbar.setNavigationOnClickListener { requireActivity().finish() }
+        with(requireActivity()) {
+            window.statusBarColor = getColor(R.color.onboarding_secondary_background)
+            binding.toolbar.setNavigationOnClickListener { finish() }
+        }
 
         setupClickListener()
     }
