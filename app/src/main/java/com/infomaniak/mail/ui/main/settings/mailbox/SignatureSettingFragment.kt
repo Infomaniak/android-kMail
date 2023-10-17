@@ -37,7 +37,7 @@ class SignatureSettingFragment : Fragment() {
     private var binding: FragmentSignatureSettingBinding by safeBinding()
     private val signatureSettingViewModel: SignatureSettingViewModel by viewModels()
 
-    private lateinit var signatureAdapter: SignatureSettingAdapter
+    private val signatureAdapter inline get() = binding.signatureList.adapter as SignatureSettingAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentSignatureSettingBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -58,7 +58,7 @@ class SignatureSettingFragment : Fragment() {
         binding.signatureList.adapter = SignatureSettingAdapter(
             canManageSignature = mailbox.permissions?.canManageSignatures ?: false,
             onSignatureSelected = ::onSignatureClicked,
-        ).also { signatureAdapter = it }
+        )
     }
 
     private fun observeApiError() {

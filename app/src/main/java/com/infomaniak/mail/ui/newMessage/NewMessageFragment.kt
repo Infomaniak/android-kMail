@@ -111,7 +111,7 @@ class NewMessageFragment : Fragment() {
 
     private var aiPromptFragment: AiPromptFragment? = null
 
-    private val attachmentAdapter = AttachmentAdapter(shouldDisplayCloseButton = true, onDelete = ::onDeleteAttachment)
+    private val attachmentAdapter inline get() = binding.attachmentsRecyclerView.adapter as AttachmentAdapter
 
     private val newMessageActivity by lazy { requireActivity() as NewMessageActivity }
     private val webViewUtils by lazy { WebViewUtils(requireContext()) }
@@ -219,7 +219,7 @@ class NewMessageFragment : Fragment() {
             WebSettingsCompat.setAlgorithmicDarkeningAllowed(quoteWebView.settings, true)
         }
 
-        attachmentsRecyclerView.adapter = attachmentAdapter
+        attachmentsRecyclerView.adapter = AttachmentAdapter(shouldDisplayCloseButton = true, onDelete = ::onDeleteAttachment)
 
         setupAutoCompletionFields()
 
