@@ -17,19 +17,14 @@
  */
 package com.infomaniak.mail.ui.bottomSheetDialogs
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
+import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.utils.launchSyncAutoConfigActivityForResult
-import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
-@AndroidEntryPoint
 class SyncDiscoveryBottomSheetDialog : InformationBottomSheetDialog() {
-
-    @Inject
-    lateinit var localSettings: LocalSettings
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
@@ -40,13 +35,20 @@ class SyncDiscoveryBottomSheetDialog : InformationBottomSheetDialog() {
         actionButton.apply {
             setText(R.string.buttonStart)
             setOnClickListener {
+                trackSyncAutoConfigEvent("discoverTry")
                 launchSyncAutoConfigActivityForResult()
                 dismiss()
             }
         }
 
         secondaryActionButton.setOnClickListener {
+            trackSyncAutoConfigEvent("discoverLater")
             dismiss()
         }
+    }
+
+    override fun onCancel(dialog: DialogInterface) {
+        trackSyncAutoConfigEvent("discoverLater")
+        super.onCancel(dialog)
     }
 }
