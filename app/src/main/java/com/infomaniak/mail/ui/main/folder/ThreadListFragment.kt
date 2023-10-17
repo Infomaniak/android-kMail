@@ -488,10 +488,12 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             }
             waitingBeforeNotifyAdapter = threadListViewModel.isRecoveringFinished
             afterUpdateAdapter = { threads ->
-                if (hasSwitchedToAnotherFolder()) scrollToTop()
-
                 if (currentFilter.value == ThreadFilter.UNSEEN && threads.isEmpty()) {
                     currentFilter.value = ThreadFilter.ALL
+                }
+                if (hasSwitchedToAnotherFolder()) {
+                    threadListAdapter.updateLoadMore(shouldDisplayLoadMore = false)
+                    scrollToTop()
                 }
             }
         }
@@ -526,16 +528,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun observeCurrentFolder() {
         mainViewModel.currentFolder.observeNotNull(viewLifecycleOwner) { folder ->
-
             lastUpdatedDate = null
-
             displayFolderName(folder)
-
-            threadListAdapter.apply {
-                updateFolderRole(folder.role)
-                if (hasSwitchedToAnotherFolder()) updateLoadMore(shouldDisplayLoadMore = false)
-            }
-
+            threadListAdapter.updateFolderRole(folder.role)
             binding.newMessageFab.extend()
         }
     }
