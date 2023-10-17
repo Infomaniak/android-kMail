@@ -64,10 +64,9 @@ class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
     }
 
     private fun setupAdapters() = with(binding) {
-        lockedMailboxesRecyclerView.adapter = MailboxesAdapter(
-            isInMenuDrawer = isInMenuDrawer,
-            hasValidMailboxes = hasValidMailboxes,
-        )
+
+        lockedMailboxesRecyclerView.adapter = MailboxesAdapter(isInMenuDrawer, hasValidMailboxes)
+
         invalidPasswordMailboxesRecyclerView.adapter = MailboxesAdapter(
             isInMenuDrawer = isInMenuDrawer,
             hasValidMailboxes = hasValidMailboxes,
