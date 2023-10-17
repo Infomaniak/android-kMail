@@ -191,9 +191,11 @@ object SentryDebug {
             if (missingUids.isNotEmpty()) {
                 Sentry.withScope { scope ->
                     scope.level = SentryLevel.ERROR
-                    scope.setExtra("missingMessages", "${missingUids.map { it.toString().toLongUid(folder.id) }}")
-                    scope.setExtra("previousCursor", "${folder.cursor}")
-                    scope.setExtra("newCursor", newCursor)
+                    scope.setExtra("1. newCursor", newCursor)
+                    scope.setExtra("2. previousCursor", "${folder.cursor}")
+                    scope.setExtra("3. input", "${sentUids.map { it }}")
+                    scope.setExtra("4. output", "${receivedMessages.map { it.shortUid }}")
+                    scope.setExtra("5. missing", "${missingUids.map { it.toString().toLongUid(folder.id) }}")
                     Sentry.captureMessage("We tried to download some Messages, but they were nowhere to be found.")
                 }
             }
