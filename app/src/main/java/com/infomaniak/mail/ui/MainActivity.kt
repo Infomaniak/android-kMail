@@ -158,6 +158,7 @@ class MainActivity : BaseActivity() {
         setupMenuDrawerCallbacks()
 
         handleUpdates()
+        showSyncDiscovery()
 
         mainViewModel.updateUserInfo()
         mainViewModel.updateFeatureFlag()
@@ -432,6 +433,13 @@ class MainActivity : BaseActivity() {
             checkUpdateIsAvailable(BuildConfig.APPLICATION_ID, BuildConfig.VERSION_CODE) { updateIsAvailable ->
                 if (updateIsAvailable) navController.navigate(R.id.updateAvailableBottomSheetDialog)
             }
+        }
+    }
+
+    private fun showSyncDiscovery() {
+        if (localSettings.showSyncDiscoveryBottomSheet && localSettings.appLaunches > 5) {
+            localSettings.showSyncDiscoveryBottomSheet = false
+            navController.navigate(R.id.syncDiscoveryBottomSheetDialog)
         }
     }
 

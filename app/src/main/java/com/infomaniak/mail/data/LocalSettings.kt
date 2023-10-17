@@ -285,6 +285,12 @@ class LocalSettings private constructor(context: Context) {
         set(value) = sharedPreferences.transaction { putBoolean(SHOW_AI_DISCOVERY_BOTTOM_SHEET_KEY, value) }
     //endregion
 
+    //region Sync
+    var showSyncDiscoveryBottomSheet: Boolean
+        get() = sharedPreferences.getBoolean(SHOW_SYNC_DISCOVERY_BOTTOM_SHEET_KEY, DEFAULT_SHOW_SYNC_DISCOVERY_BOTTOM_SHEET)
+        set(value) = sharedPreferences.transaction { putBoolean(SHOW_SYNC_DISCOVERY_BOTTOM_SHEET_KEY, value) }
+    //endregion
+
     //region Utils
     private inline fun <reified T : Enum<T>> getEnum(key: String, default: T): T {
         return enumValueOfOrNull<T>(sharedPreferences.getString(key, default.name)) ?: default
@@ -321,6 +327,7 @@ class LocalSettings private constructor(context: Context) {
         private val DEFAULT_FIREBASE_REGISTERED_USERS = emptySet<String>()
         private val DEFAULT_AI_REPLACEMENT_DIALOG_VISIBILITY = AiReplacementDialogVisibility.SHOW
         private const val DEFAULT_SHOW_AI_DISCOVERY_BOTTOM_SHEET = true
+        private const val DEFAULT_SHOW_SYNC_DISCOVERY_BOTTOM_SHEET = true
         //endregion
 
         //region Keys
@@ -345,6 +352,7 @@ class LocalSettings private constructor(context: Context) {
         private const val FIREBASE_REGISTERED_USERS_KEY = "firebaseRegisteredUsersKey"
         private const val AI_REPLACEMENT_DIALOG_VISIBILITY_KEY = "aiReplacementDialogVisibilityKey"
         private const val SHOW_AI_DISCOVERY_BOTTOM_SHEET_KEY = "showAiDiscoveryBottomSheetKey"
+        private const val SHOW_SYNC_DISCOVERY_BOTTOM_SHEET_KEY = "showSyncDiscoveryBottomSheetKey"
         //endregion
 
         @Volatile
