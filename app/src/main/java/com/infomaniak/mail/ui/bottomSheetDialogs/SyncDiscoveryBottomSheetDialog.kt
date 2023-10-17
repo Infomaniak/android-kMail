@@ -17,38 +17,19 @@
  */
 package com.infomaniak.mail.ui.bottomSheetDialogs
 
-import android.content.DialogInterface
-import android.os.Bundle
-import android.view.View
 import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.launchSyncAutoConfigActivityForResult
 
-class SyncDiscoveryBottomSheetDialog : InformationBottomSheetDialog() {
+class SyncDiscoveryBottomSheetDialog : DiscoveryBottomSheetDialog() {
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
-        super.onViewCreated(view, savedInstanceState)
+    override val titleRes = R.string.syncTutorialWelcomeTitle
+    override val descriptionRes = null
+    override val illustrationRes = R.drawable.illustration_discover_sync
+    override val positiveButtonRes = R.string.buttonStart
+    override val trackMatomoWithCategory: (name: String) -> Unit = { trackSyncAutoConfigEvent(it) }
 
-        title.setText(R.string.syncTutorialWelcomeTitle)
-        infoIllustration.setBackgroundResource(R.drawable.illustration_discover_sync)
-
-        actionButton.apply {
-            setText(R.string.buttonStart)
-            setOnClickListener {
-                trackSyncAutoConfigEvent("discoverTry")
-                launchSyncAutoConfigActivityForResult()
-                dismiss()
-            }
-        }
-
-        secondaryActionButton.setOnClickListener {
-            trackSyncAutoConfigEvent("discoverLater")
-            dismiss()
-        }
-    }
-
-    override fun onCancel(dialog: DialogInterface) {
-        trackSyncAutoConfigEvent("discoverLater")
-        super.onCancel(dialog)
+    override fun onPositiveButtonClicked() {
+        launchSyncAutoConfigActivityForResult()
     }
 }
