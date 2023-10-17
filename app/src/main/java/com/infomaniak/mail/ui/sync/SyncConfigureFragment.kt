@@ -30,6 +30,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
+import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.goToPlayStore
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
@@ -53,7 +54,7 @@ class SyncConfigureFragment : Fragment() {
         requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundColor)
         binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
 
-        setupClickListener()
+        setupListeners()
     }
 
     override fun onResume() {
@@ -61,19 +62,19 @@ class SyncConfigureFragment : Fragment() {
         updateStatusIfNeeded()
     }
 
-    private fun setupClickListener() = with(syncAutoConfigViewModel) {
-        binding.installButton.setOnClickListener {
+    private fun setupListeners() = with(binding) {
+        installButton.setOnClickListener {
             trackSyncAutoConfigEvent("openPlayStore")
-            requireContext().goToPlayStore(SyncAutoConfigViewModel.SYNC_PACKAGE)
+            context.goToPlayStore(SyncAutoConfigViewModel.SYNC_PACKAGE)
         }
 
-        binding.startButton.setOnClickListener {
+        startButton.setOnClickListener {
             if (isUserAlreadySynchronized()) {
                 trackSyncAutoConfigEvent("alreadySynchronized", TrackerAction.DATA)
                 goBackToThreadList(MainActivity.SYNC_AUTO_CONFIG_ALREADY_SYNC)
             } else {
                 trackSyncAutoConfigEvent("openSyncApp")
-                configureUserAutoSync { intent ->
+                syncAutoConfigViewModel.configureUserAutoSync { intent ->
                     startActivity(intent)
                     goBackToThreadList(MainActivity.SYNC_AUTO_CONFIG_SUCCESS)
                 }
