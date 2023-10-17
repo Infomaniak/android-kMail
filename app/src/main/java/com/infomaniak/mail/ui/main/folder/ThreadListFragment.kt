@@ -98,9 +98,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     lateinit var localSettings: LocalSettings
 
 
-    // TODO: When we will update DragDropSwipeRecyclerViewLib, we need to make the adapter nullable,
-    //  because for now it cause a memory leak for we cannot suppress the strong reference between the threadList RV and its
-    //  adapter as it throws an NPE
+    // TODO: When we'll update DragDropSwipeRecyclerViewLib, we'll need to make the adapter nullable.
+    //  For now it causes a memory leak, because we can't remove the strong reference
+    //  between the ThreadList's RecyclerView and its Adapter as it throws an NPE.
     @Inject
     lateinit var threadListAdapter: ThreadListAdapter
 
