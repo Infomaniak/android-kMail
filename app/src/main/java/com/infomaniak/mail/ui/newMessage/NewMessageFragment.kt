@@ -522,7 +522,7 @@ class NewMessageFragment : Fragment() {
             addressListPopupWindow.dismiss()
         }
 
-        fromMailAddress.post { addressListPopupWindow.width = fromMailAddress.width }
+        fromMailAddress.safePost(action = { addressListPopupWindow.width = fromMailAddress.width })
 
         addressListPopupWindow.apply {
             setAdapter(adapter)
