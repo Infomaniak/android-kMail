@@ -115,7 +115,7 @@ class HtmlFormatter(private val html: String) {
             var script = readRawResource(scriptResId)
             customVariablesDeclaration.forEach { (variableName, value) ->
                 val variableDeclaration = "const $variableName = ${formatValueForJs(value)};"
-                script = variableDeclaration + "\n" + script
+                script = "${variableDeclaration}\n${script}"
             }
             return script
         }

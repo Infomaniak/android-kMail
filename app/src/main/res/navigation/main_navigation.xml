@@ -590,4 +590,9 @@
             app:argType="string" />
     </dialog>
 
+    <dialog
+        android:id="@+id/syncDiscoveryBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.bottomSheetDialogs.SyncDiscoveryBottomSheetDialog"
+        android:label="SyncDiscoveryBottomSheetDialog" />
+
 </navigation>

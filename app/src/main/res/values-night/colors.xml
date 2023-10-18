@@ -30,6 +30,7 @@
     <color name="blueOnboardingSecondaryBackground">@color/bat</color>
 
     <!-- Context / errors -->
+    <color name="greenSuccess">@color/grass_dark</color>
     <color name="orangeWarning">@color/orange_dark</color>
     <color name="redDestructiveAction">@color/red_dark</color>
     <color name="redDestructiveActionTransparent">#1EFC8878</color>
@@ -47,7 +48,6 @@
     <color name="backgroundDisabledPrimaryButton">@color/elephant</color>
     <color name="backgroundSelectedSignature">@color/elephant</color>
     <color name="informationBlockBackground">@color/orca</color>
-
 
     <!-- Texts -->
     <color name="primaryTextColor">@color/rabbit</color>

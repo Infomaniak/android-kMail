@@ -36,6 +36,7 @@
                 android:mimeType="*/*"
                 android:scheme="*" />
         </intent>
+        <package android:name="com.infomaniak.sync" />
     </queries>
 
     <application
@@ -149,6 +150,11 @@
                 <data android:mimeType="*/*" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".ui.sync.SyncAutoConfigActivity"
+            android:configChanges="orientation|screenSize"
+            android:windowSoftInputMode="adjustResize" />
 
         <receiver
             android:name=".receivers.RebootReceiver"

@@ -131,6 +131,7 @@
     <string name="buttonHelp">Aide</string>
     <string name="buttonHyperlink">Ajouter un lien hypertexte</string>
     <string name="buttonImportEmails">Importer des e-mails</string>
+    <string name="buttonInstall">Installer</string>
     <string name="buttonItalic">Italique</string>
     <string name="buttonLoadMore">Charger plus de conversations</string>
     <string name="buttonLogInDifferentAccount">Me connecter avec un autre compte</string>
@@ -146,7 +147,9 @@
     <string name="buttonSelectAll">Tout</string>
     <string name="buttonShare">Partager</string>
     <string name="buttonStart">Commencer</string>
+    <string name="buttonStartSync">Commencer la synchronisation</string>
     <string name="buttonStrikeThrough">Barrer</string>
+    <string name="buttonSyncCalendarsAndContacts">Synchronisation des calendriers et des contacts</string>
     <string name="buttonTextOptionsClose">Fermer le formatage de texte</string>
     <string name="buttonTextOptionsOpen">Ouvrir le formatage de texte</string>
     <string name="buttonTry">Essayer</string>
@@ -226,6 +229,7 @@
     <string name="errorDraftNotFound">Brouillon introuvable</string>
     <string name="errorEditScheduledMessage">Impossible de modifier un message planifié ou envoyé</string>
     <string name="errorFolderDoesNotExist">Le dossier n’existe pas</string>
+    <string name="errorGetCredentials">Impossible d’obtenir les informations d’identification</string>
     <string name="errorInvalidAttachment">Pièce jointe non valide</string>
     <string name="errorInvalidCredentials">E-mail ou mot de passe invalide</string>
     <string name="errorInvalidEmailAddress">Adresse mail invalide</string>
@@ -245,6 +249,7 @@
     <string name="errorTooManyRecipients">Trop de destinataires</string>
     <string name="errorUnableToCreateFolder">Impossible de créer le dossier</string>
     <string name="errorUnableToFlushFolder">Impossible de vider le dossier</string>
+    <string name="errorUserAlreadySynchronized">L’utilisateur est déjà synchronisé</string>
     <string name="externalDialogConfirmButton">J’ai compris</string>
     <plurals name="externalDialogDescriptionExpeditor">
         <item quantity="one">L’expéditeur %s ne fait pas partie de votre organisation ni de vos contacts. Soyez vigilant si vous partagez des informations sensibles.</item>
@@ -457,6 +462,11 @@
     <string name="socialNetworksFolder">Réseaux sociaux</string>
     <string name="spamFolder">Spam</string>
     <string name="subjectTitle">Objet :</string>
+    <string name="syncFragmentTitle">Synchroniser vos calendriers et contacts</string>
+    <string name="syncInstallDescription">Pour pouvoir télécharger l’application kSync sur le Play Store, cliquez sur \"Installer\" puis revenez sur votre application Mail.</string>
+    <string name="syncInstalled">Installée</string>
+    <string name="syncStartDescription">Activez les calendriers et carnets d’adresses dans kSync, que vous souhaitez synchroniser sur votre téléphone.</string>
+    <string name="syncTutorialWelcomeTitle">Consulter vos calendriers et contacts Infomaniak sur votre appareil</string>
     <plurals name="threadListDeletionConfirmationAlertDescription">
         <item quantity="one">Etes-vous sûr de vouloir supprimer ce message définitivement ?</item>
         <item quantity="other">Etes-vous sûr de vouloir supprimer ces messages définitivement ?</item>

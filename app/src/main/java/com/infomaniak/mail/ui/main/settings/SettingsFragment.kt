@@ -31,11 +31,13 @@ import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.mail.MatomoMail.toFloat
 import com.infomaniak.mail.MatomoMail.trackEvent
+import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentSettingsBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.animatedNavigation
+import com.infomaniak.mail.utils.launchSyncAutoConfigActivityForResult
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -98,6 +100,11 @@ class SettingsFragment : Fragment() {
         settingsNotifications.setOnClickListener {
             trackEvent("settingsNotifications", "openNotificationSettings")
             requireContext().openAppNotificationSettings()
+        }
+
+        settingsSyncAutoConfig.setOnClickListener {
+            trackSyncAutoConfigEvent("openFromSettings")
+            launchSyncAutoConfigActivityForResult()
         }
 
         settingsSend.setOnClickListener {

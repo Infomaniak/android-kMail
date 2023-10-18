@@ -129,6 +129,7 @@
     <string name="buttonHelp">Hilfe</string>
     <string name="buttonHyperlink">Einen Hyperlink hinzufügen</string>
     <string name="buttonImportEmails">E-Mails importieren</string>
+    <string name="buttonInstall">Installieren</string>
     <string name="buttonItalic">Kursiv</string>
     <string name="buttonLoadMore">Mehr Unterhaltungen laden</string>
     <string name="buttonLogInDifferentAccount">Mit einem anderen Konto anmelden</string>
@@ -144,7 +145,9 @@
     <string name="buttonSelectAll">Alle</string>
     <string name="buttonShare">Teilen Sie</string>
     <string name="buttonStart">Anfangen</string>
+    <string name="buttonStartSync">Start der Synchronisierung</string>
     <string name="buttonStrikeThrough">Durchstreichen</string>
+    <string name="buttonSyncCalendarsAndContacts">Synchronisierung von Kalender und Kontakten</string>
     <string name="buttonTextOptionsClose">Textformatierung schliessen</string>
     <string name="buttonTextOptionsOpen">Offene Textformatierung</string>
     <string name="buttonTry">Probieren</string>
@@ -224,6 +227,7 @@
     <string name="errorDraftNotFound">Entwurf unauffindbar</string>
     <string name="errorEditScheduledMessage">Geplante oder versendete Nachrichten können nicht geändert werden</string>
     <string name="errorFolderDoesNotExist">Der Ordner besteht nicht</string>
+    <string name="errorGetCredentials">Konnte keine Anmeldeinformationen erhalten</string>
     <string name="errorInvalidAttachment">Dateianhang ungültig</string>
     <string name="errorInvalidCredentials">E-Mail oder Passwort ungültig</string>
     <string name="errorInvalidEmailAddress">Ungültige E-Mail-Adresse</string>
@@ -243,6 +247,7 @@
     <string name="errorTooManyRecipients">Zu viele Empfänger</string>
     <string name="errorUnableToCreateFolder">Ordner kann nicht erstellt werden</string>
     <string name="errorUnableToFlushFolder">Der Ordner kann nicht geleert werden</string>
+    <string name="errorUserAlreadySynchronized">Benutzer ist bereits synchronisiert</string>
     <string name="externalDialogConfirmButton">Ich habe verstanden</string>
     <plurals name="externalDialogDescriptionExpeditor">
         <item quantity="one">Der Absender %s gehört nicht zu Ihrer Organisation oder Ihren Kontakten. Seien Sie vorsichtig, wenn Sie sensible Informationen weitergeben.</item>
@@ -446,6 +451,11 @@
     <string name="socialNetworksFolder">Soziale Netzwerke</string>
     <string name="spamFolder">Spam</string>
     <string name="subjectTitle">Thema:</string>
+    <string name="syncFragmentTitle">Synchronisieren Sie Ihre Kalender und Kontakte</string>
+    <string name="syncInstallDescription">Um die kSync-App aus dem Play Store herunterladen zu können, klicken Sie auf \"Installieren\" und kehren Sie dann zu Ihrer Mail-App zurück.</string>
+    <string name="syncInstalled">Installierte</string>
+    <string name="syncStartDescription">Aktivieren Sie die Kalender und Adressbücher in kSync, die Sie mit Ihrem Telefon synchronisieren möchten.</string>
+    <string name="syncTutorialWelcomeTitle">Anzeigen Ihrer Infomaniak-Kalender und -Kontakte auf Ihrem Gerät</string>
     <plurals name="threadListDeletionConfirmationAlertDescription">
         <item quantity="one">Sind Sie sicher, dass Sie diese Nachricht endgültig löschen wollen?</item>
         <item quantity="other">Sind Sie sicher, dass Sie diese Nachrichten endgültig löschen wollen?</item>
