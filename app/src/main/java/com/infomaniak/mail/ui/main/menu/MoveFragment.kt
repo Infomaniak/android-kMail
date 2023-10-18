@@ -140,6 +140,7 @@ class MoveFragment : MenuFoldersFragment() {
         searchResultsList.adapter = searchResultsAdapter
 
         searchInputLayout.setOnClearTextClickListener { trackMoveSearchEvent(SEARCH_DELETE_NAME) }
+
         searchTextInput.apply {
             toggleFolderListsVisibility(!text.isNullOrBlank())
             doOnTextChanged { newQuery, _, _, _ ->
