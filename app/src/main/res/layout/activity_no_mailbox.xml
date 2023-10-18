@@ -113,7 +113,6 @@
         android:layout_width="0dp"
         android:layout_marginTop="@dimen/marginStandardMedium"
         android:text="@string/buttonAddEmailAddress"
-        app:icon="@drawable/ic_add"
         app:iconGravity="textStart"
         app:iconPadding="@dimen/marginStandardSmall"
         app:layout_constraintBottom_toTopOf="@id/connectAnotherAccountButton"

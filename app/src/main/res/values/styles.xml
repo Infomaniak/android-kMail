@@ -175,6 +175,7 @@
         <item name="android:minWidth">0dp</item>
         <item name="android:paddingLeft">@dimen/mediumButtonHorizontalMargin</item>
         <item name="android:paddingRight">@dimen/mediumButtonHorizontalMargin</item>
+        <item name="iconSize">@dimen/mediumIconSize</item>
     </style>
 
     <style name="TextButtonSecondaryMedium" parent="TextButtonSecondary">
@@ -517,7 +518,8 @@
         <item name="android:textColor">?attr/colorOnPrimary</item>
         <item name="android:textSize">16sp</item>
         <item name="iconGravity">start</item>
-        <item name="iconPadding">8dp</item>
+        <item name="iconPadding">@dimen/marginStandardSmall</item>
+        <item name="iconSize">@dimen/mediumIconSize</item>
         <item name="iconTint">?attr/colorOnPrimary</item>
         <item name="materialThemeOverlay">@style/FloatingActionButtonThemeOverlay</item>
     </style>
