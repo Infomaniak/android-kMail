@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.bottomSheetDialogs
 import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
+import com.infomaniak.mail.MatomoMail.DISCOVER_LATER
 
 abstract class DiscoveryBottomSheetDialog : InformationBottomSheetDialog() {
 
@@ -41,14 +42,14 @@ abstract class DiscoveryBottomSheetDialog : InformationBottomSheetDialog() {
         actionButton.apply {
             setText(positiveButtonRes)
             setOnClickListener {
-                trackMatomoWithCategory("discoverTry")
+                trackMatomoWithCategory("discoverNow")
                 onPositiveButtonClicked()
                 dismiss()
             }
         }
 
         secondaryActionButton.setOnClickListener {
-            trackMatomoWithCategory("discoverLater")
+            trackMatomoWithCategory(DISCOVER_LATER)
             dismiss()
         }
     }
@@ -56,7 +57,7 @@ abstract class DiscoveryBottomSheetDialog : InformationBottomSheetDialog() {
     abstract fun onPositiveButtonClicked()
 
     override fun onCancel(dialog: DialogInterface) {
-        trackMatomoWithCategory("discoverLater")
+        trackMatomoWithCategory(DISCOVER_LATER)
         super.onCancel(dialog)
     }
 }
