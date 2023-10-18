@@ -270,7 +270,6 @@ class ThreadFragment : Fragment() {
             onContactClicked = { contact ->
                 safeNavigate(ThreadFragmentDirections.actionThreadFragmentToDetailedContactBottomSheetDialog(contact))
             },
-
             onDraftClicked = { message ->
                 trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
                 safeNavigateToNewMessageActivity(
@@ -282,12 +281,10 @@ class ThreadFragment : Fragment() {
                     ).toBundle(),
                 )
             },
-
             onDeleteDraftClicked = { message ->
                 trackMessageActionsEvent("deleteDraft")
                 mainViewModel.currentMailbox.value?.let { mailbox -> threadViewModel.deleteDraft(message, mailbox) }
             },
-
             onAttachmentClicked = { attachment ->
                 if (attachment.openWithIntent(requireContext()).hasSupportedApplications(requireContext())) {
                     trackAttachmentActionsEvent("open")
@@ -298,26 +295,21 @@ class ThreadFragment : Fragment() {
                     scheduleDownloadManager(attachment.downloadUrl, attachment.name)
                 }
             },
-
             onDownloadAllClicked = { message ->
                 trackAttachmentActionsEvent("downloadAll")
                 mainViewModel.snackBarManager.setValue(getString(R.string.snackbarDownloadInProgress))
                 downloadAllAttachments(message)
             },
-
             onReplyClicked = { message ->
                 trackMessageActionsEvent(ACTION_REPLY_NAME)
                 replyTo(message)
             },
-
             onMenuClicked = { message ->
                 message.navigateToActionsBottomSheet()
             },
-
             navigateToNewMessageActivity = { uri ->
                 safeNavigateToNewMessageActivity(NewMessageActivityArgs(mailToUri = uri).toBundle())
             },
-
             onAllExpandedMessagesLoaded = ::scrollToFirstUnseenMessage,
         )
     }
