@@ -41,7 +41,9 @@ import com.infomaniak.lib.core.networking.LiveDataNetworkStatus
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.Utils.toEnumOrThrow
+import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.stores.checkUpdateIsAvailable
+import com.infomaniak.lib.stores.launchInAppReview
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.MatomoMail.trackEvent
@@ -51,6 +53,7 @@ import com.infomaniak.mail.data.models.draft.Draft.*
 import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.firebase.RegisterFirebaseBroadcastReceiver
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
+import com.infomaniak.mail.ui.alertDialogs.TitleAlertDialog
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.ui.newMessage.NewMessageActivity
 import com.infomaniak.mail.ui.sync.SyncAutoConfigActivity
@@ -111,6 +114,9 @@ class MainActivity : BaseActivity() {
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog
 
+    @Inject
+    lateinit var titleDialog: TitleAlertDialog
+
     private val drawerListener = object : DrawerLayout.DrawerListener {
 
         var hasDragged = false
@@ -159,6 +165,7 @@ class MainActivity : BaseActivity() {
 
         handleUpdates()
         showSyncDiscovery()
+        handleInAppReview()
 
         mainViewModel.updateUserInfo()
         mainViewModel.updateFeatureFlag()
@@ -440,6 +447,19 @@ class MainActivity : BaseActivity() {
         if (showSyncDiscoveryBottomSheet && appLaunches > 5) {
             showSyncDiscoveryBottomSheet = false
             navController.navigate(R.id.syncDiscoveryBottomSheetDialog)
+        }
+    }
+
+    private fun handleInAppReview() = with(localSettings) {
+        if (showAppReviewDialog && appLaunches != 0 && appLaunches % 50 == 0) {
+            titleDialog.show(
+                title = R.string.reviewAlertTitle,
+                onPositiveButtonClicked = {
+                    showAppReviewDialog = false
+                    launchInAppReview()
+                },
+                onNegativeButtonClicked = { openUrl(getString(R.string.urlUserReportAndroid)) },
+            )
         }
     }
 
