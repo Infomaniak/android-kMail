@@ -146,7 +146,7 @@ class WebViewUtils(context: Context) {
             evaluateJavascript(removeBackgroundStyleScript, null)
         }
 
-        fun WebView.destroy() {
+        fun WebView.destroyAndClearHistory() {
             clearHistory()
             destroy()
         }

@@ -78,11 +78,9 @@ class RoundedBackgroundSpan(
     }
 
     private fun Paint.setGivenTextStyle() {
-        apply {
-            color = textColor
-            typeface = textTypeface
-            textSize = fontSize
-        }
+        color = textColor
+        typeface = textTypeface
+        textSize = fontSize
     }
 
     override fun chooseHeight(

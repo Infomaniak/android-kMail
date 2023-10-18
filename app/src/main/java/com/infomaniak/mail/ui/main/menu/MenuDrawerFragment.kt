@@ -166,11 +166,11 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
 
     private fun setupCreateFolderDialog() {
         inputDialog.setCallbacks(
-            onErrorCheck = { folderName -> checkForFolderCreationErrors(folderName) },
             onPositiveButtonClicked = { folderName ->
                 trackCreateFolderEvent("confirm")
                 mainViewModel.createNewFolder(folderName)
             },
+            onErrorCheck = ::checkForFolderCreationErrors,
         )
     }
 
