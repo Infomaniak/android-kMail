@@ -43,13 +43,13 @@ class Quotas : EmbeddedRealmObject {
 
         // TODO: Remove this Sentry when we are sure the fix is the right one.
         if (_size < 0 || size < 0L || formattedUsedSize.firstOrNull() == '-') {
-            Sentry.withScope {
-                it.level = SentryLevel.WARNING
-                it.setExtra("1. mailbox", "$email")
-                it.setExtra("2. raw size", "$_size")
-                it.setExtra("3. display size", formattedUsedSize)
-                it.setExtra("4. raw maxSize", "$QUOTAS_MAX_SIZE")
-                it.setExtra("5. display maxSize", formattedMaxSize)
+            Sentry.withScope { scope ->
+                scope.level = SentryLevel.WARNING
+                scope.setExtra("1. mailbox", "$email")
+                scope.setExtra("2. raw size", "$_size")
+                scope.setExtra("3. display size", formattedUsedSize)
+                scope.setExtra("4. raw maxSize", "$QUOTAS_MAX_SIZE")
+                scope.setExtra("5. display maxSize", formattedMaxSize)
                 Sentry.captureMessage("Quotas: Something is negative when trying to display")
             }
         }

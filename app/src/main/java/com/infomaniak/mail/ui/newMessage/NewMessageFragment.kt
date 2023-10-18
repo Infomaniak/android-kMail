@@ -527,11 +527,8 @@ class NewMessageFragment : Fragment() {
         fromMailAddress.post {
             runCatching {
                 addressListPopupWindow.width = fromMailAddress.width
-            }.onFailure { exception ->
-                Sentry.withScope {
-                    Sentry.captureException(exception)
-                    Sentry.captureMessage("Binding null in post(), this is not normal", SentryLevel.WARNING)
-                }
+            }.onFailure {
+                Sentry.captureMessage("Binding null in post(), this is not normal", SentryLevel.WARNING)
             }
         }
 
