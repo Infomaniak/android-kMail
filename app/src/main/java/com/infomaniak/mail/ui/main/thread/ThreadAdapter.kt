@@ -66,8 +66,8 @@ class ThreadAdapter(
     onDownloadAllClicked: (message: Message) -> Unit,
     onReplyClicked: (Message) -> Unit,
     onMenuClicked: (Message) -> Unit,
-    navigateToNewMessageActivity: (Uri) -> Unit,
     onAllExpandedMessagesLoaded: () -> Unit,
+    navigateToNewMessageActivity: (Uri) -> Unit,
 ) : ListAdapter<Message, ThreadViewHolder>(MessageDiffCallback()) {
 
     inline val messages: MutableList<Message> get() = currentList
@@ -97,8 +97,8 @@ class ThreadAdapter(
             onDownloadAllClicked,
             onReplyClicked,
             onMenuClicked,
-            navigateToNewMessageActivity,
             onAllExpandedMessagesLoaded,
+            navigateToNewMessageActivity,
         )
     }
 
@@ -614,7 +614,7 @@ class ThreadAdapter(
         var onDownloadAllClicked: (message: Message) -> Unit,
         var onReplyClicked: (Message) -> Unit,
         var onMenuClicked: (Message) -> Unit,
-        var navigateToNewMessageActivity: (Uri) -> Unit,
         var onAllExpandedMessagesLoaded: () -> Unit,
+        var navigateToNewMessageActivity: (Uri) -> Unit,
     )
 }

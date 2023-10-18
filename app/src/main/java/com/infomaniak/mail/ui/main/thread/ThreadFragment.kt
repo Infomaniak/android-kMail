@@ -307,10 +307,10 @@ class ThreadFragment : Fragment() {
             onMenuClicked = { message ->
                 message.navigateToActionsBottomSheet()
             },
+            onAllExpandedMessagesLoaded = ::scrollToFirstUnseenMessage,
             navigateToNewMessageActivity = { uri ->
                 safeNavigateToNewMessageActivity(NewMessageActivityArgs(mailToUri = uri).toBundle())
             },
-            onAllExpandedMessagesLoaded = ::scrollToFirstUnseenMessage,
         )
     }
 
