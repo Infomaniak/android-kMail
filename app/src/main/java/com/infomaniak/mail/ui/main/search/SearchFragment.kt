@@ -214,7 +214,9 @@ class SearchFragment : Fragment() {
     }
 
     private fun setSearchBarUi() = with(binding.searchBar) {
+
         searchInputLayout.setOnClearTextClickListener { trackSearchEvent(SEARCH_DELETE_NAME) }
+
         searchTextInput.apply {
             showKeyboard()
 
