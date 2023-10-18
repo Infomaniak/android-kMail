@@ -116,7 +116,6 @@ class NewMessageFragment : Fragment() {
     private var quoteWebView: WebView? = null
     private var signatureWebView: WebView? = null
 
-
     private val attachmentAdapter inline get() = binding.attachmentsRecyclerView.adapter as AttachmentAdapter
 
     private val newMessageActivity by lazy { requireActivity() as NewMessageActivity }
@@ -147,7 +146,6 @@ class NewMessageFragment : Fragment() {
     @SuppressLint("RestrictedApi")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
-
 
         SentryDebug.addNavigationBreadcrumb(
             name = findNavController().currentDestination?.displayName ?: "newMessageFragment",
