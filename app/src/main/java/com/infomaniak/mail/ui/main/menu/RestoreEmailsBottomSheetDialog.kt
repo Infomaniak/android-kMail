@@ -61,9 +61,12 @@ class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
             restoreMailsButton.isEnabled = true
         }
 
-        restoreMailsButton.setOnClickListener {
-            restoreEmailsButtonProgressTimer.start()
-            restoreEmails()
+        restoreMailsButton.apply {
+            initProgress(viewLifecycleOwner)
+            setOnClickListener {
+                restoreEmailsButtonProgressTimer.start()
+                restoreEmails()
+            }
         }
     }
 

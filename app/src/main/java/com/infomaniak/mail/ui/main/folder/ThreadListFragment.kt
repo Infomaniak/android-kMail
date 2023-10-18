@@ -84,7 +84,7 @@ import com.infomaniak.lib.core.R as RCore
 @AndroidEntryPoint
 class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
-    private var binding: FragmentThreadListBinding by safeBinding()
+    var binding: FragmentThreadListBinding by safeBinding()
     private val navigationArgs: ThreadListFragmentArgs by navArgs()
     private val mainViewModel: MainViewModel by activityViewModels()
     private val threadListViewModel: ThreadListViewModel by viewModels()
@@ -140,10 +140,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         setupUnreadCountChip()
 
         threadListMultiSelection.initMultiSelection(
-            binding = binding,
             mainViewModel = mainViewModel,
             threadListFragment = this,
-            threadListAdapter = threadListAdapter,
             unlockSwipeActionsIfSet = ::unlockSwipeActionsIfSet,
             localSettings = localSettings,
         )

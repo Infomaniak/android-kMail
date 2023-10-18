@@ -145,5 +145,10 @@ class WebViewUtils(context: Context) {
             val removeBackgroundStyleScript = "document.getElementById(\"$DARK_BACKGROUND_STYLE_ID\").remove()"
             evaluateJavascript(removeBackgroundStyleScript, null)
         }
+
+        fun WebView.destroy() {
+            clearHistory()
+            destroy()
+        }
     }
 }

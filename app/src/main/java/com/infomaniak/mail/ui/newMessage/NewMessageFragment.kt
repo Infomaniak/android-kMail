@@ -108,10 +108,13 @@ class NewMessageFragment : Fragment() {
     private val backgroundColor by lazy { requireContext().getColor(R.color.backgroundColor) }
     private val black by lazy { requireContext().getColor(RCore.color.black) }
 
-    private lateinit var addressListPopupWindow: ListPopupWindow
+    private var addressListPopupWindow: ListPopupWindow? = null
     private lateinit var filePicker: FilePicker
 
     private var aiPromptFragment: AiPromptFragment? = null
+
+    private var quoteWebView: WebView? = null
+    private var signatureWebView: WebView? = null
 
     private val attachmentAdapter inline get() = binding.attachmentsRecyclerView.adapter as AttachmentAdapter
 
@@ -152,6 +155,7 @@ class NewMessageFragment : Fragment() {
         filePicker = FilePicker(this@NewMessageFragment)
         bindAlertToViewLifecycle(descriptionDialog)
 
+        setWebViewReference()
         initUi()
 
         if (newMessageViewModel.initResult.value == null) {
@@ -184,6 +188,11 @@ class NewMessageFragment : Fragment() {
         }
     }
 
+    private fun setWebViewReference() {
+        quoteWebView = binding.quoteWebView
+        signatureWebView = binding.signatureWebView
+    }
+
     override fun onStart() {
         super.onStart()
         newMessageViewModel.updateDraftInLocalIfRemoteHasChanged()
@@ -197,6 +206,15 @@ class NewMessageFragment : Fragment() {
             binding.quoteWebView.reload()
         }
         super.onConfigurationChanged(newConfig)
+    }
+
+    override fun onDestroyView() {
+        addressListPopupWindow = null
+        quoteWebView?.destroy()
+        quoteWebView = null
+        signatureWebView?.destroy()
+        signatureWebView = null
+        super.onDestroyView()
     }
 
     private fun handleOnBackPressed() {
@@ -521,18 +539,18 @@ class NewMessageFragment : Fragment() {
                 saveDraftDebouncing()
             }
 
-            addressListPopupWindow.dismiss()
+            addressListPopupWindow?.dismiss()
         }
 
         fromMailAddress.post {
             runCatching {
-                addressListPopupWindow.width = fromMailAddress.width
+                addressListPopupWindow?.width = fromMailAddress.width
             }.onFailure {
                 Sentry.captureMessage("Binding null in post(), this is not normal", SentryLevel.WARNING)
             }
         }
 
-        addressListPopupWindow.apply {
+        addressListPopupWindow?.apply {
             setAdapter(adapter)
             isModal = true
             inputMethodMode = PopupWindow.INPUT_METHOD_NOT_NEEDED
@@ -542,7 +560,7 @@ class NewMessageFragment : Fragment() {
         if (signatures.count() > 1) {
             fromMailAddress.apply {
                 icon = AppCompatResources.getDrawable(context, R.drawable.ic_chevron_down)
-                setOnClickListener { _ -> addressListPopupWindow.show() }
+                setOnClickListener { _ -> addressListPopupWindow?.show() }
             }
         }
     }
@@ -601,7 +619,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeNewAttachments() = with(binding) {
-        newMessageViewModel.importedAttachments.observe(requireActivity()) { (attachments, importationResult) ->
+        newMessageViewModel.importedAttachments.observe(viewLifecycleOwner) { (attachments, importationResult) ->
             attachmentAdapter.addAll(attachments)
             attachmentsRecyclerView.isGone = attachmentAdapter.itemCount == 0
 
@@ -862,6 +880,7 @@ class NewMessageFragment : Fragment() {
                     .remove(it)
                     .commitNow()
             }
+            aiPromptFragment = null
 
             scrim.isGone = true
         }
