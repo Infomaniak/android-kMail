@@ -265,27 +265,11 @@ class ThreadFragment : Fragment() {
     }
 
     private fun initAdapter() {
-        binding.messagesList.adapter = ThreadAdapter(shouldLoadDistantResources())
-    }
-
-    private fun setupAdapter(result: OpenThreadResult) = with(binding) {
-
-        messagesList.addItemDecoration(DividerItemDecorator(InsetDrawable(dividerDrawable(context), 0)))
-        messagesList.recycledViewPool.setMaxRecycledViews(0, 0)
-
-        messagesList.adapter = threadAdapter.apply {
-
-            isExpandedMap = result.isExpandedMap
-            initialSetOfExpandedMessagesUids = result.initialSetOfExpandedMessagesUids
-            isThemeTheSameMap = result.isThemeTheSameMap
-
-            stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
-            contacts = mainViewModel.mergedContactsLive.value ?: emptyMap()
-
+        binding.messagesList.adapter = ThreadAdapter(
+            shouldLoadDistantResources = shouldLoadDistantResources(),
             onContactClicked = { contact ->
                 safeNavigate(ThreadFragmentDirections.actionThreadFragmentToDetailedContactBottomSheetDialog(contact))
-            }
-
+            },
             onDraftClicked = { message ->
                 trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
                 safeNavigateToNewMessageActivity(
@@ -296,13 +280,11 @@ class ThreadFragment : Fragment() {
                         messageUid = message.uid,
                     ).toBundle(),
                 )
-            }
-
+            },
             onDeleteDraftClicked = { message ->
                 trackMessageActionsEvent("deleteDraft")
                 mainViewModel.currentMailbox.value?.let { mailbox -> threadViewModel.deleteDraft(message, mailbox) }
-            }
-
+            },
             onAttachmentClicked = { attachment ->
                 if (attachment.openWithIntent(requireContext()).hasSupportedApplications(requireContext())) {
                     trackAttachmentActionsEvent("open")
@@ -312,28 +294,38 @@ class ThreadFragment : Fragment() {
                     mainViewModel.snackBarManager.setValue(getString(R.string.snackbarDownloadInProgress))
                     scheduleDownloadManager(attachment.downloadUrl, attachment.name)
                 }
-            }
-
+            },
             onDownloadAllClicked = { message ->
                 trackAttachmentActionsEvent("downloadAll")
                 mainViewModel.snackBarManager.setValue(getString(R.string.snackbarDownloadInProgress))
                 downloadAllAttachments(message)
-            }
-
+            },
             onReplyClicked = { message ->
                 trackMessageActionsEvent(ACTION_REPLY_NAME)
                 replyTo(message)
-            }
-
+            },
             onMenuClicked = { message ->
                 message.navigateToActionsBottomSheet()
-            }
-
+            },
             navigateToNewMessageActivity = { uri ->
                 safeNavigateToNewMessageActivity(NewMessageActivityArgs(mailToUri = uri).toBundle())
-            }
+            },
+            onAllExpandedMessagesLoaded = ::scrollToFirstUnseenMessage,
+        )
+    }
 
-            onAllExpandedMessagesLoaded = ::scrollToFirstUnseenMessage
+    private fun setupAdapter(result: OpenThreadResult) = with(binding.messagesList) {
+
+        addItemDecoration(DividerItemDecorator(InsetDrawable(dividerDrawable(context), 0)))
+        recycledViewPool.setMaxRecycledViews(0, 0)
+
+        threadAdapter.apply {
+            isExpandedMap = result.isExpandedMap
+            initialSetOfExpandedMessagesUids = result.initialSetOfExpandedMessagesUids
+            isThemeTheSameMap = result.isThemeTheSameMap
+
+            stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
+            contacts = mainViewModel.mergedContactsLive.value ?: emptyMap()
         }
     }
 
