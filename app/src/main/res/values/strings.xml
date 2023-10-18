@@ -146,6 +146,8 @@
     <string name="buttonRefuse">Refuse</string>
     <string name="buttonRequestPassword">Request password</string>
     <string name="buttonRestoreEmails">Restore emails</string>
+    <string name="buttonReviewAlertNo">No</string>
+    <string name="buttonReviewAlertYes">Yes</string>
     <string name="buttonSchedule">Schedule email to send later</string>
     <string name="buttonSeeAll">See all</string>
     <string name="buttonSelectAll">All</string>
