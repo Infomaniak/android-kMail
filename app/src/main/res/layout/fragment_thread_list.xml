@@ -236,7 +236,6 @@
         android:layout_marginBottom="@dimen/marginStandard"
         android:text="@string/buttonNewMessage"
         app:icon="@drawable/ic_pencil"
-        app:iconSize="@dimen/mediumIconSize"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
