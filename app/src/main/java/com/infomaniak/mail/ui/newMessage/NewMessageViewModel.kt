@@ -106,9 +106,9 @@ class NewMessageViewModel @Inject constructor(
     // Needs to trigger every time the Fragment is recreated
     val initResult = MutableLiveData<List<Signature>>()
 
-    val importedAttachments = MutableLiveData<Pair<MutableList<Attachment>, ImportationResult>>()
-    val isSendingAllowed = MutableLiveData(false)
-    val externalRecipientCount = MutableLiveData<Pair<String?, Int>>()
+    val importedAttachments = SingleLiveEvent<Pair<MutableList<Attachment>, ImportationResult>>()
+    val isSendingAllowed = SingleLiveEvent(false)
+    val externalRecipientCount = SingleLiveEvent<Pair<String?, Int>>()
 
     val snackBarManager by lazy { SnackBarManager() }
     var shouldExecuteDraftActionWhenStopping = true
