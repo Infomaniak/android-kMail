@@ -67,7 +67,7 @@ class ContactAdapter(
             highlight(nameMatchedStartIndex, emailMatchedStartIndex, searchQuery.standardize().count())
         }
 
-        val isAlreadyUsed = usedContacts.contains(contact.email)
+        val isAlreadyUsed = usedContacts.contains(contact.email.standardize())
         if (!isAlreadyUsed) root.setOnClickListener { onContactClicked(contact) }
         greyedOutState.isVisible = isAlreadyUsed
         root.isEnabled = !isAlreadyUsed
