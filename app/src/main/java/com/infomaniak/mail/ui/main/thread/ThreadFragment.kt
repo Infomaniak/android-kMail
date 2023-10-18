@@ -81,7 +81,9 @@ class ThreadFragment : Fragment() {
     @Inject
     lateinit var localSettings: LocalSettings
 
-    private var binding: FragmentThreadBinding by safeBinding()
+    private var _binding: FragmentThreadBinding? = null
+    private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
+
     private val navigationArgs: ThreadFragmentArgs by navArgs()
     private val mainViewModel: MainViewModel by activityViewModels()
     private val threadViewModel: ThreadViewModel by viewModels()
@@ -108,7 +110,7 @@ class ThreadFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentThreadBinding.inflate(inflater, container, false).also {
-            binding = it
+            _binding = it
             requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundColor)
         }.root
     }
@@ -142,6 +144,12 @@ class ThreadFragment : Fragment() {
         mainViewModel.toggleLightThemeForMessage.observe(viewLifecycleOwner, threadAdapter::toggleLightMode)
 
         bindAlertToViewLifecycle(descriptionDialog)
+    }
+
+    override fun onDestroyView() {
+        threadAdapter.resetCallbacks()
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun observeSubjectUpdateTriggers() {
@@ -325,9 +333,7 @@ class ThreadFragment : Fragment() {
                 safeNavigateToNewMessageActivity(NewMessageActivityArgs(mailToUri = uri).toBundle())
             }
 
-            onAllExpandedMessagesLoaded = {
-                messagesListNestedScrollView.post(::scrollToFirstUnseenMessage)
-            }
+            onAllExpandedMessagesLoaded = ::scrollToFirstUnseenMessage
         }
     }
 

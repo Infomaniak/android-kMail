@@ -287,22 +287,22 @@ object SentryDebug {
     }
 
     fun sendCredentialsIssue(infomaniakLogin: String?, infomaniakPassword: String) {
-        Sentry.withScope {
-            it.level = SentryLevel.ERROR
-            it.setExtra("email", "${AccountUtils.currentUser?.email}")
+        Sentry.withScope { scope ->
+            scope.level = SentryLevel.ERROR
+            scope.setExtra("email", "${AccountUtils.currentUser?.email}")
             val loginStatus = when {
                 infomaniakLogin == null -> "is null"
                 infomaniakLogin.isEmpty() -> "is empty"
                 infomaniakLogin.isBlank() -> "is blank"
                 else -> "is ok"
             }
-            it.setExtra("infomaniakLogin status", loginStatus)
+            scope.setExtra("infomaniakLogin status", loginStatus)
             val passwordStatus = when {
                 infomaniakPassword.isEmpty() -> "is empty"
                 infomaniakPassword.isBlank() -> "is blank"
                 else -> "is ok"
             }
-            it.setExtra("infomaniakPassword status", passwordStatus)
+            scope.setExtra("infomaniakPassword status", passwordStatus)
             Sentry.captureMessage("Credentials issue when trying to auto-sync user")
         }
     }

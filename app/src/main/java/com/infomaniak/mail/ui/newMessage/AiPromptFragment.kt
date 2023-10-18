@@ -92,7 +92,7 @@ class AiPromptFragment : Fragment() {
             R.color.aiBetaTagTextColor,
         )
 
-        prompt.post(prompt::showKeyboard)
+        prompt.showKeyboard()
         initPromptTextAndPlaceholder()
         closeButton.setOnClickListener { newMessageFragment.closeAiPrompt() }
 

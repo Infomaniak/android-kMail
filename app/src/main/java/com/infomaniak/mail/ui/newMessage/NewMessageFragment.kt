@@ -82,6 +82,8 @@ import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
+import io.sentry.Sentry
+import io.sentry.SentryLevel
 import kotlinx.coroutines.*
 import java.util.UUID
 import javax.inject.Inject
@@ -522,7 +524,13 @@ class NewMessageFragment : Fragment() {
             addressListPopupWindow.dismiss()
         }
 
-        fromMailAddress.post { addressListPopupWindow.width = fromMailAddress.width }
+        fromMailAddress.post {
+            runCatching {
+                addressListPopupWindow.width = fromMailAddress.width
+            }.onFailure {
+                Sentry.captureMessage("Binding null in post(), this is not normal", SentryLevel.WARNING)
+            }
+        }
 
         addressListPopupWindow.apply {
             setAdapter(adapter)
