@@ -10,7 +10,7 @@ plugins {
 }
 
 def javaVersion = JavaVersion.VERSION_17
-def enableLeakCanary = true
+def enableLeakCanary = false
 
 android {
 
