@@ -60,22 +60,18 @@ open class DescriptionAlertDialog @Inject constructor(
     fun show(
         title: String,
         description: CharSequence?,
-        @StringRes confirmButtonText: Int? = R.string.buttonConfirm,
-        @StringRes negativeButtonText: Int? = null,
-        displayCancelButton: Boolean = true,
         displayLoader: Boolean = true,
+        displayCancelButton: Boolean = true,
+        @StringRes positiveButtonText: Int? = R.string.buttonConfirm,
+        @StringRes negativeButtonText: Int? = null,
         onPositiveButtonClicked: () -> Unit,
         onNegativeButtonClicked: (() -> Unit)? = null,
         onDismiss: (() -> Unit)? = null,
     ) = with(alertDialog) {
-        showDialogWithBasicInfo(title, description, confirmButtonText, negativeButtonText, displayCancelButton)
+
+        showDialogWithBasicInfo(title, description, displayCancelButton, positiveButtonText, negativeButtonText)
 
         if (displayLoader) initProgress()
-
-        onDismiss?.let {
-            onDismissed = it
-            setOnDismissListener { onDismissed?.invoke() }
-        }
 
         this@DescriptionAlertDialog.onPositiveButtonClicked = onPositiveButtonClicked
         this@DescriptionAlertDialog.onNegativeButtonClicked = onNegativeButtonClicked
@@ -87,6 +83,11 @@ open class DescriptionAlertDialog @Inject constructor(
         negativeButton.setOnClickListener {
             this@DescriptionAlertDialog.onNegativeButtonClicked?.invoke()
             dismiss()
+        }
+
+        onDismiss?.let {
+            onDismissed = it
+            setOnDismissListener { onDismissed?.invoke() }
         }
     }
 
@@ -113,10 +114,11 @@ open class DescriptionAlertDialog @Inject constructor(
     protected fun showDialogWithBasicInfo(
         title: String? = null,
         description: CharSequence? = null,
-        @StringRes confirmButtonText: Int? = null,
-        @StringRes negativeButtonText: Int? = null,
         displayCancelButton: Boolean = true,
-    ): Unit = with(binding) {
+        @StringRes positiveButtonText: Int? = null,
+        @StringRes negativeButtonText: Int? = null,
+    ) = with(binding) {
+
         alertDialog.show()
 
         title?.let(dialogTitle::setText)
@@ -124,8 +126,8 @@ open class DescriptionAlertDialog @Inject constructor(
             isGone = description == null
             text = description
         }
-        confirmButtonText?.let(positiveButton::setText)
-        negativeButtonText?.let(negativeButton::setText)
         negativeButton.isVisible = displayCancelButton
+        positiveButtonText?.let(positiveButton::setText)
+        negativeButtonText?.let(negativeButton::setText)
     }
 }

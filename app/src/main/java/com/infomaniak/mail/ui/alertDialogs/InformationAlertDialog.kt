@@ -31,7 +31,7 @@ class InformationAlertDialog @Inject constructor(
     fun show(@StringRes title: Int, description: CharSequence?, @StringRes confirmButtonText: Int) = showDialogWithBasicInfo(
         title = activityContext.getString(title),
         description = description,
-        confirmButtonText = confirmButtonText,
         displayCancelButton = false,
+        positiveButtonText = confirmButtonText,
     )
 }

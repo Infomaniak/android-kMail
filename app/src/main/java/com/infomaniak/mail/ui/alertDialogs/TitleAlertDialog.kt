@@ -36,9 +36,9 @@ class TitleAlertDialog @Inject constructor(
     ) = show(
         title = activityContext.getString(title),
         description = null,
-        confirmButtonText = R.string.buttonReviewAlertYes,
-        negativeButtonText = R.string.buttonReviewAlertNo,
         displayLoader = false,
+        positiveButtonText = R.string.buttonReviewAlertYes,
+        negativeButtonText = R.string.buttonReviewAlertNo,
         onPositiveButtonClicked = onPositiveButtonClicked,
         onNegativeButtonClicked = onNegativeButtonClicked,
     )
