@@ -79,6 +79,7 @@ import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipient
 import com.infomaniak.mail.utils.Utils
+import com.infomaniak.mail.utils.WebViewUtils.Companion.destroyAndClearHistory
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
@@ -210,9 +211,9 @@ class NewMessageFragment : Fragment() {
 
     override fun onDestroyView() {
         addressListPopupWindow = null
-        quoteWebView?.destroy()
+        quoteWebView?.destroyAndClearHistory()
         quoteWebView = null
-        signatureWebView?.destroy()
+        signatureWebView?.destroyAndClearHistory()
         signatureWebView = null
         super.onDestroyView()
     }

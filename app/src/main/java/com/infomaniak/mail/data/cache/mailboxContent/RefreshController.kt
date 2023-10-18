@@ -69,6 +69,11 @@ class RefreshController @Inject constructor(
         refreshThreadsJob?.cancel(ForcedCancellationException())
     }
 
+    fun clearCallbacks() {
+        onStart = null
+        onStop = null
+    }
+
     suspend fun refreshThreads(
         refreshMode: RefreshMode,
         mailbox: Mailbox,
@@ -91,11 +96,6 @@ class RefreshController @Inject constructor(
                 SentryLog.d("API", "End of refreshing threads with mode: $refreshMode | (${folder.name})")
             }
         }
-    }
-
-    fun clearCallbacks() {
-        onStart = null
-        onStop = null
     }
 
     private fun setupConfiguration(
