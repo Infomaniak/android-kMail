@@ -108,7 +108,7 @@ class NewMessageFragment : Fragment() {
     private val backgroundColor by lazy { requireContext().getColor(R.color.backgroundColor) }
     private val black by lazy { requireContext().getColor(RCore.color.black) }
 
-    private lateinit var addressListPopupWindow: ListPopupWindow
+    private var addressListPopupWindow: ListPopupWindow? = null
     private lateinit var filePicker: FilePicker
 
     private var aiPromptFragment: AiPromptFragment? = null
@@ -211,6 +211,7 @@ class NewMessageFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        addressListPopupWindow = null
         quoteWebView?.destroy()
         quoteWebView = null
         signatureWebView?.destroy()
@@ -540,18 +541,18 @@ class NewMessageFragment : Fragment() {
                 saveDraftDebouncing()
             }
 
-            addressListPopupWindow.dismiss()
+            addressListPopupWindow?.dismiss()
         }
 
         fromMailAddress.post {
             runCatching {
-                addressListPopupWindow.width = fromMailAddress.width
+                addressListPopupWindow?.width = fromMailAddress.width
             }.onFailure {
                 Sentry.captureMessage("Binding null in post(), this is not normal", SentryLevel.WARNING)
             }
         }
 
-        addressListPopupWindow.apply {
+        addressListPopupWindow?.apply {
             setAdapter(adapter)
             isModal = true
             inputMethodMode = PopupWindow.INPUT_METHOD_NOT_NEEDED
@@ -561,7 +562,7 @@ class NewMessageFragment : Fragment() {
         if (signatures.count() > 1) {
             fromMailAddress.apply {
                 icon = AppCompatResources.getDrawable(context, R.drawable.ic_chevron_down)
-                setOnClickListener { _ -> addressListPopupWindow.show() }
+                setOnClickListener { _ -> addressListPopupWindow?.show() }
             }
         }
     }
@@ -881,6 +882,7 @@ class NewMessageFragment : Fragment() {
                     .remove(it)
                     .commitNow()
             }
+            aiPromptFragment = null
 
             scrim.isGone = true
         }
