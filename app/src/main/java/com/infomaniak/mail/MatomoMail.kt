@@ -54,6 +54,7 @@ object MatomoMail : MatomoCore {
     const val ACTION_PRINT_NAME = "print"
     const val ACTION_POSTPONE_NAME = "postpone"
     const val ADD_MAILBOX_NAME = "addMailbox"
+    const val DISCOVER_LATER = "discoverLater"
     const val SEARCH_FOLDER_FILTER_NAME = "folderFilter"
     const val SEARCH_DELETE_NAME = "deleteSearch"
     const val SEARCH_VALIDATE_NAME = "validateSearch"
