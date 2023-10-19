@@ -158,8 +158,19 @@ class AiPropositionFragment : Fragment() {
             trackAiWriterEvent("insertProposition", TrackerAction.DATA)
         }
 
-        aiOutputToInsert.value = getLastMessage()
+        val (subject, content) = splitBodyAndSubject(getLastMessage())
+
+        aiOutputToInsert.value = subject to content
         findNavController().popBackStack()
+    }
+
+    private fun splitBodyAndSubject(proposition: String): Pair<String?, String> {
+        val match = MATCH_SUBJECT_REGEX.find(proposition)
+
+        val content = match?.groups?.get("content")?.value ?: return null to proposition
+        val signature = match.groups["subject"]?.value
+
+        return signature to content
     }
 
     private fun onMenuItemClicked(menuItemId: Int) = with(aiViewModel) {
@@ -324,5 +335,7 @@ class AiPropositionFragment : Fragment() {
 
     private companion object {
         const val REPLACEMENT_DURATION: Long = 150
+
+        val MATCH_SUBJECT_REGEX = Regex("^[^:]+:(?<subject>.+?)\\n\\s*(?<content>.+)", RegexOption.MULTILINE)
     }
 }

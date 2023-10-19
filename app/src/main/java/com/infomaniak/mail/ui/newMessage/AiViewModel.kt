@@ -58,7 +58,7 @@ class AiViewModel @Inject constructor(
     var aiPromptOpeningStatus = MutableLiveData<AiPromptOpeningStatus>()
 
     val aiPropositionStatusLiveData = MutableLiveData<PropositionStatus>()
-    val aiOutputToInsert = SingleLiveEvent<String>()
+    val aiOutputToInsert = SingleLiveEvent<Pair<String?, String>>()
 
     fun generateNewAiProposition() = viewModelScope.launch(ioCoroutineContext) {
         history.clear()
