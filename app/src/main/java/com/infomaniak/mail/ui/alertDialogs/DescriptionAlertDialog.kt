@@ -126,6 +126,7 @@ open class DescriptionAlertDialog @Inject constructor(
             isGone = description == null
             text = description
         }
+
         negativeButton.isVisible = displayCancelButton
         positiveButtonText?.let(positiveButton::setText)
         negativeButtonText?.let(negativeButton::setText)
