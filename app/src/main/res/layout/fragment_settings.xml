@@ -74,7 +74,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:itemAction="chevron"
-                app:title="@string/buttonSyncCalendarsAndContacts" />
+                app:title="@string/syncCalendarsAndContactsTitle" />
 
             <com.infomaniak.mail.ui.main.settings.ItemSettingView
                 android:id="@+id/settingsSend"

@@ -149,7 +149,6 @@
     <string name="buttonStart">Inizia</string>
     <string name="buttonStartSync">Avvio della sincronizzazione</string>
     <string name="buttonStrikeThrough">Sciopero attraverso</string>
-    <string name="buttonSyncCalendarsAndContacts">Sincronizzazione di calendario e contatti</string>
     <string name="buttonTextOptionsClose">Chiudere la formattazione del testo</string>
     <string name="buttonTextOptionsOpen">Formattazione del testo aperto</string>
     <string name="buttonTry">Prova</string>
@@ -454,6 +453,8 @@
     <string name="socialNetworksFolder">Reti sociali</string>
     <string name="spamFolder">Spam</string>
     <string name="subjectTitle">Oggetto:</string>
+    <string name="syncCalendarsAndContactsDescriptionAndroid">Controlla i tuoi calendari nelle applicazioni Calendario e Contatti del tuo Android.</string>
+    <string name="syncCalendarsAndContactsTitle">Sincronizzazione di calendario e contatti</string>
     <string name="syncFragmentTitle">Sincronizzare i calendari e i contatti</string>
     <string name="syncInstallDescription">Per scaricare l’applicazione kSync dal Play Store, fare clic su \"Installa\" e poi tornare all’applicazione Mail.</string>
     <string name="syncInstalled">Installata</string>

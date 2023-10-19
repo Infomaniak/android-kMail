@@ -149,7 +149,6 @@
     <string name="buttonStart">Empezar</string>
     <string name="buttonStartSync">Iniciar sincronización</string>
     <string name="buttonStrikeThrough">Huelga a través de</string>
-    <string name="buttonSyncCalendarsAndContacts">Sincronización de calendarios y contactos</string>
     <string name="buttonTextOptionsClose">Cerrar formato de texto</string>
     <string name="buttonTextOptionsOpen">Formato de texto abierto</string>
     <string name="buttonTry">Pruebe</string>
@@ -454,6 +453,8 @@
     <string name="socialNetworksFolder">Redes sociales</string>
     <string name="spamFolder">Spam</string>
     <string name="subjectTitle">Asunto:</string>
+    <string name="syncCalendarsAndContactsDescriptionAndroid">Consulta tus calendarios en las aplicaciones Calendario y Contactos de tu Android.</string>
+    <string name="syncCalendarsAndContactsTitle">Sincronización de calendarios y contactos</string>
     <string name="syncFragmentTitle">Sincroniza tus calendarios y contactos</string>
     <string name="syncInstallDescription">Para descargar la aplicación kSync desde Play Store, pulsa en \"Instalar\" y vuelve a la aplicación Correo.</string>
     <string name="syncInstalled">Instalada</string>
