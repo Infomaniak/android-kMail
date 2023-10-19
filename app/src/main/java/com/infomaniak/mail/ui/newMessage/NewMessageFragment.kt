@@ -762,8 +762,8 @@ class NewMessageFragment : Fragment() {
             descriptionDialog.show(
                 title = getString(R.string.emailWithoutSubjectTitle),
                 description = getString(R.string.emailWithoutSubjectDescription),
-                confirmButtonText = R.string.buttonContinue,
                 displayLoader = false,
+                positiveButtonText = R.string.buttonContinue,
                 onPositiveButtonClicked = {
                     trackNewMessageEvent("sendWithoutSubjectConfirm")
                     sendEmail()
