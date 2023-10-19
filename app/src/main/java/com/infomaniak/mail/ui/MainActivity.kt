@@ -41,16 +41,20 @@ import com.infomaniak.lib.core.networking.LiveDataNetworkStatus
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.Utils.toEnumOrThrow
+import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.stores.checkUpdateIsAvailable
+import com.infomaniak.lib.stores.launchInAppReview
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.draft.Draft.*
 import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.firebase.RegisterFirebaseBroadcastReceiver
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
+import com.infomaniak.mail.ui.alertDialogs.TitleAlertDialog
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.ui.newMessage.NewMessageActivity
 import com.infomaniak.mail.ui.sync.SyncAutoConfigActivity
@@ -80,6 +84,8 @@ class MainActivity : BaseActivity() {
     private val menuDrawerBackgroundColor: Int by lazy { getColor(R.color.menuDrawerBackgroundColor) }
     private val registerFirebaseBroadcastReceiver by lazy { RegisterFirebaseBroadcastReceiver() }
 
+    private var previousDestinationId: Int? = null
+
     private val navController by lazy {
         (supportFragmentManager.findFragmentById(R.id.mainHostFragment) as NavHostFragment).navController
     }
@@ -90,7 +96,10 @@ class MainActivity : BaseActivity() {
 
     private val newMessageActivityResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         val draftAction = result.data?.getStringExtra(DRAFT_ACTION_KEY)?.let(DraftAction::valueOf)
-        if (draftAction == DraftAction.SEND) showSendingSnackBarTimer.start()
+        if (draftAction == DraftAction.SEND) {
+            showSendingSnackBarTimer.start()
+            showAppReview()
+        }
     }
 
     private val syncAutoConfigActivityResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
@@ -110,6 +119,9 @@ class MainActivity : BaseActivity() {
 
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog
+
+    @Inject
+    lateinit var titleDialog: TitleAlertDialog
 
     private val drawerListener = object : DrawerLayout.DrawerListener {
 
@@ -294,7 +306,10 @@ class MainActivity : BaseActivity() {
 
     override fun onStart() {
         super.onStart()
-        localSettings.appLaunches++
+        localSettings.apply {
+            appLaunches++
+            appReviewLaunches--
+        }
     }
 
     override fun onResume() {
@@ -411,6 +426,10 @@ class MainActivity : BaseActivity() {
         window.updateNavigationBarColor(getColor(colorRes))
 
         trackDestination(destination)
+
+        if (destination.id == R.id.threadListFragment && previousDestinationId == R.id.threadFragment) showAppReview()
+
+        previousDestinationId = destination.id
     }
 
     fun setDrawerLockMode(isUnlocked: Boolean) {
@@ -440,6 +459,20 @@ class MainActivity : BaseActivity() {
         if (showSyncDiscoveryBottomSheet && appLaunches > 5) {
             showSyncDiscoveryBottomSheet = false
             navController.navigate(R.id.syncDiscoveryBottomSheetDialog)
+        }
+    }
+
+    private fun showAppReview() = with(localSettings) {
+        if (showAppReviewDialog && appReviewLaunches < 0) {
+            appReviewLaunches = LocalSettings.DEFAULT_APP_REVIEW_LAUNCHES
+            titleDialog.show(
+                title = R.string.reviewAlertTitle,
+                onPositiveButtonClicked = {
+                    showAppReviewDialog = false
+                    launchInAppReview()
+                },
+                onNegativeButtonClicked = { openUrl(getString(R.string.urlUserReportAndroid)) },
+            )
         }
     }
 

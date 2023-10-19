@@ -350,6 +350,7 @@
     <string name="restoreEmailsNoBackup">No backup found</string>
     <string name="restoreEmailsText">All emails will come back to your inbox.</string>
     <string name="restoreEmailsTitle">Restore your emails</string>
+    <string name="reviewAlertTitle">Do you like Infomaniak Mail?</string>
     <string name="scheduledMessagesFolder">Scheduled messages</string>
     <string name="searchAllMessages">All messages</string>
     <string name="searchFieldPlaceholder">Search an email</string>

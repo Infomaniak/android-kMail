@@ -344,6 +344,7 @@
     <string name="restoreEmailsNoBackup">Nessun backup trovato</string>
     <string name="restoreEmailsText">Tutte le e-mail torneranno nella vostra casella di posta.</string>
     <string name="restoreEmailsTitle">Ripristino delle e-mail</string>
+    <string name="reviewAlertTitle">Ti piace la posta di Infomaniak?</string>
     <string name="scheduledMessagesFolder">Messaggi programmati</string>
     <string name="searchAllMessages">Tutti i messaggi</string>
     <string name="searchFieldPlaceholder">Ricerca di un’e-mail</string>
