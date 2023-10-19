@@ -53,6 +53,7 @@ open class DescriptionAlertDialog @Inject constructor(
 
     final override fun resetCallbacks() {
         onPositiveButtonClicked = null
+        onNegativeButtonClicked = null
         onDismissed = null
     }
 
