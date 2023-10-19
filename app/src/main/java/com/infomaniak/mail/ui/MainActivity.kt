@@ -169,9 +169,6 @@ class MainActivity : BaseActivity() {
         setupNavController()
         setupMenuDrawerCallbacks()
 
-        handleUpdates()
-        showSyncDiscovery()
-
         mainViewModel.updateUserInfo()
         mainViewModel.updateFeatureFlag()
 
@@ -306,10 +303,14 @@ class MainActivity : BaseActivity() {
 
     override fun onStart() {
         super.onStart()
+
         localSettings.apply {
             appLaunches++
             appReviewLaunches--
         }
+
+        showUpdateAvailable()
+        showSyncDiscovery()
     }
 
     override fun onResume() {
@@ -447,8 +448,8 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private fun handleUpdates() = with(localSettings) {
-        if (!updateLater || (appLaunches != 0 && appLaunches % 10 == 0)) {
+    private fun showUpdateAvailable() = with(localSettings) {
+        if (isUserWantingUpdates || (appLaunches != 0 && appLaunches % 10 == 0)) {
             checkUpdateIsAvailable(BuildConfig.APPLICATION_ID, BuildConfig.VERSION_CODE) { updateIsAvailable ->
                 if (updateIsAvailable) navController.navigate(R.id.updateAvailableBottomSheetDialog)
             }
