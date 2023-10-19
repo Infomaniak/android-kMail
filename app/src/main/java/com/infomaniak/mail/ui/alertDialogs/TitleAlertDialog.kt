@@ -29,17 +29,15 @@ class TitleAlertDialog @Inject constructor(
     @ActivityContext private val activityContext: Context,
 ) : DescriptionAlertDialog(activityContext) {
 
-    fun show(
-        @StringRes title: Int,
-        onPositiveButtonClicked: () -> Unit,
-        onNegativeButtonClicked: () -> Unit,
-    ) = show(
-        title = activityContext.getString(title),
-        description = null,
-        displayLoader = false,
-        positiveButtonText = R.string.buttonReviewAlertYes,
-        negativeButtonText = R.string.buttonReviewAlertNo,
-        onPositiveButtonClicked = onPositiveButtonClicked,
-        onNegativeButtonClicked = onNegativeButtonClicked,
-    )
+    fun show(@StringRes title: Int, onPositiveButtonClicked: () -> Unit, onNegativeButtonClicked: () -> Unit) {
+        show(
+            title = activityContext.getString(title),
+            description = null,
+            displayLoader = false,
+            positiveButtonText = R.string.buttonReviewAlertYes,
+            negativeButtonText = R.string.buttonReviewAlertNo,
+            onPositiveButtonClicked = onPositiveButtonClicked,
+            onNegativeButtonClicked = onNegativeButtonClicked,
+        )
+    }
 }
