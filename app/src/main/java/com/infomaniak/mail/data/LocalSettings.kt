@@ -292,6 +292,10 @@ class LocalSettings private constructor(context: Context) {
     //endregion
 
     //region App review
+    var appReviewLaunches: Int
+        get() = sharedPreferences.getInt(APP_REVIEW_LAUNCHES_KEY, DEFAULT_APP_REVIEW_LAUNCHES)
+        set(value) = sharedPreferences.transaction { putInt(APP_REVIEW_LAUNCHES_KEY, value) }
+
     var showAppReviewDialog: Boolean
         get() = sharedPreferences.getBoolean(SHOW_APP_REVIEW_DIALOG_KEY, DEFAULT_SHOW_APP_REVIEW_DIALOG)
         set(value) = sharedPreferences.transaction { putBoolean(SHOW_APP_REVIEW_DIALOG_KEY, value) }
@@ -334,6 +338,7 @@ class LocalSettings private constructor(context: Context) {
         private val DEFAULT_AI_REPLACEMENT_DIALOG_VISIBILITY = AiReplacementDialogVisibility.SHOW
         private const val DEFAULT_SHOW_AI_DISCOVERY_BOTTOM_SHEET = true
         private const val DEFAULT_SHOW_SYNC_DISCOVERY_BOTTOM_SHEET = true
+        const val DEFAULT_APP_REVIEW_LAUNCHES = 50
         private const val DEFAULT_SHOW_APP_REVIEW_DIALOG = true
         //endregion
 
@@ -360,6 +365,7 @@ class LocalSettings private constructor(context: Context) {
         private const val AI_REPLACEMENT_DIALOG_VISIBILITY_KEY = "aiReplacementDialogVisibilityKey"
         private const val SHOW_AI_DISCOVERY_BOTTOM_SHEET_KEY = "showAiDiscoveryBottomSheetKey"
         private const val SHOW_SYNC_DISCOVERY_BOTTOM_SHEET_KEY = "showSyncDiscoveryBottomSheetKey"
+        private const val APP_REVIEW_LAUNCHES_KEY = "appReviewLaunchesKey"
         private const val SHOW_APP_REVIEW_DIALOG_KEY = "showAppReviewDialogKey"
         //endregion
 

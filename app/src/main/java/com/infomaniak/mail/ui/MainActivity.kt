@@ -49,6 +49,7 @@ import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.draft.Draft.*
 import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.firebase.RegisterFirebaseBroadcastReceiver
@@ -83,6 +84,8 @@ class MainActivity : BaseActivity() {
     private val menuDrawerBackgroundColor: Int by lazy { getColor(R.color.menuDrawerBackgroundColor) }
     private val registerFirebaseBroadcastReceiver by lazy { RegisterFirebaseBroadcastReceiver() }
 
+    private var previousDestinationId: Int? = null
+
     private val navController by lazy {
         (supportFragmentManager.findFragmentById(R.id.mainHostFragment) as NavHostFragment).navController
     }
@@ -93,7 +96,10 @@ class MainActivity : BaseActivity() {
 
     private val newMessageActivityResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         val draftAction = result.data?.getStringExtra(DRAFT_ACTION_KEY)?.let(DraftAction::valueOf)
-        if (draftAction == DraftAction.SEND) showSendingSnackBarTimer.start()
+        if (draftAction == DraftAction.SEND) {
+            showSendingSnackBarTimer.start()
+            showAppReview()
+        }
     }
 
     private val syncAutoConfigActivityResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
@@ -165,7 +171,6 @@ class MainActivity : BaseActivity() {
 
         handleUpdates()
         showSyncDiscovery()
-        handleInAppReview()
 
         mainViewModel.updateUserInfo()
         mainViewModel.updateFeatureFlag()
@@ -301,7 +306,10 @@ class MainActivity : BaseActivity() {
 
     override fun onStart() {
         super.onStart()
-        localSettings.appLaunches++
+        localSettings.apply {
+            appLaunches++
+            appReviewLaunches--
+        }
     }
 
     override fun onResume() {
@@ -418,6 +426,10 @@ class MainActivity : BaseActivity() {
         window.updateNavigationBarColor(getColor(colorRes))
 
         trackDestination(destination)
+
+        if (destination.id == R.id.threadListFragment && previousDestinationId == R.id.threadFragment) showAppReview()
+
+        previousDestinationId = destination.id
     }
 
     fun setDrawerLockMode(isUnlocked: Boolean) {
@@ -450,8 +462,9 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private fun handleInAppReview() = with(localSettings) {
-        if (showAppReviewDialog && appLaunches != 0 && appLaunches % 50 == 0) {
+    private fun showAppReview() = with(localSettings) {
+        if (showAppReviewDialog && appReviewLaunches < 0) {
+            appReviewLaunches = LocalSettings.DEFAULT_APP_REVIEW_LAUNCHES
             titleDialog.show(
                 title = R.string.reviewAlertTitle,
                 onPositiveButtonClicked = {
