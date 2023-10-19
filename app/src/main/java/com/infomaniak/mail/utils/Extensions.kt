@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.utils
 
+import android.accounts.AccountManager
 import android.animation.Animator
 import android.animation.ValueAnimator
 import android.app.Activity
@@ -508,6 +509,14 @@ fun Fragment.getStringWithBoldArg(@StringRes resId: Int, arg: String): Spanned {
     val coloredArg = textColor?.let { "<font color=\"$it\">$arg</font color>" } ?: arg
 
     return Html.fromHtml(getString(resId, "<b>$coloredArg</b>"), Html.FROM_HTML_MODE_LEGACY)
+}
+
+fun Context.isUserAlreadySynchronized(): Boolean {
+    val accountManager = AccountManager.get(this)
+    val accounts = accountManager.getAccountsByType("infomaniak.com.sync")
+    val account = accounts.find { accountManager.getUserData(it, "user_name") == AccountUtils.currentUser?.login }
+
+    return account != null
 }
 
 fun Context.getLoginActivityIntent(args: LoginActivityArgs? = null, shouldClearStack: Boolean = false): Intent {

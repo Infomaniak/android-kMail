@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.sync
 
-import android.accounts.AccountManager
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -37,7 +36,7 @@ import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentSyncConfigureBinding
 import com.infomaniak.mail.ui.MainActivity
-import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.isUserAlreadySynchronized
 
 class SyncConfigureFragment : Fragment() {
 
@@ -69,7 +68,7 @@ class SyncConfigureFragment : Fragment() {
         }
 
         startButton.setOnClickListener {
-            if (isUserAlreadySynchronized()) {
+            if (requireContext().isUserAlreadySynchronized()) {
                 trackSyncAutoConfigEvent("alreadySynchronized", TrackerAction.DATA)
                 goBackToThreadList(MainActivity.SYNC_AUTO_CONFIG_ALREADY_SYNC)
             } else {
@@ -80,14 +79,6 @@ class SyncConfigureFragment : Fragment() {
                 }
             }
         }
-    }
-
-    private fun isUserAlreadySynchronized(): Boolean {
-        val accountManager = AccountManager.get(requireContext())
-        val accounts = accountManager.getAccountsByType(ACCOUNTS_TYPE)
-        val account = accounts.find { accountManager.getUserData(it, USER_NAME_KEY) == AccountUtils.currentUser?.login }
-
-        return account != null
     }
 
     private fun goBackToThreadList(reason: String) = with(requireActivity()) {
@@ -113,10 +104,5 @@ class SyncConfigureFragment : Fragment() {
     private enum class State {
         INSTALL,
         READY,
-    }
-
-    private companion object {
-        const val ACCOUNTS_TYPE = "infomaniak.com.sync"
-        const val USER_NAME_KEY = "user_name"
     }
 }

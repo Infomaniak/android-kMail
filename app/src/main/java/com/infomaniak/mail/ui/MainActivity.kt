@@ -457,7 +457,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun showSyncDiscovery() = with(localSettings) {
-        if (showSyncDiscoveryBottomSheet && appLaunches > 5) {
+        if (showSyncDiscoveryBottomSheet && appLaunches > 5 && !isUserAlreadySynchronized()) {
             showSyncDiscoveryBottomSheet = false
             navController.navigate(R.id.syncDiscoveryBottomSheetDialog)
         }
