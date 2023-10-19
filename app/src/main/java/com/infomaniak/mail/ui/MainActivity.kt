@@ -428,17 +428,17 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private fun handleUpdates() {
-        if (!localSettings.updateLater || localSettings.appLaunches % 10 == 0) {
+    private fun handleUpdates() = with(localSettings) {
+        if (!updateLater || (appLaunches != 0 && appLaunches % 10 == 0)) {
             checkUpdateIsAvailable(BuildConfig.APPLICATION_ID, BuildConfig.VERSION_CODE) { updateIsAvailable ->
                 if (updateIsAvailable) navController.navigate(R.id.updateAvailableBottomSheetDialog)
             }
         }
     }
 
-    private fun showSyncDiscovery() {
-        if (localSettings.showSyncDiscoveryBottomSheet && localSettings.appLaunches > 5) {
-            localSettings.showSyncDiscoveryBottomSheet = false
+    private fun showSyncDiscovery() = with(localSettings) {
+        if (showSyncDiscoveryBottomSheet && appLaunches > 5) {
+            showSyncDiscoveryBottomSheet = false
             navController.navigate(R.id.syncDiscoveryBottomSheetDialog)
         }
     }
