@@ -92,9 +92,9 @@ class LocalSettings private constructor(context: Context) {
     //endregion
 
     //region Update later
-    var updateLater: Boolean
-        get() = sharedPreferences.getBoolean(UPDATE_LATER_KEY, DEFAULT_UPDATE_LATER)
-        set(value) = sharedPreferences.transaction { putBoolean(UPDATE_LATER_KEY, value) }
+    var isUserWantingUpdates: Boolean
+        get() = sharedPreferences.getBoolean(IS_USER_WANTING_UPDATES_KEY, DEFAULT_IS_USER_WANTING_UPDATES)
+        set(value) = sharedPreferences.transaction { putBoolean(IS_USER_WANTING_UPDATES_KEY, value) }
     //endregion
 
     //region Thread density
@@ -323,7 +323,7 @@ class LocalSettings private constructor(context: Context) {
         private const val DEFAULT_ASK_EMAIL_ACKNOWLEDGMENT = false
         private const val DEFAULT_HAS_ALREADY_ENABLED_NOTIFICATIONS = false
         private const val DEFAULT_IS_APP_LOCKED = false
-        private const val DEFAULT_UPDATE_LATER = false
+        private const val DEFAULT_IS_USER_WANTING_UPDATES = true
         private val DEFAULT_THREAD_DENSITY = ThreadDensity.LARGE
         private val DEFAULT_THEME = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) Theme.LIGHT else Theme.SYSTEM
         private val DEFAULT_ACCENT_COLOR = AccentColor.PINK
@@ -351,7 +351,7 @@ class LocalSettings private constructor(context: Context) {
         private const val ASK_EMAIL_ACKNOWLEDGMENT_KEY = "askEmailAcknowledgmentKey"
         private const val HAS_ALREADY_ENABLED_NOTIFICATIONS_KEY = "hasAlreadyEnabledNotificationsKey"
         private const val IS_APP_LOCKED_KEY = "isAppLockedKey"
-        private const val UPDATE_LATER_KEY = "updateLaterKey"
+        private const val IS_USER_WANTING_UPDATES_KEY = "isUserWantingUpdatesKey"
         private const val THREAD_DENSITY_KEY = "threadDensityKey"
         private const val THEME_KEY = "themeKey"
         private const val ACCENT_COLOR_KEY = "accentColorKey"

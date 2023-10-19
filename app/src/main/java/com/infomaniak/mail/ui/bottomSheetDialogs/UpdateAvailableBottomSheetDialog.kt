@@ -44,14 +44,14 @@ class UpdateAvailableBottomSheetDialog : InformationBottomSheetDialog() {
         actionButton.apply {
             setText(RCore.string.buttonUpdate)
             setOnClickListener {
-                localSettings.updateLater = false
+                localSettings.isUserWantingUpdates = true
                 requireContext().goToPlayStore()
                 dismiss()
             }
         }
 
         secondaryActionButton.setOnClickListener {
-            localSettings.updateLater = true
+            localSettings.isUserWantingUpdates = false
             dismiss()
         }
     }

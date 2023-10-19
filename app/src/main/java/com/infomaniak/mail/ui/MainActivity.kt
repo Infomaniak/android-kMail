@@ -303,10 +303,12 @@ class MainActivity : BaseActivity() {
 
     override fun onStart() {
         super.onStart()
+
         localSettings.apply {
             appLaunches++
             appReviewLaunches--
         }
+
         showUpdateAvailable()
         showSyncDiscovery()
     }
@@ -447,7 +449,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun showUpdateAvailable() = with(localSettings) {
-        if (!updateLater || (appLaunches != 0 && appLaunches % 10 == 0)) {
+        if (isUserWantingUpdates || (appLaunches != 0 && appLaunches % 10 == 0)) {
             checkUpdateIsAvailable(BuildConfig.APPLICATION_ID, BuildConfig.VERSION_CODE) { updateIsAvailable ->
                 if (updateIsAvailable) navController.navigate(R.id.updateAvailableBottomSheetDialog)
             }
