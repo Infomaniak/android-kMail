@@ -140,6 +140,8 @@
     <string name="buttonRefuse">Rifiuti</string>
     <string name="buttonRequestPassword">Richiesta password</string>
     <string name="buttonRestoreEmails">Ripristino delle e-mail</string>
+    <string name="buttonReviewAlertNo">No</string>
+    <string name="buttonReviewAlertYes">Sì</string>
     <string name="buttonSchedule">Programmare l’invio di un’e-mail in un secondo momento</string>
     <string name="buttonSeeAll">Vedi tutti</string>
     <string name="buttonSelectAll">Tutti</string>
