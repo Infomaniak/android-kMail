@@ -149,7 +149,6 @@
     <string name="buttonStart">Anfangen</string>
     <string name="buttonStartSync">Start der Synchronisierung</string>
     <string name="buttonStrikeThrough">Durchstreichen</string>
-    <string name="buttonSyncCalendarsAndContacts">Synchronisierung von Kalender und Kontakten</string>
     <string name="buttonTextOptionsClose">Textformatierung schliessen</string>
     <string name="buttonTextOptionsOpen">Offene Textformatierung</string>
     <string name="buttonTry">Probieren</string>
@@ -454,11 +453,12 @@
     <string name="socialNetworksFolder">Soziale Netzwerke</string>
     <string name="spamFolder">Spam</string>
     <string name="subjectTitle">Thema:</string>
+    <string name="syncCalendarsAndContactsDescription">Sehen Sie sich Ihre Kontakte und Kalender direkt auf Ihrem Gerät an.</string>
+    <string name="syncCalendarsAndContactsTitle">Synchronisierung von Kalendern und Kontakten</string>
     <string name="syncFragmentTitle">Synchronisieren Sie Ihre Kalender und Kontakte</string>
     <string name="syncInstallDescription">Um die kSync-App aus dem Play Store herunterladen zu können, klicken Sie auf \"Installieren\" und kehren Sie dann zu Ihrer Mail-App zurück.</string>
     <string name="syncInstalled">Installierte</string>
     <string name="syncStartDescription">Aktivieren Sie die Kalender und Adressbücher in kSync, die Sie mit Ihrem Telefon synchronisieren möchten.</string>
-    <string name="syncTutorialWelcomeTitle">Anzeigen Ihrer Infomaniak-Kalender und -Kontakte auf Ihrem Gerät</string>
     <plurals name="threadListDeletionConfirmationAlertDescription">
         <item quantity="one">Sind Sie sicher, dass Sie diese Nachricht endgültig löschen wollen?</item>
         <item quantity="other">Sind Sie sicher, dass Sie diese Nachrichten endgültig löschen wollen?</item>

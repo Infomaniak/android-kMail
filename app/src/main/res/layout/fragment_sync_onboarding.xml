@@ -85,13 +85,27 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/marginStandardMedium"
         android:gravity="center"
-        android:text="@string/syncTutorialWelcomeTitle"
-        app:layout_constraintBottom_toTopOf="@id/bottomGuideLine"
+        android:text="@string/syncCalendarsAndContactsTitle"
+        app:layout_constraintBottom_toTopOf="@id/description"
         app:layout_constraintEnd_toStartOf="@id/end"
         app:layout_constraintStart_toEndOf="@id/start"
         app:layout_constraintTop_toBottomOf="@id/iconLayout"
         app:layout_constraintVertical_bias="0.45"
         app:layout_constraintVertical_chainStyle="packed" />
+
+    <TextView
+        android:id="@+id/description"
+        style="@style/Body.Secondary"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/marginStandardMedium"
+        android:layout_marginTop="@dimen/marginStandardMedium"
+        android:gravity="center"
+        android:text="@string/syncCalendarsAndContactsDescription"
+        app:layout_constraintBottom_toBottomOf="@id/bottomGuideLine"
+        app:layout_constraintEnd_toStartOf="@id/end"
+        app:layout_constraintStart_toEndOf="@id/start"
+        app:layout_constraintTop_toBottomOf="@id/title" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/bottomGuideLine"
