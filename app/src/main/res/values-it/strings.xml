@@ -453,13 +453,12 @@
     <string name="socialNetworksFolder">Reti sociali</string>
     <string name="spamFolder">Spam</string>
     <string name="subjectTitle">Oggetto:</string>
-    <string name="syncCalendarsAndContactsDescriptionAndroid">Controlla i tuoi calendari nelle applicazioni Calendario e Contatti del tuo Android.</string>
-    <string name="syncCalendarsAndContactsTitle">Sincronizzazione di calendario e contatti</string>
+    <string name="syncCalendarsAndContactsDescription">Visualizza i contatti e il calendario direttamente dal dispositivo.</string>
+    <string name="syncCalendarsAndContactsTitle">Sincronizzazione di calendari e contatti</string>
     <string name="syncFragmentTitle">Sincronizzare i calendari e i contatti</string>
     <string name="syncInstallDescription">Per scaricare l’applicazione kSync dal Play Store, fare clic su \"Installa\" e poi tornare all’applicazione Mail.</string>
     <string name="syncInstalled">Installata</string>
     <string name="syncStartDescription">Attivare in kSync i calendari e le rubriche che si desidera sincronizzare con il telefono.</string>
-    <string name="syncTutorialWelcomeTitle">Visualizza i calendari e i contatti di Infomaniak sul tuo dispositivo</string>
     <plurals name="threadListDeletionConfirmationAlertDescription">
         <item quantity="one">Sei sicuro di voler cancellare questo messaggio in modo permanente?</item>
         <item quantity="other">Sei sicuro di voler cancellare questi messaggi in modo permanente?</item>

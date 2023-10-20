@@ -23,8 +23,8 @@ import com.infomaniak.mail.utils.launchSyncAutoConfigActivityForResult
 
 class SyncDiscoveryBottomSheetDialog : DiscoveryBottomSheetDialog() {
 
-    override val titleRes = R.string.syncTutorialWelcomeTitle
-    override val descriptionRes = R.string.syncCalendarsAndContactsDescriptionAndroid
+    override val titleRes = R.string.syncCalendarsAndContactsTitle
+    override val descriptionRes = R.string.syncCalendarsAndContactsDescription
     override val illustrationRes = R.drawable.illustration_discover_sync
     override val positiveButtonRes = R.string.buttonStart
     override val trackMatomoWithCategory: (name: String) -> Unit = { trackSyncAutoConfigEvent(it) }
