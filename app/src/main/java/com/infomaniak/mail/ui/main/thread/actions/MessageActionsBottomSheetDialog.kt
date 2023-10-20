@@ -65,9 +65,9 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
             folderRole = mainViewModel.getActionFolderRole(message)
 
-            setMarkAsReadUi(isSeen)
+            setMarkAsReadUi(message.isSeen)
             setArchiveUi(isFromArchive = folderRole == FolderRole.ARCHIVE)
-            setFavoriteUi(isFavorite)
+            setFavoriteUi(message.isFavorite)
 
             if (requireContext().isNightModeEnabled()) {
                 binding.lightTheme.apply {

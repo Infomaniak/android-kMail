@@ -533,9 +533,7 @@ class ThreadAdapter(
 
         override fun areContentsTheSame(oldMessage: Message, newMessage: Message): Boolean {
             return newMessage.body?.value == oldMessage.body?.value &&
-                    newMessage.splitBody == oldMessage.splitBody &&
-                    newMessage.isSeen == oldMessage.isSeen &&
-                    newMessage.isFavorite == oldMessage.isFavorite
+                    newMessage.splitBody == oldMessage.splitBody
         }
     }
 

@@ -334,8 +334,6 @@ class ThreadFragment : Fragment() {
             ThreadFragmentDirections.actionThreadFragmentToMessageActionsBottomSheetDialog(
                 messageUid = uid,
                 threadUid = navigationArgs.threadUid,
-                isFavorite = isFavorite,
-                isSeen = isSeen,
                 isThemeTheSame = threadAdapter.isThemeTheSameMap[uid]!!,
                 shouldLoadDistantResources = shouldLoadDistantResources(uid),
             )

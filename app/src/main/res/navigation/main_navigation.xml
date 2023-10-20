@@ -221,12 +221,6 @@
             android:name="threadUid"
             app:argType="string" />
         <argument
-            android:name="isFavorite"
-            app:argType="boolean" />
-        <argument
-            android:name="isSeen"
-            app:argType="boolean" />
-        <argument
             android:name="isThemeTheSame"
             app:argType="boolean" />
         <argument
