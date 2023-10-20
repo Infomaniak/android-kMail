@@ -39,6 +39,7 @@ import com.infomaniak.mail.data.LocalSettings.AiReplacementDialogVisibility
 import com.infomaniak.mail.data.models.ai.AiPromptOpeningStatus
 import com.infomaniak.mail.databinding.DialogAiReplaceContentBinding
 import com.infomaniak.mail.databinding.FragmentAiPropositionBinding
+import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.newMessage.AiViewModel.PropositionStatus
 import com.infomaniak.mail.ui.newMessage.AiViewModel.Shortcut
 import com.infomaniak.mail.utils.SimpleIconPopupMenu
@@ -73,6 +74,9 @@ class AiPropositionFragment : Fragment() {
 
     @Inject
     lateinit var localSettings: LocalSettings
+
+    @Inject
+    lateinit var descriptionDialog: DescriptionAlertDialog
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentAiPropositionBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -151,26 +155,47 @@ class AiPropositionFragment : Fragment() {
     }
 
     private fun choosePropositionAndPopBack() = with(aiViewModel) {
+
+        fun applyProposition(subject: String?, content: String) {
+            trackInsertionType()
+            aiOutputToInsert.value = subject to content
+            findNavController().popBackStack()
+        }
+
+        val (subject, content) = splitBodyAndSubject(getLastMessage())
+
+        if (subject == null || newMessageViewModel.draft.subject.isNullOrBlank()) { // TODO : Test
+            applyProposition(subject, content)
+        } else {
+            descriptionDialog.show(
+                title = getString(R.string.aiReplaceSubjectTitle),
+                description = getString(R.string.aiReplaceSubjectDescription, subject),
+                displayLoader = false,
+                displayCancelButton = true,
+                positiveButtonText = R.string.aiReplacementDialogPositiveButton,
+                negativeButtonText = R.string.aiReplaceSubjectNegativeButton,
+                onPositiveButtonClicked = { applyProposition(subject, content) },
+                onNegativeButtonClicked = { applyProposition(null, content) },
+            )
+        }
+    }
+
+    private fun trackInsertionType() {
         val willReplace = newMessageViewModel.draft.uiBody.isNotBlank()
         if (willReplace) {
             trackAiWriterEvent("replaceProposition", TrackerAction.DATA)
         } else {
             trackAiWriterEvent("insertProposition", TrackerAction.DATA)
         }
-
-        val (subject, content) = splitBodyAndSubject(getLastMessage())
-
-        aiOutputToInsert.value = subject to content
-        findNavController().popBackStack()
     }
 
     private fun splitBodyAndSubject(proposition: String): Pair<String?, String> {
         val match = MATCH_SUBJECT_REGEX.find(proposition)
 
         val content = match?.groups?.get("content")?.value ?: return null to proposition
-        val signature = match.groups["subject"]?.value
+        val subject = match.groups["subject"]?.value?.trim()
 
-        return signature to content
+        return subject to content
     }
 
     private fun onMenuItemClicked(menuItemId: Int) = with(aiViewModel) {
@@ -336,6 +361,6 @@ class AiPropositionFragment : Fragment() {
     private companion object {
         const val REPLACEMENT_DURATION: Long = 150
 
-        val MATCH_SUBJECT_REGEX = Regex("^[^:]+:(?<subject>.+?)\\n\\s*(?<content>.+)", RegexOption.MULTILINE)
+        val MATCH_SUBJECT_REGEX = Regex("^[^:]+:(?<subject>.+?)\\n\\s*(?<content>.+)", RegexOption.DOT_MATCHES_ALL)
     }
 }

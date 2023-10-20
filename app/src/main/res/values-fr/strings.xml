@@ -73,6 +73,9 @@
     <string name="aiPromptTag">Beta</string>
     <string name="aiPromptTitle">Assistant à la rédaction</string>
     <string name="aiPromptValidateButton">Générer</string>
+    <string name="aiReplaceSubjectDescription">L’objet actuel deviendra :\n\n%s</string>
+    <string name="aiReplaceSubjectNegativeButton">Garder</string>
+    <string name="aiReplaceSubjectTitle">Remplacer l’objet actuel par la proposition de l’assistant</string>
     <string name="aiReplacementDialogDescription">En cliquant sur \"Remplacer\", le contenu pré-existant sera perdu.</string>
     <string name="aiReplacementDialogDoNotShowAgain">Ne plus afficher ce message</string>
     <string name="aiReplacementDialogPositiveButton">Remplacer</string>
