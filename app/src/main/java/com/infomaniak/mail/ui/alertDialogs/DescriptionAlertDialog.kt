@@ -37,14 +37,17 @@ open class DescriptionAlertDialog @Inject constructor(
 
     override val binding: DialogDescriptionBinding by lazy { DialogDescriptionBinding.inflate(activity.layoutInflater) }
 
-    override val alertDialog = initDialog()
+    protected open val customThemeRes: Int? = null
+    override val alertDialog by lazy { initDialog() }
 
     private var onPositiveButtonClicked: (() -> Unit)? = null
     private var onNegativeButtonClicked: (() -> Unit)? = null
     private var onDismissed: (() -> Unit)? = null
 
     final override fun initDialog() = with(binding) {
-        MaterialAlertDialogBuilder(context)
+        val builder = customThemeRes?.let { MaterialAlertDialogBuilder(context, it) } ?: MaterialAlertDialogBuilder(context)
+
+        builder
             .setView(root)
             .setPositiveButton(R.string.buttonConfirm, null)
             .setNegativeButton(RCore.string.buttonCancel, null)

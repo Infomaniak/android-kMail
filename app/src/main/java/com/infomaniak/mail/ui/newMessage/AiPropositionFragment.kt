@@ -39,7 +39,7 @@ import com.infomaniak.mail.data.LocalSettings.AiReplacementDialogVisibility
 import com.infomaniak.mail.data.models.ai.AiPromptOpeningStatus
 import com.infomaniak.mail.databinding.DialogAiReplaceContentBinding
 import com.infomaniak.mail.databinding.FragmentAiPropositionBinding
-import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
+import com.infomaniak.mail.ui.alertDialogs.AiDescriptionAlertDialog
 import com.infomaniak.mail.ui.newMessage.AiViewModel.PropositionStatus
 import com.infomaniak.mail.ui.newMessage.AiViewModel.Shortcut
 import com.infomaniak.mail.utils.SimpleIconPopupMenu
@@ -76,7 +76,7 @@ class AiPropositionFragment : Fragment() {
     lateinit var localSettings: LocalSettings
 
     @Inject
-    lateinit var descriptionDialog: DescriptionAlertDialog
+    lateinit var descriptionDialog: AiDescriptionAlertDialog
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentAiPropositionBinding.inflate(inflater, container, false).also { binding = it }.root
