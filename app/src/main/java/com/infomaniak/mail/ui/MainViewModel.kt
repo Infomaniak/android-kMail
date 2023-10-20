@@ -901,6 +901,7 @@ class MainViewModel @Inject constructor(
         return getActionFolderRole(message.threads, message)
     }
 
+    // TODO: Handle this correctly if MultiSelect feature is added in the Search.
     /**
      * Get the FolderRole of a Message or a list of Threads.
      *
