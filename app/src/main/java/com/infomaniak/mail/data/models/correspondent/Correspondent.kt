@@ -22,6 +22,7 @@ import android.os.Parcelable
 import com.infomaniak.lib.core.utils.firstOrEmpty
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.UiUtils.parseToUnicode
 import io.sentry.Sentry
 
 interface Correspondent : Parcelable {
@@ -34,7 +35,7 @@ interface Correspondent : Parcelable {
 
     fun shouldDisplayUserAvatar(): Boolean = isMe() && email == AccountUtils.currentUser?.email
 
-    fun getNameOrEmail(): String = name.ifBlank { email }
+    fun getNameOrEmail(): String = name.ifBlank { email.parseToUnicode() }
 
     fun computeInitials(): String {
         return runCatching {

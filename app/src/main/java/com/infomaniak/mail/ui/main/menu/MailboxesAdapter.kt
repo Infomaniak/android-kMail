@@ -89,7 +89,7 @@ class MailboxesAdapter(
         isCurrentMailbox: Boolean,
         trackerCallback: () -> Unit,
     ) {
-        text = mailbox.email
+        text = mailbox.displayEmail
 
         if (!isCurrentMailbox) {
             setOnClickListener {
@@ -100,7 +100,7 @@ class MailboxesAdapter(
     }
 
     private fun ItemInvalidMailboxBinding.displayInvalidMailbox(mailbox: Mailbox) = with(root) {
-        text = mailbox.email
+        text = mailbox.displayEmail
 
         itemStyle = if (isInMenuDrawer) SelectionStyle.MENU_DRAWER else SelectionStyle.OTHER
 
@@ -111,7 +111,7 @@ class MailboxesAdapter(
         computeEndIconVisibility()
 
         initSetOnClickListener(
-            onLockedMailboxClicked = { onLockedMailboxClicked?.invoke(mailbox.email) },
+            onLockedMailboxClicked = { onLockedMailboxClicked?.invoke(mailbox.displayEmail) },
             onInvalidPasswordMailboxClicked = { onInvalidPasswordMailboxClicked?.invoke(mailbox) },
         )
     }

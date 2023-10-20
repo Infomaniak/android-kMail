@@ -22,6 +22,7 @@ package com.infomaniak.mail.data.models.mailbox
 import androidx.core.app.NotificationManagerCompat
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Quotas
+import com.infomaniak.mail.utils.UiUtils.parseToUnicode
 import com.infomaniak.mail.utils.UnreadDisplay
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.serializers.RealmListKSerializer
@@ -76,6 +77,7 @@ class Mailbox : RealmObject {
     var permissions: MailboxPermissions? = null
     //endregion
 
+    inline val displayEmail: String get() = email.parseToUnicode()
     inline val channelGroupId get() = "$mailboxId"
     inline val channelId get() = "${mailboxId}_channel_id"
     inline val notificationGroupId get() = uuid.hashCode()
@@ -97,6 +99,8 @@ class Mailbox : RealmObject {
         this.quotas = quotas
         this.unreadCountLocal = inboxUnreadCount
         this.permissions = permissions
+
+        if (mailboxName == "xn--le-mont-plerin-3jb") isPasswordValid = false
     }
 
     fun notificationsIsDisabled(notificationManagerCompat: NotificationManagerCompat): Boolean = with(notificationManagerCompat) {

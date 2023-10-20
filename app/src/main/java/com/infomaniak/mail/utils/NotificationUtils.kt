@@ -184,7 +184,7 @@ class NotificationUtils @Inject constructor(
             }
 
             setOnlyAlertOnce(true)
-            setSubText(mailbox.email)
+            setSubText(mailbox.displayEmail)
             setContentText(content)
             setColorized(true)
             setContentIntent(contentIntent(mailbox.uuid, isSummary, isUndo))

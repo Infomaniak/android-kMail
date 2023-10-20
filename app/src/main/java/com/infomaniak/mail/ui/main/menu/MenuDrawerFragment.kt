@@ -201,7 +201,7 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
 
     private fun observeCurrentMailbox() {
         mainViewModel.currentMailbox.observeNotNull(viewLifecycleOwner) { mailbox ->
-            binding.mailboxSwitcherText.text = mailbox.email
+            binding.mailboxSwitcherText.text = mailbox.displayEmail
 
             // Make sure you always cancel all mailbox current notifications, whenever it is visible by the user.
             // Also cancel notifications from the current mailbox if it no longer exists.

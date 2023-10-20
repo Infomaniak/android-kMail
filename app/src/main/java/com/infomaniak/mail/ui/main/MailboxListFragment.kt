@@ -44,7 +44,7 @@ interface MailboxListFragment {
     fun Fragment.onInvalidPasswordMailboxClicked(mailbox: Mailbox) {
         safeNavigate(
             resId = R.id.invalidPasswordFragment,
-            args = InvalidPasswordFragmentArgs(mailbox.mailboxId, mailbox.objectId, mailbox.email).toBundle(),
+            args = InvalidPasswordFragmentArgs(mailbox.mailboxId, mailbox.objectId, mailbox.displayEmail).toBundle(),
             currentClassName = currentClassName,
         )
     }

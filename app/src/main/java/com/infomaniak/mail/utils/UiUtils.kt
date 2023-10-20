@@ -31,6 +31,7 @@ import androidx.core.view.isGone
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.Correspondent
 import com.infomaniak.mail.data.models.message.SubBody
+import java.net.IDN
 
 object UiUtils {
 
@@ -90,10 +91,11 @@ object UiUtils {
         correspondent: Correspondent,
         ignoreIsMe: Boolean = false,
     ): Pair<String, String?> = with(correspondent) {
+        val displayEmail = email.parseToUnicode()
         return when {
-            isMe() && !ignoreIsMe -> getString(R.string.contactMe) to email
-            name.isBlank() || name == email -> email to null
-            else -> name to email
+            isMe() && !ignoreIsMe -> getString(R.string.contactMe) to displayEmail
+            name.isBlank() || name == displayEmail -> displayEmail to null
+            else -> name to displayEmail
         }
     }
 
@@ -146,4 +148,8 @@ object UiUtils {
 
         return subBodiesContent
     }
+
+    fun String.parseToUnicode() = runCatching {
+        split('@').let { (name, domain) -> "${IDN.toUnicode(name)}@$domain" }
+    }.getOrDefault(this)
 }
