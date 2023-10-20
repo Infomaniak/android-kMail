@@ -99,7 +99,7 @@ class AiViewModel @Inject constructor(
         handleAiResult(apiResponse = apiResponse, apiResponse.data?.promptMessage)
     }
 
-    val aiFeatureFlag = featureFlagController.getFeatureFlagAsync(FeatureFlagType.AI).asLiveData()
+    val aiFeatureFlag = featureFlagController.getFeatureFlagAsync(FeatureFlagType.AI).asLiveData(ioCoroutineContext)
 
     fun updateFeatureFlag() = viewModelScope.launch(ioCoroutineContext) {
         sharedUtils.updateAiFeatureFlag()
