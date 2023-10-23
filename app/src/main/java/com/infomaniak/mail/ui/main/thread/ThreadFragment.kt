@@ -537,11 +537,7 @@ class ThreadFragment : Fragment() {
     private fun onThreadUpdate(thread: Thread?) = with(binding) {
 
         if (thread == null) {
-            if (isTwoPanelLayout()) {
-                threadViewModel.threadUid.value = null
-            } else {
                 leaveThread()
-            }
             return@with
         }
 
@@ -617,12 +613,16 @@ class ThreadFragment : Fragment() {
     }
 
     private fun leaveThread() {
+        if (isTwoPanelLayout()) {
+            threadViewModel.threadUid.value = null
+        } else {
         // TODO: Realm broadcasts twice when the Thread is deleted.
         //  We don't know why.
         //  While it's not fixed, we do this quickfix of checking if we already left:
         if (isFirstTimeLeaving.compareAndSet(true, false)) {
             findNavController().popBackStack()
         }
+    }
     }
 
     enum class HeaderState {
