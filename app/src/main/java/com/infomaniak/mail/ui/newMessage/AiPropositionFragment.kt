@@ -167,6 +167,7 @@ class AiPropositionFragment : Fragment() {
         if (subject == null || newMessageViewModel.draft.subject.isNullOrBlank()) {
             applyProposition(subject, content)
         } else {
+            trackAiWriterEvent("replaceSubjectDialog")
             subjectReplacementDialog.show(
                 title = getString(R.string.aiReplaceSubjectTitle),
                 description = getString(R.string.aiReplaceSubjectDescription, subject),
@@ -174,8 +175,14 @@ class AiPropositionFragment : Fragment() {
                 displayCancelButton = true,
                 positiveButtonText = R.string.aiReplacementDialogPositiveButton,
                 negativeButtonText = R.string.buttonReviewAlertNo,
-                onPositiveButtonClicked = { applyProposition(subject, content) },
-                onNegativeButtonClicked = { applyProposition(null, content) },
+                onPositiveButtonClicked = {
+                    trackAiWriterEvent("replaceSubjectConfirm")
+                    applyProposition(subject, content)
+                },
+                onNegativeButtonClicked = {
+                    trackAiWriterEvent("keepSubject")
+                    applyProposition(null, content)
+                },
             )
         }
     }
