@@ -701,14 +701,12 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun setupExternalBanner() = with(binding) {
-        var manuallyClosed = false
-
         var externalRecipientEmail: String? = null
         var externalRecipientQuantity = 0
 
         closeButton.setOnClickListener {
             trackExternalEvent("bannerManuallyClosed")
-            manuallyClosed = true
+            newMessageViewModel.isExternalBannerManuallyClosed = true
             externalBanner.isGone = true
         }
 
@@ -729,7 +727,7 @@ class NewMessageFragment : Fragment() {
         }
 
         newMessageViewModel.externalRecipientCount.observe(viewLifecycleOwner) { (email, externalQuantity) ->
-            externalBanner.isGone = manuallyClosed || externalQuantity == 0
+            externalBanner.isGone = newMessageViewModel.isExternalBannerManuallyClosed || externalQuantity == 0
             externalRecipientEmail = email
             externalRecipientQuantity = externalQuantity
         }
