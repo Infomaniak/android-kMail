@@ -195,6 +195,8 @@ class AiPropositionFragment : Fragment() {
         val content = match?.groups?.get("content")?.value ?: return null to proposition
         val subject = match.groups["subject"]?.value?.trim()
 
+        if (subject.isNullOrBlank()) return null to proposition
+
         return subject to content
     }
 
