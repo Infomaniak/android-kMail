@@ -41,6 +41,7 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import kotlin.collections.set
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class ThreadViewModel @Inject constructor(
     application: Application,
@@ -48,7 +49,6 @@ class ThreadViewModel @Inject constructor(
     private val mailboxController: MailboxController,
     private val messageController: MessageController,
     private val refreshController: RefreshController,
-    private val savedStateHandle: SavedStateHandle,
     private val sharedUtils: SharedUtils,
     private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -58,47 +58,58 @@ class ThreadViewModel @Inject constructor(
 
     private var fetchMessagesJob: Job? = null
 
+    private val mailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
+
     val quickActionBarClicks = SingleLiveEvent<QuickActionBarResult>()
 
     var deletedMessagesUids = mutableSetOf<String>()
     val failedMessagesUids = SingleLiveEvent<List<String>>()
 
-    private val threadUid inline get() = savedStateHandle.get<String>(ThreadFragmentArgs::threadUid.name)!!
+    val threadUid = MutableLiveData<String?>(null)
+
+    private var threadLiveJob: Job? = null
+    val threadLive = MutableLiveData<Thread?>()
 
     private val splitBodies = mutableMapOf<String, SplitBody>()
 
-    private val mailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
+    private var messagesLiveJob: Job? = null
+    val messagesLive = MutableLiveData<List<Message>>()
 
     private val currentMailboxLive = mailboxController.getMailboxAsync(
         AccountUtils.currentUserId,
         AccountUtils.currentMailboxId,
     ).map { it.obj }.asLiveData(ioCoroutineContext)
 
-    val threadLive = liveData(ioCoroutineContext) {
-        emitSource(threadController.getThreadAsync(threadUid).map { it.obj }.asLiveData())
+    fun reassignThreadLive(threadUid: String) {
+        threadLiveJob?.cancel()
+        threadLiveJob = viewModelScope.launch(ioCoroutineContext) {
+            threadController.getThreadAsync(threadUid).map { it.obj }.collect(threadLive::postValue)
+        }
     }
 
-    val messagesLive = liveData(ioCoroutineContext) {
+    fun reassignMessagesLive(threadUid: String) {
+        messagesLiveJob?.cancel()
+        messagesLiveJob = viewModelScope.launch(ioCoroutineContext) {
 
-        suspend fun splitBody(message: Message): Message = withContext(ioDispatcher) {
-            if (message.body == null) return@withContext message
+            suspend fun splitBody(message: Message): Message = withContext(ioDispatcher) {
+                if (message.body == null) return@withContext message
 
-            return@withContext message.apply {
-                body?.let {
-                    val isNotAlreadySplit = !splitBodies.contains(message.uid)
-                    if (isNotAlreadySplit) splitBodies[message.uid] = MessageBodyUtils.splitContentAndQuote(it)
-                    splitBody = splitBodies[message.uid]
+                return@withContext message.apply {
+                    body?.let {
+                        val isNotAlreadySplit = !splitBodies.contains(message.uid)
+                        if (isNotAlreadySplit) splitBodies[message.uid] = MessageBodyUtils.splitContentAndQuote(it)
+                        splitBody = splitBodies[message.uid]
+                    }
                 }
             }
-        }
 
-        messageController.getSortedAndNotDeletedMessagesAsync(threadUid)
-            ?.map { results -> results.list.map { splitBody(it) } }
-            ?.asLiveData()
-            ?.let { emitSource(it) }
+            messageController.getSortedAndNotDeletedMessagesAsync(threadUid)
+                ?.map { results -> results.list.map { splitBody(it) } }
+                ?.collect(messagesLive::postValue)
+        }
     }
 
-    fun openThread() = liveData(ioCoroutineContext) {
+    fun openThread(threadUid: String) = liveData(ioCoroutineContext) {
 
         val thread = threadController.getThread(threadUid) ?: run {
             emit(null)
@@ -120,6 +131,11 @@ class ThreadViewModel @Inject constructor(
         emit(OpenThreadResult(thread, isExpandedMap, initialSetOfExpandedMessagesUids, isThemeTheSameMap))
 
         if (thread.unseenMessagesCount > 0) sharedUtils.markAsSeen(mailbox, listOf(thread))
+    }
+
+    fun closeThread() {
+        deletedMessagesUids.clear()
+        splitBodies.clear()
     }
 
     private fun sendMatomoAndSentryAboutThreadMessagesCount(thread: Thread) {
@@ -175,7 +191,7 @@ class ThreadViewModel @Inject constructor(
 
     fun deleteDraft(message: Message, mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
         val realm = mailboxContentRealm()
-        val thread = ThreadController.getThread(threadUid, realm) ?: return@launch
+        val thread = threadLive.value ?: return@launch
         val messages = messageController.getMessageAndDuplicates(thread, message)
         val isSuccess = ApiRepository.deleteMessages(mailbox.uuid, messages.getUids()).isSuccess()
         if (isSuccess) {
@@ -189,9 +205,9 @@ class ThreadViewModel @Inject constructor(
     }
 
     fun clickOnQuickActionBar(menuId: Int) = viewModelScope.launch(ioCoroutineContext) {
-        val thread = threadController.getThread(threadUid) ?: return@launch
+        val thread = threadLive.value ?: return@launch
         val message = messageController.getLastMessageToExecuteAction(thread)
-        quickActionBarClicks.postValue(QuickActionBarResult(message, menuId))
+        quickActionBarClicks.postValue(QuickActionBarResult(thread.uid, message, menuId))
     }
 
     fun scheduleDownload(downloadUrl: String, filename: String) = viewModelScope.launch(ioCoroutineContext) {
@@ -214,6 +230,7 @@ class ThreadViewModel @Inject constructor(
     )
 
     data class QuickActionBarResult(
+        val threadUid: String,
         val message: Message,
         val menuId: Int,
     )
