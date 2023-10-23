@@ -40,7 +40,7 @@ object ApiRoutes {
         return "$MAIL_API/api/mailbox/permissions?user_mailbox_id=$linkId&product_id=$hostingId"
     }
 
-    fun ai(): String = "$MAIL_API/api/ai"
+    private fun ai(): String = "$MAIL_API/api/ai"
 
     fun featureFlag(featureName: String): String = "$MAIL_API/api/feature-flag/check/$featureName"
 
@@ -133,9 +133,19 @@ object ApiRoutes {
         return "${getMessages(mailboxUuid, folderId)}/messages?uids=${uids.joinToString(",")}"
     }
 
-    fun aiShortcutWithContext(contextId: String, action: String): String = "${ai()}/mobile/$contextId/$action"
+    private fun emailParameter(currentMailboxEmail: String) = "?email=$currentMailboxEmail"
 
-    fun aiShortcutNoContext(action: String): String = "${ai()}/mobile/$action"
+    fun aiConversation(currentMailboxEmail: String): String {
+        return "${ai()}${emailParameter(currentMailboxEmail)}"
+    }
+
+    fun aiShortcutWithContext(contextId: String, action: String, currentMailboxEmail: String): String {
+        return "${ai()}/mobile/$contextId/$action${emailParameter(currentMailboxEmail)}"
+    }
+
+    fun aiShortcutNoContext(action: String, currentMailboxEmail: String): String {
+        return "${ai()}/mobile/$action${emailParameter(currentMailboxEmail)}"
+    }
 
     private fun getMessages(mailboxUuid: String, folderId: String): String {
         return "$MAIL_API/api/mail/${mailboxUuid}/folder/${folderId}/mobile"
