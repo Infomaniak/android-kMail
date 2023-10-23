@@ -187,6 +187,9 @@ class MainActivity : BaseActivity() {
         permissionUtils.requestMainPermissionsIfNeeded()
 
         initAppUpdateManager()
+
+        // TODO: Instead of doing that, save the state and restore it when rotating.
+        if (isTwoPanelLayout() && navController.currentDestination?.id == R.id.threadFragment) navController.popBackStack()
     }
 
     private fun observeNetworkStatus() {
