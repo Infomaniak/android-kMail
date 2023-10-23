@@ -153,6 +153,10 @@ fun Date.isLastWeek(): Boolean {
 //region UI
 fun Context.isInPortrait(): Boolean = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
 
+fun Fragment.isTwoPanelLayout(): Boolean = requireContext().isTwoPanelLayout()
+
+fun Context.isTwoPanelLayout(): Boolean = resources.getBoolean(R.bool.isTabletLandscape)
+
 fun View.toggleChevron(
     isCollapsed: Boolean,
     collapsedAngle: Float? = null,
