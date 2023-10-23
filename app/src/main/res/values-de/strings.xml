@@ -74,8 +74,7 @@
     <string name="aiPromptTitle">Schreibassistent</string>
     <string name="aiPromptValidateButton">Erzeugen</string>
     <string name="aiReplaceSubjectDescription">Der Betreff wird zu:\n\n%s</string>
-    <string name="aiReplaceSubjectNegativeButton">Behalten</string>
-    <string name="aiReplaceSubjectTitle">Ersetzen Sie den aktuellen Betreff durch den Vorschlag des Assistenten</string>
+    <string name="aiReplaceSubjectTitle">Ersetzen Sie der aktuelle Betreff durch den Vorschlag des Assistenten?</string>
     <string name="aiReplacementDialogDescription">Wenn Sie auf \"Ersetzen\" klicken, geht der bereits vorhandene Inhalt verloren.</string>
     <string name="aiReplacementDialogDoNotShowAgain">Diese Nachricht nicht mehr anzeigen</string>
     <string name="aiReplacementDialogPositiveButton">Ersetzen</string>

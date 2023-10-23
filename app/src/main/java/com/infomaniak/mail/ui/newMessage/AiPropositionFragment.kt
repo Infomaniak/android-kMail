@@ -173,7 +173,7 @@ class AiPropositionFragment : Fragment() {
                 displayLoader = false,
                 displayCancelButton = true,
                 positiveButtonText = R.string.aiReplacementDialogPositiveButton,
-                negativeButtonText = R.string.aiReplaceSubjectNegativeButton,
+                negativeButtonText = R.string.buttonReviewAlertNo,
                 onPositiveButtonClicked = { applyProposition(subject, content) },
                 onNegativeButtonClicked = { applyProposition(null, content) },
             )

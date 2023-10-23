@@ -74,8 +74,7 @@
     <string name="aiPromptTitle">Assistente di scrittura</string>
     <string name="aiPromptValidateButton">Genera</string>
     <string name="aiReplaceSubjectDescription">Il soggetto diventerà:\n\n%s</string>
-    <string name="aiReplaceSubjectNegativeButton">Mantenere</string>
-    <string name="aiReplaceSubjectTitle">Sostituire l’argomento corrente con la proposta dell’assistente.</string>
+    <string name="aiReplaceSubjectTitle">Sostituire il soggetto attuale con la proposta dell\'assistente?</string>
     <string name="aiReplacementDialogDescription">Facendo clic su \"Sostituisci\", il contenuto preesistente andrà perso.</string>
     <string name="aiReplacementDialogDoNotShowAgain">Non visualizzare più questo messaggio</string>
     <string name="aiReplacementDialogPositiveButton">Sostituisci</string>

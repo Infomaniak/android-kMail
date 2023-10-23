@@ -80,8 +80,7 @@
     <string name="aiPromptTitle">Writing assistant</string>
     <string name="aiPromptValidateButton">Generate</string>
     <string name="aiReplaceSubjectDescription">The subject will become:\n\n%s</string>
-    <string name="aiReplaceSubjectNegativeButton">Keep</string>
-    <string name="aiReplaceSubjectTitle">Replace the current subject with the assistant’s proposition</string>
+    <string name="aiReplaceSubjectTitle">Replace the current subject with the assistant\'s proposal?</string>
     <string name="aiReplacementDialogDescription">By clicking on \"Replace\", pre-existing content will be lost.</string>
     <string name="aiReplacementDialogDoNotShowAgain">Do not show this again</string>
     <string name="aiReplacementDialogPositiveButton">Replace</string>
