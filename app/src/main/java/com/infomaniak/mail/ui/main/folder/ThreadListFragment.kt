@@ -162,6 +162,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         observerDraftsActionsCompletedWorks()
         observeFlushFolderTrigger()
         observeUpdateInstall()
+        observeNavigationInTwoPanelLayout()
     }.getOrDefault(Unit)
 
     private fun navigateFromNotificationToNewMessage() {
@@ -694,6 +695,60 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun showRefreshLayout() {
         binding.swipeRefreshLayout.isRefreshing = true
+    }
+
+    private fun observeNavigationInTwoPanelLayout() = with(mainViewModel) {
+        if (isTwoPanelLayout()) {
+
+            downloadAttachmentsArgs.observe(viewLifecycleOwner) { (resource, name, fileType) ->
+                safeNavigate(
+                    ThreadListFragmentDirections.actionThreadListFragmentToDownloadAttachmentProgressDialog(
+                        attachmentResource = resource,
+                        attachmentName = name,
+                        attachmentType = fileType,
+                    ),
+                )
+            }
+
+            newMessageArgs.observe(viewLifecycleOwner) {
+                safeNavigateToNewMessageActivity(args = it.toBundle())
+            }
+
+            replyBottomSheetArgs.observe(viewLifecycleOwner) { (messageUid, shouldLoadDistantResources) ->
+                safeNavigate(
+                    ThreadListFragmentDirections.actionThreadListFragmentToReplyBottomSheetDialog(
+                        messageUid = messageUid,
+                        shouldLoadDistantResources = shouldLoadDistantResources,
+                    )
+                )
+            }
+
+            threadActionsBottomSheetArgs.observe(viewLifecycleOwner) {
+                val (threadUid, lastMessageToReplyToUid, shouldLoadDistantResources) = it
+                safeNavigate(
+                    ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(
+                        threadUid = threadUid,
+                        messageUidToReplyTo = lastMessageToReplyToUid,
+                        shouldLoadDistantResources = shouldLoadDistantResources,
+                    ),
+                )
+            }
+
+            messageActionsBottomSheetArgs.observe(viewLifecycleOwner) {
+                safeNavigate(
+                    ThreadListFragmentDirections.actionThreadListFragmentToMessageActionsBottomSheetDialog(
+                        messageUid = it.messageUid,
+                        threadUid = it.threadUid,
+                        isThemeTheSame = it.isThemeTheSame,
+                        shouldLoadDistantResources = it.shouldLoadDistantResources,
+                    ),
+                )
+            }
+
+            detailedContactArgs.observe(viewLifecycleOwner) { contact ->
+                safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToDetailedContactBottomSheetDialog(contact))
+            }
+        }
     }
 
     private enum class EmptyState(
