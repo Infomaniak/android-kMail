@@ -281,20 +281,26 @@ fun Fragment.navigateToThread(
     mainViewModel: MainViewModel,
     thread: Thread,
 ) = runCatchingRealm {
-    if (thread.isOnlyOneDraft) { // Directly go to NewMessage screen
-        trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
-        mainViewModel.navigateToSelectedDraft(thread.messages.first()).observe(viewLifecycleOwner) {
-            safeNavigateToNewMessageActivity(
-                NewMessageActivityArgs(
-                    arrivedFromExistingDraft = true,
-                    draftLocalUuid = it.draftLocalUuid,
-                    draftResource = it.draftResource,
-                    messageUid = it.messageUid,
-                ).toBundle(),
-            )
+    when {
+        thread.isOnlyOneDraft -> { // Directly go to NewMessage screen
+            trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
+            mainViewModel.navigateToSelectedDraft(thread.messages.first()).observe(viewLifecycleOwner) {
+                safeNavigateToNewMessageActivity(
+                    NewMessageActivityArgs(
+                        arrivedFromExistingDraft = true,
+                        draftLocalUuid = it.draftLocalUuid,
+                        draftResource = it.draftResource,
+                        messageUid = it.messageUid,
+                    ).toBundle(),
+                )
+            }
         }
-    } else {
-        safeNavigate(R.id.threadFragment, ThreadFragmentArgs(thread.uid).toBundle())
+        isTwoPanelLayout() -> {
+            (requireActivity() as MainActivity).openThread(thread.uid)
+        }
+        else -> {
+            safeNavigate(R.id.threadFragment, ThreadFragmentArgs(thread.uid).toBundle())
+        }
     }
 }.getOrDefault(Unit)
 //endregion

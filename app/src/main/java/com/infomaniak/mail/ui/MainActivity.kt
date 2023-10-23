@@ -59,6 +59,7 @@ import com.infomaniak.mail.firebase.RegisterFirebaseBroadcastReceiver
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.TitleAlertDialog
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
+import com.infomaniak.mail.ui.main.thread.ThreadViewModel
 import com.infomaniak.mail.ui.newMessage.NewMessageActivity
 import com.infomaniak.mail.ui.sync.SyncAutoConfigActivity
 import com.infomaniak.mail.utils.*
@@ -79,6 +80,7 @@ class MainActivity : BaseActivity() {
     // This binding is not private because it's used in ThreadListFragment (`(activity as? MainActivity)?.binding`)
     val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private val mainViewModel: MainViewModel by viewModels()
+    private val threadViewModel: ThreadViewModel by viewModels()
 
     private val permissionUtils by lazy { PermissionUtils(this).also(::registerMainPermissions) }
 
@@ -526,6 +528,10 @@ class MainActivity : BaseActivity() {
             easterEggConfettiCount = 0
             ConfettiUtils.triggerEasterEggConfetti(binding.easterEggConfettiContainer, matomoValue)
         }
+    }
+
+    fun openThread(uid: String) {
+        threadViewModel.threadUid.value = uid
     }
 
     companion object {
