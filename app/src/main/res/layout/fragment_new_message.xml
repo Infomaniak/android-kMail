@@ -719,8 +719,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:translationZ="@dimen/newMessageBottomBarElevation"
-            tools:name="com.infomaniak.mail.ui.newMessage.AiPromptFragment" />
+            android:translationZ="@dimen/newMessageBottomBarElevation" />
 
     </FrameLayout>
 </FrameLayout>
