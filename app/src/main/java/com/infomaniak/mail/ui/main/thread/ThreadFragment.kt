@@ -149,7 +149,7 @@ class ThreadFragment : Fragment() {
         observeFailedMessages()
         observeContacts()
         observeQuickActionBarClicks()
-        observeOpenAttachment()
+        if (!isTwoPanelLayout()) observeOpenAttachment()
         observeSubjectUpdateTriggers()
 
         observeThreadOpening()
@@ -353,7 +353,7 @@ class ThreadFragment : Fragment() {
                 if (isTwoPanelLayout()) {
                     mainViewModel.detailedContactArgs.value = contact
                 } else {
-                safeNavigate(ThreadFragmentDirections.actionThreadFragmentToDetailedContactBottomSheetDialog(contact))
+                    safeNavigate(ThreadFragmentDirections.actionThreadFragmentToDetailedContactBottomSheetDialog(contact))
                 }
             },
             onDraftClicked = { message ->
@@ -479,16 +479,16 @@ class ThreadFragment : Fragment() {
             val fileType = getFileTypeFromMimeType()
             if (isTwoPanelLayout()) {
                 mainViewModel.downloadAttachmentsArgs.value = Triple(resource!!, name, fileType)
-        } else {
-            safeNavigate(
-                ThreadFragmentDirections.actionThreadFragmentToDownloadAttachmentProgressDialog(
-                    attachmentResource = resource!!,
-                    attachmentName = name,
+            } else {
+                safeNavigate(
+                    ThreadFragmentDirections.actionThreadFragmentToDownloadAttachmentProgressDialog(
+                        attachmentResource = resource!!,
+                        attachmentName = name,
                         attachmentType = fileType,
+                    )
                 )
-            )
+            }
         }
-    }
     }
 
     private fun replyTo(message: Message) {
@@ -588,7 +588,7 @@ class ThreadFragment : Fragment() {
     private fun onThreadUpdate(thread: Thread?) = with(binding) {
 
         if (thread == null) {
-                leaveThread()
+            leaveThread()
             return@with
         }
 
@@ -667,13 +667,13 @@ class ThreadFragment : Fragment() {
         if (isTwoPanelLayout()) {
             threadViewModel.threadUid.value = null
         } else {
-        // TODO: Realm broadcasts twice when the Thread is deleted.
-        //  We don't know why.
-        //  While it's not fixed, we do this quickfix of checking if we already left:
-        if (isFirstTimeLeaving.compareAndSet(true, false)) {
-            findNavController().popBackStack()
+            // TODO: Realm broadcasts twice when the Thread is deleted.
+            //  We don't know why.
+            //  While it's not fixed, we do this quickfix of checking if we already left:
+            if (isFirstTimeLeaving.compareAndSet(true, false)) {
+                findNavController().popBackStack()
+            }
         }
-    }
     }
 
     private fun goToNewMessageActivity(

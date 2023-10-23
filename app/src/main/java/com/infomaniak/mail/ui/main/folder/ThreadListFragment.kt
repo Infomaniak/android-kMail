@@ -69,6 +69,7 @@ import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
+import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialog
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
@@ -697,8 +698,11 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         binding.swipeRefreshLayout.isRefreshing = true
     }
 
+    // TODO: This won't work if the Thread is opened from another fragment, for example from the Search.
     private fun observeNavigationInTwoPanelLayout() = with(mainViewModel) {
         if (isTwoPanelLayout()) {
+
+            getBackNavigationResult(DownloadAttachmentProgressDialog.OPEN_WITH, ::startActivity)
 
             downloadAttachmentsArgs.observe(viewLifecycleOwner) { (resource, name, fileType) ->
                 safeNavigate(
