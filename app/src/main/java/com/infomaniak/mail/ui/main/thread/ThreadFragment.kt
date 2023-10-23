@@ -128,6 +128,11 @@ class ThreadFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Avoid crashing the app when rotating.
+        if (!isTwoPanelLayout()) {
+            runCatching { navigationArgs.threadUid }.onFailure { if (it is IllegalStateException) return }
+        }
+
         initAdapter()
         observeThreadLive()
 
@@ -150,7 +155,10 @@ class ThreadFragment : Fragment() {
     }
 
     override fun onDestroyView() {
-        threadAdapter.resetCallbacks()
+
+        // Don't replace with `threadAdapter` variable, the cast will fail.
+        (binding.messagesList.adapter as ThreadAdapter?)?.resetCallbacks()
+
         super.onDestroyView()
         _binding = null
     }
