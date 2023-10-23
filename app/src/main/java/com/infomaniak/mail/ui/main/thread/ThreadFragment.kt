@@ -231,7 +231,12 @@ class ThreadFragment : Fragment() {
 
     private fun setupUi() = with(binding) {
 
+        // TODO: Use a different layout in normal mode & table mode instead of doing that.
+        if (isTwoPanelLayout()) {
+            toolbar.navigationIcon?.alpha = 0
+        } else {
         toolbar.setNavigationOnClickListener { leaveThread() }
+        }
 
         val defaultTextColor = context.getColor(R.color.primaryTextColor)
         appBar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
