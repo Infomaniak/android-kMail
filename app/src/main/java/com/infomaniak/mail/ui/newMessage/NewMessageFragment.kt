@@ -830,8 +830,11 @@ class NewMessageFragment : Fragment() {
         textEditing.isVisible = isEditorExpanded
     }
 
-    private fun observeAiOutput() {
-        aiViewModel.aiOutputToInsert.observe(viewLifecycleOwner, binding.bodyText::setText)
+    private fun observeAiOutput() = with(binding) {
+        aiViewModel.aiOutputToInsert.observe(viewLifecycleOwner) { (subject, content) ->
+            subject?.let { subjectTextField.setText(it) }
+            bodyText.setText(content)
+        }
     }
 
     private fun observeAiPromptStatus() {
