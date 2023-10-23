@@ -124,7 +124,6 @@
 
         <activity
             android:name=".ui.MainActivity"
-            android:configChanges="orientation|screenSize"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
