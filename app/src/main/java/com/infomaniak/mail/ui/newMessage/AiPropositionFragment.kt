@@ -76,7 +76,7 @@ class AiPropositionFragment : Fragment() {
     lateinit var localSettings: LocalSettings
 
     @Inject
-    lateinit var descriptionDialog: AiDescriptionAlertDialog
+    lateinit var subjectReplacementDialog: AiDescriptionAlertDialog
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentAiPropositionBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -167,7 +167,7 @@ class AiPropositionFragment : Fragment() {
         if (subject == null || newMessageViewModel.draft.subject.isNullOrBlank()) {
             applyProposition(subject, content)
         } else {
-            descriptionDialog.show(
+            subjectReplacementDialog.show(
                 title = getString(R.string.aiReplaceSubjectTitle),
                 description = getString(R.string.aiReplaceSubjectDescription, subject),
                 displayLoader = false,
