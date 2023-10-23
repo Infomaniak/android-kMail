@@ -511,13 +511,16 @@ fun Fragment.getStringWithBoldArg(@StringRes resId: Int, arg: String): Spanned {
     return Html.fromHtml(getString(resId, "<b>$coloredArg</b>"), Html.FROM_HTML_MODE_LEGACY)
 }
 
-fun Context.isUserAlreadySynchronized(): Boolean {
-    val accountManager = AccountManager.get(this)
-    val accounts = accountManager.getAccountsByType("infomaniak.com.sync")
-    val account = accounts.find { accountManager.getUserData(it, "user_name") == AccountUtils.currentUser?.login }
+// TODO Does not work, needs to be fixed
+// fun Context.isUserAlreadySynchronized(): Boolean {
+//     val accountManager = AccountManager.get(this)
+//     val accounts = accountManager.getAccountsByType("infomaniak.com.sync")
+//     val account = accounts.find { accountManager.getUserData(it, "user_name") == AccountUtils.currentUser?.login }
+//
+//     return account != null
+// }
 
-    return account != null
-}
+fun Context.isUserAlreadySynchronized(): Boolean = false
 
 fun Context.getLoginActivityIntent(args: LoginActivityArgs? = null, shouldClearStack: Boolean = false): Intent {
     return Intent(this, LoginActivity::class.java).apply {
