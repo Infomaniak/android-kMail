@@ -164,7 +164,7 @@ class AiPropositionFragment : Fragment() {
 
         val (subject, content) = splitBodyAndSubject(getLastMessage())
 
-        if (subject == null || newMessageViewModel.draft.subject.isNullOrBlank()) { // TODO : Test
+        if (subject == null || newMessageViewModel.draft.subject.isNullOrBlank()) {
             applyProposition(subject, content)
         } else {
             descriptionDialog.show(
