@@ -34,6 +34,7 @@ import com.infomaniak.mail.data.cache.mailboxInfo.PermissionsController
 import com.infomaniak.mail.data.cache.mailboxInfo.QuotasController
 import com.infomaniak.mail.data.cache.userInfo.AddressBookController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
+import com.infomaniak.mail.data.models.Attachment.AttachmentType
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.MoveResult
@@ -47,6 +48,8 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.SnackBarManager
 import com.infomaniak.mail.ui.main.SnackBarManager.UndoData
 import com.infomaniak.mail.ui.main.folder.ThreadListViewModel
+import com.infomaniak.mail.ui.main.thread.ThreadFragment.*
+import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
@@ -202,6 +205,15 @@ class MainViewModel @Inject constructor(
         .getMergedContactsAsync()
         .mapLatest { ContactUtils.arrangeMergedContacts(it.list.copyFromRealm()) }
         .asLiveData(ioCoroutineContext)
+    //endregion
+
+    //region Two-panels layout
+    val downloadAttachmentsArgs = SingleLiveEvent<Triple<String, String, AttachmentType>>()
+    val newMessageArgs = SingleLiveEvent<NewMessageActivityArgs>()
+    val replyBottomSheetArgs = SingleLiveEvent<Pair<String, Boolean>>()
+    val threadActionsBottomSheetArgs = SingleLiveEvent<Triple<String, String, Boolean>>()
+    val messageActionsBottomSheetArgs = SingleLiveEvent<MessageActionsArgs>()
+    val detailedContactArgs = SingleLiveEvent<Recipient>()
     //endregion
 
     fun updateUserInfo() = viewModelScope.launch(ioCoroutineContext) {

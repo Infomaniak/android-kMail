@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.main.thread
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.drawable.InsetDrawable
+import android.net.Uri
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
@@ -235,7 +236,7 @@ class ThreadFragment : Fragment() {
         if (isTwoPanelLayout()) {
             toolbar.navigationIcon?.alpha = 0
         } else {
-        toolbar.setNavigationOnClickListener { leaveThread() }
+            toolbar.setNavigationOnClickListener { leaveThread() }
         }
 
         val defaultTextColor = context.getColor(R.color.primaryTextColor)
@@ -306,20 +307,29 @@ class ThreadFragment : Fragment() {
             when (menuId) {
                 R.id.quickActionReply -> replyTo(lastMessageToReplyTo)
                 R.id.quickActionForward -> {
-                    safeNavigateToNewMessageActivity(
+                    goToNewMessageActivity(
                         draftMode = DraftMode.FORWARD,
                         previousMessageUid = lastMessageToReplyTo.uid,
                         shouldLoadDistantResources = shouldLoadDistantResources(lastMessageToReplyTo.uid),
                     )
                 }
                 R.id.quickActionMenu -> {
-                    safeNavigate(
-                        ThreadFragmentDirections.actionThreadFragmentToThreadActionsBottomSheetDialog(
-                            threadUid = threadUid,
-                            messageUidToReplyTo = lastMessageToReplyTo.uid,
-                            shouldLoadDistantResources = shouldLoadDistantResources(lastMessageToReplyTo.uid),
+                    val shouldLoadDistantResources = shouldLoadDistantResources(lastMessageToReplyTo.uid)
+                    if (isTwoPanelLayout()) {
+                        mainViewModel.threadActionsBottomSheetArgs.value = Triple(
+                            threadUid,
+                            lastMessageToReplyTo.uid,
+                            shouldLoadDistantResources,
                         )
-                    )
+                    } else {
+                        safeNavigate(
+                            ThreadFragmentDirections.actionThreadFragmentToThreadActionsBottomSheetDialog(
+                                threadUid = threadUid,
+                                messageUidToReplyTo = lastMessageToReplyTo.uid,
+                                shouldLoadDistantResources = shouldLoadDistantResources,
+                            )
+                        )
+                    }
                 }
             }
         }
@@ -340,17 +350,19 @@ class ThreadFragment : Fragment() {
         binding.messagesList.adapter = ThreadAdapter(
             shouldLoadDistantResources = shouldLoadDistantResources(),
             onContactClicked = { contact ->
+                if (isTwoPanelLayout()) {
+                    mainViewModel.detailedContactArgs.value = contact
+                } else {
                 safeNavigate(ThreadFragmentDirections.actionThreadFragmentToDetailedContactBottomSheetDialog(contact))
+                }
             },
             onDraftClicked = { message ->
                 trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
-                safeNavigateToNewMessageActivity(
-                    NewMessageActivityArgs(
-                        arrivedFromExistingDraft = true,
-                        draftLocalUuid = message.draftLocalUuid,
-                        draftResource = message.draftResource,
-                        messageUid = message.uid,
-                    ).toBundle(),
+                goToNewMessageActivity(
+                    arrivedFromExistingDraft = true,
+                    draftLocalUuid = message.draftLocalUuid,
+                    draftResource = message.draftResource,
+                    messageUid = message.uid,
                 )
             },
             onDeleteDraftClicked = { message ->
@@ -381,7 +393,7 @@ class ThreadFragment : Fragment() {
             },
             onAllExpandedMessagesLoaded = ::scrollToFirstUnseenMessage,
             navigateToNewMessageActivity = { uri ->
-                safeNavigateToNewMessageActivity(NewMessageActivityArgs(mailToUri = uri).toBundle())
+                goToNewMessageActivity(mailToUri = uri)
             },
             promptLink = { data, type ->
                 // When adding a phone number to contacts, Google decodes this value in case it's url-encoded. But I could not
@@ -426,14 +438,27 @@ class ThreadFragment : Fragment() {
     }
 
     private fun Message.navigateToActionsBottomSheet() {
-        safeNavigate(
-            ThreadFragmentDirections.actionThreadFragmentToMessageActionsBottomSheetDialog(
+        val threadUid = threadViewModel.threadUid.value ?: return
+        val isThemeTheSame = threadAdapter.isThemeTheSameMap[uid] ?: return
+        val shouldLoadDistantResources = shouldLoadDistantResources(uid)
+
+        if (isTwoPanelLayout()) {
+            mainViewModel.messageActionsBottomSheetArgs.value = MessageActionsArgs(
                 messageUid = uid,
-                threadUid = navigationArgs.threadUid,
-                isThemeTheSame = threadAdapter.isThemeTheSameMap[uid]!!,
-                shouldLoadDistantResources = shouldLoadDistantResources(uid),
+                threadUid = threadUid,
+                isThemeTheSame = isThemeTheSame,
+                shouldLoadDistantResources = shouldLoadDistantResources,
             )
-        )
+        } else {
+            safeNavigate(
+                ThreadFragmentDirections.actionThreadFragmentToMessageActionsBottomSheetDialog(
+                    messageUid = uid,
+                    threadUid = threadUid,
+                    isThemeTheSame = isThemeTheSame,
+                    shouldLoadDistantResources = shouldLoadDistantResources,
+                )
+            )
+        }
     }
 
     private fun scheduleDownloadManager(downloadUrl: String, filename: String) {
@@ -451,30 +476,43 @@ class ThreadFragment : Fragment() {
         if (hasUsableCache(requireContext()) || isInlineCachedFile(requireContext())) {
             startActivity(openWithIntent(requireContext()))
         } else {
+            val fileType = getFileTypeFromMimeType()
+            if (isTwoPanelLayout()) {
+                mainViewModel.downloadAttachmentsArgs.value = Triple(resource!!, name, fileType)
+        } else {
             safeNavigate(
                 ThreadFragmentDirections.actionThreadFragmentToDownloadAttachmentProgressDialog(
                     attachmentResource = resource!!,
                     attachmentName = name,
-                    attachmentType = getFileTypeFromMimeType(),
+                        attachmentType = fileType,
                 )
             )
         }
     }
+    }
 
     private fun replyTo(message: Message) {
-        if (message.getRecipientsForReplyTo(true).second.isEmpty()) {
-            safeNavigateToNewMessageActivity(
+
+        val shouldLoadDistantResources = shouldLoadDistantResources(message.uid)
+
+        if (message.getRecipientsForReplyTo(replyAll = true).second.isEmpty()) {
+            goToNewMessageActivity(
                 draftMode = DraftMode.REPLY,
                 previousMessageUid = message.uid,
-                shouldLoadDistantResources = shouldLoadDistantResources(message.uid),
+                shouldLoadDistantResources = shouldLoadDistantResources,
+                arrivedFromExistingDraft = false,
             )
         } else {
-            safeNavigate(
-                ThreadFragmentDirections.actionThreadFragmentToReplyBottomSheetDialog(
-                    messageUid = message.uid,
-                    shouldLoadDistantResources = shouldLoadDistantResources(message.uid),
+            if (isTwoPanelLayout()) {
+                mainViewModel.replyBottomSheetArgs.value = message.uid to shouldLoadDistantResources
+            } else {
+                safeNavigate(
+                    ThreadFragmentDirections.actionThreadFragmentToReplyBottomSheetDialog(
+                        messageUid = message.uid,
+                        shouldLoadDistantResources = shouldLoadDistantResources,
+                    )
                 )
-            )
+            }
         }
     }
 
@@ -637,6 +675,42 @@ class ThreadFragment : Fragment() {
         }
     }
     }
+
+    private fun goToNewMessageActivity(
+        draftMode: DraftMode = DraftMode.NEW_MAIL,
+        previousMessageUid: String? = null,
+        shouldLoadDistantResources: Boolean = false,
+        arrivedFromExistingDraft: Boolean = false,
+        draftLocalUuid: String? = null,
+        draftResource: String? = null,
+        messageUid: String? = null,
+        mailToUri: Uri? = null,
+    ) {
+
+        val args = NewMessageActivityArgs(
+            draftMode = draftMode,
+            previousMessageUid = previousMessageUid,
+            shouldLoadDistantResources = shouldLoadDistantResources,
+            arrivedFromExistingDraft = arrivedFromExistingDraft,
+            draftLocalUuid = draftLocalUuid,
+            draftResource = draftResource,
+            messageUid = messageUid,
+            mailToUri = mailToUri,
+        )
+
+        if (isTwoPanelLayout()) {
+            mainViewModel.newMessageArgs.value = args
+        } else {
+            safeNavigateToNewMessageActivity(args = args.toBundle())
+        }
+    }
+
+    data class MessageActionsArgs(
+        val messageUid: String,
+        val threadUid: String,
+        val isThemeTheSame: Boolean,
+        val shouldLoadDistantResources: Boolean,
+    )
 
     enum class HeaderState {
         ELEVATED,
