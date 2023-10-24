@@ -70,6 +70,10 @@ class ThreadViewModel @Inject constructor(
     private var threadLiveJob: Job? = null
     val threadLive = MutableLiveData<Thread?>()
 
+    // `true` : going to the Search
+    // `false`: coming back from it
+    val goToSearch = MutableLiveData<Boolean?>(null)
+
     private val splitBodies = mutableMapOf<String, SplitBody>()
 
     private var messagesLiveJob: Job? = null
