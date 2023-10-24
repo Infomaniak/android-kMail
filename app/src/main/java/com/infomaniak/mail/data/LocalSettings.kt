@@ -156,6 +156,11 @@ class LocalSettings private constructor(context: Context) {
             return MaterialColors.getColor(baseThemeContext, RMaterial.attr.colorPrimary, 0)
         }
 
+        fun getOnPrimary(context: Context): Int {
+            val baseThemeContext = ContextThemeWrapper(context, theme)
+            return MaterialColors.getColor(baseThemeContext, RMaterial.attr.colorOnPrimary, 0)
+        }
+
         fun getOnboardingSecondaryBackground(context: Context): Int {
             val baseThemeContext = ContextThemeWrapper(context, theme)
             return baseThemeContext.getColor(R.color.onboarding_secondary_background)
