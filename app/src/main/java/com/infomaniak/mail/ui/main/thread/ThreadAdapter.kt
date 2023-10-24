@@ -169,7 +169,7 @@ class ThreadAdapter(
         val isThemeTheSame = isThemeTheSameMap[messageUid]!!
         bodyWebView.toggleWebViewTheme(isThemeTheSame)
         fullMessageWebView.toggleWebViewTheme(isThemeTheSame)
-        toggleQuoteButtonTheme(isThemeTheSame)
+        toggleFrameLayoutsTheme(isThemeTheSame)
     }
 
     private fun ThreadViewHolder.loadContentAndQuote(message: Message) {
@@ -238,12 +238,16 @@ class ThreadAdapter(
         setOnTouchListener(touchListener)
     }
 
-    private fun ItemMessageBinding.toggleQuoteButtonTheme(isThemeTheSame: Boolean) {
+    private fun ItemMessageBinding.toggleFrameLayoutsTheme(isThemeTheSame: Boolean) {
         if (isThemeTheSame) {
-            quoteButtonFrameLayout.setBackgroundColor(context.getColor(R.color.background_color_dark))
+            val color = context.getColor(R.color.background_color_dark)
+            webViewsFrameLayout.setBackgroundColor(color)
+            quoteButtonFrameLayout.setBackgroundColor(color)
             quoteButton.setTextColor(context.getAttributeColor(RMaterial.attr.colorPrimary))
         } else {
-            quoteButtonFrameLayout.setBackgroundColor(context.getColor(R.color.background_color_light))
+            val color = context.getColor(R.color.background_color_light)
+            webViewsFrameLayout.setBackgroundColor(color)
+            quoteButtonFrameLayout.setBackgroundColor(color)
             quoteButton.setTextColor(context.getAttributeColor(RMaterial.attr.colorPrimaryInverse))
         }
     }
