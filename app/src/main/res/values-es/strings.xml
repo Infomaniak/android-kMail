@@ -143,7 +143,6 @@
     <string name="buttonRefuse">Desechos</string>
     <string name="buttonRequestPassword">Solicitar contraseña</string>
     <string name="buttonRestoreEmails">Restaurar correos electrónicos</string>
-    <string name="buttonReviewAlertYes">Sí</string>
     <string name="buttonSchedule">Programar un correo electrónico para enviarlo más tarde</string>
     <string name="buttonSeeAll">Ver todos</string>
     <string name="buttonSelectAll">Todos</string>
@@ -157,6 +156,7 @@
     <string name="buttonUnderline">Subraye</string>
     <string name="buttonUnselectAll">Ninguno</string>
     <string name="buttonValid">Validar</string>
+    <string name="buttonYes">Sí</string>
     <string name="ccTitle">Cc:</string>
     <string name="comingSoon">Próximamente…</string>
     <string name="commercialFolder">Promociones</string>

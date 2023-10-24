@@ -149,7 +149,6 @@
     <string name="buttonRefuse">Refuse</string>
     <string name="buttonRequestPassword">Request password</string>
     <string name="buttonRestoreEmails">Restore emails</string>
-    <string name="buttonReviewAlertYes">Yes</string>
     <string name="buttonSchedule">Schedule email to send later</string>
     <string name="buttonSeeAll">See all</string>
     <string name="buttonSelectAll">All</string>
@@ -163,6 +162,7 @@
     <string name="buttonUnderline">Underline</string>
     <string name="buttonUnselectAll">None</string>
     <string name="buttonValid">Validate</string>
+    <string name="buttonYes">Yes</string>
     <string name="ccTitle">Cc:</string>
     <string name="comingSoon">Coming soon…</string>
     <string name="commercialFolder">Promotions</string>
