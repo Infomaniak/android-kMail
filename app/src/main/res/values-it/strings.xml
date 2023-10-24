@@ -74,7 +74,7 @@
     <string name="aiPromptTitle">Assistente di scrittura</string>
     <string name="aiPromptValidateButton">Genera</string>
     <string name="aiReplaceSubjectDescription">Il soggetto diventerà:\n\n%s</string>
-    <string name="aiReplaceSubjectTitle">Sostituire il soggetto attuale con la proposta dell\'assistente?</string>
+    <string name="aiReplaceSubjectTitle">Sostituire il soggetto attuale con la proposta dell’assistente?</string>
     <string name="aiReplacementDialogDescription">Facendo clic su \"Sostituisci\", il contenuto preesistente andrà perso.</string>
     <string name="aiReplacementDialogDoNotShowAgain">Non visualizzare più questo messaggio</string>
     <string name="aiReplacementDialogPositiveButton">Sostituisci</string>
@@ -139,10 +139,10 @@
     <string name="buttonMore">Altro</string>
     <string name="buttonMoreStorage">Ottenere più spazio di archiviazione</string>
     <string name="buttonNewMessage">Nuovo messaggio</string>
+    <string name="buttonNo">No</string>
     <string name="buttonRefuse">Rifiuti</string>
     <string name="buttonRequestPassword">Richiesta password</string>
     <string name="buttonRestoreEmails">Ripristino delle e-mail</string>
-    <string name="buttonReviewAlertNo">No</string>
     <string name="buttonReviewAlertYes">Sì</string>
     <string name="buttonSchedule">Programmare l’invio di un’e-mail in un secondo momento</string>
     <string name="buttonSeeAll">Vedi tutti</string>

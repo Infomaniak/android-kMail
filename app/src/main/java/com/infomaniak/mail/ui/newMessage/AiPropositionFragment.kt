@@ -176,7 +176,7 @@ class AiPropositionFragment : Fragment() {
                 displayLoader = false,
                 displayCancelButton = true,
                 positiveButtonText = R.string.aiReplacementDialogPositiveButton,
-                negativeButtonText = R.string.buttonReviewAlertNo,
+                negativeButtonText = R.string.buttonNo,
                 onPositiveButtonClicked = {
                     trackAiWriterEvent("replaceSubjectConfirm")
                     applyProposition(subject, content)

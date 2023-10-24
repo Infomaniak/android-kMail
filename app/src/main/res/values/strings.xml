@@ -80,7 +80,7 @@
     <string name="aiPromptTitle">Writing assistant</string>
     <string name="aiPromptValidateButton">Generate</string>
     <string name="aiReplaceSubjectDescription">The subject will become:\n\n%s</string>
-    <string name="aiReplaceSubjectTitle">Replace the current subject with the assistant\'s proposal?</string>
+    <string name="aiReplaceSubjectTitle">Replace the current subject with the assistant’s proposal?</string>
     <string name="aiReplacementDialogDescription">By clicking on \"Replace\", pre-existing content will be lost.</string>
     <string name="aiReplacementDialogDoNotShowAgain">Do not show this again</string>
     <string name="aiReplacementDialogPositiveButton">Replace</string>
@@ -145,10 +145,10 @@
     <string name="buttonMore">More</string>
     <string name="buttonMoreStorage">Get more storage</string>
     <string name="buttonNewMessage">New message</string>
+    <string name="buttonNo">No</string>
     <string name="buttonRefuse">Refuse</string>
     <string name="buttonRequestPassword">Request password</string>
     <string name="buttonRestoreEmails">Restore emails</string>
-    <string name="buttonReviewAlertNo">No</string>
     <string name="buttonReviewAlertYes">Yes</string>
     <string name="buttonSchedule">Schedule email to send later</string>
     <string name="buttonSeeAll">See all</string>
