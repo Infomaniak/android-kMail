@@ -140,7 +140,7 @@
             app:tabIndicatorGravity="stretch"
             app:tabMode="fixed"
             app:tabRippleColor="@android:color/transparent"
-            app:tabSelectedTextColor="?attr/colorOnPrimary"
+            app:tabSelectedTextColor="@color/onColorfulBackground"
             app:tabTextColor="@color/secondaryTextColor">
 
             <com.google.android.material.tabs.TabItem
