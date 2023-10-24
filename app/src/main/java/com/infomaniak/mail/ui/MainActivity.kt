@@ -416,6 +416,22 @@ class MainActivity : BaseActivity() {
         SentryDebug.addNavigationBreadcrumb(destination.displayName, arguments)
         trackDestination(destination)
 
+        if (isTwoPanelLayout()) {
+            binding.threadHostFragment?.isVisible = when (destination.id) {
+                R.id.threadListFragment,
+                R.id.searchFragment,
+                R.id.downloadAttachmentProgressDialog,
+                R.id.replyBottomSheetDialog,
+                R.id.threadActionsBottomSheetDialog,
+                R.id.messageActionsBottomSheetDialog,
+                R.id.detailedContactBottomSheetDialog,
+                R.id.multiSelectBottomSheetDialog,
+                R.id.updateAvailableBottomSheetDialog,
+                R.id.syncDiscoveryBottomSheetDialog -> true
+                else -> false
+            }
+        }
+
         updateColorsWhenDestinationChanged(destination.id)
         setDrawerLockMode(destination.id == R.id.threadListFragment)
 
