@@ -95,6 +95,10 @@ class ThreadListAdapter @Inject constructor(
     private var onSwipeFinished: (() -> Unit)? = null
     private var multiSelection: MultiSelectionListener<Thread>? = null
 
+    // Two-panel layout only
+    var clickedThreadPosition: Int? = null
+    var clickedThreadUid: String? = null
+
     init {
         setHasStableIds(true)
     }
@@ -146,7 +150,7 @@ class ThreadListAdapter @Inject constructor(
 
     override fun onBindViewHolder(item: Any, viewHolder: ThreadListViewHolder, position: Int) = with(viewHolder.binding) {
         when (getItemViewType(position)) {
-            DisplayType.THREAD.layout -> (this as CardviewThreadItemBinding).displayThread(item as Thread)
+            DisplayType.THREAD.layout -> (this as CardviewThreadItemBinding).displayThread(item as Thread, position)
             DisplayType.DATE_SEPARATOR.layout -> (this as ItemThreadDateSeparatorBinding).displayDateSeparator(item as String)
             DisplayType.FLUSH_FOLDER_BUTTON.layout -> (this as ItemThreadFlushFolderButtonBinding).displayFlushFolderButton(item as FolderRole)
             DisplayType.LOAD_MORE_BUTTON.layout -> (this as ItemThreadLoadMoreButtonBinding).displayLoadMoreButton()
@@ -173,7 +177,9 @@ class ThreadListAdapter @Inject constructor(
         }
     }.getOrDefault(super.getItemId(position))
 
-    private fun CardviewThreadItemBinding.displayThread(thread: Thread) {
+    private fun CardviewThreadItemBinding.displayThread(thread: Thread, position: Int) {
+
+        if (thread.uid == clickedThreadUid) clickedThreadPosition = position
 
         setupThreadDensityDependentUi()
         displayAvatar(thread)
@@ -198,39 +204,57 @@ class ThreadListAdapter @Inject constructor(
         }
 
         selectionCardView.setOnClickListener {
-            if (multiSelection?.isEnabled == true) toggleSelection(thread) else onThreadClicked?.invoke(thread)
+            toggleSelection(thread, position)
+            if (multiSelection?.isEnabled == false) onThreadClicked?.invoke(thread)
         }
 
         multiSelection?.let { listener ->
-            updateSelectedState(thread)
-
             selectionCardView.setOnLongClickListener {
                 context.trackMultiSelectionEvent("enable", TrackerAction.LONG_PRESS)
                 if (!listener.isEnabled) listener.isEnabled = true
-                toggleSelection(thread)
+                toggleSelection(thread, position)
                 true
             }
         }
+
+        updateSelectedState(thread)
     }
 
-    private fun CardviewThreadItemBinding.toggleSelection(selectedThread: Thread) = with(multiSelection!!) {
-        with(selectedItems) {
-            if (contains(selectedThread)) remove(selectedThread) else add(selectedThread)
-            publishSelectedItems()
+    private fun CardviewThreadItemBinding.toggleSelection(selectedThread: Thread, position: Int) {
+
+        when {
+            multiSelection?.isEnabled == true -> {
+                with(multiSelection!!) {
+                    selectedItems.apply { if (contains(selectedThread)) remove(selectedThread) else add(selectedThread) }
+                    publishSelectedItems.invoke()
+                }
+            }
+            context.isTwoPanelLayout() -> {
+                clickedThreadPosition?.let { if (it < itemCount) notifyItemChanged(it, NotificationType.SELECTED_STATE) }
+                clickedThreadPosition = position
+                clickedThreadUid = selectedThread.uid
+                notifyItemChanged(position, NotificationType.SELECTED_STATE)
+            }
+            else -> {
+                return
+            }
         }
+
         updateSelectedState(selectedThread)
     }
 
     private fun CardviewThreadItemBinding.updateSelectedState(selectedThread: Thread) {
 
         val isMultiSelected = multiSelection?.selectedItems?.contains(selectedThread) == true
+        val isTabletSelected = selectedThread.uid == clickedThreadUid
 
         selectionCardView.backgroundTintList = when {
             isMultiSelected -> ColorStateList.valueOf(context.getAttributeColor(RMaterial.attr.colorPrimaryContainer))
+            isTabletSelected -> context.getColorStateList(R.color.tabletSelectedBackground)
             else -> context.getColorStateList(R.color.backgroundColor)
         }
 
-        with(localSettings) {
+        if (multiSelection != null) with(localSettings) {
             expeditorAvatar.isVisible = !isMultiSelected && threadDensity == LARGE
             checkMarkLayout.isVisible = multiSelection?.isEnabled == true
             checkedState.isVisible = isMultiSelected

@@ -165,7 +165,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         observerDraftsActionsCompletedWorks()
         observeFlushFolderTrigger()
         observeUpdateInstall()
-        observeNavigationInTwoPanelLayout()
+        observeInTwoPanelLayout()
     }.getOrDefault(Unit)
 
     private fun navigateFromNotificationToNewMessage() {
@@ -702,8 +702,16 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     // TODO: This won't work if the Thread is opened from another fragment, for example from the Search.
-    private fun observeNavigationInTwoPanelLayout() = with(mainViewModel) {
+    private fun observeInTwoPanelLayout() = with(mainViewModel) {
         if (isTwoPanelLayout()) {
+
+            // Reset selected Thread UI when closing Thread
+            threadViewModel.threadUid.observe(viewLifecycleOwner) {
+                if (it == null) threadListAdapter.apply {
+                    clickedThreadPosition = null
+                    clickedThreadUid = null
+                }
+            }
 
             getBackNavigationResult(DownloadAttachmentProgressDialog.OPEN_WITH, ::startActivity)
 

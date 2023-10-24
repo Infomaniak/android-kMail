@@ -107,6 +107,7 @@
     <color name="backgroundDisabledPrimaryButton">@color/shark</color>
     <color name="backgroundSelectedSignature">@color/mouse</color>
     <color name="informationBlockBackground">@color/polar_bear</color>
+    <color name="tabletSelectedBackground">@color/mouse</color>
 
     <color name="menuDrawerBackgroundColor">@color/backgroundColorSecondary</color>
     <color name="newMessageBackgroundColor">@color/backgroundColor</color>

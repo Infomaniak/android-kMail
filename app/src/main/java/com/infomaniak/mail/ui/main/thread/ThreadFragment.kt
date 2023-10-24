@@ -177,7 +177,7 @@ class ThreadFragment : Fragment() {
 
     private fun reactToFolderChange(folder: Folder) {
         binding.emptyViewFolderName.text = getString(R.string.noConversationSelected, folder.name)
-        displayEmptyView()
+        threadViewModel.threadUid.value = null
     }
 
     private fun handleThreadUid(threadUid: String?) {
