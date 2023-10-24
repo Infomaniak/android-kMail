@@ -145,29 +145,38 @@ class LoginFragment : Fragment() {
 
     private fun updateUi(newAccentColor: AccentColor, oldAccentColor: AccentColor) {
         animatePrimaryColorElements(newAccentColor, oldAccentColor)
+        animateOnPrimaryColorElements(newAccentColor, oldAccentColor)
         animateSecondaryColorElements(newAccentColor, oldAccentColor)
     }
 
-    private fun animatePrimaryColorElements(newAccentColor: AccentColor, oldAccentColor: AccentColor) {
-        val newPrimary = newAccentColor.getPrimary(requireContext())
-        val oldPrimary = oldAccentColor.getPrimary(requireContext())
-        val ripple = newAccentColor.getRipple(requireContext())
+    private fun animatePrimaryColorElements(newAccentColor: AccentColor, oldAccentColor: AccentColor) = with(binding) {
+        val newPrimary = newAccentColor.getPrimary(context)
+        val oldPrimary = oldAccentColor.getPrimary(context)
+        val ripple = newAccentColor.getRipple(context)
 
-        binding.apply {
-            UiUtils.animateColorChange(oldPrimary, newPrimary) { color ->
-                val singleColorStateList = ColorStateList.valueOf(color)
-                dotsIndicator.selectedDotColor = color
-                connectButton.setBackgroundColor(color)
-                nextButton.backgroundTintList = singleColorStateList
-                signInButton.setTextColor(color)
-                signInButton.rippleColor = ColorStateList.valueOf(ripple)
-            }
+        UiUtils.animateColorChange(oldPrimary, newPrimary) { color ->
+            dotsIndicator.selectedDotColor = color
+            connectButton.setBackgroundColor(color)
+            nextButton.backgroundTintList = ColorStateList.valueOf(color)
+            signInButton.setTextColor(color)
+            signInButton.rippleColor = ColorStateList.valueOf(ripple)
+        }
+    }
+
+    private fun animateOnPrimaryColorElements(newAccentColor: AccentColor, oldAccentColor: AccentColor) = with(binding) {
+        val newOnPrimary = newAccentColor.getOnPrimary(context)
+        val oldOnPrimary = oldAccentColor.getOnPrimary(context)
+
+        UiUtils.animateColorChange(oldOnPrimary, newOnPrimary) { color ->
+            connectButton.setTextColor(color)
+            nextButton.imageTintList = ColorStateList.valueOf(color)
         }
     }
 
     private fun animateSecondaryColorElements(newAccentColor: AccentColor, oldAccentColor: AccentColor) {
         val newSecondaryBackground = newAccentColor.getOnboardingSecondaryBackground(requireContext())
         val oldSecondaryBackground = oldAccentColor.getOnboardingSecondaryBackground(requireContext())
+
         UiUtils.animateColorChange(oldSecondaryBackground, newSecondaryBackground) { color ->
             requireActivity().window.statusBarColor = color
         }
