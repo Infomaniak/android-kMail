@@ -39,7 +39,7 @@ import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.databinding.FragmentIntroBinding
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.login.IlluColors.changeIllustrationColors
-import com.infomaniak.mail.utils.UiUtils.animateColorChange
+import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.enumValueFrom
 import com.infomaniak.mail.utils.repeatFrame
 import dagger.hilt.android.AndroidEntryPoint
@@ -157,11 +157,12 @@ class IntroFragment : Fragment() {
         if (position == ACCENT_COLOR_PICKER_PAGE) updateAccentColorPickerPageUi(newAccentColor, oldAccentColor)
     }
 
-    private fun updateEachPageUi(newAccentColor: AccentColor, oldAccentColor: AccentColor) {
-        val newColor = newAccentColor.getOnboardingSecondaryBackground(requireContext())
-        val oldColor = oldAccentColor.getOnboardingSecondaryBackground(requireContext())
-        animateColorChange(oldColor, newColor) { color ->
-            binding.waveBackground.imageTintList = ColorStateList.valueOf(color)
+    private fun updateEachPageUi(newAccentColor: AccentColor, oldAccentColor: AccentColor) = with(binding) {
+        val newColor = newAccentColor.getOnboardingSecondaryBackground(context)
+        val oldColor = oldAccentColor.getOnboardingSecondaryBackground(context)
+
+        UiUtils.animateColorChange(oldColor, newColor) { color ->
+            waveBackground.imageTintList = ColorStateList.valueOf(color)
         }
     }
 
@@ -172,7 +173,10 @@ class IntroFragment : Fragment() {
     private fun animateTabIndicatorColor(newAccentColor: AccentColor, oldAccentColor: AccentColor) = with(binding) {
         val newPrimary = newAccentColor.getPrimary(context)
         val oldPrimary = oldAccentColor.getPrimary(context)
-        animateColorChange(oldPrimary, newPrimary, applyColor = pinkBlueTabLayout::setSelectedTabIndicatorColor)
+
+        UiUtils.animateColorChange(oldPrimary, newPrimary) { color ->
+            pinkBlueTabLayout.setSelectedTabIndicatorColor(color)
+        }
     }
 
     private companion object {
