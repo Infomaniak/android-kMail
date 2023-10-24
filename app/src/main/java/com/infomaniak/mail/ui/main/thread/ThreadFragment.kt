@@ -169,14 +169,29 @@ class ThreadFragment : Fragment() {
         threadViewModel.threadUid.observe(viewLifecycleOwner, ::handleThreadUid)
 
         if (isTwoPanelLayout()) {
-            mainViewModel.currentFolder.observeNotNull(viewLifecycleOwner, ::reactToFolderChange)
+            observeFolderChange()
         } else {
             threadViewModel.threadUid.value = navigationArgs.threadUid
         }
     }
 
+    private fun observeFolderChange() {
+
+        threadViewModel.goToSearch.observeNotNull(viewLifecycleOwner) { isGoing ->
+            val folder = if (isGoing) {
+                Folder().apply { name = getString(R.string.searchFolderName) }
+            } else {
+                mainViewModel.currentFolder.value
+            }
+            folder?.let(::reactToFolderChange)
+            threadViewModel.goToSearch.value = null
+        }
+
+        mainViewModel.currentFolder.observeNotNull(viewLifecycleOwner, ::reactToFolderChange)
+    }
+
     private fun reactToFolderChange(folder: Folder) {
-        binding.emptyViewFolderName.text = getString(R.string.noConversationSelected, folder.name)
+        binding.emptyViewFolderName.text = getString(R.string.noConversationSelected, folder.getLocalizedName(requireContext()))
         threadViewModel.threadUid.value = null
     }
 

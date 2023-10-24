@@ -186,6 +186,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     override fun onStart() {
         super.onStart()
         binding.unreadCountChip.apply { isCloseIconVisible = isChecked }
+        if (isTwoPanelLayout()) threadViewModel.goToSearch.value = false
     }
 
     override fun onResume() {
@@ -317,7 +318,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
 
         searchButton.setOnClickListener {
-            if (isTwoPanelLayout()) threadViewModel.threadUid.value = null
+            if (isTwoPanelLayout()) threadViewModel.goToSearch.value = true
             safeNavigate(
                 ThreadListFragmentDirections.actionThreadListFragmentToSearchFragment(
                     dummyFolderId = mainViewModel.currentFolderId ?: "eJzz9HPyjwAABGYBgQ--", // Hardcoded INBOX folder
