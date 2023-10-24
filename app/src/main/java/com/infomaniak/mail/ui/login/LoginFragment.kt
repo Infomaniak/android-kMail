@@ -145,6 +145,7 @@ class LoginFragment : Fragment() {
 
     private fun updateUi(newAccentColor: AccentColor, oldAccentColor: AccentColor) {
         animatePrimaryColorElements(newAccentColor, oldAccentColor)
+        animateOnPrimaryColorElements(newAccentColor, oldAccentColor)
         animateSecondaryColorElements(newAccentColor, oldAccentColor)
     }
 
@@ -159,6 +160,15 @@ class LoginFragment : Fragment() {
             nextButton.backgroundTintList = ColorStateList.valueOf(color)
             signInButton.setTextColor(color)
             signInButton.rippleColor = ColorStateList.valueOf(ripple)
+        }
+    }
+
+    private fun animateOnPrimaryColorElements(newAccentColor: AccentColor, oldAccentColor: AccentColor) = with(binding) {
+        val newOnPrimary = newAccentColor.getOnPrimary(context)
+        val oldOnPrimary = oldAccentColor.getOnPrimary(context)
+
+        UiUtils.animateColorChange(oldOnPrimary, newOnPrimary) { color ->
+            connectButton.setTextColor(color)
         }
     }
 
