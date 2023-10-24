@@ -169,6 +169,7 @@ class LoginFragment : Fragment() {
 
         UiUtils.animateColorChange(oldOnPrimary, newOnPrimary) { color ->
             connectButton.setTextColor(color)
+            nextButton.imageTintList = ColorStateList.valueOf(color)
         }
     }
 
