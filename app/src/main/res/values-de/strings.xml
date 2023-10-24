@@ -139,11 +139,10 @@
     <string name="buttonMore">Mehr</string>
     <string name="buttonMoreStorage">Mehr Speicherplatz erhalten</string>
     <string name="buttonNewMessage">Neue Nachricht</string>
+    <string name="buttonNo">Nein</string>
     <string name="buttonRefuse">Abfälle</string>
     <string name="buttonRequestPassword">Passwort anfordern</string>
     <string name="buttonRestoreEmails">E-Mails wiederherstellen</string>
-    <string name="buttonReviewAlertNo">Nein</string>
-    <string name="buttonReviewAlertYes">Ja</string>
     <string name="buttonSchedule">Planen Sie den Versand von E-Mails für einen späteren Zeitpunkt</string>
     <string name="buttonSeeAll">Alle sehen</string>
     <string name="buttonSelectAll">Alle</string>
@@ -157,6 +156,7 @@
     <string name="buttonUnderline">Unterstreichen Sie</string>
     <string name="buttonUnselectAll">Keine</string>
     <string name="buttonValid">Validieren Sie</string>
+    <string name="buttonYes">Ja</string>
     <string name="ccTitle">Cc:</string>
     <string name="comingSoon">Demnächst…</string>
     <string name="commercialFolder">Werbeaktionen</string>
