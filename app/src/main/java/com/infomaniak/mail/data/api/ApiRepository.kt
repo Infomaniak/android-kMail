@@ -27,6 +27,7 @@ import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.networking.HttpUtils
 import com.infomaniak.lib.core.utils.FORMAT_FULL_DATE_WITH_HOUR
 import com.infomaniak.lib.core.utils.format
+import com.infomaniak.mail.data.LocalSettings.AiEngine
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.PaginationInfo
 import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition
@@ -287,21 +288,33 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.flushFolder(mailboxUuid, folderId), POST)
     }
 
-    fun startNewConversation(message: UserMessage, currentMailboxEmail: String): ApiResponse<AiResult> {
-        val body = getAiBodyFromMessages(listOf(message))
+    fun startNewConversation(message: UserMessage, currentMailboxEmail: String, aiEngine: AiEngine): ApiResponse<AiResult> {
+        val body = getAiBodyFromMessages(listOf(message), aiEngine)
         return callApi(ApiRoutes.aiConversation(currentMailboxEmail), POST, body, HttpClient.okHttpClientLongTimeout)
     }
 
-    fun aiShortcutWithContext(contextId: String, shortcut: Shortcut, currentMailboxEmail: String): ApiResponse<AiResult> {
+    fun aiShortcutWithContext(
+        contextId: String,
+        shortcut: Shortcut,
+        currentMailboxEmail: String,
+        aiEngine: AiEngine,
+    ): ApiResponse<AiResult> {
+        val body = aiBaseBodyWith(aiEngine)
         return callApi(
             url = ApiRoutes.aiShortcutWithContext(contextId, action = shortcut.apiRoute!!, currentMailboxEmail),
             method = PATCH,
+            body = body,
             okHttpClient = HttpClient.okHttpClientLongTimeout,
         )
     }
 
-    fun aiShortcutNoContext(shortcut: Shortcut, history: List<AiMessage>, currentMailboxEmail: String): ApiResponse<AiResult> {
-        val body = getAiBodyFromMessages(history)
+    fun aiShortcutNoContext(
+        shortcut: Shortcut,
+        history: List<AiMessage>,
+        currentMailboxEmail: String,
+        aiEngine: AiEngine
+    ): ApiResponse<AiResult> {
+        val body = getAiBodyFromMessages(history, aiEngine)
         return callApi(
             url = ApiRoutes.aiShortcutNoContext(shortcut.apiRoute!!, currentMailboxEmail),
             method = POST,
@@ -310,7 +323,12 @@ object ApiRepository : ApiRepositoryCore() {
         )
     }
 
-    private fun getAiBodyFromMessages(messages: List<AiMessage>) = mapOf(
+    private fun aiBaseBodyWith(aiEngine: AiEngine, vararg additionalValues: Pair<String, Any>): Map<String, Any> {
+        return mapOf("engine" to aiEngine.apiValue, *additionalValues)
+    }
+
+    private fun getAiBodyFromMessages(messages: List<AiMessage>, aiEngine: AiEngine) = aiBaseBodyWith(
+        aiEngine,
         "messages" to messages,
         "output" to "mail",
     )

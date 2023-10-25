@@ -26,6 +26,7 @@ import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.userInfo.FeatureFlagController
 import com.infomaniak.mail.data.models.FeatureFlag.FeatureFlagType
@@ -50,6 +51,9 @@ class AiViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
+    @Inject
+    lateinit var localSettings: LocalSettings
+
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
     var aiPrompt = ""
@@ -63,7 +67,7 @@ class AiViewModel @Inject constructor(
     fun generateNewAiProposition(currentMailboxEmail: String) = viewModelScope.launch(ioCoroutineContext) {
         history.clear()
         val userMessage = UserMessage(aiPrompt)
-        with(ApiRepository.startNewConversation(userMessage, currentMailboxEmail)) {
+        with(ApiRepository.startNewConversation(userMessage, currentMailboxEmail, localSettings.aiEngine)) {
             ensureActive()
             handleAiResult(apiResponse = this, userMessage)
         }
@@ -86,13 +90,14 @@ class AiViewModel @Inject constructor(
     }
 
     fun performShortcut(shortcut: Shortcut, currentMailboxEmail: String) = viewModelScope.launch(ioCoroutineContext) {
+        val aiEngine = localSettings.aiEngine
 
-        var apiResponse = ApiRepository.aiShortcutWithContext(conversationContextId!!, shortcut, currentMailboxEmail)
+        var apiResponse = ApiRepository.aiShortcutWithContext(conversationContextId!!, shortcut, currentMailboxEmail, aiEngine)
         ensureActive()
 
         val hasConversationExpired = apiResponse.error?.code == ErrorCode.OBJECT_NOT_FOUND
         if (hasConversationExpired) {
-            apiResponse = ApiRepository.aiShortcutNoContext(shortcut, history.toList(), currentMailboxEmail)
+            apiResponse = ApiRepository.aiShortcutNoContext(shortcut, history.toList(), currentMailboxEmail, aiEngine)
             ensureActive()
         }
 
