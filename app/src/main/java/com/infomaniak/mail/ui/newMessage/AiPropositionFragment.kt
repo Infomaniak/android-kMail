@@ -108,6 +108,9 @@ class AiPropositionFragment : Fragment() {
 
         loadingPlaceholder.text = aiViewModel.aiPrompt
 
+        aiEngineIcon.setImageResource(localSettings.aiEngine.iconRes)
+        aiEngineName.setText(localSettings.aiEngine.localisedNameRes)
+
         insertPropositionButton.setOnClickListener {
             val doNotAskAgain = localSettings.aiReplacementDialogVisibility == AiReplacementDialogVisibility.HIDE
             val body = newMessageViewModel.draft.uiBody
@@ -311,7 +314,7 @@ class AiPropositionFragment : Fragment() {
         loadingPlaceholder.isVisible = true
         generationLoader.isVisible = true
 
-        propositionTextView.isGone = true
+        propositionTextViewLayout.isGone = true
         buttonLayout.isInvisible = true
 
         errorBlock.isGone = true
@@ -324,7 +327,7 @@ class AiPropositionFragment : Fragment() {
         loadingPlaceholder.isGone = true
         generationLoader.isGone = true
 
-        propositionTextView.isVisible = true
+        propositionTextViewLayout.isVisible = true
         buttonLayout.isVisible = true
 
         errorBlock.isGone = true
@@ -344,13 +347,13 @@ class AiPropositionFragment : Fragment() {
         val isFirstTry = aiViewModel.isHistoryEmpty()
         if (isFirstTry) {
             loadingPlaceholder.isVisible = true
-            propositionTextView.isGone = true
+            propositionTextViewLayout.isGone = true
 
             buttonLayout.isInvisible = true
             retryButton.isVisible = true
         } else {
             loadingPlaceholder.isGone = true
-            propositionTextView.isVisible = true
+            propositionTextViewLayout.isVisible = true
 
             buttonLayout.isVisible = true
             retryButton.isGone = true

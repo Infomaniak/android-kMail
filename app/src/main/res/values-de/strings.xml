@@ -61,8 +61,8 @@
     <string name="aiErrorMaxTokenReached">Ihre Anfrage ist zu lang, bitte kürzen Sie sie.</string>
     <string name="aiErrorTooManyRequests">In kurzer Zeit wurden zu viele Anfragen gestellt. Bitte haben Sie etwas Geduld.</string>
     <string name="aiErrorUnknown">Es ist ein Fehler aufgetreten. Wenn dieser Fehler weiterhin besteht, wenden Sie sich bitte an unseren Support.\nVielen Dank für Ihre Geduld.</string>
-    <string name="aiGenerateWith">Erstellt von</string>
-    <string name="aiGeneratedBy">Erstellt mit:</string>
+    <string name="aiGenerationTitlePrompt">Erstellt von</string>
+    <string name="aiGenerationTitleProposition">Erstellt mit:</string>
     <string name="aiMenuEditRequest">Meine Anfrage bearbeiten</string>
     <string name="aiMenuExpand">Erweitern</string>
     <string name="aiMenuFriendlyWriting">Freundliches Schreiben</string>
@@ -363,7 +363,7 @@
     <string name="sentFolder">Gesendete Nachrichten</string>
     <string name="settingsAccentColor">Akzentfarbe</string>
     <string name="settingsAccentColorDescription">Wählen Sie die Akzentfarbe für die Anwendung</string>
-    <string name="settingsAiEngineDescription">Wählen Sie Ihren Schreibassistent :</string>
+    <string name="settingsAiEngineDescription">Wählen Sie Ihren Schreibassistent</string>
     <string name="settingsAppLock">App-Sperre</string>
     <string name="settingsCancellationPeriodDescription">Sie haben die Möglichkeit, den Versand Ihrer E-Mail bis zu 30 Sekunden abzubrechen</string>
     <string name="settingsCancellationPeriodTitle">Kündigungsfrist senden</string>

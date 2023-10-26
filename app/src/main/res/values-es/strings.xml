@@ -61,8 +61,8 @@
     <string name="aiErrorMaxTokenReached">Su solicitud es demasiado larga, por favor acórtela.</string>
     <string name="aiErrorTooManyRequests">Se han hecho demasiadas peticiones en un corto espacio de tiempo. Le rogamos que tenga paciencia.</string>
     <string name="aiErrorUnknown">Se ha producido un error. Si este error persiste, póngase en contacto con nuestro servicio de asistencia.\nGracias por su paciencia.</string>
-    <string name="aiGenerateWith">Generar con</string>
-    <string name="aiGeneratedBy">Generado con:</string>
+    <string name="aiGenerationTitlePrompt">Generar con</string>
+    <string name="aiGenerationTitleProposition">Generado con:</string>
     <string name="aiMenuEditRequest">Editar mi solicitud</string>
     <string name="aiMenuExpand">Ampliar</string>
     <string name="aiMenuFriendlyWriting">Escritura amistosa</string>
@@ -363,7 +363,7 @@
     <string name="sentFolder">Mensajes enviados</string>
     <string name="settingsAccentColor">Color de acento</string>
     <string name="settingsAccentColorDescription">Elija el color de acento para la aplicación</string>
-    <string name="settingsAiEngineDescription">Seleccione su asistente de redacción:</string>
+    <string name="settingsAiEngineDescription">Seleccione su asistente de redacción</string>
     <string name="settingsAppLock">Bloqueo de aplicaciones</string>
     <string name="settingsCancellationPeriodDescription">Tiene la posibilidad de cancelar el envío de su correo electrónico hasta 30 segundos</string>
     <string name="settingsCancellationPeriodTitle">Enviar plazo de anulación</string>

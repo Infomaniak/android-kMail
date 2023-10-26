@@ -67,8 +67,8 @@
     <string name="aiErrorMaxTokenReached">Your request is too long, please shorten it.</string>
     <string name="aiErrorTooManyRequests">Too many requests in a short time. Please wait.</string>
     <string name="aiErrorUnknown">An error has occurred. If this error persists, please contact our helpdesk.\nThank you for your patience.</string>
-    <string name="aiGenerateWith">Generate with</string>
-    <string name="aiGeneratedBy">Generated with:</string>
+    <string name="aiGenerationTitlePrompt">Generate with</string>
+    <string name="aiGenerationTitleProposition">Generated with:</string>
     <string name="aiMenuEditRequest">Edit my request</string>
     <string name="aiMenuExpand">Expand</string>
     <string name="aiMenuFriendlyWriting">Friendly writing</string>
@@ -369,7 +369,7 @@
     <string name="sentFolder">Sent messages</string>
     <string name="settingsAccentColor">Accent color</string>
     <string name="settingsAccentColorDescription">Choose the accent colour for the application</string>
-    <string name="settingsAiEngineDescription">Select your writing assistant:</string>
+    <string name="settingsAiEngineDescription">Select your writing assistant</string>
     <string name="settingsAppLock">App lock</string>
     <string name="settingsCancellationPeriodDescription">You have the possibility to cancel the sending of your email up to 30 seconds</string>
     <string name="settingsCancellationPeriodTitle">Send cancellation period</string>
