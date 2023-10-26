@@ -62,7 +62,6 @@
     <string name="aiErrorTooManyRequests">In kurzer Zeit wurden zu viele Anfragen gestellt. Bitte haben Sie etwas Geduld.</string>
     <string name="aiErrorUnknown">Es ist ein Fehler aufgetreten. Wenn dieser Fehler weiterhin besteht, wenden Sie sich bitte an unseren Support.\nVielen Dank für Ihre Geduld.</string>
     <string name="aiGenerationTitlePrompt">Erstellt von</string>
-    <string name="aiGenerationTitleProposition">Erstellt mit:</string>
     <string name="aiMenuEditRequest">Meine Anfrage bearbeiten</string>
     <string name="aiMenuExpand">Erweitern</string>
     <string name="aiMenuFriendlyWriting">Freundliches Schreiben</string>

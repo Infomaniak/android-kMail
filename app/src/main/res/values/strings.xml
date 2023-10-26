@@ -68,7 +68,6 @@
     <string name="aiErrorTooManyRequests">Too many requests in a short time. Please wait.</string>
     <string name="aiErrorUnknown">An error has occurred. If this error persists, please contact our helpdesk.\nThank you for your patience.</string>
     <string name="aiGenerationTitlePrompt">Generate with</string>
-    <string name="aiGenerationTitleProposition">Generated with:</string>
     <string name="aiMenuEditRequest">Edit my request</string>
     <string name="aiMenuExpand">Expand</string>
     <string name="aiMenuFriendlyWriting">Friendly writing</string>

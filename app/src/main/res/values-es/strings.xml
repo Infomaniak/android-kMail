@@ -62,7 +62,6 @@
     <string name="aiErrorTooManyRequests">Se han hecho demasiadas peticiones en un corto espacio de tiempo. Le rogamos que tenga paciencia.</string>
     <string name="aiErrorUnknown">Se ha producido un error. Si este error persiste, póngase en contacto con nuestro servicio de asistencia.\nGracias por su paciencia.</string>
     <string name="aiGenerationTitlePrompt">Generar con</string>
-    <string name="aiGenerationTitleProposition">Generado con:</string>
     <string name="aiMenuEditRequest">Editar mi solicitud</string>
     <string name="aiMenuExpand">Ampliar</string>
     <string name="aiMenuFriendlyWriting">Escritura amistosa</string>

@@ -62,7 +62,6 @@
     <string name="aiErrorTooManyRequests">Sono state presentate troppe richieste in un breve lasso di tempo. Attendere prego.</string>
     <string name="aiErrorUnknown">Si è verificato un errore. Se l’errore persiste, si prega di contattare il nostro helpdesk.\nGrazie per la pazienza.</string>
     <string name="aiGenerationTitlePrompt">Genera con</string>
-    <string name="aiGenerationTitleProposition">Generato con:</string>
     <string name="aiMenuEditRequest">Modifica la mia richiesta</string>
     <string name="aiMenuExpand">Espandi</string>
     <string name="aiMenuFriendlyWriting">Scrittura amichevole</string>
