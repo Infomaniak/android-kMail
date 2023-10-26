@@ -30,6 +30,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.withStarted
 import com.infomaniak.lib.core.utils.*
+import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentAiPromptBinding
@@ -101,6 +102,7 @@ class AiPromptFragment : Fragment() {
         closeButton.setOnClickListener { newMessageFragment.closeAiPrompt() }
 
         generateWithButton.setOnClickListener {
+            trackEvent("promptAiEngine", "openEngineChoice")
             safeNavigate(NewMessageFragmentDirections.actionNewMessageFragmentToAiEngineChoiceFragment(), currentClassName)
         }
 

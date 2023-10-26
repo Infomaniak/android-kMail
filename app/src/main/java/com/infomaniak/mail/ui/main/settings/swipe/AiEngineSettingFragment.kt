@@ -23,45 +23,29 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.infomaniak.lib.core.utils.safeBinding
-import com.infomaniak.mail.MatomoMail.trackEvent
-import com.infomaniak.mail.R
-import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.LocalSettings.AiEngine
 import com.infomaniak.mail.databinding.FragmentAiEngineSettingBinding
+import com.infomaniak.mail.databinding.LayoutAiEngineChoiceBinding
+import com.infomaniak.mail.utils.SharedUtils
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-
 class AiEngineSettingFragment : Fragment() {
 
     private var binding: FragmentAiEngineSettingBinding by safeBinding()
+    private var choiceBinding: LayoutAiEngineChoiceBinding by safeBinding()
 
     @Inject
-    lateinit var localSettings: LocalSettings
+    lateinit var sharedUtils: SharedUtils
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return FragmentAiEngineSettingBinding.inflate(inflater, container, false).also { binding = it }.root
+        binding = FragmentAiEngineSettingBinding.inflate(inflater, container, false)
+        choiceBinding = LayoutAiEngineChoiceBinding.bind(binding.root)
+        return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding.radioGroup) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        initBijectionTable(
-            R.id.falcon to AiEngine.FALCON,
-            R.id.chatGpt to AiEngine.CHAT_GPT,
-        )
-
-        check(localSettings.aiEngine)
-
-        onItemCheckedListener { _, _, engine ->
-            chooseEngine(engine as AiEngine)
-            trackEvent("settingsAiEngine", engine.matomoValue)
-        }
-    }
-
-    private fun chooseEngine(engine: AiEngine) {
-        // TODO
-        localSettings.aiEngine = engine
+        sharedUtils.manageAiEngineSettings(this, choiceBinding.radioGroup, "settingsAiEngine")
     }
 }

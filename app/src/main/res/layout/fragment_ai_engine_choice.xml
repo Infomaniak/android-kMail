@@ -15,8 +15,37 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:theme="@style/AiCursorAndPrimaryColorTheme">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:navigationIconTint="@color/iconColor" />
+
+    <TextView
+        style="@style/BodyMedium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/mediumButtonHorizontalMargin"
+        android:layout_marginBottom="@dimen/marginStandardMedium"
+        android:paddingTop="@dimen/marginStandardMedium"
+        android:paddingBottom="@dimen/marginStandardSmall"
+        android:text="@string/settingsAiEngineDescription" />
+
+    <include
+        layout="@layout/layout_ai_engine_choice"
+        android:theme="@style/AiCursorAndPrimaryColorTheme" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/mediumButtonHorizontalMargin"
+        android:text="@string/aiEngineChangeChoice" />
+
+</LinearLayout>

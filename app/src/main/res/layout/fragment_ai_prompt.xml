@@ -91,6 +91,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="top|start"
                     android:inputType="textMultiLine|textCapSentences|textAutoCorrect"
+                    android:minLines="3"
                     tools:hint="@string/aiPromptPlaceholder" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -119,7 +120,7 @@
                         android:layout_gravity="center_vertical"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
-                        android:paddingHorizontal="@dimen/marginStandardSmall">
+                        android:paddingHorizontal="@dimen/alternativeMargin">
 
                         <TextView
                             android:layout_width="0dp"
