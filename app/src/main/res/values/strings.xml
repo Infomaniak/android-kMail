@@ -80,13 +80,13 @@
     <string name="aiPromptExample3">a thank-you email for an invitation to an event</string>
     <string name="aiPromptExample4">an invitation to a company event</string>
     <string name="aiPromptExample5">an email requesting an appointment with an important customer</string>
-    <string name="aiPromptGenerationLoader">The assistant is writing</string>
-    <string name="aiPromptPlaceholder">Tell the writing assistant what you want to write. For example, \"%s\".</string>
+    <string name="aiPromptGenerationLoader">The wizard is writing</string>
+    <string name="aiPromptPlaceholder">Tell the wizard writer what you want to write. For example, \"%s\".</string>
     <string name="aiPromptTag">Beta</string>
-    <string name="aiPromptTitle">Writing assistant</string>
+    <string name="aiPromptTitle">Wizard writer</string>
     <string name="aiPromptValidateButton">Generate</string>
     <string name="aiReplaceSubjectDescription">The subject will become:\n\n%s</string>
-    <string name="aiReplaceSubjectTitle">Replace the current subject with the assistant’s proposal?</string>
+    <string name="aiReplaceSubjectTitle">Replace the current subject with the wizard’s proposal?</string>
     <string name="aiReplacementDialogDescription">By clicking on \"Replace\", pre-existing content will be lost.</string>
     <string name="aiReplacementDialogDoNotShowAgain">Do not show this again</string>
     <string name="aiReplacementDialogPositiveButton">Replace</string>
@@ -369,7 +369,7 @@
     <string name="sentFolder">Sent messages</string>
     <string name="settingsAccentColor">Accent color</string>
     <string name="settingsAccentColorDescription">Choose the accent colour for the application</string>
-    <string name="settingsAiEngineDescription">Select your writing assistant</string>
+    <string name="settingsAiEngineDescription">Select your wizard writer</string>
     <string name="settingsAppLock">App lock</string>
     <string name="settingsCancellationPeriodDescription">You have the possibility to cancel the sending of your email up to 30 seconds</string>
     <string name="settingsCancellationPeriodTitle">Send cancellation period</string>
