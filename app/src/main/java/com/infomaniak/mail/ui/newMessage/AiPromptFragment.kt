@@ -34,11 +34,13 @@ import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.lib.core.utils.showKeyboard
 import com.infomaniak.lib.core.utils.toPx
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentAiPromptBinding
 import com.infomaniak.mail.utils.postfixWithTag
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 import com.google.android.material.R as RMaterial
 
 @AndroidEntryPoint
@@ -59,6 +61,9 @@ class AiPromptFragment : Fragment() {
             override fun afterTextChanged(s: Editable?) = onPromptChanged(s)
         }
     }
+
+    @Inject
+    lateinit var localSettings: LocalSettings
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
@@ -95,6 +100,12 @@ class AiPromptFragment : Fragment() {
         prompt.showKeyboard()
         initPromptTextAndPlaceholder()
         closeButton.setOnClickListener { newMessageFragment.closeAiPrompt() }
+
+        generateWithButton.setOnClickListener {
+            // TODO
+        }
+
+        aiEngineIcon.setImageResource(localSettings.aiEngine.iconRes)
 
         generateButton.setOnClickListener {
             newMessageViewModel.shouldExecuteDraftActionWhenStopping = false

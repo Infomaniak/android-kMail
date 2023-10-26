@@ -61,6 +61,8 @@
     <string name="aiErrorMaxTokenReached">Votre demande est trop longue, veuillez la raccourcir.</string>
     <string name="aiErrorTooManyRequests">Trop de requêtes ont été effectuées en un court laps de temps. Veuillez patienter.</string>
     <string name="aiErrorUnknown">Une erreur s’est produite. Si cette erreur persiste, veuillez contacter notre service d’assistance.\nMerci pour votre patience.</string>
+    <string name="aiGenerateWith">Générer avec</string>
+    <string name="aiGeneratedBy">Généré avec :</string>
     <string name="aiMenuEditRequest">Modifier ma demande</string>
     <string name="aiMenuExpand">Rallonger</string>
     <string name="aiMenuFriendlyWriting">Rédaction amicale</string>
