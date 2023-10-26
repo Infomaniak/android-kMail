@@ -52,6 +52,8 @@ class AiEngineChoiceFragment : Fragment() {
         binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
         requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundColor)
 
-        sharedUtils.manageAiEngineSettings(this, choiceBinding.radioGroup, "promptAiEngine")
+        sharedUtils.manageAiEngineSettings(this, choiceBinding.radioGroup, "promptAiEngine") {
+            findNavController().popBackStack()
+        }
     }
 }

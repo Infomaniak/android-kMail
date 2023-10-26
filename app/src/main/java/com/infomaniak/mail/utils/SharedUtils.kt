@@ -122,7 +122,12 @@ class SharedUtils @Inject constructor(
         }
     }
 
-    fun manageAiEngineSettings(fragment: Fragment, settingRadioGroupView: SettingRadioGroupView, matomoCategory: String) {
+    fun manageAiEngineSettings(
+        fragment: Fragment,
+        settingRadioGroupView: SettingRadioGroupView,
+        matomoCategory: String,
+        onClick: (() -> Unit)? = null,
+    ) {
         settingRadioGroupView.initBijectionTable(
             R.id.falcon to LocalSettings.AiEngine.FALCON,
             R.id.chatGpt to LocalSettings.AiEngine.CHAT_GPT,
@@ -133,6 +138,7 @@ class SharedUtils @Inject constructor(
         settingRadioGroupView.onItemCheckedListener { _, _, engine ->
             localSettings.aiEngine = engine as LocalSettings.AiEngine
             fragment.trackEvent(matomoCategory, engine.matomoValue)
+            onClick?.invoke()
         }
     }
 
