@@ -106,6 +106,8 @@ class AiPropositionFragment : Fragment() {
     private fun setUi() = with(binding) {
         setToolbar()
 
+        requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundColor)
+
         loadingPlaceholder.text = aiViewModel.aiPrompt
 
         aiEngineIcon.setImageResource(localSettings.aiEngine.iconRes)

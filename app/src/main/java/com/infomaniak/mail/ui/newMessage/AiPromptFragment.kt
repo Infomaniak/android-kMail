@@ -29,10 +29,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.withStarted
-import com.infomaniak.lib.core.utils.safeBinding
-import com.infomaniak.lib.core.utils.setMarginsRelative
-import com.infomaniak.lib.core.utils.showKeyboard
-import com.infomaniak.lib.core.utils.toPx
+import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentAiPromptBinding
@@ -49,6 +46,8 @@ class AiPromptFragment : Fragment() {
     private var binding: FragmentAiPromptBinding by safeBinding()
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
+
+    private val currentClassName: String by lazy { AiPromptFragment::class.java.name }
 
     private val newMessageFragment by lazy { parentFragment as NewMessageFragment }
 
@@ -102,7 +101,7 @@ class AiPromptFragment : Fragment() {
         closeButton.setOnClickListener { newMessageFragment.closeAiPrompt() }
 
         generateWithButton.setOnClickListener {
-            // TODO
+            safeNavigate(NewMessageFragmentDirections.actionNewMessageFragmentToAiEngineChoiceFragment(), currentClassName)
         }
 
         aiEngineIcon.setImageResource(localSettings.aiEngine.iconRes)

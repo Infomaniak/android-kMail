@@ -124,6 +124,8 @@ class NewMessageFragment : Fragment() {
 
     private var lastFieldToTakeFocus: FieldType? = TO
 
+    private var valueAnimator: ValueAnimator? = null
+
     @Inject
     lateinit var localSettings: LocalSettings
 
@@ -210,6 +212,8 @@ class NewMessageFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        valueAnimator?.cancel()
+
         addressListPopupWindow = null
         quoteWebView?.destroyAndClearHistory()
         quoteWebView = null
@@ -898,7 +902,7 @@ class NewMessageFragment : Fragment() {
             }
         }
 
-        animateAiPrompt(false)
+        if (!withoutTransition) animateAiPrompt(false)
         setAiPromptVisibility(false)
         newMessageConstraintLayout.descendantFocusability = FOCUS_BEFORE_DESCENDANTS
     }
@@ -913,7 +917,8 @@ class NewMessageFragment : Fragment() {
 
         val (startOpacity, endOpacity) = if (isVisible) 0.0f to scrimOpacity else scrimOpacity to 0.0f
 
-        ValueAnimator.ofObject(FloatEvaluator(), startOpacity, endOpacity).apply {
+        valueAnimator?.cancel()
+        valueAnimator = ValueAnimator.ofObject(FloatEvaluator(), startOpacity, endOpacity).apply {
             duration = animationDuration
             addUpdateListener { animator ->
                 val alpha = ((animator.animatedValue as Float) * 256.0f).roundToInt() / 256.0f
