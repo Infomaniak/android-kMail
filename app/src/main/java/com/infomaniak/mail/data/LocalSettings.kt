@@ -103,8 +103,8 @@ class LocalSettings private constructor(context: Context) {
         set(value) = putEnum(AI_ENGINE_KEY, value)
 
     enum class AiEngine(@StringRes val localisedNameRes: Int, val matomoValue: String, val apiValue: String) {
-        FALCON(R.string.settingsDensityOptionCompact, "falcon", "falcon"),
-        CHAT_GPT(R.string.settingsDensityOptionNormal, "chatGpt", "gpt"), ;
+        FALCON(R.string.aiEngineFalcon, "falcon", "falcon"),
+        CHAT_GPT(R.string.aiEngineChatGpt, "chatGpt", "gpt"), ;
     }
     //endregion
 

@@ -20,7 +20,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:title="Moteur IA"
+    app:title="@string/aiPromptTitle"
     tools:context=".ui.main.settings.ThemeSettingFragment">
 
     <androidx.core.widget.NestedScrollView
@@ -34,7 +34,7 @@
 
             <TextView
                 style="@style/SettingHeader"
-                android:text="Choisissez le moteur à utiliser pour l'assistant à la rédaction" />
+                android:text="@string/settingsAiEngineDescription" />
 
             <com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
                 android:id="@+id/radioGroup"
@@ -45,31 +45,25 @@
                     android:id="@+id/falcon"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:icon="@drawable/ic_logo_infomaniak_mail"
-                    app:text="Falcon" />
+                    app:icon="@drawable/ic_ai_engine_falcon"
+                    app:text="@string/aiEngineFalcon" />
 
                 <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
                     android:id="@+id/chatGpt"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:icon="@drawable/ic_close_small"
-                    app:text="chatGPT" />
+                    app:icon="@drawable/ic_ai_engine_chat_gpt"
+                    app:text="@string/aiEngineChatGpt" />
 
             </com.infomaniak.mail.ui.main.settings.SettingRadioGroupView>
 
-            <com.google.android.material.textfield.TextInputLayout
+            <com.infomaniak.mail.views.InformationBlockView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/marginStandardMedium"
-                android:layout_marginVertical="@dimen/marginStandardSmall"
-                app:endIconMode="clear_text">
+                android:layout_margin="@dimen/marginStandardMedium"
+                app:icon="@drawable/ic_external_information"
+                app:text="@string/aiEngineWarning" />
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Clé API" />
-
-            </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </com.infomaniak.mail.ui.main.menu.SimpleSettingView>

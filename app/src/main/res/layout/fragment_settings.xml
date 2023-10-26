@@ -90,8 +90,8 @@
                 android:layout_height="wrap_content"
                 android:visibility="gone"
                 app:itemAction="chevron"
-                app:subtitle="Falcon"
-                app:title="Moteur de l'assistant à la rédaction"
+                app:title="@string/aiPromptTitle"
+                tools:subtitle="@string/aiEngineFalcon"
                 tools:visibility="visible" />
 
             <com.google.android.material.divider.MaterialDivider style="@style/ItemDivider" />

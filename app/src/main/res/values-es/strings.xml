@@ -54,6 +54,10 @@
     <string name="aiButtonRetry">Reintentar</string>
     <string name="aiDiscoveryDescription">Simplifique la redacción de sus mensajes con Inteligencia Artificial.</string>
     <string name="aiDiscoveryTitle">Escriba sus correos electrónicos utilizando IA</string>
+    <string name="aiEngineChangeChoice">Puede cambiar su elección en los ajustes de la aplicación.</string>
+    <string name="aiEngineChatGpt">ChatGPT</string>
+    <string name="aiEngineFalcon">AI soberana (Falcon LLM)</string>
+    <string name="aiEngineWarning">ChatGPT es una IA desarrollada y alojada por OpenAI. Los datos se envían y analizan en sus servidores y no en los de Infomaniak.</string>
     <string name="aiErrorMaxTokenReached">Su solicitud es demasiado larga, por favor acórtela.</string>
     <string name="aiErrorTooManyRequests">Se han hecho demasiadas peticiones en un corto espacio de tiempo. Le rogamos que tenga paciencia.</string>
     <string name="aiErrorUnknown">Se ha producido un error. Si este error persiste, póngase en contacto con nuestro servicio de asistencia.\nGracias por su paciencia.</string>
@@ -357,6 +361,7 @@
     <string name="sentFolder">Mensajes enviados</string>
     <string name="settingsAccentColor">Color de acento</string>
     <string name="settingsAccentColorDescription">Elija el color de acento para la aplicación</string>
+    <string name="settingsAiEngineDescription">Seleccione su asistente de redacción:</string>
     <string name="settingsAppLock">Bloqueo de aplicaciones</string>
     <string name="settingsCancellationPeriodDescription">Tiene la posibilidad de cancelar el envío de su correo electrónico hasta 30 segundos</string>
     <string name="settingsCancellationPeriodTitle">Enviar plazo de anulación</string>

@@ -60,6 +60,10 @@
     <string name="aiButtonRetry">Retry</string>
     <string name="aiDiscoveryDescription">Simplify your message writing with Artificial Intelligence.</string>
     <string name="aiDiscoveryTitle">Write your emails using AI</string>
+    <string name="aiEngineChangeChoice">You can change your choice in the application settings.</string>
+    <string name="aiEngineChatGpt">ChatGPT</string>
+    <string name="aiEngineFalcon">Sovereign AI (Falcon LLM)</string>
+    <string name="aiEngineWarning">ChatGPT is an AI developed and hosted by OpenAI. Data is sent and analyzed on their servers, not Infomaniak’s.</string>
     <string name="aiErrorMaxTokenReached">Your request is too long, please shorten it.</string>
     <string name="aiErrorTooManyRequests">Too many requests in a short time. Please wait.</string>
     <string name="aiErrorUnknown">An error has occurred. If this error persists, please contact our helpdesk.\nThank you for your patience.</string>
@@ -363,6 +367,7 @@
     <string name="sentFolder">Sent messages</string>
     <string name="settingsAccentColor">Accent color</string>
     <string name="settingsAccentColorDescription">Choose the accent colour for the application</string>
+    <string name="settingsAiEngineDescription">Select your writing assistant:</string>
     <string name="settingsAppLock">App lock</string>
     <string name="settingsCancellationPeriodDescription">You have the possibility to cancel the sending of your email up to 30 seconds</string>
     <string name="settingsCancellationPeriodTitle">Send cancellation period</string>

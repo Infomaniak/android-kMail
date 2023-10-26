@@ -54,6 +54,10 @@
     <string name="aiButtonRetry">Wiederholen</string>
     <string name="aiDiscoveryDescription">Vereinfachen Sie das Schreiben von Nachrichten mit künstlicher Intelligenz.</string>
     <string name="aiDiscoveryTitle">Schreiben Sie Ihre E-Mails mit KI</string>
+    <string name="aiEngineChangeChoice">Sie können Ihre Wahl in den Einstellungen der Anwendung ändern.</string>
+    <string name="aiEngineChatGpt">ChatGPT</string>
+    <string name="aiEngineFalcon">Souveräne KI (Falcon LLM)</string>
+    <string name="aiEngineWarning">ChatGPT ist eine KI, die von OpenAI entwickelt und gehostet wird. Die Daten werden auf deren Servern und nicht auf denen von Infomaniak gesendet und analysiert.</string>
     <string name="aiErrorMaxTokenReached">Ihre Anfrage ist zu lang, bitte kürzen Sie sie.</string>
     <string name="aiErrorTooManyRequests">In kurzer Zeit wurden zu viele Anfragen gestellt. Bitte haben Sie etwas Geduld.</string>
     <string name="aiErrorUnknown">Es ist ein Fehler aufgetreten. Wenn dieser Fehler weiterhin besteht, wenden Sie sich bitte an unseren Support.\nVielen Dank für Ihre Geduld.</string>
@@ -357,6 +361,7 @@
     <string name="sentFolder">Gesendete Nachrichten</string>
     <string name="settingsAccentColor">Akzentfarbe</string>
     <string name="settingsAccentColorDescription">Wählen Sie die Akzentfarbe für die Anwendung</string>
+    <string name="settingsAiEngineDescription">Wählen Sie Ihren Schreibassistent :</string>
     <string name="settingsAppLock">App-Sperre</string>
     <string name="settingsCancellationPeriodDescription">Sie haben die Möglichkeit, den Versand Ihrer E-Mail bis zu 30 Sekunden abzubrechen</string>
     <string name="settingsCancellationPeriodTitle">Kündigungsfrist senden</string>
