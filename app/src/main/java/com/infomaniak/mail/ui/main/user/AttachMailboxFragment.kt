@@ -31,11 +31,6 @@ import com.google.android.material.textfield.TextInputLayout
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
-import com.infomaniak.lib.core.utils.Utils
-import com.infomaniak.lib.core.utils.hideProgress
-import com.infomaniak.lib.core.utils.initProgress
-import com.infomaniak.lib.core.utils.showKeyboard
-import com.infomaniak.lib.core.utils.showProgress
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentAttachMailboxBinding
