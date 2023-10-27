@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.utils
 
-import android.accounts.AccountManager
 import android.animation.Animator
 import android.animation.ValueAnimator
 import android.app.Activity

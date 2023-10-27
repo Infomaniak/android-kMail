@@ -42,7 +42,7 @@ abstract class MenuFoldersFragment : Fragment() {
     @Inject
     lateinit var folderController: FolderController
 
-	@Inject
+    @Inject
     lateinit var inputDialog: InputAlertDialog
 
     protected val mainViewModel: MainViewModel by activityViewModels()
