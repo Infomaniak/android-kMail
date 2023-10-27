@@ -186,7 +186,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     override fun onStart() {
         super.onStart()
         binding.unreadCountChip.apply { isCloseIconVisible = isChecked }
-        if (isTwoPanelLayout()) threadViewModel.goToSearch.value = false
+        if (isTwoPaneLayout()) threadViewModel.goToSearch.value = false
     }
 
     override fun onResume() {
@@ -318,7 +318,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
 
         searchButton.setOnClickListener {
-            if (isTwoPanelLayout()) threadViewModel.goToSearch.value = true
+            if (isTwoPaneLayout()) threadViewModel.goToSearch.value = true
             safeNavigate(
                 ThreadListFragmentDirections.actionThreadListFragmentToSearchFragment(
                     dummyFolderId = mainViewModel.currentFolderId ?: "eJzz9HPyjwAABGYBgQ--", // Hardcoded INBOX folder
@@ -704,7 +704,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     // TODO: This won't work if the Thread is opened from another fragment, for example from the Search.
     private fun observeInTwoPanelLayout() = with(mainViewModel) {
-        if (isTwoPanelLayout()) {
+        if (isTwoPaneLayout()) {
 
             // Reset selected Thread UI when closing Thread
             threadViewModel.threadUid.observe(viewLifecycleOwner) {

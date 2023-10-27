@@ -229,7 +229,7 @@ class ThreadListAdapter @Inject constructor(
                     publishSelectedItems.invoke()
                 }
             }
-            context.isTwoPanelLayout() -> {
+            context.isTwoPaneLayout() -> {
                 clickedThreadPosition?.let { if (it < itemCount) notifyItemChanged(it, NotificationType.SELECTED_STATE) }
                 clickedThreadPosition = position
                 clickedThreadUid = selectedThread.uid
