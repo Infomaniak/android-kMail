@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.utils
 
+import android.graphics.Color
 import android.view.ViewGroup
 import com.infomaniak.lib.confetti.CommonConfetti
 import com.infomaniak.lib.confetti.ConfettiSource
@@ -30,7 +31,23 @@ object ConfettiUtils {
 
     private const val EMISSION = 1_000_000.0f
 
-    fun triggerEasterEggConfetti(container: ViewGroup, matomoValue: String): Unit = with(container.context) {
+    private const val AQUA = -0xFF0001
+    private const val FUCHSIA = -0xFF01
+    private const val LIME = -0xFF0100
+    private const val MAROON = -0x800000
+    private const val NAVY = -0xFFFF80
+    private const val OLIVE = -0x7F8000
+    private const val PURPLE = -0x7FFF80
+    private const val SILVER = -0x3F3F40
+    private const val TEAL = -0xFF7F80
+
+    private val COLORED_SNOW_COLORS = arrayOf(
+        Color.BLACK, Color.DKGRAY, Color.GRAY, Color.LTGRAY, Color.WHITE, Color.RED,
+        Color.GREEN, Color.BLUE, Color.YELLOW, Color.CYAN, Color.MAGENTA,
+        AQUA, FUCHSIA, LIME, MAROON, NAVY, OLIVE, PURPLE, SILVER, TEAL,
+    ).toIntArray()
+
+    fun triggerEasterEggConfetti(container: ViewGroup, matomoValue: String) = with(container.context) {
 
         Sentry.withScope { scope ->
             scope.level = SentryLevel.INFO
@@ -62,7 +79,10 @@ object ConfettiUtils {
             displayConfetti(config, source, container)
         }
 
-        fun displaySnow() {
+        fun displaySnow(colored: Boolean = false) {
+
+            val colors = if (colored) COLORED_SNOW_COLORS else resources.getIntArray(R.array.snowColors)
+
             val config = ConfettiConfig(
                 duration = 5_000L,
                 velocityX = none,
@@ -70,7 +90,7 @@ object ConfettiUtils {
                 velocityY = normal,
                 velocityDeviationY = slow,
                 accelerationY = none,
-                colors = resources.getIntArray(R.array.snowColors),
+                colors = colors,
                 useGaussian = false,
             )
             val size = resources.getDimensionPixelOffset(RConfetti.dimen.confetti_size)
@@ -113,13 +133,17 @@ object ConfettiUtils {
             displayConfetti(config, sourceRight, container)
         }
 
-        when ((0..2).random()) {
-            0 -> displayTada()
-            1 -> displaySnow()
-            else -> if (isInPortrait()) {
-                displaySingleGeneva()
-            } else {
-                displayDoubleGeneva()
+        if (matomoValue == "Tablet") {
+            displaySnow(colored = true)
+        } else {
+            when ((0..2).random()) {
+                0 -> displayTada()
+                1 -> displaySnow()
+                else -> if (isInPortrait()) {
+                    displaySingleGeneva()
+                } else {
+                    displayDoubleGeneva()
+                }
             }
         }
     }
