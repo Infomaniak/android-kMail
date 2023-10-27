@@ -56,8 +56,8 @@
     <string name="aiDiscoveryTitle">Rédiger vos e-mails avec l’IA</string>
     <string name="aiEngineChangeChoice">Vous pourrez modifier votre choix dans les paramètres de l’application.</string>
     <string name="aiEngineChatGpt">ChatGPT</string>
-    <string name="aiEngineFalcon">IA Souveraine (Falcon LLM)</string>
-    <string name="aiEngineWarning">ChatGPT est une IA développée et hébergée par OpenAI. Les données sont envoyées et analysées sur leurs serveurs et non ceux d’Infomaniak.</string>
+    <string name="aiEngineFalcon">IA Souveraine</string>
+    <string name="aiEngineWarning">Vos données seront traitées par la société américaine OpenAI. Nous vous conseillons de ne pas l’utiliser pour des messages sensibles.</string>
     <string name="aiErrorMaxTokenReached">Votre demande est trop longue, veuillez la raccourcir.</string>
     <string name="aiErrorTooManyRequests">Trop de requêtes ont été effectuées en un court laps de temps. Veuillez patienter.</string>
     <string name="aiErrorUnknown">Une erreur s’est produite. Si cette erreur persiste, veuillez contacter notre service d’assistance.\nMerci pour votre patience.</string>
@@ -366,6 +366,7 @@
     <string name="searchFilterFolder">Tous les dossiers</string>
     <string name="searchFilterRead">Lus</string>
     <string name="searchFilterUnread">Non lus</string>
+    <string name="searchFolderName">Recherche</string>
     <string name="send">Envoyer</string>
     <string name="sentFolder">Messages envoyés</string>
     <string name="settingsAccentColor">Couleur d’accentuation</string>
