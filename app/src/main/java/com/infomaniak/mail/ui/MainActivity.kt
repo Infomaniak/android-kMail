@@ -192,7 +192,7 @@ class MainActivity : BaseActivity() {
 
     override fun onConfigurationChanged(newConfig: Configuration) = with(binding) {
         super.onConfigurationChanged(newConfig)
-        updateThreadLayout()
+        if (isTablet()) updateThreadLayout()
     }
 
     private fun observeNetworkStatus() {
@@ -424,7 +424,7 @@ class MainActivity : BaseActivity() {
         trackDestination(destination)
 
         if (isTablet()) {
-            binding.threadHostFragment?.isVisible = shouldDisplayThreadHostFragmentInThisDestination(destination.id)
+            binding.threadHostFragment?.isVisible = shouldDisplayThreadContainer(destination.id)
         }
 
         updateColorsWhenDestinationChanged(destination.id)
@@ -549,14 +549,12 @@ class MainActivity : BaseActivity() {
     }
 
     fun updateThreadLayout() = with(binding) {
-        if (isTablet()) {
-            val shouldDisplayThreadHost = shouldDisplayThreadHostFragmentInThisDestination(navController.currentDestination?.id)
-            threadHostFragment?.isVisible = if (isTwoPaneLayout()) shouldDisplayThreadHost else threadViewModel.isInThread
-            mainHostFragment.isVisible = isTwoPaneLayout() || !threadViewModel.isInThread
-        }
+        val shouldDisplayThreadContainer = shouldDisplayThreadContainer(navController.currentDestination?.id)
+        threadHostFragment?.isVisible = if (isTwoPaneLayout()) shouldDisplayThreadContainer else threadViewModel.isInThread
+        mainHostFragment.isVisible = isTwoPaneLayout() || !threadViewModel.isInThread
     }
 
-    private fun shouldDisplayThreadHostFragmentInThisDestination(destinationId: Int?): Boolean {
+    private fun shouldDisplayThreadContainer(destinationId: Int?): Boolean {
         return if (!isTwoPaneLayout() || destinationId == null) {
             false
         } else {
