@@ -54,9 +54,14 @@
     <string name="aiButtonRetry">Riprova</string>
     <string name="aiDiscoveryDescription">Semplifica la scrittura dei messaggi con l’intelligenza artificiale.</string>
     <string name="aiDiscoveryTitle">Scrivi le vostre e-mail utilizzando l’IA</string>
+    <string name="aiEngineChangeChoice">È possibile modificare la scelta nelle impostazioni dell’applicazione.</string>
+    <string name="aiEngineChatGpt">ChatGPT</string>
+    <string name="aiEngineFalcon">AI sovrana (Falcon LLM)</string>
+    <string name="aiEngineWarning">ChatGPT è un’intelligenza artificiale sviluppata e ospitata da OpenAI. I dati vengono inviati e analizzati sui loro server e non su quelli di Infomaniak.</string>
     <string name="aiErrorMaxTokenReached">La tua richiesta è troppo lunga, ti prego di accorciarla.</string>
     <string name="aiErrorTooManyRequests">Sono state presentate troppe richieste in un breve lasso di tempo. Attendere prego.</string>
     <string name="aiErrorUnknown">Si è verificato un errore. Se l’errore persiste, si prega di contattare il nostro helpdesk.\nGrazie per la pazienza.</string>
+    <string name="aiGenerationTitlePrompt">Genera con</string>
     <string name="aiMenuEditRequest">Modifica la mia richiesta</string>
     <string name="aiMenuExpand">Espandi</string>
     <string name="aiMenuFriendlyWriting">Scrittura amichevole</string>
@@ -357,6 +362,7 @@
     <string name="sentFolder">Messaggi inviati</string>
     <string name="settingsAccentColor">Colore d’accento</string>
     <string name="settingsAccentColorDescription">Scegliere il colore d’accento per l’applicazione</string>
+    <string name="settingsAiEngineDescription">Selezionare l’assistente di scrittura</string>
     <string name="settingsAppLock">Blocco dell’app</string>
     <string name="settingsCancellationPeriodDescription">Avete la possibilità di annullare l’invio della vostra email fino a 30 secondi.</string>
     <string name="settingsCancellationPeriodTitle">Periodo di cancellazione dell’invio</string>

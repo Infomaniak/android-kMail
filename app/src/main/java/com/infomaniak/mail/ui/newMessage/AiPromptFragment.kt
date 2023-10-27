@@ -29,16 +29,16 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.withStarted
-import com.infomaniak.lib.core.utils.safeBinding
-import com.infomaniak.lib.core.utils.setMarginsRelative
-import com.infomaniak.lib.core.utils.showKeyboard
-import com.infomaniak.lib.core.utils.toPx
+import com.infomaniak.lib.core.utils.*
+import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentAiPromptBinding
 import com.infomaniak.mail.utils.postfixWithTag
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 import com.google.android.material.R as RMaterial
 
 @AndroidEntryPoint
@@ -47,6 +47,8 @@ class AiPromptFragment : Fragment() {
     private var binding: FragmentAiPromptBinding by safeBinding()
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
+
+    private val currentClassName: String by lazy { AiPromptFragment::class.java.name }
 
     private val newMessageFragment by lazy { parentFragment as NewMessageFragment }
 
@@ -59,6 +61,9 @@ class AiPromptFragment : Fragment() {
             override fun afterTextChanged(s: Editable?) = onPromptChanged(s)
         }
     }
+
+    @Inject
+    lateinit var localSettings: LocalSettings
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
@@ -95,6 +100,13 @@ class AiPromptFragment : Fragment() {
         prompt.showKeyboard()
         initPromptTextAndPlaceholder()
         closeButton.setOnClickListener { newMessageFragment.closeAiPrompt() }
+
+        generateWithButton.setOnClickListener {
+            trackEvent("promptAiEngine", "openEngineChoice")
+            safeNavigate(NewMessageFragmentDirections.actionNewMessageFragmentToAiEngineChoiceFragment(), currentClassName)
+        }
+
+        aiEngineIcon.setImageResource(localSettings.aiEngine.iconRes)
 
         generateButton.setOnClickListener {
             newMessageViewModel.shouldExecuteDraftActionWhenStopping = false

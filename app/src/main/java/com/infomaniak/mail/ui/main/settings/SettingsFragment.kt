@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import com.infomaniak.lib.applock.Utils.isKeyguardSecure
 import com.infomaniak.lib.applock.Utils.silentlyReverseSwitch
 import com.infomaniak.lib.core.utils.openAppNotificationSettings
@@ -46,6 +47,7 @@ class SettingsFragment : Fragment() {
 
     private var binding: FragmentSettingsBinding by safeBinding()
     private val mainViewModel: MainViewModel by activityViewModels()
+    private val settingsViewModel: SettingsViewModel by viewModels()
 
     @Inject
     lateinit var localSettings: LocalSettings
@@ -59,6 +61,7 @@ class SettingsFragment : Fragment() {
         setupMailboxesAdapter()
         setupListeners()
         setSubtitlesInitialState()
+        observeFeatureFlag()
     }
 
     override fun onResume() {
@@ -83,6 +86,7 @@ class SettingsFragment : Fragment() {
 
     private fun setSubtitlesInitialState() = with(binding) {
         with(localSettings) {
+            settingsAiEngine.setSubtitle(aiEngine.localisedNameRes)
             settingsThreadListDensity.setSubtitle(threadDensity.localisedNameRes)
             settingsTheme.setSubtitle(theme.localisedNameRes)
             settingsAccentColor.setSubtitle(accentColor.localisedNameRes)
@@ -121,6 +125,10 @@ class SettingsFragment : Fragment() {
             }
         }
 
+        settingsAiEngine.setOnClickListener {
+            animatedNavigation(SettingsFragmentDirections.actionSettingsFragmentToAiEngineSettingFragment())
+        }
+
         settingsThreadListDensity.setOnClickListener {
             animatedNavigation(SettingsFragmentDirections.actionSettingsToThreadListDensitySetting())
         }
@@ -143,6 +151,12 @@ class SettingsFragment : Fragment() {
 
         settingsExternalContent.setOnClickListener {
             animatedNavigation(SettingsFragmentDirections.actionSettingsToExternalContentSetting())
+        }
+    }
+
+    private fun observeFeatureFlag() {
+        settingsViewModel.aiFeatureFlag.observe(viewLifecycleOwner) {
+            binding.settingsAiEngine.isVisible = it.isEnabled
         }
     }
 }

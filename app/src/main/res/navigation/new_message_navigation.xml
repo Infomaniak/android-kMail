@@ -32,6 +32,9 @@
         <action
             android:id="@+id/action_newMessageFragment_to_aiDiscoveryBottomSheetDialog"
             app:destination="@id/aiDiscoveryBottomSheetDialog" />
+        <action
+            android:id="@+id/action_newMessageFragment_to_aiEngineChoiceFragment"
+            app:destination="@id/aiEngineChoiceFragment" />
     </fragment>
 
     <fragment
@@ -44,5 +47,11 @@
         android:id="@+id/aiDiscoveryBottomSheetDialog"
         android:name="com.infomaniak.mail.ui.bottomSheetDialogs.AiDiscoveryBottomSheetDialog"
         android:label="AiDiscoveryBottomSheetDialog" />
+
+    <fragment
+        android:id="@+id/aiEngineChoiceFragment"
+        android:name="com.infomaniak.mail.ui.newMessage.AiEngineChoiceFragment"
+        android:label="AiEngineChoiceFragment"
+        tools:layout="@layout/fragment_ai_engine_choice" />
 
 </navigation>

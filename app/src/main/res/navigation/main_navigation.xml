@@ -328,6 +328,9 @@
         <action
             android:id="@+id/action_settings_to_externalContentSetting"
             app:destination="@id/externalContentSettingFragment" />
+        <action
+            android:id="@+id/action_settingsFragment_to_aiEngineSettingFragment"
+            app:destination="@id/aiEngineSettingFragment" />
     </fragment>
 
     <fragment
@@ -588,5 +591,9 @@
         android:id="@+id/syncDiscoveryBottomSheetDialog"
         android:name="com.infomaniak.mail.ui.bottomSheetDialogs.SyncDiscoveryBottomSheetDialog"
         android:label="SyncDiscoveryBottomSheetDialog" />
+    <fragment
+        android:id="@+id/aiEngineSettingFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.swipe.AiEngineSettingFragment"
+        android:label="AiEngineSettingFragment" />
 
 </navigation>

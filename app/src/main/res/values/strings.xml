@@ -60,9 +60,14 @@
     <string name="aiButtonRetry">Retry</string>
     <string name="aiDiscoveryDescription">Simplify your message writing with Artificial Intelligence.</string>
     <string name="aiDiscoveryTitle">Write your emails using AI</string>
+    <string name="aiEngineChangeChoice">You can change your choice in the application settings.</string>
+    <string name="aiEngineChatGpt">ChatGPT</string>
+    <string name="aiEngineFalcon">Sovereign AI (Falcon LLM)</string>
+    <string name="aiEngineWarning">ChatGPT is an AI developed and hosted by OpenAI. Data is sent and analyzed on their servers, not Infomaniak’s.</string>
     <string name="aiErrorMaxTokenReached">Your request is too long, please shorten it.</string>
     <string name="aiErrorTooManyRequests">Too many requests in a short time. Please wait.</string>
     <string name="aiErrorUnknown">An error has occurred. If this error persists, please contact our helpdesk.\nThank you for your patience.</string>
+    <string name="aiGenerationTitlePrompt">Generate with</string>
     <string name="aiMenuEditRequest">Edit my request</string>
     <string name="aiMenuExpand">Expand</string>
     <string name="aiMenuFriendlyWriting">Friendly writing</string>
@@ -74,10 +79,10 @@
     <string name="aiPromptExample3">a thank-you email for an invitation to an event</string>
     <string name="aiPromptExample4">an invitation to a company event</string>
     <string name="aiPromptExample5">an email requesting an appointment with an important customer</string>
-    <string name="aiPromptGenerationLoader">The assistant is writing</string>
-    <string name="aiPromptPlaceholder">Tell the writing assistant what you want to write. For example, \"%s\".</string>
+    <string name="aiPromptGenerationLoader">The AI writing assistant is composing</string>
+    <string name="aiPromptPlaceholder">Tell the AI writing assistant what you want to write. For example, \"%s\".</string>
     <string name="aiPromptTag">Beta</string>
-    <string name="aiPromptTitle">Writing assistant</string>
+    <string name="aiPromptTitle">The AI writing assistant</string>
     <string name="aiPromptValidateButton">Generate</string>
     <string name="aiReplaceSubjectDescription">The subject will become:\n\n%s</string>
     <string name="aiReplaceSubjectTitle">Replace the current subject with the assistant’s proposal?</string>
@@ -363,6 +368,7 @@
     <string name="sentFolder">Sent messages</string>
     <string name="settingsAccentColor">Accent color</string>
     <string name="settingsAccentColorDescription">Choose the accent colour for the application</string>
+    <string name="settingsAiEngineDescription">Select your AI writing assistant</string>
     <string name="settingsAppLock">App lock</string>
     <string name="settingsCancellationPeriodDescription">You have the possibility to cancel the sending of your email up to 30 seconds</string>
     <string name="settingsCancellationPeriodTitle">Send cancellation period</string>

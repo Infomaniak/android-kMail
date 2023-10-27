@@ -17,6 +17,10 @@
  */
 package com.infomaniak.mail.utils
 
+import androidx.fragment.app.Fragment
+import com.infomaniak.mail.MatomoMail.trackEvent
+import com.infomaniak.mail.R
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
@@ -31,6 +35,7 @@ import com.infomaniak.mail.data.models.FeatureFlag.FeatureFlagType
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
 import io.realm.kotlin.Realm
 import io.sentry.Sentry
 import javax.inject.Inject
@@ -42,6 +47,9 @@ class SharedUtils @Inject constructor(
     private val messageController: MessageController,
     private val featureFlagController: FeatureFlagController,
 ) {
+
+    @Inject
+    lateinit var localSettings: LocalSettings
 
     /**
      * Mark a Message or some Threads as read
@@ -113,6 +121,27 @@ class SharedUtils @Inject constructor(
             }
         }
     }
+
+    fun manageAiEngineSettings(
+        fragment: Fragment,
+        settingRadioGroupView: SettingRadioGroupView,
+        matomoCategory: String,
+        onClick: (() -> Unit)? = null,
+    ) {
+        settingRadioGroupView.initBijectionTable(
+            R.id.falcon to LocalSettings.AiEngine.FALCON,
+            R.id.chatGpt to LocalSettings.AiEngine.CHAT_GPT,
+        )
+
+        settingRadioGroupView.check(localSettings.aiEngine)
+
+        settingRadioGroupView.onItemCheckedListener { _, _, engine ->
+            localSettings.aiEngine = engine as LocalSettings.AiEngine
+            fragment.trackEvent(matomoCategory, engine.matomoValue)
+            onClick?.invoke()
+        }
+    }
+
 
     companion object {
 

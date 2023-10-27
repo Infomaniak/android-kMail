@@ -97,6 +97,22 @@ class LocalSettings private constructor(context: Context) {
         set(value) = sharedPreferences.transaction { putBoolean(IS_USER_WANTING_UPDATES_KEY, value) }
     //endregion
 
+    //region Ai engine
+    var aiEngine: AiEngine
+        get() = getEnum(AI_ENGINE_KEY, DEFAULT_AI_ENGINE)
+        set(value) = putEnum(AI_ENGINE_KEY, value)
+
+    enum class AiEngine(
+        @StringRes val localisedNameRes: Int,
+        @DrawableRes val iconRes: Int,
+        val matomoValue: String,
+        val apiValue: String,
+    ) {
+        FALCON(R.string.aiEngineFalcon, R.drawable.ic_ai_engine_falcon, "falcon", "falcon"),
+        CHAT_GPT(R.string.aiEngineChatGpt, R.drawable.ic_ai_engine_chat_gpt, "chatGpt", "gpt"), ;
+    }
+    //endregion
+
     //region Thread density
     var threadDensity: ThreadDensity
         get() = getEnum(THREAD_DENSITY_KEY, DEFAULT_THREAD_DENSITY)
@@ -329,6 +345,7 @@ class LocalSettings private constructor(context: Context) {
         private const val DEFAULT_HAS_ALREADY_ENABLED_NOTIFICATIONS = false
         private const val DEFAULT_IS_APP_LOCKED = false
         private const val DEFAULT_IS_USER_WANTING_UPDATES = true
+        private val DEFAULT_AI_ENGINE = AiEngine.FALCON
         private val DEFAULT_THREAD_DENSITY = ThreadDensity.LARGE
         private val DEFAULT_THEME = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) Theme.LIGHT else Theme.SYSTEM
         private val DEFAULT_ACCENT_COLOR = AccentColor.PINK
@@ -357,6 +374,7 @@ class LocalSettings private constructor(context: Context) {
         private const val HAS_ALREADY_ENABLED_NOTIFICATIONS_KEY = "hasAlreadyEnabledNotificationsKey"
         private const val IS_APP_LOCKED_KEY = "isAppLockedKey"
         private const val IS_USER_WANTING_UPDATES_KEY = "isUserWantingUpdatesKey"
+        private const val AI_ENGINE_KEY = "aiEngineKey"
         private const val THREAD_DENSITY_KEY = "threadDensityKey"
         private const val THEME_KEY = "themeKey"
         private const val ACCENT_COLOR_KEY = "accentColorKey"
