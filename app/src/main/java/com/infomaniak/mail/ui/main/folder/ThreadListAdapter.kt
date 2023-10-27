@@ -246,7 +246,7 @@ class ThreadListAdapter @Inject constructor(
     private fun CardviewThreadItemBinding.updateSelectedState(selectedThread: Thread) {
 
         val isMultiSelected = multiSelection?.selectedItems?.contains(selectedThread) == true
-        val isTabletSelected = selectedThread.uid == clickedThreadUid && context.isTwoPaneLayout()
+        val isTabletSelected = selectedThread.uid == clickedThreadUid && context.isTabletInLandscape()
 
         selectionCardView.backgroundTintList = when {
             isMultiSelected -> ColorStateList.valueOf(context.getAttributeColor(RMaterial.attr.colorPrimaryContainer))

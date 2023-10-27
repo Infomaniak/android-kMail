@@ -20,7 +20,7 @@
     <!-- Whether we are on a tablet, or not -->
     <bool name="isTablet">false</bool>
 
-    <!-- Whether we are in landscape mode and on a tablet, or not -->
-    <bool name="isTabletLandscape">false</bool>
+    <!-- Whether we are on a tablet in landscape mode, or not -->
+    <bool name="isTabletInLandscape">false</bool>
 
 </resources>
