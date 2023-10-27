@@ -362,7 +362,7 @@ class MainActivity : BaseActivity() {
             when {
                 drawerLayout.isOpen -> closeDrawer()
                 mainViewModel.isMultiSelectOn -> closeMultiSelect()
-                isTablet() && !isTwoPaneLayout() && threadViewModel.isInThread -> {
+                isTabletInPortrait() && threadViewModel.isInThread -> {
                     threadViewModel.threadUid.value = null
                     updateThreadLayout()
                 }
@@ -550,12 +550,12 @@ class MainActivity : BaseActivity() {
 
     fun updateThreadLayout() = with(binding) {
         val shouldDisplayThreadContainer = shouldDisplayThreadContainer(navController.currentDestination?.id)
-        threadHostFragment?.isVisible = if (isTwoPaneLayout()) shouldDisplayThreadContainer else threadViewModel.isInThread
-        mainHostFragment.isVisible = isTwoPaneLayout() || !threadViewModel.isInThread
+        threadHostFragment?.isVisible = if (isTabletInLandscape()) shouldDisplayThreadContainer else threadViewModel.isInThread
+        mainHostFragment.isVisible = isTabletInLandscape() || !threadViewModel.isInThread
     }
 
     private fun shouldDisplayThreadContainer(destinationId: Int?): Boolean {
-        return if (!isTwoPaneLayout() || destinationId == null) {
+        return if (isTabletInPortrait() || destinationId == null) {
             false
         } else {
             when (destinationId) {

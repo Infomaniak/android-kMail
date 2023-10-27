@@ -130,7 +130,7 @@ class ThreadFragment : Fragment() {
             _binding = it
 
             // Update `statusBarColor` only when ThreadFragment is in fullscreen.
-            if (!isTablet() || (!isTwoPaneLayout() && threadViewModel.isInThread)) {
+            if (isPhone() || (isTabletInPortrait() && threadViewModel.isInThread)) {
                 requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundColor)
             }
 
@@ -258,7 +258,7 @@ class ThreadFragment : Fragment() {
 
     // TODO: We probably want a real layout instead of this workaround.
     private fun FragmentThreadBinding.updateToolbarUI() {
-        if (isTwoPaneLayout()) {
+        if (isTabletInLandscape()) {
             toolbar.navigationIcon?.alpha = 0
             toolbar.setNavigationOnClickListener {}
         } else {
@@ -701,15 +701,15 @@ class ThreadFragment : Fragment() {
 
         threadViewModel.threadUid.value = null
 
-        if (isTablet()) {
-            if (!isTwoPaneLayout()) (requireActivity() as MainActivity).updateThreadLayout()
-        } else {
+        if (isPhone()) {
             // TODO: Realm broadcasts twice when the Thread is deleted.
             //  We don't know why.
             //  While it's not fixed, we do this quickfix of checking if we already left:
             if (isFirstTimeLeaving.compareAndSet(true, false)) {
                 findNavController().popBackStack()
             }
+        } else if (isTabletInPortrait()) {
+            (requireActivity() as MainActivity).updateThreadLayout()
         }
     }
 
