@@ -207,7 +207,7 @@ class MainViewModel @Inject constructor(
         .asLiveData(ioCoroutineContext)
     //endregion
 
-    //region Two-panels layout
+    //region Tablet
     val downloadAttachmentsArgs = SingleLiveEvent<Triple<String, String, AttachmentType>>()
     val newMessageArgs = SingleLiveEvent<NewMessageActivityArgs>()
     val replyBottomSheetArgs = SingleLiveEvent<Pair<String, Boolean>>()

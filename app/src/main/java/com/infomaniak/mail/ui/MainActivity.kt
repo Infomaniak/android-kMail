@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.View
@@ -187,9 +188,11 @@ class MainActivity : BaseActivity() {
         permissionUtils.requestMainPermissionsIfNeeded()
 
         initAppUpdateManager()
+    }
 
-        // TODO: Instead of doing that, save the state and restore it when rotating.
-        if (isTwoPaneLayout() && navController.currentDestination?.id == R.id.threadFragment) navController.popBackStack()
+    override fun onConfigurationChanged(newConfig: Configuration) = with(binding) {
+        super.onConfigurationChanged(newConfig)
+        updateThreadLayout()
     }
 
     private fun observeNetworkStatus() {
@@ -359,6 +362,10 @@ class MainActivity : BaseActivity() {
             when {
                 drawerLayout.isOpen -> closeDrawer()
                 mainViewModel.isMultiSelectOn -> closeMultiSelect()
+                isTablet() && !isTwoPaneLayout() && threadViewModel.isInThread -> {
+                    threadViewModel.threadUid.value = null
+                    updateThreadLayout()
+                }
                 else -> popBack()
             }
         }
@@ -416,20 +423,8 @@ class MainActivity : BaseActivity() {
         SentryDebug.addNavigationBreadcrumb(destination.displayName, arguments)
         trackDestination(destination)
 
-        if (isTwoPaneLayout()) {
-            binding.threadHostFragment?.isVisible = when (destination.id) {
-                R.id.threadListFragment,
-                R.id.searchFragment,
-                R.id.downloadAttachmentProgressDialog,
-                R.id.replyBottomSheetDialog,
-                R.id.threadActionsBottomSheetDialog,
-                R.id.messageActionsBottomSheetDialog,
-                R.id.detailedContactBottomSheetDialog,
-                R.id.multiSelectBottomSheetDialog,
-                R.id.updateAvailableBottomSheetDialog,
-                R.id.syncDiscoveryBottomSheetDialog -> true
-                else -> false
-            }
+        if (isTablet()) {
+            binding.threadHostFragment?.isVisible = shouldDisplayThreadHostFragmentInThisDestination(destination.id)
         }
 
         updateColorsWhenDestinationChanged(destination.id)
@@ -551,6 +546,34 @@ class MainActivity : BaseActivity() {
 
     fun openThread(uid: String) {
         threadViewModel.threadUid.value = uid
+    }
+
+    fun updateThreadLayout() = with(binding) {
+        if (isTablet()) {
+            val shouldDisplayThreadHost = shouldDisplayThreadHostFragmentInThisDestination(navController.currentDestination?.id)
+            threadHostFragment?.isVisible = if (isTwoPaneLayout()) shouldDisplayThreadHost else threadViewModel.isInThread
+            mainHostFragment.isVisible = isTwoPaneLayout() || !threadViewModel.isInThread
+        }
+    }
+
+    private fun shouldDisplayThreadHostFragmentInThisDestination(destinationId: Int?): Boolean {
+        return if (!isTwoPaneLayout() || destinationId == null) {
+            false
+        } else {
+            when (destinationId) {
+                R.id.threadListFragment,
+                R.id.searchFragment,
+                R.id.downloadAttachmentProgressDialog,
+                R.id.replyBottomSheetDialog,
+                R.id.threadActionsBottomSheetDialog,
+                R.id.messageActionsBottomSheetDialog,
+                R.id.detailedContactBottomSheetDialog,
+                R.id.multiSelectBottomSheetDialog,
+                R.id.updateAvailableBottomSheetDialog,
+                R.id.syncDiscoveryBottomSheetDialog -> true
+                else -> false
+            }
+        }
     }
 
     companion object {

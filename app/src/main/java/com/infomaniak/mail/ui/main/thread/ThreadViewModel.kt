@@ -66,9 +66,12 @@ class ThreadViewModel @Inject constructor(
     val failedMessagesUids = SingleLiveEvent<List<String>>()
 
     val threadUid = MutableLiveData<String?>(null)
+    val isInThread get() = threadUid.value != null
 
     private var threadLiveJob: Job? = null
     val threadLive = MutableLiveData<Thread?>()
+
+    var previousFolderId: String? = null
 
     // `true` : going to the Search
     // `false`: coming back from it

@@ -95,7 +95,7 @@ class ThreadListAdapter @Inject constructor(
     private var onSwipeFinished: (() -> Unit)? = null
     private var multiSelection: MultiSelectionListener<Thread>? = null
 
-    // Two-panel layout only
+    // Two-pane layout only
     var clickedThreadPosition: Int? = null
     var clickedThreadUid: String? = null
 
@@ -229,7 +229,7 @@ class ThreadListAdapter @Inject constructor(
                     publishSelectedItems.invoke()
                 }
             }
-            context.isTwoPaneLayout() -> {
+            context.isTablet() -> {
                 clickedThreadPosition?.let { if (it < itemCount) notifyItemChanged(it, NotificationType.SELECTED_STATE) }
                 clickedThreadPosition = position
                 clickedThreadUid = selectedThread.uid
@@ -246,7 +246,7 @@ class ThreadListAdapter @Inject constructor(
     private fun CardviewThreadItemBinding.updateSelectedState(selectedThread: Thread) {
 
         val isMultiSelected = multiSelection?.selectedItems?.contains(selectedThread) == true
-        val isTabletSelected = selectedThread.uid == clickedThreadUid
+        val isTabletSelected = selectedThread.uid == clickedThreadUid && context.isTwoPaneLayout()
 
         selectionCardView.backgroundTintList = when {
             isMultiSelected -> ColorStateList.valueOf(context.getAttributeColor(RMaterial.attr.colorPrimaryContainer))
@@ -566,7 +566,7 @@ class ThreadListAdapter @Inject constructor(
         SEE_ALL_BUTTON(R.layout.item_thread_see_all_button),
     }
 
-    private enum class NotificationType {
+    enum class NotificationType {
         AVATAR,
         SELECTED_STATE,
     }

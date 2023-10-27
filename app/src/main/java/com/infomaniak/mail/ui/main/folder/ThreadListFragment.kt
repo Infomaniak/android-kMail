@@ -69,6 +69,7 @@ import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
+import com.infomaniak.mail.ui.main.folder.ThreadListAdapter.NotificationType
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialog
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
@@ -165,7 +166,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         observerDraftsActionsCompletedWorks()
         observeFlushFolderTrigger()
         observeUpdateInstall()
-        observeInTwoPanelLayout()
+        observeInTabletMode()
     }.getOrDefault(Unit)
 
     private fun navigateFromNotificationToNewMessage() {
@@ -186,7 +187,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     override fun onStart() {
         super.onStart()
         binding.unreadCountChip.apply { isCloseIconVisible = isChecked }
-        if (isTwoPaneLayout()) threadViewModel.goToSearch.value = false
+        if (isTablet()) threadViewModel.goToSearch.value = false
     }
 
     override fun onResume() {
@@ -318,7 +319,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
 
         searchButton.setOnClickListener {
-            if (isTwoPaneLayout()) threadViewModel.goToSearch.value = true
+            if (isTablet()) threadViewModel.goToSearch.value = true
             safeNavigate(
                 ThreadListFragmentDirections.actionThreadListFragmentToSearchFragment(
                     dummyFolderId = mainViewModel.currentFolderId ?: "eJzz9HPyjwAABGYBgQ--", // Hardcoded INBOX folder
@@ -703,16 +704,19 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     // TODO: This won't work if the Thread is opened from another fragment, for example from the Search.
-    private fun observeInTwoPanelLayout() = with(mainViewModel) {
-        if (isTwoPaneLayout()) {
+    private fun observeInTabletMode() = with(mainViewModel) {
 
-            // Reset selected Thread UI when closing Thread
-            threadViewModel.threadUid.observe(viewLifecycleOwner) {
-                if (it == null) threadListAdapter.apply {
-                    clickedThreadPosition = null
-                    clickedThreadUid = null
-                }
+        // Reset selected Thread UI when closing Thread
+        threadViewModel.threadUid.observe(viewLifecycleOwner) { threadUid ->
+            if (threadUid == null) threadListAdapter.apply {
+                val position = clickedThreadPosition
+                clickedThreadPosition = null
+                clickedThreadUid = null
+                position?.let { notifyItemChanged(it, NotificationType.SELECTED_STATE) }
             }
+        }
+
+        if (isTablet()) {
 
             getBackNavigationResult(DownloadAttachmentProgressDialog.OPEN_WITH, ::startActivity)
 
