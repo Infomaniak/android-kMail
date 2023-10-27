@@ -107,6 +107,7 @@ class AiPropositionFragment : Fragment() {
         setToolbar()
 
         loadingPlaceholder.text = aiViewModel.aiPrompt
+        if (!aiViewModel.isHistoryEmpty()) propositionTextView.text = aiViewModel.getLastMessage()
 
         insertPropositionButton.setOnClickListener {
             val doNotAskAgain = localSettings.aiReplacementDialogVisibility == AiReplacementDialogVisibility.HIDE
