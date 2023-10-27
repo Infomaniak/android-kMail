@@ -224,14 +224,14 @@
     <string name="emptyStateHistoryDescription">Search by contact or keywords</string>
     <string name="emptyStateInboxDescription">Write a new email by clicking on \"New message\" in the bottom-right corner.</string>
     <string name="emptyStateInboxTitle">You don’t have any emails</string>
-    <string name="emptyStateNetworkDescription">Please check your connection or connect to the Internet to check your e-mails.</string>
+    <string name="emptyStateNetworkDescription">Please check your connection or connect to the Internet to check your emails.</string>
     <string name="emptyStateNetworkTitle">You are not connected to the Internet</string>
-    <string name="emptyStateSearchDescription">We did not find any e-mails matching your search.</string>
+    <string name="emptyStateSearchDescription">We did not find any emails matching your search.</string>
     <string name="emptyStateSearchTitle">No results</string>
     <string name="emptyStateTrashDescription">Move the messages to the trash. They will be permanently deleted after 30 days.</string>
     <string name="emptyStateTrashTitle">Trash is empty</string>
     <string name="enterPasswordDescription1">Your password has been changed. If you are not the cause, please contact your administrator.</string>
-    <string name="enterPasswordDescription2">Please enter the new password for the e-mail address %s</string>
+    <string name="enterPasswordDescription2">Please enter the new password for the email address %s</string>
     <string name="enterPasswordOrDescription">or</string>
     <string name="enterPasswordTitle">Enter password</string>
     <string name="errorAlreadyLinkedMailbox">This email address is already linked to your account</string>
