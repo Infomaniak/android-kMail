@@ -189,7 +189,7 @@ class MainActivity : BaseActivity() {
         initAppUpdateManager()
 
         // TODO: Instead of doing that, save the state and restore it when rotating.
-        if (isTwoPanelLayout() && navController.currentDestination?.id == R.id.threadFragment) navController.popBackStack()
+        if (isTwoPaneLayout() && navController.currentDestination?.id == R.id.threadFragment) navController.popBackStack()
     }
 
     private fun observeNetworkStatus() {
@@ -416,7 +416,7 @@ class MainActivity : BaseActivity() {
         SentryDebug.addNavigationBreadcrumb(destination.displayName, arguments)
         trackDestination(destination)
 
-        if (isTwoPanelLayout()) {
+        if (isTwoPaneLayout()) {
             binding.threadHostFragment?.isVisible = when (destination.id) {
                 R.id.threadListFragment,
                 R.id.searchFragment,

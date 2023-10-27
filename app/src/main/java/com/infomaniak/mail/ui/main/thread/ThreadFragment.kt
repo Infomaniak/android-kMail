@@ -130,7 +130,7 @@ class ThreadFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // Avoid crashing the app when rotating.
-        if (!isTwoPanelLayout()) {
+        if (!isTwoPaneLayout()) {
             runCatching { navigationArgs.threadUid }.onFailure { if (it is IllegalStateException) return }
         }
 
@@ -149,7 +149,7 @@ class ThreadFragment : Fragment() {
         observeFailedMessages()
         observeContacts()
         observeQuickActionBarClicks()
-        if (!isTwoPanelLayout()) observeOpenAttachment()
+        if (!isTwoPaneLayout()) observeOpenAttachment()
         observeSubjectUpdateTriggers()
 
         observeThreadOpening()
@@ -168,7 +168,7 @@ class ThreadFragment : Fragment() {
 
         threadViewModel.threadUid.observe(viewLifecycleOwner, ::handleThreadUid)
 
-        if (isTwoPanelLayout()) {
+        if (isTwoPaneLayout()) {
             observeFolderChange()
         } else {
             threadViewModel.threadUid.value = navigationArgs.threadUid
@@ -200,7 +200,7 @@ class ThreadFragment : Fragment() {
             threadViewModel.closeThread()
             displayEmptyView()
         } else {
-            if (isTwoPanelLayout()) displayThreadView()
+            if (isTwoPaneLayout()) displayThreadView()
             openThread(threadUid)
         }
     }
@@ -248,7 +248,7 @@ class ThreadFragment : Fragment() {
     private fun setupUi() = with(binding) {
 
         // TODO: Use a different layout in normal mode & table mode instead of doing that.
-        if (isTwoPanelLayout()) {
+        if (isTwoPaneLayout()) {
             toolbar.navigationIcon?.alpha = 0
         } else {
             toolbar.setNavigationOnClickListener { leaveThread() }
@@ -330,7 +330,7 @@ class ThreadFragment : Fragment() {
                 }
                 R.id.quickActionMenu -> {
                     val shouldLoadDistantResources = shouldLoadDistantResources(lastMessageToReplyTo.uid)
-                    if (isTwoPanelLayout()) {
+                    if (isTwoPaneLayout()) {
                         mainViewModel.threadActionsBottomSheetArgs.value = Triple(
                             threadUid,
                             lastMessageToReplyTo.uid,
@@ -365,7 +365,7 @@ class ThreadFragment : Fragment() {
         binding.messagesList.adapter = ThreadAdapter(
             shouldLoadDistantResources = shouldLoadDistantResources(),
             onContactClicked = { contact ->
-                if (isTwoPanelLayout()) {
+                if (isTwoPaneLayout()) {
                     mainViewModel.detailedContactArgs.value = contact
                 } else {
                     safeNavigate(ThreadFragmentDirections.actionThreadFragmentToDetailedContactBottomSheetDialog(contact))
@@ -457,7 +457,7 @@ class ThreadFragment : Fragment() {
         val isThemeTheSame = threadAdapter.isThemeTheSameMap[uid] ?: return
         val shouldLoadDistantResources = shouldLoadDistantResources(uid)
 
-        if (isTwoPanelLayout()) {
+        if (isTwoPaneLayout()) {
             mainViewModel.messageActionsBottomSheetArgs.value = MessageActionsArgs(
                 messageUid = uid,
                 threadUid = threadUid,
@@ -492,7 +492,7 @@ class ThreadFragment : Fragment() {
             startActivity(openWithIntent(requireContext()))
         } else {
             val fileType = getFileTypeFromMimeType()
-            if (isTwoPanelLayout()) {
+            if (isTwoPaneLayout()) {
                 mainViewModel.downloadAttachmentsArgs.value = Triple(resource!!, name, fileType)
             } else {
                 safeNavigate(
@@ -518,7 +518,7 @@ class ThreadFragment : Fragment() {
                 arrivedFromExistingDraft = false,
             )
         } else {
-            if (isTwoPanelLayout()) {
+            if (isTwoPaneLayout()) {
                 mainViewModel.replyBottomSheetArgs.value = message.uid to shouldLoadDistantResources
             } else {
                 safeNavigate(
@@ -679,7 +679,7 @@ class ThreadFragment : Fragment() {
     }
 
     private fun leaveThread() {
-        if (isTwoPanelLayout()) {
+        if (isTwoPaneLayout()) {
             threadViewModel.threadUid.value = null
         } else {
             // TODO: Realm broadcasts twice when the Thread is deleted.
@@ -713,7 +713,7 @@ class ThreadFragment : Fragment() {
             mailToUri = mailToUri,
         )
 
-        if (isTwoPanelLayout()) {
+        if (isTwoPaneLayout()) {
             mainViewModel.newMessageArgs.value = args
         } else {
             safeNavigateToNewMessageActivity(args = args.toBundle())

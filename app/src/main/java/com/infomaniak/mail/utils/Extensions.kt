@@ -153,9 +153,11 @@ fun Date.isLastWeek(): Boolean {
 //region UI
 fun Context.isInPortrait(): Boolean = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
 
-fun Fragment.isTwoPanelLayout(): Boolean = requireContext().isTwoPanelLayout()
+fun Fragment.isTablet(): Boolean = requireContext().isTablet()
+fun Context.isTablet(): Boolean = resources.getBoolean(R.bool.isTablet)
 
-fun Context.isTwoPanelLayout(): Boolean = resources.getBoolean(R.bool.isTabletLandscape)
+fun Fragment.isTwoPaneLayout(): Boolean = requireContext().isTwoPaneLayout()
+fun Context.isTwoPaneLayout(): Boolean = resources.getBoolean(R.bool.isTabletLandscape)
 
 fun View.toggleChevron(
     isCollapsed: Boolean,
@@ -295,7 +297,7 @@ fun Fragment.navigateToThread(
                 )
             }
         }
-        isTwoPanelLayout() -> {
+        isTwoPaneLayout() -> {
             (requireActivity() as MainActivity).openThread(thread.uid)
         }
         else -> {
