@@ -424,7 +424,11 @@ class MainActivity : BaseActivity() {
         trackDestination(destination)
 
         if (isTablet()) {
-            binding.threadHostFragment?.isVisible = shouldDisplayThreadContainer(destination.id)
+            binding.threadHostFragment?.isVisible = if (isTabletInLandscape()) {
+                shouldDisplayThreadContainer(destination.id)
+            } else {
+                false
+            }
         }
 
         updateColorsWhenDestinationChanged(destination.id)
@@ -549,13 +553,20 @@ class MainActivity : BaseActivity() {
     }
 
     fun updateThreadLayout() = with(binding) {
+
         val shouldDisplayThreadContainer = shouldDisplayThreadContainer(navController.currentDestination?.id)
-        threadHostFragment?.isVisible = if (isTabletInLandscape()) shouldDisplayThreadContainer else threadViewModel.isInThread
-        mainHostFragment.isVisible = isTabletInLandscape() || !threadViewModel.isInThread
+
+        threadHostFragment?.isVisible = if (isTabletInLandscape()) {
+            shouldDisplayThreadContainer
+        } else {
+            shouldDisplayThreadContainer && threadViewModel.isInThread
+        }
+
+        mainHostFragment.isVisible = isTabletInLandscape() || !(shouldDisplayThreadContainer && threadViewModel.isInThread)
     }
 
     private fun shouldDisplayThreadContainer(destinationId: Int?): Boolean {
-        return if (isTabletInPortrait() || destinationId == null) {
+        return if (destinationId == null) {
             false
         } else {
             when (destinationId) {
