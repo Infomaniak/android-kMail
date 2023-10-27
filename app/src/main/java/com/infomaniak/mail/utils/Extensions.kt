@@ -297,8 +297,11 @@ fun Fragment.navigateToThread(
                 )
             }
         }
-        isTwoPaneLayout() -> {
-            (requireActivity() as MainActivity).openThread(thread.uid)
+        isTablet() -> {
+            with(requireActivity() as MainActivity) {
+                openThread(thread.uid)
+                if (!isTwoPaneLayout()) updateThreadLayout()
+            }
         }
         else -> {
             safeNavigate(R.id.threadFragment, ThreadFragmentArgs(thread.uid).toBundle())

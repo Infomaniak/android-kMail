@@ -59,6 +59,7 @@ import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadBinding
+import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.*
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.OpenThreadResult
@@ -115,24 +116,29 @@ class ThreadFragment : Fragment() {
     private var isFirstTimeLeaving = AtomicBoolean(true)
 
     override fun onConfigurationChanged(newConfig: Configuration) {
-        threadAdapter.reRenderMails()
+
+        // Don't replace with `threadAdapter` variable, the cast will fail.
+        (binding.messagesList.adapter as ThreadAdapter?)?.reRenderMails()
+
+        binding.updateToolbarUI()
+
         super.onConfigurationChanged(newConfig)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentThreadBinding.inflate(inflater, container, false).also {
             _binding = it
-            requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundColor)
+
+            // Update `statusBarColor` only when ThreadFragment is in fullscreen.
+            if (!isTablet() || (!isTwoPaneLayout() && threadViewModel.isInThread)) {
+                requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundColor)
+            }
+
         }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        // Avoid crashing the app when rotating.
-        if (!isTwoPaneLayout()) {
-            runCatching { navigationArgs.threadUid }.onFailure { if (it is IllegalStateException) return }
-        }
 
         initAdapter()
         observeThreadLive()
@@ -149,7 +155,7 @@ class ThreadFragment : Fragment() {
         observeFailedMessages()
         observeContacts()
         observeQuickActionBarClicks()
-        if (!isTwoPaneLayout()) observeOpenAttachment()
+        if (!isTablet()) observeOpenAttachment()
         observeSubjectUpdateTriggers()
 
         observeThreadOpening()
@@ -168,7 +174,7 @@ class ThreadFragment : Fragment() {
 
         threadViewModel.threadUid.observe(viewLifecycleOwner, ::handleThreadUid)
 
-        if (isTwoPaneLayout()) {
+        if (isTablet()) {
             observeFolderChange()
         } else {
             threadViewModel.threadUid.value = navigationArgs.threadUid
@@ -190,17 +196,22 @@ class ThreadFragment : Fragment() {
         mainViewModel.currentFolder.observeNotNull(viewLifecycleOwner, ::reactToFolderChange)
     }
 
-    private fun reactToFolderChange(folder: Folder) {
+    private fun reactToFolderChange(folder: Folder) = with(threadViewModel) {
+
         binding.emptyViewFolderName.text = getString(R.string.noConversationSelected, folder.getLocalizedName(requireContext()))
-        threadViewModel.threadUid.value = null
+
+        if (folder.id != previousFolderId) {
+            previousFolderId = folder.id
+            threadUid.value = null
+        }
     }
 
     private fun handleThreadUid(threadUid: String?) {
         if (threadUid == null) {
-            threadViewModel.closeThread()
+            if (isTablet()) threadViewModel.closeThread()
             displayEmptyView()
         } else {
-            if (isTwoPaneLayout()) displayThreadView()
+            displayThreadView()
             openThread(threadUid)
         }
     }
@@ -245,14 +256,20 @@ class ThreadFragment : Fragment() {
         }
     }
 
-    private fun setupUi() = with(binding) {
-
-        // TODO: Use a different layout in normal mode & table mode instead of doing that.
+    // TODO: We probably want a real layout instead of this workaround.
+    private fun FragmentThreadBinding.updateToolbarUI() {
         if (isTwoPaneLayout()) {
             toolbar.navigationIcon?.alpha = 0
+            toolbar.setNavigationOnClickListener {}
         } else {
+            toolbar.navigationIcon?.alpha = 255
             toolbar.setNavigationOnClickListener { leaveThread() }
         }
+    }
+
+    private fun setupUi() = with(binding) {
+
+        updateToolbarUI()
 
         val defaultTextColor = context.getColor(R.color.primaryTextColor)
         appBar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
@@ -269,8 +286,10 @@ class ThreadFragment : Fragment() {
             toolbarSubject.setTextColor(textColor)
         }
 
-        changeToolbarColorOnScroll(toolbar, messagesListNestedScrollView) { color ->
-            appBar.backgroundTintList = ColorStateList.valueOf(color)
+        if (!isTablet()) {
+            changeToolbarColorOnScroll(toolbar, messagesListNestedScrollView) { color ->
+                appBar.backgroundTintList = ColorStateList.valueOf(color)
+            }
         }
     }
 
@@ -330,7 +349,7 @@ class ThreadFragment : Fragment() {
                 }
                 R.id.quickActionMenu -> {
                     val shouldLoadDistantResources = shouldLoadDistantResources(lastMessageToReplyTo.uid)
-                    if (isTwoPaneLayout()) {
+                    if (isTablet()) {
                         mainViewModel.threadActionsBottomSheetArgs.value = Triple(
                             threadUid,
                             lastMessageToReplyTo.uid,
@@ -365,7 +384,7 @@ class ThreadFragment : Fragment() {
         binding.messagesList.adapter = ThreadAdapter(
             shouldLoadDistantResources = shouldLoadDistantResources(),
             onContactClicked = { contact ->
-                if (isTwoPaneLayout()) {
+                if (isTablet()) {
                     mainViewModel.detailedContactArgs.value = contact
                 } else {
                     safeNavigate(ThreadFragmentDirections.actionThreadFragmentToDetailedContactBottomSheetDialog(contact))
@@ -457,7 +476,7 @@ class ThreadFragment : Fragment() {
         val isThemeTheSame = threadAdapter.isThemeTheSameMap[uid] ?: return
         val shouldLoadDistantResources = shouldLoadDistantResources(uid)
 
-        if (isTwoPaneLayout()) {
+        if (isTablet()) {
             mainViewModel.messageActionsBottomSheetArgs.value = MessageActionsArgs(
                 messageUid = uid,
                 threadUid = threadUid,
@@ -492,7 +511,7 @@ class ThreadFragment : Fragment() {
             startActivity(openWithIntent(requireContext()))
         } else {
             val fileType = getFileTypeFromMimeType()
-            if (isTwoPaneLayout()) {
+            if (isTablet()) {
                 mainViewModel.downloadAttachmentsArgs.value = Triple(resource!!, name, fileType)
             } else {
                 safeNavigate(
@@ -518,7 +537,7 @@ class ThreadFragment : Fragment() {
                 arrivedFromExistingDraft = false,
             )
         } else {
-            if (isTwoPaneLayout()) {
+            if (isTablet()) {
                 mainViewModel.replyBottomSheetArgs.value = message.uid to shouldLoadDistantResources
             } else {
                 safeNavigate(
@@ -679,8 +698,11 @@ class ThreadFragment : Fragment() {
     }
 
     private fun leaveThread() {
-        if (isTwoPaneLayout()) {
-            threadViewModel.threadUid.value = null
+
+        threadViewModel.threadUid.value = null
+
+        if (isTablet()) {
+            if (!isTwoPaneLayout()) (requireActivity() as MainActivity).updateThreadLayout()
         } else {
             // TODO: Realm broadcasts twice when the Thread is deleted.
             //  We don't know why.
@@ -713,7 +735,7 @@ class ThreadFragment : Fragment() {
             mailToUri = mailToUri,
         )
 
-        if (isTwoPaneLayout()) {
+        if (isTablet()) {
             mainViewModel.newMessageArgs.value = args
         } else {
             safeNavigateToNewMessageActivity(args = args.toBundle())
