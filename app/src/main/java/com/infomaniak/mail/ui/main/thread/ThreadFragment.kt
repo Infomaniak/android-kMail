@@ -120,7 +120,7 @@ class ThreadFragment : Fragment() {
         // Don't replace with `threadAdapter` variable, the cast will fail.
         (binding.messagesList.adapter as ThreadAdapter?)?.reRenderMails()
 
-        binding.updateToolbarUI()
+        binding.updateToolbarUi()
 
         super.onConfigurationChanged(newConfig)
     }
@@ -259,7 +259,7 @@ class ThreadFragment : Fragment() {
     }
 
     // TODO: We probably want a real layout instead of this workaround.
-    private fun FragmentThreadBinding.updateToolbarUI() {
+    private fun FragmentThreadBinding.updateToolbarUi() {
         if (isTabletInLandscape()) {
             toolbar.navigationIcon?.alpha = 0
             toolbar.setNavigationOnClickListener {}
@@ -271,7 +271,7 @@ class ThreadFragment : Fragment() {
 
     private fun setupUi() = with(binding) {
 
-        updateToolbarUI()
+        updateToolbarUi()
 
         val defaultTextColor = context.getColor(R.color.primaryTextColor)
         appBar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
