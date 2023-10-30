@@ -22,6 +22,7 @@ import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.auth.CredentialManager
 import com.infomaniak.lib.core.auth.TokenAuthenticator
 import com.infomaniak.lib.core.models.ApiResponse
+import com.infomaniak.lib.core.models.ApiResponseStatus
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.room.UserDatabase
@@ -116,7 +117,7 @@ object AccountUtils : CredentialManager() {
 
     suspend fun updateCurrentUser(okHttpClient: OkHttpClient = HttpClient.okHttpClient) {
         with(ApiRepository.getUserProfile(okHttpClient)) {
-            if (result != ApiResponse.Status.ERROR) requestUser(remoteUser = data ?: return)
+            if (result != ApiResponseStatus.ERROR) requestUser(remoteUser = data ?: return)
         }
     }
 

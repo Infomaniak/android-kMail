@@ -26,6 +26,7 @@ import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.models.ApiResponse
+import com.infomaniak.lib.core.models.ApiResponseStatus
 import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.utils.Utils.lockOrientationForSmallScreens
 import com.infomaniak.lib.login.ApiToken
@@ -89,7 +90,7 @@ class LoginActivity : AppCompatActivity() {
             InfomaniakCore.bearerToken = apiToken.accessToken
             val userProfileResponse = ApiRepository.getUserProfile(HttpClient.okHttpClientNoTokenInterceptor)
 
-            if (userProfileResponse.result == ApiResponse.Status.ERROR) return userProfileResponse
+            if (userProfileResponse.result == ApiResponseStatus.ERROR) return userProfileResponse
             if (userProfileResponse.data == null) return getErrorResponse(RCore.string.anErrorHasOccurred)
 
             val user = userProfileResponse.data!!.apply {
@@ -116,7 +117,7 @@ class LoginActivity : AppCompatActivity() {
         }
 
         private fun getErrorResponse(@StringRes text: Int): ApiResponse<Any> {
-            return ApiResponse(result = ApiResponse.Status.ERROR, translatedError = text)
+            return ApiResponse(result = ApiResponseStatus.ERROR, translatedError = text)
         }
     }
 }

@@ -2,7 +2,7 @@
 androidGradlePlugin = "8.1.2"
 dotsindicator = "5.0"
 dragdropswipeRecyclerview = "1.2.0"
-firebaseMessagingKtx = "23.2.1"
+firebaseMessagingKtx = "23.3.0"
 flexbox = "3.0.0"
 googleServices = "4.3.15"
 hiltAndroid = "2.48.1"

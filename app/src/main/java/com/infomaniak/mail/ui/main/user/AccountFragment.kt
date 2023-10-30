@@ -41,6 +41,8 @@ import com.infomaniak.mail.ui.main.MailboxListFragment
 import com.infomaniak.mail.ui.main.menu.MailboxesAdapter
 import com.infomaniak.mail.utils.*
 import dagger.hilt.android.AndroidEntryPoint
+import io.sentry.Sentry
+import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import java.util.Calendar
@@ -113,6 +115,10 @@ class AccountFragment : Fragment(), MailboxListFragment {
         val day = calendar.get(Calendar.DAY_OF_MONTH)
         if ((month == Calendar.OCTOBER && day >= 25) || (month == Calendar.NOVEMBER && day <= 3)) {
             binding.easterEggHalloween.isVisible = true
+            Sentry.withScope { scope ->
+                scope.level = SentryLevel.INFO
+                Sentry.captureMessage("Easter egg Halloween has been triggered! Woohoo!")
+            }
         }
     }
 
