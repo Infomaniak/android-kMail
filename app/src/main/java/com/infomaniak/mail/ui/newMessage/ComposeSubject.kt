@@ -32,7 +32,7 @@ import com.google.android.material.textfield.TextInputEditText
 class ComposeSubject @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = R.attr.editTextStyle
+    defStyleAttr: Int = R.attr.editTextStyle,
 ) : TextInputEditText(context, attrs, defStyleAttr) {
     override fun onCreateInputConnection(outAttrs: EditorInfo): InputConnection? {
         val connection = super.onCreateInputConnection(outAttrs)
