@@ -364,7 +364,11 @@ class MainActivity : BaseActivity() {
                 mainViewModel.isMultiSelectOn -> closeMultiSelect()
                 isTabletInPortrait() && threadViewModel.isInThread -> {
                     threadViewModel.threadUid.value = null
-                    updateThreadLayout()
+                    if (navController.currentDestination?.id == R.id.threadListFragment) {
+                        updateThreadLayout()
+                    } else {
+                        popBack()
+                    }
                 }
                 else -> popBack()
             }
