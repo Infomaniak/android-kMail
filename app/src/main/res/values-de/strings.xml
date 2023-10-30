@@ -54,10 +54,9 @@
     <string name="aiButtonRetry">Wiederholen</string>
     <string name="aiDiscoveryDescription">Vereinfachen Sie das Schreiben von Nachrichten mit künstlicher Intelligenz.</string>
     <string name="aiDiscoveryTitle">Schreiben Sie Ihre E-Mails mit KI</string>
-    <string name="aiEngineChangeChoice">Sie können Ihre Wahl in den Einstellungen der Anwendung ändern.</string>
     <string name="aiEngineChatGpt">ChatGPT</string>
     <string name="aiEngineFalcon">Souveräne KI</string>
-    <string name="aiEngineWarning">Ihre Daten werden von der US-amerikanischen Firma OpenAI verarbeitet. Wir raten Ihnen, sie nicht für sensible Nachrichten zu verwenden.</string>
+    <string name="aiEngineWarning">Wenn Sie ChatGPT benutzen, werden Ihre Daten von der US-amerikanischen Firma OpenAI verarbeitet. Wir raten Ihnen, sie nicht für sensible Nachrichten zu verwenden.</string>
     <string name="aiErrorMaxTokenReached">Ihre Anfrage ist zu lang, bitte kürzen Sie sie.</string>
     <string name="aiErrorTooManyRequests">In kurzer Zeit wurden zu viele Anfragen gestellt. Bitte haben Sie etwas Geduld.</string>
     <string name="aiErrorUnknown">Es ist ein Fehler aufgetreten. Wenn dieser Fehler weiterhin besteht, wenden Sie sich bitte an unseren Support.\nVielen Dank für Ihre Geduld.</string>

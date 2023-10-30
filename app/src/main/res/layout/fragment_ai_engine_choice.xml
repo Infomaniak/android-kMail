@@ -42,10 +42,4 @@
         layout="@layout/layout_ai_engine_choice"
         android:theme="@style/AiCursorAndPrimaryColorTheme" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/mediumButtonHorizontalMargin"
-        android:text="@string/aiEngineChangeChoice" />
-
 </LinearLayout>
