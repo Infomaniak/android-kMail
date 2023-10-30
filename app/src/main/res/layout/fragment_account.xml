@@ -126,13 +126,13 @@
                 <com.airbnb.lottie.LottieAnimationView
                     android:id="@+id/easterEggHalloween"
                     android:layout_width="wrap_content"
-                    android:visibility="gone"
                     android:layout_height="wrap_content"
                     android:importantForAccessibility="no"
-                    app:lottie_autoPlay="true"
+                    android:visibility="gone"
                     app:layout_constraintLeft_toLeftOf="@id/avatar"
                     app:layout_constraintRight_toRightOf="@id/avatar"
                     app:layout_constraintTop_toBottomOf="@id/avatar"
+                    app:lottie_autoPlay="true"
                     app:lottie_rawRes="@raw/easter_egg_halloween" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>

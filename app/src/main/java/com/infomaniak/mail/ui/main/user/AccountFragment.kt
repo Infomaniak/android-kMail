@@ -104,15 +104,15 @@ class AccountFragment : Fragment(), MailboxListFragment {
             mail.text = user.email
         }
 
-        easterEggHalloween()
+        showEasterEggHalloween()
     }
 
-    private fun FragmentAccountBinding.easterEggHalloween() {
+    private fun showEasterEggHalloween() {
         val calendar = Calendar.getInstance()
-        if ((calendar.get(Calendar.MONTH) == Calendar.OCTOBER && calendar.get(Calendar.DAY_OF_MONTH) >= 25
-                    || (calendar.get(Calendar.MONTH) == Calendar.NOVEMBER && calendar.get(Calendar.DAY_OF_MONTH) <= 3))
-        ) {
-            easterEggHalloween.isVisible = true
+        val month = calendar.get(Calendar.MONTH)
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+        if ((month == Calendar.OCTOBER && day >= 25) || (month == Calendar.NOVEMBER && day <= 3)) {
+            binding.easterEggHalloween.isVisible = true
         }
     }
 
