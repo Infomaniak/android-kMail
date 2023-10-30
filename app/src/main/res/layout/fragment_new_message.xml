@@ -213,7 +213,7 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="@id/subjectTextFieldGuide" />
 
-                    <com.google.android.material.textfield.TextInputEditText
+                    <com.infomaniak.mail.ui.newMessage.ComposeSubject
                         android:id="@+id/subjectTextField"
                         style="@style/EmailAddressTextView"
                         android:layout_width="0dp"
@@ -221,7 +221,7 @@
                         android:layout_marginStart="@dimen/marginStandardVerySmall"
                         android:layout_marginTop="@dimen/marginStandardVerySmall"
                         android:imeOptions="actionNext"
-                        android:inputType="textMultiLine|textEmailSubject|textCapSentences"
+                        android:inputType="textEmailSubject|textAutoCorrect|textCapSentences|textImeMultiLine|textMultiLine"
                         android:maxLines="@null"
                         android:visibility="gone"
                         app:layout_constraintEnd_toEndOf="@id/divider5"

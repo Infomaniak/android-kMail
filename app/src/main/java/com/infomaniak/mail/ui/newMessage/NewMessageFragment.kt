@@ -248,17 +248,12 @@ class NewMessageFragment : Fragment() {
 
         setupAutoCompletionFields()
 
-        subjectTextField.apply {
-            // Enables having imeOptions="actionNext" and inputType="textMultiLine" at the same time
-            setRawInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES)
-
-            filters = arrayOf<InputFilter>(object : InputFilter {
-                override fun filter(source: CharSequence?, s: Int, e: Int, d: Spanned?, dS: Int, dE: Int): CharSequence? {
-                    source?.toString()?.let { if (it.contains("\n")) return it.replace("\n", "") }
-                    return null
-                }
-            })
-        }
+        subjectTextField.filters = arrayOf<InputFilter>(object : InputFilter {
+            override fun filter(source: CharSequence?, s: Int, e: Int, d: Spanned?, dS: Int, dE: Int): CharSequence? {
+                source?.toString()?.let { if (it.contains("\n")) return it.replace("\n", "") }
+                return null
+            }
+        })
 
         setupSendButton()
         setupExternalBanner()
