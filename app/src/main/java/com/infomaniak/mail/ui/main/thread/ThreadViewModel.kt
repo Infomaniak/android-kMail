@@ -80,7 +80,7 @@ class ThreadViewModel @Inject constructor(
     private val splitBodies = mutableMapOf<String, SplitBody>()
 
     private var messagesLiveJob: Job? = null
-    val messagesLive = MutableLiveData<List<Message>>()
+    val messagesLive = MutableLiveData<List<Message>?>()
 
     private val currentMailboxLive = mailboxController.getMailboxAsync(
         AccountUtils.currentUserId,
@@ -109,6 +109,8 @@ class ThreadViewModel @Inject constructor(
                     }
                 }
             }
+
+            splitBodies.clear()
 
             messageController.getSortedAndNotDeletedMessagesAsync(threadUid)
                 ?.map { results -> results.list.map { splitBody(it) } }
@@ -141,8 +143,11 @@ class ThreadViewModel @Inject constructor(
     }
 
     fun closeThread() {
-        deletedMessagesUids.clear()
-        splitBodies.clear()
+        threadUid.value = null
+    }
+
+    fun clearThreadData() {
+        messagesLive.value = null
     }
 
     private fun sendMatomoAndSentryAboutThreadMessagesCount(thread: Thread) {
@@ -190,7 +195,11 @@ class ThreadViewModel @Inject constructor(
                 //  leading to an infinite shimmering effect that we cannot escape from.
                 delay(100L)
 
-                deletedMessagesUids.addAll(deleted)
+                deletedMessagesUids.apply {
+                    clear()
+                    addAll(deleted)
+                }
+
                 failedMessagesUids.postValue(failed)
             }
         }
