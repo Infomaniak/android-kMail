@@ -415,24 +415,15 @@ fun Window.updateNavigationBarColor(color: Int) {
     if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O) navigationBarColor = color
 }
 
-fun Fragment.copyRecipientEmailToClipboard(recipient: Recipient, snackBarAnchor: View? = null) {
-    requireContext().copyStringToClipBoardBase(recipient.email) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-            showSnackbar(R.string.snackbarEmailCopiedToClipboard, anchor = snackBarAnchor)
-        }
-    }
+fun Fragment.copyRecipientEmailToClipboard(recipient: Recipient, snackBarManager: SnackBarManager) {
+    copyStringToClipboard(recipient.email, R.string.snackbarEmailCopiedToClipboard, snackBarManager)
 }
 
 fun Fragment.copyStringToClipboard(subject: String, @StringRes snackBarTitle: Int, snackBarManager: SnackBarManager) {
-    requireContext().copyStringToClipBoardBase(subject) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) snackBarManager.setValue(getString(snackBarTitle))
-    }
-}
+    val clipboardManager = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    clipboardManager.setPrimaryClip(ClipData.newPlainText(subject, subject))
 
-private fun Context.copyStringToClipBoardBase(value: String, onCopied: (() -> Unit)? = null) {
-    val clipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-    clipboardManager.setPrimaryClip(ClipData.newPlainText(value, value))
-    onCopied?.invoke()
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) snackBarManager.setValue(getString(snackBarTitle))
 }
 
 inline infix fun <reified E : Enum<E>, V> ((E) -> V).enumValueFrom(value: V): E? {

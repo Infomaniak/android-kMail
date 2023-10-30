@@ -87,6 +87,7 @@
     </androidx.core.widget.NestedScrollView>
 
     <com.google.android.material.card.MaterialCardView
+        android:id="@+id/aiPropositionBottomBar"
         style="@style/CardViewMail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
