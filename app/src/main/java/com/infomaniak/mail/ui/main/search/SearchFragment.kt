@@ -53,8 +53,10 @@ import com.infomaniak.mail.databinding.FragmentSearchBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
 import com.infomaniak.mail.ui.main.search.SearchFolderAdapter.SearchFolderElement
+import com.infomaniak.mail.ui.main.thread.ThreadViewModel
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
+import com.infomaniak.mail.utils.Utils.observeInTabletMode
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -63,6 +65,7 @@ class SearchFragment : Fragment() {
 
     private var binding: FragmentSearchBinding by safeBinding()
     private val mainViewModel: MainViewModel by activityViewModels()
+    private val threadViewModel: ThreadViewModel by activityViewModels()
     private val searchViewModel: SearchViewModel by viewModels()
 
     @Inject
@@ -116,6 +119,7 @@ class SearchFragment : Fragment() {
         observeVisibilityModeUpdates()
         observeSearchResults()
         observeHistory()
+        observeInTabletMode(mainViewModel, threadViewModel, threadListAdapter)
     }
 
     override fun onStop() {
