@@ -450,6 +450,7 @@
         <item quantity="one">Remitente incluido en la lista negra</item>
         <item quantity="other">Remitentes incluidos con éxito en la lista negra</item>
     </plurals>
+    <string name="snackbarSubjectCopiedToClipboard">Tema copiado en el portapapeles</string>
     <plurals name="snackbarThreadDeletedPermanently">
         <item quantity="one">Conversación eliminada</item>
         <item quantity="other">Conversaciones eliminadas</item>

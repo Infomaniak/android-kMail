@@ -456,6 +456,7 @@
         <item quantity="one">Sender successfully blacklisted</item>
         <item quantity="other">Senders successfully blacklisted</item>
     </plurals>
+    <string name="snackbarSubjectCopiedToClipboard">Subject copied to the clipboard</string>
     <plurals name="snackbarThreadDeletedPermanently">
         <item quantity="one">Conversation deleted</item>
         <item quantity="other">Conversations deleted</item>

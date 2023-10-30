@@ -482,6 +482,15 @@ class ThreadFragment : Fragment() {
         val (subject, spannedSubject) = computeSubject(thread, emailDictionary, aliases, externalMailFlagEnabled)
         threadSubject.text = spannedSubject
         toolbarSubject.text = subject
+
+        threadSubject.setOnLongClickListener {
+            copyStringToClipboard(subject, R.string.snackbarSubjectCopiedToClipboard, mainViewModel.snackBarManager)
+            true
+        }
+        toolbarSubject.setOnLongClickListener {
+            copyStringToClipboard(subject, R.string.snackbarSubjectCopiedToClipboard, mainViewModel.snackBarManager)
+            true
+        }
     }
 
     private fun computeSubject(
