@@ -54,10 +54,9 @@
     <string name="aiButtonRetry">Riprova</string>
     <string name="aiDiscoveryDescription">Semplifica la scrittura dei messaggi con l’intelligenza artificiale.</string>
     <string name="aiDiscoveryTitle">Scrivi le vostre e-mail utilizzando l’IA</string>
-    <string name="aiEngineChangeChoice">È possibile modificare la scelta nelle impostazioni dell’applicazione.</string>
     <string name="aiEngineChatGpt">ChatGPT</string>
     <string name="aiEngineFalcon">AI sovrana</string>
-    <string name="aiEngineWarning">I vostri dati saranno trattati dalla società americana OpenAI. Vi consigliamo di non utilizzarli per messaggi sensibili.</string>
+    <string name="aiEngineWarning">Utilizzando ChatGPT, i vostri dati saranno trattati dalla società americana OpenAI. Vi consigliamo di non utilizzarli per messaggi sensibili.</string>
     <string name="aiErrorMaxTokenReached">La tua richiesta è troppo lunga, ti prego di accorciarla.</string>
     <string name="aiErrorTooManyRequests">Sono state presentate troppe richieste in un breve lasso di tempo. Attendere prego.</string>
     <string name="aiErrorUnknown">Si è verificato un errore. Se l’errore persiste, si prega di contattare il nostro helpdesk.\nGrazie per la pazienza.</string>

@@ -60,10 +60,9 @@
     <string name="aiButtonRetry">Retry</string>
     <string name="aiDiscoveryDescription">Simplify your message writing with Artificial Intelligence.</string>
     <string name="aiDiscoveryTitle">Write your emails using AI</string>
-    <string name="aiEngineChangeChoice">You can change your choice in the application settings.</string>
     <string name="aiEngineChatGpt">ChatGPT</string>
     <string name="aiEngineFalcon">Sovereign AI</string>
-    <string name="aiEngineWarning">Your data will be processed by the American company OpenAI. We advise you not to use it for sensitive messages.</string>
+    <string name="aiEngineWarning">By using ChatGPT, your data will be processed by the American company OpenAI. We advise you not to use it for sensitive messages.</string>
     <string name="aiErrorMaxTokenReached">Your request is too long, please shorten it.</string>
     <string name="aiErrorTooManyRequests">Too many requests in a short time. Please wait.</string>
     <string name="aiErrorUnknown">An error has occurred. If this error persists, please contact our helpdesk.\nThank you for your patience.</string>
