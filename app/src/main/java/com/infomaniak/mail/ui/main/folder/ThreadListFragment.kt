@@ -69,14 +69,13 @@ import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
-import com.infomaniak.mail.ui.main.folder.ThreadListAdapter.NotificationType
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel
-import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialog
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
 import com.infomaniak.mail.utils.UiUtils.formatUnreadCount
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
+import com.infomaniak.mail.utils.Utils.observeInTabletMode
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
@@ -166,7 +165,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         observerDraftsActionsCompletedWorks()
         observeFlushFolderTrigger()
         observeUpdateInstall()
-        observeInTabletMode()
+        observeInTabletMode(mainViewModel, threadViewModel, threadListAdapter)
     }.getOrDefault(Unit)
 
     private fun navigateFromNotificationToNewMessage() {
@@ -701,74 +700,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun showRefreshLayout() {
         binding.swipeRefreshLayout.isRefreshing = true
-    }
-
-    // TODO: This won't work if the Thread is opened from another fragment, for example from the Search.
-    private fun observeInTabletMode() = with(mainViewModel) {
-
-        // Reset selected Thread UI when closing Thread
-        threadViewModel.threadUid.observe(viewLifecycleOwner) { threadUid ->
-            if (threadUid == null) threadListAdapter.apply {
-                val position = clickedThreadPosition
-                clickedThreadPosition = null
-                clickedThreadUid = null
-                position?.let { notifyItemChanged(it, NotificationType.SELECTED_STATE) }
-            }
-        }
-
-        if (isTablet()) {
-
-            getBackNavigationResult(DownloadAttachmentProgressDialog.OPEN_WITH, ::startActivity)
-
-            downloadAttachmentsArgs.observe(viewLifecycleOwner) { (resource, name, fileType) ->
-                safeNavigate(
-                    ThreadListFragmentDirections.actionThreadListFragmentToDownloadAttachmentProgressDialog(
-                        attachmentResource = resource,
-                        attachmentName = name,
-                        attachmentType = fileType,
-                    ),
-                )
-            }
-
-            newMessageArgs.observe(viewLifecycleOwner) {
-                safeNavigateToNewMessageActivity(args = it.toBundle())
-            }
-
-            replyBottomSheetArgs.observe(viewLifecycleOwner) { (messageUid, shouldLoadDistantResources) ->
-                safeNavigate(
-                    ThreadListFragmentDirections.actionThreadListFragmentToReplyBottomSheetDialog(
-                        messageUid = messageUid,
-                        shouldLoadDistantResources = shouldLoadDistantResources,
-                    )
-                )
-            }
-
-            threadActionsBottomSheetArgs.observe(viewLifecycleOwner) {
-                val (threadUid, lastMessageToReplyToUid, shouldLoadDistantResources) = it
-                safeNavigate(
-                    ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(
-                        threadUid = threadUid,
-                        messageUidToReplyTo = lastMessageToReplyToUid,
-                        shouldLoadDistantResources = shouldLoadDistantResources,
-                    ),
-                )
-            }
-
-            messageActionsBottomSheetArgs.observe(viewLifecycleOwner) {
-                safeNavigate(
-                    ThreadListFragmentDirections.actionThreadListFragmentToMessageActionsBottomSheetDialog(
-                        messageUid = it.messageUid,
-                        threadUid = it.threadUid,
-                        isThemeTheSame = it.isThemeTheSame,
-                        shouldLoadDistantResources = it.shouldLoadDistantResources,
-                    ),
-                )
-            }
-
-            detailedContactArgs.observe(viewLifecycleOwner) { contact ->
-                safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToDetailedContactBottomSheetDialog(contact))
-            }
-        }
     }
 
     private enum class EmptyState(

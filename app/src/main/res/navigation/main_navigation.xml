@@ -53,18 +53,6 @@
         <action
             android:id="@+id/action_threadListFragment_to_invalidPasswordFragment"
             app:destination="@id/invalidPasswordFragment" />
-        <action
-            android:id="@+id/action_threadListFragment_to_replyBottomSheetDialog"
-            app:destination="@id/replyBottomSheetDialog" />
-        <action
-            android:id="@+id/action_threadListFragment_to_messageActionsBottomSheetDialog"
-            app:destination="@id/messageActionsBottomSheetDialog" />
-        <action
-            android:id="@+id/action_threadListFragment_to_downloadAttachmentProgressDialog"
-            app:destination="@id/downloadAttachmentProgressDialog" />
-        <action
-            android:id="@+id/action_threadListFragment_to_detailedContactBottomSheetDialog"
-            app:destination="@id/detailedContactBottomSheetDialog" />
 
         <!-- Region Notification: Click on Reply -->
         <argument

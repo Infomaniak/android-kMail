@@ -205,7 +205,9 @@ class ThreadListAdapter @Inject constructor(
 
         selectionCardView.setOnClickListener {
             toggleSelection(thread, position)
-            if (multiSelection?.isEnabled == false) onThreadClicked?.invoke(thread)
+
+            // Don't try to invert this condition to remove the negation.
+            if (multiSelection?.isEnabled != true) onThreadClicked?.invoke(thread)
         }
 
         multiSelection?.let { listener ->
