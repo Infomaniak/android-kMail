@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.newMessage
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.webkit.WebView
 import androidx.activity.viewModels
 import androidx.navigation.NavDestination
@@ -72,7 +73,13 @@ class NewMessageActivity : BaseActivity() {
     }
 
     private fun setupSnackBar() {
-        newMessageViewModel.snackBarManager.setup(view = binding.root, activity = this)
+        fun getAnchor(): View? = when (navController.currentDestination?.id) {
+            R.id.newMessageFragment -> findViewById(R.id.editor)
+            R.id.aiPropositionFragment -> findViewById(R.id.aiPropositionBottomBar)
+            else -> null
+        }
+
+        newMessageViewModel.snackBarManager.setup(view = binding.root, activity = this, getAnchor = ::getAnchor)
     }
 
     private fun setupSystemBars() {

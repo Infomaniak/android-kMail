@@ -343,7 +343,7 @@ class NewMessageFragment : Fragment() {
             onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(TO, hasOpened) },
             onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, TO) },
             onContactRemovedCallback = { recipient -> recipient.removeInViewModelAndUpdateBannerVisibility(TO) },
-            onCopyContactAddressCallback = ::copyRecipientEmailToClipboard,
+            onCopyContactAddressCallback = { copyRecipientEmailToClipboard(it, newMessageViewModel.snackBarManager) },
             gotFocusCallback = { fieldGotFocus(TO) },
             onToggleEverythingCallback = ::openAdvancedFields,
             setSnackBarCallback = ::setSnackBar,
@@ -354,7 +354,7 @@ class NewMessageFragment : Fragment() {
             onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(CC, hasOpened) },
             onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, CC) },
             onContactRemovedCallback = { recipient -> recipient.removeInViewModelAndUpdateBannerVisibility(CC) },
-            onCopyContactAddressCallback = ::copyRecipientEmailToClipboard,
+            onCopyContactAddressCallback = { copyRecipientEmailToClipboard(it, newMessageViewModel.snackBarManager) },
             gotFocusCallback = { fieldGotFocus(CC) },
             setSnackBarCallback = ::setSnackBar,
         )
@@ -364,7 +364,7 @@ class NewMessageFragment : Fragment() {
             onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(BCC, hasOpened) },
             onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, BCC) },
             onContactRemovedCallback = { recipient -> recipient.removeInViewModelAndUpdateBannerVisibility(BCC) },
-            onCopyContactAddressCallback = ::copyRecipientEmailToClipboard,
+            onCopyContactAddressCallback = { copyRecipientEmailToClipboard(it, newMessageViewModel.snackBarManager) },
             gotFocusCallback = { fieldGotFocus(BCC) },
             setSnackBarCallback = ::setSnackBar,
         )

@@ -81,6 +81,7 @@ import com.infomaniak.mail.ui.login.IlluColors.IlluColors
 import com.infomaniak.mail.ui.login.LoginActivity
 import com.infomaniak.mail.ui.login.LoginActivityArgs
 import com.infomaniak.mail.ui.login.NoMailboxActivity
+import com.infomaniak.mail.ui.main.SnackBarManager
 import com.infomaniak.mail.ui.main.folder.DateSeparatorItemDecoration
 import com.infomaniak.mail.ui.main.folder.HeaderItemDecoration
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
@@ -414,13 +415,15 @@ fun Window.updateNavigationBarColor(color: Int) {
     if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O) navigationBarColor = color
 }
 
-fun Fragment.copyRecipientEmailToClipboard(recipient: Recipient, snackBarAnchor: View? = null) = with(recipient) {
-    val clipboardManager = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-    clipboardManager.setPrimaryClip(ClipData.newPlainText(email, email))
+fun Fragment.copyRecipientEmailToClipboard(recipient: Recipient, snackBarManager: SnackBarManager) {
+    copyStringToClipboard(recipient.email, R.string.snackbarEmailCopiedToClipboard, snackBarManager)
+}
 
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-        showSnackbar(R.string.snackbarEmailCopiedToClipboard, anchor = snackBarAnchor)
-    }
+fun Fragment.copyStringToClipboard(value: String, @StringRes snackBarTitle: Int, snackBarManager: SnackBarManager) {
+    val clipboardManager = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    clipboardManager.setPrimaryClip(ClipData.newPlainText(value, value))
+
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) snackBarManager.setValue(getString(snackBarTitle))
 }
 
 inline infix fun <reified E : Enum<E>, V> ((E) -> V).enumValueFrom(value: V): E? {

@@ -459,6 +459,7 @@
         <item quantity="other">Expéditeurs blacklistés avec succès</item>
         <item quantity="many">Expéditeurs blacklistés avec succès</item>
     </plurals>
+    <string name="snackbarSubjectCopiedToClipboard">Objet copié dans le presse-papiers</string>
     <plurals name="snackbarThreadDeletedPermanently">
         <item quantity="one">Conversation supprimée</item>
         <item quantity="other">Conversations supprimées</item>

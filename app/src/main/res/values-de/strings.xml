@@ -450,6 +450,7 @@
         <item quantity="one">Absender erfolgreich auf die schwarze Liste gesetzt</item>
         <item quantity="other">Erfolgreich auf die schwarze Liste gesetzte Absender</item>
     </plurals>
+    <string name="snackbarSubjectCopiedToClipboard">Betreff in die Zwischenablage kopiert</string>
     <plurals name="snackbarThreadDeletedPermanently">
         <item quantity="one">Konversation gelöscht</item>
         <item quantity="other">Konversationen gelöscht</item>

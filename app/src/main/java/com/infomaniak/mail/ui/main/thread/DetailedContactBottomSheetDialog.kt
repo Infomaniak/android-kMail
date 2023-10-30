@@ -70,7 +70,7 @@ class DetailedContactBottomSheetDialog : ActionsBottomSheetDialog() {
         }
         copyAddress.setClosingOnClickListener {
             trackContactActionsEvent("copyEmailAddress")
-            copyRecipientEmailToClipboard(navigationArgs.recipient, activity?.findViewById(R.id.quickActionBar))
+            copyRecipientEmailToClipboard(navigationArgs.recipient, mainViewModel.snackBarManager)
         }
     }
 
