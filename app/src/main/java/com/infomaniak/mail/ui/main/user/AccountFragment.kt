@@ -22,6 +22,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -42,6 +43,7 @@ import com.infomaniak.mail.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
+import java.util.Calendar
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -100,6 +102,17 @@ class AccountFragment : Fragment(), MailboxListFragment {
                 text = user.displayName
             }
             mail.text = user.email
+        }
+
+        showEasterEggHalloween()
+    }
+
+    private fun showEasterEggHalloween() {
+        val calendar = Calendar.getInstance()
+        val month = calendar.get(Calendar.MONTH)
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+        if ((month == Calendar.OCTOBER && day >= 25) || (month == Calendar.NOVEMBER && day <= 3)) {
+            binding.easterEggHalloween.isVisible = true
         }
     }
 
