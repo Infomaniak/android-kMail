@@ -31,6 +31,7 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.distinctUntilChanged
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
@@ -120,7 +121,7 @@ class ThreadFragment : Fragment() {
         // Don't replace with `threadAdapter` variable, the cast will fail.
         (binding.messagesList.adapter as ThreadAdapter?)?.reRenderMails()
 
-        binding.updateToolbarUi()
+        updateToolbarUi()
 
         super.onConfigurationChanged(newConfig)
     }
@@ -172,7 +173,7 @@ class ThreadFragment : Fragment() {
 
     private fun observeThreadOpening() {
 
-        threadViewModel.threadUid.observe(viewLifecycleOwner, ::handleThreadUid)
+        threadViewModel.threadUid.distinctUntilChanged().observe(viewLifecycleOwner, ::handleThreadUid)
 
         if (isTablet()) {
             observeFolderChange()
@@ -202,14 +203,15 @@ class ThreadFragment : Fragment() {
 
         if (folder.id != previousFolderId) {
             previousFolderId = folder.id
-            threadUid.value = null
+            closeThread()
         }
     }
 
     private fun handleThreadUid(threadUid: String?) {
         if (threadUid == null) {
-            if (isTablet()) threadViewModel.closeThread()
-            displayEmptyView()
+            threadViewModel.clearThreadData()
+            if (isTablet()) displayEmptyView()
+            leaveThread()
         } else {
             displayThreadView()
             openThread(threadUid)
@@ -236,7 +238,7 @@ class ThreadFragment : Fragment() {
         openThread(threadUid).observe(viewLifecycleOwner) { result ->
 
             if (result == null) {
-                leaveThread()
+                closeThread()
                 return@observe
             }
 
@@ -245,9 +247,13 @@ class ThreadFragment : Fragment() {
         }
     }
 
-    private fun observeSubjectUpdateTriggers() {
-        threadViewModel.assembleSubjectData(mainViewModel.mergedContactsLive).observe(viewLifecycleOwner) { result ->
+    private fun observeSubjectUpdateTriggers() = with(threadViewModel) {
+        assembleSubjectData(mainViewModel.mergedContactsLive).observe(viewLifecycleOwner) { result ->
             result.thread?.let {
+
+                // When we are opening ThreadFragment, we should ignore LiveData values from a possible previous Thread.
+                if (it.uid != threadUid.value) return@observe
+
                 setSubject(
                     thread = it,
                     emailDictionary = result.mergedContacts ?: emptyMap(),
@@ -259,13 +265,13 @@ class ThreadFragment : Fragment() {
     }
 
     // TODO: We probably want a real layout instead of this workaround.
-    private fun FragmentThreadBinding.updateToolbarUi() {
+    private fun updateToolbarUi() = with(binding.toolbar) {
         if (isTabletInLandscape()) {
-            toolbar.navigationIcon?.alpha = 0
-            toolbar.setNavigationOnClickListener {}
+            navigationIcon?.alpha = 0
+            setNavigationOnClickListener {}
         } else {
-            toolbar.navigationIcon?.alpha = 255
-            toolbar.setNavigationOnClickListener { leaveThread() }
+            navigationIcon?.alpha = 255
+            setNavigationOnClickListener { threadViewModel.closeThread() }
         }
     }
 
@@ -556,18 +562,22 @@ class ThreadFragment : Fragment() {
         threadViewModel.threadLive.observe(viewLifecycleOwner, ::onThreadUpdate)
     }
 
-    private fun observeMessagesLive() {
+    private fun observeMessagesLive() = with(threadViewModel) {
 
-        threadViewModel.messagesLive.observe(viewLifecycleOwner) { messages ->
+        messagesLive.observe(viewLifecycleOwner) { messages ->
+
+            // When we are opening ThreadFragment, we should ignore LiveData values from a possible previous Thread.
+            if (messages == null) return@observe
+
             SentryLog.i("UI", "Received ${messages.count()} messages")
 
             if (messages.isEmpty()) {
-                mainViewModel.deletedMessages.value = threadViewModel.deletedMessagesUids
-                leaveThread()
+                mainViewModel.deletedMessages.value = deletedMessagesUids
+                closeThread()
                 return@observe
             }
 
-            threadViewModel.fetchMessagesHeavyData(messages)
+            fetchMessagesHeavyData(messages)
             threadAdapter.submitList(messages)
         }
     }
@@ -623,8 +633,11 @@ class ThreadFragment : Fragment() {
 
     private fun onThreadUpdate(thread: Thread?) = with(binding) {
 
+        // When we are opening ThreadFragment, we should ignore LiveData values from a possible previous Thread.
+        if (thread?.uid != threadViewModel.threadUid.value) return@with
+
         if (thread == null) {
-            leaveThread()
+            threadViewModel.closeThread()
             return@with
         }
 
@@ -700,8 +713,6 @@ class ThreadFragment : Fragment() {
     }
 
     private fun leaveThread() {
-
-        threadViewModel.threadUid.value = null
 
         if (isPhone()) {
             // TODO: Realm broadcasts twice when the Thread is deleted.

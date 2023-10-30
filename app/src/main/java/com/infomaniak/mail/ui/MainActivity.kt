@@ -363,7 +363,7 @@ class MainActivity : BaseActivity() {
                 drawerLayout.isOpen -> closeDrawer()
                 mainViewModel.isMultiSelectOn -> closeMultiSelect()
                 isTabletInPortrait() && threadViewModel.isInThread -> {
-                    threadViewModel.threadUid.value = null
+                    threadViewModel.closeThread()
                     if (navController.currentDestination?.id == R.id.threadListFragment) {
                         updateThreadLayout()
                     } else {
