@@ -106,8 +106,8 @@ class AiViewModel @Inject constructor(
 
     val aiFeatureFlag = featureFlagController.getFeatureFlagAsync(FeatureFlagType.AI).asLiveData(ioCoroutineContext)
 
-    fun updateFeatureFlag() = viewModelScope.launch(ioCoroutineContext) {
-        sharedUtils.updateAiFeatureFlag()
+    fun updateFeatureFlag(mailboxUuid: String) = viewModelScope.launch(ioCoroutineContext) {
+        sharedUtils.updateAiFeatureFlag(mailboxUuid)
     }
 
     fun isHistoryEmpty(): Boolean = history.isEmpty()

@@ -327,7 +327,7 @@ class NewMessageFragment : Fragment() {
             Intent.ACTION_SEND,
             Intent.ACTION_SEND_MULTIPLE,
             Intent.ACTION_VIEW,
-            Intent.ACTION_SENDTO -> aiViewModel.updateFeatureFlag()
+            Intent.ACTION_SENDTO -> aiViewModel.updateFeatureFlag(newMessageViewModel.currentMailbox.uuid)
         }
     }
 
