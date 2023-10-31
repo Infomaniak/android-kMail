@@ -30,7 +30,6 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.login.LoginActivityArgs
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentArgs
-import com.infomaniak.mail.ui.main.thread.ThreadFragmentArgs
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.launchLoginActivity
@@ -85,7 +84,7 @@ class LaunchActivity : AppCompatActivity() {
                 applicationContext.trackNotificationActionEvent("open")
                 NavDeepLinkBuilder(this)
                     .setGraph(R.navigation.main_navigation)
-                    .setDestination(R.id.threadFragment, ThreadFragmentArgs(threadUid = openThreadUid).toBundle())
+                    .setDestination(R.id.threadListFragment, ThreadListFragmentArgs(openThreadUid = openThreadUid).toBundle())
                     .setComponentName(MainActivity::class.java)
                     .createTaskStackBuilder()
                     .startActivities()

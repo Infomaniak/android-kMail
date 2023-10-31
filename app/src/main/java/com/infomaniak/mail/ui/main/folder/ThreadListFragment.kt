@@ -38,6 +38,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
+import androidx.recyclerview.widget.RecyclerView.AdapterDataObserver
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.VERTICAL_LIST_WITH_VERTICAL_DRAGGING
@@ -101,6 +102,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private var lastUpdatedDate: Date? = null
     private var previousCustomFolderId: String? = null
+    private var threadListObserver: AdapterDataObserver? = null
 
     @Inject
     lateinit var localSettings: LocalSettings
@@ -133,6 +135,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = runCatchingRealm {
 
+        navigateFromNotificationToThread()
         navigateFromNotificationToNewMessage()
 
         super.onViewCreated(view, savedInstanceState)
@@ -166,7 +169,39 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         observeFlushFolderTrigger()
         observeUpdateInstall()
         observeInTabletMode(mainViewModel, threadViewModel, threadListAdapter)
+
     }.getOrDefault(Unit)
+
+    private fun navigateFromNotificationToThread() {
+        if (isPhone()) {
+            // Here, we use `arguments` instead of `navigationArgs` because we need mutable data.
+            if (arguments?.getString(navigationArgs::openThreadUid.name) != null) {
+                // If we are coming from a Notification, we need to navigate to ThreadFragment.
+                navigateToThread(mainViewModel, threadUid = navigationArgs.openThreadUid)
+                arguments?.remove(navigationArgs::openThreadUid.name)
+            }
+        } else {
+            threadListObserver = object : AdapterDataObserver() {
+                override fun onChanged() {
+                    if (arguments?.getString(navigationArgs::openThreadUid.name) != null) {
+                        navigationArgs.openThreadUid?.let { openThreadUid ->
+                            threadListAdapter.apply {
+                                getItemPosition(openThreadUid)?.let { position ->
+                                    clickedThreadPosition = position
+                                    clickedThreadUid = openThreadUid
+                                    notifyItemChanged(position, ThreadListAdapter.NotificationType.SELECTED_STATE)
+                                }
+                            }
+                            navigateToThread(mainViewModel, threadUid = openThreadUid)
+                            arguments?.remove(navigationArgs::openThreadUid.name)
+                            threadListObserver?.let(threadListAdapter::unregisterAdapterDataObserver)
+                        }
+                    }
+                }
+            }
+            threadListObserver?.let(threadListAdapter::registerAdapterDataObserver)
+        }
+    }
 
     private fun navigateFromNotificationToNewMessage() {
         // Here, we use `arguments` instead of `navigationArgs` because we need mutable data.

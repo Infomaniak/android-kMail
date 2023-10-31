@@ -287,10 +287,12 @@ fun Fragment.safeNavigateToNewMessageActivity(args: Bundle? = null, currentClass
 
 fun Fragment.navigateToThread(
     mainViewModel: MainViewModel,
-    thread: Thread,
+    thread: Thread? = null,
+    threadUid: String? = null,
 ) = runCatchingRealm {
+    val uid = thread?.uid ?: threadUid ?: return@runCatchingRealm
     when {
-        thread.isOnlyOneDraft -> { // Directly go to NewMessage screen
+        thread?.isOnlyOneDraft == true -> { // Directly go to NewMessage screen
             trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
             mainViewModel.navigateToSelectedDraft(thread.messages.first()).observe(viewLifecycleOwner) {
                 safeNavigateToNewMessageActivity(
@@ -303,14 +305,12 @@ fun Fragment.navigateToThread(
                 )
             }
         }
-        isTablet() -> {
-            with(requireActivity() as MainActivity) {
-                openThread(thread.uid)
-                if (isTabletInPortrait()) updateThreadLayout()
-            }
+        isTablet() -> with(requireActivity() as MainActivity) {
+            openThread(uid)
+            if (isTabletInPortrait()) updateThreadLayout()
         }
         else -> {
-            safeNavigate(R.id.threadFragment, ThreadFragmentArgs(thread.uid).toBundle())
+            safeNavigate(R.id.threadFragment, ThreadFragmentArgs(uid).toBundle())
         }
     }
 }.getOrDefault(Unit)
