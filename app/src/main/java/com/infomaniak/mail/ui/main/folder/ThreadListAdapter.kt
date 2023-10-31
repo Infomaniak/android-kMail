@@ -177,6 +177,13 @@ class ThreadListAdapter @Inject constructor(
         }
     }.getOrDefault(super.getItemId(position))
 
+    fun getItemPosition(threadUid: String): Int? {
+        dataSet.forEachIndexed { position, item ->
+            if (item is Thread && item.uid == threadUid) return position
+        }
+        return null
+    }
+
     private fun CardviewThreadItemBinding.displayThread(thread: Thread, position: Int) {
 
         if (thread.uid == clickedThreadUid) clickedThreadPosition = position

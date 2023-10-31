@@ -54,6 +54,14 @@
             android:id="@+id/action_threadListFragment_to_invalidPasswordFragment"
             app:destination="@id/invalidPasswordFragment" />
 
+        <!-- Region Notification: Click to open Thread -->
+        <argument
+            android:name="openThreadUid"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+        <!-- Endregion -->
+
         <!-- Region Notification: Click on Reply -->
         <argument
             android:name="replyToMessageUid"
