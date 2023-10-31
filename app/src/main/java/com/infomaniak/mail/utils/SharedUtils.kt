@@ -29,9 +29,8 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshCallbacks
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
-import com.infomaniak.mail.data.cache.userInfo.FeatureFlagController
+import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.FeatureFlag
-import com.infomaniak.mail.data.models.FeatureFlag.FeatureFlagType
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
@@ -45,7 +44,7 @@ class SharedUtils @Inject constructor(
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val refreshController: RefreshController,
     private val messageController: MessageController,
-    private val featureFlagController: FeatureFlagController,
+    private val mailboxController: MailboxController,
 ) {
 
     @Inject
@@ -113,11 +112,13 @@ class SharedUtils @Inject constructor(
         }
     }
 
-    fun updateAiFeatureFlag(mailboxUuid: String) {
-        with(ApiRepository.checkFeatureFlag(FeatureFlagType.AI, mailboxUuid)) {
+    fun updateAiFeatureFlag(objectId: String, mailboxUuid: String) {
+        with(ApiRepository.checkFeatureFlag(FeatureFlag.AI, mailboxUuid)) {
             if (isSuccess()) {
-                val featureFlag = FeatureFlag(FeatureFlagType.AI, isEnabled = data?.get("is_enabled") == true)
-                featureFlagController.upsertFeatureFlag(featureFlag)
+                val isEnabled = data?.get("is_enabled") == true
+                mailboxController.updateMailbox(objectId) {
+                    if (isEnabled) it.featureFlags.add(FeatureFlag.AI) else it.featureFlags.remove(FeatureFlag.AI)
+                }
             }
         }
     }

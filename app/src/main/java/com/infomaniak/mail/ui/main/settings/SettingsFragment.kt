@@ -35,6 +35,7 @@ import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.databinding.FragmentSettingsBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.animatedNavigation
@@ -47,7 +48,6 @@ class SettingsFragment : Fragment() {
 
     private var binding: FragmentSettingsBinding by safeBinding()
     private val mainViewModel: MainViewModel by activityViewModels()
-    private val settingsViewModel: SettingsViewModel by viewModels()
 
     @Inject
     lateinit var localSettings: LocalSettings
@@ -155,8 +155,8 @@ class SettingsFragment : Fragment() {
     }
 
     private fun observeFeatureFlag() {
-        settingsViewModel.aiFeatureFlag.observe(viewLifecycleOwner) {
-            binding.settingsAiEngine.isVisible = it.isEnabled
+        mainViewModel.currentMailbox.observe(viewLifecycleOwner) {
+            binding.settingsAiEngine.isVisible = it?.featureFlags?.contains(FeatureFlag.AI) == true
         }
     }
 }

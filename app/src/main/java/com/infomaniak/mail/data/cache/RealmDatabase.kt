@@ -174,7 +174,6 @@ object RealmDatabase {
         val userInfoSet = setOf(
             AddressBook::class,
             MergedContact::class,
-            FeatureFlag::class,
         )
         val mailboxInfoSet = setOf(
             Mailbox::class,

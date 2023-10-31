@@ -64,6 +64,7 @@ import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.RealmList
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.map
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import javax.inject.Inject
@@ -118,7 +119,12 @@ class NewMessageViewModel @Inject constructor(
 
     private var isNewMessage = false
 
-    val currentMailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
+    val currentMailboxLive = mailboxController.getMailboxAsync(
+            AccountUtils.currentUserId,
+            AccountUtils.currentMailboxId
+        ).map { it.obj }.asLiveData(ioCoroutineContext)
+
+    val currentMailbox get() = currentMailboxLive.value!!
 
     private val arrivedFromExistingDraft
         inline get() = savedStateHandle.get<Boolean>(NewMessageActivityArgs::arrivedFromExistingDraft.name) ?: false

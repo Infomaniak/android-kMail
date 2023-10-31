@@ -21,12 +21,16 @@ package com.infomaniak.mail.data.models.mailbox
 
 import androidx.core.app.NotificationManagerCompat
 import com.infomaniak.mail.data.models.AppSettings
+import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.Quotas
 import com.infomaniak.mail.utils.UnreadDisplay
 import io.realm.kotlin.ext.realmListOf
+import io.realm.kotlin.ext.realmSetOf
 import io.realm.kotlin.serializers.RealmListKSerializer
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.RealmSet
+import io.realm.kotlin.types.annotations.Ignore
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -74,6 +78,14 @@ class Mailbox : RealmObject {
     var unreadCountLocal: Int = 0
     @Transient
     var permissions: MailboxPermissions? = null
+    @Transient
+    var _featureFlags: RealmSet<String> = realmSetOf()
+    //endregion
+
+    //region (Transient & Ignore)
+    @Transient
+    @Ignore
+    val featureFlags = FeatureFlagSet(this)
     //endregion
 
     inline val channelGroupId get() = "$mailboxId"
@@ -103,5 +115,19 @@ class Mailbox : RealmObject {
         val isGroupBlocked = getNotificationChannelGroupCompat(channelGroupId)?.isBlocked == true
         val isChannelBlocked = getNotificationChannelCompat(channelId)?.importance == NotificationManagerCompat.IMPORTANCE_NONE
         return@with !areNotificationsEnabled() || isGroupBlocked || isChannelBlocked
+    }
+
+    class FeatureFlagSet(private val mailbox: Mailbox) {
+        fun contains(featureFlag: FeatureFlag): Boolean {
+            return mailbox._featureFlags.contains(featureFlag.name)
+        }
+
+        fun add(featureFlag: FeatureFlag): Boolean {
+            return mailbox._featureFlags.add(featureFlag.name)
+        }
+
+        fun remove(featureFlag: FeatureFlag): Boolean {
+            return mailbox._featureFlags.remove(featureFlag.name)
+        }
     }
 }

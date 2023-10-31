@@ -21,15 +21,12 @@ import androidx.annotation.IdRes
 import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.cache.userInfo.FeatureFlagController
-import com.infomaniak.mail.data.models.FeatureFlag.FeatureFlagType
 import com.infomaniak.mail.data.models.ai.*
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.newMessage.AiViewModel.PropositionStatus.*
@@ -46,7 +43,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AiViewModel @Inject constructor(
-    private val featureFlagController: FeatureFlagController,
     private val sharedUtils: SharedUtils,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
@@ -104,10 +100,8 @@ class AiViewModel @Inject constructor(
         handleAiResult(apiResponse = apiResponse, apiResponse.data?.promptMessage)
     }
 
-    val aiFeatureFlag = featureFlagController.getFeatureFlagAsync(FeatureFlagType.AI).asLiveData(ioCoroutineContext)
-
-    fun updateFeatureFlag(mailboxUuid: String) = viewModelScope.launch(ioCoroutineContext) {
-        sharedUtils.updateAiFeatureFlag(mailboxUuid)
+    fun updateFeatureFlag(currentMailboxObjectId: String, mailboxUuid: String) = viewModelScope.launch(ioCoroutineContext) {
+        sharedUtils.updateAiFeatureFlag(currentMailboxObjectId, mailboxUuid)
     }
 
     fun isHistoryEmpty(): Boolean = history.isEmpty()

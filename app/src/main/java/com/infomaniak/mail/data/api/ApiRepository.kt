@@ -32,7 +32,6 @@ import com.infomaniak.mail.data.LocalSettings.AiEngine
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.PaginationInfo
 import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition
-import com.infomaniak.mail.data.models.FeatureFlag.FeatureFlagType
 import com.infomaniak.mail.data.models.addressBook.AddressBooksResult
 import com.infomaniak.mail.data.models.ai.AiMessage
 import com.infomaniak.mail.data.models.ai.AiResult
@@ -334,9 +333,9 @@ object ApiRepository : ApiRepositoryCore() {
         "output" to "mail",
     )
 
-    fun checkFeatureFlag(featureFlagType: FeatureFlagType, currentMailboxEmail: String): ApiResponse<Map<String, Boolean>> {
+    fun checkFeatureFlag(featureFlag: FeatureFlag, currentMailboxEmail: String): ApiResponse<Map<String, Boolean>> {
         val body = mapOf("email" to currentMailboxEmail)
-        return callApi(ApiRoutes.featureFlag(featureFlagType.apiName), POST, body)
+        return callApi(ApiRoutes.featureFlag(featureFlag.apiName), POST, body)
     }
 
     fun getCredentialsPassword(): ApiResponse<InfomaniakPassword> = runCatching {

@@ -1002,7 +1002,9 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun updateFeatureFlag() = viewModelScope.launch(ioCoroutineContext) { sharedUtils.updateAiFeatureFlag(currentMailbox.value!!.uuid) } // TODO : Check when do we need to run this exactly. Because we need the current mailbox uuid
+    fun updateFeatureFlag() = viewModelScope.launch(ioCoroutineContext) {
+        sharedUtils.updateAiFeatureFlag(currentMailbox.value!!.objectId, currentMailbox.value!!.uuid) // TODO : Check when do we need to run this exactly. Because we need the current mailbox uuid
+    }
 
     private companion object {
         val TAG: String = MainViewModel::class.java.simpleName
