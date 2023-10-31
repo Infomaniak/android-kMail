@@ -114,7 +114,7 @@ class SharedUtils @Inject constructor(
     }
 
     fun updateAiFeatureFlag() {
-        with(ApiRepository.checkFeatureFlag(FeatureFlagType.AI)) {
+        with(ApiRepository.checkFeatureFlag(FeatureFlagType.AI, AccountUtils.currentMailboxEmail!!)) {
             if (isSuccess()) {
                 val featureFlag = FeatureFlag(FeatureFlagType.AI, isEnabled = data?.get("is_enabled") == true)
                 featureFlagController.upsertFeatureFlag(featureFlag)
