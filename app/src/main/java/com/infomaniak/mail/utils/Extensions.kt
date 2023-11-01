@@ -93,6 +93,7 @@ import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.ui.noValidMailboxes.NoValidMailboxesActivity
 import com.infomaniak.mail.utils.AccountUtils.NO_MAILBOX_USER_ID_KEY
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
+import com.infomaniak.mail.utils.Utils.kSyncAccountUri
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
@@ -513,16 +514,12 @@ fun Fragment.getStringWithBoldArg(@StringRes resId: Int, arg: String): Spanned {
     return Html.fromHtml(getString(resId, "<b>$coloredArg</b>"), Html.FROM_HTML_MODE_LEGACY)
 }
 
-// TODO Does not work, needs to be fixed
-// fun Context.isUserAlreadySynchronized(): Boolean {
-//     val accountManager = AccountManager.get(this)
-//     val accounts = accountManager.getAccountsByType("infomaniak.com.sync")
-//     val account = accounts.find { accountManager.getUserData(it, "user_name") == AccountUtils.currentUser?.login }
-//
-//     return account != null
-// }
-
-fun Context.isUserAlreadySynchronized(): Boolean = false
+fun Context.isUserAlreadySynchronized(): Boolean {
+    val uri = kSyncAccountUri(AccountUtils.currentUser!!.login)
+    return contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+        cursor.count > 0
+    } ?: false
+}
 
 fun Context.getLoginActivityIntent(args: LoginActivityArgs? = null, shouldClearStack: Boolean = false): Intent {
     return Intent(this, LoginActivity::class.java).apply {

@@ -17,6 +17,8 @@
  */
 package com.infomaniak.mail.utils
 
+import android.net.Uri
+import androidx.core.net.toUri
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import io.sentry.Sentry
 import okhttp3.internal.toHexString
@@ -42,6 +44,10 @@ object Utils {
 
     fun isPermanentDeleteFolder(role: FolderRole?): Boolean {
         return role == FolderRole.DRAFT || role == FolderRole.SPAM || role == FolderRole.TRASH
+    }
+
+    fun kSyncAccountUri(accountName: String): Uri {
+        return "content://com.infomaniak.sync.accounts/account/$accountName".toUri()
     }
 
     inline fun <R> runCatchingRealm(block: () -> R): Result<R> {
