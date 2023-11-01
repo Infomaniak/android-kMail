@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.login
 
+import android.animation.ValueAnimator
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -61,6 +62,8 @@ class IntroFragment : Fragment() {
     @Inject
     @IoDispatcher
     lateinit var ioDispatcher: CoroutineDispatcher
+
+    private var colorAnimator: ValueAnimator? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentIntroBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -119,6 +122,11 @@ class IntroFragment : Fragment() {
         setUi(localSettings.accentColor, localSettings.accentColor, navigationArgs.position)
     }
 
+    override fun onDestroyView() {
+        colorAnimator?.cancel()
+        super.onDestroyView()
+    }
+
     private fun setTabSelectedListener() = with(binding) {
         pinkBlueTabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
@@ -161,7 +169,7 @@ class IntroFragment : Fragment() {
         val newColor = newAccentColor.getOnboardingSecondaryBackground(context)
         val oldColor = oldAccentColor.getOnboardingSecondaryBackground(context)
 
-        UiUtils.animateColorChange(oldColor, newColor) { color ->
+        colorAnimator = UiUtils.animateColorChange(oldColor, newColor) { color ->
             waveBackground.imageTintList = ColorStateList.valueOf(color)
         }
     }
