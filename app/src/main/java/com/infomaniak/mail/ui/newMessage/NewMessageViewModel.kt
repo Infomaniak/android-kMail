@@ -120,11 +120,11 @@ class NewMessageViewModel @Inject constructor(
     private var isNewMessage = false
 
     val currentMailboxLive = mailboxController.getMailboxAsync(
-            AccountUtils.currentUserId,
-            AccountUtils.currentMailboxId
-        ).map { it.obj }.asLiveData(ioCoroutineContext)
+        AccountUtils.currentUserId,
+        AccountUtils.currentMailboxId
+    ).map { it.obj }.asLiveData(ioCoroutineContext)
 
-    val currentMailbox get() = currentMailboxLive.value!!
+    val currentMailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
 
     private val arrivedFromExistingDraft
         inline get() = savedStateHandle.get<Boolean>(NewMessageActivityArgs::arrivedFromExistingDraft.name) ?: false
