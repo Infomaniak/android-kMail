@@ -157,7 +157,7 @@ class DraftsActionsWorker @AssistedInject constructor(
                             remoteUuidOfTrackedDraft = savedDraftUuid
                             isTrackedDraftSuccess = true
                         }
-                        scheduledDates.add(scheduledDate!!)
+                        scheduledDate?.let(scheduledDates::add)
                         realmActionOnDraft?.let(realmActionsOnDraft::add)
                     } else if (isTargetDraft) {
                         trackedDraftErrorMessageResId = errorMessageResId!!
