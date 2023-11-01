@@ -304,7 +304,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun updateQuotas(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
+    private fun updateQuotas(mailbox: Mailbox) {
         SentryLog.d(TAG, "Force refresh Quotas")
         if (mailbox.isLimited) with(ApiRepository.getQuotas(mailbox.hostingId, mailbox.mailboxName)) {
             if (isSuccess()) {
@@ -315,7 +315,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun updatePermissions(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
+    private fun updatePermissions(mailbox: Mailbox) {
         SentryLog.d(TAG, "Force refresh Permissions")
         with(ApiRepository.getPermissions(mailbox.linkId, mailbox.hostingId)) {
             if (isSuccess()) mailboxController.updateMailbox(mailbox.objectId) {
@@ -324,7 +324,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun updateSignatures(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
+    private fun updateSignatures(mailbox: Mailbox) {
         updateSignatures(mailbox, mailboxContentRealm())
     }
 
