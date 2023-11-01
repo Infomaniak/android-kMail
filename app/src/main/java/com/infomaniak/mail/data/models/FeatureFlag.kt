@@ -17,26 +17,6 @@
  */
 package com.infomaniak.mail.data.models
 
-import io.realm.kotlin.types.RealmObject
-import io.realm.kotlin.types.annotations.PrimaryKey
-
-// class FeatureFlag : RealmObject {
-//     @PrimaryKey
-//     var id: String? = null
-//     var isEnabled: Boolean = false
-//
-//     constructor()
-//
-//     constructor(type: FeatureFlagType, isEnabled: Boolean) {
-//         this.id = type.apiName
-//         this.isEnabled = isEnabled
-//     }
-//
-//     // BEWARE ! The `apiName` is used as a Realm primary key for the `FeatureFlag` model. So it cannot change. Ever.
-//     enum class FeatureFlagType(val apiName: String) {
-//         AI("ai-mail-composer")
-//     }
-// }
 
 enum class FeatureFlag(val apiName: String) {
     AI("ai-mail-composer")
