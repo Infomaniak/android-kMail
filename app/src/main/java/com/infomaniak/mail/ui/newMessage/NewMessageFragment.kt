@@ -940,8 +940,8 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeAiFeatureFragmentUpdates() {
-        newMessageViewModel.currentMailboxLive.observe(viewLifecycleOwner) { mailbox ->
-            val isAiEnabled = mailbox?.featureFlags?.contains(FeatureFlag.AI) == true
+        newMessageViewModel.currentMailboxLive.observeNotNull(viewLifecycleOwner) { mailbox ->
+            val isAiEnabled = mailbox.featureFlags.contains(FeatureFlag.AI)
             binding.editorAi.isVisible = isAiEnabled
             if (isAiEnabled) navigateToDiscoveryBottomSheetIfFirstTime()
         }
