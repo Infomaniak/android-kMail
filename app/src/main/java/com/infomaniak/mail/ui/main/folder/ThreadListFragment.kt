@@ -84,7 +84,10 @@ import com.infomaniak.lib.core.R as RCore
 @AndroidEntryPoint
 class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
-    var binding: FragmentThreadListBinding by safeBinding()
+
+    private var _binding: FragmentThreadListBinding? = null
+    val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
+
     private val navigationArgs: ThreadListFragmentArgs by navArgs()
     private val mainViewModel: MainViewModel by activityViewModels()
     private val threadListViewModel: ThreadListViewModel by viewModels()
@@ -120,7 +123,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     lateinit var descriptionDialog: DescriptionAlertDialog
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return FragmentThreadListBinding.inflate(inflater, container, false).also { binding = it }.root
+        return FragmentThreadListBinding.inflate(inflater, container, false).also { _binding = it }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = runCatchingRealm {
@@ -207,6 +210,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     override fun onDestroyView() {
         showLoadingTimer.cancel()
         super.onDestroyView()
+        _binding = null
     }
 
     private fun unlockSwipeActionsIfSet() = with(binding.threadsList) {
@@ -641,7 +645,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun scrollToTop() = binding.threadsList.layoutManager?.scrollToPosition(0)
+    private fun scrollToTop() {
+        _binding?.threadsList?.layoutManager?.scrollToPosition(0)
+    }
 
     private fun isCurrentFolderRole(role: FolderRole) = mainViewModel.currentFolder.value?.role == role
 
