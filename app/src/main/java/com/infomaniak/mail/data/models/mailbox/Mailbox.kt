@@ -85,7 +85,7 @@ class Mailbox : RealmObject {
     //region (Transient & Ignore)
     @Transient
     @Ignore
-    val featureFlags = FeatureFlagSet(this)
+    val featureFlags = FeatureFlagSet()
     //endregion
 
     inline val channelGroupId get() = "$mailboxId"
@@ -117,17 +117,17 @@ class Mailbox : RealmObject {
         return@with !areNotificationsEnabled() || isGroupBlocked || isChannelBlocked
     }
 
-    class FeatureFlagSet(private val mailbox: Mailbox) {
+    inner class FeatureFlagSet {
         fun contains(featureFlag: FeatureFlag): Boolean {
-            return mailbox._featureFlags.contains(featureFlag.name)
+            return _featureFlags.contains(featureFlag.apiName)
         }
 
         fun add(featureFlag: FeatureFlag): Boolean {
-            return mailbox._featureFlags.add(featureFlag.name)
+            return _featureFlags.add(featureFlag.apiName)
         }
 
         fun remove(featureFlag: FeatureFlag): Boolean {
-            return mailbox._featureFlags.remove(featureFlag.name)
+            return _featureFlags.remove(featureFlag.apiName)
         }
     }
 }

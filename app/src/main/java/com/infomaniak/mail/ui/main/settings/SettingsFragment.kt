@@ -24,7 +24,6 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import com.infomaniak.lib.applock.Utils.isKeyguardSecure
 import com.infomaniak.lib.applock.Utils.silentlyReverseSwitch
 import com.infomaniak.lib.core.utils.openAppNotificationSettings
@@ -40,6 +39,7 @@ import com.infomaniak.mail.databinding.FragmentSettingsBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.animatedNavigation
 import com.infomaniak.mail.utils.launchSyncAutoConfigActivityForResult
+import com.infomaniak.mail.utils.observeNotNull
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -155,8 +155,8 @@ class SettingsFragment : Fragment() {
     }
 
     private fun observeFeatureFlag() {
-        mainViewModel.currentMailbox.observe(viewLifecycleOwner) {
-            binding.settingsAiEngine.isVisible = it?.featureFlags?.contains(FeatureFlag.AI) == true
+        mainViewModel.currentMailbox.observeNotNull(viewLifecycleOwner) {
+            binding.settingsAiEngine.isVisible = it.featureFlags.contains(FeatureFlag.AI)
         }
     }
 }
