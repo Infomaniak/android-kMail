@@ -143,7 +143,6 @@ class SharedUtils @Inject constructor(
         }
     }
 
-
     companion object {
 
         fun updateSignatures(mailbox: Mailbox, customRealm: Realm): Int? {

@@ -84,7 +84,6 @@ import com.infomaniak.lib.core.R as RCore
 @AndroidEntryPoint
 class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
-
     private var _binding: FragmentThreadListBinding? = null
     val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
 
@@ -483,15 +482,20 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun observeCurrentThreads() = with(mainViewModel) {
+
         reassignCurrentThreadsLive()
+
         currentThreadsLive.bindResultsChangeToAdapter(viewLifecycleOwner, threadListAdapter).apply {
             recyclerView = binding.threadsList
+
             beforeUpdateAdapter = { threads ->
                 threadListViewModel.currentThreadsCount = threads.count()
                 SentryLog.i("UI", "Received threads: ${threadListViewModel.currentThreadsCount} | (${currentFolder.value?.name})")
                 updateThreadsVisibility()
             }
+
             waitingBeforeNotifyAdapter = threadListViewModel.isRecoveringFinished
+
             afterUpdateAdapter = { threads ->
                 if (currentFilter.value == ThreadFilter.UNSEEN && threads.isEmpty()) {
                     currentFilter.value = ThreadFilter.ALL
