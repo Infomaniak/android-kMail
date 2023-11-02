@@ -113,7 +113,7 @@ class AccountFragment : Fragment(), MailboxListFragment {
         val calendar = Calendar.getInstance()
         val month = calendar.get(Calendar.MONTH)
         val day = calendar.get(Calendar.DAY_OF_MONTH)
-        if ((month == Calendar.OCTOBER && day >= 25) || (month == Calendar.NOVEMBER && day <= 3)) {
+        if ((month == Calendar.OCTOBER && day >= 26) || (month == Calendar.NOVEMBER && day <= 1)) {
             binding.easterEggHalloween.isVisible = true
             Sentry.withScope { scope ->
                 scope.level = SentryLevel.INFO
