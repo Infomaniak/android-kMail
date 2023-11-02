@@ -25,7 +25,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.trackContactActionsEvent
-import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetDetailedContactBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.thread.actions.ActionsBottomSheetDialog

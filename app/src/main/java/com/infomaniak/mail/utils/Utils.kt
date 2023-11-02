@@ -46,9 +46,7 @@ object Utils {
         return role == FolderRole.DRAFT || role == FolderRole.SPAM || role == FolderRole.TRASH
     }
 
-    fun kSyncAccountUri(accountName: String): Uri {
-        return "content://com.infomaniak.sync.accounts/account/$accountName".toUri()
-    }
+    fun kSyncAccountUri(accountName: String): Uri = "content://com.infomaniak.sync.accounts/account/$accountName".toUri()
 
     inline fun <R> runCatchingRealm(block: () -> R): Result<R> {
         return runCatching { block() }.onFailure { exception ->

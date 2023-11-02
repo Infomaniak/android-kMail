@@ -312,7 +312,7 @@ object ApiRepository : ApiRepositoryCore() {
         shortcut: Shortcut,
         history: List<AiMessage>,
         currentMailboxUuid: String,
-        aiEngine: AiEngine
+        aiEngine: AiEngine,
     ): ApiResponse<AiResult> {
         val body = getAiBodyFromMessages(history, aiEngine)
         return callApi(
