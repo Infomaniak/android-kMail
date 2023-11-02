@@ -528,7 +528,9 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun setupFromField(signatures: List<Signature>) = with(binding) {
-        val selectedSignature = signatures.find { it.id == newMessageViewModel.selectedSignatureId }!!
+        val selectedSignature = with(signatures) {
+            find { it.id == newMessageViewModel.selectedSignatureId } ?: find { it.isDefault }!!
+        }
         updateSelectedSignatureFromField(signatures.count(), selectedSignature)
 
         val adapter = SignatureAdapter(signatures, newMessageViewModel.selectedSignatureId) { newSelectedSignature ->
