@@ -270,11 +270,15 @@ class MainViewModel @Inject constructor(
 
             // Refresh Mailbox content
             val mailbox = currentMailbox.value ?: openMailbox() ?: return@launch
+
+            // These updates are parallelized so they won't slow down the flow.
             updateQuotas(mailbox)
             updatePermissions(mailbox)
             updateSignatures(mailbox)
-            updateFolders(mailbox)
             updateFeatureFlag(mailbox)
+
+            // This update is blocking because we need it for the rest of the flow : `selectFolder()` needs the Folders.
+            updateFolders(mailbox)
 
             // Refresh Threads
             (currentFolderId?.let(folderController::getFolder) ?: folderController.getFolder(DEFAULT_SELECTED_FOLDER))
@@ -304,7 +308,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun updateQuotas(mailbox: Mailbox) {
+    private fun updateQuotas(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
         SentryLog.d(TAG, "Force refresh Quotas")
         if (mailbox.isLimited) with(ApiRepository.getQuotas(mailbox.hostingId, mailbox.mailboxName)) {
             if (isSuccess()) {
@@ -315,7 +319,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun updatePermissions(mailbox: Mailbox) {
+    private fun updatePermissions(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
         SentryLog.d(TAG, "Force refresh Permissions")
         with(ApiRepository.getPermissions(mailbox.linkId, mailbox.hostingId)) {
             if (isSuccess()) mailboxController.updateMailbox(mailbox.objectId) {
@@ -324,8 +328,14 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun updateSignatures(mailbox: Mailbox) {
+    private fun updateSignatures(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
+        SentryLog.d(TAG, "Force refresh Signatures")
         updateSignatures(mailbox, mailboxContentRealm())
+    }
+
+    private fun updateFeatureFlag(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
+        SentryLog.d(TAG, "Force refresh Features flags")
+        sharedUtils.updateAiFeatureFlag(mailbox.objectId, mailbox.uuid)
     }
 
     private fun updateFolders(mailbox: Mailbox) {
@@ -333,10 +343,6 @@ class MainViewModel @Inject constructor(
         ApiRepository.getFolders(mailbox.uuid).data?.let { folders ->
             if (!mailboxContentRealm().isClosed()) folderController.update(folders, mailboxContentRealm())
         }
-    }
-
-    private fun updateFeatureFlag(mailbox: Mailbox) {
-        sharedUtils.updateAiFeatureFlag(mailbox.objectId, mailbox.uuid)
     }
 
     fun openFolder(folderId: String) = viewModelScope.launch(ioCoroutineContext) {
