@@ -42,7 +42,9 @@ object ApiRoutes {
 
     private fun ai(): String = "$MAIL_API/api/ai"
 
-    fun featureFlag(featureName: String): String = "$MAIL_API/api/feature-flag/check/$featureName"
+    fun featureFlag(featureName: String, currentMailboxUuid: String): String {
+        return "$MAIL_API/api/feature-flag/check/$featureName${mailboxUuidParameter(currentMailboxUuid)}"
+    }
 
     private fun apiMailbox(mailboxHostingId: Int, mailboxName: String): String {
         return "$INFOMANIAK_API_V1/mail_hostings/$mailboxHostingId/mailboxes/$mailboxName"
