@@ -79,7 +79,7 @@ class Mailbox : RealmObject {
     @Transient
     var permissions: MailboxPermissions? = null
     @Transient
-    var _featureFlags: RealmSet<String> = realmSetOf()
+    private var _featureFlags: RealmSet<String> = realmSetOf()
     //endregion
 
     //region (Transient & Ignore)
