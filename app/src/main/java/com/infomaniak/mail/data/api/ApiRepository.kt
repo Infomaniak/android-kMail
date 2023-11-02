@@ -288,20 +288,20 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.flushFolder(mailboxUuid, folderId), POST)
     }
 
-    fun startNewConversation(message: UserMessage, currentMailboxEmail: String, aiEngine: AiEngine): ApiResponse<AiResult> {
+    fun startNewConversation(message: UserMessage, currentMailboxUuid: String, aiEngine: AiEngine): ApiResponse<AiResult> {
         val body = getAiBodyFromMessages(listOf(message), aiEngine)
-        return callApi(ApiRoutes.aiConversation(currentMailboxEmail), POST, body, HttpClient.okHttpClientLongTimeout)
+        return callApi(ApiRoutes.aiConversation(currentMailboxUuid), POST, body, HttpClient.okHttpClientLongTimeout)
     }
 
     fun aiShortcutWithContext(
         contextId: String,
         shortcut: Shortcut,
-        currentMailboxEmail: String,
+        currentMailboxUuid: String,
         aiEngine: AiEngine,
     ): ApiResponse<AiResult> {
         val body = aiBaseBodyWith(aiEngine)
         return callApi(
-            url = ApiRoutes.aiShortcutWithContext(contextId, action = shortcut.apiRoute!!, currentMailboxEmail),
+            url = ApiRoutes.aiShortcutWithContext(contextId, action = shortcut.apiRoute!!, currentMailboxUuid),
             method = PATCH,
             body = body,
             okHttpClient = HttpClient.okHttpClientLongTimeout,
@@ -311,12 +311,12 @@ object ApiRepository : ApiRepositoryCore() {
     fun aiShortcutNoContext(
         shortcut: Shortcut,
         history: List<AiMessage>,
-        currentMailboxEmail: String,
+        currentMailboxUuid: String,
         aiEngine: AiEngine
     ): ApiResponse<AiResult> {
         val body = getAiBodyFromMessages(history, aiEngine)
         return callApi(
-            url = ApiRoutes.aiShortcutNoContext(shortcut.apiRoute!!, currentMailboxEmail),
+            url = ApiRoutes.aiShortcutNoContext(shortcut.apiRoute!!, currentMailboxUuid),
             method = POST,
             body = body,
             okHttpClient = HttpClient.okHttpClientLongTimeout

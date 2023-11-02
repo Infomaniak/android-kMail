@@ -60,10 +60,10 @@ class AiViewModel @Inject constructor(
     val aiPropositionStatusLiveData = MutableLiveData<PropositionStatus>()
     val aiOutputToInsert = SingleLiveEvent<Pair<String?, String>>()
 
-    fun generateNewAiProposition(currentMailboxEmail: String) = viewModelScope.launch(ioCoroutineContext) {
+    fun generateNewAiProposition(currentMailboxUuid: String) = viewModelScope.launch(ioCoroutineContext) {
         history.clear()
         val userMessage = UserMessage(aiPrompt)
-        with(ApiRepository.startNewConversation(userMessage, currentMailboxEmail, localSettings.aiEngine)) {
+        with(ApiRepository.startNewConversation(userMessage, currentMailboxUuid, localSettings.aiEngine)) {
             ensureActive()
             handleAiResult(apiResponse = this, userMessage)
         }
@@ -85,15 +85,15 @@ class AiViewModel @Inject constructor(
         )
     }
 
-    fun performShortcut(shortcut: Shortcut, currentMailboxEmail: String) = viewModelScope.launch(ioCoroutineContext) {
+    fun performShortcut(shortcut: Shortcut, currentMailboxUuid: String) = viewModelScope.launch(ioCoroutineContext) {
         val aiEngine = localSettings.aiEngine
 
-        var apiResponse = ApiRepository.aiShortcutWithContext(conversationContextId!!, shortcut, currentMailboxEmail, aiEngine)
+        var apiResponse = ApiRepository.aiShortcutWithContext(conversationContextId!!, shortcut, currentMailboxUuid, aiEngine)
         ensureActive()
 
         val hasConversationExpired = apiResponse.error?.code == ErrorCode.OBJECT_NOT_FOUND
         if (hasConversationExpired) {
-            apiResponse = ApiRepository.aiShortcutNoContext(shortcut, history.toList(), currentMailboxEmail, aiEngine)
+            apiResponse = ApiRepository.aiShortcutNoContext(shortcut, history.toList(), currentMailboxUuid, aiEngine)
             ensureActive()
         }
 

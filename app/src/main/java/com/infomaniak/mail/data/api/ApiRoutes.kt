@@ -133,18 +133,18 @@ object ApiRoutes {
         return "${getMessages(mailboxUuid, folderId)}/messages?uids=${uids.joinToString(",")}"
     }
 
-    private fun emailParameter(currentMailboxEmail: String) = "?email=$currentMailboxEmail"
+    private fun mailboxUuidParameter(currentMailboxUuid: String) = "?mailbox_uuid=$currentMailboxUuid"
 
-    fun aiConversation(currentMailboxEmail: String): String {
-        return "${ai()}${emailParameter(currentMailboxEmail)}"
+    fun aiConversation(currentMailboxUuid: String): String {
+        return "${ai()}${mailboxUuidParameter(currentMailboxUuid)}"
     }
 
     fun aiShortcutWithContext(contextId: String, action: String, currentMailboxEmail: String): String {
-        return "${ai()}/mobile/$contextId/$action${emailParameter(currentMailboxEmail)}"
+        return "${ai()}/mobile/$contextId/$action${mailboxUuidParameter(currentMailboxEmail)}"
     }
 
     fun aiShortcutNoContext(action: String, currentMailboxEmail: String): String {
-        return "${ai()}/mobile/$action${emailParameter(currentMailboxEmail)}"
+        return "${ai()}/mobile/$action${mailboxUuidParameter(currentMailboxEmail)}"
     }
 
     private fun getMessages(mailboxUuid: String, folderId: String): String {
