@@ -89,7 +89,7 @@ class AiPropositionFragment : Fragment() {
         setUi()
 
         if (aiViewModel.aiPropositionStatusLiveData.value == null) {
-            currentRequestJob = aiViewModel.generateNewAiProposition(newMessageViewModel.currentMailbox.email)
+            currentRequestJob = aiViewModel.generateNewAiProposition(newMessageViewModel.currentMailbox.uuid)
         }
         observeAiProposition()
     }
@@ -222,7 +222,7 @@ class AiPropositionFragment : Fragment() {
         } else {
             binding.loadingPlaceholder.text = getLastMessage()
             aiPropositionStatusLiveData.value = null
-            currentRequestJob = performShortcut(shortcut, newMessageViewModel.currentMailbox.email)
+            currentRequestJob = performShortcut(shortcut, newMessageViewModel.currentMailbox.uuid)
         }
     }
 

@@ -24,7 +24,6 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import com.infomaniak.lib.applock.Utils.isKeyguardSecure
 import com.infomaniak.lib.applock.Utils.silentlyReverseSwitch
 import com.infomaniak.lib.core.utils.openAppNotificationSettings
@@ -35,10 +34,12 @@ import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.databinding.FragmentSettingsBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.animatedNavigation
 import com.infomaniak.mail.utils.launchSyncAutoConfigActivityForResult
+import com.infomaniak.mail.utils.observeNotNull
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -47,7 +48,6 @@ class SettingsFragment : Fragment() {
 
     private var binding: FragmentSettingsBinding by safeBinding()
     private val mainViewModel: MainViewModel by activityViewModels()
-    private val settingsViewModel: SettingsViewModel by viewModels()
 
     @Inject
     lateinit var localSettings: LocalSettings
@@ -155,8 +155,8 @@ class SettingsFragment : Fragment() {
     }
 
     private fun observeFeatureFlag() {
-        settingsViewModel.aiFeatureFlag.observe(viewLifecycleOwner) {
-            binding.settingsAiEngine.isVisible = it.isEnabled
+        mainViewModel.currentMailbox.observeNotNull(viewLifecycleOwner) {
+            binding.settingsAiEngine.isVisible = it.featureFlags.contains(FeatureFlag.AI)
         }
     }
 }

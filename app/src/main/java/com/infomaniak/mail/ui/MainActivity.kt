@@ -170,7 +170,6 @@ class MainActivity : BaseActivity() {
         setupMenuDrawerCallbacks()
 
         mainViewModel.updateUserInfo()
-        mainViewModel.updateFeatureFlag()
 
         loadCurrentMailbox()
 

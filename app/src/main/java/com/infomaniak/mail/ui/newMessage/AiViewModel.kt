@@ -21,15 +21,12 @@ import androidx.annotation.IdRes
 import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.cache.userInfo.FeatureFlagController
-import com.infomaniak.mail.data.models.FeatureFlag.FeatureFlagType
 import com.infomaniak.mail.data.models.ai.*
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.newMessage.AiViewModel.PropositionStatus.*
@@ -46,7 +43,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AiViewModel @Inject constructor(
-    private val featureFlagController: FeatureFlagController,
     private val sharedUtils: SharedUtils,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
@@ -64,10 +60,10 @@ class AiViewModel @Inject constructor(
     val aiPropositionStatusLiveData = MutableLiveData<PropositionStatus>()
     val aiOutputToInsert = SingleLiveEvent<Pair<String?, String>>()
 
-    fun generateNewAiProposition(currentMailboxEmail: String) = viewModelScope.launch(ioCoroutineContext) {
+    fun generateNewAiProposition(currentMailboxUuid: String) = viewModelScope.launch(ioCoroutineContext) {
         history.clear()
         val userMessage = UserMessage(aiPrompt)
-        with(ApiRepository.startNewConversation(userMessage, currentMailboxEmail, localSettings.aiEngine)) {
+        with(ApiRepository.startNewConversation(userMessage, currentMailboxUuid, localSettings.aiEngine)) {
             ensureActive()
             handleAiResult(apiResponse = this, userMessage)
         }
@@ -89,25 +85,23 @@ class AiViewModel @Inject constructor(
         )
     }
 
-    fun performShortcut(shortcut: Shortcut, currentMailboxEmail: String) = viewModelScope.launch(ioCoroutineContext) {
+    fun performShortcut(shortcut: Shortcut, currentMailboxUuid: String) = viewModelScope.launch(ioCoroutineContext) {
         val aiEngine = localSettings.aiEngine
 
-        var apiResponse = ApiRepository.aiShortcutWithContext(conversationContextId!!, shortcut, currentMailboxEmail, aiEngine)
+        var apiResponse = ApiRepository.aiShortcutWithContext(conversationContextId!!, shortcut, currentMailboxUuid, aiEngine)
         ensureActive()
 
         val hasConversationExpired = apiResponse.error?.code == ErrorCode.OBJECT_NOT_FOUND
         if (hasConversationExpired) {
-            apiResponse = ApiRepository.aiShortcutNoContext(shortcut, history.toList(), currentMailboxEmail, aiEngine)
+            apiResponse = ApiRepository.aiShortcutNoContext(shortcut, history.toList(), currentMailboxUuid, aiEngine)
             ensureActive()
         }
 
         handleAiResult(apiResponse = apiResponse, apiResponse.data?.promptMessage)
     }
 
-    val aiFeatureFlag = featureFlagController.getFeatureFlagAsync(FeatureFlagType.AI).asLiveData(ioCoroutineContext)
-
-    fun updateFeatureFlag() = viewModelScope.launch(ioCoroutineContext) {
-        sharedUtils.updateAiFeatureFlag()
+    fun updateFeatureFlag(currentMailboxObjectId: String, mailboxUuid: String) = viewModelScope.launch(ioCoroutineContext) {
+        sharedUtils.updateAiFeatureFlag(currentMailboxObjectId, mailboxUuid)
     }
 
     fun isHistoryEmpty(): Boolean = history.isEmpty()
