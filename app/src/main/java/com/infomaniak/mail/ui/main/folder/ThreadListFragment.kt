@@ -482,7 +482,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun observeCurrentThreads() = with(mainViewModel) {
-
         reassignCurrentThreadsLive()
 
         currentThreadsLive.bindResultsChangeToAdapter(viewLifecycleOwner, threadListAdapter).apply {
