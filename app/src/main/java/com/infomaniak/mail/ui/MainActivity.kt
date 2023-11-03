@@ -186,20 +186,7 @@ class MainActivity : BaseActivity() {
 
         permissionUtils.requestMainPermissionsIfNeeded()
 
-        initAppUpdateManager(this) {
-            mainViewModel.snackBarManager.setValue(
-                title = "Update downloaded",
-                buttonTitle = R.string.buttonInstall,
-                customBehavior = {
-                    installDownloadedUpdate {
-                        Sentry.captureException(it)
-                        // TODO: Better management of error, probably send a notification
-                        // This avoid the user being instantly reprompt to download update
-                        localSettings.isUserWantingUpdates = false
-                    }
-                },
-            )
-        }
+        initAppUpdateManager()
     }
 
     private fun observeNetworkStatus() {
@@ -476,15 +463,36 @@ class MainActivity : BaseActivity() {
         }
     }
 
+    private fun initAppUpdateManager() {
+        initAppUpdateManager(this) {
+            // TODO: Decide how we prompt the user (snackbar, notif, etc)
+            mainViewModel.snackBarManager.setValue(
+                title = getString(R.string.snackbarDownloadInProgress),
+                buttonTitle = R.string.buttonInstall,
+                customBehavior = ::launchAppUpdateInstall,
+            )
+        }
+    }
+
+    private fun launchAppUpdateInstall() {
+        installDownloadedUpdate {
+            Sentry.captureException(it)
+            // TODO: Better management of error, probably send a notification
+            // This avoid the user being instantly reprompt to download update
+            localSettings.isUserWantingUpdates = false
+        }
+    }
+
     private fun showUpdateAvailable() = with(localSettings) {
         if (isUserWantingUpdates || (appLaunches != 0 && appLaunches % 10 == 0)) {
             checkUpdateIsAvailable(
                 appId = BuildConfig.APPLICATION_ID,
                 versionCode = BuildConfig.VERSION_CODE,
                 resultLauncher = inAppUpdateResultLauncher,
-            ) { updateIsAvailable ->
-                if (updateIsAvailable) navController.navigate(R.id.updateAvailableBottomSheetDialog)
-            }
+                onResult = { updateIsAvailable ->
+                    if (updateIsAvailable) navController.navigate(R.id.updateAvailableBottomSheetDialog)
+                },
+            )
         }
     }
 
