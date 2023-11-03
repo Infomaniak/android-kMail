@@ -44,7 +44,7 @@ object MessageBodyUtils {
         "#oriMsgHtmlSeperator",
         "#reply139content",
         anyCssClassContaining("gmail_extra"),
-        anyCssClassContaining("gmail_quote"),
+        "${anyCssClassContaining("gmail_quote")}:has(> blockquote)",
         anyCssClassContaining(INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME),
         anyCssClassContaining("moz-cite-prefix"),
         anyCssClassContaining("protonmail_quote"),
