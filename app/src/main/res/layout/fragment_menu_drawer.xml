@@ -309,13 +309,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
-            <TextView
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/appVersionName"
-                style="@style/Label.Secondary"
-                android:layout_width="match_parent"
+                style="@style/TextButton"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginHorizontal="@dimen/marginStandardSmall"
+                android:fontFamily="@font/suisseintl_regular"
                 android:gravity="center"
-                android:padding="@dimen/marginStandardSmall"
+                android:minHeight="0dp"
+                android:textColor="@color/secondaryTextColor"
+                android:textSize="12sp"
                 tools:text="App version XXX (xx)" />
 
         </LinearLayout>
