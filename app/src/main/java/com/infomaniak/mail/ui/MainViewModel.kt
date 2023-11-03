@@ -97,7 +97,6 @@ class MainViewModel @Inject constructor(
     val flushFolderTrigger = SingleLiveEvent<Unit>()
     val newFolderResultTrigger = MutableLiveData<Unit>()
     val reportPhishingTrigger = SingleLiveEvent<Unit>()
-    val easterEggConfettiTrigger = MutableLiveData<String?>(null)
 
     val snackBarManager by lazy { SnackBarManager() }
 

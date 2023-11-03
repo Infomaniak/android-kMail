@@ -166,7 +166,6 @@ class MainActivity : BaseActivity() {
         observeDeletedMessages()
         observeDeleteThreadTrigger()
         observeDraftWorkerResults()
-        observeEasterEggConfettiTriggers()
         binding.drawerLayout.addDrawerListener(drawerListener)
         registerFirebaseBroadcastReceiver.initFirebaseBroadcastReceiver(this, mainViewModel)
 
@@ -491,7 +490,7 @@ class MainActivity : BaseActivity() {
         syncAutoConfigActivityResultLauncher.launch(Intent(this, SyncAutoConfigActivity::class.java))
     }
 
-    fun easterEggConfettiHasBeenClicked(from: String) {
+    fun onEasterEggConfettiClicked(from: String) {
 
         val currentTime = System.currentTimeMillis()
 
@@ -503,29 +502,25 @@ class MainActivity : BaseActivity() {
         }
 
         if (easterEggConfettiCount == EASTER_EGG_CONFETTI_TAPS_TRIGGER) {
-            mainViewModel.easterEggConfettiTrigger.value = from
             easterEggConfettiCount = 0
+            triggerEasterEggConfetti(from)
         }
     }
 
-    private fun observeEasterEggConfettiTriggers() = with(mainViewModel) {
-        easterEggConfettiTrigger.observeNotNull(owner = this@MainActivity) { from ->
+    private fun triggerEasterEggConfetti(from: String) = with(mainViewModel) {
 
-            Sentry.withScope { scope ->
-                scope.level = SentryLevel.INFO
-                scope.setTag("from", from)
-                Sentry.captureMessage("Easter egg Confetti has been triggered! Woohoo!")
-            }
-
-            CommonConfetti.rainingConfetti(binding.easterEggConfettiContainer, EASTER_EGG_CONFETTI_COLORS)
-                .confettiManager
-                .setNumInitialCount(0)
-                .setEmissionDuration(EASTER_EGG_CONFETTI_DURATION)
-                .setEmissionRate(EASTER_EGG_CONFETTI_EMISSION_RATE)
-                .animate()
-
-            easterEggConfettiTrigger.value = null
+        Sentry.withScope { scope ->
+            scope.level = SentryLevel.INFO
+            scope.setTag("from", from)
+            Sentry.captureMessage("Easter egg Confetti has been triggered! Woohoo!")
         }
+
+        CommonConfetti.rainingConfetti(binding.easterEggConfettiContainer, EASTER_EGG_CONFETTI_COLORS)
+            .confettiManager
+            .setNumInitialCount(0)
+            .setEmissionDuration(EASTER_EGG_CONFETTI_DURATION)
+            .setEmissionRate(EASTER_EGG_CONFETTI_EMISSION_RATE)
+            .animate()
     }
 
     companion object {
