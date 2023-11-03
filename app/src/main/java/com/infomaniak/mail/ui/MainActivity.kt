@@ -42,8 +42,13 @@ import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.Utils.toEnumOrThrow
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
-import com.infomaniak.lib.stores.checkUpdateIsAvailable
-import com.infomaniak.lib.stores.launchInAppReview
+import com.infomaniak.lib.stores.*
+import com.infomaniak.lib.stores.StoreUtils.checkStalledUpdate
+import com.infomaniak.lib.stores.StoreUtils.checkUpdateIsAvailable
+import com.infomaniak.lib.stores.StoreUtils.initAppUpdateManager
+import com.infomaniak.lib.stores.StoreUtils.installDownloadedUpdate
+import com.infomaniak.lib.stores.StoreUtils.launchInAppReview
+import com.infomaniak.lib.stores.StoreUtils.unregisterAppUpdateListener
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.MatomoMail.trackEvent
@@ -113,6 +118,10 @@ class MainActivity : BaseActivity() {
         }
     }
 
+    private val inAppUpdateResultLauncher = registerForActivityResult(StartIntentSenderForResult()) { result ->
+        localSettings.isUserWantingUpdates = result.resultCode == RESULT_OK
+    }
+
     @Inject
     lateinit var draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler
 
@@ -176,6 +185,21 @@ class MainActivity : BaseActivity() {
         loadCurrentMailbox()
 
         permissionUtils.requestMainPermissionsIfNeeded()
+
+        initAppUpdateManager(this) {
+            mainViewModel.snackBarManager.setValue(
+                title = "Update downloaded",
+                buttonTitle = R.string.buttonInstall,
+                customBehavior = {
+                    installDownloadedUpdate {
+                        Sentry.captureException(it)
+                        // TODO: Better management of error, probably send a notification
+                        // This avoid the user being instantly reprompt to download update
+                        localSettings.isUserWantingUpdates = false
+                    }
+                },
+            )
+        }
     }
 
     private fun observeNetworkStatus() {
@@ -318,6 +342,8 @@ class MainActivity : BaseActivity() {
         super.onResume()
         playServicesUtils.checkPlayServices(this)
 
+        checkStalledUpdate(inAppUpdateResultLauncher)
+
         if (binding.drawerLayout.isOpen) colorSystemBarsWithMenuDrawer()
     }
 
@@ -350,6 +376,7 @@ class MainActivity : BaseActivity() {
 
     override fun onStop() {
         descriptionDialog.resetLoadingAndDismiss()
+        unregisterAppUpdateListener()
         super.onStop()
     }
 
@@ -451,7 +478,11 @@ class MainActivity : BaseActivity() {
 
     private fun showUpdateAvailable() = with(localSettings) {
         if (isUserWantingUpdates || (appLaunches != 0 && appLaunches % 10 == 0)) {
-            checkUpdateIsAvailable(BuildConfig.APPLICATION_ID, BuildConfig.VERSION_CODE) { updateIsAvailable ->
+            checkUpdateIsAvailable(
+                appId = BuildConfig.APPLICATION_ID,
+                versionCode = BuildConfig.VERSION_CODE,
+                resultLauncher = inAppUpdateResultLauncher,
+            ) { updateIsAvailable ->
                 if (updateIsAvailable) navController.navigate(R.id.updateAvailableBottomSheetDialog)
             }
         }
