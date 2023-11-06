@@ -34,6 +34,7 @@ import java.util.List;
  * it will automatically remove itself from the parent.
  */
 public class ConfettiView extends View implements View.OnLayoutChangeListener {
+
     private List<Confetto> confetti;
     private boolean terminated;
 
@@ -103,8 +104,7 @@ public class ConfettiView extends View implements View.OnLayoutChangeListener {
     }
 
     @Override
-    public void onLayoutChange(View view, int i, int i1, int i2, int i3, int i4, int i5, int i6,
-                               int i7) {
+    public void onLayoutChange(View view, int i, int i1, int i2, int i3, int i4, int i5, int i6, int i7) {
         if (terminated) {
             final ViewParent parent = getParent();
             if (parent != null && parent instanceof final ViewGroup vg) {
