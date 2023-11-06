@@ -59,46 +59,61 @@ object MessageBodyUtils {
         val bodyContent = body.value
         if (body.type == Utils.TEXT_PLAIN) return SplitBody(bodyContent)
 
-        return runCatching {
-            withTimeout(QUOTE_DETECTION_TIMEOUT) {
-
-                var splitBody: SplitBody? = null
-
-                CoroutineScope(Dispatchers.Default).launch {
-                    // The original parsed HTML document in full
-                    val originalHtmlDocument = Jsoup.parse(bodyContent)
-                    // Initiated to the original document and it'll be processed by Jsoup to remove quotes
-                    val htmlDocumentWithoutQuote = originalHtmlDocument.clone()
-
-                    // Find the last parent blockquote and delete it in `htmlDocumentWithoutQuote`
-                    val blockquoteElement = findAndRemoveLastParentBlockquote(htmlDocumentWithoutQuote)
-                    // Find the first known parent quote in the HTML and delete all known quotes descriptor
-                    val currentQuoteDescriptor =
-                        findFirstKnownParentQuoteDescriptor(htmlDocumentWithoutQuote, scope = this).ifEmpty {
-                            if (blockquoteElement == null) "" else BLOCKQUOTE
-                        }
-
-                    val (content, quote) = splitContentAndQuote(originalHtmlDocument, currentQuoteDescriptor, blockquoteElement)
-                    ensureActive()
-                    splitBody = if (quote.isNullOrBlank()) SplitBody(bodyContent) else SplitBody(content, bodyContent)
-
-                }.join()
-
-                splitBody!!
-            }
-        }.getOrElse {
-            if (it is TimeoutCancellationException) {
+        return executeWithTimeoutOrDefault(
+            timeout = QUOTE_DETECTION_TIMEOUT,
+            defaultValue = SplitBody(bodyContent),
+            block = {
+                val (content, quote) = splitContentAndQuote(htmlDocument = Jsoup.parse(bodyContent))
+                if (quote.isNullOrBlank()) SplitBody(bodyContent) else SplitBody(content, bodyContent)
+            },
+            onTimeout = {
                 Sentry.withScope { scope ->
                     scope.level = SentryLevel.WARNING
                     scope.setExtra("body size", "${bodyContent.toByteArray().size} bytes")
                     scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
                     Sentry.captureMessage("Timeout reached while displaying a Message's body")
                 }
-            } else {
-                Sentry.captureException(it)
-            }
-            SplitBody(bodyContent)
+            },
+        )
+    }
+
+    private suspend fun <T> executeWithTimeoutOrDefault(
+        timeout: Long,
+        defaultValue: T,
+        block: CoroutineScope.() -> T,
+        onTimeout: (() -> Unit)? = null,
+    ): T = runCatching {
+        coroutineWithTimeout(timeout, block)
+    }.getOrElse {
+        if (it is TimeoutCancellationException) onTimeout?.invoke() else Sentry.captureException(it)
+        defaultValue
+    }
+
+    private suspend fun <T> coroutineWithTimeout(
+        timeout: Long,
+        block: CoroutineScope.() -> T,
+    ): T = withTimeout(timeout) {
+        var result: T? = null
+        CoroutineScope(Dispatchers.Default).launch { result = block() }.join()
+        result!!
+    }
+
+    private fun CoroutineScope.splitContentAndQuote(htmlDocument: Document): Pair<String, String?> {
+
+        // Initiated to the original document and it'll be processed by Jsoup to remove quotes
+        val htmlDocumentWithoutQuote = htmlDocument.clone()
+
+        // Find the last parent blockquote and delete it in `htmlDocumentWithoutQuote`
+        val blockquoteElement = findAndRemoveLastParentBlockquote(htmlDocumentWithoutQuote)
+        // Find the first known parent quote in the HTML and delete all known quotes descriptor
+        val currentQuoteDescriptor = findFirstKnownParentQuoteDescriptor(htmlDocumentWithoutQuote, scope = this).ifEmpty {
+            if (blockquoteElement == null) "" else BLOCKQUOTE
         }
+
+        val (content, quote) = splitContentAndQuote(htmlDocument, currentQuoteDescriptor, blockquoteElement)
+        ensureActive()
+
+        return content to quote
     }
 
     private fun findAndRemoveLastParentBlockquote(htmlDocumentWithoutQuote: Document): Element? {
