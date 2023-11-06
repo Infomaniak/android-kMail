@@ -90,7 +90,7 @@ public class ConfettiManager {
     private ConfettiAnimationListener animationListener;
 
     public ConfettiManager(Context context, ConfettoGenerator confettoGenerator, ConfettiSource confettiSource, ViewGroup parentView) {
-        this(confettoGenerator, confettiSource, parentView, ConfettiView.newInstance(context));
+        this(confettoGenerator, confettiSource, parentView, new ConfettiView(context, null));
     }
 
     public ConfettiManager(ConfettoGenerator confettoGenerator, ConfettiSource confettiSource, ViewGroup parentView, ConfettiView confettiView) {
