@@ -333,6 +333,8 @@ class DraftsActionsWorker @AssistedInject constructor(
                 msg = "Upload failed for attachment $name - error : ${apiResponse.translatedError} - data : ${apiResponse.data}",
                 throwable = apiResponse.getApiException(),
             )
+
+            apiResponse.throwErrorAsException()
         }
     }
 
