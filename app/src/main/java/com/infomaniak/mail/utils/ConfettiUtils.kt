@@ -67,12 +67,7 @@ object ConfettiUtils {
                 velocityY = normal,
                 velocityDeviationY = slow,
                 accelerationY = none,
-                colors = arrayOf(
-                    getColor(R.color.commonColor1), getColor(R.color.commonColor2), getColor(R.color.commonColor3),
-                    getColor(R.color.commonColor4), getColor(R.color.commonColor5), getColor(R.color.commonColor6),
-                    getColor(R.color.commonColor7), getColor(R.color.commonColor8), getColor(R.color.commonColor9),
-                    getColor(R.color.commonColor10), getColor(R.color.commonColor11),
-                ).toIntArray(),
+                colors = resources.getIntArray(R.array.snowColors),
                 useGaussian = false,
             )
             val size = resources.getDimensionPixelOffset(R.dimen.confetti_size)
