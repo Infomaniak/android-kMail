@@ -267,6 +267,7 @@ class DraftsActionsWorker @AssistedInject constructor(
 
     private fun Draft.uploadAttachments(): Result {
         val attachmentsToUpload = getNotUploadedAttachments(draft = this)
+        val attachmentsNames = attachmentsToUpload.map { it.name }.toMutableList()
         val attachmentsToUploadCount = attachmentsToUpload.count()
         if (attachmentsToUploadCount > 0) {
             SentryLog.d(ATTACHMENT_TAG, "Uploading $attachmentsToUploadCount attachments")
@@ -275,7 +276,7 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         attachmentsToUpload.forEach { attachment ->
             runCatching {
-                attachment.startUpload(localUuid)
+                attachment.startUpload(localUuid, attachmentsNames)
             }.onFailure { exception ->
                 SentryLog.d(TAG, "${exception.message}", exception)
                 if ((exception as Exception).isNetworkException()) throw ApiController.NetworkException()
@@ -290,7 +291,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         return draft.attachments.filter { attachment -> attachment.uploadLocalUri != null }
     }
 
-    private fun Attachment.startUpload(localDraftUuid: String) {
+    private fun Attachment.startUpload(localDraftUuid: String, attachmentsNames: MutableList<String>) {
         val attachmentFile = getUploadLocalFile(applicationContext, localDraftUuid).also {
             if (!it.exists()) {
                 SentryLog.d(ATTACHMENT_TAG, "No local file for attachment $name")
@@ -315,13 +316,22 @@ class DraftsActionsWorker @AssistedInject constructor(
             if (apiResponse.data?.uuid == null) {
                 SentryLog.e(ATTACHMENT_TAG, "Attachment uuid null from API, this should not happen")
             }
+            attachmentsNames.remove(name)
             updateLocalAttachment(localDraftUuid, apiResponse.data!!)
-            attachmentFile.delete()
-            LocalStorageUtils.deleteAttachmentsUploadsDirIfEmpty(applicationContext, localDraftUuid, userId, mailbox.mailboxId)
+            if (!attachmentsNames.contains(name)) {
+                attachmentFile.delete()
+                LocalStorageUtils.deleteAttachmentsUploadsDirIfEmpty(
+                    context = applicationContext,
+                    localDraftUuid = localDraftUuid,
+                    userId = userId,
+                    mailboxId = mailbox.mailboxId,
+                )
+            }
         } else {
-            SentryLog.d(
+            SentryLog.e(
                 tag = ATTACHMENT_TAG,
                 msg = "Upload failed for attachment $name - error : ${apiResponse.translatedError} - data : ${apiResponse.data}",
+                throwable = apiResponse.getApiException(),
             )
         }
     }
