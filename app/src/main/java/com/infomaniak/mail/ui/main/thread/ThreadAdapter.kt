@@ -88,7 +88,7 @@ class ThreadAdapter(
 
     private val scaledTouchSlop by lazy { ViewConfiguration.get(recyclerView.context).scaledTouchSlop }
 
-    private var ItemMessageBinding.isResponseCollapsed
+    private var ItemMessageBinding.isQuoteCollapsed
         get() = bodyWebView.isVisible
         set(value) {
             bodyWebView.isVisible = value
@@ -184,7 +184,7 @@ class ThreadAdapter(
         val splitBody = message.splitBody
 
         if (body != null && splitBody != null) {
-            if (binding.isResponseCollapsed) {
+            if (binding.isQuoteCollapsed) {
                 val completeBody = splitBody.content + UiUtils.formatSubBodiesContent(body.subBodies, message.uid)
                 loadBodyInWebView(message.uid, completeBody, body.type)
             } else {
@@ -203,7 +203,7 @@ class ThreadAdapter(
     }
 
     private fun ThreadViewHolder.toggleWebViews(message: Message) = with(binding) {
-        isResponseCollapsed = !isResponseCollapsed
+        isQuoteCollapsed = !isQuoteCollapsed
         loadContentAndQuote(message)
     }
 
@@ -378,7 +378,7 @@ class ThreadAdapter(
     }
 
     private fun ItemMessageBinding.reloadVisibleWebView() {
-        if (isResponseCollapsed) bodyWebView.reload() else fullMessageWebView.reload()
+        if (isQuoteCollapsed) bodyWebView.reload() else fullMessageWebView.reload()
     }
 
     private fun ItemMessageBinding.hideAlertGroupIfNoneDisplayed() {
@@ -423,7 +423,7 @@ class ThreadAdapter(
         quoteButton.apply {
             setOnClickListener {
                 toggleWebViews(message)
-                val textId = if (isResponseCollapsed) R.string.messageShowQuotedText else R.string.messageHideQuotedText
+                val textId = if (isQuoteCollapsed) R.string.messageShowQuotedText else R.string.messageHideQuotedText
                 quoteButton.text = context.getString(textId)
             }
 
