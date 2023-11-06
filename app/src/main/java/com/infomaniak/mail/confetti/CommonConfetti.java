@@ -23,10 +23,8 @@ import android.view.ViewGroup;
 
 import com.infomaniak.mail.R;
 import com.infomaniak.mail.confetti.confetto.BitmapConfetto;
-import com.infomaniak.mail.confetti.confetto.Confetto;
 
 import java.util.List;
-import java.util.Random;
 
 public class CommonConfetti {
     private static int defaultConfettiSize;
@@ -143,12 +141,7 @@ public class CommonConfetti {
     private ConfettoGenerator getDefaultGenerator(int[] colors) {
         final List<Bitmap> bitmaps = Utils.generateConfettiBitmaps(colors, defaultConfettiSize);
         final int numBitmaps = bitmaps.size();
-        return new ConfettoGenerator() {
-            @Override
-            public Confetto generateConfetto(Random random) {
-                return new BitmapConfetto(bitmaps.get(random.nextInt(numBitmaps)));
-            }
-        };
+        return random -> new BitmapConfetto(bitmaps.get(random.nextInt(numBitmaps)));
     }
 
     private void configureRainingConfetti(ViewGroup container, ConfettiSource confettiSource, int[] colors) {
