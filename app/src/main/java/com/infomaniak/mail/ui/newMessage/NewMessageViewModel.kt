@@ -650,7 +650,7 @@ class NewMessageViewModel @Inject constructor(
         return LocalStorageUtils.saveUploadAttachment(context, uri, fileName, draft.localUuid)
             ?.let { file ->
                 val mimeType = file.path.guessMimeType()
-                Attachment().apply { initLocalValues(file.name, file.length(), mimeType, file.toUri().toString()) } to false
+                Attachment().apply { initLocalValues(fileName, file.length(), mimeType, file.toUri().toString()) } to false
             } ?: (null to false)
     }
 

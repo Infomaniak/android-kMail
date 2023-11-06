@@ -21,6 +21,8 @@ import android.content.Context
 import android.content.Intent
 import androidx.annotation.DrawableRes
 import androidx.core.content.FileProvider
+import androidx.core.net.toFile
+import androidx.core.net.toUri
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.lib.core.utils.guessMimeType
 import com.infomaniak.mail.R
@@ -107,7 +109,7 @@ class Attachment : EmbeddedRealmObject {
         mailboxId: Int = AccountUtils.currentMailboxId,
     ): File {
         val uploadFolder = LocalStorageUtils.getAttachmentsUploadDir(context, localDraftUuid, userId, mailboxId)
-        return File(uploadFolder, name)
+        return uploadLocalUri?.toUri()?.toFile() ?: File(uploadFolder, name)
     }
 
     fun openWithIntent(context: Context): Intent {

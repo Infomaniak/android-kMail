@@ -266,8 +266,7 @@ class DraftsActionsWorker @AssistedInject constructor(
     }
 
     private fun Draft.uploadAttachments(): Result {
-        val attachmentsToUpload = getNotUploadedAttachments(draft = this)
-        val attachmentsNames = attachmentsToUpload.map { it.name }.toMutableList()
+        val (attachmentsToUpload, attachmentsUris) = getNotUploadedAttachments(draft = this)
         val attachmentsToUploadCount = attachmentsToUpload.count()
         if (attachmentsToUploadCount > 0) {
             SentryLog.d(ATTACHMENT_TAG, "Uploading $attachmentsToUploadCount attachments")
@@ -276,7 +275,7 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         attachmentsToUpload.forEach { attachment ->
             runCatching {
-                attachment.startUpload(localUuid, attachmentsNames)
+                attachment.startUpload(localUuid, attachmentsUris)
             }.onFailure { exception ->
                 SentryLog.d(TAG, "${exception.message}", exception)
                 if ((exception as Exception).isNetworkException()) throw ApiController.NetworkException()
@@ -287,11 +286,16 @@ class DraftsActionsWorker @AssistedInject constructor(
         return Result.success()
     }
 
-    private fun getNotUploadedAttachments(draft: Draft): List<Attachment> {
-        return draft.attachments.filter { attachment -> attachment.uploadLocalUri != null }
+    private fun getNotUploadedAttachments(draft: Draft): Pair<List<Attachment>, MutableList<String>> {
+        val attachmentUris = mutableListOf<String>()
+        val localAttachments = draft.attachments.filter { attachment ->
+            (attachment.uploadLocalUri != null).also { if (it) attachmentUris.add(attachment.uploadLocalUri!!) }
+        }
+
+        return localAttachments to attachmentUris
     }
 
-    private fun Attachment.startUpload(localDraftUuid: String, attachmentsNames: MutableList<String>) {
+    private fun Attachment.startUpload(localDraftUuid: String, attachmentsUris: MutableList<String>) {
         val attachmentFile = getUploadLocalFile(applicationContext, localDraftUuid).also {
             if (!it.exists()) {
                 SentryLog.d(ATTACHMENT_TAG, "No local file for attachment $name")
@@ -316,9 +320,9 @@ class DraftsActionsWorker @AssistedInject constructor(
             if (apiResponse.data?.uuid == null) {
                 SentryLog.e(ATTACHMENT_TAG, "Attachment uuid null from API, this should not happen")
             }
-            attachmentsNames.remove(name)
+            attachmentsUris.remove(uploadLocalUri)
             updateLocalAttachment(localDraftUuid, apiResponse.data!!)
-            if (!attachmentsNames.contains(name)) {
+            if (!attachmentsUris.contains(uploadLocalUri)) {
                 attachmentFile.delete()
                 LocalStorageUtils.deleteAttachmentsUploadsDirIfEmpty(
                     context = applicationContext,
