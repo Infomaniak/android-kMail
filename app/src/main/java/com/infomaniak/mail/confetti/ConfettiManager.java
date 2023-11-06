@@ -23,6 +23,8 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.animation.Interpolator;
 
+import androidx.annotation.NonNull;
+
 import com.infomaniak.mail.confetti.confetto.Confetto;
 
 import java.util.ArrayList;
@@ -36,6 +38,7 @@ import java.util.Random;
  * A helper manager class for configuring a set of confetti and displaying them on the UI.
  */
 public class ConfettiManager {
+
     public static final long INFINITE_DURATION = Long.MAX_VALUE;
 
     private final Random random = new Random();
@@ -56,32 +59,41 @@ public class ConfettiManager {
     // Configured attributes for the entire confetti group
     private int numInitialCount;
     private long emissionDuration;
-    private float emissionRate, emissionRateInverse;
+    private float emissionRate;
+    private float emissionRateInverse;
     private Interpolator fadeOutInterpolator;
     private Rect bound;
 
     // Configured attributes for each confetto
-    private float velocityX, velocityDeviationX;
-    private float velocityY, velocityDeviationY;
-    private float accelerationX, accelerationDeviationX;
-    private float accelerationY, accelerationDeviationY;
-    private Float targetVelocityX, targetVelocityXDeviation;
-    private Float targetVelocityY, targetVelocityYDeviation;
-    private int initialRotation, initialRotationDeviation;
-    private float rotationalVelocity, rotationalVelocityDeviation;
-    private float rotationalAcceleration, rotationalAccelerationDeviation;
-    private Float targetRotationalVelocity, targetRotationalVelocityDeviation;
+    private float velocityX;
+    private float velocityDeviationX;
+    private float velocityY;
+    private float velocityDeviationY;
+    private float accelerationX;
+    private float accelerationDeviationX;
+    private float accelerationY;
+    private float accelerationDeviationY;
+    private Float targetVelocityX;
+    private Float targetVelocityXDeviation;
+    private Float targetVelocityY;
+    private Float targetVelocityYDeviation;
+    private int initialRotation;
+    private int initialRotationDeviation;
+    private float rotationalVelocity;
+    private float rotationalVelocityDeviation;
+    private float rotationalAcceleration;
+    private float rotationalAccelerationDeviation;
+    private Float targetRotationalVelocity;
+    private Float targetRotationalVelocityDeviation;
     private long ttl;
 
     private ConfettiAnimationListener animationListener;
 
-    public ConfettiManager(Context context, ConfettoGenerator confettoGenerator,
-                           ConfettiSource confettiSource, ViewGroup parentView) {
+    public ConfettiManager(Context context, ConfettoGenerator confettoGenerator, ConfettiSource confettiSource, ViewGroup parentView) {
         this(confettoGenerator, confettiSource, parentView, ConfettiView.newInstance(context));
     }
 
-    public ConfettiManager(ConfettoGenerator confettoGenerator,
-                           ConfettiSource confettiSource, ViewGroup parentView, ConfettiView confettiView) {
+    public ConfettiManager(ConfettoGenerator confettoGenerator, ConfettiSource confettiSource, ViewGroup parentView, ConfettiView confettiView) {
         this.confettoGenerator = confettoGenerator;
         this.confettiSource = confettiSource;
         this.parentView = parentView;
@@ -90,11 +102,12 @@ public class ConfettiManager {
 
         this.confettiView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
             @Override
-            public void onViewAttachedToWindow(View v) {
+            public void onViewAttachedToWindow(@NonNull View v) {
+                // No-op
             }
 
             @Override
-            public void onViewDetachedFromWindow(View v) {
+            public void onViewDetachedFromWindow(@NonNull View v) {
                 terminate();
             }
         });
@@ -255,8 +268,7 @@ public class ConfettiManager {
      * @param targetVelocityXDeviation the deviation from target X velocity in pixels per second.
      * @return the confetti manager so that the set calls can be chained.
      */
-    public ConfettiManager setTargetVelocityX(float targetVelocityX,
-                                              float targetVelocityXDeviation) {
+    public ConfettiManager setTargetVelocityX(float targetVelocityX, float targetVelocityXDeviation) {
         this.targetVelocityX = targetVelocityX / 1_000.0f;
         this.targetVelocityXDeviation = targetVelocityXDeviation / 1_000.0f;
         return this;
@@ -279,8 +291,7 @@ public class ConfettiManager {
      * @param targetVelocityYDeviation the deviation from target Y velocity in pixels per second.
      * @return the confetti manager so that the set calls can be chained.
      */
-    public ConfettiManager setTargetVelocityY(float targetVelocityY,
-                                              float targetVelocityYDeviation) {
+    public ConfettiManager setTargetVelocityY(float targetVelocityY, float targetVelocityYDeviation) {
         this.targetVelocityY = targetVelocityY / 1_000.0f;
         this.targetVelocityYDeviation = targetVelocityYDeviation / 1_000.0f;
         return this;
@@ -329,8 +340,7 @@ public class ConfettiManager {
      *                                    degrees per second.
      * @return the confetti manager so that the set calls can be chained.
      */
-    public ConfettiManager setRotationalVelocity(float rotationalVelocity,
-                                                 float rotationalVelocityDeviation) {
+    public ConfettiManager setRotationalVelocity(float rotationalVelocity, float rotationalVelocityDeviation) {
         this.rotationalVelocity = rotationalVelocity / 1_000.0f;
         this.rotationalVelocityDeviation = rotationalVelocityDeviation / 1_000.0f;
         return this;
@@ -355,8 +365,7 @@ public class ConfettiManager {
      *                                        per second^2.
      * @return the confetti manager so that the set calls can be chained.
      */
-    public ConfettiManager setRotationalAcceleration(float rotationalAcceleration,
-                                                     float rotationalAccelerationDeviation) {
+    public ConfettiManager setRotationalAcceleration(float rotationalAcceleration, float rotationalAccelerationDeviation) {
         this.rotationalAcceleration = rotationalAcceleration / 1_000_000.0f;
         this.rotationalAccelerationDeviation = rotationalAccelerationDeviation / 1_000_000.0f;
         return this;
@@ -542,8 +551,7 @@ public class ConfettiManager {
             } else {
                 final long timeSinceLastEmission = elapsedTime - lastEmittedTimestamp;
                 // Randomly determine how many confetti to emit
-                final int numNewConfetti = (int)
-                        (random.nextFloat() * emissionRate * timeSinceLastEmission);
+                final int numNewConfetti = (int) (random.nextFloat() * emissionRate * timeSinceLastEmission);
                 if (numNewConfetti > 0) {
                     lastEmittedTimestamp += Math.round(emissionRateInverse * numNewConfetti);
                     addNewConfetti(numNewConfetti, elapsedTime, useGaussian);

@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Utils {
+
     private static final Paint PAINT = new Paint();
     private static Interpolator defaultAlphaInterpolator;
 
@@ -32,15 +33,12 @@ public class Utils {
         PAINT.setStyle(Paint.Style.FILL);
     }
 
+    private Utils() {
+        // No-op
+    }
+
     public static Interpolator getDefaultAlphaInterpolator() {
-        if (defaultAlphaInterpolator == null) {
-            defaultAlphaInterpolator = new Interpolator() {
-                @Override
-                public float getInterpolation(float v) {
-                    return v >= 0.9f ? 1f - (v - 0.9f) * 10f : 1f;
-                }
-            };
-        }
+        if (defaultAlphaInterpolator == null) defaultAlphaInterpolator = v -> v >= 0.9f ? 1.0f - (v - 0.9f) * 10.0f : 1.0f;
         return defaultAlphaInterpolator;
     }
 
@@ -59,7 +57,7 @@ public class Utils {
         final Canvas canvas = new Canvas(bitmap);
         PAINT.setColor(color);
 
-        final float radius = size / 2f;
+        final float radius = size / 2.0f;
         canvas.drawCircle(radius, radius, radius, PAINT);
         return bitmap;
     }
@@ -87,7 +85,7 @@ public class Utils {
 
         // Generate equilateral triangle (http://mathworld.wolfram.com/EquilateralTriangle.html).
         final Path path = new Path();
-        final float point = (float) Math.tan(15f / 180f * Math.PI) * size;
+        final float point = (float) Math.tan(15.0f / 180.0f * Math.PI) * size;
         path.moveTo(0, 0);
         path.lineTo(size, point);
         path.lineTo(point, size);

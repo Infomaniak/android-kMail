@@ -28,13 +28,15 @@ import android.os.SystemClock;
 import java.util.Random;
 
 public class ShimmeringConfetto extends BitmapConfetto {
+
     private final ArgbEvaluator evaluator = new ArgbEvaluator();
-    private final int fromColor, toColor;
-    private final long waveLength, halfWaveLength;
+    private final int fromColor;
+    private final int toColor;
+    private final long waveLength;
+    private final long halfWaveLength;
     private final long randomStart;
 
-    public ShimmeringConfetto(Bitmap bitmap, int fromColor, int toColor, long waveLength,
-                              Random random) {
+    public ShimmeringConfetto(Bitmap bitmap, int fromColor, int toColor, long waveLength, Random random) {
         super(bitmap);
         this.fromColor = fromColor;
         this.toColor = toColor;
@@ -42,12 +44,11 @@ public class ShimmeringConfetto extends BitmapConfetto {
         this.halfWaveLength = waveLength / 2;
 
         final int currentTime = Math.abs((int) SystemClock.elapsedRealtime());
-        this.randomStart = currentTime - random.nextInt(currentTime);
+        this.randomStart = (long) (currentTime - random.nextInt(currentTime));
     }
 
     @Override
-    protected void drawInternal(Canvas canvas, Matrix matrix, Paint paint, float x, float y,
-                                float rotation, float percentageAnimated) {
+    protected void drawInternal(Canvas canvas, Matrix matrix, Paint paint, float x, float y, float rotation, float percentageAnimated) {
         final long currTime = SystemClock.elapsedRealtime();
         final long fraction = (currTime - randomStart) % waveLength;
         final float animated = fraction < halfWaveLength

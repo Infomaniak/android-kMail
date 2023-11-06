@@ -23,7 +23,11 @@ package com.infomaniak.mail.confetti;
  * with the confetti's size.
  */
 public class ConfettiSource {
-    public final int x0, y0, x1, y1;
+
+    public final int x0;
+    public final int y0;
+    public final int x1;
+    public final int y1;
 
     /**
      * Specifies a point source from which all confetti will emit from.

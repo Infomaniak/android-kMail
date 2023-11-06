@@ -130,32 +130,32 @@ public class ConfettiView extends View implements View.OnLayoutChangeListener {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+
         boolean handled = false;
-        if (touchEnabled) {
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    for (Confetto confetto : confetti) {
-                        if (confetto.onTouchDown(event)) {
-                            draggedConfetto = confetto;
-                            handled = true;
-                            break;
-                        }
-                    }
-                    break;
-                case MotionEvent.ACTION_MOVE:
-                    if (draggedConfetto != null) {
-                        draggedConfetto.onTouchMove(event);
+        if (!touchEnabled) return super.onTouchEvent(event);
+
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN -> {
+                for (Confetto confetto : confetti) {
+                    if (confetto.onTouchDown(event)) {
+                        draggedConfetto = confetto;
                         handled = true;
+                        break;
                     }
-                    break;
-                case MotionEvent.ACTION_UP:
-                case MotionEvent.ACTION_CANCEL:
-                    if (draggedConfetto != null) {
-                        draggedConfetto.onTouchUp(event);
-                        draggedConfetto = null;
-                        handled = true;
-                    }
-                    break;
+                }
+            }
+            case MotionEvent.ACTION_MOVE -> {
+                if (draggedConfetto != null) {
+                    draggedConfetto.onTouchMove(event);
+                    handled = true;
+                }
+            }
+            case MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                if (draggedConfetto != null) {
+                    draggedConfetto.onTouchUp(event);
+                    draggedConfetto = null;
+                    handled = true;
+                }
             }
         }
 
