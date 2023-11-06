@@ -103,51 +103,57 @@ public abstract class Confetto {
 
     // Visible for testing
     protected static long computeBound(float initialPos, float velocity, float acceleration, Long targetTime, Float targetVelocity, int minBound, int maxBound) {
-        if (acceleration != 0) {
+        if (acceleration == 0) {
+            return computeBoundWithoutAcceleration(initialPos, velocity, targetTime, targetVelocity, minBound, maxBound);
+        } else {
             // non-zero acceleration
             final int bound = acceleration > 0 ? maxBound : minBound;
 
             if (targetTime == null || targetTime < 0) {
-                // https://www.wolframalpha.com/input/
-                // ?i=solve+for+t+in+(d+%3D+x+%2B+v+*+t+%2B+0.5+*+a+*+t+*+t)
-
-                final double tmp = Math.sqrt(2 * acceleration * bound - 2 * acceleration * initialPos + velocity * velocity);
-
-                final double firstTime = (-tmp - velocity) / acceleration;
-                if (firstTime > 0) {
-                    return (long) firstTime;
-                }
-
-                final double secondTime = (tmp - velocity) / acceleration;
-                if (secondTime > 0) {
-                    return (long) secondTime;
-                }
-
-                return Long.MAX_VALUE;
+                return computeBoundWithoutTargetTime(initialPos, velocity, acceleration, bound);
             } else {
-                // d = x + v * tm + 0.5 * a * tm * tm + tv * (t - tm)
-                // d - x - v * tm - 0.5 * a * tm * tm = tv * t - tv * tm
-                // d - x - v * tm - 0.5 * a * tm * tm + tv * tm = tv * t
-                // t = (d - x - v * tm - 0.5 * a * tm * tm + tv * tm) / tv
-
-                final double time =
-                        (bound - initialPos - velocity * targetTime -
-                                0.5 * acceleration * targetTime * targetTime +
-                                targetVelocity * targetTime) /
-                                targetVelocity;
-
-                return time > 0 ? (long) time : Long.MAX_VALUE;
-            }
-        } else {
-            float actualVelocity = targetTime == null ? velocity : targetVelocity;
-            final int bound = actualVelocity > 0 ? maxBound : minBound;
-            if (actualVelocity != 0) {
-                final double time = (bound - initialPos) / actualVelocity;
-                return time > 0 ? (long) time : Long.MAX_VALUE;
-            } else {
-                return Long.MAX_VALUE;
+                return computeBoundWithTargetTime(initialPos, velocity, acceleration, targetTime, targetVelocity, bound);
             }
         }
+    }
+
+    private static long computeBoundWithoutAcceleration(float initialPos, float velocity, Long targetTime, Float targetVelocity, int minBound, int maxBound) {
+        float actualVelocity = targetTime == null ? velocity : targetVelocity;
+        final int bound = actualVelocity > 0 ? maxBound : minBound;
+        if (actualVelocity == 0) {
+            return Long.MAX_VALUE;
+        } else {
+            final double time = (bound - initialPos) / actualVelocity;
+            return time > 0 ? (long) time : Long.MAX_VALUE;
+        }
+    }
+
+    private static long computeBoundWithoutTargetTime(float initialPos, float velocity, float acceleration, int bound) {
+        // https://www.wolframalpha.com/input/
+        // ?i=solve+for+t+in+(d+%3D+x+%2B+v+*+t+%2B+0.5+*+a+*+t+*+t)
+
+        final double tmp = Math.sqrt(2 * acceleration * bound - 2 * acceleration * initialPos + velocity * velocity);
+
+        final double firstTime = (-tmp - velocity) / acceleration;
+        if (firstTime > 0) return (long) firstTime;
+
+        final double secondTime = (tmp - velocity) / acceleration;
+
+        return secondTime > 0.0 ? (long) secondTime : Long.MAX_VALUE;
+    }
+
+    private static long computeBoundWithTargetTime(float initialPos, float velocity, float acceleration, Long targetTime, Float targetVelocity, int bound) {
+        // d = x + v * tm + 0.5 * a * tm * tm + tv * (t - tm)
+        // d - x - v * tm - 0.5 * a * tm * tm = tv * t - tv * tm
+        // d - x - v * tm - 0.5 * a * tm * tm + tv * tm = tv * t
+        // t = (d - x - v * tm - 0.5 * a * tm * tm + tv * tm) / tv
+
+        final double time = (bound - initialPos - velocity * targetTime -
+                0.5 * acceleration * targetTime * targetTime +
+                targetVelocity * targetTime) /
+                targetVelocity;
+
+        return time > 0.0 ? (long) time : Long.MAX_VALUE;
     }
 
     /**
@@ -159,30 +165,22 @@ public abstract class Confetto {
     public void prepare(Rect bound) {
         this.bound = bound;
 
-        millisToReachTargetVelocityX = computeMillisToReachTarget(targetVelocityX,
-                initialVelocityX, accelerationX);
-        millisToReachTargetVelocityY = computeMillisToReachTarget(targetVelocityY,
-                initialVelocityY, accelerationY);
-        millisToReachTargetRotationalVelocity = computeMillisToReachTarget(targetRotationalVelocity,
-                initialRotationalVelocity, rotationalAcceleration);
+        millisToReachTargetVelocityX = computeMillisToReachTarget(targetVelocityX, initialVelocityX, accelerationX);
+        millisToReachTargetVelocityY = computeMillisToReachTarget(targetVelocityY, initialVelocityY, accelerationY);
+        millisToReachTargetRotationalVelocity = computeMillisToReachTarget(targetRotationalVelocity, initialRotationalVelocity, rotationalAcceleration);
 
         // Compute how long it would take to reach x/y bounds or reach TTL.
         millisToReachBound = ttl >= 0 ? ttl : Long.MAX_VALUE;
-        final long timeToReachXBound = computeBound(initialX, initialVelocityX, accelerationX,
-                millisToReachTargetVelocityX, targetVelocityX,
-                bound.left - getWidth(), bound.right);
+        final long timeToReachXBound = computeBound(initialX, initialVelocityX, accelerationX, millisToReachTargetVelocityX, targetVelocityX, bound.left - getWidth(), bound.right);
         millisToReachBound = Math.min(timeToReachXBound, millisToReachBound);
-        final long timeToReachYBound = computeBound(initialY, initialVelocityY, accelerationY,
-                millisToReachTargetVelocityY, targetVelocityY,
-                bound.top - getHeight(), bound.bottom);
+        final long timeToReachYBound = computeBound(initialY, initialVelocityY, accelerationY, millisToReachTargetVelocityY, targetVelocityY, bound.top - getHeight(), bound.bottom);
         millisToReachBound = Math.min(timeToReachYBound, millisToReachBound);
 
         configurePaint(workPaint);
     }
 
     private boolean doesLocationIntercept(float x, float y) {
-        return currentX <= x && x <= currentX + getWidth() &&
-                currentY <= y && y <= currentY + getHeight();
+        return currentX <= x && x <= currentX + getWidth() && currentY <= y && y <= currentY + getHeight();
     }
 
     public boolean onTouchDown(MotionEvent event) {
