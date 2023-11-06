@@ -30,22 +30,33 @@ import android.view.animation.Interpolator;
  * All of the configured states are in milliseconds, e.g. pixels per millisecond for velocity.
  */
 public abstract class Confetto {
+
     private static final int MAX_ALPHA = 255;
     private static final long RESET_ANIMATION_INITIAL_DELAY = -1;
 
     private final Matrix matrix = new Matrix();
     private final Paint workPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final float[] workPairs = new float[2];
-    protected float currentVelocityX, currentVelocityY, currentRotationalVelocity;
+    protected float currentVelocityX;
+    protected float currentVelocityY;
+    protected float currentRotationalVelocity;
     // Configured coordinate states
     private Rect bound;
     private long initialDelay;
-    private float initialX, initialY, initialVelocityX, initialVelocityY,
-            accelerationX, accelerationY;
-    private Float targetVelocityX, targetVelocityY;
-    private Long millisToReachTargetVelocityX, millisToReachTargetVelocityY;
+    private float initialX;
+    private float initialY;
+    private float initialVelocityX;
+    private float initialVelocityY;
+    private float accelerationX;
+    private float accelerationY;
+    private Float targetVelocityX;
+    private Float targetVelocityY;
+    private Long millisToReachTargetVelocityX;
+    private Long millisToReachTargetVelocityY;
     // Configured rotation states
-    private float initialRotation, initialRotationalVelocity, rotationalAcceleration;
+    private float initialRotation;
+    private float initialRotationalVelocity;
+    private float rotationalAcceleration;
     private Float targetRotationalVelocity;
     private Long millisToReachTargetRotationalVelocity;
     // Configured animation states
@@ -54,20 +65,26 @@ public abstract class Confetto {
     private float millisToReachBound;
     private float percentageAnimated;
     // Current draw states
-    private float currentX, currentY, currentRotation;
+    private float currentX;
+    private float currentY;
+    private float currentRotation;
     // alpha is [0, 255]
     private int alpha;
-    private boolean startedAnimation, terminated;
+    private boolean startedAnimation;
+    private boolean terminated;
 
     // Touch events
     private boolean touchOverride;
     private VelocityTracker velocityTracker;
-    private float overrideX, overrideY, overrideVelocityX, overrideVelocityY;
-    private float overrideDeltaX, overrideDeltaY;
+    private float overrideX;
+    private float overrideY;
+    private float overrideVelocityX;
+    private float overrideVelocityY;
+    private float overrideDeltaX;
+    private float overrideDeltaY;
 
     // Visible for testing
-    protected static Long computeMillisToReachTarget(Float targetVelocity, float initialVelocity,
-                                                     float acceleration) {
+    protected static Long computeMillisToReachTarget(Float targetVelocity, float initialVelocity, float acceleration) {
         if (targetVelocity != null) {
             if (acceleration != 0.0f) {
                 final long time = (long) ((targetVelocity - initialVelocity) / acceleration);
@@ -85,8 +102,7 @@ public abstract class Confetto {
     }
 
     // Visible for testing
-    protected static long computeBound(float initialPos, float velocity, float acceleration,
-                                       Long targetTime, Float targetVelocity, int minBound, int maxBound) {
+    protected static long computeBound(float initialPos, float velocity, float acceleration, Long targetTime, Float targetVelocity, int minBound, int maxBound) {
         if (acceleration != 0) {
             // non-zero acceleration
             final int bound = acceleration > 0 ? maxBound : minBound;
@@ -95,9 +111,7 @@ public abstract class Confetto {
                 // https://www.wolframalpha.com/input/
                 // ?i=solve+for+t+in+(d+%3D+x+%2B+v+*+t+%2B+0.5+*+a+*+t+*+t)
 
-                final double tmp = Math.sqrt(
-                        2 * acceleration * bound - 2 * acceleration * initialPos
-                                + velocity * velocity);
+                final double tmp = Math.sqrt(2 * acceleration * bound - 2 * acceleration * initialPos + velocity * velocity);
 
                 final double firstTime = (-tmp - velocity) / acceleration;
                 if (firstTime > 0) {
@@ -314,24 +328,20 @@ public abstract class Confetto {
         return !terminated;
     }
 
-    private void computeDistance(float[] pair, long t, float xi, float vi, float ai, Long targetTime,
-                                 Float vTarget) {
+    private void computeDistance(float[] pair, long t, float xi, float vi, float ai, Long targetTime, Float vTarget) {
         // velocity with constant acceleration
         float vX = ai * t + vi;
         pair[1] = vX;
 
+        float x;
         if (targetTime == null || t < targetTime) {
             // distance covered with constant acceleration
-            // distance = xi + vi * t + 1/2 * a * t^2
-            float x = xi + vi * t + 0.5f * ai * t * t;
-            pair[0] = x;
+            x = xi + vi * t + 0.5f * ai * t * t;
         } else {
             // distance covered with constant acceleration + distance covered with max velocity
-            // distance = xi + vi * targetTime + 1/2 * a * targetTime^2
-            //     + (t - targetTime) * vTarget;
-            float x = xi + vi * targetTime + 0.5f * ai * targetTime * targetTime + (t - targetTime) * vTarget;
-            pair[0] = x;
+            x = xi + vi * targetTime + 0.5f * ai * targetTime * targetTime + (t - targetTime) * vTarget;
         }
+        pair[0] = x;
     }
 
     /**
@@ -375,9 +385,7 @@ public abstract class Confetto {
      * @param rotation        the rotation (in degrees) to draw the confetto.
      * @param percentAnimated the percentage [0f, 1f] of animation progress for this confetto.
      */
-    protected abstract void drawInternal(Canvas canvas, Matrix matrix, Paint paint, float x,
-                                         float y, float rotation, float percentAnimated);
-
+    protected abstract void drawInternal(Canvas canvas, Matrix matrix, Paint paint, float x, float y, float rotation, float percentAnimated);
 
     // region Helper methods to set all of the necessary values for the confetto.
 
@@ -440,6 +448,5 @@ public abstract class Confetto {
     public void setFadeOut(Interpolator fadeOutInterpolator) {
         this.fadeOutInterpolator = fadeOutInterpolator;
     }
-
     // endregion
 }

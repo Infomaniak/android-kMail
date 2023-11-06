@@ -21,13 +21,15 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 
 public class BitmapConfetto extends Confetto {
+
     private final Bitmap bitmap;
-    private final float bitmapCenterX, bitmapCenterY;
+    private final float bitmapCenterX;
+    private final float bitmapCenterY;
 
     public BitmapConfetto(Bitmap bitmap) {
         this.bitmap = bitmap;
-        this.bitmapCenterX = bitmap.getWidth() / 2f;
-        this.bitmapCenterY = bitmap.getHeight() / 2f;
+        this.bitmapCenterX = bitmap.getWidth() / 2.0f;
+        this.bitmapCenterY = bitmap.getHeight() / 2.0f;
     }
 
     @Override
@@ -41,8 +43,7 @@ public class BitmapConfetto extends Confetto {
     }
 
     @Override
-    protected void drawInternal(Canvas canvas, Matrix matrix, Paint paint, float x, float y,
-                                float rotation, float percentageAnimated) {
+    protected void drawInternal(Canvas canvas, Matrix matrix, Paint paint, float x, float y, float rotation, float percentageAnimated) {
         matrix.preTranslate(x, y);
         matrix.preRotate(rotation, bitmapCenterX, bitmapCenterY);
         canvas.drawBitmap(bitmap, matrix, paint);
