@@ -88,6 +88,13 @@ class ThreadAdapter(
 
     private val scaledTouchSlop by lazy { ViewConfiguration.get(recyclerView.context).scaledTouchSlop }
 
+    private var ItemMessageBinding.isResponseCollapsed
+        get() = bodyWebView.isVisible
+        set(value) {
+            bodyWebView.isVisible = value
+            fullMessageWebView.isVisible = !value
+        }
+
     init {
         threadAdapterCallbacks = ThreadAdapterCallbacks(
             onContactClicked,
@@ -134,7 +141,7 @@ class ThreadAdapter(
                     isThemeTheSameMap[message.uid] = !isThemeTheSameMap[message.uid]!!
                     holder.toggleContentAndQuoteTheme(message.uid)
                 }
-                NotifyType.RE_RENDER -> if (bodyWebView.isVisible) bodyWebView.reload() else fullMessageWebView.reload()
+                NotifyType.RE_RENDER -> reloadVisibleWebView()
                 NotifyType.FAILED_MESSAGE -> {
                     messageLoader.isGone = true
                     failedLoadingErrorMessage.isVisible = true
@@ -173,17 +180,15 @@ class ThreadAdapter(
     }
 
     private fun ThreadViewHolder.loadContentAndQuote(message: Message) {
-        message.body?.let { body ->
-            message.splitBody?.let { splitBody ->
-                if (binding.bodyWebView.isVisible) {
-                    loadBodyInWebView(
-                        uid = message.uid,
-                        body = splitBody.content + UiUtils.formatSubBodiesContent(body.subBodies, message.uid),
-                        type = body.type,
-                    )
-                } else if (binding.fullMessageWebView.isVisible) {
-                    loadQuoteInWebView(message.uid, splitBody.quote, body.type)
-                }
+        val body = message.body
+        val splitBody = message.splitBody
+
+        if (body != null && splitBody != null) {
+            if (binding.isResponseCollapsed) {
+                val completeBody = splitBody.content + UiUtils.formatSubBodiesContent(body.subBodies, message.uid)
+                loadBodyInWebView(message.uid, completeBody, body.type)
+            } else {
+                loadQuoteInWebView(message.uid, splitBody.quote, body.type)
             }
         }
     }
@@ -198,10 +203,7 @@ class ThreadAdapter(
     }
 
     private fun ThreadViewHolder.toggleWebViews(message: Message) = with(binding) {
-        val showStandardWebView = fullMessageWebView.isVisible
-        bodyWebView.isVisible = showStandardWebView
-        fullMessageWebView.isVisible = !showStandardWebView
-
+        isResponseCollapsed = !isResponseCollapsed
         loadContentAndQuote(message)
     }
 
@@ -376,7 +378,7 @@ class ThreadAdapter(
     }
 
     private fun ItemMessageBinding.reloadVisibleWebView() {
-        if (bodyWebView.isVisible) bodyWebView.reload() else fullMessageWebView.reload()
+        if (isResponseCollapsed) bodyWebView.reload() else fullMessageWebView.reload()
     }
 
     private fun ItemMessageBinding.hideAlertGroupIfNoneDisplayed() {
@@ -420,13 +422,9 @@ class ThreadAdapter(
 
         quoteButton.apply {
             setOnClickListener {
-                val textId = if (fullMessageWebView.isVisible) {
-                    R.string.messageShowQuotedText
-                } else {
-                    R.string.messageHideQuotedText
-                }
-                quoteButton.text = context.getString(textId)
                 toggleWebViews(message)
+                val textId = if (isResponseCollapsed) R.string.messageShowQuotedText else R.string.messageHideQuotedText
+                quoteButton.text = context.getString(textId)
             }
 
             text = context.getString(R.string.messageShowQuotedText)
