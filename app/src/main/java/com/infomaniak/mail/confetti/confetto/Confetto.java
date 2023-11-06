@@ -295,25 +295,20 @@ public abstract class Confetto {
 
         if (startedAnimation && !terminated) {
 
-            computeDistance(workPairs, animatedTime, initialX, initialVelocityX, accelerationX,
-                    millisToReachTargetVelocityX, targetVelocityX);
+            computeDistance(workPairs, animatedTime, initialX, initialVelocityX, accelerationX, millisToReachTargetVelocityX, targetVelocityX);
             currentX = workPairs[0];
             currentVelocityX = workPairs[1];
 
-            computeDistance(workPairs, animatedTime, initialY, initialVelocityY, accelerationY,
-                    millisToReachTargetVelocityY, targetVelocityY);
+            computeDistance(workPairs, animatedTime, initialY, initialVelocityY, accelerationY, millisToReachTargetVelocityY, targetVelocityY);
             currentY = workPairs[0];
             currentVelocityY = workPairs[1];
 
-            computeDistance(workPairs, animatedTime, initialRotation,
-                    initialRotationalVelocity, rotationalAcceleration,
-                    millisToReachTargetRotationalVelocity, targetRotationalVelocity);
+            computeDistance(workPairs, animatedTime, initialRotation, initialRotationalVelocity, rotationalAcceleration, millisToReachTargetRotationalVelocity, targetRotationalVelocity);
             currentRotation = workPairs[0];
             currentRotationalVelocity = workPairs[1];
 
             if (fadeOutInterpolator != null) {
-                final float interpolatedTime =
-                        fadeOutInterpolator.getInterpolation(animatedTime / millisToReachBound);
+                final float interpolatedTime = fadeOutInterpolator.getInterpolation(animatedTime / millisToReachBound);
                 alpha = (int) (interpolatedTime * MAX_ALPHA);
             } else {
                 alpha = MAX_ALPHA;
