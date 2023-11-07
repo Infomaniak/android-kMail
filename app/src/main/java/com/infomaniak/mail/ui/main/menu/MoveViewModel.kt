@@ -55,14 +55,13 @@ class MoveViewModel @Inject constructor(
         filterJob?.cancel()
     }
 
-    fun getFolderIdAndCustomFolders() = liveData(ioCoroutineContext) {
-
+    fun getFolderIdAndFolders() = liveData(ioCoroutineContext) {
         val folderId = messageUid?.let { messageController.getMessage(it)!!.folderId }
             ?: threadController.getThread(threadsUids.first())!!.folderId
 
-        val customFolders = folderController.getCustomFolders().getCustomMenuFolders()
+        val folders = folderController.getMoveFolders().getCustomMenuFolders()
 
-        emit(folderId to customFolders)
+        emit(folderId to folders)
     }
 
     fun filterFolders(query: String, folders: List<Folder>, shouldDebounce: Boolean) = viewModelScope.launch(ioCoroutineContext) {

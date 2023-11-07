@@ -73,6 +73,10 @@ class FolderController @Inject constructor(
     fun getFolderAsync(id: String): Flow<Folder> {
         return getFolderQuery(Folder::id.name, id, mailboxContentRealm()).asFlow().mapNotNull { it.obj }
     }
+
+    fun getMoveFolders(): RealmResults<Folder> {
+        return getMoveFoldersQuery(mailboxContentRealm()).find()
+    }
     //endregion
 
     fun update(remoteFolders: List<Folder>, realm: Realm) {
@@ -166,6 +170,15 @@ class FolderController @Inject constructor(
 
         private fun getFolderQuery(key: String, value: String, realm: TypedRealm): RealmSingleQuery<Folder> {
             return realm.query<Folder>("$key == $0", value).first()
+        }
+
+        private fun getMoveFoldersQuery(realm: TypedRealm): RealmQuery<Folder> {
+            val isNotDraft = "${Folder.rolePropertyName} != '${FolderRole.DRAFT.name}'"
+            return realm
+                .query<Folder>("$isNotSearch AND $isRootFolder AND $isNotDraft")
+                .sort(Folder::name.name, Sort.ASCENDING)
+                .sort(Folder::isFavorite.name, Sort.DESCENDING)
+                .sort(Folder::roleOrder.name, Sort.DESCENDING)
         }
         //endregion
 

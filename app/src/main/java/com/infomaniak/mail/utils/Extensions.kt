@@ -65,6 +65,7 @@ import com.infomaniak.mail.MatomoMail.OPEN_FROM_DRAFT_NAME
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
@@ -645,4 +646,14 @@ private fun Spannable.setClickableSpan(startIndex: Int, endIndex: Int, onClick: 
 
 fun Fragment.bindAlertToViewLifecycle(alertDialog: BaseAlertDialog) {
     alertDialog.bindAlertToLifecycle(viewLifecycleOwner)
+}
+
+fun Context.checkForFolderCreationErrors(folderName: CharSequence, folderController: FolderController): String? {
+    val invalidCharactersPattern = "[/'\"]"
+    return when {
+        folderName.length > 255 -> getString(R.string.errorNewFolderNameTooLong)
+        folderName.contains(Regex(invalidCharactersPattern)) -> getString(R.string.errorNewFolderInvalidCharacter)
+        folderController.getRootFolder(folderName.toString()) != null -> getString(R.string.errorNewFolderAlreadyExists)
+        else -> null
+    }
 }

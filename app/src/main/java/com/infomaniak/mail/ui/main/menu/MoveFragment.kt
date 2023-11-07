@@ -24,10 +24,11 @@ import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.utils.hideKeyboard
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.SEARCH_DELETE_NAME
@@ -35,36 +36,50 @@ import com.infomaniak.mail.MatomoMail.SEARCH_VALIDATE_NAME
 import com.infomaniak.mail.MatomoMail.trackCreateFolderEvent
 import com.infomaniak.mail.MatomoMail.trackMoveSearchEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.FragmentMoveBinding
+import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.alertDialogs.InputAlertDialog
+import com.infomaniak.mail.utils.bindAlertToViewLifecycle
+import com.infomaniak.mail.utils.checkForFolderCreationErrors
 import com.infomaniak.mail.utils.handleEditorSearchAction
 import com.infomaniak.mail.utils.setOnClearTextClickListener
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MoveFragment : MenuFoldersFragment() {
+class MoveFragment(
+    private val folderController: FolderController
+) : Fragment() {
 
     private var binding: FragmentMoveBinding by safeBinding()
     private val navigationArgs: MoveFragmentArgs by navArgs()
+    private val mainViewModel: MainViewModel by activityViewModels()
     private val moveViewModel: MoveViewModel by viewModels()
+
+    @Inject
+    lateinit var inputDialog: InputAlertDialog
 
     @Inject
     lateinit var searchFolderAdapter: FolderAdapter
 
+    @Inject
+    lateinit var allFolderAdapter: FolderAdapter
+
     private val searchResultsAdapter by lazy {
-        searchFolderAdapter(isInMenuDrawer, shouldIndent = false, onFolderClicked = ::onFolderSelected)
+        searchFolderAdapter(isInMenuDrawer = false, shouldIndent = false, onFolderClicked = ::onFolderSelected)
     }
 
     private var hasAlreadyTrackedFolderSearch = false
 
     private var currentFolderId: String? = null
 
-    override val defaultFoldersList: RecyclerView by lazy { binding.defaultFoldersList }
-    override val customFoldersList: RecyclerView by lazy { binding.customFoldersList }
+    // override val defaultFoldersList: RecyclerView by lazy { binding.defaultFoldersList }
+    // override val customFoldersList: RecyclerView by lazy { binding.customFoldersList }
 
-    override val isInMenuDrawer = false
+    // override val isInMenuDrawer = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentMoveBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -72,6 +87,10 @@ class MoveFragment : MenuFoldersFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        allFolderAdapter(isInMenuDrawer = false, shouldIndent = true, onFolderClicked = ::onFolderSelected)
+        bindAlertToViewLifecycle(inputDialog)
+
         setupListeners()
         setupFolderAdapters()
         setupCreateFolderDialog()
@@ -103,22 +122,15 @@ class MoveFragment : MenuFoldersFragment() {
                 trackCreateFolderEvent("confirm")
                 mainViewModel.moveToNewFolder(folderName, navigationArgs.threadsUids, navigationArgs.messageUid)
             },
-            onErrorCheck = ::checkForFolderCreationErrors,
+            onErrorCheck = { requireContext().checkForFolderCreationErrors(it, folderController) },
         )
     }
 
     private fun setupFolderAdapters() {
-        moveViewModel.getFolderIdAndCustomFolders().observe(viewLifecycleOwner) { (folderId, customFolders) ->
-
+        moveViewModel.getFolderIdAndFolders().observe(viewLifecycleOwner) { (folderId, folders) ->
             currentFolderId = folderId
-
-            val defaultFoldersWithoutDraft = mainViewModel.currentDefaultFoldersLive.value!!.let { folders ->
-                folders.filterNot { it.role == FolderRole.DRAFT }
-            }
-
-            defaultFoldersAdapter.setFolders(defaultFoldersWithoutDraft, folderId)
-            customFoldersAdapter.setFolders(customFolders, folderId)
-            setSearchBarUi(allFolders = defaultFoldersWithoutDraft + customFolders)
+            allFolderAdapter.setFolders(folders, folderId)
+            setSearchBarUi(allFolders = folders)
         }
     }
 
@@ -129,12 +141,10 @@ class MoveFragment : MenuFoldersFragment() {
         }
     }
 
-    override fun onFolderSelected(folderId: String): Unit = with(navigationArgs) {
+    private fun onFolderSelected(folderId: String): Unit = with(navigationArgs) {
         mainViewModel.moveThreadsOrMessageTo(folderId, threadsUids, messageUid)
         findNavController().popBackStack()
     }
-
-    override fun onFolderCollapse(folderId: String, shouldCollapse: Boolean) = Unit
 
     private fun setSearchBarUi(allFolders: List<Folder>) = with(binding) {
         searchResultsList.adapter = searchResultsAdapter
