@@ -296,8 +296,8 @@ class DraftsActionsWorker @AssistedInject constructor(
     }
 
     private fun Attachment.startUpload(localDraftUuid: String, attachmentsUris: MutableList<String>) {
-        val attachmentFile = getUploadLocalFile(applicationContext, localDraftUuid).also {
-            if (!it.exists()) {
+        val attachmentFile = getUploadLocalFile().also {
+            if (it?.exists() != true) {
                 SentryLog.d(ATTACHMENT_TAG, "No local file for attachment $name")
                 return
             }
@@ -310,7 +310,7 @@ class DraftsActionsWorker @AssistedInject constructor(
             .build()
         val request = Request.Builder().url(ApiRoutes.createAttachment(mailbox.uuid))
             .headers(headers)
-            .post(attachmentFile.asRequestBody(mimeType.toMediaType()))
+            .post(attachmentFile!!.asRequestBody(mimeType.toMediaType()))
             .build()
 
         val response = okHttpClient.newCall(request).execute()

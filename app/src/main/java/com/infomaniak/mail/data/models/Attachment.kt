@@ -102,15 +102,7 @@ class Attachment : EmbeddedRealmObject {
         return resource?.substringAfter("folder/")?.replace(Regex("(message|attachment)/"), "") ?: ""
     }
 
-    fun getUploadLocalFile(
-        context: Context,
-        localDraftUuid: String,
-        userId: Int = AccountUtils.currentUserId,
-        mailboxId: Int = AccountUtils.currentMailboxId,
-    ): File {
-        val uploadFolder = LocalStorageUtils.getAttachmentsUploadDir(context, localDraftUuid, userId, mailboxId)
-        return uploadLocalUri?.toUri()?.toFile() ?: File(uploadFolder, name)
-    }
+    fun getUploadLocalFile() = uploadLocalUri?.toUri()?.toFile()
 
     fun openWithIntent(context: Context): Intent {
         val uri = FileProvider.getUriForFile(context, context.getString(R.string.ATTACHMENTS_AUTHORITY), getCacheFile(context))
