@@ -39,6 +39,7 @@ import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.query.RealmResults
+import io.realm.kotlin.types.RealmSet
 import io.sentry.Sentry
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
@@ -655,6 +656,11 @@ class RefreshController @Inject constructor(
                 // Other pre-existing Threads that will also require this Message and will provide the prior Messages for this new Thread
                 val existingThreads = ThreadController.getThreads(remoteMessage.messageIds, realm = this)
 
+                // Some Messages don't have references to all previous Messages of the Thread (ex: these from the iOS Mail app).
+                // Because we are missing the links between Messages, it will create multiple Threads for the same Folder.
+                // Hence, we need to find and remove these duplicates.
+                removeDuplicatedThreads(remoteMessage.messageIds, existingThreads)
+
                 val thread = createNewThreadIfRequired(
                     scope,
                     existingThreads,
@@ -712,6 +718,30 @@ class RefreshController @Inject constructor(
         if (existingMessage == null) folder.messages.add(remoteMessage)
 
         return false
+    }
+
+    private fun MutableRealm.removeDuplicatedThreads(messageIds: RealmSet<String>, existingThreads: RealmResults<Thread>) {
+
+        fun phagocyteThread(firstThread: Thread, secondThread: Thread): Thread {
+
+            // Add data from 2nd Thread into the 1st one.
+            firstThread.messages += secondThread.messages.filter { !firstThread.messages.contains(it) }
+
+            // Delete the now useless 2nd Thread. Sorry bro, you won't be missed.
+            delete(secondThread)
+
+            // Since the 1st Thread's data have changed, we need to recompute it.
+            firstThread.recomputeThread(realm = this)
+
+            // Send back 1st Thread so the map is up-to-date for the next iteration.
+            return firstThread
+        }
+
+        val foldersCount = ThreadController.getExistingThreadsFoldersCount(messageIds, realm = this)
+        if (foldersCount == existingThreads.count().toLong()) return
+
+        val map = mutableMapOf<String, Thread>()
+        existingThreads.forEach { map.merge(it.folderId, it, ::phagocyteThread) }
     }
 
     private fun TypedRealm.createNewThreadIfRequired(
