@@ -67,11 +67,12 @@ class Attachment : EmbeddedRealmObject {
 
     private inline val safeMimeType get() = if (mimeType == MIMETYPE_UNKNOWN) name.guessMimeType() else mimeType
 
-    fun initLocalValues(name: String, size: Long, mimeType: String, uri: String) {
+    fun initLocalValues(name: String, size: Long, mimeType: String, uri: String): Attachment {
         this.name = name
         this.size = size
         this.mimeType = mimeType
         this.uploadLocalUri = uri
+        return this
     }
 
     fun getFileTypeFromMimeType(): AttachmentType = AttachmentMimeTypeUtils.getFileTypeFromMimeType(safeMimeType)
