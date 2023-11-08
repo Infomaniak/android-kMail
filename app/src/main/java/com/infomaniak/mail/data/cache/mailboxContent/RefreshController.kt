@@ -730,11 +730,9 @@ class RefreshController @Inject constructor(
             // Delete the now useless 2nd Thread. Sorry bro, you won't be missed.
             delete(secondThread)
 
-            // Since the 1st Thread's data have changed, we need to recompute it.
-            firstThread.recomputeThread(realm = this)
-
             // Send back 1st Thread so the map is up-to-date for the next iteration.
-            return firstThread
+            // Also, since the data have changed, don't forget to recompute it.
+            return firstThread.also { it.recomputeThread(realm = this) }
         }
 
         val foldersCount = ThreadController.getExistingThreadsFoldersCount(messageIds, realm = this)
