@@ -488,7 +488,7 @@ class MainActivity : BaseActivity() {
         syncAutoConfigActivityResultLauncher.launch(Intent(this, SyncAutoConfigActivity::class.java))
     }
 
-    fun onEasterEggConfettiClicked(from: String) {
+    fun onEasterEggConfettiClicked(matomoValue: String) {
 
         val currentTime = System.currentTimeMillis()
 
@@ -501,7 +501,7 @@ class MainActivity : BaseActivity() {
 
         if (easterEggConfettiCount == EASTER_EGG_CONFETTI_TRIGGER_TAPS) {
             easterEggConfettiCount = 0
-            ConfettiUtils.triggerEasterEggConfetti(from, binding.easterEggConfettiContainer, applicationContext)
+            ConfettiUtils.triggerEasterEggConfetti(binding.easterEggConfettiContainer, matomoValue)
         }
     }
 

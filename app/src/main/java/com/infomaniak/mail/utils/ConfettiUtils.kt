@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.utils
 
-import android.content.Context
 import android.view.ViewGroup
 import com.infomaniak.mail.MatomoMail.trackEasterEggEvent
 import com.infomaniak.mail.R
@@ -30,15 +29,15 @@ object ConfettiUtils {
 
     private const val EMISSION = 1_000_000.0f
 
-    fun triggerEasterEggConfetti(from: String, container: ViewGroup, context: Context): Unit = with(context) {
+    fun triggerEasterEggConfetti(container: ViewGroup, matomoValue: String): Unit = with(container.context) {
 
         Sentry.withScope { scope ->
             scope.level = SentryLevel.INFO
-            scope.setTag("from", from)
+            scope.setTag("from", matomoValue)
             Sentry.captureMessage("Easter egg Confetti has been triggered! Woohoo!")
         }
 
-        trackEasterEggEvent("confetti$from")
+        trackEasterEggEvent("confetti$matomoValue")
 
         val none = 0.0f
         val verySlow = resources.getDimensionPixelOffset(R.dimen.confetti_velocity_very_slow).toFloat()
