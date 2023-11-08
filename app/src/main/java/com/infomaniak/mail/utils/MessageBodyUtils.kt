@@ -38,6 +38,7 @@ object MessageBodyUtils {
         // Do not detect this quote as long as we can't detect siblings quotes or else a single reply will be missing among the
         // many replies of an Outlook reply "chain", which is worst than simply ignoring it.
         // "#divRplyFwdMsg", // Microsoft Outlook
+        "blockquote[type=cite]", // macOS and iOS mail client
         "#isForwardContent",
         "#isReplyContent",
         "#mailcontent:not(table)",
