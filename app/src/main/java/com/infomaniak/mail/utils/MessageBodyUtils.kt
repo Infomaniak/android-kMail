@@ -20,7 +20,8 @@ package com.infomaniak.mail.utils
 import com.infomaniak.mail.data.models.message.Body
 import io.sentry.Sentry
 import io.sentry.SentryLevel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ensureActive
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
@@ -59,7 +60,7 @@ object MessageBodyUtils {
         val bodyContent = body.value
         if (body.type == Utils.TEXT_PLAIN) return SplitBody(bodyContent)
 
-        return executeWithTimeoutOrDefault(
+        return Utils.executeWithTimeoutOrDefault(
             timeout = QUOTE_DETECTION_TIMEOUT,
             defaultValue = SplitBody(bodyContent),
             block = {
@@ -75,27 +76,6 @@ object MessageBodyUtils {
                 }
             },
         )
-    }
-
-    private suspend fun <T> executeWithTimeoutOrDefault(
-        timeout: Long,
-        defaultValue: T,
-        block: CoroutineScope.() -> T,
-        onTimeout: (() -> Unit)? = null,
-    ): T = runCatching {
-        coroutineWithTimeout(timeout, block)
-    }.getOrElse {
-        if (it is TimeoutCancellationException) onTimeout?.invoke() else Sentry.captureException(it)
-        defaultValue
-    }
-
-    private suspend fun <T> coroutineWithTimeout(
-        timeout: Long,
-        block: CoroutineScope.() -> T,
-    ): T = withTimeout(timeout) {
-        var result: T? = null
-        CoroutineScope(Dispatchers.Default).launch { result = block() }.join()
-        result!!
     }
 
     private fun CoroutineScope.splitContentAndQuote(htmlDocument: Document): Pair<String, String?> {
