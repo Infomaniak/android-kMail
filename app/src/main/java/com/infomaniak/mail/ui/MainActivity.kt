@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.View
@@ -36,6 +37,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.work.Data
+import com.github.jinatonic.confetti.CommonConfetti
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.networking.LiveDataNetworkStatus
 import com.infomaniak.lib.core.utils.SentryLog
@@ -85,6 +87,8 @@ class MainActivity : BaseActivity() {
     private val registerFirebaseBroadcastReceiver by lazy { RegisterFirebaseBroadcastReceiver() }
 
     private var previousDestinationId: Int? = null
+    private var easterEggConfettiCount = 0
+    private var easterEggConfettiTime = 0L
 
     private val navController by lazy {
         (supportFragmentManager.findFragmentById(R.id.mainHostFragment) as NavHostFragment).navController
@@ -162,6 +166,7 @@ class MainActivity : BaseActivity() {
         observeDeletedMessages()
         observeDeleteThreadTrigger()
         observeDraftWorkerResults()
+        observeEasterEggConfettiTriggers()
         binding.drawerLayout.addDrawerListener(drawerListener)
         registerFirebaseBroadcastReceiver.initFirebaseBroadcastReceiver(this, mainViewModel)
 
@@ -486,11 +491,57 @@ class MainActivity : BaseActivity() {
         syncAutoConfigActivityResultLauncher.launch(Intent(this, SyncAutoConfigActivity::class.java))
     }
 
+    fun easterEggConfettiHasBeenClicked(from: String) {
+
+        val currentTime = System.currentTimeMillis()
+
+        if (easterEggConfettiTime == 0L || currentTime - easterEggConfettiTime > EASTER_EGG_CONFETTI_DELAY_TRIGGER) {
+            easterEggConfettiTime = currentTime
+            easterEggConfettiCount = 1
+        } else {
+            easterEggConfettiCount++
+        }
+
+        if (easterEggConfettiCount == EASTER_EGG_CONFETTI_TAPS_TRIGGER) {
+            mainViewModel.easterEggConfettiTrigger.value = from
+            easterEggConfettiCount = 0
+        }
+    }
+
+    private fun observeEasterEggConfettiTriggers() = with(mainViewModel) {
+        easterEggConfettiTrigger.observeNotNull(owner = this@MainActivity) { from ->
+
+            Sentry.withScope { scope ->
+                scope.level = SentryLevel.INFO
+                scope.setTag("from", from)
+                Sentry.captureMessage("Easter egg Confetti has been triggered! Woohoo!")
+            }
+
+            CommonConfetti.rainingConfetti(binding.easterEggConfettiContainer, EASTER_EGG_CONFETTI_COLORS)
+                .confettiManager
+                .setNumInitialCount(0)
+                .setEmissionDuration(EASTER_EGG_CONFETTI_DURATION)
+                .setEmissionRate(EASTER_EGG_CONFETTI_EMISSION_RATE)
+                .animate()
+
+            easterEggConfettiTrigger.value = null
+        }
+    }
+
     companion object {
         private const val FULLY_SLID = 1.0f
         const val DRAFT_ACTION_KEY = "draftAction"
         const val SYNC_AUTO_CONFIG_KEY = "syncAutoConfigKey"
         const val SYNC_AUTO_CONFIG_SUCCESS = "syncAutoConfigSuccess"
         const val SYNC_AUTO_CONFIG_ALREADY_SYNC = "syncAutoConfigAlreadySync"
+
+        private const val EASTER_EGG_CONFETTI_TAPS_TRIGGER = 3
+        private const val EASTER_EGG_CONFETTI_DELAY_TRIGGER = 1_000L
+        private const val EASTER_EGG_CONFETTI_DURATION = 5_000L
+        private const val EASTER_EGG_CONFETTI_EMISSION_RATE = 50.0f
+        private val EASTER_EGG_CONFETTI_COLORS = arrayOf(
+            Color.BLACK, Color.DKGRAY, Color.GRAY, Color.LTGRAY, Color.WHITE, Color.RED,
+            Color.GREEN, Color.BLUE, Color.YELLOW, Color.CYAN, Color.MAGENTA,
+        ).toIntArray()
     }
 }
