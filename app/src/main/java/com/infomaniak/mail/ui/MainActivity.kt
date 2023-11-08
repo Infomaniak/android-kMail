@@ -492,14 +492,14 @@ class MainActivity : BaseActivity() {
 
         val currentTime = System.currentTimeMillis()
 
-        if (easterEggConfettiTime == 0L || currentTime - easterEggConfettiTime > EASTER_EGG_CONFETTI_DELAY_TRIGGER) {
+        if (easterEggConfettiTime == 0L || currentTime - easterEggConfettiTime > EASTER_EGG_CONFETTI_TRIGGER_DELAY) {
             easterEggConfettiTime = currentTime
             easterEggConfettiCount = 1
         } else {
             easterEggConfettiCount++
         }
 
-        if (easterEggConfettiCount == EASTER_EGG_CONFETTI_TAPS_TRIGGER) {
+        if (easterEggConfettiCount == EASTER_EGG_CONFETTI_TRIGGER_TAPS) {
             easterEggConfettiCount = 0
             ConfettiUtils.triggerEasterEggConfetti(from, binding.easterEggConfettiContainer, applicationContext)
         }
@@ -512,7 +512,7 @@ class MainActivity : BaseActivity() {
         const val SYNC_AUTO_CONFIG_SUCCESS = "syncAutoConfigSuccess"
         const val SYNC_AUTO_CONFIG_ALREADY_SYNC = "syncAutoConfigAlreadySync"
 
-        private const val EASTER_EGG_CONFETTI_TAPS_TRIGGER = 3
-        private const val EASTER_EGG_CONFETTI_DELAY_TRIGGER = 1_000L
+        private const val EASTER_EGG_CONFETTI_TRIGGER_TAPS = 3
+        private const val EASTER_EGG_CONFETTI_TRIGGER_DELAY = 1_000L
     }
 }
