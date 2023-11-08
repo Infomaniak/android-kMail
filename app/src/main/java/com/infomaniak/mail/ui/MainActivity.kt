@@ -20,7 +20,6 @@ package com.infomaniak.mail.ui
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.View
@@ -37,7 +36,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.work.Data
-import com.github.jinatonic.confetti.CommonConfetti
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.networking.LiveDataNetworkStatus
 import com.infomaniak.lib.core.utils.SentryLog
@@ -503,24 +501,8 @@ class MainActivity : BaseActivity() {
 
         if (easterEggConfettiCount == EASTER_EGG_CONFETTI_TAPS_TRIGGER) {
             easterEggConfettiCount = 0
-            triggerEasterEggConfetti(from)
+            ConfettiUtils.triggerEasterEggConfetti(from, binding.easterEggConfettiContainer, applicationContext)
         }
-    }
-
-    private fun triggerEasterEggConfetti(from: String) = with(mainViewModel) {
-
-        Sentry.withScope { scope ->
-            scope.level = SentryLevel.INFO
-            scope.setTag("from", from)
-            Sentry.captureMessage("Easter egg Confetti has been triggered! Woohoo!")
-        }
-
-        CommonConfetti.rainingConfetti(binding.easterEggConfettiContainer, EASTER_EGG_CONFETTI_COLORS)
-            .confettiManager
-            .setNumInitialCount(0)
-            .setEmissionDuration(EASTER_EGG_CONFETTI_DURATION)
-            .setEmissionRate(EASTER_EGG_CONFETTI_EMISSION_RATE)
-            .animate()
     }
 
     companion object {
@@ -532,11 +514,5 @@ class MainActivity : BaseActivity() {
 
         private const val EASTER_EGG_CONFETTI_TAPS_TRIGGER = 3
         private const val EASTER_EGG_CONFETTI_DELAY_TRIGGER = 1_000L
-        private const val EASTER_EGG_CONFETTI_DURATION = 5_000L
-        private const val EASTER_EGG_CONFETTI_EMISSION_RATE = 50.0f
-        private val EASTER_EGG_CONFETTI_COLORS = arrayOf(
-            Color.BLACK, Color.DKGRAY, Color.GRAY, Color.LTGRAY, Color.WHITE, Color.RED,
-            Color.GREEN, Color.BLUE, Color.YELLOW, Color.CYAN, Color.MAGENTA,
-        ).toIntArray()
     }
 }

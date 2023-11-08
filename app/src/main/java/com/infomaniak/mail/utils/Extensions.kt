@@ -150,6 +150,12 @@ fun Date.isLastWeek(): Boolean {
 //endregion
 
 //region UI
+fun Fragment.isInPortrait(): Boolean = requireContext().isInPortrait()
+fun Context.isInPortrait(): Boolean = !isInLandscape()
+
+fun Fragment.isInLandscape(): Boolean = requireContext().isInLandscape()
+fun Context.isInLandscape(): Boolean = resources.getBoolean(R.bool.isInLandscape)
+
 fun View.toggleChevron(
     isCollapsed: Boolean,
     collapsedAngle: Float? = null,
