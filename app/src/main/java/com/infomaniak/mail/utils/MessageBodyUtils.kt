@@ -24,7 +24,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ensureActive
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.jsoup.nodes.Element
 
 object MessageBodyUtils {
 
@@ -64,8 +63,8 @@ object MessageBodyUtils {
             timeout = QUOTE_DETECTION_TIMEOUT,
             defaultValue = SplitBody(bodyContent),
             block = {
-                val (content, quote) = splitContentAndQuote(htmlDocument = Jsoup.parse(bodyContent))
-                if (quote.isNullOrBlank()) SplitBody(bodyContent) else SplitBody(content, bodyContent)
+                val (content, quotes) = splitContentAndQuotes(htmlDocument = Jsoup.parse(bodyContent))
+                if (quotes.isEmpty() || quotes.all { it.isBlank() }) SplitBody(bodyContent) else SplitBody(content, bodyContent)
             },
             onTimeout = {
                 Sentry.withScope { scope ->
@@ -78,21 +77,22 @@ object MessageBodyUtils {
         )
     }
 
-    private fun CoroutineScope.splitContentAndQuote(htmlDocument: Document): Pair<String, String?> {
-        var quote: Element? = null
+    private fun CoroutineScope.splitContentAndQuotes(htmlDocument: Document): Pair<String, MutableList<String>> {
+        val quotes = mutableListOf<String>()
 
         for (quoteDescriptor in quoteDescriptors) {
             ensureActive()
 
-            val foundQuote = htmlDocument.selectFirst(quoteDescriptor)
-            if (foundQuote != null) {
-                quote = foundQuote
-                foundQuote.remove()
-                break
+            val foundQuotes = htmlDocument.select(quoteDescriptor)
+            if (foundQuotes.isNotEmpty()) {
+                foundQuotes.forEach { foundQuote ->
+                    quotes.add(foundQuote.outerHtml())
+                    foundQuote.remove()
+                }
             }
         }
 
-        return htmlDocument.outerHtml() to quote?.outerHtml()
+        return htmlDocument.outerHtml() to quotes
     }
 
     //region Utils
