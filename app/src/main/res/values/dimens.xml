@@ -66,4 +66,14 @@
     <dimen name="newMessageBottomBarElevation">10dp</dimen>
     <dimen name="textButtonCornerRadius">16dp</dimen>
 
+    <!-- Easter Egg Confetti -->
+    <dimen name="confetti_elevation">9999dp</dimen>
+    <dimen name="confetti_size">6dp</dimen>
+    <dimen name="confetti_explosion_radius">100dp</dimen>
+    <dimen name="confetti_velocity_very_slow">20dp</dimen>
+    <dimen name="confetti_velocity_slow">50dp</dimen>
+    <dimen name="confetti_velocity_normal">100dp</dimen>
+    <dimen name="confetti_velocity_fast">200dp</dimen>
+    <dimen name="confetti_velocity_very_fast">275dp</dimen>
+    <dimen name="confetti_velocity_ultra_fast">2375dp</dimen>
 </resources>
