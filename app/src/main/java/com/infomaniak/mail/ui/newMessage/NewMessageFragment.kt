@@ -696,7 +696,7 @@ class NewMessageFragment : Fragment() {
         }
 
         runCatching {
-            draft.attachments[position].getUploadLocalFile(requireContext(), draft.localUuid).delete()
+            draft.attachments[position].getUploadLocalFile()?.delete()
             draft.attachments.removeAt(position)
         }.onFailure { exception ->
             SentryLog.e(TAG, " Attachment $position doesn't exist", exception)

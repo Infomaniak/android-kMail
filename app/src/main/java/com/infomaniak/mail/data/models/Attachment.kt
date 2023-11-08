@@ -21,6 +21,8 @@ import android.content.Context
 import android.content.Intent
 import androidx.annotation.DrawableRes
 import androidx.core.content.FileProvider
+import androidx.core.net.toFile
+import androidx.core.net.toUri
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.lib.core.utils.guessMimeType
 import com.infomaniak.mail.R
@@ -65,11 +67,12 @@ class Attachment : EmbeddedRealmObject {
 
     private inline val safeMimeType get() = if (mimeType == MIMETYPE_UNKNOWN) name.guessMimeType() else mimeType
 
-    fun initLocalValues(name: String, size: Long, mimeType: String, uri: String) {
+    fun initLocalValues(name: String, size: Long, mimeType: String, uri: String): Attachment {
         this.name = name
         this.size = size
         this.mimeType = mimeType
         this.uploadLocalUri = uri
+        return this
     }
 
     fun getFileTypeFromMimeType(): AttachmentType = AttachmentMimeTypeUtils.getFileTypeFromMimeType(safeMimeType)
@@ -100,15 +103,7 @@ class Attachment : EmbeddedRealmObject {
         return resource?.substringAfter("folder/")?.replace(Regex("(message|attachment)/"), "") ?: ""
     }
 
-    fun getUploadLocalFile(
-        context: Context,
-        localDraftUuid: String,
-        userId: Int = AccountUtils.currentUserId,
-        mailboxId: Int = AccountUtils.currentMailboxId,
-    ): File {
-        val uploadFolder = LocalStorageUtils.getAttachmentsUploadDir(context, localDraftUuid, userId, mailboxId)
-        return File(uploadFolder, name)
-    }
+    fun getUploadLocalFile() = uploadLocalUri?.toUri()?.toFile()
 
     fun openWithIntent(context: Context): Intent {
         val uri = FileProvider.getUriForFile(context, context.getString(R.string.ATTACHMENTS_AUTHORITY), getCacheFile(context))
