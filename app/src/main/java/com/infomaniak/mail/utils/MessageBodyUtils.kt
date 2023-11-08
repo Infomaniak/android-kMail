@@ -36,21 +36,21 @@ object MessageBodyUtils {
 
     private val quoteDescriptors = arrayOf(
         // Do not detect this quote as long as we can't detect siblings quotes or else a single reply will be missing among the
-        // many replies of an Outlook reply "chain", which is worst than simply ignoring it
-        // "#divRplyFwdMsg", // Outlook
+        // many replies of an Outlook reply "chain", which is worst than simply ignoring it.
+        // "#divRplyFwdMsg", // Microsoft Outlook
         "#isForwardContent",
         "#isReplyContent",
         "#mailcontent:not(table)",
         "#origbody",
         "#oriMsgHtmlSeperator",
         "#reply139content",
-        anyCssClassContaining("gmail_extra"),
-        anyCssClassContaining("gmail_quote"),
-        anyCssClassContaining(INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME),
-        anyCssClassContaining("moz-cite-prefix"),
-        anyCssClassContaining("protonmail_quote"),
-        anyCssClassContaining("yahoo_quoted"),
-        anyCssClassContaining("zmail_extra"), // Zoho
+        anyCssClassContaining("gmail_extra"), // Gmail
+        anyCssClassContaining("gmail_quote"), // Gmail
+        anyCssClassContaining(INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME), // That's us :3
+        anyCssClassContaining("moz-cite-prefix"), // Mozilla Thunderbird
+        anyCssClassContaining("protonmail_quote"), // Proton Mail
+        anyCssClassContaining("yahoo_quoted"), // Yahoo! Mail
+        anyCssClassContaining("zmail_extra"), // Zoho Mail
         "[name=\"quote\"]", // GMX
     )
 
