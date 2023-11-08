@@ -24,6 +24,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -150,11 +151,7 @@ fun Date.isLastWeek(): Boolean {
 //endregion
 
 //region UI
-fun Fragment.isInPortrait(): Boolean = requireContext().isInPortrait()
-fun Context.isInPortrait(): Boolean = !isInLandscape()
-
-fun Fragment.isInLandscape(): Boolean = requireContext().isInLandscape()
-fun Context.isInLandscape(): Boolean = resources.getBoolean(R.bool.isInLandscape)
+fun Context.isInPortrait(): Boolean = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
 
 fun View.toggleChevron(
     isCollapsed: Boolean,
