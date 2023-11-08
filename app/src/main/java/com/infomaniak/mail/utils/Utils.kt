@@ -21,6 +21,7 @@ import android.net.Uri
 import androidx.core.net.toUri
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import io.sentry.Sentry
+import kotlinx.coroutines.*
 import okhttp3.internal.toHexString
 import java.nio.charset.StandardCharsets
 
@@ -53,6 +54,27 @@ object Utils {
             if (!exception.shouldIgnoreRealmError()) Sentry.captureException(exception)
             exception.printStackTrace()
         }
+    }
+
+    suspend fun <T> executeWithTimeoutOrDefault(
+        timeout: Long,
+        defaultValue: T,
+        block: CoroutineScope.() -> T,
+        onTimeout: (() -> Unit)? = null,
+    ): T = runCatching {
+        coroutineWithTimeout(timeout, block)
+    }.getOrElse {
+        if (it is TimeoutCancellationException) onTimeout?.invoke() else Sentry.captureException(it)
+        defaultValue
+    }
+
+    private suspend fun <T> coroutineWithTimeout(
+        timeout: Long,
+        block: CoroutineScope.() -> T,
+    ): T = withTimeout(timeout) {
+        var result: T? = null
+        CoroutineScope(Dispatchers.Default).launch { result = block() }.join()
+        result!!
     }
 
     enum class MailboxErrorCode {

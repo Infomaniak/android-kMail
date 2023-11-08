@@ -20,7 +20,8 @@ package com.infomaniak.mail.utils
 import com.infomaniak.mail.data.models.message.Body
 import io.sentry.Sentry
 import io.sentry.SentryLevel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ensureActive
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
@@ -36,21 +37,21 @@ object MessageBodyUtils {
 
     private val quoteDescriptors = arrayOf(
         // Do not detect this quote as long as we can't detect siblings quotes or else a single reply will be missing among the
-        // many replies of an Outlook reply "chain", which is worst than simply ignoring it
-        // "#divRplyFwdMsg", // Outlook
+        // many replies of an Outlook reply "chain", which is worst than simply ignoring it.
+        // "#divRplyFwdMsg", // Microsoft Outlook
         "#isForwardContent",
         "#isReplyContent",
         "#mailcontent:not(table)",
         "#origbody",
         "#oriMsgHtmlSeperator",
         "#reply139content",
-        anyCssClassContaining("gmail_extra"),
-        anyCssClassContaining("gmail_quote"),
-        anyCssClassContaining(INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME),
-        anyCssClassContaining("moz-cite-prefix"),
-        anyCssClassContaining("protonmail_quote"),
-        anyCssClassContaining("yahoo_quoted"),
-        anyCssClassContaining("zmail_extra"), // Zoho
+        anyCssClassContaining("gmail_extra"), // Gmail
+        anyCssClassContaining("gmail_quote"), // Gmail
+        anyCssClassContaining(INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME), // That's us :3
+        anyCssClassContaining("moz-cite-prefix"), // Mozilla Thunderbird
+        anyCssClassContaining("protonmail_quote"), // Proton Mail
+        anyCssClassContaining("yahoo_quoted"), // Yahoo! Mail
+        anyCssClassContaining("zmail_extra"), // Zoho Mail
         "[name=\"quote\"]", // GMX
     )
 
@@ -59,46 +60,40 @@ object MessageBodyUtils {
         val bodyContent = body.value
         if (body.type == Utils.TEXT_PLAIN) return SplitBody(bodyContent)
 
-        return runCatching {
-            withTimeout(QUOTE_DETECTION_TIMEOUT) {
-
-                var splitBody: SplitBody? = null
-
-                CoroutineScope(Dispatchers.Default).launch {
-                    // The original parsed HTML document in full
-                    val originalHtmlDocument = Jsoup.parse(bodyContent)
-                    // Initiated to the original document and it'll be processed by Jsoup to remove quotes
-                    val htmlDocumentWithoutQuote = originalHtmlDocument.clone()
-
-                    // Find the last parent blockquote and delete it in `htmlDocumentWithoutQuote`
-                    val blockquoteElement = findAndRemoveLastParentBlockquote(htmlDocumentWithoutQuote)
-                    // Find the first known parent quote in the HTML and delete all known quotes descriptor
-                    val currentQuoteDescriptor =
-                        findFirstKnownParentQuoteDescriptor(htmlDocumentWithoutQuote, scope = this).ifEmpty {
-                            if (blockquoteElement == null) "" else BLOCKQUOTE
-                        }
-
-                    val (content, quote) = splitContentAndQuote(originalHtmlDocument, currentQuoteDescriptor, blockquoteElement)
-                    ensureActive()
-                    splitBody = if (quote.isNullOrBlank()) SplitBody(bodyContent) else SplitBody(content, bodyContent)
-
-                }.join()
-
-                splitBody!!
-            }
-        }.getOrElse {
-            if (it is TimeoutCancellationException) {
+        return Utils.executeWithTimeoutOrDefault(
+            timeout = QUOTE_DETECTION_TIMEOUT,
+            defaultValue = SplitBody(bodyContent),
+            block = {
+                val (content, quote) = splitContentAndQuote(htmlDocument = Jsoup.parse(bodyContent))
+                if (quote.isNullOrBlank()) SplitBody(bodyContent) else SplitBody(content, bodyContent)
+            },
+            onTimeout = {
                 Sentry.withScope { scope ->
                     scope.level = SentryLevel.WARNING
                     scope.setExtra("body size", "${bodyContent.toByteArray().size} bytes")
                     scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
                     Sentry.captureMessage("Timeout reached while displaying a Message's body")
                 }
-            } else {
-                Sentry.captureException(it)
-            }
-            SplitBody(bodyContent)
+            },
+        )
+    }
+
+    private fun CoroutineScope.splitContentAndQuote(htmlDocument: Document): Pair<String, String?> {
+
+        // Initiated to the original document and it'll be processed by Jsoup to remove quotes
+        val htmlDocumentWithoutQuote = htmlDocument.clone()
+
+        // Find the last parent blockquote and delete it in `htmlDocumentWithoutQuote`
+        val blockquoteElement = findAndRemoveLastParentBlockquote(htmlDocumentWithoutQuote)
+        // Find the first known parent quote in the HTML and delete all known quotes descriptor
+        val currentQuoteDescriptor = findFirstKnownParentQuoteDescriptor(htmlDocumentWithoutQuote, scope = this).ifEmpty {
+            if (blockquoteElement == null) "" else BLOCKQUOTE
         }
+
+        val (content, quote) = splitContentAndQuote(htmlDocument, currentQuoteDescriptor, blockquoteElement)
+        ensureActive()
+
+        return content to quote
     }
 
     private fun findAndRemoveLastParentBlockquote(htmlDocumentWithoutQuote: Document): Element? {
