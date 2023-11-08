@@ -223,7 +223,15 @@ object MatomoMail : MatomoCore {
     }
 
     fun Fragment.trackSyncAutoConfigEvent(name: String, action: TrackerAction = TrackerAction.CLICK) {
-        context?.trackEvent("syncAutoConfig", name, action)
+        trackEvent("syncAutoConfig", name, action)
+    }
+
+    fun Fragment.trackEasterEggEvent(name: String, action: TrackerAction = TrackerAction.CLICK) {
+        context?.trackEasterEggEvent(name, action)
+    }
+
+    fun Context.trackEasterEggEvent(name: String, action: TrackerAction = TrackerAction.CLICK) {
+        trackEvent("easterEgg", name, action)
     }
 
     // We need to invert this logical value to keep a coherent value for analytics because actions
