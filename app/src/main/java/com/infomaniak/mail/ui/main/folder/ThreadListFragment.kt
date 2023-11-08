@@ -77,6 +77,8 @@ import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
 import io.realm.kotlin.ext.isValid
+import io.sentry.Sentry
+import io.sentry.SentryLevel
 import java.util.Date
 import javax.inject.Inject
 import com.infomaniak.lib.core.R as RCore
@@ -627,6 +629,19 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             shouldDisplayThreadsView -> {
                 binding.emptyStateView.isGone = true
                 binding.threadsList.isVisible = true
+
+                // TODO: Remove this when https://trello.com/c/f8skqtOL will be fixed.
+                if (!thereAreThreads && !filterIsEnabled) {
+                    val currentFolder = mainViewModel.currentFolder.value
+                    Sentry.withScope { scope ->
+                        scope.level = SentryLevel.WARNING
+                        scope.setExtra("cursor", "$currentFolderCursor")
+                        scope.setExtra("isBooting", "$isBooting")
+                        scope.setExtra("folderRole", "${currentFolder?.role?.name}")
+                        scope.setExtra("folderThreadsCount", "${currentFolder?.threads?.count()}")
+                        Sentry.captureMessage("Should display threads is true but there are no threads to display")
+                    }
+                }
             }
             cursorIsNull -> setEmptyState(EmptyState.NETWORK)
             isCurrentFolderRole(FolderRole.INBOX) -> setEmptyState(EmptyState.INBOX)
