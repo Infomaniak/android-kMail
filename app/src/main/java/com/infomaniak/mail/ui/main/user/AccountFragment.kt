@@ -30,8 +30,10 @@ import androidx.lifecycle.lifecycleScope
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.lib.core.utils.year
 import com.infomaniak.mail.MatomoMail.ADD_MAILBOX_NAME
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
+import com.infomaniak.mail.MatomoMail.trackEasterEggEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentAccountBinding
 import com.infomaniak.mail.di.IoDispatcher
@@ -46,6 +48,7 @@ import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import java.util.Calendar
+import java.util.Date
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -119,6 +122,7 @@ class AccountFragment : Fragment(), MailboxListFragment {
                 scope.level = SentryLevel.INFO
                 Sentry.captureMessage("Easter egg Halloween has been triggered! Woohoo!")
             }
+            trackEasterEggEvent("halloween${Date().year()}")
         }
     }
 
