@@ -32,7 +32,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
 import com.infomaniak.lib.core.utils.*
-import com.infomaniak.lib.core.views.ViewHolder
 import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
@@ -546,7 +545,7 @@ class ThreadAdapter(
         private val shouldLoadDistantResources: Boolean,
         onContactClicked: ((contact: Recipient) -> Unit)?,
         onAttachmentClicked: ((attachment: Attachment) -> Unit)?,
-    ) : ViewHolder(binding.root) {
+    ) : RecyclerView.ViewHolder(binding.root) {
 
         val fromAdapter = DetailedRecipientAdapter(onContactClicked)
         val toAdapter = DetailedRecipientAdapter(onContactClicked)
