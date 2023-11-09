@@ -20,7 +20,8 @@ package com.infomaniak.mail.ui.main.thread
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.Adapter
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import coil.load
 import com.infomaniak.lib.core.utils.FormatterFileSize
 import com.infomaniak.lib.core.utils.context
@@ -34,7 +35,7 @@ class AttachmentAdapter(
     private val shouldDisplayCloseButton: Boolean = false,
     private val onDelete: ((position: Int, itemCountLeft: Int) -> Unit)? = null,
     private val onAttachmentClicked: ((Attachment) -> Unit)? = null,
-) : RecyclerView.Adapter<AttachmentViewHolder>() {
+) : Adapter<AttachmentViewHolder>() {
 
     private var attachments: MutableList<Attachment> = mutableListOf()
 
@@ -88,5 +89,5 @@ class AttachmentAdapter(
         notifyItemRangeInserted(attachments.lastIndex, newAttachments.count())
     }
 
-    class AttachmentViewHolder(val binding: ItemAttachmentBinding) : RecyclerView.ViewHolder(binding.root)
+    class AttachmentViewHolder(val binding: ItemAttachmentBinding) : ViewHolder(binding.root)
 }

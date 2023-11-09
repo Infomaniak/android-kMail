@@ -21,6 +21,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.*
 import com.infomaniak.mail.utils.RealmChangesBinding.OnRealmChanged
 import io.realm.kotlin.notifications.*
 import io.realm.kotlin.types.BaseRealmObject
@@ -48,9 +49,9 @@ import io.realm.kotlin.types.RealmObject
  * @see RecyclerView.Adapter.setHasStableIds
  * @see RecyclerView.Adapter.getItemId
  */
-class RealmChangesBinding<T : BaseRealmObject, VH : RecyclerView.ViewHolder> private constructor(
+class RealmChangesBinding<T : BaseRealmObject, VH : ViewHolder> private constructor(
     private val lifecycleOwner: LifecycleOwner,
-    private val recyclerViewAdapter: RecyclerView.Adapter<VH>,
+    private val recyclerViewAdapter: Adapter<VH>,
     private var resultsChangeLiveData: LiveData<ResultsChange<T>>? = null,
     private var listChangeLiveData: LiveData<ListChange<T>>? = null,
 ) {
@@ -183,16 +184,16 @@ class RealmChangesBinding<T : BaseRealmObject, VH : RecyclerView.ViewHolder> pri
     }
 
     companion object {
-        fun <VH : RecyclerView.ViewHolder, T : BaseRealmObject> LiveData<ResultsChange<T>>.bindResultsChangeToAdapter(
+        fun <VH : ViewHolder, T : BaseRealmObject> LiveData<ResultsChange<T>>.bindResultsChangeToAdapter(
             lifecycleOwner: LifecycleOwner,
-            recyclerViewAdapter: RecyclerView.Adapter<VH>,
+            recyclerViewAdapter: Adapter<VH>,
         ): RealmChangesBinding<T, VH> {
             return RealmChangesBinding<T, VH>(lifecycleOwner, recyclerViewAdapter).also { it.bindResultsChange(this) }
         }
 
-        fun <VH : RecyclerView.ViewHolder, T : BaseRealmObject> LiveData<ListChange<T>>.bindListChangeToAdapter(
+        fun <VH : ViewHolder, T : BaseRealmObject> LiveData<ListChange<T>>.bindListChangeToAdapter(
             lifecycleOwner: LifecycleOwner,
-            recyclerViewAdapter: RecyclerView.Adapter<VH>,
+            recyclerViewAdapter: Adapter<VH>,
         ): RealmChangesBinding<T, VH> {
             return RealmChangesBinding<T, VH>(lifecycleOwner, recyclerViewAdapter).also { it.bindListChange(this) }
         }

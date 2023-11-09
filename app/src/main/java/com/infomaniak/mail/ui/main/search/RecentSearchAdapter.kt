@@ -19,14 +19,15 @@ package com.infomaniak.mail.ui.main.search
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.Adapter
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.infomaniak.mail.databinding.ItemRecentSearchBinding
 
 class RecentSearchAdapter(
     private var searchQueries: MutableList<String>,
     private val onSearchQueryClicked: (searchQuery: String) -> Unit,
     private val onSearchQueryDeleted: (history: List<String>) -> Unit,
-) : RecyclerView.Adapter<RecentSearchAdapter.RecentSearchViewHolder>() {
+) : Adapter<RecentSearchAdapter.RecentSearchViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecentSearchViewHolder {
         return RecentSearchViewHolder(ItemRecentSearchBinding.inflate(LayoutInflater.from(parent.context), parent, false))
@@ -75,7 +76,7 @@ class RecentSearchAdapter(
 
     fun getSearchQueries(): MutableList<String> = searchQueries
 
-    class RecentSearchViewHolder(val binding: ItemRecentSearchBinding) : RecyclerView.ViewHolder(binding.root)
+    class RecentSearchViewHolder(val binding: ItemRecentSearchBinding) : ViewHolder(binding.root)
 
     private companion object {
         const val MAX_HISTORY_COUNT = 10

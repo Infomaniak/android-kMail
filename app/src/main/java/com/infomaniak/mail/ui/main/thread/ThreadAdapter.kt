@@ -29,10 +29,10 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.*
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
 import com.infomaniak.lib.core.utils.*
-import com.infomaniak.lib.core.views.ViewHolder
 import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
