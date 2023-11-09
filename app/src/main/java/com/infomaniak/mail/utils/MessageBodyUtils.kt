@@ -24,7 +24,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ensureActive
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.jsoup.nodes.Element
 
 object MessageBodyUtils {
 
@@ -32,13 +31,11 @@ object MessageBodyUtils {
     const val INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME = "ik_mail_quote"
     const val INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME = "forwardContentMessage"
 
-    private const val BLOCKQUOTE = "blockquote"
     private const val QUOTE_DETECTION_TIMEOUT = 1_500L
 
     private val quoteDescriptors = arrayOf(
-        // Do not detect this quote as long as we can't detect siblings quotes or else a single reply will be missing among the
-        // many replies of an Outlook reply "chain", which is worst than simply ignoring it.
-        // "#divRplyFwdMsg", // Microsoft Outlook
+        "blockquote[type=cite]", // macOS and iOS mail client
+        "#divRplyFwdMsg", // Microsoft Outlook
         "#isForwardContent",
         "#isReplyContent",
         "#mailcontent:not(table)",
@@ -64,8 +61,8 @@ object MessageBodyUtils {
             timeout = QUOTE_DETECTION_TIMEOUT,
             defaultValue = SplitBody(bodyContent),
             block = {
-                val (content, quote) = splitContentAndQuote(htmlDocument = Jsoup.parse(bodyContent))
-                if (quote.isNullOrBlank()) SplitBody(bodyContent) else SplitBody(content, bodyContent)
+                val (content, quotes) = splitContentAndQuotes(htmlDocument = Jsoup.parse(bodyContent))
+                if (quotes.isEmpty() || quotes.all { it.isBlank() }) SplitBody(bodyContent) else SplitBody(content, bodyContent)
             },
             onTimeout = {
                 Sentry.withScope { scope ->
@@ -78,73 +75,19 @@ object MessageBodyUtils {
         )
     }
 
-    private fun CoroutineScope.splitContentAndQuote(htmlDocument: Document): Pair<String, String?> {
-
-        // Initiated to the original document and it'll be processed by Jsoup to remove quotes
-        val htmlDocumentWithoutQuote = htmlDocument.clone()
-
-        // Find the last parent blockquote and delete it in `htmlDocumentWithoutQuote`
-        val blockquoteElement = findAndRemoveLastParentBlockquote(htmlDocumentWithoutQuote)
-        // Find the first known parent quote in the HTML and delete all known quotes descriptor
-        val currentQuoteDescriptor = findFirstKnownParentQuoteDescriptor(htmlDocumentWithoutQuote, scope = this).ifEmpty {
-            if (blockquoteElement == null) "" else BLOCKQUOTE
-        }
-
-        val (content, quote) = splitContentAndQuote(htmlDocument, currentQuoteDescriptor, blockquoteElement)
-        ensureActive()
-
-        return content to quote
-    }
-
-    private fun findAndRemoveLastParentBlockquote(htmlDocumentWithoutQuote: Document): Element? {
-        fun Document.selectLastParentBlockquote(): Element? {
-            return selectFirst("$BLOCKQUOTE:not($BLOCKQUOTE $BLOCKQUOTE):last-of-type")
-        }
-
-        return htmlDocumentWithoutQuote.selectLastParentBlockquote()?.also { it.remove() }
-    }
-
-    private fun findFirstKnownParentQuoteDescriptor(htmlDocumentWithoutQuote: Document, scope: CoroutineScope): String {
-
-        var currentQuoteDescriptor = ""
+    private fun CoroutineScope.splitContentAndQuotes(htmlDocument: Document): Pair<String, MutableList<String>> {
+        val quotes = mutableListOf<String>()
 
         for (quoteDescriptor in quoteDescriptors) {
-            scope.ensureActive()
+            ensureActive()
 
-            val quotedContentElement = htmlDocumentWithoutQuote.select(quoteDescriptor)
-            if (quotedContentElement.isNotEmpty()) {
-                quotedContentElement.remove()
-                currentQuoteDescriptor = quoteDescriptor
+            htmlDocument.select(quoteDescriptor).forEach { foundQuote ->
+                quotes.add(foundQuote.outerHtml())
+                foundQuote.remove()
             }
         }
 
-        return currentQuoteDescriptor
-    }
-
-    private fun splitContentAndQuote(
-        htmlDocumentWithQuote: Document,
-        currentQuoteDescriptor: String,
-        blockquoteElement: Element?,
-    ): Pair<String, String?> {
-        return when {
-            currentQuoteDescriptor == BLOCKQUOTE -> {
-                for (quotedContentElement in htmlDocumentWithQuote.select(currentQuoteDescriptor)) {
-                    if (quotedContentElement.toString() == blockquoteElement.toString()) {
-                        quotedContentElement.remove()
-                        break
-                    }
-                }
-                htmlDocumentWithQuote.toString() to blockquoteElement.toString()
-            }
-            currentQuoteDescriptor.isNotEmpty() -> {
-                val quotedContentElements = htmlDocumentWithQuote.select(currentQuoteDescriptor)
-                quotedContentElements.remove()
-                htmlDocumentWithQuote.toString() to quotedContentElements.toString()
-            }
-            else -> {
-                htmlDocumentWithQuote.toString() to null
-            }
-        }
+        return htmlDocument.outerHtml() to quotes
     }
 
     //region Utils
