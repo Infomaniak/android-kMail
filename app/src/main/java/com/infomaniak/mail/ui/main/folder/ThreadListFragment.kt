@@ -635,7 +635,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun setEmptyState(emptyState: EmptyState) = with(binding) {
+    private fun setEmptyState(emptyState: EmptyState): Unit = with(binding) {
         threadsList.isGone = true
         emptyStateView.apply {
             illustration = getDrawable(context, emptyState.drawableId)
