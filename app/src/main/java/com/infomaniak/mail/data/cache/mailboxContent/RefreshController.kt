@@ -758,8 +758,8 @@ class RefreshController @Inject constructor(
 
             newThread = newMessage.toThread()
 
-            val referenceThread = getReferenceThread(existingThreads, idsOfFoldersWithIncompleteThreads)
-            if (referenceThread != null) addPreviousMessagesToThread(scope, newThread, referenceThread)
+            val referenceMessages = getReferenceMessages(existingThreads, idsOfFoldersWithIncompleteThreads)
+            addPreviousMessagesToThread(scope, newThread, referenceMessages)
         }
 
         return newThread
@@ -805,21 +805,29 @@ class RefreshController @Inject constructor(
      * We need to add 2 things to a new Thread:
      * - the previous Messages `messagesIds`
      * - the previous Messages, depending on conditions (for example, we don't want deleted Messages outside of the Trash)
-     * If there is no `existingThread` with all the Messages, we fallback on an `incompleteThread` to get its `messagesIds`.
+     * If there is no `existingThread` with all the Messages, we fallback on an `incompleteThread`.
      */
-    private fun getReferenceThread(existingThreads: List<Thread>, idsOfFoldersWithIncompleteThreads: List<String>): Thread? {
-        return existingThreads.firstOrNull { !idsOfFoldersWithIncompleteThreads.contains(it.folderId) }
-            ?: existingThreads.firstOrNull()
+    private fun getReferenceMessages(
+        existingThreads: List<Thread>,
+        idsOfFoldersWithIncompleteThreads: List<String>,
+    ): Set<Message> {
+        return existingThreads.filter { !idsOfFoldersWithIncompleteThreads.contains(it.folderId) }
+            .flatMap { it.messages }.toSet()
+            .ifEmpty { existingThreads.firstOrNull()?.messages?.toSet() ?: emptySet() }
     }
 
-    private fun TypedRealm.addPreviousMessagesToThread(scope: CoroutineScope, newThread: Thread, existingThread: Thread) {
-
-        newThread.messagesIds += existingThread.messagesIds
-
-        existingThread.messages.forEach { message ->
+    private fun TypedRealm.addPreviousMessagesToThread(
+        scope: CoroutineScope,
+        newThread: Thread,
+        referenceMessages: Set<Message>,
+    ) {
+        referenceMessages.forEach { message ->
             scope.ensureActive()
 
-            newThread.addMessageWithConditions(message, realm = this)
+            newThread.apply {
+                messagesIds += message.computeMessageIds()
+                addMessageWithConditions(message, realm = this@addPreviousMessagesToThread)
+            }
         }
     }
 

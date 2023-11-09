@@ -246,7 +246,7 @@ class Message : RealmObject {
         return to to cc
     }
 
-    private fun computeMessageIds(): RealmSet<String> {
+    fun computeMessageIds(): RealmSet<String> {
 
         fun String.ifNotBlank(completion: (String) -> Unit) {
             if (isNotBlank()) completion(this)
