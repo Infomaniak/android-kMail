@@ -18,12 +18,13 @@
 package com.infomaniak.mail.utils
 
 import android.view.ViewGroup
+import com.infomaniak.lib.confetti.CommonConfetti
+import com.infomaniak.lib.confetti.ConfettiSource
 import com.infomaniak.mail.MatomoMail.trackEasterEggEvent
 import com.infomaniak.mail.R
-import com.infomaniak.mail.confetti.CommonConfetti
-import com.infomaniak.mail.confetti.ConfettiSource
 import io.sentry.Sentry
 import io.sentry.SentryLevel
+import com.infomaniak.lib.confetti.R as RConfetti
 
 object ConfettiUtils {
 
@@ -40,12 +41,12 @@ object ConfettiUtils {
         trackEasterEggEvent("confetti$matomoValue")
 
         val none = 0.0f
-        val verySlow = resources.getDimensionPixelOffset(R.dimen.confetti_velocity_very_slow).toFloat()
-        val slow = resources.getDimensionPixelOffset(R.dimen.confetti_velocity_slow).toFloat()
-        val normal = resources.getDimensionPixelOffset(R.dimen.confetti_velocity_normal).toFloat()
-        val fast = resources.getDimensionPixelOffset(R.dimen.confetti_velocity_fast).toFloat()
-        val veryFast = resources.getDimensionPixelOffset(R.dimen.confetti_velocity_very_fast).toFloat()
-        val ultraFast = resources.getDimensionPixelOffset(R.dimen.confetti_velocity_ultra_fast).toFloat()
+        val verySlow = resources.getDimensionPixelOffset(RConfetti.dimen.confetti_velocity_very_slow).toFloat()
+        val slow = resources.getDimensionPixelOffset(RConfetti.dimen.confetti_velocity_slow).toFloat()
+        val normal = resources.getDimensionPixelOffset(RConfetti.dimen.confetti_velocity_normal).toFloat()
+        val fast = resources.getDimensionPixelOffset(RConfetti.dimen.confetti_velocity_fast).toFloat()
+        val veryFast = resources.getDimensionPixelOffset(RConfetti.dimen.confetti_velocity_very_fast).toFloat()
+        val ultraFast = resources.getDimensionPixelOffset(RConfetti.dimen.confetti_velocity_ultra_fast).toFloat()
 
         fun displayTada() {
             val config = ConfettiConfig(
@@ -72,7 +73,7 @@ object ConfettiUtils {
                 colors = resources.getIntArray(R.array.snowColors),
                 useGaussian = false,
             )
-            val size = resources.getDimensionPixelOffset(R.dimen.confetti_size)
+            val size = resources.getDimensionPixelOffset(RConfetti.dimen.confetti_size)
             val source = ConfettiSource(0, -size, container.width, -size)
             displayConfetti(config, source, container)
         }
