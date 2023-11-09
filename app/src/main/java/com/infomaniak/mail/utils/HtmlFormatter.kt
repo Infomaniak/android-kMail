@@ -23,6 +23,8 @@ import com.infomaniak.html.cleaner.HtmlSanitizer
 import com.infomaniak.mail.R
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
+import org.jsoup.nodes.Node
+import org.jsoup.nodes.TextNode
 import com.google.android.material.R as RMaterial
 
 class HtmlFormatter(private val html: String) {
@@ -54,8 +56,22 @@ class HtmlFormatter(private val html: String) {
             injectMetaViewPort()
             injectScript()
         }
+        body().breakLongStrings()
         if (needsBodyEncapsulation) body().encapsulateElementInDiv()
         html()
+    }
+
+    private fun Node.breakLongStrings() {
+        childNodes().forEach { child ->
+            if (child is TextNode) {
+                if (!child.isBlank) {
+                    val chunkedText = child.text().chunked(30).joinToString(separator = 0x200B.toChar().toString())
+                    child.text(chunkedText)
+                }
+            } else {
+                child.breakLongStrings()
+            }
+        }
     }
 
     private fun Element.injectCss() {
