@@ -81,12 +81,9 @@ object MessageBodyUtils {
         for (quoteDescriptor in quoteDescriptors) {
             ensureActive()
 
-            val foundQuotes = htmlDocument.select(quoteDescriptor)
-            if (foundQuotes.isNotEmpty()) {
-                foundQuotes.forEach { foundQuote ->
-                    quotes.add(foundQuote.outerHtml())
-                    foundQuote.remove()
-                }
+            htmlDocument.select(quoteDescriptor).forEach { foundQuote ->
+                quotes.add(foundQuote.outerHtml())
+                foundQuote.remove()
             }
         }
 
