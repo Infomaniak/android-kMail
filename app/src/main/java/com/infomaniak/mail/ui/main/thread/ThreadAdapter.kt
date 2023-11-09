@@ -93,6 +93,9 @@ class ThreadAdapter(
         set(value) {
             bodyWebView.isVisible = value
             fullMessageWebView.isVisible = !value
+
+            val textId = if (isQuoteCollapsed) R.string.messageShowQuotedText else R.string.messageHideQuotedText
+            quoteButton.text = context.getString(textId)
         }
 
     init {
@@ -419,17 +422,8 @@ class ThreadAdapter(
     }
 
     private fun ThreadViewHolder.bindBody(message: Message, hasQuote: Boolean) = with(binding) {
-
-        quoteButton.apply {
-            setOnClickListener {
-                toggleWebViews(message)
-                val textId = if (isQuoteCollapsed) R.string.messageShowQuotedText else R.string.messageHideQuotedText
-                quoteButton.text = context.getString(textId)
-            }
-
-            text = context.getString(R.string.messageShowQuotedText)
-        }
-
+        setQuoteInitialCollapsedState(hasQuote)
+        quoteButton.setOnClickListener { toggleWebViews(message) }
         quoteButtonFrameLayout.isVisible = hasQuote
 
         initWebViewClientIfNeeded(
@@ -443,6 +437,14 @@ class ThreadAdapter(
             bodyWebViewClient.unblockDistantResources()
             fullMessageWebViewClient.unblockDistantResources()
         }
+    }
+
+    // Automatically expand quotes of single message threads
+    private fun ItemMessageBinding.setQuoteInitialCollapsedState(hasQuote: Boolean) {
+        val isSingleMessageThread = itemCount == 1
+        val shouldBeExpanded = isSingleMessageThread && hasQuote
+
+        isQuoteCollapsed = !shouldBeExpanded
     }
 
     private fun onExpandedMessageLoaded(messageUid: String) {
