@@ -39,6 +39,7 @@ import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.query.RealmResults
+import io.realm.kotlin.types.RealmSet
 import io.sentry.Sentry
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
@@ -655,6 +656,11 @@ class RefreshController @Inject constructor(
                 // Other pre-existing Threads that will also require this Message and will provide the prior Messages for this new Thread.
                 val existingThreads = ThreadController.getThreads(remoteMessage.messageIds, realm = this)
 
+                // Some Messages don't have references to all previous Messages of the Thread (ex: these from the iOS Mail app).
+                // Because we are missing the links between Messages, it will create multiple Threads for the same Folder.
+                // Hence, we need to find these duplicates.
+                val isThereDuplicatedThreads = isThereDuplicatedThreads(remoteMessage.messageIds, existingThreads.count())
+
                 val thread = createNewThreadIfRequired(
                     scope,
                     existingThreads,
@@ -663,6 +669,9 @@ class RefreshController @Inject constructor(
                 )
 
                 updateOtherExistingThreads(existingThreads, remoteMessage, scope, impactedThreadsManaged)
+
+                // Now that all other existing Threads are updated, we need to remove the duplicated Threads.
+                if (isThereDuplicatedThreads) removeDuplicatedThreads(remoteMessage.messageIds, impactedThreadsManaged)
 
                 thread
             } else {
@@ -712,6 +721,29 @@ class RefreshController @Inject constructor(
         if (existingMessage == null) folder.messages.add(remoteMessage)
 
         return false
+    }
+
+    private fun MutableRealm.isThereDuplicatedThreads(messageIds: RealmSet<String>, threadsCount: Int): Boolean {
+        val foldersCount = ThreadController.getExistingThreadsFoldersCount(messageIds, realm = this)
+        return foldersCount != threadsCount.toLong()
+    }
+
+    private fun MutableRealm.removeDuplicatedThreads(messageIds: RealmSet<String>, impactedThreadsManaged: MutableSet<Thread>) {
+
+        // Create a map with all duplicated Threads of the same Thread in a list.
+        val map = mutableMapOf<String, MutableList<Thread>>()
+        ThreadController.getThreads(messageIds, realm = this).forEach {
+            map.getOrPut(it.folderId) { mutableListOf() }.add(it)
+        }
+
+        map.values.forEach { threads ->
+            threads.forEachIndexed { index, thread ->
+                if (index > 0) { // We want to keep only 1 duplicated Thread, so we skip the 1st one. (He's the chosen one!)
+                    impactedThreadsManaged.remove(thread)
+                    delete(thread) // Delete the other Threads. Sorry bro, you won't be missed.
+                }
+            }
+        }
     }
 
     private fun TypedRealm.createNewThreadIfRequired(
