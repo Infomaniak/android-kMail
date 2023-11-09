@@ -624,7 +624,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         val shouldDisplayThreadsView = isBooting || thereAreThreads || filterIsEnabled || (cursorIsNull && isNetworkConnected)
 
         when {
-            shouldDisplayThreadsView -> binding.emptyStateView.isGone = true
+            shouldDisplayThreadsView -> {
+                binding.emptyStateView.isGone = true
+                binding.threadsList.isVisible = true
+            }
             cursorIsNull -> setEmptyState(EmptyState.NETWORK)
             isCurrentFolderRole(FolderRole.INBOX) -> setEmptyState(EmptyState.INBOX)
             isCurrentFolderRole(FolderRole.TRASH) -> setEmptyState(EmptyState.TRASH)
@@ -632,8 +635,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun setEmptyState(emptyState: EmptyState) {
-        binding.emptyStateView.apply {
+    private fun setEmptyState(emptyState: EmptyState) = with(binding) {
+        threadsList.isGone = true
+        emptyStateView.apply {
             illustration = getDrawable(context, emptyState.drawableId)
             title = getString(emptyState.titleId)
             description = getString(emptyState.descriptionId)
