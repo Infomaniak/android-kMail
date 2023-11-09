@@ -25,15 +25,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.forEachIndexed
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.*
 import com.infomaniak.mail.ui.main.folder.HeaderItemDecoration.Intersection.*
 
 class HeaderItemDecoration(
     parent: RecyclerView,
     private val shouldFadeOutHeader: Boolean = false,
     private val isHeader: (itemPosition: Int) -> Boolean,
-) : RecyclerView.ItemDecoration() {
+) : ItemDecoration() {
 
-    private var currentHeader: Pair<Int, RecyclerView.ViewHolder>? = null
+    private var currentHeader: Pair<Int, ViewHolder>? = null
 
     private inline fun View.doOnEachNextLayout(crossinline action: (view: View) -> Unit) {
         addOnLayoutChangeListener { view, _, _, _, _, _, _, _, _ ->
@@ -42,7 +43,7 @@ class HeaderItemDecoration(
     }
 
     init {
-        parent.adapter?.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+        parent.adapter?.registerAdapterDataObserver(object : AdapterDataObserver() {
             override fun onChanged() {
                 // Clear saved header as it can be outdated now
                 currentHeader = null
@@ -55,7 +56,7 @@ class HeaderItemDecoration(
         }
 
         // Handle click on sticky header
-        parent.addOnItemTouchListener(object : RecyclerView.SimpleOnItemTouchListener() {
+        parent.addOnItemTouchListener(object : SimpleOnItemTouchListener() {
             override fun onInterceptTouchEvent(recyclerView: RecyclerView, motionEvent: MotionEvent): Boolean {
                 return if (motionEvent.action == MotionEvent.ACTION_DOWN) {
                     motionEvent.y <= (currentHeader?.second?.itemView?.bottom ?: 0)
@@ -66,7 +67,7 @@ class HeaderItemDecoration(
         })
     }
 
-    override fun onDrawOver(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
+    override fun onDrawOver(c: Canvas, parent: RecyclerView, state: State) {
         super.onDrawOver(c, parent, state)
 
         val topChildAdapterPosition = getPositionInAdapterOfFirstChild(parent) ?: return
@@ -113,7 +114,7 @@ class HeaderItemDecoration(
         }
 
         val headerPosition = getHeaderPositionForItem(itemPosition)
-        if (headerPosition == RecyclerView.NO_POSITION) return null
+        if (headerPosition == NO_POSITION) return null
         val headerType = parent.adapter?.getItemViewType(headerPosition) ?: return null
         // If match, reuse viewHolder
         if (currentHeader?.first == headerPosition && currentHeader?.second?.itemViewType == headerType) {
@@ -131,7 +132,7 @@ class HeaderItemDecoration(
     }
 
     private fun getHeaderPositionForItem(itemPosition: Int): Int {
-        var headerPosition = RecyclerView.NO_POSITION
+        var headerPosition = NO_POSITION
         var currentPosition = itemPosition
         do {
             if (isHeader(currentPosition)) {
@@ -213,9 +214,5 @@ class HeaderItemDecoration(
         INSET_TOP,
         CENTER,
         INSET_BOTTOM,
-    }
-
-    private companion object {
-        val TAG = HeaderItemDecoration::class.simpleName
     }
 }

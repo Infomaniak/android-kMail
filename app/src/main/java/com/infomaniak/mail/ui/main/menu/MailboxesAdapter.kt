@@ -19,7 +19,8 @@ package com.infomaniak.mail.ui.main.menu
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.Adapter
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
 import com.infomaniak.mail.MatomoMail.SWITCH_MAILBOX_NAME
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
@@ -42,7 +43,7 @@ class MailboxesAdapter(
     private val onInvalidPasswordMailboxClicked: ((Mailbox) -> Unit)? = null,
     private val onLockedMailboxClicked: ((String) -> Unit)? = null,
     private var mailboxes: List<Mailbox> = emptyList(),
-) : RecyclerView.Adapter<MailboxesViewHolder>() {
+) : Adapter<MailboxesViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MailboxesViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -137,5 +138,5 @@ class MailboxesAdapter(
         SIMPLE_MAILBOX(R.layout.item_selectable_mailbox),
     }
 
-    class MailboxesViewHolder(val binding: ViewBinding) : RecyclerView.ViewHolder(binding.root)
+    class MailboxesViewHolder(val binding: ViewBinding) : ViewHolder(binding.root)
 }

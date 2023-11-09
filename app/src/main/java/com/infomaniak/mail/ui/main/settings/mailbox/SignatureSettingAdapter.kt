@@ -20,7 +20,7 @@ package com.infomaniak.mail.ui.main.settings.mailbox
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.*
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.databinding.ItemSettingsSignatureBinding
 import com.infomaniak.mail.ui.main.settings.mailbox.SignatureSettingAdapter.SettingsSignatureViewHolder
@@ -28,7 +28,7 @@ import com.infomaniak.mail.ui.main.settings.mailbox.SignatureSettingAdapter.Sett
 class SignatureSettingAdapter(
     private val canManageSignature: Boolean,
     private val onSignatureSelected: (Signature) -> Unit,
-) : RecyclerView.Adapter<SettingsSignatureViewHolder>() {
+) : Adapter<SettingsSignatureViewHolder>() {
 
     private var signatures: List<Signature> = emptyList()
 
@@ -54,5 +54,5 @@ class SignatureSettingAdapter(
         notifyDataSetChanged()
     }
 
-    class SettingsSignatureViewHolder(val binding: ItemSettingsSignatureBinding) : RecyclerView.ViewHolder(binding.root)
+    class SettingsSignatureViewHolder(val binding: ItemSettingsSignatureBinding) : ViewHolder(binding.root)
 }

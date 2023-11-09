@@ -21,7 +21,7 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.*
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.databinding.ItemSwitchUserAccountBinding
@@ -34,7 +34,7 @@ import io.sentry.SentryLevel
 class SwitchUserAdapter(
     val currentUserId: Int,
     val onChangingUserAccount: ((User) -> Unit),
-) : RecyclerView.Adapter<SwitchUserAccountViewHolder>() {
+) : Adapter<SwitchUserAccountViewHolder>() {
 
     private var accounts: List<User> = emptyList()
 
@@ -87,5 +87,5 @@ class SwitchUserAdapter(
         notifyDataSetChanged()
     }
 
-    class SwitchUserAccountViewHolder(val binding: ItemSwitchUserAccountBinding) : RecyclerView.ViewHolder(binding.root)
+    class SwitchUserAccountViewHolder(val binding: ItemSwitchUserAccountBinding) : ViewHolder(binding.root)
 }

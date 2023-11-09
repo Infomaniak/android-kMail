@@ -29,6 +29,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.*
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
 import com.infomaniak.lib.core.utils.*
@@ -545,7 +546,7 @@ class ThreadAdapter(
         private val shouldLoadDistantResources: Boolean,
         onContactClicked: ((contact: Recipient) -> Unit)?,
         onAttachmentClicked: ((attachment: Attachment) -> Unit)?,
-    ) : RecyclerView.ViewHolder(binding.root) {
+    ) : ViewHolder(binding.root) {
 
         val fromAdapter = DetailedRecipientAdapter(onContactClicked)
         val toAdapter = DetailedRecipientAdapter(onContactClicked)

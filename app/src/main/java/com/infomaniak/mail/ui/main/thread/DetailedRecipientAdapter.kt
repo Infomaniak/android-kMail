@@ -19,7 +19,8 @@ package com.infomaniak.mail.ui.main.thread
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.Adapter
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -29,7 +30,7 @@ import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
 
 class DetailedRecipientAdapter(
     private val onContactClicked: ((contact: Recipient) -> Unit)?,
-) : RecyclerView.Adapter<DetailedRecipientViewHolder>() {
+) : Adapter<DetailedRecipientViewHolder>() {
 
     private var recipients = emptyList<Recipient>()
 
@@ -54,5 +55,5 @@ class DetailedRecipientAdapter(
         recipients = newList
     }
 
-    class DetailedRecipientViewHolder(val binding: ItemDetailedContactBinding) : RecyclerView.ViewHolder(binding.root)
+    class DetailedRecipientViewHolder(val binding: ItemDetailedContactBinding) : ViewHolder(binding.root)
 }

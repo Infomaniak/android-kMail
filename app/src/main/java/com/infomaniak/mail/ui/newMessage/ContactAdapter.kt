@@ -21,7 +21,7 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.*
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
@@ -37,7 +37,7 @@ class ContactAdapter(
     private val onContactClicked: (item: MergedContact) -> Unit,
     private val onAddUnrecognizedContact: () -> Unit,
     private val setSnackBar: (titleRes: Int) -> Unit,
-) : RecyclerView.Adapter<ContactViewHolder>() {
+) : Adapter<ContactViewHolder>() {
 
     private var allContacts: List<MergedContact> = emptyList()
     private var matchedContacts = mutableListOf<MatchedContact>()
@@ -159,5 +159,5 @@ class ContactAdapter(
         const val MAX_AUTOCOMPLETE_RESULTS = 10
     }
 
-    class ContactViewHolder(val binding: ItemContactBinding) : RecyclerView.ViewHolder(binding.root)
+    class ContactViewHolder(val binding: ItemContactBinding) : ViewHolder(binding.root)
 }

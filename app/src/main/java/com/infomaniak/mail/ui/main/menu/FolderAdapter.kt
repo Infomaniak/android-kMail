@@ -24,7 +24,7 @@ import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.*
 import androidx.viewbinding.ViewBinding
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.R
@@ -41,7 +41,7 @@ import kotlin.math.min
 
 class FolderAdapter @Inject constructor(
     private val globalCoroutineScope: CoroutineScope,
-) : RecyclerView.Adapter<FolderViewHolder>() {
+) : Adapter<FolderViewHolder>() {
 
     private val foldersDiffer = AsyncListDiffer(this, FolderDiffCallback())
 
@@ -212,7 +212,7 @@ class FolderAdapter @Inject constructor(
         const val MAX_SUB_FOLDERS_INDENT = 2
     }
 
-    class FolderViewHolder(val binding: ViewBinding) : RecyclerView.ViewHolder(binding.root)
+    class FolderViewHolder(val binding: ViewBinding) : ViewHolder(binding.root)
 
     private class FolderDiffCallback : DiffUtil.ItemCallback<Folder>() {
 

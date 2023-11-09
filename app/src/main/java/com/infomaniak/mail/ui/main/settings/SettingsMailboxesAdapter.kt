@@ -20,14 +20,14 @@ package com.infomaniak.mail.ui.main.settings
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.*
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.databinding.ItemSettingsMailboxBinding
 import com.infomaniak.mail.ui.main.settings.SettingsMailboxesAdapter.SettingsMailboxViewHolder
 
 class SettingsMailboxesAdapter(
     private val onMailboxSelected: (Mailbox) -> Unit,
-) : RecyclerView.Adapter<SettingsMailboxViewHolder>() {
+) : Adapter<SettingsMailboxViewHolder>() {
 
     private var mailboxes: List<Mailbox> = emptyList()
 
@@ -51,5 +51,5 @@ class SettingsMailboxesAdapter(
         notifyDataSetChanged()
     }
 
-    class SettingsMailboxViewHolder(val binding: ItemSettingsMailboxBinding) : RecyclerView.ViewHolder(binding.root)
+    class SettingsMailboxViewHolder(val binding: ItemSettingsMailboxBinding) : ViewHolder(binding.root)
 }

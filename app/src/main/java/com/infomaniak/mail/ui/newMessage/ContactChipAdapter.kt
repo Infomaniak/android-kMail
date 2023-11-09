@@ -19,7 +19,8 @@ package com.infomaniak.mail.ui.newMessage
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.Adapter
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ChipContactBinding
 import com.infomaniak.mail.ui.newMessage.RecipientFieldView.Companion.setChipStyle
@@ -27,7 +28,7 @@ import com.infomaniak.mail.ui.newMessage.RecipientFieldView.Companion.setChipSty
 class ContactChipAdapter(
     val openContextMenu: (Recipient, BackspaceAwareChip) -> Unit,
     val onBackspace: (Recipient) -> Unit,
-) : RecyclerView.Adapter<ContactChipAdapter.ContactChipViewHolder>() {
+) : Adapter<ContactChipAdapter.ContactChipViewHolder>() {
 
     private val recipients = mutableSetOf<Recipient>()
 
@@ -63,5 +64,5 @@ class ContactChipAdapter(
         notifyItemRemoved(index)
     }
 
-    class ContactChipViewHolder(val binding: ChipContactBinding) : RecyclerView.ViewHolder(binding.root)
+    class ContactChipViewHolder(val binding: ChipContactBinding) : ViewHolder(binding.root)
 }
