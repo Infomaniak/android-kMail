@@ -264,15 +264,16 @@ class ThreadFragment : Fragment() {
         }
     }
 
-    // TODO: We probably want a real layout instead of this workaround.
     private fun updateToolbarUi() = with(binding.toolbar) {
-        if (isTabletInLandscape()) {
-            navigationIcon?.alpha = 0
-            setNavigationOnClickListener {}
+
+        val (alpha, callback) = if (isTabletInLandscape()) {
+            0 to { }
         } else {
-            navigationIcon?.alpha = 255
-            setNavigationOnClickListener { threadViewModel.closeThread() }
+            255 to { leaveThread() }
         }
+
+        navigationIcon?.alpha = alpha
+        setNavigationOnClickListener { callback() }
     }
 
     private fun setupUi() = with(binding) {
