@@ -99,7 +99,7 @@ class HtmlFormatter(private val html: String) {
         for (child in childNodes()) {
             if (child is TextNode) {
                 val text = child.text()
-                if (text.length <= 30) continue
+                if (text.length <= BREAK_LIMIT) continue
 
                 child.text(breakString(text))
             } else {
@@ -110,7 +110,7 @@ class HtmlFormatter(private val html: String) {
 
     private fun breakString(text: String): String {
         var counter = 0
-        var lastCharIsBreakable = false
+        var previousCharIsBreakable = false
         val stringBuilder = StringBuilder(OPTIMAL_STRING_LENGTH)
 
         for (char in text) {
@@ -123,17 +123,20 @@ class HtmlFormatter(private val html: String) {
 
             when (char) {
                 in DETECT_BUT_DO_NOT_BREAK -> {
-                    stringBuilder.append(char)
                     counter = 0
+                    stringBuilder.append(char)
                 }
                 in BREAK_CHARACTERS -> {
                     stringBuilder.append(char)
-                    lastCharIsBreakable = true
+                    previousCharIsBreakable = true
                 }
                 else -> {
-                    if (lastCharIsBreakable) stringBuilder.append(ZERO_WIDTH_SPACE)
+                    if (previousCharIsBreakable) {
+                        counter = 0
+                        stringBuilder.append(ZERO_WIDTH_SPACE)
+                    }
                     stringBuilder.append(char)
-                    lastCharIsBreakable = false
+                    previousCharIsBreakable = false
                 }
             }
         }
