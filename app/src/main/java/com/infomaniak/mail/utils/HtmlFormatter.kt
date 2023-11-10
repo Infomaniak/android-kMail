@@ -92,6 +92,9 @@ class HtmlFormatter(private val html: String) {
         }
     }
 
+    // When displaying emails that have very long strings that are hard to break (mostly URLs), sometimes using
+    // 'overflow-wrap: break-word' doesn't help softwrapping the line. This results in very wide emails that need to be zoomed out
+    // excessively. To fix this issue, we add zero width spaces in optimal places to help this css attribute wrap correctly
     private fun Node.breakLongStrings() {
         for (child in childNodes()) {
             if (child is TextNode) {
