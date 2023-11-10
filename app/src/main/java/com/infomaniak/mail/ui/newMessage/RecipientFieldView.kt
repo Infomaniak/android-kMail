@@ -49,6 +49,7 @@ import com.infomaniak.mail.utils.MergedContactDictionary
 import com.infomaniak.mail.utils.UiUtils.dividerDrawable
 import com.infomaniak.mail.utils.isEmail
 import com.infomaniak.mail.utils.toggleChevron
+import io.realm.kotlin.types.RealmList
 import kotlin.math.min
 
 class RecipientFieldView @JvmOverloads constructor(
@@ -376,17 +377,9 @@ class RecipientFieldView @JvmOverloads constructor(
 
     fun clearField() = binding.textInput.setText("")
 
-    fun initRecipients(
-        initialRecipients: List<Recipient>,
-        shouldWarnForExternalContacts: Boolean,
-        emailDictionary: MergedContactDictionary,
-        aliases: List<String>,
-        otherFieldsAreAllEmpty: Boolean = true,
-    ) {
-
+    fun initRecipients(initialRecipients: List<Recipient>, otherFieldsAreAllEmpty: Boolean = true) {
         initialRecipients.forEach { recipient ->
-            val shouldDisplayAsExternal = shouldWarnForExternalContacts && recipient.isExternal(emailDictionary, aliases)
-            recipient.initDisplayAsExternal(shouldDisplayAsExternal)
+            recipient.isManuallyEntered = false
             if (contactChipAdapter.addChip(recipient)) contactAdapter.addUsedContact(recipient.email)
         }
 
@@ -425,6 +418,17 @@ class RecipientFieldView @JvmOverloads constructor(
         val recipients = contactChipAdapter.getRecipients().filter { it.displayAsExternal }
         val recipientCount = recipients.count()
         return (if (recipientCount == 1) recipients.single().email else null) to recipientCount
+    }
+
+    fun updateExternals(shouldWarnForExternal: Boolean, emailDictionary: MergedContactDictionary, aliases: RealmList<String>) {
+        for (recipient in contactChipAdapter.getRecipients()) {
+            if (recipient.isManuallyEntered) continue
+
+            val shouldDisplayAsExternal = shouldWarnForExternal && recipient.isExternal(emailDictionary, aliases)
+            recipient.initDisplayAsExternal(shouldDisplayAsExternal)
+
+            updateCollapsedChipValues(isSelfCollapsed)
+        }
     }
 
     companion object {

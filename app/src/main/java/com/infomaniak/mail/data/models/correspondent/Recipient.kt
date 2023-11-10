@@ -34,6 +34,8 @@ open class Recipient : EmbeddedRealmObject, Correspondent {
     override var email: String = ""
     override var name: String = ""
 
+    var isManuallyEntered: Boolean = true
+
     //region UI data (Transient & Ignore)
     // Only indicates how to display the Recipient chip when composing a new Message.
     // `isExternal()` could return true even if this value is false.

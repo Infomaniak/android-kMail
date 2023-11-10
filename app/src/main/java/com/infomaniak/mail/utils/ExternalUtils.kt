@@ -44,7 +44,8 @@ object ExternalUtils {
         return externalRecipientEmail to externalRecipientQuantity
     }
 
-    fun Draft.findExternalRecipient(
+    // TODO : Only apply to recipient that are not manually entered
+    fun Draft.findExternalRecipientForNewMessage(
         aliases: List<String>,
         emailDictionary: MergedContactDictionary,
     ): Pair<String?, Int> = findExternalRecipientInIterables(emailDictionary, aliases, to, cc, bcc)

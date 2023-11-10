@@ -78,7 +78,7 @@ import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.ui.newMessage.NewMessageFragment.FieldType.*
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipient
+import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipientForNewMessage
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.destroyAndClearHistory
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
@@ -191,18 +191,20 @@ class NewMessageFragment : Fragment() {
             newMessageViewModel.initResult,
             newMessageViewModel.mergedContacts,
         ).observe(viewLifecycleOwner) { (_, mergedContacts) ->
-            val aliases = newMessageViewModel.currentMailbox.aliases
-
             val externalMailFlagEnabled = newMessageViewModel.currentMailbox.externalMailFlagEnabled
             val shouldWarnForExternal = externalMailFlagEnabled && !newMessageActivityArgs.arrivedFromExistingDraft
-
             val emailDictionary = mergedContacts.second
+            val aliases = newMessageViewModel.currentMailbox.aliases
 
-            // TODO: updatesRecipients that got created manually
+            binding.apply {
+                toField.updateExternals(shouldWarnForExternal, emailDictionary, aliases)
+                ccField.updateExternals(shouldWarnForExternal, emailDictionary, aliases)
+                bccField.updateExternals(shouldWarnForExternal, emailDictionary, aliases)
+            }
 
-            if (shouldWarnForExternal) {
-                val (externalRecipientEmail, externalRecipientQuantity) = draft.findExternalRecipient(aliases, emailDictionary)
-                newMessageViewModel.externalRecipientCount.value = externalRecipientEmail to externalRecipientQuantity
+            if (shouldWarnForExternal && !newMessageViewModel.isExternalBannerManuallyClosed) {
+                val (externalEmail, externalQuantity) = newMessageViewModel.draft.findExternalRecipientForNewMessage(aliases, emailDictionary)
+                newMessageViewModel.externalRecipientCount.value = externalEmail to externalQuantity
             }
         }
     }
@@ -452,9 +454,9 @@ class NewMessageFragment : Fragment() {
     private fun populateUiWithViewModel() = with(binding) {
         val draft = newMessageViewModel.draft
         val ccAndBccFieldsAreEmpty = draft.cc.isEmpty() && draft.bcc.isEmpty()
-        toField.initRecipients(draft.to, shouldWarnForExternal, emailDictionary, aliases, ccAndBccFieldsAreEmpty)
-        ccField.initRecipients(draft.cc, shouldWarnForExternal, emailDictionary, aliases)
-        bccField.initRecipients(draft.bcc, shouldWarnForExternal, emailDictionary, aliases)
+        toField.initRecipients(draft.to, ccAndBccFieldsAreEmpty)
+        ccField.initRecipients(draft.cc)
+        bccField.initRecipients(draft.bcc)
 
         newMessageViewModel.updateIsSendingAllowed()
 
