@@ -32,6 +32,7 @@ class HtmlFormatter(private val html: String) {
     private val scripts = mutableListOf<String>()
     private var needsMetaViewport = false
     private var needsBodyEncapsulation = false
+    private var breakLongWords = false
 
     fun registerCss(css: String, styleId: String? = null) {
         cssList.add(css to styleId)
@@ -49,6 +50,10 @@ class HtmlFormatter(private val html: String) {
         needsBodyEncapsulation = true
     }
 
+    fun registerBreakLongWords() {
+        breakLongWords = true
+    }
+
     fun inject(): String = with(HtmlSanitizer.getInstance().sanitize(Jsoup.parse(html))) {
         outputSettings().prettyPrint(true)
         head().apply {
@@ -56,22 +61,11 @@ class HtmlFormatter(private val html: String) {
             injectMetaViewPort()
             injectScript()
         }
-        body().breakLongStrings()
+
+        if (breakLongWords) body().breakLongStrings()
+
         if (needsBodyEncapsulation) body().encapsulateElementInDiv()
         html()
-    }
-
-    private fun Node.breakLongStrings() {
-        childNodes().forEach { child ->
-            if (child is TextNode) {
-                if (!child.isBlank) {
-                    val chunkedText = child.text().chunked(30).joinToString(separator = 0x200B.toChar().toString())
-                    child.text(chunkedText)
-                }
-            } else {
-                child.breakLongStrings()
-            }
-        }
     }
 
     private fun Element.injectCss() {
@@ -98,6 +92,54 @@ class HtmlFormatter(private val html: String) {
         }
     }
 
+    private fun Node.breakLongStrings() {
+        for (child in childNodes()) {
+            if (child is TextNode) {
+                if (child.isBlank) continue
+
+                val text = child.text()
+                if (text.length <= 30) continue
+
+                child.text(breakString(text))
+            } else {
+                child.breakLongStrings()
+            }
+        }
+    }
+
+    private fun breakString(text: String): String {
+        var counter = 0
+        var lastCharIsBreakable = false
+        val stringBuilder = StringBuilder(OPTIMAL_STRING_LENGTH)
+
+        for (char in text) {
+            if (++counter == BREAK_LIMIT) {
+                counter = 0
+                stringBuilder.append(char)
+                stringBuilder.append(ZERO_WIDTH_SPACE)
+                continue
+            }
+
+            when (char) {
+                in DETECT_BUT_DO_NOT_BREAK -> {
+                    stringBuilder.append(char)
+                    counter = 0
+                }
+                in BREAK_CHARACTERS -> {
+                    stringBuilder.append(char)
+                    lastCharIsBreakable = true
+                }
+                else -> {
+                    if (lastCharIsBreakable) stringBuilder.append(ZERO_WIDTH_SPACE)
+                    stringBuilder.append(char)
+                    lastCharIsBreakable = false
+                }
+            }
+        }
+
+        return stringBuilder.toString()
+    }
+
     private fun Element.encapsulateElementInDiv() {
         val bodyContent = childNodesCopy()
         empty()
@@ -107,6 +149,14 @@ class HtmlFormatter(private val html: String) {
     companion object {
         private const val PRIMARY_COLOR_CODE = "--kmail-primary-color"
         private const val KMAIL_MESSAGE_ID = "kmail-message-content"
+
+        private val DETECT_BUT_DO_NOT_BREAK = setOf(' ')
+        private val BREAK_CHARACTERS = setOf(':', '/', '~', '.', ',', '-', '_', '?', '#', '%', '=', '&')
+        private const val ZERO_WIDTH_SPACE = 0x200B.toChar()
+        private const val BREAK_LIMIT = 30
+        // Across a few handpicked representative emails, average text node length for text nodes bigger than 30 characters seems
+        // to be centered between 60 and 120
+        private const val OPTIMAL_STRING_LENGTH = 120
 
         private fun Context.loadCss(@RawRes cssResId: Int, customColors: List<Pair<String, Int>> = emptyList()): String {
             var css = readRawResource(cssResId)
