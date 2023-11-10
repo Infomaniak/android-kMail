@@ -122,23 +122,18 @@ class HtmlFormatter(private val html: String) {
             }
 
             when (char) {
-                in DETECT_BUT_DO_NOT_BREAK -> {
-                    counter = 0
-                    stringBuilder.append(char)
-                }
-                in BREAK_CHARACTERS -> {
-                    stringBuilder.append(char)
-                    previousCharIsBreakable = true
-                }
+                in DETECT_BUT_DO_NOT_BREAK -> counter = 0
+                in BREAK_CHARACTERS -> previousCharIsBreakable = true
                 else -> {
                     if (previousCharIsBreakable) {
                         counter = 0
                         stringBuilder.append(ZERO_WIDTH_SPACE)
+                        previousCharIsBreakable = false
                     }
-                    stringBuilder.append(char)
-                    previousCharIsBreakable = false
                 }
             }
+
+            stringBuilder.append(char)
         }
 
         return stringBuilder.toString()
