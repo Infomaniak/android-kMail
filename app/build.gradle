@@ -80,6 +80,7 @@ dependencies {
     implementation project(path: ':Core')
     implementation project(path: ':Core:AppLock')
     implementation project(path: ':Core:BugTracker')
+    implementation project(path: ':Core:Confetti')
     implementation project(path: ':Core:Stores')
     implementation project(path: ':HtmlCleaner')
 

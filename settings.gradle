@@ -16,4 +16,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = 'Infomaniak Mail'
-include ':app', ':Core', ':Core:AppLock', ':Core:BugTracker', ':Core:Stores', ':HtmlCleaner'
+include ':app', ':Core', ':Core:AppLock', ':Core:BugTracker', ':Core:Confetti', ':Core:Stores', ':HtmlCleaner'
