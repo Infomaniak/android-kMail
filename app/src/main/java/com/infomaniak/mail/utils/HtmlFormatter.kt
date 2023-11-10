@@ -98,8 +98,6 @@ class HtmlFormatter(private val html: String) {
     private fun Node.breakLongStrings() {
         for (child in childNodes()) {
             if (child is TextNode) {
-                if (child.isBlank) continue
-
                 val text = child.text()
                 if (text.length <= 30) continue
 
