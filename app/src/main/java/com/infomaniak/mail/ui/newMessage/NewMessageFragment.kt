@@ -183,6 +183,28 @@ class NewMessageFragment : Fragment() {
         observeAiOutput()
         observeAiPromptStatus()
         observeAiFeatureFragmentUpdates()
+        observeExternals()
+    }
+
+    private fun observeExternals() {
+        Utils.nonNullMediator(
+            newMessageViewModel.initResult,
+            newMessageViewModel.mergedContacts,
+        ).observe(viewLifecycleOwner) { (_, mergedContacts) ->
+            val aliases = newMessageViewModel.currentMailbox.aliases
+
+            val externalMailFlagEnabled = newMessageViewModel.currentMailbox.externalMailFlagEnabled
+            val shouldWarnForExternal = externalMailFlagEnabled && !newMessageActivityArgs.arrivedFromExistingDraft
+
+            val emailDictionary = mergedContacts.second
+
+            // TODO: updatesRecipients that got created manually
+
+            if (shouldWarnForExternal) {
+                val (externalRecipientEmail, externalRecipientQuantity) = draft.findExternalRecipient(aliases, emailDictionary)
+                newMessageViewModel.externalRecipientCount.value = externalRecipientEmail to externalRecipientQuantity
+            }
+        }
     }
 
     private fun navigateToDiscoveryBottomSheetIfFirstTime() = with(localSettings) {
@@ -429,21 +451,10 @@ class NewMessageFragment : Fragment() {
 
     private fun populateUiWithViewModel() = with(binding) {
         val draft = newMessageViewModel.draft
-        val aliases = newMessageViewModel.currentMailbox.aliases
-
-        val externalMailFlagEnabled = newMessageViewModel.currentMailbox.externalMailFlagEnabled
-        val shouldWarnForExternal = externalMailFlagEnabled && !newMessageActivityArgs.arrivedFromExistingDraft
-
         val ccAndBccFieldsAreEmpty = draft.cc.isEmpty() && draft.bcc.isEmpty()
-        val emailDictionary = newMessageViewModel.mergedContacts.value?.second ?: emptyMap()
         toField.initRecipients(draft.to, shouldWarnForExternal, emailDictionary, aliases, ccAndBccFieldsAreEmpty)
         ccField.initRecipients(draft.cc, shouldWarnForExternal, emailDictionary, aliases)
         bccField.initRecipients(draft.bcc, shouldWarnForExternal, emailDictionary, aliases)
-
-        if (shouldWarnForExternal) {
-            val (externalRecipientEmail, externalRecipientQuantity) = draft.findExternalRecipient(aliases, emailDictionary)
-            newMessageViewModel.externalRecipientCount.value = externalRecipientEmail to externalRecipientQuantity
-        }
 
         newMessageViewModel.updateIsSendingAllowed()
 

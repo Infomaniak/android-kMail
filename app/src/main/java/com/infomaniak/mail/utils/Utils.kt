@@ -19,6 +19,8 @@ package com.infomaniak.mail.utils
 
 import android.net.Uri
 import androidx.core.net.toUri
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import io.sentry.Sentry
 import kotlinx.coroutines.*
@@ -75,6 +77,38 @@ object Utils {
         var result: T? = null
         CoroutineScope(Dispatchers.Default).launch { result = block() }.join()
         result!!
+    }
+
+
+    // A Mediator of the type 'non null' acts as a normal mediator but will only trigger if all values are non-null
+    fun <R> nonNullMediator(vararg liveData: LiveData<*>, constructor: (List<Any>) -> R): MediatorLiveData<R> {
+        return MediatorLiveData<R>().apply {
+            liveData.forEach { singleLiveData ->
+                addSource(singleLiveData) {
+                    val values = liveData.map { it.value }
+                    if (values.all { it != null }) postValue(constructor(values as List<Any>))
+                }
+            }
+        }
+    }
+
+    // Helper method to automatically wrap two live data inside a Pair
+    fun <T1, T2> nonNullMediator(liveData1: LiveData<T1>, liveData2: LiveData<T2>): MediatorLiveData<Pair<T1, T2>> {
+        return nonNullMediator(liveData1, liveData2) { (value1, value2) ->
+            Pair(value1 as T1, value2 as T2)
+        }
+    }
+
+
+    // Helper method to automatically wrap three live data inside a Triple
+    fun <T1, T2, T3> nonNullMediator(
+        liveData1: LiveData<T1>,
+        liveData2: LiveData<T2>,
+        liveData3: LiveData<T3>,
+    ): MediatorLiveData<Triple<T1, T2, T3>> {
+        return nonNullMediator(liveData1, liveData2, liveData3) { (value1, value2, value3) ->
+            Triple(value1 as T1, value2 as T2, value3 as T3)
+        }
     }
 
     enum class MailboxErrorCode {
