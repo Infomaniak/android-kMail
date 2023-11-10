@@ -64,6 +64,7 @@ class WebViewUtils(context: Context) {
         registerScript(fixStyleScript)
         registerScript(jsBridgeScript)
         registerBodyEncapsulation()
+        registerBreakLongWords()
     }
 
     class JavascriptBridge {

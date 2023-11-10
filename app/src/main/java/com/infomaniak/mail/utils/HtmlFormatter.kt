@@ -23,6 +23,8 @@ import com.infomaniak.html.cleaner.HtmlSanitizer
 import com.infomaniak.mail.R
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
+import org.jsoup.nodes.Node
+import org.jsoup.nodes.TextNode
 import com.google.android.material.R as RMaterial
 
 class HtmlFormatter(private val html: String) {
@@ -30,6 +32,7 @@ class HtmlFormatter(private val html: String) {
     private val scripts = mutableListOf<String>()
     private var needsMetaViewport = false
     private var needsBodyEncapsulation = false
+    private var breakLongWords = false
 
     fun registerCss(css: String, styleId: String? = null) {
         cssList.add(css to styleId)
@@ -47,6 +50,10 @@ class HtmlFormatter(private val html: String) {
         needsBodyEncapsulation = true
     }
 
+    fun registerBreakLongWords() {
+        breakLongWords = true
+    }
+
     fun inject(): String = with(HtmlSanitizer.getInstance().sanitize(Jsoup.parse(html))) {
         outputSettings().prettyPrint(true)
         head().apply {
@@ -54,6 +61,9 @@ class HtmlFormatter(private val html: String) {
             injectMetaViewPort()
             injectScript()
         }
+
+        if (breakLongWords) body().breakLongStrings()
+
         if (needsBodyEncapsulation) body().encapsulateElementInDiv()
         html()
     }
@@ -82,6 +92,53 @@ class HtmlFormatter(private val html: String) {
         }
     }
 
+    // When displaying emails that have very long strings that are hard to break (mostly URLs), sometimes using
+    // 'overflow-wrap: break-word' doesn't help softwrapping the line. This results in very wide emails that need to be zoomed out
+    // excessively. To fix this issue, we add zero width spaces in optimal places to help this css attribute wrap correctly
+    private fun Node.breakLongStrings() {
+        for (child in childNodes()) {
+            if (child is TextNode) {
+                val text = child.text()
+                if (text.length <= BREAK_LIMIT) continue
+
+                child.text(breakString(text))
+            } else {
+                child.breakLongStrings()
+            }
+        }
+    }
+
+    private fun breakString(text: String): String {
+        var counter = 0
+        var previousCharIsBreakable = false
+        val stringBuilder = StringBuilder(OPTIMAL_STRING_LENGTH)
+
+        for (char in text) {
+            if (++counter == BREAK_LIMIT) {
+                counter = 0
+                stringBuilder.append(char)
+                stringBuilder.append(ZERO_WIDTH_SPACE)
+                continue
+            }
+
+            when (char) {
+                in DETECT_BUT_DO_NOT_BREAK -> counter = 0
+                in BREAK_CHARACTERS -> previousCharIsBreakable = true
+                else -> {
+                    if (previousCharIsBreakable) {
+                        counter = 0
+                        stringBuilder.append(ZERO_WIDTH_SPACE)
+                        previousCharIsBreakable = false
+                    }
+                }
+            }
+
+            stringBuilder.append(char)
+        }
+
+        return stringBuilder.toString()
+    }
+
     private fun Element.encapsulateElementInDiv() {
         val bodyContent = childNodesCopy()
         empty()
@@ -91,6 +148,14 @@ class HtmlFormatter(private val html: String) {
     companion object {
         private const val PRIMARY_COLOR_CODE = "--kmail-primary-color"
         private const val KMAIL_MESSAGE_ID = "kmail-message-content"
+
+        private const val ZERO_WIDTH_SPACE = 0x200B.toChar()
+        private const val BREAK_LIMIT = 30
+        // Across a few handpicked representative emails, average text node length for text nodes bigger than 30 characters seems
+        // to be centered between 60 and 120
+        private const val OPTIMAL_STRING_LENGTH = 120
+        private val DETECT_BUT_DO_NOT_BREAK = setOf(' ', ZERO_WIDTH_SPACE) // ZWSP could already be present in the original html
+        private val BREAK_CHARACTERS = setOf(':', '/', '~', '.', ',', '-', '_', '?', '#', '%', '=', '&')
 
         private fun Context.loadCss(@RawRes cssResId: Int, customColors: List<Pair<String, Int>> = emptyList()): String {
             var css = readRawResource(cssResId)
