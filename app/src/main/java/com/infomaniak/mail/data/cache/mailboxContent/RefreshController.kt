@@ -637,11 +637,6 @@ class RefreshController @Inject constructor(
         isConversationMode: Boolean,
     ): Set<Thread> {
 
-        val idsOfFoldersWithIncompleteThreads = if (isConversationMode) {
-            FolderController.getIdsOfFoldersWithIncompleteThreads(realm = this)
-        } else {
-            emptyList()
-        }
         val impactedThreadsManaged = mutableSetOf<Thread>()
         val existingMessages = folder.messages.associateByTo(mutableMapOf()) { it.uid }
 
@@ -661,12 +656,7 @@ class RefreshController @Inject constructor(
                 // Hence, we need to find these duplicates.
                 val isThereDuplicatedThreads = isThereDuplicatedThreads(remoteMessage.messageIds, existingThreads.count())
 
-                val thread = createNewThreadIfRequired(
-                    scope,
-                    existingThreads,
-                    remoteMessage,
-                    idsOfFoldersWithIncompleteThreads,
-                )
+                val thread = createNewThreadIfRequired(scope, existingThreads, remoteMessage)
 
                 updateOtherExistingThreads(existingThreads, remoteMessage, scope, impactedThreadsManaged)
 
@@ -750,7 +740,6 @@ class RefreshController @Inject constructor(
         scope: CoroutineScope,
         existingThreads: List<Thread>,
         newMessage: Message,
-        idsOfFoldersWithIncompleteThreads: List<String>,
     ): Thread? {
         var newThread: Thread? = null
 
@@ -758,7 +747,7 @@ class RefreshController @Inject constructor(
 
             newThread = newMessage.toThread()
 
-            val referenceMessages = getReferenceMessages(existingThreads, idsOfFoldersWithIncompleteThreads)
+            val referenceMessages = getExistingMessages(existingThreads)
             addPreviousMessagesToThread(scope, newThread, referenceMessages)
         }
 
@@ -801,19 +790,8 @@ class RefreshController @Inject constructor(
         }
     }
 
-    /**
-     * We need to add 2 things to a new Thread:
-     * - the previous Messages `messagesIds`
-     * - the previous Messages, depending on conditions (for example, we don't want deleted Messages outside of the Trash)
-     * If there is no `existingThread` with all the Messages, we fallback on an `incompleteThread`.
-     */
-    private fun getReferenceMessages(
-        existingThreads: List<Thread>,
-        idsOfFoldersWithIncompleteThreads: List<String>,
-    ): Set<Message> {
-        return existingThreads.filter { !idsOfFoldersWithIncompleteThreads.contains(it.folderId) }
-            .flatMap { it.messages }.toSet()
-            .ifEmpty { existingThreads.firstOrNull()?.messages?.toSet() ?: emptySet() }
+    private fun getExistingMessages(existingThreads: List<Thread>): Set<Message> {
+        return existingThreads.flatMap { it.messages }.toSet()
     }
 
     private fun TypedRealm.addPreviousMessagesToThread(
@@ -829,11 +807,6 @@ class RefreshController @Inject constructor(
                 addMessageWithConditions(message, realm = this@addPreviousMessagesToThread)
             }
         }
-    }
-
-    private fun Thread.addMessageWithConditions(message: Message, realm: TypedRealm) {
-        val folderRole = FolderController.getFolder(folderId, realm)?.role
-        addMessageWithConditions(message, folderRole)
     }
     //endregion
 

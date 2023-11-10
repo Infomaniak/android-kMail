@@ -192,18 +192,6 @@ class FolderController @Inject constructor(
                 realm.copyToRealm(Folder().apply { id = SEARCH_FOLDER_ID })
             }
         }
-
-        /**
-         * An "incomplete Thread" is a Thread in a specific Folder where only Messages from this Folder are displayed.
-         * - In the Draft folder, we only want to display draft Messages.
-         * - In the Trash folder, we only want to display deleted Messages.
-         */
-        fun getIdsOfFoldersWithIncompleteThreads(realm: TypedRealm): List<String> {
-            return mutableListOf<String>().apply {
-                getFolder(FolderRole.DRAFT, realm)?.id?.let(::add)
-                getFolder(FolderRole.TRASH, realm)?.id?.let(::add)
-            }
-        }
         //endregion
 
         //region Edit data
