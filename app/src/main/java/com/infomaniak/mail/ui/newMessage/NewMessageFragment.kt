@@ -196,15 +196,24 @@ class NewMessageFragment : Fragment() {
             val emailDictionary = mergedContacts.second
             val aliases = newMessageViewModel.currentMailbox.aliases
 
-            binding.apply {
-                toField.updateExternals(shouldWarnForExternal, emailDictionary, aliases)
-                ccField.updateExternals(shouldWarnForExternal, emailDictionary, aliases)
-                bccField.updateExternals(shouldWarnForExternal, emailDictionary, aliases)
-            }
+            updateFields(shouldWarnForExternal, emailDictionary, aliases)
+            updateBanner(shouldWarnForExternal, emailDictionary, aliases)
+        }
+    }
 
-            if (shouldWarnForExternal && !newMessageViewModel.isExternalBannerManuallyClosed) {
-                val (externalEmail, externalQuantity) = newMessageViewModel.draft.findExternalRecipientForNewMessage(aliases, emailDictionary)
-                newMessageViewModel.externalRecipientCount.value = externalEmail to externalQuantity
+    private fun updateFields(shouldWarnForExternal: Boolean, emailDictionary: MergedContactDictionary, aliases: List<String>) {
+        with(binding) {
+            toField.updateExternals(shouldWarnForExternal, emailDictionary, aliases)
+            ccField.updateExternals(shouldWarnForExternal, emailDictionary, aliases)
+            bccField.updateExternals(shouldWarnForExternal, emailDictionary, aliases)
+        }
+    }
+
+    private fun updateBanner(shouldWarnForExternal: Boolean, emailDictionary: MergedContactDictionary, aliases: List<String>) {
+        with(newMessageViewModel) {
+            if (shouldWarnForExternal && !isExternalBannerManuallyClosed) {
+                val (externalEmail, externalQuantity) = draft.findExternalRecipientForNewMessage(aliases, emailDictionary)
+                externalRecipientCount.value = externalEmail to externalQuantity
             }
         }
     }

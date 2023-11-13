@@ -420,7 +420,7 @@ class RecipientFieldView @JvmOverloads constructor(
         return (if (recipientCount == 1) recipients.single().email else null) to recipientCount
     }
 
-    fun updateExternals(shouldWarnForExternal: Boolean, emailDictionary: MergedContactDictionary, aliases: RealmList<String>) {
+    fun updateExternals(shouldWarnForExternal: Boolean, emailDictionary: MergedContactDictionary, aliases: List<String>) {
         for (recipient in contactChipAdapter.getRecipients()) {
             if (recipient.isManuallyEntered) continue
 
