@@ -25,6 +25,7 @@ import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.MatomoMail.SEARCH_FOLDER_FILTER_NAME
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.RealmInstantSerializer
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -35,6 +36,7 @@ import com.infomaniak.mail.utils.toDate
 import com.infomaniak.mail.utils.toRealmInstant
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
+import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.*
 import io.realm.kotlin.internal.getRealm
 import io.realm.kotlin.serializers.RealmListKSerializer
@@ -111,9 +113,9 @@ class Thread : RealmObject {
 
     val isOnlyOneDraft get() = messages.count() == 1 && hasDrafts
 
-    fun addMessageWithConditions(newMessage: Message, folderRole: FolderRole?) {
+    fun addMessageWithConditions(newMessage: Message, realm: TypedRealm) {
 
-        val shouldAddMessage = when (folderRole) {
+        val shouldAddMessage = when (FolderController.getFolder(folderId, realm)?.role) {
             FolderRole.DRAFT -> newMessage.isDraft // In Draft folder: only add draft Messages.
             FolderRole.TRASH -> newMessage.isTrashed // In Trash folder: only add deleted Messages.
             else -> !newMessage.isTrashed // In other folders: only add non-deleted Messages.
