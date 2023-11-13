@@ -96,10 +96,10 @@ class HtmlFormatter(private val html: String) {
 
     // When displaying emails that have very long strings that are hard to break (mostly URLs), sometimes using
     // 'overflow-wrap: break-word' doesn't help softwrapping the line. This results in very wide emails that need to be zoomed out
-    private fun Node.breakLongStrings() {
-        childNodes().forEach { parent ->
-            if (parent is Element && parent.textNodes().isNotEmpty()) {
     // excessively. To fix this issue, we add <wbr> tags in optimal places to help 'overflow-wrap: break-word' wrap correctly
+    private fun Element.breakLongStrings() {
+        children().forEach { parent ->
+            if (parent.textNodes().isNotEmpty()) {
                 for (textNode in parent.textNodes()) {
                     val text = textNode.text()
                     if (text.length <= BREAK_LIMIT) continue
@@ -108,7 +108,7 @@ class HtmlFormatter(private val html: String) {
                 }
             }
 
-            if (parent is Element) parent.breakLongStrings()
+            parent.breakLongStrings()
         }
     }
 
