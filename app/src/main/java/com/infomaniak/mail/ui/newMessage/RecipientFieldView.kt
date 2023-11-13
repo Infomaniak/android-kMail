@@ -49,7 +49,6 @@ import com.infomaniak.mail.utils.MergedContactDictionary
 import com.infomaniak.mail.utils.UiUtils.dividerDrawable
 import com.infomaniak.mail.utils.isEmail
 import com.infomaniak.mail.utils.toggleChevron
-import io.realm.kotlin.types.RealmList
 import kotlin.math.min
 
 class RecipientFieldView @JvmOverloads constructor(
@@ -379,7 +378,6 @@ class RecipientFieldView @JvmOverloads constructor(
 
     fun initRecipients(initialRecipients: List<Recipient>, otherFieldsAreAllEmpty: Boolean = true) {
         initialRecipients.forEach { recipient ->
-            recipient.isManuallyEntered = false
             if (contactChipAdapter.addChip(recipient)) contactAdapter.addUsedContact(recipient.email)
         }
 
