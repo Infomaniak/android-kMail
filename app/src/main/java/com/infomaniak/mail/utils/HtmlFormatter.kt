@@ -34,8 +34,6 @@ class HtmlFormatter(private val html: String) {
     private var needsBodyEncapsulation = false
     private var breakLongWords = false
 
-    private val tempElement by lazy { Element("temp") }
-
     fun registerCss(css: String, styleId: String? = null) {
         cssList.add(css to styleId)
     }
@@ -100,12 +98,12 @@ class HtmlFormatter(private val html: String) {
     private fun Element.breakLongStrings() {
         children().forEach { parent ->
             val textNodes = parent.textNodes()
-            if (textNodes.isNotEmpty()) {
+            if (textNodes.isNotEmpty()) { // TODO : Remove
                 for (textNode in textNodes) {
                     val text = textNode.text()
                     if (text.length <= BREAK_LIMIT) continue
 
-                    parent.replaceChildWith(textNode, breakString(text))
+                    parent.replaceChildWithNodes(textNode, breakString(text))
                 }
             }
 
@@ -113,28 +111,33 @@ class HtmlFormatter(private val html: String) {
         }
     }
 
-    private fun Element.replaceChildWith(textNode: TextNode, newHtmlString: String) {
+    private fun Element.replaceChildWithNodes(textNode: TextNode, nodes: List<Node>) {
         val index = textNode.siblingIndex()
         textNode.remove()
-        insertChildren(index, parseHtmlAndGetNodes(newHtmlString))
+        insertChildren(index, nodes)
     }
 
-    private fun parseHtmlAndGetNodes(newHtmlString: String): List<Node> {
-        tempElement.empty()
-        tempElement.html(newHtmlString)
-        return tempElement.childNodes()
-    }
-
-    private fun breakString(text: String): String {
+    private fun breakString(text: String): List<Node> {
         var counter = 0
         var previousCharIsBreakable = false
         val stringBuilder = StringBuilder(OPTIMAL_STRING_LENGTH)
+        val nodes = mutableListOf<Node>()
+
+        fun MutableList<Node>.addTextNode() {
+            add(TextNode(stringBuilder.toString()))
+        }
+
+        fun breakHere() = with(nodes) {
+            addTextNode()
+            stringBuilder.clear()
+            add(Element(WBR))
+        }
 
         for (char in text) {
             if (++counter == BREAK_LIMIT) {
                 counter = 0
                 stringBuilder.append(char)
-                stringBuilder.append(WBR)
+                breakHere()
                 continue
             }
 
@@ -144,8 +147,8 @@ class HtmlFormatter(private val html: String) {
                 else -> {
                     if (previousCharIsBreakable) {
                         counter = 0
-                        stringBuilder.append(WBR)
                         previousCharIsBreakable = false
+                        breakHere()
                     }
                 }
             }
@@ -153,7 +156,8 @@ class HtmlFormatter(private val html: String) {
             stringBuilder.append(char)
         }
 
-        return stringBuilder.toString()
+        nodes.addTextNode()
+        return nodes
     }
 
     private fun Element.encapsulateElementInDiv() {
@@ -166,7 +170,7 @@ class HtmlFormatter(private val html: String) {
         private const val PRIMARY_COLOR_CODE = "--kmail-primary-color"
         private const val KMAIL_MESSAGE_ID = "kmail-message-content"
 
-        private const val WBR = "<wbr>"
+        private const val WBR = "wbr"
         private const val BREAK_LIMIT = 30
         // Across a few handpicked representative emails, average text node length for text nodes bigger than 30 characters seems
         // to be centered between 60 and 120
