@@ -98,22 +98,20 @@ class HtmlFormatter(private val html: String) {
     private fun Element.breakLongStrings() {
         children().forEach { parent ->
             val textNodes = parent.textNodes()
-            if (textNodes.isNotEmpty()) { // TODO : Remove
-                for (textNode in textNodes) {
-                    val text = textNode.text()
-                    if (text.length <= BREAK_LIMIT) continue
+            for (textNode in textNodes) {
+                val text = textNode.text()
+                if (text.length <= BREAK_LIMIT) continue
 
-                    parent.replaceChildWithNodes(textNode, breakString(text))
-                }
+                parent.replaceChildWithNodes(child = textNode, breakString(text))
             }
 
             parent.breakLongStrings()
         }
     }
 
-    private fun Element.replaceChildWithNodes(textNode: TextNode, nodes: List<Node>) {
-        val index = textNode.siblingIndex()
-        textNode.remove()
+    private fun Element.replaceChildWithNodes(child: Node, nodes: List<Node>) {
+        val index = child.siblingIndex()
+        child.remove()
         insertChildren(index, nodes)
     }
 
