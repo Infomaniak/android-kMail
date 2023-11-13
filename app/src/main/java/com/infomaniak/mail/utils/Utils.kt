@@ -19,8 +19,6 @@ package com.infomaniak.mail.utils
 
 import android.net.Uri
 import androidx.core.net.toUri
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import io.sentry.Sentry
 import kotlinx.coroutines.*
