@@ -193,9 +193,17 @@ class NewMessageFragment : Fragment() {
             newMessageViewModel.initResult,
             newMessageViewModel.mergedContacts,
         ).observe(viewLifecycleOwner) { (_, mergedContacts) ->
+            if (mergedContacts == null) {
+                Sentry.withScope { scope ->
+                    scope.level = SentryLevel.ERROR
+                    Sentry.captureMessage("Observed two live data for external detection but received null mergedContacts")
+                }
+                return@observe
+            }
+
             val externalMailFlagEnabled = newMessageViewModel.currentMailbox.externalMailFlagEnabled
             val shouldWarnForExternal = externalMailFlagEnabled && !newMessageActivityArgs.arrivedFromExistingDraft
-            val emailDictionary = mergedContacts!!.second
+            val emailDictionary = mergedContacts.second
             val aliases = newMessageViewModel.currentMailbox.aliases
 
             updateFields(shouldWarnForExternal, emailDictionary, aliases)
