@@ -34,6 +34,8 @@ class HtmlFormatter(private val html: String) {
     private var needsBodyEncapsulation = false
     private var breakLongWords = false
 
+    private val tempElement by lazy { Element("temp") }
+
     fun registerCss(css: String, styleId: String? = null) {
         cssList.add(css to styleId)
     }
@@ -96,16 +98,30 @@ class HtmlFormatter(private val html: String) {
     // 'overflow-wrap: break-word' doesn't help softwrapping the line. This results in very wide emails that need to be zoomed out
     // excessively. To fix this issue, we add zero width spaces in optimal places to help this css attribute wrap correctly
     private fun Node.breakLongStrings() {
-        for (child in childNodes()) {
-            if (child is TextNode) {
-                val text = child.text()
-                if (text.length <= BREAK_LIMIT) continue
+        childNodes().forEach { parent ->
+            if (parent is Element && parent.textNodes().isNotEmpty()) {
+                for (textNode in parent.textNodes()) {
+                    val text = textNode.text()
+                    if (text.length <= BREAK_LIMIT) continue
 
-                child.text(breakString(text))
-            } else {
-                child.breakLongStrings()
+                    parent.replaceChildWith(textNode, breakString(text))
+                }
             }
+
+            if (parent is Element) parent.breakLongStrings()
         }
+    }
+
+    private fun Element.replaceChildWith(textNode: TextNode, newHtmlString: String) {
+        val index = textNode.siblingIndex()
+        textNode.remove()
+        insertChildren(index, parseHtmlAndGetNodes(newHtmlString))
+    }
+
+    private fun parseHtmlAndGetNodes(newHtmlString: String): List<Node> {
+        tempElement.empty()
+        tempElement.html(newHtmlString)
+        return tempElement.childNodes()
     }
 
     private fun breakString(text: String): String {
@@ -117,7 +133,7 @@ class HtmlFormatter(private val html: String) {
             if (++counter == BREAK_LIMIT) {
                 counter = 0
                 stringBuilder.append(char)
-                stringBuilder.append(ZERO_WIDTH_SPACE)
+                stringBuilder.append(WBR)
                 continue
             }
 
@@ -127,7 +143,7 @@ class HtmlFormatter(private val html: String) {
                 else -> {
                     if (previousCharIsBreakable) {
                         counter = 0
-                        stringBuilder.append(ZERO_WIDTH_SPACE)
+                        stringBuilder.append(WBR)
                         previousCharIsBreakable = false
                     }
                 }
@@ -149,12 +165,12 @@ class HtmlFormatter(private val html: String) {
         private const val PRIMARY_COLOR_CODE = "--kmail-primary-color"
         private const val KMAIL_MESSAGE_ID = "kmail-message-content"
 
-        private const val ZERO_WIDTH_SPACE = 0x200B.toChar()
+        private const val WBR = "<wbr>"
         private const val BREAK_LIMIT = 30
         // Across a few handpicked representative emails, average text node length for text nodes bigger than 30 characters seems
         // to be centered between 60 and 120
         private const val OPTIMAL_STRING_LENGTH = 120
-        private val DETECT_BUT_DO_NOT_BREAK = setOf(' ', ZERO_WIDTH_SPACE) // ZWSP could already be present in the original html
+        private val DETECT_BUT_DO_NOT_BREAK = setOf(' ', WBR)
         private val BREAK_CHARACTERS = setOf(':', '/', '~', '.', ',', '-', '_', '?', '#', '%', '=', '&')
 
         private fun Context.loadCss(@RawRes cssResId: Int, customColors: List<Pair<String, Int>> = emptyList()): String {
