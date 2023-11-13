@@ -99,8 +99,9 @@ class HtmlFormatter(private val html: String) {
     // excessively. To fix this issue, we add <wbr> tags in optimal places to help 'overflow-wrap: break-word' wrap correctly
     private fun Element.breakLongStrings() {
         children().forEach { parent ->
-            if (parent.textNodes().isNotEmpty()) {
-                for (textNode in parent.textNodes()) {
+            val textNodes = parent.textNodes()
+            if (textNodes.isNotEmpty()) {
+                for (textNode in textNodes) {
                     val text = textNode.text()
                     if (text.length <= BREAK_LIMIT) continue
 
