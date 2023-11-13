@@ -171,7 +171,7 @@ class HtmlFormatter(private val html: String) {
         // Across a few handpicked representative emails, average text node length for text nodes bigger than 30 characters seems
         // to be centered between 60 and 120
         private const val OPTIMAL_STRING_LENGTH = 120
-        private val DETECT_BUT_DO_NOT_BREAK = setOf(' ', WBR)
+        private val DETECT_BUT_DO_NOT_BREAK = setOf(' ')
         private val BREAK_CHARACTERS = setOf(':', '/', '~', '.', ',', '-', '_', '?', '#', '%', '=', '&')
 
         private fun Context.loadCss(@RawRes cssResId: Int, customColors: List<Pair<String, Int>> = emptyList()): String {
