@@ -47,6 +47,8 @@ import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.webkit.WebSettingsCompat
@@ -187,17 +189,30 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeExternals() {
-        Utils.nonNullMediator(
+        waitInitMediator(
             newMessageViewModel.initResult,
             newMessageViewModel.mergedContacts,
         ).observe(viewLifecycleOwner) { (_, mergedContacts) ->
             val externalMailFlagEnabled = newMessageViewModel.currentMailbox.externalMailFlagEnabled
             val shouldWarnForExternal = externalMailFlagEnabled && !newMessageActivityArgs.arrivedFromExistingDraft
-            val emailDictionary = mergedContacts.second
+            val emailDictionary = mergedContacts!!.second
             val aliases = newMessageViewModel.currentMailbox.aliases
 
             updateFields(shouldWarnForExternal, emailDictionary, aliases)
             updateBanner(shouldWarnForExternal, emailDictionary, aliases)
+        }
+    }
+
+    private fun <T1, T2> waitInitMediator(liveData1: LiveData<T1>, liveData2: LiveData<T2>): MediatorLiveData<Pair<T1?, T2?>> {
+        fun areLiveDataInitialized() = liveData1.isInitialized && liveData2.isInitialized
+
+        fun MediatorLiveData<Pair<T1?, T2?>>.postIfInit() {
+            if (areLiveDataInitialized()) postValue(liveData1.value to liveData2.value)
+        }
+
+        return MediatorLiveData<Pair<T1?, T2?>>().apply {
+            addSource(liveData1) { postIfInit() }
+            addSource(liveData2) { postIfInit() }
         }
     }
 
