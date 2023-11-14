@@ -365,11 +365,7 @@ class MainActivity : BaseActivity() {
                 isTabletInPortrait() && threadViewModel.isInThread -> {
                     threadViewModel.closeThread()
                     val currentDestination = navController.currentDestination?.id
-                    if (currentDestination == R.id.threadListFragment) {
-                        updateThreadLayout()
-                    } else if (currentDestination != R.id.searchFragment) {
-                        popBack()
-                    }
+                    if (currentDestination != R.id.threadListFragment && currentDestination != R.id.searchFragment) popBack()
                 }
                 else -> popBack()
             }
