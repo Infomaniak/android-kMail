@@ -723,6 +723,7 @@ class ThreadFragment : Fragment() {
                 findNavController().popBackStack()
             }
         } else if (isTabletInPortrait()) {
+            if (threadViewModel.isInThread) threadViewModel.closeThread()
             (requireActivity() as MainActivity).updateThreadLayout()
         }
     }
