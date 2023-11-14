@@ -62,6 +62,8 @@ import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.RealmList
+import io.sentry.Sentry
+import io.sentry.SentryLevel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.map
 import org.jsoup.Jsoup
@@ -92,6 +94,7 @@ class NewMessageViewModel @Inject constructor(
             field = value
             if (field.body.isNotEmpty()) splitSignatureAndQuoteFromBody()
         }
+    var previousMessageBodyPlainText: String? = null
     var selectedSignatureId = -1
 
     var isAutoCompletionOpened = false
@@ -353,14 +356,31 @@ class NewMessageViewModel @Inject constructor(
                         )
                         if (!isSuccess) return null
 
-                        if (shouldPreselectSignature) {
-                            val mostFittingSignature = guessMostFittingSignature(message, signatures)
-                            identityId = mostFittingSignature.id.toString()
-                            body += signatureUtils.encapsulateSignatureContentWithInfomaniakClass(mostFittingSignature.content)
-                        }
+                        parsePreviousMailForAnsweringWithAi(message)
+                        if (shouldPreselectSignature) preSelectSignature(message, signatures)
                     }
             }
         }
+    }
+
+    private fun parsePreviousMailForAnsweringWithAi(message: Message) {
+        fun captureSentryError() {
+            Sentry.withScope { scope ->
+                scope.level = SentryLevel.ERROR
+                Sentry.captureMessage("The message we're trying to reply to has an unexpected null body")
+            }
+        }
+
+        if (draftMode == DraftMode.REPLY || draftMode == DraftMode.REPLY_ALL) {
+            val body = message.body
+            if (body != null) previousMessageBodyPlainText = body.asText() else captureSentryError()
+        }
+    }
+
+    private fun Draft.preSelectSignature(message: Message, signatures: List<Signature>) {
+        val mostFittingSignature = guessMostFittingSignature(message, signatures)
+        identityId = mostFittingSignature.id.toString()
+        body += signatureUtils.encapsulateSignatureContentWithInfomaniakClass(mostFittingSignature.content)
     }
 
     private fun guessMostFittingSignature(message: Message, signatures: List<Signature>): Signature {
