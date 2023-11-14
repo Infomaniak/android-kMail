@@ -41,6 +41,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
@@ -356,7 +357,7 @@ class NewMessageViewModel @Inject constructor(
                         )
                         if (!isSuccess) return null
 
-                        parsePreviousMailForAnsweringWithAi(message)
+                        if (currentMailbox.featureFlags.contains(FeatureFlag.AI)) parsePreviousMailForAnsweringWithAi(message)
                         if (shouldPreselectSignature) preSelectSignature(message, signatures)
                     }
             }
