@@ -76,7 +76,6 @@ import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.ui.newMessage.NewMessageFragment.FieldType.*
-import com.infomaniak.mail.ui.newMessage.NewMessageUtils.waitInitMediator
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipientForNewMessage
@@ -187,15 +186,12 @@ class NewMessageFragment : Fragment() {
         observeExternals()
     }
 
-    private fun observeExternals() {
-        waitInitMediator(
-            newMessageViewModel.initResult,
-            newMessageViewModel.mergedContacts,
-        ).observe(viewLifecycleOwner) { (_, mergedContacts) ->
-            val externalMailFlagEnabled = newMessageViewModel.currentMailbox.externalMailFlagEnabled
+    private fun observeExternals() = with(newMessageViewModel) {
+        Utils.waitInitMediator(initResult, mergedContacts).observe(viewLifecycleOwner) { (_, mergedContacts) ->
+            val externalMailFlagEnabled = currentMailbox.externalMailFlagEnabled
             val shouldWarnForExternal = externalMailFlagEnabled && !newMessageActivityArgs.arrivedFromExistingDraft
             val emailDictionary = mergedContacts.second
-            val aliases = newMessageViewModel.currentMailbox.aliases
+            val aliases = currentMailbox.aliases
 
             updateFields(shouldWarnForExternal, emailDictionary, aliases)
             updateBanner(shouldWarnForExternal, emailDictionary, aliases)

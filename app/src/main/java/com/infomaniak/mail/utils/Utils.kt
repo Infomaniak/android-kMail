@@ -19,6 +19,8 @@ package com.infomaniak.mail.utils
 
 import android.net.Uri
 import androidx.core.net.toUri
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import io.sentry.Sentry
 import kotlinx.coroutines.*
@@ -80,5 +82,20 @@ object Utils {
     enum class MailboxErrorCode {
         NO_MAILBOX,
         NO_VALID_MAILBOX,
+    }
+
+    fun <T1, T2> waitInitMediator(liveData1: LiveData<T1>, liveData2: LiveData<T2>): MediatorLiveData<Pair<T1, T2>> {
+
+        fun areLiveDataInitialized() = liveData1.isInitialized && liveData2.isInitialized
+
+        fun MediatorLiveData<Pair<T1, T2>>.postIfInit() {
+            @Suppress("UNCHECKED_CAST")
+            if (areLiveDataInitialized()) postValue((liveData1.value as T1) to (liveData2.value as T2))
+        }
+
+        return MediatorLiveData<Pair<T1, T2>>().apply {
+            addSource(liveData1) { postIfInit() }
+            addSource(liveData2) { postIfInit() }
+        }
     }
 }
