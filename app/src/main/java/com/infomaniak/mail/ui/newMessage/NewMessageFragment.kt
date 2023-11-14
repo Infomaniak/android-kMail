@@ -182,7 +182,7 @@ class NewMessageFragment : Fragment() {
         observeInitResult()
         observeAiOutput()
         observeAiPromptStatus()
-        observeAiFeatureFragmentUpdates()
+        observeAiFeatureFlagUpdates()
         observeExternals()
     }
 
@@ -960,7 +960,7 @@ class NewMessageFragment : Fragment() {
         updateNavigationBarColor()
     }
 
-    private fun observeAiFeatureFragmentUpdates() {
+    private fun observeAiFeatureFlagUpdates() {
         newMessageViewModel.currentMailboxLive.observeNotNull(viewLifecycleOwner) { mailbox ->
             val isAiEnabled = mailbox.featureFlags.contains(FeatureFlag.AI)
             binding.editorAi.isVisible = isAiEnabled
