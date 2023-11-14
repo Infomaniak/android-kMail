@@ -146,10 +146,6 @@ class ThreadViewModel @Inject constructor(
         threadUid.value = null
     }
 
-    fun clearThreadData() {
-        messagesLive.value = null
-    }
-
     private fun sendMatomoAndSentryAboutThreadMessagesCount(thread: Thread) {
 
         val nbMessages = thread.messages.count()

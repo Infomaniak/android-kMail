@@ -167,6 +167,8 @@ class ThreadFragment : Fragment() {
         // Don't replace with `threadAdapter` variable, the cast will fail.
         (binding.messagesList.adapter as ThreadAdapter?)?.resetCallbacks()
 
+        if (isPhone()) clearThreadData()
+
         super.onDestroyView()
         _binding = null
     }
@@ -209,7 +211,7 @@ class ThreadFragment : Fragment() {
 
     private fun handleThreadUid(threadUid: String?) {
         if (threadUid == null) {
-            threadViewModel.clearThreadData()
+            clearThreadData()
             if (isTablet()) displayEmptyView()
             leaveThread()
         } else {
@@ -219,8 +221,6 @@ class ThreadFragment : Fragment() {
     }
 
     private fun displayEmptyView() = with(binding) {
-        threadAdapter.submitList(emptyList())
-        threadSubject.text = ""
         threadView.isInvisible = true
         emptyView.isVisible = true
     }
@@ -724,6 +724,12 @@ class ThreadFragment : Fragment() {
             if (threadViewModel.isInThread) threadViewModel.closeThread()
             (requireActivity() as MainActivity).updateThreadLayout()
         }
+    }
+
+    private fun clearThreadData() {
+        threadViewModel.messagesLive.value = null
+        threadAdapter.submitList(emptyList())
+        binding.threadSubject.text = ""
     }
 
     private fun goToNewMessageActivity(
