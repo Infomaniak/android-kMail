@@ -469,13 +469,11 @@ class ThreadFragment : Fragment() {
         phoneContextualMenuAlertDialog.initValues(snackBarManager)
     }
 
-    private fun updateAdapter(result: OpenThreadResult) = with(binding.messagesList) {
-
+    private fun updateAdapter(result: OpenThreadResult) {
         threadAdapter.apply {
             isExpandedMap = result.isExpandedMap
             initialSetOfExpandedMessagesUids = result.initialSetOfExpandedMessagesUids
             isThemeTheSameMap = result.isThemeTheSameMap
-
             contacts = mainViewModel.mergedContactsLive.value ?: emptyMap()
         }
     }
