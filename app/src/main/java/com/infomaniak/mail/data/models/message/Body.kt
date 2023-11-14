@@ -18,8 +18,6 @@
 package com.infomaniak.mail.data.models.message
 
 import com.infomaniak.mail.data.api.FlatteningSubBodiesSerializer
-import com.infomaniak.mail.utils.Utils
-import com.infomaniak.mail.utils.htmlToText
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.EmbeddedRealmObject
 import io.realm.kotlin.types.RealmList
@@ -37,11 +35,4 @@ class Body : EmbeddedRealmObject {
     @SerialName("subBody")
     var subBodies: RealmList<SubBody> = realmListOf()
     //endregion
-
-    fun asText(): String {
-        return when (type) {
-            Utils.TEXT_HTML -> value.htmlToText()
-            else -> value
-        }
-    }
 }

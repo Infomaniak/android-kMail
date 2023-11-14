@@ -47,6 +47,7 @@ import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.di.IoDispatcher
@@ -57,6 +58,7 @@ import com.infomaniak.mail.ui.newMessage.NewMessageFragment.FieldType
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.SignatureScore.*
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
+import com.infomaniak.mail.utils.Utils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
@@ -214,7 +216,7 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    private fun getNewDraft(signatures: List<Signature>, realm: Realm): Draft? {
+    private suspend fun getNewDraft(signatures: List<Signature>, realm: Realm): Draft? {
         isNewMessage = true
         return createDraft(signatures, realm)
     }
@@ -337,7 +339,7 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    private fun createDraft(signatures: List<Signature>, realm: Realm): Draft? = Draft().apply {
+    private suspend fun createDraft(signatures: List<Signature>, realm: Realm): Draft? = Draft().apply {
         initLocalValues(mimeType = ClipDescription.MIMETYPE_TEXT_HTML)
 
         val shouldPreselectSignature = draftMode == DraftMode.REPLY || draftMode == DraftMode.REPLY_ALL
@@ -364,7 +366,7 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    private fun parsePreviousMailForAnsweringWithAi(message: Message) {
+    private suspend fun parsePreviousMailForAnsweringWithAi(message: Message) {
         fun captureSentryError() {
             Sentry.withScope { scope ->
                 scope.level = SentryLevel.ERROR
@@ -375,6 +377,13 @@ class NewMessageViewModel @Inject constructor(
         if (draftMode == DraftMode.REPLY || draftMode == DraftMode.REPLY_ALL) {
             val body = message.body
             if (body != null) previousMessageBodyPlainText = body.asText() else captureSentryError()
+        }
+    }
+
+    private suspend fun Body.asText(): String {
+        return when (type) {
+            Utils.TEXT_HTML -> MessageBodyUtils.splitContentAndQuote(this).content.htmlToText()
+            else -> value
         }
     }
 
