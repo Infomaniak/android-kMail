@@ -47,8 +47,6 @@ import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.webkit.WebSettingsCompat
@@ -78,6 +76,7 @@ import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.ui.newMessage.NewMessageFragment.FieldType.*
+import com.infomaniak.mail.ui.newMessage.NewMessageUtils.waitInitMediator
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipientForNewMessage
@@ -208,19 +207,6 @@ class NewMessageFragment : Fragment() {
 
             updateFields(shouldWarnForExternal, emailDictionary, aliases)
             updateBanner(shouldWarnForExternal, emailDictionary, aliases)
-        }
-    }
-
-    private fun <T1, T2> waitInitMediator(liveData1: LiveData<T1>, liveData2: LiveData<T2>): MediatorLiveData<Pair<T1?, T2?>> {
-        fun areLiveDataInitialized() = liveData1.isInitialized && liveData2.isInitialized
-
-        fun MediatorLiveData<Pair<T1?, T2?>>.postIfInit() {
-            if (areLiveDataInitialized()) postValue(liveData1.value to liveData2.value)
-        }
-
-        return MediatorLiveData<Pair<T1?, T2?>>().apply {
-            addSource(liveData1) { postIfInit() }
-            addSource(liveData2) { postIfInit() }
         }
     }
 
