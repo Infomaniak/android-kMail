@@ -1009,20 +1009,6 @@ class NewMessageFragment : Fragment() {
         BCC,
     }
 
-    enum class CreationStatus {
-        NOT_YET_CREATED,
-        CREATED,
-        RECREATED;
-
-        fun next(): CreationStatus? {
-            return when (this) {
-                NOT_YET_CREATED -> CREATED
-                CREATED -> RECREATED
-                RECREATED -> null
-            }
-        }
-    }
-
     private companion object {
         val TAG = NewMessageFragment::class.java.simpleName
         const val AI_PROMPT_FRAGMENT_TAG = "aiPromptFragmentTag"
