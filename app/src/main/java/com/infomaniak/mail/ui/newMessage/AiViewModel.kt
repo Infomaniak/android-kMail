@@ -60,13 +60,26 @@ class AiViewModel @Inject constructor(
     val aiPropositionStatusLiveData = MutableLiveData<PropositionStatus>()
     val aiOutputToInsert = SingleLiveEvent<Pair<String?, String>>()
 
-    fun generateNewAiProposition(currentMailboxUuid: String) = viewModelScope.launch(ioCoroutineContext) {
+    fun generateNewAiProposition(
+        currentMailboxUuid: String,
+        previousMessageBodyPlainText: String?,
+    ) = viewModelScope.launch(ioCoroutineContext) {
         history.clear()
+
+        val contextMessage = previousMessageBodyPlainText?.let { ContextMessage(it) }
         val userMessage = UserMessage(aiPrompt)
-        with(ApiRepository.startNewConversation(userMessage, currentMailboxUuid, localSettings.aiEngine)) {
-            ensureActive()
-            handleAiResult(apiResponse = this, userMessage)
-        }
+
+        contextMessage?.let(history::add)
+
+        val apiResponse = ApiRepository.startNewConversation(
+            contextMessage,
+            userMessage,
+            currentMailboxUuid,
+            localSettings.aiEngine,
+        )
+
+        ensureActive()
+        handleAiResult(apiResponse = apiResponse, userMessage)
     }
 
     private fun handleAiResult(apiResponse: ApiResponse<AiResult>, promptMessage: AiMessage?) = with(apiResponse) {

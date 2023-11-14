@@ -89,7 +89,10 @@ class AiPropositionFragment : Fragment() {
         setUi()
 
         if (aiViewModel.aiPropositionStatusLiveData.value == null) {
-            currentRequestJob = aiViewModel.generateNewAiProposition(newMessageViewModel.currentMailbox.uuid)
+            currentRequestJob = aiViewModel.generateNewAiProposition(
+                newMessageViewModel.currentMailbox.uuid,
+                newMessageViewModel.previousMessageBodyPlainText,
+            )
         }
         observeAiProposition()
     }
