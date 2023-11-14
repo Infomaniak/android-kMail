@@ -21,14 +21,17 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 
 object NewMessageUtils {
-    fun <T1, T2> waitInitMediator(liveData1: LiveData<T1>, liveData2: LiveData<T2>): MediatorLiveData<Pair<T1?, T2?>> {
+
+    fun <T1, T2> waitInitMediator(liveData1: LiveData<T1>, liveData2: LiveData<T2>): MediatorLiveData<Pair<T1, T2>> {
+
         fun areLiveDataInitialized() = liveData1.isInitialized && liveData2.isInitialized
 
-        fun MediatorLiveData<Pair<T1?, T2?>>.postIfInit() {
-            if (areLiveDataInitialized()) postValue(liveData1.value to liveData2.value)
+        fun MediatorLiveData<Pair<T1, T2>>.postIfInit() {
+            @Suppress("UNCHECKED_CAST")
+            if (areLiveDataInitialized()) postValue((liveData1.value as T1) to (liveData2.value as T2))
         }
 
-        return MediatorLiveData<Pair<T1?, T2?>>().apply {
+        return MediatorLiveData<Pair<T1, T2>>().apply {
             addSource(liveData1) { postIfInit() }
             addSource(liveData2) { postIfInit() }
         }
