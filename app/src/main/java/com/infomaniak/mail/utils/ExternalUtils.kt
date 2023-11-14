@@ -44,10 +44,17 @@ object ExternalUtils {
         return externalRecipientEmail to externalRecipientQuantity
     }
 
-    fun Draft.findExternalRecipient(
+    fun Draft.findExternalRecipientForNewMessage(
         aliases: List<String>,
         emailDictionary: MergedContactDictionary,
-    ): Pair<String?, Int> = findExternalRecipientInIterables(emailDictionary, aliases, to, cc, bcc)
+    ): Pair<String?, Int> {
+        val to = to.onlyAutomaticallyAddedOnes()
+        val cc = cc.onlyAutomaticallyAddedOnes()
+        val bcc = bcc.onlyAutomaticallyAddedOnes()
+        return findExternalRecipientInIterables(emailDictionary, aliases, to, cc, bcc)
+    }
+
+    private fun List<Recipient>.onlyAutomaticallyAddedOnes(): List<Recipient> = filter { !it.isManuallyEntered }
 
     /**
      * Only returns a quantity of at most 2, used to differentiate between the singular or plural form of the dialog messages

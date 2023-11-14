@@ -76,9 +76,10 @@ import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.ui.newMessage.NewMessageFragment.FieldType.*
+import com.infomaniak.mail.ui.newMessage.NewMessageUtils.waitInitMediator
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipient
+import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipientForNewMessage
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.destroyAndClearHistory
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
@@ -183,6 +184,39 @@ class NewMessageFragment : Fragment() {
         observeAiOutput()
         observeAiPromptStatus()
         observeAiFeatureFragmentUpdates()
+        observeExternals()
+    }
+
+    private fun observeExternals() {
+        waitInitMediator(
+            newMessageViewModel.initResult,
+            newMessageViewModel.mergedContacts,
+        ).observe(viewLifecycleOwner) { (_, mergedContacts) ->
+            val externalMailFlagEnabled = newMessageViewModel.currentMailbox.externalMailFlagEnabled
+            val shouldWarnForExternal = externalMailFlagEnabled && !newMessageActivityArgs.arrivedFromExistingDraft
+            val emailDictionary = mergedContacts.second
+            val aliases = newMessageViewModel.currentMailbox.aliases
+
+            updateFields(shouldWarnForExternal, emailDictionary, aliases)
+            updateBanner(shouldWarnForExternal, emailDictionary, aliases)
+        }
+    }
+
+    private fun updateFields(shouldWarnForExternal: Boolean, emailDictionary: MergedContactDictionary, aliases: List<String>) {
+        with(binding) {
+            toField.updateExternals(shouldWarnForExternal, emailDictionary, aliases)
+            ccField.updateExternals(shouldWarnForExternal, emailDictionary, aliases)
+            bccField.updateExternals(shouldWarnForExternal, emailDictionary, aliases)
+        }
+    }
+
+    private fun updateBanner(shouldWarnForExternal: Boolean, emailDictionary: MergedContactDictionary, aliases: List<String>) {
+        with(newMessageViewModel) {
+            if (shouldWarnForExternal && !isExternalBannerManuallyClosed) {
+                val (externalEmail, externalQuantity) = draft.findExternalRecipientForNewMessage(aliases, emailDictionary)
+                externalRecipientCount.value = externalEmail to externalQuantity
+            }
+        }
     }
 
     private fun navigateToDiscoveryBottomSheetIfFirstTime() = with(localSettings) {
@@ -429,21 +463,10 @@ class NewMessageFragment : Fragment() {
 
     private fun populateUiWithViewModel() = with(binding) {
         val draft = newMessageViewModel.draft
-        val aliases = newMessageViewModel.currentMailbox.aliases
-
-        val externalMailFlagEnabled = newMessageViewModel.currentMailbox.externalMailFlagEnabled
-        val shouldWarnForExternal = externalMailFlagEnabled && !newMessageActivityArgs.arrivedFromExistingDraft
-
         val ccAndBccFieldsAreEmpty = draft.cc.isEmpty() && draft.bcc.isEmpty()
-        val emailDictionary = newMessageViewModel.mergedContacts.value?.second ?: emptyMap()
-        toField.initRecipients(draft.to, shouldWarnForExternal, emailDictionary, aliases, ccAndBccFieldsAreEmpty)
-        ccField.initRecipients(draft.cc, shouldWarnForExternal, emailDictionary, aliases)
-        bccField.initRecipients(draft.bcc, shouldWarnForExternal, emailDictionary, aliases)
-
-        if (shouldWarnForExternal) {
-            val (externalRecipientEmail, externalRecipientQuantity) = draft.findExternalRecipient(aliases, emailDictionary)
-            newMessageViewModel.externalRecipientCount.value = externalRecipientEmail to externalRecipientQuantity
-        }
+        toField.initRecipients(draft.to, ccAndBccFieldsAreEmpty)
+        ccField.initRecipients(draft.cc)
+        bccField.initRecipients(draft.bcc)
 
         newMessageViewModel.updateIsSendingAllowed()
 
@@ -976,20 +999,6 @@ class NewMessageFragment : Fragment() {
         TO,
         CC,
         BCC,
-    }
-
-    enum class CreationStatus {
-        NOT_YET_CREATED,
-        CREATED,
-        RECREATED;
-
-        fun next(): CreationStatus? {
-            return when (this) {
-                NOT_YET_CREATED -> CREATED
-                CREATED -> RECREATED
-                RECREATED -> null
-            }
-        }
     }
 
     private companion object {

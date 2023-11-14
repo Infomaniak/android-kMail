@@ -41,6 +41,9 @@ open class Recipient : EmbeddedRealmObject, Correspondent {
     @Ignore
     var displayAsExternal: Boolean = false
         private set
+    @Transient
+    @Ignore
+    var isManuallyEntered: Boolean = true
     //endregion
 
     @delegate:Ignore

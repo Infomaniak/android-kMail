@@ -51,7 +51,6 @@ import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.main.SnackBarManager
-import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.ui.newMessage.NewMessageFragment.EditorAction
 import com.infomaniak.mail.ui.newMessage.NewMessageFragment.FieldType
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.SignatureScore.*
@@ -179,6 +178,7 @@ class NewMessageViewModel @Inject constructor(
             dismissNotification()
             markAsRead(currentMailbox, realm)
             selectedSignatureId = draft.identityId!!.toInt()
+            flagRecipientsAsAutomaticallyEntered()
             saveDraftSnapshot()
             if (draft.cc.isNotEmpty() || draft.bcc.isNotEmpty()) {
                 otherFieldsAreAllEmpty.postValue(false)
@@ -189,6 +189,18 @@ class NewMessageViewModel @Inject constructor(
         }
 
         emit(isSuccess)
+    }
+
+    private fun flagRecipientsAsAutomaticallyEntered() = with(draft) {
+        to.flagRecipientsAsAutomaticallyEntered()
+        cc.flagRecipientsAsAutomaticallyEntered()
+        bcc.flagRecipientsAsAutomaticallyEntered()
+    }
+
+    private fun RealmList<Recipient>.flagRecipientsAsAutomaticallyEntered() {
+        forEach { recipient ->
+            recipient.isManuallyEntered = false
+        }
     }
 
     private fun getExistingDraft(realm: Realm): Draft? {
