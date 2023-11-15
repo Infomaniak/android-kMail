@@ -329,7 +329,7 @@ class MainActivity : BaseActivity() {
         super.onResume()
         playServicesUtils.checkPlayServices(this)
 
-        checkStalledUpdate(inAppUpdateResultLauncher)
+        checkStalledUpdate()
 
         if (binding.drawerLayout.isOpen) colorSystemBarsWithMenuDrawer()
     }
