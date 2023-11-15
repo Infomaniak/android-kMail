@@ -31,7 +31,6 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.ui.main.thread.MessageWebViewClient.Companion.CID_SCHEME
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.MessageBodyUtils
-import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.toDate
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
@@ -135,7 +134,7 @@ class DraftController @Inject constructor(
         val previousBody = getHtmlDocument(message)?.let { document ->
             val attachmentsMap = message.attachments.associate { it.contentId to it.name }
 
-            document.doOnHTMLImage { imageElement ->
+            document.doOnHtmlImage { imageElement ->
                 attachmentsMap[getCid(imageElement)]?.let { name ->
                     imageElement.replaceWith(TextNode("<$name>"))
                 }
@@ -144,17 +143,22 @@ class DraftController @Inject constructor(
             return@let document.outerHtml()
         } ?: ""
 
-        val subBodiesContent = message.body?.subBodies?.let { UiUtils.formatSubBodiesContent(subBodies = it, message.uid) } ?: ""
+        val previousFullBody = computePreviousFullBody(previousBody, message)
 
         return """
             <div id=\"answerContentMessage\" class="${MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME}" >
             <div>$messageReplyHeader</div>
             <blockquote class=\"ws-ng-quote\">
-            $previousBody
-            $subBodiesContent
+            $previousFullBody
             </blockquote>
         </div>
         """.trimIndent()
+    }
+
+    private fun computePreviousFullBody(previousBody: String, message: Message): String {
+        return message.body?.let { body ->
+            MessageBodyUtils.fuseSplitBodyAndSubBodies(previousBody, body.subBodies, message.uid)
+        } ?: previousBody
     }
 
     private fun Context.forwardQuote(message: Message, attachmentsToForward: List<Attachment>): String {
@@ -173,7 +177,7 @@ class DraftController @Inject constructor(
                 oldAttachment.contentId to newAttachment?.contentId
             }
 
-            document.doOnHTMLImage { imageElement ->
+            document.doOnHtmlImage { imageElement ->
                 attachmentsMap[getCid(imageElement)]?.let { newContentId ->
                     imageElement.attr(SRC_ATTRIBUTE, "$CID_PROTOCOL$newContentId")
                 }
@@ -188,7 +192,7 @@ class DraftController @Inject constructor(
             ""
         }
 
-        val subBodiesContent = message.body?.subBodies?.let { UiUtils.formatSubBodiesContent(subBodies = it, message.uid) } ?: ""
+        val previousFullBody = computePreviousFullBody(previousBody, message)
 
         return """
             <div class="${MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME}">
@@ -200,8 +204,7 @@ class DraftController @Inject constructor(
             $ccList
             <div><br></div>
             <div><br></div>
-            $previousBody
-            $subBodiesContent
+            $previousFullBody
             </div>
         """.trimIndent()
     }
@@ -210,7 +213,7 @@ class DraftController @Inject constructor(
 
     private fun getCid(imageElement: Element) = imageElement.attr(SRC_ATTRIBUTE).removePrefix(CID_PROTOCOL)
 
-    private fun Document.doOnHTMLImage(actionOnImage: (Element) -> Unit) {
+    private fun Document.doOnHtmlImage(actionOnImage: (Element) -> Unit) {
         select(CID_IMAGE_CSS_QUERY).forEach { imageElement -> actionOnImage(imageElement) }
     }
 
