@@ -79,7 +79,7 @@ class AiViewModel @Inject constructor(
         )
 
         ensureActive()
-        handleAiResult(apiResponse = apiResponse, userMessage)
+        handleAiResult(apiResponse, userMessage)
     }
 
     private fun handleAiResult(apiResponse: ApiResponse<AiResult>, promptMessage: AiMessage?) = with(apiResponse) {
@@ -110,7 +110,7 @@ class AiViewModel @Inject constructor(
             ensureActive()
         }
 
-        handleAiResult(apiResponse = apiResponse, apiResponse.data?.promptMessage)
+        handleAiResult(apiResponse, apiResponse.data?.promptMessage)
     }
 
     fun updateFeatureFlag(currentMailboxObjectId: String, mailboxUuid: String) = viewModelScope.launch(ioCoroutineContext) {
