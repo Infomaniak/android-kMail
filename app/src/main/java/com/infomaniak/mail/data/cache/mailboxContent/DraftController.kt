@@ -27,6 +27,7 @@ import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
+import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.ui.main.thread.MessageWebViewClient.Companion.CID_SCHEME
 import com.infomaniak.mail.utils.AccountUtils
@@ -84,7 +85,7 @@ class DraftController @Inject constructor(
     //endregion
 
     //region Open Draft
-    fun setPreviousMessage(draft: Draft, draftMode: DraftMode, message: Message, realm: Realm): Boolean {
+    fun setPreviousMessage(draft: Draft, draftMode: DraftMode, message: Message, realm: Realm): Pair<Boolean, Body> {
 
         var isSuccess = true
 
@@ -128,7 +129,7 @@ class DraftController @Inject constructor(
             DraftMode.NEW_MAIL -> Unit
         }
 
-        return isSuccess
+        return isSuccess to previousMessage.body!!
     }
 
     private fun Context.replyQuote(message: Message): String {

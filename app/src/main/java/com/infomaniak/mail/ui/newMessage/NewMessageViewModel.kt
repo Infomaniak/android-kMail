@@ -65,8 +65,6 @@ import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.RealmList
-import io.sentry.Sentry
-import io.sentry.SentryLevel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.map
 import org.jsoup.Jsoup
@@ -351,7 +349,7 @@ class NewMessageViewModel @Inject constructor(
                 previousMessageUid
                     ?.let { uid -> MessageController.getMessage(uid, realm) }
                     ?.let { message ->
-                        val isSuccess = draftController.setPreviousMessage(
+                        val (isSuccess, previousMessageBody) = draftController.setPreviousMessage(
                             draft = this,
                             draftMode = draftMode,
                             message = message,
@@ -359,28 +357,23 @@ class NewMessageViewModel @Inject constructor(
                         )
                         if (!isSuccess) return null
 
-                        if (currentMailbox.featureFlags.contains(FeatureFlag.AI)) parsePreviousMailForAnsweringWithAi(message)
+
+                        if (currentMailbox.featureFlags.contains(FeatureFlag.AI)) {
+                            parsePreviousMailForAnsweringWithAi(previousMessageBody)
+                        }
                         if (shouldPreselectSignature) preSelectSignature(message, signatures)
                     }
             }
         }
     }
 
-    private suspend fun parsePreviousMailForAnsweringWithAi(message: Message) {
-        fun captureSentryError() {
-            Sentry.withScope { scope ->
-                scope.level = SentryLevel.ERROR
-                Sentry.captureMessage("The message we're trying to reply to has an unexpected null body")
-            }
-        }
-
+    private suspend fun parsePreviousMailForAnsweringWithAi(previousMessageBody: Body) {
         if (draftMode == DraftMode.REPLY || draftMode == DraftMode.REPLY_ALL) {
-            val body = message.body
-            if (body != null) previousMessageBodyPlainText = body.asText() else captureSentryError()
+            previousMessageBodyPlainText = previousMessageBody.asPlainText()
         }
     }
 
-    private suspend fun Body.asText(): String {
+    private suspend fun Body.asPlainText(): String {
         return when (type) {
             Utils.TEXT_HTML -> MessageBodyUtils.splitContentAndQuote(this).content.htmlToText()
             else -> value
