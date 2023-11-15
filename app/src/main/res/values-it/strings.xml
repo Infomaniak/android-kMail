@@ -67,6 +67,7 @@
     <string name="aiMenuRegenerate">Rigenera una risposta</string>
     <string name="aiMenuSeriousWriting">Scrittura seria</string>
     <string name="aiMenuShorten">Accorcia</string>
+    <string name="aiPromptAnswer">Dica all’assistente come può aiutarti a rispondere a questa e-mail…</string>
     <string name="aiPromptExample1">un’e-mail di ringraziamento per un regalo di benvenuto</string>
     <string name="aiPromptExample2">un’e-mail di conferma della prenotazione alberghiera</string>
     <string name="aiPromptExample3">un’e-mail di ringraziamento per un invito a un evento</string>
