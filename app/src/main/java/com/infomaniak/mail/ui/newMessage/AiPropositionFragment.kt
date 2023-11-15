@@ -279,6 +279,7 @@ class AiPropositionFragment : Fragment() {
                 }
                 PropositionStatus.ERROR,
                 PropositionStatus.PROMPT_TOO_LONG,
+                PropositionStatus.CONTEXT_TOO_LONG,
                 PropositionStatus.RATE_LIMIT_EXCEEDED,
                 PropositionStatus.MISSING_CONTENT -> {
                     sendMissingContentSentry(propositionStatus)

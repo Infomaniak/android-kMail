@@ -79,10 +79,15 @@ class AiViewModel @Inject constructor(
         )
 
         ensureActive()
-        handleAiResult(apiResponse, userMessage)
+        val usesPreviousMessageAsContext = previousMessageBodyPlainText != null
+        handleAiResult(apiResponse, userMessage, shouldTriggerContextTooLongInstead = usesPreviousMessageAsContext)
     }
 
-    private fun handleAiResult(apiResponse: ApiResponse<AiResult>, promptMessage: AiMessage?) = with(apiResponse) {
+    private fun handleAiResult(
+        apiResponse: ApiResponse<AiResult>,
+        promptMessage: AiMessage?,
+        shouldTriggerContextTooLongInstead: Boolean
+    ) = with(apiResponse) {
         aiPropositionStatusLiveData.postValue(
             when {
                 isSuccess() -> data?.let { aiResult ->
@@ -91,7 +96,9 @@ class AiViewModel @Inject constructor(
                     history += AssistantMessage(aiResult.content)
                     SUCCESS
                 } ?: MISSING_CONTENT
-                error?.code == MAX_SYNTAX_TOKENS_REACHED -> PROMPT_TOO_LONG
+                error?.code == MAX_SYNTAX_TOKENS_REACHED -> {
+                    if (shouldTriggerContextTooLongInstead) CONTEXT_TOO_LONG else PROMPT_TOO_LONG
+                }
                 error?.code == TOO_MANY_REQUESTS -> RATE_LIMIT_EXCEEDED
                 else -> ERROR
             }
@@ -110,14 +117,18 @@ class AiViewModel @Inject constructor(
             ensureActive()
         }
 
-        handleAiResult(apiResponse, apiResponse.data?.promptMessage)
+        handleAiResult(apiResponse, apiResponse.data?.promptMessage, shouldTriggerContextTooLongInstead = false)
     }
 
     fun updateFeatureFlag(currentMailboxObjectId: String, mailboxUuid: String) = viewModelScope.launch(ioCoroutineContext) {
         sharedUtils.updateAiFeatureFlag(currentMailboxObjectId, mailboxUuid)
     }
 
-    fun isHistoryEmpty(): Boolean = history.isEmpty()
+    fun isHistoryEmpty(): Boolean = history.excludingContextMessage().isEmpty()
+
+    private fun List<AiMessage>.excludingContextMessage(): List<AiMessage> {
+        return filter { it.type == "assistant" || it.type == "user" }
+    }
 
     fun getLastMessage(): String = history.last().content
 
@@ -134,6 +145,7 @@ class AiViewModel @Inject constructor(
         SUCCESS(null),
         ERROR(R.string.aiErrorUnknown),
         PROMPT_TOO_LONG(R.string.aiErrorMaxTokenReached),
+        CONTEXT_TOO_LONG(R.string.inboxFolder),
         RATE_LIMIT_EXCEEDED(R.string.aiErrorTooManyRequests),
         MISSING_CONTENT(R.string.aiErrorUnknown),
     }
