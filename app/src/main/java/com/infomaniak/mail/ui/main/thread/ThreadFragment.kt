@@ -269,7 +269,10 @@ class ThreadFragment : Fragment() {
         val (alpha, callback) = if (isTabletInLandscape()) {
             0 to { }
         } else {
-            255 to { leaveThread() }
+            255 to {
+                leaveThread()
+                if (isTabletInPortrait()) (requireActivity() as MainActivity).resetThreadFragment()
+            }
         }
 
         navigationIcon?.alpha = alpha

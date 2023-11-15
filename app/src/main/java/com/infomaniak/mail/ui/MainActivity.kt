@@ -60,6 +60,7 @@ import com.infomaniak.mail.firebase.RegisterFirebaseBroadcastReceiver
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.TitleAlertDialog
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
+import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel
 import com.infomaniak.mail.ui.newMessage.NewMessageActivity
 import com.infomaniak.mail.ui.sync.SyncAutoConfigActivity
@@ -366,10 +367,15 @@ class MainActivity : BaseActivity() {
                     threadViewModel.closeThread()
                     val currentDestination = navController.currentDestination?.id
                     if (currentDestination != R.id.threadListFragment && currentDestination != R.id.searchFragment) popBack()
+                    resetThreadFragment()
                 }
                 else -> popBack()
             }
         }
+    }
+
+    fun resetThreadFragment() {
+        supportFragmentManager.beginTransaction().replace(R.id.threadHostFragment, ThreadFragment()).commit()
     }
 
     override fun onStop() {
