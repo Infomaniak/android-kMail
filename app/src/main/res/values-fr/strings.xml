@@ -57,7 +57,7 @@
     <string name="aiEngineChatGpt">ChatGPT</string>
     <string name="aiEngineFalcon">IA Souveraine</string>
     <string name="aiEngineWarning">En utilisant ChatGPT, vos données seront traitées par la société américaine OpenAI. Nous vous conseillons de ne pas l’utiliser pour des messages sensibles.</string>
-    <string name="aiErrorContextMaxTokenReached">L’e-mail auquel vous répondez est trop long pour être pris en compte.\n\nRecommencez la rédaction de votre demande en ajoutant du contexte afin que l’assistant puisse formuler une réponse adaptée.</string>
+    <string name="aiErrorContextMaxTokenReached">L’e-mail auquel vous répondez est trop long pour que l’IA puisse actuellement générer une réponse. \n\nRésumez ce que vous souhaitez dire pour obtenir son aide.</string>
     <string name="aiErrorMaxTokenReached">Votre demande est trop longue, veuillez la raccourcir.</string>
     <string name="aiErrorTooManyRequests">Trop de requêtes ont été effectuées en un court laps de temps. Veuillez patienter.</string>
     <string name="aiErrorUnknown">Une erreur s’est produite. Si cette erreur persiste, veuillez contacter notre service d’assistance.\nMerci pour votre patience.</string>
