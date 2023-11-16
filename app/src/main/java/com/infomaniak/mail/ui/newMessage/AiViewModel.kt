@@ -145,7 +145,7 @@ class AiViewModel @Inject constructor(
         SUCCESS(null),
         ERROR(R.string.aiErrorUnknown),
         PROMPT_TOO_LONG(R.string.aiErrorMaxTokenReached),
-        CONTEXT_TOO_LONG(R.string.inboxFolder),
+        CONTEXT_TOO_LONG(R.string.aiErrorContextMaxTokenReached),
         RATE_LIMIT_EXCEEDED(R.string.aiErrorTooManyRequests),
         MISSING_CONTENT(R.string.aiErrorUnknown),
     }
