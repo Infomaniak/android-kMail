@@ -126,7 +126,7 @@ class AiPromptFragment : Fragment() {
                 setText(aiViewModel.aiPrompt)
                 setSelection(length())
 
-                val isAnswering = newMessageViewModel.previousMessageBodyPlainText != null
+                val isAnswering = aiViewModel.previousMessageBodyPlainText != null
                 val placeholder = if (isAnswering) getAnswerPlaceholder() else getPlaceholderFromScratch()
                 hint = placeholder
             }

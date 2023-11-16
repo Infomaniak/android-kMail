@@ -56,14 +56,12 @@ class AiViewModel @Inject constructor(
     private var history = mutableListOf<AiMessage>()
     private var conversationContextId: String? = null
     var aiPromptOpeningStatus = MutableLiveData<AiPromptOpeningStatus>()
+    var previousMessageBodyPlainText: String? = null
 
     val aiPropositionStatusLiveData = MutableLiveData<PropositionStatus>()
     val aiOutputToInsert = SingleLiveEvent<Pair<String?, String>>()
 
-    fun generateNewAiProposition(
-        currentMailboxUuid: String,
-        previousMessageBodyPlainText: String?,
-    ) = viewModelScope.launch(ioCoroutineContext) {
+    fun generateNewAiProposition(currentMailboxUuid: String) = viewModelScope.launch(ioCoroutineContext) {
         history.clear()
 
         val contextMessage = previousMessageBodyPlainText?.let(::ContextMessage)
@@ -97,12 +95,22 @@ class AiViewModel @Inject constructor(
                     SUCCESS
                 } ?: MISSING_CONTENT
                 error?.code == MAX_SYNTAX_TOKENS_REACHED -> {
-                    if (shouldTriggerContextTooLongInstead) CONTEXT_TOO_LONG else PROMPT_TOO_LONG
+                    if (shouldTriggerContextTooLongInstead) {
+                        discardPreviousMailContext()
+                        CONTEXT_TOO_LONG
+                    } else {
+                        PROMPT_TOO_LONG
+                    }
                 }
                 error?.code == TOO_MANY_REQUESTS -> RATE_LIMIT_EXCEEDED
                 else -> ERROR
             }
         )
+    }
+
+    private fun discardPreviousMailContext() {
+        previousMessageBodyPlainText = null
+        history.firstOrNull()?.takeIf { it.type == "context" }?.let { history.removeFirst() }
     }
 
     fun performShortcut(shortcut: Shortcut, currentMailboxUuid: String) = viewModelScope.launch(ioCoroutineContext) {

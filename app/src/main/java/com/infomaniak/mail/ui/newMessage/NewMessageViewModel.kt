@@ -95,7 +95,6 @@ class NewMessageViewModel @Inject constructor(
             field = value
             if (field.body.isNotEmpty()) splitSignatureAndQuoteFromBody()
         }
-    var previousMessageBodyPlainText: String? = null
     var selectedSignatureId = -1
 
     var isAutoCompletionOpened = false
@@ -109,6 +108,9 @@ class NewMessageViewModel @Inject constructor(
 
     // Needs to trigger every time the Fragment is recreated
     val initResult = MutableLiveData<List<Signature>>()
+
+    // Must only be used to send the value to AiViewModel
+    val previousMessageTrigger = SingleLiveEvent<String>()
 
     val importedAttachments = SingleLiveEvent<Pair<MutableList<Attachment>, ImportationResult>>()
     val isSendingAllowed = SingleLiveEvent(false)
@@ -365,7 +367,7 @@ class NewMessageViewModel @Inject constructor(
 
     private suspend fun parsePreviousMailToAnswerWithAi(previousMessageBody: Body, messageUid: String) {
         if (draftMode == DraftMode.REPLY || draftMode == DraftMode.REPLY_ALL) {
-            previousMessageBodyPlainText = previousMessageBody.asPlainText(messageUid)
+            previousMessageTrigger.postValue(previousMessageBody.asPlainText(messageUid))
         }
     }
 

@@ -174,6 +174,8 @@ class NewMessageFragment : Fragment() {
         doAfterSubjectChange()
         doAfterBodyChange()
 
+        observePreviousMessageToUpdateAiViewModel()
+
         observeContacts()
         observeEditorActions()
         observeNewAttachments()
@@ -184,6 +186,12 @@ class NewMessageFragment : Fragment() {
         observeAiPromptStatus()
         observeAiFeatureFlagUpdates()
         observeExternals()
+    }
+
+    private fun observePreviousMessageToUpdateAiViewModel() {
+        newMessageViewModel.previousMessageTrigger.observe(viewLifecycleOwner) {
+            aiViewModel.previousMessageBodyPlainText = it
+        }
     }
 
     private fun observeExternals() = with(newMessageViewModel) {
