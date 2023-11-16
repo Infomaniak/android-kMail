@@ -162,12 +162,12 @@ class MainActivity : BaseActivity() {
         override fun onDrawerOpened(drawerView: View) {
             if (hasDragged) trackMenuDrawerEvent("openByGesture", TrackerAction.DRAG)
             colorSystemBarsWithMenuDrawer(UiUtils.FULLY_SLID)
-            (binding.menuDrawerFragmentContainer.getFragment() as? MenuDrawerFragment)?.onDrawerOpened()
+            binding.menuDrawerFragmentContainer.getFragment<MenuDrawerFragment?>()?.onDrawerOpened()
         }
 
         override fun onDrawerClosed(drawerView: View) {
             if (hasDragged) trackMenuDrawerEvent("closeByGesture", TrackerAction.DRAG)
-            (binding.menuDrawerFragmentContainer.getFragment() as? MenuDrawerFragment)?.closeDropdowns()
+            binding.menuDrawerFragmentContainer.getFragment<MenuDrawerFragment?>()?.closeDropdowns()
         }
 
         override fun onDrawerStateChanged(newState: Int) {
@@ -361,7 +361,7 @@ class MainActivity : BaseActivity() {
     private fun handleOnBackPressed() = with(binding) {
 
         fun closeDrawer() {
-            (menuDrawerFragmentContainer.getFragment() as? MenuDrawerFragment)?.closeDrawer()
+            menuDrawerFragmentContainer.getFragment<MenuDrawerFragment?>()?.closeDrawer()
         }
 
         fun closeMultiSelect() {
@@ -420,7 +420,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun setupMenuDrawerCallbacks() = with(binding) {
-        (menuDrawerFragmentContainer.getFragment() as? MenuDrawerFragment)?.exitDrawer = { drawerLayout.close() }
+        menuDrawerFragmentContainer.getFragment<MenuDrawerFragment?>()?.exitDrawer = { drawerLayout.close() }
     }
 
     private fun registerMainPermissions() {
