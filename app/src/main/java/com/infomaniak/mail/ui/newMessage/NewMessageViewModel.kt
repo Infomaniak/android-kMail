@@ -83,6 +83,7 @@ class NewMessageViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val sharedUtils: SharedUtils,
     private val signatureUtils: SignatureUtils,
+    private val aiSharedData: AiSharedData,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
@@ -108,9 +109,6 @@ class NewMessageViewModel @Inject constructor(
 
     // Needs to trigger every time the Fragment is recreated
     val initResult = MutableLiveData<List<Signature>>()
-
-    // Must only be used to send the value to AiViewModel
-    val previousMessageTrigger = SingleLiveEvent<String>()
 
     val importedAttachments = SingleLiveEvent<Pair<MutableList<Attachment>, ImportationResult>>()
     val isSendingAllowed = SingleLiveEvent(false)
@@ -367,7 +365,7 @@ class NewMessageViewModel @Inject constructor(
 
     private suspend fun parsePreviousMailToAnswerWithAi(previousMessageBody: Body, messageUid: String) {
         if (draftMode == DraftMode.REPLY || draftMode == DraftMode.REPLY_ALL) {
-            previousMessageTrigger.postValue(previousMessageBody.asPlainText(messageUid))
+            aiSharedData.previousMessageBodyPlainText = previousMessageBody.asPlainText(messageUid)
         }
     }
 
