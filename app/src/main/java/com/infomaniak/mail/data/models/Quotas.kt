@@ -21,8 +21,6 @@ import android.content.Context
 import android.text.format.Formatter
 import com.infomaniak.mail.R
 import io.realm.kotlin.types.EmbeddedRealmObject
-import io.sentry.Sentry
-import io.sentry.SentryLevel
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.math.ceil
@@ -39,23 +37,10 @@ class Quotas : EmbeddedRealmObject {
             return converted * 1_000L // Convert from KiloOctets to Octets
         }
 
-    fun getText(context: Context, email: String?): String {
+    fun getText(context: Context): String {
 
         val usedSize = Formatter.formatShortFileSize(context, size)
         val maxSize = Formatter.formatShortFileSize(context, QUOTAS_MAX_SIZE)
-
-        // TODO: Remove this Sentry when we are sure the fix is the right one.
-        if (_size < 0L || size < 0L || usedSize.firstOrNull() == '-') {
-            Sentry.withScope { scope ->
-                scope.level = SentryLevel.WARNING
-                scope.setExtra("1. mailbox", "$email")
-                scope.setExtra("2. raw size", "$_size")
-                scope.setExtra("3. display size", usedSize)
-                scope.setExtra("4. raw maxSize", "$QUOTAS_MAX_SIZE")
-                scope.setExtra("5. display maxSize", maxSize)
-                Sentry.captureMessage("Quotas: Something is negative when trying to display")
-            }
-        }
 
         return context.getString(R.string.menuDrawerMailboxStorage, usedSize, maxSize)
     }
