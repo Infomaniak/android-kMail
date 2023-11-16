@@ -133,6 +133,7 @@ class AiPropositionFragment : Fragment() {
 
         retryButton.setOnClickListener {
             trackAiWriterEvent("retry")
+            discardPreviousMailIfContextTooLong()
             aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(isOpened = true)
             findNavController().popBackStack()
         }
@@ -142,6 +143,11 @@ class AiPropositionFragment : Fragment() {
             TransitionManager.beginDelayedTransition(nestedScrollView, ChangeBounds())
             errorBlock.isGone = true
         }
+    }
+
+    private fun discardPreviousMailIfContextTooLong() {
+        val shouldDiscardPreviousMessage = aiViewModel.aiPropositionStatusLiveData.value == PropositionStatus.CONTEXT_TOO_LONG
+        if (shouldDiscardPreviousMessage) newMessageViewModel.previousMessageBodyPlainText = null
     }
 
     private fun setToolbar() = with(binding) {
