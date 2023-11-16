@@ -431,7 +431,7 @@ class MainActivity : BaseActivity() {
         trackDestination(destination)
 
         if (isTablet()) {
-            binding.threadHostFragment?.isVisible = if (isTabletInLandscape()) {
+            binding.threadHostFragment?.isVisible = if (threadViewModel.isInThread || isTabletInLandscape()) {
                 shouldDisplayThreadContainer(destination.id)
             } else {
                 false
