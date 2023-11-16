@@ -57,7 +57,7 @@ class AiViewModel @Inject constructor(
     private var history = mutableListOf<AiMessage>()
     private var conversationContextId: String? = null
     var aiPromptOpeningStatus = MutableLiveData<AiPromptOpeningStatus>()
-    val previousMessageBodyPlainText get() = aiSharedData.previousMessageBodyPlainText
+    var previousMessageBodyPlainText by aiSharedData::previousMessageBodyPlainText
 
     val aiPropositionStatusLiveData = MutableLiveData<PropositionStatus>()
     val aiOutputToInsert = SingleLiveEvent<Pair<String?, String>>()
@@ -65,7 +65,7 @@ class AiViewModel @Inject constructor(
     fun generateNewAiProposition(currentMailboxUuid: String) = viewModelScope.launch(ioCoroutineContext) {
         history.clear()
 
-        val contextMessage = aiSharedData.previousMessageBodyPlainText?.let(::ContextMessage)
+        val contextMessage = previousMessageBodyPlainText?.let(::ContextMessage)
         val userMessage = UserMessage(aiPrompt)
 
         contextMessage?.let(history::add)
@@ -78,7 +78,7 @@ class AiViewModel @Inject constructor(
         )
 
         ensureActive()
-        val usesPreviousMessageAsContext = aiSharedData.previousMessageBodyPlainText != null
+        val usesPreviousMessageAsContext = previousMessageBodyPlainText != null
         handleAiResult(apiResponse, userMessage, shouldTriggerContextTooLongInstead = usesPreviousMessageAsContext)
     }
 
@@ -110,7 +110,7 @@ class AiViewModel @Inject constructor(
     }
 
     private fun discardPreviousMailContext() {
-        aiSharedData.previousMessageBodyPlainText = null
+        previousMessageBodyPlainText = null
         history.firstOrNull()?.takeIf { it.type == "context" }?.let { history.removeFirst() }
     }
 
