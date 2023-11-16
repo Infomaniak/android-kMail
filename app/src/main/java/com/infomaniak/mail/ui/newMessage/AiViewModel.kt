@@ -44,7 +44,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AiViewModel @Inject constructor(
     private val sharedUtils: SharedUtils,
-    private val aiSharedData: AiSharedData,
+    aiSharedData: AiSharedData,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
