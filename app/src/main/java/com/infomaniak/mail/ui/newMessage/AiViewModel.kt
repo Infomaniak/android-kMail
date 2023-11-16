@@ -78,8 +78,8 @@ class AiViewModel @Inject constructor(
         )
 
         ensureActive()
-        val usesPreviousMessageAsContext = previousMessageBodyPlainText != null
-        handleAiResult(apiResponse, userMessage, shouldTriggerContextTooLongInstead = usesPreviousMessageAsContext)
+        val isUsingPreviousMessageAsContext = previousMessageBodyPlainText != null
+        handleAiResult(apiResponse, userMessage, shouldTriggerContextTooLongInstead = isUsingPreviousMessageAsContext)
     }
 
     private fun handleAiResult(
