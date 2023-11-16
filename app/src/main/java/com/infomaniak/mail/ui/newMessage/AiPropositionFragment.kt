@@ -130,7 +130,11 @@ class AiPropositionFragment : Fragment() {
 
         retryButton.setOnClickListener {
             trackAiWriterEvent("retry")
-            aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(isOpened = true)
+            val shouldKeepPrompt = aiViewModel.aiPropositionStatusLiveData.value == PropositionStatus.CONTEXT_TOO_LONG
+            aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(
+                isOpened = true,
+                shouldResetPrompt = !shouldKeepPrompt,
+            )
             findNavController().popBackStack()
         }
 
