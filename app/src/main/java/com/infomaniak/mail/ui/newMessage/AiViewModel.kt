@@ -111,7 +111,6 @@ class AiViewModel @Inject constructor(
 
     private fun discardPreviousMailContext() {
         previousMessageBodyPlainText = null
-        history.firstOrNull()?.takeIf { it.type == "context" }?.let { history.removeFirst() }
     }
 
     fun performShortcut(shortcut: Shortcut, currentMailboxUuid: String) = viewModelScope.launch(ioCoroutineContext) {
