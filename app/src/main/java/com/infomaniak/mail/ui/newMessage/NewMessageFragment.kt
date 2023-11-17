@@ -17,8 +17,6 @@
  */
 package com.infomaniak.mail.ui.newMessage
 
-import android.animation.FloatEvaluator
-import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ClipDescription
@@ -27,7 +25,6 @@ import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.os.Bundle
 import android.text.*
-import android.transition.Slide
 import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
@@ -41,13 +38,11 @@ import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.Group
-import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
@@ -55,7 +50,6 @@ import com.google.android.material.button.MaterialButton
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.MatomoMail
-import com.infomaniak.mail.MatomoMail.trackAiWriterEvent
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackExternalEvent
@@ -64,8 +58,6 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.*
 import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition.INLINE
-import com.infomaniak.mail.data.models.FeatureFlag
-import com.infomaniak.mail.data.models.ai.AiPromptOpeningStatus
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.*
@@ -89,9 +81,7 @@ import io.sentry.SentryLevel
 import kotlinx.coroutines.*
 import java.util.UUID
 import javax.inject.Inject
-import kotlin.math.roundToInt
 import com.google.android.material.R as RMaterial
-import com.infomaniak.lib.core.R as RCore
 
 @AndroidEntryPoint
 class NewMessageFragment : Fragment() {
@@ -104,16 +94,19 @@ class NewMessageFragment : Fragment() {
     }
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
-
-    private val animationDuration by lazy { resources.getInteger(R.integer.aiPromptAnimationDuration).toLong() }
-    private val scrimOpacity by lazy { ResourcesCompat.getFloat(requireContext().resources, R.dimen.scrimOpacity) }
-    private val backgroundColor by lazy { requireContext().getColor(R.color.backgroundColor) }
-    private val black by lazy { requireContext().getColor(RCore.color.black) }
+    private val aiManager: NewMessageAiManager by lazy {
+        NewMessageAiManager(
+            newMessageViewModel = newMessageViewModel,
+            aiViewModel = aiViewModel,
+            binding = binding,
+            fragment = this@NewMessageFragment,
+            activity = requireActivity(),
+            localSettings = localSettings
+        )
+    }
 
     private var addressListPopupWindow: ListPopupWindow? = null
     private lateinit var filePicker: FilePicker
-
-    private var aiPromptFragment: AiPromptFragment? = null
 
     private var quoteWebView: WebView? = null
     private var signatureWebView: WebView? = null
@@ -124,8 +117,6 @@ class NewMessageFragment : Fragment() {
     private val webViewUtils by lazy { WebViewUtils(requireContext()) }
 
     private var lastFieldToTakeFocus: FieldType? = TO
-
-    private var valueAnimator: ValueAnimator? = null
 
     @Inject
     lateinit var localSettings: LocalSettings
@@ -180,9 +171,7 @@ class NewMessageFragment : Fragment() {
         observeCcAndBccVisibility()
         observeDraftWorkerResults()
         observeInitResult()
-        observeAiOutput()
-        observeAiPromptStatus()
-        observeAiFeatureFlagUpdates()
+        aiManager.observeEverything()
         observeExternals()
     }
 
@@ -215,13 +204,6 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun navigateToDiscoveryBottomSheetIfFirstTime() = with(localSettings) {
-        if (showAiDiscoveryBottomSheet) {
-            showAiDiscoveryBottomSheet = false
-            safeNavigate(NewMessageFragmentDirections.actionNewMessageFragmentToAiDiscoveryBottomSheetDialog())
-        }
-    }
-
     private fun setWebViewReference() {
         quoteWebView = binding.quoteWebView
         signatureWebView = binding.signatureWebView
@@ -243,7 +225,7 @@ class NewMessageFragment : Fragment() {
     }
 
     override fun onDestroyView() {
-        valueAnimator?.cancel()
+        aiManager.valueAnimator?.cancel()
 
         addressListPopupWindow = null
         quoteWebView?.destroyAndClearHistory()
@@ -256,7 +238,7 @@ class NewMessageFragment : Fragment() {
     private fun handleOnBackPressed() {
         newMessageActivity.onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             when {
-                aiViewModel.aiPromptOpeningStatus.value?.isOpened == true -> closeAiPrompt()
+                aiViewModel.aiPromptOpeningStatus.value?.isOpened == true -> aiManager.closeAiPrompt()
                 newMessageViewModel.isAutoCompletionOpened -> closeAutoCompletion()
                 else -> newMessageActivity.finishAppAndRemoveTaskIfNeeded()
             }
@@ -291,7 +273,7 @@ class NewMessageFragment : Fragment() {
 
         scrim.setOnClickListener {
             scrim.isClickable = false
-            closeAiPrompt()
+            aiManager.closeAiPrompt()
         }
     }
 
@@ -628,19 +610,9 @@ class NewMessageFragment : Fragment() {
                 EditorAction.CAMERA -> notYetImplemented()
                 EditorAction.LINK -> notYetImplemented()
                 EditorAction.CLOCK -> notYetImplemented()
-                EditorAction.AI -> openAiPrompt()
+                EditorAction.AI -> aiManager.openAiPrompt()
             }
         }
-    }
-
-    private fun openAiPrompt() {
-        aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(isOpened = true)
-    }
-
-    fun closeAiPrompt(becauseOfGeneration: Boolean = false) {
-        trackAiWriterEvent(name = if (becauseOfGeneration) "generate" else "dismissPromptWithoutGenerating")
-        aiViewModel.aiPromptOpeningStatus.value =
-            AiPromptOpeningStatus(isOpened = false, becauseOfGeneration = becauseOfGeneration)
     }
 
     private fun observeNewAttachments() = with(binding) {
@@ -852,131 +824,9 @@ class NewMessageFragment : Fragment() {
         textEditing.isVisible = isEditorExpanded
     }
 
-    private fun observeAiOutput() = with(binding) {
-        aiViewModel.aiOutputToInsert.observe(viewLifecycleOwner) { (subject, content) ->
-            subject?.let { subjectTextField.setText(it) }
-            bodyText.setText(content)
-        }
-    }
+    fun navigateToPropositionFragment() = aiManager.navigateToPropositionFragment()
 
-    private fun observeAiPromptStatus() {
-        aiViewModel.aiPromptOpeningStatus.observe(viewLifecycleOwner) { (shouldDisplay, shouldResetContent, becauseOfGeneration) ->
-            if (shouldDisplay) onAiPromptOpened(shouldResetContent) else onAiPromptClosed(becauseOfGeneration)
-        }
-    }
-
-    private fun onAiPromptOpened(resetPrompt: Boolean) = with(binding) {
-        if (resetPrompt) {
-            aiViewModel.apply {
-                aiPrompt = ""
-                aiPromptOpeningStatus.value?.shouldResetPrompt = false
-            }
-        }
-
-        // Keyboard is opened inside onCreate() of AiPromptFragment
-
-        val foundFragment = childFragmentManager.findFragmentByTag(AI_PROMPT_FRAGMENT_TAG) as? AiPromptFragment
-        if (aiPromptFragment == null) {
-            aiPromptFragment = foundFragment ?: AiPromptFragment()
-        }
-
-        if (foundFragment == null) {
-            childFragmentManager
-                .beginTransaction()
-                .add(aiPromptFragmentContainer.id, aiPromptFragment!!, AI_PROMPT_FRAGMENT_TAG)
-                .commitNow()
-        }
-
-        scrim.apply {
-            isVisible = true
-            isClickable = true
-        }
-
-        animateAiPrompt(true)
-        setAiPromptVisibility(true)
-        newMessageConstraintLayout.descendantFocusability = FOCUS_BLOCK_DESCENDANTS
-    }
-
-    private fun onAiPromptClosed(withoutTransition: Boolean) = with(binding) {
-
-        fun removeFragmentAndHideScrim() {
-            aiPromptFragment?.let {
-                childFragmentManager
-                    .beginTransaction()
-                    .remove(it)
-                    .commitNow()
-            }
-            aiPromptFragment = null
-
-            scrim.isGone = true
-        }
-
-        aiPromptFragmentContainer.hideKeyboard()
-
-        if (withoutTransition) {
-            removeFragmentAndHideScrim()
-        } else {
-            viewLifecycleOwner.lifecycleScope.launch {
-                delay(animationDuration)
-                removeFragmentAndHideScrim()
-            }
-        }
-
-        if (!withoutTransition) animateAiPrompt(false)
-        setAiPromptVisibility(false)
-        newMessageConstraintLayout.descendantFocusability = FOCUS_BEFORE_DESCENDANTS
-    }
-
-    private fun animateAiPrompt(isVisible: Boolean) = with(binding) {
-
-        val slidingTransition = Slide()
-            .addTarget(aiPromptLayout)
-            .setDuration(animationDuration)
-
-        TransitionManager.beginDelayedTransition(root, slidingTransition)
-
-        val (startOpacity, endOpacity) = if (isVisible) 0.0f to scrimOpacity else scrimOpacity to 0.0f
-
-        valueAnimator?.cancel()
-        valueAnimator = ValueAnimator.ofObject(FloatEvaluator(), startOpacity, endOpacity).apply {
-            duration = animationDuration
-            addUpdateListener { animator ->
-                val alpha = ((animator.animatedValue as Float) * 256.0f).roundToInt() / 256.0f
-                scrim.alpha = alpha
-                requireActivity().window.statusBarColor = UiUtils.pointBetweenColors(backgroundColor, black, alpha)
-            }
-            start()
-        }
-    }
-
-    private fun setAiPromptVisibility(isVisible: Boolean) {
-
-        fun updateNavigationBarColor() {
-            val backgroundColorRes = if (isVisible) R.color.backgroundColorSecondary else R.color.backgroundColor
-            requireActivity().window.navigationBarColor = requireContext().getColor(backgroundColorRes)
-        }
-
-        binding.aiPromptLayout.isVisible = isVisible
-        updateNavigationBarColor()
-    }
-
-    private fun observeAiFeatureFlagUpdates() {
-        newMessageViewModel.currentMailboxLive.observeNotNull(viewLifecycleOwner) { mailbox ->
-            val isAiEnabled = mailbox.featureFlags.contains(FeatureFlag.AI)
-            binding.editorAi.isVisible = isAiEnabled
-            if (isAiEnabled) navigateToDiscoveryBottomSheetIfFirstTime()
-        }
-    }
-
-    fun navigateToPropositionFragment() {
-        closeAiPrompt(becauseOfGeneration = true)
-        resetAiProposition()
-        safeNavigate(NewMessageFragmentDirections.actionNewMessageFragmentToAiPropositionFragment())
-    }
-
-    private fun resetAiProposition() {
-        aiViewModel.aiPropositionStatusLiveData.value = null
-    }
+    fun closeAiPrompt() = aiManager.closeAiPrompt()
 
     enum class EditorAction(val matomoValue: String) {
         ATTACHMENT("importFile"),
@@ -999,6 +849,5 @@ class NewMessageFragment : Fragment() {
 
     companion object {
         private val TAG = NewMessageFragment::class.java.simpleName
-        private const val AI_PROMPT_FRAGMENT_TAG = "aiPromptFragmentTag"
     }
 }
