@@ -17,11 +17,100 @@
  */
 package com.infomaniak.mail.ui.newMessage
 
+import androidx.core.view.isGone
+import com.infomaniak.mail.MatomoMail.trackExternalEvent
+import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
+import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
+import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipientForNewMessage
+import com.infomaniak.mail.utils.MergedContactDictionary
+import com.infomaniak.mail.utils.Utils
 
 class NewMessageExternalsManager(
     newMessageViewModel: NewMessageViewModel,
     binding: FragmentNewMessageBinding,
     fragment: NewMessageFragment,
+    private val informationDialog: InformationAlertDialog,
 ) : NewMessageManager(newMessageViewModel, binding, fragment) {
+
+    fun observeExternals(arrivedFromExistingDraft: Boolean) = with(newMessageViewModel) {
+        Utils.waitInitMediator(initResult, mergedContacts).observe(viewLifecycleOwner) { (_, mergedContacts) ->
+            val externalMailFlagEnabled = currentMailbox.externalMailFlagEnabled
+            val shouldWarnForExternal = externalMailFlagEnabled && !arrivedFromExistingDraft
+            val emailDictionary = mergedContacts.second
+            val aliases = currentMailbox.aliases
+
+            updateFields(shouldWarnForExternal, emailDictionary, aliases)
+            updateBanner(shouldWarnForExternal, emailDictionary, aliases)
+        }
+    }
+
+    private fun updateFields(shouldWarnForExternal: Boolean, emailDictionary: MergedContactDictionary, aliases: List<String>) {
+        with(binding) {
+            toField.updateExternals(shouldWarnForExternal, emailDictionary, aliases)
+            ccField.updateExternals(shouldWarnForExternal, emailDictionary, aliases)
+            bccField.updateExternals(shouldWarnForExternal, emailDictionary, aliases)
+        }
+    }
+
+    private fun updateBanner(shouldWarnForExternal: Boolean, emailDictionary: MergedContactDictionary, aliases: List<String>) {
+        with(newMessageViewModel) {
+            if (shouldWarnForExternal && !isExternalBannerManuallyClosed) {
+                val (externalEmail, externalQuantity) = draft.findExternalRecipientForNewMessage(aliases, emailDictionary)
+                externalRecipientCount.value = externalEmail to externalQuantity
+            }
+        }
+    }
+
+    fun setupExternalBanner() = with(binding) {
+        var externalRecipientEmail: String? = null
+        var externalRecipientQuantity = 0
+
+        closeButton.setOnClickListener {
+            context.trackExternalEvent("bannerManuallyClosed")
+            newMessageViewModel.isExternalBannerManuallyClosed = true
+            externalBanner.isGone = true
+        }
+
+        informationButton.setOnClickListener {
+            context.trackExternalEvent("bannerInfo")
+
+            val description = resources.getQuantityString(
+                R.plurals.externalDialogDescriptionRecipient,
+                externalRecipientQuantity,
+                externalRecipientEmail,
+            )
+
+            informationDialog.show(
+                title = R.string.externalDialogTitleRecipient,
+                description = description,
+                confirmButtonText = R.string.externalDialogConfirmButton,
+            )
+        }
+
+        newMessageViewModel.externalRecipientCount.observe(viewLifecycleOwner) { (email, externalQuantity) ->
+            externalBanner.isGone = newMessageViewModel.isExternalBannerManuallyClosed || externalQuantity == 0
+            externalRecipientEmail = email
+            externalRecipientQuantity = externalQuantity
+        }
+    }
+
+    fun updateBannerVisibility() = with(binding) {
+        var externalRecipientEmail: String? = null
+        var externalRecipientQuantity = 0
+
+        listOf(toField, ccField, bccField).forEach { field ->
+            val (singleEmail, quantityForThisField) = field.findAlreadyExistingExternalRecipientsInFields()
+            externalRecipientQuantity += quantityForThisField
+
+            if (externalRecipientQuantity > 1) {
+                newMessageViewModel.externalRecipientCount.value = null to 2
+                return
+            }
+
+            if (quantityForThisField == 1) externalRecipientEmail = singleEmail
+        }
+
+        newMessageViewModel.externalRecipientCount.value = externalRecipientEmail to externalRecipientQuantity
+    }
 }

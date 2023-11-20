@@ -52,7 +52,6 @@ import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.MatomoMail
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
 import com.infomaniak.mail.MatomoMail.trackEvent
-import com.infomaniak.mail.MatomoMail.trackExternalEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -70,7 +69,6 @@ import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.ui.newMessage.NewMessageFragment.FieldType.*
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipientForNewMessage
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.destroyAndClearHistory
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
@@ -95,6 +93,7 @@ class NewMessageFragment : Fragment() {
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
     private lateinit var aiManager: NewMessageAiManager
+    private lateinit var externalsManager: NewMessageExternalsManager
 
     private var addressListPopupWindow: ListPopupWindow? = null
     private lateinit var filePicker: FilePicker
@@ -147,6 +146,13 @@ class NewMessageFragment : Fragment() {
             localSettings = localSettings
         )
 
+        externalsManager = NewMessageExternalsManager(
+            newMessageViewModel = newMessageViewModel,
+            binding = binding,
+            fragment = this@NewMessageFragment,
+            informationDialog = informationDialog,
+        )
+
         filePicker = FilePicker(this@NewMessageFragment)
         bindAlertToViewLifecycle(descriptionDialog)
 
@@ -172,36 +178,7 @@ class NewMessageFragment : Fragment() {
         observeDraftWorkerResults()
         observeInitResult()
         aiManager.observeEverything()
-        observeExternals()
-    }
-
-    private fun observeExternals() = with(newMessageViewModel) {
-        Utils.waitInitMediator(initResult, mergedContacts).observe(viewLifecycleOwner) { (_, mergedContacts) ->
-            val externalMailFlagEnabled = currentMailbox.externalMailFlagEnabled
-            val shouldWarnForExternal = externalMailFlagEnabled && !newMessageActivityArgs.arrivedFromExistingDraft
-            val emailDictionary = mergedContacts.second
-            val aliases = currentMailbox.aliases
-
-            updateFields(shouldWarnForExternal, emailDictionary, aliases)
-            updateBanner(shouldWarnForExternal, emailDictionary, aliases)
-        }
-    }
-
-    private fun updateFields(shouldWarnForExternal: Boolean, emailDictionary: MergedContactDictionary, aliases: List<String>) {
-        with(binding) {
-            toField.updateExternals(shouldWarnForExternal, emailDictionary, aliases)
-            ccField.updateExternals(shouldWarnForExternal, emailDictionary, aliases)
-            bccField.updateExternals(shouldWarnForExternal, emailDictionary, aliases)
-        }
-    }
-
-    private fun updateBanner(shouldWarnForExternal: Boolean, emailDictionary: MergedContactDictionary, aliases: List<String>) {
-        with(newMessageViewModel) {
-            if (shouldWarnForExternal && !isExternalBannerManuallyClosed) {
-                val (externalEmail, externalQuantity) = draft.findExternalRecipientForNewMessage(aliases, emailDictionary)
-                externalRecipientCount.value = externalEmail to externalQuantity
-            }
-        }
+        externalsManager.observeExternals(newMessageActivityArgs.arrivedFromExistingDraft)
     }
 
     private fun setWebViewReference() {
@@ -269,7 +246,7 @@ class NewMessageFragment : Fragment() {
         })
 
         setupSendButton()
-        setupExternalBanner()
+        externalsManager.setupExternalBanner()
 
         scrim.setOnClickListener {
             scrim.isClickable = false
@@ -436,7 +413,7 @@ class NewMessageFragment : Fragment() {
 
     private fun Recipient.removeInViewModelAndUpdateBannerVisibility(type: FieldType) {
         newMessageViewModel.removeRecipientFromField(recipient = this, type)
-        updateBannerVisibility()
+        externalsManager.updateBannerVisibility()
     }
 
     private fun populateUiWithViewModel() = with(binding) {
@@ -492,25 +469,6 @@ class NewMessageFragment : Fragment() {
                 quoteGroup.isGone = true
             }
         }
-    }
-
-    private fun updateBannerVisibility() = with(binding) {
-        var externalRecipientEmail: String? = null
-        var externalRecipientQuantity = 0
-
-        listOf(toField, ccField, bccField).forEach { field ->
-            val (singleEmail, quantityForThisField) = field.findAlreadyExistingExternalRecipientsInFields()
-            externalRecipientQuantity += quantityForThisField
-
-            if (externalRecipientQuantity > 1) {
-                newMessageViewModel.externalRecipientCount.value = null to 2
-                return
-            }
-
-            if (quantityForThisField == 1) externalRecipientEmail = singleEmail
-        }
-
-        newMessageViewModel.externalRecipientCount.value = externalRecipientEmail to externalRecipientQuantity
     }
 
     private fun WebView.loadSignatureContent(html: String, webViewGroup: Group) {
@@ -694,39 +652,6 @@ class NewMessageFragment : Fragment() {
         }
 
         newMessageViewModel.saveDraftWithoutDebouncing()
-    }
-
-    private fun setupExternalBanner() = with(binding) {
-        var externalRecipientEmail: String? = null
-        var externalRecipientQuantity = 0
-
-        closeButton.setOnClickListener {
-            trackExternalEvent("bannerManuallyClosed")
-            newMessageViewModel.isExternalBannerManuallyClosed = true
-            externalBanner.isGone = true
-        }
-
-        informationButton.setOnClickListener {
-            trackExternalEvent("bannerInfo")
-
-            val description = resources.getQuantityString(
-                R.plurals.externalDialogDescriptionRecipient,
-                externalRecipientQuantity,
-                externalRecipientEmail,
-            )
-
-            informationDialog.show(
-                title = R.string.externalDialogTitleRecipient,
-                description = description,
-                confirmButtonText = R.string.externalDialogConfirmButton,
-            )
-        }
-
-        newMessageViewModel.externalRecipientCount.observe(viewLifecycleOwner) { (email, externalQuantity) ->
-            externalBanner.isGone = newMessageViewModel.isExternalBannerManuallyClosed || externalQuantity == 0
-            externalRecipientEmail = email
-            externalRecipientQuantity = externalQuantity
-        }
     }
 
     private fun setupSendButton() = with(binding) {
