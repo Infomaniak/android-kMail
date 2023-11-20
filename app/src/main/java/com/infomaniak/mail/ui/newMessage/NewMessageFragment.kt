@@ -52,8 +52,6 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.*
 import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition.INLINE
-import com.infomaniak.mail.data.models.correspondent.MergedContact
-import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.*
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
@@ -61,7 +59,6 @@ import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
-import com.infomaniak.mail.ui.newMessage.NewMessageFragment.FieldType.*
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.Utils
@@ -89,6 +86,7 @@ class NewMessageFragment : Fragment() {
     private lateinit var aiManager: NewMessageAiManager
     private lateinit var externalsManager: NewMessageExternalsManager
     private lateinit var editorManager: NewMessageEditorManager
+    private lateinit var recipientFieldsManager: NewMessageRecipientFieldsManager
 
     private var addressListPopupWindow: ListPopupWindow? = null
 
@@ -99,8 +97,6 @@ class NewMessageFragment : Fragment() {
 
     private val newMessageActivity by lazy { requireActivity() as NewMessageActivity }
     private val webViewUtils by lazy { WebViewUtils(requireContext()) }
-
-    private var lastFieldToTakeFocus: FieldType? = TO
 
     @Inject
     lateinit var localSettings: LocalSettings
@@ -145,15 +141,15 @@ class NewMessageFragment : Fragment() {
 
         handleOnBackPressed()
 
-        setOnFocusChangedListeners()
+        recipientFieldsManager.setOnFocusChangedListeners()
 
         doAfterSubjectChange()
         doAfterBodyChange()
 
-        observeContacts()
+        recipientFieldsManager.observeContacts()
+        recipientFieldsManager.observeCcAndBccVisibility()
         editorManager.observeEditorActions()
         observeNewAttachments()
-        observeCcAndBccVisibility()
         observeDraftWorkerResults()
         observeInitResult()
         aiManager.observeEverything()
@@ -184,6 +180,13 @@ class NewMessageFragment : Fragment() {
             activity = requireActivity(),
             aiManager = aiManager,
             filePicker = FilePicker(this@NewMessageFragment)
+        )
+
+        recipientFieldsManager = NewMessageRecipientFieldsManager(
+            newMessageViewModel = newMessageViewModel,
+            binding = binding,
+            fragment = this@NewMessageFragment,
+            externalsManager = externalsManager,
         )
     }
 
@@ -222,7 +225,7 @@ class NewMessageFragment : Fragment() {
         newMessageActivity.onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             when {
                 aiViewModel.aiPromptOpeningStatus.value?.isOpened == true -> aiManager.closeAiPrompt()
-                newMessageViewModel.isAutoCompletionOpened -> closeAutoCompletion()
+                newMessageViewModel.isAutoCompletionOpened -> recipientFieldsManager.closeAutoCompletion()
                 else -> newMessageActivity.finishAppAndRemoveTaskIfNeeded()
             }
         }
@@ -242,7 +245,7 @@ class NewMessageFragment : Fragment() {
 
         attachmentsRecyclerView.adapter = AttachmentAdapter(shouldDisplayCloseButton = true, onDelete = ::onDeleteAttachment)
 
-        setupAutoCompletionFields()
+        recipientFieldsManager.setupAutoCompletionFields()
 
         subjectTextField.filters = arrayOf<InputFilter>(object : InputFilter {
             override fun filter(source: CharSequence?, s: Int, e: Int, d: Spanned?, dS: Int, dE: Int): CharSequence? {
@@ -298,24 +301,16 @@ class NewMessageFragment : Fragment() {
     private fun showKeyboardInCorrectView() = with(binding) {
         when (newMessageActivityArgs.draftMode) {
             DraftMode.REPLY,
-            DraftMode.REPLY_ALL -> focusBodyField()
-            DraftMode.FORWARD -> focusToField()
+            DraftMode.REPLY_ALL -> recipientFieldsManager.focusBodyField()
+            DraftMode.FORWARD -> recipientFieldsManager.focusToField()
             DraftMode.NEW_MAIL -> {
                 if (newMessageActivityArgs.recipient == null && newMessageViewModel.draft.to.isEmpty()) {
-                    focusToField()
+                    recipientFieldsManager.focusToField()
                 } else {
-                    focusBodyField()
+                    recipientFieldsManager.focusBodyField()
                 }
             }
         }
-    }
-
-    private fun FragmentNewMessageBinding.focusBodyField() {
-        bodyText.showKeyboard()
-    }
-
-    private fun FragmentNewMessageBinding.focusToField() {
-        toField.showKeyboardInTextInput()
     }
 
     private fun updateFeatureFlagIfMailTo() {
@@ -330,104 +325,9 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun setOnFocusChangedListeners() = with(binding) {
-        val listener = View.OnFocusChangeListener { _, hasFocus -> if (hasFocus) fieldGotFocus(null) }
-        subjectTextField.onFocusChangeListener = listener
-        bodyText.onFocusChangeListener = listener
-    }
-
-    private fun setupAutoCompletionFields() = with(binding) {
-        toField.initRecipientField(
-            autoComplete = autoCompleteTo,
-            onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(TO, hasOpened) },
-            onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, TO) },
-            onContactRemovedCallback = { recipient -> recipient.removeInViewModelAndUpdateBannerVisibility(TO) },
-            onCopyContactAddressCallback = { copyRecipientEmailToClipboard(it, newMessageViewModel.snackBarManager) },
-            gotFocusCallback = { fieldGotFocus(TO) },
-            onToggleEverythingCallback = ::openAdvancedFields,
-            setSnackBarCallback = ::setSnackBar,
-        )
-
-        ccField.initRecipientField(
-            autoComplete = autoCompleteCc,
-            onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(CC, hasOpened) },
-            onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, CC) },
-            onContactRemovedCallback = { recipient -> recipient.removeInViewModelAndUpdateBannerVisibility(CC) },
-            onCopyContactAddressCallback = { copyRecipientEmailToClipboard(it, newMessageViewModel.snackBarManager) },
-            gotFocusCallback = { fieldGotFocus(CC) },
-            setSnackBarCallback = ::setSnackBar,
-        )
-
-        bccField.initRecipientField(
-            autoComplete = autoCompleteBcc,
-            onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(BCC, hasOpened) },
-            onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, BCC) },
-            onContactRemovedCallback = { recipient -> recipient.removeInViewModelAndUpdateBannerVisibility(BCC) },
-            onCopyContactAddressCallback = { copyRecipientEmailToClipboard(it, newMessageViewModel.snackBarManager) },
-            gotFocusCallback = { fieldGotFocus(BCC) },
-            setSnackBarCallback = ::setSnackBar,
-        )
-    }
-
-    private fun fieldGotFocus(field: FieldType?) = with(binding) {
-        if (lastFieldToTakeFocus == field) return
-
-        if (field == null && newMessageViewModel.otherFieldsAreAllEmpty.value == true) {
-            toField.collapseEverything()
-        } else {
-            if (field != TO) toField.collapse()
-            if (field != CC) ccField.collapse()
-            if (field != BCC) bccField.collapse()
-        }
-
-        lastFieldToTakeFocus = field
-    }
-
-    private fun openAdvancedFields(isCollapsed: Boolean) = with(binding) {
-        cc.isGone = isCollapsed
-        bcc.isGone = isCollapsed
-    }
-
-    private fun setSnackBar(titleRes: Int) {
-        newMessageViewModel.snackBarManager.setValue(getString(titleRes))
-    }
-
-    private fun observeContacts() {
-        newMessageViewModel.mergedContacts.observe(viewLifecycleOwner) { (sortedContactList, contactMap) ->
-            updateRecipientFieldsContacts(sortedContactList, contactMap)
-        }
-    }
-
-    private fun updateRecipientFieldsContacts(
-        sortedContactList: List<MergedContact>,
-        contactMap: MergedContactDictionary,
-    ) = with(binding) {
-        toField.updateContacts(sortedContactList, contactMap)
-        ccField.updateContacts(sortedContactList, contactMap)
-        bccField.updateContacts(sortedContactList, contactMap)
-    }
-
-    private fun toggleAutoCompletion(field: FieldType? = null, isAutoCompletionOpened: Boolean) = with(binding) {
-        preFields.isGone = isAutoCompletionOpened
-        to.isVisible = !isAutoCompletionOpened || field == TO
-        cc.isVisible = !isAutoCompletionOpened || field == CC
-        bcc.isVisible = !isAutoCompletionOpened || field == BCC
-        postFields.isGone = isAutoCompletionOpened
-
-        newMessageViewModel.isAutoCompletionOpened = isAutoCompletionOpened
-    }
-
-    private fun Recipient.removeInViewModelAndUpdateBannerVisibility(type: FieldType) {
-        newMessageViewModel.removeRecipientFromField(recipient = this, type)
-        externalsManager.updateBannerVisibility()
-    }
-
     private fun populateUiWithViewModel() = with(binding) {
         val draft = newMessageViewModel.draft
-        val ccAndBccFieldsAreEmpty = draft.cc.isEmpty() && draft.bcc.isEmpty()
-        toField.initRecipients(draft.to, ccAndBccFieldsAreEmpty)
-        ccField.initRecipients(draft.cc)
-        bccField.initRecipients(draft.bcc)
+        recipientFieldsManager.initRecipients(draft)
 
         newMessageViewModel.updateIsSendingAllowed()
 
@@ -571,11 +471,6 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun observeCcAndBccVisibility() = with(newMessageViewModel) {
-        otherFieldsAreAllEmpty.observe(viewLifecycleOwner, binding.toField::updateOtherFieldsVisibility)
-        initializeFieldsAsOpen.observe(viewLifecycleOwner) { openAdvancedFields(!it) }
-    }
-
     override fun onStop() = with(newMessageViewModel) {
 
         // TODO:
@@ -616,12 +511,6 @@ class NewMessageFragment : Fragment() {
                 }
             }
         }
-    }
-
-    private fun closeAutoCompletion() = with(binding) {
-        toField.clearField()
-        ccField.clearField()
-        bccField.clearField()
     }
 
     private fun onDeleteAttachment(position: Int, itemCountLeft: Int) = with(binding) {
@@ -699,12 +588,6 @@ class NewMessageFragment : Fragment() {
     fun navigateToPropositionFragment() = aiManager.navigateToPropositionFragment()
 
     fun closeAiPrompt() = aiManager.closeAiPrompt()
-
-    enum class FieldType {
-        TO,
-        CC,
-        BCC,
-    }
 
     companion object {
         private val TAG = NewMessageFragment::class.java.simpleName
