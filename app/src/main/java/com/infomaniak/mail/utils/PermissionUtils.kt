@@ -110,7 +110,6 @@ class PermissionUtils {
     //endregion
 
     companion object {
-
         @get:DeprecatedSinceApi(Build.VERSION_CODES.Q, "Only used for DownloadManager below API 29")
         private const val storagePermission = Manifest.permission.WRITE_EXTERNAL_STORAGE
     }

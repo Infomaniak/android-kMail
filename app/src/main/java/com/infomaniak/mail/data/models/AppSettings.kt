@@ -20,6 +20,7 @@ package com.infomaniak.mail.data.models
 import io.realm.kotlin.types.RealmObject
 
 class AppSettings : RealmObject {
+
     var currentUserId: Int = DEFAULT_ID
     var currentMailboxId: Int = DEFAULT_ID
 

@@ -134,7 +134,6 @@ class FolderController @Inject constructor(
 
     companion object {
         const val SEARCH_FOLDER_ID = "search_folder_id"
-
         private val isNotSearch = "${Folder::id.name} != '$SEARCH_FOLDER_ID'"
         private val isRootFolder = "${Folder.parentsPropertyName}.@count == 0"
 

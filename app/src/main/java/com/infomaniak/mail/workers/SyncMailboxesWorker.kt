@@ -92,11 +92,7 @@ class SyncMailboxesWorker @AssistedInject constructor(
     }
 
     companion object {
-
-        /** To support the old services, we do not change the name */
-        private const val TAG = "SyncMessagesWorker"
-
+        private const val TAG = "SyncMessagesWorker" // To support the old services, don't change this name
         private const val INITIAL_DELAY = 2L
-
     }
 }

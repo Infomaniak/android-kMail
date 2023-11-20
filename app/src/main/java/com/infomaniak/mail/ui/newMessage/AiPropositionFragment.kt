@@ -381,8 +381,7 @@ class AiPropositionFragment : Fragment() {
     }
 
     companion object {
-        private const val REPLACEMENT_DURATION: Long = 150
-
+        private const val REPLACEMENT_DURATION = 150L
         private val MATCH_SUBJECT_REGEX = Regex("^[^:]+:(?<subject>.+?)\\n\\s*(?<content>.+)", RegexOption.DOT_MATCHES_ALL)
     }
 }
