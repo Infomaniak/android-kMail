@@ -83,6 +83,7 @@ class NewMessageFragment : Fragment() {
     }
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
+
     private lateinit var aiManager: NewMessageAiManager
     private lateinit var externalsManager: NewMessageExternalsManager
     private lateinit var editorManager: NewMessageEditorManager
@@ -159,9 +160,9 @@ class NewMessageFragment : Fragment() {
     private fun initManagers() {
         aiManager = NewMessageAiManager(
             newMessageViewModel = newMessageViewModel,
-            aiViewModel = aiViewModel,
             binding = binding,
             fragment = this@NewMessageFragment,
+            aiViewModel = aiViewModel,
             activity = requireActivity(),
             localSettings = localSettings
         )

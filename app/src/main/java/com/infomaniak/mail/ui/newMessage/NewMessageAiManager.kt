@@ -45,9 +45,9 @@ import com.infomaniak.lib.core.R as RCore
 
 class NewMessageAiManager(
     newMessageViewModel: NewMessageViewModel,
-    private val aiViewModel: AiViewModel,
     binding: FragmentNewMessageBinding,
     fragment: NewMessageFragment,
+    private val aiViewModel: AiViewModel,
     private val activity: Activity,
     private val localSettings: LocalSettings,
 ) : NewMessageManager(newMessageViewModel, binding, fragment) {
