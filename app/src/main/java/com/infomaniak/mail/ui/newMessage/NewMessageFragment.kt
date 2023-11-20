@@ -131,30 +131,7 @@ class NewMessageFragment : Fragment() {
             arguments = newMessageActivityArgs.toBundle(),
         )
 
-        aiManager = NewMessageAiManager(
-            newMessageViewModel = newMessageViewModel,
-            aiViewModel = aiViewModel,
-            binding = binding,
-            fragment = this@NewMessageFragment,
-            activity = requireActivity(),
-            localSettings = localSettings
-        )
-
-        externalsManager = NewMessageExternalsManager(
-            newMessageViewModel = newMessageViewModel,
-            binding = binding,
-            fragment = this@NewMessageFragment,
-            informationDialog = informationDialog,
-        )
-
-        editorManager = NewMessageEditorManager(
-            newMessageViewModel = newMessageViewModel,
-            binding = binding,
-            fragment = this@NewMessageFragment,
-            activity = requireActivity(),
-            aiManager = aiManager,
-            filePicker = FilePicker(this@NewMessageFragment)
-        )
+        initManagers()
 
         bindAlertToViewLifecycle(descriptionDialog)
 
@@ -181,6 +158,33 @@ class NewMessageFragment : Fragment() {
         observeInitResult()
         aiManager.observeEverything()
         externalsManager.observeExternals(newMessageActivityArgs.arrivedFromExistingDraft)
+    }
+
+    private fun initManagers() {
+        aiManager = NewMessageAiManager(
+            newMessageViewModel = newMessageViewModel,
+            aiViewModel = aiViewModel,
+            binding = binding,
+            fragment = this@NewMessageFragment,
+            activity = requireActivity(),
+            localSettings = localSettings
+        )
+
+        externalsManager = NewMessageExternalsManager(
+            newMessageViewModel = newMessageViewModel,
+            binding = binding,
+            fragment = this@NewMessageFragment,
+            informationDialog = informationDialog,
+        )
+
+        editorManager = NewMessageEditorManager(
+            newMessageViewModel = newMessageViewModel,
+            binding = binding,
+            fragment = this@NewMessageFragment,
+            activity = requireActivity(),
+            aiManager = aiManager,
+            filePicker = FilePicker(this@NewMessageFragment)
+        )
     }
 
     private fun setWebViewReference() {
