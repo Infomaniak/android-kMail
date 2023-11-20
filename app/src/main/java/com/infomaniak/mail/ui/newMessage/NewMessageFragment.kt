@@ -94,16 +94,7 @@ class NewMessageFragment : Fragment() {
     }
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
-    private val aiManager: NewMessageAiManager by lazy {
-        NewMessageAiManager(
-            newMessageViewModel = newMessageViewModel,
-            aiViewModel = aiViewModel,
-            binding = binding,
-            fragment = this@NewMessageFragment,
-            activity = requireActivity(),
-            localSettings = localSettings
-        )
-    }
+    private lateinit var aiManager: NewMessageAiManager
 
     private var addressListPopupWindow: ListPopupWindow? = null
     private lateinit var filePicker: FilePicker
@@ -145,6 +136,15 @@ class NewMessageFragment : Fragment() {
         SentryDebug.addNavigationBreadcrumb(
             name = findNavController().currentDestination?.displayName ?: "newMessageFragment",
             arguments = newMessageActivityArgs.toBundle(),
+        )
+
+        aiManager = NewMessageAiManager(
+            newMessageViewModel = newMessageViewModel,
+            aiViewModel = aiViewModel,
+            binding = binding,
+            fragment = this@NewMessageFragment,
+            activity = requireActivity(),
+            localSettings = localSettings
         )
 
         filePicker = FilePicker(this@NewMessageFragment)
