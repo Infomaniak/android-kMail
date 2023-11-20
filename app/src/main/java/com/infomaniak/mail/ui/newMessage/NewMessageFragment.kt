@@ -997,8 +997,8 @@ class NewMessageFragment : Fragment() {
         BCC,
     }
 
-    private companion object {
-        val TAG = NewMessageFragment::class.java.simpleName
-        const val AI_PROMPT_FRAGMENT_TAG = "aiPromptFragmentTag"
+    companion object {
+        private val TAG = NewMessageFragment::class.java.simpleName
+        private const val AI_PROMPT_FRAGMENT_TAG = "aiPromptFragmentTag"
     }
 }

@@ -78,7 +78,7 @@ class RecentSearchAdapter(
 
     class RecentSearchViewHolder(val binding: ItemRecentSearchBinding) : ViewHolder(binding.root)
 
-    private companion object {
-        const val MAX_HISTORY_COUNT = 10
+    companion object {
+        private const val MAX_HISTORY_COUNT = 10
     }
 }

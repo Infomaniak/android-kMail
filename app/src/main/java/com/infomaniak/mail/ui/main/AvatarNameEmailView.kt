@@ -108,7 +108,7 @@ class AvatarNameEmailView @JvmOverloads constructor(
         text = highlightedText
     }
 
-    private companion object {
-        const val NOT_SET = -1
+    companion object {
+        private const val NOT_SET = -1
     }
 }

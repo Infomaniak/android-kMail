@@ -86,7 +86,7 @@ abstract class MenuFoldersFragment : Fragment() {
         else -> null
     }
 
-    private companion object {
-        const val INVALID_CHARACTERS_PATTERN = "[/'\"]"
+    companion object {
+        private const val INVALID_CHARACTERS_PATTERN = "[/'\"]"
     }
 }

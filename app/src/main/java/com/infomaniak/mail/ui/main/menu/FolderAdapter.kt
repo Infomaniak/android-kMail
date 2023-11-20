@@ -208,8 +208,8 @@ class FolderAdapter @Inject constructor(
         MENU_DRAWER(R.layout.item_folder_menu_drawer),
     }
 
-    private companion object {
-        const val MAX_SUB_FOLDERS_INDENT = 2
+    companion object {
+        private const val MAX_SUB_FOLDERS_INDENT = 2
     }
 
     class FolderViewHolder(val binding: ViewBinding) : ViewHolder(binding.root)

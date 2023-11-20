@@ -187,7 +187,7 @@ class IntroFragment : Fragment() {
         }
     }
 
-    private companion object {
-        const val ACCENT_COLOR_PICKER_PAGE = 0
+    companion object {
+        private const val ACCENT_COLOR_PICKER_PAGE = 0
     }
 }

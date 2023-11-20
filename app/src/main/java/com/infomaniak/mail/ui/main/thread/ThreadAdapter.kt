@@ -524,10 +524,10 @@ class ThreadAdapter(
         FAILED_MESSAGE,
     }
 
-    private companion object {
-        const val FORMAT_EMAIL_DATE_HOUR = "HH:mm"
-        const val FORMAT_EMAIL_DATE_SHORT_DATE = "d MMM"
-        const val FORMAT_EMAIL_DATE_LONG_DATE = "d MMM yyyy"
+    companion object {
+        private const val FORMAT_EMAIL_DATE_HOUR = "HH:mm"
+        private const val FORMAT_EMAIL_DATE_SHORT_DATE = "d MMM"
+        private const val FORMAT_EMAIL_DATE_LONG_DATE = "d MMM yyyy"
     }
 
     private class MessageDiffCallback : DiffUtil.ItemCallback<Message>() {

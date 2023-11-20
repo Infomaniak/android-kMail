@@ -155,8 +155,8 @@ class ContactAdapter(
         val emailMatchedStartIndex: Int,
     )
 
-    private companion object {
-        const val MAX_AUTOCOMPLETE_RESULTS = 10
+    companion object {
+        private const val MAX_AUTOCOMPLETE_RESULTS = 10
     }
 
     class ContactViewHolder(val binding: ItemContactBinding) : ViewHolder(binding.root)

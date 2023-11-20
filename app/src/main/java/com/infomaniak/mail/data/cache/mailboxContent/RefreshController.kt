@@ -942,7 +942,7 @@ class RefreshController @Inject constructor(
         val onStop: (() -> Unit),
     )
 
-    private companion object {
-        val FIBONACCI_SEQUENCE = arrayOf(2, 8, 34, 144)
+    companion object {
+        private val FIBONACCI_SEQUENCE = arrayOf(2, 8, 34, 144)
     }
 }

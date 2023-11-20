@@ -505,14 +505,14 @@ class ThreadListAdapter @Inject constructor(
 
     private data class SwipeActionUiData(@ColorRes val colorRes: Int, @DrawableRes val iconRes: Int?)
 
-    private companion object {
-        const val SWIPE_ANIMATION_THRESHOLD = 0.15f
-        val CARD_ELEVATION = 6.toPx().toFloat()
+    companion object {
+        private const val SWIPE_ANIMATION_THRESHOLD = 0.15f
+        private val CARD_ELEVATION = 6.toPx().toFloat()
 
-        const val FULL_MONTH = "MMMM"
-        const val MONTH_AND_YEAR = "MMMM yyyy"
+        private const val FULL_MONTH = "MMMM"
+        private const val MONTH_AND_YEAR = "MMMM yyyy"
 
-        fun formatList(
+        private fun formatList(
             threads: List<Thread>,
             context: Context,
             folderRole: FolderRole?,
@@ -541,7 +541,7 @@ class ThreadListAdapter @Inject constructor(
             }
         }
 
-        fun Thread.getSectionTitle(context: Context): String = with(date.toDate()) {
+        private fun Thread.getSectionTitle(context: Context): String = with(date.toDate()) {
             return when {
                 isInTheFuture() -> context.getString(R.string.comingSoon)
                 isToday() -> context.getString(R.string.threadListSectionToday)

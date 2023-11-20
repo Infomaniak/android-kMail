@@ -237,7 +237,7 @@ class FetchMessagesManager @Inject constructor(
         }
     }
 
-    private companion object {
-        val TAG: String = FetchMessagesManager::class.java.simpleName
+    companion object {
+        private val TAG: String = FetchMessagesManager::class.java.simpleName
     }
 }

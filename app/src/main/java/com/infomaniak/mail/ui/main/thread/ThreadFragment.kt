@@ -543,10 +543,10 @@ class ThreadFragment : Fragment() {
         LOWERED,
     }
 
-    private companion object {
-        const val COLLAPSE_TITLE_THRESHOLD = 0.5
-        const val ARCHIVE_INDEX = 2
+    companion object {
+        private const val COLLAPSE_TITLE_THRESHOLD = 0.5
+        private const val ARCHIVE_INDEX = 2
 
-        fun allAttachmentsFileName(subject: String) = "infomaniak-mail-attachments-$subject.zip"
+        private fun allAttachmentsFileName(subject: String) = "infomaniak-mail-attachments-$subject.zip"
     }
 }
