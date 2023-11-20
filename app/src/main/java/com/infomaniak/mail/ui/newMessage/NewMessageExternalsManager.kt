@@ -18,6 +18,9 @@
 package com.infomaniak.mail.ui.newMessage
 
 import androidx.core.view.isGone
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import com.infomaniak.mail.MatomoMail.trackExternalEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
@@ -42,6 +45,12 @@ class NewMessageExternalsManager @Inject constructor() : NewMessageManager() {
     ) {
         super.initValues(newMessageViewModel, binding, fragment)
         _informationDialog = informationDialog
+
+        viewLifecycleOwner.lifecycle.addObserver(LifecycleEventObserver { _: LifecycleOwner, event: Lifecycle.Event ->
+            if (event == Lifecycle.Event.ON_DESTROY) {
+                _informationDialog = null
+            }
+        })
     }
 
     fun observeExternals(arrivedFromExistingDraft: Boolean) = with(newMessageViewModel) {

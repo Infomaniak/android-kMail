@@ -221,8 +221,6 @@ class NewMessageFragment : Fragment() {
     }
 
     override fun onDestroyView() {
-        aiManager.valueAnimator?.cancel()
-
         addressListPopupWindow = null
         quoteWebView?.destroyAndClearHistory()
         quoteWebView = null

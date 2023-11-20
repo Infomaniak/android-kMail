@@ -17,6 +17,9 @@
  */
 package com.infomaniak.mail.ui.newMessage
 
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
@@ -43,5 +46,13 @@ open class NewMessageManager @Inject constructor() {
         _newMessageViewModel = newMessageViewModel
         _binding = binding
         _fragment = fragment
+
+        viewLifecycleOwner.lifecycle.addObserver(LifecycleEventObserver { _: LifecycleOwner, event: Lifecycle.Event ->
+            if (event == Lifecycle.Event.ON_DESTROY) {
+                _newMessageViewModel = null
+                _binding = null
+                _fragment = null
+            }
+        })
     }
 }
