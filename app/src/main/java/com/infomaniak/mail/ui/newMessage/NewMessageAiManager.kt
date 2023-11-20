@@ -44,18 +44,13 @@ import kotlin.math.roundToInt
 import com.infomaniak.lib.core.R as RCore
 
 class NewMessageAiManager(
-    private val newMessageViewModel: NewMessageViewModel,
+    newMessageViewModel: NewMessageViewModel,
     private val aiViewModel: AiViewModel,
-    private val binding: FragmentNewMessageBinding,
-    private val fragment: NewMessageFragment,
+    binding: FragmentNewMessageBinding,
+    fragment: NewMessageFragment,
     private val activity: Activity,
     private val localSettings: LocalSettings,
-) {
-
-    private val viewLifecycleOwner by fragment::viewLifecycleOwner
-    private val childFragmentManager by fragment::childFragmentManager
-    private val resources by fragment::resources
-    private val context = fragment.requireContext()
+) : NewMessageManager(newMessageViewModel, binding, fragment) {
 
     private val animationDuration by lazy { resources.getInteger(R.integer.aiPromptAnimationDuration).toLong() }
     private val scrimOpacity by lazy { ResourcesCompat.getFloat(context.resources, R.dimen.scrimOpacity) }
