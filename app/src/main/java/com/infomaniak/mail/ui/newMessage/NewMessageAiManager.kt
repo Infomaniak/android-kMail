@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.newMessage
 import android.animation.FloatEvaluator
 import android.animation.ValueAnimator
 import android.app.Activity
+import android.content.Context
 import android.transition.Slide
 import android.transition.TransitionManager
 import android.view.ViewGroup.FOCUS_BEFORE_DESCENDANTS
@@ -38,19 +39,24 @@ import com.infomaniak.mail.data.models.ai.AiPromptOpeningStatus
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.observeNotNull
+import dagger.hilt.android.qualifiers.ActivityContext
+import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 import kotlin.math.roundToInt
 import com.infomaniak.lib.core.R as RCore
 
-class NewMessageAiManager(
-    newMessageViewModel: NewMessageViewModel,
-    binding: FragmentNewMessageBinding,
-    fragment: NewMessageFragment,
-    private val aiViewModel: AiViewModel,
-    private val activity: Activity,
+@ActivityScoped
+class NewMessageAiManager @Inject constructor(
+    @ActivityContext private val activityContext: Context,
     private val localSettings: LocalSettings,
-) : NewMessageManager(newMessageViewModel, binding, fragment) {
+) : NewMessageManager() {
+
+    private val activity get() = activityContext as Activity
+
+    private var _aiViewModel: AiViewModel? = null
+    private val aiViewModel: AiViewModel get() = _aiViewModel!!
 
     private val animationDuration by lazy { resources.getInteger(R.integer.aiPromptAnimationDuration).toLong() }
     private val scrimOpacity by lazy { ResourcesCompat.getFloat(context.resources, R.dimen.scrimOpacity) }
@@ -61,6 +67,16 @@ class NewMessageAiManager(
 
     var valueAnimator: ValueAnimator? = null
         private set
+
+    fun initValues(
+        newMessageViewModel: NewMessageViewModel,
+        binding: FragmentNewMessageBinding,
+        fragment: NewMessageFragment,
+        aiViewModel: AiViewModel
+    ) {
+        super.initValues(newMessageViewModel, binding, fragment)
+        _aiViewModel = aiViewModel
+    }
 
     fun observeEverything() {
         observeAiOutput()

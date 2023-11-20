@@ -84,10 +84,22 @@ class NewMessageFragment : Fragment() {
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
 
-    private lateinit var aiManager: NewMessageAiManager
-    private lateinit var externalsManager: NewMessageExternalsManager
-    private lateinit var editorManager: NewMessageEditorManager
-    private lateinit var recipientFieldsManager: NewMessageRecipientFieldsManager
+    @Inject
+    lateinit var aiManager: NewMessageAiManager
+
+    @Inject
+    lateinit var externalsManager: NewMessageExternalsManager
+
+    @Inject
+    lateinit var editorManager: NewMessageEditorManager
+
+    @Inject
+    lateinit var recipientFieldsManager: NewMessageRecipientFieldsManager
+
+    // private lateinit var aiManager: NewMessageAiManager
+    // private lateinit var externalsManager: NewMessageExternalsManager
+    // private lateinit var editorManager: NewMessageEditorManager
+    // private lateinit var recipientFieldsManager: NewMessageRecipientFieldsManager
 
     private var addressListPopupWindow: ListPopupWindow? = null
 
@@ -158,32 +170,29 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun initManagers() {
-        aiManager = NewMessageAiManager(
+        aiManager.initValues(
             newMessageViewModel = newMessageViewModel,
             binding = binding,
             fragment = this@NewMessageFragment,
             aiViewModel = aiViewModel,
-            activity = requireActivity(),
-            localSettings = localSettings
         )
 
-        externalsManager = NewMessageExternalsManager(
+        externalsManager.initValues(
             newMessageViewModel = newMessageViewModel,
             binding = binding,
             fragment = this@NewMessageFragment,
             informationDialog = informationDialog,
         )
 
-        editorManager = NewMessageEditorManager(
+        editorManager.initValues(
             newMessageViewModel = newMessageViewModel,
             binding = binding,
             fragment = this@NewMessageFragment,
-            activity = requireActivity(),
             aiManager = aiManager,
             filePicker = FilePicker(this@NewMessageFragment)
         )
 
-        recipientFieldsManager = NewMessageRecipientFieldsManager(
+        recipientFieldsManager.initValues(
             newMessageViewModel = newMessageViewModel,
             binding = binding,
             fragment = this@NewMessageFragment,

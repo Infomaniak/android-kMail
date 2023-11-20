@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.newMessage
 
 import android.app.Activity
+import android.content.Context
 import android.content.res.ColorStateList
 import android.view.WindowManager
 import androidx.core.view.isGone
@@ -30,16 +31,34 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.utils.getAttributeColor
 import com.infomaniak.mail.utils.notYetImplemented
+import dagger.hilt.android.qualifiers.ActivityContext
+import dagger.hilt.android.scopes.ActivityScoped
+import javax.inject.Inject
 import com.google.android.material.R as RMaterial
 
-class NewMessageEditorManager(
-    newMessageViewModel: NewMessageViewModel,
-    binding: FragmentNewMessageBinding,
-    fragment: NewMessageFragment,
-    private val activity: Activity,
-    private val aiManager: NewMessageAiManager,
-    private val filePicker: FilePicker,
-) : NewMessageManager(newMessageViewModel, binding, fragment) {
+@ActivityScoped
+class NewMessageEditorManager @Inject constructor(
+    @ActivityContext private val activityContext: Context,
+) : NewMessageManager() {
+
+    private val activity get() = activityContext as Activity
+
+    private var _aiManager: NewMessageAiManager? = null
+    private val aiManager: NewMessageAiManager get() = _aiManager!!
+    private var _filePicker: FilePicker? = null
+    private val filePicker: FilePicker get() = _filePicker!!
+
+    fun initValues(
+        newMessageViewModel: NewMessageViewModel,
+        binding: FragmentNewMessageBinding,
+        fragment: NewMessageFragment,
+        aiManager: NewMessageAiManager,
+        filePicker: FilePicker,
+    ) {
+        super.initValues(newMessageViewModel, binding, fragment)
+        _aiManager = aiManager
+        _filePicker = filePicker
+    }
 
     fun observeEditorActions() {
         newMessageViewModel.editorAction.observe(viewLifecycleOwner) { (editorAction, /*isToggled*/ _) ->

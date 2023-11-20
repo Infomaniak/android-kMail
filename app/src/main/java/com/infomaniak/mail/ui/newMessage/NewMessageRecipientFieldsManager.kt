@@ -28,15 +28,27 @@ import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType.*
 import com.infomaniak.mail.utils.MergedContactDictionary
 import com.infomaniak.mail.utils.copyRecipientEmailToClipboard
+import dagger.hilt.android.scopes.ActivityScoped
+import javax.inject.Inject
 
-class NewMessageRecipientFieldsManager(
-    newMessageViewModel: NewMessageViewModel,
-    binding: FragmentNewMessageBinding,
-    fragment: NewMessageFragment,
-    private val externalsManager: NewMessageExternalsManager,
-) : NewMessageManager(newMessageViewModel, binding, fragment) {
+@ActivityScoped
+class NewMessageRecipientFieldsManager @Inject constructor() : NewMessageManager() {
+
+    private var _externalsManager: NewMessageExternalsManager? = null
+    private val externalsManager: NewMessageExternalsManager get() = _externalsManager!!
+
 
     private var lastFieldToTakeFocus: FieldType? = TO
+
+    fun initValues(
+        newMessageViewModel: NewMessageViewModel,
+        binding: FragmentNewMessageBinding,
+        fragment: NewMessageFragment,
+        externalsManager: NewMessageExternalsManager,
+    ) {
+        super.initValues(newMessageViewModel, binding, fragment)
+        _externalsManager = externalsManager
+    }
 
     fun setupAutoCompletionFields() = with(binding) {
         toField.initRecipientField(

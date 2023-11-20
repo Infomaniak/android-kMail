@@ -25,13 +25,24 @@ import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
 import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipientForNewMessage
 import com.infomaniak.mail.utils.MergedContactDictionary
 import com.infomaniak.mail.utils.Utils
+import dagger.hilt.android.scopes.ActivityScoped
+import javax.inject.Inject
 
-class NewMessageExternalsManager(
-    newMessageViewModel: NewMessageViewModel,
-    binding: FragmentNewMessageBinding,
-    fragment: NewMessageFragment,
-    private val informationDialog: InformationAlertDialog,
-) : NewMessageManager(newMessageViewModel, binding, fragment) {
+@ActivityScoped
+class NewMessageExternalsManager @Inject constructor() : NewMessageManager() {
+
+    private var _informationDialog: InformationAlertDialog? = null
+    private val informationDialog: InformationAlertDialog get() = _informationDialog!!
+
+    fun initValues(
+        newMessageViewModel: NewMessageViewModel,
+        binding: FragmentNewMessageBinding,
+        fragment: NewMessageFragment,
+        informationDialog: InformationAlertDialog,
+    ) {
+        super.initValues(newMessageViewModel, binding, fragment)
+        _informationDialog = informationDialog
+    }
 
     fun observeExternals(arrivedFromExistingDraft: Boolean) = with(newMessageViewModel) {
         Utils.waitInitMediator(initResult, mergedContacts).observe(viewLifecycleOwner) { (_, mergedContacts) ->

@@ -18,14 +18,30 @@
 package com.infomaniak.mail.ui.newMessage
 
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
+import dagger.hilt.android.scopes.ActivityScoped
+import javax.inject.Inject
 
-open class NewMessageManager(
-    val newMessageViewModel: NewMessageViewModel,
-    val binding: FragmentNewMessageBinding,
-    val fragment: NewMessageFragment,
-) {
-    val viewLifecycleOwner by fragment::viewLifecycleOwner
-    val childFragmentManager by fragment::childFragmentManager
-    val resources by fragment::resources
-    val context = fragment.requireContext()
+@ActivityScoped
+open class NewMessageManager @Inject constructor() {
+    private var _newMessageViewModel: NewMessageViewModel? = null
+    protected val newMessageViewModel: NewMessageViewModel get() = _newMessageViewModel!!
+    private var _binding: FragmentNewMessageBinding? = null
+    protected val binding: FragmentNewMessageBinding get() = _binding!!
+    private var _fragment: NewMessageFragment? = null
+    protected val fragment: NewMessageFragment get() = _fragment!!
+
+    val viewLifecycleOwner get() = fragment.viewLifecycleOwner
+    val childFragmentManager get() = fragment.childFragmentManager
+    val resources get() = fragment.resources
+    val context get() = fragment.requireContext()
+
+    protected fun initValues(
+        newMessageViewModel: NewMessageViewModel,
+        binding: FragmentNewMessageBinding,
+        fragment: NewMessageFragment,
+    ) {
+        _newMessageViewModel = newMessageViewModel
+        _binding = binding
+        _fragment = fragment
+    }
 }
