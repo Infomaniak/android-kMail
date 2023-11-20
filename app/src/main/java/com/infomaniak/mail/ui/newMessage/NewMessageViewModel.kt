@@ -53,7 +53,7 @@ import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.main.SnackBarManager
-import com.infomaniak.mail.ui.newMessage.NewMessageFragment.EditorAction
+import com.infomaniak.mail.ui.newMessage.NewMessageEditorManager.EditorAction
 import com.infomaniak.mail.ui.newMessage.NewMessageFragment.FieldType
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.SignatureScore.*
 import com.infomaniak.mail.utils.*

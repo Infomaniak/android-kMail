@@ -21,7 +21,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ClipDescription
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.os.Bundle
 import android.text.*
@@ -30,7 +29,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.*
-import android.view.WindowManager
 import android.webkit.WebView
 import android.widget.ListPopupWindow
 import android.widget.PopupWindow
@@ -46,12 +44,9 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
-import com.google.android.material.button.MaterialButton
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
-import com.infomaniak.mail.MatomoMail
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
-import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -79,7 +74,6 @@ import io.sentry.SentryLevel
 import kotlinx.coroutines.*
 import java.util.UUID
 import javax.inject.Inject
-import com.google.android.material.R as RMaterial
 
 @AndroidEntryPoint
 class NewMessageFragment : Fragment() {
@@ -94,9 +88,9 @@ class NewMessageFragment : Fragment() {
     private val aiViewModel: AiViewModel by activityViewModels()
     private lateinit var aiManager: NewMessageAiManager
     private lateinit var externalsManager: NewMessageExternalsManager
+    private lateinit var editorManager: NewMessageEditorManager
 
     private var addressListPopupWindow: ListPopupWindow? = null
-    private lateinit var filePicker: FilePicker
 
     private var quoteWebView: WebView? = null
     private var signatureWebView: WebView? = null
@@ -153,7 +147,15 @@ class NewMessageFragment : Fragment() {
             informationDialog = informationDialog,
         )
 
-        filePicker = FilePicker(this@NewMessageFragment)
+        editorManager = NewMessageEditorManager(
+            newMessageViewModel = newMessageViewModel,
+            binding = binding,
+            fragment = this@NewMessageFragment,
+            activity = requireActivity(),
+            aiManager = aiManager,
+            filePicker = FilePicker(this@NewMessageFragment)
+        )
+
         bindAlertToViewLifecycle(descriptionDialog)
 
         setWebViewReference()
@@ -172,7 +174,7 @@ class NewMessageFragment : Fragment() {
         doAfterBodyChange()
 
         observeContacts()
-        observeEditorActions()
+        editorManager.observeEditorActions()
         observeNewAttachments()
         observeCcAndBccVisibility()
         observeDraftWorkerResults()
@@ -556,23 +558,6 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun observeEditorActions() {
-        newMessageViewModel.editorAction.observe(viewLifecycleOwner) { (editorAction, /*isToggled*/ _) ->
-            when (editorAction) {
-                EditorAction.ATTACHMENT -> {
-                    filePicker.open { uris ->
-                        requireActivity().window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-                        newMessageViewModel.importAttachmentsToCurrentDraft(uris)
-                    }
-                }
-                EditorAction.CAMERA -> notYetImplemented()
-                EditorAction.LINK -> notYetImplemented()
-                EditorAction.CLOCK -> notYetImplemented()
-                EditorAction.AI -> aiManager.openAiPrompt()
-            }
-        }
-    }
-
     private fun observeNewAttachments() = with(binding) {
         newMessageViewModel.importedAttachments.observe(viewLifecycleOwner) { (attachments, importationResult) ->
             attachmentAdapter.addAll(attachments)
@@ -702,69 +687,14 @@ class NewMessageFragment : Fragment() {
             hideLoader()
             populateUiWithViewModel()
             setupFromField(signatures)
-            setupEditorActions()
-            setupEditorFormatActionsToggle()
+            editorManager.setupEditorActions()
+            editorManager.setupEditorFormatActionsToggle()
         }
-    }
-
-    private fun setupEditorActions() = with(binding) {
-
-        fun linkEditor(view: MaterialButton, action: EditorAction) {
-            view.setOnClickListener {
-                // TODO: Don't forget to add in this `if` all actions that make the app go to background.
-                if (action == EditorAction.ATTACHMENT) newMessageViewModel.shouldExecuteDraftActionWhenStopping = false
-                trackEvent("editorActions", action.matomoValue)
-                newMessageViewModel.editorAction.value = action to null
-            }
-        }
-
-        linkEditor(editorAttachment, EditorAction.ATTACHMENT)
-        linkEditor(editorCamera, EditorAction.CAMERA)
-        linkEditor(editorLink, EditorAction.LINK)
-        linkEditor(editorClock, EditorAction.CLOCK)
-        linkEditor(editorAi, EditorAction.AI)
-    }
-
-    private fun setupEditorFormatActionsToggle() = with(binding) {
-        editorTextOptions.setOnClickListener {
-            newMessageViewModel.isEditorExpanded = !newMessageViewModel.isEditorExpanded
-            updateEditorVisibility(newMessageViewModel.isEditorExpanded)
-        }
-    }
-
-    private fun updateEditorVisibility(isEditorExpanded: Boolean) = with(binding) {
-        val color = if (isEditorExpanded) {
-            context.getAttributeColor(RMaterial.attr.colorPrimary)
-        } else {
-            context.getColor(R.color.iconColor)
-        }
-        val resId = if (isEditorExpanded) R.string.buttonTextOptionsClose else R.string.buttonTextOptionsOpen
-
-        editorTextOptions.apply {
-            iconTint = ColorStateList.valueOf(color)
-            contentDescription = getString(resId)
-        }
-
-        editorActions.isGone = isEditorExpanded
-        textEditing.isVisible = isEditorExpanded
     }
 
     fun navigateToPropositionFragment() = aiManager.navigateToPropositionFragment()
 
     fun closeAiPrompt() = aiManager.closeAiPrompt()
-
-    enum class EditorAction(val matomoValue: String) {
-        ATTACHMENT("importFile"),
-        CAMERA("importFromCamera"),
-        LINK("addLink"),
-        CLOCK(MatomoMail.ACTION_POSTPONE_NAME),
-        AI("aiWriter"),
-        // BOLD("bold"),
-        // ITALIC("italic"),
-        // UNDERLINE("underline"),
-        // STRIKE_THROUGH("strikeThrough"),
-        // UNORDERED_LIST("unorderedList"),
-    }
 
     enum class FieldType {
         TO,
