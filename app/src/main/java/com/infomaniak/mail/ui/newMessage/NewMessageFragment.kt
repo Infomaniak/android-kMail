@@ -96,11 +96,6 @@ class NewMessageFragment : Fragment() {
     @Inject
     lateinit var recipientFieldsManager: NewMessageRecipientFieldsManager
 
-    // private lateinit var aiManager: NewMessageAiManager
-    // private lateinit var externalsManager: NewMessageExternalsManager
-    // private lateinit var editorManager: NewMessageEditorManager
-    // private lateinit var recipientFieldsManager: NewMessageRecipientFieldsManager
-
     private var addressListPopupWindow: ListPopupWindow? = null
 
     private var quoteWebView: WebView? = null

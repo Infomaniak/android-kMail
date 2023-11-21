@@ -40,7 +40,6 @@ class NewMessageRecipientFieldsManager @Inject constructor() : NewMessageManager
     private var _externalsManager: NewMessageExternalsManager? = null
     private val externalsManager: NewMessageExternalsManager get() = _externalsManager!!
 
-
     private var lastFieldToTakeFocus: FieldType? = TO
 
     fun initValues(
