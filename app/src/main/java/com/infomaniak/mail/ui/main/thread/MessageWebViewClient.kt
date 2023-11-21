@@ -111,8 +111,10 @@ class MessageWebViewClient(
 
     companion object {
         val TAG = MessageWebViewClient::class.simpleName
+
         const val CID_SCHEME = "cid"
         const val DATA_SCHEME = "data"
+
         val trustedUrls = listOf(
             "https://.*?.infomaniak.com".toRegex(),
             "https://.*?.storage.infomaniak.com".toRegex(),

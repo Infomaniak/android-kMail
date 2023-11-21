@@ -508,6 +508,7 @@ class ThreadListAdapter @Inject constructor(
     companion object {
         private const val SWIPE_ANIMATION_THRESHOLD = 0.15f
         private val CARD_ELEVATION = 6.toPx().toFloat()
+
         private const val FULL_MONTH = "MMMM"
         private const val MONTH_AND_YEAR = "MMMM yyyy"
 

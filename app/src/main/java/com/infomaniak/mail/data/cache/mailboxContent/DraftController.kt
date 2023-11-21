@@ -245,6 +245,7 @@ class DraftController @Inject constructor(
         private const val PREFIX_FORWARD = "Fw: "
         private const val REGEX_REPLY = "(re|ref|aw|rif|r):"
         private const val REGEX_FORWARD = "(fw|fwd|rv|wg|tr|i):"
+
         private const val CID_PROTOCOL = "$CID_SCHEME:"
         private const val SRC_ATTRIBUTE = "src"
         private const val CID_IMAGE_CSS_QUERY = "img[$SRC_ATTRIBUTE^='$CID_PROTOCOL']"

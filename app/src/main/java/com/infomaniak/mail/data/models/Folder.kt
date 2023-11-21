@@ -156,6 +156,7 @@ class Folder : RealmObject {
     companion object {
         val rolePropertyName = Folder::_role.name
         val parentsPropertyName = Folder::_parents.name
+
         val DEFAULT_REMAINING_OLD_MESSAGES_TO_FETCH = max(Utils.NUMBER_OF_OLD_MESSAGES_TO_FETCH - Utils.PAGE_SIZE, 0)
         const val DEFAULT_IS_HISTORY_COMPLETE = false
     }

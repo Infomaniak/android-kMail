@@ -206,6 +206,7 @@ class ThreadListMultiSelection {
 
     companion object {
         private const val TOOLBAR_FADE_DURATION = 150L
+
         private const val READ_UNREAD_INDEX = 0
         private const val ARCHIVE_INDEX = 1
         private const val FAVORITE_INDEX = 2

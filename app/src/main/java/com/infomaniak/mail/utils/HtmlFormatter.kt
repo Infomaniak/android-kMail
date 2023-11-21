@@ -167,6 +167,7 @@ class HtmlFormatter(private val html: String) {
     companion object {
         private const val PRIMARY_COLOR_CODE = "--kmail-primary-color"
         private const val KMAIL_MESSAGE_ID = "kmail-message-content"
+
         private const val WBR = "wbr"
         private const val BREAK_LIMIT = 30
         // Across a few handpicked representative emails, average text node length for text

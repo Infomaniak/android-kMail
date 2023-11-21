@@ -510,6 +510,7 @@ class MainActivity : BaseActivity() {
         const val SYNC_AUTO_CONFIG_KEY = "syncAutoConfigKey"
         const val SYNC_AUTO_CONFIG_SUCCESS = "syncAutoConfigSuccess"
         const val SYNC_AUTO_CONFIG_ALREADY_SYNC = "syncAutoConfigAlreadySync"
+
         private const val FULLY_SLID = 1.0f
         private const val EASTER_EGG_CONFETTI_TRIGGER_TAPS = 3
         private const val EASTER_EGG_CONFETTI_TRIGGER_DELAY = 1_000L

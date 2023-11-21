@@ -203,6 +203,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
         const val ARCHIVE_ACTION = "archive_action"
         const val DELETE_ACTION = "delete_action"
         const val UNDO_ACTION = "undo_action"
+
         private const val UNDO_TIMEOUT = 6_000L
     }
 }
