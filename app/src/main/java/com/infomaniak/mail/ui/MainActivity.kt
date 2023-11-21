@@ -46,7 +46,6 @@ import com.infomaniak.lib.stores.*
 import com.infomaniak.lib.stores.StoreUtils.checkStalledUpdate
 import com.infomaniak.lib.stores.StoreUtils.checkUpdateIsAvailable
 import com.infomaniak.lib.stores.StoreUtils.initAppUpdateManager
-import com.infomaniak.lib.stores.StoreUtils.installDownloadedUpdate
 import com.infomaniak.lib.stores.StoreUtils.launchInAppReview
 import com.infomaniak.lib.stores.StoreUtils.unregisterAppUpdateListener
 import com.infomaniak.mail.BuildConfig
@@ -464,23 +463,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun initAppUpdateManager() {
-        initAppUpdateManager(this) {
-            // TODO: Decide how we prompt the user (snackbar, notif, etc)
-            mainViewModel.snackBarManager.setValue(
-                title = getString(R.string.snackbarDownloadInProgress),
-                buttonTitle = R.string.buttonInstall,
-                customBehavior = ::launchAppUpdateInstall,
-            )
-        }
-    }
-
-    private fun launchAppUpdateInstall() {
-        installDownloadedUpdate {
-            Sentry.captureException(it)
-            // TODO: Better management of error, probably send a notification
-            // This avoid the user being instantly reprompt to download update
-            localSettings.isUserWantingUpdates = false
-        }
+        initAppUpdateManager(this) { mainViewModel.canInstallUpdate.value = true }
     }
 
     private fun showUpdateAvailable() = with(localSettings) {

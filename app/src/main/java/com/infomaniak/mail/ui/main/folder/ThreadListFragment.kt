@@ -49,6 +49,7 @@ import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListen
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.Utils
+import com.infomaniak.lib.stores.StoreUtils
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
@@ -160,6 +161,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         observeContacts()
         observerDraftsActionsCompletedWorks()
         observeFlushFolderTrigger()
+        observeUpdateInstall()
     }.getOrDefault(Unit)
 
     private fun navigateFromNotificationToNewMessage() {
@@ -290,6 +292,18 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             onLoadMoreClicked = {
                 trackThreadListEvent("loadMore")
                 mainViewModel.getOnePageOfOldMessages()
+            }
+
+            onInstallUpdate = {
+                trackEvent("inAppUpdate", "installUpdate")
+                mainViewModel.canInstallUpdate.value = false
+
+                StoreUtils.installDownloadedUpdate {
+                    Sentry.captureException(it)
+                    // This avoid the user being instantly reprompt to download update
+                    localSettings.isUserWantingUpdates = false
+                    mainViewModel.snackBarManager.setValue(getString(RCore.string.errorUpdateInstall))
+                }
             }
         }
     }
@@ -567,6 +581,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun observeFlushFolderTrigger() {
         mainViewModel.flushFolderTrigger.observe(viewLifecycleOwner) { descriptionDialog.resetLoadingAndDismiss() }
+    }
+
+    private fun observeUpdateInstall() {
+        mainViewModel.canInstallUpdate.observe(viewLifecycleOwner) { threadListAdapter.canInstallUpdate = it }
     }
 
     private fun observerDraftsActionsCompletedWorks() {
