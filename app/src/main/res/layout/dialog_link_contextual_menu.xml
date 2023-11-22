@@ -30,7 +30,6 @@
         android:layout_height="wrap_content"
         android:ellipsize="end"
         android:maxLines="5"
-        android:textIsSelectable="true"
         tools:text="https://www.infomaniak.com/fr" />
 
 </LinearLayout>
