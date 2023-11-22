@@ -68,6 +68,7 @@ class ThreadAdapter(
     onMenuClicked: (Message) -> Unit,
     onAllExpandedMessagesLoaded: () -> Unit,
     navigateToNewMessageActivity: (Uri) -> Unit,
+    promptLink: (String) -> Unit,
 ) : ListAdapter<Message, ThreadViewHolder>(MessageDiffCallback()) {
 
     inline val messages: MutableList<Message> get() = currentList
@@ -109,6 +110,7 @@ class ThreadAdapter(
             onMenuClicked,
             onAllExpandedMessagesLoaded,
             navigateToNewMessageActivity,
+            promptLink,
         )
     }
 
@@ -422,6 +424,9 @@ class ThreadAdapter(
     }
 
     private fun ThreadViewHolder.bindBody(message: Message, hasQuote: Boolean) = with(binding) {
+        bodyWebView.setupLinkContextualMenu { url -> threadAdapterCallbacks?.promptLink?.invoke(url) }
+        fullMessageWebView.setupLinkContextualMenu { url -> threadAdapterCallbacks?.promptLink?.invoke(url) }
+
         setQuoteInitialCollapsedState(hasQuote)
         quoteButton.setOnClickListener { toggleWebViews(message) }
         quoteButtonFrameLayout.isVisible = hasQuote
@@ -436,6 +441,34 @@ class ThreadAdapter(
         if (isMessageUidManuallyAllowed(message.uid)) {
             bodyWebViewClient.unblockDistantResources()
             fullMessageWebViewClient.unblockDistantResources()
+        }
+    }
+
+    private fun WebView.setupLinkContextualMenu(onClicked: (String) -> Unit) {
+        setOnLongClickListener {
+            val result = hitTestResult
+
+            when (result.type) {
+                WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE,
+                WebView.HitTestResult.SRC_ANCHOR_TYPE -> {
+                    getLinkFromResult(result)?.let { url -> onClicked(url) }
+                    true
+                }
+                else -> false
+            }
+        }
+    }
+
+    private fun WebView.getLinkFromResult(hitTestResult: WebView.HitTestResult): String? {
+        return when (hitTestResult.type) {
+            WebView.HitTestResult.SRC_ANCHOR_TYPE -> hitTestResult.extra
+            WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE -> {
+                val message = handler.obtainMessage()
+                requestFocusNodeHref(message)
+                val url = message.data.getString("url")
+                url
+            }
+            else -> null
         }
     }
 
@@ -618,5 +651,6 @@ class ThreadAdapter(
         var onMenuClicked: (Message) -> Unit,
         var onAllExpandedMessagesLoaded: () -> Unit,
         var navigateToNewMessageActivity: (Uri) -> Unit,
+        var promptLink: (String) -> Unit,
     )
 }
