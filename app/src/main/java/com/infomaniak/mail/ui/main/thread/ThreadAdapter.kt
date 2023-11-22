@@ -465,8 +465,7 @@ class ThreadAdapter(
             WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE -> {
                 val message = handler.obtainMessage()
                 requestFocusNodeHref(message)
-                val url = message.data.getString("url")
-                url
+                message.data.getString("url")
             }
             else -> null
         }
