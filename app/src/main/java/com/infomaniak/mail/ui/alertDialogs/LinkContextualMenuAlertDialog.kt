@@ -26,6 +26,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.DialogLinkContextualMenuBinding
 import com.infomaniak.mail.ui.main.SnackBarManager
 import com.infomaniak.mail.utils.copyStringToClipboard
+import com.infomaniak.mail.utils.shareString
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
@@ -59,7 +60,7 @@ class LinkContextualMenuAlertDialog @Inject constructor(
                 when (index) {
                     0 -> Log.e("gibran", "initDialog: open the link: $lastUrl")
                     1 -> context.copyStringToClipboard(lastUrl, R.string.snackbarLinkCopiedToClipboard, snackBarManager)
-                    2 -> Log.e("gibran", "initDialog: share the link: $lastUrl")
+                    2 -> context.shareString(lastUrl)
                 }
             }
             .create()
