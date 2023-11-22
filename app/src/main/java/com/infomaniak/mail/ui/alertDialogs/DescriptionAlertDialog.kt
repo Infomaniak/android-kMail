@@ -35,7 +35,7 @@ open class DescriptionAlertDialog @Inject constructor(
     @ActivityContext private val activityContext: Context,
 ) : BaseAlertDialog(activityContext) {
 
-    override val binding: DialogDescriptionBinding by lazy { DialogDescriptionBinding.inflate(activity.layoutInflater) }
+    val binding: DialogDescriptionBinding by lazy { DialogDescriptionBinding.inflate(activity.layoutInflater) }
 
     protected open val customThemeRes: Int? = null
     override val alertDialog by lazy { initDialog() }

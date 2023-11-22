@@ -1,0 +1,69 @@
+/*
+ * Infomaniak Mail - Android
+ * Copyright (C) 2023 Infomaniak Network SA
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package com.infomaniak.mail.ui.alertDialogs
+
+import android.content.Context
+import android.util.Log
+import androidx.appcompat.app.AlertDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.infomaniak.lib.core.utils.context
+import com.infomaniak.mail.R
+import com.infomaniak.mail.databinding.DialogLinkContextualMenuBinding
+import dagger.hilt.android.qualifiers.ActivityContext
+import dagger.hilt.android.scopes.ActivityScoped
+import javax.inject.Inject
+
+@ActivityScoped
+class LinkContextualMenuAlertDialog @Inject constructor(
+    @ActivityContext private val activityContext: Context,
+) : BaseAlertDialog(activityContext) {
+
+    private val items = arrayOf(
+        activityContext.getString(R.string.linkContextMenuOpen),
+        activityContext.getString(R.string.linkContextMenuCopy),
+        activityContext.getString(R.string.linkContextMenuShare),
+    )
+
+    val binding: DialogLinkContextualMenuBinding by lazy { DialogLinkContextualMenuBinding.inflate(activity.layoutInflater) }
+    override val alertDialog: AlertDialog = initDialog()
+
+    private var lastUrl = ""
+
+    override fun initDialog(): AlertDialog = with(binding) {
+        MaterialAlertDialogBuilder(context)
+            .setCustomTitle(binding.root)
+            .setItems(items) { _, index ->
+                when (index) {
+                    0 -> Log.e("gibran", "initDialog: open the link: $lastUrl")
+                    1 -> Log.e("gibran", "initDialog: copy the link: $lastUrl")
+                    2 -> Log.e("gibran", "initDialog: share the link: $lastUrl")
+                }
+            }
+            .create()
+    }
+
+    override fun resetCallbacks() {
+        // TODO("Not yet implemented")
+    }
+
+    fun show(url: String) {
+        binding.url.text = url
+        lastUrl = url
+        alertDialog.show()
+    }
+}

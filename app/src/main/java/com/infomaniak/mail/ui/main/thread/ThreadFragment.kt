@@ -22,7 +22,6 @@ import android.content.res.Configuration
 import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -60,6 +59,7 @@ import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
+import com.infomaniak.mail.ui.alertDialogs.LinkContextualMenuAlertDialog
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.OpenThreadResult
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialog
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
@@ -98,6 +98,9 @@ class ThreadFragment : Fragment() {
 
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog
+
+    @Inject
+    lateinit var linkContextualMenuAlertDialog: LinkContextualMenuAlertDialog
 
     private var isFavorite = false
 
@@ -312,9 +315,7 @@ class ThreadFragment : Fragment() {
             navigateToNewMessageActivity = { uri ->
                 safeNavigateToNewMessageActivity(NewMessageActivityArgs(mailToUri = uri).toBundle())
             },
-            promptLink = { url ->
-                Log.e("gibran", "initAdapter - url: ${url}")
-            }
+            promptLink = { url -> linkContextualMenuAlertDialog.show(url) }
         )
     }
 

@@ -272,6 +272,9 @@
     <string name="fromTitle">Da:</string>
     <string name="googlePlayServicesAreRequired">I servizi Google Play sono necessari</string>
     <string name="inboxFolder">Posta in arrivo</string>
+    <string name="linkContextMenuCopy">Copia il link</string>
+    <string name="linkContextMenuOpen">Apri il link nel browser</string>
+    <string name="linkContextMenuShare">Condividi il link</string>
     <string name="loadingText">Caricamento…</string>
     <plurals name="lockedMailboxDescription">
         <item quantity="one">L’accesso al tuo indirizzo e-mail è attualmente bloccato. Si prega di contattare l’amministratore.</item>
@@ -386,7 +389,7 @@
     <string name="settingsOptionAlways">Sempre</string>
     <string name="settingsOptionAskMe">Chiedetemi</string>
     <string name="settingsOptionDarkTheme">Scuro</string>
-    <string name="settingsOptionLightTheme">Luce</string>
+    <string name="settingsOptionLightTheme">Chiaro</string>
     <string name="settingsOptionSystemTheme">Sistema</string>
     <string name="settingsOptionThreadModeConversation">Discussioni</string>
     <string name="settingsOptionThreadModeMessage">Messaggi</string>
