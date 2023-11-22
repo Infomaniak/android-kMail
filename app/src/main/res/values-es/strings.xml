@@ -443,6 +443,7 @@
     <string name="snackbarEmailSending">Envío de correo electrónico en curso</string>
     <string name="snackbarEmailSent">Correo electrónico enviado</string>
     <string name="snackbarInvalidUrl">URL no válida</string>
+    <string name="snackbarLinkCopiedToClipboard">Enlace copiado en el portapapeles</string>
     <string name="snackbarMailboxPasswordRequested">Solicitud enviada al administrador</string>
     <string name="snackbarMessageDeletedPermanently">Mensaje eliminado</string>
     <string name="snackbarMessageMoved">Mensaje trasladado a %s</string>

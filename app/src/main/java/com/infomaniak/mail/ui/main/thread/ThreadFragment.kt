@@ -123,8 +123,9 @@ class ThreadFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initAdapter()
-
         observeThreadLive()
+
+        linkContextualMenuAlertDialog.initValues(mainViewModel.snackBarManager)
 
         threadViewModel.openThread().observe(viewLifecycleOwner) { result ->
 
@@ -489,11 +490,11 @@ class ThreadFragment : Fragment() {
         toolbarSubject.text = subject
 
         threadSubject.setOnLongClickListener {
-            copyStringToClipboard(subject, R.string.snackbarSubjectCopiedToClipboard, mainViewModel.snackBarManager)
+            context.copyStringToClipboard(subject, R.string.snackbarSubjectCopiedToClipboard, mainViewModel.snackBarManager)
             true
         }
         toolbarSubject.setOnLongClickListener {
-            copyStringToClipboard(subject, R.string.snackbarSubjectCopiedToClipboard, mainViewModel.snackBarManager)
+            context.copyStringToClipboard(subject, R.string.snackbarSubjectCopiedToClipboard, mainViewModel.snackBarManager)
             true
         }
     }

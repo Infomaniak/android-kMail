@@ -420,11 +420,11 @@ fun Window.updateNavigationBarColor(color: Int) {
 }
 
 fun Fragment.copyRecipientEmailToClipboard(recipient: Recipient, snackBarManager: SnackBarManager) {
-    copyStringToClipboard(recipient.email, R.string.snackbarEmailCopiedToClipboard, snackBarManager)
+    requireContext().copyStringToClipboard(recipient.email, R.string.snackbarEmailCopiedToClipboard, snackBarManager)
 }
 
-fun Fragment.copyStringToClipboard(value: String, @StringRes snackBarTitle: Int, snackBarManager: SnackBarManager) {
-    val clipboardManager = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+fun Context.copyStringToClipboard(value: String, @StringRes snackBarTitle: Int, snackBarManager: SnackBarManager) {
+    val clipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     clipboardManager.setPrimaryClip(ClipData.newPlainText(value, value))
 
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) snackBarManager.setValue(getString(snackBarTitle))

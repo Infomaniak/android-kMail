@@ -449,6 +449,7 @@
     <string name="snackbarEmailSending">Email sending in progress</string>
     <string name="snackbarEmailSent">Email sent</string>
     <string name="snackbarInvalidUrl">Invalid URL</string>
+    <string name="snackbarLinkCopiedToClipboard">Link copied to clipboard</string>
     <string name="snackbarMailboxPasswordRequested">Request sent to administrator</string>
     <string name="snackbarMessageDeletedPermanently">Message deleted</string>
     <string name="snackbarMessageMoved">Message moved to %s</string>

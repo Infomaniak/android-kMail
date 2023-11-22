@@ -24,6 +24,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.DialogLinkContextualMenuBinding
+import com.infomaniak.mail.ui.main.SnackBarManager
+import com.infomaniak.mail.utils.copyStringToClipboard
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
@@ -42,7 +44,13 @@ class LinkContextualMenuAlertDialog @Inject constructor(
     val binding: DialogLinkContextualMenuBinding by lazy { DialogLinkContextualMenuBinding.inflate(activity.layoutInflater) }
     override val alertDialog: AlertDialog = initDialog()
 
+    private lateinit var snackBarManager: SnackBarManager
+
     private var lastUrl = ""
+
+    fun initValues(snackBarManager: SnackBarManager) {
+        this.snackBarManager = snackBarManager
+    }
 
     override fun initDialog(): AlertDialog = with(binding) {
         MaterialAlertDialogBuilder(context)
@@ -50,7 +58,7 @@ class LinkContextualMenuAlertDialog @Inject constructor(
             .setItems(items) { _, index ->
                 when (index) {
                     0 -> Log.e("gibran", "initDialog: open the link: $lastUrl")
-                    1 -> Log.e("gibran", "initDialog: copy the link: $lastUrl")
+                    1 -> context.copyStringToClipboard(lastUrl, R.string.snackbarLinkCopiedToClipboard, snackBarManager)
                     2 -> Log.e("gibran", "initDialog: share the link: $lastUrl")
                 }
             }
