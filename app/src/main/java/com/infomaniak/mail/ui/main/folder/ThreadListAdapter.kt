@@ -26,6 +26,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.core.view.isGone
@@ -281,14 +282,32 @@ class ThreadListAdapter @Inject constructor(
 
     private fun CardviewThreadItemBinding.setThreadUiRead() {
         newMailBullet.isInvisible = true
+
+        expeditor.setBodyRegularSecondary()
+        mailSubject.setBodyRegularSecondary()
+
         threadCountText.setTextAppearance(R.style.Label_Secondary)
         threadCountCard.strokeColor = context.getColor(R.color.threadCountBorderRead)
     }
 
+    private fun TextView.setBodyRegularSecondary() {
+        setTextAppearance(R.style.Body)
+        setTextColor(context.getColor(R.color.secondaryTextColor))
+    }
+
     private fun CardviewThreadItemBinding.setThreadUiUnread() {
         newMailBullet.isVisible = true
+
+        expeditor.setBodyMediumPrimary()
+        mailSubject.setBodyMediumPrimary()
+
         threadCountText.setTextAppearance(R.style.LabelMedium)
         threadCountCard.strokeColor = context.getColor(R.color.threadCountBorderUnread)
+    }
+
+    private fun TextView.setBodyMediumPrimary() {
+        setTextAppearance(R.style.BodyMedium)
+        setTextColor(context.getColor(R.color.primaryTextColor))
     }
 
     private fun ItemThreadDateSeparatorBinding.displayDateSeparator(title: String) {
