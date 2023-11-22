@@ -91,13 +91,13 @@ class MainViewModel @Inject constructor(
     val isDownloadingChanges: MutableLiveData<Pair<Boolean, Boolean?>> = MutableLiveData(false to null)
     val isInternetAvailable = MutableLiveData<Boolean>()
     val isMovedToNewFolder = SingleLiveEvent<Boolean>()
-    val canInstallUpdate = MutableLiveData(false)
     val toggleLightThemeForMessage = SingleLiveEvent<Message>()
     val deletedMessages = SingleLiveEvent<Set<String>>()
     val deleteThreadOrMessageTrigger = SingleLiveEvent<Unit>()
     val flushFolderTrigger = SingleLiveEvent<Unit>()
     val newFolderResultTrigger = MutableLiveData<Unit>()
     val reportPhishingTrigger = SingleLiveEvent<Unit>()
+    val canInstallUpdate = MutableLiveData(false)
 
     val snackBarManager by lazy { SnackBarManager() }
 
