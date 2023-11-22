@@ -21,7 +21,6 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Canvas
 import android.os.Build
-import android.util.Log
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.view.View
@@ -90,13 +89,6 @@ class ThreadListAdapter @Inject constructor(
     var onThreadClicked: ((thread: Thread) -> Unit)? = null
     var onFlushClicked: ((dialogTitle: String) -> Unit)? = null
     var onLoadMoreClicked: (() -> Unit)? = null
-    var onInstallUpdate: (() -> Unit)? = null
-
-    var canInstallUpdate: Boolean = false
-        set(value) {
-            field = value
-            updateInstallHeader(value)
-        }
 
     private var folderRole: FolderRole? = null
     private lateinit var contacts: MergedContactDictionary
@@ -127,9 +119,6 @@ class ThreadListAdapter @Inject constructor(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ThreadListViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding = when (viewType) {
-            R.layout.item_thread_update_install_button -> {
-                ItemThreadUpdateInstallButtonBinding.inflate(layoutInflater, parent, false)
-            }
             R.layout.item_thread_date_separator -> ItemThreadDateSeparatorBinding.inflate(layoutInflater, parent, false)
             R.layout.item_thread_flush_folder_button -> ItemThreadFlushFolderButtonBinding.inflate(layoutInflater, parent, false)
             R.layout.item_thread_load_more_button -> ItemThreadLoadMoreButtonBinding.inflate(layoutInflater, parent, false)
@@ -150,18 +139,13 @@ class ThreadListAdapter @Inject constructor(
                 NotificationType.AVATAR -> binding.displayAvatar(thread)
                 NotificationType.SELECTED_STATE -> binding.updateSelectedState(thread)
             }
-        } else if (holder.itemViewType == DisplayType.INSTALL_UPDATE_BUTTON.layout) {
-            // Log.e("TOTO", "payloads view holder")
-            (holder.binding as ItemThreadUpdateInstallButtonBinding).displayInstallUpdate()
         } else {
             super.onBindViewHolder(holder, position, payloads)
         }
     }.getOrDefault(Unit)
 
     override fun onBindViewHolder(item: Any, viewHolder: ThreadListViewHolder, position: Int) = with(viewHolder.binding) {
-        // Log.e("TOTO", "${getItemViewType(position) == DisplayType.INSTALL_UPDATE_BUTTON.layout}")
         when (getItemViewType(position)) {
-            DisplayType.INSTALL_UPDATE_BUTTON.layout -> (this as ItemThreadUpdateInstallButtonBinding).displayInstallUpdate()
             DisplayType.THREAD.layout -> (this as CardviewThreadItemBinding).displayThread(item as Thread)
             DisplayType.DATE_SEPARATOR.layout -> (this as ItemThreadDateSeparatorBinding).displayDateSeparator(item as String)
             DisplayType.FLUSH_FOLDER_BUTTON.layout -> (this as ItemThreadFlushFolderButtonBinding).displayFlushFolderButton(item as FolderRole)
@@ -173,10 +157,6 @@ class ThreadListAdapter @Inject constructor(
     override fun getItemViewType(position: Int): Int = runCatchingRealm {
         val item = dataSet[position]
         return when {
-            item is Boolean -> {
-                // Log.e("TOTO", "boolean view type")
-                DisplayType.INSTALL_UPDATE_BUTTON.layout
-            }
             item is String -> DisplayType.DATE_SEPARATOR.layout
             item is FolderRole -> DisplayType.FLUSH_FOLDER_BUTTON.layout
             item is Unit -> DisplayType.LOAD_MORE_BUTTON.layout
@@ -188,7 +168,7 @@ class ThreadListAdapter @Inject constructor(
     override fun getItemId(position: Int): Long = runCatchingRealm {
         return when (val item = dataSet[position]) {
             is Thread -> item.uid.hashCode().toLong()
-            is String, is Boolean -> item.hashCode().toLong()
+            is String -> item.hashCode().toLong()
             else -> super.getItemId(position)
         }
     }.getOrDefault(super.getItemId(position))
@@ -364,11 +344,6 @@ class ThreadListAdapter @Inject constructor(
         // seeAllText.text = "See all $threadsNumber"
     }
 
-    private fun ItemThreadUpdateInstallButtonBinding.displayInstallUpdate() {
-        Log.e("TOTO", "setOnClickListener $onInstallUpdate")
-        installUpdate.setOnClickListener { onInstallUpdate?.invoke() }
-    }
-
     override fun onSwipeStarted(item: Any, viewHolder: ThreadListViewHolder) {
         (item as Thread).updateDynamicIcons()
     }
@@ -475,7 +450,7 @@ class ThreadListAdapter @Inject constructor(
         globalCoroutineScope.launch {
 
             val formattedList = runCatchingRealm {
-                formatList(itemList, recyclerView.context, canInstallUpdate, folderRole, localSettings.threadDensity).apply {
+                formatList(itemList, recyclerView.context, folderRole, localSettings.threadDensity).apply {
                     // Add "Load more" button
                     if (isLoadMoreDisplayed) add(Unit)
                 }
@@ -496,23 +471,6 @@ class ThreadListAdapter @Inject constructor(
 
     fun updateSelection() {
         notifyItemRangeChanged(0, itemCount, NotificationType.SELECTED_STATE)
-    }
-
-    private fun updateInstallHeader(canInstallUpdate: Boolean) {
-        dataSet.toMutableList().apply {
-            val firstItem = firstOrNull() ?: return@apply
-
-            val shouldUpdateDataSet = when {
-                canInstallUpdate && firstItem !is Boolean -> {
-                    add(0, true)
-                    true
-                }
-                !canInstallUpdate && firstItem is Boolean -> removeIf { it is Boolean }
-                else -> false
-            }
-
-            if (shouldUpdateDataSet) dataSet = this
-        }
     }
 
     fun updateLoadMore(shouldDisplayLoadMore: Boolean) {
@@ -538,7 +496,6 @@ class ThreadListAdapter @Inject constructor(
         FLUSH_FOLDER_BUTTON(R.layout.item_thread_flush_folder_button),
         LOAD_MORE_BUTTON(R.layout.item_thread_load_more_button),
         SEE_ALL_BUTTON(R.layout.item_thread_see_all_button),
-        INSTALL_UPDATE_BUTTON(R.layout.item_thread_update_install_button),
     }
 
     private enum class NotificationType {
@@ -558,16 +515,9 @@ class ThreadListAdapter @Inject constructor(
         private fun formatList(
             threads: List<Thread>,
             context: Context,
-            canInstallUpdate: Boolean,
             folderRole: FolderRole?,
             threadDensity: ThreadDensity,
         ) = mutableListOf<Any>().apply {
-
-            Log.e("TOTO", "formatList")
-            if (canInstallUpdate) {
-                Log.e("TOTO", "add(true)")
-                add(true)
-            }
 
             if ((folderRole == FolderRole.TRASH || folderRole == FolderRole.SPAM) && threads.isNotEmpty()) {
                 add(folderRole)

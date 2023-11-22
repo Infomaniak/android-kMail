@@ -193,15 +193,62 @@
                     android:layout_height="wrap_content"
                     android:nestedScrollingEnabled="true">
 
-                    <com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
-                        android:id="@+id/threadsList"
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:clipToPadding="false"
-                        android:paddingBottom="@dimen/recyclerViewPaddingBottom"
-                        app:behind_swiped_item_icon_margin="@dimen/marginStandard"
-                        tools:listitem="@layout/cardview_thread_item"
-                        tools:visibility="gone" />
+                        android:layout_height="match_parent">
+
+                        <TextView
+                            android:id="@+id/updateDownloadedText"
+                            style="@style/BodySmall"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                            android:layout_marginTop="@dimen/marginStandardMedium"
+                            android:text="@string/updateAvailableTitle"
+                            app:layout_constraintEnd_toStartOf="@+id/installUpdate"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/installUpdate"
+                            style="@style/TextButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/buttonInstall"
+                            app:icon="@drawable/ic_app_update"
+                            app:iconPadding="@dimen/marginStandardSmall"
+                            app:iconSize="@dimen/marginStandardMedium"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <com.google.android.material.divider.MaterialDivider
+                            android:id="@+id/installUpdateDivider"
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            app:dividerColor="@color/divider"
+                            app:layout_constraintTop_toBottomOf="@id/installUpdate" />
+
+                        <androidx.constraintlayout.widget.Group
+                            android:id="@+id/installUpdateGroup"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:visibility="gone"
+                            app:constraint_referenced_ids="installUpdate, installUpdateDivider, updateDownloadedText"
+                            tools:visibility="visible" />
+
+                        <com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
+                            android:id="@+id/threadsList"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:clipToPadding="false"
+                            android:paddingBottom="@dimen/recyclerViewPaddingBottom"
+                            app:behind_swiped_item_icon_margin="@dimen/marginStandard"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/installUpdateDivider"
+                            tools:listitem="@layout/cardview_thread_item"
+                            tools:visibility="gone" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
                     <com.infomaniak.mail.ui.main.EmptyStateView
                         android:id="@+id/emptyStateView"

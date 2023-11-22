@@ -293,18 +293,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 trackThreadListEvent("loadMore")
                 mainViewModel.getOnePageOfOldMessages()
             }
-
-            onInstallUpdate = {
-                trackEvent("inAppUpdate", "installUpdate")
-                mainViewModel.canInstallUpdate.value = false
-
-                StoreUtils.installDownloadedUpdate {
-                    Sentry.captureException(it)
-                    // This avoid the user being instantly reprompt to download update
-                    localSettings.isUserWantingUpdates = false
-                    mainViewModel.snackBarManager.setValue(getString(RCore.string.errorUpdateInstall))
-                }
-            }
         }
     }
 
@@ -583,8 +571,21 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         mainViewModel.flushFolderTrigger.observe(viewLifecycleOwner) { descriptionDialog.resetLoadingAndDismiss() }
     }
 
-    private fun observeUpdateInstall() {
-        mainViewModel.canInstallUpdate.observe(viewLifecycleOwner) { threadListAdapter.canInstallUpdate = it }
+    private fun observeUpdateInstall() = with(binding) {
+        mainViewModel.canInstallUpdate.observe(viewLifecycleOwner) { isUpdateDownloaded ->
+            installUpdateGroup.isVisible = isUpdateDownloaded
+            installUpdate.setOnClickListener {
+                trackEvent("inAppUpdate", "installUpdate")
+                mainViewModel.canInstallUpdate.value = false
+
+                StoreUtils.installDownloadedUpdate {
+                    Sentry.captureException(it)
+                    // This avoid the user being instantly reprompt to download update
+                    localSettings.isUserWantingUpdates = false
+                    mainViewModel.snackBarManager.setValue(getString(RCore.string.errorUpdateInstall))
+                }
+            }
+        }
     }
 
     private fun observerDraftsActionsCompletedWorks() {
