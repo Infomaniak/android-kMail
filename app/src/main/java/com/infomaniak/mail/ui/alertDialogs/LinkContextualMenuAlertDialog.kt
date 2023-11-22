@@ -18,9 +18,9 @@
 package com.infomaniak.mail.ui.alertDialogs
 
 import android.content.Context
-import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.DialogLinkContextualMenuBinding
@@ -58,7 +58,7 @@ class LinkContextualMenuAlertDialog @Inject constructor(
             .setCustomTitle(binding.root)
             .setItems(items) { _, index ->
                 when (index) {
-                    0 -> Log.e("gibran", "initDialog: open the link: $lastUrl")
+                    0 -> context.openUrl(lastUrl)
                     1 -> context.copyStringToClipboard(lastUrl, R.string.snackbarLinkCopiedToClipboard, snackBarManager)
                     2 -> context.shareString(lastUrl)
                 }
@@ -66,9 +66,7 @@ class LinkContextualMenuAlertDialog @Inject constructor(
             .create()
     }
 
-    override fun resetCallbacks() {
-        // TODO("Not yet implemented")
-    }
+    override fun resetCallbacks() = Unit
 
     fun show(url: String) {
         binding.url.text = url
