@@ -348,26 +348,22 @@ class NewMessageViewModel @Inject constructor(
             DraftMode.REPLY, DraftMode.REPLY_ALL, DraftMode.FORWARD -> {
                 previousMessageUid
                     ?.let { uid -> MessageController.getMessage(uid, realm) }
-                    ?.let { message ->
-                        val (isSuccess, previousMessageBody) = draftController.setPreviousMessage(
-                            draft = this,
-                            draftMode = draftMode,
-                            message = message,
-                            realm = realm,
-                        )
-                        if (!isSuccess) return null
+                    ?.let { previousMessage ->
+                        val (fullMessage, hasFailedFetching) = draftController.fetchHeavyDataIfNeeded(previousMessage, realm)
 
+                        if (hasFailedFetching) return null
 
-                        if (currentMailbox.featureFlags.contains(FeatureFlag.AI)) {
-                            parsePreviousMailForAnsweringWithAi(previousMessageBody)
-                        }
-                        if (shouldPreselectSignature) preSelectSignature(message, signatures)
+                        draftController.setPreviousMessage(draft = this, draftMode = draftMode, previousMessage = fullMessage)
+
+                        val isAiEnabled = currentMailbox.featureFlags.contains(FeatureFlag.AI)
+                        if (isAiEnabled) parsePreviousMailToAnswerWithAi(fullMessage.body!!)
+                        if (shouldPreselectSignature) preSelectSignature(previousMessage, signatures)
                     }
             }
         }
     }
 
-    private suspend fun parsePreviousMailForAnsweringWithAi(previousMessageBody: Body) {
+    private suspend fun parsePreviousMailToAnswerWithAi(previousMessageBody: Body) {
         if (draftMode == DraftMode.REPLY || draftMode == DraftMode.REPLY_ALL) {
             previousMessageBodyPlainText = previousMessageBody.asPlainText()
         }
