@@ -369,11 +369,9 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    private suspend fun Body.asPlainText(): String {
-        return when (type) {
-            Utils.TEXT_HTML -> MessageBodyUtils.splitContentAndQuote(this).content.htmlToText()
-            else -> value
-        }
+    private suspend fun Body.asPlainText(): String = when (type) {
+        Utils.TEXT_HTML -> MessageBodyUtils.splitContentAndQuote(this).content.htmlToText()
+        else -> value
     }
 
     private fun Draft.preSelectSignature(message: Message, signatures: List<Signature>) {

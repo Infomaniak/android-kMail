@@ -66,7 +66,7 @@ class AiViewModel @Inject constructor(
     ) = viewModelScope.launch(ioCoroutineContext) {
         history.clear()
 
-        val contextMessage = previousMessageBodyPlainText?.let { ContextMessage(it) }
+        val contextMessage = previousMessageBodyPlainText?.let(::ContextMessage)
         val userMessage = UserMessage(aiPrompt)
 
         contextMessage?.let(history::add)
