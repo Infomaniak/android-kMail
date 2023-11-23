@@ -78,39 +78,38 @@ class AiViewModel @Inject constructor(
         )
 
         ensureActive()
-        val isUsingPreviousMessageAsContext = previousMessageBodyPlainText != null
-        handleAiResult(apiResponse, userMessage, shouldTriggerContextTooLongInstead = isUsingPreviousMessageAsContext)
+        handleAiResult(apiResponse, userMessage, isUsingPreviousMessageAsContext = previousMessageBodyPlainText != null)
     }
 
     private fun handleAiResult(
         apiResponse: ApiResponse<AiResult>,
         promptMessage: AiMessage?,
-        shouldTriggerContextTooLongInstead: Boolean
+        isUsingPreviousMessageAsContext: Boolean,
     ) = with(apiResponse) {
-        aiPropositionStatusLiveData.postValue(
-            when {
-                isSuccess() -> data?.let { aiResult ->
-                    aiResult.contextId?.let { conversationContextId = it }
-                    history += promptMessage!!
-                    history += AssistantMessage(aiResult.content)
-                    SUCCESS
-                } ?: MISSING_CONTENT
-                error?.code == MAX_SYNTAX_TOKENS_REACHED -> {
-                    if (shouldTriggerContextTooLongInstead) {
-                        discardPreviousMailContext()
-                        CONTEXT_TOO_LONG
-                    } else {
-                        PROMPT_TOO_LONG
-                    }
-                }
-                error?.code == TOO_MANY_REQUESTS -> RATE_LIMIT_EXCEEDED
-                else -> ERROR
-            }
-        )
+        val propositionStatus = when {
+            isSuccess() -> updateHistoryAndContext(promptMessage!!)
+            error?.code == MAX_SYNTAX_TOKENS_REACHED -> handleMaxTokenAndChooseStatus(isUsingPreviousMessageAsContext)
+            error?.code == TOO_MANY_REQUESTS -> RATE_LIMIT_EXCEEDED
+            else -> ERROR
+        }
+
+        aiPropositionStatusLiveData.postValue(propositionStatus)
     }
 
-    private fun discardPreviousMailContext() {
-        previousMessageBodyPlainText = null
+    private fun ApiResponse<AiResult>.updateHistoryAndContext(promptMessage: AiMessage): PropositionStatus {
+        return data?.let { aiResult ->
+            aiResult.contextId?.let { conversationContextId = it }
+            history += promptMessage
+            history += AssistantMessage(aiResult.content)
+            SUCCESS
+        } ?: MISSING_CONTENT
+    }
+
+    private fun handleMaxTokenAndChooseStatus(isUsingPreviousMessageAsContext: Boolean) = if (isUsingPreviousMessageAsContext) {
+        previousMessageBodyPlainText = null // Discard previous mail context
+        CONTEXT_TOO_LONG
+    } else {
+        PROMPT_TOO_LONG
     }
 
     fun performShortcut(shortcut: Shortcut, currentMailboxUuid: String) = viewModelScope.launch(ioCoroutineContext) {
@@ -125,7 +124,7 @@ class AiViewModel @Inject constructor(
             ensureActive()
         }
 
-        handleAiResult(apiResponse, apiResponse.data?.promptMessage, shouldTriggerContextTooLongInstead = false)
+        handleAiResult(apiResponse, apiResponse.data?.promptMessage, isUsingPreviousMessageAsContext = false)
     }
 
     fun updateFeatureFlag(currentMailboxObjectId: String, mailboxUuid: String) = viewModelScope.launch(ioCoroutineContext) {
@@ -134,9 +133,7 @@ class AiViewModel @Inject constructor(
 
     fun isHistoryEmpty(): Boolean = history.excludingContextMessage().isEmpty()
 
-    private fun List<AiMessage>.excludingContextMessage(): List<AiMessage> {
-        return filter { it.type == "assistant" || it.type == "user" }
-    }
+    private fun List<AiMessage>.excludingContextMessage(): List<AiMessage> = filterNot { it.type == "context" }
 
     fun getLastMessage(): String = history.last().content
 

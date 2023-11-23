@@ -20,7 +20,6 @@ package com.infomaniak.mail.ui.newMessage
 import dagger.hilt.android.scopes.ActivityRetainedScoped
 import javax.inject.Inject
 
-
 @ActivityRetainedScoped
 class AiSharedData @Inject constructor() {
     var previousMessageBodyPlainText: String? = null
