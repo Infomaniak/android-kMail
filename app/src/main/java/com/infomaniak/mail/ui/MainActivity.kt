@@ -42,7 +42,6 @@ import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.Utils.toEnumOrThrow
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
-import com.infomaniak.lib.stores.*
 import com.infomaniak.lib.stores.StoreUtils.checkStalledUpdate
 import com.infomaniak.lib.stores.StoreUtils.checkUpdateIsAvailable
 import com.infomaniak.lib.stores.StoreUtils.initAppUpdateManager
@@ -471,8 +470,8 @@ class MainActivity : BaseActivity() {
             checkUpdateIsAvailable(
                 appId = BuildConfig.APPLICATION_ID,
                 versionCode = BuildConfig.VERSION_CODE,
-                resultLauncher = inAppUpdateResultLauncher,
-                onResult = { updateIsAvailable ->
+                inAppResultLauncher = inAppUpdateResultLauncher,
+                onFDroidResult = { updateIsAvailable ->
                     if (updateIsAvailable) navController.navigate(R.id.updateAvailableBottomSheetDialog)
                 },
             )
