@@ -95,8 +95,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private val navigationArgs: ThreadListFragmentArgs by navArgs()
     private val mainViewModel: MainViewModel by activityViewModels()
-    private val threadViewModel: ThreadViewModel by activityViewModels()
     private val threadListViewModel: ThreadListViewModel by viewModels()
+
+    private val threadViewModel: ThreadViewModel?
+        get() = (requireActivity() as MainActivity).threadViewModel
 
     private val threadListMultiSelection by lazy { ThreadListMultiSelection() }
 
@@ -168,7 +170,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         observerDraftsActionsCompletedWorks()
         observeFlushFolderTrigger()
         observeUpdateInstall()
-        observeInTabletMode(mainViewModel, threadViewModel, threadListAdapter)
+
+        // TODO: This won't work because we are recreating the Fragment & VM when closing a Thread, so we lose the ThreadViewModel.
+        if (isTablet()) observeInTabletMode(mainViewModel, threadViewModel, threadListAdapter)
 
     }.getOrDefault(Unit)
 
@@ -221,7 +225,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     override fun onStart() {
         super.onStart()
         binding.unreadCountChip.apply { isCloseIconVisible = isChecked }
-        if (isTablet()) threadViewModel.goToSearch.value = false
+        if (isTablet()) threadViewModel?.goToSearch?.value = false
     }
 
     override fun onResume() {
@@ -353,7 +357,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
 
         searchButton.setOnClickListener {
-            if (isTablet()) threadViewModel.goToSearch.value = true
+            if (isTablet()) threadViewModel?.goToSearch?.value = true
             safeNavigate(
                 ThreadListFragmentDirections.actionThreadListFragmentToSearchFragment(
                     dummyFolderId = mainViewModel.currentFolderId ?: "eJzz9HPyjwAABGYBgQ--", // Hardcoded INBOX folder

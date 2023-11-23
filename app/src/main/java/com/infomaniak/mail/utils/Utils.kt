@@ -91,86 +91,6 @@ object Utils {
         result!!
     }
 
-    fun Fragment.observeInTabletMode(
-        mainViewModel: MainViewModel,
-        threadViewModel: ThreadViewModel,
-        threadListAdapter: ThreadListAdapter,
-    ) = with(mainViewModel) {
-
-        // Reset selected Thread UI when closing Thread
-        threadViewModel.threadUid.observe(viewLifecycleOwner) { threadUid ->
-            if (threadUid == null) threadListAdapter.apply {
-                val position = clickedThreadPosition
-                clickedThreadPosition = null
-                clickedThreadUid = null
-                position?.let { notifyItemChanged(it, NotificationType.SELECTED_STATE) }
-            }
-        }
-
-        if (isTablet()) {
-
-            getBackNavigationResult(DownloadAttachmentProgressDialog.OPEN_WITH, ::startActivity)
-
-            downloadAttachmentsArgs.observe(viewLifecycleOwner) { (resource, name, fileType) ->
-                safeNavigate(
-                    resId = R.id.downloadAttachmentProgressDialog,
-                    args = DownloadAttachmentProgressDialogArgs(
-                        attachmentResource = resource,
-                        attachmentName = name,
-                        attachmentType = fileType,
-                    ).toBundle(),
-                )
-            }
-
-            newMessageArgs.observe(viewLifecycleOwner) {
-                safeNavigateToNewMessageActivity(args = it.toBundle())
-            }
-
-            replyBottomSheetArgs.observe(viewLifecycleOwner) { (messageUid, shouldLoadDistantResources) ->
-                safeNavigate(
-                    resId = R.id.replyBottomSheetDialog,
-                    args = ReplyBottomSheetDialogArgs(
-                        messageUid = messageUid,
-                        shouldLoadDistantResources = shouldLoadDistantResources,
-                    ).toBundle(),
-                )
-            }
-
-            threadActionsBottomSheetArgs.observe(viewLifecycleOwner) {
-                val (threadUid, lastMessageToReplyToUid, shouldLoadDistantResources) = it
-                safeNavigate(
-                    resId = R.id.threadActionsBottomSheetDialog,
-                    args = ThreadActionsBottomSheetDialogArgs(
-                        threadUid = threadUid,
-                        messageUidToReplyTo = lastMessageToReplyToUid,
-                        shouldLoadDistantResources = shouldLoadDistantResources,
-                    ).toBundle(),
-                )
-            }
-
-            messageActionsBottomSheetArgs.observe(viewLifecycleOwner) {
-                safeNavigate(
-                    resId = R.id.messageActionsBottomSheetDialog,
-                    args = MessageActionsBottomSheetDialogArgs(
-                        messageUid = it.messageUid,
-                        threadUid = it.threadUid,
-                        isThemeTheSame = it.isThemeTheSame,
-                        shouldLoadDistantResources = it.shouldLoadDistantResources,
-                    ).toBundle(),
-                )
-            }
-
-            detailedContactArgs.observe(viewLifecycleOwner) { contact ->
-                safeNavigate(
-                    resId = R.id.detailedContactBottomSheetDialog,
-                    args = DetailedContactBottomSheetDialogArgs(
-                        recipient = contact,
-                    ).toBundle(),
-                )
-            }
-        }
-    }
-
     fun <T1, T2> waitInitMediator(liveData1: LiveData<T1>, liveData2: LiveData<T2>): MediatorLiveData<Pair<T1, T2>> {
 
         fun areLiveDataInitialized() = liveData1.isInitialized && liveData2.isInitialized
@@ -183,6 +103,83 @@ object Utils {
         return MediatorLiveData<Pair<T1, T2>>().apply {
             addSource(liveData1) { postIfInit() }
             addSource(liveData2) { postIfInit() }
+        }
+    }
+
+    fun Fragment.observeInTabletMode(
+        mainViewModel: MainViewModel,
+        threadViewModel: ThreadViewModel?,
+        threadListAdapter: ThreadListAdapter,
+    ) = with(mainViewModel) {
+
+        // Reset selected Thread UI when closing Thread
+        threadViewModel?.threadUid?.observe(viewLifecycleOwner) { threadUid ->
+            if (threadUid == null) threadListAdapter.apply {
+                val position = clickedThreadPosition
+                clickedThreadPosition = null
+                clickedThreadUid = null
+                position?.let { notifyItemChanged(it, NotificationType.SELECTED_STATE) }
+            }
+        }
+
+        getBackNavigationResult(DownloadAttachmentProgressDialog.OPEN_WITH, ::startActivity)
+
+        downloadAttachmentsArgs.observe(viewLifecycleOwner) { (resource, name, fileType) ->
+            safeNavigate(
+                resId = R.id.downloadAttachmentProgressDialog,
+                args = DownloadAttachmentProgressDialogArgs(
+                    attachmentResource = resource,
+                    attachmentName = name,
+                    attachmentType = fileType,
+                ).toBundle(),
+            )
+        }
+
+        newMessageArgs.observe(viewLifecycleOwner) {
+            safeNavigateToNewMessageActivity(args = it.toBundle())
+        }
+
+        replyBottomSheetArgs.observe(viewLifecycleOwner) { (messageUid, shouldLoadDistantResources) ->
+            safeNavigate(
+                resId = R.id.replyBottomSheetDialog,
+                args = ReplyBottomSheetDialogArgs(
+                    messageUid = messageUid,
+                    shouldLoadDistantResources = shouldLoadDistantResources,
+                ).toBundle(),
+            )
+        }
+
+        threadActionsBottomSheetArgs.observe(viewLifecycleOwner) {
+            val (threadUid, lastMessageToReplyToUid, shouldLoadDistantResources) = it
+            safeNavigate(
+                resId = R.id.threadActionsBottomSheetDialog,
+                args = ThreadActionsBottomSheetDialogArgs(
+                    threadUid = threadUid,
+                    messageUidToReplyTo = lastMessageToReplyToUid,
+                    shouldLoadDistantResources = shouldLoadDistantResources,
+                ).toBundle(),
+            )
+        }
+
+        messageActionsBottomSheetArgs.observe(viewLifecycleOwner) {
+            safeNavigate(
+                resId = R.id.messageActionsBottomSheetDialog,
+                args = MessageActionsBottomSheetDialogArgs(
+                    messageUid = it.messageUid,
+                    threadUid = it.threadUid,
+                    isThemeTheSame = it.isThemeTheSame,
+                    shouldLoadDistantResources = it.shouldLoadDistantResources,
+                ).toBundle(),
+            )
+        }
+
+        detailedContactArgs.observe(viewLifecycleOwner) { contact ->
+            safeNavigate(
+                resId = R.id.detailedContactBottomSheetDialog,
+                args = DetailedContactBottomSheetDialogArgs(
+                    recipient = contact,
+                ).toBundle(),
+            )
         }
     }
 

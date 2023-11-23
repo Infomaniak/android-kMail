@@ -41,7 +41,6 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import kotlin.collections.set
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class ThreadViewModel @Inject constructor(
     application: Application,
@@ -56,31 +55,23 @@ class ThreadViewModel @Inject constructor(
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
+    private var threadLiveJob: Job? = null
+    private var messagesLiveJob: Job? = null
     private var fetchMessagesJob: Job? = null
-
-    private val mailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
 
     val quickActionBarClicks = SingleLiveEvent<QuickActionBarResult>()
 
     var deletedMessagesUids = mutableSetOf<String>()
     val failedMessagesUids = SingleLiveEvent<List<String>>()
 
-    val threadUid = MutableLiveData<String?>(null)
-    val isInThread get() = threadUid.value != null
-
-    private var threadLiveJob: Job? = null
     val threadLive = MutableLiveData<Thread?>()
-
-    var previousFolderId: String? = null
-
-    // `true` : going to the Search
-    // `false`: coming back from it
-    val goToSearch = MutableLiveData<Boolean?>(null)
+    val messagesLive = MutableLiveData<List<Message>>()
 
     private val splitBodies = mutableMapOf<String, SplitBody>()
 
-    private var messagesLiveJob: Job? = null
-    val messagesLive = MutableLiveData<List<Message>?>()
+    var previousFolderId: String? = null
+
+    private val mailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
 
     private val currentMailboxLive = mailboxController.getMailboxAsync(
         AccountUtils.currentUserId,
@@ -140,10 +131,6 @@ class ThreadViewModel @Inject constructor(
         emit(OpenThreadResult(thread, isExpandedMap, initialSetOfExpandedMessagesUids, isThemeTheSameMap))
 
         if (thread.unseenMessagesCount > 0) sharedUtils.markAsSeen(mailbox, listOf(thread))
-    }
-
-    fun closeThread() {
-        threadUid.value = null
     }
 
     private fun sendMatomoAndSentryAboutThreadMessagesCount(thread: Thread) {

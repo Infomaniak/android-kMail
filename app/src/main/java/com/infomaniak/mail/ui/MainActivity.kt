@@ -29,6 +29,7 @@ import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts.*
 import androidx.activity.viewModels
 import androidx.annotation.FloatRange
+import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Lifecycle.State
 import androidx.lifecycle.distinctUntilChanged
@@ -82,7 +83,6 @@ class MainActivity : BaseActivity() {
     // This binding is not private because it's used in ThreadListFragment (`(activity as? MainActivity)?.binding`)
     val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private val mainViewModel: MainViewModel by viewModels()
-    private val threadViewModel: ThreadViewModel by viewModels()
 
     private val permissionUtils by lazy { PermissionUtils(this).also(::registerMainPermissions) }
 
@@ -94,6 +94,11 @@ class MainActivity : BaseActivity() {
     private var previousDestinationId: Int? = null
     private var easterEggConfettiCount = 0
     private var easterEggConfettiTime = 0L
+
+    val threadViewModel: ThreadViewModel?
+        get() = binding.threadHostFragment?.getFragment<ThreadFragment>()?.threadViewModel
+    private val isInThread: Boolean
+        get() = threadViewModel?.isInThread ?: false
 
     private val navController by lazy {
         (supportFragmentManager.findFragmentById(R.id.mainHostFragment) as NavHostFragment).navController
@@ -189,11 +194,6 @@ class MainActivity : BaseActivity() {
         permissionUtils.requestMainPermissionsIfNeeded()
 
         initAppUpdateManager()
-    }
-
-    override fun onConfigurationChanged(newConfig: Configuration) = with(binding) {
-        super.onConfigurationChanged(newConfig)
-        if (isTablet()) updateThreadLayout()
     }
 
     private fun observeNetworkStatus() {
@@ -363,19 +363,13 @@ class MainActivity : BaseActivity() {
             when {
                 drawerLayout.isOpen -> closeDrawer()
                 mainViewModel.isMultiSelectOn -> closeMultiSelect()
-                isTabletInPortrait() && threadViewModel.isInThread -> {
-                    threadViewModel.closeThread()
-                    val currentDestination = navController.currentDestination?.id
-                    if (currentDestination != R.id.threadListFragment && currentDestination != R.id.searchFragment) popBack()
-                    resetThreadFragment()
+                isTabletInPortrait() && isInThread -> {
+                    closeThread()
+                    updateTabletLayout()
                 }
                 else -> popBack()
             }
         }
-    }
-
-    fun resetThreadFragment() {
-        supportFragmentManager.beginTransaction().replace(R.id.threadHostFragment, ThreadFragment()).commit()
     }
 
     override fun onStop() {
@@ -423,6 +417,11 @@ class MainActivity : BaseActivity() {
         }
     }
 
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        if (isTablet()) updateTabletLayout()
+    }
+
     // This `SuppressLint` seems useless, but it's for the CI. Don't remove it.
     @SuppressLint("RestrictedApi")
     private fun onDestinationChanged(destination: NavDestination, arguments: Bundle?) {
@@ -430,16 +429,10 @@ class MainActivity : BaseActivity() {
         SentryDebug.addNavigationBreadcrumb(destination.displayName, arguments)
         trackDestination(destination)
 
-        if (isTablet()) {
-            binding.threadHostFragment?.isVisible = if (threadViewModel.isInThread || isTabletInLandscape()) {
-                shouldDisplayThreadContainer(destination.id)
-            } else {
-                false
-            }
-        }
-
         updateColorsWhenDestinationChanged(destination.id)
         setDrawerLockMode(destination.id == R.id.threadListFragment)
+
+        if (isTablet()) updateTabletLayout()
 
         previousDestinationId = destination.id
     }
@@ -556,40 +549,50 @@ class MainActivity : BaseActivity() {
     }
 
     fun openThread(uid: String) {
-        threadViewModel.threadUid.value = uid
+        threadViewModel?.threadUid?.value = uid
     }
 
-    fun updateThreadLayout() = with(binding) {
+    fun closeThread() {
 
-        val shouldDisplayThreadContainer = shouldDisplayThreadContainer(navController.currentDestination?.id)
+        // The transaction to replace the ThreadFragment takes some time to execute.
+        // The ThreadViewModel won't be cleared instantly.
+        // So, when we want to update the Tablet layout just after closing a Thread, we first need to make sure data are up-to-date.
+        // Hence, we hereby manually reset the `threadUid` to get the correct result in `updateTabletLayout()`.
+        if (isTabletInPortrait()) threadViewModel?.threadUid?.value = null
 
-        threadHostFragment?.isVisible = if (isTabletInLandscape()) {
-            shouldDisplayThreadContainer
-        } else {
-            shouldDisplayThreadContainer && threadViewModel.isInThread
-        }
-
-        mainHostFragment.isVisible = isTabletInLandscape() || !(shouldDisplayThreadContainer && threadViewModel.isInThread)
+        supportFragmentManager.beginTransaction().replace(R.id.threadHostFragment, ThreadFragment()).commit()
     }
 
-    private fun shouldDisplayThreadContainer(destinationId: Int?): Boolean {
-        return if (destinationId == null) {
-            false
-        } else {
-            when (destinationId) {
-                R.id.threadListFragment,
-                R.id.searchFragment,
-                R.id.downloadAttachmentProgressDialog,
-                R.id.replyBottomSheetDialog,
-                R.id.threadActionsBottomSheetDialog,
-                R.id.messageActionsBottomSheetDialog,
-                R.id.detailedContactBottomSheetDialog,
-                R.id.multiSelectBottomSheetDialog,
-                R.id.updateAvailableBottomSheetDialog,
-                R.id.syncDiscoveryBottomSheetDialog -> true
-                else -> false
+    fun updateTabletLayout() = with(binding) {
+
+        val canShowThreadFragment = canShowThreadFragment(navController.currentDestination?.id)
+
+        val mustShowThreadFragment = canShowThreadFragment && isInThread
+
+        when {
+            isTabletInLandscape() -> {
+                threadHostFragment?.isVisible = canShowThreadFragment
+                mainHostFragment.isVisible = true
+            }
+            isTabletInPortrait() -> {
+                threadHostFragment?.isVisible = mustShowThreadFragment
+                mainHostFragment.isVisible = !mustShowThreadFragment
             }
         }
+    }
+
+    private fun canShowThreadFragment(destinationId: Int?): Boolean = when (destinationId) {
+        R.id.threadListFragment,
+        R.id.searchFragment,
+        R.id.downloadAttachmentProgressDialog,
+        R.id.replyBottomSheetDialog,
+        R.id.threadActionsBottomSheetDialog,
+        R.id.messageActionsBottomSheetDialog,
+        R.id.detailedContactBottomSheetDialog,
+        R.id.multiSelectBottomSheetDialog,
+        R.id.updateAvailableBottomSheetDialog,
+        R.id.syncDiscoveryBottomSheetDialog -> true
+        else -> false
     }
 
     companion object {
