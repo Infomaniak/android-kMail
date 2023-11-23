@@ -305,9 +305,11 @@ fun Fragment.navigateToThread(
                 )
             }
         }
-        isTablet() -> with(requireActivity() as MainActivity) {
-            openThread(uid)
-            if (isTabletInPortrait()) updateThreadLayout()
+        isTablet() -> {
+            (requireActivity() as MainActivity).let {
+                it.openThread(uid)
+                it.updateTabletLayout()
+            }
         }
         else -> {
             safeNavigate(R.id.threadFragment, ThreadFragmentArgs(uid).toBundle())

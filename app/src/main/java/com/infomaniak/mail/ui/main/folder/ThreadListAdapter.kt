@@ -95,9 +95,10 @@ class ThreadListAdapter @Inject constructor(
     private var onSwipeFinished: (() -> Unit)? = null
     private var multiSelection: MultiSelectionListener<Thread>? = null
 
-    // Two-pane layout only
+    //region Tablet mode
     var clickedThreadPosition: Int? = null
     var clickedThreadUid: String? = null
+    //endregion
 
     init {
         setHasStableIds(true)
@@ -263,11 +264,13 @@ class ThreadListAdapter @Inject constructor(
             else -> context.getColorStateList(R.color.backgroundColor)
         }
 
-        if (multiSelection != null) with(localSettings) {
-            expeditorAvatar.isVisible = !isMultiSelected && threadDensity == LARGE
-            checkMarkLayout.isVisible = multiSelection?.isEnabled == true
-            checkedState.isVisible = isMultiSelected
-            uncheckedState.isVisible = threadDensity != LARGE && !isMultiSelected
+        multiSelection?.let {
+            with(localSettings) {
+                expeditorAvatar.isVisible = !isMultiSelected && threadDensity == LARGE
+                checkMarkLayout.isVisible = it.isEnabled == true
+                checkedState.isVisible = isMultiSelected
+                uncheckedState.isVisible = threadDensity != LARGE && !isMultiSelected
+            }
         }
     }
 
