@@ -1013,13 +1013,13 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private companion object {
-        val TAG: String = MainViewModel::class.java.simpleName
+    companion object {
+        private val TAG: String = MainViewModel::class.java.simpleName
 
-        val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
+        private val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
 
         // We add this delay because it doesn't always work if we just use the `etop`.
-        const val REFRESH_DELAY = 2_000L
-        const val MAX_REFRESH_DELAY = 6_000L
+        private const val REFRESH_DELAY = 2_000L
+        private const val MAX_REFRESH_DELAY = 6_000L
     }
 }

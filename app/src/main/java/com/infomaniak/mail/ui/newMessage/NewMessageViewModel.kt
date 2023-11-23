@@ -707,8 +707,8 @@ class NewMessageViewModel @Inject constructor(
                 attachmentsUuids != draft.attachments.map { it.uuid }.toSet()
     }
 
-    private companion object {
-        const val DELAY_BEFORE_AUTO_SAVING_DRAFT = 1_000L
-        const val FILE_SIZE_25_MB = 25L * 1_024L * 1_024L
+    companion object {
+        private const val DELAY_BEFORE_AUTO_SAVING_DRAFT = 1_000L
+        private const val FILE_SIZE_25_MB = 25L * 1_024L * 1_024L
     }
 }

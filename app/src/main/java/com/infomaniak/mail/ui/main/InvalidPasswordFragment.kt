@@ -137,8 +137,8 @@ class InvalidPasswordFragment : Fragment() {
         }
     }
 
-    private companion object {
-        val PASSWORD_LENGTH_RANGE = 6..80
+    companion object {
+        private val PASSWORD_LENGTH_RANGE = 6..80
     }
 
     private fun startProgress() {

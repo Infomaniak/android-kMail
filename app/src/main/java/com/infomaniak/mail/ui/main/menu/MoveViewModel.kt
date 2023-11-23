@@ -86,7 +86,7 @@ class MoveViewModel @Inject constructor(
         super.onCleared()
     }
 
-    private companion object {
-        const val FILTER_DEBOUNCE_DURATION = 300L
+    companion object {
+        private const val FILTER_DEBOUNCE_DURATION = 300L
     }
 }

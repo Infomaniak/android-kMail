@@ -250,15 +250,15 @@ class SearchViewModel @Inject constructor(
         visibilityMode.postValue(resultsVisibilityMode)
     }
 
-    private companion object {
+    companion object {
 
-        val TAG: String = SearchViewModel::class.java.simpleName
+        private val TAG: String = SearchViewModel::class.java.simpleName
 
         /**
          * The minimum value allowed for a search query
          */
-        const val MIN_SEARCH_QUERY = 3
+        private const val MIN_SEARCH_QUERY = 3
 
-        const val SEARCH_DEBOUNCE_DURATION = 500L
+        private const val SEARCH_DEBOUNCE_DURATION = 500L
     }
 }

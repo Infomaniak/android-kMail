@@ -355,7 +355,7 @@ class SearchFragment : Fragment() {
         RECENT_SEARCHES, LOADING, NO_RESULTS, RESULTS
     }
 
-    private companion object {
-        const val PAGINATION_TRIGGER_OFFSET = 15
+    companion object {
+        private const val PAGINATION_TRIGGER_OFFSET = 15
     }
 }

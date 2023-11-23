@@ -72,6 +72,20 @@ class PermissionUtils {
         if (!activity.hasPermissions(mainPermissions)) mainForActivityResult.launch(mainPermissions)
     }
 
+    /**
+     * If the user has manually disabled notifications permissions, stop requesting it.
+     * Manually disabled means the permission was granted at one point, but is no more.
+     */
+    private fun getMainPermissions(mustRequireNotification: Boolean): Array<String> {
+        val mainPermissions = mutableListOf(Manifest.permission.READ_CONTACTS)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && mustRequireNotification) {
+            mainPermissions.add(Manifest.permission.POST_NOTIFICATIONS)
+        }
+
+        return mainPermissions.toTypedArray()
+    }
+
     //region DownloadManager permissions
     private var downloadCallback: (() -> Unit)? = null
 
@@ -95,23 +109,9 @@ class PermissionUtils {
     }
     //endregion
 
-    private companion object {
+    companion object {
 
         @get:DeprecatedSinceApi(Build.VERSION_CODES.Q, "Only used for DownloadManager below API 29")
-        const val storagePermission = Manifest.permission.WRITE_EXTERNAL_STORAGE
-
-        /**
-         * If the user has manually disabled notifications permissions, stop requesting it.
-         * Manually disabled means the permission was granted at one point, but is no more.
-         */
-        fun getMainPermissions(mustRequireNotification: Boolean): Array<String> {
-            val mainPermissions = mutableListOf(Manifest.permission.READ_CONTACTS)
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && mustRequireNotification) {
-                mainPermissions.add(Manifest.permission.POST_NOTIFICATIONS)
-            }
-
-            return mainPermissions.toTypedArray()
-        }
+        private const val storagePermission = Manifest.permission.WRITE_EXTERNAL_STORAGE
     }
 }

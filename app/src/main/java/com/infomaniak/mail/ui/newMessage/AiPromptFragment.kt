@@ -150,11 +150,11 @@ class AiPromptFragment : Fragment() {
         aiViewModel.aiPrompt = prompt.toString()
     }
 
-    private companion object {
-        const val NO_MARGIN = 0
-        val m3BottomSheetHorizontalMarginPx = 56.toPx()
+    companion object {
+        private const val NO_MARGIN = 0
+        private val m3BottomSheetHorizontalMarginPx = 56.toPx()
 
-        val promptExamples = listOf(
+        private val promptExamples = listOf(
             R.string.aiPromptExample1,
             R.string.aiPromptExample2,
             R.string.aiPromptExample3,

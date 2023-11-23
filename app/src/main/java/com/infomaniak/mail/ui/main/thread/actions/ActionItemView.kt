@@ -90,7 +90,7 @@ class ActionItemView @JvmOverloads constructor(
         binding.divider.isVisible = isVisible
     }
 
-    private companion object {
-        const val NOT_SET = -1
+    companion object {
+        private const val NOT_SET = -1
     }
 }

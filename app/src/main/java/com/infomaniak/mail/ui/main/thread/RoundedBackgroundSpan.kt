@@ -92,10 +92,10 @@ class RoundedBackgroundSpan(
         fm: FontMetricsInt?,
     ) = Unit
 
-    private companion object {
-        const val LEFT_MARGIN = 4
-        const val PADDING = 16
-        const val VERTICAL_OFFSET = 4
-        const val CORNER_RADIUS = 6.0f
+    companion object {
+        private const val LEFT_MARGIN = 4
+        private const val PADDING = 16
+        private const val VERTICAL_OFFSET = 4
+        private const val CORNER_RADIUS = 6.0f
     }
 }
