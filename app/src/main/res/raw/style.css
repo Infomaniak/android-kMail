@@ -7,6 +7,7 @@ body {
     margin: 16px;
     padding: 0;
     width: auto !important;
+    min-width: auto !important;
 }
 
 blockquote {
