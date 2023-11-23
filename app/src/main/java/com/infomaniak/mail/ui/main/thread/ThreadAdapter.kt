@@ -191,7 +191,7 @@ class ThreadAdapter(
 
         if (body != null && splitBody != null) {
             if (binding.isQuoteCollapsed) {
-                val completeBody = MessageBodyUtils.fuseSplitBodyAndSubBodies(splitBody.content, body.subBodies, message.uid)
+                val completeBody = MessageBodyUtils.mergeSplitBodyAndSubBodies(splitBody.content, body.subBodies, message.uid)
                 loadBodyInWebView(message.uid, completeBody, body.type)
             } else {
                 loadQuoteInWebView(message.uid, splitBody.quote, body.type)

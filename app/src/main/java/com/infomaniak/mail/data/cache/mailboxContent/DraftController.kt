@@ -157,7 +157,7 @@ class DraftController @Inject constructor(
 
     private fun computePreviousFullBody(previousBody: String, message: Message): String {
         return message.body?.let { body ->
-            MessageBodyUtils.fuseSplitBodyAndSubBodies(previousBody, body.subBodies, message.uid)
+            MessageBodyUtils.mergeSplitBodyAndSubBodies(previousBody, body.subBodies, message.uid)
         } ?: previousBody
     }
 

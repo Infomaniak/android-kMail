@@ -91,7 +91,7 @@ object MessageBodyUtils {
         return htmlDocument.outerHtml() to quotes
     }
 
-    fun fuseSplitBodyAndSubBodies(body: String, subBodies: List<SubBody>, messageUid: String): String {
+    fun mergeSplitBodyAndSubBodies(body: String, subBodies: List<SubBody>, messageUid: String): String {
         return body + formatSubBodiesContent(subBodies, messageUid)
     }
 

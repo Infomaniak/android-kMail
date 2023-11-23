@@ -372,7 +372,7 @@ class NewMessageViewModel @Inject constructor(
     private suspend fun Body.asPlainText(messageUid: String): String = when (type) {
         Utils.TEXT_HTML -> {
             val splitBodyContent = MessageBodyUtils.splitContentAndQuote(this).content
-            val fullBody = MessageBodyUtils.fuseSplitBodyAndSubBodies(splitBodyContent, subBodies, messageUid)
+            val fullBody = MessageBodyUtils.mergeSplitBodyAndSubBodies(splitBodyContent, subBodies, messageUid)
             fullBody.htmlToText()
         }
         else -> value
