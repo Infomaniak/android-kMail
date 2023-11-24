@@ -18,6 +18,7 @@
 package com.infomaniak.mail.utils
 
 import com.infomaniak.mail.data.models.message.Body
+import com.infomaniak.mail.data.models.message.SubBody
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineScope
@@ -88,6 +89,25 @@ object MessageBodyUtils {
         }
 
         return htmlDocument.outerHtml() to quotes
+    }
+
+    fun mergeSplitBodyAndSubBodies(body: String, subBodies: List<SubBody>, messageUid: String): String {
+        return body + formatSubBodiesContent(subBodies, messageUid)
+    }
+
+    private fun formatSubBodiesContent(subBodies: List<SubBody>, messageUid: String): String {
+        var subBodiesContent = ""
+
+        subBodies.forEach { subBody ->
+            subBody.bodyValue?.let {
+                if (subBodiesContent.isNotEmpty()) subBodiesContent += "<br/>"
+                subBodiesContent += "<blockquote>${it}</blockquote>"
+            }
+        }
+
+        if (subBodiesContent.isNotEmpty()) SentryDebug.sendSubBodiesTrigger(messageUid)
+
+        return subBodiesContent
     }
 
     //region Utils

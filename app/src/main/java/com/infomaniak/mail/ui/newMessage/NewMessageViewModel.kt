@@ -356,21 +356,25 @@ class NewMessageViewModel @Inject constructor(
                         draftController.setPreviousMessage(draft = this, draftMode = draftMode, previousMessage = fullMessage)
 
                         val isAiEnabled = currentMailbox.featureFlags.contains(FeatureFlag.AI)
-                        if (isAiEnabled) parsePreviousMailToAnswerWithAi(fullMessage.body!!)
+                        if (isAiEnabled) parsePreviousMailToAnswerWithAi(fullMessage.body!!, fullMessage.uid)
                         if (shouldPreselectSignature) preSelectSignature(previousMessage, signatures)
                     }
             }
         }
     }
 
-    private suspend fun parsePreviousMailToAnswerWithAi(previousMessageBody: Body) {
+    private suspend fun parsePreviousMailToAnswerWithAi(previousMessageBody: Body, messageUid: String) {
         if (draftMode == DraftMode.REPLY || draftMode == DraftMode.REPLY_ALL) {
-            previousMessageBodyPlainText = previousMessageBody.asPlainText()
+            previousMessageBodyPlainText = previousMessageBody.asPlainText(messageUid)
         }
     }
 
-    private suspend fun Body.asPlainText(): String = when (type) {
-        Utils.TEXT_HTML -> MessageBodyUtils.splitContentAndQuote(this).content.htmlToText()
+    private suspend fun Body.asPlainText(messageUid: String): String = when (type) {
+        Utils.TEXT_HTML -> {
+            val splitBodyContent = MessageBodyUtils.splitContentAndQuote(this).content
+            val fullBody = MessageBodyUtils.mergeSplitBodyAndSubBodies(splitBodyContent, subBodies, messageUid)
+            fullBody.htmlToText()
+        }
         else -> value
     }
 
