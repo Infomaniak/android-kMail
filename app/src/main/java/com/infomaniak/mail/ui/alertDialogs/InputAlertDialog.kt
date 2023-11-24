@@ -43,7 +43,7 @@ class InputAlertDialog @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : BaseAlertDialog(activityContext) {
 
-    override val binding by lazy { DialogInputBinding.inflate(activity.layoutInflater) }
+    val binding by lazy { DialogInputBinding.inflate(activity.layoutInflater) }
     override var alertDialog: AlertDialog = initDialog()
 
     private var errorJob: Job? = null

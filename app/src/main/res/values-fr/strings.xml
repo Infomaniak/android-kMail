@@ -276,6 +276,9 @@
     <string name="fromTitle">De :</string>
     <string name="googlePlayServicesAreRequired">Les Google Play Services sont requis</string>
     <string name="inboxFolder">Boîte de réception</string>
+    <string name="linkContextMenuCopy">Copier le lien</string>
+    <string name="linkContextMenuOpen">Ouvrir le lien dans le navigateur</string>
+    <string name="linkContextMenuShare">Partager le lien</string>
     <string name="loadingText">Chargement…</string>
     <plurals name="lockedMailboxDescription">
         <item quantity="one">L’accès à votre adresse mail est actuellement bloqué. Nous vous invitons à contacter votre administrateur.</item>
@@ -448,6 +451,7 @@
     <string name="snackbarEmailSending">E-mail en cours d’envoi</string>
     <string name="snackbarEmailSent">E-mail envoyé</string>
     <string name="snackbarInvalidUrl">URL invalide</string>
+    <string name="snackbarLinkCopiedToClipboard">Lien copié dans le presse-papiers</string>
     <string name="snackbarMailboxPasswordRequested">Demande transmise à l’administrateur</string>
     <string name="snackbarMessageDeletedPermanently">Message supprimé</string>
     <string name="snackbarMessageMoved">Message déplacé vers %s</string>

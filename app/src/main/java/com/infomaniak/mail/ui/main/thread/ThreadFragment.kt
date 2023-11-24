@@ -59,6 +59,7 @@ import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
+import com.infomaniak.mail.ui.alertDialogs.LinkContextualMenuAlertDialog
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.OpenThreadResult
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialog
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
@@ -98,6 +99,9 @@ class ThreadFragment : Fragment() {
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog
 
+    @Inject
+    lateinit var linkContextualMenuAlertDialog: LinkContextualMenuAlertDialog
+
     private var isFavorite = false
 
     // TODO: Remove this when Realm doesn't broadcast twice when deleting a Thread anymore.
@@ -119,8 +123,9 @@ class ThreadFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initAdapter()
-
         observeThreadLive()
+
+        linkContextualMenuAlertDialog.initValues(mainViewModel.snackBarManager)
 
         threadViewModel.openThread().observe(viewLifecycleOwner) { result ->
 
@@ -311,6 +316,7 @@ class ThreadFragment : Fragment() {
             navigateToNewMessageActivity = { uri ->
                 safeNavigateToNewMessageActivity(NewMessageActivityArgs(mailToUri = uri).toBundle())
             },
+            promptLink = { url -> linkContextualMenuAlertDialog.show(url) }
         )
     }
 
@@ -484,11 +490,11 @@ class ThreadFragment : Fragment() {
         toolbarSubject.text = subject
 
         threadSubject.setOnLongClickListener {
-            copyStringToClipboard(subject, R.string.snackbarSubjectCopiedToClipboard, mainViewModel.snackBarManager)
+            context.copyStringToClipboard(subject, R.string.snackbarSubjectCopiedToClipboard, mainViewModel.snackBarManager)
             true
         }
         toolbarSubject.setOnLongClickListener {
-            copyStringToClipboard(subject, R.string.snackbarSubjectCopiedToClipboard, mainViewModel.snackBarManager)
+            context.copyStringToClipboard(subject, R.string.snackbarSubjectCopiedToClipboard, mainViewModel.snackBarManager)
             true
         }
     }

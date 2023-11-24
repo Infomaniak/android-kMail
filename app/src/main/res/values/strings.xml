@@ -278,6 +278,9 @@
     <string name="fromTitle">From:</string>
     <string name="googlePlayServicesAreRequired">Google Play Services are required</string>
     <string name="inboxFolder">Inbox</string>
+    <string name="linkContextMenuCopy">Copy link</string>
+    <string name="linkContextMenuOpen">Open the link in browser</string>
+    <string name="linkContextMenuShare">Share link</string>
     <string name="loadingText">Loading…</string>
     <plurals name="lockedMailboxDescription">
         <item quantity="one">Access to your mailbox is currently blocked. Please contact your administrator.</item>
@@ -446,6 +449,7 @@
     <string name="snackbarEmailSending">Email sending in progress</string>
     <string name="snackbarEmailSent">Email sent</string>
     <string name="snackbarInvalidUrl">Invalid URL</string>
+    <string name="snackbarLinkCopiedToClipboard">Link copied to clipboard</string>
     <string name="snackbarMailboxPasswordRequested">Request sent to administrator</string>
     <string name="snackbarMessageDeletedPermanently">Message deleted</string>
     <string name="snackbarMessageMoved">Message moved to %s</string>

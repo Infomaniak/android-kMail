@@ -24,7 +24,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
-import androidx.viewbinding.ViewBinding
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.hideProgress
@@ -37,7 +36,6 @@ abstract class BaseAlertDialog(@ActivityContext private val activityContext: Con
 
     protected val activity = activityContext as AppCompatActivity
 
-    protected abstract val binding: ViewBinding
     protected abstract val alertDialog: AlertDialog
 
     private var isProgressInitialized = false
