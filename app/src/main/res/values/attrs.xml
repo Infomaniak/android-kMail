@@ -141,4 +141,11 @@
         <attr name="showCloseIcon" format="boolean" />
     </declare-styleable>
 
+    <declare-styleable name="AttachmentDetailsView">
+        <attr name="displayStyle" format="enum">
+            <enum name="chip" value="0" />
+            <enum name="bottomSheet" value="1" />
+        </attr>
+    </declare-styleable>
+
 </resources>
