@@ -22,6 +22,7 @@ import android.content.Context
 import android.net.Uri
 import android.view.*
 import android.webkit.WebView
+import android.webkit.WebView.*
 import android.widget.FrameLayout
 import androidx.core.view.children
 import androidx.core.view.isGone
@@ -449,8 +450,8 @@ class ThreadAdapter(
             val result = hitTestResult
 
             when (result.type) {
-                WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE,
-                WebView.HitTestResult.SRC_ANCHOR_TYPE -> {
+                HitTestResult.SRC_IMAGE_ANCHOR_TYPE,
+                HitTestResult.SRC_ANCHOR_TYPE -> {
                     getLinkFromResult(result)?.let { url -> onClicked(url) }
                     true
                 }
@@ -459,10 +460,10 @@ class ThreadAdapter(
         }
     }
 
-    private fun WebView.getLinkFromResult(hitTestResult: WebView.HitTestResult): String? {
+    private fun WebView.getLinkFromResult(hitTestResult: HitTestResult): String? {
         return when (hitTestResult.type) {
-            WebView.HitTestResult.SRC_ANCHOR_TYPE -> hitTestResult.extra
-            WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE -> {
+            HitTestResult.SRC_ANCHOR_TYPE -> hitTestResult.extra
+            HitTestResult.SRC_IMAGE_ANCHOR_TYPE -> {
                 val message = handler.obtainMessage()
                 requestFocusNodeHref(message)
                 message.data.getString("url")
