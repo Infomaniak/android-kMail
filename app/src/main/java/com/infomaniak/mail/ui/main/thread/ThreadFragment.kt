@@ -22,6 +22,7 @@ import android.content.res.Configuration
 import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -316,7 +317,13 @@ class ThreadFragment : Fragment() {
             navigateToNewMessageActivity = { uri ->
                 safeNavigateToNewMessageActivity(NewMessageActivityArgs(mailToUri = uri).toBundle())
             },
-            promptLink = linkContextualMenuAlertDialog::show
+            promptLink = { url, type ->
+                when (type) {
+                    ThreadAdapter.ContextMenuType.LINK -> linkContextualMenuAlertDialog.show(url)
+                    ThreadAdapter.ContextMenuType.EMAIL -> Log.e("gibran", "initAdapter: show email")
+                    ThreadAdapter.ContextMenuType.PHONE -> Log.e("gibran", "initAdapter: show phone")
+                }
+            }
         )
     }
 
