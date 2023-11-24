@@ -88,9 +88,7 @@ class AiPropositionFragment : Fragment() {
         handleBackDispatcher()
         setUi()
 
-        if (aiViewModel.aiPropositionStatusLiveData.value == null) {
-            currentRequestJob = aiViewModel.generateNewAiProposition(newMessageViewModel.currentMailbox.uuid)
-        }
+        if (aiViewModel.aiPropositionStatusLiveData.value == null) generateNewAiProposition()
         observeAiProposition()
     }
 
@@ -254,6 +252,12 @@ class AiPropositionFragment : Fragment() {
             .setNegativeButton(RCore.string.buttonCancel, null)
             .setOnDismissListener { if (checkbox.isChecked) trackAiWriterEvent("doNotShowAgain", TrackerAction.DATA) }
             .create()
+    }
+
+    private fun generateNewAiProposition() {
+        val formattedRecipientsString = newMessageViewModel.draft.to.joinToString(", ") { it.name }.takeIf { it.isNotBlank() }
+        val currentMailboxUuid = newMessageViewModel.currentMailbox.uuid
+        currentRequestJob = aiViewModel.generateNewAiProposition(currentMailboxUuid, formattedRecipientsString)
     }
 
     private fun observeAiProposition() {
