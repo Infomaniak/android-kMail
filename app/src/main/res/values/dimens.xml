@@ -29,11 +29,11 @@
     <dimen name="searchViewHeight">38dp</dimen>
     <dimen name="smallCornerRadius">6dp</dimen>
     <dimen name="userAvatarSizeLarge">40dp</dimen>
-    <dimen name="checkMarkSizeOther">32dp</dimen>
     <dimen name="messageDividerHeight">6dp</dimen>
     <dimen name="smallIconSize">12dp</dimen>
     <dimen name="mediumIconSize">16dp</dimen>
     <dimen name="standardIconSize">24dp</dimen>
+    <dimen name="largeIconSize">32dp</dimen>
     <dimen name="maxSearchChipWidth">300dp</dimen>
     <dimen name="contactPopupMaxWidth">300dp</dimen>
     <dimen name="textButtonPrimaryHeight">56dp</dimen>
