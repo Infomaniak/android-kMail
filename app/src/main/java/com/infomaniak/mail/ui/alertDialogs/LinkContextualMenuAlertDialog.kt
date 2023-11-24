@@ -18,12 +18,8 @@
 package com.infomaniak.mail.ui.alertDialogs
 
 import android.content.Context
-import androidx.appcompat.app.AlertDialog
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
-import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.R
-import com.infomaniak.mail.databinding.DialogLinkContextualMenuBinding
 import com.infomaniak.mail.ui.main.SnackBarManager
 import com.infomaniak.mail.utils.copyStringToClipboard
 import com.infomaniak.mail.utils.shareString
@@ -34,43 +30,16 @@ import javax.inject.Inject
 @ActivityScoped
 class LinkContextualMenuAlertDialog @Inject constructor(
     @ActivityContext private val activityContext: Context,
-) : BaseAlertDialog(activityContext) {
-
-    private val items = arrayOf(
-        activityContext.getString(R.string.linkContextMenuOpen),
-        activityContext.getString(R.string.linkContextMenuCopy),
-        activityContext.getString(R.string.linkContextMenuShare),
+) : ContextualMenuAlertDialog(activityContext) {
+    override val items = listOf<Pair<Int, (String, SnackBarManager) -> Unit>>(
+        R.string.linkContextMenuOpen to { url, _ ->
+            activityContext.openUrl(url)
+        },
+        R.string.linkContextMenuCopy to { url, snackBarManager ->
+            activityContext.copyStringToClipboard(url, R.string.snackbarLinkCopiedToClipboard, snackBarManager)
+        },
+        R.string.linkContextMenuShare to { url, _ ->
+            activityContext.shareString(url)
+        },
     )
-
-    val binding: DialogLinkContextualMenuBinding by lazy { DialogLinkContextualMenuBinding.inflate(activity.layoutInflater) }
-    override val alertDialog: AlertDialog = initDialog()
-
-    private lateinit var snackBarManager: SnackBarManager
-
-    private var lastUrl = ""
-
-    fun initValues(snackBarManager: SnackBarManager) {
-        this.snackBarManager = snackBarManager
-    }
-
-    private fun initDialog(): AlertDialog = with(binding) {
-        MaterialAlertDialogBuilder(context)
-            .setCustomTitle(binding.root)
-            .setItems(items) { _, index ->
-                when (index) {
-                    0 -> context.openUrl(lastUrl)
-                    1 -> context.copyStringToClipboard(lastUrl, R.string.snackbarLinkCopiedToClipboard, snackBarManager)
-                    2 -> context.shareString(lastUrl)
-                }
-            }
-            .create()
-    }
-
-    override fun resetCallbacks() = Unit
-
-    fun show(url: String) {
-        binding.url.text = url
-        lastUrl = url
-        alertDialog.show()
-    }
 }
