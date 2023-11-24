@@ -452,7 +452,7 @@ class ThreadAdapter(
             when (result.type) {
                 HitTestResult.SRC_IMAGE_ANCHOR_TYPE,
                 HitTestResult.SRC_ANCHOR_TYPE -> {
-                    getLinkFromResult(result)?.let { url -> onClicked(url) }
+                    getLinkFromResult(result)?.let(onClicked)
                     true
                 }
                 else -> false

@@ -316,7 +316,7 @@ class ThreadFragment : Fragment() {
             navigateToNewMessageActivity = { uri ->
                 safeNavigateToNewMessageActivity(NewMessageActivityArgs(mailToUri = uri).toBundle())
             },
-            promptLink = { url -> linkContextualMenuAlertDialog.show(url) }
+            promptLink = linkContextualMenuAlertDialog::show
         )
     }
 
