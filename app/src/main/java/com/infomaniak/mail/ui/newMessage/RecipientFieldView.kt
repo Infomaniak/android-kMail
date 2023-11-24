@@ -430,7 +430,7 @@ class RecipientFieldView @JvmOverloads constructor(
     }
 
     companion object {
-        private const val MAX_WIDTH_PERCENTAGE = 0.8
+        private const val MAX_WIDTH_PERCENTAGE = 0.8f
         private const val MAX_ALLOWED_RECIPIENT = 99
         private const val EXTERNAL_CHIP_STROKE_WIDTH = 1
         private const val NO_STROKE = 0.0f

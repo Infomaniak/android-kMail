@@ -144,7 +144,6 @@ class SharedUtils @Inject constructor(
     }
 
     companion object {
-
         fun updateSignatures(mailbox: Mailbox, customRealm: Realm): Int? {
             return with(ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName)) {
                 if (isSuccess() && data?.signatures?.isNotEmpty() == true) {

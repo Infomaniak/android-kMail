@@ -251,14 +251,8 @@ class SearchViewModel @Inject constructor(
     }
 
     companion object {
-
         private val TAG: String = SearchViewModel::class.java.simpleName
-
-        /**
-         * The minimum value allowed for a search query
-         */
-        private const val MIN_SEARCH_QUERY = 3
-
+        private const val MIN_SEARCH_QUERY = 3 // The minimum value allowed for a search query
         private const val SEARCH_DEBOUNCE_DURATION = 500L
     }
 }

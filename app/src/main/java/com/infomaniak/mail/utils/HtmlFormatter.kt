@@ -170,8 +170,8 @@ class HtmlFormatter(private val html: String) {
 
         private const val WBR = "wbr"
         private const val BREAK_LIMIT = 30
-        // Across a few handpicked representative emails, average text node length for text nodes bigger than 30 characters seems
-        // to be centered between 60 and 120
+        // Across a few handpicked representative emails, average text node length for text
+        // nodes bigger than 30 characters seems to be centered between 60 and 120.
         private const val OPTIMAL_STRING_LENGTH = 120
         private val DETECT_BUT_DO_NOT_BREAK = setOf(' ')
         private val BREAK_CHARACTERS = setOf(':', '/', '~', '.', ',', '-', '_', '?', '#', '%', '=', '&')
