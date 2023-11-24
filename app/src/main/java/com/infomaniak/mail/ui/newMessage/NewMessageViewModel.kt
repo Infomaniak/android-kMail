@@ -83,6 +83,7 @@ class NewMessageViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val sharedUtils: SharedUtils,
     private val signatureUtils: SignatureUtils,
+    private val aiSharedData: AiSharedData,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
@@ -95,7 +96,6 @@ class NewMessageViewModel @Inject constructor(
             field = value
             if (field.body.isNotEmpty()) splitSignatureAndQuoteFromBody()
         }
-    var previousMessageBodyPlainText: String? = null
     var selectedSignatureId = -1
 
     var isAutoCompletionOpened = false
@@ -365,7 +365,7 @@ class NewMessageViewModel @Inject constructor(
 
     private suspend fun parsePreviousMailToAnswerWithAi(previousMessageBody: Body, messageUid: String) {
         if (draftMode == DraftMode.REPLY || draftMode == DraftMode.REPLY_ALL) {
-            previousMessageBodyPlainText = previousMessageBody.asPlainText(messageUid)
+            aiSharedData.previousMessageBodyPlainText = previousMessageBody.asPlainText(messageUid)
         }
     }
 

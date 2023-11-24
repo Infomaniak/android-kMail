@@ -126,14 +126,14 @@ class AiPromptFragment : Fragment() {
                 setText(aiViewModel.aiPrompt)
                 setSelection(length())
 
-                val isAnswering = newMessageViewModel.previousMessageBodyPlainText != null
-                val placeholder = if (isAnswering) getAnswerPlaceholder() else getPlaceholderFromScratch()
+                val isReplying = aiViewModel.previousMessageBodyPlainText != null
+                val placeholder = if (isReplying) getReplyPlaceholder() else getPlaceholderFromScratch()
                 hint = placeholder
             }
         }
     }
 
-    private fun getAnswerPlaceholder(): String = getString(R.string.aiPromptAnswer)
+    private fun getReplyPlaceholder(): String = getString(R.string.aiPromptAnswer)
 
     private fun getPlaceholderFromScratch(): String {
         val promptExample = getString(promptExamples.random())

@@ -89,10 +89,7 @@ class AiPropositionFragment : Fragment() {
         setUi()
 
         if (aiViewModel.aiPropositionStatusLiveData.value == null) {
-            currentRequestJob = aiViewModel.generateNewAiProposition(
-                newMessageViewModel.currentMailbox.uuid,
-                newMessageViewModel.previousMessageBodyPlainText,
-            )
+            currentRequestJob = aiViewModel.generateNewAiProposition(newMessageViewModel.currentMailbox.uuid)
         }
         observeAiProposition()
     }
@@ -133,7 +130,10 @@ class AiPropositionFragment : Fragment() {
 
         retryButton.setOnClickListener {
             trackAiWriterEvent("retry")
-            aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(isOpened = true)
+            aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(
+                isOpened = true,
+                shouldResetPrompt = aiViewModel.aiPropositionStatusLiveData.value != PropositionStatus.CONTEXT_TOO_LONG,
+            )
             findNavController().popBackStack()
         }
 
@@ -279,6 +279,7 @@ class AiPropositionFragment : Fragment() {
                 }
                 PropositionStatus.ERROR,
                 PropositionStatus.PROMPT_TOO_LONG,
+                PropositionStatus.CONTEXT_TOO_LONG,
                 PropositionStatus.RATE_LIMIT_EXCEEDED,
                 PropositionStatus.MISSING_CONTENT -> {
                     sendMissingContentSentry(propositionStatus)

@@ -44,6 +44,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AiViewModel @Inject constructor(
     private val sharedUtils: SharedUtils,
+    aiSharedData: AiSharedData,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -56,14 +57,12 @@ class AiViewModel @Inject constructor(
     private var history = mutableListOf<AiMessage>()
     private var conversationContextId: String? = null
     var aiPromptOpeningStatus = MutableLiveData<AiPromptOpeningStatus>()
+    var previousMessageBodyPlainText by aiSharedData::previousMessageBodyPlainText
 
     val aiPropositionStatusLiveData = MutableLiveData<PropositionStatus>()
     val aiOutputToInsert = SingleLiveEvent<Pair<String?, String>>()
 
-    fun generateNewAiProposition(
-        currentMailboxUuid: String,
-        previousMessageBodyPlainText: String?,
-    ) = viewModelScope.launch(ioCoroutineContext) {
+    fun generateNewAiProposition(currentMailboxUuid: String) = viewModelScope.launch(ioCoroutineContext) {
         history.clear()
 
         val contextMessage = previousMessageBodyPlainText?.let(::ContextMessage)
@@ -79,23 +78,38 @@ class AiViewModel @Inject constructor(
         )
 
         ensureActive()
-        handleAiResult(apiResponse, userMessage)
+        handleAiResult(apiResponse, userMessage, isUsingPreviousMessageAsContext = previousMessageBodyPlainText != null)
     }
 
-    private fun handleAiResult(apiResponse: ApiResponse<AiResult>, promptMessage: AiMessage?) = with(apiResponse) {
-        aiPropositionStatusLiveData.postValue(
-            when {
-                isSuccess() -> data?.let { aiResult ->
-                    aiResult.contextId?.let { conversationContextId = it }
-                    history += promptMessage!!
-                    history += AssistantMessage(aiResult.content)
-                    SUCCESS
-                } ?: MISSING_CONTENT
-                error?.code == MAX_SYNTAX_TOKENS_REACHED -> PROMPT_TOO_LONG
-                error?.code == TOO_MANY_REQUESTS -> RATE_LIMIT_EXCEEDED
-                else -> ERROR
-            }
-        )
+    private fun handleAiResult(
+        apiResponse: ApiResponse<AiResult>,
+        promptMessage: AiMessage?,
+        isUsingPreviousMessageAsContext: Boolean,
+    ) = with(apiResponse) {
+        val propositionStatus = when {
+            isSuccess() -> updateHistoryAndContext(promptMessage!!)
+            error?.code == MAX_SYNTAX_TOKENS_REACHED -> handleMaxTokenAndChooseStatus(isUsingPreviousMessageAsContext)
+            error?.code == TOO_MANY_REQUESTS -> RATE_LIMIT_EXCEEDED
+            else -> ERROR
+        }
+
+        aiPropositionStatusLiveData.postValue(propositionStatus)
+    }
+
+    private fun ApiResponse<AiResult>.updateHistoryAndContext(promptMessage: AiMessage): PropositionStatus {
+        return data?.let { aiResult ->
+            aiResult.contextId?.let { conversationContextId = it }
+            history += promptMessage
+            history += AssistantMessage(aiResult.content)
+            SUCCESS
+        } ?: MISSING_CONTENT
+    }
+
+    private fun handleMaxTokenAndChooseStatus(isUsingPreviousMessageAsContext: Boolean) = if (isUsingPreviousMessageAsContext) {
+        previousMessageBodyPlainText = null // Discard previous mail context
+        CONTEXT_TOO_LONG
+    } else {
+        PROMPT_TOO_LONG
     }
 
     fun performShortcut(shortcut: Shortcut, currentMailboxUuid: String) = viewModelScope.launch(ioCoroutineContext) {
@@ -110,14 +124,16 @@ class AiViewModel @Inject constructor(
             ensureActive()
         }
 
-        handleAiResult(apiResponse, apiResponse.data?.promptMessage)
+        handleAiResult(apiResponse, apiResponse.data?.promptMessage, isUsingPreviousMessageAsContext = false)
     }
 
     fun updateFeatureFlag(currentMailboxObjectId: String, mailboxUuid: String) = viewModelScope.launch(ioCoroutineContext) {
         sharedUtils.updateAiFeatureFlag(currentMailboxObjectId, mailboxUuid)
     }
 
-    fun isHistoryEmpty(): Boolean = history.isEmpty()
+    fun isHistoryEmpty(): Boolean = history.excludingContextMessage().isEmpty()
+
+    private fun List<AiMessage>.excludingContextMessage(): List<AiMessage> = filterNot { it.type == "context" }
 
     fun getLastMessage(): String = history.last().content
 
@@ -134,6 +150,7 @@ class AiViewModel @Inject constructor(
         SUCCESS(null),
         ERROR(R.string.aiErrorUnknown),
         PROMPT_TOO_LONG(R.string.aiErrorMaxTokenReached),
+        CONTEXT_TOO_LONG(R.string.aiErrorContextMaxTokenReached),
         RATE_LIMIT_EXCEEDED(R.string.aiErrorTooManyRequests),
         MISSING_CONTENT(R.string.aiErrorUnknown),
     }
