@@ -38,22 +38,40 @@
             app:displayStyle="chip"
             app:layout_constraintStart_toStartOf="parent" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/closeButton"
-            style="@style/IconButton"
+        <FrameLayout
+            android:id="@+id/endButton"
             android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:contentDescription="@string/actionDelete"
-            android:visibility="gone"
-            app:icon="@drawable/ic_close_small"
-            app:iconSize="@dimen/smallIconSize"
-            app:iconTint="@color/iconColor"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_height="match_parent"
             app:layout_constraintDimensionRatio="1"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/attachmentDetails"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:visibility="visible" />
+            app:layout_constraintStart_toEndOf="@id/attachmentDetails">
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/closeButton"
+                style="@style/IconButton"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/actionDelete"
+                android:visibility="gone"
+                app:icon="@drawable/ic_close_small"
+                app:iconSize="@dimen/smallIconSize"
+                app:iconTint="@color/iconColor"
+                tools:visibility="visible" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/moreButton"
+                style="@style/IconButton"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                android:clickable="false"
+                android:contentDescription="@string/buttonMore"
+                android:focusable="false"
+                android:visibility="gone"
+                app:icon="@drawable/ic_param_dots"
+                app:iconSize="@dimen/mediumIconSize"
+                app:iconTint="@color/iconColor" />
+
+        </FrameLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

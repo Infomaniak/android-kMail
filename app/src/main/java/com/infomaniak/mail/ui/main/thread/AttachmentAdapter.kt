@@ -49,11 +49,12 @@ class AttachmentAdapter(
         val attachment = attachments[position]
 
         attachmentDetails.setDetails(attachment)
+        onAttachmentClicked?.let { root.setOnClickListener { it(attachment) } }
+        moreButton.isVisible = !shouldDisplayCloseButton
+        closeButton.apply {
+            isVisible = shouldDisplayCloseButton
 
-        if (!shouldDisplayCloseButton) {
-            root.setOnClickListener { onAttachmentClicked?.invoke(attachment) }
-        } else {
-            closeButton.apply {
+            if (shouldDisplayCloseButton) {
                 contentDescription = context.getString(R.string.contentDescriptionButtonDelete, attachment.name)
                 setOnClickListener {
                     val index = attachments.indexOf(attachment)
@@ -69,7 +70,6 @@ class AttachmentAdapter(
                         onDelete?.invoke(index, itemCount)
                     }
                 }
-                isVisible = true
             }
         }
     }
