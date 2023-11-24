@@ -122,11 +122,10 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     mainViewModel.archiveMessage(threadUid, message)
                 }
 
-                override fun onReadUnread() {
+                override fun onReadUnread() = with(mainViewModel) {
                     trackBottomSheetMessageActionsEvent(ACTION_MARK_AS_SEEN_NAME, message.isSeen)
-                    mainViewModel.toggleMessageSeenStatus(threadUid, message)
-                    // TODO
-                    // findNavController().popBackStack(R.id.threadFragment, inclusive = true)
+                    toggleMessageSeenStatus(threadUid, message)
+                    closeThread()
                 }
 
                 override fun onMove() {
