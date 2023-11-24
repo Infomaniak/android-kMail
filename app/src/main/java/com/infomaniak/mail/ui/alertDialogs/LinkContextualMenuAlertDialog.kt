@@ -53,7 +53,7 @@ class LinkContextualMenuAlertDialog @Inject constructor(
         this.snackBarManager = snackBarManager
     }
 
-    override fun initDialog(): AlertDialog = with(binding) {
+    private fun initDialog(): AlertDialog = with(binding) {
         MaterialAlertDialogBuilder(context)
             .setCustomTitle(binding.root)
             .setItems(items) { _, index ->
