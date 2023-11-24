@@ -25,7 +25,6 @@ import android.widget.FrameLayout
 import androidx.annotation.DimenRes
 import androidx.annotation.StyleRes
 import coil.load
-import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.mail.R
@@ -43,25 +42,21 @@ class AttachmentDetailsView @JvmOverloads constructor(
 
     init {
         attrs?.getAttributes(context, R.styleable.AttachmentDetailsView) {
-            when (DisplayStyle.values()[getInteger(R.styleable.AttachmentDetailsView_displayStyle, 0)]) {
-                DisplayStyle.CHIP -> displayChipStyle()
-                DisplayStyle.BOTTOMSHEET -> displayBottomSheetStyle()
+            val displayStyle = DisplayStyle.values()[getInteger(R.styleable.AttachmentDetailsView_displayStyle, 0)]
+            val displayResources = displayStyle.getStyleResources()
+            val iconSize = context.resources.getDimension(displayResources.iconSize).toInt()
+            val marginSize = context.resources.getDimension(displayResources.marginSize).toInt()
+
+            with(binding) {
+                fileName.setTextAppearance(displayResources.fileNameStyle)
+                fileSize.setTextAppearance(displayResources.fileSizeStyle)
+                icon.apply {
+                    layoutParams.height = iconSize
+                    layoutParams.width = iconSize
+                    setMarginsRelative(start = marginSize, end = marginSize)
+                }
             }
         }
-    }
-
-    private fun displayChipStyle() = with(binding) {
-    }
-
-    private fun displayBottomSheetStyle() = with(binding) {
-        val iconSize = context.resources.getDimension(R.dimen.largeIconSize).toInt()
-        val marginStandard = context.resources.getDimension(RCore.dimen.marginStandard).toInt()
-        icon.apply {
-            layoutParams = LayoutParams(iconSize, iconSize)
-            setMarginsRelative(start = marginStandard, end = marginStandard)
-        }
-        fileName.setTextAppearance(R.style.Body)
-        fileSize.setTextAppearance(R.style.Body_Secondary)
     }
 
     fun setDetails(attachment: Attachment) = with(binding) {
@@ -70,15 +65,30 @@ class AttachmentDetailsView @JvmOverloads constructor(
         icon.load(attachment.getFileTypeFromMimeType().icon)
     }
 
-    enum class DisplayStyle {
-        CHIP, BOTTOMSHEET
+    private enum class DisplayStyle {
+        CHIP {
+            override fun getStyleResources() = DisplayStyleResources(
+                iconSize = R.dimen.standardIconSize,
+                marginSize = RCore.dimen.marginStandardSmall,
+                fileNameStyle = R.style.BodySmall,
+                fileSizeStyle = R.style.BodySmall_Secondary,
+            )
+        },
+        BOTTOMSHEET {
+            override fun getStyleResources() = DisplayStyleResources(
+                iconSize = R.dimen.largeIconSize,
+                marginSize = RCore.dimen.marginStandard,
+                fileNameStyle = R.style.Body,
+                fileSizeStyle = R.style.Body_Secondary,
+            )
+        };
 
-
+        abstract fun getStyleResources(): DisplayStyleResources
     }
 
     private data class DisplayStyleResources(
         @DimenRes val iconSize: Int,
-        @DimenRes val marginStandard: Int,
+        @DimenRes val marginSize: Int,
         @StyleRes val fileNameStyle: Int,
         @StyleRes val fileSizeStyle: Int,
     )
