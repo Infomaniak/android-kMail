@@ -73,6 +73,7 @@
     <string name="aiMenuRegenerate">Regenerate a response</string>
     <string name="aiMenuSeriousWriting">Serious writing</string>
     <string name="aiMenuShorten">Shorten</string>
+    <string name="aiPromptAnswer">Tell the assistant how it can help you reply to this email.</string>
     <string name="aiPromptExample1">a thank-you email for a welcome gift</string>
     <string name="aiPromptExample2">an email confirming your hotel reservation</string>
     <string name="aiPromptExample3">a thank-you email for an invitation to an event</string>

@@ -60,13 +60,26 @@ class AiViewModel @Inject constructor(
     val aiPropositionStatusLiveData = MutableLiveData<PropositionStatus>()
     val aiOutputToInsert = SingleLiveEvent<Pair<String?, String>>()
 
-    fun generateNewAiProposition(currentMailboxUuid: String) = viewModelScope.launch(ioCoroutineContext) {
+    fun generateNewAiProposition(
+        currentMailboxUuid: String,
+        previousMessageBodyPlainText: String?,
+    ) = viewModelScope.launch(ioCoroutineContext) {
         history.clear()
+
+        val contextMessage = previousMessageBodyPlainText?.let(::ContextMessage)
         val userMessage = UserMessage(aiPrompt)
-        with(ApiRepository.startNewConversation(userMessage, currentMailboxUuid, localSettings.aiEngine)) {
-            ensureActive()
-            handleAiResult(apiResponse = this, userMessage)
-        }
+
+        contextMessage?.let(history::add)
+
+        val apiResponse = ApiRepository.startNewConversation(
+            contextMessage,
+            userMessage,
+            currentMailboxUuid,
+            localSettings.aiEngine,
+        )
+
+        ensureActive()
+        handleAiResult(apiResponse, userMessage)
     }
 
     private fun handleAiResult(apiResponse: ApiResponse<AiResult>, promptMessage: AiMessage?) = with(apiResponse) {
@@ -97,7 +110,7 @@ class AiViewModel @Inject constructor(
             ensureActive()
         }
 
-        handleAiResult(apiResponse = apiResponse, apiResponse.data?.promptMessage)
+        handleAiResult(apiResponse, apiResponse.data?.promptMessage)
     }
 
     fun updateFeatureFlag(currentMailboxObjectId: String, mailboxUuid: String) = viewModelScope.launch(ioCoroutineContext) {

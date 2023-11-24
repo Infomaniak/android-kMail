@@ -126,10 +126,18 @@ class AiPromptFragment : Fragment() {
                 setText(aiViewModel.aiPrompt)
                 setSelection(length())
 
-                val promptExample = getString(promptExamples.random())
-                hint = getString(R.string.aiPromptPlaceholder, promptExample)
+                val isAnswering = newMessageViewModel.previousMessageBodyPlainText != null
+                val placeholder = if (isAnswering) getAnswerPlaceholder() else getPlaceholderFromScratch()
+                hint = placeholder
             }
         }
+    }
+
+    private fun getAnswerPlaceholder(): String = getString(R.string.aiPromptAnswer)
+
+    private fun getPlaceholderFromScratch(): String {
+        val promptExample = getString(promptExamples.random())
+        return getString(R.string.aiPromptPlaceholder, promptExample)
     }
 
     private fun updateButtonEnabledState(prompt: Editable?) {

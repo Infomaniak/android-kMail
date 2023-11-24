@@ -41,11 +41,13 @@ import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.di.IoDispatcher
@@ -56,6 +58,7 @@ import com.infomaniak.mail.ui.newMessage.NewMessageFragment.FieldType
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.SignatureScore.*
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
+import com.infomaniak.mail.utils.Utils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
@@ -92,6 +95,7 @@ class NewMessageViewModel @Inject constructor(
             field = value
             if (field.body.isNotEmpty()) splitSignatureAndQuoteFromBody()
         }
+    var previousMessageBodyPlainText: String? = null
     var selectedSignatureId = -1
 
     var isAutoCompletionOpened = false
@@ -210,7 +214,7 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    private fun getNewDraft(signatures: List<Signature>, realm: Realm): Draft? {
+    private suspend fun getNewDraft(signatures: List<Signature>, realm: Realm): Draft? {
         isNewMessage = true
         return createDraft(signatures, realm)
     }
@@ -333,7 +337,7 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    private fun createDraft(signatures: List<Signature>, realm: Realm): Draft? = Draft().apply {
+    private suspend fun createDraft(signatures: List<Signature>, realm: Realm): Draft? = Draft().apply {
         initLocalValues(mimeType = ClipDescription.MIMETYPE_TEXT_HTML)
 
         val shouldPreselectSignature = draftMode == DraftMode.REPLY || draftMode == DraftMode.REPLY_ALL
@@ -344,23 +348,36 @@ class NewMessageViewModel @Inject constructor(
             DraftMode.REPLY, DraftMode.REPLY_ALL, DraftMode.FORWARD -> {
                 previousMessageUid
                     ?.let { uid -> MessageController.getMessage(uid, realm) }
-                    ?.let { message ->
-                        val isSuccess = draftController.setPreviousMessage(
-                            draft = this,
-                            draftMode = draftMode,
-                            message = message,
-                            realm = realm,
-                        )
-                        if (!isSuccess) return null
+                    ?.let { previousMessage ->
+                        val (fullMessage, hasFailedFetching) = draftController.fetchHeavyDataIfNeeded(previousMessage, realm)
 
-                        if (shouldPreselectSignature) {
-                            val mostFittingSignature = guessMostFittingSignature(message, signatures)
-                            identityId = mostFittingSignature.id.toString()
-                            body += signatureUtils.encapsulateSignatureContentWithInfomaniakClass(mostFittingSignature.content)
-                        }
+                        if (hasFailedFetching) return null
+
+                        draftController.setPreviousMessage(draft = this, draftMode = draftMode, previousMessage = fullMessage)
+
+                        val isAiEnabled = currentMailbox.featureFlags.contains(FeatureFlag.AI)
+                        if (isAiEnabled) parsePreviousMailToAnswerWithAi(fullMessage.body!!)
+                        if (shouldPreselectSignature) preSelectSignature(previousMessage, signatures)
                     }
             }
         }
+    }
+
+    private suspend fun parsePreviousMailToAnswerWithAi(previousMessageBody: Body) {
+        if (draftMode == DraftMode.REPLY || draftMode == DraftMode.REPLY_ALL) {
+            previousMessageBodyPlainText = previousMessageBody.asPlainText()
+        }
+    }
+
+    private suspend fun Body.asPlainText(): String = when (type) {
+        Utils.TEXT_HTML -> MessageBodyUtils.splitContentAndQuote(this).content.htmlToText()
+        else -> value
+    }
+
+    private fun Draft.preSelectSignature(message: Message, signatures: List<Signature>) {
+        val mostFittingSignature = guessMostFittingSignature(message, signatures)
+        identityId = mostFittingSignature.id.toString()
+        body += signatureUtils.encapsulateSignatureContentWithInfomaniakClass(mostFittingSignature.content)
     }
 
     private fun guessMostFittingSignature(message: Message, signatures: List<Signature>): Signature {

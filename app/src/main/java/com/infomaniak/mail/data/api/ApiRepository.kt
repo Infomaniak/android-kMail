@@ -35,6 +35,7 @@ import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition
 import com.infomaniak.mail.data.models.addressBook.AddressBooksResult
 import com.infomaniak.mail.data.models.ai.AiMessage
 import com.infomaniak.mail.data.models.ai.AiResult
+import com.infomaniak.mail.data.models.ai.ContextMessage
 import com.infomaniak.mail.data.models.ai.UserMessage
 import com.infomaniak.mail.data.models.correspondent.Contact
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -288,8 +289,15 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.flushFolder(mailboxUuid, folderId), POST)
     }
 
-    fun startNewConversation(message: UserMessage, currentMailboxUuid: String, aiEngine: AiEngine): ApiResponse<AiResult> {
-        val body = getAiBodyFromMessages(listOf(message), aiEngine)
+    fun startNewConversation(
+        contextMessage: ContextMessage?,
+        message: UserMessage,
+        currentMailboxUuid: String,
+        aiEngine: AiEngine,
+    ): ApiResponse<AiResult> {
+        val messages = if (contextMessage == null) listOf(message) else listOf(contextMessage, message)
+
+        val body = getAiBodyFromMessages(messages, aiEngine)
         return callApi(ApiRoutes.aiConversation(currentMailboxUuid), POST, body, HttpClient.okHttpClientLongTimeout)
     }
 

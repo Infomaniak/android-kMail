@@ -84,18 +84,7 @@ class DraftController @Inject constructor(
     //endregion
 
     //region Open Draft
-    fun setPreviousMessage(draft: Draft, draftMode: DraftMode, message: Message, realm: Realm): Boolean {
-
-        var isSuccess = true
-
-        val previousMessage = if (message.isFullyDownloaded()) {
-            message
-        } else {
-            val (deleted, failed) = ThreadController.fetchMessagesHeavyData(listOf(message), realm)
-            isSuccess = deleted.isEmpty() && failed.isEmpty()
-            MessageController.getMessage(message.uid, realm)!!
-        }
-
+    fun setPreviousMessage(draft: Draft, draftMode: DraftMode, previousMessage: Message) {
         draft.inReplyTo = previousMessage.messageId
 
         val previousReferences = if (previousMessage.references == null) "" else "${previousMessage.references} "
@@ -127,8 +116,14 @@ class DraftController @Inject constructor(
             }
             DraftMode.NEW_MAIL -> Unit
         }
+    }
 
-        return isSuccess
+    fun fetchHeavyDataIfNeeded(message: Message, realm: Realm): Pair<Message, Boolean> {
+        if (message.isFullyDownloaded()) return message to false
+
+        val (deleted, failed) = ThreadController.fetchMessagesHeavyData(listOf(message), realm)
+        val hasFailedFetching = deleted.isNotEmpty() || failed.isNotEmpty()
+        return MessageController.getMessage(message.uid, realm)!! to hasFailedFetching
     }
 
     private fun Context.replyQuote(message: Message): String {
