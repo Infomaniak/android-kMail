@@ -22,7 +22,7 @@ import android.content.Context
 import android.net.Uri
 import android.view.*
 import android.webkit.WebView
-import android.webkit.WebView.*
+import android.webkit.WebView.HitTestResult
 import android.widget.FrameLayout
 import androidx.core.view.children
 import androidx.core.view.isGone
@@ -456,6 +456,7 @@ class ThreadAdapter(
             when (result.type) {
                 HitTestResult.PHONE_TYPE,
                 HitTestResult.EMAIL_TYPE,
+                HitTestResult.GEO_TYPE,
                 HitTestResult.SRC_IMAGE_ANCHOR_TYPE,
                 HitTestResult.SRC_ANCHOR_TYPE -> {
                     getDataFromResult(result)?.let { data -> onClicked(data, contextMenuTypeForHitTestResultType[result.type]!!) }
@@ -471,6 +472,7 @@ class ThreadAdapter(
             HitTestResult.PHONE_TYPE,
             HitTestResult.EMAIL_TYPE,
             HitTestResult.SRC_ANCHOR_TYPE -> hitTestResult.extra
+            HitTestResult.GEO_TYPE -> WebView.SCHEME_GEO + hitTestResult.extra
             HitTestResult.SRC_IMAGE_ANCHOR_TYPE -> {
                 val message = handler.obtainMessage()
                 requestFocusNodeHref(message)
@@ -670,6 +672,7 @@ class ThreadAdapter(
         private val contextMenuTypeForHitTestResultType = mapOf(
             HitTestResult.PHONE_TYPE to ContextMenuType.PHONE,
             HitTestResult.EMAIL_TYPE to ContextMenuType.EMAIL,
+            HitTestResult.GEO_TYPE to ContextMenuType.LINK,
             HitTestResult.SRC_ANCHOR_TYPE to ContextMenuType.LINK,
             HitTestResult.SRC_IMAGE_ANCHOR_TYPE to ContextMenuType.LINK,
         )
