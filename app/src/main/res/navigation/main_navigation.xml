@@ -178,6 +178,9 @@
         <action
             android:id="@+id/action_threadFragment_to_downloadAttachmentProgressDialog"
             app:destination="@id/downloadAttachmentProgressDialog" />
+        <action
+            android:id="@+id/action_threadFragment_to_attachmentActionsBottomSheetDialog"
+            app:destination="@id/attachmentActionsBottomSheetDialog" />
     </fragment>
 
     <dialog
@@ -591,9 +594,22 @@
         android:id="@+id/syncDiscoveryBottomSheetDialog"
         android:name="com.infomaniak.mail.ui.bottomSheetDialogs.SyncDiscoveryBottomSheetDialog"
         android:label="SyncDiscoveryBottomSheetDialog" />
+
     <fragment
         android:id="@+id/aiEngineSettingFragment"
         android:name="com.infomaniak.mail.ui.main.settings.swipe.AiEngineSettingFragment"
         android:label="AiEngineSettingFragment" />
+
+    <dialog
+        android:id="@+id/attachmentActionsBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.main.thread.actions.AttachmentActionsBottomSheetDialog"
+        android:label="AttachmentActionsBottomSheetDialog">
+        <argument
+            android:name="attachmentResource"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_attachmentActionsBottomSheetDialog_to_downloadAttachmentProgressDialog"
+            app:destination="@id/downloadAttachmentProgressDialog" />
+    </dialog>
 
 </navigation>

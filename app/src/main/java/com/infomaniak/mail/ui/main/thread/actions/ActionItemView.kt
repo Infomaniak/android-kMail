@@ -71,9 +71,7 @@ class ActionItemView @JvmOverloads constructor(
                     }
                 }
 
-                if (getBoolean(R.styleable.ActionItemView_keepIconTint, false)) {
-                    button.setIconTintResource(R.color.bluekDrive)
-                }
+                if (getBoolean(R.styleable.ActionItemView_keepIconTint, false)) button.iconTint = null
             }
         }
     }

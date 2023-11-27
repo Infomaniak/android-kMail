@@ -21,33 +21,22 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:paddingBottom="@dimen/marginStandardMedium">
 
-        <include
-            android:id="@+id/handle"
-            layout="@layout/view_bottom_sheet_separator" />
+        <include layout="@layout/view_bottom_sheet_separator" />
 
         <com.infomaniak.mail.views.AttachmentDetailsView
             android:id="@+id/attachmentDetails"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/marginStandard"
+            android:layout_marginStart="@dimen/marginStandardMedium"
             android:layout_marginEnd="@dimen/marginStandardMedium"
-            app:displayStyle="bottomSheet"
-            app:layout_constraintTop_toBottomOf="@id/handle" />
-
-        <TextView
-            android:id="@+id/openWithTitle"
-            style="@style/Body.Secondary"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/marginStandardMedium"
-            android:layout_marginVertical="@dimen/marginStandard"
-            android:text="@string/openWith"
-            app:layout_constraintTop_toBottomOf="@id/attachmentDetails" />
+            android:layout_marginBottom="@dimen/marginStandardMedium"
+            app:displayStyle="bottomSheet" />
 
         <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
             android:id="@+id/supportedApplication"
@@ -56,21 +45,7 @@
             app:icon="@drawable/ic_file_image"
             app:padding="40dp"
             app:text="Visionneuse pdf de l'appareil"
-            app:visibleDivider="false"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/openWithTitle" />
-
-        <TextView
-            android:id="@+id/saveToTitle"
-            style="@style/Body.Secondary"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/marginStandardMedium"
-            android:layout_marginTop="@dimen/marginStandard"
-            android:layout_marginBottom="@dimen/marginStandardSmall"
-            android:text="@string/saveToDriveTitle"
-            app:layout_constraintTop_toBottomOf="@id/supportedApplication" />
+            app:visibleDivider="false" />
 
         <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
             android:id="@+id/kdriveItem"
@@ -78,10 +53,8 @@
             android:layout_height="wrap_content"
             app:icon="@drawable/ic_kdrive"
             app:keepIconTint="true"
-            app:layout_constraintTop_toBottomOf="@id/saveToTitle"
             app:padding="40dp"
-            app:text="@string/saveToDriveTitle"
-            app:visibleDivider="false" />
+            app:text="@string/saveToDriveTitle" />
 
         <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
             android:id="@+id/deviceItem"
@@ -89,10 +62,9 @@
             android:layout_height="wrap_content"
             app:icon="@drawable/ic_import"
             app:iconTint="?attr/colorPrimary"
-            app:layout_constraintTop_toBottomOf="@id/kdriveItem"
             app:padding="40dp"
             app:text="@string/saveToDriveDeviceItem" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 </androidx.core.widget.NestedScrollView>
 

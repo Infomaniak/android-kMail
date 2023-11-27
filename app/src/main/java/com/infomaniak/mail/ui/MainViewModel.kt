@@ -21,6 +21,7 @@ import android.app.Application
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
+import com.infomaniak.lib.core.utils.DownloadManagerUtils
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
@@ -1011,6 +1012,12 @@ class MainViewModel @Inject constructor(
                 folder = folder,
                 realm = realm,
             )
+        }
+    }
+
+    fun scheduleDownload(downloadUrl: String, filename: String) = viewModelScope.launch(ioCoroutineContext) {
+        if (ApiRepository.ping().isSuccess()) {
+            DownloadManagerUtils.scheduleDownload(context, downloadUrl, filename)
         }
     }
 

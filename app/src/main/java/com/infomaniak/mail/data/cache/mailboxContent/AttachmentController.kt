@@ -27,9 +27,9 @@ import javax.inject.Inject
 class AttachmentController @Inject constructor(private val mailboxContentRealm: RealmDatabase.MailboxContent) {
 
     //region Get data
-    fun getAttachment(resource: String): Attachment {
-        return getAttachmentQuery(resource, mailboxContentRealm()).find()!!
-    }
+    fun getAttachment(resource: String) = getAttachmentQuery(resource, mailboxContentRealm()).find()!!
+
+    fun getAttachmentAsync(resource: String) = getAttachmentQuery(resource, mailboxContentRealm()).asFlow()
     //endregion
 
     companion object {
