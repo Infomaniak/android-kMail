@@ -476,6 +476,7 @@
     </plurals>
     <string name="socialNetworksFolder">Reti sociali</string>
     <string name="spamFolder">Spam</string>
+    <string name="startActivityCantHandleAction">Non è stata trovata alcuna applicazione in grado di gestire questa azione</string>
     <string name="subjectTitle">Oggetto:</string>
     <string name="syncCalendarsAndContactsDescription">Visualizza i contatti e il calendario direttamente dal dispositivo.</string>
     <string name="syncCalendarsAndContactsTitle">Sincronizzazione di calendari e contatti</string>
@@ -516,6 +517,5 @@
     <string name="urlEntryTitle">Creare un collegamento ipertestuale</string>
     <string name="urlPlaceholder">URL</string>
     <string name="urlUserReportAndroid">https://feedback.userreport.com/3cc072b7-61ff-4592-b1aa-307a58fdcec9/</string>
-    <string name="webViewCantHandleAction">Non è stata trovata alcuna applicazione in grado di gestire questa azione</string>
     <string name="workInProgressTitle">Disponibile a breve</string>
 </resources>

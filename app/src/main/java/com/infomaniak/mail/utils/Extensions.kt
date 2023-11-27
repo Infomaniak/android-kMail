@@ -437,10 +437,14 @@ fun Context.shareString(value: String) {
         putExtra(Intent.EXTRA_TEXT, value)
     }
 
+    safeStartActivity(Intent.createChooser(intent, null))
+}
+
+fun Context.safeStartActivity(intent: Intent) {
     runCatching {
-        startActivity(Intent.createChooser(intent, null))
+        startActivity(intent)
     }.onFailure {
-        showToast(R.string.webViewCantHandleAction)
+        showToast(R.string.startActivityCantHandleAction)
     }
 }
 

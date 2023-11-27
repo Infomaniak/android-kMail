@@ -93,7 +93,7 @@ class MessageWebViewClient(
             runCatching {
                 context.startActivity(Intent(Intent.ACTION_VIEW, uri))
             }.onFailure {
-                context.showToast(R.string.webViewCantHandleAction)
+                context.showToast(R.string.startActivityCantHandleAction)
             }
         }
         return true

@@ -26,6 +26,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.ui.main.SnackBarManager
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.copyStringToClipboard
+import com.infomaniak.mail.utils.safeStartActivity
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
@@ -34,7 +35,6 @@ import javax.inject.Inject
 class PhoneContextualMenuAlertDialog @Inject constructor(
     @ActivityContext private val activityContext: Context,
 ) : ContextualMenuAlertDialog(activityContext) {
-    // TODO : If dial/sms supported only
     override val items = listOf<Pair<Int, (String, SnackBarManager) -> Unit>>(
         R.string.contextMenuPhoneNumberDial to { phoneNumber, _ ->
             activityContext.dialPhoneNumber(phoneNumber)
@@ -53,18 +53,18 @@ class PhoneContextualMenuAlertDialog @Inject constructor(
     private fun Context.dialPhoneNumber(phoneNumber: String) {
         val telUri = Uri.parse(WebView.SCHEME_TEL + phoneNumber)
         val dialPhoneNumberIntent = Intent(Intent.ACTION_DIAL, telUri)
-        startActivity(dialPhoneNumberIntent)
+        safeStartActivity(dialPhoneNumberIntent)
     }
 
     private fun Context.smsToPhoneNumber(phoneNumber: String) {
         val smsToPhoneNumberIntent = Intent(Intent.ACTION_SENDTO, Uri.parse(Utils.SCHEME_SMSTO + phoneNumber))
-        startActivity(smsToPhoneNumberIntent)
+        safeStartActivity(smsToPhoneNumberIntent)
     }
 
     private fun Context.addPhoneNumberToContacts(phoneNumber: String) {
         val addContactIntent = Intent(Intent.ACTION_INSERT_OR_EDIT)
         addContactIntent.type = ContactsContract.Contacts.CONTENT_ITEM_TYPE
         addContactIntent.putExtra(ContactsContract.Intents.Insert.PHONE, phoneNumber)
-        startActivity(addContactIntent)
+        safeStartActivity(addContactIntent)
     }
 }
