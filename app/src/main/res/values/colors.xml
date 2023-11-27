@@ -28,6 +28,7 @@
     <color name="blueMailOnPrimary">@color/blue_mail_on_primary_light</color>
     <color name="blueMailContainer">@color/blue_mail_container_light</color>
     <color name="blueOnboardingSecondaryBackground">@color/blueMailContainer</color>
+    <color name="bluekDrive">#5287FF</color>
 
     <!-- Context / errors -->
     <color name="greenSuccess">@color/grass_light</color>
