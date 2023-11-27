@@ -18,7 +18,8 @@
 package com.infomaniak.mail.ui.alertDialogs
 
 import android.content.Context
-import androidx.core.net.toUri
+import android.net.Uri
+import android.webkit.WebView
 import com.infomaniak.mail.R
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.main.SnackBarManager
@@ -34,7 +35,8 @@ class EmailContextualMenuAlertDialog @Inject constructor(
 ) : ContextualMenuAlertDialog(activityContext) {
     override val items = listOf<Pair<Int, (String, SnackBarManager) -> Unit>>(
         R.string.contextMenuEmailOpen to { email, _ ->
-            (activityContext as MainActivity).navigateToNewMessageActivity(NewMessageActivityArgs(mailToUri = "mailto:$email".toUri()).toBundle())
+            val mailToUri = Uri.parse(WebView.SCHEME_MAILTO + email)
+            (activityContext as MainActivity).navigateToNewMessageActivity(NewMessageActivityArgs(mailToUri = mailToUri).toBundle())
         },
         R.string.contextMenuEmailCopy to { email, snackBarManager ->
             activityContext.copyStringToClipboard(email, R.string.snackbarEmailCopiedToClipboard, snackBarManager)

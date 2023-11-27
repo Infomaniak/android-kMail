@@ -211,6 +211,10 @@
     <string name="contextMenuLinkCopy">Copia il link</string>
     <string name="contextMenuLinkOpen">Apri il link nel browser</string>
     <string name="contextMenuLinkShare">Condividi il link</string>
+    <string name="contextMenuPhoneNumberAddContact">Aggiungi contatto</string>
+    <string name="contextMenuPhoneNumberCopy">Copia il numero</string>
+    <string name="contextMenuPhoneNumberDial">Componi</string>
+    <string name="contextMenuPhoneNumberSms">Scrivi un SMS</string>
     <string name="createFolderName">Nome della cartella</string>
     <string name="createFolderNoParent">Nessuno</string>
     <string name="createFolderParent">Cartella dei genitori</string>
@@ -454,6 +458,7 @@
     <string name="snackbarMessageDeletedPermanently">Messaggio cancellato</string>
     <string name="snackbarMessageMoved">Messaggio spostato a %s</string>
     <string name="snackbarMoveCancelled">Spostamento annullato</string>
+    <string name="snackbarPhoneNumberCopiedToClipboard">Numero copiato negli appunti</string>
     <string name="snackbarReportPhishingConfirmation">Segnalato con successo</string>
     <string name="snackbarRestorationLaunched">Avvio del restauro</string>
     <plurals name="snackbarSenderBlacklisted">
