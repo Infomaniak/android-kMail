@@ -59,6 +59,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
+import com.infomaniak.mail.ui.alertDialogs.EmailContextualMenuAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.LinkContextualMenuAlertDialog
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.OpenThreadResult
@@ -103,6 +104,9 @@ class ThreadFragment : Fragment() {
     @Inject
     lateinit var linkContextualMenuAlertDialog: LinkContextualMenuAlertDialog
 
+    @Inject
+    lateinit var emailContextualMenuAlertDialog: EmailContextualMenuAlertDialog
+
     private var isFavorite = false
 
     // TODO: Remove this when Realm doesn't broadcast twice when deleting a Thread anymore.
@@ -127,6 +131,7 @@ class ThreadFragment : Fragment() {
         observeThreadLive()
 
         linkContextualMenuAlertDialog.initValues(mainViewModel.snackBarManager)
+        emailContextualMenuAlertDialog.initValues(mainViewModel.snackBarManager)
 
         threadViewModel.openThread().observe(viewLifecycleOwner) { result ->
 
@@ -320,7 +325,7 @@ class ThreadFragment : Fragment() {
             promptLink = { url, type ->
                 when (type) {
                     ThreadAdapter.ContextMenuType.LINK -> linkContextualMenuAlertDialog.show(url)
-                    ThreadAdapter.ContextMenuType.EMAIL -> Log.e("gibran", "initAdapter: show email")
+                    ThreadAdapter.ContextMenuType.EMAIL -> emailContextualMenuAlertDialog.show(url)
                     ThreadAdapter.ContextMenuType.PHONE -> Log.e("gibran", "initAdapter: show phone")
                 }
             }

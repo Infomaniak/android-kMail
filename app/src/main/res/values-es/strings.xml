@@ -206,6 +206,11 @@
     <string name="contentDescriptionUnreadPastille">Esta carpeta contiene mensajes no leídos</string>
     <string name="contentDescriptionUserAvatar">Avatar de usuario</string>
     <string name="contentDescriptionWarningIcon">Advertencia</string>
+    <string name="contextMenuEmailCopy">Copiar dirección de correo electrónico</string>
+    <string name="contextMenuEmailOpen">Enviar correo</string>
+    <string name="contextMenuLinkCopy">Copiar enlace</string>
+    <string name="contextMenuLinkOpen">Abrir el enlace en el navegador</string>
+    <string name="contextMenuLinkShare">Compartir este enlace</string>
     <string name="createFolderName">Nombre de la carpeta</string>
     <string name="createFolderNoParent">Ninguno</string>
     <string name="createFolderParent">Carpeta principal</string>
@@ -274,9 +279,6 @@
     <string name="fromTitle">De:</string>
     <string name="googlePlayServicesAreRequired">Se requieren los servicios de Google Play</string>
     <string name="inboxFolder">Bandeja de entrada</string>
-    <string name="linkContextMenuCopy">Copiar enlace</string>
-    <string name="linkContextMenuOpen">Abrir el enlace en el navegador</string>
-    <string name="linkContextMenuShare">Compartir este enlace</string>
     <string name="loadingText">Cargando…</string>
     <plurals name="lockedMailboxDescription">
         <item quantity="one">El acceso a su dirección de correo electrónico está bloqueado. Póngase en contacto con su administrador.</item>
@@ -355,6 +357,8 @@
     <string name="restoreEmailsText">Todos los correos electrónicos volverán a tu bandeja de entrada.</string>
     <string name="restoreEmailsTitle">Restaura tus correos electrónicos</string>
     <string name="reviewAlertTitle">¿Te gusta Infomaniak Mail?</string>
+    <string name="saveToDriveDeviceItem">Dispositivo</string>
+    <string name="saveToDriveTitle">Guardar en</string>
     <string name="scheduledMessagesFolder">Mensajes programados</string>
     <string name="searchAllMessages">Todos los mensajes</string>
     <string name="searchFieldPlaceholder">Buscar un correo electrónico</string>

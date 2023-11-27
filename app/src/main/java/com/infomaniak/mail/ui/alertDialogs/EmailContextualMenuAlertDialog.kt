@@ -18,28 +18,26 @@
 package com.infomaniak.mail.ui.alertDialogs
 
 import android.content.Context
-import com.infomaniak.lib.core.utils.UtilsUi.openUrl
+import androidx.core.net.toUri
 import com.infomaniak.mail.R
+import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.main.SnackBarManager
+import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.copyStringToClipboard
-import com.infomaniak.mail.utils.shareString
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
 
 @ActivityScoped
-class LinkContextualMenuAlertDialog @Inject constructor(
+class EmailContextualMenuAlertDialog @Inject constructor(
     @ActivityContext private val activityContext: Context,
 ) : ContextualMenuAlertDialog(activityContext) {
     override val items = listOf<Pair<Int, (String, SnackBarManager) -> Unit>>(
-        R.string.contextMenuLinkOpen to { url, _ ->
-            activityContext.openUrl(url)
+        R.string.contextMenuEmailOpen to { email, _ ->
+            (activityContext as MainActivity).navigateToNewMessageActivity(NewMessageActivityArgs(mailToUri = "mailto:$email".toUri()).toBundle())
         },
-        R.string.contextMenuLinkCopy to { url, snackBarManager ->
-            activityContext.copyStringToClipboard(url, R.string.snackbarLinkCopiedToClipboard, snackBarManager)
-        },
-        R.string.contextMenuLinkShare to { url, _ ->
-            activityContext.shareString(url)
+        R.string.contextMenuEmailCopy to { email, snackBarManager ->
+            activityContext.copyStringToClipboard(email, R.string.snackbarEmailCopiedToClipboard, snackBarManager)
         },
     )
 }
