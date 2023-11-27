@@ -36,7 +36,7 @@ abstract class ContextualMenuAlertDialog(
 
     private lateinit var snackBarManager: SnackBarManager
 
-    private var lastTitle = ""
+    private var lastData = ""
 
     fun initValues(snackBarManager: SnackBarManager) {
         this.snackBarManager = snackBarManager
@@ -48,15 +48,15 @@ abstract class ContextualMenuAlertDialog(
         MaterialAlertDialogBuilder(context)
             .setCustomTitle(binding.root)
             // TODO : Name items correctly and simplify map/toTypedArray
-            .setItems(stringItems) { _, index -> items[index].second(lastTitle, snackBarManager) }
+            .setItems(stringItems) { _, index -> items[index].second(lastData, snackBarManager) }
             .create()
     }
 
     override fun resetCallbacks() = Unit
 
-    fun show(url: String) {
-        binding.url.text = url
-        lastTitle = url
+    fun show(data: String) {
+        binding.title.text = data
+        lastData = data
         alertDialog.show()
     }
 }

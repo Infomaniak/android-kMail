@@ -425,11 +425,11 @@ class ThreadAdapter(
     }
 
     private fun ThreadViewHolder.bindBody(message: Message, hasQuote: Boolean) = with(binding) {
-        bodyWebView.setupLinkContextualMenu { url, type ->
-            threadAdapterCallbacks?.promptLink?.invoke(url, type)
+        bodyWebView.setupLinkContextualMenu { data, type ->
+            threadAdapterCallbacks?.promptLink?.invoke(data, type)
         }
-        fullMessageWebView.setupLinkContextualMenu { url, type ->
-            threadAdapterCallbacks?.promptLink?.invoke(url, type)
+        fullMessageWebView.setupLinkContextualMenu { data, type ->
+            threadAdapterCallbacks?.promptLink?.invoke(data, type)
         }
 
         setQuoteInitialCollapsedState(hasQuote)
@@ -458,7 +458,7 @@ class ThreadAdapter(
                 HitTestResult.EMAIL_TYPE,
                 HitTestResult.SRC_IMAGE_ANCHOR_TYPE,
                 HitTestResult.SRC_ANCHOR_TYPE -> {
-                    getLinkFromResult(result)?.let { url -> onClicked(url, contextMenuTypeForHitTestResultType[result.type]!!) }
+                    getDataFromResult(result)?.let { data -> onClicked(data, contextMenuTypeForHitTestResultType[result.type]!!) }
                     true
                 }
                 else -> false
@@ -466,7 +466,7 @@ class ThreadAdapter(
         }
     }
 
-    private fun WebView.getLinkFromResult(hitTestResult: HitTestResult): String? {
+    private fun WebView.getDataFromResult(hitTestResult: HitTestResult): String? {
         return when (hitTestResult.type) {
             HitTestResult.PHONE_TYPE,
             HitTestResult.EMAIL_TYPE,
