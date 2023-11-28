@@ -33,8 +33,6 @@
             android:id="@+id/attachmentDetails"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/marginStandardMedium"
-            android:layout_marginEnd="@dimen/marginStandardMedium"
             android:layout_marginBottom="@dimen/marginStandardMedium"
             app:displayStyle="bottomSheet" />
 
@@ -42,9 +40,8 @@
             android:id="@+id/supportedApplication"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:icon="@drawable/ic_file_image"
-            app:padding="40dp"
-            app:text="Visionneuse pdf de l'appareil"
+            app:icon="@drawable/ic_open_external"
+            app:text="@string/openWith"
             app:visibleDivider="false" />
 
         <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
@@ -53,8 +50,7 @@
             android:layout_height="wrap_content"
             app:icon="@drawable/ic_kdrive"
             app:keepIconTint="true"
-            app:padding="40dp"
-            app:text="@string/saveToDriveTitle" />
+            app:text="@string/saveToDriveItem" />
 
         <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
             android:id="@+id/deviceItem"
@@ -62,7 +58,6 @@
             android:layout_height="wrap_content"
             app:icon="@drawable/ic_import"
             app:iconTint="?attr/colorPrimary"
-            app:padding="40dp"
             app:text="@string/saveToDriveDeviceItem" />
 
     </LinearLayout>
