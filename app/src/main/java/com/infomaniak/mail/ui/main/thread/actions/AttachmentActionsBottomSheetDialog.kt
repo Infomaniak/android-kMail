@@ -33,8 +33,8 @@ import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.databinding.BottomSheetAttachmentActionsBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.PermissionUtils
-import com.infomaniak.mail.utils.context
 import dagger.hilt.android.AndroidEntryPoint
+import com.infomaniak.lib.core.R as RCore
 
 @AndroidEntryPoint
 class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
@@ -58,16 +58,7 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         }
 
         binding.attachmentDetails.setDetails(attachment)
-        binding.openWithItem.setOnClickListener {
-            if (attachment.openWithIntent(context).hasSupportedApplications(context)) {
-                trackAttachmentActionsEvent("open")
-                attachment.display()
-            } else {
-                trackAttachmentActionsEvent("download")
-                mainViewModel.snackBarManager.setValue(getString(R.string.snackbarDownloadInProgress))
-                scheduleDownloadManager(attachment.downloadUrl, attachment.name)
-            }
-        }
+        setupListeners(attachment)
     }
 
     private fun Attachment.display() {
@@ -82,6 +73,25 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
                     attachmentType = getFileTypeFromMimeType(),
                 ).toBundle(),
             )
+        }
+    }
+
+    private fun setupListeners(attachment: Attachment) = with(binding) {
+        openWithItem.setClosingOnClickListener {
+            trackAttachmentActionsEvent("open")
+            if (attachment.openWithIntent(requireContext()).hasSupportedApplications(requireContext())) {
+                attachment.display()
+            } else {
+                mainViewModel.snackBarManager.setValue(getString(RCore.string.errorNoSupportingAppFound))
+            }
+        }
+        kDriveItem.setClosingOnClickListener {
+            trackAttachmentActionsEvent("saveToKDrive")
+        }
+        deviceItem.setClosingOnClickListener {
+            trackAttachmentActionsEvent("download")
+            mainViewModel.snackBarManager.setValue(getString(R.string.snackbarDownloadInProgress))
+            scheduleDownloadManager(attachment.downloadUrl, attachment.name)
         }
     }
 
