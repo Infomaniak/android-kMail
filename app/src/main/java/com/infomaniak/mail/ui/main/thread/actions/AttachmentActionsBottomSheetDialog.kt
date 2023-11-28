@@ -72,7 +72,6 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         }
     }
 
-
     private fun Attachment.display() {
         if (hasUsableCache(requireContext()) || isInlineCachedFile(requireContext())) {
             startActivity(openWithIntent(requireContext()))

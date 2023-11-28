@@ -33,14 +33,16 @@
             android:id="@+id/attachmentDetails"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/marginStandardMedium"
+            android:layout_marginStart="@dimen/marginStandardSmall"
+            android:layout_marginEnd="@dimen/marginStandardMedium"
+            android:layout_marginBottom="@dimen/marginStandardSmall"
             app:displayStyle="bottomSheet" />
 
         <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
             android:id="@+id/supportedApplication"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:icon="@drawable/ic_open_external"
+            app:icon="@drawable/ic_open_with"
             app:text="@string/openWith"
             app:visibleDivider="false" />
 

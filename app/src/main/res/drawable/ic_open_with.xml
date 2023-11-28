@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?><!--
+  ~ Infomaniak Mail - Android
+  ~ Copyright (C) 2023 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#000"
+        android:pathData="m16.085,0.511c0,-0.282 0.229,-0.511 0.511,-0.511h6.894c0.069,0 0.135,0.014 0.195,0.039 0.06,0.025 0.117,0.062 0.166,0.111 0.049,0.049 0.086,0.105 0.111,0.166 0.025,0.06 0.039,0.126 0.039,0.195v6.894c0,0.282 -0.229,0.511 -0.511,0.511 -0.282,0 -0.511,-0.229 -0.511,-0.511v-5.661l-14.447,14.447c-0.199,0.199 -0.523,0.199 -0.722,0 -0.199,-0.199 -0.199,-0.523 0,-0.722l14.447,-14.447h-5.661c-0.282,0 -0.511,-0.229 -0.511,-0.511z" />
+    <path
+        android:fillColor="#000"
+        android:pathData="m2.043,4.596c-0.542,0 -1.061,0.215 -1.444,0.598 -0.383,0.383 -0.598,0.903 -0.598,1.444v15.319c0,0.542 0.215,1.061 0.598,1.444 0.383,0.383 0.903,0.598 1.444,0.598h15.319c0.542,0 1.061,-0.215 1.444,-0.598 0.383,-0.383 0.598,-0.903 0.598,-1.444v-9.191c0,-0.282 -0.229,-0.511 -0.511,-0.511s-0.511,0.229 -0.511,0.511v9.191c0,0.271 -0.108,0.531 -0.299,0.722 -0.192,0.191 -0.451,0.299 -0.722,0.299h-15.319c-0.271,0 -0.531,-0.108 -0.722,-0.299 -0.192,-0.191 -0.299,-0.451 -0.299,-0.722v-15.319c0,-0.271 0.108,-0.531 0.299,-0.722 0.192,-0.192 0.451,-0.299 0.722,-0.299h9.191c0.282,0 0.511,-0.229 0.511,-0.511s-0.229,-0.511 -0.511,-0.511z" />
+</vector>
