@@ -35,6 +35,7 @@
     <dimen name="standardIconSize">24dp</dimen>
     <dimen name="largeIconSize">32dp</dimen>
     <dimen name="maxSearchChipWidth">300dp</dimen>
+    <dimen name="maxAttachmentChipWidth">220dp</dimen>
     <dimen name="contactPopupMaxWidth">300dp</dimen>
     <dimen name="textButtonPrimaryHeight">56dp</dimen>
     <dimen name="textButtonPrimaryMediumHeight">40dp</dimen>
