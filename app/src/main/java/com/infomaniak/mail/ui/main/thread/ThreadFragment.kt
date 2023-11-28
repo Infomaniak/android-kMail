@@ -271,7 +271,7 @@ class ThreadFragment : Fragment() {
     private fun shouldLoadDistantResources(): Boolean = localSettings.externalContent == ExternalContent.ALWAYS && isNotInSpam
 
     private fun observeOpenAttachment() {
-        getBackNavigationResult(DownloadAttachmentProgressDialog.OPEN_WITH, ::startActivity)
+        getBackNavigationResult(DownloadAttachmentProgressDialog.DOWNLOAD_ATTACHMENT_RESULT, ::startActivity)
     }
 
     private fun initAdapter() {

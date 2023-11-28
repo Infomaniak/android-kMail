@@ -25,6 +25,7 @@ import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.cache.mailboxContent.AttachmentController
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.ui.main.thread.actions.AttachmentActionsBottomSheetDialog.AttachmentIntent
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.context
@@ -51,22 +52,21 @@ class DownloadAttachmentViewModel @Inject constructor(
      */
     private var attachment: Attachment? = null
 
-    fun downloadAttachment() = liveData(ioCoroutineContext) {
-        val attachment = attachmentController.getAttachment(attachmentResource).also { attachment = it }
-        val attachmentFile = attachment.getCacheFile(context)
+    fun downloadAttachment(intentType: AttachmentIntent) = liveData(ioCoroutineContext) {
+        val localAttachment = attachmentController.getAttachment(attachmentResource).also { attachment = it }
+        val attachmentFile = localAttachment.getCacheFile(context)
+        val isAttachmentCached = localAttachment.hasUsableCache(context, attachmentFile) ||
+                LocalStorageUtils.saveAttachmentToCache(attachmentResource, attachmentFile)
 
-        if (attachment.hasUsableCache(context, attachmentFile)) {
-            emit(attachment.openWithIntent(context))
-            this@DownloadAttachmentViewModel.attachment = null
-            return@liveData
-        }
+        val intent = if (isAttachmentCached) {
+            attachment = null
+            when (intentType) {
+                AttachmentIntent.OPEN_WITH -> localAttachment.openWithIntent(context)
+                AttachmentIntent.SAVE_TO_DRIVE -> localAttachment.saveToDriveIntent(context)
+            }
+        } else null
 
-        if (LocalStorageUtils.saveAttachmentToCache(attachmentResource, attachmentFile)) {
-            emit(attachment.openWithIntent(context))
-            this@DownloadAttachmentViewModel.attachment = null
-        } else {
-            emit(null)
-        }
+        emit(intent)
     }
 
     override fun onCleared() = runCatchingRealm {

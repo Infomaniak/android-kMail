@@ -62,8 +62,8 @@ class DownloadAttachmentProgressDialog : DialogFragment() {
     }
 
     private fun downloadAttachment() {
-        downloadAttachmentViewModel.downloadAttachment().observe(this@DownloadAttachmentProgressDialog) { intent ->
-            if (intent == null) popBackStackWithError() else setBackNavigationResult(OPEN_WITH, intent)
+        downloadAttachmentViewModel.downloadAttachment(navigationArgs.intentType).observe(this) { intent ->
+            if (intent == null) popBackStackWithError() else setBackNavigationResult(DOWNLOAD_ATTACHMENT_RESULT, intent)
         }
     }
 
@@ -74,6 +74,6 @@ class DownloadAttachmentProgressDialog : DialogFragment() {
     }
 
     companion object {
-        const val OPEN_WITH = "open_with"
+        const val DOWNLOAD_ATTACHMENT_RESULT = "download_attachment_result"
     }
 }

@@ -32,6 +32,8 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.databinding.BottomSheetAttachmentActionsBinding
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.main.thread.actions.AttachmentActionsBottomSheetDialog.AttachmentIntent.OPEN_WITH
+import com.infomaniak.mail.ui.main.thread.actions.AttachmentActionsBottomSheetDialog.AttachmentIntent.SAVE_TO_DRIVE
 import com.infomaniak.mail.utils.PermissionUtils
 import dagger.hilt.android.AndroidEntryPoint
 import com.infomaniak.lib.core.R as RCore
@@ -61,32 +63,18 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         setupListeners(attachment)
     }
 
-    private fun Attachment.display() {
-        if (hasUsableCache(requireContext()) || isInlineCachedFile(requireContext())) {
-            startActivity(openWithIntent(requireContext()))
-        } else {
-            safeNavigate(
-                resId = R.id.downloadAttachmentProgressDialog,
-                args = DownloadAttachmentProgressDialogArgs(
-                    attachmentResource = resource!!,
-                    attachmentName = name,
-                    attachmentType = getFileTypeFromMimeType(),
-                ).toBundle(),
-            )
-        }
-    }
-
     private fun setupListeners(attachment: Attachment) = with(binding) {
         openWithItem.setClosingOnClickListener {
             trackAttachmentActionsEvent("open")
             if (attachment.openWithIntent(requireContext()).hasSupportedApplications(requireContext())) {
-                attachment.display()
+                attachment.executeIntent(OPEN_WITH)
             } else {
                 mainViewModel.snackBarManager.setValue(getString(RCore.string.errorNoSupportingAppFound))
             }
         }
         kDriveItem.setClosingOnClickListener {
             trackAttachmentActionsEvent("saveToKDrive")
+            attachment.executeIntent(SAVE_TO_DRIVE)
         }
         deviceItem.setClosingOnClickListener {
             trackAttachmentActionsEvent("download")
@@ -95,11 +83,40 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         }
     }
 
+    private fun Attachment.executeIntent(intentType: AttachmentIntent) {
+        if (hasUsableCache(requireContext()) || isInlineCachedFile(requireContext())) {
+            val intent = when (intentType) {
+                OPEN_WITH -> openWithIntent(requireContext())
+                SAVE_TO_DRIVE -> saveToDriveIntent(requireContext())
+            }
+            startActivity(intent)
+        } else {
+            navigateToDownloadProgressDialog(intentType)
+        }
+    }
+
+    private fun Attachment.navigateToDownloadProgressDialog(intentType: AttachmentIntent) {
+        safeNavigate(
+            resId = R.id.downloadAttachmentProgressDialog,
+            args = DownloadAttachmentProgressDialogArgs(
+                attachmentResource = resource!!,
+                attachmentName = name,
+                attachmentType = getFileTypeFromMimeType(),
+                intentType = intentType,
+            ).toBundle(),
+            currentClassName = AttachmentActionsBottomSheetDialog::class.java.name,
+        )
+    }
+
     private fun scheduleDownloadManager(downloadUrl: String, filename: String) {
         if (permissionUtils.hasDownloadManagerPermission) {
             mainViewModel.scheduleDownload(downloadUrl, filename)
         } else {
             permissionUtils.requestDownloadManagerPermission { mainViewModel.scheduleDownload(downloadUrl, filename) }
         }
+    }
+
+    enum class AttachmentIntent {
+        OPEN_WITH, SAVE_TO_DRIVE
     }
 }

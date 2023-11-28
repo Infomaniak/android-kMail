@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.data.models
 
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import androidx.annotation.DrawableRes
@@ -114,6 +115,16 @@ class Attachment : EmbeddedRealmObject {
         }
     }
 
+    fun saveToDriveIntent(context: Context): Intent {
+        val uri = FileProvider.getUriForFile(context, context.getString(R.string.ATTACHMENTS_AUTHORITY), getCacheFile(context))
+        return Intent().apply {
+            component = ComponentName(DRIVE_PACKAGE, DRIVE_CLASS)
+            action = Intent.ACTION_SEND
+            flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            putExtra(Intent.EXTRA_STREAM, uri)
+        }
+    }
+
     enum class AttachmentDisposition {
         INLINE,
         ATTACHMENT,
@@ -133,5 +144,10 @@ class Attachment : EmbeddedRealmObject {
         VCARD(R.drawable.ic_file_vcard),
         VIDEO(R.drawable.ic_file_video),
         UNKNOWN(R.drawable.ic_file_unknown),
+    }
+
+    companion object {
+        private const val DRIVE_PACKAGE = "com.infomaniak.drive"
+        private const val DRIVE_CLASS = "com.infomaniak.drive.ui.SaveExternalFilesActivity"
     }
 }

@@ -26,8 +26,8 @@ import javax.inject.Inject
 @HiltViewModel
 class AttachmentActionsViewModel @Inject constructor(
     application: Application,
+    attachmentController: AttachmentController,
     private val savedStateHandle: SavedStateHandle,
-    private val attachmentController: AttachmentController,
 ) : AndroidViewModel(application) {
 
     private val attachmentResource
