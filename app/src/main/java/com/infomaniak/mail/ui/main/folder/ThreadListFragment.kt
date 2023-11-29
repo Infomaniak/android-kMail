@@ -520,6 +520,18 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
 
             waitingBeforeNotifyAdapter = threadListViewModel.isRecoveringFinished
 
+            deletedItemsIndices = { indices ->
+                if (isMultiSelectOn) {
+                    val previousThreads = threadListAdapter.dataSet.filterIsInstance<Thread>()
+                    var shouldPublish = false
+                    indices.forEach {
+                        val isRemoved = mainViewModel.selectedThreads.remove(previousThreads[it])
+                        if (isRemoved) shouldPublish = true
+                    }
+                    if (shouldPublish) publishSelectedItems()
+                }
+            }
+
             afterUpdateAdapter = { threads ->
                 if (currentFilter.value == ThreadFilter.UNSEEN && threads.isEmpty()) {
                     currentFilter.value = ThreadFilter.ALL
