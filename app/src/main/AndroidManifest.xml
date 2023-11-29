@@ -43,6 +43,7 @@
         android:name=".MainApplication"
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
+        android:enableOnBackInvokedCallback="true"
         android:fullBackupContent="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/appName"
@@ -50,7 +51,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/AppTheme.Pink"
         android:usesCleartextTraffic="true"
-        tools:targetApi="S">
+        tools:targetApi="tiramisu">
 
         <meta-data
             android:name="io.sentry.auto-init"
