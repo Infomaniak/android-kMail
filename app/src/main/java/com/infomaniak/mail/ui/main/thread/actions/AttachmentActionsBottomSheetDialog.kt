@@ -32,8 +32,11 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.databinding.BottomSheetAttachmentActionsBinding
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.ui.main.thread.actions.AttachmentActionsBottomSheetDialog.AttachmentIntent.OPEN_WITH
-import com.infomaniak.mail.ui.main.thread.actions.AttachmentActionsBottomSheetDialog.AttachmentIntent.SAVE_TO_DRIVE
+import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntent
+import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntent.OPEN_WITH
+import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntent.SAVE_TO_DRIVE
+import com.infomaniak.mail.utils.AttachmentIntentUtils.openWithIntent
+import com.infomaniak.mail.utils.AttachmentIntentUtils.saveToDriveIntent
 import com.infomaniak.mail.utils.PermissionUtils
 import dagger.hilt.android.AndroidEntryPoint
 import com.infomaniak.lib.core.R as RCore
@@ -114,9 +117,5 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         } else {
             permissionUtils.requestDownloadManagerPermission { mainViewModel.scheduleDownload(downloadUrl, filename) }
         }
-    }
-
-    enum class AttachmentIntent {
-        OPEN_WITH, SAVE_TO_DRIVE
     }
 }

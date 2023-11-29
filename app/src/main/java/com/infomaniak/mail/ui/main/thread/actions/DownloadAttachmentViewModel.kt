@@ -25,7 +25,9 @@ import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.cache.mailboxContent.AttachmentController
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.di.IoDispatcher
-import com.infomaniak.mail.ui.main.thread.actions.AttachmentActionsBottomSheetDialog.AttachmentIntent
+import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntent
+import com.infomaniak.mail.utils.AttachmentIntentUtils.openWithIntent
+import com.infomaniak.mail.utils.AttachmentIntentUtils.saveToDriveIntent
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.context

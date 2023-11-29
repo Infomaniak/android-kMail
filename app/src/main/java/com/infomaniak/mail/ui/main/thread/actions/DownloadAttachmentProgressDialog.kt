@@ -32,6 +32,7 @@ import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.setBackNavigationResult
 import com.infomaniak.mail.databinding.DialogDownloadProgressBinding
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.utils.AttachmentIntentUtils.DOWNLOAD_ATTACHMENT_RESULT
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -71,9 +72,5 @@ class DownloadAttachmentProgressDialog : DialogFragment() {
         val title = if (mainViewModel.isInternetAvailable.value == true) R.string.anErrorHasOccurred else R.string.noConnection
         showSnackbar(title)
         findNavController().popBackStack()
-    }
-
-    companion object {
-        const val DOWNLOAD_ATTACHMENT_RESULT = "download_attachment_result"
     }
 }

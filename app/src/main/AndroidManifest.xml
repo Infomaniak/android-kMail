@@ -36,9 +36,7 @@
                 android:mimeType="*/*"
                 android:scheme="*" />
         </intent>
-
         <package android:name="com.infomaniak.sync" />
-        <package android:name="com.infomaniak.drive" />
     </queries>
 
     <application

@@ -558,7 +558,7 @@
             app:argType="com.infomaniak.mail.data.models.Attachment$AttachmentType" />
         <argument
             android:name="intentType"
-            app:argType="com.infomaniak.mail.ui.main.thread.actions.AttachmentActionsBottomSheetDialog$AttachmentIntent" />
+            app:argType="com.infomaniak.mail.utils.AttachmentIntentUtils$AttachmentIntent" />
     </dialog>
 
     <dialog
