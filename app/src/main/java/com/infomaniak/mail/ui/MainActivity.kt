@@ -428,11 +428,11 @@ class MainActivity : BaseActivity() {
             R.id.threadActionsBottomSheetDialog -> null
             R.id.searchFragment -> R.color.backgroundColor
             else -> R.color.backgroundHeaderColor
-        }?.let {
-            window.statusBarColor = getColor(it)
+        }?.let { statusBarColor ->
+            window.statusBarColor = getColor(statusBarColor)
         }
 
-        val colorRes = when (destinationId) {
+        when (destinationId) {
             R.id.messageActionsBottomSheetDialog,
             R.id.replyBottomSheetDialog,
             R.id.detailedContactBottomSheetDialog,
@@ -440,9 +440,9 @@ class MainActivity : BaseActivity() {
             R.id.threadFragment -> R.color.elevatedBackground
             R.id.threadListFragment -> if (mainViewModel.isMultiSelectOn) R.color.elevatedBackground else R.color.backgroundColor
             else -> R.color.backgroundColor
+        }.let { navigationBarColor ->
+            window.updateNavigationBarColor(getColor(navigationBarColor))
         }
-
-        window.updateNavigationBarColor(getColor(colorRes))
     }
 
     fun setDrawerLockMode(isUnlocked: Boolean) {
