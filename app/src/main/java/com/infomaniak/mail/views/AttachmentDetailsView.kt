@@ -38,7 +38,7 @@ class AttachmentDetailsView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
-    private val binding by lazy { ViewAttachmentDetailsBinding.inflate(LayoutInflater.from(context), this, true) }
+    private val binding by lazy { ViewAttachmentDetailsBinding.inflate(LayoutInflater.from(context), this) }
 
     init {
         attrs?.getAttributes(context, R.styleable.AttachmentDetailsView) {

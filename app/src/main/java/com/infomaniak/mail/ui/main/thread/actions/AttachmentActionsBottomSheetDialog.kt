@@ -58,7 +58,7 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         }
 
         binding.attachmentDetails.setDetails(attachment)
-        binding.supportedApplication.setOnClickListener {
+        binding.openWithItem.setOnClickListener {
             if (attachment.openWithIntent(context).hasSupportedApplications(context)) {
                 trackAttachmentActionsEvent("open")
                 attachment.display()
@@ -86,13 +86,10 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
     }
 
     private fun scheduleDownloadManager(downloadUrl: String, filename: String) {
-
-        fun scheduleDownloadManager() = mainViewModel.scheduleDownload(downloadUrl, filename)
-
         if (permissionUtils.hasDownloadManagerPermission) {
-            scheduleDownloadManager()
+            mainViewModel.scheduleDownload(downloadUrl, filename)
         } else {
-            permissionUtils.requestDownloadManagerPermission { scheduleDownloadManager() }
+            permissionUtils.requestDownloadManagerPermission { mainViewModel.scheduleDownload(downloadUrl, filename) }
         }
     }
 }

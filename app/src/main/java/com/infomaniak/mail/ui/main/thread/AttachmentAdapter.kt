@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
-import android.text.format.Formatter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
@@ -50,11 +49,10 @@ class AttachmentAdapter(
 
         attachmentDetails.setDetails(attachment)
         onAttachmentClicked?.let { root.setOnClickListener { it(attachment) } }
-        moreButton.isVisible = !shouldDisplayCloseButton
-        closeButton.apply {
-            isVisible = shouldDisplayCloseButton
+        toggleEndIconVisibility(shouldDisplayCloseButton)
 
-            if (shouldDisplayCloseButton) {
+        if (shouldDisplayCloseButton) {
+            closeButton.apply {
                 contentDescription = context.getString(R.string.contentDescriptionButtonDelete, attachment.name)
                 setOnClickListener {
                     val index = attachments.indexOf(attachment)
@@ -83,6 +81,11 @@ class AttachmentAdapter(
     fun addAll(newAttachments: List<Attachment>) {
         attachments.addAll(newAttachments)
         notifyItemRangeInserted(attachments.lastIndex, newAttachments.count())
+    }
+
+    private fun ItemAttachmentBinding.toggleEndIconVisibility(shouldDisplayCloseButton: Boolean) {
+        closeButton.isVisible = shouldDisplayCloseButton
+        moreButton.isVisible = !shouldDisplayCloseButton
     }
 
     class AttachmentViewHolder(val binding: ItemAttachmentBinding) : ViewHolder(binding.root)
