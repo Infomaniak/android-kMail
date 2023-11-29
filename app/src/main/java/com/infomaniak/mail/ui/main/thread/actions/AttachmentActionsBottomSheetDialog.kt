@@ -33,6 +33,7 @@ import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.databinding.BottomSheetAttachmentActionsBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.PermissionUtils
+import com.infomaniak.mail.utils.context
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -48,26 +49,23 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         return BottomSheetAttachmentActionsBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(attachmentActionsViewModel) {
         super.onViewCreated(view, savedInstanceState)
 
-        attachmentActionsViewModel.attachmentLive.observe(viewLifecycleOwner) { attachment ->
-            if (attachment == null) {
-                findNavController().popBackStack()
-                return@observe
-            }
+        if (attachment == null) {
+            findNavController().popBackStack()
+            return@with
+        }
 
-            attachmentDetails.setDetails(attachment)
-
-            supportedApplication.setOnClickListener {
-                if (attachment.openWithIntent(requireContext()).hasSupportedApplications(requireContext())) {
-                    trackAttachmentActionsEvent("open")
-                    attachment.display()
-                } else {
-                    trackAttachmentActionsEvent("download")
-                    mainViewModel.snackBarManager.setValue(getString(R.string.snackbarDownloadInProgress))
-                    scheduleDownloadManager(attachment.downloadUrl, attachment.name)
-                }
+        binding.attachmentDetails.setDetails(attachment)
+        binding.supportedApplication.setOnClickListener {
+            if (attachment.openWithIntent(context).hasSupportedApplications(context)) {
+                trackAttachmentActionsEvent("open")
+                attachment.display()
+            } else {
+                trackAttachmentActionsEvent("download")
+                mainViewModel.snackBarManager.setValue(getString(R.string.snackbarDownloadInProgress))
+                scheduleDownloadManager(attachment.downloadUrl, attachment.name)
             }
         }
     }

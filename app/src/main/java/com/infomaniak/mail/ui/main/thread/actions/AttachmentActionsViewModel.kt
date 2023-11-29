@@ -20,11 +20,7 @@ package com.infomaniak.mail.ui.main.thread.actions
 import android.app.Application
 import androidx.lifecycle.*
 import com.infomaniak.mail.data.cache.mailboxContent.AttachmentController
-import com.infomaniak.mail.di.IoDispatcher
-import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 @HiltViewModel
@@ -32,15 +28,10 @@ class AttachmentActionsViewModel @Inject constructor(
     application: Application,
     private val savedStateHandle: SavedStateHandle,
     private val attachmentController: AttachmentController,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
-
-    private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
     private val attachmentResource
         inline get() = savedStateHandle.get<String>(AttachmentActionsBottomSheetDialogArgs::attachmentResource.name)!!
 
-    val attachmentLive = attachmentController.getAttachmentAsync(attachmentResource)
-        .map { it.obj }
-        .asLiveData(ioCoroutineContext)
+    val attachment = runCatching { attachmentController.getAttachment(attachmentResource) }.getOrNull()
 }
