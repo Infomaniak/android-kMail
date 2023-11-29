@@ -25,9 +25,8 @@ import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.cache.mailboxContent.AttachmentController
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.di.IoDispatcher
-import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntent
-import com.infomaniak.mail.utils.AttachmentIntentUtils.openWithIntent
-import com.infomaniak.mail.utils.AttachmentIntentUtils.saveToDriveIntent
+import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntentType
+import com.infomaniak.mail.utils.AttachmentIntentUtils.getIntentFromType
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.context
@@ -54,7 +53,7 @@ class DownloadAttachmentViewModel @Inject constructor(
      */
     private var attachment: Attachment? = null
 
-    fun downloadAttachment(intentType: AttachmentIntent) = liveData(ioCoroutineContext) {
+    fun downloadAttachment(intentType: AttachmentIntentType) = liveData(ioCoroutineContext) {
         val localAttachment = attachmentController.getAttachment(attachmentResource).also { attachment = it }
         val attachmentFile = localAttachment.getCacheFile(context)
         val isAttachmentCached = localAttachment.hasUsableCache(context, attachmentFile) ||
@@ -62,10 +61,7 @@ class DownloadAttachmentViewModel @Inject constructor(
 
         val intent = if (isAttachmentCached) {
             attachment = null
-            when (intentType) {
-                AttachmentIntent.OPEN_WITH -> localAttachment.openWithIntent(context)
-                AttachmentIntent.SAVE_TO_DRIVE -> localAttachment.saveToDriveIntent(context)
-            }
+            localAttachment.getIntentFromType(context, intentType)
         } else null
 
         emit(intent)

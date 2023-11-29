@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.hasSupportedApplications
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.safeNavigate
@@ -32,11 +33,11 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.databinding.BottomSheetAttachmentActionsBinding
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntent
-import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntent.OPEN_WITH
-import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntent.SAVE_TO_DRIVE
+import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntentType
+import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntentType.OPEN_WITH
+import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntentType.SAVE_TO_DRIVE
+import com.infomaniak.mail.utils.AttachmentIntentUtils.getIntentFromType
 import com.infomaniak.mail.utils.AttachmentIntentUtils.openWithIntent
-import com.infomaniak.mail.utils.AttachmentIntentUtils.saveToDriveIntent
 import com.infomaniak.mail.utils.PermissionUtils
 import dagger.hilt.android.AndroidEntryPoint
 import com.infomaniak.lib.core.R as RCore
@@ -69,7 +70,7 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
     private fun setupListeners(attachment: Attachment) = with(binding) {
         openWithItem.setClosingOnClickListener {
             trackAttachmentActionsEvent("open")
-            if (attachment.openWithIntent(requireContext()).hasSupportedApplications(requireContext())) {
+            if (attachment.openWithIntent(context).hasSupportedApplications(context)) {
                 attachment.executeIntent(OPEN_WITH)
             } else {
                 mainViewModel.snackBarManager.setValue(getString(RCore.string.errorNoSupportingAppFound))
@@ -86,19 +87,15 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         }
     }
 
-    private fun Attachment.executeIntent(intentType: AttachmentIntent) {
+    private fun Attachment.executeIntent(intentType: AttachmentIntentType) {
         if (hasUsableCache(requireContext()) || isInlineCachedFile(requireContext())) {
-            val intent = when (intentType) {
-                OPEN_WITH -> openWithIntent(requireContext())
-                SAVE_TO_DRIVE -> saveToDriveIntent(requireContext())
-            }
-            startActivity(intent)
+            startActivity(getIntentFromType(requireContext(), intentType))
         } else {
             navigateToDownloadProgressDialog(intentType)
         }
     }
 
-    private fun Attachment.navigateToDownloadProgressDialog(intentType: AttachmentIntent) {
+    private fun Attachment.navigateToDownloadProgressDialog(intentType: AttachmentIntentType) {
         safeNavigate(
             resId = R.id.downloadAttachmentProgressDialog,
             args = DownloadAttachmentProgressDialogArgs(

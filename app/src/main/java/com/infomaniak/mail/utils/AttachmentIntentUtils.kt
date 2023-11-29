@@ -23,14 +23,17 @@ import android.content.Intent
 import androidx.core.content.FileProvider
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntentType.OPEN_WITH
+import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntentType.SAVE_TO_DRIVE
 
 object AttachmentIntentUtils {
+
     private const val DRIVE_PACKAGE = "com.infomaniak.drive"
     private const val DRIVE_CLASS = "com.infomaniak.drive.ui.SaveExternalFilesActivity"
 
     const val DOWNLOAD_ATTACHMENT_RESULT = "download_attachment_result"
 
-    fun Attachment.saveToDriveIntent(context: Context): Intent {
+    private fun Attachment.saveToDriveIntent(context: Context): Intent {
         val uri = FileProvider.getUriForFile(context, context.getString(R.string.ATTACHMENTS_AUTHORITY), getCacheFile(context))
         return Intent().apply {
             component = ComponentName(DRIVE_PACKAGE, DRIVE_CLASS)
@@ -49,7 +52,12 @@ object AttachmentIntentUtils {
         }
     }
 
-    enum class AttachmentIntent {
+    fun Attachment.getIntentFromType(context: Context, intentType: AttachmentIntentType) = when (intentType) {
+        OPEN_WITH -> openWithIntent(context)
+        SAVE_TO_DRIVE -> saveToDriveIntent(context)
+    }
+
+    enum class AttachmentIntentType {
         OPEN_WITH, SAVE_TO_DRIVE
     }
 }
