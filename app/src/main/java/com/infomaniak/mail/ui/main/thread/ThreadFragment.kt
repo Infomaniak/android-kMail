@@ -296,8 +296,8 @@ class ThreadFragment : Fragment() {
                 mainViewModel.currentMailbox.value?.let { mailbox -> threadViewModel.deleteDraft(message, mailbox) }
             },
             onAttachmentClicked = { attachment ->
-                attachment.resource?.let {
-                    safeNavigate(ThreadFragmentDirections.actionThreadFragmentToAttachmentActionsBottomSheetDialog(it))
+                attachment.resource?.let { resource ->
+                    safeNavigate(ThreadFragmentDirections.actionThreadFragmentToAttachmentActionsBottomSheetDialog(resource))
                 }
             },
             onDownloadAllClicked = { message ->
