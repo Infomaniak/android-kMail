@@ -58,6 +58,7 @@ class RealmChangesBinding<T : BaseRealmObject, VH : ViewHolder> private construc
 
     private var onRealmChanged: OnRealmChanged<T>
 
+    // TODO: Unused?
     private var previousList = emptyList<T>()
 
     var recyclerView: RecyclerView? = null
@@ -75,7 +76,7 @@ class RealmChangesBinding<T : BaseRealmObject, VH : ViewHolder> private construc
         val list = resultsChange.list
 
         fun notifyAdapter() {
-            notifyAdapter(resultsChange.list)
+            notifyAdapter(resultsChange.list) // TODO: Why not using `list`?
             notifyAfterUpdate(list)
         }
 
@@ -84,6 +85,7 @@ class RealmChangesBinding<T : BaseRealmObject, VH : ViewHolder> private construc
         when (resultsChange) {
 
             is InitialResults -> { // First call
+                // TODO: Why not calling `notifyAdapter()`?
                 notifyAdapter(list)
                 notifyAfterUpdate(list)
             }
@@ -104,7 +106,7 @@ class RealmChangesBinding<T : BaseRealmObject, VH : ViewHolder> private construc
         val list = listChange.list
 
         fun notifyAdapter() {
-            notifyAdapter(listChange.list)
+            notifyAdapter(listChange.list) // TODO: Why not using `list`?
             notifyAfterUpdate(list)
         }
 
@@ -113,6 +115,7 @@ class RealmChangesBinding<T : BaseRealmObject, VH : ViewHolder> private construc
         when (listChange) {
 
             is InitialList -> { // First call
+                // TODO: Why not calling `notifyAdapter()`?
                 notifyAdapter(list)
                 notifyAfterUpdate(list)
             }
