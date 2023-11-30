@@ -44,6 +44,9 @@ import com.google.android.material.R as RMaterial
 @AndroidEntryPoint
 class AiPromptFragment : Fragment() {
 
+    @Inject
+    lateinit var localSettings: LocalSettings
+
     private var binding: FragmentAiPromptBinding by safeBinding()
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
@@ -62,22 +65,6 @@ class AiPromptFragment : Fragment() {
         }
     }
 
-    @Inject
-    lateinit var localSettings: LocalSettings
-
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        setCorrectSheetMargins()
-    }
-
-    private fun setCorrectSheetMargins() = with(binding.root) {
-        val screenWidth = resources.displayMetrics.widthPixels
-        val isScreenTooBig = screenWidth > m3BottomSheetMaxWidthPx
-        val horizontalMargin = if (isScreenTooBig) m3BottomSheetHorizontalMarginPx else NO_MARGIN
-
-        setMarginsRelative(start = horizontalMargin, end = horizontalMargin)
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentAiPromptBinding.inflate(inflater, container, false).also { binding = it }.root
     }
@@ -85,6 +72,11 @@ class AiPromptFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setUi()
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        setCorrectSheetMargins()
     }
 
     private fun setUi() = with(binding) {
@@ -118,6 +110,14 @@ class AiPromptFragment : Fragment() {
         // that the button may remain disabled even though it should be enabled based on the current
         // prompt. `onPromptChanged()` is not enough which is why it's done in `doAfterTextChanged()`.
         prompt.doAfterTextChanged(::updateButtonEnabledState)
+    }
+
+    private fun setCorrectSheetMargins() = with(binding.root) {
+        val screenWidth = resources.displayMetrics.widthPixels
+        val isScreenTooBig = screenWidth > m3BottomSheetMaxWidthPx
+        val horizontalMargin = if (isScreenTooBig) m3BottomSheetHorizontalMarginPx else NO_MARGIN
+
+        setMarginsRelative(start = horizontalMargin, end = horizontalMargin)
     }
 
     private fun initPromptTextAndPlaceholder() = viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {

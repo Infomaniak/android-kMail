@@ -273,7 +273,10 @@ fun Fragment.safeNavigateToNewMessageActivity(args: Bundle? = null, currentClass
     if (canNavigate(currentClassName)) (activity as MainActivity).navigateToNewMessageActivity(args)
 }
 
-fun Fragment.navigateToThread(thread: Thread, mainViewModel: MainViewModel) = runCatchingRealm {
+fun Fragment.navigateToThread(
+    mainViewModel: MainViewModel,
+    thread: Thread,
+) = runCatchingRealm {
     if (thread.isOnlyOneDraft) { // Directly go to NewMessage screen
         trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
         mainViewModel.navigateToSelectedDraft(thread.messages.first()).observe(viewLifecycleOwner) {

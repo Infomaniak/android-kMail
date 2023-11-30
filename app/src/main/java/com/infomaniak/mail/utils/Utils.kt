@@ -81,11 +81,6 @@ object Utils {
         result!!
     }
 
-    enum class MailboxErrorCode {
-        NO_MAILBOX,
-        NO_VALID_MAILBOX,
-    }
-
     fun <T1, T2> waitInitMediator(liveData1: LiveData<T1>, liveData2: LiveData<T2>): MediatorLiveData<Pair<T1, T2>> {
 
         fun areLiveDataInitialized() = liveData1.isInitialized && liveData2.isInitialized
@@ -99,5 +94,10 @@ object Utils {
             addSource(liveData1) { postIfInit() }
             addSource(liveData2) { postIfInit() }
         }
+    }
+
+    enum class MailboxErrorCode {
+        NO_MAILBOX,
+        NO_VALID_MAILBOX,
     }
 }
