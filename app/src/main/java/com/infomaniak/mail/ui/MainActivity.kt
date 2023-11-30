@@ -58,6 +58,7 @@ import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.firebase.RegisterFirebaseBroadcastReceiver
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.TitleAlertDialog
+import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.ui.newMessage.NewMessageActivity
 import com.infomaniak.mail.ui.sync.SyncAutoConfigActivity
@@ -343,8 +344,13 @@ class MainActivity : BaseActivity() {
         }
 
         fun popBack() {
-            if (navController.currentDestination?.id == R.id.threadListFragment) {
-                finish()
+            val currentFragment = supportFragmentManager
+                .findFragmentById(R.id.mainHostFragment)
+                ?.childFragmentManager
+                ?.primaryNavigationFragment
+
+            if (currentFragment is TwoPaneFragment) {
+                currentFragment.handleOnBackPressed()
             } else {
                 navController.popBackStack()
             }

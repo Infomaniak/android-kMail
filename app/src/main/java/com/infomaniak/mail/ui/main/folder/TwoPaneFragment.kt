@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.slidingpanelayout.widget.SlidingPaneLayout
 import com.infomaniak.lib.core.utils.getBackNavigationResult
 import com.infomaniak.lib.core.utils.safeNavigate
@@ -147,6 +148,14 @@ abstract class TwoPaneFragment : Fragment() {
                     recipient = contact,
                 ).toBundle(),
             )
+        }
+    }
+
+    fun handleOnBackPressed() {
+        when {
+            isOnlyRightShown() -> resetPanes()
+            this is ThreadListFragment -> requireActivity().finish()
+            else -> findNavController().popBackStack()
         }
     }
 
