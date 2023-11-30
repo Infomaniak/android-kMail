@@ -169,6 +169,13 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
                 // Here, we use `arguments` instead of `navigationArgs` because we need mutable data.
                 if (arguments?.getString(navigationArgs::openThreadUid.name) != null) {
                     navigationArgs.openThreadUid?.let { openThreadUid ->
+                        threadListAdapter.apply {
+                            getItemPosition(openThreadUid)?.let { position ->
+                                clickedThreadPosition = position
+                                clickedThreadUid = openThreadUid
+                                notifyItemChanged(position, ThreadListAdapter.NotificationType.SELECTED_STATE)
+                            }
+                        }
                         // If we are coming from a Notification, we need to navigate to ThreadFragment.
                         navigateToThread(mainViewModel, threadUid = openThreadUid)
                         arguments?.remove(navigationArgs::openThreadUid.name)
