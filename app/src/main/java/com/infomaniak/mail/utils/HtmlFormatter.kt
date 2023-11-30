@@ -99,7 +99,7 @@ class HtmlFormatter(private val html: String) {
         children().forEach { parent ->
             val textNodes = parent.textNodes()
             for (textNode in textNodes) {
-                val text = textNode.text()
+                val text = textNode.wholeText
                 if (text.length <= BREAK_LIMIT) continue
 
                 parent.replaceChildWithNodes(child = textNode, breakString(text))
