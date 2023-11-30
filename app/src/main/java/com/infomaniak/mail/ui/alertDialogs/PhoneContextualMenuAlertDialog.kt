@@ -23,7 +23,6 @@ import android.net.Uri
 import android.provider.ContactsContract
 import android.webkit.WebView
 import com.infomaniak.mail.R
-import com.infomaniak.mail.ui.main.SnackBarManager
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.copyStringToClipboard
 import com.infomaniak.mail.utils.safeStartActivity
@@ -35,17 +34,17 @@ import javax.inject.Inject
 class PhoneContextualMenuAlertDialog @Inject constructor(
     @ActivityContext private val activityContext: Context,
 ) : ContextualMenuAlertDialog(activityContext) {
-    override val items = listOf<Pair<Int, (String, SnackBarManager) -> Unit>>(
-        R.string.contextMenuPhoneNumberDial to { phoneNumber, _ ->
+    override val items = listOf<ContextualItem>(
+        ContextualItem(R.string.contextMenuPhoneNumberDial) { phoneNumber, _ ->
             activityContext.dialPhoneNumber(phoneNumber)
         },
-        R.string.contextMenuPhoneNumberSms to { phoneNumber, _ ->
+        ContextualItem(R.string.contextMenuPhoneNumberSms) { phoneNumber, _ ->
             activityContext.smsToPhoneNumber(phoneNumber)
         },
-        R.string.contextMenuPhoneNumberAddContact to { phoneNumber, _ ->
+        ContextualItem(R.string.contextMenuPhoneNumberAddContact) { phoneNumber, _ ->
             activityContext.addPhoneNumberToContacts(phoneNumber)
         },
-        R.string.contextMenuPhoneNumberCopy to { phoneNumber, snackBarManager ->
+        ContextualItem(R.string.contextMenuPhoneNumberCopy) { phoneNumber, snackBarManager ->
             activityContext.copyStringToClipboard(phoneNumber, R.string.snackbarPhoneNumberCopiedToClipboard, snackBarManager)
         },
     )

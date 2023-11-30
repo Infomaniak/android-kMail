@@ -20,7 +20,6 @@ package com.infomaniak.mail.ui.alertDialogs
 import android.content.Context
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.mail.R
-import com.infomaniak.mail.ui.main.SnackBarManager
 import com.infomaniak.mail.utils.copyStringToClipboard
 import com.infomaniak.mail.utils.shareString
 import dagger.hilt.android.qualifiers.ActivityContext
@@ -31,14 +30,14 @@ import javax.inject.Inject
 class LinkContextualMenuAlertDialog @Inject constructor(
     @ActivityContext private val activityContext: Context,
 ) : ContextualMenuAlertDialog(activityContext) {
-    override val items = listOf<Pair<Int, (String, SnackBarManager) -> Unit>>(
-        R.string.contextMenuLinkOpen to { url, _ ->
+    override val items = listOf<ContextualItem>(
+        ContextualItem(R.string.contextMenuLinkOpen) { url, _ ->
             activityContext.openUrl(url)
         },
-        R.string.contextMenuLinkCopy to { url, snackBarManager ->
+        ContextualItem(R.string.contextMenuLinkCopy) { url, snackBarManager ->
             activityContext.copyStringToClipboard(url, R.string.snackbarLinkCopiedToClipboard, snackBarManager)
         },
-        R.string.contextMenuLinkShare to { url, _ ->
+        ContextualItem(R.string.contextMenuLinkShare) { url, _ ->
             activityContext.shareString(url)
         },
     )

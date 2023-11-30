@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.alertDialogs
 
 import android.content.Context
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.infomaniak.lib.core.utils.context
@@ -29,7 +30,7 @@ abstract class ContextualMenuAlertDialog(
     @ActivityContext private val activityContext: Context,
 ) : BaseAlertDialog(activityContext) {
 
-    protected abstract val items: List<Pair<Int, (String, SnackBarManager) -> Unit>>
+    protected abstract val items: List<ContextualItem>
 
     val binding: DialogLinkContextualMenuBinding by lazy { DialogLinkContextualMenuBinding.inflate(activity.layoutInflater) }
     override val alertDialog: AlertDialog by lazy { initDialog() }
@@ -43,12 +44,11 @@ abstract class ContextualMenuAlertDialog(
     }
 
     private fun initDialog(): AlertDialog = with(binding) {
-        val stringItems = items.map { context.getString(it.first) }.toTypedArray()
+        val stringItems = items.map { context.getString(it.textRes) }.toTypedArray()
 
         MaterialAlertDialogBuilder(context)
             .setCustomTitle(binding.root)
-            // TODO : Name items correctly and simplify map/toTypedArray
-            .setItems(stringItems) { _, index -> items[index].second(lastData, snackBarManager) }
+            .setItems(stringItems) { _, index -> items[index].onClick(lastData, snackBarManager) }
             .create()
     }
 
@@ -59,4 +59,9 @@ abstract class ContextualMenuAlertDialog(
         lastData = data
         alertDialog.show()
     }
+
+    data class ContextualItem(
+        @StringRes val textRes: Int,
+        val onClick: (data: String, snackBarManager: SnackBarManager) -> Unit
+    )
 }
