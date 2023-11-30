@@ -192,7 +192,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun refreshThreadsIfNotificationsAreDisabled() = with(mainViewModel) {
-        val areGoogleServicesDisabled = playServicesUtils.areGooglePlayServicesNotAvailable()
+        val areGoogleServicesDisabled = !playServicesUtils.areGooglePlayServicesAvailable()
         val areAppNotifsDisabled = !notificationManagerCompat.areNotificationsEnabled()
         val areMailboxNotifsDisabled = currentMailbox.value?.notificationsIsDisabled(notificationManagerCompat) == true
         val shouldRefreshThreads = areGoogleServicesDisabled || areAppNotifsDisabled || areMailboxNotifsDisabled
