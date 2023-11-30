@@ -69,8 +69,6 @@ class ThreadViewModel @Inject constructor(
 
     private val splitBodies = mutableMapOf<String, SplitBody>()
 
-    var previousFolderId: String? = null
-
     private val mailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
 
     private val currentMailboxLive = mailboxController.getMailboxAsync(

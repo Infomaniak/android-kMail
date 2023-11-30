@@ -30,8 +30,6 @@ import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.distinctUntilChanged
 import androidx.navigation.fragment.findNavController
@@ -68,15 +66,12 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
-import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
-import com.infomaniak.mail.ui.main.thread.ThreadViewModel
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
 import com.infomaniak.mail.utils.UiUtils.formatUnreadCount
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
-import com.infomaniak.mail.utils.Utils.observeInTabletMode
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
@@ -88,17 +83,13 @@ import javax.inject.Inject
 import com.infomaniak.lib.core.R as RCore
 
 @AndroidEntryPoint
-class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
+class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private var _binding: FragmentThreadListBinding? = null
     val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
 
     private val navigationArgs: ThreadListFragmentArgs by navArgs()
-    private val mainViewModel: MainViewModel by activityViewModels()
     private val threadListViewModel: ThreadListViewModel by viewModels()
-
-    private val threadViewModel: ThreadViewModel?
-        get() = (requireActivity() as MainActivity).threadViewModel
 
     private val threadListMultiSelection by lazy { ThreadListMultiSelection() }
 
@@ -170,41 +161,23 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         observerDraftsActionsCompletedWorks()
         observeFlushFolderTrigger()
         observeUpdateInstall()
-
-        // TODO: This won't work because we are recreating the Fragment & VM when closing a Thread, so we lose the ThreadViewModel.
-        if (isTablet()) observeInTabletMode(mainViewModel, threadViewModel, threadListAdapter)
-
     }.getOrDefault(Unit)
 
     private fun navigateFromNotificationToThread() {
-        if (isPhone()) {
-            // Here, we use `arguments` instead of `navigationArgs` because we need mutable data.
-            if (arguments?.getString(navigationArgs::openThreadUid.name) != null) {
-                // If we are coming from a Notification, we need to navigate to ThreadFragment.
-                navigateToThread(mainViewModel, threadUid = navigationArgs.openThreadUid)
-                arguments?.remove(navigationArgs::openThreadUid.name)
-            }
-        } else {
-            threadListObserver = object : AdapterDataObserver() {
-                override fun onChanged() {
-                    if (arguments?.getString(navigationArgs::openThreadUid.name) != null) {
-                        navigationArgs.openThreadUid?.let { openThreadUid ->
-                            threadListAdapter.apply {
-                                getItemPosition(openThreadUid)?.let { position ->
-                                    clickedThreadPosition = position
-                                    clickedThreadUid = openThreadUid
-                                    notifyItemChanged(position, ThreadListAdapter.NotificationType.SELECTED_STATE)
-                                }
-                            }
-                            navigateToThread(mainViewModel, threadUid = openThreadUid)
-                            arguments?.remove(navigationArgs::openThreadUid.name)
-                            threadListObserver?.let(threadListAdapter::unregisterAdapterDataObserver)
-                        }
+        threadListObserver = object : AdapterDataObserver() {
+            override fun onChanged() {
+                // Here, we use `arguments` instead of `navigationArgs` because we need mutable data.
+                if (arguments?.getString(navigationArgs::openThreadUid.name) != null) {
+                    navigationArgs.openThreadUid?.let { openThreadUid ->
+                        // If we are coming from a Notification, we need to navigate to ThreadFragment.
+                        navigateToThread(mainViewModel, threadUid = openThreadUid)
+                        arguments?.remove(navigationArgs::openThreadUid.name)
+                        threadListObserver?.let(threadListAdapter::unregisterAdapterDataObserver)
                     }
                 }
             }
-            threadListObserver?.let(threadListAdapter::registerAdapterDataObserver)
         }
+        threadListObserver?.let(threadListAdapter::registerAdapterDataObserver)
     }
 
     private fun navigateFromNotificationToNewMessage() {
@@ -225,7 +198,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     override fun onStart() {
         super.onStart()
         binding.unreadCountChip.apply { isCloseIconVisible = isChecked }
-        if (isTablet()) threadViewModel?.goToSearch?.value = false
     }
 
     override fun onResume() {
@@ -357,7 +329,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
 
         searchButton.setOnClickListener {
-            if (isTablet()) threadViewModel?.goToSearch?.value = true
             safeNavigate(
                 ThreadListFragmentDirections.actionThreadListFragmentToSearchFragment(
                     dummyFolderId = mainViewModel.currentFolderId ?: "eJzz9HPyjwAABGYBgQ--", // Hardcoded INBOX folder

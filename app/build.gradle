@@ -93,6 +93,7 @@ dependencies {
     implementation libs.lottie
     implementation libs.dragdropswipe.recyclerview
     implementation libs.dotsindicator
+    implementation libs.slidingpanelayout
 
     implementation libs.flexbox
     implementation libs.lifecycle.process

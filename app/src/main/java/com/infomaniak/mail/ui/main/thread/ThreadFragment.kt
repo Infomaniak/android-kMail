@@ -33,10 +33,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.distinctUntilChanged
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
-import com.infomaniak.lib.core.utils.*
+import com.infomaniak.lib.core.utils.SentryLog
+import com.infomaniak.lib.core.utils.context
+import com.infomaniak.lib.core.utils.hasSupportedApplications
 import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_DELETE_NAME
@@ -55,17 +55,15 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ExternalContent
 import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.models.Attachment
-import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadBinding
-import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.*
+import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.OpenThreadResult
-import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialog
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipients
@@ -73,7 +71,6 @@ import com.infomaniak.mail.utils.UiUtils.dividerDrawable
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
-import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import kotlin.math.absoluteValue
 import kotlin.math.min
@@ -104,9 +101,8 @@ class ThreadFragment : Fragment() {
     private var _binding: FragmentThreadBinding? = null
     private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
 
-    private val navigationArgs: ThreadFragmentArgs by navArgs()
     private val mainViewModel: MainViewModel by activityViewModels()
-    val threadViewModel: ThreadViewModel by viewModels()
+    private val threadViewModel: ThreadViewModel by viewModels()
 
     private val threadAdapter inline get() = binding.messagesList.adapter as ThreadAdapter
     private val permissionUtils by lazy { PermissionUtils(this) }
@@ -114,13 +110,10 @@ class ThreadFragment : Fragment() {
 
     private var isFavorite = false
 
-    // TODO: Remove this when Realm doesn't broadcast twice when deleting a Thread anymore.
-    private var isFirstTimeLeaving = AtomicBoolean(true)
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentThreadBinding.inflate(inflater, container, false).also {
             _binding = it
-            if (isPhone()) requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundColor)
+            requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundColor)
         }.root
     }
 
@@ -129,7 +122,6 @@ class ThreadFragment : Fragment() {
 
         setupUi()
         setupAdapter()
-
         setupDialogs()
         permissionUtils.registerDownloadManagerPermission()
 
@@ -140,15 +132,12 @@ class ThreadFragment : Fragment() {
         observeContacts()
         observeQuickActionBarClicks()
         observeSubjectUpdateTriggers()
-        if (isPhone()) observeOpenAttachment()
-        if (isTablet()) observeFolderChange()
 
         observeThreadOpening()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         threadAdapter.reRenderMails()
-        updateToolbarUi()
         super.onConfigurationChanged(newConfig)
     }
 
@@ -160,7 +149,10 @@ class ThreadFragment : Fragment() {
 
     private fun setupUi() = with(binding) {
 
-        updateToolbarUi()
+        toolbar.setNavigationOnClickListener {
+            val bothPanesAreShown = (parentFragment as TwoPaneFragment).areBothShown()
+            if (!bothPanesAreShown) mainViewModel.shouldCloseThread.value = Unit
+        }
 
         val defaultTextColor = context.getColor(R.color.primaryTextColor)
         appBar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
@@ -177,19 +169,8 @@ class ThreadFragment : Fragment() {
             toolbarSubject.setTextColor(textColor)
         }
 
-        if (isPhone()) {
-            changeToolbarColorOnScroll(toolbar, messagesListNestedScrollView) { color ->
-                appBar.backgroundTintList = ColorStateList.valueOf(color)
-            }
-        }
-    }
-
-    private fun updateToolbarUi() = with(binding.toolbar) {
-
-        navigationIcon?.alpha = if (isTabletInLandscape()) 0 else 255
-
-        setNavigationOnClickListener {
-            if (isPhone() || isTabletInPortrait()) closeThread()
+        changeToolbarColorOnScroll(toolbar, messagesListNestedScrollView) { color ->
+            appBar.backgroundTintList = ColorStateList.valueOf(color)
         }
     }
 
@@ -197,11 +178,7 @@ class ThreadFragment : Fragment() {
         adapter = ThreadAdapter(
             shouldLoadDistantResources = shouldLoadDistantResources(),
             onContactClicked = { contact ->
-                if (isTablet()) {
-                    mainViewModel.detailedContactArgs.value = contact
-                } else {
-                    safeNavigate(ThreadFragmentDirections.actionThreadFragmentToDetailedContactBottomSheetDialog(contact))
-                }
+                mainViewModel.detailedContactArgs.value = contact
             },
             onDraftClicked = { message ->
                 trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
@@ -273,7 +250,7 @@ class ThreadFragment : Fragment() {
 
     private fun observeThreadOpening() = with(binding) {
 
-        threadViewModel.threadUid.distinctUntilChanged().observeNotNull(viewLifecycleOwner) { threadUid ->
+        mainViewModel.currentThreadUid.distinctUntilChanged().observeNotNull(viewLifecycleOwner) { threadUid ->
 
             // Display Thread view
             emptyView.isInvisible = true
@@ -281,8 +258,6 @@ class ThreadFragment : Fragment() {
 
             openThread(threadUid)
         }
-
-        if (isPhone()) threadViewModel.threadUid.value = navigationArgs.threadUid
     }
 
     private fun observeLightThemeToggle() {
@@ -294,7 +269,7 @@ class ThreadFragment : Fragment() {
         threadViewModel.threadLive.observe(viewLifecycleOwner) { thread ->
 
             if (thread == null) {
-                closeThread()
+                mainViewModel.shouldCloseThread.value = Unit
                 return@observe
             }
 
@@ -322,7 +297,7 @@ class ThreadFragment : Fragment() {
 
             if (messages.isEmpty()) {
                 mainViewModel.deletedMessages.value = deletedMessagesUids
-                closeThread()
+                mainViewModel.shouldCloseThread.value = Unit
                 return@observe
             }
 
@@ -351,22 +326,11 @@ class ThreadFragment : Fragment() {
                     )
                 }
                 R.id.quickActionMenu -> {
-                    val shouldLoadDistantResources = shouldLoadDistantResources(lastMessageToReplyTo.uid)
-                    if (isTablet()) {
-                        mainViewModel.threadActionsBottomSheetArgs.value = Triple(
-                            threadUid,
-                            lastMessageToReplyTo.uid,
-                            shouldLoadDistantResources,
-                        )
-                    } else {
-                        safeNavigate(
-                            ThreadFragmentDirections.actionThreadFragmentToThreadActionsBottomSheetDialog(
-                                threadUid = threadUid,
-                                messageUidToReplyTo = lastMessageToReplyTo.uid,
-                                shouldLoadDistantResources = shouldLoadDistantResources,
-                            )
-                        )
-                    }
+                    mainViewModel.threadActionsBottomSheetArgs.value = Triple(
+                        threadUid,
+                        lastMessageToReplyTo.uid,
+                        shouldLoadDistantResources(lastMessageToReplyTo.uid),
+                    )
                 }
             }
         }
@@ -396,41 +360,6 @@ class ThreadFragment : Fragment() {
         }
     }
 
-    private fun observeOpenAttachment() {
-        getBackNavigationResult(DownloadAttachmentProgressDialog.OPEN_WITH, ::startActivity)
-    }
-
-    private fun observeFolderChange() = with(threadViewModel) {
-
-        fun reactToFolderChange(folder: Folder) {
-
-            binding.emptyViewFolderName.text = getString(
-                R.string.noConversationSelected,
-                folder.getLocalizedName(requireContext()),
-            )
-
-            if (folder.id != previousFolderId) {
-                previousFolderId = folder.id
-                if (isInThread) closeThread()
-            }
-        }
-
-        // TODO: This won't work because we are recreating the Fragment & VM when closing a Thread, so we lose the information.
-        goToSearch.observeNotNull(viewLifecycleOwner) { isGoing ->
-
-            val folder = if (isGoing) {
-                Folder().apply { name = getString(R.string.searchFolderName) }
-            } else {
-                mainViewModel.currentFolder.value
-            }
-
-            folder?.let(::reactToFolderChange)
-            goToSearch.value = null
-        }
-
-        mainViewModel.currentFolder.observeNotNull(viewLifecycleOwner, ::reactToFolderChange)
-    }
-
     private fun openThread(threadUid: String) = with(threadViewModel) {
 
         reassignThreadLive(threadUid)
@@ -439,30 +368,12 @@ class ThreadFragment : Fragment() {
         openThread(threadUid).observe(viewLifecycleOwner) { result ->
 
             if (result == null) {
-                closeThread()
+                mainViewModel.shouldCloseThread.value = Unit
                 return@observe
             }
 
             updateUi(threadUid, folderRole = mainViewModel.getActionFolderRole(result.thread))
             updateAdapter(result)
-        }
-    }
-
-    private fun closeThread() {
-
-        if (isPhone()) {
-            // TODO: Realm broadcasts twice when the Thread is deleted.
-            //  We don't know why.
-            //  While it's not fixed, we do this quickfix of checking if we already left:
-            if (isFirstTimeLeaving.compareAndSet(true, false)) {
-                findNavController().popBackStack()
-            }
-
-        } else { // Tablet mode
-            (requireActivity() as MainActivity).let {
-                it.closeThread() // Both orientations
-                if (isTabletInPortrait()) it.updateTabletLayout()
-            }
         }
     }
 
@@ -522,18 +433,7 @@ class ThreadFragment : Fragment() {
         if (hasUsableCache(requireContext()) || isInlineCachedFile(requireContext())) {
             startActivity(openWithIntent(requireContext()))
         } else {
-            val fileType = getFileTypeFromMimeType()
-            if (isTablet()) {
-                mainViewModel.downloadAttachmentsArgs.value = Triple(resource!!, name, fileType)
-            } else {
-                safeNavigate(
-                    ThreadFragmentDirections.actionThreadFragmentToDownloadAttachmentProgressDialog(
-                        attachmentResource = resource!!,
-                        attachmentName = name,
-                        attachmentType = fileType,
-                    )
-                )
-            }
+            mainViewModel.downloadAttachmentsArgs.value = Triple(resource!!, name, getFileTypeFromMimeType())
         }
     }
 
@@ -571,41 +471,17 @@ class ThreadFragment : Fragment() {
                 arrivedFromExistingDraft = false,
             )
         } else {
-            if (isTablet()) {
-                mainViewModel.replyBottomSheetArgs.value = message.uid to shouldLoadDistantResources
-            } else {
-                safeNavigate(
-                    ThreadFragmentDirections.actionThreadFragmentToReplyBottomSheetDialog(
-                        messageUid = message.uid,
-                        shouldLoadDistantResources = shouldLoadDistantResources,
-                    )
-                )
-            }
+            mainViewModel.replyBottomSheetArgs.value = message.uid to shouldLoadDistantResources
         }
     }
 
-    private fun Message.navigateToActionsBottomSheet() {
-        val threadUid = threadViewModel.threadUid.value ?: return
-        val isThemeTheSame = threadAdapter.isThemeTheSameMap[uid] ?: return
-        val shouldLoadDistantResources = shouldLoadDistantResources(uid)
-
-        if (isTablet()) {
-            mainViewModel.messageActionsBottomSheetArgs.value = MessageActionsArgs(
-                messageUid = uid,
-                threadUid = threadUid,
-                isThemeTheSame = isThemeTheSame,
-                shouldLoadDistantResources = shouldLoadDistantResources,
-            )
-        } else {
-            safeNavigate(
-                ThreadFragmentDirections.actionThreadFragmentToMessageActionsBottomSheetDialog(
-                    messageUid = uid,
-                    threadUid = threadUid,
-                    isThemeTheSame = isThemeTheSame,
-                    shouldLoadDistantResources = shouldLoadDistantResources,
-                )
-            )
-        }
+    private fun Message.navigateToActionsBottomSheet() = with(mainViewModel) {
+        messageActionsBottomSheetArgs.value = MessageActionsArgs(
+            messageUid = uid,
+            threadUid = currentThreadUid.value ?: return,
+            isThemeTheSame = threadAdapter.isThemeTheSameMap[uid] ?: return,
+            shouldLoadDistantResources = shouldLoadDistantResources(uid),
+        )
     }
 
     private fun scrollToFirstUnseenMessage() = with(binding) {
@@ -655,8 +531,7 @@ class ThreadFragment : Fragment() {
         messageUid: String? = null,
         mailToUri: Uri? = null,
     ) {
-
-        val args = NewMessageActivityArgs(
+        mainViewModel.newMessageArgs.value = NewMessageActivityArgs(
             draftMode = draftMode,
             previousMessageUid = previousMessageUid,
             shouldLoadDistantResources = shouldLoadDistantResources,
@@ -666,12 +541,6 @@ class ThreadFragment : Fragment() {
             messageUid = messageUid,
             mailToUri = mailToUri,
         )
-
-        if (isTablet()) {
-            mainViewModel.newMessageArgs.value = args
-        } else {
-            safeNavigateToNewMessageActivity(args = args.toBundle())
-        }
     }
 
     private fun computeSubject(
