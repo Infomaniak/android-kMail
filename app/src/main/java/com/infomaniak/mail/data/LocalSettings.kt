@@ -91,10 +91,14 @@ class LocalSettings private constructor(context: Context) {
         set(value) = sharedPreferences.transaction { putBoolean(IS_APP_LOCKED_KEY, value) }
     //endregion
 
-    //region Update later
+    //region Update
     var isUserWantingUpdates: Boolean
         get() = sharedPreferences.getBoolean(IS_USER_WANTING_UPDATES_KEY, DEFAULT_IS_USER_WANTING_UPDATES)
         set(value) = sharedPreferences.transaction { putBoolean(IS_USER_WANTING_UPDATES_KEY, value) }
+
+    var hasAppUpdateDownloaded: Boolean
+        get() = sharedPreferences.getBoolean(HAS_APP_UPDATE_DOWNLOADED_KEY, DEFAULT_HAS_APP_UPDATE_DOWNLOADED)
+        set(value) = sharedPreferences.transaction { putBoolean(HAS_APP_UPDATE_DOWNLOADED_KEY, value) }
     //endregion
 
     //region Ai engine
@@ -345,6 +349,7 @@ class LocalSettings private constructor(context: Context) {
         private const val DEFAULT_HAS_ALREADY_ENABLED_NOTIFICATIONS = false
         private const val DEFAULT_IS_APP_LOCKED = false
         private const val DEFAULT_IS_USER_WANTING_UPDATES = true
+        private const val DEFAULT_HAS_APP_UPDATE_DOWNLOADED = false
         private val DEFAULT_AI_ENGINE = AiEngine.FALCON
         private val DEFAULT_THREAD_DENSITY = ThreadDensity.LARGE
         private val DEFAULT_THEME = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) Theme.LIGHT else Theme.SYSTEM
@@ -374,6 +379,7 @@ class LocalSettings private constructor(context: Context) {
         private const val HAS_ALREADY_ENABLED_NOTIFICATIONS_KEY = "hasAlreadyEnabledNotificationsKey"
         private const val IS_APP_LOCKED_KEY = "isAppLockedKey"
         private const val IS_USER_WANTING_UPDATES_KEY = "isUserWantingUpdatesKey"
+        private const val HAS_APP_UPDATE_DOWNLOADED_KEY = "hasAppUpdateDownloaded"
         private const val AI_ENGINE_KEY = "aiEngineKey"
         private const val THREAD_DENSITY_KEY = "threadDensityKey"
         private const val THEME_KEY = "themeKey"

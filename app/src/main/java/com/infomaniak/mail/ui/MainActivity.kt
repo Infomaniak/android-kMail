@@ -117,7 +117,10 @@ class MainActivity : BaseActivity() {
     }
 
     private val inAppUpdateResultLauncher = registerForActivityResult(StartIntentSenderForResult()) { result ->
-        localSettings.isUserWantingUpdates = result.resultCode == RESULT_OK
+        localSettings.apply {
+            isUserWantingUpdates = result.resultCode == RESULT_OK
+            hasAppUpdateDownloaded = false
+        }
     }
 
     @Inject
@@ -466,7 +469,10 @@ class MainActivity : BaseActivity() {
     private fun initAppUpdateManager() {
         initAppUpdateManager(
             context = this,
-            onInstall = { mainViewModel.canInstallUpdate.value = true },
+            onInstall = {
+                mainViewModel.canInstallUpdate.value = true
+                localSettings.hasAppUpdateDownloaded = true
+            },
         )
     }
 
