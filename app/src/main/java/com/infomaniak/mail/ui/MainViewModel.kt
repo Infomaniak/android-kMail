@@ -203,7 +203,7 @@ class MainViewModel @Inject constructor(
     val currentThreadUid = MutableLiveData<String?>(null)
 
     val isInThread get() = currentThreadUid.value != null
-    val shouldCloseThread = SingleLiveEvent<Unit>()
+    val closeThreadTrigger = SingleLiveEvent<Unit>()
 
     val downloadAttachmentsArgs = SingleLiveEvent<Triple<String, String, AttachmentType>>()
     val newMessageArgs = SingleLiveEvent<NewMessageActivityArgs>()
@@ -211,6 +211,10 @@ class MainViewModel @Inject constructor(
     val threadActionsBottomSheetArgs = SingleLiveEvent<Triple<String, String, Boolean>>()
     val messageActionsBottomSheetArgs = SingleLiveEvent<MessageActionsArgs>()
     val detailedContactArgs = SingleLiveEvent<Recipient>()
+
+    fun closeThread() {
+        closeThreadTrigger.value = Unit
+    }
     //endregion
 
     //region Merged Contacts
