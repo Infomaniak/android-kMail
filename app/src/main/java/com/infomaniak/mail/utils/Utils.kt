@@ -43,6 +43,8 @@ object Utils {
 
     const val TAG_SEPARATOR = " "
 
+    const val SCHEME_SMSTO = "smsto:"
+
     fun colorToHexRepresentation(color: Int) = "#" + color.toHexString().substring(2 until 8)
 
     fun isPermanentDeleteFolder(role: FolderRole?): Boolean {

@@ -24,7 +24,7 @@
     android:paddingTop="@dimen/marginStandardMedium">
 
     <TextView
-        android:id="@+id/url"
+        android:id="@+id/title"
         style="@style/Body.Secondary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

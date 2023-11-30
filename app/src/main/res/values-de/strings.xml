@@ -206,6 +206,15 @@
     <string name="contentDescriptionUnreadPastille">Dieser Ordner enthält ungelesene Nachrichten</string>
     <string name="contentDescriptionUserAvatar">Benutzer-Avatar</string>
     <string name="contentDescriptionWarningIcon">Warnung</string>
+    <string name="contextMenuEmailCopy">Mailadresse kopieren</string>
+    <string name="contextMenuEmailOpen">E-Mail senden</string>
+    <string name="contextMenuLinkCopy">Link kopieren</string>
+    <string name="contextMenuLinkOpen">Den Link im Browser öffnen</string>
+    <string name="contextMenuLinkShare">Link teilen</string>
+    <string name="contextMenuPhoneNumberAddContact">Kontakt hinzufügen</string>
+    <string name="contextMenuPhoneNumberCopy">Nummer kopieren</string>
+    <string name="contextMenuPhoneNumberDial">Wählen</string>
+    <string name="contextMenuPhoneNumberSms">Eine SMS schreiben</string>
     <string name="createFolderName">Name des Ordners</string>
     <string name="createFolderNoParent">Keine</string>
     <string name="createFolderParent">Übergeordneter Ordner</string>
@@ -274,9 +283,6 @@
     <string name="fromTitle">Von:</string>
     <string name="googlePlayServicesAreRequired">Google Play Services sind erforderlich</string>
     <string name="inboxFolder">Posteingang</string>
-    <string name="linkContextMenuCopy">Link kopieren</string>
-    <string name="linkContextMenuOpen">Den Link im Browser öffnen</string>
-    <string name="linkContextMenuShare">Link teilen</string>
     <string name="loadingText">Laden…</string>
     <plurals name="lockedMailboxDescription">
         <item quantity="one">Der Zugriff auf Ihre E-Mail-Adresse ist derzeit gesperrt. Bitte wenden Sie sich an Ihren Administrator.</item>
@@ -355,6 +361,8 @@
     <string name="restoreEmailsText">Alle E-Mails werden wieder in Ihrem Posteingang landen.</string>
     <string name="restoreEmailsTitle">Wiederherstellung Ihrer E-Mails</string>
     <string name="reviewAlertTitle">Möchten Sie Infomaniak Mail?</string>
+    <string name="saveToDriveDeviceItem">Gerät</string>
+    <string name="saveToDriveTitle">Speichern in</string>
     <string name="scheduledMessagesFolder">Geplante Nachrichten</string>
     <string name="searchAllMessages">Alle Meldungen</string>
     <string name="searchFieldPlaceholder">Eine E-Mail suchen</string>
@@ -450,6 +458,7 @@
     <string name="snackbarMessageDeletedPermanently">Nachricht gelöscht</string>
     <string name="snackbarMessageMoved">Nachricht an %s verschoben</string>
     <string name="snackbarMoveCancelled">Umzug abgesagt</string>
+    <string name="snackbarPhoneNumberCopiedToClipboard">Nummer in die Zwischenablage kopiert</string>
     <string name="snackbarReportPhishingConfirmation">Erfolgreich gemeldet</string>
     <string name="snackbarRestorationLaunched">Starten der Wiederherstellung</string>
     <plurals name="snackbarSenderBlacklisted">
@@ -467,6 +476,7 @@
     </plurals>
     <string name="socialNetworksFolder">Soziale Netzwerke</string>
     <string name="spamFolder">Spam</string>
+    <string name="startActivityCantHandleAction">Es wurde keine Anwendung gefunden, die diese Aktion bearbeitet</string>
     <string name="subjectTitle">Thema:</string>
     <string name="syncCalendarsAndContactsDescription">Sehen Sie sich Ihre Kontakte und Kalender direkt auf Ihrem Gerät an.</string>
     <string name="syncCalendarsAndContactsTitle">Synchronisierung von Kalendern und Kontakten</string>
@@ -507,6 +517,5 @@
     <string name="urlEntryTitle">Einen Hyperlink erstellen</string>
     <string name="urlPlaceholder">URL</string>
     <string name="urlUserReportAndroid">https://feedback.userreport.com/8f405fa0-e5b0-49e7-85d8-477b64ea48f7/</string>
-    <string name="webViewCantHandleAction">Es wurde keine Anwendung gefunden, die diese Aktion bearbeitet</string>
     <string name="workInProgressTitle">Bald verfügbar</string>
 </resources>

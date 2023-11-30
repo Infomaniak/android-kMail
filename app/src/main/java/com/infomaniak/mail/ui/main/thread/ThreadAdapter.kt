@@ -23,7 +23,7 @@ import android.net.Uri
 import android.text.format.Formatter
 import android.view.*
 import android.webkit.WebView
-import android.webkit.WebView.*
+import android.webkit.WebView.HitTestResult
 import android.widget.FrameLayout
 import androidx.core.view.children
 import androidx.core.view.isGone
@@ -70,7 +70,7 @@ class ThreadAdapter(
     onMenuClicked: (Message) -> Unit,
     onAllExpandedMessagesLoaded: () -> Unit,
     navigateToNewMessageActivity: (Uri) -> Unit,
-    promptLink: (String) -> Unit,
+    promptLink: (String, ContextMenuType) -> Unit,
 ) : ListAdapter<Message, ThreadViewHolder>(MessageDiffCallback()) {
 
     inline val messages: MutableList<Message> get() = currentList
@@ -426,8 +426,12 @@ class ThreadAdapter(
     }
 
     private fun ThreadViewHolder.bindBody(message: Message, hasQuote: Boolean) = with(binding) {
-        bodyWebView.setupLinkContextualMenu { url -> threadAdapterCallbacks?.promptLink?.invoke(url) }
-        fullMessageWebView.setupLinkContextualMenu { url -> threadAdapterCallbacks?.promptLink?.invoke(url) }
+        bodyWebView.setupLinkContextualMenu { data, type ->
+            threadAdapterCallbacks?.promptLink?.invoke(data, type)
+        }
+        fullMessageWebView.setupLinkContextualMenu { data, type ->
+            threadAdapterCallbacks?.promptLink?.invoke(data, type)
+        }
 
         setQuoteInitialCollapsedState(hasQuote)
         quoteButton.setOnClickListener { toggleWebViews(message) }
@@ -446,14 +450,17 @@ class ThreadAdapter(
         }
     }
 
-    private fun WebView.setupLinkContextualMenu(onClicked: (String) -> Unit) {
+    private fun WebView.setupLinkContextualMenu(onClicked: (String, ContextMenuType) -> Unit) {
         setOnLongClickListener {
             val result = hitTestResult
 
             when (result.type) {
+                HitTestResult.PHONE_TYPE,
+                HitTestResult.EMAIL_TYPE,
+                HitTestResult.GEO_TYPE,
                 HitTestResult.SRC_IMAGE_ANCHOR_TYPE,
                 HitTestResult.SRC_ANCHOR_TYPE -> {
-                    getLinkFromResult(result)?.let(onClicked)
+                    getDataFromResult(result)?.let { data -> onClicked(data, contextMenuTypeForHitTestResultType[result.type]!!) }
                     true
                 }
                 else -> false
@@ -461,9 +468,12 @@ class ThreadAdapter(
         }
     }
 
-    private fun WebView.getLinkFromResult(hitTestResult: HitTestResult): String? {
+    private fun WebView.getDataFromResult(hitTestResult: HitTestResult): String? {
         return when (hitTestResult.type) {
+            HitTestResult.PHONE_TYPE,
+            HitTestResult.EMAIL_TYPE,
             HitTestResult.SRC_ANCHOR_TYPE -> hitTestResult.extra
+            HitTestResult.GEO_TYPE -> WebView.SCHEME_GEO + hitTestResult.extra
             HitTestResult.SRC_IMAGE_ANCHOR_TYPE -> {
                 val message = handler.obtainMessage()
                 requestFocusNodeHref(message)
@@ -558,10 +568,10 @@ class ThreadAdapter(
         FAILED_MESSAGE,
     }
 
-    companion object {
-        private const val FORMAT_EMAIL_DATE_HOUR = "HH:mm"
-        private const val FORMAT_EMAIL_DATE_SHORT_DATE = "d MMM"
-        private const val FORMAT_EMAIL_DATE_LONG_DATE = "d MMM yyyy"
+    enum class ContextMenuType {
+        LINK,
+        EMAIL,
+        PHONE,
     }
 
     private class MessageDiffCallback : DiffUtil.ItemCallback<Message>() {
@@ -652,6 +662,20 @@ class ThreadAdapter(
         var onMenuClicked: (Message) -> Unit,
         var onAllExpandedMessagesLoaded: () -> Unit,
         var navigateToNewMessageActivity: (Uri) -> Unit,
-        var promptLink: (String) -> Unit,
+        var promptLink: (String, ContextMenuType) -> Unit,
     )
+
+    companion object {
+        private const val FORMAT_EMAIL_DATE_HOUR = "HH:mm"
+        private const val FORMAT_EMAIL_DATE_SHORT_DATE = "d MMM"
+        private const val FORMAT_EMAIL_DATE_LONG_DATE = "d MMM yyyy"
+
+        private val contextMenuTypeForHitTestResultType = mapOf(
+            HitTestResult.PHONE_TYPE to ContextMenuType.PHONE,
+            HitTestResult.EMAIL_TYPE to ContextMenuType.EMAIL,
+            HitTestResult.GEO_TYPE to ContextMenuType.LINK,
+            HitTestResult.SRC_ANCHOR_TYPE to ContextMenuType.LINK,
+            HitTestResult.SRC_IMAGE_ANCHOR_TYPE to ContextMenuType.LINK,
+        )
+    }
 }

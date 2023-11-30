@@ -208,6 +208,15 @@
     <string name="contentDescriptionUnreadPastille">Ce dossier contient des messages non lus</string>
     <string name="contentDescriptionUserAvatar">Avatar de l’utilisateur</string>
     <string name="contentDescriptionWarningIcon">Attention</string>
+    <string name="contextMenuEmailCopy">Copier l’adresse mail</string>
+    <string name="contextMenuEmailOpen">Envoyer un e-mail</string>
+    <string name="contextMenuLinkCopy">Copier le lien</string>
+    <string name="contextMenuLinkOpen">Ouvrir le lien dans le navigateur</string>
+    <string name="contextMenuLinkShare">Partager le lien</string>
+    <string name="contextMenuPhoneNumberAddContact">Ajouter un contact</string>
+    <string name="contextMenuPhoneNumberCopy">Copier le numéro</string>
+    <string name="contextMenuPhoneNumberDial">Composer</string>
+    <string name="contextMenuPhoneNumberSms">Rédiger un SMS</string>
     <string name="createFolderName">Nom du dossier</string>
     <string name="createFolderNoParent">Aucun</string>
     <string name="createFolderParent">Dossier parent</string>
@@ -278,9 +287,6 @@
     <string name="fromTitle">De :</string>
     <string name="googlePlayServicesAreRequired">Les Google Play Services sont requis</string>
     <string name="inboxFolder">Boîte de réception</string>
-    <string name="linkContextMenuCopy">Copier le lien</string>
-    <string name="linkContextMenuOpen">Ouvrir le lien dans le navigateur</string>
-    <string name="linkContextMenuShare">Partager le lien</string>
     <string name="loadingText">Chargement…</string>
     <plurals name="lockedMailboxDescription">
         <item quantity="one">L’accès à votre adresse mail est actuellement bloqué. Nous vous invitons à contacter votre administrateur.</item>
@@ -363,6 +369,8 @@
     <string name="restoreEmailsText">Tous les e-mails reviendront dans votre boîte de réception.</string>
     <string name="restoreEmailsTitle">Restaurer vos e-mails</string>
     <string name="reviewAlertTitle">Aimez-vous Infomaniak Mail ?</string>
+    <string name="saveToDriveDeviceItem">Appareil</string>
+    <string name="saveToDriveTitle">Enregistrer dans</string>
     <string name="scheduledMessagesFolder">Messages programmés</string>
     <string name="searchAllMessages">Tous les messages</string>
     <string name="searchFieldPlaceholder">Rechercher un message</string>
@@ -458,6 +466,7 @@
     <string name="snackbarMessageDeletedPermanently">Message supprimé</string>
     <string name="snackbarMessageMoved">Message déplacé vers %s</string>
     <string name="snackbarMoveCancelled">Déplacement annulé</string>
+    <string name="snackbarPhoneNumberCopiedToClipboard">Numéro copié dans le presse-papiers</string>
     <string name="snackbarReportPhishingConfirmation">Signalement effectué avec succès</string>
     <string name="snackbarRestorationLaunched">Lancement de la restauration</string>
     <plurals name="snackbarSenderBlacklisted">
@@ -478,6 +487,7 @@
     </plurals>
     <string name="socialNetworksFolder">Réseaux sociaux</string>
     <string name="spamFolder">Spam</string>
+    <string name="startActivityCantHandleAction">Aucune application n’a été trouvée pour gérer cette action</string>
     <string name="subjectTitle">Objet :</string>
     <string name="syncCalendarsAndContactsDescription">Consultez vos contacts et calendriers directement depuis votre appareil.</string>
     <string name="syncCalendarsAndContactsTitle">Synchronisation des calendriers et contacts</string>
@@ -521,6 +531,5 @@
     <string name="urlEntryTitle">Créer un lien hypertexte</string>
     <string name="urlPlaceholder">URL</string>
     <string name="urlUserReportAndroid">https://feedback.userreport.com/91aeb5c2-f609-4b9c-9787-755e83ed940c/</string>
-    <string name="webViewCantHandleAction">Aucune application n’a été trouvée pour gérer cette action</string>
     <string name="workInProgressTitle">Disponible prochainement</string>
 </resources>

@@ -57,9 +57,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
-import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
-import com.infomaniak.mail.ui.alertDialogs.LinkContextualMenuAlertDialog
+import com.infomaniak.mail.ui.alertDialogs.*
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.OpenThreadResult
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialog
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
@@ -102,6 +100,12 @@ class ThreadFragment : Fragment() {
     @Inject
     lateinit var linkContextualMenuAlertDialog: LinkContextualMenuAlertDialog
 
+    @Inject
+    lateinit var emailContextualMenuAlertDialog: EmailContextualMenuAlertDialog
+
+    @Inject
+    lateinit var phoneContextualMenuAlertDialog: PhoneContextualMenuAlertDialog
+
     private var isFavorite = false
 
     // TODO: Remove this when Realm doesn't broadcast twice when deleting a Thread anymore.
@@ -126,6 +130,8 @@ class ThreadFragment : Fragment() {
         observeThreadLive()
 
         linkContextualMenuAlertDialog.initValues(mainViewModel.snackBarManager)
+        emailContextualMenuAlertDialog.initValues(mainViewModel.snackBarManager)
+        phoneContextualMenuAlertDialog.initValues(mainViewModel.snackBarManager)
 
         threadViewModel.openThread().observe(viewLifecycleOwner) { result ->
 
@@ -316,7 +322,21 @@ class ThreadFragment : Fragment() {
             navigateToNewMessageActivity = { uri ->
                 safeNavigateToNewMessageActivity(NewMessageActivityArgs(mailToUri = uri).toBundle())
             },
-            promptLink = linkContextualMenuAlertDialog::show
+            promptLink = { data, type ->
+                // When adding a phone number to contacts, Google decodes this value in case it's url-encoded. But I could not
+                // reproduce this issue when manually creating a url-encoded href. If this is triggered, fix it by also
+                // decoding it at that step.
+                if (type == ThreadAdapter.ContextMenuType.PHONE && data.contains('%')) Sentry.withScope { scope ->
+                    scope.level = SentryLevel.ERROR
+                    Sentry.captureMessage("Google was right, phone numbers can be url-encoded. Needs to be fixed")
+                }
+
+                when (type) {
+                    ThreadAdapter.ContextMenuType.LINK -> linkContextualMenuAlertDialog.show(data)
+                    ThreadAdapter.ContextMenuType.EMAIL -> emailContextualMenuAlertDialog.show(data)
+                    ThreadAdapter.ContextMenuType.PHONE -> phoneContextualMenuAlertDialog.show(data)
+                }
+            }
         )
     }
 

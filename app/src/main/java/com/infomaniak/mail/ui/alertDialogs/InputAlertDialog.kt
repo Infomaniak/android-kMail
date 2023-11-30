@@ -50,7 +50,7 @@ class InputAlertDialog @Inject constructor(
     private var onErrorCheck: (suspend (CharSequence) -> String?)? = null
     private var onPositiveButtonClicked: ((String) -> Unit)? = null
 
-    override fun initDialog() = with(binding) {
+    private fun initDialog() = with(binding) {
 
         fun Button.checkValidation(text: CharSequence) {
             errorJob?.cancel()

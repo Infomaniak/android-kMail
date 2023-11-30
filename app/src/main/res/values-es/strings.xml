@@ -206,6 +206,15 @@
     <string name="contentDescriptionUnreadPastille">Esta carpeta contiene mensajes no leídos</string>
     <string name="contentDescriptionUserAvatar">Avatar de usuario</string>
     <string name="contentDescriptionWarningIcon">Advertencia</string>
+    <string name="contextMenuEmailCopy">Copiar dirección de correo electrónico</string>
+    <string name="contextMenuEmailOpen">Enviar correo</string>
+    <string name="contextMenuLinkCopy">Copiar enlace</string>
+    <string name="contextMenuLinkOpen">Abrir el enlace en el navegador</string>
+    <string name="contextMenuLinkShare">Compartir este enlace</string>
+    <string name="contextMenuPhoneNumberAddContact">Añadir contacto</string>
+    <string name="contextMenuPhoneNumberCopy">Copiar el número</string>
+    <string name="contextMenuPhoneNumberDial">Marcar</string>
+    <string name="contextMenuPhoneNumberSms">Escribir un SMS</string>
     <string name="createFolderName">Nombre de la carpeta</string>
     <string name="createFolderNoParent">Ninguno</string>
     <string name="createFolderParent">Carpeta principal</string>
@@ -274,9 +283,6 @@
     <string name="fromTitle">De:</string>
     <string name="googlePlayServicesAreRequired">Se requieren los servicios de Google Play</string>
     <string name="inboxFolder">Bandeja de entrada</string>
-    <string name="linkContextMenuCopy">Copiar enlace</string>
-    <string name="linkContextMenuOpen">Abrir el enlace en el navegador</string>
-    <string name="linkContextMenuShare">Compartir este enlace</string>
     <string name="loadingText">Cargando…</string>
     <plurals name="lockedMailboxDescription">
         <item quantity="one">El acceso a su dirección de correo electrónico está bloqueado. Póngase en contacto con su administrador.</item>
@@ -355,6 +361,8 @@
     <string name="restoreEmailsText">Todos los correos electrónicos volverán a tu bandeja de entrada.</string>
     <string name="restoreEmailsTitle">Restaura tus correos electrónicos</string>
     <string name="reviewAlertTitle">¿Te gusta Infomaniak Mail?</string>
+    <string name="saveToDriveDeviceItem">Dispositivo</string>
+    <string name="saveToDriveTitle">Guardar en</string>
     <string name="scheduledMessagesFolder">Mensajes programados</string>
     <string name="searchAllMessages">Todos los mensajes</string>
     <string name="searchFieldPlaceholder">Buscar un correo electrónico</string>
@@ -450,6 +458,7 @@
     <string name="snackbarMessageDeletedPermanently">Mensaje eliminado</string>
     <string name="snackbarMessageMoved">Mensaje trasladado a %s</string>
     <string name="snackbarMoveCancelled">Mudanza cancelada</string>
+    <string name="snackbarPhoneNumberCopiedToClipboard">Número copiado en el portapapeles</string>
     <string name="snackbarReportPhishingConfirmation">Informado con éxito</string>
     <string name="snackbarRestorationLaunched">Iniciar la restauración</string>
     <plurals name="snackbarSenderBlacklisted">
@@ -467,6 +476,7 @@
     </plurals>
     <string name="socialNetworksFolder">Redes sociales</string>
     <string name="spamFolder">Spam</string>
+    <string name="startActivityCantHandleAction">No se ha encontrado ninguna aplicación que gestione esta acción</string>
     <string name="subjectTitle">Asunto:</string>
     <string name="syncCalendarsAndContactsDescription">Consulta tus contactos y tu calendario directamente desde tu dispositivo.</string>
     <string name="syncCalendarsAndContactsTitle">Sincronización de calendarios y contactos</string>
@@ -507,6 +517,5 @@
     <string name="urlEntryTitle">Crear un hiperenlace</string>
     <string name="urlPlaceholder">URL</string>
     <string name="urlUserReportAndroid">https://feedback.userreport.com/f0daec0a-6950-4891-a064-7d040bdce127/</string>
-    <string name="webViewCantHandleAction">No se ha encontrado ninguna aplicación que gestione esta acción</string>
     <string name="workInProgressTitle">Disponible en breve</string>
 </resources>
