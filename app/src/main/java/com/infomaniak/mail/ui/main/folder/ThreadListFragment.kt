@@ -167,7 +167,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun navigateFromNotificationToNewMessage() {
         // Here, we use `arguments` instead of `navigationArgs` because we need mutable data.
         if (arguments?.getString(navigationArgs::replyToMessageUid.name) != null) {
-            // If we are coming from the Reply action of a Notification, we need to navigate to NewMessageActivity
+            // If we are coming from the Reply action of a Notification, we need to navigate to NewMessageActivity.
             safeNavigateToNewMessageActivity(
                 NewMessageActivityArgs(
                     draftMode = navigationArgs.draftMode,
@@ -266,7 +266,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
             stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
 
-            onThreadClicked = { thread -> navigateToThread(thread, mainViewModel) }
+            onThreadClicked = { thread -> navigateToThread(mainViewModel, thread) }
 
             onFlushClicked = { dialogTitle ->
 

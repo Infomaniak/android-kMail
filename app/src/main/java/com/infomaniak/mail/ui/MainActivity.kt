@@ -409,10 +409,17 @@ class MainActivity : BaseActivity() {
     private fun onDestinationChanged(destination: NavDestination, arguments: Bundle?) {
 
         SentryDebug.addNavigationBreadcrumb(destination.displayName, arguments)
+        trackDestination(destination)
 
+        updateColorsWhenDestinationChanged(destination.id)
         setDrawerLockMode(destination.id == R.id.threadListFragment)
 
-        when (destination.id) {
+        previousDestinationId = destination.id
+    }
+
+    private fun updateColorsWhenDestinationChanged(destinationId: Int) {
+
+        when (destinationId) {
             R.id.junkBottomSheetDialog,
             R.id.messageActionsBottomSheetDialog,
             R.id.replyBottomSheetDialog,
@@ -425,25 +432,17 @@ class MainActivity : BaseActivity() {
             window.statusBarColor = getColor(it)
         }
 
-        val colorRes = when (destination.id) {
-            R.id.threadFragment -> R.color.elevatedBackground
+        val colorRes = when (destinationId) {
             R.id.messageActionsBottomSheetDialog,
             R.id.replyBottomSheetDialog,
             R.id.detailedContactBottomSheetDialog,
             R.id.threadActionsBottomSheetDialog -> R.color.backgroundColorSecondary
-            R.id.threadListFragment -> {
-                if (mainViewModel.isMultiSelectOn) R.color.elevatedBackground else R.color.backgroundColor
-            }
+            R.id.threadFragment -> R.color.elevatedBackground
+            R.id.threadListFragment -> if (mainViewModel.isMultiSelectOn) R.color.elevatedBackground else R.color.backgroundColor
             else -> R.color.backgroundColor
         }
 
         window.updateNavigationBarColor(getColor(colorRes))
-
-        trackDestination(destination)
-
-        if (destination.id == R.id.threadListFragment && previousDestinationId == R.id.threadFragment) showAppReview()
-
-        previousDestinationId = destination.id
     }
 
     fun setDrawerLockMode(isUnlocked: Boolean) {

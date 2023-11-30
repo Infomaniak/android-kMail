@@ -174,8 +174,8 @@ class ThreadListAdapter @Inject constructor(
     }.getOrDefault(super.getItemId(position))
 
     private fun CardviewThreadItemBinding.displayThread(thread: Thread) {
-        setupThreadDensityDependentUi()
 
+        setupThreadDensityDependentUi()
         displayAvatar(thread)
 
         with(thread) {
@@ -222,20 +222,19 @@ class ThreadListAdapter @Inject constructor(
     }
 
     private fun CardviewThreadItemBinding.updateSelectedState(selectedThread: Thread) {
-        // TODO: Modify the UI accordingly
-        val isSelected = multiSelection?.selectedItems?.contains(selectedThread) == true
-        selectionCardView.backgroundTintList = if (isSelected) {
-            ColorStateList.valueOf(context.getAttributeColor(RMaterial.attr.colorPrimaryContainer))
-        } else {
-            context.getColorStateList(R.color.backgroundColor)
+
+        val isMultiSelected = multiSelection?.selectedItems?.contains(selectedThread) == true
+
+        selectionCardView.backgroundTintList = when {
+            isMultiSelected -> ColorStateList.valueOf(context.getAttributeColor(RMaterial.attr.colorPrimaryContainer))
+            else -> context.getColorStateList(R.color.backgroundColor)
         }
 
         with(localSettings) {
-            expeditorAvatar.isVisible = !isSelected && threadDensity == LARGE
+            expeditorAvatar.isVisible = !isMultiSelected && threadDensity == LARGE
             checkMarkLayout.isVisible = multiSelection?.isEnabled == true
-
-            checkedState.isVisible = isSelected
-            uncheckedState.isVisible = threadDensity != LARGE && !isSelected
+            checkedState.isVisible = isMultiSelected
+            uncheckedState.isVisible = threadDensity != LARGE && !isMultiSelected
         }
     }
 
