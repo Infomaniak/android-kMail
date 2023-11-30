@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.main.thread
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
+import android.text.format.Formatter
 import android.view.*
 import android.webkit.WebView
 import android.webkit.WebView.*
@@ -416,7 +417,7 @@ class ThreadAdapter(
             attachment.size
         }.reduce { accumulator: Long, size: Long -> accumulator + size }
 
-        return FormatterFileSize.formatShortFileSize(context, totalAttachmentsFileSizeInBytes)
+        return Formatter.formatShortFileSize(context, totalAttachmentsFileSizeInBytes)
     }
 
     private fun ThreadViewHolder.bindContent(message: Message) {

@@ -17,13 +17,13 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
+import android.text.format.Formatter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import coil.load
-import com.infomaniak.lib.core.utils.FormatterFileSize
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
@@ -51,7 +51,7 @@ class AttachmentAdapter(
         val attachment = attachments[position]
 
         fileName.text = attachment.name
-        fileDetails.text = FormatterFileSize.formatShortFileSize(context, attachment.size)
+        fileDetails.text = Formatter.formatShortFileSize(context, attachment.size)
         icon.load(attachment.getFileTypeFromMimeType().icon)
 
         if (!shouldDisplayCloseButton) {
