@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.folder
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
 import androidx.annotation.FloatRange
@@ -76,6 +77,16 @@ abstract class TwoPaneFragment : Fragment(), SlidingPaneLayout.PanelSlideListene
         observeCurrentFolder()
         observeSlidingPane()
         observeThreadNavigation()
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        ensureThreadIsOpen()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        ensureThreadIsOpen()
     }
 
     private fun setupSlidingPane() {
@@ -179,6 +190,10 @@ abstract class TwoPaneFragment : Fragment(), SlidingPaneLayout.PanelSlideListene
         detailedContactArgs.observe(viewLifecycleOwner) {
             safeNavigate(resId = R.id.detailedContactBottomSheetDialog, args = it.toBundle())
         }
+    }
+
+    private fun ensureThreadIsOpen() = with(twoPaneViewModel) {
+        if (isThreadOpen) openThread(currentThreadUid.value!!)
     }
 
     fun handleOnBackPressed() {
