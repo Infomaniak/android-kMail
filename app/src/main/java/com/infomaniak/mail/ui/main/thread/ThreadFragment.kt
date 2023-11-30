@@ -323,14 +323,12 @@ class ThreadFragment : Fragment() {
                 safeNavigateToNewMessageActivity(NewMessageActivityArgs(mailToUri = uri).toBundle())
             },
             promptLink = { data, type ->
-                if (type == ThreadAdapter.ContextMenuType.PHONE) {
-                    // When adding a phone number to contacts, Google decodes this value in case it's url-encoded. But I could not
-                    // reproduce this issue when manually creating a url-encoded href. If this is triggered, fix it by also
-                    // decoding it at that step.
-                    if (data.contains('%')) Sentry.withScope { scope ->
-                        scope.level = SentryLevel.ERROR
-                        Sentry.captureMessage("Google was right, phone numbers can appear url-encoded. Needs to be fixed")
-                    }
+                // When adding a phone number to contacts, Google decodes this value in case it's url-encoded. But I could not
+                // reproduce this issue when manually creating a url-encoded href. If this is triggered, fix it by also
+                // decoding it at that step.
+                if (type == ThreadAdapter.ContextMenuType.PHONE && data.contains('%')) Sentry.withScope { scope ->
+                    scope.level = SentryLevel.ERROR
+                    Sentry.captureMessage("Google was right, phone numbers can appear url-encoded. Needs to be fixed")
                 }
 
                 when (type) {
