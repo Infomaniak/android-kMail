@@ -25,11 +25,13 @@ import androidx.slidingpanelayout.widget.SlidingPaneLayout
 import com.infomaniak.lib.core.utils.getBackNavigationResult
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.search.SearchFragment
 import com.infomaniak.mail.ui.main.thread.DetailedContactBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.main.thread.actions.*
+import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 
 abstract class TwoPaneFragment : Fragment() {
@@ -50,11 +52,29 @@ abstract class TwoPaneFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupSlidingPane()
+        observeFolderName()
         observeThreadEvents()
     }
 
     private fun setupSlidingPane() {
         slidingPaneLayout.lockMode = SlidingPaneLayout.LOCK_MODE_LOCKED
+    }
+
+    private fun observeFolderName() = with(mainViewModel) {
+
+        Utils.waitInitMediator(currentFolder, isInSearch).observe(viewLifecycleOwner) { (folder, isInSearch) ->
+
+            val displayedFolder = (if (isInSearch) {
+                Folder().apply { name = getString(R.string.searchFolderName) }
+            } else {
+                folder
+            }) ?: return@observe
+
+            rightPaneFolderName.value = getString(
+                R.string.noConversationSelected,
+                displayedFolder.getLocalizedName(requireContext()),
+            )
+        }
     }
 
     private fun observeThreadEvents() = with(mainViewModel) {
