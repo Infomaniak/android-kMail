@@ -55,21 +55,28 @@ class ThreadViewModel @Inject constructor(
 ) : AndroidViewModel(application) {
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
-    private var fetchMessagesJob: Job? = null
 
-    private val threadUid inline get() = savedStateHandle.get<String>(ThreadFragmentArgs::threadUid.name)!!
-    private val mailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
+    private var fetchMessagesJob: Job? = null
 
     val quickActionBarClicks = SingleLiveEvent<Pair<Message, Int>>()
 
     var deletedMessagesUids = mutableSetOf<String>()
     val failedMessagesUids = SingleLiveEvent<List<String>>()
 
+    private val threadUid inline get() = savedStateHandle.get<String>(ThreadFragmentArgs::threadUid.name)!!
+
+    private val splitBodies = mutableMapOf<String, SplitBody>()
+
+    private val mailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
+
+    private val currentMailboxLive = mailboxController.getMailboxAsync(
+        AccountUtils.currentUserId,
+        AccountUtils.currentMailboxId,
+    ).map { it.obj }.asLiveData(ioCoroutineContext)
+
     val threadLive = liveData(ioCoroutineContext) {
         emitSource(threadController.getThreadAsync(threadUid).map { it.obj }.asLiveData())
     }
-
-    private val splitBodies = mutableMapOf<String, SplitBody>()
 
     val messagesLive = liveData(ioCoroutineContext) {
 
@@ -89,29 +96,6 @@ class ThreadViewModel @Inject constructor(
             ?.map { results -> results.list.map { splitBody(it) } }
             ?.asLiveData()
             ?.let { emitSource(it) }
-    }
-
-    private val currentMailboxLive = mailboxController.getMailboxAsync(
-        AccountUtils.currentUserId,
-        AccountUtils.currentMailboxId,
-    ).map { it.obj }.asLiveData(ioCoroutineContext)
-
-    fun assembleSubjectData(mergedContactsLive: LiveData<MergedContactDictionary?>): LiveData<SubjectDataResult> {
-
-        return MediatorLiveData<SubjectDataResult>().apply {
-
-            addSource(threadLive) { thread ->
-                value = SubjectDataResult(thread, value?.mergedContacts, value?.mailbox)
-            }
-
-            addSource(mergedContactsLive) { mergedContacts ->
-                value = SubjectDataResult(value?.thread, mergedContacts, value?.mailbox)
-            }
-
-            addSource(currentMailboxLive) { mailbox ->
-                value = SubjectDataResult(value?.thread, value?.mergedContacts, mailbox)
-            }
-        }
     }
 
     fun openThread() = liveData(ioCoroutineContext) {
@@ -148,6 +132,24 @@ class ThreadViewModel @Inject constructor(
             0 -> SentryDebug.sendEmptyThread(thread)
             1 -> context.trackUserInfo("oneMessagesInThread")
             else -> context.trackUserInfo("multipleMessagesInThread", nbMessages)
+        }
+    }
+
+    fun assembleSubjectData(mergedContactsLive: LiveData<MergedContactDictionary?>): LiveData<SubjectDataResult> {
+
+        return MediatorLiveData<SubjectDataResult>().apply {
+
+            addSource(threadLive) { thread ->
+                value = SubjectDataResult(thread, value?.mergedContacts, value?.mailbox)
+            }
+
+            addSource(mergedContactsLive) { mergedContacts ->
+                value = SubjectDataResult(value?.thread, mergedContacts, value?.mailbox)
+            }
+
+            addSource(currentMailboxLive) { mailbox ->
+                value = SubjectDataResult(value?.thread, value?.mergedContacts, mailbox)
+            }
         }
     }
 
