@@ -59,7 +59,7 @@ open class TwoPaneFragment : Fragment() {
 
     private fun observeThreadEvents() = with(mainViewModel) {
 
-        shouldCloseThread.observe(viewLifecycleOwner) { closeThread() }
+        closeThreadTrigger.observe(viewLifecycleOwner) { resetPanes() }
 
         getBackNavigationResult(DownloadAttachmentProgressDialog.OPEN_WITH, ::startActivity)
 
@@ -127,7 +127,7 @@ open class TwoPaneFragment : Fragment() {
         slidingPaneLayout?.open()
     }
 
-    private fun closeThread() {
+    private fun resetPanes() {
         slidingPaneLayout?.close()
         mainViewModel.currentThreadUid.value = null
         // TODO: We can see that the ThreadFragment's content is changing, while the pane is closing.

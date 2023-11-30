@@ -151,7 +151,7 @@ class ThreadFragment : Fragment() {
 
         toolbar.setNavigationOnClickListener {
             val bothPanesAreShown = (parentFragment as TwoPaneFragment).areBothShown()
-            if (!bothPanesAreShown) mainViewModel.shouldCloseThread.value = Unit
+            if (!bothPanesAreShown) mainViewModel.closeThread()
         }
 
         val defaultTextColor = context.getColor(R.color.primaryTextColor)
@@ -269,7 +269,7 @@ class ThreadFragment : Fragment() {
         threadViewModel.threadLive.observe(viewLifecycleOwner) { thread ->
 
             if (thread == null) {
-                mainViewModel.shouldCloseThread.value = Unit
+                mainViewModel.closeThread()
                 return@observe
             }
 
@@ -297,7 +297,7 @@ class ThreadFragment : Fragment() {
 
             if (messages.isEmpty()) {
                 mainViewModel.deletedMessages.value = deletedMessagesUids
-                mainViewModel.shouldCloseThread.value = Unit
+                mainViewModel.closeThread()
                 return@observe
             }
 
@@ -368,7 +368,7 @@ class ThreadFragment : Fragment() {
         openThread(threadUid).observe(viewLifecycleOwner) { result ->
 
             if (result == null) {
-                mainViewModel.shouldCloseThread.value = Unit
+                mainViewModel.closeThread()
                 return@observe
             }
 
