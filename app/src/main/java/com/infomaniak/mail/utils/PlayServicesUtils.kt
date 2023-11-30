@@ -23,7 +23,7 @@ interface PlayServicesUtils {
 
     fun checkPlayServices(fragmentActivity: FragmentActivity) = Unit
 
-    fun areGooglePlayServicesNotAvailable(): Boolean = true
+    fun areGooglePlayServicesAvailable(): Boolean = false
 
     fun deleteFirebaseToken() = Unit
 }
