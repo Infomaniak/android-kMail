@@ -22,7 +22,8 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 
-open class NewMessageManager {
+abstract class NewMessageManager {
+
     private var _newMessageViewModel: NewMessageViewModel? = null
     protected val newMessageViewModel: NewMessageViewModel get() = _newMessageViewModel!!
     private var _binding: FragmentNewMessageBinding? = null
