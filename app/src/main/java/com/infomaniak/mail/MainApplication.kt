@@ -50,6 +50,7 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.workers.AppUpdateWorker
 import com.infomaniak.mail.workers.SyncMailboxesWorker
 import dagger.hilt.android.HiltAndroidApp
 import io.sentry.SentryEvent
@@ -108,6 +109,9 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
     @MainDispatcher
     lateinit var mainDispatcher: CoroutineDispatcher
 
+    @Inject
+    lateinit var appUpdateWorkerScheduler: AppUpdateWorker.Scheduler
+
     override fun getWorkManagerConfiguration(): Configuration {
         return Configuration.Builder()
             .setWorkerFactory(workerFactory)
@@ -132,12 +136,16 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
     override fun onStart(owner: LifecycleOwner) {
         isAppInBackground = false
         syncMailboxesWorkerScheduler.cancelWork()
+        appUpdateWorkerScheduler.cancelWork()
     }
 
     override fun onStop(owner: LifecycleOwner) {
         lastAppClosingTime = Date().time
         isAppInBackground = true
-        owner.lifecycleScope.launch { syncMailboxesWorkerScheduler.scheduleWorkIfNeeded() }
+        owner.lifecycleScope.launch {
+            syncMailboxesWorkerScheduler.scheduleWorkIfNeeded()
+            appUpdateWorkerScheduler.scheduleWorkIfNeeded()
+        }
     }
 
     private fun configureDebugMode() {
