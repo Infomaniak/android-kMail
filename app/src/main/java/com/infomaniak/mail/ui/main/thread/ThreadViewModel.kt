@@ -58,7 +58,7 @@ class ThreadViewModel @Inject constructor(
 
     private var fetchMessagesJob: Job? = null
 
-    val quickActionBarClicks = SingleLiveEvent<Pair<Message, Int>>()
+    val quickActionBarClicks = SingleLiveEvent<QuickActionBarResult>()
 
     var deletedMessagesUids = mutableSetOf<String>()
     val failedMessagesUids = SingleLiveEvent<List<String>>()
@@ -191,7 +191,7 @@ class ThreadViewModel @Inject constructor(
     fun clickOnQuickActionBar(menuId: Int) = viewModelScope.launch(ioCoroutineContext) {
         val thread = threadController.getThread(threadUid) ?: return@launch
         val message = messageController.getLastMessageToExecuteAction(thread)
-        quickActionBarClicks.postValue(message to menuId)
+        quickActionBarClicks.postValue(QuickActionBarResult(message, menuId))
     }
 
     fun scheduleDownload(downloadUrl: String, filename: String) = viewModelScope.launch(ioCoroutineContext) {
@@ -211,5 +211,10 @@ class ThreadViewModel @Inject constructor(
         val isExpandedMap: MutableMap<String, Boolean>,
         val initialSetOfExpandedMessagesUids: Set<String>,
         val isThemeTheSameMap: MutableMap<String, Boolean>,
+    )
+
+    data class QuickActionBarResult(
+        val message: Message,
+        val menuId: Int,
     )
 }
