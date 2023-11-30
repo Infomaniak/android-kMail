@@ -30,7 +30,8 @@ import javax.inject.Inject
 class LinkContextualMenuAlertDialog @Inject constructor(
     @ActivityContext private val activityContext: Context,
 ) : ContextualMenuAlertDialog(activityContext) {
-    override val items = listOf<ContextualItem>(
+
+    override val items = listOf(
         ContextualItem(R.string.contextMenuLinkOpen) { url, _ ->
             activityContext.openUrl(url)
         },

@@ -34,7 +34,8 @@ import javax.inject.Inject
 class PhoneContextualMenuAlertDialog @Inject constructor(
     @ActivityContext private val activityContext: Context,
 ) : ContextualMenuAlertDialog(activityContext) {
-    override val items = listOf<ContextualItem>(
+
+    override val items = listOf(
         ContextualItem(R.string.contextMenuPhoneNumberDial) { phoneNumber, _ ->
             activityContext.dialPhoneNumber(phoneNumber)
         },

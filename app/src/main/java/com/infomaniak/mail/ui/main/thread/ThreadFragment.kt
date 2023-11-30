@@ -328,7 +328,7 @@ class ThreadFragment : Fragment() {
                 // decoding it at that step.
                 if (type == ThreadAdapter.ContextMenuType.PHONE && data.contains('%')) Sentry.withScope { scope ->
                     scope.level = SentryLevel.ERROR
-                    Sentry.captureMessage("Google was right, phone numbers can appear url-encoded. Needs to be fixed")
+                    Sentry.captureMessage("Google was right, phone numbers can be url-encoded. Needs to be fixed")
                 }
 
                 when (type) {

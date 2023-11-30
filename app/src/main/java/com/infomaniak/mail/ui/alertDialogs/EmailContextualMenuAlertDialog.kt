@@ -32,7 +32,8 @@ import javax.inject.Inject
 class EmailContextualMenuAlertDialog @Inject constructor(
     @ActivityContext private val activityContext: Context,
 ) : ContextualMenuAlertDialog(activityContext) {
-    override val items = listOf<ContextualItem>(
+
+    override val items = listOf(
         ContextualItem(R.string.contextMenuEmailOpen) { email, _ ->
             val mailToUri = Uri.parse(WebView.SCHEME_MAILTO + email)
             (activityContext as MainActivity).navigateToNewMessageActivity(NewMessageActivityArgs(mailToUri = mailToUri).toBundle())

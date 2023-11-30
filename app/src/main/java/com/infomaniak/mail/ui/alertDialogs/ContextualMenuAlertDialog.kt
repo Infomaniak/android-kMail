@@ -37,18 +37,18 @@ abstract class ContextualMenuAlertDialog(
 
     private lateinit var snackBarManager: SnackBarManager
 
-    private var lastData = ""
+    private var dataToProcess = ""
 
     fun initValues(snackBarManager: SnackBarManager) {
         this.snackBarManager = snackBarManager
     }
 
     private fun initDialog(): AlertDialog = with(binding) {
-        val stringItems = items.map { context.getString(it.textRes) }.toTypedArray()
+        val stringItems = items.map { context.getString(it.titleRes) }.toTypedArray()
 
         MaterialAlertDialogBuilder(context)
             .setCustomTitle(binding.root)
-            .setItems(stringItems) { _, index -> items[index].onClick(lastData, snackBarManager) }
+            .setItems(stringItems) { _, index -> items[index].onClick(dataToProcess, snackBarManager) }
             .create()
     }
 
@@ -56,12 +56,12 @@ abstract class ContextualMenuAlertDialog(
 
     fun show(data: String) {
         binding.title.text = data
-        lastData = data
+        dataToProcess = data
         alertDialog.show()
     }
 
     data class ContextualItem(
-        @StringRes val textRes: Int,
+        @StringRes val titleRes: Int,
         val onClick: (data: String, snackBarManager: SnackBarManager) -> Unit
     )
 }
