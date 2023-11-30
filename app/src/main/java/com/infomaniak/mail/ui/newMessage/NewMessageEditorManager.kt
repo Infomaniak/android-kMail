@@ -44,12 +44,12 @@ class NewMessageEditorManager @Inject constructor(
     @ActivityContext private val activityContext: Context,
 ) : NewMessageManager() {
 
-    private val activity get() = activityContext as Activity
+    private inline val activity get() = activityContext as Activity
 
     private var _aiManager: NewMessageAiManager? = null
-    private val aiManager: NewMessageAiManager get() = _aiManager!!
+    private inline val aiManager: NewMessageAiManager get() = _aiManager!!
     private var _filePicker: FilePicker? = null
-    private val filePicker: FilePicker get() = _filePicker!!
+    private inline val filePicker: FilePicker get() = _filePicker!!
 
     fun initValues(
         newMessageViewModel: NewMessageViewModel,

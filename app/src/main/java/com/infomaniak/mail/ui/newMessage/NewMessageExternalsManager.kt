@@ -35,7 +35,7 @@ import javax.inject.Inject
 class NewMessageExternalsManager @Inject constructor() : NewMessageManager() {
 
     private var _informationDialog: InformationAlertDialog? = null
-    private val informationDialog: InformationAlertDialog get() = _informationDialog!!
+    private inline val informationDialog: InformationAlertDialog get() = _informationDialog!!
 
     fun initValues(
         newMessageViewModel: NewMessageViewModel,

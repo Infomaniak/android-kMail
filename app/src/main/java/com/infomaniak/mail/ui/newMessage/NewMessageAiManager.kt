@@ -56,10 +56,10 @@ class NewMessageAiManager @Inject constructor(
     private val localSettings: LocalSettings,
 ) : NewMessageManager() {
 
-    private val activity get() = activityContext as Activity
+    private inline val activity get() = activityContext as Activity
 
     private var _aiViewModel: AiViewModel? = null
-    private val aiViewModel: AiViewModel get() = _aiViewModel!!
+    private inline val aiViewModel: AiViewModel get() = _aiViewModel!!
 
     private val animationDuration by lazy { resources.getInteger(R.integer.aiPromptAnimationDuration).toLong() }
     private val scrimOpacity by lazy { ResourcesCompat.getFloat(context.resources, R.dimen.scrimOpacity) }
