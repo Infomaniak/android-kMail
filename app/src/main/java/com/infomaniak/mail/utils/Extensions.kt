@@ -86,10 +86,10 @@ import com.infomaniak.mail.ui.main.SnackBarManager
 import com.infomaniak.mail.ui.main.folder.DateSeparatorItemDecoration
 import com.infomaniak.mail.ui.main.folder.HeaderItemDecoration
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
+import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.thread.MessageWebViewClient
 import com.infomaniak.mail.ui.main.thread.RoundedBackgroundSpan
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
-import com.infomaniak.mail.ui.main.thread.ThreadFragmentArgs
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.ui.noValidMailboxes.NoValidMailboxesActivity
 import com.infomaniak.mail.utils.AccountUtils.NO_MAILBOX_USER_ID_KEY
@@ -152,18 +152,6 @@ fun Date.isLastWeek(): Boolean {
 
 //region UI
 fun Context.isInPortrait(): Boolean = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
-
-fun Fragment.isPhone(): Boolean = requireContext().isPhone()
-fun Context.isPhone(): Boolean = !isTablet()
-
-fun Fragment.isTablet(): Boolean = requireContext().isTablet()
-fun Context.isTablet(): Boolean = resources.getBoolean(R.bool.isTablet)
-
-fun Fragment.isTabletInLandscape(): Boolean = requireContext().isTabletInLandscape()
-fun Context.isTabletInLandscape(): Boolean = resources.getBoolean(R.bool.isTabletInLandscape)
-
-fun Fragment.isTabletInPortrait(): Boolean = requireContext().isTabletInPortrait()
-fun Context.isTabletInPortrait(): Boolean = isTablet() && !isTabletInLandscape()
 
 fun View.toggleChevron(
     isCollapsed: Boolean,
@@ -285,35 +273,26 @@ fun Fragment.safeNavigateToNewMessageActivity(args: Bundle? = null, currentClass
     if (canNavigate(currentClassName)) (activity as MainActivity).navigateToNewMessageActivity(args)
 }
 
-fun Fragment.navigateToThread(
+fun TwoPaneFragment.navigateToThread(
     mainViewModel: MainViewModel,
     thread: Thread? = null,
     threadUid: String? = null,
 ) = runCatchingRealm {
-    val uid = thread?.uid ?: threadUid ?: return@runCatchingRealm
-    when {
-        thread?.isOnlyOneDraft == true -> { // Directly go to NewMessage screen
-            trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
-            mainViewModel.navigateToSelectedDraft(thread.messages.first()).observe(viewLifecycleOwner) {
-                safeNavigateToNewMessageActivity(
-                    NewMessageActivityArgs(
-                        arrivedFromExistingDraft = true,
-                        draftLocalUuid = it.draftLocalUuid,
-                        draftResource = it.draftResource,
-                        messageUid = it.messageUid,
-                    ).toBundle(),
-                )
-            }
+    if (thread?.isOnlyOneDraft == true) { // Directly go to NewMessage screen
+        trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
+        mainViewModel.navigateToSelectedDraft(thread.messages.first()).observe(viewLifecycleOwner) {
+            safeNavigateToNewMessageActivity(
+                NewMessageActivityArgs(
+                    arrivedFromExistingDraft = true,
+                    draftLocalUuid = it.draftLocalUuid,
+                    draftResource = it.draftResource,
+                    messageUid = it.messageUid,
+                ).toBundle(),
+            )
         }
-        isTablet() -> {
-            (requireActivity() as MainActivity).let {
-                it.openThread(uid)
-                it.updateTabletLayout()
-            }
-        }
-        else -> {
-            safeNavigate(R.id.threadFragment, ThreadFragmentArgs(uid).toBundle())
-        }
+    } else {
+        val uid = thread?.uid ?: threadUid ?: return@runCatchingRealm
+        openThread(uid)
     }
 }.getOrDefault(Unit)
 //endregion

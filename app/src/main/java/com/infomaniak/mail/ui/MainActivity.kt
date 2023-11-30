@@ -20,7 +20,6 @@ package com.infomaniak.mail.ui
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.content.res.Configuration
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.View
@@ -29,7 +28,6 @@ import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts.*
 import androidx.activity.viewModels
 import androidx.annotation.FloatRange
-import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Lifecycle.State
 import androidx.lifecycle.distinctUntilChanged
@@ -61,8 +59,6 @@ import com.infomaniak.mail.firebase.RegisterFirebaseBroadcastReceiver
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.TitleAlertDialog
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
-import com.infomaniak.mail.ui.main.thread.ThreadFragment
-import com.infomaniak.mail.ui.main.thread.ThreadViewModel
 import com.infomaniak.mail.ui.newMessage.NewMessageActivity
 import com.infomaniak.mail.ui.sync.SyncAutoConfigActivity
 import com.infomaniak.mail.utils.*
@@ -94,11 +90,6 @@ class MainActivity : BaseActivity() {
     private var previousDestinationId: Int? = null
     private var easterEggConfettiCount = 0
     private var easterEggConfettiTime = 0L
-
-    val threadViewModel: ThreadViewModel?
-        get() = binding.threadHostFragment?.getFragment<ThreadFragment>()?.threadViewModel
-    private val isInThread: Boolean
-        get() = threadViewModel?.isInThread ?: false
 
     private val navController by lazy {
         (supportFragmentManager.findFragmentById(R.id.mainHostFragment) as NavHostFragment).navController
@@ -363,10 +354,6 @@ class MainActivity : BaseActivity() {
             when {
                 drawerLayout.isOpen -> closeDrawer()
                 mainViewModel.isMultiSelectOn -> closeMultiSelect()
-                isTabletInPortrait() && isInThread -> {
-                    closeThread()
-                    updateTabletLayout()
-                }
                 else -> popBack()
             }
         }
@@ -386,7 +373,6 @@ class MainActivity : BaseActivity() {
     private fun setupSnackBar() {
         fun getAnchor(): View? = when (navController.currentDestination?.id) {
             R.id.threadListFragment -> findViewById(R.id.newMessageFab)
-            R.id.threadFragment -> findViewById(R.id.quickActionBar)
             else -> null
         }
 
@@ -417,11 +403,6 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        if (isTablet()) updateTabletLayout()
-    }
-
     // This `SuppressLint` seems useless, but it's for the CI. Don't remove it.
     @SuppressLint("RestrictedApi")
     private fun onDestinationChanged(destination: NavDestination, arguments: Bundle?) {
@@ -431,8 +412,6 @@ class MainActivity : BaseActivity() {
 
         updateColorsWhenDestinationChanged(destination.id)
         setDrawerLockMode(destination.id == R.id.threadListFragment)
-
-        if (isTablet()) updateTabletLayout()
 
         previousDestinationId = destination.id
     }
@@ -444,7 +423,6 @@ class MainActivity : BaseActivity() {
             R.id.messageActionsBottomSheetDialog,
             R.id.replyBottomSheetDialog,
             R.id.detailedContactBottomSheetDialog,
-            R.id.threadFragment,
             R.id.threadActionsBottomSheetDialog -> null
             R.id.searchFragment -> R.color.backgroundColor
             else -> R.color.backgroundHeaderColor
@@ -457,7 +435,6 @@ class MainActivity : BaseActivity() {
             R.id.replyBottomSheetDialog,
             R.id.detailedContactBottomSheetDialog,
             R.id.threadActionsBottomSheetDialog -> R.color.backgroundColorSecondary
-            R.id.threadFragment -> R.color.elevatedBackground
             R.id.threadListFragment -> if (mainViewModel.isMultiSelectOn) R.color.elevatedBackground else R.color.backgroundColor
             else -> R.color.backgroundColor
         }.let { navigationBarColor ->
@@ -546,53 +523,6 @@ class MainActivity : BaseActivity() {
             easterEggConfettiCount = 0
             ConfettiUtils.triggerEasterEggConfetti(binding.easterEggConfettiContainer, matomoValue)
         }
-    }
-
-    fun openThread(uid: String) {
-        threadViewModel?.threadUid?.value = uid
-    }
-
-    fun closeThread() {
-
-        // The transaction to replace the ThreadFragment takes some time to execute.
-        // The ThreadViewModel won't be cleared instantly.
-        // So, when we want to update the Tablet layout just after closing a Thread, we first need to make sure data are up-to-date.
-        // Hence, we hereby manually reset the `threadUid` to get the correct result in `updateTabletLayout()`.
-        if (isTabletInPortrait()) threadViewModel?.threadUid?.value = null
-
-        supportFragmentManager.beginTransaction().replace(R.id.threadHostFragment, ThreadFragment()).commit()
-    }
-
-    fun updateTabletLayout() = with(binding) {
-
-        val canShowThreadFragment = canShowThreadFragment(navController.currentDestination?.id)
-
-        val mustShowThreadFragment = canShowThreadFragment && isInThread
-
-        when {
-            isTabletInLandscape() -> {
-                threadHostFragment?.isVisible = canShowThreadFragment
-                mainHostFragment.isVisible = true
-            }
-            isTabletInPortrait() -> {
-                threadHostFragment?.isVisible = mustShowThreadFragment
-                mainHostFragment.isVisible = !mustShowThreadFragment
-            }
-        }
-    }
-
-    private fun canShowThreadFragment(destinationId: Int?): Boolean = when (destinationId) {
-        R.id.threadListFragment,
-        R.id.searchFragment,
-        R.id.downloadAttachmentProgressDialog,
-        R.id.replyBottomSheetDialog,
-        R.id.threadActionsBottomSheetDialog,
-        R.id.messageActionsBottomSheetDialog,
-        R.id.detailedContactBottomSheetDialog,
-        R.id.multiSelectBottomSheetDialog,
-        R.id.updateAvailableBottomSheetDialog,
-        R.id.syncDiscoveryBottomSheetDialog -> true
-        else -> false
     }
 
     companion object {

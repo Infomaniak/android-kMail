@@ -34,7 +34,7 @@ import com.infomaniak.mail.data.cache.mailboxInfo.PermissionsController
 import com.infomaniak.mail.data.cache.mailboxInfo.QuotasController
 import com.infomaniak.mail.data.cache.userInfo.AddressBookController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
-import com.infomaniak.mail.data.models.Attachment.AttachmentType
+import com.infomaniak.mail.data.models.Attachment.*
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.MoveResult
@@ -199,21 +199,26 @@ class MainViewModel @Inject constructor(
     }
     //endregion
 
-    //region Merged Contacts
-    // Explanation of this Map: Map<Email, Map<Name, MergedContact>>
-    val mergedContactsLive: LiveData<MergedContactDictionary?> = mergedContactController
-        .getMergedContactsAsync()
-        .mapLatest { ContactUtils.arrangeMergedContacts(it.list.copyFromRealm()) }
-        .asLiveData(ioCoroutineContext)
-    //endregion
+    //region Current Thread
+    val currentThreadUid = MutableLiveData<String?>(null)
 
-    //region Tablet mode
+    val isInThread get() = currentThreadUid.value != null
+    val shouldCloseThread = SingleLiveEvent<Unit>()
+
     val downloadAttachmentsArgs = SingleLiveEvent<Triple<String, String, AttachmentType>>()
     val newMessageArgs = SingleLiveEvent<NewMessageActivityArgs>()
     val replyBottomSheetArgs = SingleLiveEvent<Pair<String, Boolean>>()
     val threadActionsBottomSheetArgs = SingleLiveEvent<Triple<String, String, Boolean>>()
     val messageActionsBottomSheetArgs = SingleLiveEvent<MessageActionsArgs>()
     val detailedContactArgs = SingleLiveEvent<Recipient>()
+    //endregion
+
+    //region Merged Contacts
+    // Explanation of this Map: Map<Email, Map<Name, MergedContact>>
+    val mergedContactsLive: LiveData<MergedContactDictionary?> = mergedContactController
+        .getMergedContactsAsync()
+        .mapLatest { ContactUtils.arrangeMergedContacts(it.list.copyFromRealm()) }
+        .asLiveData(ioCoroutineContext)
     //endregion
 
     fun updateUserInfo() = viewModelScope.launch(ioCoroutineContext) {
