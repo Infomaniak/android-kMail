@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.folder
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -156,6 +157,18 @@ abstract class TwoPaneFragment : Fragment() {
         }
     }
 
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+
+        val isLeftShown = areBothShown() || isOnlyLeftShown() // TODO: Only works on Phone, and not on Tablet.
+        val statusBarColor = if (isLeftShown && this is ThreadListFragment) {
+            R.color.backgroundHeaderColor
+        } else {
+            R.color.backgroundColor
+        }
+        requireActivity().window.statusBarColor = requireContext().getColor(statusBarColor)
+    }
+
     fun handleOnBackPressed() {
         when {
             isOnlyRightShown() -> resetPanes()
@@ -165,13 +178,24 @@ abstract class TwoPaneFragment : Fragment() {
     }
 
     fun openThread(uid: String) {
+
         mainViewModel.currentThreadUid.value = uid
-        slidingPaneLayout.open()
+
+        val isOpening = slidingPaneLayout.openPane()
+
+        if (isOpening) requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundColor)
     }
 
     private fun resetPanes() {
-        slidingPaneLayout.close()
+
+        val isClosing = slidingPaneLayout.closePane()
+
+        if (isClosing && this is ThreadListFragment) {
+            requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundHeaderColor)
+        }
+
         mainViewModel.currentThreadUid.value = null
+
         // TODO: We can see that the ThreadFragment's content is changing, while the pane is closing.
         //  Maybe we need to delay the transaction? Or better: start it when the pane is fully closed?
         childFragmentManager.beginTransaction().replace(R.id.threadHostFragment, ThreadFragment()).commit()

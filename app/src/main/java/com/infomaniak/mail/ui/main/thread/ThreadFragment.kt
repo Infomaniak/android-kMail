@@ -127,10 +127,7 @@ class ThreadFragment : Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return FragmentThreadBinding.inflate(inflater, container, false).also {
-            _binding = it
-            requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundColor)
-        }.root
+        return FragmentThreadBinding.inflate(inflater, container, false).also { _binding = it }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -193,9 +190,10 @@ class ThreadFragment : Fragment() {
             toolbarSubject.setTextColor(textColor)
         }
 
-        changeToolbarColorOnScroll(toolbar, messagesListNestedScrollView) { color ->
-            appBar.backgroundTintList = ColorStateList.valueOf(color)
-        }
+        // TODO: Disabled while there is no Tablet design
+        // changeToolbarColorOnScroll(toolbar, messagesListNestedScrollView) { color ->
+        //     appBar.backgroundTintList = ColorStateList.valueOf(color)
+        // }
     }
 
     private fun setupAdapter() = with(binding.messagesList) {
