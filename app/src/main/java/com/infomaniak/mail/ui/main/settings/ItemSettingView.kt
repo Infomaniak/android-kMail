@@ -24,7 +24,7 @@ import android.widget.FrameLayout
 import androidx.annotation.StringRes
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import com.google.android.material.switchmaterial.SwitchMaterial
+import com.google.android.material.materialswitch.MaterialSwitch
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewItemSettingBinding
@@ -45,7 +45,7 @@ class ItemSettingView @JvmOverloads constructor(
             binding.toggle.isChecked = value
         }
 
-    val toggle: SwitchMaterial? get() = if (action == Action.TOGGLE) binding.toggle else null
+    val toggle: MaterialSwitch? get() = if (action == Action.TOGGLE) binding.toggle else null
 
     init {
         attrs?.getAttributes(context, R.styleable.ItemSettingView) {
