@@ -80,7 +80,7 @@ class ThreadListAdapter @Inject constructor(
     private val threadMarginCompact by lazy { context.resources.getDimension(RCore.dimen.marginStandardVerySmall).toInt() }
     private val threadMarginOther by lazy { context.resources.getDimension(RCore.dimen.marginStandardSmall).toInt() }
     private val checkMarkSizeLarge by lazy { context.resources.getDimension(R.dimen.userAvatarSizeLarge).toInt() }
-    private val checkMarkSizeOther by lazy { context.resources.getDimension(R.dimen.checkMarkSizeOther).toInt() }
+    private val checkMarkSizeOther by lazy { context.resources.getDimension(R.dimen.largeIconSize).toInt() }
 
     private var swipingIsAuthorized: Boolean = true
     private var displaySeeAllButton = false // TODO: Manage this for intelligent mailbox
