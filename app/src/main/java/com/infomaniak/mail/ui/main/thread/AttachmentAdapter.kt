@@ -23,8 +23,6 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import coil.load
-import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.databinding.ItemAttachmentBinding
@@ -50,9 +48,7 @@ class AttachmentAdapter(
     override fun onBindViewHolder(holder: AttachmentViewHolder, position: Int): Unit = with(holder.binding) {
         val attachment = attachments[position]
 
-        fileName.text = attachment.name
-        fileDetails.text = Formatter.formatShortFileSize(context, attachment.size)
-        icon.load(attachment.getFileTypeFromMimeType().icon)
+        attachmentDetails.setDetails(attachment)
 
         if (!shouldDisplayCloseButton) {
             root.setOnClickListener { onAttachmentClicked?.invoke(attachment) }

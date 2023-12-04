@@ -31,51 +31,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ImageView
-            android:id="@+id/icon"
-            android:layout_width="@dimen/standardIconSize"
-            android:layout_height="@dimen/standardIconSize"
-            android:layout_marginVertical="@dimen/marginStandardVerySmall"
-            android:layout_marginStart="@dimen/marginStandardSmall"
-            android:layout_marginEnd="@dimen/marginStandardVerySmall"
-            android:importantForAccessibility="no"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:src="@drawable/ic_file_pdf" />
-
-        <LinearLayout
-            android:id="@+id/textsLayout"
+        <com.infomaniak.mail.views.AttachmentDetailsView
+            android:id="@+id/attachmentDetails"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/marginStandardSmall"
-            android:layout_marginTop="@dimen/marginStandardVerySmall"
-            android:layout_marginEnd="@dimen/marginStandardVerySmall"
-            android:layout_marginBottom="@dimen/marginStandardVerySmall"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/closeButton"
-            app:layout_constraintStart_toEndOf="@id/icon"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_goneMarginEnd="@dimen/marginStandardSmall">
-
-            <TextView
-                android:id="@+id/fileName"
-                style="@style/BodySmall"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ellipsize="middle"
-                android:lines="1"
-                android:maxWidth="220dp"
-                tools:text="billet-055.pdf" />
-
-            <TextView
-                android:id="@+id/fileDetails"
-                style="@style/Label.Secondary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="36 ko" />
-        </LinearLayout>
+            android:layout_height="match_parent"
+            app:displayStyle="chip"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/closeButton"
@@ -90,7 +51,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintDimensionRatio="1"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/textsLayout"
+            app:layout_constraintStart_toEndOf="@id/attachmentDetails"
             app:layout_constraintTop_toTopOf="parent"
             tools:visibility="visible" />
 
