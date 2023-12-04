@@ -24,10 +24,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.infomaniak.lib.core.utils.context
-import com.infomaniak.lib.core.utils.hasSupportedApplications
-import com.infomaniak.lib.core.utils.safeBinding
-import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
@@ -36,7 +33,7 @@ import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntentType
 import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntentType.OPEN_WITH
 import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntentType.SAVE_TO_DRIVE
-import com.infomaniak.mail.utils.AttachmentIntentUtils.getIntentFromType
+import com.infomaniak.mail.utils.AttachmentIntentUtils.getIntentOrGoToPlaystore
 import com.infomaniak.mail.utils.AttachmentIntentUtils.openWithIntent
 import com.infomaniak.mail.utils.PermissionUtils
 import dagger.hilt.android.AndroidEntryPoint
@@ -89,7 +86,7 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private fun Attachment.executeIntent(intentType: AttachmentIntentType) {
         if (hasUsableCache(requireContext()) || isInlineCachedFile(requireContext())) {
-            startActivity(getIntentFromType(requireContext(), intentType))
+            getIntentOrGoToPlaystore(requireContext(), intentType)?.let(::startActivity)
         } else {
             navigateToDownloadProgressDialog(intentType)
         }

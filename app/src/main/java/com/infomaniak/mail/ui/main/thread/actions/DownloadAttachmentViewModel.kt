@@ -25,8 +25,6 @@ import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.cache.mailboxContent.AttachmentController
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.di.IoDispatcher
-import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntentType
-import com.infomaniak.mail.utils.AttachmentIntentUtils.getIntentFromType
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.context
@@ -53,18 +51,18 @@ class DownloadAttachmentViewModel @Inject constructor(
      */
     private var attachment: Attachment? = null
 
-    fun downloadAttachment(intentType: AttachmentIntentType) = liveData(ioCoroutineContext) {
+    fun downloadAttachment() = liveData(ioCoroutineContext) {
         val localAttachment = attachmentController.getAttachment(attachmentResource).also { attachment = it }
         val attachmentFile = localAttachment.getCacheFile(context)
         val isAttachmentCached = localAttachment.hasUsableCache(context, attachmentFile) ||
                 LocalStorageUtils.saveAttachmentToCache(attachmentResource, attachmentFile)
 
-        val intent = if (isAttachmentCached) {
+        if (isAttachmentCached) {
+            emit(localAttachment)
             attachment = null
-            localAttachment.getIntentFromType(context, intentType)
-        } else null
-
-        emit(intent)
+        } else {
+            emit(null)
+        }
     }
 
     override fun onCleared() = runCatchingRealm {
