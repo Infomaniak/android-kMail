@@ -40,14 +40,14 @@ abstract class NewMessageManager {
         newMessageViewModel: NewMessageViewModel,
         binding: FragmentNewMessageBinding,
         fragment: NewMessageFragment,
-        setReferencesToNull: (() -> Unit)? = null,
+        freeReferences: (() -> Unit)? = null,
     ) {
         _newMessageViewModel = newMessageViewModel
         _binding = binding
         _fragment = fragment
 
         onFreeReferences {
-            setReferencesToNull?.invoke()
+            freeReferences?.invoke()
             _newMessageViewModel = null
             _binding = null
             _fragment = null

@@ -73,11 +73,11 @@ class NewMessageAiManager @Inject constructor(
         fragment: NewMessageFragment,
         aiViewModel: AiViewModel
     ) {
-        super.initValues(newMessageViewModel, binding, fragment) {
+        super.initValues(newMessageViewModel, binding, fragment, freeReferences = {
             _aiViewModel = null
             valueAnimator?.cancel()
             valueAnimator = null
-        }
+        })
 
         _aiViewModel = aiViewModel
     }

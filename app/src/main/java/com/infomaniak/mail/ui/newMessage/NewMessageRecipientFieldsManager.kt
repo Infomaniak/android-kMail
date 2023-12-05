@@ -45,9 +45,9 @@ class NewMessageRecipientFieldsManager @Inject constructor() : NewMessageManager
         fragment: NewMessageFragment,
         externalsManager: NewMessageExternalsManager,
     ) {
-        super.initValues(newMessageViewModel, binding, fragment) {
+        super.initValues(newMessageViewModel, binding, fragment, freeReferences = {
             _externalsManager = null
-        }
+        })
 
         _externalsManager = externalsManager
     }
