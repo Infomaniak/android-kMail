@@ -117,10 +117,7 @@ class MainActivity : BaseActivity() {
     }
 
     private val inAppUpdateResultLauncher = registerForActivityResult(StartIntentSenderForResult()) { result ->
-        localSettings.apply {
-            isUserWantingUpdates = result.resultCode == RESULT_OK
-            hasAppUpdateDownloaded = false
-        }
+        localSettings.isUserWantingUpdates = result.resultCode == RESULT_OK
     }
 
     @Inject
@@ -330,7 +327,7 @@ class MainActivity : BaseActivity() {
         super.onResume()
         playServicesUtils.checkPlayServices(this)
 
-        checkStalledUpdate()
+        checkAppUpdateStatus()
 
         if (binding.drawerLayout.isOpen) colorSystemBarsWithMenuDrawer()
     }
@@ -469,9 +466,13 @@ class MainActivity : BaseActivity() {
     private fun initAppUpdateManager() {
         initAppUpdateManager(
             context = this,
-            onInstall = {
+            onUpdateDownloaded = {
                 mainViewModel.canInstallUpdate.value = true
                 localSettings.hasAppUpdateDownloaded = true
+            },
+            onUpdateInstalled = {
+                mainViewModel.canInstallUpdate.value = false
+                localSettings.hasAppUpdateDownloaded = false
             },
         )
     }
@@ -487,6 +488,11 @@ class MainActivity : BaseActivity() {
                 },
             )
         }
+    }
+
+    private fun checkAppUpdateStatus() {
+        mainViewModel.canInstallUpdate.value = localSettings.hasAppUpdateDownloaded
+        checkStalledUpdate()
     }
 
     private fun showSyncDiscovery() = with(localSettings) {

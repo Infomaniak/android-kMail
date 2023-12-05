@@ -27,6 +27,7 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.PlayServicesUtils
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import io.sentry.Sentry
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
@@ -44,9 +45,11 @@ class AppUpdateWorker @AssistedInject constructor(
     override suspend fun launchWork(): Result = withContext(ioDispatcher) {
         SentryLog.i(TAG, "Work started")
         StoreUtils.installDownloadedUpdate { exception ->
-            // This avoid the user being instantly reprompted to download update
-            localSettings.isUserWantingUpdates = false
-            throw exception
+            localSettings.apply {
+                isUserWantingUpdates = false // This avoid the user being instantly reprompted to download update
+                localSettings.hasAppUpdateDownloaded = false
+            }
+            Sentry.captureException(exception)
         }
 
         SentryLog.d(TAG, "Work finished")
