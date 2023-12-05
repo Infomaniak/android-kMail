@@ -102,15 +102,15 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
     lateinit var syncMailboxesWorkerScheduler: SyncMailboxesWorker.Scheduler
 
     @Inject
+    lateinit var appUpdateWorkerScheduler: AppUpdateWorker.Scheduler
+
+    @Inject
     @IoDispatcher
     lateinit var ioDispatcher: CoroutineDispatcher
 
     @Inject
     @MainDispatcher
     lateinit var mainDispatcher: CoroutineDispatcher
-
-    @Inject
-    lateinit var appUpdateWorkerScheduler: AppUpdateWorker.Scheduler
 
     override fun getWorkManagerConfiguration(): Configuration {
         return Configuration.Builder()
