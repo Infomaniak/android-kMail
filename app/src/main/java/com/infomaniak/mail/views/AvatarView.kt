@@ -49,7 +49,11 @@ class AvatarView @JvmOverloads constructor(
 
     init {
         attrs?.getAttributes(context, R.styleable.AvatarView) {
-            binding.avatarImage.setImageDrawable(getDrawable(R.styleable.AvatarView_android_src))
+            binding.avatarImage.apply {
+                setImageDrawable(getDrawable(R.styleable.AvatarView_android_src))
+                val padding = getDimensionPixelOffset(R.styleable.AvatarView_inset, 0)
+                setPaddingRelative(padding, padding, padding, padding)
+            }
         }
     }
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~ Copyright (C) 2022-2023 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -21,17 +21,19 @@
     android:id="@+id/avatar"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:backgroundTint="@android:color/transparent"
     app:shapeAppearance="@style/CircleImageView"
     app:strokeWidth="0dp"
     tools:layout_height="wrap_content"
     tools:layout_width="wrap_content">
 
-    <ImageView
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/avatarImage"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:contentDescription="@string/contentDescriptionUserAvatar"
         android:src="@drawable/placeholder"
+        app:shapeAppearance="@style/CircleImageView"
         tools:src="@tools:sample/avatars" />
 
 </com.google.android.material.card.MaterialCardView>
