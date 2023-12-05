@@ -28,9 +28,6 @@ import android.view.ViewGroup.FOCUS_BLOCK_DESCENDANTS
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.infomaniak.lib.core.utils.hideKeyboard
 import com.infomaniak.lib.core.utils.safeNavigate
@@ -76,16 +73,13 @@ class NewMessageAiManager @Inject constructor(
         fragment: NewMessageFragment,
         aiViewModel: AiViewModel
     ) {
-        super.initValues(newMessageViewModel, binding, fragment)
-        _aiViewModel = aiViewModel
+        super.initValues(newMessageViewModel, binding, fragment) {
+            _aiViewModel = null
+            valueAnimator?.cancel()
+            valueAnimator = null
+        }
 
-        viewLifecycleOwner.lifecycle.addObserver(LifecycleEventObserver { _: LifecycleOwner, event: Lifecycle.Event ->
-            if (event == Lifecycle.Event.ON_DESTROY) {
-                _aiViewModel = null
-                valueAnimator?.cancel()
-                valueAnimator = null
-            }
-        })
+        _aiViewModel = aiViewModel
     }
 
     fun observeEverything() {

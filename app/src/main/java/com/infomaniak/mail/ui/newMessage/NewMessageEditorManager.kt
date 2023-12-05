@@ -23,9 +23,6 @@ import android.content.res.ColorStateList
 import android.view.WindowManager
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.LifecycleOwner
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.lib.core.utils.FilePicker
 import com.infomaniak.mail.MatomoMail
@@ -58,16 +55,13 @@ class NewMessageEditorManager @Inject constructor(
         aiManager: NewMessageAiManager,
         filePicker: FilePicker,
     ) {
-        super.initValues(newMessageViewModel, binding, fragment)
+        super.initValues(newMessageViewModel, binding, fragment) {
+            _aiManager = null
+            _filePicker = null
+        }
+
         _aiManager = aiManager
         _filePicker = filePicker
-
-        viewLifecycleOwner.lifecycle.addObserver(LifecycleEventObserver { _: LifecycleOwner, event: Lifecycle.Event ->
-            if (event == Lifecycle.Event.ON_DESTROY) {
-                _aiManager = null
-                _filePicker = null
-            }
-        })
     }
 
     fun observeEditorActions() {

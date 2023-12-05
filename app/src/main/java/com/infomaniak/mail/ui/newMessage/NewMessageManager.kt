@@ -40,17 +40,23 @@ abstract class NewMessageManager {
         newMessageViewModel: NewMessageViewModel,
         binding: FragmentNewMessageBinding,
         fragment: NewMessageFragment,
+        setReferencesToNull: (() -> Unit)? = null,
     ) {
         _newMessageViewModel = newMessageViewModel
         _binding = binding
         _fragment = fragment
 
+        onFreeReferences {
+            setReferencesToNull?.invoke()
+            _newMessageViewModel = null
+            _binding = null
+            _fragment = null
+        }
+    }
+
+    private fun onFreeReferences(setReferencesToNull: () -> Unit) {
         viewLifecycleOwner.lifecycle.addObserver(LifecycleEventObserver { _: LifecycleOwner, event: Lifecycle.Event ->
-            if (event == Lifecycle.Event.ON_DESTROY) {
-                _newMessageViewModel = null
-                _binding = null
-                _fragment = null
-            }
+            if (event == Lifecycle.Event.ON_DESTROY) setReferencesToNull()
         })
     }
 }

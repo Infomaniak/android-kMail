@@ -20,9 +20,6 @@ package com.infomaniak.mail.ui.newMessage
 import android.view.View
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.LifecycleOwner
 import com.infomaniak.lib.core.utils.showKeyboard
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -48,14 +45,11 @@ class NewMessageRecipientFieldsManager @Inject constructor() : NewMessageManager
         fragment: NewMessageFragment,
         externalsManager: NewMessageExternalsManager,
     ) {
-        super.initValues(newMessageViewModel, binding, fragment)
-        _externalsManager = externalsManager
+        super.initValues(newMessageViewModel, binding, fragment) {
+            _externalsManager = null
+        }
 
-        viewLifecycleOwner.lifecycle.addObserver(LifecycleEventObserver { _: LifecycleOwner, event: Lifecycle.Event ->
-            if (event == Lifecycle.Event.ON_DESTROY) {
-                _externalsManager = null
-            }
-        })
+        _externalsManager = externalsManager
     }
 
     fun setupAutoCompletionFields() = with(binding) {
