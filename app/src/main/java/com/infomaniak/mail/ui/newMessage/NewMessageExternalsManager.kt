@@ -25,10 +25,10 @@ import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
 import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipientForNewMessage
 import com.infomaniak.mail.utils.MergedContactDictionary
 import com.infomaniak.mail.utils.Utils
-import dagger.hilt.android.scopes.ActivityScoped
+import dagger.hilt.android.scopes.FragmentScoped
 import javax.inject.Inject
 
-@ActivityScoped
+@FragmentScoped
 class NewMessageExternalsManager @Inject constructor() : NewMessageManager() {
 
     private var _informationDialog: InformationAlertDialog? = null

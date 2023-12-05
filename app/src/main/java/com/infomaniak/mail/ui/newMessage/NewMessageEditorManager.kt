@@ -32,11 +32,11 @@ import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.utils.getAttributeColor
 import com.infomaniak.mail.utils.notYetImplemented
 import dagger.hilt.android.qualifiers.ActivityContext
-import dagger.hilt.android.scopes.ActivityScoped
+import dagger.hilt.android.scopes.FragmentScoped
 import javax.inject.Inject
 import com.google.android.material.R as RMaterial
 
-@ActivityScoped
+@FragmentScoped
 class NewMessageEditorManager @Inject constructor(
     @ActivityContext private val activityContext: Context,
 ) : NewMessageManager() {

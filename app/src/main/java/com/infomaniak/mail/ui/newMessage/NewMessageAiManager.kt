@@ -40,14 +40,14 @@ import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.observeNotNull
 import dagger.hilt.android.qualifiers.ActivityContext
-import dagger.hilt.android.scopes.ActivityScoped
+import dagger.hilt.android.scopes.FragmentScoped
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.roundToInt
 import com.infomaniak.lib.core.R as RCore
 
-@ActivityScoped
+@FragmentScoped
 class NewMessageAiManager @Inject constructor(
     @ActivityContext private val activityContext: Context,
     private val localSettings: LocalSettings,

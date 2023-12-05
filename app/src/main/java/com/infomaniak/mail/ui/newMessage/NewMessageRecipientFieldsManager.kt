@@ -28,10 +28,10 @@ import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType.*
 import com.infomaniak.mail.utils.MergedContactDictionary
 import com.infomaniak.mail.utils.copyRecipientEmailToClipboard
-import dagger.hilt.android.scopes.ActivityScoped
+import dagger.hilt.android.scopes.FragmentScoped
 import javax.inject.Inject
 
-@ActivityScoped
+@FragmentScoped
 class NewMessageRecipientFieldsManager @Inject constructor() : NewMessageManager() {
 
     private var _externalsManager: NewMessageExternalsManager? = null
