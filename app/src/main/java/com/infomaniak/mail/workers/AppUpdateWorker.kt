@@ -44,16 +44,13 @@ class AppUpdateWorker @AssistedInject constructor(
 
     override suspend fun launchWork(): Result = withContext(ioDispatcher) {
         SentryLog.i(TAG, "Work started")
+
         StoreUtils.installDownloadedUpdate { exception ->
-            localSettings.apply {
-                isUserWantingUpdates = false // This avoid the user being instantly reprompted to download update
-                localSettings.hasAppUpdateDownloaded = false
-            }
             Sentry.captureException(exception)
+            localSettings.resetUpdateSettings()
         }
 
         SentryLog.d(TAG, "Work finished")
-
         Result.success()
     }
 
@@ -69,12 +66,11 @@ class AppUpdateWorker @AssistedInject constructor(
             if (playServicesUtils.areGooglePlayServicesAvailable() && localSettings.hasAppUpdateDownloaded) {
                 SentryLog.d(TAG, "Work scheduled")
 
-                val workRequest =
-                    OneTimeWorkRequestBuilder<AppUpdateWorker>()
-                        .setConstraints(Constraints.Builder().setRequiresBatteryNotLow(true).build())
-                        // We start with a delayed duration, so that when the app is rebooted the service is not launched
-                        .setInitialDelay(INITIAL_DELAY, TimeUnit.SECONDS)
-                        .build()
+                val workRequest = OneTimeWorkRequestBuilder<AppUpdateWorker>()
+                    .setConstraints(Constraints.Builder().setRequiresBatteryNotLow(true).build())
+                    // We start with a delayed duration, so that when the app is rebooted the service is not launched
+                    .setInitialDelay(INITIAL_DELAY, TimeUnit.SECONDS)
+                    .build()
 
                 workManager.enqueueUniqueWork(TAG, ExistingWorkPolicy.KEEP, workRequest)
             }

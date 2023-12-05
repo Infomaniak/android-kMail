@@ -99,6 +99,11 @@ class LocalSettings private constructor(context: Context) {
     var hasAppUpdateDownloaded: Boolean
         get() = sharedPreferences.getBoolean(HAS_APP_UPDATE_DOWNLOADED_KEY, DEFAULT_HAS_APP_UPDATE_DOWNLOADED)
         set(value) = sharedPreferences.transaction { putBoolean(HAS_APP_UPDATE_DOWNLOADED_KEY, value) }
+
+    fun resetUpdateSettings() {
+        isUserWantingUpdates = false // This avoid the user being instantly reprompted to download update
+        hasAppUpdateDownloaded = false
+    }
     //endregion
 
     //region Ai engine

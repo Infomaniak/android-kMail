@@ -580,10 +580,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
                 StoreUtils.installDownloadedUpdate {
                     Sentry.captureException(it)
-                    localSettings.apply {
-                        isUserWantingUpdates = false // This avoid the user being instantly reprompted to download update
-                        hasAppUpdateDownloaded = false
-                    }
+                    localSettings.resetUpdateSettings()
                     mainViewModel.snackBarManager.setValue(getString(RCore.string.errorUpdateInstall))
                 }
             }
