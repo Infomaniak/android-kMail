@@ -42,8 +42,11 @@ import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.Utils.toEnumOrThrow
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
-import com.infomaniak.lib.stores.checkUpdateIsAvailable
-import com.infomaniak.lib.stores.launchInAppReview
+import com.infomaniak.lib.stores.StoreUtils.checkStalledUpdate
+import com.infomaniak.lib.stores.StoreUtils.checkUpdateIsAvailable
+import com.infomaniak.lib.stores.StoreUtils.initAppUpdateManager
+import com.infomaniak.lib.stores.StoreUtils.launchInAppReview
+import com.infomaniak.lib.stores.StoreUtils.unregisterAppUpdateListener
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.MatomoMail.trackEvent
@@ -113,6 +116,10 @@ class MainActivity : BaseActivity() {
         }
     }
 
+    private val inAppUpdateResultLauncher = registerForActivityResult(StartIntentSenderForResult()) { result ->
+        localSettings.isUserWantingUpdates = result.resultCode == RESULT_OK
+    }
+
     @Inject
     lateinit var draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler
 
@@ -176,6 +183,8 @@ class MainActivity : BaseActivity() {
         loadCurrentMailbox()
 
         permissionUtils.requestMainPermissionsIfNeeded()
+
+        initAppUpdateManager()
     }
 
     private fun observeNetworkStatus() {
@@ -318,6 +327,8 @@ class MainActivity : BaseActivity() {
         super.onResume()
         playServicesUtils.checkPlayServices(this)
 
+        checkStalledUpdate()
+
         if (binding.drawerLayout.isOpen) colorSystemBarsWithMenuDrawer()
     }
 
@@ -350,6 +361,7 @@ class MainActivity : BaseActivity() {
 
     override fun onStop() {
         descriptionDialog.resetLoadingAndDismiss()
+        unregisterAppUpdateListener()
         super.onStop()
     }
 
@@ -449,11 +461,23 @@ class MainActivity : BaseActivity() {
         }
     }
 
+    private fun initAppUpdateManager() {
+        initAppUpdateManager(
+            context = this,
+            onInstall = { mainViewModel.canInstallUpdate.value = true },
+        )
+    }
+
     private fun showUpdateAvailable() = with(localSettings) {
         if (isUserWantingUpdates || (appLaunches != 0 && appLaunches % 10 == 0)) {
-            checkUpdateIsAvailable(BuildConfig.APPLICATION_ID, BuildConfig.VERSION_CODE) { updateIsAvailable ->
-                if (updateIsAvailable) navController.navigate(R.id.updateAvailableBottomSheetDialog)
-            }
+            checkUpdateIsAvailable(
+                appId = BuildConfig.APPLICATION_ID,
+                versionCode = BuildConfig.VERSION_CODE,
+                inAppResultLauncher = inAppUpdateResultLauncher,
+                onFDroidResult = { updateIsAvailable ->
+                    if (updateIsAvailable) navController.navigate(R.id.updateAvailableBottomSheetDialog)
+                },
+            )
         }
     }
 
