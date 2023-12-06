@@ -204,7 +204,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginHorizontal="@dimen/marginStandardMedium"
                             android:layout_marginTop="@dimen/marginStandardMedium"
-                            android:text="@string/updateAvailableTitle"
+                            android:text="@string/updateReadyTitle"
                             app:layout_constraintEnd_toStartOf="@+id/installUpdate"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
