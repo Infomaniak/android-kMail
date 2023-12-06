@@ -51,9 +51,15 @@ class AvatarView @JvmOverloads constructor(
         attrs?.getAttributes(context, R.styleable.AvatarView) {
             binding.avatarImage.apply {
                 setImageDrawable(getDrawable(R.styleable.AvatarView_android_src))
-                val padding = getDimensionPixelOffset(R.styleable.AvatarView_inset, 0)
+                val padding = getDimensionPixelOffset(R.styleable.AvatarView_padding, 0)
                 setPaddingRelative(padding, padding, padding, padding)
             }
+
+            val inset = getDimensionPixelOffset(R.styleable.AvatarView_inset, 0)
+            setPaddingRelative(inset, inset, inset, inset)
+
+            @Suppress("ClickableViewAccessibility")
+            setOnTouchListener { _, event -> binding.avatar.onTouchEvent(event) }
         }
     }
 

@@ -61,6 +61,7 @@
     <declare-styleable name="AvatarView">
         <attr name="android:src" format="reference|color" />
         <attr name="inset" format="dimension" />
+        <attr name="padding" />
     </declare-styleable>
 
     <declare-styleable name="ItemSettingView">

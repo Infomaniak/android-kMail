@@ -71,7 +71,7 @@
                             android:layout_height="48dp"
                             android:layout_gravity="center"
                             android:layout_marginEnd="@dimen/marginStandardMedium"
-                            app:inset="8dp"
+                            app:inset="@dimen/marginStandardSmall"
                             tools:src="@tools:sample/avatars[12]" />
 
                     </LinearLayout>
