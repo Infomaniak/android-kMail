@@ -25,7 +25,6 @@ import androidx.appcompat.app.AppCompatDelegate
 import com.google.android.material.color.MaterialColors
 import com.infomaniak.lib.core.api.ApiController.json
 import com.infomaniak.lib.core.utils.SentryLog
-import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.lib.core.utils.transaction
 import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_DELETE_NAME
@@ -35,7 +34,10 @@ import com.infomaniak.mail.MatomoMail.ACTION_MOVE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_POSTPONE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_SPAM_NAME
 import com.infomaniak.mail.R
+import com.infomaniak.mail.utils.sharedValue
+import com.infomaniak.mail.utils.sharedValueNullable
 import kotlinx.serialization.encodeToString
+import kotlin.properties.ReadWriteProperty
 import com.google.android.material.R as RMaterial
 
 class LocalSettings private constructor(context: Context) {
@@ -44,22 +46,11 @@ class LocalSettings private constructor(context: Context) {
 
     fun removeSettings() = sharedPreferences.transaction { clear() }
 
-    //region App launches count
-    var appLaunches: Int
-        get() = sharedPreferences.getInt(APP_LAUNCHES_KEY, DEFAULT_APP_LAUNCHES)
-        set(value) = sharedPreferences.transaction { putInt(APP_LAUNCHES_KEY, value) }
-    //endregion
-
-    //region Cancel delay
-    var cancelDelay: Int
-        get() = sharedPreferences.getInt(CANCEL_DELAY_KEY, DEFAULT_CANCEL_DELAY)
-        set(value) = sharedPreferences.transaction { putInt(CANCEL_DELAY_KEY, value) }
-    //endregion
+    var appLaunches by sharedValue("appLaunchesKey", 0)
+    var cancelDelay by sharedValue("cancelDelayKey", 10)
 
     //region Email forwarding
-    var emailForwarding: EmailForwarding
-        get() = getEnum(EMAIL_FORWARDING_KEY, DEFAULT_EMAIL_FORWARDING)
-        set(value) = putEnum(EMAIL_FORWARDING_KEY, value)
+    var emailForwarding by sharedValue("emailForwardingKey", EmailForwarding.IN_BODY)
 
     enum class EmailForwarding(@StringRes val localisedNameRes: Int) {
         IN_BODY(R.string.settingsTransferInBody),
@@ -67,34 +58,11 @@ class LocalSettings private constructor(context: Context) {
     }
     //endregion
 
-    //region Include original message in reply
-    var includeMessageInReply: Boolean
-        get() = sharedPreferences.getBoolean(INCLUDE_MESSAGE_IN_REPLY_KEY, DEFAULT_INCLUDE_MESSAGE_IN_REPLY)
-        set(value) = sharedPreferences.transaction { putBoolean(INCLUDE_MESSAGE_IN_REPLY_KEY, value) }
-    //endregion
-
-    //region Ask email acknowledgment
-    var askEmailAcknowledgement: Boolean
-        get() = sharedPreferences.getBoolean(ASK_EMAIL_ACKNOWLEDGMENT_KEY, DEFAULT_ASK_EMAIL_ACKNOWLEDGMENT)
-        set(value) = sharedPreferences.transaction { putBoolean(ASK_EMAIL_ACKNOWLEDGMENT_KEY, value) }
-    //endregion
-
-    //region Already enabled notifications
-    var hasAlreadyEnabledNotifications: Boolean
-        get() = sharedPreferences.getBoolean(HAS_ALREADY_ENABLED_NOTIFICATIONS_KEY, DEFAULT_HAS_ALREADY_ENABLED_NOTIFICATIONS)
-        set(value) = sharedPreferences.transaction { putBoolean(HAS_ALREADY_ENABLED_NOTIFICATIONS_KEY, value) }
-    //endregion
-
-    //region App lock
-    var isAppLocked: Boolean
-        get() = sharedPreferences.getBoolean(IS_APP_LOCKED_KEY, DEFAULT_IS_APP_LOCKED)
-        set(value) = sharedPreferences.transaction { putBoolean(IS_APP_LOCKED_KEY, value) }
-    //endregion
-
-    //region Update
-    var isUserWantingUpdates: Boolean
-        get() = sharedPreferences.getBoolean(IS_USER_WANTING_UPDATES_KEY, DEFAULT_IS_USER_WANTING_UPDATES)
-        set(value) = sharedPreferences.transaction { putBoolean(IS_USER_WANTING_UPDATES_KEY, value) }
+    var includeMessageInReply by sharedValue("includeMessageInReplyKey", true)
+    var askEmailAcknowledgement by sharedValue("askEmailAcknowledgmentKey", false)
+    var hasAlreadyEnabledNotifications by sharedValue("hasAlreadyEnabledNotificationsKey", false)
+    var isAppLocked by sharedValue("isAppLockedKey", false)
+    var isUserWantingUpdates by sharedValue("isUserWantingUpdatesKey", true)
 
     var hasAppUpdateDownloaded: Boolean
         get() = sharedPreferences.getBoolean(HAS_APP_UPDATE_DOWNLOADED_KEY, DEFAULT_HAS_APP_UPDATE_DOWNLOADED)
@@ -104,12 +72,9 @@ class LocalSettings private constructor(context: Context) {
         isUserWantingUpdates = false // This avoid the user being instantly reprompted to download update
         hasAppUpdateDownloaded = false
     }
-    //endregion
 
-    //region AI engine
-    var aiEngine: AiEngine
-        get() = getEnum(AI_ENGINE_KEY, DEFAULT_AI_ENGINE)
-        set(value) = putEnum(AI_ENGINE_KEY, value)
+    //region Ai engine
+    var aiEngine by sharedValue("aiEngineKey", AiEngine.FALCON)
 
     enum class AiEngine(
         @StringRes val localisedNameRes: Int,
@@ -123,9 +88,7 @@ class LocalSettings private constructor(context: Context) {
     //endregion
 
     //region Thread density
-    var threadDensity: ThreadDensity
-        get() = getEnum(THREAD_DENSITY_KEY, DEFAULT_THREAD_DENSITY)
-        set(value) = putEnum(THREAD_DENSITY_KEY, value)
+    var threadDensity by sharedValue("threadDensityKey", ThreadDensity.LARGE)
 
     enum class ThreadDensity(@StringRes val localisedNameRes: Int) {
         COMPACT(R.string.settingsDensityOptionCompact),
@@ -137,9 +100,7 @@ class LocalSettings private constructor(context: Context) {
     //endregion
 
     //region Theme
-    var theme: Theme
-        get() = getEnum(THEME_KEY, DEFAULT_THEME)
-        set(value) = putEnum(THEME_KEY, value)
+    var theme by sharedValue("themeKey", if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) Theme.LIGHT else Theme.SYSTEM)
 
     enum class Theme(@StringRes val localisedNameRes: Int, val mode: Int) {
         SYSTEM(R.string.settingsOptionSystemTheme, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM),
@@ -151,9 +112,7 @@ class LocalSettings private constructor(context: Context) {
     //endregion
 
     //region Accent color
-    var accentColor: AccentColor
-        get() = getEnum(ACCENT_COLOR_KEY, DEFAULT_ACCENT_COLOR)
-        set(value) = putEnum(ACCENT_COLOR_KEY, value)
+    var accentColor by sharedValue("accentColorKey", AccentColor.PINK)
 
     enum class AccentColor(
         @StringRes val localisedNameRes: Int,
@@ -201,13 +160,8 @@ class LocalSettings private constructor(context: Context) {
     //endregion
 
     //region Swipe actions
-    var swipeRight: SwipeAction
-        get() = getEnum(SWIPE_RIGHT_KEY, INITIAL_SWIPE_ACTION)
-        set(value) = putEnum(SWIPE_RIGHT_KEY, value)
-
-    var swipeLeft: SwipeAction
-        get() = getEnum(SWIPE_LEFT_KEY, INITIAL_SWIPE_ACTION)
-        set(value) = putEnum(SWIPE_LEFT_KEY, value)
+    var swipeRight by sharedValue("swipeRightKey", SwipeAction.TUTORIAL)
+    var swipeLeft by sharedValue("swipeLeftKey", SwipeAction.TUTORIAL)
 
     enum class SwipeAction(
         @StringRes val nameRes: Int,
@@ -248,9 +202,7 @@ class LocalSettings private constructor(context: Context) {
     //endregion
 
     //region Thread mode
-    var threadMode: ThreadMode
-        get() = getEnum(THREAD_MODE_KEY, DEFAULT_THREAD_MODE)
-        set(value) = putEnum(THREAD_MODE_KEY, value)
+    var threadMode by sharedValue("threadModeKey", ThreadMode.CONVERSATION)
 
     enum class ThreadMode(@StringRes val localisedNameRes: Int, val matomoValue: String) {
         CONVERSATION(R.string.settingsOptionThreadModeConversation, "conversation"),
@@ -259,9 +211,7 @@ class LocalSettings private constructor(context: Context) {
     //endregion
 
     //region External content
-    var externalContent: ExternalContent
-        get() = getEnum(EXTERNAL_CONTENT_KEY, DEFAULT_EXTERNAL_CONTENT)
-        set(value) = putEnum(EXTERNAL_CONTENT_KEY, value)
+    var externalContent by sharedValue("externalContentKey", ExternalContent.ALWAYS)
 
     enum class ExternalContent(val apiCallValue: String, @StringRes val localisedNameRes: Int, val matomoValue: String) {
         ALWAYS("true", R.string.settingsOptionAlways, "always"),
@@ -276,9 +226,7 @@ class LocalSettings private constructor(context: Context) {
     //endregion
 
     //region Firebase
-    var firebaseToken: String?
-        get() = sharedPreferences.getString(FIREBASE_TOKEN_KEY, DEFAULT_FIREBASE_TOKEN)
-        set(value) = sharedPreferences.transaction { putString(FIREBASE_TOKEN_KEY, value) }
+    var firebaseToken: String? by sharedValueNullable("firebaseTokenKey", null)
 
     var firebaseRegisteredUsers: MutableSet<String>
         get() = sharedPreferences.getStringSet(FIREBASE_REGISTERED_USERS_KEY, DEFAULT_FIREBASE_REGISTERED_USERS)!!
@@ -301,106 +249,45 @@ class LocalSettings private constructor(context: Context) {
     //endregion
 
     //region AI
-    var aiReplacementDialogVisibility: AiReplacementDialogVisibility
-        get() = getEnum(AI_REPLACEMENT_DIALOG_VISIBILITY_KEY, DEFAULT_AI_REPLACEMENT_DIALOG_VISIBILITY)
-        set(value) = putEnum(AI_REPLACEMENT_DIALOG_VISIBILITY_KEY, value)
+    var aiReplacementDialogVisibility by sharedValue("aiReplacementDialogVisibilityKey", AiReplacementDialogVisibility.SHOW)
 
     enum class AiReplacementDialogVisibility {
         SHOW,
         HIDE,
     }
 
-    var showAiDiscoveryBottomSheet: Boolean
-        get() = sharedPreferences.getBoolean(SHOW_AI_DISCOVERY_BOTTOM_SHEET_KEY, DEFAULT_SHOW_AI_DISCOVERY_BOTTOM_SHEET)
-        set(value) = sharedPreferences.transaction { putBoolean(SHOW_AI_DISCOVERY_BOTTOM_SHEET_KEY, value) }
+    var showAiDiscoveryBottomSheet by sharedValue("showAiDiscoveryBottomSheetKey", true)
     //endregion
 
-    //region Sync
-    var showSyncDiscoveryBottomSheet: Boolean
-        get() = sharedPreferences.getBoolean(SHOW_SYNC_DISCOVERY_BOTTOM_SHEET_KEY, DEFAULT_SHOW_SYNC_DISCOVERY_BOTTOM_SHEET)
-        set(value) = sharedPreferences.transaction { putBoolean(SHOW_SYNC_DISCOVERY_BOTTOM_SHEET_KEY, value) }
-    //endregion
+    var showSyncDiscoveryBottomSheet by sharedValue("showSyncDiscoveryBottomSheetKey", true)
+    var appReviewLaunches by sharedValue("appReviewLaunchesKey", DEFAULT_APP_REVIEW_LAUNCHES)
+    var showAppReviewDialog by sharedValue("showAppReviewDialogKey", true)
 
-    //region App review
-    var appReviewLaunches: Int
-        get() = sharedPreferences.getInt(APP_REVIEW_LAUNCHES_KEY, DEFAULT_APP_REVIEW_LAUNCHES)
-        set(value) = sharedPreferences.transaction { putInt(APP_REVIEW_LAUNCHES_KEY, value) }
-
-    var showAppReviewDialog: Boolean
-        get() = sharedPreferences.getBoolean(SHOW_APP_REVIEW_DIALOG_KEY, DEFAULT_SHOW_APP_REVIEW_DIALOG)
-        set(value) = sharedPreferences.transaction { putBoolean(SHOW_APP_REVIEW_DIALOG_KEY, value) }
-    //endregion
-
-    //region Utils
-    private inline fun <reified T : Enum<T>> getEnum(key: String, default: T): T {
-        return enumValueOfOrNull<T>(sharedPreferences.getString(key, default.name)) ?: default
+    private fun sharedValue(key: String, defaultValue: Int) = sharedPreferences.sharedValue(key, defaultValue)
+    private fun sharedValueNullable(key: String, defaultValue: String?) = sharedPreferences.sharedValueNullable(key, defaultValue)
+    private fun sharedValue(key: String, defaultValue: Boolean) = sharedPreferences.sharedValue(key, defaultValue)
+    private inline fun <reified E : Enum<E>> sharedValue(key: String, defaultValue: E): ReadWriteProperty<Any, E> {
+        return sharedPreferences.sharedValue(key, defaultValue)
     }
-
-    private fun putEnum(key: String, value: Enum<*>) {
-        sharedPreferences.transaction { putString(key, value.name) }
-    }
-    //endregion
 
     companion object {
 
         private val TAG = LocalSettings::class.java.simpleName
 
         //region Default values
-        private const val DEFAULT_APP_LAUNCHES = 0
-        private const val DEFAULT_CANCEL_DELAY = 10
-        private val DEFAULT_EMAIL_FORWARDING = EmailForwarding.IN_BODY
-        private const val DEFAULT_INCLUDE_MESSAGE_IN_REPLY = true
-        private const val DEFAULT_ASK_EMAIL_ACKNOWLEDGMENT = false
-        private const val DEFAULT_HAS_ALREADY_ENABLED_NOTIFICATIONS = false
-        private const val DEFAULT_IS_APP_LOCKED = false
-        private const val DEFAULT_IS_USER_WANTING_UPDATES = true
         private const val DEFAULT_HAS_APP_UPDATE_DOWNLOADED = false
-        private val DEFAULT_AI_ENGINE = AiEngine.FALCON
-        private val DEFAULT_THREAD_DENSITY = ThreadDensity.LARGE
-        private val DEFAULT_THEME = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) Theme.LIGHT else Theme.SYSTEM
-        private val DEFAULT_ACCENT_COLOR = AccentColor.PINK
-        private val INITIAL_SWIPE_ACTION = SwipeAction.TUTORIAL
         val DEFAULT_SWIPE_ACTION_RIGHT = SwipeAction.READ_UNREAD
         val DEFAULT_SWIPE_ACTION_LEFT = SwipeAction.DELETE
-        private val DEFAULT_THREAD_MODE = ThreadMode.CONVERSATION
-        private val DEFAULT_EXTERNAL_CONTENT = ExternalContent.ALWAYS
         private const val DEFAULT_RECENT_SEARCHES = "[]"
-        private val DEFAULT_FIREBASE_TOKEN = null
         private val DEFAULT_FIREBASE_REGISTERED_USERS = emptySet<String>()
-        private val DEFAULT_AI_REPLACEMENT_DIALOG_VISIBILITY = AiReplacementDialogVisibility.SHOW
-        private const val DEFAULT_SHOW_AI_DISCOVERY_BOTTOM_SHEET = true
-        private const val DEFAULT_SHOW_SYNC_DISCOVERY_BOTTOM_SHEET = true
         const val DEFAULT_APP_REVIEW_LAUNCHES = 50
-        private const val DEFAULT_SHOW_APP_REVIEW_DIALOG = true
         //endregion
 
         //region Keys
         private const val SHARED_PREFS_NAME = "LocalSettingsSharedPref"
-        private const val APP_LAUNCHES_KEY = "appLaunchesKey"
-        private const val CANCEL_DELAY_KEY = "cancelDelayKey"
-        private const val EMAIL_FORWARDING_KEY = "emailForwardingKey"
-        private const val INCLUDE_MESSAGE_IN_REPLY_KEY = "includeMessageInReplyKey"
-        private const val ASK_EMAIL_ACKNOWLEDGMENT_KEY = "askEmailAcknowledgmentKey"
-        private const val HAS_ALREADY_ENABLED_NOTIFICATIONS_KEY = "hasAlreadyEnabledNotificationsKey"
-        private const val IS_APP_LOCKED_KEY = "isAppLockedKey"
-        private const val IS_USER_WANTING_UPDATES_KEY = "isUserWantingUpdatesKey"
         private const val HAS_APP_UPDATE_DOWNLOADED_KEY = "hasAppUpdateDownloaded"
-        private const val AI_ENGINE_KEY = "aiEngineKey"
-        private const val THREAD_DENSITY_KEY = "threadDensityKey"
-        private const val THEME_KEY = "themeKey"
-        private const val ACCENT_COLOR_KEY = "accentColorKey"
-        private const val SWIPE_RIGHT_KEY = "swipeRightKey"
-        private const val SWIPE_LEFT_KEY = "swipeLeftKey"
-        private const val THREAD_MODE_KEY = "threadModeKey"
-        private const val EXTERNAL_CONTENT_KEY = "externalContentKey"
         private const val RECENT_SEARCHES_KEY = "recentSearchesKey"
-        private const val FIREBASE_TOKEN_KEY = "firebaseTokenKey"
         private const val FIREBASE_REGISTERED_USERS_KEY = "firebaseRegisteredUsersKey"
-        private const val AI_REPLACEMENT_DIALOG_VISIBILITY_KEY = "aiReplacementDialogVisibilityKey"
-        private const val SHOW_AI_DISCOVERY_BOTTOM_SHEET_KEY = "showAiDiscoveryBottomSheetKey"
-        private const val SHOW_SYNC_DISCOVERY_BOTTOM_SHEET_KEY = "showSyncDiscoveryBottomSheetKey"
-        private const val APP_REVIEW_LAUNCHES_KEY = "appReviewLaunchesKey"
-        private const val SHOW_APP_REVIEW_DIALOG_KEY = "showAppReviewDialogKey"
         //endregion
 
         @Volatile
