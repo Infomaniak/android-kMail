@@ -42,7 +42,6 @@ import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.Utils.toEnumOrThrow
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
-import com.infomaniak.lib.stores.StoreUtils.checkStalledUpdate
 import com.infomaniak.lib.stores.StoreUtils.checkUpdateIsAvailable
 import com.infomaniak.lib.stores.StoreUtils.initAppUpdateManager
 import com.infomaniak.lib.stores.StoreUtils.launchInAppReview
@@ -327,7 +326,7 @@ class MainActivity : BaseActivity() {
         super.onResume()
         playServicesUtils.checkPlayServices(this)
 
-        checkAppUpdateStatus()
+        mainViewModel.checkAppUpdateStatus()
 
         if (binding.drawerLayout.isOpen) colorSystemBarsWithMenuDrawer()
     }
@@ -466,14 +465,8 @@ class MainActivity : BaseActivity() {
     private fun initAppUpdateManager() {
         initAppUpdateManager(
             context = this,
-            onUpdateDownloaded = {
-                mainViewModel.canInstallUpdate.value = true
-                localSettings.hasAppUpdateDownloaded = true
-            },
-            onUpdateInstalled = {
-                mainViewModel.canInstallUpdate.value = false
-                localSettings.hasAppUpdateDownloaded = false
-            },
+            onUpdateDownloaded = { mainViewModel.toggleAppUpdateStatus(isUpdateDownloaded = true) },
+            onUpdateInstalled = { mainViewModel.toggleAppUpdateStatus(isUpdateDownloaded = false) },
         )
     }
 
@@ -488,11 +481,6 @@ class MainActivity : BaseActivity() {
                 },
             )
         }
-    }
-
-    private fun checkAppUpdateStatus() {
-        mainViewModel.canInstallUpdate.value = localSettings.hasAppUpdateDownloaded
-        checkStalledUpdate()
     }
 
     private fun showSyncDiscovery() = with(localSettings) {
