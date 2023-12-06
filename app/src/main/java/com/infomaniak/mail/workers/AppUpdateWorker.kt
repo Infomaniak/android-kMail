@@ -18,8 +18,10 @@
 package com.infomaniak.mail.workers
 
 import android.content.Context
+import androidx.concurrent.futures.CallbackToFutureAdapter
 import androidx.hilt.work.HiltWorker
 import androidx.work.*
+import com.google.common.util.concurrent.ListenableFuture
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.stores.StoreUtils
 import com.infomaniak.mail.data.LocalSettings
@@ -30,7 +32,6 @@ import dagger.assisted.AssistedInject
 import io.sentry.Sentry
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -39,19 +40,31 @@ class AppUpdateWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted params: WorkerParameters,
     private val localSettings: LocalSettings,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-) : BaseCoroutineWorker(appContext, params) {
+) : ListenableWorker(appContext, params) {
 
-    override suspend fun launchWork(): Result = withContext(ioDispatcher) {
+    override fun startWork(): ListenableFuture<Result> {
         SentryLog.i(TAG, "Work started")
 
-        StoreUtils.installDownloadedUpdate { exception ->
-            Sentry.captureException(exception)
-            localSettings.resetUpdateSettings()
-        }
+        return CallbackToFutureAdapter.getFuture { completer ->
 
+            StoreUtils.installDownloadedUpdate(
+                onSuccess = { completer.setResult(Result.success()) },
+                onFailure = { exception ->
+                    localSettings.apply {
+                        isUserWantingUpdates = false // This avoid the user being instantly reprompted to download update
+                        localSettings.hasAppUpdateDownloaded = false
+                    }
+                    Sentry.captureException(exception)
+                    localSettings.resetUpdateSettings()
+                    completer.setResult(Result.failure())
+                },
+            )
+        }
+    }
+
+    private fun CallbackToFutureAdapter.Completer<Result>.setResult(result: Result) {
+        set(result)
         SentryLog.d(TAG, "Work finished")
-        Result.success()
     }
 
     @Singleton
@@ -68,8 +81,6 @@ class AppUpdateWorker @AssistedInject constructor(
 
                 val workRequest = OneTimeWorkRequestBuilder<AppUpdateWorker>()
                     .setConstraints(Constraints.Builder().setRequiresBatteryNotLow(true).build())
-                    // We start with a delayed duration, so that when the app is rebooted the service is not launched
-                    .setInitialDelay(INITIAL_DELAY, TimeUnit.SECONDS)
                     .build()
 
                 workManager.enqueueUniqueWork(TAG, ExistingWorkPolicy.KEEP, workRequest)
@@ -84,6 +95,5 @@ class AppUpdateWorker @AssistedInject constructor(
 
     companion object {
         private const val TAG = "AppUpdateWorker"
-        private const val INITIAL_DELAY = 15L //15s
     }
 }
