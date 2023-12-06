@@ -462,7 +462,10 @@ class MainActivity : BaseActivity() {
     }
 
     private fun initAppUpdateManager() {
-        initAppUpdateManager(this) { mainViewModel.canInstallUpdate.value = true }
+        initAppUpdateManager(
+            context = this,
+            onInstall = { mainViewModel.canInstallUpdate.value = true },
+        )
     }
 
     private fun showUpdateAvailable() = with(localSettings) {
