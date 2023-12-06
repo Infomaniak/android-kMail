@@ -95,6 +95,7 @@ dependencies {
     implementation libs.flexbox
     implementation libs.lifecycle.process
     implementation libs.webkit
+    implementation libs.work.concurrent.futures
     implementation libs.work.runtime.ktx
 
     implementation libs.hilt.android

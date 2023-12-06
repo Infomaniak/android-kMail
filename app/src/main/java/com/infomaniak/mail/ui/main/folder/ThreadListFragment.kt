@@ -578,11 +578,11 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 trackEvent("inAppUpdate", "installUpdate")
                 mainViewModel.canInstallUpdate.value = false
 
-                StoreUtils.installDownloadedUpdate {
+                StoreUtils.installDownloadedUpdate(onFailure = {
                     Sentry.captureException(it)
                     localSettings.resetUpdateSettings()
                     mainViewModel.snackBarManager.setValue(getString(RCore.string.errorUpdateInstall))
-                }
+                })
             }
         }
     }

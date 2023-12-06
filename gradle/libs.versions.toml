@@ -1,5 +1,6 @@
 [versions]
 androidGradlePlugin = "8.1.4"
+concurrentFuturesKtx = "1.1.0"
 dotsindicator = "5.0"
 dragdropswipeRecyclerview = "1.2.0"
 firebaseMessagingKtx = "23.3.1"
@@ -39,6 +40,7 @@ navigation-safeargs = { module = "androidx.navigation:navigation-safe-args-gradl
 realm-kotlin-base = { module = "io.realm.kotlin:library-base", version.ref = "realmKotlin" }
 sentry-android-fragment = { module = "io.sentry:sentry-android-fragment", version.ref = "sentryAndroidFragment" }
 webkit = { module = "androidx.webkit:webkit", version.ref = "webkit" }
+work-concurrent-futures = { module = "androidx.concurrent:concurrent-futures-ktx", version.ref = "concurrentFuturesKtx" }
 work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
 # Unit tests
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junitJupiterEngine" }
