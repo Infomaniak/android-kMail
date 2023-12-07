@@ -59,11 +59,11 @@ class AvatarView @JvmOverloads constructor(
             setPaddingRelative(inset, inset, inset, inset)
 
             @Suppress("ClickableViewAccessibility")
-            setOnTouchListener { _, event -> binding.avatar.onTouchEvent(event) }
+            setOnTouchListener { _, event -> binding.root.onTouchEvent(event) }
         }
     }
 
-    override fun setOnClickListener(onClickListener: OnClickListener?) = binding.avatar.setOnClickListener(onClickListener)
+    override fun setOnClickListener(onClickListener: OnClickListener?) = binding.root.setOnClickListener(onClickListener)
 
     fun loadAvatar(user: User): Disposable = with(binding.avatarImage) {
         val color = context.getColor(R.color.onColorfulBackground)
