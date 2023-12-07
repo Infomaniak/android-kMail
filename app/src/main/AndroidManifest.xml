@@ -51,7 +51,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/AppTheme.Pink"
         android:usesCleartextTraffic="true"
-        tools:targetApi="tiramisu">
+        tools:targetApi="UPSIDE_DOWN_CAKE">
 
         <meta-data
             android:name="io.sentry.auto-init"
