@@ -567,6 +567,19 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         mainViewModel.mergedContactsLive.observeNotNull(viewLifecycleOwner, threadListAdapter::updateContacts)
     }
 
+    private fun observerDraftsActionsCompletedWorks() {
+
+        fun observeDraftsActions() {
+            draftsActionsWorkerScheduler.getCompletedWorkInfoLiveData().observe(viewLifecycleOwner) {
+                mainViewModel.currentFolder.value?.let { folder ->
+                    if (folder.isValid() && folder.role == FolderRole.DRAFT) mainViewModel.forceRefreshThreads()
+                }
+            }
+        }
+
+        WorkerUtils.flushWorkersBefore(requireContext(), viewLifecycleOwner, ::observeDraftsActions)
+    }
+
     private fun observeFlushFolderTrigger() {
         mainViewModel.flushFolderTrigger.observe(viewLifecycleOwner) { descriptionDialog.resetLoadingAndDismiss() }
     }
@@ -586,19 +599,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 }
             }
         }
-    }
-
-    private fun observerDraftsActionsCompletedWorks() {
-
-        fun observeDraftsActions() {
-            draftsActionsWorkerScheduler.getCompletedWorkInfoLiveData().observe(viewLifecycleOwner) {
-                mainViewModel.currentFolder.value?.let { folder ->
-                    if (folder.isValid() && folder.role == FolderRole.DRAFT) mainViewModel.forceRefreshThreads()
-                }
-            }
-        }
-
-        WorkerUtils.flushWorkersBefore(requireContext(), viewLifecycleOwner, ::observeDraftsActions)
     }
 
     private fun checkLastUpdateDay() {
