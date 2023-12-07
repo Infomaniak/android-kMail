@@ -50,7 +50,7 @@
                     app:navigationContentDescription="@string/contentDescriptionButtonMenu"
                     app:navigationIcon="@drawable/ic_burger"
                     tools:title="Boîte de réception"
-                    tools:visibility="gone">
+                    tools:visibility="visible">
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -68,9 +68,10 @@
                         <com.infomaniak.mail.views.AvatarView
                             android:id="@+id/userAvatar"
                             android:layout_width="wrap_content"
-                            android:layout_height="30dp"
+                            android:layout_height="48dp"
                             android:layout_gravity="center"
-                            android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                            android:layout_marginEnd="@dimen/marginStandardMedium"
+                            app:inset="@dimen/marginStandardSmall"
                             tools:src="@tools:sample/avatars[12]" />
 
                     </LinearLayout>
@@ -84,7 +85,7 @@
                     app:contentInsetEnd="0dp"
                     app:contentInsetStart="0dp"
                     app:navigationIcon="@null"
-                    tools:visibility="visible">
+                    tools:visibility="gone">
 
                     <LinearLayout
                         android:layout_width="match_parent"

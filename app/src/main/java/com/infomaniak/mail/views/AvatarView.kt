@@ -49,11 +49,21 @@ class AvatarView @JvmOverloads constructor(
 
     init {
         attrs?.getAttributes(context, R.styleable.AvatarView) {
-            binding.avatarImage.setImageDrawable(getDrawable(R.styleable.AvatarView_android_src))
+            binding.avatarImage.apply {
+                setImageDrawable(getDrawable(R.styleable.AvatarView_android_src))
+                val padding = getDimensionPixelOffset(R.styleable.AvatarView_padding, 0)
+                setPaddingRelative(padding, padding, padding, padding)
+            }
+
+            val inset = getDimensionPixelOffset(R.styleable.AvatarView_inset, 0)
+            setPaddingRelative(inset, inset, inset, inset)
+
+            @Suppress("ClickableViewAccessibility")
+            setOnTouchListener { _, event -> binding.root.onTouchEvent(event) }
         }
     }
 
-    override fun setOnClickListener(onClickListener: OnClickListener?) = binding.avatar.setOnClickListener(onClickListener)
+    override fun setOnClickListener(onClickListener: OnClickListener?) = binding.root.setOnClickListener(onClickListener)
 
     fun loadAvatar(user: User): Disposable = with(binding.avatarImage) {
         val color = context.getColor(R.color.onColorfulBackground)
