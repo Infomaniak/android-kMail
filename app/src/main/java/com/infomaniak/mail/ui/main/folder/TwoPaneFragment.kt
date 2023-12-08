@@ -45,6 +45,7 @@ abstract class TwoPaneFragment : Fragment() {
     protected abstract val slidingPaneLayout: SlidingPaneLayout
 
     abstract fun getAnchor(): View?
+    open fun doAfterFolderChanged() {}
 
     fun areBothShown() = !slidingPaneLayout.isSlideable
     fun isOnlyLeftShown() = slidingPaneLayout.let { it.isSlideable && !it.isOpen }
@@ -90,6 +91,8 @@ abstract class TwoPaneFragment : Fragment() {
                 previousFolderId = folderId
                 if (isThreadOpen) closeThread()
             }
+
+            doAfterFolderChanged()
         }
     }
 
