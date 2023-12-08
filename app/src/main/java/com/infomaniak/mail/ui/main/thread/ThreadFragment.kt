@@ -216,9 +216,7 @@ class ThreadFragment : Fragment() {
                 message.navigateToActionsBottomSheet()
             },
             onAllExpandedMessagesLoaded = ::scrollToFirstUnseenMessage,
-            navigateToNewMessageActivity = { uri ->
-                goToNewMessageActivity(mailToUri = uri)
-            },
+            navigateToNewMessageActivity = { goToNewMessageActivity(mailToUri = it) },
             promptLink = { data, type ->
                 // When adding a phone number to contacts, Google decodes this value in case it's url-encoded. But I could not
                 // reproduce this issue when manually creating a url-encoded href. If this is triggered, fix it by also
@@ -468,7 +466,6 @@ class ThreadFragment : Fragment() {
                 draftMode = DraftMode.REPLY,
                 previousMessageUid = message.uid,
                 shouldLoadDistantResources = shouldLoadDistantResources,
-                arrivedFromExistingDraft = false,
             )
         } else {
             mainViewModel.replyBottomSheetArgs.value = message.uid to shouldLoadDistantResources
