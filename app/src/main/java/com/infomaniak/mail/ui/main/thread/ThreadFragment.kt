@@ -365,7 +365,7 @@ class ThreadFragment : Fragment() {
 
     private fun observeFolderChange() {
         mainViewModel.rightPaneFolderName.observeNotNull(viewLifecycleOwner) {
-            binding.emptyViewFolderName.text = it
+            binding.emptyView.text = it
         }
     }
 
