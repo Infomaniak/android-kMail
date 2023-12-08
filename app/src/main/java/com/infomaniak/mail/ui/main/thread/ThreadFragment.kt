@@ -65,6 +65,10 @@ import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.*
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.OpenThreadResult
+import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialogArgs
+import com.infomaniak.mail.ui.main.thread.actions.MessageActionsBottomSheetDialogArgs
+import com.infomaniak.mail.ui.main.thread.actions.ReplyBottomSheetDialogArgs
+import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialogArgs
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipients
@@ -200,9 +204,7 @@ class ThreadFragment : Fragment() {
     private fun setupAdapter() = with(binding.messagesList) {
         adapter = ThreadAdapter(
             shouldLoadDistantResources = shouldLoadDistantResources(),
-            onContactClicked = { contact ->
-                mainViewModel.detailedContactArgs.value = contact
-            },
+            onContactClicked = { mainViewModel.detailedContactArgs.value = DetailedContactBottomSheetDialogArgs(it) },
             onDraftClicked = { message ->
                 trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
                 goToNewMessageActivity(
@@ -353,10 +355,10 @@ class ThreadFragment : Fragment() {
                     )
                 }
                 R.id.quickActionMenu -> {
-                    mainViewModel.threadActionsBottomSheetArgs.value = Triple(
-                        threadUid,
-                        lastMessageToReplyTo.uid,
-                        shouldLoadDistantResources(lastMessageToReplyTo.uid),
+                    mainViewModel.threadActionsArgs.value = ThreadActionsBottomSheetDialogArgs(
+                        threadUid = threadUid,
+                        messageUidToReplyTo = lastMessageToReplyTo.uid,
+                        shouldLoadDistantResources = shouldLoadDistantResources(lastMessageToReplyTo.uid),
                     )
                 }
             }
@@ -453,7 +455,11 @@ class ThreadFragment : Fragment() {
         if (hasUsableCache(requireContext()) || isInlineCachedFile(requireContext())) {
             startActivity(openWithIntent(requireContext()))
         } else {
-            mainViewModel.downloadAttachmentsArgs.value = Triple(resource!!, name, getFileTypeFromMimeType())
+            mainViewModel.downloadAttachmentArgs.value = DownloadAttachmentProgressDialogArgs(
+                attachmentResource = resource!!,
+                attachmentName = name,
+                attachmentType = getFileTypeFromMimeType(),
+            )
         }
     }
 
@@ -490,12 +496,15 @@ class ThreadFragment : Fragment() {
                 shouldLoadDistantResources = shouldLoadDistantResources,
             )
         } else {
-            mainViewModel.replyBottomSheetArgs.value = message.uid to shouldLoadDistantResources
+            mainViewModel.replyBottomSheetArgs.value = ReplyBottomSheetDialogArgs(
+                messageUid = message.uid,
+                shouldLoadDistantResources = shouldLoadDistantResources,
+            )
         }
     }
 
     private fun Message.navigateToActionsBottomSheet() = with(mainViewModel) {
-        messageActionsBottomSheetArgs.value = MessageActionsArgs(
+        messageActionsArgs.value = MessageActionsBottomSheetDialogArgs(
             messageUid = uid,
             threadUid = currentThreadUid.value ?: return,
             isThemeTheSame = threadAdapter.isThemeTheSameMap[uid] ?: return,
@@ -597,13 +606,6 @@ class ThreadFragment : Fragment() {
 
         return subject to spannedSubject
     }
-
-    data class MessageActionsArgs(
-        val messageUid: String,
-        val threadUid: String,
-        val isThemeTheSame: Boolean,
-        val shouldLoadDistantResources: Boolean,
-    )
 
     enum class HeaderState {
         ELEVATED,
