@@ -28,9 +28,9 @@
         android:layout_width="@dimen/standardIconSize"
         android:layout_height="@dimen/standardIconSize"
         android:layout_gravity="center_vertical"
-        android:layout_marginHorizontal="@dimen/marginStandardSmall"
         android:layout_marginVertical="@dimen/marginStandardVerySmall"
         android:importantForAccessibility="no"
+        tools:layout_marginHorizontal="@dimen/marginStandardSmall"
         tools:src="@drawable/ic_file_pdf" />
 
     <LinearLayout

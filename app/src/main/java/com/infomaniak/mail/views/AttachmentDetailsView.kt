@@ -83,7 +83,7 @@ class AttachmentDetailsView @JvmOverloads constructor(
         ),
         BOTTOMSHEET(
             R.dimen.largeIconSize,
-            RCore.dimen.marginStandardMedium,
+            R.dimen.alternativeMargin,
             R.style.Body,
             R.style.Body_Secondary,
         )
