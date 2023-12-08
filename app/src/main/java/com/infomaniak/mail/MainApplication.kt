@@ -136,7 +136,7 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
     override fun onStart(owner: LifecycleOwner) {
         isAppInBackground = false
         syncMailboxesWorkerScheduler.cancelWork()
-        appUpdateWorkerScheduler.cancelWork()
+        owner.lifecycleScope.launch { appUpdateWorkerScheduler.cancelWorkIfNeeded() }
     }
 
     override fun onStop(owner: LifecycleOwner) {

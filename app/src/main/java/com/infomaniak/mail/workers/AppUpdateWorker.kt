@@ -90,9 +90,18 @@ class AppUpdateWorker @AssistedInject constructor(
             }
         }
 
-        fun cancelWork() {
-            SentryLog.d(TAG, "Work cancelled")
-            workManager.cancelUniqueWork(TAG)
+        suspend fun cancelWorkIfNeeded() = withContext(ioDispatcher) {
+
+            val workInfos = workManager.getWorkInfos(
+                WorkQuery.Builder.fromUniqueWorkNames(listOf(TAG))
+                    .addStates(listOf(WorkInfo.State.BLOCKED, WorkInfo.State.ENQUEUED))
+                    .build()
+            ).get()
+
+            workInfos.forEach {
+                workManager.cancelWorkById(it.id)
+                SentryLog.d(TAG, "Work cancelled")
+            }
         }
     }
 
