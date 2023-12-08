@@ -27,7 +27,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.graphics.ColorUtils
-import androidx.core.view.isInvisible
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -253,7 +253,7 @@ class ThreadFragment : Fragment() {
         mainViewModel.currentThreadUid.distinctUntilChanged().observeNotNull(viewLifecycleOwner) { threadUid ->
 
             // Display Thread view
-            emptyView.isInvisible = true
+            emptyView.isGone = true
             threadView.isVisible = true
 
             openThread(threadUid)
