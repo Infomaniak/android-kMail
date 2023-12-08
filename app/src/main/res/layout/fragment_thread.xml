@@ -26,7 +26,7 @@
         android:id="@+id/threadView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="invisible"
+        android:visibility="gone"
         tools:visibility="visible">
 
         <com.google.android.material.appbar.MaterialToolbar
@@ -138,6 +138,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="visible"
-        tools:visibility="invisible" />
+        tools:visibility="gone" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
