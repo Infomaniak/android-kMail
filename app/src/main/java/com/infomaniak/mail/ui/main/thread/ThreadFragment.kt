@@ -150,8 +150,8 @@ class ThreadFragment : Fragment() {
     private fun setupUi() = with(binding) {
 
         toolbar.setNavigationOnClickListener {
-            val bothPanesAreShown = (parentFragment as TwoPaneFragment).areBothShown()
-            if (!bothPanesAreShown) mainViewModel.closeThread()
+            val onlyThreadIsShown = (parentFragment as TwoPaneFragment).isOnlyRightShown()
+            if (onlyThreadIsShown) mainViewModel.closeThread()
         }
 
         val defaultTextColor = context.getColor(R.color.primaryTextColor)
