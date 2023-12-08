@@ -29,9 +29,8 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.search.SearchFragment
-import com.infomaniak.mail.ui.main.thread.DetailedContactBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
-import com.infomaniak.mail.ui.main.thread.actions.*
+import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialog
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 
@@ -97,62 +96,28 @@ abstract class TwoPaneFragment : Fragment() {
 
         getBackNavigationResult(DownloadAttachmentProgressDialog.OPEN_WITH, ::startActivity)
 
-        downloadAttachmentsArgs.observe(viewLifecycleOwner) { (resource, name, fileType) ->
-            safeNavigate(
-                resId = R.id.downloadAttachmentProgressDialog,
-                args = DownloadAttachmentProgressDialogArgs(
-                    attachmentResource = resource,
-                    attachmentName = name,
-                    attachmentType = fileType,
-                ).toBundle(),
-            )
+        downloadAttachmentArgs.observe(viewLifecycleOwner) {
+            safeNavigate(resId = R.id.downloadAttachmentProgressDialog, args = it.toBundle())
         }
 
         newMessageArgs.observe(viewLifecycleOwner) {
             safeNavigateToNewMessageActivity(args = it.toBundle())
         }
 
-        replyBottomSheetArgs.observe(viewLifecycleOwner) { (messageUid, shouldLoadDistantResources) ->
-            safeNavigate(
-                resId = R.id.replyBottomSheetDialog,
-                args = ReplyBottomSheetDialogArgs(
-                    messageUid = messageUid,
-                    shouldLoadDistantResources = shouldLoadDistantResources,
-                ).toBundle(),
-            )
+        replyBottomSheetArgs.observe(viewLifecycleOwner) {
+            safeNavigate(resId = R.id.replyBottomSheetDialog, args = it.toBundle())
         }
 
-        threadActionsBottomSheetArgs.observe(viewLifecycleOwner) {
-            val (threadUid, lastMessageToReplyToUid, shouldLoadDistantResources) = it
-            safeNavigate(
-                resId = R.id.threadActionsBottomSheetDialog,
-                args = ThreadActionsBottomSheetDialogArgs(
-                    threadUid = threadUid,
-                    messageUidToReplyTo = lastMessageToReplyToUid,
-                    shouldLoadDistantResources = shouldLoadDistantResources,
-                ).toBundle(),
-            )
+        threadActionsArgs.observe(viewLifecycleOwner) {
+            safeNavigate(resId = R.id.threadActionsBottomSheetDialog, args = it.toBundle())
         }
 
-        messageActionsBottomSheetArgs.observe(viewLifecycleOwner) {
-            safeNavigate(
-                resId = R.id.messageActionsBottomSheetDialog,
-                args = MessageActionsBottomSheetDialogArgs(
-                    messageUid = it.messageUid,
-                    threadUid = it.threadUid,
-                    isThemeTheSame = it.isThemeTheSame,
-                    shouldLoadDistantResources = it.shouldLoadDistantResources,
-                ).toBundle(),
-            )
+        messageActionsArgs.observe(viewLifecycleOwner) {
+            safeNavigate(resId = R.id.messageActionsBottomSheetDialog, args = it.toBundle())
         }
 
-        detailedContactArgs.observe(viewLifecycleOwner) { contact ->
-            safeNavigate(
-                resId = R.id.detailedContactBottomSheetDialog,
-                args = DetailedContactBottomSheetDialogArgs(
-                    recipient = contact,
-                ).toBundle(),
-            )
+        detailedContactArgs.observe(viewLifecycleOwner) {
+            safeNavigate(resId = R.id.detailedContactBottomSheetDialog, args = it.toBundle())
         }
     }
 
