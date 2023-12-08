@@ -20,7 +20,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/CardViewMail"
     android:layout_width="wrap_content"
-    android:layout_height="40dp"
+    android:layout_height="wrap_content"
     android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
     app:cardBackgroundColor="@color/backgroundColorTertiary"
     app:cardCornerRadius="@dimen/smallCornerRadius"
@@ -34,16 +34,20 @@
         <com.infomaniak.mail.views.AttachmentDetailsView
             android:id="@+id/attachmentDetails"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:displayStyle="chip"
             app:layout_constraintStart_toStartOf="parent" />
 
         <FrameLayout
             android:id="@+id/endButton"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
             app:layout_constraintDimensionRatio="1"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/attachmentDetails">
 
             <com.google.android.material.button.MaterialButton
