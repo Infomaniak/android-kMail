@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
-import android.text.format.Formatter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
@@ -78,7 +77,7 @@ class AttachmentAdapter(
 
     fun setAttachments(newList: List<Attachment>) = runCatchingRealm {
         attachments = newList.toMutableList()
-    }.getOrDefault(Unit)
+    }
 
     fun addAll(newAttachments: List<Attachment>) {
         attachments.addAll(newAttachments)

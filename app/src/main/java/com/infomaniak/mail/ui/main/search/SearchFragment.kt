@@ -235,7 +235,7 @@ class SearchFragment : TwoPaneFragment() {
             onThreadClicked = { thread ->
                 with(searchViewModel) {
                     if (!isLengthTooShort(currentSearchQuery)) history.value = currentSearchQuery
-                    navigateToThread(mainViewModel, thread)
+                    navigateToThread(thread, mainViewModel)
                 }
             }
         }
