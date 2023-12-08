@@ -36,16 +36,16 @@ open class TwoPaneFragment : Fragment() {
 
     val mainViewModel: MainViewModel by activityViewModels()
 
-    private val slidingPaneLayout: SlidingPaneLayout?
+    private val slidingPaneLayout: SlidingPaneLayout
         get() = when (this) {
             is ThreadListFragment -> binding.threadListSlidingPaneLayout
             is SearchFragment -> binding.searchSlidingPaneLayout
-            else -> null
+            else -> throw IllegalStateException()
         }
 
-    fun areBothShown() = slidingPaneLayout?.isSlideable == false
-    fun isOnlyLeftShown() = slidingPaneLayout?.let { it.isSlideable && !it.isOpen } ?: false
-    fun isOnlyRightShown() = slidingPaneLayout?.let { it.isSlideable && it.isOpen } ?: false
+    fun areBothShown() = !slidingPaneLayout.isSlideable
+    fun isOnlyLeftShown() = slidingPaneLayout.let { it.isSlideable && !it.isOpen }
+    fun isOnlyRightShown() = slidingPaneLayout.let { it.isSlideable && it.isOpen }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -54,7 +54,7 @@ open class TwoPaneFragment : Fragment() {
     }
 
     private fun setupSlidingPane() {
-        slidingPaneLayout?.lockMode = SlidingPaneLayout.LOCK_MODE_LOCKED
+        slidingPaneLayout.lockMode = SlidingPaneLayout.LOCK_MODE_LOCKED
     }
 
     private fun observeThreadEvents() = with(mainViewModel) {
@@ -124,11 +124,11 @@ open class TwoPaneFragment : Fragment() {
 
     fun openThread(uid: String) {
         mainViewModel.currentThreadUid.value = uid
-        slidingPaneLayout?.open()
+        slidingPaneLayout.open()
     }
 
     private fun resetPanes() {
-        slidingPaneLayout?.close()
+        slidingPaneLayout.close()
         mainViewModel.currentThreadUid.value = null
         // TODO: We can see that the ThreadFragment's content is changing, while the pane is closing.
         //  Maybe we need to delay the transaction? Or better: start it when the pane is fully closed?
