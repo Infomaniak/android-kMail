@@ -18,7 +18,7 @@
 <androidx.slidingpanelayout.widget.SlidingPaneLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/slidingPaneLayout"
+    android:id="@+id/threadListSlidingPaneLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.main.folder.ThreadListFragment">

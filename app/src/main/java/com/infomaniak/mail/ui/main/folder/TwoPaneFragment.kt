@@ -38,8 +38,8 @@ open class TwoPaneFragment : Fragment() {
 
     private val slidingPaneLayout: SlidingPaneLayout?
         get() = when (this) {
-            is ThreadListFragment -> binding.slidingPaneLayout
-            is SearchFragment -> binding.slidingPaneLayout
+            is ThreadListFragment -> binding.threadListSlidingPaneLayout
+            is SearchFragment -> binding.searchSlidingPaneLayout
             else -> null
         }
 
