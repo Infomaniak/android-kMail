@@ -273,6 +273,12 @@ fun Fragment.safeNavigateToNewMessageActivity(args: Bundle? = null, currentClass
     if (canNavigate(currentClassName)) (activity as MainActivity).navigateToNewMessageActivity(args)
 }
 
+/**
+ * The `thread` is the default parameter for this function. But if we are coming from a Notification,
+ * we only have the `threadUid`. Since the `thread` is only used to know if it's `isOnlyOneDraft` or
+ * not, and that it can't be `true` if coming from a Notification, we can bypass the usage of the
+ * `thread` and directly use `threadUid` instead.
+ */
 fun TwoPaneFragment.navigateToThread(
     mainViewModel: MainViewModel,
     thread: Thread? = null,
