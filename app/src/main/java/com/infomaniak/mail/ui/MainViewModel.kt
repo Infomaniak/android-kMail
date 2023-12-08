@@ -46,7 +46,6 @@ import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.SnackBarManager
 import com.infomaniak.mail.ui.main.SnackBarManager.UndoData
-import com.infomaniak.mail.ui.main.folder.ThreadListViewModel
 import com.infomaniak.mail.ui.main.thread.DetailedContactBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.MessageActionsBottomSheetDialogArgs
@@ -980,8 +979,14 @@ class MainViewModel @Inject constructor(
     }
 
     fun navigateToSelectedDraft(message: Message) = liveData(ioCoroutineContext) {
-        val localUuid = draftController.getDraftByMessageUid(message.uid)?.localUuid
-        emit(ThreadListViewModel.SelectedDraft(localUuid, message.draftResource, message.uid))
+        emit(
+            NewMessageActivityArgs(
+                arrivedFromExistingDraft = true,
+                draftLocalUuid = draftController.getDraftByMessageUid(message.uid)?.localUuid,
+                draftResource = message.draftResource,
+                messageUid = message.uid,
+            ),
+        )
     }
 
     fun selectOrUnselectAll() {
