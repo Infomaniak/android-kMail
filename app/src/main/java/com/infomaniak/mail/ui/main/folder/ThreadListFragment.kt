@@ -67,6 +67,7 @@ import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
+import com.infomaniak.mail.ui.main.folder.ThreadListAdapter.NotificationType
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
@@ -173,7 +174,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
                             getItemPosition(openThreadUid)?.let { position ->
                                 clickedThreadPosition = position
                                 clickedThreadUid = openThreadUid
-                                notifyItemChanged(position, ThreadListAdapter.NotificationType.SELECTED_STATE)
+                                notifyItemChanged(position, NotificationType.SELECTED_STATE)
                             }
                         }
                         // If we are coming from a Notification, we need to navigate to ThreadFragment.
