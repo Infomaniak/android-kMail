@@ -37,7 +37,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
-import androidx.recyclerview.widget.RecyclerView.AdapterDataObserver
 import androidx.slidingpanelayout.widget.SlidingPaneLayout
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
@@ -100,7 +99,6 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
 
     private var lastUpdatedDate: Date? = null
     private var previousCustomFolderId: String? = null
-    private var threadListObserver: AdapterDataObserver? = null
 
     @Inject
     lateinit var localSettings: LocalSettings
@@ -133,7 +131,6 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = runCatchingRealm {
 
-        navigateFromNotificationToThread()
         navigateFromNotificationToNewMessage()
 
         super.onViewCreated(view, savedInstanceState)
@@ -176,42 +173,44 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         }
     }
 
+    override fun doAfterFolderChanged() {
+        navigateFromNotificationToThread()
+    }
+
     private fun navigateFromNotificationToThread() {
-        threadListObserver = object : AdapterDataObserver() {
-            override fun onChanged() {
-                // Here, we use `arguments` instead of `navigationArgs` because we need mutable data.
-                if (arguments?.getString(navigationArgs::openThreadUid.name) != null) {
-                    navigationArgs.openThreadUid?.let { threadUid ->
+        arguments?.consumeKeyIfProvided(navigationArgs::openThreadUid.name) { threadUid ->
 
-                        // Select Thread in ThreadList
-                        with(threadListAdapter) {
-                            getItemPosition(threadUid)?.let { position -> selectNewThread(position, threadUid) }
-                        }
-
-                        // If we are coming from a Notification, we need to navigate to ThreadFragment.
-                        twoPaneViewModel.openThread(threadUid)
-
-                        arguments?.remove(navigationArgs::openThreadUid.name)
-                        threadListObserver?.let(threadListAdapter::unregisterAdapterDataObserver)
-                    }
-                }
+            // Select Thread in ThreadList
+            with(threadListAdapter) {
+                getItemPosition(threadUid)
+                    ?.let { position -> selectNewThread(position, threadUid) }
+                    ?: run { preselectNewThread(threadUid) }
             }
+
+            // If we are coming from a Notification, we need to navigate to ThreadFragment.
+            twoPaneViewModel.openThread(threadUid)
         }
-        threadListObserver?.let(threadListAdapter::registerAdapterDataObserver)
     }
 
     private fun navigateFromNotificationToNewMessage() {
-        // Here, we use `arguments` instead of `navigationArgs` because we need mutable data.
-        if (arguments?.getString(navigationArgs::replyToMessageUid.name) != null) {
-            // If we are coming from the Reply action of a Notification, we need to navigate to NewMessageActivity.
+        arguments?.consumeKeyIfProvided(navigationArgs::replyToMessageUid.name) { replyToMessageUid ->
+
+            // If we clicked on the "Reply" action of a Notification, we need to navigate to ThreadFragment.
             safeNavigateToNewMessageActivity(
                 NewMessageActivityArgs(
                     draftMode = navigationArgs.draftMode,
-                    previousMessageUid = navigationArgs.replyToMessageUid,
+                    previousMessageUid = replyToMessageUid,
                     notificationId = navigationArgs.notificationId,
                 ).toBundle(),
             )
-            arguments?.remove(navigationArgs::replyToMessageUid.name)
+        }
+    }
+
+    // We remove the key from the `arguments` to prevent it from triggering again. To do this we need to use
+    // `arguments` instead of `navigationArgs` so the data can be mutated.
+    private fun Bundle.consumeKeyIfProvided(key: String, block: (String) -> Unit) {
+        getString(key)?.let {
+            block(it)
         }
     }
 

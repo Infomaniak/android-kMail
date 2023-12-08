@@ -182,7 +182,7 @@ class ThreadListAdapter @Inject constructor(
     fun getItemPosition(threadUid: String): Int? {
         return dataSet
             .indexOfFirst { it is Thread && it.uid == threadUid }
-            .let { position -> if (position == -1) null else position }
+            .takeIf { position -> position != -1 }
     }
 
     private fun CardviewThreadItemBinding.displayThread(thread: Thread, position: Int) {
@@ -246,6 +246,14 @@ class ThreadListAdapter @Inject constructor(
 
         if (oldPosition != null && oldPosition < itemCount) notifyItemChanged(oldPosition, NotificationType.SELECTED_STATE)
         if (newPosition != null) notifyItemChanged(newPosition, NotificationType.SELECTED_STATE)
+    }
+
+    /**
+     * Sometimes, we want to select a Thread before even having any Thread in the Adapter (example: coming from a Notification).
+     * The selected Thread's UI will update when the Adapter triggers the next batch of `onBindViewHolder()`.
+     */
+    fun preselectNewThread(threadUid: String?) {
+        selectNewThread(newPosition = null, threadUid)
     }
 
     private fun CardviewThreadItemBinding.toggleMultiSelectedThread(thread: Thread, shouldUpdateSelectedUi: Boolean = true) {
