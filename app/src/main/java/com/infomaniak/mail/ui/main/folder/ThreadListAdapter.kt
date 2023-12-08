@@ -179,10 +179,9 @@ class ThreadListAdapter @Inject constructor(
     }.getOrDefault(super.getItemId(position))
 
     fun getItemPosition(threadUid: String): Int? {
-        dataSet.forEachIndexed { position, item ->
-            if (item is Thread && item.uid == threadUid) return position
-        }
-        return null
+        return dataSet
+            .indexOfFirst { it is Thread && it.uid == threadUid }
+            .let { position -> if (position == -1) null else position }
     }
 
     private fun CardviewThreadItemBinding.displayThread(thread: Thread, position: Int) {
@@ -235,16 +234,15 @@ class ThreadListAdapter @Inject constructor(
         if (multiSelection?.isEnabled == true) {
             with(multiSelection!!) {
                 selectedItems.apply { if (contains(selectedThread)) remove(selectedThread) else add(selectedThread) }
-                publishSelectedItems.invoke()
+                publishSelectedItems()
             }
-        } else {
+            updateSelectedState(selectedThread)
+        } else if (selectedThread.uid != clickedThreadUid) {
             clickedThreadPosition?.let { if (it < itemCount) notifyItemChanged(it, NotificationType.SELECTED_STATE) }
             clickedThreadPosition = position
             clickedThreadUid = selectedThread.uid
-            notifyItemChanged(position, NotificationType.SELECTED_STATE)
+            updateSelectedState(selectedThread)
         }
-
-        updateSelectedState(selectedThread)
     }
 
     private fun CardviewThreadItemBinding.updateSelectedState(selectedThread: Thread) {
@@ -261,9 +259,9 @@ class ThreadListAdapter @Inject constructor(
         multiSelection?.let {
             with(localSettings) {
                 expeditorAvatar.isVisible = !isMultiSelected && threadDensity == LARGE
-                checkMarkLayout.isVisible = it.isEnabled == true
+                checkMarkLayout.isVisible = it.isEnabled
                 checkedState.isVisible = isMultiSelected
-                uncheckedState.isVisible = threadDensity != LARGE && !isMultiSelected
+                uncheckedState.isVisible = !isMultiSelected && threadDensity != LARGE
             }
         }
     }

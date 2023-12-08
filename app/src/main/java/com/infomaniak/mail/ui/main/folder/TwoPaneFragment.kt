@@ -26,6 +26,7 @@ import com.infomaniak.lib.core.utils.getBackNavigationResult
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.main.folder.ThreadListAdapter.NotificationType
 import com.infomaniak.mail.ui.main.search.SearchFragment
 import com.infomaniak.mail.ui.main.thread.DetailedContactBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
@@ -67,11 +68,13 @@ abstract class TwoPaneFragment : Fragment() {
 
         // Reset selected Thread UI when closing Thread
         currentThreadUid.observe(viewLifecycleOwner) { threadUid ->
-            if (threadUid == null) threadListAdapter?.apply {
-                val position = clickedThreadPosition
-                clickedThreadPosition = null
-                clickedThreadUid = null
-                position?.let { notifyItemChanged(it, ThreadListAdapter.NotificationType.SELECTED_STATE) }
+            if (threadUid == null) {
+                threadListAdapter?.apply {
+                    val position = clickedThreadPosition
+                    clickedThreadPosition = null
+                    clickedThreadUid = null
+                    position?.let { notifyItemChanged(it, NotificationType.SELECTED_STATE) }
+                }
             }
         }
 
