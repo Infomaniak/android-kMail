@@ -32,6 +32,7 @@ import dagger.assisted.AssistedInject
 import io.sentry.Sentry
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -47,13 +48,12 @@ class AppUpdateWorker @AssistedInject constructor(
 
         return CallbackToFutureAdapter.getFuture { completer ->
 
+            localSettings.hasAppUpdateDownloaded = false
             StoreUtils.installDownloadedUpdate(
                 onSuccess = { completer.setResult(Result.success()) },
                 onFailure = { exception ->
-                    localSettings.apply {
-                        isUserWantingUpdates = false // This avoid the user being instantly reprompted to download update
-                        localSettings.hasAppUpdateDownloaded = false
-                    }
+                    // This avoid the user being instantly reprompted to download update
+                    localSettings.isUserWantingUpdates = false
                     Sentry.captureException(exception)
                     localSettings.resetUpdateSettings()
                     completer.setResult(Result.failure())
@@ -81,6 +81,9 @@ class AppUpdateWorker @AssistedInject constructor(
 
                 val workRequest = OneTimeWorkRequestBuilder<AppUpdateWorker>()
                     .setConstraints(Constraints.Builder().setRequiresBatteryNotLow(true).build())
+                    // We start with a delayed duration, so that when the app quickly come back to foreground because the user
+                    // was just switching apps, the service is not launched
+                    .setInitialDelay(INITIAL_DELAY, TimeUnit.SECONDS)
                     .build()
 
                 workManager.enqueueUniqueWork(TAG, ExistingWorkPolicy.KEEP, workRequest)
@@ -95,5 +98,6 @@ class AppUpdateWorker @AssistedInject constructor(
 
     companion object {
         private const val TAG = "AppUpdateWorker"
+        private const val INITIAL_DELAY = 10L //10s
     }
 }
