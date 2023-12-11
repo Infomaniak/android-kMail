@@ -68,6 +68,7 @@ import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
+import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
@@ -742,6 +743,14 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
 
     private fun showRefreshLayout() {
         binding.swipeRefreshLayout.isRefreshing = true
+    }
+
+    fun getAnchor(): View? {
+        return if (isOnlyRightShown()) {
+            _binding?.threadHostFragment?.getFragment<ThreadFragment?>()?.getAnchor()
+        } else {
+            _binding?.newMessageFab
+        }
     }
 
     private enum class EmptyState(

@@ -38,7 +38,6 @@ import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListen
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollState
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.hideKeyboard
-import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.showKeyboard
 import com.infomaniak.mail.MatomoMail.SEARCH_DELETE_NAME
 import com.infomaniak.mail.MatomoMail.SEARCH_VALIDATE_NAME
@@ -51,6 +50,7 @@ import com.infomaniak.mail.databinding.FragmentSearchBinding
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.search.SearchFolderAdapter.SearchFolderElement
+import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
 import dagger.hilt.android.AndroidEntryPoint
@@ -59,7 +59,9 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class SearchFragment : TwoPaneFragment() {
 
-    var binding: FragmentSearchBinding by safeBinding()
+    private var _binding: FragmentSearchBinding? = null
+    val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
+
     private val searchViewModel: SearchViewModel by viewModels()
 
     @Inject
@@ -93,7 +95,7 @@ class SearchFragment : TwoPaneFragment() {
     private lateinit var searchAdapter: SearchFolderAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return FragmentSearchBinding.inflate(inflater, container, false).also { binding = it }.root
+        return FragmentSearchBinding.inflate(inflater, container, false).also { _binding = it }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -123,6 +125,7 @@ class SearchFragment : TwoPaneFragment() {
     override fun onDestroyView() {
         showLoadingTimer.cancel()
         super.onDestroyView()
+        _binding = null
     }
 
     private fun setupAdapter() {
@@ -346,6 +349,14 @@ class SearchFragment : TwoPaneFragment() {
 
     private fun showRefreshLayout() {
         binding.swipeRefreshLayout.isRefreshing = true
+    }
+
+    fun getAnchor(): View? {
+        return if (isOnlyLeftShown()) {
+            null
+        } else {
+            _binding?.threadHostFragment?.getFragment<ThreadFragment?>()?.getAnchor()
+        }
     }
 
     enum class VisibilityMode {
