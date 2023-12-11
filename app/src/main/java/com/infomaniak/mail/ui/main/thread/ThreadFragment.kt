@@ -108,8 +108,6 @@ class ThreadFragment : Fragment() {
     private val permissionUtils by lazy { PermissionUtils(this) }
     private val isNotInSpam by lazy { mainViewModel.currentFolder.value?.role != FolderRole.SPAM }
 
-    private var isFavorite = false
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentThreadBinding.inflate(inflater, container, false).also {
             _binding = it
@@ -290,8 +288,6 @@ class ThreadFragment : Fragment() {
                 }
                 iconTint = ColorStateList.valueOf(color)
             }
-
-            isFavorite = thread.isFavorite
         }
     }
 
@@ -373,7 +369,7 @@ class ThreadFragment : Fragment() {
         threadView.isVisible = true
 
         iconFavorite.setOnClickListener {
-            trackThreadActionsEvent(ACTION_FAVORITE_NAME, isFavorite)
+            trackThreadActionsEvent(ACTION_FAVORITE_NAME, threadViewModel.threadLive.value?.isFavorite ?: false)
             mainViewModel.toggleThreadFavoriteStatus(threadUid)
         }
 
