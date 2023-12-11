@@ -167,6 +167,27 @@
                       </LayoutPositions>
                     </value>
                   </entry>
+                  <entry key="attachmentActionsBottomSheetDialog">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="12" />
+                            <option name="y" value="12" />
+                          </Point>
+                        </option>
+                        <option name="myPositions">
+                          <map>
+                            <entry key="action_attachmentActionsBottomSheetDialog_to_downloadAttachmentProgressDialog">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                          </map>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
                   <entry key="autoReplySettingFragment">
                     <value>
                       <LayoutPositions>
@@ -664,6 +685,11 @@
                         </option>
                         <option name="myPositions">
                           <map>
+                            <entry key="action_threadFragment_to_attachmentActionsBottomSheetDialog">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
                             <entry key="action_threadFragment_to_detailedContactBottomSheetDialog">
                               <value>
                                 <LayoutPositions />
