@@ -167,7 +167,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun navigateFromNotificationToNewMessage() {
         // Here, we use `arguments` instead of `navigationArgs` because we need mutable data.
         if (arguments?.getString(navigationArgs::replyToMessageUid.name) != null) {
-            // If we are coming from the Reply action of a Notification, we need to navigate to NewMessageActivity
+            // If we are coming from the Reply action of a Notification, we need to navigate to NewMessageActivity.
             safeNavigateToNewMessageActivity(
                 NewMessageActivityArgs(
                     draftMode = navigationArgs.draftMode,
@@ -266,7 +266,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
             stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
 
-            onThreadClicked = { thread -> navigateToThread(thread, mainViewModel) }
+            onThreadClicked = { thread -> navigateToThread(mainViewModel, thread) }
 
             onFlushClicked = { dialogTitle ->
 
@@ -567,6 +567,19 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         mainViewModel.mergedContactsLive.observeNotNull(viewLifecycleOwner, threadListAdapter::updateContacts)
     }
 
+    private fun observerDraftsActionsCompletedWorks() {
+
+        fun observeDraftsActions() {
+            draftsActionsWorkerScheduler.getCompletedWorkInfoLiveData().observe(viewLifecycleOwner) {
+                mainViewModel.currentFolder.value?.let { folder ->
+                    if (folder.isValid() && folder.role == FolderRole.DRAFT) mainViewModel.forceRefreshThreads()
+                }
+            }
+        }
+
+        WorkerUtils.flushWorkersBefore(requireContext(), viewLifecycleOwner, ::observeDraftsActions)
+    }
+
     private fun observeFlushFolderTrigger() {
         mainViewModel.flushFolderTrigger.observe(viewLifecycleOwner) { descriptionDialog.resetLoadingAndDismiss() }
     }
@@ -586,19 +599,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 }
             }
         }
-    }
-
-    private fun observerDraftsActionsCompletedWorks() {
-
-        fun observeDraftsActions() {
-            draftsActionsWorkerScheduler.getCompletedWorkInfoLiveData().observe(viewLifecycleOwner) {
-                mainViewModel.currentFolder.value?.let { folder ->
-                    if (folder.isValid() && folder.role == FolderRole.DRAFT) mainViewModel.forceRefreshThreads()
-                }
-            }
-        }
-
-        WorkerUtils.flushWorkersBefore(requireContext(), viewLifecycleOwner, ::observeDraftsActions)
     }
 
     private fun checkLastUpdateDay() {
