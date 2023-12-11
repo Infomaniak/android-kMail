@@ -109,13 +109,19 @@ class ThreadFragment : Fragment() {
     private val permissionUtils by lazy { PermissionUtils(this) }
     private val isNotInSpam by lazy { mainViewModel.currentFolder.value?.role != FolderRole.SPAM }
 
-    private val onlyThreadIsShown get() = (parentFragment as TwoPaneFragment).isOnlyRightShown()
+    private val twoPaneFragment get() = parentFragment as TwoPaneFragment
 
     // TODO: This is probably too global as a trigger. Find something more refined?
     private val globalLayoutListener by lazy {
         OnGlobalLayoutListener {
             runCatching {
-                binding.toolbar.navigationIcon?.alpha = if (onlyThreadIsShown) 255 else 0
+                binding.toolbar.navigationIcon?.apply {
+                    if (twoPaneFragment.areBothShown()) {
+                        if (alpha != 0) alpha = 0
+                    } else {
+                        if (alpha != 255) alpha = 255
+                    }
+                }
             }
         }
     }
@@ -171,7 +177,7 @@ class ThreadFragment : Fragment() {
     private fun setupUi() = with(binding) {
 
         toolbar.setNavigationOnClickListener {
-            if (onlyThreadIsShown) mainViewModel.closeThread()
+            if (twoPaneFragment.isOnlyRightShown()) mainViewModel.closeThread()
         }
 
         val defaultTextColor = context.getColor(R.color.primaryTextColor)
