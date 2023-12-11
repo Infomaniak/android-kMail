@@ -17,23 +17,18 @@
  */
 package com.infomaniak.mail.ui.newMessage
 
-import android.animation.FloatEvaluator
-import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ClipDescription
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.os.Bundle
 import android.text.*
-import android.transition.Slide
 import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.*
-import android.view.WindowManager
 import android.webkit.WebView
 import android.widget.ListPopupWindow
 import android.widget.PopupWindow
@@ -41,33 +36,22 @@ import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.Group
-import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
-import com.google.android.material.button.MaterialButton
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
-import com.infomaniak.mail.MatomoMail
-import com.infomaniak.mail.MatomoMail.trackAiWriterEvent
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
-import com.infomaniak.mail.MatomoMail.trackEvent
-import com.infomaniak.mail.MatomoMail.trackExternalEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.*
 import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition.INLINE
-import com.infomaniak.mail.data.models.FeatureFlag
-import com.infomaniak.mail.data.models.ai.AiPromptOpeningStatus
-import com.infomaniak.mail.data.models.correspondent.MergedContact
-import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.*
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
@@ -75,10 +59,8 @@ import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
-import com.infomaniak.mail.ui.newMessage.NewMessageFragment.FieldType.*
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipientForNewMessage
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.destroyAndClearHistory
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
@@ -89,9 +71,6 @@ import io.sentry.SentryLevel
 import kotlinx.coroutines.*
 import java.util.UUID
 import javax.inject.Inject
-import kotlin.math.roundToInt
-import com.google.android.material.R as RMaterial
-import com.infomaniak.lib.core.R as RCore
 
 @AndroidEntryPoint
 class NewMessageFragment : Fragment() {
@@ -105,15 +84,19 @@ class NewMessageFragment : Fragment() {
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
 
-    private val animationDuration by lazy { resources.getInteger(R.integer.aiPromptAnimationDuration).toLong() }
-    private val scrimOpacity by lazy { ResourcesCompat.getFloat(requireContext().resources, R.dimen.scrimOpacity) }
-    private val backgroundColor by lazy { requireContext().getColor(R.color.backgroundColor) }
-    private val black by lazy { requireContext().getColor(RCore.color.black) }
+    @Inject
+    lateinit var aiManager: NewMessageAiManager
+
+    @Inject
+    lateinit var externalsManager: NewMessageExternalsManager
+
+    @Inject
+    lateinit var editorManager: NewMessageEditorManager
+
+    @Inject
+    lateinit var recipientFieldsManager: NewMessageRecipientFieldsManager
 
     private var addressListPopupWindow: ListPopupWindow? = null
-    private lateinit var filePicker: FilePicker
-
-    private var aiPromptFragment: AiPromptFragment? = null
 
     private var quoteWebView: WebView? = null
     private var signatureWebView: WebView? = null
@@ -122,10 +105,6 @@ class NewMessageFragment : Fragment() {
 
     private val newMessageActivity by lazy { requireActivity() as NewMessageActivity }
     private val webViewUtils by lazy { WebViewUtils(requireContext()) }
-
-    private var lastFieldToTakeFocus: FieldType? = TO
-
-    private var valueAnimator: ValueAnimator? = null
 
     @Inject
     lateinit var localSettings: LocalSettings
@@ -156,7 +135,8 @@ class NewMessageFragment : Fragment() {
             arguments = newMessageActivityArgs.toBundle(),
         )
 
-        filePicker = FilePicker(this@NewMessageFragment)
+        initManagers()
+
         bindAlertToViewLifecycle(descriptionDialog)
 
         setWebViewReference()
@@ -169,57 +149,50 @@ class NewMessageFragment : Fragment() {
 
         handleOnBackPressed()
 
-        setOnFocusChangedListeners()
+        recipientFieldsManager.setOnFocusChangedListeners()
 
         doAfterSubjectChange()
         doAfterBodyChange()
 
-        observeContacts()
-        observeEditorActions()
+        recipientFieldsManager.observeContacts()
+        recipientFieldsManager.observeCcAndBccVisibility()
+        editorManager.observeEditorActions()
         observeNewAttachments()
-        observeCcAndBccVisibility()
         observeDraftWorkerResults()
         observeInitResult()
-        observeAiOutput()
-        observeAiPromptStatus()
-        observeAiFeatureFlagUpdates()
-        observeExternals()
+        aiManager.observeEverything()
+        externalsManager.observeExternals(newMessageActivityArgs.arrivedFromExistingDraft)
     }
 
-    private fun observeExternals() = with(newMessageViewModel) {
-        Utils.waitInitMediator(initResult, mergedContacts).observe(viewLifecycleOwner) { (_, mergedContacts) ->
-            val externalMailFlagEnabled = currentMailbox.externalMailFlagEnabled
-            val shouldWarnForExternal = externalMailFlagEnabled && !newMessageActivityArgs.arrivedFromExistingDraft
-            val emailDictionary = mergedContacts.second
-            val aliases = currentMailbox.aliases
+    private fun initManagers() {
+        aiManager.initValues(
+            newMessageViewModel = newMessageViewModel,
+            binding = binding,
+            fragment = this@NewMessageFragment,
+            aiViewModel = aiViewModel,
+        )
 
-            updateFields(shouldWarnForExternal, emailDictionary, aliases)
-            updateBanner(shouldWarnForExternal, emailDictionary, aliases)
-        }
-    }
+        externalsManager.initValues(
+            newMessageViewModel = newMessageViewModel,
+            binding = binding,
+            fragment = this@NewMessageFragment,
+            informationDialog = informationDialog,
+        )
 
-    private fun updateFields(shouldWarnForExternal: Boolean, emailDictionary: MergedContactDictionary, aliases: List<String>) {
-        with(binding) {
-            toField.updateExternals(shouldWarnForExternal, emailDictionary, aliases)
-            ccField.updateExternals(shouldWarnForExternal, emailDictionary, aliases)
-            bccField.updateExternals(shouldWarnForExternal, emailDictionary, aliases)
-        }
-    }
+        editorManager.initValues(
+            newMessageViewModel = newMessageViewModel,
+            binding = binding,
+            fragment = this@NewMessageFragment,
+            aiManager = aiManager,
+            filePicker = FilePicker(this@NewMessageFragment)
+        )
 
-    private fun updateBanner(shouldWarnForExternal: Boolean, emailDictionary: MergedContactDictionary, aliases: List<String>) {
-        with(newMessageViewModel) {
-            if (shouldWarnForExternal && !isExternalBannerManuallyClosed) {
-                val (externalEmail, externalQuantity) = draft.findExternalRecipientForNewMessage(aliases, emailDictionary)
-                externalRecipientCount.value = externalEmail to externalQuantity
-            }
-        }
-    }
-
-    private fun navigateToDiscoveryBottomSheetIfFirstTime() = with(localSettings) {
-        if (showAiDiscoveryBottomSheet) {
-            showAiDiscoveryBottomSheet = false
-            safeNavigate(NewMessageFragmentDirections.actionNewMessageFragmentToAiDiscoveryBottomSheetDialog())
-        }
+        recipientFieldsManager.initValues(
+            newMessageViewModel = newMessageViewModel,
+            binding = binding,
+            fragment = this@NewMessageFragment,
+            externalsManager = externalsManager,
+        )
     }
 
     private fun setWebViewReference() {
@@ -243,8 +216,6 @@ class NewMessageFragment : Fragment() {
     }
 
     override fun onDestroyView() {
-        valueAnimator?.cancel()
-
         addressListPopupWindow = null
         quoteWebView?.destroyAndClearHistory()
         quoteWebView = null
@@ -256,8 +227,8 @@ class NewMessageFragment : Fragment() {
     private fun handleOnBackPressed() {
         newMessageActivity.onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             when {
-                aiViewModel.aiPromptOpeningStatus.value?.isOpened == true -> closeAiPrompt()
-                newMessageViewModel.isAutoCompletionOpened -> closeAutoCompletion()
+                aiViewModel.aiPromptOpeningStatus.value?.isOpened == true -> aiManager.closeAiPrompt()
+                newMessageViewModel.isAutoCompletionOpened -> recipientFieldsManager.closeAutoCompletion()
                 else -> newMessageActivity.finishAppAndRemoveTaskIfNeeded()
             }
         }
@@ -277,7 +248,7 @@ class NewMessageFragment : Fragment() {
 
         attachmentsRecyclerView.adapter = AttachmentAdapter(shouldDisplayCloseButton = true, onDelete = ::onDeleteAttachment)
 
-        setupAutoCompletionFields()
+        recipientFieldsManager.setupAutoCompletionFields()
 
         subjectTextField.filters = arrayOf<InputFilter>(object : InputFilter {
             override fun filter(source: CharSequence?, s: Int, e: Int, d: Spanned?, dS: Int, dE: Int): CharSequence? {
@@ -287,11 +258,11 @@ class NewMessageFragment : Fragment() {
         })
 
         setupSendButton()
-        setupExternalBanner()
+        externalsManager.setupExternalBanner()
 
         scrim.setOnClickListener {
             scrim.isClickable = false
-            closeAiPrompt()
+            aiManager.closeAiPrompt()
         }
     }
 
@@ -333,24 +304,16 @@ class NewMessageFragment : Fragment() {
     private fun showKeyboardInCorrectView() = with(binding) {
         when (newMessageActivityArgs.draftMode) {
             DraftMode.REPLY,
-            DraftMode.REPLY_ALL -> focusBodyField()
-            DraftMode.FORWARD -> focusToField()
+            DraftMode.REPLY_ALL -> recipientFieldsManager.focusBodyField()
+            DraftMode.FORWARD -> recipientFieldsManager.focusToField()
             DraftMode.NEW_MAIL -> {
                 if (newMessageActivityArgs.recipient == null && newMessageViewModel.draft.to.isEmpty()) {
-                    focusToField()
+                    recipientFieldsManager.focusToField()
                 } else {
-                    focusBodyField()
+                    recipientFieldsManager.focusBodyField()
                 }
             }
         }
-    }
-
-    private fun FragmentNewMessageBinding.focusBodyField() {
-        bodyText.showKeyboard()
-    }
-
-    private fun FragmentNewMessageBinding.focusToField() {
-        toField.showKeyboardInTextInput()
     }
 
     private fun updateFeatureFlagIfMailTo() {
@@ -365,104 +328,9 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun setOnFocusChangedListeners() = with(binding) {
-        val listener = View.OnFocusChangeListener { _, hasFocus -> if (hasFocus) fieldGotFocus(null) }
-        subjectTextField.onFocusChangeListener = listener
-        bodyText.onFocusChangeListener = listener
-    }
-
-    private fun setupAutoCompletionFields() = with(binding) {
-        toField.initRecipientField(
-            autoComplete = autoCompleteTo,
-            onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(TO, hasOpened) },
-            onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, TO) },
-            onContactRemovedCallback = { recipient -> recipient.removeInViewModelAndUpdateBannerVisibility(TO) },
-            onCopyContactAddressCallback = { copyRecipientEmailToClipboard(it, newMessageViewModel.snackBarManager) },
-            gotFocusCallback = { fieldGotFocus(TO) },
-            onToggleEverythingCallback = ::openAdvancedFields,
-            setSnackBarCallback = ::setSnackBar,
-        )
-
-        ccField.initRecipientField(
-            autoComplete = autoCompleteCc,
-            onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(CC, hasOpened) },
-            onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, CC) },
-            onContactRemovedCallback = { recipient -> recipient.removeInViewModelAndUpdateBannerVisibility(CC) },
-            onCopyContactAddressCallback = { copyRecipientEmailToClipboard(it, newMessageViewModel.snackBarManager) },
-            gotFocusCallback = { fieldGotFocus(CC) },
-            setSnackBarCallback = ::setSnackBar,
-        )
-
-        bccField.initRecipientField(
-            autoComplete = autoCompleteBcc,
-            onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(BCC, hasOpened) },
-            onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, BCC) },
-            onContactRemovedCallback = { recipient -> recipient.removeInViewModelAndUpdateBannerVisibility(BCC) },
-            onCopyContactAddressCallback = { copyRecipientEmailToClipboard(it, newMessageViewModel.snackBarManager) },
-            gotFocusCallback = { fieldGotFocus(BCC) },
-            setSnackBarCallback = ::setSnackBar,
-        )
-    }
-
-    private fun fieldGotFocus(field: FieldType?) = with(binding) {
-        if (lastFieldToTakeFocus == field) return
-
-        if (field == null && newMessageViewModel.otherFieldsAreAllEmpty.value == true) {
-            toField.collapseEverything()
-        } else {
-            if (field != TO) toField.collapse()
-            if (field != CC) ccField.collapse()
-            if (field != BCC) bccField.collapse()
-        }
-
-        lastFieldToTakeFocus = field
-    }
-
-    private fun openAdvancedFields(isCollapsed: Boolean) = with(binding) {
-        cc.isGone = isCollapsed
-        bcc.isGone = isCollapsed
-    }
-
-    private fun setSnackBar(titleRes: Int) {
-        newMessageViewModel.snackBarManager.setValue(getString(titleRes))
-    }
-
-    private fun observeContacts() {
-        newMessageViewModel.mergedContacts.observe(viewLifecycleOwner) { (sortedContactList, contactMap) ->
-            updateRecipientFieldsContacts(sortedContactList, contactMap)
-        }
-    }
-
-    private fun updateRecipientFieldsContacts(
-        sortedContactList: List<MergedContact>,
-        contactMap: MergedContactDictionary,
-    ) = with(binding) {
-        toField.updateContacts(sortedContactList, contactMap)
-        ccField.updateContacts(sortedContactList, contactMap)
-        bccField.updateContacts(sortedContactList, contactMap)
-    }
-
-    private fun toggleAutoCompletion(field: FieldType? = null, isAutoCompletionOpened: Boolean) = with(binding) {
-        preFields.isGone = isAutoCompletionOpened
-        to.isVisible = !isAutoCompletionOpened || field == TO
-        cc.isVisible = !isAutoCompletionOpened || field == CC
-        bcc.isVisible = !isAutoCompletionOpened || field == BCC
-        postFields.isGone = isAutoCompletionOpened
-
-        newMessageViewModel.isAutoCompletionOpened = isAutoCompletionOpened
-    }
-
-    private fun Recipient.removeInViewModelAndUpdateBannerVisibility(type: FieldType) {
-        newMessageViewModel.removeRecipientFromField(recipient = this, type)
-        updateBannerVisibility()
-    }
-
     private fun populateUiWithViewModel() = with(binding) {
         val draft = newMessageViewModel.draft
-        val ccAndBccFieldsAreEmpty = draft.cc.isEmpty() && draft.bcc.isEmpty()
-        toField.initRecipients(draft.to, ccAndBccFieldsAreEmpty)
-        ccField.initRecipients(draft.cc)
-        bccField.initRecipients(draft.bcc)
+        recipientFieldsManager.initRecipients(draft)
 
         newMessageViewModel.updateIsSendingAllowed()
 
@@ -510,25 +378,6 @@ class NewMessageFragment : Fragment() {
                 quoteGroup.isGone = true
             }
         }
-    }
-
-    private fun updateBannerVisibility() = with(binding) {
-        var externalRecipientEmail: String? = null
-        var externalRecipientQuantity = 0
-
-        listOf(toField, ccField, bccField).forEach { field ->
-            val (singleEmail, quantityForThisField) = field.findAlreadyExistingExternalRecipientsInFields()
-            externalRecipientQuantity += quantityForThisField
-
-            if (externalRecipientQuantity > 1) {
-                newMessageViewModel.externalRecipientCount.value = null to 2
-                return
-            }
-
-            if (quantityForThisField == 1) externalRecipientEmail = singleEmail
-        }
-
-        newMessageViewModel.externalRecipientCount.value = externalRecipientEmail to externalRecipientQuantity
     }
 
     private fun WebView.loadSignatureContent(html: String, webViewGroup: Group) {
@@ -616,33 +465,6 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun observeEditorActions() {
-        newMessageViewModel.editorAction.observe(viewLifecycleOwner) { (editorAction, /*isToggled*/ _) ->
-            when (editorAction) {
-                EditorAction.ATTACHMENT -> {
-                    filePicker.open { uris ->
-                        requireActivity().window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-                        newMessageViewModel.importAttachmentsToCurrentDraft(uris)
-                    }
-                }
-                EditorAction.CAMERA -> notYetImplemented()
-                EditorAction.LINK -> notYetImplemented()
-                EditorAction.CLOCK -> notYetImplemented()
-                EditorAction.AI -> openAiPrompt()
-            }
-        }
-    }
-
-    private fun openAiPrompt() {
-        aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(isOpened = true)
-    }
-
-    fun closeAiPrompt(becauseOfGeneration: Boolean = false) {
-        trackAiWriterEvent(name = if (becauseOfGeneration) "generate" else "dismissPromptWithoutGenerating")
-        aiViewModel.aiPromptOpeningStatus.value =
-            AiPromptOpeningStatus(isOpened = false, becauseOfGeneration = becauseOfGeneration)
-    }
-
     private fun observeNewAttachments() = with(binding) {
         newMessageViewModel.importedAttachments.observe(viewLifecycleOwner) { (attachments, importationResult) ->
             attachmentAdapter.addAll(attachments)
@@ -650,11 +472,6 @@ class NewMessageFragment : Fragment() {
 
             if (importationResult == ImportationResult.FILE_SIZE_TOO_BIG) showSnackbar(R.string.attachmentFileLimitReached)
         }
-    }
-
-    private fun observeCcAndBccVisibility() = with(newMessageViewModel) {
-        otherFieldsAreAllEmpty.observe(viewLifecycleOwner, binding.toField::updateOtherFieldsVisibility)
-        initializeFieldsAsOpen.observe(viewLifecycleOwner) { openAdvancedFields(!it) }
     }
 
     override fun onStop() = with(newMessageViewModel) {
@@ -699,12 +516,6 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun closeAutoCompletion() = with(binding) {
-        toField.clearField()
-        ccField.clearField()
-        bccField.clearField()
-    }
-
     private fun onDeleteAttachment(position: Int, itemCountLeft: Int) = with(binding) {
         trackAttachmentActionsEvent("delete")
         val draft = newMessageViewModel.draft
@@ -722,39 +533,6 @@ class NewMessageFragment : Fragment() {
         }
 
         newMessageViewModel.saveDraftWithoutDebouncing()
-    }
-
-    private fun setupExternalBanner() = with(binding) {
-        var externalRecipientEmail: String? = null
-        var externalRecipientQuantity = 0
-
-        closeButton.setOnClickListener {
-            trackExternalEvent("bannerManuallyClosed")
-            newMessageViewModel.isExternalBannerManuallyClosed = true
-            externalBanner.isGone = true
-        }
-
-        informationButton.setOnClickListener {
-            trackExternalEvent("bannerInfo")
-
-            val description = resources.getQuantityString(
-                R.plurals.externalDialogDescriptionRecipient,
-                externalRecipientQuantity,
-                externalRecipientEmail,
-            )
-
-            informationDialog.show(
-                title = R.string.externalDialogTitleRecipient,
-                description = description,
-                confirmButtonText = R.string.externalDialogConfirmButton,
-            )
-        }
-
-        newMessageViewModel.externalRecipientCount.observe(viewLifecycleOwner) { (email, externalQuantity) ->
-            externalBanner.isGone = newMessageViewModel.isExternalBannerManuallyClosed || externalQuantity == 0
-            externalRecipientEmail = email
-            externalRecipientQuantity = externalQuantity
-        }
     }
 
     private fun setupSendButton() = with(binding) {
@@ -805,200 +583,16 @@ class NewMessageFragment : Fragment() {
             hideLoader()
             populateUiWithViewModel()
             setupFromField(signatures)
-            setupEditorActions()
-            setupEditorFormatActionsToggle()
+            editorManager.setupEditorActions()
+            editorManager.setupEditorFormatActionsToggle()
         }
     }
 
-    private fun setupEditorActions() = with(binding) {
+    fun navigateToPropositionFragment() = aiManager.navigateToPropositionFragment()
 
-        fun linkEditor(view: MaterialButton, action: EditorAction) {
-            view.setOnClickListener {
-                // TODO: Don't forget to add in this `if` all actions that make the app go to background.
-                if (action == EditorAction.ATTACHMENT) newMessageViewModel.shouldExecuteDraftActionWhenStopping = false
-                trackEvent("editorActions", action.matomoValue)
-                newMessageViewModel.editorAction.value = action to null
-            }
-        }
-
-        linkEditor(editorAttachment, EditorAction.ATTACHMENT)
-        linkEditor(editorCamera, EditorAction.CAMERA)
-        linkEditor(editorLink, EditorAction.LINK)
-        linkEditor(editorClock, EditorAction.CLOCK)
-        linkEditor(editorAi, EditorAction.AI)
-    }
-
-    private fun setupEditorFormatActionsToggle() = with(binding) {
-        editorTextOptions.setOnClickListener {
-            newMessageViewModel.isEditorExpanded = !newMessageViewModel.isEditorExpanded
-            updateEditorVisibility(newMessageViewModel.isEditorExpanded)
-        }
-    }
-
-    private fun updateEditorVisibility(isEditorExpanded: Boolean) = with(binding) {
-        val color = if (isEditorExpanded) {
-            context.getAttributeColor(RMaterial.attr.colorPrimary)
-        } else {
-            context.getColor(R.color.iconColor)
-        }
-        val resId = if (isEditorExpanded) R.string.buttonTextOptionsClose else R.string.buttonTextOptionsOpen
-
-        editorTextOptions.apply {
-            iconTint = ColorStateList.valueOf(color)
-            contentDescription = getString(resId)
-        }
-
-        editorActions.isGone = isEditorExpanded
-        textEditing.isVisible = isEditorExpanded
-    }
-
-    private fun observeAiOutput() = with(binding) {
-        aiViewModel.aiOutputToInsert.observe(viewLifecycleOwner) { (subject, content) ->
-            subject?.let { subjectTextField.setText(it) }
-            bodyText.setText(content)
-        }
-    }
-
-    private fun observeAiPromptStatus() {
-        aiViewModel.aiPromptOpeningStatus.observe(viewLifecycleOwner) { (shouldDisplay, shouldResetContent, becauseOfGeneration) ->
-            if (shouldDisplay) onAiPromptOpened(shouldResetContent) else onAiPromptClosed(becauseOfGeneration)
-        }
-    }
-
-    private fun onAiPromptOpened(resetPrompt: Boolean) = with(binding) {
-        if (resetPrompt) {
-            aiViewModel.apply {
-                aiPrompt = ""
-                aiPromptOpeningStatus.value?.shouldResetPrompt = false
-            }
-        }
-
-        // Keyboard is opened inside onCreate() of AiPromptFragment
-
-        val foundFragment = childFragmentManager.findFragmentByTag(AI_PROMPT_FRAGMENT_TAG) as? AiPromptFragment
-        if (aiPromptFragment == null) {
-            aiPromptFragment = foundFragment ?: AiPromptFragment()
-        }
-
-        if (foundFragment == null) {
-            childFragmentManager
-                .beginTransaction()
-                .add(aiPromptFragmentContainer.id, aiPromptFragment!!, AI_PROMPT_FRAGMENT_TAG)
-                .commitNow()
-        }
-
-        scrim.apply {
-            isVisible = true
-            isClickable = true
-        }
-
-        animateAiPrompt(true)
-        setAiPromptVisibility(true)
-        newMessageConstraintLayout.descendantFocusability = FOCUS_BLOCK_DESCENDANTS
-    }
-
-    private fun onAiPromptClosed(withoutTransition: Boolean) = with(binding) {
-
-        fun removeFragmentAndHideScrim() {
-            aiPromptFragment?.let {
-                childFragmentManager
-                    .beginTransaction()
-                    .remove(it)
-                    .commitNow()
-            }
-            aiPromptFragment = null
-
-            scrim.isGone = true
-        }
-
-        aiPromptFragmentContainer.hideKeyboard()
-
-        if (withoutTransition) {
-            removeFragmentAndHideScrim()
-        } else {
-            viewLifecycleOwner.lifecycleScope.launch {
-                delay(animationDuration)
-                removeFragmentAndHideScrim()
-            }
-        }
-
-        if (!withoutTransition) animateAiPrompt(false)
-        setAiPromptVisibility(false)
-        newMessageConstraintLayout.descendantFocusability = FOCUS_BEFORE_DESCENDANTS
-    }
-
-    private fun animateAiPrompt(isVisible: Boolean) = with(binding) {
-
-        val slidingTransition = Slide()
-            .addTarget(aiPromptLayout)
-            .setDuration(animationDuration)
-
-        TransitionManager.beginDelayedTransition(root, slidingTransition)
-
-        val (startOpacity, endOpacity) = if (isVisible) 0.0f to scrimOpacity else scrimOpacity to 0.0f
-
-        valueAnimator?.cancel()
-        valueAnimator = ValueAnimator.ofObject(FloatEvaluator(), startOpacity, endOpacity).apply {
-            duration = animationDuration
-            addUpdateListener { animator ->
-                val alpha = ((animator.animatedValue as Float) * 256.0f).roundToInt() / 256.0f
-                scrim.alpha = alpha
-                requireActivity().window.statusBarColor = UiUtils.pointBetweenColors(backgroundColor, black, alpha)
-            }
-            start()
-        }
-    }
-
-    private fun setAiPromptVisibility(isVisible: Boolean) {
-
-        fun updateNavigationBarColor() {
-            val backgroundColorRes = if (isVisible) R.color.backgroundColorSecondary else R.color.backgroundColor
-            requireActivity().window.navigationBarColor = requireContext().getColor(backgroundColorRes)
-        }
-
-        binding.aiPromptLayout.isVisible = isVisible
-        updateNavigationBarColor()
-    }
-
-    private fun observeAiFeatureFlagUpdates() {
-        newMessageViewModel.currentMailboxLive.observeNotNull(viewLifecycleOwner) { mailbox ->
-            val isAiEnabled = mailbox.featureFlags.contains(FeatureFlag.AI)
-            binding.editorAi.isVisible = isAiEnabled
-            if (isAiEnabled) navigateToDiscoveryBottomSheetIfFirstTime()
-        }
-    }
-
-    fun navigateToPropositionFragment() {
-        closeAiPrompt(becauseOfGeneration = true)
-        resetAiProposition()
-        safeNavigate(NewMessageFragmentDirections.actionNewMessageFragmentToAiPropositionFragment())
-    }
-
-    private fun resetAiProposition() {
-        aiViewModel.aiPropositionStatusLiveData.value = null
-    }
-
-    enum class EditorAction(val matomoValue: String) {
-        ATTACHMENT("importFile"),
-        CAMERA("importFromCamera"),
-        LINK("addLink"),
-        CLOCK(MatomoMail.ACTION_POSTPONE_NAME),
-        AI("aiWriter"),
-        // BOLD("bold"),
-        // ITALIC("italic"),
-        // UNDERLINE("underline"),
-        // STRIKE_THROUGH("strikeThrough"),
-        // UNORDERED_LIST("unorderedList"),
-    }
-
-    enum class FieldType {
-        TO,
-        CC,
-        BCC,
-    }
+    fun closeAiPrompt() = aiManager.closeAiPrompt()
 
     companion object {
         private val TAG = NewMessageFragment::class.java.simpleName
-        private const val AI_PROMPT_FRAGMENT_TAG = "aiPromptFragmentTag"
     }
 }
