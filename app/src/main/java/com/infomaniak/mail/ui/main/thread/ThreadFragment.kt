@@ -246,15 +246,23 @@ class ThreadFragment : Fragment() {
         phoneContextualMenuAlertDialog.initValues(snackBarManager)
     }
 
-    private fun observeThreadOpening() = with(binding) {
+    private fun observeThreadOpening() = with(threadViewModel) {
 
         mainViewModel.currentThreadUid.distinctUntilChanged().observeNotNull(viewLifecycleOwner) { threadUid ->
 
-            // Display Thread view
-            emptyView.isGone = true
-            threadView.isVisible = true
+            reassignThreadLive(threadUid)
+            reassignMessagesLive(threadUid)
 
-            openThread(threadUid)
+            openThread(threadUid).observe(viewLifecycleOwner) { result ->
+
+                if (result == null) {
+                    mainViewModel.closeThread()
+                    return@observe
+                }
+
+                updateUi(threadUid, folderRole = mainViewModel.getActionFolderRole(result.thread))
+                updateAdapter(result)
+            }
         }
     }
 
@@ -358,24 +366,11 @@ class ThreadFragment : Fragment() {
         }
     }
 
-    private fun openThread(threadUid: String) = with(threadViewModel) {
-
-        reassignThreadLive(threadUid)
-        reassignMessagesLive(threadUid)
-
-        openThread(threadUid).observe(viewLifecycleOwner) { result ->
-
-            if (result == null) {
-                mainViewModel.closeThread()
-                return@observe
-            }
-
-            updateUi(threadUid, folderRole = mainViewModel.getActionFolderRole(result.thread))
-            updateAdapter(result)
-        }
-    }
-
     private fun updateUi(threadUid: String, folderRole: FolderRole?) = with(binding) {
+
+        // Display Thread view
+        emptyView.isGone = true
+        threadView.isVisible = true
 
         iconFavorite.setOnClickListener {
             trackThreadActionsEvent(ACTION_FAVORITE_NAME, isFavorite)
