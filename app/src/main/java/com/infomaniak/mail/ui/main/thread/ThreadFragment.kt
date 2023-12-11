@@ -258,11 +258,11 @@ class ThreadFragment : Fragment() {
         updateAdapter(result)
     }
 
-    private fun setupDialogs() {
+    private fun setupDialogs() = with(mainViewModel) {
         bindAlertToViewLifecycle(descriptionDialog)
-        linkContextualMenuAlertDialog.initValues(mainViewModel.snackBarManager)
-        emailContextualMenuAlertDialog.initValues(mainViewModel.snackBarManager)
-        phoneContextualMenuAlertDialog.initValues(mainViewModel.snackBarManager)
+        linkContextualMenuAlertDialog.initValues(snackBarManager)
+        emailContextualMenuAlertDialog.initValues(snackBarManager)
+        phoneContextualMenuAlertDialog.initValues(snackBarManager)
     }
 
     private fun observeLightThemeToggle() {
