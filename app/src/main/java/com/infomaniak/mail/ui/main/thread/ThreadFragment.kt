@@ -104,7 +104,7 @@ class ThreadFragment : Fragment() {
     lateinit var phoneContextualMenuAlertDialog: PhoneContextualMenuAlertDialog
 
     private var _binding: FragmentThreadBinding? = null
-    private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
+    val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
 
     private val mainViewModel: MainViewModel by activityViewModels()
     private val threadViewModel: ThreadViewModel by viewModels()

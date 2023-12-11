@@ -59,8 +59,11 @@ import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.firebase.RegisterFirebaseBroadcastReceiver
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.TitleAlertDialog
+import com.infomaniak.mail.ui.main.folder.ThreadListFragment
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
+import com.infomaniak.mail.ui.main.search.SearchFragment
+import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.newMessage.NewMessageActivity
 import com.infomaniak.mail.ui.sync.SyncAutoConfigActivity
 import com.infomaniak.mail.utils.*
@@ -118,6 +121,12 @@ class MainActivity : BaseActivity() {
     private val inAppUpdateResultLauncher = registerForActivityResult(StartIntentSenderForResult()) { result ->
         localSettings.isUserWantingUpdates = result.resultCode == RESULT_OK
     }
+
+    private val currentFragment
+        get() = supportFragmentManager
+            .findFragmentById(R.id.mainHostFragment)
+            ?.childFragmentManager
+            ?.primaryNavigationFragment
 
     @Inject
     lateinit var draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler
@@ -342,13 +351,9 @@ class MainActivity : BaseActivity() {
         }
 
         fun popBack() {
-            val currentFragment = supportFragmentManager
-                .findFragmentById(R.id.mainHostFragment)
-                ?.childFragmentManager
-                ?.primaryNavigationFragment
-
-            if (currentFragment is TwoPaneFragment) {
-                currentFragment.handleOnBackPressed()
+            val fragment = currentFragment
+            if (fragment is TwoPaneFragment) {
+                fragment.handleOnBackPressed()
             } else {
                 navController.popBackStack()
             }
@@ -375,8 +380,26 @@ class MainActivity : BaseActivity() {
     }
 
     private fun setupSnackBar() {
+
         fun getAnchor(): View? = when (navController.currentDestination?.id) {
-            R.id.threadListFragment -> findViewById(R.id.newMessageFab)
+            R.id.threadListFragment -> {
+                val threadListFragment = currentFragment as? ThreadListFragment
+                if (threadListFragment?.isOnlyRightShown() == true) {
+                    val threadFragment = threadListFragment.binding.threadHostFragment.getFragment<ThreadFragment?>()
+                    threadFragment?.binding?.quickActionBar
+                } else {
+                    threadListFragment?.binding?.newMessageFab
+                }
+            }
+            R.id.searchFragment -> {
+                val searchFragment = currentFragment as? SearchFragment
+                if (searchFragment?.isOnlyLeftShown() == true) {
+                    null
+                } else {
+                    val threadFragment = searchFragment?.binding?.threadHostFragment?.getFragment<ThreadFragment?>()
+                    threadFragment?.binding?.quickActionBar
+                }
+            }
             else -> null
         }
 
