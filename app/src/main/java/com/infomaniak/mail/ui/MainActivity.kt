@@ -418,7 +418,9 @@ class MainActivity : BaseActivity() {
             R.id.replyBottomSheetDialog,
             R.id.detailedContactBottomSheetDialog,
             R.id.threadFragment,
-            R.id.threadActionsBottomSheetDialog -> null
+            R.id.threadActionsBottomSheetDialog,
+            R.id.attachmentActionsBottomSheetDialog,
+            R.id.downloadAttachmentProgressDialog -> null
             R.id.searchFragment -> R.color.backgroundColor
             else -> R.color.backgroundHeaderColor
         }?.let {

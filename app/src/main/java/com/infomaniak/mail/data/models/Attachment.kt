@@ -18,9 +18,7 @@
 package com.infomaniak.mail.data.models
 
 import android.content.Context
-import android.content.Intent
 import androidx.annotation.DrawableRes
-import androidx.core.content.FileProvider
 import androidx.core.net.toFile
 import androidx.core.net.toUri
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
@@ -65,7 +63,7 @@ class Attachment : EmbeddedRealmObject {
 
     inline val downloadUrl get() = ApiRoutes.resource(resource!!)
 
-    private inline val safeMimeType get() = if (mimeType == MIMETYPE_UNKNOWN) name.guessMimeType() else mimeType
+    inline val safeMimeType get() = if (mimeType == MIMETYPE_UNKNOWN) name.guessMimeType() else mimeType
 
     fun initLocalValues(name: String, size: Long, mimeType: String, uri: String): Attachment {
         this.name = name
@@ -104,15 +102,6 @@ class Attachment : EmbeddedRealmObject {
     }
 
     fun getUploadLocalFile() = uploadLocalUri?.toUri()?.toFile()
-
-    fun openWithIntent(context: Context): Intent {
-        val uri = FileProvider.getUriForFile(context, context.getString(R.string.ATTACHMENTS_AUTHORITY), getCacheFile(context))
-        return Intent().apply {
-            action = Intent.ACTION_VIEW
-            flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-            setDataAndType(uri, safeMimeType)
-        }
-    }
 
     enum class AttachmentDisposition {
         INLINE,

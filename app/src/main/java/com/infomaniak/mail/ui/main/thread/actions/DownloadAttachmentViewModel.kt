@@ -52,18 +52,14 @@ class DownloadAttachmentViewModel @Inject constructor(
     private var attachment: Attachment? = null
 
     fun downloadAttachment() = liveData(ioCoroutineContext) {
-        val attachment = attachmentController.getAttachment(attachmentResource).also { attachment = it }
-        val attachmentFile = attachment.getCacheFile(context)
+        val localAttachment = attachmentController.getAttachment(attachmentResource).also { attachment = it }
+        val attachmentFile = localAttachment.getCacheFile(context)
+        val isAttachmentCached = localAttachment.hasUsableCache(context, attachmentFile) ||
+                LocalStorageUtils.saveAttachmentToCache(attachmentResource, attachmentFile)
 
-        if (attachment.hasUsableCache(context, attachmentFile)) {
-            emit(attachment.openWithIntent(context))
-            this@DownloadAttachmentViewModel.attachment = null
-            return@liveData
-        }
-
-        if (LocalStorageUtils.saveAttachmentToCache(attachmentResource, attachmentFile)) {
-            emit(attachment.openWithIntent(context))
-            this@DownloadAttachmentViewModel.attachment = null
+        if (isAttachmentCached) {
+            emit(localAttachment)
+            attachment = null
         } else {
             emit(null)
         }

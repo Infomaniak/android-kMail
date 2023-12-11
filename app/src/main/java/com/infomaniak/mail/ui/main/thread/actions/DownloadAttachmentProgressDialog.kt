@@ -32,6 +32,8 @@ import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.setBackNavigationResult
 import com.infomaniak.mail.databinding.DialogDownloadProgressBinding
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.utils.AttachmentIntentUtils.DOWNLOAD_ATTACHMENT_RESULT
+import com.infomaniak.mail.utils.AttachmentIntentUtils.getIntentOrGoToPlaystore
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -62,8 +64,14 @@ class DownloadAttachmentProgressDialog : DialogFragment() {
     }
 
     private fun downloadAttachment() {
-        downloadAttachmentViewModel.downloadAttachment().observe(this@DownloadAttachmentProgressDialog) { intent ->
-            if (intent == null) popBackStackWithError() else setBackNavigationResult(OPEN_WITH, intent)
+        downloadAttachmentViewModel.downloadAttachment().observe(this) { cachedAttachment ->
+            if (cachedAttachment == null) {
+                popBackStackWithError()
+            } else {
+                cachedAttachment.getIntentOrGoToPlaystore(requireContext(), navigationArgs.intentType)?.let { openWithIntent ->
+                    setBackNavigationResult(DOWNLOAD_ATTACHMENT_RESULT, openWithIntent)
+                } ?: run { findNavController().popBackStack() }
+            }
         }
     }
 
@@ -71,9 +79,5 @@ class DownloadAttachmentProgressDialog : DialogFragment() {
         val title = if (mainViewModel.isInternetAvailable.value == true) R.string.anErrorHasOccurred else R.string.noConnection
         showSnackbar(title)
         findNavController().popBackStack()
-    }
-
-    companion object {
-        const val OPEN_WITH = "open_with"
     }
 }
