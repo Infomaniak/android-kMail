@@ -117,9 +117,9 @@ class ThreadFragment : Fragment() {
             runCatching {
                 binding.toolbar.navigationIcon?.apply {
                     if (twoPaneFragment.areBothShown()) {
-                        if (alpha != 0) alpha = 0
+                        if (alpha != MIN_ALPHA) alpha = MIN_ALPHA
                     } else {
-                        if (alpha != 255) alpha = 255
+                        if (alpha != MAX_ALPHA) alpha = MAX_ALPHA
                     }
                 }
             }
@@ -616,6 +616,8 @@ class ThreadFragment : Fragment() {
     companion object {
         private const val COLLAPSE_TITLE_THRESHOLD = 0.5
         private const val ARCHIVE_INDEX = 2
+        private const val MIN_ALPHA = 0
+        private const val MAX_ALPHA = 255
 
         private fun allAttachmentsFileName(subject: String) = "infomaniak-mail-attachments-$subject.zip"
     }
