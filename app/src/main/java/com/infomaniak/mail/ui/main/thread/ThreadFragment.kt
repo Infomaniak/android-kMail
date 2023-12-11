@@ -50,7 +50,6 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ExternalContent
 import com.infomaniak.mail.data.api.ApiRoutes
-import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
@@ -297,13 +296,8 @@ class ThreadFragment : Fragment() {
                 mainViewModel.currentMailbox.value?.let { mailbox -> threadViewModel.deleteDraft(message, mailbox) }
             },
             onAttachmentClicked = { attachment ->
-                if (attachment.openWithIntent(requireContext()).hasSupportedApplications(requireContext())) {
-                    trackAttachmentActionsEvent("open")
-                    attachment.display()
-                } else {
-                    trackAttachmentActionsEvent("download")
-                    mainViewModel.snackBarManager.setValue(getString(R.string.snackbarDownloadInProgress))
-                    scheduleDownloadManager(attachment.downloadUrl, attachment.name)
+                attachment.resource?.let { resource ->
+                    safeNavigate(ThreadFragmentDirections.actionThreadFragmentToAttachmentActionsBottomSheetDialog(resource))
                 }
             },
             onDownloadAllClicked = { message ->
@@ -368,26 +362,12 @@ class ThreadFragment : Fragment() {
 
     private fun scheduleDownloadManager(downloadUrl: String, filename: String) {
 
-        fun scheduleDownloadManager() = threadViewModel.scheduleDownload(downloadUrl, filename)
+        fun scheduleDownloadManager() = mainViewModel.scheduleDownload(downloadUrl, filename)
 
         if (permissionUtils.hasDownloadManagerPermission) {
             scheduleDownloadManager()
         } else {
             permissionUtils.requestDownloadManagerPermission { scheduleDownloadManager() }
-        }
-    }
-
-    private fun Attachment.display() {
-        if (hasUsableCache(requireContext()) || isInlineCachedFile(requireContext())) {
-            startActivity(openWithIntent(requireContext()))
-        } else {
-            safeNavigate(
-                ThreadFragmentDirections.actionThreadFragmentToDownloadAttachmentProgressDialog(
-                    attachmentResource = resource!!,
-                    attachmentName = name,
-                    attachmentType = getFileTypeFromMimeType(),
-                )
-            )
         }
     }
 

@@ -25,7 +25,7 @@
         android:id="@+id/divider"
         android:layout_width="0dp"
         android:layout_height="1dp"
-        android:layout_marginHorizontal="@dimen/marginStandardSmall"
+        android:layout_marginHorizontal="@dimen/marginStandardMedium"
         android:layout_marginVertical="0dp"
         app:dividerColor="@color/dividerColor"
         app:layout_constraintEnd_toEndOf="parent"

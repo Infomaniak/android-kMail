@@ -56,6 +56,7 @@
         <attr name="visibleDivider" format="boolean" />
         <attr name="dividerColor" format="color" />
         <attr name="staffOnly" format="boolean" />
+        <attr name="keepIconTint" format="boolean" />
     </declare-styleable>
 
     <declare-styleable name="AvatarView">
