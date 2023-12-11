@@ -67,7 +67,7 @@ class ThreadViewModel @Inject constructor(
     val threadLive = MutableLiveData<Thread?>()
     val messagesLive = MutableLiveData<List<Message>>()
 
-    private val splitBodies = mutableMapOf<String, SplitBody>()
+    private val cachedSplitBodies = mutableMapOf<String, SplitBody>()
 
     private val mailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
 
@@ -92,14 +92,14 @@ class ThreadViewModel @Inject constructor(
 
                 return@withContext message.apply {
                     body?.let {
-                        val isNotAlreadySplit = !splitBodies.contains(message.uid)
-                        if (isNotAlreadySplit) splitBodies[message.uid] = MessageBodyUtils.splitContentAndQuote(it)
-                        splitBody = splitBodies[message.uid]
+                        val isNotAlreadySplit = !cachedSplitBodies.contains(message.uid)
+                        if (isNotAlreadySplit) cachedSplitBodies[message.uid] = MessageBodyUtils.splitContentAndQuote(it)
+                        splitBody = cachedSplitBodies[message.uid]
                     }
                 }
             }
 
-            splitBodies.clear()
+            cachedSplitBodies.clear()
 
             messageController.getSortedAndNotDeletedMessagesAsync(threadUid)
                 ?.map { results -> results.list.map { splitBody(it) } }
