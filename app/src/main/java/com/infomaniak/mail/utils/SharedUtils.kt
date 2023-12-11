@@ -37,6 +37,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
 import io.realm.kotlin.Realm
 import io.sentry.Sentry
+import org.jsoup.Jsoup
 import javax.inject.Inject
 
 class SharedUtils @Inject constructor(
@@ -153,6 +154,13 @@ class SharedUtils @Inject constructor(
                     Sentry.captureException(getApiException())
                     return@with translatedError
                 }
+            }
+        }
+
+        fun createHtmlForPlainText(text: String): String {
+            Jsoup.parse("").apply {
+                body().appendElement("pre").text(text).attr("style", "word-wrap: break-word; white-space: pre-wrap;")
+                return html()
             }
         }
     }

@@ -31,6 +31,8 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.ui.main.thread.MessageWebViewClient.Companion.CID_SCHEME
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.MessageBodyUtils
+import com.infomaniak.mail.utils.SharedUtils.Companion.createHtmlForPlainText
+import com.infomaniak.mail.utils.Utils.TEXT_PLAIN
 import com.infomaniak.mail.utils.toDate
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
@@ -209,7 +211,15 @@ class DraftController @Inject constructor(
         """.trimIndent()
     }
 
-    private fun getHtmlDocument(message: Message) = message.body?.value?.let(Jsoup::parse)
+    private fun getHtmlDocument(message: Message): Document? {
+        val html = message.body?.let { body ->
+            when (body.type) {
+                TEXT_PLAIN -> createHtmlForPlainText(body.value)
+                else -> body.value
+            }
+        }
+        return html?.let(Jsoup::parse)
+    }
 
     private fun getCid(imageElement: Element) = imageElement.attr(SRC_ATTRIBUTE).removePrefix(CID_PROTOCOL)
 

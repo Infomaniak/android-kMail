@@ -45,6 +45,7 @@ import com.infomaniak.mail.data.models.message.Message.*
 import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.*
 import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.SharedUtils.Companion.createHtmlForPlainText
 import com.infomaniak.mail.utils.UiUtils.getPrettyNameAndEmail
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.TEXT_HTML
@@ -55,7 +56,6 @@ import com.infomaniak.mail.utils.WebViewUtils.Companion.toggleWebViewTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.jsoup.Jsoup
 import java.util.*
 import com.google.android.material.R as RMaterial
 
@@ -226,13 +226,6 @@ class ThreadAdapter(
         setupZoomListeners()
 
         loadDataWithBaseURL("", styledBody, TEXT_HTML, Utils.UTF_8, "")
-    }
-
-    private fun createHtmlForPlainText(text: String): String {
-        Jsoup.parse("").apply {
-            body().appendElement("pre").text(text).attr("style", "word-wrap: break-word; white-space: pre-wrap;")
-            return html()
-        }
     }
 
     private fun WebView.processMailDisplay(styledBody: String, uid: String): String {
