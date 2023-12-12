@@ -54,6 +54,9 @@ class ReplyForwardFooterManager @Inject constructor(private val appContext: Cont
         } ?: ""
 
         val previousFullBody = computePreviousFullBody(previousBody, message)
+
+        message.html
+
         return assembleForwardHtmlFooter(message, previousFullBody)
     }
 

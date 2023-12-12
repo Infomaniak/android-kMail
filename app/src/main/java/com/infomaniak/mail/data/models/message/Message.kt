@@ -19,6 +19,7 @@
 
 package com.infomaniak.mail.data.models.message
 
+import com.airbnb.lottie.parser.DocumentDataParser
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.data.api.RealmInstantSerializer
@@ -45,6 +46,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.UseSerializers
+import org.jsoup.nodes.Document
 import java.util.Date
 
 @Serializable

@@ -18,11 +18,18 @@
 package com.infomaniak.mail.data.models.message
 
 import com.infomaniak.mail.data.api.FlatteningSubBodiesSerializer
+import com.infomaniak.mail.utils.SentryDebug
+import com.infomaniak.mail.utils.Utils.TEXT_PLAIN
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.EmbeddedRealmObject
 import io.realm.kotlin.types.RealmList
-import kotlinx.serialization.*
-import kotlinx.serialization.json.*
+import io.realm.kotlin.types.annotations.Ignore
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
+import org.jsoup.nodes.Element
 
 @Serializable
 class Body : EmbeddedRealmObject {
@@ -35,4 +42,44 @@ class Body : EmbeddedRealmObject {
     @SerialName("subBody")
     var subBodies: RealmList<SubBody> = realmListOf()
     //endregion
+
+    @Transient
+    @Ignore
+    val html: Document
+        get() {
+            var mainBody = if (type == TEXT_PLAIN) wrapPlainTextInsideHtml(value) else Jsoup.parse(value)
+            // TODO : Should I modify in place instead of sending the value back for no reason
+            mainBody = mergeSplitBodyAndSubBodies(mainBody, subBodies, "")
+
+            // TODO : Sanitize
+
+            return mainBody
+        }
+
+
+    companion object {
+        private fun wrapPlainTextInsideHtml(textPlain: String): Document {
+            return Document("").apply {
+                body().appendElement("pre").text(textPlain).attr("style", "word-wrap: break-word; white-space: pre-wrap;")
+            }
+        }
+
+        private fun mergeSplitBodyAndSubBodies(mainBody: Document, subBodies: List<SubBody>, messageUid: String): Document {
+            return mainBody.apply {
+                body().appendSubBodies(subBodies, messageUid)
+            }
+        }
+
+        private fun Element.appendSubBodies(subBodies: List<SubBody>, messageUid: String) {
+            if (subBodies.isEmpty()) return
+            SentryDebug.sendSubBodiesTrigger(messageUid)
+
+            subBodies.forEach { subBody ->
+                subBody.bodyValue?.let { subBodyHtml ->
+                    appendElement("br")
+                    appendElement("blockquote").append(subBodyHtml)
+                }
+            }
+        }
+    }
 }
