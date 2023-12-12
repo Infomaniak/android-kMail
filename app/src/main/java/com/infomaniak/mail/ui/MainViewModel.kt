@@ -24,12 +24,15 @@ import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.lib.core.utils.DownloadManagerUtils
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.SingleLiveEvent
+import com.infomaniak.lib.stores.StoreUtils
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.*
-import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.*
+import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshCallbacks
+import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.mailboxInfo.PermissionsController
 import com.infomaniak.mail.data.cache.mailboxInfo.QuotasController
@@ -41,7 +44,6 @@ import com.infomaniak.mail.data.models.MoveResult
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.data.models.message.Message.*
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.di.IoDispatcher
@@ -73,6 +75,7 @@ class MainViewModel @Inject constructor(
     private val addressBookController: AddressBookController,
     private val draftController: DraftController,
     private val folderController: FolderController,
+    private val localSettings: LocalSettings,
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val mailboxController: MailboxController,
     private val mergedContactController: MergedContactController,
@@ -1019,6 +1022,16 @@ class MainViewModel @Inject constructor(
         if (ApiRepository.ping().isSuccess()) {
             DownloadManagerUtils.scheduleDownload(context, downloadUrl, filename)
         }
+    }
+
+    fun checkAppUpdateStatus() {
+        canInstallUpdate.value = localSettings.hasAppUpdateDownloaded
+        StoreUtils.checkStalledUpdate()
+    }
+
+    fun toggleAppUpdateStatus(isUpdateDownloaded: Boolean) {
+        canInstallUpdate.value = isUpdateDownloaded
+        localSettings.hasAppUpdateDownloaded = isUpdateDownloaded
     }
 
     companion object {

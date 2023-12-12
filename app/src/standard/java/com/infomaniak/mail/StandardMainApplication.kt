@@ -39,8 +39,10 @@ class StandardMainApplication : MainApplication() {
     }
 
     private fun registerUserDeviceIfNeeded() {
-        val areGooglePlayServicesAvailable = !playServicesUtils.areGooglePlayServicesNotAvailable()
-        if (AccountUtils.currentUserId != AppSettings.DEFAULT_ID && areGooglePlayServicesAvailable && localSettings.firebaseToken != null) {
+        if (AccountUtils.currentUserId != AppSettings.DEFAULT_ID &&
+            playServicesUtils.areGooglePlayServicesAvailable() &&
+            localSettings.firebaseToken != null
+        ) {
             hiltEntryPoint.registerUserDeviceWorkerScheduler().scheduleWork()
         }
     }
