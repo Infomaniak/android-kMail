@@ -21,6 +21,7 @@ import android.content.Context
 import androidx.concurrent.futures.CallbackToFutureAdapter
 import androidx.hilt.work.HiltWorker
 import androidx.work.*
+import androidx.work.WorkInfo.State
 import com.google.common.util.concurrent.ListenableFuture
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.stores.StoreUtils
@@ -92,13 +93,13 @@ class AppUpdateWorker @AssistedInject constructor(
 
         suspend fun cancelWorkIfNeeded() = withContext(ioDispatcher) {
 
-            val workInfos = workManager.getWorkInfos(
+            val workInfo = workManager.getWorkInfos(
                 WorkQuery.Builder.fromUniqueWorkNames(listOf(TAG))
-                    .addStates(listOf(WorkInfo.State.BLOCKED, WorkInfo.State.ENQUEUED))
-                    .build()
+                    .addStates(listOf(State.BLOCKED, State.ENQUEUED))
+                    .build(),
             ).get()
 
-            workInfos.forEach {
+            workInfo.forEach {
                 workManager.cancelWorkById(it.id)
                 SentryLog.d(TAG, "Work cancelled")
             }
@@ -107,6 +108,6 @@ class AppUpdateWorker @AssistedInject constructor(
 
     companion object {
         private const val TAG = "AppUpdateWorker"
-        private const val INITIAL_DELAY = 10L //10s
+        private const val INITIAL_DELAY = 10L // 10s
     }
 }

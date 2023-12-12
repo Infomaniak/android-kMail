@@ -106,7 +106,7 @@ class LocalSettings private constructor(context: Context) {
     }
     //endregion
 
-    //region Ai engine
+    //region AI engine
     var aiEngine: AiEngine
         get() = getEnum(AI_ENGINE_KEY, DEFAULT_AI_ENGINE)
         set(value) = putEnum(AI_ENGINE_KEY, value)
