@@ -98,7 +98,7 @@ class NotificationUtils @Inject constructor(
                 val channel = buildNotificationChannel(
                     channelId = it.channelId,
                     name = getString(R.string.notificationNewMessagesChannelName),
-                    importance = NotificationManager.IMPORTANCE_HIGH,
+                    importance = NotificationManager.IMPORTANCE_DEFAULT,
                     groupId = group.id,
                 )
                 channels.add(channel)
