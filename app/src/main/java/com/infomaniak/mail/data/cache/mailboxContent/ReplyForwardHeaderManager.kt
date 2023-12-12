@@ -37,14 +37,7 @@ import javax.inject.Singleton
 @Singleton
 class ReplyForwardHeaderManager @Inject constructor(private val appContext: Context) {
 
-    fun createForwardFooter(message: Message, attachmentsToForward: List<Attachment>): String = with(appContext) {
-        val messageForwardHeader = getString(R.string.messageForwardHeader)
-        val fromTitle = getString(R.string.fromTitle)
-        val dateTitle = getString(R.string.dateTitle)
-        val subjectTitle = getString(R.string.subjectTitle)
-        val toTitle = getString(R.string.toTitle)
-        val ccTitle = getString(R.string.ccTitle)
-
+    fun createForwardFooter(message: Message, attachmentsToForward: List<Attachment>): String {
         val previousBody = getHtmlDocument(message)?.let { document ->
             val attachmentsMap = message.attachments.associate { oldAttachment ->
                 val newAttachment = attachmentsToForward.find { it.originalContentId == oldAttachment.contentId }
@@ -63,16 +56,7 @@ class ReplyForwardHeaderManager @Inject constructor(private val appContext: Cont
 
         val previousFullBody = computePreviousFullBody(previousBody, message)
 
-        return assembleForwardHtmlFooter(
-            messageForwardHeader,
-            fromTitle,
-            message,
-            dateTitle,
-            subjectTitle,
-            toTitle,
-            ccTitle,
-            previousFullBody
-        )
+        return assembleForwardHtmlFooter(message, previousFullBody)
     }
 
     fun createReplyFooter(message: Message): String {
@@ -127,15 +111,16 @@ class ReplyForwardHeaderManager @Inject constructor(private val appContext: Cont
     private fun Recipient.quotedDisplay(): String = "${("$name ").ifBlank { "" }}<$email>"
 
     private fun assembleForwardHtmlFooter(
-        messageForwardHeader: String,
-        fromTitle: String,
         message: Message,
-        dateTitle: String,
-        subjectTitle: String,
-        toTitle: String,
-        ccTitle: String,
         previousFullBody: String
-    ): String {
+    ): String = with(appContext) {
+        val messageForwardHeader = getString(R.string.messageForwardHeader)
+        val fromTitle = getString(R.string.fromTitle)
+        val dateTitle = getString(R.string.dateTitle)
+        val subjectTitle = getString(R.string.subjectTitle)
+        val toTitle = getString(R.string.toTitle)
+        val ccTitle = getString(R.string.ccTitle)
+
         val forwardRoot = "<div class=\"${MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME}\" />"
         return parseAndWrapElementInNewDocument(forwardRoot).apply {
             addAndEscapeTextLine("---------- $messageForwardHeader ---------")
