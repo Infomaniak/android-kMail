@@ -32,7 +32,7 @@ import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.main.thread.actions.*
 import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 
-open class TwoPaneFragment : Fragment() {
+abstract class TwoPaneFragment : Fragment() {
 
     val mainViewModel: MainViewModel by activityViewModels()
 
