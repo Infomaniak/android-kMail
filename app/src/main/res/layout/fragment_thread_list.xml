@@ -249,17 +249,6 @@
                             tools:listitem="@layout/cardview_thread_item"
                             tools:visibility="gone" />
 
-                        <com.airbnb.lottie.LottieAnimationView
-                            android:id="@+id/easterEggXMas"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:importantForAccessibility="no"
-                            android:visibility="gone"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:lottie_rawRes="@raw/easter_egg_xmas" />
-
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
                     <com.infomaniak.mail.ui.main.EmptyStateView

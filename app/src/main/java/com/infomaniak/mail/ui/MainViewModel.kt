@@ -102,7 +102,6 @@ class MainViewModel @Inject constructor(
     val newFolderResultTrigger = MutableLiveData<Unit>()
     val reportPhishingTrigger = SingleLiveEvent<Unit>()
     val canInstallUpdate = MutableLiveData(false)
-    val xMasEasterEggTrigger = SingleLiveEvent<Unit>()
 
     val snackBarManager by lazy { SnackBarManager() }
 

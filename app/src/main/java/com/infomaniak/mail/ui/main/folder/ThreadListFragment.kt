@@ -161,7 +161,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         observerDraftsActionsCompletedWorks()
         observeFlushFolderTrigger()
         observeUpdateInstall()
-        observeXMasEasterEggTrigger()
     }.getOrDefault(Unit)
 
     private fun navigateFromNotificationToNewMessage() {
@@ -585,15 +584,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                         mainViewModel.snackBarManager.setValue(getString(RCore.string.errorUpdateInstall))
                     },
                 )
-            }
-        }
-    }
-
-    private fun observeXMasEasterEggTrigger() {
-        mainViewModel.xMasEasterEggTrigger.observe(viewLifecycleOwner) {
-            binding.easterEggXMas.apply {
-                isVisible = true
-                playAnimation()
             }
         }
     }

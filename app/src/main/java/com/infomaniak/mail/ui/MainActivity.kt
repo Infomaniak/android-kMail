@@ -29,6 +29,7 @@ import androidx.activity.result.contract.ActivityResultContracts.StartActivityFo
 import androidx.activity.result.contract.ActivityResultContracts.StartIntentSenderForResult
 import androidx.activity.viewModels
 import androidx.annotation.FloatRange
+import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Lifecycle.State
 import androidx.lifecycle.distinctUntilChanged
@@ -109,20 +110,6 @@ class MainActivity : BaseActivity() {
             showEasterXMas()
             showSendingSnackBarTimer.start()
             showAppReview()
-        }
-    }
-
-    private fun showEasterXMas() {
-        val calendar = Calendar.getInstance()
-        val month = calendar.get(Calendar.MONTH)
-        val day = calendar.get(Calendar.DAY_OF_MONTH)
-        if (month == Calendar.DECEMBER && day <= 25) {
-            mainViewModel.xMasEasterEggTrigger.postValue(Unit)
-            Sentry.withScope { scope ->
-                scope.level = SentryLevel.INFO
-                Sentry.captureMessage("Easter egg XMas has been triggered! Woohoo!")
-            }
-            trackEasterEggEvent("XMas${Date().year()}")
         }
     }
 
@@ -521,6 +508,25 @@ class MainActivity : BaseActivity() {
                 },
                 onNegativeButtonClicked = { openUrl(getString(R.string.urlUserReportAndroid)) },
             )
+        }
+    }
+
+    private fun showEasterXMas() {
+
+        val calendar = Calendar.getInstance()
+        val month = calendar.get(Calendar.MONTH)
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+        if (month == Calendar.DECEMBER && day <= 25) {
+            binding.easterEggXMas.apply {
+                isVisible = true
+                playAnimation()
+            }
+            Sentry.withScope { scope ->
+                scope.level = SentryLevel.INFO
+                Sentry.captureMessage("Easter egg XMas has been triggered! Woohoo!")
+            }
+            trackEasterEggEvent("XMas${Date().year()}")
         }
     }
 
