@@ -32,6 +32,7 @@ import com.infomaniak.mail.ui.main.thread.DetailedContactBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.main.thread.actions.*
 import com.infomaniak.mail.utils.Utils
+import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 
 abstract class TwoPaneFragment : Fragment() {
@@ -70,10 +71,7 @@ abstract class TwoPaneFragment : Fragment() {
                 folder
             }) ?: return@observe
 
-            rightPaneFolderName.value = getString(
-                R.string.noConversationSelected,
-                displayedFolder.getLocalizedName(requireContext()),
-            )
+            rightPaneFolderName.value = getString(R.string.noConversationSelected, displayedFolder.getLocalizedName(context))
         }
     }
 

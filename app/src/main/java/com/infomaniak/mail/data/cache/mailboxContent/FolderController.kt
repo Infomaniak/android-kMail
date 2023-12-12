@@ -133,6 +133,7 @@ class FolderController @Inject constructor(
     //endregion
 
     companion object {
+        const val INBOX_FOLDER_ID = "eJzz9HPyjwAABGYBgQ--" // Hardcoded INBOX folder
         const val SEARCH_FOLDER_ID = "search_folder_id"
         private val isNotSearch = "${Folder::id.name} != '$SEARCH_FOLDER_ID'"
         private val isRootFolder = "${Folder.parentsPropertyName}.@count == 0"
