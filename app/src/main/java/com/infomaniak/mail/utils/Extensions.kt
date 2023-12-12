@@ -270,7 +270,7 @@ fun Fragment.safeNavigateToNewMessageActivity(
 }
 
 fun Fragment.safeNavigateToNewMessageActivity(args: Bundle? = null, currentClassName: String? = null) {
-    if (canNavigate(currentClassName)) (activity as MainActivity).navigateToNewMessageActivity(args)
+    if (canNavigate(currentClassName)) (requireActivity() as MainActivity).navigateToNewMessageActivity(args)
 }
 
 /**

@@ -29,6 +29,9 @@ import com.infomaniak.lib.confetti.R as RConfetti
 
 object ConfettiUtils {
 
+    private const val EASTER_EGG_CONFETTI_TRIGGER_TAPS = 3
+    private const val EASTER_EGG_CONFETTI_TRIGGER_DELAY = 1_000L
+
     private const val EMISSION = 1_000_000.0f
 
     private const val AQUA = -0xFF0001
@@ -47,7 +50,27 @@ object ConfettiUtils {
         AQUA, FUCHSIA, LIME, MAROON, NAVY, OLIVE, PURPLE, SILVER, TEAL,
     ).toIntArray()
 
-    fun triggerEasterEggConfetti(container: ViewGroup, matomoValue: String) = with(container.context) {
+    private var easterEggConfettiCount = 0
+    private var easterEggConfettiTime = 0L
+
+    fun onEasterEggConfettiClicked(container: ViewGroup, matomoValue: String) {
+
+        val currentTime = System.currentTimeMillis()
+
+        if (easterEggConfettiTime == 0L || currentTime - easterEggConfettiTime > EASTER_EGG_CONFETTI_TRIGGER_DELAY) {
+            easterEggConfettiTime = currentTime
+            easterEggConfettiCount = 1
+        } else {
+            easterEggConfettiCount++
+        }
+
+        if (easterEggConfettiCount == EASTER_EGG_CONFETTI_TRIGGER_TAPS) {
+            easterEggConfettiCount = 0
+            triggerEasterEggConfetti(container, matomoValue)
+        }
+    }
+
+    private fun triggerEasterEggConfetti(container: ViewGroup, matomoValue: String) = with(container.context) {
 
         Sentry.withScope { scope ->
             scope.level = SentryLevel.INFO
@@ -139,11 +162,7 @@ object ConfettiUtils {
             when ((0..2).random()) {
                 0 -> displayTada()
                 1 -> displaySnow()
-                else -> if (isInPortrait()) {
-                    displaySingleGeneva()
-                } else {
-                    displayDoubleGeneva()
-                }
+                else -> if (isInPortrait()) displaySingleGeneva() else displayDoubleGeneva()
             }
         }
     }

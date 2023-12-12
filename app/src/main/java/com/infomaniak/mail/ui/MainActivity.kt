@@ -77,7 +77,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : BaseActivity() {
 
-    // This binding is not private because it's used in ThreadListFragment (`(activity as? MainActivity)?.binding`)
     val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private val mainViewModel: MainViewModel by viewModels()
 
@@ -89,8 +88,6 @@ class MainActivity : BaseActivity() {
     private val registerFirebaseBroadcastReceiver by lazy { RegisterFirebaseBroadcastReceiver() }
 
     private var previousDestinationId: Int? = null
-    private var easterEggConfettiCount = 0
-    private var easterEggConfettiTime = 0L
 
     private val navController by lazy {
         (supportFragmentManager.findFragmentById(R.id.mainHostFragment) as NavHostFragment).navController
@@ -514,23 +511,6 @@ class MainActivity : BaseActivity() {
         syncAutoConfigActivityResultLauncher.launch(Intent(this, SyncAutoConfigActivity::class.java))
     }
 
-    fun onEasterEggConfettiClicked(matomoValue: String) {
-
-        val currentTime = System.currentTimeMillis()
-
-        if (easterEggConfettiTime == 0L || currentTime - easterEggConfettiTime > EASTER_EGG_CONFETTI_TRIGGER_DELAY) {
-            easterEggConfettiTime = currentTime
-            easterEggConfettiCount = 1
-        } else {
-            easterEggConfettiCount++
-        }
-
-        if (easterEggConfettiCount == EASTER_EGG_CONFETTI_TRIGGER_TAPS) {
-            easterEggConfettiCount = 0
-            ConfettiUtils.triggerEasterEggConfetti(binding.easterEggConfettiContainer, matomoValue)
-        }
-    }
-
     companion object {
         const val DRAFT_ACTION_KEY = "draftAction"
         const val SYNC_AUTO_CONFIG_KEY = "syncAutoConfigKey"
@@ -538,7 +518,5 @@ class MainActivity : BaseActivity() {
         const val SYNC_AUTO_CONFIG_ALREADY_SYNC = "syncAutoConfigAlreadySync"
 
         private const val FULLY_SLID = 1.0f
-        private const val EASTER_EGG_CONFETTI_TRIGGER_TAPS = 3
-        private const val EASTER_EGG_CONFETTI_TRIGGER_DELAY = 1_000L
     }
 }
