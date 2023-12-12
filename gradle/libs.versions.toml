@@ -20,7 +20,7 @@ sentryAndroidFragment = "7.0.0"
 testRunner = "1.5.2"
 webkit = "1.8.0"
 workConcurrentFutures = "1.1.0"
-workRuntimeKtx = "2.8.1"
+workRuntimeKtx = "2.9.0"
 
 [libraries]
 dotsindicator = { module = "com.tbuonomo:dotsindicator", version.ref = "dotsindicator" }

@@ -112,11 +112,8 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
     @MainDispatcher
     lateinit var mainDispatcher: CoroutineDispatcher
 
-    override fun getWorkManagerConfiguration(): Configuration {
-        return Configuration.Builder()
-            .setWorkerFactory(workerFactory)
-            .build()
-    }
+    override val workManagerConfiguration: Configuration
+        get() = Configuration.Builder().setWorkerFactory(workerFactory).build()
 
     override fun onCreate() {
         super<Application>.onCreate()
