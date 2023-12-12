@@ -328,7 +328,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
 
         toolbar.setNavigationOnClickListener {
             trackMenuDrawerEvent("openByButton")
-            (activity as? MainActivity)?.binding?.drawerLayout?.open()
+            (requireActivity() as MainActivity).binding.drawerLayout.open()
         }
 
         cancel.setOnClickListener {

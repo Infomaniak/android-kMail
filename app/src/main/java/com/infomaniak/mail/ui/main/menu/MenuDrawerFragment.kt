@@ -165,7 +165,9 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
         }
 
         appVersionName.setOnClickListener {
-            (requireActivity() as MainActivity).onEasterEggConfettiClicked(matomoValue = "MenuDrawer")
+            (activity as? MainActivity)?.binding?.easterEggConfettiContainer?.let {
+                ConfettiUtils.onEasterEggConfettiClicked(container = it, matomoValue = "MenuDrawer")
+            }
         }
     }
 
