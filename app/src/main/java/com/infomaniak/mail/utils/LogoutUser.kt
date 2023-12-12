@@ -63,7 +63,7 @@ class LogoutUser @Inject constructor(
         }
     }
 
-    private suspend fun updateCurrentMailboxId() {
+    private fun updateCurrentMailboxId() {
         mailboxController.getFirstValidMailbox(AccountUtils.requestCurrentUser()!!.id)?.mailboxId?.let {
             AccountUtils.currentMailboxId = it
         }
