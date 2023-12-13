@@ -63,10 +63,7 @@ class LocalSettings private constructor(context: Context) {
     var hasAlreadyEnabledNotifications by sharedValue("hasAlreadyEnabledNotificationsKey", false)
     var isAppLocked by sharedValue("isAppLockedKey", false)
     var isUserWantingUpdates by sharedValue("isUserWantingUpdatesKey", true)
-
-    var hasAppUpdateDownloaded: Boolean
-        get() = sharedPreferences.getBoolean(HAS_APP_UPDATE_DOWNLOADED_KEY, DEFAULT_HAS_APP_UPDATE_DOWNLOADED)
-        set(value) = sharedPreferences.transaction { putBoolean(HAS_APP_UPDATE_DOWNLOADED_KEY, value) }
+    var hasAppUpdateDownloaded by sharedValue("hasAppUpdateDownloaded", false)
 
     fun resetUpdateSettings() {
         isUserWantingUpdates = false // This avoid the user being instantly reprompted to download update
@@ -275,7 +272,6 @@ class LocalSettings private constructor(context: Context) {
         private val TAG = LocalSettings::class.java.simpleName
 
         //region Default values
-        private const val DEFAULT_HAS_APP_UPDATE_DOWNLOADED = false
         val DEFAULT_SWIPE_ACTION_RIGHT = SwipeAction.READ_UNREAD
         val DEFAULT_SWIPE_ACTION_LEFT = SwipeAction.DELETE
         private const val DEFAULT_RECENT_SEARCHES = "[]"
@@ -285,7 +281,6 @@ class LocalSettings private constructor(context: Context) {
 
         //region Keys
         private const val SHARED_PREFS_NAME = "LocalSettingsSharedPref"
-        private const val HAS_APP_UPDATE_DOWNLOADED_KEY = "hasAppUpdateDownloaded"
         private const val RECENT_SEARCHES_KEY = "recentSearchesKey"
         private const val FIREBASE_REGISTERED_USERS_KEY = "firebaseRegisteredUsersKey"
         //endregion
