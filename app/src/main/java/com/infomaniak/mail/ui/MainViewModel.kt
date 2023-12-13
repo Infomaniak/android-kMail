@@ -203,7 +203,6 @@ class MainViewModel @Inject constructor(
 
     //region Current Thread
     val currentThreadUid = MutableLiveData<String?>(null)
-    val closeThreadTrigger = SingleLiveEvent<Unit>()
 
     inline val isThreadOpen get() = currentThreadUid.value != null
     val rightPaneFolderName = MutableLiveData<String>()
@@ -216,8 +215,12 @@ class MainViewModel @Inject constructor(
     val messageActionsArgs = SingleLiveEvent<MessageActionsBottomSheetDialogArgs>()
     val detailedContactArgs = SingleLiveEvent<DetailedContactBottomSheetDialogArgs>()
 
+    fun openThread(uid: String) {
+        currentThreadUid.value = uid
+    }
+
     fun closeThread() {
-        closeThreadTrigger.value = Unit
+        currentThreadUid.value = null
     }
     //endregion
 
