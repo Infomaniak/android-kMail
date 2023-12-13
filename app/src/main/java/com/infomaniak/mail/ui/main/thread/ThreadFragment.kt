@@ -122,21 +122,16 @@ class ThreadFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initAdapter()
-
+        setupDialogs()
         permissionUtils.registerDownloadManagerPermission()
-        bindAlertToViewLifecycle(descriptionDialog)
 
-        linkContextualMenuAlertDialog.initValues(mainViewModel.snackBarManager)
-        emailContextualMenuAlertDialog.initValues(mainViewModel.snackBarManager)
-        phoneContextualMenuAlertDialog.initValues(mainViewModel.snackBarManager)
-
-        mainViewModel.toggleLightThemeForMessage.observe(viewLifecycleOwner, threadAdapter::toggleLightMode)
+        observeLightThemeToggle()
         observeThreadLive()
 
         threadViewModel.openThread().observe(viewLifecycleOwner) { result ->
 
             if (result == null) {
-                leaveThread()
+                closeThread()
                 return@observe
             }
 
@@ -165,7 +160,9 @@ class ThreadFragment : Fragment() {
 
     private fun setupUi(folderRole: FolderRole?) = with(binding) {
 
-        toolbar.setNavigationOnClickListener { leaveThread() }
+        toolbar.setNavigationOnClickListener {
+            closeThread()
+        }
 
         val defaultTextColor = context.getColor(R.color.primaryTextColor)
         appBar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
@@ -186,49 +183,11 @@ class ThreadFragment : Fragment() {
             appBar.backgroundTintList = ColorStateList.valueOf(color)
         }
 
-        iconFavorite.setOnClickListener {
-            trackThreadActionsEvent(ACTION_FAVORITE_NAME, isFavorite)
-            mainViewModel.toggleThreadFavoriteStatus(navigationArgs.threadUid)
-        }
-
-        val isFromArchive = folderRole == FolderRole.ARCHIVE
-
-        if (isFromArchive) {
-            quickActionBar.disable(ARCHIVE_INDEX)
-        } else {
-            quickActionBar.enable(ARCHIVE_INDEX)
-        }
-
-        quickActionBar.setOnItemClickListener { menuId ->
-            when (menuId) {
-                R.id.quickActionReply -> {
-                    trackThreadActionsEvent(ACTION_REPLY_NAME)
-                    threadViewModel.clickOnQuickActionBar(menuId)
-                }
-                R.id.quickActionForward -> {
-                    trackThreadActionsEvent(ACTION_FORWARD_NAME)
-                    threadViewModel.clickOnQuickActionBar(menuId)
-                }
-                R.id.quickActionArchive -> with(mainViewModel) {
-                    trackThreadActionsEvent(ACTION_ARCHIVE_NAME, isFromArchive)
-                    archiveThread(navigationArgs.threadUid)
-                }
-                R.id.quickActionDelete -> {
-                    descriptionDialog.deleteWithConfirmationPopup(folderRole, count = 1) {
-                        trackThreadActionsEvent(ACTION_DELETE_NAME)
-                        mainViewModel.deleteThread(navigationArgs.threadUid)
-                    }
-                }
-                R.id.quickActionMenu -> {
-                    trackThreadActionsEvent(OPEN_ACTION_BOTTOM_SHEET)
-                    threadViewModel.clickOnQuickActionBar(menuId)
-                }
-            }
-        }
+        updateUi(folderRole)
     }
 
-    private fun initAdapter() {
-        binding.messagesList.adapter = ThreadAdapter(
+    private fun initAdapter() = with(binding.messagesList) {
+        adapter = ThreadAdapter(
             shouldLoadDistantResources = shouldLoadDistantResources(),
             onContactClicked = { contact ->
                 safeNavigate(ThreadFragmentDirections.actionThreadFragmentToDetailedContactBottomSheetDialog(contact))
@@ -293,58 +252,61 @@ class ThreadFragment : Fragment() {
     }
 
     private fun setupAdapter(result: OpenThreadResult) = with(binding.messagesList) {
-
         addItemDecoration(DividerItemDecorator(InsetDrawable(dividerDrawable(context), 0)))
         recycledViewPool.setMaxRecycledViews(0, 0)
-
-        threadAdapter.apply {
-            isExpandedMap = result.isExpandedMap
-            initialSetOfExpandedMessagesUids = result.initialSetOfExpandedMessagesUids
-            isThemeTheSameMap = result.isThemeTheSameMap
-
-            stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
-            contacts = mainViewModel.mergedContactsLive.value ?: emptyMap()
-        }
+        threadAdapter.stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
+        updateAdapter(result)
     }
 
-    private fun observeThreadLive() {
-        threadViewModel.threadLive.observe(viewLifecycleOwner, ::onThreadUpdate)
+    private fun setupDialogs() = with(mainViewModel) {
+        bindAlertToViewLifecycle(descriptionDialog)
+        linkContextualMenuAlertDialog.initValues(snackBarManager)
+        emailContextualMenuAlertDialog.initValues(snackBarManager)
+        phoneContextualMenuAlertDialog.initValues(snackBarManager)
     }
 
-    private fun onThreadUpdate(thread: Thread?) = with(binding) {
-
-        if (thread == null) {
-            leaveThread()
-            return@with
-        }
-
-        threadSubject.movementMethod = LinkMovementMethod.getInstance()
-
-        iconFavorite.apply {
-            setIconResource(if (thread.isFavorite) R.drawable.ic_star_filled else R.drawable.ic_star)
-            val color = if (thread.isFavorite) {
-                context.getColor(R.color.favoriteYellow)
-            } else {
-                context.getAttributeColor(RMaterial.attr.colorPrimary)
-            }
-            iconTint = ColorStateList.valueOf(color)
-        }
-
-        isFavorite = thread.isFavorite
+    private fun observeLightThemeToggle() {
+        mainViewModel.toggleLightThemeForMessage.observe(viewLifecycleOwner, threadAdapter::toggleLightMode)
     }
 
-    private fun observeMessagesLive() {
+    private fun observeThreadLive() = with(binding) {
 
-        threadViewModel.messagesLive.observe(viewLifecycleOwner) { messages ->
-            SentryLog.i("UI", "Received ${messages.count()} messages")
+        threadViewModel.threadLive.observe(viewLifecycleOwner) { thread ->
 
-            if (messages.isEmpty()) {
-                mainViewModel.deletedMessages.value = threadViewModel.deletedMessagesUids
-                leaveThread()
+            if (thread == null) {
+                closeThread()
                 return@observe
             }
 
-            threadViewModel.fetchMessagesHeavyData(messages)
+            threadSubject.movementMethod = LinkMovementMethod.getInstance()
+
+            iconFavorite.apply {
+                setIconResource(if (thread.isFavorite) R.drawable.ic_star_filled else R.drawable.ic_star)
+                val color = if (thread.isFavorite) {
+                    context.getColor(R.color.favoriteYellow)
+                } else {
+                    context.getAttributeColor(RMaterial.attr.colorPrimary)
+                }
+                iconTint = ColorStateList.valueOf(color)
+            }
+
+            isFavorite = thread.isFavorite
+        }
+    }
+
+    private fun observeMessagesLive() = with(threadViewModel) {
+
+        messagesLive.observe(viewLifecycleOwner) { messages ->
+
+            SentryLog.i("UI", "Received ${messages.count()} messages")
+
+            if (messages.isEmpty()) {
+                mainViewModel.deletedMessages.value = deletedMessagesUids
+                closeThread()
+                return@observe
+            }
+
+            fetchMessagesHeavyData(messages)
             threadAdapter.submitList(messages)
         }
     }
@@ -381,36 +343,27 @@ class ThreadFragment : Fragment() {
         }
     }
 
-    private fun observeSubjectUpdateTriggers() {
+    private fun observeSubjectUpdateTriggers() = with(binding) {
         threadViewModel.assembleSubjectData(mainViewModel.mergedContactsLive).observe(viewLifecycleOwner) { result ->
-            result.thread?.let {
-                setSubject(
-                    thread = it,
-                    emailDictionary = result.mergedContacts ?: emptyMap(),
-                    aliases = result.mailbox?.aliases ?: emptyList(),
-                    externalMailFlagEnabled = result.mailbox?.externalMailFlagEnabled ?: false,
-                )
+
+            val (subject, spannedSubject) = computeSubject(
+                thread = result.thread ?: return@observe,
+                emailDictionary = result.mergedContacts ?: emptyMap(),
+                aliases = result.mailbox?.aliases ?: emptyList(),
+                externalMailFlagEnabled = result.mailbox?.externalMailFlagEnabled ?: false,
+            )
+
+            threadSubject.text = spannedSubject
+            toolbarSubject.text = subject
+
+            threadSubject.setOnLongClickListener {
+                context.copyStringToClipboard(subject, R.string.snackbarSubjectCopiedToClipboard, mainViewModel.snackBarManager)
+                true
             }
-        }
-    }
-
-    private fun setSubject(
-        thread: Thread,
-        emailDictionary: MergedContactDictionary,
-        aliases: List<String>,
-        externalMailFlagEnabled: Boolean,
-    ) = with(binding) {
-        val (subject, spannedSubject) = computeSubject(thread, emailDictionary, aliases, externalMailFlagEnabled)
-        threadSubject.text = spannedSubject
-        toolbarSubject.text = subject
-
-        threadSubject.setOnLongClickListener {
-            context.copyStringToClipboard(subject, R.string.snackbarSubjectCopiedToClipboard, mainViewModel.snackBarManager)
-            true
-        }
-        toolbarSubject.setOnLongClickListener {
-            context.copyStringToClipboard(subject, R.string.snackbarSubjectCopiedToClipboard, mainViewModel.snackBarManager)
-            true
+            toolbarSubject.setOnLongClickListener {
+                context.copyStringToClipboard(subject, R.string.snackbarSubjectCopiedToClipboard, mainViewModel.snackBarManager)
+                true
+            }
         }
     }
 
@@ -418,12 +371,65 @@ class ThreadFragment : Fragment() {
         getBackNavigationResult(DownloadAttachmentProgressDialog.OPEN_WITH, ::startActivity)
     }
 
-    private fun leaveThread() {
+    private fun closeThread() {
+
         // TODO: Realm broadcasts twice when the Thread is deleted.
         //  We don't know why.
         //  While it's not fixed, we do this quickfix of checking if we already left:
         if (isFirstTimeLeaving.compareAndSet(true, false)) {
             findNavController().popBackStack()
+        }
+    }
+
+    private fun updateUi(folderRole: FolderRole?) = with(binding) {
+
+        iconFavorite.setOnClickListener {
+            trackThreadActionsEvent(ACTION_FAVORITE_NAME, isFavorite)
+            mainViewModel.toggleThreadFavoriteStatus(navigationArgs.threadUid)
+        }
+
+        val isFromArchive = folderRole == FolderRole.ARCHIVE
+
+        if (isFromArchive) {
+            quickActionBar.disable(ARCHIVE_INDEX)
+        } else {
+            quickActionBar.enable(ARCHIVE_INDEX)
+        }
+
+        quickActionBar.setOnItemClickListener { menuId ->
+            when (menuId) {
+                R.id.quickActionReply -> {
+                    trackThreadActionsEvent(ACTION_REPLY_NAME)
+                    threadViewModel.clickOnQuickActionBar(menuId)
+                }
+                R.id.quickActionForward -> {
+                    trackThreadActionsEvent(ACTION_FORWARD_NAME)
+                    threadViewModel.clickOnQuickActionBar(menuId)
+                }
+                R.id.quickActionArchive -> {
+                    trackThreadActionsEvent(ACTION_ARCHIVE_NAME, isFromArchive)
+                    mainViewModel.archiveThread(navigationArgs.threadUid)
+                }
+                R.id.quickActionDelete -> {
+                    descriptionDialog.deleteWithConfirmationPopup(folderRole, count = 1) {
+                        trackThreadActionsEvent(ACTION_DELETE_NAME)
+                        mainViewModel.deleteThread(navigationArgs.threadUid)
+                    }
+                }
+                R.id.quickActionMenu -> {
+                    trackThreadActionsEvent(OPEN_ACTION_BOTTOM_SHEET)
+                    threadViewModel.clickOnQuickActionBar(menuId)
+                }
+            }
+        }
+    }
+
+    private fun updateAdapter(result: OpenThreadResult) {
+        threadAdapter.apply {
+            isExpandedMap = result.isExpandedMap
+            initialSetOfExpandedMessagesUids = result.initialSetOfExpandedMessagesUids
+            isThemeTheSameMap = result.isThemeTheSameMap
+            contacts = mainViewModel.mergedContactsLive.value ?: emptyMap()
         }
     }
 
@@ -464,17 +470,20 @@ class ThreadFragment : Fragment() {
     }
 
     private fun replyTo(message: Message) {
-        if (message.getRecipientsForReplyTo(true).second.isEmpty()) {
+
+        val shouldLoadDistantResources = shouldLoadDistantResources(message.uid)
+
+        if (message.getRecipientsForReplyTo(replyAll = true).second.isEmpty()) {
             safeNavigateToNewMessageActivity(
                 draftMode = DraftMode.REPLY,
                 previousMessageUid = message.uid,
-                shouldLoadDistantResources = shouldLoadDistantResources(message.uid),
+                shouldLoadDistantResources = shouldLoadDistantResources,
             )
         } else {
             safeNavigate(
                 ThreadFragmentDirections.actionThreadFragmentToReplyBottomSheetDialog(
                     messageUid = message.uid,
-                    shouldLoadDistantResources = shouldLoadDistantResources(message.uid),
+                    shouldLoadDistantResources = shouldLoadDistantResources,
                 )
             )
         }
