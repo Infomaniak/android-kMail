@@ -310,7 +310,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
 
             stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
 
-            onThreadClicked = { thread -> navigateToThread(thread, mainViewModel) }
+            onThreadClicked = ::navigateToThread
 
             onFlushClicked = { dialogTitle ->
 
