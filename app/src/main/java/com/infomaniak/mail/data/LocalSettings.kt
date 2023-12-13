@@ -24,6 +24,8 @@ import androidx.annotation.*
 import androidx.appcompat.app.AppCompatDelegate
 import com.google.android.material.color.MaterialColors
 import com.infomaniak.lib.core.utils.SentryLog
+import com.infomaniak.lib.core.utils.sharedValue
+import com.infomaniak.lib.core.utils.sharedValueNullable
 import com.infomaniak.lib.core.utils.transaction
 import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_DELETE_NAME
@@ -33,8 +35,6 @@ import com.infomaniak.mail.MatomoMail.ACTION_MOVE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_POSTPONE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_SPAM_NAME
 import com.infomaniak.mail.R
-import com.infomaniak.mail.utils.sharedValue
-import com.infomaniak.mail.utils.sharedValueNullable
 import kotlin.properties.ReadWriteProperty
 import com.google.android.material.R as RMaterial
 
