@@ -369,7 +369,7 @@ class ThreadFragment : Fragment() {
         threadView.isVisible = true
 
         iconFavorite.setOnClickListener {
-            trackThreadActionsEvent(ACTION_FAVORITE_NAME, threadViewModel.threadLive.value?.isFavorite ?: false)
+            trackThreadActionsEvent(ACTION_FAVORITE_NAME, threadViewModel.threadLive.value!!.isFavorite)
             mainViewModel.toggleThreadFavoriteStatus(threadUid)
         }
 
