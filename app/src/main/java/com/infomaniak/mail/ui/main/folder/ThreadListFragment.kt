@@ -67,7 +67,6 @@ import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
-import com.infomaniak.mail.ui.main.folder.ThreadListAdapter.NotificationType
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
@@ -170,12 +169,8 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
                 // Here, we use `arguments` instead of `navigationArgs` because we need mutable data.
                 if (arguments?.getString(navigationArgs::openThreadUid.name) != null) {
                     navigationArgs.openThreadUid?.let { openThreadUid ->
-                        threadListAdapter.apply {
-                            getItemPosition(openThreadUid)?.let { position ->
-                                clickedThreadPosition = position
-                                clickedThreadUid = openThreadUid
-                                notifyItemChanged(position, NotificationType.SELECTED_STATE)
-                            }
+                        with(threadListAdapter) {
+                            getItemPosition(openThreadUid)?.let { position -> selectNewThread(position, openThreadUid) }
                         }
                         // If we are coming from a Notification, we need to navigate to ThreadFragment.
                         navigateToThread(mainViewModel, threadUid = openThreadUid)
