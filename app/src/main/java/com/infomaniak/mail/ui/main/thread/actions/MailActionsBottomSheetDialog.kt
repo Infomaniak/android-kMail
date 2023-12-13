@@ -26,11 +26,13 @@ import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetActionsMenuBinding
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel
 
 abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
     protected var binding: BottomSheetActionsMenuBinding by safeBinding()
     protected val mainViewModel: MainViewModel by activityViewModels()
+    protected val twoPaneViewModel: TwoPaneViewModel by activityViewModels()
 
     private var onClickListener: OnActionClick = object : OnActionClick {
 

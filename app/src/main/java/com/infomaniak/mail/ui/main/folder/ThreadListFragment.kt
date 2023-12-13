@@ -189,7 +189,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
                         }
 
                         // If we are coming from a Notification, we need to navigate to ThreadFragment.
-                        mainViewModel.openThread(threadUid)
+                        twoPaneViewModel.openThread(threadUid)
 
                         arguments?.remove(navigationArgs::openThreadUid.name)
                         threadListObserver?.let(threadListAdapter::unregisterAdapterDataObserver)
