@@ -57,8 +57,6 @@ import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.MatomoMail.trackThreadListEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.LocalSettings.Companion.DEFAULT_SWIPE_ACTION_LEFT
-import com.infomaniak.mail.data.LocalSettings.Companion.DEFAULT_SWIPE_ACTION_RIGHT
 import com.infomaniak.mail.data.LocalSettings.SwipeAction
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity.COMPACT
 import com.infomaniak.mail.data.models.Folder
@@ -69,6 +67,7 @@ import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
+import com.infomaniak.mail.ui.main.settings.swipe.SwipeActionsSettingsFragment
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
@@ -387,7 +386,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             SwipeAction.TUTORIAL -> {
                 setDefaultSwipeActions()
                 safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSettingsFragment())
-                findNavController().navigate(R.id.swipeActionsSettingsFragment, null, getAnimatedNavOptions())
+                findNavController().navigate(R.id.swipeActionsSettingsFragment, args = null, getAnimatedNavOptions())
                 true
             }
             SwipeAction.ARCHIVE -> {
@@ -449,8 +448,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun setDefaultSwipeActions() = with(localSettings) {
-        if (swipeRight == SwipeAction.TUTORIAL) swipeRight = DEFAULT_SWIPE_ACTION_RIGHT
-        if (swipeLeft == SwipeAction.TUTORIAL) swipeLeft = DEFAULT_SWIPE_ACTION_LEFT
+        if (swipeRight == SwipeAction.TUTORIAL) swipeRight = SwipeActionsSettingsFragment.DEFAULT_SWIPE_ACTION_RIGHT
+        if (swipeLeft == SwipeAction.TUTORIAL) swipeLeft = SwipeActionsSettingsFragment.DEFAULT_SWIPE_ACTION_LEFT
     }
 
     private fun extendCollapseFab(scrollDirection: ScrollDirection) = with(binding) {
