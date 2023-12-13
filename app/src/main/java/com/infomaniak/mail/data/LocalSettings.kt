@@ -24,8 +24,8 @@ import androidx.annotation.*
 import androidx.appcompat.app.AppCompatDelegate
 import com.google.android.material.color.MaterialColors
 import com.infomaniak.lib.core.utils.SentryLog
-import com.infomaniak.lib.core.utils.sharedValue
-import com.infomaniak.lib.core.utils.sharedValueNullable
+import com.infomaniak.lib.core.utils.SharedValue.sharedValue
+import com.infomaniak.lib.core.utils.SharedValue.sharedValueNullable
 import com.infomaniak.lib.core.utils.transaction
 import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_DELETE_NAME
