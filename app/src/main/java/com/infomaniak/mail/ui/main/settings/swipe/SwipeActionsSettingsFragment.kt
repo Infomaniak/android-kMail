@@ -28,6 +28,7 @@ import androidx.fragment.app.Fragment
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.LocalSettings.SwipeAction
 import com.infomaniak.mail.databinding.FragmentSwipeActionsSettingsBinding
 import com.infomaniak.mail.utils.animatedNavigation
 import dagger.hilt.android.AndroidEntryPoint
@@ -75,5 +76,10 @@ class SwipeActionsSettingsFragment : Fragment() {
 
     private fun navigateToSwipeActionSelection(@StringRes resId: Int) {
         animatedNavigation(SwipeActionsSettingsFragmentDirections.actionSwipeActionsSettingsToSwipeActionSelectionSetting(resId))
+    }
+
+    companion object {
+        val DEFAULT_SWIPE_ACTION_RIGHT = SwipeAction.READ_UNREAD
+        val DEFAULT_SWIPE_ACTION_LEFT = SwipeAction.DELETE
     }
 }

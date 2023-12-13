@@ -867,7 +867,7 @@ class MainViewModel @Inject constructor(
             updateFolders(mailbox)
             apiResponse.data?.id
         } else {
-            snackBarManager.postValue(context.getString(apiResponse.translateError()), null)
+            snackBarManager.postValue(title = context.getString(apiResponse.translateError()), undoData = null)
             null
         }
     }

@@ -23,7 +23,6 @@ import android.view.ContextThemeWrapper
 import androidx.annotation.*
 import androidx.appcompat.app.AppCompatDelegate
 import com.google.android.material.color.MaterialColors
-import com.infomaniak.lib.core.api.ApiController.json
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.transaction
 import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
@@ -36,7 +35,6 @@ import com.infomaniak.mail.MatomoMail.ACTION_SPAM_NAME
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.sharedValue
 import com.infomaniak.mail.utils.sharedValueNullable
-import kotlinx.serialization.encodeToString
 import kotlin.properties.ReadWriteProperty
 import com.google.android.material.R as RMaterial
 
@@ -44,34 +42,63 @@ class LocalSettings private constructor(context: Context) {
 
     private val sharedPreferences = context.applicationContext.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE)
 
-    fun removeSettings() = sharedPreferences.transaction { clear() }
-
     var appLaunches by sharedValue("appLaunchesKey", 0)
     var cancelDelay by sharedValue("cancelDelayKey", 10)
-
-    //region Email forwarding
     var emailForwarding by sharedValue("emailForwardingKey", EmailForwarding.IN_BODY)
-
-    enum class EmailForwarding(@StringRes val localisedNameRes: Int) {
-        IN_BODY(R.string.settingsTransferInBody),
-        AS_ATTACHMENT(R.string.settingsTransferAsAttachment),
-    }
-    //endregion
-
     var includeMessageInReply by sharedValue("includeMessageInReplyKey", true)
     var askEmailAcknowledgement by sharedValue("askEmailAcknowledgmentKey", false)
     var hasAlreadyEnabledNotifications by sharedValue("hasAlreadyEnabledNotificationsKey", false)
     var isAppLocked by sharedValue("isAppLockedKey", false)
     var isUserWantingUpdates by sharedValue("isUserWantingUpdatesKey", true)
     var hasAppUpdateDownloaded by sharedValue("hasAppUpdateDownloaded", false)
+    var aiEngine by sharedValue("aiEngineKey", AiEngine.FALCON)
+    var threadDensity by sharedValue("threadDensityKey", ThreadDensity.LARGE)
+    var theme by sharedValue("themeKey", if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) Theme.LIGHT else Theme.SYSTEM)
+    var accentColor by sharedValue("accentColorKey", AccentColor.PINK)
+    var swipeRight by sharedValue("swipeRightKey", SwipeAction.TUTORIAL)
+    var swipeLeft by sharedValue("swipeLeftKey", SwipeAction.TUTORIAL)
+    var threadMode by sharedValue("threadModeKey", ThreadMode.CONVERSATION)
+    var externalContent by sharedValue("externalContentKey", ExternalContent.ALWAYS)
+    var recentSearches: List<String> by sharedValue("recentSearchesKey", emptyList())
+    var firebaseToken by sharedValueNullable("firebaseTokenKey", null)
+    var firebaseRegisteredUsers by sharedValue("firebaseRegisteredUsersKey", emptySet())
+    var aiReplacementDialogVisibility by sharedValue("aiReplacementDialogVisibilityKey", AiReplacementDialogVisibility.SHOW)
+    var showAiDiscoveryBottomSheet by sharedValue("showAiDiscoveryBottomSheetKey", true)
+    var showSyncDiscoveryBottomSheet by sharedValue("showSyncDiscoveryBottomSheetKey", true)
+    var appReviewLaunches by sharedValue("appReviewLaunchesKey", DEFAULT_APP_REVIEW_LAUNCHES)
+    var showAppReviewDialog by sharedValue("showAppReviewDialogKey", true)
+
+    fun removeSettings() = sharedPreferences.transaction { clear() }
 
     fun resetUpdateSettings() {
         isUserWantingUpdates = false // This avoid the user being instantly reprompted to download update
         hasAppUpdateDownloaded = false
     }
 
-    //region Ai engine
-    var aiEngine by sharedValue("aiEngineKey", AiEngine.FALCON)
+    fun getSwipeAction(@StringRes nameRes: Int): SwipeAction = when (nameRes) {
+        R.string.settingsSwipeRight -> swipeRight
+        R.string.settingsSwipeLeft -> swipeLeft
+        else -> throw IllegalArgumentException()
+    }
+
+    fun markUserAsRegisteredByFirebase(userId: Int) {
+        SentryLog.i(TAG, "markUserAsRegisteredByFirebase: $userId has been registered")
+        firebaseRegisteredUsers = firebaseRegisteredUsers.toMutableSet().apply { add(userId.toString()) }
+    }
+
+    fun removeRegisteredFirebaseUser(userId: Int) {
+        firebaseRegisteredUsers = firebaseRegisteredUsers.filterNot { it == userId.toString() }.toSet()
+    }
+
+    fun clearRegisteredFirebaseUsers() {
+        SentryLog.i(TAG, "clearRegisteredFirebaseUsers: called")
+        firebaseRegisteredUsers = mutableSetOf()
+    }
+
+    enum class EmailForwarding(@StringRes val localisedNameRes: Int) {
+        IN_BODY(R.string.settingsTransferInBody),
+        AS_ATTACHMENT(R.string.settingsTransferAsAttachment),
+    }
 
     enum class AiEngine(
         @StringRes val localisedNameRes: Int,
@@ -82,10 +109,6 @@ class LocalSettings private constructor(context: Context) {
         FALCON(R.string.aiEngineFalcon, R.drawable.ic_ai_engine_falcon, "falcon", "falcon"),
         CHAT_GPT(R.string.aiEngineChatGpt, R.drawable.ic_ai_engine_chat_gpt, "chatGpt", "gpt"), ;
     }
-    //endregion
-
-    //region Thread density
-    var threadDensity by sharedValue("threadDensityKey", ThreadDensity.LARGE)
 
     enum class ThreadDensity(@StringRes val localisedNameRes: Int) {
         COMPACT(R.string.settingsDensityOptionCompact),
@@ -94,10 +117,6 @@ class LocalSettings private constructor(context: Context) {
 
         override fun toString() = name.lowercase()
     }
-    //endregion
-
-    //region Theme
-    var theme by sharedValue("themeKey", if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) Theme.LIGHT else Theme.SYSTEM)
 
     enum class Theme(@StringRes val localisedNameRes: Int, val mode: Int) {
         SYSTEM(R.string.settingsOptionSystemTheme, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM),
@@ -106,10 +125,6 @@ class LocalSettings private constructor(context: Context) {
 
         override fun toString() = name.lowercase()
     }
-    //endregion
-
-    //region Accent color
-    var accentColor by sharedValue("accentColorKey", AccentColor.PINK)
 
     enum class AccentColor(
         @StringRes val localisedNameRes: Int,
@@ -154,11 +169,6 @@ class LocalSettings private constructor(context: Context) {
 
         override fun toString() = name.lowercase()
     }
-    //endregion
-
-    //region Swipe actions
-    var swipeRight by sharedValue("swipeRightKey", SwipeAction.TUTORIAL)
-    var swipeLeft by sharedValue("swipeLeftKey", SwipeAction.TUTORIAL)
 
     enum class SwipeAction(
         @StringRes val nameRes: Int,
@@ -191,78 +201,26 @@ class LocalSettings private constructor(context: Context) {
         fun getBackgroundColor(context: Context): Int = context.getColor(colorRes)
     }
 
-    fun getSwipeAction(@StringRes nameRes: Int): SwipeAction = when (nameRes) {
-        R.string.settingsSwipeRight -> swipeRight
-        R.string.settingsSwipeLeft -> swipeLeft
-        else -> throw IllegalArgumentException()
-    }
-    //endregion
-
-    //region Thread mode
-    var threadMode by sharedValue("threadModeKey", ThreadMode.CONVERSATION)
-
     enum class ThreadMode(@StringRes val localisedNameRes: Int, val matomoValue: String) {
         CONVERSATION(R.string.settingsOptionThreadModeConversation, "conversation"),
         MESSAGE(R.string.settingsOptionThreadModeMessage, "message"),
     }
-    //endregion
-
-    //region External content
-    var externalContent by sharedValue("externalContentKey", ExternalContent.ALWAYS)
 
     enum class ExternalContent(val apiCallValue: String, @StringRes val localisedNameRes: Int, val matomoValue: String) {
         ALWAYS("true", R.string.settingsOptionAlways, "always"),
         ASK_ME("false", R.string.settingsOptionAskMe, "askMe"),
     }
-    //endregion
-
-    //region Recent searches
-    var recentSearches: List<String>
-        get() = json.decodeFromString(sharedPreferences.getString(RECENT_SEARCHES_KEY, DEFAULT_RECENT_SEARCHES)!!)
-        set(value) = sharedPreferences.transaction { putString(RECENT_SEARCHES_KEY, json.encodeToString(value)) }
-    //endregion
-
-    //region Firebase
-    var firebaseToken: String? by sharedValueNullable("firebaseTokenKey", null)
-
-    var firebaseRegisteredUsers: MutableSet<String>
-        get() = sharedPreferences.getStringSet(FIREBASE_REGISTERED_USERS_KEY, DEFAULT_FIREBASE_REGISTERED_USERS)!!
-            .mapNotNull { it }.toMutableSet()
-        private set(value) = sharedPreferences.transaction { putStringSet(FIREBASE_REGISTERED_USERS_KEY, value) }
-
-    fun markUserAsRegisteredByFirebase(userId: Int) {
-        SentryLog.i(TAG, "markUserAsRegisteredByFirebase: $userId has been registered")
-        firebaseRegisteredUsers = firebaseRegisteredUsers.apply { add(userId.toString()) }
-    }
-
-    fun removeRegisteredFirebaseUser(userId: Int) {
-        firebaseRegisteredUsers = firebaseRegisteredUsers.filterNot { it == userId.toString() }.toMutableSet()
-    }
-
-    fun clearRegisteredFirebaseUsers() {
-        SentryLog.i(TAG, "clearRegisteredFirebaseUsers: called")
-        firebaseRegisteredUsers = mutableSetOf()
-    }
-    //endregion
-
-    //region AI
-    var aiReplacementDialogVisibility by sharedValue("aiReplacementDialogVisibilityKey", AiReplacementDialogVisibility.SHOW)
 
     enum class AiReplacementDialogVisibility {
         SHOW,
         HIDE,
     }
 
-    var showAiDiscoveryBottomSheet by sharedValue("showAiDiscoveryBottomSheetKey", true)
-    //endregion
-
-    var showSyncDiscoveryBottomSheet by sharedValue("showSyncDiscoveryBottomSheetKey", true)
-    var appReviewLaunches by sharedValue("appReviewLaunchesKey", DEFAULT_APP_REVIEW_LAUNCHES)
-    var showAppReviewDialog by sharedValue("showAppReviewDialogKey", true)
-
+    private fun sharedValue(key: String, defaultValue: Boolean) = sharedPreferences.sharedValue(key, defaultValue)
     private fun sharedValue(key: String, defaultValue: Int) = sharedPreferences.sharedValue(key, defaultValue)
     private fun sharedValueNullable(key: String, defaultValue: String?) = sharedPreferences.sharedValueNullable(key, defaultValue)
-    private fun sharedValue(key: String, defaultValue: Boolean) = sharedPreferences.sharedValue(key, defaultValue)
+    private fun sharedValue(key: String, defaultValue: Set<String>) = sharedPreferences.sharedValue(key, defaultValue)
+    private fun sharedValue(key: String, defaultValue: List<String>) = sharedPreferences.sharedValue(key, defaultValue)
     private inline fun <reified E : Enum<E>> sharedValue(key: String, defaultValue: E): ReadWriteProperty<Any, E> {
         return sharedPreferences.sharedValue(key, defaultValue)
     }
@@ -270,20 +228,9 @@ class LocalSettings private constructor(context: Context) {
     companion object {
 
         private val TAG = LocalSettings::class.java.simpleName
-
-        //region Default values
-        val DEFAULT_SWIPE_ACTION_RIGHT = SwipeAction.READ_UNREAD
-        val DEFAULT_SWIPE_ACTION_LEFT = SwipeAction.DELETE
-        private const val DEFAULT_RECENT_SEARCHES = "[]"
-        private val DEFAULT_FIREBASE_REGISTERED_USERS = emptySet<String>()
-        const val DEFAULT_APP_REVIEW_LAUNCHES = 50
-        //endregion
-
-        //region Keys
         private const val SHARED_PREFS_NAME = "LocalSettingsSharedPref"
-        private const val RECENT_SEARCHES_KEY = "recentSearchesKey"
-        private const val FIREBASE_REGISTERED_USERS_KEY = "firebaseRegisteredUsersKey"
-        //endregion
+
+        const val DEFAULT_APP_REVIEW_LAUNCHES = 50
 
         @Volatile
         private var INSTANCE: LocalSettings? = null

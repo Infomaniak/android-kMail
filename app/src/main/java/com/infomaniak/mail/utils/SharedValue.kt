@@ -18,23 +18,24 @@
 package com.infomaniak.mail.utils
 
 import android.content.SharedPreferences
+import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.transaction
+import kotlinx.serialization.encodeToString
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
-
-
-fun SharedPreferences.sharedValue(key: String, defaultValue: Int): ReadWriteProperty<Any, Int> {
-    return object : ReadWriteProperty<Any, Int> {
-        override fun getValue(thisRef: Any, property: KProperty<*>): Int = getInt(key, defaultValue)
-        override fun setValue(thisRef: Any, property: KProperty<*>, value: Int) = transaction { putInt(key, value) }
-    }
-}
 
 fun SharedPreferences.sharedValue(key: String, defaultValue: Boolean): ReadWriteProperty<Any, Boolean> {
     return object : ReadWriteProperty<Any, Boolean> {
         override fun getValue(thisRef: Any, property: KProperty<*>): Boolean = getBoolean(key, defaultValue)
         override fun setValue(thisRef: Any, property: KProperty<*>, value: Boolean) = transaction { putBoolean(key, value) }
+    }
+}
+
+fun SharedPreferences.sharedValue(key: String, defaultValue: Int): ReadWriteProperty<Any, Int> {
+    return object : ReadWriteProperty<Any, Int> {
+        override fun getValue(thisRef: Any, property: KProperty<*>): Int = getInt(key, defaultValue)
+        override fun setValue(thisRef: Any, property: KProperty<*>, value: Int) = transaction { putInt(key, value) }
     }
 }
 
@@ -70,6 +71,18 @@ fun SharedPreferences.sharedValue(key: String, defaultValue: Set<String>): ReadW
     return object : ReadWriteProperty<Any, Set<String>> {
         override fun getValue(thisRef: Any, property: KProperty<*>) = getStringSet(key, defaultValue) ?: defaultValue
         override fun setValue(thisRef: Any, property: KProperty<*>, value: Set<String>) = transaction { putStringSet(key, value) }
+    }
+}
+
+fun SharedPreferences.sharedValue(key: String, defaultValue: List<String>): ReadWriteProperty<Any, List<String>> {
+    return object : ReadWriteProperty<Any, List<String>> {
+        override fun getValue(thisRef: Any, property: KProperty<*>): List<String> {
+            return getString(key, null)?.let(ApiController.json::decodeFromString) ?: defaultValue
+        }
+
+        override fun setValue(thisRef: Any, property: KProperty<*>, value: List<String>) {
+            transaction { putString(key, ApiController.json.encodeToString(value)) }
+        }
     }
 }
 
