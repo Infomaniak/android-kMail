@@ -148,7 +148,7 @@ class ReplyForwardFooterManager @Inject constructor(private val appContext: Cont
     }
 
     private fun assembleReplyHtmlFooter(messageReplyHeader: String, previousFullBody: String): String {
-        val replyRoot = """<div id="answerContentMessage" class="${MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME}" />"""
+        val replyRoot = """<div class="${MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME}" />"""
         return parseAndWrapElementInNewDocument(replyRoot).apply {
             addAndEscapeTextLine(messageReplyHeader, endWithBr = false)
             addReplyBlockQuote {
@@ -178,7 +178,7 @@ class ReplyForwardFooterManager @Inject constructor(private val appContext: Cont
     }
 
     private fun Element.addReplyBlockQuote(addInnerElements: Element.() -> Unit) {
-        val blockQuote = appendElement("blockquote").addClass("ws-ng-quote")
+        val blockQuote = appendElement("blockquote")
         blockQuote.addInnerElements()
     }
 
