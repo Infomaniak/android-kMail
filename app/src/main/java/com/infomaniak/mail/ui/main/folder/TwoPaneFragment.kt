@@ -25,12 +25,16 @@ import androidx.navigation.fragment.findNavController
 import androidx.slidingpanelayout.widget.SlidingPaneLayout
 import com.infomaniak.lib.core.utils.getBackNavigationResult
 import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.mail.MatomoMail.OPEN_FROM_DRAFT_NAME
+import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
+import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.search.SearchFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialog
+import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 
@@ -126,6 +130,21 @@ abstract class TwoPaneFragment : Fragment() {
             isOnlyRightShown() -> mainViewModel.closeThread()
             this is ThreadListFragment -> requireActivity().finish()
             else -> findNavController().popBackStack()
+        }
+    }
+
+    fun navigateToThread(thread: Thread) {
+        if (thread.isOnlyOneDraft) {
+            trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
+            openDraft(thread)
+        } else {
+            mainViewModel.openThread(thread.uid)
+        }
+    }
+
+    private fun openDraft(thread: Thread) = runCatchingRealm {
+        mainViewModel.navigateToSelectedDraft(thread.messages.first()).observe(viewLifecycleOwner) {
+            safeNavigateToNewMessageActivity(it.toBundle())
         }
     }
 
