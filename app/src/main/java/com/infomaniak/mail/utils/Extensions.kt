@@ -278,7 +278,7 @@ fun TwoPaneFragment.navigateToThread(thread: Thread, mainViewModel: MainViewMode
         trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
         openDraft(mainViewModel, thread)
     } else {
-        openThread(thread.uid)
+        mainViewModel.openThread(thread.uid)
     }
 }
 

@@ -84,12 +84,15 @@ abstract class TwoPaneFragment : Fragment() {
             else -> null
         }
 
-        // Reset selected Thread UI when closing Thread
         currentThreadUid.observe(viewLifecycleOwner) { threadUid ->
-            if (threadUid == null) threadListAdapter?.selectNewThread(newPosition = null, threadUid = null)
+            val isOpeningThread = threadUid != null
+            if (isOpeningThread) {
+                val hasPaneOpened = slidingPaneLayout.openPane()
+                if (hasPaneOpened) requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundColor)
+            } else {
+                resetPanes(threadListAdapter)
+            }
         }
-
-        closeThreadTrigger.observe(viewLifecycleOwner) { resetPanes() }
 
         getBackNavigationResult(DownloadAttachmentProgressDialog.OPEN_WITH, ::startActivity)
 
@@ -120,30 +123,20 @@ abstract class TwoPaneFragment : Fragment() {
 
     fun handleOnBackPressed() {
         when {
-            isOnlyRightShown() -> resetPanes()
+            isOnlyRightShown() -> mainViewModel.closeThread()
             this is ThreadListFragment -> requireActivity().finish()
             else -> findNavController().popBackStack()
         }
     }
 
-    fun openThread(uid: String) {
-
-        mainViewModel.currentThreadUid.value = uid
-
-        val isOpening = slidingPaneLayout.openPane()
-
-        if (isOpening) requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundColor)
-    }
-
-    private fun resetPanes() {
+    private fun resetPanes(threadListAdapter: ThreadListAdapter?) {
 
         val isClosing = slidingPaneLayout.closePane()
-
         if (isClosing && this is ThreadListFragment) {
             requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundHeaderColor)
         }
 
-        mainViewModel.currentThreadUid.value = null
+        threadListAdapter?.selectNewThread(newPosition = null, threadUid = null)
 
         // TODO: We can see that the ThreadFragment's content is changing, while the pane is closing.
         //  Maybe we need to delay the transaction? Or better: start it when the pane is fully closed?
