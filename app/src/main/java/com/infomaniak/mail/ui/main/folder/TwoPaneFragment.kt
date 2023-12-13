@@ -35,12 +35,12 @@ import com.infomaniak.mail.ui.main.search.SearchFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialog
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
-import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 
 abstract class TwoPaneFragment : Fragment() {
 
     val mainViewModel: MainViewModel by activityViewModels()
+    val twoPaneViewModel: TwoPaneViewModel by activityViewModels()
 
     protected abstract val slidingPaneLayout: SlidingPaneLayout
 
@@ -54,15 +54,28 @@ abstract class TwoPaneFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupSlidingPane()
         observeCurrentFolder()
-        observeThreadEvents()
+        observeThreadUid()
+        observeThreadNavigation()
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+
+        val isLeftShown = areBothShown() || isOnlyLeftShown() // TODO: Only works on Phone, and not on Tablet.
+        val statusBarColor = if (isLeftShown && this is ThreadListFragment) {
+            R.color.backgroundHeaderColor
+        } else {
+            R.color.backgroundColor
+        }
+        requireActivity().window.statusBarColor = requireContext().getColor(statusBarColor)
     }
 
     private fun setupSlidingPane() {
         slidingPaneLayout.lockMode = SlidingPaneLayout.LOCK_MODE_LOCKED
     }
 
-    private fun observeCurrentFolder() = with(mainViewModel) {
-        currentFolder.observe(viewLifecycleOwner) { folder ->
+    private fun observeCurrentFolder() = with(twoPaneViewModel) {
+        mainViewModel.currentFolder.observe(viewLifecycleOwner) { folder ->
 
             val (folderId, name) = if (this@TwoPaneFragment is SearchFragment) {
                 FolderController.SEARCH_FOLDER_ID to getString(R.string.searchFolderName)
@@ -80,15 +93,15 @@ abstract class TwoPaneFragment : Fragment() {
         }
     }
 
-    private fun observeThreadEvents() = with(mainViewModel) {
+    private fun observeThreadUid() {
 
-        val threadListAdapter = when (this@TwoPaneFragment) {
-            is ThreadListFragment -> this@TwoPaneFragment.threadListAdapter
-            is SearchFragment -> this@TwoPaneFragment.threadListAdapter
+        val threadListAdapter = when (this) {
+            is ThreadListFragment -> this.threadListAdapter
+            is SearchFragment -> this.threadListAdapter
             else -> null
         }
 
-        currentThreadUid.observe(viewLifecycleOwner) { threadUid ->
+        twoPaneViewModel.currentThreadUid.observe(viewLifecycleOwner) { threadUid ->
             val isOpeningThread = threadUid != null
             if (isOpeningThread) {
                 val hasPaneOpened = slidingPaneLayout.openPane()
@@ -97,6 +110,9 @@ abstract class TwoPaneFragment : Fragment() {
                 resetPanes(threadListAdapter)
             }
         }
+    }
+
+    private fun observeThreadNavigation() = with(twoPaneViewModel) {
 
         getBackNavigationResult(DownloadAttachmentProgressDialog.OPEN_WITH, ::startActivity)
 
@@ -127,7 +143,7 @@ abstract class TwoPaneFragment : Fragment() {
 
     fun handleOnBackPressed() {
         when {
-            isOnlyRightShown() -> mainViewModel.closeThread()
+            isOnlyRightShown() -> twoPaneViewModel.closeThread()
             this is ThreadListFragment -> requireActivity().finish()
             else -> findNavController().popBackStack()
         }
@@ -138,12 +154,12 @@ abstract class TwoPaneFragment : Fragment() {
             trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
             openDraft(thread)
         } else {
-            mainViewModel.openThread(thread.uid)
+            twoPaneViewModel.openThread(thread.uid)
         }
     }
 
     private fun openDraft(thread: Thread) = runCatchingRealm {
-        mainViewModel.navigateToSelectedDraft(thread.messages.first()).observe(viewLifecycleOwner) {
+        twoPaneViewModel.navigateToSelectedDraft(thread.messages.first()).observe(viewLifecycleOwner) {
             safeNavigateToNewMessageActivity(it.toBundle())
         }
     }

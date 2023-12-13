@@ -20,7 +20,6 @@ package com.infomaniak.mail.ui.main.thread
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.drawable.InsetDrawable
-import android.net.Uri
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
@@ -64,12 +63,8 @@ import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.*
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
+import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.OpenThreadResult
-import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialogArgs
-import com.infomaniak.mail.ui.main.thread.actions.MessageActionsBottomSheetDialogArgs
-import com.infomaniak.mail.ui.main.thread.actions.ReplyBottomSheetDialogArgs
-import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialogArgs
-import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipients
 import com.infomaniak.mail.utils.UiUtils.dividerDrawable
@@ -107,6 +102,7 @@ class ThreadFragment : Fragment() {
     private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
 
     private val mainViewModel: MainViewModel by activityViewModels()
+    private val twoPaneViewModel: TwoPaneViewModel by activityViewModels()
     private val threadViewModel: ThreadViewModel by viewModels()
 
     private val twoPaneFragment inline get() = parentFragment as TwoPaneFragment
@@ -176,7 +172,7 @@ class ThreadFragment : Fragment() {
 
     private fun setupUi() = with(binding) {
 
-        toolbar.setNavigationOnClickListener { mainViewModel.closeThread() }
+        toolbar.setNavigationOnClickListener { twoPaneViewModel.closeThread() }
 
         val defaultTextColor = context.getColor(R.color.primaryTextColor)
         appBar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
@@ -204,10 +200,10 @@ class ThreadFragment : Fragment() {
     private fun setupAdapter() = with(binding.messagesList) {
         adapter = ThreadAdapter(
             shouldLoadDistantResources = shouldLoadDistantResources(),
-            onContactClicked = { mainViewModel.detailedContactArgs.value = DetailedContactBottomSheetDialogArgs(it) },
+            onContactClicked = twoPaneViewModel::navigateToDetailContact,
             onDraftClicked = { message ->
                 trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
-                goToNewMessageActivity(
+                twoPaneViewModel.navigateToNewMessage(
                     arrivedFromExistingDraft = true,
                     draftLocalUuid = message.draftLocalUuid,
                     draftResource = message.draftResource,
@@ -241,7 +237,7 @@ class ThreadFragment : Fragment() {
                 message.navigateToActionsBottomSheet()
             },
             onAllExpandedMessagesLoaded = ::scrollToFirstUnseenMessage,
-            navigateToNewMessageActivity = { goToNewMessageActivity(mailToUri = it) },
+            navigateToNewMessageActivity = { twoPaneViewModel.navigateToNewMessage(mailToUri = it) },
             promptLink = { data, type ->
                 // When adding a phone number to contacts, Google decodes this value in case it's url-encoded. But I could not
                 // reproduce this issue when manually creating a url-encoded href. If this is triggered, fix it by also
@@ -273,7 +269,7 @@ class ThreadFragment : Fragment() {
 
     private fun observeThreadOpening() = with(threadViewModel) {
 
-        mainViewModel.currentThreadUid.distinctUntilChanged().observeNotNull(viewLifecycleOwner) { threadUid ->
+        twoPaneViewModel.currentThreadUid.distinctUntilChanged().observeNotNull(viewLifecycleOwner) { threadUid ->
 
             reassignThreadLive(threadUid)
             reassignMessagesLive(threadUid)
@@ -281,7 +277,7 @@ class ThreadFragment : Fragment() {
             openThread(threadUid).observe(viewLifecycleOwner) { result ->
 
                 if (result == null) {
-                    mainViewModel.closeThread()
+                    twoPaneViewModel.closeThread()
                     return@observe
                 }
 
@@ -300,7 +296,7 @@ class ThreadFragment : Fragment() {
         threadViewModel.threadLive.observe(viewLifecycleOwner) { thread ->
 
             if (thread == null) {
-                mainViewModel.closeThread()
+                twoPaneViewModel.closeThread()
                 return@observe
             }
 
@@ -326,7 +322,7 @@ class ThreadFragment : Fragment() {
 
             if (messages.isEmpty()) {
                 mainViewModel.deletedMessages.value = deletedMessagesUids
-                mainViewModel.closeThread()
+                twoPaneViewModel.closeThread()
                 return@observe
             }
 
@@ -343,22 +339,22 @@ class ThreadFragment : Fragment() {
         mainViewModel.mergedContactsLive.observeNotNull(viewLifecycleOwner, threadAdapter::updateContacts)
     }
 
-    private fun observeQuickActionBarClicks() {
+    private fun observeQuickActionBarClicks() = with(twoPaneViewModel) {
         threadViewModel.quickActionBarClicks.observe(viewLifecycleOwner) { (threadUid, lastMessageToReplyTo, menuId) ->
             when (menuId) {
                 R.id.quickActionReply -> replyTo(lastMessageToReplyTo)
                 R.id.quickActionForward -> {
-                    goToNewMessageActivity(
+                    navigateToNewMessage(
                         draftMode = DraftMode.FORWARD,
                         previousMessageUid = lastMessageToReplyTo.uid,
                         shouldLoadDistantResources = shouldLoadDistantResources(lastMessageToReplyTo.uid),
                     )
                 }
                 R.id.quickActionMenu -> {
-                    mainViewModel.threadActionsArgs.value = ThreadActionsBottomSheetDialogArgs(
+                    navigateToThreadActions(
                         threadUid = threadUid,
-                        messageUidToReplyTo = lastMessageToReplyTo.uid,
                         shouldLoadDistantResources = shouldLoadDistantResources(lastMessageToReplyTo.uid),
+                        messageUidToReplyTo = lastMessageToReplyTo.uid,
                     )
                 }
             }
@@ -390,7 +386,7 @@ class ThreadFragment : Fragment() {
     }
 
     private fun observeCurrentFolderName() {
-        mainViewModel.rightPaneFolderName.observe(viewLifecycleOwner) {
+        twoPaneViewModel.rightPaneFolderName.observe(viewLifecycleOwner) {
             binding.emptyView.text = getString(R.string.noConversationSelected, it)
         }
     }
@@ -455,11 +451,7 @@ class ThreadFragment : Fragment() {
         if (hasUsableCache(requireContext()) || isInlineCachedFile(requireContext())) {
             startActivity(openWithIntent(requireContext()))
         } else {
-            mainViewModel.downloadAttachmentArgs.value = DownloadAttachmentProgressDialogArgs(
-                attachmentResource = resource!!,
-                attachmentName = name,
-                attachmentType = getFileTypeFromMimeType(),
-            )
+            twoPaneViewModel.navigateToDownloadAttachment(resource!!, name, getFileTypeFromMimeType())
         }
     }
 
@@ -485,28 +477,24 @@ class ThreadFragment : Fragment() {
         scheduleDownloadManager(url, name)
     }
 
-    private fun replyTo(message: Message) {
+    private fun replyTo(message: Message) = with(twoPaneViewModel) {
 
         val shouldLoadDistantResources = shouldLoadDistantResources(message.uid)
 
         if (message.getRecipientsForReplyTo(replyAll = true).second.isEmpty()) {
-            goToNewMessageActivity(
+            navigateToNewMessage(
                 draftMode = DraftMode.REPLY,
                 previousMessageUid = message.uid,
                 shouldLoadDistantResources = shouldLoadDistantResources,
             )
         } else {
-            mainViewModel.replyBottomSheetArgs.value = ReplyBottomSheetDialogArgs(
-                messageUid = message.uid,
-                shouldLoadDistantResources = shouldLoadDistantResources,
-            )
+            navigateToReply(message.uid, shouldLoadDistantResources)
         }
     }
 
-    private fun Message.navigateToActionsBottomSheet() = with(mainViewModel) {
-        messageActionsArgs.value = MessageActionsBottomSheetDialogArgs(
+    private fun Message.navigateToActionsBottomSheet() {
+        twoPaneViewModel.navigateToMessageAction(
             messageUid = uid,
-            threadUid = currentThreadUid.value ?: return,
             isThemeTheSame = threadAdapter.isThemeTheSameMap[uid] ?: return,
             shouldLoadDistantResources = shouldLoadDistantResources(uid),
         )
@@ -548,28 +536,6 @@ class ThreadFragment : Fragment() {
     }
 
     private fun shouldLoadDistantResources(): Boolean = localSettings.externalContent == ExternalContent.ALWAYS && isNotInSpam
-
-    private fun goToNewMessageActivity(
-        draftMode: DraftMode = DraftMode.NEW_MAIL,
-        previousMessageUid: String? = null,
-        shouldLoadDistantResources: Boolean = false,
-        arrivedFromExistingDraft: Boolean = false,
-        draftLocalUuid: String? = null,
-        draftResource: String? = null,
-        messageUid: String? = null,
-        mailToUri: Uri? = null,
-    ) {
-        mainViewModel.newMessageArgs.value = NewMessageActivityArgs(
-            draftMode = draftMode,
-            previousMessageUid = previousMessageUid,
-            shouldLoadDistantResources = shouldLoadDistantResources,
-            arrivedFromExistingDraft = arrivedFromExistingDraft,
-            draftLocalUuid = draftLocalUuid,
-            draftResource = draftResource,
-            messageUid = messageUid,
-            mailToUri = mailToUri,
-        )
-    }
 
     private fun computeSubject(
         thread: Thread,

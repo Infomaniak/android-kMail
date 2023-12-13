@@ -149,10 +149,10 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 archiveThread(threadUid)
             }
 
-            override fun onReadUnread() = with(mainViewModel) {
+            override fun onReadUnread() {
                 trackBottomSheetThreadActionsEvent(ACTION_MARK_AS_SEEN_NAME, value = thread.unseenMessagesCount == 0)
-                toggleThreadSeenStatus(threadUid)
-                closeThread()
+                mainViewModel.toggleThreadSeenStatus(threadUid)
+                twoPaneViewModel.closeThread()
             }
 
             override fun onMove() {
