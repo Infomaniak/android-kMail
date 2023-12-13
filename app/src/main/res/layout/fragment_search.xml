@@ -24,7 +24,7 @@
     tools:context=".ui.main.search.SearchFragment">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:layout_width="600dp"
+        android:layout_width="@dimen/leftSlidingPaneWidth"
         android:layout_height="match_parent">
 
         <com.google.android.material.appbar.AppBarLayout
@@ -208,7 +208,7 @@
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/threadHostFragment"
         android:name="com.infomaniak.mail.ui.main.thread.ThreadFragment"
-        android:layout_width="500dp"
+        android:layout_width="@dimen/rightSlidingPaneWidth"
         android:layout_height="match_parent"
         android:layout_weight="1" />
 </androidx.slidingpanelayout.widget.SlidingPaneLayout>
