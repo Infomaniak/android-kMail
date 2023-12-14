@@ -36,6 +36,7 @@ import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialog
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
+import com.infomaniak.mail.utils.updateNavigationBarColor
 
 abstract class TwoPaneFragment : Fragment() {
 
@@ -47,9 +48,10 @@ abstract class TwoPaneFragment : Fragment() {
     abstract fun getAnchor(): View?
     open fun doAfterFolderChanged() {}
 
+    fun isOnlyOneShown() = slidingPaneLayout.isSlideable
     fun areBothShown() = !slidingPaneLayout.isSlideable
-    fun isOnlyLeftShown() = slidingPaneLayout.let { it.isSlideable && !it.isOpen }
-    fun isOnlyRightShown() = slidingPaneLayout.let { it.isSlideable && it.isOpen }
+    fun isOnlyLeftShown() = isOnlyOneShown() && !slidingPaneLayout.isOpen
+    fun isOnlyRightShown() = isOnlyOneShown() && slidingPaneLayout.isOpen
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -167,11 +169,13 @@ abstract class TwoPaneFragment : Fragment() {
         }
     }
 
-    private fun resetPanes(threadListAdapter: ThreadListAdapter?) {
+    private fun resetPanes(threadListAdapter: ThreadListAdapter?) = with(requireActivity()) {
 
         val isClosing = slidingPaneLayout.closePane()
-        if (isClosing && this is ThreadListFragment) {
-            requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundHeaderColor)
+
+        if (isClosing) {
+            if (this@TwoPaneFragment is ThreadListFragment) window.statusBarColor = getColor(R.color.backgroundHeaderColor)
+            window.updateNavigationBarColor(getColor(R.color.backgroundColor))
         }
 
         threadListAdapter?.selectNewThread(newPosition = null, threadUid = null)

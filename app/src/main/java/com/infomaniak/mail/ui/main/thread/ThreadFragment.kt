@@ -397,6 +397,10 @@ class ThreadFragment : Fragment() {
         emptyView.isGone = true
         threadView.isVisible = true
 
+        if (twoPaneFragment.isOnlyOneShown()) {
+            requireActivity().window.updateNavigationBarColor(context.getColor(R.color.elevatedBackground))
+        }
+
         iconFavorite.setOnClickListener {
             trackThreadActionsEvent(ACTION_FAVORITE_NAME, threadViewModel.threadLive.value!!.isFavorite)
             mainViewModel.toggleThreadFavoriteStatus(threadUid)
