@@ -24,7 +24,6 @@ import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.*
 import androidx.viewbinding.ViewBinding
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
@@ -59,14 +58,12 @@ class FolderAdapter @Inject constructor(
 
     private var setFoldersJob: Job? = null
 
-    private var recyclerView: RecyclerView? = null
-
     operator fun invoke(
         isInMenuDrawer: Boolean,
         shouldIndent: Boolean = true,
         onFolderClicked: (folderId: String) -> Unit,
         onCollapseClicked: ((folderId: String, shouldCollapse: Boolean) -> Unit)? = null,
-        onCollapseTransition: (() -> Unit)? = null
+        onCollapseTransition: (() -> Unit)? = null,
     ): FolderAdapter {
         this.isInMenuDrawer = isInMenuDrawer
         this.shouldIndent = shouldIndent
@@ -75,11 +72,6 @@ class FolderAdapter @Inject constructor(
         this.onCollapseTransition = onCollapseTransition
 
         return this
-    }
-
-    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        super.onAttachedToRecyclerView(recyclerView)
-        this.recyclerView = recyclerView
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FolderViewHolder {
