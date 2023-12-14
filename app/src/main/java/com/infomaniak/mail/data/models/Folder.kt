@@ -90,16 +90,16 @@ class Folder : RealmObject {
         get() = enumValueOfOrNull<FolderRole>(_role)
 
     val unreadCountDisplay: UnreadDisplay
-        get() = UnreadDisplay(
+        inline get() = UnreadDisplay(
             count = unreadCountLocal,
             shouldDisplayPastille = unreadCountLocal == 0 && unreadCountRemote > 0,
         )
 
     val canBeCollapsed: Boolean // For parents only (only a parent can be collapsed, its children will be hidden instead)
-        get() = role == null && children.isNotEmpty() && isRoot
+        inline get() = children.isNotEmpty() && isRoot
 
     val isRoot: Boolean
-        get() = !path.contains(separator)
+        inline get() = !path.contains(separator)
 
     fun initLocalValues(
         lastUpdatedAt: RealmInstant?,

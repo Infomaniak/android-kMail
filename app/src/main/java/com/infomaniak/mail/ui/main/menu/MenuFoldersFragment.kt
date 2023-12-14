@@ -53,7 +53,7 @@ abstract class MenuFoldersFragment : Fragment() {
     protected abstract val isInMenuDrawer: Boolean
 
     protected val defaultFoldersAdapter: FolderAdapter by lazy {
-        defaultFolderAdapter(isInMenuDrawer, onFolderClicked = ::onFolderSelected)
+        defaultFolderAdapter(isInMenuDrawer, onFolderClicked = ::onFolderSelected, onCollapseClicked = ::onFolderCollapse)
     }
 
     protected val customFoldersAdapter: FolderAdapter by lazy {
