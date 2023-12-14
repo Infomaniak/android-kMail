@@ -258,8 +258,8 @@ class ThreadFragment : Fragment() {
                     return@observe
                 }
 
-                updateUi(threadUid, folderRole = mainViewModel.getActionFolderRole(result.thread))
-                updateAdapter(result)
+                initUi(threadUid, folderRole = mainViewModel.getActionFolderRole(result.thread))
+                initAdapter(result)
             }
         }
     }
@@ -362,7 +362,7 @@ class ThreadFragment : Fragment() {
         }
     }
 
-    private fun updateUi(threadUid: String, folderRole: FolderRole?) = with(binding) {
+    private fun initUi(threadUid: String, folderRole: FolderRole?) = with(binding) {
 
         // Display Thread view
         emptyView.isGone = true
@@ -409,7 +409,7 @@ class ThreadFragment : Fragment() {
         }
     }
 
-    private fun updateAdapter(result: OpenThreadResult) {
+    private fun initAdapter(result: OpenThreadResult) {
         threadAdapter.apply {
             isExpandedMap = result.isExpandedMap
             initialSetOfExpandedMessagesUids = result.initialSetOfExpandedMessagesUids
