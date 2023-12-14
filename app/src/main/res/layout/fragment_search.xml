@@ -25,7 +25,8 @@
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="@dimen/leftSlidingPaneWidth"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_weight="@integer/leftSlidingPaneWeight">
 
         <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
@@ -210,5 +211,6 @@
         android:name="com.infomaniak.mail.ui.main.thread.ThreadFragment"
         android:layout_width="@dimen/rightSlidingPaneWidth"
         android:layout_height="match_parent"
-        android:layout_weight="1" />
+        android:layout_weight="@integer/rightSlidingPaneWeight" />
+
 </androidx.slidingpanelayout.widget.SlidingPaneLayout>
