@@ -100,6 +100,7 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
         }
 
         mailboxSwitcher.setOnClickListener {
+            addMenuDrawerTransition()
             mailboxList.apply {
                 isVisible = !isVisible
                 mailboxExpandButton.toggleChevron(!isVisible)
@@ -109,6 +110,7 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
         }
 
         customFolders.setOnClickListener {
+            addMenuDrawerTransition()
             trackMenuDrawerEvent("customFolders", !customFolders.isCollapsed)
             customFoldersLayout.isGone = customFolders.isCollapsed
         }
@@ -145,6 +147,7 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
         }
 
         advancedActions.setOnClickListener {
+            addMenuDrawerTransition()
             trackMenuDrawerEvent("advancedActions", !advancedActions.isCollapsed)
             advancedActionsLayout.isGone = advancedActions.isCollapsed
         }
@@ -202,7 +205,12 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
     }
 
     override fun onCollapseTransition() {
-        TransitionManager.beginDelayedTransition(binding.drawerContentScrollView, ChangeBounds())
+        addMenuDrawerTransition(shouldFade = false)
+    }
+
+    private fun addMenuDrawerTransition(shouldFade: Boolean = true) {
+        val transition = if (shouldFade) null else ChangeBounds()
+        TransitionManager.beginDelayedTransition(binding.drawerContentScrollView, transition)
     }
 
     @SuppressLint("SetTextI18n")
