@@ -24,6 +24,7 @@ import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.*
 import androidx.viewbinding.ViewBinding
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
@@ -54,20 +55,31 @@ class FolderAdapter @Inject constructor(
     private var shouldIndent: Boolean = true
     private lateinit var onFolderClicked: (folderId: String) -> Unit
     private var onCollapseClicked: ((folderId: String, shouldCollapse: Boolean) -> Unit)? = null
+    private var onCollapseTransition: (() -> Unit)? = null
 
     private var setFoldersJob: Job? = null
+
+    private var recyclerView: RecyclerView? = null
 
     operator fun invoke(
         isInMenuDrawer: Boolean,
         shouldIndent: Boolean = true,
         onFolderClicked: (folderId: String) -> Unit,
         onCollapseClicked: ((folderId: String, shouldCollapse: Boolean) -> Unit)? = null,
+        onCollapseTransition: (() -> Unit)? = null
     ): FolderAdapter {
         this.isInMenuDrawer = isInMenuDrawer
         this.shouldIndent = shouldIndent
         this.onFolderClicked = onFolderClicked
         this.onCollapseClicked = onCollapseClicked
+        this.onCollapseTransition = onCollapseTransition
+
         return this
+    }
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
+        this.recyclerView = recyclerView
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FolderViewHolder {
@@ -159,6 +171,7 @@ class FolderAdapter @Inject constructor(
                 canBeCollapsed = folder.canBeCollapsed
                 setIndent(folderIndent, hasCollapsableFolder ?: false, canBeCollapsed)
                 setCollapsingButtonContentDescription(folderName)
+                onCollapseTransition?.invoke()
             }
             is SelectableMailboxItemView, is UnreadItemView -> {
                 throw IllegalStateException("`${this::class.simpleName}` cannot exists here. Only Folder classes are allowed")

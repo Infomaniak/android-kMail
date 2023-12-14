@@ -20,6 +20,8 @@ package com.infomaniak.mail.ui.main.menu
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.transition.ChangeBounds
+import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -197,6 +199,10 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
 
     override fun onFolderCollapse(folderId: String, shouldCollapse: Boolean) {
         menuDrawerViewModel.toggleFolderCollapsingState(folderId, shouldCollapse)
+    }
+
+    override fun onCollapseTransition() {
+        TransitionManager.beginDelayedTransition(binding.drawerContentScrollView, ChangeBounds())
     }
 
     @SuppressLint("SetTextI18n")
