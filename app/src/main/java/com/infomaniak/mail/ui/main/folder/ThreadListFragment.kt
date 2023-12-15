@@ -60,7 +60,6 @@ import com.infomaniak.mail.data.LocalSettings.Companion.DEFAULT_SWIPE_ACTION_LEF
 import com.infomaniak.mail.data.LocalSettings.Companion.DEFAULT_SWIPE_ACTION_RIGHT
 import com.infomaniak.mail.data.LocalSettings.SwipeAction
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity.COMPACT
-import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.thread.Thread
@@ -336,8 +335,10 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         searchButton.setOnClickListener {
             mainViewModel.isInSearch.value = true
             safeNavigate(
+                // We need a valid Folder ID for the API call to not fail, but the value itself won't be used.
+                // So if we don't have any, we use a hardcoded one (corresponding to "INBOX" folder).
                 ThreadListFragmentDirections.actionThreadListFragmentToSearchFragment(
-                    dummyFolderId = mainViewModel.currentFolderId ?: FolderController.INBOX_FOLDER_ID,
+                    dummyFolderId = mainViewModel.currentFolderId ?: "eJzz9HPyjwAABGYBgQ--"
                 ),
             )
         }
