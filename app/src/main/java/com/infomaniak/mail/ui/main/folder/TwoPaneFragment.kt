@@ -31,7 +31,6 @@ import com.infomaniak.mail.ui.main.search.SearchFragment
 import com.infomaniak.mail.ui.main.thread.DetailedContactBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.main.thread.actions.*
-import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 
@@ -63,9 +62,9 @@ abstract class TwoPaneFragment : Fragment() {
 
     private fun observeFolderName() = with(mainViewModel) {
 
-        Utils.waitInitMediator(currentFolder, isInSearch).observe(viewLifecycleOwner) { (folder, isInSearch) ->
+        currentFolder.observe(viewLifecycleOwner) { folder ->
 
-            val displayedFolder = (if (isInSearch) {
+            val displayedFolder = (if (this@TwoPaneFragment is SearchFragment) {
                 Folder().apply { name = getString(R.string.searchFolderName) }
             } else {
                 folder
