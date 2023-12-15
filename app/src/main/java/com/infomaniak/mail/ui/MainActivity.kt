@@ -29,6 +29,7 @@ import androidx.activity.result.contract.ActivityResultContracts.StartActivityFo
 import androidx.activity.result.contract.ActivityResultContracts.StartIntentSenderForResult
 import androidx.activity.viewModels
 import androidx.annotation.FloatRange
+import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Lifecycle.State
 import androidx.lifecycle.distinctUntilChanged
@@ -43,12 +44,14 @@ import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.Utils.toEnumOrThrow
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
+import com.infomaniak.lib.core.utils.year
 import com.infomaniak.lib.stores.StoreUtils.checkUpdateIsAvailable
 import com.infomaniak.lib.stores.StoreUtils.initAppUpdateManager
 import com.infomaniak.lib.stores.StoreUtils.launchInAppReview
 import com.infomaniak.lib.stores.StoreUtils.unregisterAppUpdateListener
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackDestination
+import com.infomaniak.mail.MatomoMail.trackEasterEggEvent
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.R
@@ -70,6 +73,8 @@ import io.sentry.SentryLevel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.Calendar
+import java.util.Date
 import java.util.UUID
 import javax.inject.Inject
 
@@ -102,6 +107,7 @@ class MainActivity : BaseActivity() {
     private val newMessageActivityResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         val draftAction = result.data?.getStringExtra(DRAFT_ACTION_KEY)?.let(DraftAction::valueOf)
         if (draftAction == DraftAction.SEND) {
+            showEasterXMas()
             showSendingSnackBarTimer.start()
             showAppReview()
         }
@@ -502,6 +508,25 @@ class MainActivity : BaseActivity() {
                 },
                 onNegativeButtonClicked = { openUrl(getString(R.string.urlUserReportAndroid)) },
             )
+        }
+    }
+
+    private fun showEasterXMas() {
+
+        val calendar = Calendar.getInstance()
+        val month = calendar.get(Calendar.MONTH)
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+        if (month == Calendar.DECEMBER && day <= 25) {
+            binding.easterEggXMas.apply {
+                isVisible = true
+                playAnimation()
+            }
+            Sentry.withScope { scope ->
+                scope.level = SentryLevel.INFO
+                Sentry.captureMessage("Easter egg XMas has been triggered! Woohoo!")
+            }
+            trackEasterEggEvent("XMas${Date().year()}")
         }
     }
 
