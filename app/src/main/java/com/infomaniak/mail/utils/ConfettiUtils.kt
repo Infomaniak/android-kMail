@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.utils
 
-import android.graphics.Color
 import android.view.ViewGroup
 import com.infomaniak.lib.confetti.CommonConfetti
 import com.infomaniak.lib.confetti.ConfettiSource
@@ -33,22 +32,6 @@ object ConfettiUtils {
     private const val EASTER_EGG_CONFETTI_TRIGGER_DELAY = 1_000L
 
     private const val EMISSION = 1_000_000.0f
-
-    private const val AQUA = -0xFF0001
-    private const val FUCHSIA = -0xFF01
-    private const val LIME = -0xFF0100
-    private const val MAROON = -0x800000
-    private const val NAVY = -0xFFFF80
-    private const val OLIVE = -0x7F8000
-    private const val PURPLE = -0x7FFF80
-    private const val SILVER = -0x3F3F40
-    private const val TEAL = -0xFF7F80
-
-    private val COLORED_SNOW_COLORS = arrayOf(
-        Color.BLACK, Color.DKGRAY, Color.GRAY, Color.LTGRAY, Color.WHITE, Color.RED,
-        Color.GREEN, Color.BLUE, Color.YELLOW, Color.CYAN, Color.MAGENTA,
-        AQUA, FUCHSIA, LIME, MAROON, NAVY, OLIVE, PURPLE, SILVER, TEAL,
-    ).toIntArray()
 
     private var easterEggConfettiCount = 0
     private var easterEggConfettiTime = 0L
@@ -104,7 +87,7 @@ object ConfettiUtils {
 
         fun displaySnow(colored: Boolean = false) {
 
-            val colors = if (colored) COLORED_SNOW_COLORS else resources.getIntArray(R.array.snowColors)
+            val colors = resources.getIntArray(if (colored) R.array.coloredSnowColors else R.array.snowColors)
 
             val config = ConfettiConfig(
                 duration = 5_000L,
