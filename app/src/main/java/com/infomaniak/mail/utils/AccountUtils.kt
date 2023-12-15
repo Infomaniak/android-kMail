@@ -105,11 +105,11 @@ object AccountUtils : CredentialManager() {
         return shouldStop
     }
 
-    fun requestCurrentUser(): User? {
+    suspend fun requestCurrentUser(): User? {
         return (getUserById(currentUserId) ?: userDatabase.userDao().getFirst()).also { currentUser = it }
     }
 
-    fun addUser(user: User) {
+    suspend fun addUser(user: User) {
         currentUser = user
         userDatabase.userDao().insert(user)
     }
@@ -131,7 +131,7 @@ object AccountUtils : CredentialManager() {
         }
     }
 
-    fun removeUser(user: User) {
+    suspend fun removeUser(user: User) {
         userDatabase.userDao().delete(user)
     }
 

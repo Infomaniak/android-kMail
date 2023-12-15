@@ -84,7 +84,7 @@ class LoginActivity : AppCompatActivity() {
 
     companion object {
 
-        fun authenticateUser(context: Context, apiToken: ApiToken, mailboxController: MailboxController): Any {
+        suspend fun authenticateUser(context: Context, apiToken: ApiToken, mailboxController: MailboxController): Any {
             if (AccountUtils.getUserById(apiToken.userId) != null) return getErrorResponse(RCore.string.errorUserAlreadyPresent)
 
             InfomaniakCore.bearerToken = apiToken.accessToken
