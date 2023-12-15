@@ -130,6 +130,7 @@ class ThreadFragment : Fragment() {
         observeContacts()
         observeQuickActionBarClicks()
         observeSubjectUpdateTriggers()
+        observeCurrentFolderName()
 
         observeThreadOpening()
     }
@@ -359,6 +360,12 @@ class ThreadFragment : Fragment() {
                 context.copyStringToClipboard(subject, R.string.snackbarSubjectCopiedToClipboard, mainViewModel.snackBarManager)
                 true
             }
+        }
+    }
+
+    private fun observeCurrentFolderName() {
+        mainViewModel.rightPaneFolderName.observe(viewLifecycleOwner) {
+            binding.emptyView.text = getString(R.string.noConversationSelected, it)
         }
     }
 

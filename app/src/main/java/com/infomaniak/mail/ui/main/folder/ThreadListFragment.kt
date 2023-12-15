@@ -333,9 +333,11 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
 
         searchButton.setOnClickListener {
             safeNavigate(
+                // We need a valid Folder ID for the API call to not fail, but the value itself won't be used.
+                // So if we don't have any, we use a hardcoded one (corresponding to "INBOX" folder).
                 ThreadListFragmentDirections.actionThreadListFragmentToSearchFragment(
-                    dummyFolderId = mainViewModel.currentFolderId ?: "eJzz9HPyjwAABGYBgQ--", // Hardcoded INBOX folder
-                )
+                    dummyFolderId = mainViewModel.currentFolderId ?: "eJzz9HPyjwAABGYBgQ--"
+                ),
             )
         }
 

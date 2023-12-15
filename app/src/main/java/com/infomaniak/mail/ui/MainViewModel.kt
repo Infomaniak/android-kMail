@@ -204,6 +204,7 @@ class MainViewModel @Inject constructor(
 
     val closeThreadTrigger = SingleLiveEvent<Unit>()
 
+    val rightPaneFolderName = MutableLiveData<String>()
     val downloadAttachmentsArgs = SingleLiveEvent<Triple<String, String, AttachmentType>>()
     val newMessageArgs = SingleLiveEvent<NewMessageActivityArgs>()
     val replyBottomSheetArgs = SingleLiveEvent<Pair<String, Boolean>>()
