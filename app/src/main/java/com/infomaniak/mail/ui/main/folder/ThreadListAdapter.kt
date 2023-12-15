@@ -95,6 +95,12 @@ class ThreadListAdapter @Inject constructor(
     private var onSwipeFinished: (() -> Unit)? = null
     private var multiSelection: MultiSelectionListener<Thread>? = null
 
+    //region Tablet mode
+    var clickedThreadPosition: Int? = null
+        private set
+    private var clickedThreadUid: String? = null
+    //endregion
+
     init {
         setHasStableIds(true)
     }
@@ -137,7 +143,7 @@ class ThreadListAdapter @Inject constructor(
 
             when (payload) {
                 NotificationType.AVATAR -> binding.displayAvatar(thread)
-                NotificationType.SELECTED_STATE -> binding.updateSelectedState(thread)
+                NotificationType.SELECTED_STATE -> binding.updateSelectedUi(thread)
             }
         } else {
             super.onBindViewHolder(holder, position, payloads)
@@ -146,7 +152,7 @@ class ThreadListAdapter @Inject constructor(
 
     override fun onBindViewHolder(item: Any, viewHolder: ThreadListViewHolder, position: Int) = with(viewHolder.binding) {
         when (getItemViewType(position)) {
-            DisplayType.THREAD.layout -> (this as CardviewThreadItemBinding).displayThread(item as Thread)
+            DisplayType.THREAD.layout -> (this as CardviewThreadItemBinding).displayThread(item as Thread, position)
             DisplayType.DATE_SEPARATOR.layout -> (this as ItemThreadDateSeparatorBinding).displayDateSeparator(item as String)
             DisplayType.FLUSH_FOLDER_BUTTON.layout -> (this as ItemThreadFlushFolderButtonBinding).displayFlushFolderButton(item as FolderRole)
             DisplayType.LOAD_MORE_BUTTON.layout -> (this as ItemThreadLoadMoreButtonBinding).displayLoadMoreButton()
@@ -173,8 +179,15 @@ class ThreadListAdapter @Inject constructor(
         }
     }.getOrDefault(super.getItemId(position))
 
-    private fun CardviewThreadItemBinding.displayThread(thread: Thread) {
+    fun getItemPosition(threadUid: String): Int? {
+        return dataSet
+            .indexOfFirst { it is Thread && it.uid == threadUid }
+            .let { position -> if (position == -1) null else position }
+    }
 
+    private fun CardviewThreadItemBinding.displayThread(thread: Thread, position: Int) {
+
+        refreshCachedSelectedPosition(thread.uid, position) // If item changed position, update cached position.
         setupThreadDensityDependentUi()
         displayAvatar(thread)
 
@@ -197,44 +210,70 @@ class ThreadListAdapter @Inject constructor(
             if (unseenMessagesCount == 0) setThreadUiRead() else setThreadUiUnread()
         }
 
-        selectionCardView.setOnClickListener {
-            if (multiSelection?.isEnabled == true) toggleSelection(thread) else onThreadClicked?.invoke(thread)
-        }
+        selectionCardView.setOnClickListener { chooseWhatToDoWhenClicked(thread, position) }
 
         multiSelection?.let { listener ->
-            updateSelectedState(thread)
-
             selectionCardView.setOnLongClickListener {
                 context.trackMultiSelectionEvent("enable", TrackerAction.LONG_PRESS)
                 if (!listener.isEnabled) listener.isEnabled = true
-                toggleSelection(thread)
+                toggleMultiSelectedThread(thread, shouldUpdateSelectedUi = false)
                 true
             }
         }
+
+        updateSelectedUi(thread)
     }
 
-    private fun CardviewThreadItemBinding.toggleSelection(selectedThread: Thread) = with(multiSelection!!) {
-        with(selectedItems) {
-            if (contains(selectedThread)) remove(selectedThread) else add(selectedThread)
+    private fun refreshCachedSelectedPosition(threadUid: String, position: Int) {
+        if (threadUid == clickedThreadUid) clickedThreadPosition = position
+    }
+
+    private fun CardviewThreadItemBinding.chooseWhatToDoWhenClicked(thread: Thread, position: Int) {
+        if (multiSelection?.isEnabled == true) {
+            toggleMultiSelectedThread(thread)
+        } else {
+            onThreadClicked?.invoke(thread)
+            if (thread.uid != clickedThreadUid) selectNewThread(position, thread.uid)
+        }
+    }
+
+    fun selectNewThread(newPosition: Int?, threadUid: String?) {
+
+        val oldPosition = clickedThreadPosition
+
+        clickedThreadPosition = newPosition
+        clickedThreadUid = threadUid
+
+        if (oldPosition != null && oldPosition < itemCount) notifyItemChanged(oldPosition, NotificationType.SELECTED_STATE)
+        if (newPosition != null) notifyItemChanged(newPosition, NotificationType.SELECTED_STATE)
+    }
+
+    private fun CardviewThreadItemBinding.toggleMultiSelectedThread(thread: Thread, shouldUpdateSelectedUi: Boolean = true) {
+        with(multiSelection!!) {
+            selectedItems.apply { if (contains(thread)) remove(thread) else add(thread) }
             publishSelectedItems()
         }
-        updateSelectedState(selectedThread)
+        if (shouldUpdateSelectedUi) updateSelectedUi(thread)
     }
 
-    private fun CardviewThreadItemBinding.updateSelectedState(selectedThread: Thread) {
+    private fun CardviewThreadItemBinding.updateSelectedUi(targetThread: Thread) {
 
-        val isMultiSelected = multiSelection?.selectedItems?.contains(selectedThread) == true
+        val isMultiSelected = multiSelection?.selectedItems?.contains(targetThread) == true
+        val isTabletSelected = targetThread.uid == clickedThreadUid
 
         selectionCardView.backgroundTintList = when {
             isMultiSelected -> ColorStateList.valueOf(context.getAttributeColor(RMaterial.attr.colorPrimaryContainer))
+            isTabletSelected -> context.getColorStateList(R.color.tabletSelectedBackground)
             else -> context.getColorStateList(R.color.backgroundColor)
         }
 
-        with(localSettings) {
-            expeditorAvatar.isVisible = !isMultiSelected && threadDensity == LARGE
-            checkMarkLayout.isVisible = multiSelection?.isEnabled == true
-            checkedState.isVisible = isMultiSelected
-            uncheckedState.isVisible = threadDensity != LARGE && !isMultiSelected
+        multiSelection?.let {
+            with(localSettings) {
+                expeditorAvatar.isVisible = !isMultiSelected && threadDensity == LARGE
+                checkMarkLayout.isVisible = it.isEnabled
+                checkedState.isVisible = isMultiSelected
+                uncheckedState.isVisible = !isMultiSelected && threadDensity != LARGE
+            }
         }
     }
 
@@ -542,7 +581,7 @@ class ThreadListAdapter @Inject constructor(
         SEE_ALL_BUTTON(R.layout.item_thread_see_all_button),
     }
 
-    private enum class NotificationType {
+    enum class NotificationType {
         AVATAR,
         SELECTED_STATE,
     }

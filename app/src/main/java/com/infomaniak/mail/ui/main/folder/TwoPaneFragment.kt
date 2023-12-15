@@ -59,6 +59,17 @@ abstract class TwoPaneFragment : Fragment() {
 
     private fun observeThreadEvents() = with(mainViewModel) {
 
+        val threadListAdapter = when (this@TwoPaneFragment) {
+            is ThreadListFragment -> this@TwoPaneFragment.threadListAdapter
+            is SearchFragment -> this@TwoPaneFragment.threadListAdapter
+            else -> null
+        }
+
+        // Reset selected Thread UI when closing Thread
+        currentThreadUid.observe(viewLifecycleOwner) { threadUid ->
+            if (threadUid == null) threadListAdapter?.selectNewThread(newPosition = null, threadUid = null)
+        }
+
         closeThreadTrigger.observe(viewLifecycleOwner) { resetPanes() }
 
         getBackNavigationResult(DownloadAttachmentProgressDialog.OPEN_WITH, ::startActivity)
