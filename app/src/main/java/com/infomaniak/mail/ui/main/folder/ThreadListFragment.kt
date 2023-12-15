@@ -195,7 +195,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
     private fun navigateFromNotificationToNewMessage() {
         arguments?.consumeKeyIfProvided(navigationArgs::replyToMessageUid.name) { replyToMessageUid ->
 
-            // If we clicked on the "Reply" action of a Notification, we need to navigate to ThreadFragment.
+            // If we clicked on the "Reply" action of a Notification, we need to navigate to NewMessageActivity.
             safeNavigateToNewMessageActivity(
                 NewMessageActivityArgs(
                     draftMode = navigationArgs.draftMode,
