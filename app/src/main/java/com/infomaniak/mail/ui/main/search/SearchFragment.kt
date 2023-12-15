@@ -48,7 +48,6 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentSearchBinding
-import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.search.SearchFolderAdapter.SearchFolderElement
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
@@ -72,9 +71,6 @@ class SearchFragment : TwoPaneFragment() {
 
     @Inject
     lateinit var localSettings: LocalSettings
-
-    @Inject
-    lateinit var threadListAdapter: ThreadListAdapter
 
     private val showLoadingTimer: CountDownTimer by lazy { Utils.createRefreshTimer(onTimerFinish = ::showRefreshLayout) }
 

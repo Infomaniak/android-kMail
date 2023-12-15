@@ -37,6 +37,7 @@ import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDial
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 import com.infomaniak.mail.utils.updateNavigationBarColor
+import javax.inject.Inject
 
 abstract class TwoPaneFragment : Fragment() {
 
@@ -44,6 +45,12 @@ abstract class TwoPaneFragment : Fragment() {
     val twoPaneViewModel: TwoPaneViewModel by activityViewModels()
 
     protected abstract val slidingPaneLayout: SlidingPaneLayout
+
+    // TODO: When we'll update DragDropSwipeRecyclerViewLib, we'll need to make the adapter nullable.
+    //  For now it causes a memory leak, because we can't remove the strong reference
+    //  between the ThreadList's RecyclerView and its Adapter as it throws an NPE.
+    @Inject
+    lateinit var threadListAdapter: ThreadListAdapter
 
     abstract fun getAnchor(): View?
     open fun doAfterFolderChanged() {}
@@ -99,13 +106,6 @@ abstract class TwoPaneFragment : Fragment() {
     }
 
     private fun observeThreadUid() {
-
-        val threadListAdapter = when (this) {
-            is ThreadListFragment -> this.threadListAdapter
-            is SearchFragment -> this.threadListAdapter
-            else -> null
-        }
-
         twoPaneViewModel.currentThreadUid.observe(viewLifecycleOwner) { threadUid ->
             val isOpeningThread = threadUid != null
             if (isOpeningThread) {
