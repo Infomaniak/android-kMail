@@ -36,7 +36,9 @@ object ConfettiUtils {
     private var easterEggConfettiCount = 0
     private var easterEggConfettiTime = 0L
 
-    fun onEasterEggConfettiClicked(container: ViewGroup, type: ConfettiType, matomoValue: String) {
+    fun onEasterEggConfettiClicked(container: ViewGroup?, type: ConfettiType, matomoValue: String) {
+
+        if (container == null) return
 
         val currentTime = System.currentTimeMillis()
 
