@@ -96,8 +96,7 @@ class ThreadListAdapter @Inject constructor(
     private var multiSelection: MultiSelectionListener<Thread>? = null
 
     //region Tablet mode
-    var clickedThreadPosition: Int? = null
-        private set
+    private var clickedThreadPosition: Int? = null
     private var clickedThreadUid: String? = null
     //endregion
 
