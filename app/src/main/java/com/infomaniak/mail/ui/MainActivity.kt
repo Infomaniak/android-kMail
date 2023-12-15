@@ -23,6 +23,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.View
+import android.view.ViewGroup
 import android.webkit.WebView
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts.*
@@ -510,6 +511,8 @@ class MainActivity : BaseActivity() {
     fun navigateToSyncAutoConfigActivity() {
         syncAutoConfigActivityResultLauncher.launch(Intent(this, SyncAutoConfigActivity::class.java))
     }
+
+    fun getConfettiContainer(): ViewGroup = binding.easterEggConfettiContainer
 
     companion object {
         const val DRAFT_ACTION_KEY = "draftAction"
