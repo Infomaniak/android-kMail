@@ -128,6 +128,14 @@ class SearchFragment : TwoPaneFragment() {
         _binding = null
     }
 
+    override fun getAnchor(): View? {
+        return if (isOnlyLeftShown()) {
+            null
+        } else {
+            _binding?.threadHostFragment?.getFragment<ThreadFragment?>()?.getAnchor()
+        }
+    }
+
     private fun setupAdapter() {
         threadListAdapter(
             folderRole = null,
@@ -349,14 +357,6 @@ class SearchFragment : TwoPaneFragment() {
 
     private fun showRefreshLayout() {
         binding.swipeRefreshLayout.isRefreshing = true
-    }
-
-    fun getAnchor(): View? {
-        return if (isOnlyLeftShown()) {
-            null
-        } else {
-            _binding?.threadHostFragment?.getFragment<ThreadFragment?>()?.getAnchor()
-        }
     }
 
     enum class VisibilityMode {
