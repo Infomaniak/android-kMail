@@ -26,6 +26,7 @@ import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -108,6 +109,23 @@ class ThreadFragment : Fragment() {
     private val permissionUtils by lazy { PermissionUtils(this) }
     private val isNotInSpam by lazy { mainViewModel.currentFolder.value?.role != FolderRole.SPAM }
 
+    private val twoPaneFragment get() = parentFragment as TwoPaneFragment
+
+    // TODO: This is probably too global as a trigger. Find something more refined?
+    private val globalLayoutListener by lazy {
+        OnGlobalLayoutListener {
+            runCatching {
+                binding.toolbar.apply {
+                    if (twoPaneFragment.areBothShown()) {
+                        if (navigationIcon != null) navigationIcon = null
+                    } else {
+                        if (navigationIcon == null) setNavigationIcon(R.drawable.ic_chevron_left)
+                    }
+                }
+            }
+        }
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentThreadBinding.inflate(inflater, container, false).also {
             _binding = it
@@ -121,6 +139,7 @@ class ThreadFragment : Fragment() {
         setupUi()
         setupAdapter()
         setupDialogs()
+        listenToGlobalLayoutChanges()
         permissionUtils.registerDownloadManagerPermission()
 
         observeLightThemeToggle()
@@ -141,17 +160,23 @@ class ThreadFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        removeGlobalLayoutListener()
         threadAdapter.resetCallbacks()
         super.onDestroyView()
         _binding = null
     }
 
+    private fun listenToGlobalLayoutChanges() {
+        binding.toolbar.viewTreeObserver.addOnGlobalLayoutListener(globalLayoutListener)
+    }
+
+    private fun removeGlobalLayoutListener() {
+        binding.toolbar.viewTreeObserver.removeOnGlobalLayoutListener(globalLayoutListener)
+    }
+
     private fun setupUi() = with(binding) {
 
-        toolbar.setNavigationOnClickListener {
-            val onlyThreadIsShown = (parentFragment as TwoPaneFragment).isOnlyRightShown()
-            if (onlyThreadIsShown) mainViewModel.closeThread()
-        }
+        toolbar.setNavigationOnClickListener { mainViewModel.closeThread() }
 
         val defaultTextColor = context.getColor(R.color.primaryTextColor)
         appBar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
@@ -589,6 +614,8 @@ class ThreadFragment : Fragment() {
     companion object {
         private const val COLLAPSE_TITLE_THRESHOLD = 0.5
         private const val ARCHIVE_INDEX = 2
+        private const val MIN_ALPHA = 0
+        private const val MAX_ALPHA = 255
 
         private fun allAttachmentsFileName(subject: String) = "infomaniak-mail-attachments-$subject.zip"
     }
