@@ -17,6 +17,17 @@
   -->
 <resources>
 
+    <!-- Two panes sizes -->
+    <!--
+        TODO: When we'll be able to recreate the Activity in `onConfigurationChanged`,
+            we should probably use different layouts in portrait & landscape instead of these hardcoded values.
+    -->
+    <!-- Keep the 2/5 & 3/5 ratios between widths & weights. -->
+    <dimen name="leftSlidingPaneWidth">440dp</dimen>
+    <dimen name="rightSlidingPaneWidth">660dp</dimen>
+    <integer name="leftSlidingPaneWeight">2</integer>
+    <integer name="rightSlidingPaneWeight">3</integer>
+
     <!-- View sizes -->
     <dimen name="accountAvatarSize">110dp</dimen>
     <dimen name="attachmentChipMaxSize">160dp</dimen>

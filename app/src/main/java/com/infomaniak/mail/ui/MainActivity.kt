@@ -373,7 +373,6 @@ class MainActivity : BaseActivity() {
     private fun setupSnackBar() {
         fun getAnchor(): View? = when (navController.currentDestination?.id) {
             R.id.threadListFragment -> findViewById(R.id.newMessageFab)
-            R.id.threadFragment -> findViewById(R.id.quickActionBar)
             else -> null
         }
 
@@ -424,7 +423,6 @@ class MainActivity : BaseActivity() {
             R.id.messageActionsBottomSheetDialog,
             R.id.replyBottomSheetDialog,
             R.id.detailedContactBottomSheetDialog,
-            R.id.threadFragment,
             R.id.threadActionsBottomSheetDialog -> null
             R.id.searchFragment -> R.color.backgroundColor
             else -> R.color.backgroundHeaderColor
@@ -437,7 +435,6 @@ class MainActivity : BaseActivity() {
             R.id.replyBottomSheetDialog,
             R.id.detailedContactBottomSheetDialog,
             R.id.threadActionsBottomSheetDialog -> R.color.backgroundColorSecondary
-            R.id.threadFragment -> R.color.elevatedBackground
             R.id.threadListFragment -> if (mainViewModel.isMultiSelectOn) R.color.elevatedBackground else R.color.backgroundColor
             else -> R.color.backgroundColor
         }.let { navigationBarColor ->

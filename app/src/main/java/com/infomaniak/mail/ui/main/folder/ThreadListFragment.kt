@@ -30,14 +30,13 @@ import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.distinctUntilChanged
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
+import androidx.recyclerview.widget.RecyclerView.AdapterDataObserver
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.VERTICAL_LIST_WITH_VERTICAL_DRAGGING
@@ -67,7 +66,6 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
-import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.*
@@ -85,19 +83,19 @@ import javax.inject.Inject
 import com.infomaniak.lib.core.R as RCore
 
 @AndroidEntryPoint
-class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
+class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private var _binding: FragmentThreadListBinding? = null
     val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
 
     private val navigationArgs: ThreadListFragmentArgs by navArgs()
-    private val mainViewModel: MainViewModel by activityViewModels()
     private val threadListViewModel: ThreadListViewModel by viewModels()
 
     private val threadListMultiSelection by lazy { ThreadListMultiSelection() }
 
     private var lastUpdatedDate: Date? = null
     private var previousCustomFolderId: String? = null
+    private var threadListObserver: AdapterDataObserver? = null
 
     @Inject
     lateinit var localSettings: LocalSettings
@@ -130,6 +128,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = runCatchingRealm {
 
+        navigateFromNotificationToThread()
         navigateFromNotificationToNewMessage()
 
         super.onViewCreated(view, savedInstanceState)
@@ -163,6 +162,23 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         observeFlushFolderTrigger()
         observeUpdateInstall()
     }.getOrDefault(Unit)
+
+    private fun navigateFromNotificationToThread() {
+        threadListObserver = object : AdapterDataObserver() {
+            override fun onChanged() {
+                // Here, we use `arguments` instead of `navigationArgs` because we need mutable data.
+                if (arguments?.getString(navigationArgs::openThreadUid.name) != null) {
+                    navigationArgs.openThreadUid?.let { openThreadUid ->
+                        // If we are coming from a Notification, we need to navigate to ThreadFragment.
+                        navigateToThread(mainViewModel, threadUid = openThreadUid)
+                        arguments?.remove(navigationArgs::openThreadUid.name)
+                        threadListObserver?.let(threadListAdapter::unregisterAdapterDataObserver)
+                    }
+                }
+            }
+        }
+        threadListObserver?.let(threadListAdapter::registerAdapterDataObserver)
+    }
 
     private fun navigateFromNotificationToNewMessage() {
         // Here, we use `arguments` instead of `navigationArgs` because we need mutable data.

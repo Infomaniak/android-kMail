@@ -15,181 +15,202 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.slidingpanelayout.widget.SlidingPaneLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/searchSlidingPaneLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".ui.main.search.SearchFragment">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <com.google.android.material.appbar.CollapsingToolbarLayout
-            android:id="@+id/collapsingToolbarLayout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="?android:windowBackground"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
-            app:title="@string/bugTrackerTitle">
-
-            <com.google.android.material.appbar.MaterialToolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:contentInsetEnd="@dimen/marginStandardMedium"
-                app:layout_collapseMode="pin">
-
-                <include
-                    android:id="@+id/searchBar"
-                    layout="@layout/item_search_view" />
-
-            </com.google.android.material.appbar.MaterialToolbar>
-        </com.google.android.material.appbar.CollapsingToolbarLayout>
-
-        <HorizontalScrollView
-            android:id="@+id/horizontalScrollViewDummyId"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/backgroundColor"
-            android:clipToPadding="false"
-            android:paddingHorizontal="@dimen/marginStandardMedium"
-            android:scrollbars="none">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <com.google.android.material.chip.ChipGroup
-                    android:id="@+id/mutuallyExclusiveChipGroup"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="@dimen/marginStandardSmall"
-                    app:chipSpacingHorizontal="@dimen/marginStandardSmall"
-                    app:singleLine="true"
-                    app:singleSelection="true">
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/read"
-                        style="@style/SearchFilterChip"
-                        android:text="@string/searchFilterRead" />
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/unread"
-                        style="@style/SearchFilterChip"
-                        android:text="@string/searchFilterUnread" />
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/favorites"
-                        style="@style/SearchFilterChip"
-                        android:text="@string/favoritesFolder"
-                        tools:checked="true" />
-
-                </com.google.android.material.chip.ChipGroup>
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/attachments"
-                    style="@style/SearchFilterChip"
-                    android:layout_marginEnd="@dimen/marginStandardSmall"
-                    android:text="@string/searchFilterAttachment"
-                    tools:checked="true" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/folderDropDown"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:backgroundTint="@color/chip_unread_background"
-                    android:checkable="true"
-                    android:drawableTint="@color/chip_unread_text_color"
-                    android:ellipsize="end"
-                    android:fontFamily="@font/suisseintl_medium"
-                    android:insetLeft="0dp"
-                    android:insetTop="@dimen/marginStandardSmall"
-                    android:insetRight="0dp"
-                    android:insetBottom="@dimen/marginStandardSmall"
-                    android:maxWidth="@dimen/maxSearchChipWidth"
-                    android:paddingStart="@dimen/alternativeMargin"
-                    android:paddingEnd="@dimen/marginStandardMedium"
-                    android:text="@string/searchFilterFolder"
-                    android:textColor="@color/chip_unread_text_color"
-                    app:closeIcon="@drawable/ic_chevron_down"
-                    app:strokeColor="?attr/colorPrimary"
-                    app:strokeWidth="1dp"
-                    app:toggleCheckedStateOnClick="false"
-                    tools:drawableLeft="@drawable/ic_check_sharp"
-                    tools:drawableRight="@drawable/ic_chevron_down" />
-
-            </LinearLayout>
-        </HorizontalScrollView>
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/swipeRefreshLayout"
-        android:layout_width="match_parent"
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="@dimen/leftSlidingPaneWidth"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:layout_weight="@integer/leftSlidingPaneWeight">
 
-        <FrameLayout
+        <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
 
-            <com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
-                android:id="@+id/mailRecyclerView"
+            <com.google.android.material.appbar.CollapsingToolbarLayout
+                android:id="@+id/collapsingToolbarLayout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+                android:background="?android:windowBackground"
+                app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
+                app:title="@string/bugTrackerTitle">
 
-            <FrameLayout
-                android:id="@+id/recentSearchesLayout"
+                <com.google.android.material.appbar.MaterialToolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:contentInsetEnd="@dimen/marginStandardMedium"
+                    app:layout_collapseMode="pin">
+
+                    <include
+                        android:id="@+id/searchBar"
+                        layout="@layout/item_search_view" />
+
+                </com.google.android.material.appbar.MaterialToolbar>
+            </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+            <!--
+                Don't remove this presumably useless ID.
+                By giving it an ID, the HorizontalScrollView will retain how much it has scrolled when the activity is recreated.
+                Without the ID, it resets to 0 every time.
+            -->
+            <HorizontalScrollView
+                android:id="@+id/horizontalScrollViewDummyId"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="gone">
+                android:layout_height="wrap_content"
+                android:background="@color/backgroundColor"
+                android:clipToPadding="false"
+                android:paddingHorizontal="@dimen/marginStandardMedium"
+                android:scrollbars="none">
 
                 <LinearLayout
-                    android:id="@+id/recentSearches"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/mutuallyExclusiveChipGroup"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/marginStandardSmall"
+                        app:chipSpacingHorizontal="@dimen/marginStandardSmall"
+                        app:singleLine="true"
+                        app:singleSelection="true">
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/read"
+                            style="@style/SearchFilterChip"
+                            android:text="@string/searchFilterRead" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/unread"
+                            style="@style/SearchFilterChip"
+                            android:text="@string/searchFilterUnread" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/favorites"
+                            style="@style/SearchFilterChip"
+                            android:text="@string/favoritesFolder"
+                            tools:checked="true" />
+
+                    </com.google.android.material.chip.ChipGroup>
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/attachments"
+                        style="@style/SearchFilterChip"
+                        android:layout_marginEnd="@dimen/marginStandardSmall"
+                        android:text="@string/searchFilterAttachment"
+                        tools:checked="true" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/folderDropDown"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:backgroundTint="@color/chip_unread_background"
+                        android:checkable="true"
+                        android:drawableTint="@color/chip_unread_text_color"
+                        android:ellipsize="end"
+                        android:fontFamily="@font/suisseintl_medium"
+                        android:insetLeft="0dp"
+                        android:insetTop="@dimen/marginStandardSmall"
+                        android:insetRight="0dp"
+                        android:insetBottom="@dimen/marginStandardSmall"
+                        android:maxWidth="@dimen/maxSearchChipWidth"
+                        android:paddingStart="@dimen/alternativeMargin"
+                        android:paddingEnd="@dimen/marginStandardMedium"
+                        android:text="@string/searchFilterFolder"
+                        android:textColor="@color/chip_unread_text_color"
+                        app:closeIcon="@drawable/ic_chevron_down"
+                        app:strokeColor="?attr/colorPrimary"
+                        app:strokeWidth="1dp"
+                        app:toggleCheckedStateOnClick="false"
+                        tools:drawableLeft="@drawable/ic_check_sharp"
+                        tools:drawableRight="@drawable/ic_chevron_down" />
+
+                </LinearLayout>
+            </HorizontalScrollView>
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefreshLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
+                    android:id="@+id/mailRecyclerView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+                <FrameLayout
+                    android:id="@+id/recentSearchesLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:visibility="gone">
 
+                    <LinearLayout
+                        android:id="@+id/recentSearches"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <TextView
+                            style="@style/SettingHeader"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/recentSearchesTitle" />
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/recentSearchesRecyclerView"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                            tools:listitem="@layout/item_recent_search" />
+
+                    </LinearLayout>
+
                     <TextView
+                        android:id="@+id/noHistory"
                         style="@style/SettingHeader"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/recentSearchesTitle" />
+                        android:gravity="center_horizontal"
+                        android:text="@string/emptyStateHistoryDescription" />
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/recentSearchesRecyclerView"
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                        tools:listitem="@layout/item_recent_search" />
+                </FrameLayout>
 
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/noHistory"
-                    style="@style/SettingHeader"
+                <com.infomaniak.mail.ui.main.EmptyStateView
+                    android:id="@+id/noResultsEmptyState"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center_horizontal"
-                    android:text="@string/emptyStateHistoryDescription" />
+                    android:layout_gravity="center_vertical"
+                    android:visibility="gone"
+                    app:description="@string/emptyStateSearchDescription"
+                    app:icon="@drawable/ic_empty_state_search"
+                    app:title="@string/emptyStateSearchTitle"
+                    tools:visibility="visible" />
 
             </FrameLayout>
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-            <com.infomaniak.mail.ui.main.EmptyStateView
-                android:id="@+id/noResultsEmptyState"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:visibility="gone"
-                app:description="@string/emptyStateSearchDescription"
-                app:icon="@drawable/ic_empty_state_search"
-                app:title="@string/emptyStateSearchTitle"
-                tools:visibility="visible" />
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/threadHostFragment"
+        android:name="com.infomaniak.mail.ui.main.thread.ThreadFragment"
+        android:layout_width="@dimen/rightSlidingPaneWidth"
+        android:layout_height="match_parent"
+        android:layout_weight="@integer/rightSlidingPaneWeight" />
 
-        </FrameLayout>
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</androidx.slidingpanelayout.widget.SlidingPaneLayout>

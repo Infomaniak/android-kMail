@@ -86,10 +86,10 @@ import com.infomaniak.mail.ui.main.SnackBarManager
 import com.infomaniak.mail.ui.main.folder.DateSeparatorItemDecoration
 import com.infomaniak.mail.ui.main.folder.HeaderItemDecoration
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
+import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.thread.MessageWebViewClient
 import com.infomaniak.mail.ui.main.thread.RoundedBackgroundSpan
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
-import com.infomaniak.mail.ui.main.thread.ThreadFragmentArgs
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.ui.noValidMailboxes.NoValidMailboxesActivity
 import com.infomaniak.mail.utils.AccountUtils.NO_MAILBOX_USER_ID_KEY
@@ -273,11 +273,18 @@ fun Fragment.safeNavigateToNewMessageActivity(args: Bundle? = null, currentClass
     if (canNavigate(currentClassName)) (activity as MainActivity).navigateToNewMessageActivity(args)
 }
 
-fun Fragment.navigateToThread(
+/**
+ * The `thread` is the default parameter for this function. But if we are coming from a Notification,
+ * we only have the `threadUid`. Since the `thread` is only used to know if it's `isOnlyOneDraft` or
+ * not, and that it can't be `true` if coming from a Notification, we can bypass the usage of the
+ * `thread` and directly use `threadUid` instead.
+ */
+fun TwoPaneFragment.navigateToThread(
     mainViewModel: MainViewModel,
-    thread: Thread,
+    thread: Thread? = null,
+    threadUid: String? = null,
 ) = runCatchingRealm {
-    if (thread.isOnlyOneDraft) { // Directly go to NewMessage screen
+    if (thread?.isOnlyOneDraft == true) { // Directly go to NewMessage screen
         trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
         mainViewModel.navigateToSelectedDraft(thread.messages.first()).observe(viewLifecycleOwner) {
             safeNavigateToNewMessageActivity(
@@ -290,7 +297,8 @@ fun Fragment.navigateToThread(
             )
         }
     } else {
-        safeNavigate(R.id.threadFragment, ThreadFragmentArgs(thread.uid).toBundle())
+        val uid = thread?.uid ?: threadUid ?: return@runCatchingRealm
+        openThread(uid)
     }
 }.getOrDefault(Unit)
 //endregion
