@@ -70,20 +70,15 @@ abstract class TwoPaneFragment : Fragment() {
     }
 
     private fun observeCurrentFolder() = with(mainViewModel) {
-
         currentFolder.observe(viewLifecycleOwner) { folder ->
 
-            val currentFolder = if (this@TwoPaneFragment is SearchFragment) {
-                searchFolder
-            } else {
-                folder ?: return@observe
-            }
+            val currentFolder = if (this@TwoPaneFragment is SearchFragment) searchFolder else folder ?: return@observe
 
             rightPaneFolderName.value = currentFolder.getLocalizedName(context)
 
             if (currentFolder.id != previousFolderId) {
                 previousFolderId = currentFolder.id
-                if (isInThread) closeThread()
+                if (isThreadOpen) closeThread()
             }
         }
     }

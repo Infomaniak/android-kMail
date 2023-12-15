@@ -203,7 +203,7 @@ class MainViewModel @Inject constructor(
     val currentThreadUid = MutableLiveData<String?>(null)
     val closeThreadTrigger = SingleLiveEvent<Unit>()
 
-    inline val isInThread get() = currentThreadUid.value != null
+    inline val isThreadOpen get() = currentThreadUid.value != null
     val rightPaneFolderName = MutableLiveData<String>()
     var previousFolderId: String? = null
 
