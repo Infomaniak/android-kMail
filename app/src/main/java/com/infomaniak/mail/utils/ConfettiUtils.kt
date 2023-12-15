@@ -36,7 +36,7 @@ object ConfettiUtils {
     private var easterEggConfettiCount = 0
     private var easterEggConfettiTime = 0L
 
-    fun onEasterEggConfettiClicked(container: ViewGroup, matomoValue: String) {
+    fun onEasterEggConfettiClicked(container: ViewGroup, type: ConfettiType, matomoValue: String) {
 
         val currentTime = System.currentTimeMillis()
 
@@ -49,11 +49,15 @@ object ConfettiUtils {
 
         if (easterEggConfettiCount == EASTER_EGG_CONFETTI_TRIGGER_TAPS) {
             easterEggConfettiCount = 0
-            triggerEasterEggConfetti(container, matomoValue)
+            triggerEasterEggConfetti(container, type, matomoValue)
         }
     }
 
-    private fun triggerEasterEggConfetti(container: ViewGroup, matomoValue: String) = with(container.context) {
+    private fun triggerEasterEggConfetti(
+        container: ViewGroup,
+        type: ConfettiType,
+        matomoValue: String,
+    ) = with(container.context) {
 
         Sentry.withScope { scope ->
             scope.level = SentryLevel.INFO
@@ -139,10 +143,9 @@ object ConfettiUtils {
             displayConfetti(config, sourceRight, container)
         }
 
-        if (matomoValue == "Tablet") {
-            displaySnow(colored = true)
-        } else {
-            when ((0..2).random()) {
+        when (type) {
+            ConfettiType.COLORED_SNOW -> displaySnow(colored = true)
+            ConfettiType.INFOMANIAK -> when ((0..2).random()) {
                 0 -> displayTada()
                 1 -> displaySnow()
                 else -> if (isInPortrait()) displaySingleGeneva() else displayDoubleGeneva()
@@ -160,6 +163,11 @@ object ConfettiUtils {
             .setVelocityY(velocityY, velocityDeviationY)
             .setAccelerationY(accelerationY)
             .animate(useGaussian)
+    }
+
+    enum class ConfettiType {
+        COLORED_SNOW,
+        INFOMANIAK,
     }
 
     @Suppress("ArrayInDataClass")
