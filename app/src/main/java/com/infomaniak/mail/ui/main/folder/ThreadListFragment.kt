@@ -201,7 +201,6 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
     override fun onStart() {
         super.onStart()
         binding.unreadCountChip.apply { isCloseIconVisible = isChecked }
-        mainViewModel.isInSearch.value = false
     }
 
     override fun onResume() {
@@ -333,7 +332,6 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         }
 
         searchButton.setOnClickListener {
-            mainViewModel.isInSearch.value = true
             safeNavigate(
                 // We need a valid Folder ID for the API call to not fail, but the value itself won't be used.
                 // So if we don't have any, we use a hardcoded one (corresponding to "INBOX" folder).
