@@ -115,11 +115,11 @@ class ThreadFragment : Fragment() {
     private val globalLayoutListener by lazy {
         OnGlobalLayoutListener {
             runCatching {
-                binding.toolbar.navigationIcon?.apply {
+                binding.toolbar.apply {
                     if (twoPaneFragment.areBothShown()) {
-                        if (alpha != MIN_ALPHA) alpha = MIN_ALPHA
+                        if (navigationIcon != null) navigationIcon = null
                     } else {
-                        if (alpha != MAX_ALPHA) alpha = MAX_ALPHA
+                        if (navigationIcon == null) setNavigationIcon(R.drawable.ic_chevron_left)
                     }
                 }
             }
@@ -176,9 +176,7 @@ class ThreadFragment : Fragment() {
 
     private fun setupUi() = with(binding) {
 
-        toolbar.setNavigationOnClickListener {
-            if (twoPaneFragment.isOnlyRightShown()) mainViewModel.closeThread()
-        }
+        toolbar.setNavigationOnClickListener { mainViewModel.closeThread() }
 
         val defaultTextColor = context.getColor(R.color.primaryTextColor)
         appBar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
