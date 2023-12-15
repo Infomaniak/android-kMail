@@ -211,13 +211,10 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
     }
 
     private fun addMenuDrawerTransition(shouldFade: Boolean = true) {
-        val transition = if (shouldFade) {
-            TransitionSet()
-                .addTransition(ChangeBounds())
-                .addTransition(Fade(Fade.IN))
-        } else {
-            ChangeBounds()
-        }.setDuration(MENU_DRAWER_TRANSITION_DURATION)
+        val transition = TransitionSet()
+            .addTransition(ChangeBounds())
+            .also { if (shouldFade) it.addTransition(Fade(Fade.IN)) }
+            .setDuration(MENU_DRAWER_TRANSITION_DURATION)
 
         TransitionManager.beginDelayedTransition(binding.drawerContentScrollView, transition)
     }
