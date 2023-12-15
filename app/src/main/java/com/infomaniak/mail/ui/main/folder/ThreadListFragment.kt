@@ -210,6 +210,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
     // `arguments` instead of `navigationArgs` so the data can be mutated.
     private fun Bundle.consumeKeyIfProvided(key: String, block: (String) -> Unit) {
         getString(key)?.let {
+            remove(key)
             block(it)
         }
     }
