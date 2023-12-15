@@ -96,8 +96,8 @@ class ThreadListAdapter @Inject constructor(
     private var multiSelection: MultiSelectionListener<Thread>? = null
 
     //region Tablet mode
-    private var clickedThreadPosition: Int? = null
-    private var clickedThreadUid: String? = null
+    private var openedThreadPosition: Int? = null
+    private var openedThreadUid: String? = null
     //endregion
 
     init {
@@ -224,7 +224,7 @@ class ThreadListAdapter @Inject constructor(
     }
 
     private fun refreshCachedSelectedPosition(threadUid: String, position: Int) {
-        if (threadUid == clickedThreadUid) clickedThreadPosition = position
+        if (threadUid == openedThreadUid) openedThreadPosition = position
     }
 
     private fun CardviewThreadItemBinding.chooseWhatToDoWhenClicked(thread: Thread, position: Int) {
@@ -232,16 +232,16 @@ class ThreadListAdapter @Inject constructor(
             toggleMultiSelectedThread(thread)
         } else {
             onThreadClicked?.invoke(thread)
-            if (thread.uid != clickedThreadUid) selectNewThread(position, thread.uid)
+            if (thread.uid != openedThreadUid) selectNewThread(position, thread.uid)
         }
     }
 
     fun selectNewThread(newPosition: Int?, threadUid: String?) {
 
-        val oldPosition = clickedThreadPosition
+        val oldPosition = openedThreadPosition
 
-        clickedThreadPosition = newPosition
-        clickedThreadUid = threadUid
+        openedThreadPosition = newPosition
+        openedThreadUid = threadUid
 
         if (oldPosition != null && oldPosition < itemCount) notifyItemChanged(oldPosition, NotificationType.SELECTED_STATE)
         if (newPosition != null) notifyItemChanged(newPosition, NotificationType.SELECTED_STATE)
@@ -266,7 +266,7 @@ class ThreadListAdapter @Inject constructor(
     private fun CardviewThreadItemBinding.updateSelectedUi(targetThread: Thread) {
 
         val isMultiSelected = multiSelection?.selectedItems?.contains(targetThread) == true
-        val isTabletSelected = targetThread.uid == clickedThreadUid
+        val isTabletSelected = targetThread.uid == openedThreadUid
 
         selectionCardView.backgroundTintList = when {
             isMultiSelected -> ColorStateList.valueOf(context.getAttributeColor(RMaterial.attr.colorPrimaryContainer))
