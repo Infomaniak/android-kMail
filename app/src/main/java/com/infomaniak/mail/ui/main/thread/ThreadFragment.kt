@@ -130,7 +130,7 @@ class ThreadFragment : Fragment() {
         observeContacts()
         observeQuickActionBarClicks()
         observeSubjectUpdateTriggers()
-        observeFolderChange()
+        observeCurrentFolderName()
 
         observeThreadOpening()
     }
@@ -363,9 +363,9 @@ class ThreadFragment : Fragment() {
         }
     }
 
-    private fun observeFolderChange() {
-        mainViewModel.rightPaneFolderName.observeNotNull(viewLifecycleOwner) {
-            binding.emptyView.text = it
+    private fun observeCurrentFolderName() {
+        mainViewModel.rightPaneFolderName.observe(viewLifecycleOwner) {
+            binding.emptyView.text = getString(R.string.noConversationSelected, it)
         }
     }
 

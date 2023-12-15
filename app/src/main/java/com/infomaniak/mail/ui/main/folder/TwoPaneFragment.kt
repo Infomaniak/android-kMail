@@ -70,7 +70,7 @@ abstract class TwoPaneFragment : Fragment() {
                 folder
             }) ?: return@observe
 
-            rightPaneFolderName.value = getString(R.string.noConversationSelected, displayedFolder.getLocalizedName(context))
+            rightPaneFolderName.value = displayedFolder.getLocalizedName(context)
         }
     }
 
