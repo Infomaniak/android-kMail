@@ -59,10 +59,8 @@ import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.firebase.RegisterFirebaseBroadcastReceiver
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.TitleAlertDialog
-import com.infomaniak.mail.ui.main.folder.ThreadListFragment
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
-import com.infomaniak.mail.ui.main.search.SearchFragment
 import com.infomaniak.mail.ui.newMessage.NewMessageActivity
 import com.infomaniak.mail.ui.sync.SyncAutoConfigActivity
 import com.infomaniak.mail.utils.*
@@ -381,8 +379,7 @@ class MainActivity : BaseActivity() {
     private fun setupSnackBar() {
 
         fun getAnchor(): View? = when (navController.currentDestination?.id) {
-            R.id.threadListFragment -> (currentFragment as? ThreadListFragment)?.getAnchor()
-            R.id.searchFragment -> (currentFragment as? SearchFragment)?.getAnchor()
+            R.id.threadListFragment, R.id.searchFragment -> (currentFragment as? TwoPaneFragment)?.getAnchor()
             else -> null
         }
 

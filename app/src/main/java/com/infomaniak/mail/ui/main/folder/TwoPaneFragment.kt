@@ -45,6 +45,8 @@ abstract class TwoPaneFragment : Fragment() {
             else -> throw IllegalStateException()
         }
 
+    abstract fun getAnchor(): View?
+
     fun areBothShown() = !slidingPaneLayout.isSlideable
     fun isOnlyLeftShown() = slidingPaneLayout.let { it.isSlideable && !it.isOpen }
     fun isOnlyRightShown() = slidingPaneLayout.let { it.isSlideable && it.isOpen }

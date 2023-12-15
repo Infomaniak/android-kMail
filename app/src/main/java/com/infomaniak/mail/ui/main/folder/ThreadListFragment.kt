@@ -165,6 +165,14 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         observeUpdateInstall()
     }.getOrDefault(Unit)
 
+    override fun getAnchor(): View? {
+        return if (isOnlyRightShown()) {
+            _binding?.threadHostFragment?.getFragment<ThreadFragment?>()?.getAnchor()
+        } else {
+            _binding?.newMessageFab
+        }
+    }
+
     private fun navigateFromNotificationToThread() {
         threadListObserver = object : AdapterDataObserver() {
             override fun onChanged() {
@@ -743,14 +751,6 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
 
     private fun showRefreshLayout() {
         binding.swipeRefreshLayout.isRefreshing = true
-    }
-
-    fun getAnchor(): View? {
-        return if (isOnlyRightShown()) {
-            _binding?.threadHostFragment?.getFragment<ThreadFragment?>()?.getAnchor()
-        } else {
-            _binding?.newMessageFab
-        }
     }
 
     private enum class EmptyState(
