@@ -31,6 +31,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
+import androidx.slidingpanelayout.widget.SlidingPaneLayout
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListener
@@ -60,9 +61,11 @@ import javax.inject.Inject
 class SearchFragment : TwoPaneFragment() {
 
     private var _binding: FragmentSearchBinding? = null
-    val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
+    private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
 
     private val searchViewModel: SearchViewModel by viewModels()
+
+    override val slidingPaneLayout: SlidingPaneLayout get() = binding.searchSlidingPaneLayout
 
     @Inject
     lateinit var localSettings: LocalSettings
