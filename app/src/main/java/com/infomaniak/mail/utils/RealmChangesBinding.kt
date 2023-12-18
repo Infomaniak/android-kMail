@@ -60,6 +60,7 @@ class RealmChangesBinding<T : BaseRealmObject, VH : ViewHolder> private construc
 
     var recyclerView: RecyclerView? = null
     var waitingBeforeNotifyAdapter: LiveData<Boolean>? = null
+    var deletedItemsIndices: ((indices: IntArray) -> Unit)? = null
     var beforeUpdateAdapter: ((itemList: List<T>) -> Unit)? = null
     var afterUpdateAdapter: ((itemList: List<T>) -> Unit)? = null
 
@@ -87,8 +88,10 @@ class RealmChangesBinding<T : BaseRealmObject, VH : ViewHolder> private construc
 
             is UpdatedResults -> { // Any update
                 waitingBeforeNotifyAdapter?.observeWaiting {
+                    deletedItemsIndices?.invoke(resultsChange.deletions)
                     notifyAdapter()
                 } ?: run {
+                    deletedItemsIndices?.invoke(resultsChange.deletions)
                     notifyAdapter()
                 }
             }
@@ -115,8 +118,10 @@ class RealmChangesBinding<T : BaseRealmObject, VH : ViewHolder> private construc
 
             is UpdatedList -> { // Any update
                 waitingBeforeNotifyAdapter?.observeWaiting {
+                    deletedItemsIndices?.invoke(listChange.deletions)
                     notifyAdapter()
                 } ?: run {
+                    deletedItemsIndices?.invoke(listChange.deletions)
                     notifyAdapter()
                 }
             }

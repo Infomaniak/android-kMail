@@ -520,6 +520,8 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
 
             waitingBeforeNotifyAdapter = threadListViewModel.isRecoveringFinished
 
+            deletedItemsIndices = ::removeMultiSelectItems
+
             afterUpdateAdapter = { threads ->
                 if (currentFilter.value == ThreadFilter.UNSEEN && threads.isEmpty()) {
                     currentFilter.value = ThreadFilter.ALL
@@ -654,6 +656,18 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         val folderName = folder.getLocalizedName(binding.context)
         SentryLog.i("UI", "Received folder name: $folderName")
         binding.toolbar.title = folderName
+    }
+
+    private fun removeMultiSelectItems(deletedIndices: IntArray) = with(mainViewModel) {
+        if (isMultiSelectOn) {
+            val previousThreads = threadListAdapter.dataSet.filterIsInstance<Thread>()
+            var shouldPublish = false
+            deletedIndices.forEach {
+                val isRemoved = mainViewModel.selectedThreads.remove(previousThreads[it])
+                if (isRemoved) shouldPublish = true
+            }
+            if (shouldPublish) publishSelectedItems()
+        }
     }
 
     private fun updateThreadsVisibility() = with(threadListViewModel) {
