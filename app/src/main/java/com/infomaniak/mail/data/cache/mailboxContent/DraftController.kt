@@ -147,12 +147,12 @@ class DraftController @Inject constructor(
 
         val previousFullBody = computePreviousFullBody(previousBody, message)
 
-        return assembleReplyHtmlHeader(messageReplyHeader, previousFullBody)
+        return assembleReplyHtmlFooter(messageReplyHeader, previousFullBody)
     }
 
-    private fun assembleReplyHtmlHeader(messageReplyHeader: String, previousFullBody: String): String {
+    private fun assembleReplyHtmlFooter(messageReplyHeader: String, previousFullBody: String): String {
         val replyRoot = """<div id="answerContentMessage" class="${MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME}" />"""
-        return newDocumentWithParentElement(replyRoot).apply {
+        return parseAndWrapElementInNewDocument(replyRoot).apply {
             addAndEscapeTextLine(messageReplyHeader, endWithBr = false)
             addReplyBlockQuote {
                 addAlreadyEscapedBody(previousFullBody)
@@ -193,7 +193,7 @@ class DraftController @Inject constructor(
 
         val previousFullBody = computePreviousFullBody(previousBody, message)
 
-        return assembleForwardHtmlHeader(
+        return assembleForwardHtmlFooter(
             messageForwardHeader,
             fromTitle,
             message,
@@ -205,7 +205,7 @@ class DraftController @Inject constructor(
         )
     }
 
-    private fun assembleForwardHtmlHeader(
+    private fun assembleForwardHtmlFooter(
         messageForwardHeader: String,
         fromTitle: String,
         message: Message,
@@ -216,7 +216,7 @@ class DraftController @Inject constructor(
         previousFullBody: String
     ): String {
         val forwardRoot = "<div class=\"${MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME}\" />"
-        return newDocumentWithParentElement(forwardRoot).apply {
+        return parseAndWrapElementInNewDocument(forwardRoot).apply {
             addAndEscapeTextLine("---------- $messageForwardHeader ---------")
             addAndEscapeTextLine("$fromTitle ${message.fromName()}")
             addAndEscapeTextLine("$dateTitle ${message.date.toDate()}")
@@ -230,9 +230,8 @@ class DraftController @Inject constructor(
         }.outerHtml()
     }
 
-    private fun newDocumentWithParentElement(parentElementHtml: String): Element {
-        val doc = Jsoup.parseBodyFragment(parentElementHtml)
-        return doc.body().firstElementChild()!!
+    private fun parseAndWrapElementInNewDocument(elementHtml: String): Element {
+        return Jsoup.parseBodyFragment(elementHtml).body().firstElementChild()!!
     }
 
     private fun Element.addAndEscapeTextLine(content: String, endWithBr: Boolean = true) {
