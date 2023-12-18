@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.main.folder
 
-import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -155,18 +154,6 @@ abstract class TwoPaneFragment : Fragment() {
                 ).toBundle(),
             )
         }
-    }
-
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-
-        val isLeftShown = areBothShown() || isOnlyLeftShown() // TODO: Only works on Phone, and not on Tablet.
-        val statusBarColor = if (isLeftShown && this is ThreadListFragment) {
-            R.color.backgroundHeaderColor
-        } else {
-            R.color.backgroundColor
-        }
-        requireActivity().window.statusBarColor = requireContext().getColor(statusBarColor)
     }
 
     fun handleOnBackPressed() {
