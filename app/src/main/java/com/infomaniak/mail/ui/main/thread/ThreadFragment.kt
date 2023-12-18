@@ -190,10 +190,12 @@ class ThreadFragment : Fragment() {
             toolbarSubject.setTextColor(textColor)
         }
 
-        // TODO: Disabled while there is no Tablet design
-        // changeToolbarColorOnScroll(toolbar, messagesListNestedScrollView) { color ->
-        //     appBar.backgroundTintList = ColorStateList.valueOf(color)
-        // }
+        changeToolbarColorOnScroll(
+            toolbar,
+            messagesListNestedScrollView,
+            shouldUpdateStatusBar = { twoPaneFragment.isOnlyRightShown() },
+            otherUpdates = { color -> appBar.backgroundTintList = ColorStateList.valueOf(color) },
+        )
     }
 
     private fun setupAdapter() = with(binding.messagesList) {
