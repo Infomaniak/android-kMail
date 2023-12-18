@@ -38,24 +38,20 @@ import javax.inject.Singleton
 class ReplyForwardFooterManager @Inject constructor(private val appContext: Context) {
 
     fun createForwardFooter(message: Message, attachmentsToForward: List<Attachment>): String {
-        val previousBody = getHtmlDocument(message)?.let { document ->
-            val attachmentsMap = message.attachments.associate { oldAttachment ->
-                val newAttachment = attachmentsToForward.find { it.originalContentId == oldAttachment.contentId }
-
-                oldAttachment.contentId to newAttachment?.contentId
-            }
-
-            document.doOnHtmlImage { imageElement ->
-                attachmentsMap[getCid(imageElement)]?.let { newContentId ->
+        val previousBody = getHtmlDocument(message)?.apply {
+            processCids(
+                message = message,
+                associateDataToCid = { oldAttachment ->
+                    val newAttachment = attachmentsToForward.find { it.originalContentId == oldAttachment.contentId }
+                    newAttachment?.contentId
+                },
+                applyAssociatedDataToImage = { newContentId, imageElement ->
                     imageElement.attr(SRC_ATTRIBUTE, "${CID_PROTOCOL}$newContentId")
                 }
-            }
-
-            return@let document.outerHtml()
-        } ?: ""
+            )
+        }?.outerHtml() ?: ""
 
         val previousFullBody = computePreviousFullBody(previousBody, message)
-
         return assembleForwardHtmlFooter(message, previousFullBody)
     }
 
@@ -64,21 +60,34 @@ class ReplyForwardFooterManager @Inject constructor(private val appContext: Cont
         val from = message.fromName()
         val messageReplyHeader = appContext.getString(R.string.messageReplyHeader, date, from)
 
-        val previousBody = getHtmlDocument(message)?.let { document ->
-            val attachmentsMap = message.attachments.associate { it.contentId to it.name }
-
-            document.doOnHtmlImage { imageElement ->
-                attachmentsMap[getCid(imageElement)]?.let { name ->
+        val previousBody = getHtmlDocument(message)?.apply {
+            processCids(
+                message = message,
+                associateDataToCid = Attachment::name,
+                applyAssociatedDataToImage = { name, imageElement ->
                     imageElement.replaceWith(TextNode("<$name>"))
                 }
-            }
-
-            return@let document.outerHtml()
-        } ?: ""
+            )
+        }?.outerHtml() ?: ""
 
         val previousFullBody = computePreviousFullBody(previousBody, message)
-
         return assembleReplyHtmlFooter(messageReplyHeader, previousFullBody)
+    }
+
+    private fun Document.processCids(
+        message: Message,
+        associateDataToCid: (Attachment) -> String?,
+        applyAssociatedDataToImage: (String, Element) -> Unit
+    ) {
+        val attachmentsMap = message.attachments.associate {
+            it.contentId to associateDataToCid(it)
+        }
+
+        doOnHtmlImage { imageElement ->
+            attachmentsMap[getCid(imageElement)]?.let { associatedData ->
+                applyAssociatedDataToImage(associatedData, imageElement)
+            }
+        }
     }
 
     private fun Message.fromName(): String {
