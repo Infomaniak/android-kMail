@@ -349,11 +349,7 @@ class MainActivity : BaseActivity() {
 
         fun popBack() {
             val fragment = currentFragment
-            if (fragment is TwoPaneFragment) {
-                fragment.handleOnBackPressed()
-            } else {
-                navController.popBackStack()
-            }
+            if (fragment is TwoPaneFragment) fragment.handleOnBackPressed() else navController.popBackStack()
         }
 
         onBackPressedDispatcher.addCallback(this@MainActivity) {
