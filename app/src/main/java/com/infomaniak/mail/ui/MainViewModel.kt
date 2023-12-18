@@ -201,10 +201,12 @@ class MainViewModel @Inject constructor(
 
     //region Current Thread
     val currentThreadUid = MutableLiveData<String?>(null)
-
     val closeThreadTrigger = SingleLiveEvent<Unit>()
 
+    inline val isThreadOpen get() = currentThreadUid.value != null
     val rightPaneFolderName = MutableLiveData<String>()
+    var previousFolderId: String? = null
+
     val downloadAttachmentsArgs = SingleLiveEvent<Triple<String, String, AttachmentType>>()
     val newMessageArgs = SingleLiveEvent<NewMessageActivityArgs>()
     val replyBottomSheetArgs = SingleLiveEvent<Pair<String, Boolean>>()

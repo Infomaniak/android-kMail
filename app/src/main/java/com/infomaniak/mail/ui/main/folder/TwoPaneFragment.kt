@@ -26,7 +26,7 @@ import androidx.slidingpanelayout.widget.SlidingPaneLayout
 import com.infomaniak.lib.core.utils.getBackNavigationResult
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.search.SearchFragment
 import com.infomaniak.mail.ui.main.thread.DetailedContactBottomSheetDialogArgs
@@ -53,7 +53,7 @@ abstract class TwoPaneFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupSlidingPane()
-        observeFolderName()
+        observeCurrentFolder()
         observeThreadEvents()
     }
 
@@ -61,17 +61,22 @@ abstract class TwoPaneFragment : Fragment() {
         slidingPaneLayout.lockMode = SlidingPaneLayout.LOCK_MODE_LOCKED
     }
 
-    private fun observeFolderName() = with(mainViewModel) {
-
+    private fun observeCurrentFolder() = with(mainViewModel) {
         currentFolder.observe(viewLifecycleOwner) { folder ->
 
-            val displayedFolder = (if (this@TwoPaneFragment is SearchFragment) {
-                Folder().apply { name = getString(R.string.searchFolderName) }
+            val (folderId, name) = if (this@TwoPaneFragment is SearchFragment) {
+                FolderController.SEARCH_FOLDER_ID to getString(R.string.searchFolderName)
             } else {
-                folder
-            }) ?: return@observe
+                if (folder == null) return@observe
+                folder.id to folder.getLocalizedName(context)
+            }
 
-            rightPaneFolderName.value = displayedFolder.getLocalizedName(context)
+            rightPaneFolderName.value = name
+
+            if (folderId != previousFolderId) {
+                previousFolderId = folderId
+                if (isThreadOpen) closeThread()
+            }
         }
     }
 
