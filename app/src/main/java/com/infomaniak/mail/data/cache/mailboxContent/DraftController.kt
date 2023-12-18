@@ -39,7 +39,7 @@ import javax.inject.Inject
 class DraftController @Inject constructor(
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val mailboxController: MailboxController,
-    private val replyForwardHeaderManager: ReplyForwardHeaderManager,
+    private val replyForwardFooterManager: ReplyForwardFooterManager,
 ) {
 
     //region Get data
@@ -88,7 +88,7 @@ class DraftController @Inject constructor(
                 draft.to = toList.toRealmList()
                 draft.cc = ccList.toRealmList()
 
-                draft.body += replyForwardHeaderManager.createReplyFooter(previousMessage)
+                draft.body += replyForwardFooterManager.createReplyFooter(previousMessage)
             }
             DraftMode.FORWARD -> {
                 draft.forwardedUid = previousMessage.uid
@@ -100,7 +100,7 @@ class DraftController @Inject constructor(
                     }
                 }
 
-                draft.body += replyForwardHeaderManager.createForwardFooter(previousMessage, draft.attachments)
+                draft.body += replyForwardFooterManager.createForwardFooter(previousMessage, draft.attachments)
             }
             DraftMode.NEW_MAIL -> Unit
         }

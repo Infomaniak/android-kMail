@@ -35,7 +35,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ReplyForwardHeaderManager @Inject constructor(private val appContext: Context) {
+class ReplyForwardFooterManager @Inject constructor(private val appContext: Context) {
 
     fun createForwardFooter(message: Message, attachmentsToForward: List<Attachment>): String {
         val previousBody = getHtmlDocument(message)?.let { document ->
