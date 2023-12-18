@@ -90,9 +90,7 @@ class ReplyForwardFooterManager @Inject constructor(private val appContext: Cont
         }
     }
 
-    private fun Message.fromName(): String {
-        return sender?.quotedDisplay() ?: appContext.getString(R.string.unknownRecipientTitle)
-    }
+    private fun Message.fromName(): String = sender?.quotedDisplay() ?: appContext.getString(R.string.unknownRecipientTitle)
 
     private fun getHtmlDocument(message: Message): Document? {
         val html = message.body?.let { body ->
@@ -121,7 +119,7 @@ class ReplyForwardFooterManager @Inject constructor(private val appContext: Cont
 
     private fun assembleForwardHtmlFooter(
         message: Message,
-        previousFullBody: String
+        previousFullBody: String,
     ): String = with(appContext) {
         val messageForwardHeader = getString(R.string.messageForwardHeader)
         val fromTitle = getString(R.string.fromTitle)
