@@ -84,6 +84,7 @@ class AiPropositionFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
+        requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundColor)
 
         handleBackDispatcher()
         setUi()
@@ -103,8 +104,6 @@ class AiPropositionFragment : Fragment() {
 
     private fun setUi() = with(binding) {
         setToolbar()
-
-        requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundColor)
 
         loadingPlaceholder.text = aiViewModel.aiPrompt
         if (!aiViewModel.isHistoryEmpty()) propositionTextView.text = aiViewModel.getLastMessage()
