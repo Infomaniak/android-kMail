@@ -27,7 +27,6 @@ import com.infomaniak.lib.core.utils.getBackNavigationResult
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
-import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.search.SearchFragment
 import com.infomaniak.mail.ui.main.thread.DetailedContactBottomSheetDialogArgs
@@ -51,13 +50,6 @@ abstract class TwoPaneFragment : Fragment() {
     fun isOnlyLeftShown() = slidingPaneLayout.let { it.isSlideable && !it.isOpen }
     fun isOnlyRightShown() = slidingPaneLayout.let { it.isSlideable && it.isOpen }
 
-    private val searchFolder by lazy {
-        Folder().apply {
-            id = FolderController.SEARCH_FOLDER_ID
-            name = getString(R.string.searchFolderName)
-        }
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupSlidingPane()
@@ -72,12 +64,17 @@ abstract class TwoPaneFragment : Fragment() {
     private fun observeCurrentFolder() = with(mainViewModel) {
         currentFolder.observe(viewLifecycleOwner) { folder ->
 
-            val currentFolder = if (this@TwoPaneFragment is SearchFragment) searchFolder else folder ?: return@observe
+            val (folderId, name) = if (this@TwoPaneFragment is SearchFragment) {
+                FolderController.SEARCH_FOLDER_ID to getString(R.string.searchFolderName)
+            } else {
+                if (folder == null) return@observe
+                folder.id to folder.getLocalizedName(context)
+            }
 
-            rightPaneFolderName.value = currentFolder.getLocalizedName(context)
+            rightPaneFolderName.value = name
 
-            if (currentFolder.id != previousFolderId) {
-                previousFolderId = currentFolder.id
+            if (folderId != previousFolderId) {
+                previousFolderId = folderId
                 if (isThreadOpen) closeThread()
             }
         }
