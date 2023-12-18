@@ -118,7 +118,7 @@ class ThreadFragment : Fragment() {
                     if (twoPaneFragment.areBothShown()) {
                         if (navigationIcon != null) navigationIcon = null
                     } else {
-                        if (navigationIcon == null) setNavigationIcon(R.drawable.ic_chevron_left)
+                        if (navigationIcon == null) setNavigationIcon(R.drawable.ic_navigation_default)
                     }
                 }
             }
