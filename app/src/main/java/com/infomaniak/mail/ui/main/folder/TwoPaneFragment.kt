@@ -91,7 +91,7 @@ abstract class TwoPaneFragment : Fragment() {
                 FolderController.SEARCH_FOLDER_ID to getString(R.string.searchFolderName)
             } else {
                 if (folder == null) return@observe
-                folder.id to folder.getLocalizedName(context)
+                folder.id to folder.getLocalizedName(requireContext())
             }
 
             rightPaneFolderName.value = name
