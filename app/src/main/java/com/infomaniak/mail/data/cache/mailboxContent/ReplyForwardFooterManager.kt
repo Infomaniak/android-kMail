@@ -38,8 +38,8 @@ import javax.inject.Singleton
 class ReplyForwardFooterManager @Inject constructor(private val appContext: Context) {
 
     fun createForwardFooter(message: Message, attachmentsToForward: List<Attachment>): String {
-        val previousBody = getHtmlDocument(message)?.apply {
-            processCids(
+        val previousBody = getHtmlDocument(message)?.let { document ->
+            document.processCids(
                 message = message,
                 associateDataToCid = { oldAttachment ->
                     val newAttachment = attachmentsToForward.find { it.originalContentId == oldAttachment.contentId }
@@ -47,9 +47,11 @@ class ReplyForwardFooterManager @Inject constructor(private val appContext: Cont
                 },
                 applyAssociatedDataToImage = { newContentId, imageElement ->
                     imageElement.attr(SRC_ATTRIBUTE, "${CID_PROTOCOL}$newContentId")
-                }
+                },
             )
-        }?.outerHtml() ?: ""
+
+            document.outerHtml()
+        } ?: ""
 
         val previousFullBody = computePreviousFullBody(previousBody, message)
         return assembleForwardHtmlFooter(message, previousFullBody)
@@ -60,15 +62,17 @@ class ReplyForwardFooterManager @Inject constructor(private val appContext: Cont
         val from = message.fromName()
         val messageReplyHeader = appContext.getString(R.string.messageReplyHeader, date, from)
 
-        val previousBody = getHtmlDocument(message)?.apply {
-            processCids(
+        val previousBody = getHtmlDocument(message)?.let { document ->
+            document.processCids(
                 message = message,
                 associateDataToCid = Attachment::name,
                 applyAssociatedDataToImage = { name, imageElement ->
                     imageElement.replaceWith(TextNode("<$name>"))
-                }
+                },
             )
-        }?.outerHtml() ?: ""
+
+            document.outerHtml()
+        } ?: ""
 
         val previousFullBody = computePreviousFullBody(previousBody, message)
         return assembleReplyHtmlFooter(messageReplyHeader, previousFullBody)
