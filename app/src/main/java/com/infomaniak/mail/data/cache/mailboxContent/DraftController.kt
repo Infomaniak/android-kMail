@@ -147,14 +147,17 @@ class DraftController @Inject constructor(
 
         val previousFullBody = computePreviousFullBody(previousBody, message)
 
-        return """
-            <div id=\"answerContentMessage\" class="${MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME}" >
-            <div>$messageReplyHeader</div>
-            <blockquote class=\"ws-ng-quote\">
-            $previousFullBody
-            </blockquote>
-        </div>
-        """.trimIndent()
+        return assembleReplyHtmlFooter(messageReplyHeader, previousFullBody)
+    }
+
+    private fun assembleReplyHtmlFooter(messageReplyHeader: String, previousFullBody: String): String {
+        val replyRoot = """<div id="answerContentMessage" class="${MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME}" />"""
+        return parseAndWrapElementInNewDocument(replyRoot).apply {
+            addAndEscapeTextLine(messageReplyHeader, endWithBr = false)
+            addReplyBlockQuote {
+                addAlreadyEscapedBody(previousFullBody)
+            }
+        }.outerHtml()
     }
 
     private fun computePreviousFullBody(previousBody: String, message: Message): String {
@@ -188,27 +191,71 @@ class DraftController @Inject constructor(
             return@let document.outerHtml()
         } ?: ""
 
-        val ccList = if (message.cc.isNotEmpty()) {
-            "<div>$ccTitle ${message.cc.joinToString { it.quotedDisplay() }}<br></div>"
-        } else {
-            ""
-        }
-
         val previousFullBody = computePreviousFullBody(previousBody, message)
 
-        return """
-            <div class="${MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME}">
-            <div>---------- $messageForwardHeader ---------<br></div>
-            <div>$fromTitle ${message.fromName()}<br></div>
-            <div>$dateTitle ${message.date.toDate()}<br></div>
-            <div>$subjectTitle ${message.subject}<br></div>
-            <div>$toTitle ${message.to.joinToString { it.quotedDisplay() }}<br></div>
-            $ccList
-            <div><br></div>
-            <div><br></div>
-            $previousFullBody
-            </div>
-        """.trimIndent()
+        return assembleForwardHtmlFooter(
+            messageForwardHeader,
+            fromTitle,
+            message,
+            dateTitle,
+            subjectTitle,
+            toTitle,
+            ccTitle,
+            previousFullBody
+        )
+    }
+
+    private fun assembleForwardHtmlFooter(
+        messageForwardHeader: String,
+        fromTitle: String,
+        message: Message,
+        dateTitle: String,
+        subjectTitle: String,
+        toTitle: String,
+        ccTitle: String,
+        previousFullBody: String
+    ): String {
+        val forwardRoot = "<div class=\"${MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME}\" />"
+        return parseAndWrapElementInNewDocument(forwardRoot).apply {
+            addAndEscapeTextLine("---------- $messageForwardHeader ---------")
+            addAndEscapeTextLine("$fromTitle ${message.fromName()}")
+            addAndEscapeTextLine("$dateTitle ${message.date.toDate()}")
+            addAndEscapeTextLine("$subjectTitle ${message.subject}")
+            addAndEscapeRecipientLine(toTitle, message.to)
+            addAndEscapeRecipientLine(ccTitle, message.cc)
+            addAndEscapeTextLine("")
+            addAndEscapeTextLine("")
+
+            addAlreadyEscapedBody(previousFullBody)
+        }.outerHtml()
+    }
+
+    private fun parseAndWrapElementInNewDocument(elementHtml: String): Element {
+        return Jsoup.parseBodyFragment(elementHtml).body().firstElementChild()!!
+    }
+
+    private fun Element.addAndEscapeTextLine(content: String, endWithBr: Boolean = true) {
+        appendElement("div").apply {
+            text(content)
+            if (endWithBr) appendElement("br")
+        }
+    }
+
+    private fun Element.addAndEscapeRecipientLine(prefix: String, recipientList: List<Recipient>) {
+        formatRecipientList(recipientList)?.let { recipients -> addAndEscapeTextLine("$prefix $recipients") }
+    }
+
+    private fun formatRecipientList(recipientList: List<Recipient>): String? {
+        return if (recipientList.isNotEmpty()) recipientList.joinToString { it.quotedDisplay() } else null
+    }
+
+    private fun Element.addAlreadyEscapedBody(previousFullBody: String) {
+        append(previousFullBody)
+    }
+
+    private fun Element.addReplyBlockQuote(addInnerElements: Element.() -> Unit) {
+        val blockQuote = appendElement("blockquote").addClass("ws-ng-quote")
+        blockQuote.addInnerElements()
     }
 
     private fun getHtmlDocument(message: Message): Document? {
@@ -232,7 +279,7 @@ class DraftController @Inject constructor(
         return sender?.quotedDisplay() ?: appContext.getString(R.string.unknownRecipientTitle)
     }
 
-    private fun Recipient.quotedDisplay(): String = "${("$name ").ifBlank { "" }}&lt;$email&gt;"
+    private fun Recipient.quotedDisplay(): String = "${("$name ").ifBlank { "" }}<$email>"
 
     private fun formatSubject(draftMode: DraftMode, subject: String): String {
 
