@@ -56,7 +56,7 @@ abstract class TwoPaneFragment : Fragment() {
     open fun doAfterFolderChanged() = Unit
 
     fun isOnlyOneShown() = slidingPaneLayout.isSlideable
-    fun areBothShown() = !slidingPaneLayout.isSlideable
+    fun areBothShown() = !isOnlyOneShown()
     fun isOnlyLeftShown() = isOnlyOneShown() && !slidingPaneLayout.isOpen
     fun isOnlyRightShown() = isOnlyOneShown() && slidingPaneLayout.isOpen
 
@@ -66,18 +66,6 @@ abstract class TwoPaneFragment : Fragment() {
         observeCurrentFolder()
         observeThreadUid()
         observeThreadNavigation()
-    }
-
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-
-        val isLeftShown = areBothShown() || isOnlyLeftShown() // TODO: Only works on Phone, and not on Tablet.
-        val statusBarColor = if (isLeftShown && this is ThreadListFragment) {
-            R.color.backgroundHeaderColor
-        } else {
-            R.color.backgroundColor
-        }
-        requireActivity().window.statusBarColor = requireContext().getColor(statusBarColor)
     }
 
     private fun setupSlidingPane() {
