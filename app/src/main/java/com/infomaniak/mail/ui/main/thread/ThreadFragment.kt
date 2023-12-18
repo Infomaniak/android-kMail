@@ -193,7 +193,7 @@ class ThreadFragment : Fragment() {
         changeToolbarColorOnScroll(
             toolbar,
             messagesListNestedScrollView,
-            shouldUpdateStatusBar = { twoPaneFragment.isOnlyRightShown() },
+            shouldUpdateStatusBar = twoPaneFragment::isOnlyRightShown,
             otherUpdates = { color -> appBar.backgroundTintList = ColorStateList.valueOf(color) },
         )
     }
