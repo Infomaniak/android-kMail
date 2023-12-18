@@ -53,7 +53,7 @@ abstract class TwoPaneFragment : Fragment() {
     lateinit var threadListAdapter: ThreadListAdapter
 
     abstract fun getAnchor(): View?
-    open fun doAfterFolderChanged() {}
+    open fun doAfterFolderChanged() = Unit
 
     fun isOnlyOneShown() = slidingPaneLayout.isSlideable
     fun areBothShown() = !slidingPaneLayout.isSlideable

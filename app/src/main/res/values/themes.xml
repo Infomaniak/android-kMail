@@ -151,7 +151,7 @@
         <item name="contentInsetEnd">54dp</item>
         <item name="contentInsetStartWithNavigation">0dp</item>
         <item name="navigationContentDescription">@string/contentDescriptionButtonBack</item>
-        <item name="navigationIcon">@drawable/ic_chevron_left</item>
+        <item name="navigationIcon">@drawable/ic_navigation_default</item>
         <item name="navigationIconTint">?attr/colorPrimary</item>
         <item name="titleMarginTop">8dp</item>
         <item name="titleTextAppearance">@style/H1</item>
