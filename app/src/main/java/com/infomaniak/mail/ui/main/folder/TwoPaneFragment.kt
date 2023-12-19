@@ -34,7 +34,6 @@ import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.search.SearchFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialog
-import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 import com.infomaniak.mail.utils.updateNavigationBarColor
 import javax.inject.Inject
@@ -142,18 +141,12 @@ abstract class TwoPaneFragment : Fragment() {
         }
     }
 
-    fun navigateToThread(thread: Thread) {
+    fun navigateToThread(thread: Thread) = with(twoPaneViewModel) {
         if (thread.isOnlyOneDraft) {
             trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
             openDraft(thread)
         } else {
-            twoPaneViewModel.openThread(thread.uid)
-        }
-    }
-
-    private fun openDraft(thread: Thread) = runCatchingRealm {
-        twoPaneViewModel.navigateToSelectedDraft(thread.messages.first()).observe(viewLifecycleOwner) {
-            safeNavigateToNewMessageActivity(it.toBundle())
+            openThread(thread.uid)
         }
     }
 
