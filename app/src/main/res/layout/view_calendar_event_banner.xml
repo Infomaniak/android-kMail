@@ -138,5 +138,30 @@
             app:rippleColor="@color/color_primary_translucent_ripple"
             tools:text="Participants" />
 
+        <com.infomaniak.mail.views.AvatarView
+            android:id="@+id/organiserAvatar"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="@dimen/marginStandardMedium"
+            app:layout_constraintBottom_toBottomOf="@id/organiserName"
+            app:layout_constraintEnd_toStartOf="@id/organiserName"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/organiserName"
+            tools:src="@tools:sample/avatars[9]" />
+
+        <TextView
+            android:id="@+id/organiserName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/marginStandardMedium"
+            android:layout_marginTop="@dimen/marginStandardSmall"
+            android:text="Lucien Cheval (Organisateur)"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/organiserAvatar"
+            app:layout_constraintTop_toBottomOf="@id/participantsButton"
+            tools:text="Lucien Cheval (Organisateur)" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>
