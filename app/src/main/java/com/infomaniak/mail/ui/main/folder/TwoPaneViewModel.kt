@@ -20,7 +20,6 @@ package com.infomaniak.mail.ui.main.folder
 import android.net.Uri
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
@@ -28,6 +27,7 @@ import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.thread.DetailedContactBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialogArgs
@@ -35,6 +35,7 @@ import com.infomaniak.mail.ui.main.thread.actions.MessageActionsBottomSheetDialo
 import com.infomaniak.mail.ui.main.thread.actions.ReplyBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialogArgs
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
+import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -69,19 +70,21 @@ class TwoPaneViewModel @Inject constructor(
         currentThreadUid.value = null
     }
 
-    fun navigateToSelectedDraft(message: Message) = liveData(ioCoroutineContext) {
-        emit(
-            NewMessageActivityArgs(
-                arrivedFromExistingDraft = true,
-                draftLocalUuid = draftController.getDraftByMessageUid(message.uid)?.localUuid,
-                draftResource = message.draftResource,
-                messageUid = message.uid,
-            ),
-        )
+    fun openDraft(thread: Thread) {
+        navigateToSelectedDraft(thread.messages.first())
     }
 
     fun navigateToDownloadAttachment(resource: String, name: String, type: Attachment.AttachmentType) {
         downloadAttachmentArgs.value = DownloadAttachmentProgressDialogArgs(resource, name, type)
+    }
+
+    private fun navigateToSelectedDraft(message: Message) = runCatchingRealm {
+        newMessageArgs.value = NewMessageActivityArgs(
+            arrivedFromExistingDraft = true,
+            draftLocalUuid = draftController.getDraftByMessageUid(message.uid)?.localUuid,
+            draftResource = message.draftResource,
+            messageUid = message.uid,
+        )
     }
 
     fun navigateToNewMessage(
