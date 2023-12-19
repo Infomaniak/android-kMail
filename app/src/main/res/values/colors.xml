@@ -157,6 +157,9 @@
     <color name="aiBetaTagTextColor">@color/onAiColor</color>
     <color name="aiBetaTagBackground">@color/aiColor</color>
 
+    <!-- Calendar events -->
+    <color name="calendarHeaderBackground">@color/polar_bear</color>
+
     <!-- Swipe actions -->
     <color name="swipeDelete">@color/redDestructiveAction</color>
     <color name="swipeMove">@color/fougere_light</color>

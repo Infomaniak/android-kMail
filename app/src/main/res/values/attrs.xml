@@ -26,6 +26,10 @@
         <attr name="padding" format="dimension" />
     </declare-styleable>
 
+    <declare-styleable name="ThemeAttributes">
+        <attr name="calendarChipSelectedStrokeColor" format="color" />
+    </declare-styleable>
+
     <declare-styleable name="DecoratedItemView">
         <attr name="badge" format="integer" />
         <attr name="icon" />

@@ -389,6 +389,15 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/alerts" />
 
+        <com.infomaniak.mail.ui.main.thread.CalendarEventBannerView
+            android:id="@+id/calendarEvent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/marginStandardMedium"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/alertsBottomDivider" />
+
         <include
             android:id="@+id/attachmentLayout"
             layout="@layout/layout_attachments"
@@ -398,7 +407,7 @@
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/alertsBottomDivider"
+            app:layout_constraintTop_toBottomOf="@id/calendarEvent"
             app:layout_goneMarginTop="0dp"
             tools:visibility="visible" />
 
@@ -473,8 +482,7 @@
                 android:fontFamily="@font/suisseintl_regular_italic"
                 android:text="@string/errorLoadingMessage"
                 android:textColor="@color/secondaryTextColor"
-                android:visibility="gone"
-                tools:visibility="visible" />
+                android:visibility="gone" />
 
             <!-- `focusableInTouchMode` is set to false to prevent the WebView from automatically scrolling a small amount for no
             reason when long pressing it -->

@@ -62,6 +62,9 @@
         <item name="snackbarTextViewStyle">@style/SnackbarTextViewStyle</item>
         <item name="textInputStyle">@style/TextInputLayout</item>
         <item name="toolbarStyle">@style/AppThemeToolbarTheme</item>
+
+        <!--Created for the stroke color of participation chips-->
+        <item name="calendarChipSelectedStrokeColor">#00ff00</item>
     </style>
 
     <style name="AppTheme" parent="AppThemeBase" />

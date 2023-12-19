@@ -1,0 +1,142 @@
+<!--
+  ~ Infomaniak Mail - Android
+  ~ Copyright (C) 2023 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/CardViewMail"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="8dp"
+    app:strokeColor="@color/cardViewStrokeColor"
+    app:strokeWidth="1dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/eventName"
+            style="@style/BodyMedium"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/calendarHeaderBackground"
+            android:drawablePadding="@dimen/marginStandardSmall"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="@dimen/marginStandardMedium"
+            android:paddingVertical="@dimen/marginStandardSmall"
+            android:text="Réunion Produit"
+            app:drawableStartCompat="@drawable/ic_calendar_infomaniak"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Réunion Produit" />
+
+        <TextView
+            android:id="@+id/eventDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/marginStandardMedium"
+            android:layout_marginTop="@dimen/marginStandardMedium"
+            android:drawablePadding="@dimen/marginStandardMedium"
+            android:gravity="center_vertical"
+            android:text="Mardi 28 novembre 2023"
+            app:drawableStartCompat="@drawable/ic_calendar"
+            app:drawableTint="@color/iconColor"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/eventName"
+            tools:text="Mardi 28 novembre 2023" />
+
+        <TextView
+            android:id="@+id/eventHour"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/marginStandardMedium"
+            android:layout_marginTop="@dimen/marginStandardMedium"
+            android:drawablePadding="@dimen/marginStandardMedium"
+            android:gravity="center_vertical"
+            android:text="09:00-10:00 (CET)"
+            app:drawableStartCompat="@drawable/ic_editor_clock"
+            app:drawableTint="@color/iconColor"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/eventDate"
+            tools:text="09:00-10:00 (CET)" />
+
+        <com.google.android.flexbox.FlexboxLayout
+            android:id="@+id/participationButtons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/marginStandardMedium"
+            android:paddingStart="@dimen/marginStandardSmall"
+            android:paddingEnd="@dimen/marginStandardMedium"
+            app:flexWrap="wrap"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/eventHour">
+
+            <com.google.android.material.button.MaterialButton
+                style="@style/CalendarParticipationButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Oui"
+                android:theme="@style/CalendarYesTheme"
+                app:icon="@drawable/ic_check_rounded"
+                tools:text="Oui" />
+
+            <com.google.android.material.button.MaterialButton
+                style="@style/CalendarParticipationButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Peut-être"
+                android:theme="@style/CalendarMaybeTheme"
+                app:icon="@drawable/ic_calendar_maybe"
+                tools:text="Peut-être" />
+
+            <com.google.android.material.button.MaterialButton
+                style="@style/CalendarParticipationButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Non"
+                android:theme="@style/CalendarNoTheme"
+                app:icon="@drawable/ic_calendar_no"
+                tools:text="Non" />
+
+        </com.google.android.flexbox.FlexboxLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/participantsButton"
+            style="@style/TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/marginStandardMedium"
+            android:layout_marginTop="@dimen/marginStandardSmall"
+            android:checkable="true"
+            android:text="Participants"
+            app:backgroundTint="@android:color/transparent"
+            app:icon="@drawable/ic_calendar_participants_chevron"
+            app:iconGravity="end"
+            app:iconSize="@dimen/smallIconSize"
+            app:iconTint="?attr/colorPrimary"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/participationButtons"
+            app:rippleColor="@color/color_primary_translucent_ripple"
+            tools:text="Participants" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>
