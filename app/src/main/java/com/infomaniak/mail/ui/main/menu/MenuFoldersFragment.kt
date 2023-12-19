@@ -74,7 +74,7 @@ abstract class MenuFoldersFragment : Fragment() {
 
     protected abstract fun onFolderCollapse(folderId: String, shouldCollapse: Boolean)
 
-    protected abstract fun onCollapseTransition()
+    protected abstract fun onCollapseTransition(shouldExclude: Boolean)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

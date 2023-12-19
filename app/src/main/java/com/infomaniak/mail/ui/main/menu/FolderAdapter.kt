@@ -54,7 +54,7 @@ class FolderAdapter @Inject constructor(
     private var shouldIndent: Boolean = true
     private lateinit var onFolderClicked: (folderId: String) -> Unit
     private var onCollapseClicked: ((folderId: String, shouldCollapse: Boolean) -> Unit)? = null
-    private var onCollapseTransition: (() -> Unit)? = null
+    private var onCollapseTransition: ((Boolean) -> Unit)? = null
 
     private var setFoldersJob: Job? = null
 
@@ -63,7 +63,7 @@ class FolderAdapter @Inject constructor(
         shouldIndent: Boolean = true,
         onFolderClicked: (folderId: String) -> Unit,
         onCollapseClicked: ((folderId: String, shouldCollapse: Boolean) -> Unit)? = null,
-        onCollapseTransition: (() -> Unit)? = null,
+        onCollapseTransition: ((Boolean) -> Unit)? = null,
     ): FolderAdapter {
         this.isInMenuDrawer = isInMenuDrawer
         this.shouldIndent = shouldIndent
@@ -163,7 +163,7 @@ class FolderAdapter @Inject constructor(
                 canBeCollapsed = folder.canBeCollapsed
                 setIndent(folderIndent, hasCollapsableFolder ?: false, canBeCollapsed)
                 setCollapsingButtonContentDescription(folderName)
-                onCollapseTransition?.invoke()
+                onCollapseTransition?.invoke(false)
             }
             is SelectableMailboxItemView, is UnreadItemView -> {
                 throw IllegalStateException("`${this::class.simpleName}` cannot exists here. Only Folder classes are allowed")
