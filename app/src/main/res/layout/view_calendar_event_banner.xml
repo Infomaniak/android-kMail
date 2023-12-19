@@ -143,6 +143,7 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_marginStart="@dimen/marginStandardMedium"
+            android:src="@drawable/ic_unknown_user_avatar"
             app:layout_constraintBottom_toBottomOf="@id/organiserName"
             app:layout_constraintEnd_toStartOf="@id/organiserName"
             app:layout_constraintHorizontal_bias="0"
@@ -162,6 +163,23 @@
             app:layout_constraintStart_toEndOf="@id/organiserAvatar"
             app:layout_constraintTop_toBottomOf="@id/participantsButton"
             tools:text="Lucien Cheval (Organisateur)" />
+
+        <com.infomaniak.mail.ui.main.thread.ManyAvatarsView
+            android:id="@+id/manyAvatarsView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/marginStandardMedium"
+            android:layout_marginTop="@dimen/marginStandardMedium"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/organiserName" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/participantsGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:constraint_referenced_ids="organiserAvatar,organiserName,manyAvatarsView"
+            tools:visibility="visible" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>
