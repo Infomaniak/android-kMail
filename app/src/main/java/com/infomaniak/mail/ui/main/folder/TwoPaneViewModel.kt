@@ -42,6 +42,7 @@ class TwoPaneViewModel @Inject constructor(
     private val draftController: DraftController,
 ) : ViewModel() {
 
+    val triggerSlidingButAlsoCarryingThreadUid = MutableLiveData<String?>(null)
     val currentThreadUid = MutableLiveData<String?>(null)
 
     inline val isThreadOpen get() = currentThreadUid.value != null
@@ -56,11 +57,11 @@ class TwoPaneViewModel @Inject constructor(
     val detailedContactArgs = SingleLiveEvent<DetailedContactBottomSheetDialogArgs>()
 
     fun openThread(uid: String) {
-        currentThreadUid.value = uid
+        triggerSlidingButAlsoCarryingThreadUid.value = uid
     }
 
     fun closeThread() {
-        currentThreadUid.value = null
+        triggerSlidingButAlsoCarryingThreadUid.value = null
     }
 
     fun openDraft(thread: Thread) {

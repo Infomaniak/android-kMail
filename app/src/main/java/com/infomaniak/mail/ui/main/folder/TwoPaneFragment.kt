@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.folder
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -72,15 +73,30 @@ abstract class TwoPaneFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupSlidingPane()
         observeCurrentFolder()
+        observeSlidingPane()
         observeThreadUid()
         observeThreadNavigation()
     }
 
     private fun setupSlidingPane() = with(slidingPaneLayout) {
+
         lockMode = SlidingPaneLayout.LOCK_MODE_LOCKED
+
         addPanelSlideListener(object : SlidingPaneLayout.PanelSlideListener {
-            override fun onPanelOpened(panel: View) = Unit
-            override fun onPanelClosed(panel: View) = Unit
+
+            override fun onPanelOpened(panel: View): Unit = with(twoPaneViewModel) {
+                Log.e("TOTO", "onPanelOpened: ${triggerSlidingButAlsoCarryingThreadUid.value}")
+                val oldUid = currentThreadUid.value
+                triggerSlidingButAlsoCarryingThreadUid.value?.let { newUid ->
+                    if (newUid != oldUid) currentThreadUid.value = triggerSlidingButAlsoCarryingThreadUid.value
+                }
+            }
+
+            override fun onPanelClosed(panel: View) = with(twoPaneViewModel) {
+                Log.e("TOTO", "onPanelClosed: ${triggerSlidingButAlsoCarryingThreadUid.value}")
+                if (triggerSlidingButAlsoCarryingThreadUid.value == null)
+                    currentThreadUid.value = null
+            }
 
             override fun onPanelSlide(panel: View, slideOffset: Float) {
                 requireActivity().window.progressivelyColorSystemBars(
@@ -115,14 +131,24 @@ abstract class TwoPaneFragment : Fragment() {
         }
     }
 
+    private fun observeSlidingPane() = with(twoPaneViewModel) {
+        triggerSlidingButAlsoCarryingThreadUid.observe(viewLifecycleOwner) { threadUid ->
+            val isSliding = if (threadUid == null) slidingPaneLayout.closePane() else slidingPaneLayout.openPane()
+            if (!isSliding) currentThreadUid.value = threadUid
+        }
+    }
+
     private fun observeThreadUid() {
         twoPaneViewModel.currentThreadUid.observe(viewLifecycleOwner) { threadUid ->
             val isOpeningThread = threadUid != null
             if (isOpeningThread) {
                 val hasPaneOpened = slidingPaneLayout.openPane()
                 if (hasPaneOpened) requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundColor)
-            } else {
-                resetPanes(threadListAdapter)
+                if (threadUid != null) {
+                    requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundColor)
+                } else {
+                    resetPanes(threadListAdapter)
+                }
             }
         }
     }
@@ -175,12 +201,8 @@ abstract class TwoPaneFragment : Fragment() {
 
     private fun resetPanes(threadListAdapter: ThreadListAdapter?) = with(requireActivity()) {
 
-        val isClosing = slidingPaneLayout.closePane()
-
-        if (isClosing) {
-            if (this@TwoPaneFragment is ThreadListFragment) window.statusBarColor = getColor(R.color.backgroundHeaderColor)
-            window.updateNavigationBarColor(getColor(R.color.backgroundColor))
-        }
+        if (this@TwoPaneFragment is ThreadListFragment) window.statusBarColor = getColor(R.color.backgroundHeaderColor)
+        window.updateNavigationBarColor(getColor(R.color.backgroundColor))
 
         threadListAdapter?.selectNewThread(newPosition = null, threadUid = null)
 
