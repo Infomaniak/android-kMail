@@ -63,6 +63,7 @@
     </com.google.android.material.card.MaterialCardView>
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/drawerContentScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scrollbars="none">

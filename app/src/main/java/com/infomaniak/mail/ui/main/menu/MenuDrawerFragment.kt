@@ -20,6 +20,10 @@ package com.infomaniak.mail.ui.main.menu
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.transition.ChangeBounds
+import android.transition.Fade
+import android.transition.TransitionManager
+import android.transition.TransitionSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -98,6 +102,7 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
         }
 
         mailboxSwitcher.setOnClickListener {
+            addMenuDrawerTransition()
             mailboxList.apply {
                 isVisible = !isVisible
                 mailboxExpandButton.toggleChevron(!isVisible)
@@ -107,6 +112,7 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
         }
 
         customFolders.setOnClickListener {
+            addMenuDrawerTransition()
             trackMenuDrawerEvent("customFolders", !customFolders.isCollapsed)
             customFoldersLayout.isGone = customFolders.isCollapsed
         }
@@ -143,6 +149,7 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
         }
 
         advancedActions.setOnClickListener {
+            addMenuDrawerTransition()
             trackMenuDrawerEvent("advancedActions", !advancedActions.isCollapsed)
             advancedActionsLayout.isGone = advancedActions.isCollapsed
         }
@@ -197,6 +204,20 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
 
     override fun onFolderCollapse(folderId: String, shouldCollapse: Boolean) {
         menuDrawerViewModel.toggleFolderCollapsingState(folderId, shouldCollapse)
+    }
+
+    override fun onCollapseTransition(shouldExclude: Boolean) {
+        addMenuDrawerTransition(shouldExclude, shouldFade = false)
+    }
+
+    private fun addMenuDrawerTransition(shouldExclude: Boolean = false, shouldFade: Boolean = true) {
+        val transition = TransitionSet()
+            .addTransition(ChangeBounds())
+            .also { if (shouldFade) it.addTransition(Fade(Fade.IN)) }
+            .excludeTarget(RecyclerView::class.java, shouldExclude)
+            .setDuration(MENU_DRAWER_TRANSITION_DURATION)
+
+        TransitionManager.beginDelayedTransition(binding.drawerContentScrollView, transition)
     }
 
     @SuppressLint("SetTextI18n")
@@ -261,6 +282,7 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
             val newCurrentFolderId = currentFolder?.id ?: return@observe
             binding.customFoldersList.post {
                 customFoldersAdapter.setFolders(customFolders, newCurrentFolderId)
+                onCollapseTransition(shouldExclude = true)
             }
         }
     }
@@ -305,5 +327,9 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
         customFolders.isCollapsed = false
         advancedActionsLayout.isGone = true
         advancedActions.isCollapsed = true
+    }
+
+    companion object {
+        private const val MENU_DRAWER_TRANSITION_DURATION = 250L
     }
 }
