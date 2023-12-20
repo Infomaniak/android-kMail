@@ -252,7 +252,7 @@ class ThreadFragment : Fragment() {
                     ContextMenuType.LINK -> linkContextualMenuAlertDialog.show(data)
                     ContextMenuType.EMAIL -> emailContextualMenuAlertDialog.show(data)
                     ContextMenuType.PHONE -> phoneContextualMenuAlertDialog.show(data)
-            }
+                }
             },
         )
 
@@ -588,8 +588,6 @@ class ThreadFragment : Fragment() {
     companion object {
         private const val COLLAPSE_TITLE_THRESHOLD = 0.5
         private const val ARCHIVE_INDEX = 2
-        private const val MIN_ALPHA = 0
-        private const val MAX_ALPHA = 255
 
         private fun allAttachmentsFileName(subject: String) = "infomaniak-mail-attachments-$subject.zip"
     }
