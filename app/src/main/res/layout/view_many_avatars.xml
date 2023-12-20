@@ -21,41 +21,60 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <com.infomaniak.mail.views.AvatarView
+    <com.infomaniak.mail.ui.main.thread.calendar.AttendanceAvatarView
         android:id="@+id/avatar1"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@tools:sample/avatars" />
+        tools:src="@tools:sample/avatars"
+        tools:visibility="visible" />
 
-    <com.infomaniak.mail.views.AvatarView
+    <com.infomaniak.mail.ui.main.thread.calendar.AttendanceAvatarView
         android:id="@+id/avatar2"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:visibility="gone"
         app:layout_constraintStart_toEndOf="@id/avatar1"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@tools:sample/avatars" />
+        tools:src="@tools:sample/avatars"
+        tools:visibility="visible" />
 
-    <com.infomaniak.mail.views.AvatarView
+    <com.infomaniak.mail.ui.main.thread.calendar.AttendanceAvatarView
         android:id="@+id/avatar3"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:visibility="gone"
         app:layout_constraintStart_toEndOf="@id/avatar2"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@tools:sample/avatars" />
+        tools:src="@tools:sample/avatars"
+        tools:visibility="visible" />
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/additionalPeople"
         android:layout_width="32dp"
         android:layout_height="32dp"
-        app:cardBackgroundColor="#0f0"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:visibility="gone"
+        app:cardBackgroundColor="@color/manyAvatarsAdditionalPeopleBackground"
         app:layout_constraintStart_toEndOf="@id/avatar3"
         app:layout_constraintTop_toTopOf="parent"
-        app:strokeWidth="0dp" />
+        app:shapeAppearance="@style/CircleImageView"
+        app:strokeWidth="0dp"
+        tools:visibility="visible">
 
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/additionalPeopleCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textColor="?attr/colorPrimary"
+                tools:text="+12" />
+
+        </FrameLayout>
+    </com.google.android.material.card.MaterialCardView>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -65,8 +65,16 @@
 
     <declare-styleable name="AvatarView">
         <attr name="android:src" format="reference|color" />
+        <attr name="android:strokeColor" format="color" />
+        <attr name="android:strokeWidth" format="dimension" />
         <attr name="inset" format="dimension" />
         <attr name="padding" />
+    </declare-styleable>
+
+    <declare-styleable name="AttendanceAvatarView">
+        <attr name="android:src" format="reference|color" />
+        <attr name="android:strokeColor" format="color" />
+        <attr name="android:strokeWidth" format="dimension" />
     </declare-styleable>
 
     <declare-styleable name="ItemSettingView">

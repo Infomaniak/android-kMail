@@ -21,6 +21,8 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
+import androidx.core.view.isVisible
+import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.databinding.ViewManyAvatarsBinding
 
 class ManyAvatarsView @JvmOverloads constructor(
@@ -31,10 +33,29 @@ class ManyAvatarsView @JvmOverloads constructor(
 
     private val binding by lazy { ViewManyAvatarsBinding.inflate(LayoutInflater.from(context), this, true) }
 
+    private var attendees = emptyList<Attendee>()
+
     init {
         binding
-        // with(binding) {
-        //
-        // }
+    }
+
+    fun setAttendees(attendees: List<Attendee>) {
+        this.attendees = attendees
+        updateAttendeesUi()
+    }
+
+    private fun updateAttendeesUi(): Unit = with(binding) {
+        avatar1.setup(0)
+        avatar2.setup(1)
+        avatar3.setup(2)
+
+        additionalPeople.isVisible = attendees.count() > 3
+        additionalPeopleCount.text = "+${attendees.count() - 3}"
+    }
+
+    private fun AttendanceAvatarView.setup(index: Int) {
+        val isDisplayed = attendees.lastIndex >= index
+        isVisible = isDisplayed
+        if (isDisplayed) setAttendee(attendees[index])
     }
 }

@@ -34,8 +34,8 @@ class CalendarEventBannerView @JvmOverloads constructor(
 
     init {
         with(binding) {
-            participantsButton.addOnCheckedChangeListener { _, isChecked ->
-                participantsGroup.isVisible = isChecked
+            attendeesButton.addOnCheckedChangeListener { _, isChecked ->
+                attendeesGroup.isVisible = isChecked
             }
         }
         // attrs?.getAttributes(context, R.styleable.CalendarEventBannerView) {

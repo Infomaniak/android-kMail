@@ -608,3 +608,5 @@ private fun Spannable.setClickableSpan(startIndex: Int, endIndex: Int, onClick: 
 fun Fragment.bindAlertToViewLifecycle(alertDialog: BaseAlertDialog) {
     alertDialog.bindAlertToLifecycle(viewLifecycleOwner)
 }
+
+fun Context.getTransparentColor() = getColor(android.R.color.transparent)

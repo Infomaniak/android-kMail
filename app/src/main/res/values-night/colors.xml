@@ -86,6 +86,7 @@
 
     <!-- Calendar events -->
     <color name="calendarHeaderBackground">@color/orca</color>
+    <color name="manyAvatarsAdditionalPeopleBackground">@color/orca</color>
 
     <!-- Swipe actions -->
     <color name="swipeDelete">@color/redDestructiveAction</color>

@@ -159,6 +159,7 @@
 
     <!-- Calendar events -->
     <color name="calendarHeaderBackground">@color/polar_bear</color>
+    <color name="manyAvatarsAdditionalPeopleBackground">@color/polar_bear</color>
 
     <!-- Swipe actions -->
     <color name="swipeDelete">@color/redDestructiveAction</color>

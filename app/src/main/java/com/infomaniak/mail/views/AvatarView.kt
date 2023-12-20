@@ -18,6 +18,7 @@
 package com.infomaniak.mail.views
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -38,12 +39,13 @@ import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.databinding.ViewAvatarBinding
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.MergedContactDictionary
+import com.infomaniak.mail.utils.getTransparentColor
 import com.infomaniak.mail.views.itemViews.AvatarMergedContactData
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class AvatarView @JvmOverloads constructor(
+open class AvatarView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
@@ -60,12 +62,28 @@ class AvatarView @JvmOverloads constructor(
     @Inject
     lateinit var avatarMergedContactData: AvatarMergedContactData
 
+    var strokeWidth: Float
+        get() = binding.avatarImage.strokeWidth
+        set(value) {
+            binding.avatarImage.strokeWidth = value
+        }
+
+    var strokeColor: ColorStateList?
+        get() = binding.avatarImage.strokeColor
+        set(value) {
+            binding.avatarImage.strokeColor = value
+        }
+
     init {
         attrs?.getAttributes(context, R.styleable.AvatarView) {
             binding.avatarImage.apply {
                 setImageDrawable(getDrawable(R.styleable.AvatarView_android_src))
                 val padding = getDimensionPixelOffset(R.styleable.AvatarView_padding, 0)
                 setPaddingRelative(padding, padding, padding, padding)
+
+                strokeWidth = getDimensionPixelOffset(R.styleable.AvatarView_android_strokeWidth, 0).toFloat()
+                val strokeColorInt = getColor(R.styleable.AvatarView_android_strokeColor, context.getTransparentColor())
+                strokeColor = ColorStateList.valueOf(strokeColorInt)
             }
 
             val inset = getDimensionPixelOffset(R.styleable.AvatarView_inset, 0)
