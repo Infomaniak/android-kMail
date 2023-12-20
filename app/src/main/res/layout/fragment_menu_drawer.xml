@@ -43,8 +43,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/marginStandard"
                 android:contentDescription="@string/appName"
-                android:src="@drawable/ic_logo_infomaniak_mail"
-                app:layout_constraintStart_toStartOf="parent" />
+                android:src="@drawable/ic_logo_infomaniak_mail" />
 
             <Space
                 android:layout_width="0dp"
@@ -55,8 +54,7 @@
                 android:id="@+id/settingsButton"
                 style="@style/IconButton"
                 android:contentDescription="@string/contentDescriptionButtonSettings"
-                app:icon="@drawable/ic_cog"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:icon="@drawable/ic_cog" />
 
         </LinearLayout>
 

@@ -51,21 +51,14 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:ellipsize="end"
-                    android:lines="1"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/iconFavorite"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    android:lines="1" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/iconFavorite"
                     style="@style/IconButton"
                     android:layout_marginEnd="@dimen/marginStandardMedium"
                     android:contentDescription="@string/actionStar"
-                    app:icon="@drawable/ic_star"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:icon="@drawable/ic_star" />
 
             </LinearLayout>
         </com.google.android.material.appbar.MaterialToolbar>
