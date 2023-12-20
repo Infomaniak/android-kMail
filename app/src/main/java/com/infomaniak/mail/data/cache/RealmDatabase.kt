@@ -57,7 +57,6 @@ object RealmDatabase {
     //region Realms' mutexes
     private val appSettingsMutex = Mutex()
     private val userInfoMutex = Mutex()
-    private val mailboxInfoMutex = Mutex()
     private val mailboxContentMutex = Mutex()
     //endregion
 
@@ -156,7 +155,7 @@ object RealmDatabase {
         //region Configurations versions
         const val USER_INFO_SCHEMA_VERSION = 1L
         const val MAILBOX_INFO_SCHEMA_VERSION = 4L
-        const val MAILBOX_CONTENT_SCHEMA_VERSION = 8L
+        const val MAILBOX_CONTENT_SCHEMA_VERSION = 9L
         //endregion
 
         //region Configurations names
@@ -179,6 +178,7 @@ object RealmDatabase {
             Mailbox::class,
             MailboxPermissions::class,
             Quotas::class,
+            Signature::class,
         )
         val mailboxContentSet = setOf(
             Folder::class,
@@ -189,7 +189,7 @@ object RealmDatabase {
             Body::class,
             SubBody::class,
             Attachment::class,
-            Signature::class,
+            Signature::class, // TODO: This model is in 2 schemas for now, it will be removed from here in a next migration.
         )
         //endregion
 

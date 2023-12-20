@@ -37,7 +37,6 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
-import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.data.models.Attachment
@@ -155,17 +154,17 @@ class NewMessageViewModel @Inject constructor(
         intent: Intent,
         navArgs: NewMessageActivityArgs,
     ): LiveData<Boolean> = liveData(ioCoroutineContext) {
+
         val realm = mailboxContentRealm()
-        var signatures = emptyList<Signature>()
+        val signatures = currentMailbox.signatures
 
         val isSuccess = runCatching {
 
-            signatures = SignatureController.getAllSignatures(realm)
             if (signatures.isEmpty()) return@runCatching false
 
             val draftExists = arrivedFromExistingDraft
             draft = if (draftExists) {
-                getExistingDraft(realm) ?: return@runCatching false
+                getExistingDraft() ?: return@runCatching false
             } else {
                 getNewDraft(signatures, realm) ?: return@runCatching false
             }
@@ -207,10 +206,10 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    private fun getExistingDraft(realm: Realm): Draft? {
+    private fun getExistingDraft(): Draft? {
         val uuid = draftLocalUuid ?: draft.localUuid
         return getLocalOrRemoteDraft(uuid)?.also {
-            if (it.identityId.isNullOrBlank()) signatureUtils.addMissingSignatureData(it, realm)
+            if (it.identityId.isNullOrBlank()) signatureUtils.addMissingSignatureData(it, currentMailbox)
         }
     }
 
@@ -341,7 +340,7 @@ class NewMessageViewModel @Inject constructor(
         initLocalValues(mimeType = ClipDescription.MIMETYPE_TEXT_HTML)
 
         val shouldPreselectSignature = draftMode == DraftMode.REPLY || draftMode == DraftMode.REPLY_ALL
-        signatureUtils.initSignature(draft = this, realm, addContent = !shouldPreselectSignature)
+        signatureUtils.initSignature(draft = this, mailbox = currentMailbox, addContent = !shouldPreselectSignature)
 
         when (draftMode) {
             DraftMode.NEW_MAIL -> recipient?.let { to = realmListOf(it) }

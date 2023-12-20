@@ -28,7 +28,6 @@ import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshCallbacks
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
-import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.mailbox.Mailbox
@@ -36,6 +35,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
 import io.realm.kotlin.Realm
+import io.realm.kotlin.ext.toRealmList
 import io.sentry.Sentry
 import org.jsoup.Jsoup
 import javax.inject.Inject
@@ -43,9 +43,9 @@ import javax.inject.Inject
 class SharedUtils @Inject constructor(
     private val folderController: FolderController,
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
-    private val refreshController: RefreshController,
-    private val messageController: MessageController,
     private val mailboxController: MailboxController,
+    private val messageController: MessageController,
+    private val refreshController: RefreshController,
 ) {
 
     @Inject
@@ -148,7 +148,11 @@ class SharedUtils @Inject constructor(
         fun updateSignatures(mailbox: Mailbox, customRealm: Realm): Int? {
             return with(ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName)) {
                 if (isSuccess() && data?.signatures?.isNotEmpty() == true) {
-                    customRealm.writeBlocking { SignatureController.update(data!!.signatures, realm = this) }
+                    customRealm.writeBlocking {
+                        MailboxController.getMailbox(mailbox.objectId, realm = this)?.let {
+                            it.signatures = data!!.signatures.toRealmList()
+                        }
+                    }
                     return@with null
                 } else {
                     Sentry.captureException(getApiException())

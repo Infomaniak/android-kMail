@@ -17,14 +17,13 @@
  */
 package com.infomaniak.mail.data.models.signature
 
-import io.realm.kotlin.types.RealmObject
-import io.realm.kotlin.types.annotations.PrimaryKey
+import io.realm.kotlin.types.EmbeddedRealmObject
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-class Signature : RealmObject {
-    @PrimaryKey
+class Signature : EmbeddedRealmObject {
+
     var id: Int = 0
     var name: String = ""
     @SerialName("full_name")

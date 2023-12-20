@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,20 +17,21 @@
  */
 package com.infomaniak.mail.data.cache.mailboxInfo
 
-import com.infomaniak.mail.data.models.Quotas
+import com.infomaniak.mail.data.models.signature.Signature
+import io.realm.kotlin.types.RealmList
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class QuotasController @Inject constructor(
+class SignatureController @Inject constructor(
     private val mailboxController: MailboxController,
 ) {
 
     //region Get data
-    fun getQuotasAsync(mailboxObjectId: String): Flow<Quotas?> {
-        return mailboxController.getMailboxAsync(mailboxObjectId).map { it.obj?.quotas }
+    fun getSignaturesAsync(mailboxObjectId: String): Flow<RealmList<Signature>> {
+        return mailboxController.getMailboxAsync(mailboxObjectId).mapNotNull { it.obj?.signatures }
     }
     //endregion
 }

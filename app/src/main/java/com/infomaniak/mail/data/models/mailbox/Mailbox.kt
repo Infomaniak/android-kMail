@@ -23,6 +23,7 @@ import androidx.core.app.NotificationManagerCompat
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.Quotas
+import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.utils.UnreadDisplay
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.realmSetOf
@@ -79,6 +80,8 @@ class Mailbox : RealmObject {
     @Transient
     var permissions: MailboxPermissions? = null
     @Transient
+    var signatures: RealmList<Signature> = realmListOf()
+    @Transient
     private var _featureFlags: RealmSet<String> = realmSetOf()
     //endregion
 
@@ -116,6 +119,8 @@ class Mailbox : RealmObject {
         val isChannelBlocked = getNotificationChannelCompat(channelId)?.importance == NotificationManagerCompat.IMPORTANCE_NONE
         return@with !areNotificationsEnabled() || isGroupBlocked || isChannelBlocked
     }
+
+    fun getDefaultSignature(): Signature = signatures.firstOrNull { it.isDefault } ?: signatures.first()
 
     inner class FeatureFlagSet {
         fun contains(featureFlag: FeatureFlag): Boolean {
