@@ -164,14 +164,20 @@
             app:layout_constraintTop_toBottomOf="@id/attendeesButton"
             tools:text="Lucien Cheval (Organisateur)" />
 
+        <!-- 15dp as marginStart is 1 less than 16 and is here to account for the fact that the first avatar of the list has a
+        stroke which offsets the actual circle representing the avatar by 1-->
+        <!--TODO : Color of stroke-->
         <com.infomaniak.mail.ui.main.thread.calendar.ManyAvatarsView
             android:id="@+id/manyAvatarsView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/marginStandardMedium"
+            android:layout_marginStart="15dp"
             android:layout_marginTop="@dimen/marginStandardMedium"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/organiserName" />
+            app:layout_constraintTop_toBottomOf="@id/organiserName"
+            app:statusBackgroundColor="@color/backgroundColor"
+            app:strokeColor="@color/backgroundColor"
+            app:strokeWidth="2dp" />
 
         <androidx.constraintlayout.widget.Group
             android:id="@+id/attendeesGroup"

@@ -19,13 +19,16 @@ package com.infomaniak.mail.ui.main.thread.calendar
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.drawable.ColorDrawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isVisible
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.databinding.ViewAttendanceAvatarBinding
+import com.infomaniak.mail.utils.getColorOrNull
 import com.infomaniak.mail.utils.getTransparentColor
 
 class AttendanceAvatarView @JvmOverloads constructor(
@@ -36,19 +39,46 @@ class AttendanceAvatarView @JvmOverloads constructor(
 
     private val binding by lazy { ViewAttendanceAvatarBinding.inflate(LayoutInflater.from(context), this) }
 
-    init {
-        attrs?.getAttributes(context, R.styleable.AttendanceAvatarView) {
-            binding.avatarImage.apply {
-                setImageDrawable(getDrawable(R.styleable.AttendanceAvatarView_android_src))
+    var strokeWidth: Float
+        get() = binding.avatarImage.strokeWidth
+        set(value) {
+            binding.avatarImage.strokeWidth = value
+        }
 
-                strokeWidth = getDimensionPixelOffset(R.styleable.AttendanceAvatarView_android_strokeWidth, 0).toFloat()
-                val strokeColorInt = getColor(R.styleable.AttendanceAvatarView_android_strokeColor, context.getTransparentColor())
-                strokeColor = ColorStateList.valueOf(strokeColorInt)
+    var strokeColor: Int?
+        get() = binding.avatarImage.strokeColor
+        set(value) {
+            binding.avatarImage.strokeColor = value
+        }
+
+    var statusBackgroundColor: Int?
+        get() = (binding.attendanceIcon.background as? ColorDrawable)?.color
+        set(value) {
+            val color = value ?: context.getTransparentColor()
+            binding.attendanceIcon.background = ColorDrawable(color)
+            binding.attendanceIcon.strokeColor = ColorStateList.valueOf(color)
+        }
+
+    init {
+        with(binding) {
+            attrs?.getAttributes(context, R.styleable.AttendanceAvatarView) {
+                avatarImage.setImageDrawable(getDrawable(R.styleable.AttendanceAvatarView_android_src))
+
+                strokeWidth = getDimensionPixelOffset(R.styleable.AttendanceAvatarView_strokeWidth, 0).toFloat()
+                strokeColor = getColorOrNull(R.styleable.AttendanceAvatarView_strokeColor)
+
+                statusBackgroundColor = getColorOrNull(R.styleable.AttendanceAvatarView_statusBackgroundColor)
             }
         }
     }
 
-    fun setAttendee(attendee: Attendee) {
-        // TODO
+    fun setAttendee(attendee: Attendee) = with(binding) {
+        avatarImage.loadAvatar(attendee)
+
+        attendanceIcon.apply {
+            isVisible = attendee.state.icon != null
+            attendee.state.icon?.let { setImageResource(it) }
+            imageTintList = ColorStateList.valueOf(context.getColor(attendee.state.iconColor))
+        }
     }
 }

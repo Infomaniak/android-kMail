@@ -27,39 +27,55 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.89" />
+        app:layout_constraintGuide_percent="0.8889" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/avatarEndEdge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.89" />
+        app:layout_constraintGuide_percent="0.8889" />
 
     <com.infomaniak.mail.views.AvatarView
         android:id="@+id/avatarImage"
-        tools:strokeColor="@color/red"
-        tools:strokeWidth="1dp"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="@id/avatarBottomEdge"
         app:layout_constraintEnd_toEndOf="@id/avatarEndEdge"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:strokeColor="#0f0"
+        app:strokeWidth="1dp"
         tools:src="@tools:sample/avatars" />
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/attendanceIconTopEdge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.5555" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/attendanceIconStartEdge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5555" />
+
     <com.google.android.material.imageview.ShapeableImageView
-        android:layout_height="@dimen/mediumIconSize"
-        android:layout_width="@dimen/mediumIconSize"
+        android:id="@+id/attendanceIcon"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:padding="0.5dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/attendanceIconStartEdge"
+        app:layout_constraintTop_toTopOf="@id/attendanceIconTopEdge"
         app:shapeAppearance="@style/CircleImageView"
-        app:strokeColor="@color/white"
         app:strokeWidth="1dp"
         tools:background="@color/white"
-        tools:layout_height="@dimen/mediumIconSize"
-        tools:layout_width="@dimen/mediumIconSize"
         tools:src="@drawable/ic_calendar_no"
+        tools:strokeColor="#0f0"
         tools:tint="@color/redDestructiveAction" />
 
 </merge>

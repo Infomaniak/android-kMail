@@ -22,6 +22,8 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.core.view.isVisible
+import com.infomaniak.mail.data.models.calendar.Attendee
+import com.infomaniak.mail.data.models.calendar.Attendee.AttendanceState
 import com.infomaniak.mail.databinding.ViewCalendarEventBannerBinding
 
 class CalendarEventBannerView @JvmOverloads constructor(
@@ -37,6 +39,16 @@ class CalendarEventBannerView @JvmOverloads constructor(
             attendeesButton.addOnCheckedChangeListener { _, isChecked ->
                 attendeesGroup.isVisible = isChecked
             }
+
+            val attendees = listOf(
+                Attendee().apply { initLocalValues("alice@info.com", "Alice"); state = AttendanceState.ACCEPTED },
+                Attendee().apply { initLocalValues("bob@info.com", "Bob"); state = AttendanceState.DECLINED },
+                Attendee().apply { initLocalValues("charles@info.com", "Charles"); state = AttendanceState.TENTATIVE },
+                Attendee().apply { initLocalValues("delta@info.com", "Delta"); state = AttendanceState.NEEDS_ACTION },
+                Attendee().apply { initLocalValues("echo@info.com", "Echo"); state = AttendanceState.NEEDS_ACTION },
+            )
+
+            manyAvatarsView.setAttendees(attendees)
         }
         // attrs?.getAttributes(context, R.styleable.CalendarEventBannerView) {
         //     with(binding) {

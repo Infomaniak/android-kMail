@@ -21,9 +21,11 @@
 
     <declare-styleable name="CommonAttributes">
         <attr name="icon" format="reference" />
+        <attr name="padding" format="dimension" />
+        <attr name="strokeColor" format="color" />
+        <attr name="strokeWidth" format="dimension" />
         <attr name="text" format="string" />
         <attr name="title" format="string" />
-        <attr name="padding" format="dimension" />
     </declare-styleable>
 
     <declare-styleable name="ThemeAttributes">
@@ -65,16 +67,23 @@
 
     <declare-styleable name="AvatarView">
         <attr name="android:src" format="reference|color" />
-        <attr name="android:strokeColor" format="color" />
-        <attr name="android:strokeWidth" format="dimension" />
         <attr name="inset" format="dimension" />
         <attr name="padding" />
+        <attr name="strokeColor" />
+        <attr name="strokeWidth" />
     </declare-styleable>
 
     <declare-styleable name="AttendanceAvatarView">
         <attr name="android:src" format="reference|color" />
-        <attr name="android:strokeColor" format="color" />
-        <attr name="android:strokeWidth" format="dimension" />
+        <attr name="strokeColor" />
+        <attr name="strokeWidth" />
+        <attr name="statusBackgroundColor" format="color" />
+    </declare-styleable>
+
+    <declare-styleable name="ManyAvatarsView">
+        <attr name="strokeColor" />
+        <attr name="strokeWidth" />
+        <attr name="statusBackgroundColor" />
     </declare-styleable>
 
     <declare-styleable name="ItemSettingView">

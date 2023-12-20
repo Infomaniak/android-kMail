@@ -22,8 +22,12 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.core.view.isVisible
+import com.infomaniak.lib.core.utils.getAttributes
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.databinding.ViewManyAvatarsBinding
+import com.infomaniak.mail.utils.getColorOrNull
+import com.infomaniak.mail.utils.getTransparentColor
 
 class ManyAvatarsView @JvmOverloads constructor(
     context: Context,
@@ -36,7 +40,30 @@ class ManyAvatarsView @JvmOverloads constructor(
     private var attendees = emptyList<Attendee>()
 
     init {
-        binding
+        attrs?.getAttributes(context, R.styleable.ManyAvatarsView) {
+            with(binding) {
+                val strokeColor = getColorOrNull(R.styleable.ManyAvatarsView_strokeColor)
+                val strokeWidth = getDimensionPixelOffset(R.styleable.ManyAvatarsView_strokeWidth, 0).toFloat()
+                val statusBackgroundColor = getColorOrNull(R.styleable.ManyAvatarsView_statusBackgroundColor)
+
+                avatar1.init(strokeColor, strokeWidth, statusBackgroundColor)
+                avatar2.init(strokeColor, strokeWidth, statusBackgroundColor)
+                avatar3.init(strokeColor, strokeWidth, statusBackgroundColor)
+
+                additionalPeople.strokeWidth = strokeWidth.toInt()
+                additionalPeople.strokeColor = strokeColor ?: context.getTransparentColor()
+            }
+        }
+    }
+
+    fun AttendanceAvatarView.init(
+        initialStrokeColor: Int?,
+        initialStrokeWidth: Float,
+        initialStatusBackgroundColor: Int?,
+    ) {
+        strokeColor = initialStrokeColor
+        strokeWidth = initialStrokeWidth
+        statusBackgroundColor = initialStatusBackgroundColor
     }
 
     fun setAttendees(attendees: List<Attendee>) {
@@ -45,15 +72,16 @@ class ManyAvatarsView @JvmOverloads constructor(
     }
 
     private fun updateAttendeesUi(): Unit = with(binding) {
-        avatar1.setup(0)
-        avatar2.setup(1)
-        avatar3.setup(2)
+        avatar1.setupAttendee(0)
+        avatar2.setupAttendee(1)
+        avatar3.setupAttendee(2)
 
         additionalPeople.isVisible = attendees.count() > 3
-        additionalPeopleCount.text = "+${attendees.count() - 3}"
+        val extraPeopleCount = (attendees.count() - 3).coerceAtMost(99)
+        additionalPeopleCount.text = "+$extraPeopleCount"
     }
 
-    private fun AttendanceAvatarView.setup(index: Int) {
+    private fun AttendanceAvatarView.setupAttendee(index: Int) {
         val isDisplayed = attendees.lastIndex >= index
         isVisible = isDisplayed
         if (isDisplayed) setAttendee(attendees[index])

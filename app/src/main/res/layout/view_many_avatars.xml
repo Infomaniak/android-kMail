@@ -21,40 +21,56 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
+    <!-- 38dp are necessary so the actual avatar is 32dp after adding 4dp for the offset status and adding 1dp for the
+    stroke width on each side -->
     <com.infomaniak.mail.ui.main.thread.calendar.AttendanceAvatarView
         android:id="@+id/avatar1"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:src="@tools:sample/avatars"
+        tools:statusBackgroundColor="@color/backgroundColor"
+        tools:strokeColor="@color/backgroundColor"
+        tools:strokeWidth="2dp"
         tools:visibility="visible" />
 
+    <!-- -9dp is -8dp and we remove one more dp to account for the stroke width of each avatar -->
     <com.infomaniak.mail.ui.main.thread.calendar.AttendanceAvatarView
         android:id="@+id/avatar2"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        android:layout_marginStart="-9dp"
         android:visibility="gone"
         app:layout_constraintStart_toEndOf="@id/avatar1"
         app:layout_constraintTop_toTopOf="parent"
         tools:src="@tools:sample/avatars"
+        tools:statusBackgroundColor="@color/backgroundColor"
+        tools:strokeColor="@color/backgroundColor"
+        tools:strokeWidth="2dp"
         tools:visibility="visible" />
 
     <com.infomaniak.mail.ui.main.thread.calendar.AttendanceAvatarView
         android:id="@+id/avatar3"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        android:layout_marginStart="-9dp"
         android:visibility="gone"
         app:layout_constraintStart_toEndOf="@id/avatar2"
         app:layout_constraintTop_toTopOf="parent"
         tools:src="@tools:sample/avatars"
+        tools:statusBackgroundColor="@color/backgroundColor"
+        tools:strokeColor="@color/backgroundColor"
+        tools:strokeWidth="2dp"
         tools:visibility="visible" />
 
+    <!-- 34dp becomes 32dp after adding 1dp for the stroke width on each side -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/additionalPeople"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_width="34dp"
+        android:layout_height="34dp"
+        android:layout_marginStart="-9dp"
         android:visibility="gone"
         app:cardBackgroundColor="@color/manyAvatarsAdditionalPeopleBackground"
         app:layout_constraintStart_toEndOf="@id/avatar3"
