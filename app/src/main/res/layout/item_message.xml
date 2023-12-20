@@ -48,10 +48,10 @@
                     android:layout_width="@dimen/userAvatarSizeLarge"
                     android:layout_height="@dimen/userAvatarSizeLarge"
                     android:layout_marginBottom="@dimen/marginStandardVerySmall"
+                    android:src="@drawable/ic_unknown_user_avatar"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:src="@tools:sample/avatars" />
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/expeditorName"
@@ -68,6 +68,20 @@
                     app:layout_constraintStart_toEndOf="@id/userAvatar"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:text="@tools:sample/full_names" />
+
+                <com.infomaniak.lib.core.views.LoaderTextView
+                    android:id="@+id/expeditorNameLoader"
+                    style="@style/BodyMedium"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/marginStandardMedium"
+                    android:visibility="gone"
+                    app:layout_constrainedWidth="true"
+                    app:layout_constraintEnd_toStartOf="@id/shortMessageDateLoader"
+                    app:layout_constraintHorizontal_bias="0"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    app:layout_constraintStart_toEndOf="@id/userAvatar"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/subjectTextView"
@@ -109,7 +123,17 @@
                         android:ellipsize="end"
                         android:maxLines="1"
                         tools:ignore="InefficientWeight"
-                        tools:text="Myriam Rais, George Li, +3" />
+                        tools:text="Myriam Rais, George Li, +3"
+                        tools:visibility="visible" />
+
+                    <com.infomaniak.lib.core.views.LoaderTextView
+                        android:id="@+id/recipientLoader"
+                        style="@style/BodySmall.Secondary"
+                        android:layout_width="50dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/marginStandardSmall"
+                        android:layout_weight="1"
+                        android:visibility="gone" />
 
                     <ImageView
                         android:id="@+id/recipientChevron"
@@ -143,6 +167,18 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/expeditorName"
                     tools:text="9 déc 2021 à 11:00" />
+
+                <com.infomaniak.lib.core.views.LoaderTextView
+                    android:id="@+id/shortMessageDateLoader"
+                    style="@style/Label.Secondary"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/marginStandardSmall"
+                    android:layout_marginEnd="@dimen/marginStandardSmall"
+                    android:visibility="gone"
+                    app:layout_constraintBaseline_toBaselineOf="@id/expeditorNameLoader"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/expeditorNameLoader" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <com.google.android.material.button.MaterialButton

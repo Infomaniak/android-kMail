@@ -68,6 +68,7 @@ class SearchFragment : TwoPaneFragment() {
     private val searchViewModel: SearchViewModel by viewModels()
 
     override val slidingPaneLayout: SlidingPaneLayout get() = binding.searchSlidingPaneLayout
+    override val threadFragment: ThreadFragment? get() = binding.threadHostFragment.getFragment()
 
     @Inject
     lateinit var localSettings: LocalSettings

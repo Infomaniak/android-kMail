@@ -94,6 +94,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
     private val threadListViewModel: ThreadListViewModel by viewModels()
 
     override val slidingPaneLayout: SlidingPaneLayout get() = binding.threadListSlidingPaneLayout
+    override val threadFragment: ThreadFragment? get() = binding.threadHostFragment.getFragment()
 
     private val threadListMultiSelection by lazy { ThreadListMultiSelection() }
 

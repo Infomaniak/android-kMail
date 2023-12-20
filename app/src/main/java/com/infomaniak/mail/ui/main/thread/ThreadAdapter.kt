@@ -71,6 +71,7 @@ class ThreadAdapter(
     onAllExpandedMessagesLoaded: () -> Unit,
     navigateToNewMessageActivity: (Uri) -> Unit,
     promptLink: (String, ContextMenuType) -> Unit,
+    onLastItemRendered: () -> Unit,
 ) : ListAdapter<Message, ThreadViewHolder>(MessageDiffCallback()) {
 
     inline val messages: MutableList<Message> get() = currentList
@@ -113,6 +114,7 @@ class ThreadAdapter(
             onAllExpandedMessagesLoaded,
             navigateToNewMessageActivity,
             promptLink,
+            onLastItemRendered,
         )
     }
 
@@ -159,6 +161,7 @@ class ThreadAdapter(
     }.getOrDefault(Unit)
 
     override fun onBindViewHolder(holder: ThreadViewHolder, position: Int) = with(holder) {
+
         val message = messages[position]
 
         initMapForNewMessage(message, position)
@@ -169,6 +172,8 @@ class ThreadAdapter(
         bindContent(message)
 
         onExpandOrCollapseMessage(message, shouldTrack = false)
+
+        if (position == messages.count() - 1) threadAdapterCallbacks?.onLastItemRendered?.invoke()
     }
 
     private fun initMapForNewMessage(message: Message, position: Int) {
@@ -663,6 +668,7 @@ class ThreadAdapter(
         var onAllExpandedMessagesLoaded: () -> Unit,
         var navigateToNewMessageActivity: (Uri) -> Unit,
         var promptLink: (String, ContextMenuType) -> Unit,
+        var onLastItemRendered: () -> Unit,
     )
 
     companion object {
