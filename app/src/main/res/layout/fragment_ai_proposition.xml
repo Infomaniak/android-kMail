@@ -102,8 +102,7 @@
             <com.google.android.material.divider.MaterialDivider
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                app:dividerColor="@color/backgroundColorTertiary"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:dividerColor="@color/backgroundColorTertiary" />
 
             <FrameLayout
                 android:layout_width="match_parent"
