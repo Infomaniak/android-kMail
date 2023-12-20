@@ -23,7 +23,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
-import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.Attachment.AttachmentType
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
@@ -74,7 +74,7 @@ class TwoPaneViewModel @Inject constructor(
         navigateToSelectedDraft(thread.messages.single())
     }
 
-    fun navigateToDownloadAttachment(resource: String, name: String, type: Attachment.AttachmentType) {
+    fun navigateToDownloadAttachment(resource: String, name: String, type: AttachmentType) {
         downloadAttachmentArgs.value = DownloadAttachmentProgressDialogArgs(resource, name, type)
     }
 

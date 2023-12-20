@@ -64,6 +64,7 @@ import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.*
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel
+import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ContextMenuType
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.OpenThreadResult
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipients
@@ -242,17 +243,17 @@ class ThreadFragment : Fragment() {
                 // When adding a phone number to contacts, Google decodes this value in case it's url-encoded. But I could not
                 // reproduce this issue when manually creating a url-encoded href. If this is triggered, fix it by also
                 // decoding it at that step.
-                if (type == ThreadAdapter.ContextMenuType.PHONE && data.contains('%')) Sentry.withScope { scope ->
+                if (type == ContextMenuType.PHONE && data.contains('%')) Sentry.withScope { scope ->
                     scope.level = SentryLevel.ERROR
                     Sentry.captureMessage("Google was right, phone numbers can be url-encoded. Needs to be fixed")
                 }
 
                 when (type) {
-                    ThreadAdapter.ContextMenuType.LINK -> linkContextualMenuAlertDialog.show(data)
-                    ThreadAdapter.ContextMenuType.EMAIL -> emailContextualMenuAlertDialog.show(data)
-                    ThreadAdapter.ContextMenuType.PHONE -> phoneContextualMenuAlertDialog.show(data)
-                }
+                    ContextMenuType.LINK -> linkContextualMenuAlertDialog.show(data)
+                    ContextMenuType.EMAIL -> emailContextualMenuAlertDialog.show(data)
+                    ContextMenuType.PHONE -> phoneContextualMenuAlertDialog.show(data)
             }
+            },
         )
 
         addItemDecoration(DividerItemDecorator(InsetDrawable(dividerDrawable(context), 0)))
