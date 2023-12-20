@@ -15,26 +15,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.thread
+package com.infomaniak.mail.ui.main.thread.calendar
 
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
-import com.infomaniak.mail.databinding.ViewManyAvatarsBinding
+import androidx.core.view.isVisible
+import com.infomaniak.mail.databinding.ViewCalendarEventBannerBinding
 
-class ManyAvatarsView @JvmOverloads constructor(
+class CalendarEventBannerView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
-    private val binding by lazy { ViewManyAvatarsBinding.inflate(LayoutInflater.from(context), this, true) }
+    private val binding by lazy { ViewCalendarEventBannerBinding.inflate(LayoutInflater.from(context), this, true) }
 
     init {
-        binding
-        // with(binding) {
+        with(binding) {
+            participantsButton.addOnCheckedChangeListener { _, isChecked ->
+                participantsGroup.isVisible = isChecked
+            }
+        }
+        // attrs?.getAttributes(context, R.styleable.CalendarEventBannerView) {
+        //     with(binding) {
         //
+        //     }
         // }
     }
 }
