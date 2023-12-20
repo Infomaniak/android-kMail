@@ -22,6 +22,15 @@
     android:layout_height="match_parent"
     tools:context=".ui.main.thread.ThreadFragment">
 
+    <TextView
+        android:id="@+id/emptyView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:visibility="visible"
+        tools:text="@string/noConversationSelected"
+        tools:visibility="gone" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/threadView"
         android:layout_width="match_parent"
@@ -90,7 +99,18 @@
                         android:layout_height="wrap_content"
                         android:layout_marginHorizontal="@dimen/marginStandardMedium"
                         android:layout_marginBottom="@dimen/marginStandardMedium"
-                        tools:text="@tools:sample/lorem[7]" />
+                        android:visibility="gone"
+                        tools:text="@tools:sample/lorem[7]"
+                        tools:visibility="visible" />
+
+                    <com.infomaniak.lib.core.views.LoaderTextView
+                        android:id="@+id/threadSubjectLoader"
+                        style="@style/H2"
+                        android:layout_width="250dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                        android:layout_marginBottom="@dimen/marginStandardMedium"
+                        tools:visibility="gone" />
 
                 </com.google.android.material.appbar.CollapsingToolbarLayout>
 
@@ -111,8 +131,16 @@
                     android:nestedScrollingEnabled="false"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     tools:listitem="@layout/item_message" />
-
             </androidx.core.widget.NestedScrollView>
+
+            <include
+                android:id="@+id/messagesListNestedScrollViewLoader"
+                layout="@layout/item_message"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                tools:visibility="gone" />
+
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
         <com.infomaniak.mail.views.BottomQuickActionBarView
@@ -125,14 +153,4 @@
             app:layout_constraintTop_toBottomOf="@id/threadCoordinatorLayout"
             app:menu="@menu/message_menu" />
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <TextView
-        android:id="@+id/emptyView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:visibility="visible"
-        tools:text="@string/noConversationSelected"
-        tools:visibility="gone" />
-
 </FrameLayout>

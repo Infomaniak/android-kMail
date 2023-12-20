@@ -28,6 +28,7 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.isGone
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -62,6 +63,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.*
+import com.infomaniak.mail.ui.main.folder.ThreadListFragment
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ContextMenuType
@@ -254,6 +256,7 @@ class ThreadFragment : Fragment() {
                     ContextMenuType.PHONE -> phoneContextualMenuAlertDialog.show(data)
                 }
             },
+            onLastItemRendered = ::displayThreadView,
         )
 
         addItemDecoration(DividerItemDecorator(InsetDrawable(dividerDrawable(context), 0)))
@@ -269,21 +272,32 @@ class ThreadFragment : Fragment() {
     }
 
     private fun observeThreadOpening() = with(threadViewModel) {
+        val activity = requireActivity()
 
-        twoPaneViewModel.currentThreadUid.distinctUntilChanged().observeNotNull(viewLifecycleOwner) { threadUid ->
+        twoPaneViewModel.currentThreadUid.distinctUntilChanged().observe(viewLifecycleOwner) { threadUid ->
+
+            if (threadUid == null) with(activity.window) {
+                if (twoPaneFragment is ThreadListFragment) statusBarColor = context.getColor(R.color.backgroundHeaderColor)
+                updateNavigationBarColor(context.getColor(R.color.backgroundColor))
+                return@observe
+            }
+
+            if (twoPaneFragment is ThreadListFragment) {
+                activity.window.statusBarColor = context.getColor(
+                    if (twoPaneFragment.isOnlyRightShown()) R.color.backgroundColor else R.color.backgroundHeaderColor,
+                )
+            }
 
             reassignThreadLive(threadUid)
             reassignMessagesLive(threadUid)
 
             openThread(threadUid).observe(viewLifecycleOwner) { result ->
-
                 if (result == null) {
                     twoPaneViewModel.closeThread()
-                    return@observe
+                } else {
+                    initUi(threadUid, folderRole = mainViewModel.getActionFolderRole(result.thread))
+                    initAdapter(result)
                 }
-
-                initUi(threadUid, folderRole = mainViewModel.getActionFolderRole(result.thread))
-                initAdapter(result)
             }
         }
     }
@@ -393,10 +407,6 @@ class ThreadFragment : Fragment() {
     }
 
     private fun initUi(threadUid: String, folderRole: FolderRole?) = with(binding) {
-
-        // Display Thread view
-        emptyView.isGone = true
-        threadView.isVisible = true
 
         if (twoPaneFragment.isOnlyOneShown()) {
             requireActivity().window.updateNavigationBarColor(context.getColor(R.color.elevatedBackground))
@@ -576,6 +586,52 @@ class ThreadFragment : Fragment() {
         }
 
         return subject to spannedSubject
+    }
+
+    fun displayLoadingView() = with(binding) {
+
+        emptyView.isGone = true
+
+        threadSubject.isGone = true
+        threadSubjectLoader.isVisible = true
+
+        with(messagesListNestedScrollViewLoader) {
+            root.isVisible = true
+
+            expeditorName.isInvisible = true
+            expeditorNameLoader.isVisible = true
+
+            recipient.isGone = true
+            recipientLoader.isVisible = true
+
+            shortMessageDate.isGone = true
+            shortMessageDateLoader.isVisible = true
+
+            messageLoader.isVisible = true
+        }
+
+        threadView.isVisible = true
+    }
+
+    private fun displayThreadView() = with(binding) {
+
+        threadSubjectLoader.isGone = true
+        threadSubject.isVisible = true
+
+        with(messagesListNestedScrollViewLoader) {
+            root.isGone = true
+
+            expeditorNameLoader.isGone = true
+            expeditorName.isVisible = true
+
+            recipientLoader.isGone = true
+            recipient.isVisible = true
+
+            shortMessageDateLoader.isGone = true
+            shortMessageDate.isVisible = true
+
+            messageLoader.isGone = true
+        }
     }
 
     fun getAnchor(): View? = _binding?.quickActionBar

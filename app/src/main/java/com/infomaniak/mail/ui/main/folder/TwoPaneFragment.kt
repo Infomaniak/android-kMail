@@ -18,10 +18,10 @@
 package com.infomaniak.mail.ui.main.folder
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.distinctUntilChanged
 import androidx.navigation.fragment.findNavController
 import androidx.slidingpanelayout.widget.SlidingPaneLayout
 import com.infomaniak.lib.core.utils.getBackNavigationResult
@@ -36,7 +36,6 @@ import com.infomaniak.mail.ui.main.search.SearchFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialog
 import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
-import com.infomaniak.mail.utils.updateNavigationBarColor
 import javax.inject.Inject
 
 abstract class TwoPaneFragment : Fragment(), SlidingPaneLayout.PanelSlideListener {
@@ -45,6 +44,7 @@ abstract class TwoPaneFragment : Fragment(), SlidingPaneLayout.PanelSlideListene
     val twoPaneViewModel: TwoPaneViewModel by activityViewModels()
 
     protected abstract val slidingPaneLayout: SlidingPaneLayout
+    protected abstract val threadFragment: ThreadFragment?
 
     // TODO: When we'll update DragDropSwipeRecyclerViewLib, we'll need to make the adapter nullable.
     //  For now it causes a memory leak, because we can't remove the strong reference
@@ -65,7 +65,6 @@ abstract class TwoPaneFragment : Fragment(), SlidingPaneLayout.PanelSlideListene
         setupSlidingPane()
         observeCurrentFolder()
         observeSlidingPane()
-        observeThreadUid()
         observeThreadNavigation()
     }
 
@@ -98,36 +97,34 @@ abstract class TwoPaneFragment : Fragment(), SlidingPaneLayout.PanelSlideListene
 
         slidingPaneLayout.addPanelSlideListener(this@TwoPaneFragment)
 
-        triggerSlidingButAlsoCarryingThreadUid.observe(viewLifecycleOwner) { threadUid ->
-            val isSliding = if (threadUid == null) slidingPaneLayout.closePane() else slidingPaneLayout.openPane()
+        slidePane.distinctUntilChanged().observe(viewLifecycleOwner) { threadUid ->
+
+            resetThreadFragment()
+
+            val isSliding = if (threadUid == null) {
+                threadListAdapter.selectNewThread(newPosition = null, threadUid = null)
+                slidingPaneLayout.closePane()
+            } else {
+                threadFragment?.displayLoadingView()
+                slidingPaneLayout.openPane()
+            }
+
             if (!isSliding) currentThreadUid.value = threadUid
         }
     }
 
-    override fun onPanelOpened(panel: View): Unit = with(twoPaneViewModel) {
-        Log.e("TOTO", "onPanelOpened: ${triggerSlidingButAlsoCarryingThreadUid.value}")
-        val oldUid = currentThreadUid.value
-        triggerSlidingButAlsoCarryingThreadUid.value?.let { newUid ->
-            if (newUid != oldUid) currentThreadUid.value = triggerSlidingButAlsoCarryingThreadUid.value
-        }
+    override fun onPanelOpened(panel: View) {
+        updateCurrentThreadUid()
     }
 
-    override fun onPanelClosed(panel: View) = with(twoPaneViewModel) {
-        Log.e("TOTO", "onPanelClosed: ${triggerSlidingButAlsoCarryingThreadUid.value}")
-        if (triggerSlidingButAlsoCarryingThreadUid.value == null)
-            currentThreadUid.value = null
+    override fun onPanelClosed(panel: View) {
+        updateCurrentThreadUid()
     }
 
     override fun onPanelSlide(panel: View, slideOffset: Float) = Unit
 
-    private fun observeThreadUid() {
-        twoPaneViewModel.currentThreadUid.observe(viewLifecycleOwner) { threadUid ->
-            if (threadUid != null) {
-                requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundColor)
-            } else {
-                resetPanes(threadListAdapter)
-            }
-        }
+    private fun updateCurrentThreadUid() = with(twoPaneViewModel) {
+        currentThreadUid.value = slidePane.value
     }
 
     private fun observeThreadNavigation() = with(twoPaneViewModel) {
@@ -176,15 +173,7 @@ abstract class TwoPaneFragment : Fragment(), SlidingPaneLayout.PanelSlideListene
         }
     }
 
-    private fun resetPanes(threadListAdapter: ThreadListAdapter?) = with(requireActivity()) {
-
-        if (this@TwoPaneFragment is ThreadListFragment) window.statusBarColor = getColor(R.color.backgroundHeaderColor)
-        window.updateNavigationBarColor(getColor(R.color.backgroundColor))
-
-        threadListAdapter?.selectNewThread(newPosition = null, threadUid = null)
-
-        // TODO: We can see that the ThreadFragment's content is changing, while the pane is closing.
-        //  Maybe we need to delay the transaction? Or better: start it when the pane is fully closed?
-        childFragmentManager.beginTransaction().replace(R.id.threadHostFragment, ThreadFragment()).commit()
+    private fun resetThreadFragment() {
+        childFragmentManager.beginTransaction().replace(R.id.threadHostFragment, ThreadFragment()).commitNow()
     }
 }
