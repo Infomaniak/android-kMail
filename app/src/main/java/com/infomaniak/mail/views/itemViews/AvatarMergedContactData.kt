@@ -17,12 +17,25 @@
  */
 package com.infomaniak.mail.views.itemViews
 
-import androidx.lifecycle.MutableLiveData
-import com.infomaniak.mail.utils.MergedContactDictionary
+import androidx.lifecycle.asLiveData
+import com.infomaniak.mail.data.cache.userInfo.MergedContactController
+import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.utils.ContactUtils
+import io.realm.kotlin.ext.copyFromRealm
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.mapLatest
 import javax.inject.Inject
 import javax.inject.Singleton
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @Singleton
-class AvatarMergedContactData @Inject constructor() {
-    val mergedContactLiveData = MutableLiveData<MergedContactDictionary>()
+class AvatarMergedContactData @Inject constructor(
+    mergedContactController: MergedContactController,
+    @IoDispatcher ioDispatcher: CoroutineDispatcher,
+) {
+    val mergedContactLiveData = mergedContactController
+        .getMergedContactsAsync()
+        .mapLatest { ContactUtils.arrangeMergedContacts(it.list.copyFromRealm()) }
+        .asLiveData(ioDispatcher) // TODO : was ioCoroutineContext
 }
