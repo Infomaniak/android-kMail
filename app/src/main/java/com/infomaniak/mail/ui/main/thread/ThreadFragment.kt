@@ -105,11 +105,10 @@ class ThreadFragment : Fragment() {
     private val mainViewModel: MainViewModel by activityViewModels()
     private val threadViewModel: ThreadViewModel by viewModels()
 
+    private val twoPaneFragment inline get() = parentFragment as TwoPaneFragment
     private val threadAdapter inline get() = binding.messagesList.adapter as ThreadAdapter
     private val permissionUtils by lazy { PermissionUtils(this) }
     private val isNotInSpam by lazy { mainViewModel.currentFolder.value?.role != FolderRole.SPAM }
-
-    private val twoPaneFragment get() = parentFragment as TwoPaneFragment
 
     // TODO: This is probably too global as a trigger. Find something more refined?
     private val globalLayoutListener by lazy {
