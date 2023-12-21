@@ -21,8 +21,10 @@ import androidx.lifecycle.asLiveData
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.ContactUtils
+import com.infomaniak.mail.utils.coroutineContext
 import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.mapLatest
 import javax.inject.Inject
@@ -32,10 +34,13 @@ import javax.inject.Singleton
 @Singleton
 class AvatarMergedContactData @Inject constructor(
     mergedContactController: MergedContactController,
+    globalCoroutineScope: CoroutineScope,
     @IoDispatcher ioDispatcher: CoroutineDispatcher,
 ) {
+    private val ioCoroutineContext = globalCoroutineScope.coroutineContext(ioDispatcher)
+
     val mergedContactLiveData = mergedContactController
         .getMergedContactsAsync()
         .mapLatest { ContactUtils.arrangeMergedContacts(it.list.copyFromRealm()) }
-        .asLiveData(ioDispatcher) // TODO : was ioCoroutineContext
+        .asLiveData(ioCoroutineContext)
 }
