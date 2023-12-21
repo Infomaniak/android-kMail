@@ -20,15 +20,13 @@ package com.infomaniak.mail.ui.main.folder
 import android.net.Uri
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
-import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.Attachment.AttachmentType
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.thread.DetailedContactBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.MessageActionsBottomSheetDialogArgs
@@ -36,18 +34,13 @@ import com.infomaniak.mail.ui.main.thread.actions.ReplyBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialogArgs
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
-import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
 
 @HiltViewModel
 class TwoPaneViewModel @Inject constructor(
     private val draftController: DraftController,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
-
-    private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
     val currentThreadUid = MutableLiveData<String?>(null)
 
@@ -74,7 +67,7 @@ class TwoPaneViewModel @Inject constructor(
         navigateToSelectedDraft(thread.messages.single())
     }
 
-    fun navigateToDownloadAttachment(resource: String, name: String, type: Attachment.AttachmentType) {
+    fun navigateToDownloadAttachment(resource: String, name: String, type: AttachmentType) {
         downloadAttachmentArgs.value = DownloadAttachmentProgressDialogArgs(resource, name, type)
     }
 

@@ -26,10 +26,7 @@
         android:id="@+id/messageHeader"
         style="@style/CardViewMail"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_height="wrap_content">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -121,7 +118,6 @@
                         android:layout_marginHorizontal="@dimen/marginStandardSmall"
                         android:contentDescription="@string/contentDescriptionButtonExpandRecipients"
                         android:src="@drawable/ic_chevron_down"
-                        app:layout_constraintHorizontal_bias="0"
                         app:tint="@color/iconColor" />
                 </LinearLayout>
 

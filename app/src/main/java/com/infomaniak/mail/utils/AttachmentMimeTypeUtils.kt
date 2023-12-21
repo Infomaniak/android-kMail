@@ -17,7 +17,7 @@
  */
 package com.infomaniak.mail.utils
 
-import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.Attachment.AttachmentType
 
 object AttachmentMimeTypeUtils {
 
@@ -118,20 +118,20 @@ object AttachmentMimeTypeUtils {
         "application/font-tdpfr"
     )
 
-    fun getFileTypeFromMimeType(mimeType: String): Attachment.AttachmentType = when (mimeType) {
-        in pdfMatches -> Attachment.AttachmentType.PDF
-        in calendarMatches -> Attachment.AttachmentType.CALENDAR
-        in vcardMatches -> Attachment.AttachmentType.VCARD
-        in imageMatches -> Attachment.AttachmentType.IMAGE
-        in audioMatches -> Attachment.AttachmentType.AUDIO
-        in videoMatches -> Attachment.AttachmentType.VIDEO
-        in sheetMatches -> Attachment.AttachmentType.SPREADSHEET
-        in pointMatches -> Attachment.AttachmentType.POINTS
-        in textMatches -> Attachment.AttachmentType.TEXT
-        in archiveMatches -> Attachment.AttachmentType.ARCHIVE
-        in codeMatches -> Attachment.AttachmentType.CODE // Beware of the order, this must come after every other "text/"
-        in fontMatches -> Attachment.AttachmentType.FONT
-        else -> Attachment.AttachmentType.UNKNOWN
+    fun getFileTypeFromMimeType(mimeType: String): AttachmentType = when (mimeType) {
+        in pdfMatches -> AttachmentType.PDF
+        in calendarMatches -> AttachmentType.CALENDAR
+        in vcardMatches -> AttachmentType.VCARD
+        in imageMatches -> AttachmentType.IMAGE
+        in audioMatches -> AttachmentType.AUDIO
+        in videoMatches -> AttachmentType.VIDEO
+        in sheetMatches -> AttachmentType.SPREADSHEET
+        in pointMatches -> AttachmentType.POINTS
+        in textMatches -> AttachmentType.TEXT
+        in archiveMatches -> AttachmentType.ARCHIVE
+        in codeMatches -> AttachmentType.CODE // Beware of the order, this must come after every other "text/"
+        in fontMatches -> AttachmentType.FONT
+        else -> AttachmentType.UNKNOWN
     }
 
     private fun mimeTypeSetOf(vararg mimeTypes: String) = MimeTypeSet(mimeTypes.toSet())
