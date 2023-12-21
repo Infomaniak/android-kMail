@@ -35,7 +35,6 @@ import com.infomaniak.mail.data.cache.mailboxInfo.PermissionsController
 import com.infomaniak.mail.data.cache.mailboxInfo.QuotasController
 import com.infomaniak.mail.data.cache.userInfo.AddressBookController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
-import com.infomaniak.mail.data.models.Attachment.AttachmentType
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.MoveResult
@@ -48,7 +47,11 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.SnackBarManager
 import com.infomaniak.mail.ui.main.SnackBarManager.UndoData
 import com.infomaniak.mail.ui.main.folder.ThreadListViewModel
-import com.infomaniak.mail.ui.main.thread.ThreadFragment.MessageActionsArgs
+import com.infomaniak.mail.ui.main.thread.DetailedContactBottomSheetDialogArgs
+import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialogArgs
+import com.infomaniak.mail.ui.main.thread.actions.MessageActionsBottomSheetDialogArgs
+import com.infomaniak.mail.ui.main.thread.actions.ReplyBottomSheetDialogArgs
+import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialogArgs
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
@@ -207,12 +210,12 @@ class MainViewModel @Inject constructor(
     val rightPaneFolderName = MutableLiveData<String>()
     var previousFolderId: String? = null
 
-    val downloadAttachmentsArgs = SingleLiveEvent<Triple<String, String, AttachmentType>>()
+    val downloadAttachmentArgs = SingleLiveEvent<DownloadAttachmentProgressDialogArgs>()
     val newMessageArgs = SingleLiveEvent<NewMessageActivityArgs>()
-    val replyBottomSheetArgs = SingleLiveEvent<Pair<String, Boolean>>()
-    val threadActionsBottomSheetArgs = SingleLiveEvent<Triple<String, String, Boolean>>()
-    val messageActionsBottomSheetArgs = SingleLiveEvent<MessageActionsArgs>()
-    val detailedContactArgs = SingleLiveEvent<Recipient>()
+    val replyBottomSheetArgs = SingleLiveEvent<ReplyBottomSheetDialogArgs>()
+    val threadActionsArgs = SingleLiveEvent<ThreadActionsBottomSheetDialogArgs>()
+    val messageActionsArgs = SingleLiveEvent<MessageActionsBottomSheetDialogArgs>()
+    val detailedContactArgs = SingleLiveEvent<DetailedContactBottomSheetDialogArgs>()
 
     fun closeThread() {
         closeThreadTrigger.value = Unit
