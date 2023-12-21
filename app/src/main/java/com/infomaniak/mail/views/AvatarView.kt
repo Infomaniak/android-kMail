@@ -23,6 +23,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import android.widget.ImageView
+import androidx.lifecycle.Observer
 import coil.imageLoader
 import coil.load
 import coil.request.Disposable
@@ -34,11 +35,14 @@ import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.Correspondent
 import com.infomaniak.mail.data.models.correspondent.MergedContact
-import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ViewAvatarBinding
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.MergedContactDictionary
+import com.infomaniak.mail.views.itemViews.AvatarMergedContactData
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class AvatarView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -46,6 +50,17 @@ class AvatarView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     private val binding by lazy { ViewAvatarBinding.inflate(LayoutInflater.from(context), this, true) }
+
+    private var savedCorrespondent: Correspondent? = null
+
+    private val mergedContactObserver = Observer<MergedContactDictionary> { contacts ->
+        savedCorrespondent?.let { correspondent ->
+            loadAvatar(correspondent, contacts)
+        }
+    }
+
+    @Inject
+    lateinit var avatarMergedContactData: AvatarMergedContactData
 
     init {
         attrs?.getAttributes(context, R.styleable.AvatarView) {
@@ -63,6 +78,16 @@ class AvatarView @JvmOverloads constructor(
         }
     }
 
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        avatarMergedContactData.mergedContactLiveData.observeForever(mergedContactObserver)
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        avatarMergedContactData.mergedContactLiveData.removeObserver(mergedContactObserver)
+    }
+
     override fun setOnClickListener(onClickListener: OnClickListener?) = binding.root.setOnClickListener(onClickListener)
 
     fun loadAvatar(user: User): Disposable = with(binding.avatarImage) {
@@ -77,18 +102,23 @@ class AvatarView @JvmOverloads constructor(
         )
     }
 
-    fun loadAvatar(recipient: Recipient?, contacts: MergedContactDictionary) {
-        if (recipient == null) {
+    fun loadAvatar(correspondent: Correspondent?) {
+        if (correspondent == null) {
             loadUnknownUserAvatar()
         } else {
-            val recipientsForEmail = contacts[recipient.email]
-            val mergedContact = recipientsForEmail?.getOrElse(recipient.name) { recipientsForEmail.entries.elementAt(0).value }
-            binding.avatarImage.loadCorrespondentAvatar(mergedContact ?: recipient)
+            val contacts = avatarMergedContactData.mergedContactLiveData.value ?: emptyMap()
+            loadAvatar(correspondent, contacts)
+
+            savedCorrespondent = correspondent
         }
     }
 
+    fun loadAvatar(correspondent: Correspondent?, contacts: MergedContactDictionary) {
+        // Temp
+    }
+
     fun loadAvatar(mergedContact: MergedContact) {
-        binding.avatarImage.loadCorrespondentAvatar(mergedContact)
+        binding.avatarImage.baseLoadAvatar(mergedContact)
     }
 
     fun loadUnknownUserAvatar() {
@@ -97,9 +127,19 @@ class AvatarView @JvmOverloads constructor(
 
     fun setImageDrawable(drawable: Drawable?) = binding.avatarImage.setImageDrawable(drawable)
 
-    private fun ImageView.loadCorrespondentAvatar(correspondent: Correspondent): Disposable {
+    private fun searchInMergedContact(correspondent: Correspondent, contacts: MergedContactDictionary): MergedContact? {
+        val recipientsForEmail = contacts[correspondent.email]
+        return recipientsForEmail?.getOrElse(correspondent.name) { recipientsForEmail.entries.elementAt(0).value }
+    }
+
+    private fun loadAvatar(correspondent: Correspondent, contacts: MergedContactDictionary) {
+        val mergedContact = searchInMergedContact(correspondent, contacts)
+        binding.avatarImage.baseLoadAvatar(mergedContact ?: correspondent)
+    }
+
+    private fun ImageView.baseLoadAvatar(correspondent: Correspondent): Disposable {
         return if (correspondent.shouldDisplayUserAvatar()) {
-            loadAvatar(AccountUtils.currentUser!!)
+            this@AvatarView.loadAvatar(AccountUtils.currentUser!!)
         } else {
             val avatar = (correspondent as? MergedContact)?.avatar
             val color = context.getColor(R.color.onColorfulBackground)
