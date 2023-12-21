@@ -953,7 +953,7 @@ class NewMessageFragment : Fragment() {
 
         fun updateNavigationBarColor() {
             val backgroundColorRes = if (isVisible) R.color.backgroundColorSecondary else R.color.backgroundColor
-            requireActivity().window.navigationBarColor = requireContext().getColor(backgroundColorRes)
+            requireActivity().window.updateNavigationBarColor(requireContext().getColor(backgroundColorRes))
         }
 
         binding.aiPromptLayout.isVisible = isVisible
