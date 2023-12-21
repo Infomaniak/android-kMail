@@ -58,10 +58,4 @@ class ThreadListViewModel @Inject constructor(
         // Delete Search data in case they couldn't be deleted at the end of the previous Search.
         searchUtils.deleteRealmSearchData()
     }
-
-    data class SelectedDraft(
-        val draftLocalUuid: String?,
-        val draftResource: String?,
-        val messageUid: String?,
-    )
 }

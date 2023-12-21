@@ -158,7 +158,7 @@ class ThreadListMultiSelection {
     private fun hideUnreadChip(isMultiSelectOn: Boolean) = runCatchingRealm {
         val thereAreUnread = mainViewModel.currentFolderLive.value?.let { it.unreadCountLocal > 0 } == true
         threadListFragment.binding.unreadCountChip.isVisible = thereAreUnread && !isMultiSelectOn
-    }.getOrDefault(Unit)
+    }
 
     private fun displayMultiSelectActions(isMultiSelectOn: Boolean) = with(threadListFragment.binding) {
         newMessageFab.isGone = isMultiSelectOn

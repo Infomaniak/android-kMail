@@ -273,34 +273,20 @@ fun Fragment.safeNavigateToNewMessageActivity(args: Bundle? = null, currentClass
     if (canNavigate(currentClassName)) (requireActivity() as MainActivity).navigateToNewMessageActivity(args)
 }
 
-/**
- * The `thread` is the default parameter for this function. But if we are coming from a Notification,
- * we only have the `threadUid`. Since the `thread` is only used to know if it's `isOnlyOneDraft` or
- * not, and that it can't be `true` if coming from a Notification, we can bypass the usage of the
- * `thread` and directly use `threadUid` instead.
- */
-fun TwoPaneFragment.navigateToThread(
-    mainViewModel: MainViewModel,
-    thread: Thread? = null,
-    threadUid: String? = null,
-) = runCatchingRealm {
-    if (thread?.isOnlyOneDraft == true) { // Directly go to NewMessage screen
+fun TwoPaneFragment.navigateToThread(thread: Thread, mainViewModel: MainViewModel) {
+    if (thread.isOnlyOneDraft) {
         trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
-        mainViewModel.navigateToSelectedDraft(thread.messages.first()).observe(viewLifecycleOwner) {
-            safeNavigateToNewMessageActivity(
-                NewMessageActivityArgs(
-                    arrivedFromExistingDraft = true,
-                    draftLocalUuid = it.draftLocalUuid,
-                    draftResource = it.draftResource,
-                    messageUid = it.messageUid,
-                ).toBundle(),
-            )
-        }
+        openDraft(mainViewModel, thread)
     } else {
-        val uid = thread?.uid ?: threadUid ?: return@runCatchingRealm
-        openThread(uid)
+        openThread(thread.uid)
     }
-}.getOrDefault(Unit)
+}
+
+private fun TwoPaneFragment.openDraft(mainViewModel: MainViewModel, thread: Thread) = runCatchingRealm {
+    mainViewModel.navigateToSelectedDraft(thread.messages.first()).observe(viewLifecycleOwner) {
+        safeNavigateToNewMessageActivity(it.toBundle())
+    }
+}
 //endregion
 
 //region API

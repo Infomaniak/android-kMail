@@ -169,12 +169,16 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
             override fun onChanged() {
                 // Here, we use `arguments` instead of `navigationArgs` because we need mutable data.
                 if (arguments?.getString(navigationArgs::openThreadUid.name) != null) {
-                    navigationArgs.openThreadUid?.let { openThreadUid ->
+                    navigationArgs.openThreadUid?.let { threadUid ->
+
+                        // Select Thread in ThreadList
                         with(threadListAdapter) {
-                            getItemPosition(openThreadUid)?.let { position -> selectNewThread(position, openThreadUid) }
+                            getItemPosition(threadUid)?.let { position -> selectNewThread(position, threadUid) }
                         }
+
                         // If we are coming from a Notification, we need to navigate to ThreadFragment.
-                        navigateToThread(mainViewModel, threadUid = openThreadUid)
+                        openThread(threadUid)
+
                         arguments?.remove(navigationArgs::openThreadUid.name)
                         threadListObserver?.let(threadListAdapter::unregisterAdapterDataObserver)
                     }
@@ -294,7 +298,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
 
             stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
 
-            onThreadClicked = { thread -> navigateToThread(mainViewModel, thread) }
+            onThreadClicked = { thread -> navigateToThread(thread, mainViewModel) }
 
             onFlushClicked = { dialogTitle ->
 
