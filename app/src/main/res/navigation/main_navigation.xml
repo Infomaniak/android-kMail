@@ -26,30 +26,6 @@
         android:name="com.infomaniak.mail.ui.main.folder.ThreadListFragment"
         android:label="ThreadListFragment"
         tools:layout="@layout/fragment_thread_list">
-        <action
-            android:id="@+id/action_threadListFragment_to_searchFragment"
-            app:destination="@id/searchFragment" />
-        <action
-            android:id="@+id/action_threadListFragment_to_accountFragment"
-            app:destination="@id/accountFragment" />
-        <action
-            android:id="@+id/action_threadListFragment_to_settingsFragment"
-            app:destination="@id/settingsFragment" />
-        <action
-            android:id="@+id/action_threadListFragment_to_threadActionsBottomSheetDialog"
-            app:destination="@id/threadActionsBottomSheetDialog" />
-        <action
-            android:id="@+id/action_threadListFragment_to_moveFragment"
-            app:destination="@id/moveFragment" />
-        <action
-            android:id="@+id/action_threadListFragment_to_multiSelectBottomSheetDialog"
-            app:destination="@id/multiSelectBottomSheetDialog" />
-        <action
-            android:id="@+id/action_threadListFragment_to_lockedMailboxBottomSheetDialog"
-            app:destination="@id/lockedMailboxBottomSheetDialog" />
-        <action
-            android:id="@+id/action_threadListFragment_to_invalidPasswordFragment"
-            app:destination="@id/invalidPasswordFragment" />
 
         <!-- Region Notification: Click to open Thread -->
         <argument
@@ -74,6 +50,31 @@
             android:defaultValue="-1"
             app:argType="integer" />
         <!-- Endregion -->
+
+        <action
+            android:id="@+id/action_threadListFragment_to_searchFragment"
+            app:destination="@id/searchFragment" />
+        <action
+            android:id="@+id/action_threadListFragment_to_accountFragment"
+            app:destination="@id/accountFragment" />
+        <action
+            android:id="@+id/action_threadListFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_threadListFragment_to_threadActionsBottomSheetDialog"
+            app:destination="@id/threadActionsBottomSheetDialog" />
+        <action
+            android:id="@+id/action_threadListFragment_to_moveFragment"
+            app:destination="@id/moveFragment" />
+        <action
+            android:id="@+id/action_threadListFragment_to_multiSelectBottomSheetDialog"
+            app:destination="@id/multiSelectBottomSheetDialog" />
+        <action
+            android:id="@+id/action_threadListFragment_to_lockedMailboxBottomSheetDialog"
+            app:destination="@id/lockedMailboxBottomSheetDialog" />
+        <action
+            android:id="@+id/action_threadListFragment_to_invalidPasswordFragment"
+            app:destination="@id/invalidPasswordFragment" />
     </fragment>
 
     <activity
@@ -458,7 +459,7 @@
             app:argType="integer" />
         <!-- Endregion -->
 
-        <!-- Region Notification: Click on Notif -->
+        <!-- Region Notification: Click to open Thread -->
         <argument
             android:name="openThreadUid"
             android:defaultValue="@null"
