@@ -33,6 +33,8 @@ import com.infomaniak.mail.data.models.correspondent.Correspondent
 
 object UiUtils {
 
+    const val FULLY_SLID = 1.0f
+
     @ColorInt
     fun pointBetweenColors(@ColorInt from: Int, @ColorInt to: Int, percent: Float): Int {
         return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {

@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.main.folder
 
 import android.os.Bundle
 import android.view.View
+import androidx.annotation.FloatRange
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.distinctUntilChanged
@@ -35,7 +36,9 @@ import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.search.SearchFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialog
+import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
+import com.infomaniak.mail.utils.updateNavigationBarColor
 import javax.inject.Inject
 
 abstract class TwoPaneFragment : Fragment(), SlidingPaneLayout.PanelSlideListener {
@@ -51,6 +54,13 @@ abstract class TwoPaneFragment : Fragment(), SlidingPaneLayout.PanelSlideListene
     //  between the ThreadList's RecyclerView and its Adapter as it throws an NPE.
     @Inject
     lateinit var threadListAdapter: ThreadListAdapter
+
+    private val leftStatusBarColor: Int by lazy {
+        requireContext().getColor(if (this is ThreadListFragment) R.color.backgroundHeaderColor else R.color.backgroundColor)
+    }
+    private val leftNavigationBarColor: Int by lazy { requireContext().getColor(R.color.backgroundColor) }
+    private val rightStatusBarColor: Int by lazy { requireContext().getColor(R.color.backgroundColor) }
+    private val rightNavigationBarColor: Int by lazy { requireContext().getColor(R.color.elevatedBackground) }
 
     abstract fun getAnchor(): View?
     open fun doAfterFolderChanged() = Unit
@@ -121,7 +131,22 @@ abstract class TwoPaneFragment : Fragment(), SlidingPaneLayout.PanelSlideListene
         updateCurrentThreadUid()
     }
 
-    override fun onPanelSlide(panel: View, slideOffset: Float) = Unit
+    override fun onPanelSlide(panel: View, slideOffset: Float) {
+        colorSystemBarsWithSlidingPane(slideOffset)
+    }
+
+    private fun colorSystemBarsWithSlidingPane(
+        @FloatRange(0.0, 1.0) slideOffset: Float = UiUtils.FULLY_SLID,
+    ): Unit = with(requireActivity().window) {
+        if (slideOffset == UiUtils.FULLY_SLID) {
+            statusBarColor = leftStatusBarColor
+            updateNavigationBarColor(leftNavigationBarColor)
+        } else {
+            statusBarColor = UiUtils.pointBetweenColors(rightStatusBarColor, leftStatusBarColor, slideOffset)
+            updateNavigationBarColor(UiUtils.pointBetweenColors(rightNavigationBarColor, leftNavigationBarColor, slideOffset))
+        }
+    }
+
 
     private fun updateCurrentThreadUid() = with(twoPaneViewModel) {
         currentThreadUid.value = slidePane.value
