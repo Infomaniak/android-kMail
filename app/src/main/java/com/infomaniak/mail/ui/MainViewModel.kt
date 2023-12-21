@@ -203,7 +203,6 @@ class MainViewModel @Inject constructor(
     //endregion
 
     //region Merged Contacts
-    // Explanation of this Map: Map<Email, Map<Name, MergedContact>>
     val mergedContactsLive: LiveData<MergedContactDictionary> = avatarMergedContactData.mergedContactLiveData
     //endregion
 

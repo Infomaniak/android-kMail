@@ -113,6 +113,7 @@ import java.util.Date
 import java.util.Scanner
 
 //region Type alias
+// Explanation of this Map: Map<Email, Map<Name, MergedContact>>
 typealias MergedContactDictionary = Map<String, Map<String, MergedContact>>
 //endregion
 
