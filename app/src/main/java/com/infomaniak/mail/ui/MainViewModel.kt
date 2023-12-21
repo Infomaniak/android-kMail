@@ -27,9 +27,12 @@ import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.cache.mailboxContent.*
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController
+import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshCallbacks
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
+import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.mailboxInfo.PermissionsController
 import com.infomaniak.mail.data.cache.mailboxInfo.QuotasController
@@ -46,12 +49,6 @@ import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.SnackBarManager
 import com.infomaniak.mail.ui.main.SnackBarManager.UndoData
-import com.infomaniak.mail.ui.main.thread.DetailedContactBottomSheetDialogArgs
-import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialogArgs
-import com.infomaniak.mail.ui.main.thread.actions.MessageActionsBottomSheetDialogArgs
-import com.infomaniak.mail.ui.main.thread.actions.ReplyBottomSheetDialogArgs
-import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialogArgs
-import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
@@ -75,7 +72,6 @@ import com.infomaniak.lib.core.R as RCore
 class MainViewModel @Inject constructor(
     application: Application,
     private val addressBookController: AddressBookController,
-    private val draftController: DraftController,
     private val folderController: FolderController,
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val mailboxController: MailboxController,
@@ -198,26 +194,6 @@ class MainViewModel @Inject constructor(
      */
     fun forceTriggerCurrentFolder() {
         currentFilter.apply { value = value }
-    }
-    //endregion
-
-    //region Current Thread
-    val currentThreadUid = MutableLiveData<String?>(null)
-    val closeThreadTrigger = SingleLiveEvent<Unit>()
-
-    inline val isThreadOpen get() = currentThreadUid.value != null
-    val rightPaneFolderName = MutableLiveData<String>()
-    var previousFolderId: String? = null
-
-    val downloadAttachmentArgs = SingleLiveEvent<DownloadAttachmentProgressDialogArgs>()
-    val newMessageArgs = SingleLiveEvent<NewMessageActivityArgs>()
-    val replyBottomSheetArgs = SingleLiveEvent<ReplyBottomSheetDialogArgs>()
-    val threadActionsArgs = SingleLiveEvent<ThreadActionsBottomSheetDialogArgs>()
-    val messageActionsArgs = SingleLiveEvent<MessageActionsBottomSheetDialogArgs>()
-    val detailedContactArgs = SingleLiveEvent<DetailedContactBottomSheetDialogArgs>()
-
-    fun closeThread() {
-        closeThreadTrigger.value = Unit
     }
     //endregion
 
@@ -976,17 +952,6 @@ class MainViewModel @Inject constructor(
 
     fun getMessage(messageUid: String) = liveData(ioCoroutineContext) {
         emit(messageController.getMessage(messageUid)!!)
-    }
-
-    fun navigateToSelectedDraft(message: Message) = liveData(ioCoroutineContext) {
-        emit(
-            NewMessageActivityArgs(
-                arrivedFromExistingDraft = true,
-                draftLocalUuid = draftController.getDraftByMessageUid(message.uid)?.localUuid,
-                draftResource = message.draftResource,
-                messageUid = message.uid,
-            ),
-        )
     }
 
     fun selectOrUnselectAll() {

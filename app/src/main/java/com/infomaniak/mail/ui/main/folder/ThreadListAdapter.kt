@@ -96,9 +96,8 @@ class ThreadListAdapter @Inject constructor(
     private var multiSelection: MultiSelectionListener<Thread>? = null
 
     //region Tablet mode
-    var clickedThreadPosition: Int? = null
-        private set
-    private var clickedThreadUid: String? = null
+    private var openedThreadPosition: Int? = null
+    private var openedThreadUid: String? = null
     //endregion
 
     init {
@@ -182,7 +181,7 @@ class ThreadListAdapter @Inject constructor(
     fun getItemPosition(threadUid: String): Int? {
         return dataSet
             .indexOfFirst { it is Thread && it.uid == threadUid }
-            .let { position -> if (position == -1) null else position }
+            .takeIf { position -> position != -1 }
     }
 
     private fun CardviewThreadItemBinding.displayThread(thread: Thread, position: Int) {
@@ -225,7 +224,7 @@ class ThreadListAdapter @Inject constructor(
     }
 
     private fun refreshCachedSelectedPosition(threadUid: String, position: Int) {
-        if (threadUid == clickedThreadUid) clickedThreadPosition = position
+        if (threadUid == openedThreadUid) openedThreadPosition = position
     }
 
     private fun CardviewThreadItemBinding.chooseWhatToDoWhenClicked(thread: Thread, position: Int) {
@@ -233,19 +232,27 @@ class ThreadListAdapter @Inject constructor(
             toggleMultiSelectedThread(thread)
         } else {
             onThreadClicked?.invoke(thread)
-            if (thread.uid != clickedThreadUid) selectNewThread(position, thread.uid)
+            if (thread.uid != openedThreadUid) selectNewThread(position, thread.uid)
         }
     }
 
     fun selectNewThread(newPosition: Int?, threadUid: String?) {
 
-        val oldPosition = clickedThreadPosition
+        val oldPosition = openedThreadPosition
 
-        clickedThreadPosition = newPosition
-        clickedThreadUid = threadUid
+        openedThreadPosition = newPosition
+        openedThreadUid = threadUid
 
         if (oldPosition != null && oldPosition < itemCount) notifyItemChanged(oldPosition, NotificationType.SELECTED_STATE)
         if (newPosition != null) notifyItemChanged(newPosition, NotificationType.SELECTED_STATE)
+    }
+
+    /**
+     * Sometimes, we want to select a Thread before even having any Thread in the Adapter (example: coming from a Notification).
+     * The selected Thread's UI will update when the Adapter triggers the next batch of `onBindViewHolder()`.
+     */
+    fun preselectNewThread(threadUid: String?) {
+        selectNewThread(newPosition = null, threadUid)
     }
 
     private fun CardviewThreadItemBinding.toggleMultiSelectedThread(thread: Thread, shouldUpdateSelectedUi: Boolean = true) {
@@ -259,7 +266,7 @@ class ThreadListAdapter @Inject constructor(
     private fun CardviewThreadItemBinding.updateSelectedUi(targetThread: Thread) {
 
         val isMultiSelected = multiSelection?.selectedItems?.contains(targetThread) == true
-        val isTabletSelected = targetThread.uid == clickedThreadUid
+        val isTabletSelected = targetThread.uid == openedThreadUid
 
         selectionCardView.backgroundTintList = when {
             isMultiSelected -> ColorStateList.valueOf(context.getAttributeColor(RMaterial.attr.colorPrimaryContainer))

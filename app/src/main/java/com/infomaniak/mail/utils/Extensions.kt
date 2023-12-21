@@ -62,8 +62,6 @@ import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MainApplication
-import com.infomaniak.mail.MatomoMail.OPEN_FROM_DRAFT_NAME
-import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity
 import com.infomaniak.mail.data.models.Attachment
@@ -73,9 +71,7 @@ import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.MainActivity
-import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.BaseAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.login.IlluColors.IlluColors
@@ -86,7 +82,6 @@ import com.infomaniak.mail.ui.main.SnackBarManager
 import com.infomaniak.mail.ui.main.folder.DateSeparatorItemDecoration
 import com.infomaniak.mail.ui.main.folder.HeaderItemDecoration
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
-import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.thread.MessageWebViewClient
 import com.infomaniak.mail.ui.main.thread.RoundedBackgroundSpan
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
@@ -95,7 +90,6 @@ import com.infomaniak.mail.ui.noValidMailboxes.NoValidMailboxesActivity
 import com.infomaniak.mail.utils.AccountUtils.NO_MAILBOX_USER_ID_KEY
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.Utils.kSyncAccountUri
-import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
@@ -271,21 +265,6 @@ fun Fragment.safeNavigateToNewMessageActivity(
 
 fun Fragment.safeNavigateToNewMessageActivity(args: Bundle? = null, currentClassName: String? = null) {
     if (canNavigate(currentClassName)) (requireActivity() as MainActivity).navigateToNewMessageActivity(args)
-}
-
-fun TwoPaneFragment.navigateToThread(thread: Thread, mainViewModel: MainViewModel) {
-    if (thread.isOnlyOneDraft) {
-        trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
-        openDraft(mainViewModel, thread)
-    } else {
-        openThread(thread.uid)
-    }
-}
-
-private fun TwoPaneFragment.openDraft(mainViewModel: MainViewModel, thread: Thread) = runCatchingRealm {
-    mainViewModel.navigateToSelectedDraft(thread.messages.first()).observe(viewLifecycleOwner) {
-        safeNavigateToNewMessageActivity(it.toBundle())
-    }
 }
 //endregion
 

@@ -25,46 +25,60 @@ import androidx.navigation.fragment.findNavController
 import androidx.slidingpanelayout.widget.SlidingPaneLayout
 import com.infomaniak.lib.core.utils.getBackNavigationResult
 import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.mail.MatomoMail.OPEN_FROM_DRAFT_NAME
+import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
+import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.search.SearchFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialog
-import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
+import com.infomaniak.mail.utils.updateNavigationBarColor
+import javax.inject.Inject
 
 abstract class TwoPaneFragment : Fragment() {
 
     val mainViewModel: MainViewModel by activityViewModels()
+    val twoPaneViewModel: TwoPaneViewModel by activityViewModels()
 
     protected abstract val slidingPaneLayout: SlidingPaneLayout
 
-    abstract fun getAnchor(): View?
+    // TODO: When we'll update DragDropSwipeRecyclerViewLib, we'll need to make the adapter nullable.
+    //  For now it causes a memory leak, because we can't remove the strong reference
+    //  between the ThreadList's RecyclerView and its Adapter as it throws an NPE.
+    @Inject
+    lateinit var threadListAdapter: ThreadListAdapter
 
-    fun areBothShown() = !slidingPaneLayout.isSlideable
-    fun isOnlyLeftShown() = slidingPaneLayout.let { it.isSlideable && !it.isOpen }
-    fun isOnlyRightShown() = slidingPaneLayout.let { it.isSlideable && it.isOpen }
+    abstract fun getAnchor(): View?
+    open fun doAfterFolderChanged() = Unit
+
+    fun isOnlyOneShown() = slidingPaneLayout.isSlideable
+    fun areBothShown() = !isOnlyOneShown()
+    fun isOnlyLeftShown() = isOnlyOneShown() && !slidingPaneLayout.isOpen
+    fun isOnlyRightShown() = isOnlyOneShown() && slidingPaneLayout.isOpen
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupSlidingPane()
         observeCurrentFolder()
-        observeThreadEvents()
+        observeThreadUid()
+        observeThreadNavigation()
     }
 
     private fun setupSlidingPane() {
         slidingPaneLayout.lockMode = SlidingPaneLayout.LOCK_MODE_LOCKED
     }
 
-    private fun observeCurrentFolder() = with(mainViewModel) {
-        currentFolder.observe(viewLifecycleOwner) { folder ->
+    private fun observeCurrentFolder() = with(twoPaneViewModel) {
+        mainViewModel.currentFolder.observe(viewLifecycleOwner) { folder ->
 
             val (folderId, name) = if (this@TwoPaneFragment is SearchFragment) {
                 FolderController.SEARCH_FOLDER_ID to getString(R.string.searchFolderName)
             } else {
                 if (folder == null) return@observe
-                folder.id to folder.getLocalizedName(context)
+                folder.id to folder.getLocalizedName(requireContext())
             }
 
             rightPaneFolderName.value = name
@@ -73,23 +87,24 @@ abstract class TwoPaneFragment : Fragment() {
                 previousFolderId = folderId
                 if (isThreadOpen) closeThread()
             }
+
+            doAfterFolderChanged()
         }
     }
 
-    private fun observeThreadEvents() = with(mainViewModel) {
-
-        val threadListAdapter = when (this@TwoPaneFragment) {
-            is ThreadListFragment -> this@TwoPaneFragment.threadListAdapter
-            is SearchFragment -> this@TwoPaneFragment.threadListAdapter
-            else -> null
+    private fun observeThreadUid() {
+        twoPaneViewModel.currentThreadUid.observe(viewLifecycleOwner) { threadUid ->
+            val isOpeningThread = threadUid != null
+            if (isOpeningThread) {
+                val hasPaneOpened = slidingPaneLayout.openPane()
+                if (hasPaneOpened) requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundColor)
+            } else {
+                resetPanes(threadListAdapter)
+            }
         }
+    }
 
-        // Reset selected Thread UI when closing Thread
-        currentThreadUid.observe(viewLifecycleOwner) { threadUid ->
-            if (threadUid == null) threadListAdapter?.selectNewThread(newPosition = null, threadUid = null)
-        }
-
-        closeThreadTrigger.observe(viewLifecycleOwner) { resetPanes() }
+    private fun observeThreadNavigation() = with(twoPaneViewModel) {
 
         getBackNavigationResult(DownloadAttachmentProgressDialog.OPEN_WITH, ::startActivity)
 
@@ -120,30 +135,31 @@ abstract class TwoPaneFragment : Fragment() {
 
     fun handleOnBackPressed() {
         when {
-            isOnlyRightShown() -> resetPanes()
+            isOnlyRightShown() -> twoPaneViewModel.closeThread()
             this is ThreadListFragment -> requireActivity().finish()
             else -> findNavController().popBackStack()
         }
     }
 
-    fun openThread(uid: String) {
-
-        mainViewModel.currentThreadUid.value = uid
-
-        val isOpening = slidingPaneLayout.openPane()
-
-        if (isOpening) requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundColor)
+    fun navigateToThread(thread: Thread) = with(twoPaneViewModel) {
+        if (thread.isOnlyOneDraft) {
+            trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
+            openDraft(thread)
+        } else {
+            openThread(thread.uid)
+        }
     }
 
-    private fun resetPanes() {
+    private fun resetPanes(threadListAdapter: ThreadListAdapter?) = with(requireActivity()) {
 
         val isClosing = slidingPaneLayout.closePane()
 
-        if (isClosing && this is ThreadListFragment) {
-            requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundHeaderColor)
+        if (isClosing) {
+            if (this@TwoPaneFragment is ThreadListFragment) window.statusBarColor = getColor(R.color.backgroundHeaderColor)
+            window.updateNavigationBarColor(getColor(R.color.backgroundColor))
         }
 
-        mainViewModel.currentThreadUid.value = null
+        threadListAdapter?.selectNewThread(newPosition = null, threadUid = null)
 
         // TODO: We can see that the ThreadFragment's content is changing, while the pane is closing.
         //  Maybe we need to delay the transaction? Or better: start it when the pane is fully closed?

@@ -78,7 +78,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : BaseActivity() {
 
-    val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
+    private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private val mainViewModel: MainViewModel by viewModels()
 
     private val permissionUtils by lazy { PermissionUtils(this).also(::registerMainPermissions) }
@@ -509,6 +509,10 @@ class MainActivity : BaseActivity() {
 
     fun navigateToSyncAutoConfigActivity() {
         syncAutoConfigActivityResultLauncher.launch(Intent(this, SyncAutoConfigActivity::class.java))
+    }
+
+    fun openDrawerLayout() {
+        binding.drawerLayout.open()
     }
 
     fun getConfettiContainer(): ViewGroup = binding.easterEggConfettiContainer
