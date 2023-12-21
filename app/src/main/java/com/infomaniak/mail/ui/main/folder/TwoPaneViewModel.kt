@@ -71,7 +71,7 @@ class TwoPaneViewModel @Inject constructor(
     }
 
     fun openDraft(thread: Thread) {
-        navigateToSelectedDraft(thread.messages.first())
+        navigateToSelectedDraft(thread.messages.single())
     }
 
     fun navigateToDownloadAttachment(resource: String, name: String, type: Attachment.AttachmentType) {
