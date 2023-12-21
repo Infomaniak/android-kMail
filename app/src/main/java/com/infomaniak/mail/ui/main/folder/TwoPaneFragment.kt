@@ -165,13 +165,24 @@ abstract class TwoPaneFragment : Fragment() {
     }
 
     fun openThread(uid: String) {
+
         mainViewModel.currentThreadUid.value = uid
-        slidingPaneLayout.open()
+
+        val isOpening = slidingPaneLayout.openPane()
+
+        if (isOpening) requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundColor)
     }
 
     private fun resetPanes() {
-        slidingPaneLayout.close()
+
+        val isClosing = slidingPaneLayout.closePane()
+
+        if (isClosing && this is ThreadListFragment) {
+            requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundHeaderColor)
+        }
+
         mainViewModel.currentThreadUid.value = null
+
         // TODO: We can see that the ThreadFragment's content is changing, while the pane is closing.
         //  Maybe we need to delay the transaction? Or better: start it when the pane is fully closed?
         childFragmentManager.beginTransaction().replace(R.id.threadHostFragment, ThreadFragment()).commit()

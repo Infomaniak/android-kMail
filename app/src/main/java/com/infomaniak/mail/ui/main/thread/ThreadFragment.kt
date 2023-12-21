@@ -127,10 +127,7 @@ class ThreadFragment : Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return FragmentThreadBinding.inflate(inflater, container, false).also {
-            _binding = it
-            requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundColor)
-        }.root
+        return FragmentThreadBinding.inflate(inflater, container, false).also { _binding = it }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -193,9 +190,12 @@ class ThreadFragment : Fragment() {
             toolbarSubject.setTextColor(textColor)
         }
 
-        changeToolbarColorOnScroll(toolbar, messagesListNestedScrollView) { color ->
-            appBar.backgroundTintList = ColorStateList.valueOf(color)
-        }
+        changeToolbarColorOnScroll(
+            toolbar,
+            messagesListNestedScrollView,
+            shouldUpdateStatusBar = twoPaneFragment::isOnlyRightShown,
+            otherUpdates = { color -> appBar.backgroundTintList = ColorStateList.valueOf(color) },
+        )
     }
 
     private fun setupAdapter() = with(binding.messagesList) {

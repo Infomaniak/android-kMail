@@ -468,6 +468,7 @@ fun Fragment.changeToolbarColorOnScroll(
     nestedScrollView: NestedScrollView,
     @ColorRes loweredColor: Int = R.color.toolbarLoweredColor,
     @ColorRes elevatedColor: Int = R.color.toolbarElevatedColor,
+    shouldUpdateStatusBar: (() -> Boolean) = { true },
     otherUpdates: ((color: Int) -> Unit)? = null,
 ) {
     requireContext().changeToolbarColorOnScroll(
@@ -475,6 +476,7 @@ fun Fragment.changeToolbarColorOnScroll(
         nestedScrollView,
         loweredColor,
         elevatedColor,
+        shouldUpdateStatusBar,
         otherUpdates,
         viewLifecycleOwner.lifecycle,
         requireActivity(),
@@ -486,6 +488,7 @@ fun FragmentActivity.changeToolbarColorOnScroll(
     nestedScrollView: NestedScrollView,
     @ColorRes loweredColor: Int = R.color.toolbarLoweredColor,
     @ColorRes elevatedColor: Int = R.color.toolbarElevatedColor,
+    shouldUpdateStatusBar: (() -> Boolean) = { true },
     otherUpdates: ((color: Int) -> Unit)? = null,
 ) {
     changeToolbarColorOnScroll(
@@ -493,6 +496,7 @@ fun FragmentActivity.changeToolbarColorOnScroll(
         nestedScrollView,
         loweredColor,
         elevatedColor,
+        shouldUpdateStatusBar,
         otherUpdates,
         lifecycle,
         this,
@@ -504,6 +508,7 @@ private fun Context.changeToolbarColorOnScroll(
     nestedScrollView: NestedScrollView,
     @ColorRes loweredColor: Int,
     @ColorRes elevatedColor: Int,
+    shouldUpdateStatusBar: (() -> Boolean),
     otherUpdates: ((color: Int) -> Unit)?,
     lifecycle: Lifecycle,
     activity: Activity,
@@ -531,7 +536,7 @@ private fun Context.changeToolbarColorOnScroll(
         valueAnimator = UiUtils.animateColorChange(oldColor, newColor, animate = true) { color ->
             oldColor = color
             toolbar.setBackgroundColor(color)
-            activity.window.statusBarColor = color
+            if (shouldUpdateStatusBar()) activity.window.statusBarColor = color
             otherUpdates?.invoke(color)
         }
     }
