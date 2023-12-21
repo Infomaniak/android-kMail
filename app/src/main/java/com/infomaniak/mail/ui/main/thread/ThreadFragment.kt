@@ -607,6 +607,8 @@ class ThreadFragment : Fragment() {
         return subject to spannedSubject
     }
 
+    fun getAnchor(): View? = _binding?.quickActionBar
+
     enum class HeaderState {
         ELEVATED,
         LOWERED,

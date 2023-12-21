@@ -119,6 +119,12 @@ class MainActivity : BaseActivity() {
         localSettings.isUserWantingUpdates = result.resultCode == RESULT_OK
     }
 
+    private val currentFragment
+        get() = supportFragmentManager
+            .findFragmentById(R.id.mainHostFragment)
+            ?.childFragmentManager
+            ?.primaryNavigationFragment
+
     @Inject
     lateinit var draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler
 
@@ -342,16 +348,8 @@ class MainActivity : BaseActivity() {
         }
 
         fun popBack() {
-            val currentFragment = supportFragmentManager
-                .findFragmentById(R.id.mainHostFragment)
-                ?.childFragmentManager
-                ?.primaryNavigationFragment
-
-            if (currentFragment is TwoPaneFragment) {
-                currentFragment.handleOnBackPressed()
-            } else {
-                navController.popBackStack()
-            }
+            val fragment = currentFragment
+            if (fragment is TwoPaneFragment) fragment.handleOnBackPressed() else navController.popBackStack()
         }
 
         onBackPressedDispatcher.addCallback(this@MainActivity) {
@@ -375,8 +373,9 @@ class MainActivity : BaseActivity() {
     }
 
     private fun setupSnackBar() {
+
         fun getAnchor(): View? = when (navController.currentDestination?.id) {
-            R.id.threadListFragment -> findViewById(R.id.newMessageFab)
+            R.id.threadListFragment, R.id.searchFragment -> (currentFragment as? TwoPaneFragment)?.getAnchor()
             else -> null
         }
 

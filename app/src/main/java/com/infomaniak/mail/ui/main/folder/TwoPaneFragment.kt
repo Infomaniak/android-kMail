@@ -38,12 +38,9 @@ abstract class TwoPaneFragment : Fragment() {
 
     val mainViewModel: MainViewModel by activityViewModels()
 
-    private val slidingPaneLayout: SlidingPaneLayout
-        get() = when (this) {
-            is ThreadListFragment -> binding.threadListSlidingPaneLayout
-            is SearchFragment -> binding.searchSlidingPaneLayout
-            else -> throw IllegalStateException()
-        }
+    protected abstract val slidingPaneLayout: SlidingPaneLayout
+
+    abstract fun getAnchor(): View?
 
     fun areBothShown() = !slidingPaneLayout.isSlideable
     fun isOnlyLeftShown() = slidingPaneLayout.let { it.isSlideable && !it.isOpen }
