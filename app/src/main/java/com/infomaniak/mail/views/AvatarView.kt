@@ -113,10 +113,6 @@ class AvatarView @JvmOverloads constructor(
         }
     }
 
-    fun loadAvatar(correspondent: Correspondent?, contacts: MergedContactDictionary) {
-        // Temp
-    }
-
     fun loadAvatar(mergedContact: MergedContact) {
         binding.avatarImage.baseLoadAvatar(mergedContact)
     }

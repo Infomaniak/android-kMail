@@ -144,7 +144,6 @@ class ThreadFragment : Fragment() {
 
             observeMessagesLive()
             observeFailedMessages()
-            observeContacts()
             observeQuickActionBarClicks()
             observeOpenAttachment()
             observeSubjectUpdateTriggers()
@@ -345,7 +344,6 @@ class ThreadFragment : Fragment() {
             isThemeTheSameMap = result.isThemeTheSameMap
 
             stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
-            contacts = mainViewModel.mergedContactsLive.value ?: emptyMap()
         }
     }
 
@@ -440,10 +438,6 @@ class ThreadFragment : Fragment() {
                 messagesListNestedScrollView.scrollY = targetChild.top
             }
         }
-    }
-
-    private fun observeContacts() {
-        mainViewModel.mergedContactsLive.observeNotNull(viewLifecycleOwner, threadAdapter::updateContacts)
     }
 
     private fun downloadAllAttachments(message: Message) {
