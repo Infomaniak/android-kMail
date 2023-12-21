@@ -450,8 +450,8 @@ class MainActivity : BaseActivity() {
         binding.drawerLayout.setDrawerLockMode(drawerLockMode)
     }
 
-    private fun colorSystemBarsWithMenuDrawer(@FloatRange(0.0, 1.0) slideOffset: Float = FULLY_SLID) = with(window) {
-        if (slideOffset == FULLY_SLID) {
+    private fun colorSystemBarsWithMenuDrawer(@FloatRange(0.0, 1.0) slideOffset: Float = UiUtils.FULLY_SLID) = with(window) {
+        if (slideOffset == UiUtils.FULLY_SLID) {
             statusBarColor = menuDrawerBackgroundColor
             updateNavigationBarColor(menuDrawerBackgroundColor)
         } else {
@@ -522,7 +522,5 @@ class MainActivity : BaseActivity() {
         const val SYNC_AUTO_CONFIG_KEY = "syncAutoConfigKey"
         const val SYNC_AUTO_CONFIG_SUCCESS = "syncAutoConfigSuccess"
         const val SYNC_AUTO_CONFIG_ALREADY_SYNC = "syncAutoConfigAlreadySync"
-
-        private const val FULLY_SLID = 1.0f
     }
 }
