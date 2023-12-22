@@ -26,6 +26,7 @@ import androidx.core.view.isVisible
 import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.data.models.calendar.Attendee.AttendanceState
 import com.infomaniak.mail.databinding.ViewCalendarEventBannerBinding
+import com.infomaniak.mail.utils.UiUtils.getPrettyNameAndEmail
 
 class CalendarEventBannerView @JvmOverloads constructor(
     context: Context,
@@ -35,32 +36,56 @@ class CalendarEventBannerView @JvmOverloads constructor(
 
     private val binding by lazy { ViewCalendarEventBannerBinding.inflate(LayoutInflater.from(context), this, true) }
 
+    //region Debug
+    private val attendees = listOf<Attendee>(
+        createAttendee("alice@info.com", "Alice in Borderlands", false, AttendanceState.ACCEPTED),
+        createAttendee("bob@info.com", "Bob Dylan", false, AttendanceState.DECLINED),
+        createAttendee("charles.windsor@infomaniak.com", "Charles Windsor", true, AttendanceState.TENTATIVE),
+        createAttendee("delta@info.com", "Delta Rune", false, AttendanceState.NEEDS_ACTION),
+        createAttendee("echo@info.com", "Echo Location", false, AttendanceState.NEEDS_ACTION),
+    )
+
+    private fun createAttendee(email: String, name: String?, isOrganizer: Boolean, state: AttendanceState): Attendee =
+        Attendee().apply {
+            this.email = email
+            name?.let { this.name = it }
+            this.isOrganizer = isOrganizer
+            this.state = state
+        }
+    //endregion
+
     init {
         with(binding) {
-            attendeesButton.addOnCheckedChangeListener { _, isChecked ->
-                attendeesGroup.isVisible = isChecked
-            }
+            val organizer = attendees.singleOrNull(Attendee::isOrganizer)
+            val hasAnOrganizer = organizer != null
 
-            val attendees = listOf(
-                Attendee().apply { initLocalValues("alice@info.com", "Alice"); state = AttendanceState.ACCEPTED },
-                Attendee().apply { initLocalValues("bob@info.com", "Bob"); state = AttendanceState.DECLINED },
-                Attendee().apply { initLocalValues("charles@info.com", "Charles"); state = AttendanceState.TENTATIVE },
-                Attendee().apply { initLocalValues("delta@info.com", "Delta"); state = AttendanceState.NEEDS_ACTION },
-                Attendee().apply { initLocalValues("echo@info.com", "Echo"); state = AttendanceState.NEEDS_ACTION },
-            )
-
-            manyAvatarsView.setAttendees(attendees)
-            allAttendeesButton.apply {
+            attendeesButton.apply {
                 isGone = attendees.isEmpty()
-                setOnClickListener {
-                    // TODO
+                addOnCheckedChangeListener { _, isChecked ->
+                    setAttendeesVisible(isVisible = isChecked, hasAnOrganizer)
                 }
             }
+
+            organizer?.let(::displayOrganizer)
+            allAttendeesButton.setOnClickListener {/* TODO */ }
+            manyAvatarsView.setAttendees(attendees)
         }
         // attrs?.getAttributes(context, R.styleable.CalendarEventBannerView) {
         //     with(binding) {
         //
         //     }
         // }
+    }
+
+    private fun displayOrganizer(organizer: Attendee) = with(binding) {
+        organizerAvatar.loadAvatar(organizer)
+
+        val (name, _) = context.getPrettyNameAndEmail(organizer, true) // TODO : do we want to ignoreIsMe?
+        organizerName.text = "$name (Organisateur)" // TODO : Use a string resource
+    }
+
+    private fun setAttendeesVisible(isVisible: Boolean, hasAnOrganizer: Boolean) = with(binding) {
+        allAttendeesButton.isVisible = isVisible
+        organizerLayout.isVisible = isVisible && hasAnOrganizer
     }
 }
