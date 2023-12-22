@@ -21,7 +21,7 @@
     style="@style/CardViewMail"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardCornerRadius="8dp"
+    app:cardCornerRadius="@dimen/calendarCornerRadius"
     app:strokeColor="@color/cardViewStrokeColor"
     app:strokeWidth="1dp">
 
@@ -125,10 +125,12 @@
             android:layout_marginTop="@dimen/marginStandardSmall"
             android:checkable="true"
             android:gravity="start|center_vertical"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
             android:paddingHorizontal="@dimen/marginStandardMedium"
             android:text="Participants"
             app:backgroundTint="@android:color/transparent"
-            app:cornerRadius="8dp"
+            app:cornerRadius="@dimen/calendarCornerRadius"
             app:icon="@drawable/ic_calendar_participants_chevron"
             app:iconGravity="textEnd"
             app:iconSize="@dimen/smallIconSize"
@@ -166,27 +168,58 @@
             app:layout_constraintTop_toBottomOf="@id/attendeesButton"
             tools:text="Lucien Cheval (Organisateur)" />
 
-        <!-- 15dp as marginStart is 1 less than 16 and is here to account for the fact that the first avatar of the list has a
-        stroke which offsets the actual circle representing the avatar by 1-->
-        <!--TODO : Color of stroke-->
-        <com.infomaniak.mail.ui.main.thread.calendar.ManyAvatarsView
-            android:id="@+id/manyAvatarsView"
-            android:layout_width="wrap_content"
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/allAttendeesButton"
+            style="@style/CardViewMail"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
             android:layout_marginTop="@dimen/marginStandardMedium"
+            android:minHeight="48dp"
+            app:cardCornerRadius="@dimen/calendarCornerRadius"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/organiserName"
-            app:statusBackgroundColor="@color/backgroundColor"
-            app:strokeColor="@color/backgroundColor"
-            app:strokeWidth="2dp" />
+            app:layout_constraintTop_toBottomOf="@id/organiserName">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical">
+
+                <!-- 15dp as marginStart is 1 less than 16 and is here to account for the fact that the first avatar of the list has a
+                    stroke which offsets the actual circle representing the avatar by 1-->
+                <!--TODO : Color of stroke-->
+                <com.infomaniak.mail.ui.main.thread.calendar.ManyAvatarsView
+                    android:id="@+id/manyAvatarsView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    app:statusBackgroundColor="@color/backgroundColor"
+                    app:strokeColor="@color/backgroundColor"
+                    app:strokeWidth="2dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/marginStandardMedium"
+                    android:text="Consulter"
+                    android:textColor="?attr/colorPrimary"
+                    app:layout_constraintBottom_toBottomOf="@id/manyAvatarsView"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0"
+                    app:layout_constraintStart_toEndOf="@id/manyAvatarsView"
+                    app:layout_constraintTop_toTopOf="@id/manyAvatarsView"
+                    tools:text="Consulter" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
         <androidx.constraintlayout.widget.Group
             android:id="@+id/attendeesGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="gone"
-            app:constraint_referenced_ids="organiserAvatar,organiserName,manyAvatarsView"
+            app:constraint_referenced_ids="organiserAvatar,organiserName,allAttendeesButton"
             tools:visibility="visible" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

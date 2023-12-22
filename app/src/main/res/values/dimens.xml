@@ -69,6 +69,9 @@
     <dimen name="scrimOpacity">0.32</dimen>
     <integer name="aiPromptAnimationDuration">300</integer>
 
+    <!-- Calendar events -->
+    <dimen name="calendarCornerRadius">8dp</dimen>
+
     <!-- Other -->
     <dimen name="roundCornerRadius">100dp</dimen>
     <dimen name="angleViewNotRotated">0.0</dimen>

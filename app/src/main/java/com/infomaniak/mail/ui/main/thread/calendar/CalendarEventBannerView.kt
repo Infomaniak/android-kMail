@@ -21,6 +21,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.data.models.calendar.Attendee.AttendanceState
@@ -49,6 +50,12 @@ class CalendarEventBannerView @JvmOverloads constructor(
             )
 
             manyAvatarsView.setAttendees(attendees)
+            allAttendeesButton.apply {
+                isGone = attendees.isEmpty()
+                setOnClickListener {
+                    // TODO
+                }
+            }
         }
         // attrs?.getAttributes(context, R.styleable.CalendarEventBannerView) {
         //     with(binding) {
