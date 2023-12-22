@@ -46,6 +46,23 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Réunion Produit" />
 
+        <!--  TODO :  Create Body.Warning and synchronize with iOS about this new style -->
+        <TextView
+            android:id="@+id/pastEventWarning"
+            style="@style/BodySmall.Warning"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/marginStandardMedium"
+            android:layout_marginTop="@dimen/marginStandardMedium"
+            android:drawablePadding="@dimen/marginStandardMedium"
+            android:gravity="center_vertical"
+            android:text="Cet évènement est déjà passé"
+            app:drawableStartCompat="@drawable/ic_warning_big"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/eventName" />
+
         <TextView
             android:id="@+id/eventDate"
             android:layout_width="wrap_content"
@@ -58,7 +75,7 @@
             app:drawableStartCompat="@drawable/ic_calendar"
             app:drawableTint="@color/iconColor"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/eventName"
+            app:layout_constraintTop_toBottomOf="@id/pastEventWarning"
             tools:text="Mardi 28 novembre 2023" />
 
         <TextView
