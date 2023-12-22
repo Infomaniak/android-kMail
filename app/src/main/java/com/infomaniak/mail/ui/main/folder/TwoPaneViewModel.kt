@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023 Infomaniak Network SA
+ * Copyright (C) 2023-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
+import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
@@ -31,6 +32,7 @@ import com.infomaniak.mail.ui.main.thread.actions.AttachmentActionsBottomSheetDi
 import com.infomaniak.mail.ui.main.thread.actions.MessageActionsBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.ReplyBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialogArgs
+import com.infomaniak.mail.ui.main.thread.calendar.AttendeesBottomSheetDialogArgs
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -53,6 +55,7 @@ class TwoPaneViewModel @Inject constructor(
     val threadActionsArgs = SingleLiveEvent<ThreadActionsBottomSheetDialogArgs>()
     val messageActionsArgs = SingleLiveEvent<MessageActionsBottomSheetDialogArgs>()
     val detailedContactArgs = SingleLiveEvent<DetailedContactBottomSheetDialogArgs>()
+    val attendeesArgs = SingleLiveEvent<AttendeesBottomSheetDialogArgs>()
 
     fun openThread(uid: String) {
         currentThreadUid.value = uid
@@ -120,5 +123,9 @@ class TwoPaneViewModel @Inject constructor(
 
     fun navigateToDetailContact(recipient: Recipient) {
         detailedContactArgs.value = DetailedContactBottomSheetDialogArgs(recipient)
+    }
+
+    fun navigateToAttendees(attendees: Array<Attendee>) {
+        attendeesArgs.value = AttendeesBottomSheetDialogArgs(attendees)
     }
 }

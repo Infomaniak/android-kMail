@@ -155,6 +155,10 @@ abstract class TwoPaneFragment : Fragment() {
         detailedContactArgs.observe(viewLifecycleOwner) {
             safeNavigate(resId = R.id.detailedContactBottomSheetDialog, args = it.toBundle())
         }
+
+        attendeesArgs.observe(viewLifecycleOwner) {
+            safeNavigate(resId = R.id.attendeesBottomSheetDialog, args = it.toBundle())
+        }
     }
 
     fun handleOnBackPressed() {
