@@ -143,89 +143,97 @@
             tools:text="Participants" />
 
         <LinearLayout
-            android:id="@+id/organizerLayout"
+            android:id="@+id/attendeesSubMenu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:paddingVertical="@dimen/marginStandardSmall"
+            android:orientation="vertical"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/attendeesButton"
             tools:visibility="visible">
 
-            <com.infomaniak.mail.views.AvatarView
-                android:id="@+id/organizerAvatar"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_marginStart="@dimen/marginStandardMedium"
-                android:src="@drawable/ic_unknown_user_avatar"
-                app:layout_constraintBottom_toBottomOf="@id/organizerName"
-                app:layout_constraintEnd_toStartOf="@id/organizerName"
-                app:layout_constraintHorizontal_bias="0"
-                app:layout_constraintHorizontal_chainStyle="packed"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/organizerName"
-                tools:src="@tools:sample/avatars[9]" />
-
-            <TextView
-                android:id="@+id/organizerName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/marginStandardMedium"
-                android:text="Lucien Cheval (Organisateur)"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/organizerAvatar"
-                app:layout_constraintTop_toBottomOf="@id/attendeesButton"
-                tools:text="Lucien Cheval (Organisateur)" />
-
-        </LinearLayout>
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/allAttendeesButton"
-            style="@style/CardViewMail"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:minHeight="48dp"
-            android:visibility="gone"
-            app:cardCornerRadius="@dimen/calendarCornerRadius"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/organizerLayout"
-            tools:visibility="visible">
-
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:id="@+id/organizerLayout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:paddingVertical="@dimen/marginStandardSmall"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/attendeesButton">
 
-                <!-- 15dp as marginStart is 1 less than 16 and is here to account for the fact that the first avatar of the list has a
-                    stroke which offsets the actual circle representing the avatar by 1-->
-                <!--TODO : Color of stroke-->
-                <com.infomaniak.mail.ui.main.thread.calendar.ManyAvatarsView
-                    android:id="@+id/manyAvatarsView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
-                    app:statusBackgroundColor="@color/backgroundColor"
-                    app:strokeColor="@color/backgroundColor"
-                    app:strokeWidth="2dp" />
+                <com.infomaniak.mail.views.AvatarView
+                    android:id="@+id/organizerAvatar"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginStart="@dimen/marginStandardMedium"
+                    android:src="@drawable/ic_unknown_user_avatar"
+                    app:layout_constraintBottom_toBottomOf="@id/organizerName"
+                    app:layout_constraintEnd_toStartOf="@id/organizerName"
+                    app:layout_constraintHorizontal_bias="0"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/organizerName"
+                    tools:src="@tools:sample/avatars[9]" />
 
                 <TextView
+                    android:id="@+id/organizerName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/marginStandardMedium"
-                    android:text="Consulter"
-                    android:textColor="?attr/colorPrimary"
-                    app:layout_constraintBottom_toBottomOf="@id/manyAvatarsView"
+                    android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                    android:text="Lucien Cheval (Organisateur)"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0"
-                    app:layout_constraintStart_toEndOf="@id/manyAvatarsView"
-                    app:layout_constraintTop_toTopOf="@id/manyAvatarsView"
-                    tools:text="Consulter" />
+                    app:layout_constraintStart_toEndOf="@id/organizerAvatar"
+                    app:layout_constraintTop_toBottomOf="@id/attendeesButton"
+                    tools:text="Lucien Cheval (Organisateur)" />
 
             </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/allAttendeesButton"
+                style="@style/CardViewMail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                app:cardCornerRadius="@dimen/calendarCornerRadius"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/organizerLayout">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center_vertical">
+
+                    <!-- 15dp as marginStart is 1 less than 16 and is here to account for the fact that the first avatar of the list has a
+                        stroke which offsets the actual circle representing the avatar by 1-->
+                    <!--TODO : Color of stroke-->
+                    <com.infomaniak.mail.ui.main.thread.calendar.ManyAvatarsView
+                        android:id="@+id/manyAvatarsView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="15dp"
+                        app:statusBackgroundColor="@color/backgroundColor"
+                        app:strokeColor="@color/backgroundColor"
+                        app:strokeWidth="2dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/marginStandardMedium"
+                        android:text="Consulter"
+                        android:textColor="?attr/colorPrimary"
+                        app:layout_constraintBottom_toBottomOf="@id/manyAvatarsView"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0"
+                        app:layout_constraintStart_toEndOf="@id/manyAvatarsView"
+                        app:layout_constraintTop_toTopOf="@id/manyAvatarsView"
+                        tools:text="Consulter" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

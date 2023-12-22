@@ -56,17 +56,14 @@ class CalendarEventBannerView @JvmOverloads constructor(
 
     init {
         with(binding) {
-            val organizer = attendees.singleOrNull(Attendee::isOrganizer)
-            val hasAnOrganizer = organizer != null
-
             attendeesButton.apply {
                 isGone = attendees.isEmpty()
                 addOnCheckedChangeListener { _, isChecked ->
-                    setAttendeesVisible(isVisible = isChecked, hasAnOrganizer)
+                    attendeesSubMenu.isVisible = isChecked
                 }
             }
 
-            organizer?.let(::displayOrganizer)
+            displayOrganizer()
             allAttendeesButton.setOnClickListener {/* TODO */ }
             manyAvatarsView.setAttendees(attendees)
         }
@@ -77,15 +74,15 @@ class CalendarEventBannerView @JvmOverloads constructor(
         // }
     }
 
-    private fun displayOrganizer(organizer: Attendee) = with(binding) {
-        organizerAvatar.loadAvatar(organizer)
+    private fun displayOrganizer() = with(binding) {
+        val organizer = attendees.singleOrNull(Attendee::isOrganizer)
+        organizerLayout.isGone = organizer == null
 
-        val (name, _) = context.getPrettyNameAndEmail(organizer, true) // TODO : do we want to ignoreIsMe?
-        organizerName.text = "$name (Organisateur)" // TODO : Use a string resource
-    }
+        organizer?.let {
+            organizerAvatar.loadAvatar(organizer)
 
-    private fun setAttendeesVisible(isVisible: Boolean, hasAnOrganizer: Boolean) = with(binding) {
-        allAttendeesButton.isVisible = isVisible
-        organizerLayout.isVisible = isVisible && hasAnOrganizer
+            val (name, _) = context.getPrettyNameAndEmail(organizer, true) // TODO : do we want to ignoreIsMe?
+            organizerName.text = "$name (Organisateur)" // TODO : Use a string resource
+        }
     }
 }
