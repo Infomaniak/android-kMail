@@ -40,9 +40,9 @@ class Attendee : EmbeddedRealmObject, Correspondent {
     @delegate:Ignore
     override val initials by lazy { computeInitials() }
 
-    enum class AttendanceState(@DrawableRes val icon: Int?, @ColorRes val iconColor: Int) {
+    enum class AttendanceState(@DrawableRes val icon: Int?, @ColorRes val iconColor: Int?) {
         ACCEPTED(R.drawable.ic_check_rounded, R.color.greenSuccess),
-        NEEDS_ACTION(null, 0),
+        NEEDS_ACTION(null, null),
         TENTATIVE(R.drawable.ic_calendar_maybe, R.color.iconColorSecondaryText),
         DECLINED(R.drawable.ic_calendar_no, R.color.redDestructiveAction),
     }

@@ -78,7 +78,7 @@ class AttendanceAvatarView @JvmOverloads constructor(
         attendanceIcon.apply {
             isVisible = attendee.state.icon != null
             attendee.state.icon?.let { setImageResource(it) }
-            imageTintList = ColorStateList.valueOf(context.getColor(attendee.state.iconColor))
+            attendee.state.iconColor?.let { imageTintList = ColorStateList.valueOf(context.getColor(it)) }
         }
     }
 }
