@@ -17,19 +17,15 @@
  */
 package com.infomaniak.mail.data.models.calendar
 
-import android.os.Parcel
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.Correspondent
 import io.realm.kotlin.types.EmbeddedRealmObject
 import io.realm.kotlin.types.annotations.Ignore
-import kotlinx.parcelize.Parceler
-import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-@Parcelize
 @Serializable
 class Attendee : EmbeddedRealmObject, Correspondent {
     @SerialName("address")
@@ -44,29 +40,10 @@ class Attendee : EmbeddedRealmObject, Correspondent {
     @delegate:Ignore
     override val initials by lazy { computeInitials() }
 
-    fun initLocalValues(email: String, name: String?) {
-        this.email = email
-        name?.let { this.name = it }
-    }
-
     enum class AttendanceState(@DrawableRes val icon: Int?, @ColorRes val iconColor: Int) {
         ACCEPTED(R.drawable.ic_check_rounded, R.color.greenSuccess),
         NEEDS_ACTION(null, 0),
         TENTATIVE(R.drawable.ic_calendar_maybe, R.color.iconColorSecondaryText),
         DECLINED(R.drawable.ic_calendar_no, R.color.redDestructiveAction),
-    }
-
-    companion object : Parceler<Attendee> {
-        override fun create(parcel: Parcel): Attendee {
-            val email = parcel.readString()!!
-            val name = parcel.readString()!!
-
-            return Attendee().apply { initLocalValues(email, name) }
-        }
-
-        override fun Attendee.write(parcel: Parcel, flags: Int) {
-            parcel.writeString(email)
-            parcel.writeString(name)
-        }
     }
 }

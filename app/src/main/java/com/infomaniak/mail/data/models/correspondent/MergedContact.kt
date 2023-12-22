@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.data.models.correspondent
 
+import android.os.Parcelable
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.Ignore
 import io.realm.kotlin.types.annotations.PrimaryKey
@@ -24,7 +25,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 @Suppress("PROPERTY_WONT_BE_SERIALIZED")
-class MergedContact : RealmObject, Correspondent {
+class MergedContact : RealmObject, Correspondent, Parcelable {
     @PrimaryKey
     var id: Long? = null
     override var email: String = ""

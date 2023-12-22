@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.models.correspondent
 
 import android.os.Parcel
+import android.os.Parcelable
 import com.infomaniak.mail.utils.MergedContactDictionary
 import com.infomaniak.mail.utils.isEmail
 import io.realm.kotlin.types.EmbeddedRealmObject
@@ -29,7 +30,7 @@ import kotlinx.serialization.Transient
 
 @Parcelize
 @Serializable
-open class Recipient : EmbeddedRealmObject, Correspondent {
+open class Recipient : EmbeddedRealmObject, Correspondent, Parcelable {
 
     override var email: String = ""
     override var name: String = ""

@@ -18,13 +18,12 @@
 package com.infomaniak.mail.data.models.correspondent
 
 import android.content.Context
-import android.os.Parcelable
 import com.infomaniak.lib.core.utils.firstOrEmpty
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.AccountUtils
 import io.sentry.Sentry
 
-interface Correspondent : Parcelable {
+interface Correspondent {
     var email: String
     var name: String
 
