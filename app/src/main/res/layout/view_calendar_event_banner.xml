@@ -25,9 +25,10 @@
     app:strokeColor="@color/cardViewStrokeColor"
     app:strokeWidth="1dp">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/eventName"
@@ -41,9 +42,6 @@
             android:paddingVertical="@dimen/marginStandardSmall"
             android:text="Réunion Produit"
             app:drawableStartCompat="@drawable/ic_calendar_infomaniak"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
             tools:text="Réunion Produit" />
 
         <!--  TODO :  Create Body.Warning and synchronize with iOS about this new style -->
@@ -57,11 +55,7 @@
             android:drawablePadding="@dimen/marginStandardMedium"
             android:gravity="center_vertical"
             android:text="Cet évènement est déjà passé"
-            app:drawableStartCompat="@drawable/ic_warning_big"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/eventName" />
+            app:drawableStartCompat="@drawable/ic_warning_big" />
 
         <TextView
             android:id="@+id/eventDate"
@@ -74,8 +68,6 @@
             android:text="Mardi 28 novembre 2023"
             app:drawableStartCompat="@drawable/ic_calendar"
             app:drawableTint="@color/iconColor"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/pastEventWarning"
             tools:text="Mardi 28 novembre 2023" />
 
         <TextView
@@ -89,8 +81,6 @@
             android:text="09:00-10:00 (CET)"
             app:drawableStartCompat="@drawable/ic_editor_clock"
             app:drawableTint="@color/iconColor"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/eventDate"
             tools:text="09:00-10:00 (CET)" />
 
         <com.google.android.flexbox.FlexboxLayout
@@ -100,10 +90,7 @@
             android:layout_marginTop="@dimen/marginStandardMedium"
             android:paddingStart="@dimen/marginStandardSmall"
             android:paddingEnd="@dimen/marginStandardMedium"
-            app:flexWrap="wrap"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/eventHour">
+            app:flexWrap="wrap">
 
             <com.google.android.material.button.MaterialButton
                 style="@style/CalendarParticipationButton"
@@ -152,10 +139,6 @@
             app:iconGravity="textEnd"
             app:iconSize="@dimen/smallIconSize"
             app:iconTint="?attr/colorPrimary"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/participationButtons"
             app:rippleColor="@color/color_primary_translucent_ripple"
             tools:text="Participants" />
 
@@ -166,9 +149,6 @@
             android:orientation="vertical"
             android:paddingBottom="@dimen/marginStandardMedium"
             android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/attendeesButton"
             tools:visibility="visible">
 
             <LinearLayout
@@ -176,10 +156,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
-                android:paddingVertical="@dimen/marginStandardSmall"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/attendeesButton">
+                android:paddingVertical="@dimen/marginStandardSmall">
 
                 <com.infomaniak.mail.views.AvatarView
                     android:id="@+id/organizerAvatar"
@@ -187,12 +164,6 @@
                     android:layout_height="32dp"
                     android:layout_marginStart="@dimen/marginStandardMedium"
                     android:src="@drawable/ic_unknown_user_avatar"
-                    app:layout_constraintBottom_toBottomOf="@id/organizerName"
-                    app:layout_constraintEnd_toStartOf="@id/organizerName"
-                    app:layout_constraintHorizontal_bias="0"
-                    app:layout_constraintHorizontal_chainStyle="packed"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/organizerName"
                     tools:src="@tools:sample/avatars[9]" />
 
                 <TextView
@@ -201,9 +172,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="@dimen/marginStandardMedium"
                     android:text="Lucien Cheval (Organisateur)"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/organizerAvatar"
-                    app:layout_constraintTop_toBottomOf="@id/attendeesButton"
                     tools:text="Lucien Cheval (Organisateur)" />
 
             </LinearLayout>
@@ -214,10 +182,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="48dp"
-                app:cardCornerRadius="@dimen/calendarCornerRadius"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/organizerLayout">
+                app:cardCornerRadius="@dimen/calendarCornerRadius">
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -243,15 +208,10 @@
                         android:layout_marginStart="@dimen/marginStandardMedium"
                         android:text="Consulter"
                         android:textColor="?attr/colorPrimary"
-                        app:layout_constraintBottom_toBottomOf="@id/manyAvatarsView"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="0"
-                        app:layout_constraintStart_toEndOf="@id/manyAvatarsView"
-                        app:layout_constraintTop_toTopOf="@id/manyAvatarsView"
                         tools:text="Consulter" />
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
