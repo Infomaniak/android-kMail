@@ -213,5 +213,15 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/addToCalendarButton"
+            style="@style/TextButtonPrimaryMedium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/marginStandardMedium"
+            android:layout_marginBottom="@dimen/marginStandardMedium"
+            android:text="Ajouter à mon calendrier" />
+
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
