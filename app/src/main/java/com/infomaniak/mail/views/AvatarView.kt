@@ -80,11 +80,13 @@ class AvatarView @JvmOverloads constructor(
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
+        if (isInEditMode) return // Avoid lateinit property has not been initialized in preview
         avatarMergedContactData.mergedContactLiveData.observeForever(mergedContactObserver)
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
+        if (isInEditMode) return // Avoid lateinit property has not been initialized in preview
         avatarMergedContactData.mergedContactLiveData.removeObserver(mergedContactObserver)
     }
 
@@ -106,7 +108,10 @@ class AvatarView @JvmOverloads constructor(
         if (correspondent == null) {
             loadUnknownUserAvatar()
         } else {
-            val contacts = avatarMergedContactData.mergedContactLiveData.value ?: emptyMap()
+            // Avoid lateinit property has not been initialized in preview
+            val contactsFromViewModel = if (isInEditMode) emptyMap() else avatarMergedContactData.mergedContactLiveData.value
+
+            val contacts = contactsFromViewModel ?: emptyMap()
             loadAvatar(correspondent, contacts)
 
             savedCorrespondent = correspondent
