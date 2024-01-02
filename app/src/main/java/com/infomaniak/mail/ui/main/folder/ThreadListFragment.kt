@@ -578,6 +578,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 mainViewModel.canInstallUpdate.value = false
 
                 StoreUtils.installDownloadedUpdate(
+                    onSuccess = { localSettings.hasAppUpdateDownloaded = false },
                     onFailure = {
                         Sentry.captureException(it)
                         localSettings.resetUpdateSettings()
