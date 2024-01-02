@@ -473,7 +473,10 @@ class MainActivity : BaseActivity() {
         initAppUpdateManager(
             context = this,
             onUpdateDownloaded = { mainViewModel.toggleAppUpdateStatus(isUpdateDownloaded = true) },
-            onUpdateInstalled = { mainViewModel.toggleAppUpdateStatus(isUpdateDownloaded = false) },
+            onUpdateInstalled = {
+                Sentry.captureMessage("InstallStateUpdateListener called ’state == INSTALLED’", SentryLevel.DEBUG)
+                mainViewModel.toggleAppUpdateStatus(isUpdateDownloaded = false)
+            },
         )
     }
 
