@@ -430,7 +430,7 @@
         <item name="buttonBarNegativeButtonStyle">@style/DeletePositiveButtonStyle</item>
         <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
         <item name="colorControlNormal">?attr/colorControlNormal</item>
-        <item name="colorSurface">@color/backgroundColorTertiary</item>
+        <item name="colorSurfaceContainerHigh">@color/backgroundColorTertiary</item>
         <item name="elevationOverlayEnabled">false</item>
         <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlayDialogRounded</item>
     </style>
@@ -501,7 +501,7 @@
         <item name="android:textColor">@color/primary_text_color_disabled</item>
         <item name="colorControlHighlight">@color/color_ai_translucent_ripple</item>
         <item name="colorPrimary">@color/backgroundColorTertiary</item>
-        <item name="colorSurface">@color/backgroundColorTertiary</item>
+        <item name="colorSurfaceContainer">@color/backgroundColorTertiary</item>
     </style>
 
     <style name="AiCardView" parent="CardViewMail">
