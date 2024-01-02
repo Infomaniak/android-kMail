@@ -53,8 +53,6 @@ class AppUpdateWorker @AssistedInject constructor(
             StoreUtils.installDownloadedUpdate(
                 onSuccess = { completer.setResult(Result.success()) },
                 onFailure = { exception ->
-                    // This avoid the user being instantly reprompted to download update
-                    localSettings.isUserWantingUpdates = false
                     Sentry.captureException(exception)
                     localSettings.resetUpdateSettings()
                     completer.setResult(Result.failure())
