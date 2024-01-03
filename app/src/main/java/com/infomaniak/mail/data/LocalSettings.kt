@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2023 Infomaniak Network SA
+ * Copyright (C) 2022-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,8 +24,8 @@ import androidx.annotation.*
 import androidx.appcompat.app.AppCompatDelegate
 import com.google.android.material.color.MaterialColors
 import com.infomaniak.lib.core.utils.SentryLog
-import com.infomaniak.lib.core.utils.SharedValue.sharedValue
-import com.infomaniak.lib.core.utils.SharedValue.sharedValueNullable
+import com.infomaniak.lib.core.utils.SharedValues
+import com.infomaniak.lib.core.utils.sharedValue
 import com.infomaniak.lib.core.utils.transaction
 import com.infomaniak.lib.stores.StoreUtils.APP_UPDATE_TAG
 import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
@@ -36,12 +36,11 @@ import com.infomaniak.mail.MatomoMail.ACTION_MOVE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_POSTPONE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_SPAM_NAME
 import com.infomaniak.mail.R
-import kotlin.properties.ReadWriteProperty
 import com.google.android.material.R as RMaterial
 
-class LocalSettings private constructor(context: Context) {
+class LocalSettings private constructor(context: Context) : SharedValues {
 
-    private val sharedPreferences = context.applicationContext.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE)
+    override val sharedPreferences = context.applicationContext.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE)!!
 
     var appLaunches by sharedValue("appLaunchesKey", 0)
     var cancelDelay by sharedValue("cancelDelayKey", 10)
@@ -216,15 +215,6 @@ class LocalSettings private constructor(context: Context) {
     enum class AiReplacementDialogVisibility {
         SHOW,
         HIDE,
-    }
-
-    private fun sharedValue(key: String, defaultValue: Boolean) = sharedPreferences.sharedValue(key, defaultValue)
-    private fun sharedValue(key: String, defaultValue: Int) = sharedPreferences.sharedValue(key, defaultValue)
-    private fun sharedValueNullable(key: String, defaultValue: String?) = sharedPreferences.sharedValueNullable(key, defaultValue)
-    private fun sharedValue(key: String, defaultValue: Set<String>) = sharedPreferences.sharedValue(key, defaultValue)
-    private fun sharedValue(key: String, defaultValue: List<String>) = sharedPreferences.sharedValue(key, defaultValue)
-    private inline fun <reified E : Enum<E>> sharedValue(key: String, defaultValue: E): ReadWriteProperty<Any, E> {
-        return sharedPreferences.sharedValue(key, defaultValue)
     }
 
     companion object {
