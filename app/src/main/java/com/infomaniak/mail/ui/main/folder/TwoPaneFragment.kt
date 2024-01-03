@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023 Infomaniak Network SA
+ * Copyright (C) 2023-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@ package com.infomaniak.mail.ui.main.folder
 
 import android.os.Bundle
 import android.view.View
-import androidx.annotation.FloatRange
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -35,7 +34,8 @@ import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.search.SearchFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialog
-import com.infomaniak.mail.utils.UiUtils
+import com.infomaniak.mail.utils.UiUtils.FULLY_SLID
+import com.infomaniak.mail.utils.UiUtils.progressivelyColorSystemBars
 import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 import com.infomaniak.mail.utils.updateNavigationBarColor
 import javax.inject.Inject
@@ -119,19 +119,13 @@ abstract class TwoPaneFragment : Fragment(), SlidingPaneLayout.PanelSlideListene
     override fun onPanelClosed(panel: View) = Unit
 
     override fun onPanelSlide(panel: View, slideOffset: Float) {
-        colorSystemBarsWithSlidingPane(slideOffset)
-    }
-
-    private fun colorSystemBarsWithSlidingPane(
-        @FloatRange(0.0, 1.0) slideOffset: Float = UiUtils.FULLY_SLID,
-    ): Unit = with(requireActivity().window) {
-        if (slideOffset == UiUtils.FULLY_SLID) {
-            statusBarColor = leftStatusBarColor
-            updateNavigationBarColor(leftNavigationBarColor)
-        } else {
-            statusBarColor = UiUtils.pointBetweenColors(rightStatusBarColor, leftStatusBarColor, slideOffset)
-            updateNavigationBarColor(UiUtils.pointBetweenColors(rightNavigationBarColor, leftNavigationBarColor, slideOffset))
-        }
+        requireActivity().window.progressivelyColorSystemBars(
+            slideOffset = FULLY_SLID - slideOffset,
+            statusBarColorFrom = leftStatusBarColor,
+            statusBarColorTo = rightStatusBarColor,
+            navBarColorFrom = leftNavigationBarColor,
+            navBarColorTo = rightNavigationBarColor,
+        )
     }
 
     private fun observeThreadNavigation() = with(twoPaneViewModel) {

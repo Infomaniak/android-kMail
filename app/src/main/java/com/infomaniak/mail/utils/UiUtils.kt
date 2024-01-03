@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2023 Infomaniak Network SA
+ * Copyright (C) 2022-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,8 +22,10 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Color
 import android.os.Build
+import android.view.Window
 import android.widget.TextView
 import androidx.annotation.ColorInt
+import androidx.annotation.FloatRange
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.toColor
 import androidx.core.graphics.toColorInt
@@ -83,6 +85,22 @@ object UiUtils {
             pointBetweenColor(fromColor.g, toColor.g, percent),
             pointBetweenColor(fromColor.b, toColor.b, percent),
         ).toColorInt()
+    }
+
+    fun Window.progressivelyColorSystemBars(
+        @FloatRange(0.0, 1.0) slideOffset: Float,
+        @ColorInt statusBarColorFrom: Int,
+        @ColorInt statusBarColorTo: Int,
+        @ColorInt navBarColorFrom: Int,
+        @ColorInt navBarColorTo: Int,
+    ) {
+        if (slideOffset == FULLY_SLID) {
+            statusBarColor = statusBarColorTo
+            updateNavigationBarColor(navBarColorTo)
+        } else {
+            statusBarColor = pointBetweenColors(statusBarColorFrom, statusBarColorTo, slideOffset)
+            updateNavigationBarColor(pointBetweenColors(navBarColorFrom, navBarColorTo, slideOffset))
+        }
     }
 
     fun formatUnreadCount(unread: Int) = if (unread >= 100) "99+" else unread.toString()
