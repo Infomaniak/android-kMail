@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023 Infomaniak Network SA
+ * Copyright (C) 2023-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,6 +34,8 @@ import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.search.SearchFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialog
+import com.infomaniak.mail.utils.UiUtils.FULLY_SLID
+import com.infomaniak.mail.utils.UiUtils.progressivelyColorSystemBars
 import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 import com.infomaniak.mail.utils.updateNavigationBarColor
 import javax.inject.Inject
@@ -51,6 +53,13 @@ abstract class TwoPaneFragment : Fragment() {
     @Inject
     lateinit var threadListAdapter: ThreadListAdapter
 
+    private val leftStatusBarColor: Int by lazy {
+        requireContext().getColor(if (this is ThreadListFragment) R.color.backgroundHeaderColor else R.color.backgroundColor)
+    }
+    private val leftNavigationBarColor: Int by lazy { requireContext().getColor(R.color.backgroundColor) }
+    private val rightStatusBarColor: Int by lazy { requireContext().getColor(R.color.backgroundColor) }
+    private val rightNavigationBarColor: Int by lazy { requireContext().getColor(R.color.elevatedBackground) }
+
     abstract fun getAnchor(): View?
     open fun doAfterFolderChanged() = Unit
 
@@ -67,8 +76,22 @@ abstract class TwoPaneFragment : Fragment() {
         observeThreadNavigation()
     }
 
-    private fun setupSlidingPane() {
-        slidingPaneLayout.lockMode = SlidingPaneLayout.LOCK_MODE_LOCKED
+    private fun setupSlidingPane() = with(slidingPaneLayout) {
+        lockMode = SlidingPaneLayout.LOCK_MODE_LOCKED
+        addPanelSlideListener(object : SlidingPaneLayout.PanelSlideListener {
+            override fun onPanelOpened(panel: View) = Unit
+            override fun onPanelClosed(panel: View) = Unit
+
+            override fun onPanelSlide(panel: View, slideOffset: Float) {
+                requireActivity().window.progressivelyColorSystemBars(
+                    slideOffset = FULLY_SLID - slideOffset,
+                    statusBarColorFrom = leftStatusBarColor,
+                    statusBarColorTo = rightStatusBarColor,
+                    navBarColorFrom = leftNavigationBarColor,
+                    navBarColorTo = rightNavigationBarColor,
+                )
+            }
+        })
     }
 
     private fun observeCurrentFolder() = with(twoPaneViewModel) {

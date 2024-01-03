@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2023 Infomaniak Network SA
+ * Copyright (C) 2022-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -64,6 +64,7 @@ import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.ui.newMessage.NewMessageActivity
 import com.infomaniak.mail.ui.sync.SyncAutoConfigActivity
 import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.UiUtils.progressivelyColorSystemBars
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Breadcrumb
@@ -147,7 +148,7 @@ class MainActivity : BaseActivity() {
 
         override fun onDrawerOpened(drawerView: View) {
             if (hasDragged) trackMenuDrawerEvent("openByGesture", TrackerAction.DRAG)
-            colorSystemBarsWithMenuDrawer()
+            colorSystemBarsWithMenuDrawer(UiUtils.FULLY_SLID)
             (binding.menuDrawerFragmentContainer.getFragment() as? MenuDrawerFragment)?.onDrawerOpened()
         }
 
@@ -334,7 +335,7 @@ class MainActivity : BaseActivity() {
 
         checkStalledUpdate()
 
-        if (binding.drawerLayout.isOpen) colorSystemBarsWithMenuDrawer()
+        if (binding.drawerLayout.isOpen) colorSystemBarsWithMenuDrawer(UiUtils.FULLY_SLID)
     }
 
     private fun handleOnBackPressed() = with(binding) {
@@ -450,14 +451,14 @@ class MainActivity : BaseActivity() {
         binding.drawerLayout.setDrawerLockMode(drawerLockMode)
     }
 
-    private fun colorSystemBarsWithMenuDrawer(@FloatRange(0.0, 1.0) slideOffset: Float = FULLY_SLID) = with(window) {
-        if (slideOffset == FULLY_SLID) {
-            statusBarColor = menuDrawerBackgroundColor
-            updateNavigationBarColor(menuDrawerBackgroundColor)
-        } else {
-            statusBarColor = UiUtils.pointBetweenColors(backgroundHeaderColor, menuDrawerBackgroundColor, slideOffset)
-            updateNavigationBarColor(UiUtils.pointBetweenColors(backgroundColor, menuDrawerBackgroundColor, slideOffset))
-        }
+    private fun colorSystemBarsWithMenuDrawer(@FloatRange(0.0, 1.0) slideOffset: Float) {
+        window.progressivelyColorSystemBars(
+            slideOffset = slideOffset,
+            statusBarColorFrom = backgroundHeaderColor,
+            statusBarColorTo = menuDrawerBackgroundColor,
+            navBarColorFrom = backgroundColor,
+            navBarColorTo = menuDrawerBackgroundColor,
+        )
     }
 
     private fun initAppUpdateManager() {
@@ -522,7 +523,5 @@ class MainActivity : BaseActivity() {
         const val SYNC_AUTO_CONFIG_KEY = "syncAutoConfigKey"
         const val SYNC_AUTO_CONFIG_SUCCESS = "syncAutoConfigSuccess"
         const val SYNC_AUTO_CONFIG_ALREADY_SYNC = "syncAutoConfigAlreadySync"
-
-        private const val FULLY_SLID = 1.0f
     }
 }
