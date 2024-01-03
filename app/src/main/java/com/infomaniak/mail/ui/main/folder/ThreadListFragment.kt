@@ -50,6 +50,7 @@ import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.stores.StoreUtils
+import com.infomaniak.lib.stores.StoreUtils.APP_UPDATE_TAG
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
@@ -566,13 +567,15 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun observeUpdateInstall() = with(binding) {
         mainViewModel.canInstallUpdate.observe(viewLifecycleOwner) { isUpdateDownloaded ->
+            SentryLog.d(APP_UPDATE_TAG, "Must display update button : $isUpdateDownloaded")
             installUpdateGroup.isVisible = isUpdateDownloaded
             installUpdate.setOnClickListener {
+                SentryLog.d(APP_UPDATE_TAG, "Install downloaded Update from button")
                 trackEvent("inAppUpdate", "installUpdate")
                 mainViewModel.canInstallUpdate.value = false
+                localSettings.hasAppUpdateDownloaded = false
 
                 StoreUtils.installDownloadedUpdate(
-                    onSuccess = { localSettings.hasAppUpdateDownloaded = false },
                     onFailure = {
                         Sentry.captureException(it)
                         localSettings.resetUpdateSettings()

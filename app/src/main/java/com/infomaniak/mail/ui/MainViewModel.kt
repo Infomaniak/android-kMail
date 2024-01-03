@@ -25,6 +25,7 @@ import com.infomaniak.lib.core.utils.DownloadManagerUtils
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.lib.stores.StoreUtils
+import com.infomaniak.lib.stores.StoreUtils.APP_UPDATE_TAG
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -1023,11 +1024,16 @@ class MainViewModel @Inject constructor(
     }
 
     fun checkAppUpdateStatus() {
+        SentryLog.d(
+            tag = APP_UPDATE_TAG,
+            msg = "Setting canInstallUpdate value to ${localSettings.hasAppUpdateDownloaded} in checkAppUpdateStatus",
+        )
         canInstallUpdate.value = localSettings.hasAppUpdateDownloaded
         StoreUtils.checkStalledUpdate()
     }
 
     fun toggleAppUpdateStatus(isUpdateDownloaded: Boolean) {
+        SentryLog.d(APP_UPDATE_TAG, "Setting canInstallUpdate value to $isUpdateDownloaded in toggleAppUpdateStatus")
         canInstallUpdate.value = isUpdateDownloaded
         localSettings.hasAppUpdateDownloaded = isUpdateDownloaded
     }

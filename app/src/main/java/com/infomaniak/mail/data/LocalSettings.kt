@@ -27,6 +27,7 @@ import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.SharedValue.sharedValue
 import com.infomaniak.lib.core.utils.SharedValue.sharedValueNullable
 import com.infomaniak.lib.core.utils.transaction
+import com.infomaniak.lib.stores.StoreUtils.APP_UPDATE_TAG
 import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_DELETE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_FAVORITE_NAME
@@ -71,6 +72,7 @@ class LocalSettings private constructor(context: Context) {
     fun removeSettings() = sharedPreferences.transaction { clear() }
 
     fun resetUpdateSettings() {
+        SentryLog.d(APP_UPDATE_TAG, "Reset update settings")
         isUserWantingUpdates = false // This avoid the user being instantly reprompted to download update
         hasAppUpdateDownloaded = false
     }
