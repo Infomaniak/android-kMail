@@ -50,6 +50,7 @@ import com.infomaniak.lib.stores.StoreUtils.initAppUpdateManager
 import com.infomaniak.lib.stores.StoreUtils.launchInAppReview
 import com.infomaniak.lib.stores.StoreUtils.unregisterAppUpdateListener
 import com.infomaniak.mail.BuildConfig
+import com.infomaniak.mail.MatomoMail.trackAppReviewEvent
 import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.MatomoMail.trackEasterEggEvent
 import com.infomaniak.mail.MatomoMail.trackEvent
@@ -503,13 +504,18 @@ class MainActivity : BaseActivity() {
     private fun showAppReview() = with(localSettings) {
         if (showAppReviewDialog && appReviewLaunches < 0) {
             appReviewLaunches = LocalSettings.DEFAULT_APP_REVIEW_LAUNCHES
+            trackAppReviewEvent("presentAlert", TrackerAction.DATA)
             titleDialog.show(
                 title = R.string.reviewAlertTitle,
                 onPositiveButtonClicked = {
+                    trackAppReviewEvent("like")
                     showAppReviewDialog = false
                     launchInAppReview()
                 },
-                onNegativeButtonClicked = { openUrl(getString(R.string.urlUserReportAndroid)) },
+                onNegativeButtonClicked = {
+                    trackAppReviewEvent("dislike")
+                    openUrl(getString(R.string.urlUserReportAndroid))
+                },
             )
         }
     }

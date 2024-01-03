@@ -18,6 +18,7 @@
 package com.infomaniak.mail
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavDestination
@@ -183,7 +184,7 @@ object MatomoMail : MatomoCore {
     }
 
     fun Fragment.trackOnBoardingEvent(name: String) {
-        trackEvent("onBoarding", name)
+        trackEvent("onboarding", name)
     }
 
     fun Fragment.trackThreadListEvent(name: String) {
@@ -232,6 +233,10 @@ object MatomoMail : MatomoCore {
 
     fun Context.trackEasterEggEvent(name: String, action: TrackerAction = TrackerAction.CLICK) {
         trackEvent("easterEgg", name, action)
+    }
+
+    fun Activity.trackAppReviewEvent(name: String, action: TrackerAction = TrackerAction.CLICK) {
+        trackEvent("appReview", name, action)
     }
 
     // We need to invert this logical value to keep a coherent value for analytics because actions
