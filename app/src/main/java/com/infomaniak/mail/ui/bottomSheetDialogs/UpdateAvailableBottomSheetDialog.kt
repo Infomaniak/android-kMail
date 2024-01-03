@@ -22,6 +22,7 @@ import android.view.View
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.getAppName
 import com.infomaniak.lib.core.utils.goToPlayStore
+import com.infomaniak.mail.MatomoMail.trackAppUpdateEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import dagger.hilt.android.AndroidEntryPoint
@@ -42,6 +43,7 @@ class UpdateAvailableBottomSheetDialog : InformationBottomSheetDialog() {
         infoIllustration.setBackgroundResource(R.drawable.ic_update_logo)
 
         actionButton.apply {
+            trackAppUpdateEvent("discoverNow")
             setText(RCore.string.buttonUpdate)
             setOnClickListener {
                 localSettings.isUserWantingUpdates = true
@@ -51,6 +53,7 @@ class UpdateAvailableBottomSheetDialog : InformationBottomSheetDialog() {
         }
 
         secondaryActionButton.setOnClickListener {
+            trackAppUpdateEvent("discoverLater")
             localSettings.isUserWantingUpdates = false
             dismiss()
         }

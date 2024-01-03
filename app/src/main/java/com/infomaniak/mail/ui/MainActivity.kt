@@ -54,6 +54,7 @@ import com.infomaniak.mail.MatomoMail.trackAppReviewEvent
 import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.MatomoMail.trackEasterEggEvent
 import com.infomaniak.mail.MatomoMail.trackEvent
+import com.infomaniak.mail.MatomoMail.trackInAppUpdateEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -124,7 +125,9 @@ class MainActivity : BaseActivity() {
     }
 
     private val inAppUpdateResultLauncher = registerForActivityResult(StartIntentSenderForResult()) { result ->
-        localSettings.isUserWantingUpdates = result.resultCode == RESULT_OK
+        val isUserWantingUpdates = result.resultCode == RESULT_OK
+        localSettings.isUserWantingUpdates = isUserWantingUpdates
+        trackInAppUpdateEvent(if (isUserWantingUpdates) "discoverNow" else "discoverLater")
     }
 
     @Inject
