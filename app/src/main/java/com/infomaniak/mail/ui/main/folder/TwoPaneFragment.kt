@@ -84,7 +84,15 @@ abstract class TwoPaneFragment : Fragment() {
         addPanelSlideListener(object : SlidingPaneLayout.PanelSlideListener {
 
             override fun onPanelOpened(panel: View) = updateCurrentThreadUid()
-            override fun onPanelClosed(panel: View) = updateCurrentThreadUid()
+
+            override fun onPanelClosed(panel: View) = with(twoPaneViewModel) {
+                if (slidePane.value == null) {
+                    updateCurrentThreadUid()
+                } else {
+                    currentThreadUid.value = null
+                    slidePane.value = null
+                }
+            }
 
             private fun updateCurrentThreadUid() = with(twoPaneViewModel) {
                 currentThreadUid.value = slidePane.value
