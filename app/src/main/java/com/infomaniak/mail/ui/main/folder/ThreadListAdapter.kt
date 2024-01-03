@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2023 Infomaniak Network SA
+ * Copyright (C) 2022-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -132,9 +132,7 @@ class ThreadListAdapter @Inject constructor(
             val binding = holder.binding as CardviewThreadItemBinding
             val thread = dataSet[position] as Thread
 
-            when (payload) {
-                NotificationType.SELECTED_STATE -> binding.updateSelectedState(thread)
-            }
+            binding.updateSelectedState(thread)
         } else {
             super.onBindViewHolder(holder, position, payloads)
         }

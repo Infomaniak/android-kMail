@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2023 Infomaniak Network SA
+ * Copyright (C) 2022-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,9 +54,7 @@ class AvatarView @JvmOverloads constructor(
     private var savedCorrespondent: Correspondent? = null
 
     private val mergedContactObserver = Observer<MergedContactDictionary> { contacts ->
-        savedCorrespondent?.let { correspondent ->
-            loadAvatar(correspondent, contacts)
-        }
+        savedCorrespondent?.let { correspondent -> loadAvatarUsingDictionary(correspondent, contacts) }
     }
 
     @Inject
@@ -110,10 +108,7 @@ class AvatarView @JvmOverloads constructor(
         } else {
             // Avoid lateinit property has not been initialized in preview
             val contactsFromViewModel = if (isInEditMode) emptyMap() else avatarMergedContactData.mergedContactLiveData.value
-
-            val contacts = contactsFromViewModel ?: emptyMap()
-            loadAvatar(correspondent, contacts)
-
+            loadAvatarUsingDictionary(correspondent, contacts = contactsFromViewModel ?: emptyMap())
             savedCorrespondent = correspondent
         }
     }
@@ -133,9 +128,9 @@ class AvatarView @JvmOverloads constructor(
         return recipientsForEmail?.getOrElse(correspondent.name) { recipientsForEmail.entries.elementAt(0).value }
     }
 
-    private fun loadAvatar(correspondent: Correspondent, contacts: MergedContactDictionary) {
+    private fun loadAvatarUsingDictionary(correspondent: Correspondent, contacts: MergedContactDictionary) {
         val mergedContact = searchInMergedContact(correspondent, contacts)
-        binding.avatarImage.baseLoadAvatar(mergedContact ?: correspondent)
+        binding.avatarImage.baseLoadAvatar(correspondent = mergedContact ?: correspondent)
     }
 
     private fun ImageView.baseLoadAvatar(correspondent: Correspondent): Disposable {
