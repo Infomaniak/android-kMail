@@ -42,7 +42,7 @@ class AttachmentDetailsView @JvmOverloads constructor(
 
     init {
         attrs?.getAttributes(context, R.styleable.AttachmentDetailsView) {
-            val displayStyle = DisplayStyle.values()[getInteger(R.styleable.AttachmentDetailsView_displayStyle, 0)]
+            val displayStyle = DisplayStyle.entries[getInteger(R.styleable.AttachmentDetailsView_displayStyle, 0)]
             val iconSize = context.resources.getDimension(displayStyle.iconSize).toInt()
             val marginSize = context.resources.getDimension(displayStyle.marginSize).toInt()
 
