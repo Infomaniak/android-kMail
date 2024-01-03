@@ -4,6 +4,7 @@ html {
 }
 
 body {
+    font-family: 'Helvetica';
     margin: 16px;
     padding: 0;
     width: auto !important;
@@ -24,4 +25,8 @@ blockquote blockquote blockquote blockquote {
 
 a:link, a:visited, a:hover, a:active {
     color: var(--kmail-primary-color);
+}
+
+pre {
+    font-family: 'Helvetica';
 }
