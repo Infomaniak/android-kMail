@@ -40,7 +40,7 @@ import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 import com.infomaniak.mail.utils.updateNavigationBarColor
 import javax.inject.Inject
 
-abstract class TwoPaneFragment : Fragment(), SlidingPaneLayout.PanelSlideListener {
+abstract class TwoPaneFragment : Fragment() {
 
     val mainViewModel: MainViewModel by activityViewModels()
     val twoPaneViewModel: TwoPaneViewModel by activityViewModels()
@@ -78,7 +78,20 @@ abstract class TwoPaneFragment : Fragment(), SlidingPaneLayout.PanelSlideListene
 
     private fun setupSlidingPane() = with(slidingPaneLayout) {
         lockMode = SlidingPaneLayout.LOCK_MODE_LOCKED
-        addPanelSlideListener(this@TwoPaneFragment)
+        addPanelSlideListener(object : SlidingPaneLayout.PanelSlideListener {
+            override fun onPanelOpened(panel: View) = Unit
+            override fun onPanelClosed(panel: View) = Unit
+
+            override fun onPanelSlide(panel: View, slideOffset: Float) {
+                requireActivity().window.progressivelyColorSystemBars(
+                    slideOffset = FULLY_SLID - slideOffset,
+                    statusBarColorFrom = leftStatusBarColor,
+                    statusBarColorTo = rightStatusBarColor,
+                    navBarColorFrom = leftNavigationBarColor,
+                    navBarColorTo = rightNavigationBarColor,
+                )
+            }
+        })
     }
 
     private fun observeCurrentFolder() = with(twoPaneViewModel) {
@@ -112,20 +125,6 @@ abstract class TwoPaneFragment : Fragment(), SlidingPaneLayout.PanelSlideListene
                 resetPanes(threadListAdapter)
             }
         }
-    }
-
-    override fun onPanelOpened(panel: View) = Unit
-
-    override fun onPanelClosed(panel: View) = Unit
-
-    override fun onPanelSlide(panel: View, slideOffset: Float) {
-        requireActivity().window.progressivelyColorSystemBars(
-            slideOffset = FULLY_SLID - slideOffset,
-            statusBarColorFrom = leftStatusBarColor,
-            statusBarColorTo = rightStatusBarColor,
-            navBarColorFrom = leftNavigationBarColor,
-            navBarColorTo = rightNavigationBarColor,
-        )
     }
 
     private fun observeThreadNavigation() = with(twoPaneViewModel) {
