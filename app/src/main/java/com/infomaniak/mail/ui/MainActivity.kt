@@ -50,6 +50,8 @@ import com.infomaniak.lib.stores.StoreUtils.initAppUpdateManager
 import com.infomaniak.lib.stores.StoreUtils.launchInAppReview
 import com.infomaniak.lib.stores.StoreUtils.unregisterAppUpdateListener
 import com.infomaniak.mail.BuildConfig
+import com.infomaniak.mail.MatomoMail.DISCOVER_LATER
+import com.infomaniak.mail.MatomoMail.DISCOVER_NOW
 import com.infomaniak.mail.MatomoMail.trackAppReviewEvent
 import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.MatomoMail.trackEasterEggEvent
@@ -127,7 +129,7 @@ class MainActivity : BaseActivity() {
     private val inAppUpdateResultLauncher = registerForActivityResult(StartIntentSenderForResult()) { result ->
         val isUserWantingUpdates = result.resultCode == RESULT_OK
         localSettings.isUserWantingUpdates = isUserWantingUpdates
-        trackInAppUpdateEvent(if (isUserWantingUpdates) "discoverNow" else "discoverLater")
+        trackInAppUpdateEvent(if (isUserWantingUpdates) DISCOVER_NOW else DISCOVER_LATER)
     }
 
     @Inject

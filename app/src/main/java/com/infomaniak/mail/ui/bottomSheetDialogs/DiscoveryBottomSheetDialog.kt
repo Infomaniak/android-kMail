@@ -21,6 +21,7 @@ import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
 import com.infomaniak.mail.MatomoMail.DISCOVER_LATER
+import com.infomaniak.mail.MatomoMail.DISCOVER_NOW
 
 abstract class DiscoveryBottomSheetDialog : InformationBottomSheetDialog() {
 
@@ -42,7 +43,7 @@ abstract class DiscoveryBottomSheetDialog : InformationBottomSheetDialog() {
         actionButton.apply {
             setText(positiveButtonRes)
             setOnClickListener {
-                trackMatomoWithCategory("discoverNow")
+                trackMatomoWithCategory(DISCOVER_NOW)
                 onPositiveButtonClicked()
                 dismiss()
             }
