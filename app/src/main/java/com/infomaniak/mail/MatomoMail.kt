@@ -143,7 +143,7 @@ object MatomoMail : MatomoCore {
     }
 
     fun Context.trackNotificationActionEvent(name: String) {
-        trackEvent(category = "notificationAction", name = name)
+        trackEvent(category = "notificationActions", name = name)
     }
 
     fun Fragment.trackNewMessageEvent(name: String) {

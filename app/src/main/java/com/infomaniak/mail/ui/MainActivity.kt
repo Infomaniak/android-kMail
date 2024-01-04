@@ -540,7 +540,7 @@ class MainActivity : BaseActivity() {
                 scope.level = SentryLevel.INFO
                 Sentry.captureMessage("Easter egg XMas has been triggered! Woohoo!")
             }
-            trackEasterEggEvent("XMas${Date().year()}")
+            trackEasterEggEvent("xmas${Date().year()}")
         }
     }
 
