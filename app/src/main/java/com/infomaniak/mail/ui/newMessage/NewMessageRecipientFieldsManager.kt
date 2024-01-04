@@ -21,12 +21,10 @@ import android.view.View
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.infomaniak.lib.core.utils.showKeyboard
-import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType.*
-import com.infomaniak.mail.utils.MergedContactDictionary
 import com.infomaniak.mail.utils.copyRecipientEmailToClipboard
 import dagger.hilt.android.scopes.FragmentScoped
 import javax.inject.Inject
@@ -142,19 +140,12 @@ class NewMessageRecipientFieldsManager @Inject constructor() : NewMessageManager
         binding.toField.showKeyboardInTextInput()
     }
 
-    fun observeContacts() {
-        newMessageViewModel.mergedContacts.observe(viewLifecycleOwner) { (sortedContactList, contactMap) ->
-            updateRecipientFieldsContacts(sortedContactList, contactMap)
+    fun observeContacts() = with(binding) {
+        newMessageViewModel.mergedContacts.observe(viewLifecycleOwner) { (sortedContactList, _) ->
+            toField.updateContacts(sortedContactList)
+            ccField.updateContacts(sortedContactList)
+            bccField.updateContacts(sortedContactList)
         }
-    }
-
-    private fun updateRecipientFieldsContacts(
-        sortedContactList: List<MergedContact>,
-        contactMap: MergedContactDictionary,
-    ) = with(binding) {
-        toField.updateContacts(sortedContactList, contactMap)
-        ccField.updateContacts(sortedContactList, contactMap)
-        bccField.updateContacts(sortedContactList, contactMap)
     }
 
     fun initRecipients(draft: Draft) = with(binding) {

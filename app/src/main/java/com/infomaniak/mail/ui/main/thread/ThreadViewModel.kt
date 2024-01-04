@@ -95,10 +95,8 @@ class ThreadViewModel @Inject constructor(
         AccountUtils.currentMailboxId,
     ).map { it.obj }.asLiveData(ioCoroutineContext)
 
-    fun assembleSubjectData(mergedContactsLive: LiveData<MergedContactDictionary?>): LiveData<SubjectDataResult> {
-
+    fun assembleSubjectData(mergedContactsLive: LiveData<MergedContactDictionary>): LiveData<SubjectDataResult> {
         return MediatorLiveData<SubjectDataResult>().apply {
-
             addSource(threadLive) { thread ->
                 value = SubjectDataResult(thread, value?.mergedContacts, value?.mailbox)
             }

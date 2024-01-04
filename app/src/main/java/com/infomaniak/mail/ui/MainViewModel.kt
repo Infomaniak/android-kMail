@@ -57,6 +57,7 @@ import com.infomaniak.mail.utils.NotificationUtils.Companion.cancelNotification
 import com.infomaniak.mail.utils.SharedUtils.Companion.updateSignatures
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
+import com.infomaniak.mail.views.itemViews.AvatarMergedContactData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.notifications.ResultsChange
@@ -85,6 +86,7 @@ class MainViewModel @Inject constructor(
     private val refreshController: RefreshController,
     private val sharedUtils: SharedUtils,
     private val threadController: ThreadController,
+    private val avatarMergedContactData: AvatarMergedContactData,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
@@ -201,11 +203,7 @@ class MainViewModel @Inject constructor(
     //endregion
 
     //region Merged Contacts
-    // Explanation of this Map: Map<Email, Map<Name, MergedContact>>
-    val mergedContactsLive: LiveData<MergedContactDictionary?> = mergedContactController
-        .getMergedContactsAsync()
-        .mapLatest { ContactUtils.arrangeMergedContacts(it.list.copyFromRealm()) }
-        .asLiveData(ioCoroutineContext)
+    val mergedContactsLive: LiveData<MergedContactDictionary> = avatarMergedContactData.mergedContactLiveData
     //endregion
 
     fun updateUserInfo() = viewModelScope.launch(ioCoroutineContext) {

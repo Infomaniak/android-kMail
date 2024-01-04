@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2023 Infomaniak Network SA
+ * Copyright (C) 2022-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -91,7 +91,6 @@ class ThreadListAdapter @Inject constructor(
     var onLoadMoreClicked: (() -> Unit)? = null
 
     private var folderRole: FolderRole? = null
-    private lateinit var contacts: MergedContactDictionary
     private var onSwipeFinished: (() -> Unit)? = null
     private var multiSelection: MultiSelectionListener<Thread>? = null
 
@@ -101,12 +100,10 @@ class ThreadListAdapter @Inject constructor(
 
     operator fun invoke(
         folderRole: FolderRole?,
-        contacts: MergedContactDictionary,
         onSwipeFinished: (() -> Unit)? = null,
         multiSelection: MultiSelectionListener<Thread>? = null,
     ) {
         this.folderRole = folderRole
-        this.contacts = contacts
         this.onSwipeFinished = onSwipeFinished
         this.multiSelection = multiSelection
     }
@@ -135,10 +132,7 @@ class ThreadListAdapter @Inject constructor(
             val binding = holder.binding as CardviewThreadItemBinding
             val thread = dataSet[position] as Thread
 
-            when (payload) {
-                NotificationType.AVATAR -> binding.displayAvatar(thread)
-                NotificationType.SELECTED_STATE -> binding.updateSelectedState(thread)
-            }
+            binding.updateSelectedState(thread)
         } else {
             super.onBindViewHolder(holder, position, payloads)
         }
@@ -260,7 +254,7 @@ class ThreadListAdapter @Inject constructor(
     }
 
     private fun CardviewThreadItemBinding.displayAvatar(thread: Thread) {
-        expeditorAvatar.loadAvatar(thread.computeAvatarRecipient(), contacts)
+        expeditorAvatar.loadAvatar(thread.computeAvatarRecipient())
     }
 
     private fun CardviewThreadItemBinding.formatRecipientNames(recipients: List<Recipient>): String {
@@ -460,11 +454,6 @@ class ThreadListAdapter @Inject constructor(
         }
     }
 
-    fun updateContacts(newContacts: MergedContactDictionary) {
-        contacts = newContacts
-        notifyItemRangeChanged(0, itemCount, NotificationType.AVATAR)
-    }
-
     fun updateFolderRole(newRole: FolderRole?) {
         folderRole = newRole
     }
@@ -499,7 +488,6 @@ class ThreadListAdapter @Inject constructor(
     }
 
     private enum class NotificationType {
-        AVATAR,
         SELECTED_STATE,
     }
 

@@ -157,7 +157,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         observeCurrentFolder()
         observeCurrentFolderLive()
         observeUpdatedAtTriggers()
-        observeContacts()
         observerDraftsActionsCompletedWorks()
         observeFlushFolderTrigger()
         observeUpdateInstall()
@@ -241,7 +240,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         threadListAdapter(
             folderRole = mainViewModel.currentFolder.value?.role,
-            contacts = mainViewModel.mergedContactsLive.value ?: emptyMap(),
             onSwipeFinished = { threadListViewModel.isRecoveringFinished.value = true },
             multiSelection = object : MultiSelectionListener<Thread> {
                 override var isEnabled by mainViewModel::isMultiSelectOn
@@ -560,10 +558,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun observeUpdatedAtTriggers() {
         threadListViewModel.updatedAtTrigger.observe(viewLifecycleOwner) { updateUpdatedAt() }
-    }
-
-    private fun observeContacts() {
-        mainViewModel.mergedContactsLive.observeNotNull(viewLifecycleOwner, threadListAdapter::updateContacts)
     }
 
     private fun observeFlushFolderTrigger() {

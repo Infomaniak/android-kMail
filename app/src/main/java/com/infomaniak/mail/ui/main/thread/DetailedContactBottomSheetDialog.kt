@@ -30,7 +30,6 @@ import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.thread.actions.ActionsBottomSheetDialog
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.copyRecipientEmailToClipboard
-import com.infomaniak.mail.utils.observeNotNull
 import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -49,9 +48,8 @@ class DetailedContactBottomSheetDialog : ActionsBottomSheetDialog() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
-        contactDetails.setRecipient(navigationArgs.recipient, mainViewModel.mergedContactsLive.value ?: emptyMap())
+        contactDetails.setRecipient(navigationArgs.recipient)
         setupListeners()
-        observeContacts()
     }
 
     private fun setupListeners() = with(binding) {
@@ -70,12 +68,6 @@ class DetailedContactBottomSheetDialog : ActionsBottomSheetDialog() {
         copyAddress.setClosingOnClickListener {
             trackContactActionsEvent("copyEmailAddress")
             copyRecipientEmailToClipboard(navigationArgs.recipient, mainViewModel.snackBarManager)
-        }
-    }
-
-    private fun observeContacts() {
-        mainViewModel.mergedContactsLive.observeNotNull(viewLifecycleOwner) {
-            binding.contactDetails.updateAvatar(navigationArgs.recipient, it)
         }
     }
 }

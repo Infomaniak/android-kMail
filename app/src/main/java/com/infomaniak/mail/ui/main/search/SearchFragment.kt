@@ -129,10 +129,7 @@ class SearchFragment : Fragment() {
     }
 
     private fun setupThreadListAdapter() {
-        threadListAdapter(
-            folderRole = null,
-            contacts = mainViewModel.mergedContactsLive.value ?: emptyMap(),
-        )
+        threadListAdapter(folderRole = null)
     }
 
     private fun setupListeners() = with(binding) {
