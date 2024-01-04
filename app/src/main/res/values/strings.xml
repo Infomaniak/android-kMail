@@ -353,9 +353,13 @@
     <string name="notificationTitleCouldNotSaveDraft">The draft could not be saved</string>
     <string name="notificationTitleCouldNotSendDraft">The email could not be sent</string>
     <string name="notificationTitleDelete">Deleted</string>
+    <string name="onBoardingContactsDescription">By authorizing access, your contact management and messaging experience will be simplified.</string>
+    <string name="onBoardingContactsTitle">Allow Mail to access your contacts</string>
     <string name="onBoardingDescription2">Customize your shortcuts freely in the app settings.</string>
     <string name="onBoardingDescription3">Archive, delete, move or favorite multiple messages at once.</string>
     <string name="onBoardingDescription4">Create a free address or connect to an existing Infomaniak account.</string>
+    <string name="onBoardingNotificationsDescription">Don’t miss any important emails and be able to respond quickly by activating notifications.</string>
+    <string name="onBoardingNotificationsTitle">Enable notifications</string>
     <string name="onBoardingTitle1">Choose your theme</string>
     <string name="onBoardingTitle2">Save time with swipe actions</string>
     <string name="onBoardingTitle3">Press a message for a few seconds to select multiple messages</string>

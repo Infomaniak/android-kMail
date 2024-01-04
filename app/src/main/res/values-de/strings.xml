@@ -347,9 +347,13 @@
     <string name="notificationTitleCouldNotSaveDraft">Der Entwurf konnte nicht gespeichert werden</string>
     <string name="notificationTitleCouldNotSendDraft">Die E-Mail konnte nicht gesendet werden</string>
     <string name="notificationTitleDelete">Gelöscht</string>
+    <string name="onBoardingContactsDescription">Wenn Sie den Zugriff erlauben, wird die Verwaltung Ihrer Kontakte und Ihre E-Mail-Erfahrung vereinfacht.</string>
+    <string name="onBoardingContactsTitle">Mail den Zugriff auf Ihre Kontakte erlauben</string>
     <string name="onBoardingDescription2">Passen Sie Ihre Shortcuts in den Einstellungen der App frei an.</string>
     <string name="onBoardingDescription3">Archivieren, Löschen, Verschieben oder Favorisieren mehrerer Nachrichten auf einmal.</string>
     <string name="onBoardingDescription4">Erstellen Sie eine kostenlose Adresse oder melden Sie sich bei einem bestehenden Infomaniak-Konto an.</string>
+    <string name="onBoardingNotificationsDescription">Verpassen Sie keine wichtigen E-Mails und seien Sie in der Lage, schnell zu antworten, indem Sie die Benachrichtigungen aktivieren.</string>
+    <string name="onBoardingNotificationsTitle">Benachrichtigungen aktivieren</string>
     <string name="onBoardingTitle1">Wählen Sie Ihr Thema</string>
     <string name="onBoardingTitle2">Sparen Sie Zeit mit Wischaktionen</string>
     <string name="onBoardingTitle3">Drücken Sie einige Sekunden auf eine Nachricht, um mehrere auszuwählen</string>
