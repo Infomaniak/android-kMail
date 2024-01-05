@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2023 Infomaniak Network SA
+  ~ Copyright (C) 2023-2024 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -88,7 +88,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:textColor="?attr/colorPrimary"
+                android:textColor="@color/onColorfulBackground"
                 tools:text="+12" />
 
         </FrameLayout>

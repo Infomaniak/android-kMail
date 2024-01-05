@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023 Infomaniak Network SA
+ * Copyright (C) 2023-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,14 +43,15 @@ class ManyAvatarsView @JvmOverloads constructor(
         attrs?.getAttributes(context, R.styleable.ManyAvatarsView) {
             with(binding) {
                 val strokeColor = getColorOrNull(R.styleable.ManyAvatarsView_strokeColor)
-                val strokeWidth = getDimensionPixelOffset(R.styleable.ManyAvatarsView_strokeWidth, 0).toFloat()
+                val strokeWidthInt = getDimensionPixelOffset(R.styleable.ManyAvatarsView_strokeWidth, 0)
+                val strokeWidthFloat = strokeWidthInt.toFloat()
                 val statusBackgroundColor = getColorOrNull(R.styleable.ManyAvatarsView_statusBackgroundColor)
 
-                avatar1.init(strokeColor, strokeWidth, statusBackgroundColor)
-                avatar2.init(strokeColor, strokeWidth, statusBackgroundColor)
-                avatar3.init(strokeColor, strokeWidth, statusBackgroundColor)
+                avatar1.init(strokeColor, strokeWidthFloat, statusBackgroundColor)
+                avatar2.init(strokeColor, strokeWidthFloat, statusBackgroundColor)
+                avatar3.init(strokeColor, strokeWidthFloat, statusBackgroundColor)
 
-                additionalPeople.strokeWidth = strokeWidth.toInt()
+                additionalPeople.strokeWidth = strokeWidthInt
                 additionalPeople.strokeColor = strokeColor ?: context.getTransparentColor()
             }
         }
