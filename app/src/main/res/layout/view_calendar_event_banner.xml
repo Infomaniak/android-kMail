@@ -43,10 +43,9 @@
             app:drawableStartCompat="@drawable/ic_calendar_infomaniak"
             tools:text="Réunion Produit" />
 
-        <!--  TODO :  Create Body.Warning and synchronize with iOS about this new style -->
         <TextView
             android:id="@+id/pastEventWarning"
-            style="@style/BodySmall.Warning"
+            style="@style/Body.Warning"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/marginStandardMedium"
