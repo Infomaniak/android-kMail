@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2022-2023 Infomaniak Network SA
+  ~ Copyright (C) 2022-2024 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@
         <item name="textInputStyle">@style/TextInputLayout</item>
         <item name="toolbarStyle">@style/AppThemeToolbarTheme</item>
 
-        <!--Created for the stroke color of participation chips-->
+        <!--Created for the stroke color of participation chips so it can be overridden later on-->
         <item name="calendarChipSelectedStrokeColor">#00ff00</item>
     </style>
 

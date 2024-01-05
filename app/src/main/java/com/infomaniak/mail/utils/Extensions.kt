@@ -24,7 +24,6 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.content.res.TypedArray
 import android.net.Uri
@@ -611,8 +610,6 @@ private fun Spannable.setClickableSpan(startIndex: Int, endIndex: Int, onClick: 
 fun Fragment.bindAlertToViewLifecycle(alertDialog: BaseAlertDialog) {
     alertDialog.bindAlertToLifecycle(viewLifecycleOwner)
 }
-
-fun Context.getTransparentColorStateList() = ColorStateList.valueOf(getColor(android.R.color.transparent))
 
 fun Context.getTransparentColor() = getColor(android.R.color.transparent)
 
