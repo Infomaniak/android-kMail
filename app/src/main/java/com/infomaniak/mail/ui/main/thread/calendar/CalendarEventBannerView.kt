@@ -45,17 +45,21 @@ class CalendarEventBannerView @JvmOverloads constructor(
         createAttendee("echo@info.com", "Echo Location", false, AttendanceState.NEEDS_ACTION),
     )
 
-    private fun createAttendee(email: String, name: String?, isOrganizer: Boolean, state: AttendanceState): Attendee =
-        Attendee().apply {
-            this.email = email
-            name?.let { this.name = it }
-            this.isOrganizer = isOrganizer
-            this.state = state
-        }
+    private fun createAttendee(
+        email: String,
+        name: String?,
+        isOrganizer: Boolean,
+        state: AttendanceState
+    ): Attendee = Attendee(email, name ?: "", isOrganizer, state)
     //endregion
 
     init {
         with(binding) {
+            // TODO : Use event values
+            eventName.text = "Réunion Produit"
+            eventDate.text = "Mardi 28 novembre 2023"
+            eventHour.text = "09:00-10:00 (CET)"
+
             attendeesButton.apply {
                 isGone = attendees.isEmpty()
                 addOnCheckedChangeListener { _, isChecked ->
@@ -67,11 +71,6 @@ class CalendarEventBannerView @JvmOverloads constructor(
             allAttendeesButton.setOnClickListener {/* TODO */ }
             manyAvatarsView.setAttendees(attendees)
         }
-        // attrs?.getAttributes(context, R.styleable.CalendarEventBannerView) {
-        //     with(binding) {
-        //
-        //     }
-        // }
     }
 
     private fun displayOrganizer() = with(binding) {

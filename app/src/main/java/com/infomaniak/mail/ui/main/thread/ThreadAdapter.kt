@@ -163,7 +163,6 @@ class ThreadAdapter(
 
         bindHeader(message)
         bindAlerts(message.uid)
-        // bindCalendarEvent()
         bindAttachment(message)
         bindContent(message)
 

@@ -1,6 +1,6 @@
 <!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2023 Infomaniak Network SA
+  ~ Copyright (C) 2023-2024 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -40,7 +40,6 @@
             android:gravity="center_vertical"
             android:paddingHorizontal="@dimen/marginStandardMedium"
             android:paddingVertical="@dimen/marginStandardSmall"
-            android:text="Réunion Produit"
             app:drawableStartCompat="@drawable/ic_calendar_infomaniak"
             tools:text="Réunion Produit" />
 
@@ -65,7 +64,6 @@
             android:layout_marginTop="@dimen/marginStandardMedium"
             android:drawablePadding="@dimen/marginStandardMedium"
             android:gravity="center_vertical"
-            android:text="Mardi 28 novembre 2023"
             app:drawableStartCompat="@drawable/ic_calendar"
             app:drawableTint="@color/iconColor"
             tools:text="Mardi 28 novembre 2023" />
@@ -78,7 +76,6 @@
             android:layout_marginTop="@dimen/marginStandardMedium"
             android:drawablePadding="@dimen/marginStandardMedium"
             android:gravity="center_vertical"
-            android:text="09:00-10:00 (CET)"
             app:drawableStartCompat="@drawable/ic_editor_clock"
             app:drawableTint="@color/iconColor"
             tools:text="09:00-10:00 (CET)" />
@@ -98,8 +95,7 @@
                 android:layout_height="wrap_content"
                 android:text="Oui"
                 android:theme="@style/CalendarYesTheme"
-                app:icon="@drawable/ic_check_rounded"
-                tools:text="Oui" />
+                app:icon="@drawable/ic_check_rounded" />
 
             <com.google.android.material.button.MaterialButton
                 style="@style/CalendarParticipationButton"
@@ -107,8 +103,7 @@
                 android:layout_height="wrap_content"
                 android:text="Peut-être"
                 android:theme="@style/CalendarMaybeTheme"
-                app:icon="@drawable/ic_calendar_maybe"
-                tools:text="Peut-être" />
+                app:icon="@drawable/ic_calendar_maybe" />
 
             <com.google.android.material.button.MaterialButton
                 style="@style/CalendarParticipationButton"
@@ -116,8 +111,7 @@
                 android:layout_height="wrap_content"
                 android:text="Non"
                 android:theme="@style/CalendarNoTheme"
-                app:icon="@drawable/ic_calendar_no"
-                tools:text="Non" />
+                app:icon="@drawable/ic_calendar_no" />
 
         </com.google.android.flexbox.FlexboxLayout>
 
@@ -139,8 +133,7 @@
             app:iconGravity="textEnd"
             app:iconSize="@dimen/smallIconSize"
             app:iconTint="?attr/colorPrimary"
-            app:rippleColor="@color/color_primary_translucent_ripple"
-            tools:text="Participants" />
+            app:rippleColor="@color/color_primary_translucent_ripple" />
 
         <LinearLayout
             android:id="@+id/attendeesSubMenu"
@@ -171,7 +164,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="@dimen/marginStandardMedium"
-                    android:text="Lucien Cheval (Organisateur)"
                     tools:text="Lucien Cheval (Organisateur)" />
 
             </LinearLayout>
@@ -207,8 +199,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/marginStandardMedium"
                         android:text="Consulter"
-                        android:textColor="?attr/colorPrimary"
-                        tools:text="Consulter" />
+                        android:textColor="?attr/colorPrimary" />
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
