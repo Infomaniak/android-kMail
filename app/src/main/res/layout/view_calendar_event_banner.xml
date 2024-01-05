@@ -52,7 +52,7 @@
             android:layout_marginTop="@dimen/marginStandardMedium"
             android:drawablePadding="@dimen/marginStandardMedium"
             android:gravity="center_vertical"
-            android:text="Cet évènement est déjà passé"
+            android:text="@string/warningEventHasPassed"
             app:drawableStartCompat="@drawable/ic_warning_big" />
 
         <TextView
@@ -93,7 +93,7 @@
                 style="@style/CalendarParticipationButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Oui"
+                android:text="@string/buttonYes"
                 android:theme="@style/CalendarYesTheme"
                 app:icon="@drawable/ic_check_rounded" />
 
@@ -102,7 +102,7 @@
                 style="@style/CalendarParticipationButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Peut-être"
+                android:text="@string/buttonMaybe"
                 android:theme="@style/CalendarMaybeTheme"
                 app:icon="@drawable/ic_calendar_maybe" />
 
@@ -111,7 +111,7 @@
                 style="@style/CalendarParticipationButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Non"
+                android:text="@string/buttonNo"
                 android:theme="@style/CalendarNoTheme"
                 app:icon="@drawable/ic_calendar_no" />
 
@@ -128,7 +128,7 @@
             android:insetTop="0dp"
             android:insetBottom="0dp"
             android:paddingHorizontal="@dimen/marginStandardMedium"
-            android:text="Participants"
+            android:text="@string/buttonAttendees"
             app:backgroundTint="@android:color/transparent"
             app:cornerRadius="@dimen/calendarCornerRadius"
             app:icon="@drawable/ic_calendar_participants_chevron"
@@ -200,7 +200,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/marginStandardMedium"
-                        android:text="Consulter"
+                        android:text="@string/buttonSee"
                         android:textColor="?attr/colorPrimary" />
 
                 </LinearLayout>
@@ -214,7 +214,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/marginStandardMedium"
             android:layout_marginBottom="@dimen/marginStandardMedium"
-            android:text="Ajouter à mon calendrier" />
+            android:text="@string/buttonAddToMyCalendar" />
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

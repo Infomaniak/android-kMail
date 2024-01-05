@@ -103,6 +103,7 @@
         <item quantity="one">%d allegato</item>
         <item quantity="other">%d allegati</item>
     </plurals>
+    <string name="attendeesListTitle">Elenco dei partecipanti (%d)</string>
     <string name="bccTitle">Bcc:</string>
     <string name="blockedMailboxTitle">L’indirizzo e-mail %s è bloccato</string>
     <plurals name="blockedPasswordTitle">
@@ -116,8 +117,10 @@
     <string name="buttonAccountSwitch">Modifica del conto</string>
     <string name="buttonAddAccount">Aggiungere un account</string>
     <string name="buttonAddEmailAddress">Aggiungere un indirizzo e-mail</string>
+    <string name="buttonAddToMyCalendar">Aggiungi al mio calendario</string>
     <string name="buttonAttachMailbox">Aggiungi l’indirizzo e-mail</string>
     <string name="buttonAttachment">Aggiungere un allegato</string>
+    <string name="buttonAttendees">Partecipanti</string>
     <string name="buttonAvailableSoon">Disponibile a breve</string>
     <string name="buttonBold">In grassetto</string>
     <string name="buttonBulletPoint">Punto di riferimento</string>
@@ -142,6 +145,7 @@
     <string name="buttonLoadMore">Carica altre conversazioni</string>
     <string name="buttonLogInDifferentAccount">Accedere con un altro account</string>
     <string name="buttonLogin">Accesso</string>
+    <string name="buttonMaybe">Forse</string>
     <string name="buttonMore">Altro</string>
     <string name="buttonMoreStorage">Ottenere più spazio di archiviazione</string>
     <string name="buttonNewMessage">Nuovo messaggio</string>
@@ -150,6 +154,7 @@
     <string name="buttonRequestPassword">Richiesta password</string>
     <string name="buttonRestoreEmails">Ripristino delle e-mail</string>
     <string name="buttonSchedule">Programmare l’invio di un’e-mail in un secondo momento</string>
+    <string name="buttonSee">Vedi</string>
     <string name="buttonSeeAll">Vedi tutti</string>
     <string name="buttonSelectAll">Tutti</string>
     <string name="buttonShare">Condividi</string>
@@ -163,6 +168,7 @@
     <string name="buttonUnselectAll">Nessuno</string>
     <string name="buttonValid">Convalidare</string>
     <string name="buttonYes">Sì</string>
+    <string name="calendarOrganizerName">%s (Organizzatore)</string>
     <string name="ccTitle">Cc:</string>
     <string name="comingSoon">Prossimamente…</string>
     <string name="commercialFolder">Promozioni</string>
@@ -517,5 +523,6 @@
     <string name="urlEntryTitle">Creare un collegamento ipertestuale</string>
     <string name="urlPlaceholder">URL</string>
     <string name="urlUserReportAndroid">https://feedback.userreport.com/3cc072b7-61ff-4592-b1aa-307a58fdcec9/</string>
+    <string name="warningEventHasPassed">Questo evento è già passato</string>
     <string name="workInProgressTitle">Disponibile a breve</string>
 </resources>

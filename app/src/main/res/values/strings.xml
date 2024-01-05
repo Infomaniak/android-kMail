@@ -109,6 +109,7 @@
         <item quantity="one">%d attachment</item>
         <item quantity="other">%d attachments</item>
     </plurals>
+    <string name="attendeesListTitle">List of attendees (%d)</string>
     <string name="bccTitle">Bcc:</string>
     <string name="blockedMailboxTitle">Mailbox %s is blocked</string>
     <plurals name="blockedPasswordTitle">
@@ -122,8 +123,10 @@
     <string name="buttonAccountSwitch">Change account</string>
     <string name="buttonAddAccount">Add an account</string>
     <string name="buttonAddEmailAddress">Add an email address</string>
+    <string name="buttonAddToMyCalendar">Add to my calendar</string>
     <string name="buttonAttachMailbox">Add this email address</string>
     <string name="buttonAttachment">Add an attachment</string>
+    <string name="buttonAttendees">Attendees</string>
     <string name="buttonAvailableSoon">Available soon</string>
     <string name="buttonBold">Bold</string>
     <string name="buttonBulletPoint">Bullet point</string>
@@ -148,6 +151,7 @@
     <string name="buttonLoadMore">Load more conversations</string>
     <string name="buttonLogInDifferentAccount">Log in with another account</string>
     <string name="buttonLogin">Login</string>
+    <string name="buttonMaybe">Maybe</string>
     <string name="buttonMore">More</string>
     <string name="buttonMoreStorage">Get more storage</string>
     <string name="buttonNewMessage">New message</string>
@@ -156,6 +160,7 @@
     <string name="buttonRequestPassword">Request password</string>
     <string name="buttonRestoreEmails">Restore emails</string>
     <string name="buttonSchedule">Schedule email to send later</string>
+    <string name="buttonSee">See</string>
     <string name="buttonSeeAll">See all</string>
     <string name="buttonSelectAll">All</string>
     <string name="buttonShare">Share</string>
@@ -169,6 +174,7 @@
     <string name="buttonUnselectAll">None</string>
     <string name="buttonValid">Validate</string>
     <string name="buttonYes">Yes</string>
+    <string name="calendarOrganizerName">%s (Organizer)</string>
     <string name="ccTitle">Cc:</string>
     <string name="comingSoon">Coming soon…</string>
     <string name="commercialFolder">Promotions</string>
@@ -523,5 +529,6 @@
     <string name="urlEntryTitle">Create a hyperlink</string>
     <string name="urlPlaceholder">URL</string>
     <string name="urlUserReportAndroid">https://feedback.userreport.com/dbf02b8c-36f7-4388-839c-a2b6a3029704/</string>
+    <string name="warningEventHasPassed">This event has already passed</string>
     <string name="workInProgressTitle">Available soon</string>
 </resources>

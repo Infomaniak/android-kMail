@@ -104,6 +104,7 @@
         <item quantity="other">%d pièces jointes</item>
         <item quantity="many">%d de pièces jointes</item>
     </plurals>
+    <string name="attendeesListTitle">Liste des participants (%d)</string>
     <string name="bccTitle">Cci :</string>
     <string name="blockedMailboxTitle">L’adresse %s est bloquée</string>
     <plurals name="blockedPasswordTitle">
@@ -118,8 +119,10 @@
     <string name="buttonAccountSwitch">Changer de compte</string>
     <string name="buttonAddAccount">Ajouter un compte</string>
     <string name="buttonAddEmailAddress">Ajouter une adresse mail</string>
+    <string name="buttonAddToMyCalendar">Ajouter à mon calendrier</string>
     <string name="buttonAttachMailbox">Ajouter l’adresse mail</string>
     <string name="buttonAttachment">Ajouter une pièce jointe</string>
+    <string name="buttonAttendees">Participants</string>
     <string name="buttonAvailableSoon">Bientôt disponible</string>
     <string name="buttonBold">Gras</string>
     <string name="buttonBulletPoint">Puce</string>
@@ -144,6 +147,7 @@
     <string name="buttonLoadMore">Charger plus de conversations</string>
     <string name="buttonLogInDifferentAccount">Me connecter avec un autre compte</string>
     <string name="buttonLogin">Se connecter</string>
+    <string name="buttonMaybe">Peut-être</string>
     <string name="buttonMore">Plus</string>
     <string name="buttonMoreStorage">Obtenir plus de stockage</string>
     <string name="buttonNewMessage">Nouveau message</string>
@@ -152,6 +156,7 @@
     <string name="buttonRequestPassword">Demander le mot de passe</string>
     <string name="buttonRestoreEmails">Restaurer des e-mails</string>
     <string name="buttonSchedule">Programmer l’envoi de l’e-mail</string>
+    <string name="buttonSee">Consulter</string>
     <string name="buttonSeeAll">Voir tout</string>
     <string name="buttonSelectAll">Tout</string>
     <string name="buttonShare">Partager</string>
@@ -165,6 +170,7 @@
     <string name="buttonUnselectAll">Aucun</string>
     <string name="buttonValid">Valider</string>
     <string name="buttonYes">Oui</string>
+    <string name="calendarOrganizerName">%s (Organisateur)</string>
     <string name="ccTitle">Cc :</string>
     <string name="comingSoon">À venir…</string>
     <string name="commercialFolder">Promotions</string>
@@ -531,5 +537,6 @@
     <string name="urlEntryTitle">Créer un lien hypertexte</string>
     <string name="urlPlaceholder">URL</string>
     <string name="urlUserReportAndroid">https://feedback.userreport.com/91aeb5c2-f609-4b9c-9787-755e83ed940c/</string>
+    <string name="warningEventHasPassed">Cet événement est déjà passé</string>
     <string name="workInProgressTitle">Disponible prochainement</string>
 </resources>

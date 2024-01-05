@@ -24,6 +24,7 @@ import android.widget.FrameLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.google.android.material.button.MaterialButton
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.data.models.calendar.Attendee.AttendanceState
 import com.infomaniak.mail.databinding.ViewCalendarEventBannerBinding
@@ -100,7 +101,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
             organizerAvatar.loadAvatar(organizer)
 
             val (name, _) = context.getPrettyNameAndEmail(organizer)
-            organizerName.text = "$name (Organisateur)" // TODO : Use a string resource
+            organizerName.text = context.getString(R.string.calendarOrganizerName, name)
         }
     }
 }

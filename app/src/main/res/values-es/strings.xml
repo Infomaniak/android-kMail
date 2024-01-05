@@ -103,6 +103,7 @@
         <item quantity="one">%d anexo</item>
         <item quantity="other">%d archivos adjuntos</item>
     </plurals>
+    <string name="attendeesListTitle">Lista de asistentes (%d)</string>
     <string name="bccTitle">CCO:</string>
     <string name="blockedMailboxTitle">La dirección de correo electrónico %s está bloqueada</string>
     <plurals name="blockedPasswordTitle">
@@ -116,8 +117,10 @@
     <string name="buttonAccountSwitch">Cambiar de cuenta</string>
     <string name="buttonAddAccount">Añadir una cuenta</string>
     <string name="buttonAddEmailAddress">Añadir una dirección de correo electrónico</string>
+    <string name="buttonAddToMyCalendar">Añadir a mi calendario</string>
     <string name="buttonAttachMailbox">Añadir dirección de correo electrónico</string>
     <string name="buttonAttachment">Añadir un archivo adjunto</string>
+    <string name="buttonAttendees">Asistentes</string>
     <string name="buttonAvailableSoon">Disponible en breve</string>
     <string name="buttonBold">Negrita</string>
     <string name="buttonBulletPoint">Viñetas</string>
@@ -142,6 +145,7 @@
     <string name="buttonLoadMore">Cargar más conversaciones</string>
     <string name="buttonLogInDifferentAccount">Conectarse con otra cuenta</string>
     <string name="buttonLogin">Inicio de sesión</string>
+    <string name="buttonMaybe">Quizás</string>
     <string name="buttonMore">Más</string>
     <string name="buttonMoreStorage">Más espacio de almacenamiento</string>
     <string name="buttonNewMessage">Nuevo mensaje</string>
@@ -150,6 +154,7 @@
     <string name="buttonRequestPassword">Solicitar contraseña</string>
     <string name="buttonRestoreEmails">Restaurar correos electrónicos</string>
     <string name="buttonSchedule">Programar un correo electrónico para enviarlo más tarde</string>
+    <string name="buttonSee">Véase</string>
     <string name="buttonSeeAll">Ver todos</string>
     <string name="buttonSelectAll">Todos</string>
     <string name="buttonShare">Compartir</string>
@@ -163,6 +168,7 @@
     <string name="buttonUnselectAll">Ninguno</string>
     <string name="buttonValid">Validar</string>
     <string name="buttonYes">Sí</string>
+    <string name="calendarOrganizerName">%s (Organizador)</string>
     <string name="ccTitle">Cc:</string>
     <string name="comingSoon">Próximamente…</string>
     <string name="commercialFolder">Promociones</string>
@@ -517,5 +523,6 @@
     <string name="urlEntryTitle">Crear un hiperenlace</string>
     <string name="urlPlaceholder">URL</string>
     <string name="urlUserReportAndroid">https://feedback.userreport.com/f0daec0a-6950-4891-a064-7d040bdce127/</string>
+    <string name="warningEventHasPassed">Este acontecimiento ya ha pasado</string>
     <string name="workInProgressTitle">Disponible en breve</string>
 </resources>
