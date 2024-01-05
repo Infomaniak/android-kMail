@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2023 Infomaniak Network SA
+ * Copyright (C) 2022-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,12 +18,13 @@
 package com.infomaniak.mail.data.models.correspondent
 
 import android.content.Context
+import android.os.Parcelable
 import com.infomaniak.lib.core.utils.firstOrEmpty
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.AccountUtils
 import io.sentry.Sentry
 
-interface Correspondent {
+interface Correspondent : Parcelable {
     var email: String
     var name: String
 

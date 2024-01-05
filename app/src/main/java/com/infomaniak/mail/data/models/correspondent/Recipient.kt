@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2023 Infomaniak Network SA
+ * Copyright (C) 2022-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
 package com.infomaniak.mail.data.models.correspondent
 
 import android.os.Parcel
-import android.os.Parcelable
 import com.infomaniak.mail.utils.MergedContactDictionary
 import com.infomaniak.mail.utils.isEmail
 import io.realm.kotlin.types.EmbeddedRealmObject
@@ -30,7 +29,7 @@ import kotlinx.serialization.Transient
 
 @Parcelize
 @Serializable
-open class Recipient : EmbeddedRealmObject, Correspondent, Parcelable {
+open class Recipient : EmbeddedRealmObject, Correspondent {
 
     override var email: String = ""
     override var name: String = ""

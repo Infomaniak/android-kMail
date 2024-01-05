@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2023 Infomaniak Network SA
+ * Copyright (C) 2022-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.data.models.correspondent
 
-import android.os.Parcelable
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.Ignore
 import io.realm.kotlin.types.annotations.PrimaryKey
@@ -25,7 +24,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 @Suppress("PROPERTY_WONT_BE_SERIALIZED")
-class MergedContact : RealmObject, Correspondent, Parcelable {
+class MergedContact : RealmObject, Correspondent {
     @PrimaryKey
     var id: Long? = null
     override var email: String = ""
