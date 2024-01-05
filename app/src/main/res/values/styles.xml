@@ -276,6 +276,7 @@
     </style>
 
     <style name="CalendarParticipationButton" parent="BodyMedium">
+        <item name="android:checkable">true</item>
         <item name="android:layout_marginStart">@dimen/marginStandardSmall</item>
         <item name="android:minWidth">0dp</item>
         <item name="android:paddingBottom">@dimen/marginStandardSmall</item>

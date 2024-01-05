@@ -23,6 +23,7 @@ import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import com.google.android.material.button.MaterialButton
 import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.data.models.calendar.Attendee.AttendanceState
 import com.infomaniak.mail.databinding.ViewCalendarEventBannerBinding
@@ -60,6 +61,10 @@ class CalendarEventBannerView @JvmOverloads constructor(
             eventDate.text = "Mardi 28 novembre 2023"
             eventHour.text = "09:00-10:00 (CET)"
 
+            yesButton.handleChoiceButtonBehavior()
+            maybeButton.handleChoiceButtonBehavior()
+            noButton.handleChoiceButtonBehavior()
+
             attendeesButton.apply {
                 isGone = attendees.isEmpty()
                 addOnCheckedChangeListener { _, isChecked ->
@@ -71,6 +76,20 @@ class CalendarEventBannerView @JvmOverloads constructor(
             allAttendeesButton.setOnClickListener {/* TODO */ }
             manyAvatarsView.setAttendees(attendees)
         }
+    }
+
+    private fun MaterialButton.handleChoiceButtonBehavior() {
+        setOnClickListener {
+            val changedSelectedButton = isChecked
+            if (changedSelectedButton) resetChoiceButtons()
+            isChecked = true
+        }
+    }
+
+    private fun resetChoiceButtons() = with(binding) {
+        yesButton.isChecked = false
+        maybeButton.isChecked = false
+        noButton.isChecked = false
     }
 
     private fun displayOrganizer() = with(binding) {
