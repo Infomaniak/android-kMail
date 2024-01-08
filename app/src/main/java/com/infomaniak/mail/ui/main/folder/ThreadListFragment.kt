@@ -52,6 +52,7 @@ import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.stores.StoreUtils
 import com.infomaniak.lib.stores.StoreUtils.APP_UPDATE_TAG
 import com.infomaniak.mail.MatomoMail.trackEvent
+import com.infomaniak.mail.MatomoMail.trackInAppUpdateEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
@@ -571,7 +572,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             installUpdateGroup.isVisible = isUpdateDownloaded
             installUpdate.setOnClickListener {
                 SentryLog.d(APP_UPDATE_TAG, "Install downloaded Update from button")
-                trackEvent("inAppUpdate", "installUpdate")
+                context.trackInAppUpdateEvent("installUpdate")
                 mainViewModel.canInstallUpdate.value = false
                 localSettings.hasAppUpdateDownloaded = false
 
