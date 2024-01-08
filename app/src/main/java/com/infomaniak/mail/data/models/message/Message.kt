@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2023 Infomaniak Network SA
+ * Copyright (C) 2022-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@ import com.infomaniak.mail.data.api.UnwrappingJsonListSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController.Companion.SEARCH_FOLDER_ID
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.getMessages.ActivitiesResult.MessageFlags
 import com.infomaniak.mail.data.models.thread.Thread
@@ -122,6 +123,8 @@ class Message : RealmObject {
     var shortUid: Int = -1
     @Transient
     var isDeletedOnApi: Boolean = false
+    @Transient
+    var latestCalendarEventResponse: CalendarEventResponse? = null // TODO : Migration? If message already exists set it to null
     //endregion
 
     //region UI data (Transient & Ignore)

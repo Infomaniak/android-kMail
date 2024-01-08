@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2023 Infomaniak Network SA
+ * Copyright (C) 2022-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@ import com.infomaniak.mail.data.models.ai.AiMessage
 import com.infomaniak.mail.data.models.ai.AiResult
 import com.infomaniak.mail.data.models.ai.ContextMessage
 import com.infomaniak.mail.data.models.ai.UserMessage
+import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
 import com.infomaniak.mail.data.models.correspondent.Contact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
@@ -376,6 +377,19 @@ object ApiRepository : ApiRepositoryCore() {
             .headers(HttpUtils.getHeaders(contentType = null))
             .build()
         return HttpClient.okHttpClient.newBuilder().build().newCall(request).execute()
+    }
+
+    fun getAttachmentCalendarEvent(
+        currentMailboxUuid: String,
+        currentFolderId: String,
+        messageId: Int,
+        attachmentPartId: String,
+    ): ApiResponse<CalendarEventResponse> {
+        return callApi(
+            url = ApiRoutes.calendarEvent(currentMailboxUuid, currentFolderId, messageId, attachmentPartId),
+            method = GET,
+            okHttpClient = HttpClient.okHttpClientLongTimeout
+        )
     }
 
     /**

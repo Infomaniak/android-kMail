@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.thread
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.trackUserInfo
@@ -57,8 +58,11 @@ class ThreadViewModel @Inject constructor(
     private var threadLiveJob: Job? = null
     private var messagesLiveJob: Job? = null
     private var fetchMessagesJob: Job? = null
+    private var fetchCalendarEvent: Job? = null
 
     val quickActionBarClicks = SingleLiveEvent<QuickActionBarResult>()
+
+    private val treatedMessagesForCalendarEvent = mutableSetOf<String>()
 
     var deletedMessagesUids = mutableSetOf<String>()
     val failedMessagesUids = SingleLiveEvent<List<String>>()
@@ -185,6 +189,34 @@ class ThreadViewModel @Inject constructor(
         }
     }
 
+    fun fetchCalendarEvents(messages: List<Message>, currentMailboxUuid: String) {
+        fetchCalendarEvent?.cancel()
+        fetchCalendarEvent = viewModelScope.launch(ioCoroutineContext) {
+            mailboxContentRealm().writeBlocking {
+                messages.forEach { message ->
+                    if (!treatedMessagesForCalendarEvent.add(message.uid)) return@forEach
+
+                    val icsAttachments = message.attachments.filter { it.mimeType == "application/ics" }
+                    if (icsAttachments.count() != 1) return@forEach
+
+                    val icsAttachment = icsAttachments.single()
+
+                    Log.e("gibran", "fetchCalendarEvents - Gotta fetch the attachment with attachmentPartId: ${icsAttachment.partId}")
+                    val calendarEventResponse = ApiRepository.getAttachmentCalendarEvent(
+                        currentMailboxUuid,
+                        message.folderId,
+                        message.shortUid,
+                        icsAttachment.partId
+                    )
+
+                    if (calendarEventResponse.isSuccess()) {
+                        messageController.updateCalendarEvent(message.uid, calendarEventResponse.data!!, realm = this)
+                    }
+                }
+            }
+        }
+    }
+
     fun deleteDraft(message: Message, mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
         val realm = mailboxContentRealm()
         val thread = threadLive.value ?: return@launch
@@ -204,6 +236,10 @@ class ThreadViewModel @Inject constructor(
         val thread = threadLive.value ?: return@launch
         val message = messageController.getLastMessageToExecuteAction(thread)
         quickActionBarClicks.postValue(QuickActionBarResult(thread.uid, message, menuId))
+    }
+
+    fun getCalendarEventTreatedMessageCount(): Int {
+        return treatedMessagesForCalendarEvent.count()
     }
 
     data class SubjectDataResult(

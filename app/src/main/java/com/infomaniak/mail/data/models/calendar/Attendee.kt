@@ -28,6 +28,7 @@ import kotlinx.parcelize.Parceler
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 @Parcelize
 @Serializable
@@ -37,7 +38,10 @@ class Attendee() : EmbeddedRealmObject, Correspondent {
     override var name: String = ""
     @SerialName("organizer")
     var isOrganizer = false
+    @SerialName("state")
+    var _state = ""
 
+    @Transient
     @Ignore // TODO : Put this enum in realm
     var state = AttendanceState.NEEDS_ACTION
 

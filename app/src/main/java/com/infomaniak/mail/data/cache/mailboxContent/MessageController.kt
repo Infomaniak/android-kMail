@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2023 Infomaniak Network SA
+ * Copyright (C) 2022-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,9 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
+import android.util.Log
 import com.infomaniak.mail.data.cache.RealmDatabase
+import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
@@ -33,6 +35,8 @@ import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmSingleQuery
 import io.realm.kotlin.query.Sort
+import io.sentry.Sentry
+import io.sentry.SentryLevel
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -140,6 +144,23 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
     //region Edit data
     fun deleteSearchMessages(realm: MutableRealm) = with(realm) {
         delete(query<Message>("${Message::isFromSearch.name} == true").find())
+    }
+
+    fun updateCalendarEvent(messageUid: String, calendarEventResponse: CalendarEventResponse, realm: MutableRealm) {
+        Log.e("gibran", "updateCalendarEvent: Asking to write calendarEventResponse: $calendarEventResponse to messageUid: $messageUid");
+        getMessage(messageUid, realm)?.let { message ->
+            message.latestCalendarEventResponse = calendarEventResponse
+            Log.i("gibran", "updateCalendarEvent - DONE: update to message.latestCalendarEventResponse: ${message.latestCalendarEventResponse}")
+        } ?: run {
+            Sentry.withScope { scope ->
+                scope.level = SentryLevel.ERROR
+                scope.setExtra("messageUid", messageUid)
+                scope.setExtra("event has userStoredEvent", calendarEventResponse.hasUserStoredEvent().toString())
+                scope.setExtra("event's userStoredEventDeleted", calendarEventResponse.userStoredEventDeleted.toString())
+                scope.setExtra("event has attachmentEvent", calendarEventResponse.hasAttachmentEvent().toString())
+                Sentry.captureMessage("Cannot find message by uid for fetched calendar event inside Realm")
+            }
+        }
     }
     //endregion
 

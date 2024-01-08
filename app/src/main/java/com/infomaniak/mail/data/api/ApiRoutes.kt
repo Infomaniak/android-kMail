@@ -50,6 +50,16 @@ object ApiRoutes {
     }
     //endregion
 
+    //region Resource
+    fun resource(resource: String): String {
+        return "${MAIL_API}${resource}"
+    }
+
+    fun calendarEvent(resource: String): String {
+        return "${resource(resource)}?format=render"
+    }
+    //endregion
+
     //region Personal Information Manager
     private fun pim(): String {
         return "$MAIL_API/api/pim"
@@ -238,9 +248,5 @@ object ApiRoutes {
 
     fun ping(): String {
         return "$MAIL_API/api/ping-with-auth"
-    }
-
-    fun resource(resource: String): String {
-        return "${MAIL_API}${resource}"
     }
 }
