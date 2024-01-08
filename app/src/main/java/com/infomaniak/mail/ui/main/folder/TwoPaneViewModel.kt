@@ -22,13 +22,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
-import com.infomaniak.mail.data.models.Attachment.AttachmentType
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.main.thread.DetailedContactBottomSheetDialogArgs
-import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.MessageActionsBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.ReplyBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialogArgs
@@ -48,7 +46,7 @@ class TwoPaneViewModel @Inject constructor(
     val rightPaneFolderName = MutableLiveData<String>()
     var previousFolderId: String? = null
 
-    val downloadAttachmentArgs = SingleLiveEvent<DownloadAttachmentProgressDialogArgs>()
+    val attachmentActionsArgs = SingleLiveEvent<AttachmentActionsBottomSheetDialogArgs>()
     val newMessageArgs = SingleLiveEvent<NewMessageActivityArgs>()
     val replyBottomSheetArgs = SingleLiveEvent<ReplyBottomSheetDialogArgs>()
     val threadActionsArgs = SingleLiveEvent<ThreadActionsBottomSheetDialogArgs>()
@@ -67,8 +65,8 @@ class TwoPaneViewModel @Inject constructor(
         navigateToSelectedDraft(thread.messages.single())
     }
 
-    fun navigateToDownloadAttachment(resource: String, name: String, type: AttachmentType) {
-        downloadAttachmentArgs.value = DownloadAttachmentProgressDialogArgs(resource, name, type)
+    fun navigateToAttachmentActions(resource: String) {
+        attachmentActionsArgs.value = AttachmentActionsBottomSheetDialogArgs(resource)
     }
 
     private fun navigateToSelectedDraft(message: Message) = runCatchingRealm {

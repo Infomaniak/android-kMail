@@ -33,7 +33,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.search.SearchFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
-import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialog
+import com.infomaniak.mail.utils.AttachmentIntentUtils
 import com.infomaniak.mail.utils.UiUtils.FULLY_SLID
 import com.infomaniak.mail.utils.UiUtils.progressivelyColorSystemBars
 import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
@@ -129,10 +129,10 @@ abstract class TwoPaneFragment : Fragment() {
 
     private fun observeThreadNavigation() = with(twoPaneViewModel) {
 
-        getBackNavigationResult(DownloadAttachmentProgressDialog.OPEN_WITH, ::startActivity)
+        getBackNavigationResult(AttachmentIntentUtils.DOWNLOAD_ATTACHMENT_RESULT, ::startActivity)
 
-        downloadAttachmentArgs.observe(viewLifecycleOwner) {
-            safeNavigate(resId = R.id.downloadAttachmentProgressDialog, args = it.toBundle())
+        attachmentActionsArgs.observe(viewLifecycleOwner) {
+            safeNavigate(resId = R.id.attachmentActionsBottomSheetDialog, args = it.toBundle())
         }
 
         newMessageArgs.observe(viewLifecycleOwner) {

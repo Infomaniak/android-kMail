@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2023 Infomaniak Network SA
+ * Copyright (C) 2022-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,7 +36,6 @@ import androidx.lifecycle.distinctUntilChanged
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.context
-import com.infomaniak.lib.core.utils.hasSupportedApplications
 import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_DELETE_NAME
@@ -54,7 +53,6 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ExternalContent
 import com.infomaniak.mail.data.api.ApiRoutes
-import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
@@ -143,7 +141,6 @@ class ThreadFragment : Fragment() {
         observeThreadLive()
         observeMessagesLive()
         observeFailedMessages()
-        observeContacts()
         observeQuickActionBarClicks()
         observeSubjectUpdateTriggers()
         observeCurrentFolderName()
@@ -216,14 +213,7 @@ class ThreadFragment : Fragment() {
                 mainViewModel.currentMailbox.value?.let { mailbox -> threadViewModel.deleteDraft(message, mailbox) }
             },
             onAttachmentClicked = { attachment ->
-                if (attachment.openWithIntent(requireContext()).hasSupportedApplications(requireContext())) {
-                    trackAttachmentActionsEvent("open")
-                    attachment.display()
-                } else {
-                    trackAttachmentActionsEvent("download")
-                    mainViewModel.snackBarManager.setValue(getString(R.string.snackbarDownloadInProgress))
-                    scheduleDownloadManager(attachment.downloadUrl, attachment.name)
-                }
+                attachment.resource?.let(twoPaneViewModel::navigateToAttachmentActions)
             },
             onDownloadAllClicked = { message ->
                 trackAttachmentActionsEvent("downloadAll")
@@ -336,10 +326,6 @@ class ThreadFragment : Fragment() {
         threadViewModel.failedMessagesUids.observe(viewLifecycleOwner, threadAdapter::updateFailedMessages)
     }
 
-    private fun observeContacts() {
-        mainViewModel.mergedContactsLive.observeNotNull(viewLifecycleOwner, threadAdapter::updateContacts)
-    }
-
     private fun observeQuickActionBarClicks() = with(twoPaneViewModel) {
         threadViewModel.quickActionBarClicks.observe(viewLifecycleOwner) { (threadUid, lastMessageToReplyTo, menuId) ->
             when (menuId) {
@@ -448,21 +434,12 @@ class ThreadFragment : Fragment() {
             isExpandedMap = result.isExpandedMap
             initialSetOfExpandedMessagesUids = result.initialSetOfExpandedMessagesUids
             isThemeTheSameMap = result.isThemeTheSameMap
-            contacts = mainViewModel.mergedContactsLive.value ?: emptyMap()
-        }
-    }
-
-    private fun Attachment.display() {
-        if (hasUsableCache(requireContext()) || isInlineCachedFile(requireContext())) {
-            startActivity(openWithIntent(requireContext()))
-        } else {
-            twoPaneViewModel.navigateToDownloadAttachment(resource!!, name, getFileTypeFromMimeType())
         }
     }
 
     private fun scheduleDownloadManager(downloadUrl: String, filename: String) {
 
-        fun scheduleDownloadManager() = threadViewModel.scheduleDownload(downloadUrl, filename)
+        fun scheduleDownloadManager() = mainViewModel.scheduleDownload(downloadUrl, filename)
 
         if (permissionUtils.hasDownloadManagerPermission) {
             scheduleDownloadManager()
