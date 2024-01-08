@@ -26,7 +26,6 @@ import androidx.core.view.isVisible
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.calendar.Attendee
-import com.infomaniak.mail.data.models.calendar.Attendee.AttendanceState
 import com.infomaniak.mail.databinding.ViewCalendarEventBannerBinding
 import com.infomaniak.mail.utils.UiUtils.getPrettyNameAndEmail
 
@@ -38,22 +37,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
 
     private val binding by lazy { ViewCalendarEventBannerBinding.inflate(LayoutInflater.from(context), this, true) }
 
-    //region Debug
-    private val attendees = listOf<Attendee>(
-        createAttendee("alice@info.com", "Alice in Borderlands", false, AttendanceState.ACCEPTED),
-        createAttendee("bob@info.com", "Bob Dylan", false, AttendanceState.DECLINED),
-        createAttendee("charles.windsor@infomaniak.com", "Charles Windsor", true, AttendanceState.TENTATIVE),
-        createAttendee("delta@info.com", "Delta Rune", false, AttendanceState.NEEDS_ACTION),
-        createAttendee("echo@info.com", "Echo Location", false, AttendanceState.NEEDS_ACTION),
-    )
-
-    private fun createAttendee(
-        email: String,
-        name: String?,
-        isOrganizer: Boolean,
-        state: AttendanceState
-    ): Attendee = Attendee(email, name ?: "", isOrganizer, state)
-    //endregion
+    private val attendees = listOf<Attendee>() // TODO : Use real data instead
 
     init {
         with(binding) {
