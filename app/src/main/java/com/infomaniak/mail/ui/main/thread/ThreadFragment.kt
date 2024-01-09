@@ -303,7 +303,6 @@ class ThreadFragment : Fragment() {
             },
             onDownloadAllClicked = { message ->
                 trackAttachmentActionsEvent("downloadAll")
-                mainViewModel.snackBarManager.setValue(getString(R.string.snackbarDownloadInProgress))
                 downloadAllAttachments(message)
             },
             onReplyClicked = { message ->
