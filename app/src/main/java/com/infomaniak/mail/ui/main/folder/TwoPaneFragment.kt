@@ -31,6 +31,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.main.NoAnimSlidingPaneLayout
 import com.infomaniak.mail.ui.main.search.SearchFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.utils.AttachmentIntentUtils
@@ -45,7 +46,7 @@ abstract class TwoPaneFragment : Fragment() {
     val mainViewModel: MainViewModel by activityViewModels()
     val twoPaneViewModel: TwoPaneViewModel by activityViewModels()
 
-    protected abstract val slidingPaneLayout: SlidingPaneLayout
+    protected abstract val slidingPaneLayout: NoAnimSlidingPaneLayout
 
     // TODO: When we'll update DragDropSwipeRecyclerViewLib, we'll need to make the adapter nullable.
     //  For now it causes a memory leak, because we can't remove the strong reference
@@ -119,7 +120,7 @@ abstract class TwoPaneFragment : Fragment() {
         twoPaneViewModel.currentThreadUid.observe(viewLifecycleOwner) { threadUid ->
             val isOpeningThread = threadUid != null
             if (isOpeningThread) {
-                val hasPaneOpened = slidingPaneLayout.openPane()
+                val hasPaneOpened = slidingPaneLayout.openPaneNoAnimation()
                 if (hasPaneOpened) requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundColor)
             } else {
                 resetPanes(threadListAdapter)
@@ -174,9 +175,7 @@ abstract class TwoPaneFragment : Fragment() {
     }
 
     private fun resetPanes(threadListAdapter: ThreadListAdapter?) = with(requireActivity()) {
-
-        val isClosing = slidingPaneLayout.closePane()
-
+        val isClosing = slidingPaneLayout.closePaneNoAnimation()
         if (isClosing) {
             if (this@TwoPaneFragment is ThreadListFragment) window.statusBarColor = getColor(R.color.backgroundHeaderColor)
             window.updateNavigationBarColor(getColor(R.color.backgroundColor))

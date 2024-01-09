@@ -15,7 +15,8 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<androidx.slidingpanelayout.widget.SlidingPaneLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.infomaniak.mail.ui.main.NoAnimSlidingPaneLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/searchSlidingPaneLayout"
@@ -213,4 +214,4 @@
         android:layout_height="match_parent"
         android:layout_weight="@integer/rightSlidingPaneWeight" />
 
-</androidx.slidingpanelayout.widget.SlidingPaneLayout>
+</com.infomaniak.mail.ui.main.NoAnimSlidingPaneLayout>

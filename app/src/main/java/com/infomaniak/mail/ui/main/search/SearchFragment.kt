@@ -31,7 +31,6 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
-import androidx.slidingpanelayout.widget.SlidingPaneLayout
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListener
@@ -48,6 +47,7 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentSearchBinding
+import com.infomaniak.mail.ui.main.NoAnimSlidingPaneLayout
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.search.SearchFolderAdapter.SearchFolderElement
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
@@ -67,7 +67,7 @@ class SearchFragment : TwoPaneFragment() {
 
     private val searchViewModel: SearchViewModel by viewModels()
 
-    override val slidingPaneLayout: SlidingPaneLayout get() = binding.searchSlidingPaneLayout
+    override val slidingPaneLayout: NoAnimSlidingPaneLayout get() = binding.searchSlidingPaneLayout
 
     @Inject
     lateinit var localSettings: LocalSettings
