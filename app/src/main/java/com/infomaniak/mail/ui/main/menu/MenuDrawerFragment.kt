@@ -106,7 +106,7 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
             mailboxList.apply {
                 isVisible = !isVisible
                 mailboxExpandButton.toggleChevron(!isVisible)
-                mailboxSwitcherText.setTextAppearance(if (isVisible) R.style.BodyMedium_Accent else R.style.BodyMedium)
+                setMailboxSwitcherTextAppearance(isVisible)
                 trackMenuDrawerEvent("mailboxes", isVisible)
             }
         }
@@ -323,10 +323,11 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
     fun closeDropdowns() = with(binding) {
         mailboxList.isGone = true
         mailboxExpandButton.rotation = ResourcesCompat.getFloat(resources, R.dimen.angleViewNotRotated)
-        customFoldersLayout.isVisible = true
-        customFolders.isCollapsed = false
-        advancedActionsLayout.isGone = true
-        advancedActions.isCollapsed = true
+        setMailboxSwitcherTextAppearance(isOpen = false)
+    }
+
+    private fun setMailboxSwitcherTextAppearance(isOpen: Boolean) {
+        binding.mailboxSwitcherText.setTextAppearance(if (isOpen) R.style.BodyMedium_Accent else R.style.BodyMedium)
     }
 
     companion object {
