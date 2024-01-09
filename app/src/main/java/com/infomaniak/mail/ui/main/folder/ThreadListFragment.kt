@@ -37,7 +37,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
-import androidx.slidingpanelayout.widget.SlidingPaneLayout
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.VERTICAL_LIST_WITH_VERTICAL_DRAGGING
@@ -68,6 +67,7 @@ import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
+import com.infomaniak.mail.ui.main.NoAnimSlidingPaneLayout
 import com.infomaniak.mail.ui.main.settings.swipe.SwipeActionsSettingsFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
@@ -94,7 +94,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
     private val navigationArgs: ThreadListFragmentArgs by navArgs()
     private val threadListViewModel: ThreadListViewModel by viewModels()
 
-    override val slidingPaneLayout: SlidingPaneLayout get() = binding.threadListSlidingPaneLayout
+    override val slidingPaneLayout: NoAnimSlidingPaneLayout get() = binding.threadListSlidingPaneLayout
 
     private val threadListMultiSelection by lazy { ThreadListMultiSelection() }
 
