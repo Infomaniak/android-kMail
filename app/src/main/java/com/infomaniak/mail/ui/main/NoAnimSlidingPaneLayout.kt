@@ -25,83 +25,77 @@ import androidx.slidingpanelayout.widget.SlidingPaneLayout
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 
-
-class NoAnimSlidingPaneLayout(context: Context, attrs: AttributeSet?, defStyle: Int) :
-    SlidingPaneLayout(context, attrs, defStyle) {
+class NoAnimSlidingPaneLayout(
+    context: Context,
+    attrs: AttributeSet?,
+    defStyle: Int,
+) : SlidingPaneLayout(context, attrs, defStyle) {
 
     private var slideOffsetField: Field? = null
     private var slideableViewField: Field? = null
-    private var updateObscuredViewsVisibilityMethod: Method? = null
+    private var preservedOpenStateField: Field? = null
+
+    private var parallaxOtherViewsMethod: Method? = null
     private var dispatchOnPanelOpenedMethod: Method? = null
     private var dispatchOnPanelClosedMethod: Method? = null
-    private var preservedOpenStateField: Field? = null
-    private var parallaxOtherViewsMethod: Method? = null
+    private var updateObscuredViewsVisibilityMethod: Method? = null
 
-    constructor(context: Context) : this(context, null, 0)
-    constructor(context: Context, attrs: AttributeSet) : this(context, attrs, 0)
+    constructor(context: Context, attrs: AttributeSet? = null) : this(context, attrs, defStyle = 0)
 
     init {
-        try {
-            slideOffsetField = SlidingPaneLayout::class.java.getDeclaredField("mSlideOffset")
-            slideableViewField = SlidingPaneLayout::class.java.getDeclaredField("mSlideableView")
-            preservedOpenStateField = SlidingPaneLayout::class.java.getDeclaredField("mPreservedOpenState")
+        runCatching {
+            slideOffsetField =
+                SlidingPaneLayout::class.java.getDeclaredField("mSlideOffset")
+            slideableViewField =
+                SlidingPaneLayout::class.java.getDeclaredField("mSlideableView")
+            preservedOpenStateField =
+                SlidingPaneLayout::class.java.getDeclaredField("mPreservedOpenState")
 
-            updateObscuredViewsVisibilityMethod = SlidingPaneLayout::class.java.getDeclaredMethod(
-                "updateObscuredViewsVisibility",
-                View::class.java
-            )
-            dispatchOnPanelClosedMethod = SlidingPaneLayout::class.java.getDeclaredMethod(
-                "dispatchOnPanelClosed",
-                View::class.java
-            )
-            dispatchOnPanelOpenedMethod = SlidingPaneLayout::class.java.getDeclaredMethod(
-                "dispatchOnPanelOpened",
-                View::class.java
-            )
-            parallaxOtherViewsMethod = SlidingPaneLayout::class.java.getDeclaredMethod(
-                "parallaxOtherViews",
-                Float::class.javaPrimitiveType
-            )
+            parallaxOtherViewsMethod =
+                SlidingPaneLayout::class.java.getDeclaredMethod("parallaxOtherViews", Float::class.javaPrimitiveType)
+            dispatchOnPanelOpenedMethod =
+                SlidingPaneLayout::class.java.getDeclaredMethod("dispatchOnPanelOpened", View::class.java)
+            dispatchOnPanelClosedMethod =
+                SlidingPaneLayout::class.java.getDeclaredMethod("dispatchOnPanelClosed", View::class.java)
+            updateObscuredViewsVisibilityMethod =
+                SlidingPaneLayout::class.java.getDeclaredMethod("updateObscuredViewsVisibility", View::class.java)
 
             slideOffsetField?.isAccessible = true
             slideableViewField?.isAccessible = true
-            updateObscuredViewsVisibilityMethod?.isAccessible = true
+            preservedOpenStateField?.isAccessible = true
+
+            parallaxOtherViewsMethod?.isAccessible = true
             dispatchOnPanelOpenedMethod?.isAccessible = true
             dispatchOnPanelClosedMethod?.isAccessible = true
-            preservedOpenStateField?.isAccessible = true
-            parallaxOtherViewsMethod?.isAccessible = true
-        } catch (e: Exception) {
-            Log.w(this.javaClass.simpleName, "Failed to set up animation-less sliding pane layout.")
+            updateObscuredViewsVisibilityMethod?.isAccessible = true
+        }.onFailure {
+            Log.w(this.javaClass.simpleName, "Failed to set up animation-less SlidingPaneLayout.")
         }
     }
 
-    fun openPaneNoAnimation(): Boolean {
-        return try {
-            slideOffsetField?.set(this, 0f)
-            parallaxOtherViewsMethod?.invoke(this, 0f)
-            requestLayout()
-            invalidate()
-            dispatchOnPanelOpenedMethod?.invoke(this, slideableViewField?.get(this) as View)
-            preservedOpenStateField?.set(this, true)
-            isOpen
-        } catch (e: Exception) {
-            openPane()
-        }
+    fun openPaneNoAnimation(): Boolean = runCatching {
+        slideOffsetField?.set(this, 0.0f)
+        parallaxOtherViewsMethod?.invoke(this, 0.0f)
+        requestLayout()
+        invalidate()
+        dispatchOnPanelOpenedMethod?.invoke(this, slideableViewField?.get(this) as View)
+        preservedOpenStateField?.set(this, true)
+        isOpen
+    }.getOrElse {
+        openPane()
     }
 
-    fun closePaneNoAnimation(): Boolean {
-        return try {
-            val slideableView = slideableViewField?.get(this) as View
-            slideOffsetField?.set(this, 1f)
-            parallaxOtherViewsMethod?.invoke(this, 1f)
-            requestLayout()
-            invalidate()
-            updateObscuredViewsVisibilityMethod?.invoke(this, slideableView)
-            dispatchOnPanelClosedMethod?.invoke(this, slideableView)
-            preservedOpenStateField?.set(this, false)
-            !isOpen
-        } catch (e: Exception) {
-            closePane()
-        }
+    fun closePaneNoAnimation(): Boolean = runCatching {
+        val slideableView = slideableViewField?.get(this) as View
+        slideOffsetField?.set(this, 1.0f)
+        parallaxOtherViewsMethod?.invoke(this, 1.0f)
+        requestLayout()
+        invalidate()
+        updateObscuredViewsVisibilityMethod?.invoke(this, slideableView)
+        dispatchOnPanelClosedMethod?.invoke(this, slideableView)
+        preservedOpenStateField?.set(this, false)
+        !isOpen
+    }.getOrElse {
+        closePane()
     }
 }
