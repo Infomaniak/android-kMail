@@ -37,6 +37,7 @@ import com.infomaniak.mail.utils.AttachmentIntentUtils.getIntentOrGoToPlaystore
 import com.infomaniak.mail.utils.AttachmentIntentUtils.openWithIntent
 import com.infomaniak.mail.utils.PermissionUtils
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import com.infomaniak.lib.core.R as RCore
 
 @AndroidEntryPoint
@@ -46,7 +47,8 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
     private val mainViewModel: MainViewModel by activityViewModels()
     private val attachmentActionsViewModel: AttachmentActionsViewModel by viewModels()
 
-    private val permissionUtils by lazy { PermissionUtils(this) }
+    @Inject
+    lateinit var permissionUtils: PermissionUtils
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetAttachmentActionsBinding.inflate(inflater, container, false).also { binding = it }.root

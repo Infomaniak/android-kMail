@@ -87,7 +87,6 @@ class ThreadFragment : Fragment() {
     private val threadViewModel: ThreadViewModel by viewModels()
 
     private val threadAdapter inline get() = binding.messagesList.adapter as ThreadAdapter
-    private val permissionUtils by lazy { PermissionUtils(this) }
     private val isNotInSpam by lazy { mainViewModel.currentFolder.value?.role != FolderRole.SPAM }
 
     @Inject
@@ -104,6 +103,9 @@ class ThreadFragment : Fragment() {
 
     @Inject
     lateinit var phoneContextualMenuAlertDialog: PhoneContextualMenuAlertDialog
+
+    @Inject
+    lateinit var permissionUtils: PermissionUtils
 
     private var isFavorite = false
 
@@ -149,7 +151,7 @@ class ThreadFragment : Fragment() {
             observeSubjectUpdateTriggers()
         }
 
-        permissionUtils.registerDownloadManagerPermission()
+        permissionUtils.registerDownloadManagerPermission(fragment = this)
         mainViewModel.toggleLightThemeForMessage.observe(viewLifecycleOwner, threadAdapter::toggleLightMode)
 
         bindAlertToViewLifecycle(descriptionDialog)
