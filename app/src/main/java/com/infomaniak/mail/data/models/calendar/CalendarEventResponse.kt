@@ -18,10 +18,8 @@
 package com.infomaniak.mail.data.models.calendar
 
 import io.realm.kotlin.types.EmbeddedRealmObject
-import io.realm.kotlin.types.annotations.Ignore
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 
 @Serializable
 class CalendarEventResponse : EmbeddedRealmObject {
@@ -32,11 +30,27 @@ class CalendarEventResponse : EmbeddedRealmObject {
     @SerialName("attachment_event")
     private var attachmentEvent: CalendarEvent? = null
 
-    @Transient
-    @Ignore
-    var calendarEvent = userStoredEvent ?: attachmentEvent
+    val calendarEvent get() = userStoredEvent ?: attachmentEvent
 
     fun hasUserStoredEvent() = userStoredEvent != null
 
     fun hasAttachmentEvent() = attachmentEvent != null
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as CalendarEventResponse
+
+        if (userStoredEvent != other.userStoredEvent) return false
+        if (userStoredEventDeleted != other.userStoredEventDeleted) return false
+        return attachmentEvent == other.attachmentEvent
+    }
+
+    override fun hashCode(): Int {
+        var result = userStoredEvent?.hashCode() ?: 0
+        result = 31 * result + userStoredEventDeleted.hashCode()
+        result = 31 * result + (attachmentEvent?.hashCode() ?: 0)
+        return result
+    }
 }

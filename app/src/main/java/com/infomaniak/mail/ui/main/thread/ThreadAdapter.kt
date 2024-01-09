@@ -21,6 +21,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.text.format.Formatter
+import android.util.Log
 import android.view.*
 import android.webkit.WebView
 import android.webkit.WebView.HitTestResult
@@ -40,6 +41,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Attachment.*
 import com.infomaniak.mail.data.models.calendar.Attendee
+import com.infomaniak.mail.data.models.calendar.CalendarEvent
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.message.Message.*
@@ -166,14 +168,16 @@ class ThreadAdapter(
 
         bindHeader(message)
         bindAlerts(message.uid)
-        bindCalendarEvent()
+        bindCalendarEvent(message.latestCalendarEventResponse?.calendarEvent)
         bindAttachment(message)
         bindContent(message)
 
         onExpandOrCollapseMessage(message, shouldTrack = false)
     }
 
-    private fun ThreadViewHolder.bindCalendarEvent() {
+    private fun ThreadViewHolder.bindCalendarEvent(calendarEvent: CalendarEvent?) {
+        Log.v("gibran", "bindCalendarEvent - binding thread with calendarEvent: ${calendarEvent}")
+        binding.calendarEvent.isVisible = calendarEvent != null
         binding.calendarEvent.initCallback { attendees ->
             threadAdapterCallbacks?.navigateToAttendeeBottomSheet?.invoke(attendees)
         }
@@ -576,7 +580,8 @@ class ThreadAdapter(
 
         override fun areContentsTheSame(oldMessage: Message, newMessage: Message): Boolean {
             return newMessage.body?.value == oldMessage.body?.value &&
-                    newMessage.splitBody == oldMessage.splitBody
+                    newMessage.splitBody == oldMessage.splitBody &&
+                    newMessage.latestCalendarEventResponse == oldMessage.latestCalendarEventResponse
         }
     }
 

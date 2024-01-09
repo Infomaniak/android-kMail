@@ -67,6 +67,26 @@ class Attendee() : EmbeddedRealmObject, Correspondent {
         DECLINED(3, R.drawable.ic_calendar_no, R.color.redDestructiveAction),
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Attendee
+
+        if (email != other.email) return false
+        if (name != other.name) return false
+        if (isOrganizer != other.isOrganizer) return false
+        return _state == other._state
+    }
+
+    override fun hashCode(): Int {
+        var result = email.hashCode()
+        result = 31 * result + name.hashCode()
+        result = 31 * result + isOrganizer.hashCode()
+        result = 31 * result + _state.hashCode()
+        return result
+    }
+
     companion object : Parceler<Attendee> {
         override fun create(parcel: Parcel): Attendee {
             val email = parcel.readString()!!

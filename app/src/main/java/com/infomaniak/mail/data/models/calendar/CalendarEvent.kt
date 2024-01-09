@@ -45,4 +45,40 @@ class CalendarEvent : EmbeddedRealmObject {
     @SerialName("done")
     var hasPassed: Boolean = false
     var attendees: RealmList<Attendee> = realmListOf()
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as CalendarEvent
+
+        if (type != other.type) return false
+        if (title != other.title) return false
+        if (description != other.description) return false
+        if (location != other.location) return false
+        if (fullDay != other.fullDay) return false
+        if (start != other.start) return false
+        if (end != other.end) return false
+        if (timezone != other.timezone) return false
+        if (timezoneStart != other.timezoneStart) return false
+        if (timezoneEnd != other.timezoneEnd) return false
+        if (hasPassed != other.hasPassed) return false
+        return attendees == other.attendees
+    }
+
+    override fun hashCode(): Int {
+        var result = type.hashCode()
+        result = 31 * result + title.hashCode()
+        result = 31 * result + description.hashCode()
+        result = 31 * result + (location?.hashCode() ?: 0)
+        result = 31 * result + fullDay.hashCode()
+        result = 31 * result + start.hashCode()
+        result = 31 * result + end.hashCode()
+        result = 31 * result + (timezone?.hashCode() ?: 0)
+        result = 31 * result + timezoneStart.hashCode()
+        result = 31 * result + timezoneEnd.hashCode()
+        result = 31 * result + hasPassed.hashCode()
+        result = 31 * result + attendees.hashCode()
+        return result
+    }
 }
