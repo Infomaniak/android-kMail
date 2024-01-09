@@ -175,7 +175,9 @@ abstract class TwoPaneFragment : Fragment() {
     }
 
     private fun resetPanes(threadListAdapter: ThreadListAdapter?) = with(requireActivity()) {
+
         val isClosing = slidingPaneLayout.closePaneNoAnimation()
+
         if (isClosing) {
             if (this@TwoPaneFragment is ThreadListFragment) window.statusBarColor = getColor(R.color.backgroundHeaderColor)
             window.updateNavigationBarColor(getColor(R.color.backgroundColor))
