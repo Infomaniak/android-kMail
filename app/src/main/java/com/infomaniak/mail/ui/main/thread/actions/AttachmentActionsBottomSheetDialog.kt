@@ -24,7 +24,10 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.infomaniak.lib.core.utils.*
+import com.infomaniak.lib.core.utils.context
+import com.infomaniak.lib.core.utils.hasSupportedApplications
+import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
