@@ -208,6 +208,9 @@ class MainActivity : BaseActivity() {
 
         permissionUtils.requestMainPermissionsIfNeeded()
 
+        // TODO make this only after login
+        navController.navigate(R.id.permissionsOnboardingPagerFragment)
+
         initAppUpdateManager()
     }
 

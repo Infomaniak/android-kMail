@@ -28,7 +28,7 @@
         android:layout_height="0dp"
         android:importantForAccessibility="no"
         android:scaleType="fitXY"
-        android:src="@drawable/ic_back_wave_1"
+        android:src="@drawable/ic_back_wave_2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_percent="0.5"
         app:layout_constraintHorizontal_bias="0.0"
@@ -73,14 +73,13 @@
     <ImageView
         android:id="@+id/iconLayout"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="250dp"
         android:importantForAccessibility="no"
         app:layout_constraintBottom_toBottomOf="@id/bottomWave"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/end"
         app:layout_constraintHeight_max="250dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/logo"
-        tools:src="@drawable/illustration_onboarding_contact" />
+        app:layout_constraintStart_toStartOf="@id/start"
+        tools:src="@drawable/illustration_onboarding_contacts" />
 
     <TextView
         android:id="@+id/title"
@@ -105,38 +104,10 @@
         android:layout_marginHorizontal="@dimen/marginStandardMedium"
         android:layout_marginTop="@dimen/marginStandardMedium"
         android:gravity="center"
-        app:layout_constraintBottom_toBottomOf="@id/bottomGuideLine"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/end"
         app:layout_constraintStart_toEndOf="@id/start"
         app:layout_constraintTop_toBottomOf="@id/title"
         tools:text="@string/onBoardingContactsDescription" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/bottomGuideLine"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.8" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/continueButton"
-        style="@style/TextButtonPrimary"
-        android:layout_width="0dp"
-        android:layout_marginHorizontal="@dimen/marginStandard"
-        android:text="@string/contentDescriptionButtonNext"
-        app:layout_constraintBottom_toTopOf="@id/dummyButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/bottomGuideLine" />
-
-    <View
-        android:id="@+id/dummyButton"
-        android:layout_width="0dp"
-        android:layout_height="@dimen/textButtonPrimaryHeight"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/continueButton" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

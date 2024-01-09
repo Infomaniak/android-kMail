@@ -597,4 +597,18 @@
             app:argType="com.infomaniak.mail.data.models.calendar.Attendee[]" />
     </dialog>
 
+    <fragment
+        android:id="@+id/permissionsOnboardingPagerFragment"
+        android:name="com.infomaniak.mail.ui.main.onboarding.PermissionsOnboardingPagerFragment"
+        android:label="PermissionsOnboardingPagerFragment" />
+
+    <fragment
+        android:id="@+id/permissionsOnboardingFragment"
+        android:name="com.infomaniak.mail.ui.main.onboarding.PermissionsOnboardingFragment"
+        android:label="PermissionsOnboardingFragment">
+        <argument
+            android:name="position"
+            app:argType="integer" />
+    </fragment>
+
 </navigation>
