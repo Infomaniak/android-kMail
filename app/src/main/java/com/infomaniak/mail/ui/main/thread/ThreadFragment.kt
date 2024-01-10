@@ -262,6 +262,8 @@ class ThreadFragment : Fragment() {
 
         twoPaneViewModel.currentThreadUid.distinctUntilChanged().observeNotNull(viewLifecycleOwner) { threadUid ->
 
+            displayThreadView()
+
             reassignThreadLive(threadUid)
             reassignMessagesLive(threadUid)
 
@@ -378,11 +380,12 @@ class ThreadFragment : Fragment() {
         }
     }
 
-    private fun initUi(threadUid: String, folderRole: FolderRole?) = with(binding) {
-
-        // Display Thread view
+    private fun displayThreadView() = with(binding) {
         emptyView.isGone = true
         threadView.isVisible = true
+    }
+
+    private fun initUi(threadUid: String, folderRole: FolderRole?) = with(binding) {
 
         if (twoPaneFragment.isOnlyOneShown()) {
             requireActivity().window.updateNavigationBarColor(context.getColor(R.color.elevatedBackground))
