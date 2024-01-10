@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.viewpager2.widget.ViewPager2
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
@@ -69,14 +70,17 @@ class PermissionsOnboardingPagerFragment : Fragment() {
                 0 -> {
                     permissionUtils.requestReadContactsPermission { hasPermission ->
                         if (hasPermission) mainViewModel.updateUserInfo()
-                        permissionsViewpager.currentItem += 1
+                        if (permissionsViewpager.isLastPage()) leaveOnboarding() else permissionsViewpager.currentItem += 1
                     }
                 }
-                1 -> {
-                    permissionUtils.requestNotificationsPermissionIfNeeded { safeNavigate(R.id.threadListFragment) }
-                }
+                1 -> permissionUtils.requestNotificationsPermissionIfNeeded { leaveOnboarding() }
             }
-
         }
+    }
+
+    private fun ViewPager2.isLastPage() = adapter?.let { currentItem == it.itemCount - 1 } ?: true
+
+    private fun leaveOnboarding() {
+        safeNavigate(R.id.threadListFragment)
     }
 }
