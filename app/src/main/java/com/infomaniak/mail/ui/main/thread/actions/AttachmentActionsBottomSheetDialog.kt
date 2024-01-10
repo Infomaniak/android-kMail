@@ -62,6 +62,7 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
             return@with
         }
 
+        permissionUtils.registerDownloadManagerPermission(this@AttachmentActionsBottomSheetDialog)
         binding.attachmentDetails.setDetails(attachment)
         setupListeners(attachment)
     }
@@ -79,9 +80,8 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
             trackAttachmentActionsEvent("saveToKDrive")
             attachment.executeIntent(SAVE_TO_DRIVE)
         }
-        deviceItem.setClosingOnClickListener {
+        deviceItem.setOnClickListener {
             trackAttachmentActionsEvent("download")
-            mainViewModel.snackBarManager.setValue(getString(R.string.snackbarDownloadInProgress))
             scheduleDownloadManager(attachment.downloadUrl, attachment.name)
         }
     }
@@ -109,9 +109,14 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private fun scheduleDownloadManager(downloadUrl: String, filename: String) {
         if (permissionUtils.hasDownloadManagerPermission) {
-            mainViewModel.scheduleDownload(downloadUrl, filename)
+            scheduleDownloadAndPopBack(downloadUrl, filename)
         } else {
-            permissionUtils.requestDownloadManagerPermission { mainViewModel.scheduleDownload(downloadUrl, filename) }
+            permissionUtils.requestDownloadManagerPermission { scheduleDownloadAndPopBack(downloadUrl, filename) }
         }
+    }
+
+    private fun scheduleDownloadAndPopBack(downloadUrl: String, filename: String) {
+        mainViewModel.scheduleDownload(downloadUrl, filename)
+        findNavController().popBackStack()
     }
 }
