@@ -52,7 +52,10 @@ class PermissionsOnboardingPagerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
-        permissionUtils.registerReadContactsPermission(fragment = this@PermissionsOnboardingPagerFragment)
+        permissionUtils.apply {
+            registerReadContactsPermission(fragment = this@PermissionsOnboardingPagerFragment)
+            registerNotificationsPermissionIfNeeded(fragment = this@PermissionsOnboardingPagerFragment)
+        }
 
         permissionsViewpager.apply {
             adapter = PermissionsPagerAdapter(childFragmentManager, viewLifecycleOwner.lifecycle)
@@ -62,14 +65,13 @@ class PermissionsOnboardingPagerFragment : Fragment() {
         continueButton.setOnClickListener {
             when (permissionsViewpager.currentItem) {
                 0 -> {
-                    permissionUtils.requestReadContactsPermission {
-                        mainViewModel.updateUserInfo()
+                    permissionUtils.requestReadContactsPermission { hasPermission ->
+                        if (hasPermission) mainViewModel.updateUserInfo()
                         permissionsViewpager.currentItem += 1
                     }
                 }
                 1 -> {
-                    // TODO: write in localSettings ?
-                    safeNavigate(R.id.threadListFragment)
+                    permissionUtils.requestNotificationsPermissionIfNeeded { safeNavigate(R.id.threadListFragment) }
                 }
             }
 

@@ -36,6 +36,7 @@ class PermissionUtils @Inject constructor(private val activity: FragmentActivity
 
     private var mainForActivityResult: ActivityResultLauncher<Array<String>>? = null
     private var contactsPermissionForActivityResult: ActivityResultLauncher<String>? = null
+    private var notificationsPermissionForActivityResult: ActivityResultLauncher<String>? = null
     private var storageForActivityResult: ActivityResultLauncher<String>? = null
 
     val hasDownloadManagerPermission
@@ -64,20 +65,45 @@ class PermissionUtils @Inject constructor(private val activity: FragmentActivity
     }
 
     //region read contacts permissions
-    private var contactsCallback: (() -> Unit)? = null
+    private var contactsCallback: ((Boolean) -> Unit)? = null
 
     fun registerReadContactsPermission(fragment: Fragment) {
         contactsPermissionForActivityResult = fragment.registerForActivityResult(RequestPermission()) { hasPermission ->
-            if (hasPermission) contactsCallback?.invoke()
+            contactsCallback?.invoke(hasPermission)
         }
     }
 
-    fun requestReadContactsPermission(contactsCallback: () -> Unit) {
-        contactsPermissionForActivityResult?.launch(READ_CONTACTS_PERMISSION)
+    fun requestReadContactsPermission(contactsCallback: (Boolean) -> Unit) {
         this.contactsCallback = contactsCallback
+        contactsPermissionForActivityResult?.launch(READ_CONTACTS_PERMISSION)
     }
     //endregion
 
+    //region notifications permissions
+    private var notificationsCallback: ((Boolean) -> Unit)? = null
+
+    /**
+     * Register notifications permission only for Android API above or equal 33 and if user never manually disabled it.
+     */
+    fun registerNotificationsPermissionIfNeeded(fragment: Fragment) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !localSettings.hasAlreadyEnabledNotifications) {
+            notificationsPermissionForActivityResult = fragment.registerForActivityResult(RequestPermission()) { hasPermission ->
+                if (hasPermission) localSettings.hasAlreadyEnabledNotifications = true
+                notificationsCallback?.invoke(hasPermission)
+            }
+        }
+    }
+
+    /**
+     * Request notifications permission only for Android API above or equal 33 and if user never manually disabled it.
+     */
+    fun requestNotificationsPermissionIfNeeded(notificationsCallback: (Boolean) -> Unit) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !localSettings.hasAlreadyEnabledNotifications) {
+            this.notificationsCallback = notificationsCallback
+            notificationsPermissionForActivityResult?.launch(POST_NOTIFICATIONS_PERMISSION)
+        }
+    }
+    //endregion
 
     //region DownloadManager permissions
     private var downloadCallback: (() -> Unit)? = null
@@ -97,8 +123,8 @@ class PermissionUtils @Inject constructor(private val activity: FragmentActivity
      * Request storage permission only for Android API below 29.
      */
     fun requestDownloadManagerPermission(downloadCallback: () -> Unit) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) storageForActivityResult?.launch(STORAGE_PERMISSION)
         this.downloadCallback = downloadCallback
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) storageForActivityResult?.launch(STORAGE_PERMISSION)
     }
     //endregion
 
