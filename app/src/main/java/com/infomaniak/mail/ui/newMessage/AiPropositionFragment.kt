@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.newMessage
 
 import android.os.Bundle
 import android.transition.*
+import android.transition.Fade.IN
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -348,7 +349,7 @@ class AiPropositionFragment : Fragment() {
         val transition = TransitionSet()
             .setOrdering(TransitionSet.ORDERING_SEQUENTIAL)
             .addTransition(ChangeBounds())
-            .addTransition(Fade(Fade.IN).addTarget(errorBlock))
+            .addTransition(Fade(IN).addTarget(errorBlock))
 
         TransitionManager.beginDelayedTransition(nestedScrollView, transition)
 

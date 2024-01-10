@@ -57,7 +57,6 @@ abstract class MenuFoldersFragment : Fragment() {
             isInMenuDrawer,
             onFolderClicked = ::onFolderSelected,
             onCollapseClicked = ::onFolderCollapse,
-            onCollapseTransition = ::onCollapseTransition,
         )
     }
 
@@ -66,15 +65,12 @@ abstract class MenuFoldersFragment : Fragment() {
             isInMenuDrawer,
             onFolderClicked = ::onFolderSelected,
             onCollapseClicked = ::onFolderCollapse,
-            onCollapseTransition = ::onCollapseTransition,
         )
     }
 
     protected abstract fun onFolderSelected(folderId: String)
 
     protected abstract fun onFolderCollapse(folderId: String, shouldCollapse: Boolean)
-
-    protected abstract fun onCollapseTransition(shouldExclude: Boolean)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
