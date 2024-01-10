@@ -1018,10 +1018,14 @@ class MainViewModel @Inject constructor(
     }
 
     fun scheduleDownload(downloadUrl: String, filename: String) = viewModelScope.launch(ioCoroutineContext) {
-        if (ApiRepository.ping().isSuccess()) {
-            snackBarManager.postValue(context.getString(R.string.snackbarDownloadInProgress))
+        val snackbarTitleRes = if (ApiRepository.ping().isSuccess()) {
             DownloadManagerUtils.scheduleDownload(context, downloadUrl, filename)
+            R.string.snackbarDownloadInProgress
+        } else {
+            RCore.string.errorDownload
         }
+
+        snackBarManager.postValue(context.getString(snackbarTitleRes))
     }
 
     fun checkAppUpdateStatus() {
