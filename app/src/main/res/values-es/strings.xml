@@ -361,8 +361,8 @@
     <string name="restoreEmailsText">Todos los correos electrónicos volverán a tu bandeja de entrada.</string>
     <string name="restoreEmailsTitle">Restaura tus correos electrónicos</string>
     <string name="reviewAlertTitle">¿Te gusta Infomaniak Mail?</string>
-    <string name="saveToDriveDeviceItem">Dispositivo</string>
-    <string name="saveToDriveTitle">Guardar en</string>
+    <string name="saveToDriveDeviceItem">Guardar en el dispositivo</string>
+    <string name="saveToDriveItem">Guardar en kDrive</string>
     <string name="scheduledMessagesFolder">Mensajes programados</string>
     <string name="searchAllMessages">Todos los mensajes</string>
     <string name="searchFieldPlaceholder">Buscar un correo electrónico</string>

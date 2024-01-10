@@ -367,8 +367,8 @@
     <string name="restoreEmailsText">All emails will come back to your inbox.</string>
     <string name="restoreEmailsTitle">Restore your emails</string>
     <string name="reviewAlertTitle">Do you like Infomaniak Mail?</string>
-    <string name="saveToDriveDeviceItem">Device</string>
-    <string name="saveToDriveTitle">Save to</string>
+    <string name="saveToDriveDeviceItem">Save to device</string>
+    <string name="saveToDriveItem">Save to kDrive</string>
     <string name="scheduledMessagesFolder">Scheduled messages</string>
     <string name="searchAllMessages">All messages</string>
     <string name="searchFieldPlaceholder">Search an email</string>

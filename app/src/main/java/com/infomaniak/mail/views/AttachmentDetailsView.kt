@@ -21,9 +21,9 @@ import android.content.Context
 import android.text.format.Formatter
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.widget.LinearLayout
 import androidx.annotation.DimenRes
 import androidx.annotation.StyleRes
-import androidx.constraintlayout.widget.ConstraintLayout
 import coil.load
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.setMarginsRelative
@@ -36,17 +36,22 @@ class AttachmentDetailsView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : ConstraintLayout(context, attrs, defStyleAttr) {
+) : LinearLayout(context, attrs, defStyleAttr) {
 
     private val binding by lazy { ViewAttachmentDetailsBinding.inflate(LayoutInflater.from(context), this) }
 
     init {
         attrs?.getAttributes(context, R.styleable.AttachmentDetailsView) {
-            val displayStyle = DisplayStyle.values()[getInteger(R.styleable.AttachmentDetailsView_displayStyle, 0)]
+            val displayStyle = DisplayStyle.entries[getInteger(R.styleable.AttachmentDetailsView_displayStyle, 0)]
             val iconSize = context.resources.getDimension(displayStyle.iconSize).toInt()
             val marginSize = context.resources.getDimension(displayStyle.marginSize).toInt()
 
             with(binding) {
+
+                if (displayStyle == DisplayStyle.CHIP) {
+                    fileName.maxWidth = context.resources.getDimension(R.dimen.maxAttachmentChipWidth).toInt()
+                }
+
                 fileName.setTextAppearance(displayStyle.fileNameStyle)
                 fileSize.setTextAppearance(displayStyle.fileSizeStyle)
                 icon.apply {
@@ -78,7 +83,7 @@ class AttachmentDetailsView @JvmOverloads constructor(
         ),
         BOTTOMSHEET(
             R.dimen.largeIconSize,
-            RCore.dimen.marginStandard,
+            R.dimen.alternativeMargin,
             R.style.Body,
             R.style.Body_Secondary,
         )

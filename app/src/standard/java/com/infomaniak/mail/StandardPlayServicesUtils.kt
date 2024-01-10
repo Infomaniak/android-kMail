@@ -54,8 +54,8 @@ class StandardPlayServicesUtils @Inject constructor(
         }
     }
 
-    override fun areGooglePlayServicesNotAvailable(): Boolean {
-        return GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(appContext) != ConnectionResult.SUCCESS
+    override fun areGooglePlayServicesAvailable(): Boolean {
+        return GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(appContext) == ConnectionResult.SUCCESS
     }
 
     override fun deleteFirebaseToken() {

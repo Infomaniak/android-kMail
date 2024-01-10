@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2023 Infomaniak Network SA
+ * Copyright (C) 2022-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,10 +21,14 @@ import android.app.Application
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
+import com.infomaniak.lib.core.utils.DownloadManagerUtils
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.SingleLiveEvent
+import com.infomaniak.lib.stores.StoreUtils
+import com.infomaniak.lib.stores.StoreUtils.APP_UPDATE_TAG
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
@@ -56,6 +60,7 @@ import com.infomaniak.mail.utils.NotificationUtils.Companion.cancelNotification
 import com.infomaniak.mail.utils.SharedUtils.Companion.updateSignatures
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
+import com.infomaniak.mail.views.itemViews.AvatarMergedContactData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.notifications.ResultsChange
@@ -73,6 +78,7 @@ class MainViewModel @Inject constructor(
     application: Application,
     private val addressBookController: AddressBookController,
     private val folderController: FolderController,
+    private val localSettings: LocalSettings,
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val mailboxController: MailboxController,
     private val mergedContactController: MergedContactController,
@@ -82,6 +88,7 @@ class MainViewModel @Inject constructor(
     private val refreshController: RefreshController,
     private val sharedUtils: SharedUtils,
     private val threadController: ThreadController,
+    private val avatarMergedContactData: AvatarMergedContactData,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
@@ -198,11 +205,7 @@ class MainViewModel @Inject constructor(
     //endregion
 
     //region Merged Contacts
-    // Explanation of this Map: Map<Email, Map<Name, MergedContact>>
-    val mergedContactsLive: LiveData<MergedContactDictionary?> = mergedContactController
-        .getMergedContactsAsync()
-        .mapLatest { ContactUtils.arrangeMergedContacts(it.list.copyFromRealm()) }
-        .asLiveData(ioCoroutineContext)
+    val mergedContactsLive: LiveData<MergedContactDictionary> = avatarMergedContactData.mergedContactLiveData
     //endregion
 
     fun updateUserInfo() = viewModelScope.launch(ioCoroutineContext) {
@@ -864,7 +867,7 @@ class MainViewModel @Inject constructor(
             updateFolders(mailbox)
             apiResponse.data?.id
         } else {
-            snackBarManager.postValue(context.getString(apiResponse.translateError()), null)
+            snackBarManager.postValue(title = context.getString(apiResponse.translateError()), undoData = null)
             null
         }
     }
@@ -1008,6 +1011,27 @@ class MainViewModel @Inject constructor(
                 realm = realm,
             )
         }
+    }
+
+    fun scheduleDownload(downloadUrl: String, filename: String) = viewModelScope.launch(ioCoroutineContext) {
+        if (ApiRepository.ping().isSuccess()) {
+            DownloadManagerUtils.scheduleDownload(context, downloadUrl, filename)
+        }
+    }
+
+    fun checkAppUpdateStatus() {
+        SentryLog.d(
+            tag = APP_UPDATE_TAG,
+            msg = "Setting canInstallUpdate value to ${localSettings.hasAppUpdateDownloaded} in checkAppUpdateStatus",
+        )
+        canInstallUpdate.value = localSettings.hasAppUpdateDownloaded
+        StoreUtils.checkStalledUpdate()
+    }
+
+    fun toggleAppUpdateStatus(isUpdateDownloaded: Boolean) {
+        SentryLog.d(APP_UPDATE_TAG, "Setting canInstallUpdate value to $isUpdateDownloaded in toggleAppUpdateStatus")
+        canInstallUpdate.value = isUpdateDownloaded
+        localSettings.hasAppUpdateDownloaded = isUpdateDownloaded
     }
 
     companion object {

@@ -528,6 +528,9 @@
         <argument
             android:name="attachmentType"
             app:argType="com.infomaniak.mail.data.models.Attachment$AttachmentType" />
+        <argument
+            android:name="intentType"
+            app:argType="com.infomaniak.mail.utils.AttachmentIntentUtils$AttachmentIntentType" />
     </dialog>
 
     <dialog
@@ -566,9 +569,22 @@
         android:id="@+id/syncDiscoveryBottomSheetDialog"
         android:name="com.infomaniak.mail.ui.bottomSheetDialogs.SyncDiscoveryBottomSheetDialog"
         android:label="SyncDiscoveryBottomSheetDialog" />
+
     <fragment
         android:id="@+id/aiEngineSettingFragment"
         android:name="com.infomaniak.mail.ui.main.settings.swipe.AiEngineSettingFragment"
         android:label="AiEngineSettingFragment" />
+
+    <dialog
+        android:id="@+id/attachmentActionsBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.main.thread.actions.AttachmentActionsBottomSheetDialog"
+        android:label="AttachmentActionsBottomSheetDialog">
+        <argument
+            android:name="attachmentResource"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_attachmentActionsBottomSheetDialog_to_downloadAttachmentProgressDialog"
+            app:destination="@id/downloadAttachmentProgressDialog" />
+    </dialog>
 
 </navigation>

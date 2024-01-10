@@ -19,34 +19,28 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:layout_height="wrap_content"
-    tools:layout_width="wrap_content"
-    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
+    tools:layout_width="match_parent"
+    tools:orientation="horizontal"
+    tools:parentTag="android.widget.LinearLayout">
 
     <ImageView
         android:id="@+id/icon"
         android:layout_width="@dimen/standardIconSize"
         android:layout_height="@dimen/standardIconSize"
         android:layout_gravity="center_vertical"
-        android:layout_marginHorizontal="@dimen/marginStandardSmall"
         android:layout_marginVertical="@dimen/marginStandardVerySmall"
         android:importantForAccessibility="no"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/textsLayout"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_marginHorizontal="@dimen/marginStandardSmall"
         tools:src="@drawable/ic_file_pdf" />
 
     <LinearLayout
         android:id="@+id/textsLayout"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginVertical="@dimen/marginStandardVerySmall"
         android:layout_marginEnd="@dimen/marginStandardVerySmall"
+        android:layout_weight="1"
         android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/icon"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_goneMarginEnd="@dimen/marginStandardSmall">
 
         <TextView
@@ -56,7 +50,6 @@
             android:layout_height="wrap_content"
             android:ellipsize="middle"
             android:lines="1"
-            android:maxWidth="220dp"
             tools:text="billet-055.pdf" />
 
         <TextView

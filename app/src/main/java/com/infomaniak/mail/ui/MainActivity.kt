@@ -26,9 +26,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
 import androidx.activity.addCallback
-import androidx.activity.result.contract.ActivityResultContracts.*
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.activity.result.contract.ActivityResultContracts.StartIntentSenderForResult
 import androidx.activity.viewModels
 import androidx.annotation.FloatRange
+import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Lifecycle.State
 import androidx.lifecycle.distinctUntilChanged
@@ -43,18 +45,23 @@ import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.Utils.toEnumOrThrow
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
-import com.infomaniak.lib.stores.StoreUtils.checkStalledUpdate
+import com.infomaniak.lib.core.utils.year
 import com.infomaniak.lib.stores.StoreUtils.checkUpdateIsAvailable
 import com.infomaniak.lib.stores.StoreUtils.initAppUpdateManager
 import com.infomaniak.lib.stores.StoreUtils.launchInAppReview
 import com.infomaniak.lib.stores.StoreUtils.unregisterAppUpdateListener
 import com.infomaniak.mail.BuildConfig
+import com.infomaniak.mail.MatomoMail.DISCOVER_LATER
+import com.infomaniak.mail.MatomoMail.DISCOVER_NOW
+import com.infomaniak.mail.MatomoMail.trackAppReviewEvent
 import com.infomaniak.mail.MatomoMail.trackDestination
+import com.infomaniak.mail.MatomoMail.trackEasterEggEvent
 import com.infomaniak.mail.MatomoMail.trackEvent
+import com.infomaniak.mail.MatomoMail.trackInAppUpdateEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.models.draft.Draft.*
+import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.firebase.RegisterFirebaseBroadcastReceiver
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
@@ -73,6 +80,8 @@ import io.sentry.SentryLevel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.Calendar
+import java.util.Date
 import java.util.UUID
 import javax.inject.Inject
 
@@ -102,6 +111,7 @@ class MainActivity : BaseActivity() {
     private val newMessageActivityResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         val draftAction = result.data?.getStringExtra(DRAFT_ACTION_KEY)?.let(DraftAction::valueOf)
         if (draftAction == DraftAction.SEND) {
+            showEasterXMas()
             showSendingSnackBarTimer.start()
             showAppReview()
         }
@@ -117,7 +127,9 @@ class MainActivity : BaseActivity() {
     }
 
     private val inAppUpdateResultLauncher = registerForActivityResult(StartIntentSenderForResult()) { result ->
-        localSettings.isUserWantingUpdates = result.resultCode == RESULT_OK
+        val isUserWantingUpdates = result.resultCode == RESULT_OK
+        localSettings.isUserWantingUpdates = isUserWantingUpdates
+        trackInAppUpdateEvent(if (isUserWantingUpdates) DISCOVER_NOW else DISCOVER_LATER)
     }
 
     private val currentFragment
@@ -333,7 +345,7 @@ class MainActivity : BaseActivity() {
         super.onResume()
         playServicesUtils.checkPlayServices(this)
 
-        checkStalledUpdate()
+        mainViewModel.checkAppUpdateStatus()
 
         if (binding.drawerLayout.isOpen) colorSystemBarsWithMenuDrawer(UiUtils.FULLY_SLID)
     }
@@ -427,7 +439,9 @@ class MainActivity : BaseActivity() {
             R.id.messageActionsBottomSheetDialog,
             R.id.replyBottomSheetDialog,
             R.id.detailedContactBottomSheetDialog,
-            R.id.threadActionsBottomSheetDialog -> null
+            R.id.threadActionsBottomSheetDialog,
+            R.id.attachmentActionsBottomSheetDialog,
+            R.id.downloadAttachmentProgressDialog -> null
             R.id.searchFragment -> R.color.backgroundColor
             else -> R.color.backgroundHeaderColor
         }?.let { statusBarColor ->
@@ -464,7 +478,11 @@ class MainActivity : BaseActivity() {
     private fun initAppUpdateManager() {
         initAppUpdateManager(
             context = this,
-            onInstall = { mainViewModel.canInstallUpdate.value = true },
+            onUpdateDownloaded = { mainViewModel.toggleAppUpdateStatus(isUpdateDownloaded = true) },
+            onUpdateInstalled = {
+                Sentry.captureMessage("InstallStateUpdateListener called ’state == INSTALLED’", SentryLevel.DEBUG)
+                mainViewModel.toggleAppUpdateStatus(isUpdateDownloaded = false)
+            },
         )
     }
 
@@ -491,14 +509,38 @@ class MainActivity : BaseActivity() {
     private fun showAppReview() = with(localSettings) {
         if (showAppReviewDialog && appReviewLaunches < 0) {
             appReviewLaunches = LocalSettings.DEFAULT_APP_REVIEW_LAUNCHES
+            trackAppReviewEvent("presentAlert", TrackerAction.DATA)
             titleDialog.show(
                 title = R.string.reviewAlertTitle,
                 onPositiveButtonClicked = {
+                    trackAppReviewEvent("like")
                     showAppReviewDialog = false
                     launchInAppReview()
                 },
-                onNegativeButtonClicked = { openUrl(getString(R.string.urlUserReportAndroid)) },
+                onNegativeButtonClicked = {
+                    trackAppReviewEvent("dislike")
+                    openUrl(getString(R.string.urlUserReportAndroid))
+                },
             )
+        }
+    }
+
+    private fun showEasterXMas() {
+
+        val calendar = Calendar.getInstance()
+        val month = calendar.get(Calendar.MONTH)
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+        if (month == Calendar.DECEMBER && day <= 25) {
+            binding.easterEggXMas.apply {
+                isVisible = true
+                playAnimation()
+            }
+            Sentry.withScope { scope ->
+                scope.level = SentryLevel.INFO
+                Sentry.captureMessage("Easter egg XMas has been triggered! Woohoo!")
+            }
+            trackEasterEggEvent("xmas${Date().year()}")
         }
     }
 

@@ -48,10 +48,10 @@ class AttachmentAdapter(
         val attachment = attachments[position]
 
         attachmentDetails.setDetails(attachment)
+        onAttachmentClicked?.let { root.setOnClickListener { it(attachment) } }
+        toggleEndIconVisibility(shouldDisplayCloseButton)
 
-        if (!shouldDisplayCloseButton) {
-            root.setOnClickListener { onAttachmentClicked?.invoke(attachment) }
-        } else {
+        if (shouldDisplayCloseButton) {
             closeButton.apply {
                 contentDescription = context.getString(R.string.contentDescriptionButtonDelete, attachment.name)
                 setOnClickListener {
@@ -68,7 +68,6 @@ class AttachmentAdapter(
                         onDelete?.invoke(index, itemCount)
                     }
                 }
-                isVisible = true
             }
         }
     }
@@ -82,6 +81,11 @@ class AttachmentAdapter(
     fun addAll(newAttachments: List<Attachment>) {
         attachments.addAll(newAttachments)
         notifyItemRangeInserted(attachments.lastIndex, newAttachments.count())
+    }
+
+    private fun ItemAttachmentBinding.toggleEndIconVisibility(shouldDisplayCloseButton: Boolean) {
+        closeButton.isVisible = shouldDisplayCloseButton
+        moreButton.isVisible = !shouldDisplayCloseButton
     }
 
     class AttachmentViewHolder(val binding: ItemAttachmentBinding) : ViewHolder(binding.root)

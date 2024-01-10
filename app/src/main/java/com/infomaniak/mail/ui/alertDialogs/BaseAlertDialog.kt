@@ -30,9 +30,8 @@ import com.infomaniak.lib.core.utils.hideProgress
 import com.infomaniak.lib.core.utils.initProgress
 import com.infomaniak.lib.core.utils.showProgress
 import com.infomaniak.mail.R
-import dagger.hilt.android.qualifiers.ActivityContext
 
-abstract class BaseAlertDialog(@ActivityContext private val activityContext: Context) : DefaultLifecycleObserver {
+abstract class BaseAlertDialog(activityContext: Context) : DefaultLifecycleObserver {
 
     protected val activity = activityContext as AppCompatActivity
 

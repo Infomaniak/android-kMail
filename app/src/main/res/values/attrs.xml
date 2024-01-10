@@ -56,10 +56,13 @@
         <attr name="visibleDivider" format="boolean" />
         <attr name="dividerColor" format="color" />
         <attr name="staffOnly" format="boolean" />
+        <attr name="keepIconTint" format="boolean" />
     </declare-styleable>
 
     <declare-styleable name="AvatarView">
         <attr name="android:src" format="reference|color" />
+        <attr name="inset" format="dimension" />
+        <attr name="padding" />
     </declare-styleable>
 
     <declare-styleable name="ItemSettingView">

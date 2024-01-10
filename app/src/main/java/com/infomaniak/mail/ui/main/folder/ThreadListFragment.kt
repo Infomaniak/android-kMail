@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2023 Infomaniak Network SA
+ * Copyright (C) 2022-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,15 +50,15 @@ import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.stores.StoreUtils
+import com.infomaniak.lib.stores.StoreUtils.APP_UPDATE_TAG
 import com.infomaniak.mail.MatomoMail.trackEvent
+import com.infomaniak.mail.MatomoMail.trackInAppUpdateEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.MatomoMail.trackThreadListEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.LocalSettings.Companion.DEFAULT_SWIPE_ACTION_LEFT
-import com.infomaniak.mail.data.LocalSettings.Companion.DEFAULT_SWIPE_ACTION_RIGHT
 import com.infomaniak.mail.data.LocalSettings.SwipeAction
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity.COMPACT
 import com.infomaniak.mail.data.models.Folder
@@ -68,6 +68,7 @@ import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
+import com.infomaniak.mail.ui.main.settings.swipe.SwipeActionsSettingsFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.*
@@ -153,7 +154,6 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         observeCurrentFolder()
         observeCurrentFolderLive()
         observeUpdatedAtTriggers()
-        observeContacts()
         observerDraftsActionsCompletedWorks()
         observeFlushFolderTrigger()
         observeUpdateInstall()
@@ -230,7 +230,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
     }
 
     private fun refreshThreadsIfNotificationsAreDisabled() = with(mainViewModel) {
-        val areGoogleServicesDisabled = playServicesUtils.areGooglePlayServicesNotAvailable()
+        val areGoogleServicesDisabled = !playServicesUtils.areGooglePlayServicesAvailable()
         val areAppNotifsDisabled = !notificationManagerCompat.areNotificationsEnabled()
         val areMailboxNotifsDisabled = currentMailbox.value?.notificationsIsDisabled(notificationManagerCompat) == true
         val shouldRefreshThreads = areGoogleServicesDisabled || areAppNotifsDisabled || areMailboxNotifsDisabled
@@ -280,7 +280,6 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
 
         threadListAdapter(
             folderRole = mainViewModel.currentFolder.value?.role,
-            contacts = mainViewModel.mergedContactsLive.value ?: emptyMap(),
             onSwipeFinished = { threadListViewModel.isRecoveringFinished.value = true },
             multiSelection = object : MultiSelectionListener<Thread> {
                 override var isEnabled by mainViewModel::isMultiSelectOn
@@ -427,7 +426,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
             SwipeAction.TUTORIAL -> {
                 setDefaultSwipeActions()
                 safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSettingsFragment())
-                findNavController().navigate(R.id.swipeActionsSettingsFragment, null, getAnimatedNavOptions())
+                findNavController().navigate(R.id.swipeActionsSettingsFragment, args = null, getAnimatedNavOptions())
                 true
             }
             SwipeAction.ARCHIVE -> {
@@ -489,8 +488,8 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
     }
 
     private fun setDefaultSwipeActions() = with(localSettings) {
-        if (swipeRight == SwipeAction.TUTORIAL) swipeRight = DEFAULT_SWIPE_ACTION_RIGHT
-        if (swipeLeft == SwipeAction.TUTORIAL) swipeLeft = DEFAULT_SWIPE_ACTION_LEFT
+        if (swipeRight == SwipeAction.TUTORIAL) swipeRight = SwipeActionsSettingsFragment.DEFAULT_SWIPE_ACTION_RIGHT
+        if (swipeLeft == SwipeAction.TUTORIAL) swipeLeft = SwipeActionsSettingsFragment.DEFAULT_SWIPE_ACTION_LEFT
     }
 
     private fun extendCollapseFab(scrollDirection: ScrollDirection) = with(binding) {
@@ -605,10 +604,6 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         threadListViewModel.updatedAtTrigger.observe(viewLifecycleOwner) { updateUpdatedAt() }
     }
 
-    private fun observeContacts() {
-        mainViewModel.mergedContactsLive.observeNotNull(viewLifecycleOwner, threadListAdapter::updateContacts)
-    }
-
     private fun observerDraftsActionsCompletedWorks() {
 
         fun observeDraftsActions() {
@@ -628,17 +623,22 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
 
     private fun observeUpdateInstall() = with(binding) {
         mainViewModel.canInstallUpdate.observe(viewLifecycleOwner) { isUpdateDownloaded ->
+            SentryLog.d(APP_UPDATE_TAG, "Must display update button : $isUpdateDownloaded")
             installUpdateGroup.isVisible = isUpdateDownloaded
             installUpdate.setOnClickListener {
-                trackEvent("inAppUpdate", "installUpdate")
+                SentryLog.d(APP_UPDATE_TAG, "Install downloaded Update from button")
+                context.trackInAppUpdateEvent("installUpdate")
                 mainViewModel.canInstallUpdate.value = false
+                localSettings.hasAppUpdateDownloaded = false
 
-                StoreUtils.installDownloadedUpdate {
-                    Sentry.captureException(it)
-                    // This avoid the user being instantly reprompted to download update
-                    localSettings.isUserWantingUpdates = false
-                    mainViewModel.snackBarManager.setValue(getString(RCore.string.errorUpdateInstall))
-                }
+                StoreUtils.installDownloadedUpdate(
+                    onFailure = {
+                        Sentry.captureException(it)
+                        localSettings.resetUpdateSettings()
+
+                        mainViewModel.snackBarManager.setValue(getString(RCore.string.errorUpdateInstall))
+                    },
+                )
             }
         }
     }

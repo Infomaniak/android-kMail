@@ -61,7 +61,6 @@ class RecipientFieldView @JvmOverloads constructor(
     private var contactAdapter: ContactAdapter
     private var contactChipAdapter: ContactChipAdapter
 
-    private var contactMap: MergedContactDictionary = emptyMap()
     private lateinit var popupRecipient: Recipient
     private var popupDeletesTheCollapsedChip = false
 
@@ -294,9 +293,8 @@ class RecipientFieldView @JvmOverloads constructor(
         textInputLayout.isVisible = isTextInputAccessible
     }
 
-    fun updateContacts(allContacts: List<MergedContact>, newContactMap: MergedContactDictionary) {
+    fun updateContacts(allContacts: List<MergedContact>) {
         contactAdapter.updateContacts(allContacts)
-        contactMap = newContactMap
     }
 
     private fun openAutoCompletion() {
@@ -329,7 +327,7 @@ class RecipientFieldView @JvmOverloads constructor(
     }
 
     private fun showContactContextMenu(recipient: Recipient, anchor: BackspaceAwareChip, isForSingleChip: Boolean = false) {
-        contextMenuBinding.contactDetails.setRecipient(recipient, contactMap)
+        contextMenuBinding.contactDetails.setRecipient(recipient)
 
         popupRecipient = recipient
         popupDeletesTheCollapsedChip = isForSingleChip

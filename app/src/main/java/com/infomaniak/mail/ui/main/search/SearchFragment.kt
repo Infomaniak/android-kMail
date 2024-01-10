@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2023 Infomaniak Network SA
+ * Copyright (C) 2022-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -139,10 +139,7 @@ class SearchFragment : TwoPaneFragment() {
     }
 
     private fun setupAdapter() {
-        threadListAdapter(
-            folderRole = null,
-            contacts = mainViewModel.mergedContactsLive.value ?: emptyMap(),
-        )
+        threadListAdapter(folderRole = null)
     }
 
     private fun setupListeners() = with(binding) {

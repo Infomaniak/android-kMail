@@ -70,6 +70,8 @@ class ActionItemView @JvmOverloads constructor(
                         isGone = true
                     }
                 }
+
+                if (getBoolean(R.styleable.ActionItemView_keepIconTint, false)) button.iconTint = null
             }
         }
     }

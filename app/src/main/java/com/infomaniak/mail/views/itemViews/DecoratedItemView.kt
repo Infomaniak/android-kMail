@@ -94,10 +94,10 @@ sealed class DecoratedItemView @JvmOverloads constructor(
     init {
         attrs?.getAttributes(context, R.styleable.DecoratedItemView) {
             icon = getDrawable(R.styleable.DecoratedItemView_icon)
-            itemStyle = SelectionStyle.values()[getInteger(R.styleable.DecoratedItemView_itemStyle, 0)]
+            itemStyle = SelectionStyle.entries[getInteger(R.styleable.DecoratedItemView_itemStyle, 0)]
             maxLines = getInteger(R.styleable.DecoratedItemView_maxLines, maxLines)
             text = getString(R.styleable.DecoratedItemView_text)
-            textWeight = TextWeight.values()[getInteger(R.styleable.DecoratedItemView_textWeight, 0)]
+            textWeight = TextWeight.entries[getInteger(R.styleable.DecoratedItemView_textWeight, 0)]
         }
     }
 

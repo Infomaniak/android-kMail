@@ -53,16 +53,28 @@ abstract class MenuFoldersFragment : Fragment() {
     protected abstract val isInMenuDrawer: Boolean
 
     protected val defaultFoldersAdapter: FolderAdapter by lazy {
-        defaultFolderAdapter(isInMenuDrawer, onFolderClicked = ::onFolderSelected)
+        defaultFolderAdapter(
+            isInMenuDrawer,
+            onFolderClicked = ::onFolderSelected,
+            onCollapseClicked = ::onFolderCollapse,
+            onCollapseTransition = ::onCollapseTransition,
+        )
     }
 
     protected val customFoldersAdapter: FolderAdapter by lazy {
-        customFolderAdapter(isInMenuDrawer, onFolderClicked = ::onFolderSelected, onCollapseClicked = ::onFolderCollapse)
+        customFolderAdapter(
+            isInMenuDrawer,
+            onFolderClicked = ::onFolderSelected,
+            onCollapseClicked = ::onFolderCollapse,
+            onCollapseTransition = ::onCollapseTransition,
+        )
     }
 
     protected abstract fun onFolderSelected(folderId: String)
 
     protected abstract fun onFolderCollapse(folderId: String, shouldCollapse: Boolean)
+
+    protected abstract fun onCollapseTransition(shouldExclude: Boolean)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

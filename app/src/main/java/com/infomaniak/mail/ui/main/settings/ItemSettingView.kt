@@ -50,7 +50,7 @@ class ItemSettingView @JvmOverloads constructor(
     init {
         attrs?.getAttributes(context, R.styleable.ItemSettingView) {
             with(binding) {
-                action = Action.values()[getInteger(R.styleable.ItemSettingView_itemAction, 0)]
+                action = Action.entries[getInteger(R.styleable.ItemSettingView_itemAction, 0)]
 
                 title.text = getString(R.styleable.ItemSettingView_title) ?: ""
 

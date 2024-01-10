@@ -45,6 +45,7 @@ import com.infomaniak.mail.data.models.message.Message.*
 import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.*
 import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.SharedUtils.Companion.createHtmlForPlainText
 import com.infomaniak.mail.utils.UiUtils.getPrettyNameAndEmail
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.TEXT_HTML
@@ -55,7 +56,6 @@ import com.infomaniak.mail.utils.WebViewUtils.Companion.toggleWebViewTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.jsoup.Jsoup
 import java.util.*
 import com.google.android.material.R as RMaterial
 
@@ -82,7 +82,6 @@ class ThreadAdapter(
 
     private val manuallyAllowedMessageUids = mutableSetOf<String>()
     var isThemeTheSameMap = mutableMapOf<String, Boolean>()
-    var contacts: MergedContactDictionary = emptyMap()
 
     private var threadAdapterCallbacks: ThreadAdapterCallbacks? = null
 
@@ -143,7 +142,6 @@ class ThreadAdapter(
             val message = messages[position]
 
             when (payload) {
-                NotifyType.AVATAR -> if (!message.isDraft) userAvatar.loadAvatar(message.sender, contacts)
                 NotifyType.TOGGLE_LIGHT_MODE -> {
                     isThemeTheSameMap[message.uid] = !isThemeTheSameMap[message.uid]!!
                     holder.toggleContentAndQuoteTheme(message.uid)
@@ -228,13 +226,6 @@ class ThreadAdapter(
         loadDataWithBaseURL("", styledBody, TEXT_HTML, Utils.UTF_8, "")
     }
 
-    private fun createHtmlForPlainText(text: String): String {
-        Jsoup.parse("").apply {
-            body().appendElement("pre").text(text).attr("style", "word-wrap: break-word; white-space: pre-wrap;")
-            return html()
-        }
-    }
-
     private fun WebView.processMailDisplay(styledBody: String, uid: String): String {
         val isDisplayedInDark = context.isNightModeEnabled() && isThemeTheSameMap[uid] == true
         return webViewUtils.processHtmlForDisplay(styledBody, isDisplayedInDark)
@@ -273,7 +264,7 @@ class ThreadAdapter(
             shortMessageDate.text = ""
         } else {
             val firstSender = message.sender
-            userAvatar.loadAvatar(firstSender, contacts)
+            userAvatar.loadAvatar(firstSender)
             expeditorName.apply {
                 text = firstSender?.let { context.getPrettyNameAndEmail(it).first }
                     ?: run { context.getString(R.string.unknownRecipientTitle) }
@@ -536,11 +527,6 @@ class ThreadAdapter(
 
     fun isMessageUidManuallyAllowed(messageUid: String) = manuallyAllowedMessageUids.contains(messageUid)
 
-    fun updateContacts(newContacts: MergedContactDictionary) {
-        contacts = newContacts
-        notifyItemRangeChanged(0, itemCount, NotifyType.AVATAR)
-    }
-
     fun toggleLightMode(message: Message) {
         val index = messages.indexOf(message)
         notifyItemChanged(index, NotifyType.TOGGLE_LIGHT_MODE)
@@ -562,7 +548,6 @@ class ThreadAdapter(
     }
 
     private enum class NotifyType {
-        AVATAR,
         TOGGLE_LIGHT_MODE,
         RE_RENDER,
         FAILED_MESSAGE,

@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2023 Infomaniak Network SA
+ * Copyright (C) 2022-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@ package com.infomaniak.mail.ui.main.thread
 
 import android.app.Application
 import androidx.lifecycle.*
-import com.infomaniak.lib.core.utils.DownloadManagerUtils
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.trackUserInfo
 import com.infomaniak.mail.data.api.ApiRepository
@@ -144,7 +143,7 @@ class ThreadViewModel @Inject constructor(
         }
     }
 
-    fun assembleSubjectData(mergedContactsLive: LiveData<MergedContactDictionary?>): LiveData<SubjectDataResult> {
+    fun assembleSubjectData(mergedContactsLive: LiveData<MergedContactDictionary>): LiveData<SubjectDataResult> {
 
         return MediatorLiveData<SubjectDataResult>().apply {
 
@@ -205,12 +204,6 @@ class ThreadViewModel @Inject constructor(
         val thread = threadLive.value ?: return@launch
         val message = messageController.getLastMessageToExecuteAction(thread)
         quickActionBarClicks.postValue(QuickActionBarResult(thread.uid, message, menuId))
-    }
-
-    fun scheduleDownload(downloadUrl: String, filename: String) = viewModelScope.launch(ioCoroutineContext) {
-        if (ApiRepository.ping().isSuccess()) {
-            DownloadManagerUtils.scheduleDownload(context, downloadUrl, filename)
-        }
     }
 
     data class SubjectDataResult(

@@ -22,8 +22,8 @@ android {
         applicationId 'com.infomaniak.mail'
         minSdk 25
         targetSdk 34
-        versionCode 1_01_001_01
-        versionName '1.1.1'
+        versionCode 1_01_005_01
+        versionName '1.1.5'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 
         setProperty "archivesBaseName", "infomaniak-mail-$versionName ($versionCode)"
@@ -96,6 +96,7 @@ dependencies {
     implementation libs.flexbox
     implementation libs.lifecycle.process
     implementation libs.webkit
+    implementation libs.work.concurrent.futures
     implementation libs.work.runtime.ktx
 
     implementation libs.hilt.android

@@ -123,9 +123,11 @@ class AccountFragment : Fragment(), MailboxListFragment {
     }
 
     private fun showEasterEggHalloween() {
+
         val calendar = Calendar.getInstance()
         val month = calendar.get(Calendar.MONTH)
         val day = calendar.get(Calendar.DAY_OF_MONTH)
+
         if ((month == Calendar.OCTOBER && day >= 26) || (month == Calendar.NOVEMBER && day <= 1)) {
             binding.easterEggHalloween.isVisible = true
             Sentry.withScope { scope ->

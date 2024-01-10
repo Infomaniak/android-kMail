@@ -213,7 +213,7 @@ class AiPropositionFragment : Fragment() {
     }
 
     private fun onMenuItemClicked(menuItemId: Int) = with(aiViewModel) {
-        val shortcut = Shortcut.values().find { it.menuId == menuItemId }!!
+        val shortcut = Shortcut.entries.find { it.menuId == menuItemId }!!
         trackAiWriterEvent(shortcut.matomoValue)
 
         if (shortcut == Shortcut.MODIFY) {

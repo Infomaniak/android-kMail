@@ -48,7 +48,13 @@ class SnackBarManager {
             val buttonTitle = buttonTitleRes ?: RCore.string.buttonCancel
 
             previousSnackbar?.dismiss()
-            previousSnackbar = showSnackbar(view, title, getAnchor?.invoke(), buttonTitle, onActionClicked = safeAction)
+            previousSnackbar = showSnackbar(
+                view = view,
+                title = title,
+                anchor = getAnchor?.invoke(),
+                actionButtonTitle = buttonTitle,
+                onActionClicked = safeAction,
+            )
         }
     }
 

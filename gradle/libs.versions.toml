@@ -1,26 +1,28 @@
 [versions]
-androidGradlePlugin = "8.1.4"
+androidGradlePlugin = "8.2.1"
 dotsindicator = "5.0"
 dragdropswipeRecyclerview = "1.2.0"
-firebaseMessagingKtx = "23.3.1"
+firebaseMessagingKtx = "23.4.0"
 flexbox = "3.0.0"
-googleServices = "4.3.15"
-hiltAndroid = "2.48.1"
+googleServices = "4.4.0"
+hiltAndroid = "2.50"
 hiltAndroidx = "1.1.0"
-jsoup = "1.17.1"
+jsoup = "1.17.2"
 junitJupiterEngine = "5.10.1"
 kapt = "1.8.22"
-kotlin = "1.8.22"
+kotlin = "1.9.22"
+ksp = "1.9.22-1.0.16"
 leakcanaryAndroid = "2.12"
 lifecycleProcess = "2.6.2"
-lottie = "6.2.0"
-navigation = "2.6.0"
-realmKotlin = "1.12.0"
-sentryAndroidFragment = "6.29.0"
+lottie = "6.3.0"
+navigation = "2.7.6"
+realmKotlin = "1.13.0"
+sentryAndroidFragment = "7.1.0"
 slidingPaneLayout = "1.2.0"
 testRunner = "1.5.2"
-webkit = "1.8.0"
-workRuntimeKtx = "2.8.1"
+webkit = "1.9.0"
+workConcurrentFutures = "1.1.0"
+workRuntimeKtx = "2.9.0"
 
 [libraries]
 dotsindicator = { module = "com.tbuonomo:dotsindicator", version.ref = "dotsindicator" }
@@ -41,6 +43,7 @@ realm-kotlin-base = { module = "io.realm.kotlin:library-base", version.ref = "re
 sentry-android-fragment = { module = "io.sentry:sentry-android-fragment", version.ref = "sentryAndroidFragment" }
 slidingpanelayout = { module = "androidx.slidingpanelayout:slidingpanelayout", version.ref = "slidingPaneLayout" }
 webkit = { module = "androidx.webkit:webkit", version.ref = "webkit" }
+work-concurrent-futures = { module = "androidx.concurrent:concurrent-futures-ktx", version.ref = "workConcurrentFutures" }
 work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
 # Unit tests
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junitJupiterEngine" }
@@ -53,4 +56,5 @@ dagger-hilt = { id = "com.google.dagger.hilt.android", version.ref = "hiltAndroi
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 jetbrains-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kapt" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 realm-kotlin = { id = "io.realm.kotlin", version.ref = "realmKotlin" }

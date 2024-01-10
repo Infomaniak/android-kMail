@@ -17,21 +17,14 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
-import android.content.Context
 import com.infomaniak.lib.core.utils.contains
-import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
-import com.infomaniak.mail.data.models.Attachment
-import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.ui.main.thread.MessageWebViewClient.Companion.CID_SCHEME
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.MessageBodyUtils
-import com.infomaniak.mail.utils.toDate
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
@@ -41,16 +34,12 @@ import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
-import org.jsoup.nodes.Element
-import org.jsoup.nodes.TextNode
 import javax.inject.Inject
 
 class DraftController @Inject constructor(
-    private val appContext: Context,
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val mailboxController: MailboxController,
+    private val replyForwardFooterManager: ReplyForwardFooterManager,
 ) {
 
     //region Get data
@@ -99,7 +88,7 @@ class DraftController @Inject constructor(
                 draft.to = toList.toRealmList()
                 draft.cc = ccList.toRealmList()
 
-                draft.body += appContext.replyQuote(previousMessage)
+                draft.body += replyForwardFooterManager.createReplyFooter(previousMessage)
             }
             DraftMode.FORWARD -> {
                 draft.forwardedUid = previousMessage.uid
@@ -111,7 +100,7 @@ class DraftController @Inject constructor(
                     }
                 }
 
-                draft.body += appContext.forwardQuote(previousMessage, draft.attachments)
+                draft.body += replyForwardFooterManager.createForwardFooter(previousMessage, draft.attachments)
             }
             DraftMode.NEW_MAIL -> Unit
         }
@@ -124,104 +113,6 @@ class DraftController @Inject constructor(
         val hasFailedFetching = deleted.isNotEmpty() || failed.isNotEmpty()
         return MessageController.getMessage(message.uid, realm)!! to hasFailedFetching
     }
-
-    private fun Context.replyQuote(message: Message): String {
-
-        val date = message.date.toDate()
-        val from = message.fromName()
-        val messageReplyHeader = getString(R.string.messageReplyHeader, date, from)
-
-        val previousBody = getHtmlDocument(message)?.let { document ->
-            val attachmentsMap = message.attachments.associate { it.contentId to it.name }
-
-            document.doOnHtmlImage { imageElement ->
-                attachmentsMap[getCid(imageElement)]?.let { name ->
-                    imageElement.replaceWith(TextNode("<$name>"))
-                }
-            }
-
-            return@let document.outerHtml()
-        } ?: ""
-
-        val previousFullBody = computePreviousFullBody(previousBody, message)
-
-        return """
-            <div id=\"answerContentMessage\" class="${MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME}" >
-            <div>$messageReplyHeader</div>
-            <blockquote class=\"ws-ng-quote\">
-            $previousFullBody
-            </blockquote>
-        </div>
-        """.trimIndent()
-    }
-
-    private fun computePreviousFullBody(previousBody: String, message: Message): String {
-        return message.body?.let { body ->
-            MessageBodyUtils.mergeSplitBodyAndSubBodies(previousBody, body.subBodies, message.uid)
-        } ?: previousBody
-    }
-
-    private fun Context.forwardQuote(message: Message, attachmentsToForward: List<Attachment>): String {
-
-        val messageForwardHeader = getString(R.string.messageForwardHeader)
-        val fromTitle = getString(R.string.fromTitle)
-        val dateTitle = getString(R.string.dateTitle)
-        val subjectTitle = getString(R.string.subjectTitle)
-        val toTitle = getString(R.string.toTitle)
-        val ccTitle = getString(R.string.ccTitle)
-
-        val previousBody = getHtmlDocument(message)?.let { document ->
-            val attachmentsMap = message.attachments.associate { oldAttachment ->
-                val newAttachment = attachmentsToForward.find { it.originalContentId == oldAttachment.contentId }
-
-                oldAttachment.contentId to newAttachment?.contentId
-            }
-
-            document.doOnHtmlImage { imageElement ->
-                attachmentsMap[getCid(imageElement)]?.let { newContentId ->
-                    imageElement.attr(SRC_ATTRIBUTE, "$CID_PROTOCOL$newContentId")
-                }
-            }
-
-            return@let document.outerHtml()
-        } ?: ""
-
-        val ccList = if (message.cc.isNotEmpty()) {
-            "<div>$ccTitle ${message.cc.joinToString { it.quotedDisplay() }}<br></div>"
-        } else {
-            ""
-        }
-
-        val previousFullBody = computePreviousFullBody(previousBody, message)
-
-        return """
-            <div class="${MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME}">
-            <div>---------- $messageForwardHeader ---------<br></div>
-            <div>$fromTitle ${message.fromName()}<br></div>
-            <div>$dateTitle ${message.date.toDate()}<br></div>
-            <div>$subjectTitle ${message.subject}<br></div>
-            <div>$toTitle ${message.to.joinToString { it.quotedDisplay() }}<br></div>
-            $ccList
-            <div><br></div>
-            <div><br></div>
-            $previousFullBody
-            </div>
-        """.trimIndent()
-    }
-
-    private fun getHtmlDocument(message: Message) = message.body?.value?.let(Jsoup::parse)
-
-    private fun getCid(imageElement: Element) = imageElement.attr(SRC_ATTRIBUTE).removePrefix(CID_PROTOCOL)
-
-    private fun Document.doOnHtmlImage(actionOnImage: (Element) -> Unit) {
-        select(CID_IMAGE_CSS_QUERY).forEach { imageElement -> actionOnImage(imageElement) }
-    }
-
-    private fun Message.fromName(): String {
-        return sender?.quotedDisplay() ?: appContext.getString(R.string.unknownRecipientTitle)
-    }
-
-    private fun Recipient.quotedDisplay(): String = "${("$name ").ifBlank { "" }}&lt;$email&gt;"
 
     private fun formatSubject(draftMode: DraftMode, subject: String): String {
 
@@ -245,10 +136,6 @@ class DraftController @Inject constructor(
         private const val PREFIX_FORWARD = "Fw: "
         private const val REGEX_REPLY = "(re|ref|aw|rif|r):"
         private const val REGEX_FORWARD = "(fw|fwd|rv|wg|tr|i):"
-
-        private const val CID_PROTOCOL = "$CID_SCHEME:"
-        private const val SRC_ATTRIBUTE = "src"
-        private const val CID_IMAGE_CSS_QUERY = "img[$SRC_ATTRIBUTE^='$CID_PROTOCOL']"
 
         //region Queries
         private fun getDraftsQuery(query: String? = null, realm: TypedRealm): RealmQuery<Draft> = with(realm) {

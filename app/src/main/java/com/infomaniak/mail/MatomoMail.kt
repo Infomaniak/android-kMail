@@ -18,6 +18,7 @@
 package com.infomaniak.mail
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavDestination
@@ -55,6 +56,7 @@ object MatomoMail : MatomoCore {
     const val ACTION_POSTPONE_NAME = "postpone"
     const val ADD_MAILBOX_NAME = "addMailbox"
     const val DISCOVER_LATER = "discoverLater"
+    const val DISCOVER_NOW = "discoverNow"
     const val SEARCH_FOLDER_FILTER_NAME = "folderFilter"
     const val SEARCH_DELETE_NAME = "deleteSearch"
     const val SEARCH_VALIDATE_NAME = "validateSearch"
@@ -141,7 +143,7 @@ object MatomoMail : MatomoCore {
     }
 
     fun Context.trackNotificationActionEvent(name: String) {
-        trackEvent(category = "notificationAction", name = name)
+        trackEvent(category = "notificationActions", name = name)
     }
 
     fun Fragment.trackNewMessageEvent(name: String) {
@@ -183,7 +185,7 @@ object MatomoMail : MatomoCore {
     }
 
     fun Fragment.trackOnBoardingEvent(name: String) {
-        trackEvent("onBoarding", name)
+        trackEvent("onboarding", name)
     }
 
     fun Fragment.trackThreadListEvent(name: String) {
@@ -232,6 +234,18 @@ object MatomoMail : MatomoCore {
 
     fun Context.trackEasterEggEvent(name: String, action: TrackerAction = TrackerAction.CLICK) {
         trackEvent("easterEgg", name, action)
+    }
+
+    fun Activity.trackAppReviewEvent(name: String, action: TrackerAction = TrackerAction.CLICK) {
+        trackEvent("appReview", name, action)
+    }
+
+    fun Fragment.trackAppUpdateEvent(name: String) {
+        trackEvent("appUpdate", name)
+    }
+
+    fun Context.trackInAppUpdateEvent(name: String) {
+        trackEvent("inAppUpdate", name)
     }
 
     // We need to invert this logical value to keep a coherent value for analytics because actions
