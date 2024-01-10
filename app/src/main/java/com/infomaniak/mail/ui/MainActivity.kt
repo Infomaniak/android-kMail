@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
@@ -206,10 +205,12 @@ class MainActivity : BaseActivity() {
 
         loadCurrentMailbox()
 
-        permissionUtils.requestMainPermissionsIfNeeded()
-
-        // TODO make this only after login
-        navController.navigate(R.id.permissionsOnboardingPagerFragment)
+        if (localSettings.appLaunches == 0) {
+            // TODO make this only after login
+            navController.navigate(R.id.permissionsOnboardingPagerFragment)
+        } else {
+            permissionUtils.requestMainPermissionsIfNeeded()
+        }
 
         initAppUpdateManager()
     }
@@ -425,7 +426,7 @@ class MainActivity : BaseActivity() {
 
     private fun registerMainPermissions() {
         permissionUtils.registerMainPermissions { permissionsResults ->
-            if (permissionsResults[Manifest.permission.READ_CONTACTS] == true) mainViewModel.updateUserInfo()
+            if (permissionsResults[PermissionUtils.READ_CONTACTS_PERMISSION] == true) mainViewModel.updateUserInfo()
         }
     }
 

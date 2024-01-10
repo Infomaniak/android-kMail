@@ -22,11 +22,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentPermissionsOnboardingPagerBinding
+import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.PermissionUtils
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -35,11 +37,13 @@ import javax.inject.Inject
 class PermissionsOnboardingPagerFragment : Fragment() {
 
     private var binding: FragmentPermissionsOnboardingPagerBinding by safeBinding()
-
-    private val permissionUtils by lazy { PermissionUtils(this) }
+    private val mainViewModel: MainViewModel by activityViewModels()
 
     @Inject
     lateinit var localSettings: LocalSettings
+
+    @Inject
+    lateinit var permissionUtils: PermissionUtils
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentPermissionsOnboardingPagerBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -47,6 +51,8 @@ class PermissionsOnboardingPagerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
+
+        permissionUtils.registerReadContactsPermission(fragment = this@PermissionsOnboardingPagerFragment)
 
         permissionsViewpager.apply {
             adapter = PermissionsPagerAdapter(childFragmentManager, viewLifecycleOwner.lifecycle)
@@ -56,7 +62,10 @@ class PermissionsOnboardingPagerFragment : Fragment() {
         continueButton.setOnClickListener {
             when (permissionsViewpager.currentItem) {
                 0 -> {
-                    // permissionUtils.requestMainPermissionsIfNeeded()
+                    permissionUtils.requestReadContactsPermission {
+                        mainViewModel.updateUserInfo()
+                        permissionsViewpager.currentItem += 1
+                    }
                 }
                 1 -> {
                     // TODO: write in localSettings ?
@@ -64,7 +73,6 @@ class PermissionsOnboardingPagerFragment : Fragment() {
                 }
             }
 
-            permissionsViewpager.currentItem += 1
         }
     }
 }
