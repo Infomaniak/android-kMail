@@ -48,6 +48,8 @@ import androidx.lifecycle.*
 import androidx.navigation.NavDirections
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.ViewPager2
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.SimpleColorFilter
@@ -624,4 +626,10 @@ fun ShapeableImageView.setInnerStrokeWidth(strokeWidth: Float) {
     this.strokeWidth = strokeWidth
     val halfStrokeWidth = (strokeWidth / 2.0f).roundToInt()
     setPaddingRelative(halfStrokeWidth, halfStrokeWidth, halfStrokeWidth, halfStrokeWidth)
+}
+
+fun ViewPager2.removeOverScrollForApiBelow31() {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+        (getChildAt(0) as? RecyclerView)?.overScrollMode = View.OVER_SCROLL_NEVER
+    }
 }

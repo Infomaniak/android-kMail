@@ -30,6 +30,7 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentPermissionsOnboardingPagerBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.PermissionUtils
+import com.infomaniak.mail.utils.removeOverScrollForApiBelow31
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -60,6 +61,7 @@ class PermissionsOnboardingPagerFragment : Fragment() {
         permissionsViewpager.apply {
             adapter = PermissionsPagerAdapter(childFragmentManager, viewLifecycleOwner.lifecycle)
             isUserInputEnabled = false
+            removeOverScrollForApiBelow31()
         }
 
         continueButton.setOnClickListener {

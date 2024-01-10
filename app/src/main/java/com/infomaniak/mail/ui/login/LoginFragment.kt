@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui.login
 
 import android.content.res.ColorStateList
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -30,7 +29,6 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.infomaniak.lib.core.R
 import com.infomaniak.lib.core.utils.*
@@ -42,6 +40,7 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.utils.LoginUtils
 import com.infomaniak.mail.utils.UiUtils
+import com.infomaniak.mail.utils.removeOverScrollForApiBelow31
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
@@ -99,9 +98,7 @@ class LoginFragment : Fragment() {
                 }
             })
 
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
-                removeOverScroll()
-            }
+            removeOverScrollForApiBelow31()
         }
 
         dotsIndicator.apply {
@@ -191,10 +188,6 @@ class LoginFragment : Fragment() {
         connectButtonProgressTimer.cancel()
         connectButton.hideProgress(R.string.connect)
         signInButton.isEnabled = true
-    }
-
-    private fun ViewPager2.removeOverScroll() {
-        (getChildAt(0) as? RecyclerView)?.overScrollMode = View.OVER_SCROLL_NEVER
     }
 
     private fun getViewPagerCurrentItem(): Int = binding.introViewpager.currentItem
