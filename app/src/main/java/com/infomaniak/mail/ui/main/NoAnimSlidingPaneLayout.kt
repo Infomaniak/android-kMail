@@ -25,11 +25,11 @@ import androidx.slidingpanelayout.widget.SlidingPaneLayout
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 
-class NoAnimSlidingPaneLayout(
+class NoAnimSlidingPaneLayout @JvmOverloads constructor(
     context: Context,
-    attrs: AttributeSet?,
-    defStyle: Int,
-) : SlidingPaneLayout(context, attrs, defStyle) {
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0,
+) : SlidingPaneLayout(context, attrs, defStyleAttr) {
 
     private var slideOffsetField: Field? = null
     private var slideableViewField: Field? = null
@@ -39,8 +39,6 @@ class NoAnimSlidingPaneLayout(
     private var dispatchOnPanelOpenedMethod: Method? = null
     private var dispatchOnPanelClosedMethod: Method? = null
     private var updateObscuredViewsVisibilityMethod: Method? = null
-
-    constructor(context: Context, attrs: AttributeSet? = null) : this(context, attrs, defStyle = 0)
 
     init {
         runCatching {
