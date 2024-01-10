@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui.main.thread
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.trackUserInfo
@@ -193,19 +192,15 @@ class ThreadViewModel @Inject constructor(
         fetchCalendarEvent?.cancel()
         fetchCalendarEvent = viewModelScope.launch(ioCoroutineContext) {
             mailboxContentRealm().writeBlocking {
-                Log.e("gibran", "fetchCalendarEvents: Start loop to fetch data", );
                 messages.forEach { message ->
                     val isNewMessage = treatedMessagesForCalendarEvent.add(message.uid)
-                    Log.i("gibran", "fetchCalendarEvents - isNewMessage: ${isNewMessage}")
                     if (!isNewMessage) return@forEach
 
                     val icsAttachments = message.attachments.filter { it.mimeType == "application/ics" }
-                    Log.i("gibran", "fetchCalendarEvents - icsAttachments.count(): ${icsAttachments.count()}")
                     if (icsAttachments.count() != 1) return@forEach
 
                     val icsAttachment = icsAttachments.single()
 
-                    Log.i("gibran", "fetchCalendarEvents - Gotta fetch the attachment with attachmentPartId: ${icsAttachment.partId}")
                     val calendarEventResponse = ApiRepository.getAttachmentCalendarEvent(
                         currentMailboxUuid,
                         message.folderId,

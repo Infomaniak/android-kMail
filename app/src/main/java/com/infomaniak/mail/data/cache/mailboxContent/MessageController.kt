@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
-import android.util.Log
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -147,10 +146,8 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
     }
 
     fun updateCalendarEvent(messageUid: String, calendarEventResponse: CalendarEventResponse, realm: MutableRealm) {
-        Log.e("gibran", "updateCalendarEvent: Asking to write calendarEventResponse: $calendarEventResponse to messageUid: $messageUid");
         getMessage(messageUid, realm)?.let { message ->
             message.latestCalendarEventResponse = calendarEventResponse
-            Log.i("gibran", "updateCalendarEvent - DONE: update to message.latestCalendarEventResponse: ${message.latestCalendarEventResponse}")
         } ?: run {
             Sentry.withScope { scope ->
                 scope.level = SentryLevel.ERROR

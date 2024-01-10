@@ -21,7 +21,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.text.format.Formatter
-import android.util.Log
 import android.view.*
 import android.webkit.WebView
 import android.webkit.WebView.HitTestResult
@@ -176,7 +175,6 @@ class ThreadAdapter(
     }
 
     private fun ThreadViewHolder.bindCalendarEvent(calendarEvent: CalendarEvent?) {
-        Log.v("gibran", "bindCalendarEvent - binding thread with calendarEvent: ${calendarEvent}")
         binding.calendarEvent.isVisible = calendarEvent != null
         binding.calendarEvent.initCallback { attendees ->
             threadAdapterCallbacks?.navigateToAttendeeBottomSheet?.invoke(attendees)
