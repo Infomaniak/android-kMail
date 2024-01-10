@@ -224,8 +224,11 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
 
-        val isLeftShown = areBothShown() || isOnlyLeftShown() // TODO: Only works on Phone, and not on Tablet.
-        val statusBarColor = if (isLeftShown) R.color.backgroundHeaderColor else R.color.backgroundColor
+        val statusBarColor = if (isThreadOpen() && (isPhone() || isTabletInPortrait())) {
+            R.color.backgroundColor
+        } else {
+            R.color.backgroundHeaderColor
+        }
         requireActivity().window.statusBarColor = requireContext().getColor(statusBarColor)
     }
 

@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2023 Infomaniak Network SA
+ * Copyright (C) 2022-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -146,6 +146,18 @@ fun Date.isLastWeek(): Boolean {
 
 //region UI
 fun Context.isInPortrait(): Boolean = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+
+fun Fragment.isPhone(): Boolean = requireContext().isPhone()
+fun Context.isPhone(): Boolean = !isTablet()
+
+fun Fragment.isTablet(): Boolean = requireContext().isTablet()
+fun Context.isTablet(): Boolean = resources.getBoolean(R.bool.isTablet)
+
+fun Fragment.isTabletInLandscape(): Boolean = requireContext().isTabletInLandscape()
+fun Context.isTabletInLandscape(): Boolean = resources.getBoolean(R.bool.isTabletInLandscape)
+
+fun Fragment.isTabletInPortrait(): Boolean = requireContext().isTabletInPortrait()
+fun Context.isTabletInPortrait(): Boolean = isTablet() && !isTabletInLandscape()
 
 fun View.toggleChevron(
     isCollapsed: Boolean,
