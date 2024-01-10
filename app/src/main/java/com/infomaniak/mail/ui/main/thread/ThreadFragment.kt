@@ -22,6 +22,7 @@ import android.content.res.Configuration
 import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -335,6 +336,7 @@ class ThreadFragment : Fragment() {
 
             threadViewModel.fetchMessagesHeavyData(messages)
 
+            Log.e("gibran", "observeMessagesLive - Messages notified modif and getCalendarEventTreatedMessageCount() != messages.count(): ${threadViewModel.getCalendarEventTreatedMessageCount() != messages.count()}")
             val currentMailboxUuid = mainViewModel.currentMailbox.value!!.uuid // TODO : What do we do if value is null?
             if (threadViewModel.getCalendarEventTreatedMessageCount() != messages.count()) {
                 threadViewModel.fetchCalendarEvents(messages, currentMailboxUuid)

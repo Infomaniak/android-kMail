@@ -15,17 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-@file:UseSerializers(RealmListKSerializer::class)
+@file:UseSerializers(RealmListKSerializer::class, RealmInstantSerializer::class)
 
 package com.infomaniak.mail.data.models.calendar
 
+import com.infomaniak.mail.data.api.RealmInstantSerializer
+import com.infomaniak.mail.utils.toRealmInstant
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.serializers.RealmListKSerializer
 import io.realm.kotlin.types.EmbeddedRealmObject
+import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmList
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
+import java.util.Date
 
 @Serializable
 class CalendarEvent : EmbeddedRealmObject {
@@ -35,15 +39,13 @@ class CalendarEvent : EmbeddedRealmObject {
     var location: String? = null
     @SerialName("fullday")
     var fullDay: Boolean = false
-    var start: String = "" // TODO : Date
-    var end: String = "" // TODO : Date
+    var start: RealmInstant = Date(0).toRealmInstant()
+    var end: RealmInstant = Date(0).toRealmInstant()
     var timezone: String? = null
     @SerialName("timezone_start")
     private var timezoneStart: String = ""
     @SerialName("timezone_end")
     private var timezoneEnd: String = ""
-    @SerialName("done")
-    var hasPassed: Boolean = false
     var attendees: RealmList<Attendee> = realmListOf()
 
     override fun equals(other: Any?): Boolean {
@@ -62,7 +64,6 @@ class CalendarEvent : EmbeddedRealmObject {
         if (timezone != other.timezone) return false
         if (timezoneStart != other.timezoneStart) return false
         if (timezoneEnd != other.timezoneEnd) return false
-        if (hasPassed != other.hasPassed) return false
         return attendees == other.attendees
     }
 
@@ -77,7 +78,6 @@ class CalendarEvent : EmbeddedRealmObject {
         result = 31 * result + (timezone?.hashCode() ?: 0)
         result = 31 * result + timezoneStart.hashCode()
         result = 31 * result + timezoneEnd.hashCode()
-        result = 31 * result + hasPassed.hashCode()
         result = 31 * result + attendees.hashCode()
         return result
     }

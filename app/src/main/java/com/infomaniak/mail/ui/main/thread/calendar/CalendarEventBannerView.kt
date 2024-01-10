@@ -18,16 +18,22 @@
 package com.infomaniak.mail.ui.main.thread.calendar
 
 import android.content.Context
+import android.os.Build
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.google.android.material.button.MaterialButton
+import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.calendar.Attendee
+import com.infomaniak.mail.data.models.calendar.CalendarEvent
 import com.infomaniak.mail.databinding.ViewCalendarEventBannerBinding
 import com.infomaniak.mail.utils.UiUtils.getPrettyNameAndEmail
+import com.infomaniak.mail.utils.toDate
+import java.time.format.FormatStyle
+import java.util.Date
 
 class CalendarEventBannerView @JvmOverloads constructor(
     context: Context,
@@ -39,36 +45,47 @@ class CalendarEventBannerView @JvmOverloads constructor(
 
     private var navigateToAttendeesBottomSheet: ((List<Attendee>) -> Unit)? = null
 
-    private val attendees = listOf<Attendee>() // TODO : Use real data instead
-
     init {
         with(binding) {
-            // TODO : Use event values
-            eventName.text = "Réunion Produit"
-            eventDate.text = "Mardi 28 novembre 2023"
-            eventHour.text = "09:00-10:00 (CET)"
-            eventLocation.text = "Genève"
-
             yesButton.handleChoiceButtonBehavior()
             maybeButton.handleChoiceButtonBehavior()
             noButton.handleChoiceButtonBehavior()
 
-            val iAmPartOfAttendees = attendees.any { it.isMe() }
-            notPartOfAttendeesWarning.isGone = iAmPartOfAttendees
-            participationButtons.isVisible = iAmPartOfAttendees
-
-            attendeesLayout.isGone = attendees.isEmpty()
-
-            attendeesButton.apply {
-                addOnCheckedChangeListener { _, isChecked ->
-                    attendeesSubMenu.isVisible = isChecked
-                }
+            attendeesButton.addOnCheckedChangeListener { _, isChecked ->
+                attendeesSubMenu.isVisible = isChecked
             }
-
-            displayOrganizer()
-            allAttendeesButton.setOnClickListener { navigateToAttendeesBottomSheet?.invoke(attendees) }
-            manyAvatarsView.setAttendees(attendees)
         }
+    }
+
+    fun loadCalendarEvent(calendarEvent: CalendarEvent) = with(binding) {
+        val startDate = calendarEvent.start.toDate()
+        val endDate = calendarEvent.end.toDate()
+
+        pastEventWarning.isVisible = startDate > Date()
+
+        eventName.text = calendarEvent.title
+
+        eventDate.text = if (startDate.isSameDayAs(endDate)) {
+            startDate.formatFullDate()
+        } else {
+            "${startDate.formatMediumDate()} - ${endDate.formatMediumDate()}"
+        }
+
+        eventHour.text = "${startDate.formatShortHour()} - ${endDate.formatShortHour()}"
+
+        eventLocation.apply {
+            isVisible = calendarEvent.location != null
+            text = calendarEvent.location
+        }
+
+        val iAmPartOfAttendees = calendarEvent.attendees.any { it.isMe() }
+        notPartOfAttendeesWarning.isGone = iAmPartOfAttendees
+        participationButtons.isVisible = iAmPartOfAttendees
+        attendeesLayout.isGone = calendarEvent.attendees.isEmpty()
+
+        displayOrganizer(calendarEvent.attendees)
+        allAttendeesButton.setOnClickListener { navigateToAttendeesBottomSheet?.invoke(calendarEvent.attendees) }
+        manyAvatarsView.setAttendees(calendarEvent.attendees)
     }
 
     fun initCallback(navigateToAttendeesBottomSheet: (List<Attendee>) -> Unit) {
@@ -89,7 +106,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
         noButton.isChecked = false
     }
 
-    private fun displayOrganizer() = with(binding) {
+    private fun displayOrganizer(attendees: List<Attendee>) = with(binding) {
         val organizer = attendees.singleOrNull(Attendee::isOrganizer)
         organizerLayout.isGone = organizer == null
 
@@ -98,6 +115,30 @@ class CalendarEventBannerView @JvmOverloads constructor(
 
             val (name, _) = context.getPrettyNameAndEmail(attendee)
             organizerName.text = context.getString(R.string.calendarOrganizerName, name)
+        }
+    }
+
+    private fun Date.formatFullDate(): String {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            formatWithLocal(FormatStyle.FULL, FormatData.DATE)
+        } else {
+            format(FORMAT_FULL_DATE) // Fallback on day, month, year ordering for everyone
+        }
+    }
+
+    private fun Date.formatMediumDate(): String {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            formatWithLocal(FormatStyle.MEDIUM, FormatData.DATE)
+        } else {
+            format(FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR) // Fallback on textual day, day, month, year ordering for everyone
+        }
+    }
+
+    private fun Date.formatShortHour(): String {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            formatWithLocal(FormatStyle.SHORT, FormatData.HOUR)
+        } else {
+            format(FORMAT_DATE_HOUR_MINUTE) // Fallback on 24 hours separated by colon format for everyone
         }
     }
 }

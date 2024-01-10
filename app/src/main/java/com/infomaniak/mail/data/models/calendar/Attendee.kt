@@ -28,7 +28,6 @@ import kotlinx.parcelize.Parceler
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 
 @Parcelize
 @Serializable
@@ -39,11 +38,9 @@ class Attendee() : EmbeddedRealmObject, Correspondent {
     @SerialName("organizer")
     var isOrganizer = false
     @SerialName("state")
-    var _state = ""
+    private var _state = ""
 
-    @Transient
-    @Ignore // TODO : Put this enum in realm
-    var state = AttendanceState.NEEDS_ACTION
+    val state get() = AttendanceState.entries.firstOrNull { it.apiValue == _state } ?: AttendanceState.NEEDS_ACTION
 
     @delegate:Ignore
     override val initials by lazy { computeInitials() }
@@ -52,19 +49,19 @@ class Attendee() : EmbeddedRealmObject, Correspondent {
         email: String,
         name: String,
         isOrganizer: Boolean,
-        state: AttendanceState,
+        state: String,
     ) : this() {
         this.email = email
         this.name = name
         this.isOrganizer = isOrganizer
-        this.state = state
+        _state = state
     }
 
-    enum class AttendanceState(val id: Int, @DrawableRes val icon: Int?, @ColorRes val iconColor: Int?) {
-        ACCEPTED(0, R.drawable.ic_check_rounded, R.color.greenSuccess),
-        NEEDS_ACTION(1, null, null),
-        TENTATIVE(2, R.drawable.ic_calendar_maybe, R.color.iconColorSecondaryText),
-        DECLINED(3, R.drawable.ic_calendar_no, R.color.redDestructiveAction),
+    enum class AttendanceState(val apiValue: String, @DrawableRes val icon: Int?, @ColorRes val iconColor: Int?) {
+        ACCEPTED("ACCEPTED", R.drawable.ic_check_rounded, R.color.greenSuccess),
+        NEEDS_ACTION("NEEDS-ACTION", null, null),
+        TENTATIVE("TENTATIVE", R.drawable.ic_calendar_maybe, R.color.iconColorSecondaryText),
+        DECLINED("DECLINED", R.drawable.ic_calendar_no, R.color.redDestructiveAction), ;
     }
 
     override fun equals(other: Any?): Boolean {
@@ -92,8 +89,7 @@ class Attendee() : EmbeddedRealmObject, Correspondent {
             val email = parcel.readString()!!
             val name = parcel.readString()!!
             val isOrganizer = parcel.customReadBoolean()
-            val stateId = parcel.readInt()
-            val state = enumValues<AttendanceState>().single { it.id == stateId }
+            val state = parcel.readString()!!
 
             return Attendee(email, name, isOrganizer, state)
         }
@@ -102,7 +98,7 @@ class Attendee() : EmbeddedRealmObject, Correspondent {
             parcel.writeString(email)
             parcel.writeString(name)
             parcel.customWriteBoolean(isOrganizer)
-            parcel.writeInt(state.id)
+            parcel.writeString(_state)
         }
 
         private fun Parcel.customWriteBoolean(value: Boolean) {
