@@ -27,34 +27,23 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.infomaniak.lib.core.utils.hasPermissions
 import com.infomaniak.mail.data.LocalSettings
+import dagger.hilt.android.scopes.ActivityScoped
+import javax.inject.Inject
 
-class PermissionUtils {
+@ActivityScoped
+class PermissionUtils @Inject constructor(private val activity: FragmentActivity, private val localSettings: LocalSettings) {
 
-    private var activity: FragmentActivity
-    private var fragment: Fragment? = null
-    private var localSettings: LocalSettings
-
-    private lateinit var mainForActivityResult: ActivityResultLauncher<Array<String>>
+    private var mainForActivityResult: ActivityResultLauncher<Array<String>>? = null
     private var storageForActivityResult: ActivityResultLauncher<String>? = null
 
     val hasDownloadManagerPermission
         get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q || activity.hasPermissions(arrayOf(storagePermission))
 
-    constructor(activity: FragmentActivity) {
-        this.activity = activity
-        localSettings = LocalSettings.getInstance(activity)
-    }
-
-    constructor(fragment: Fragment) : this(fragment.requireActivity()) {
-        this.fragment = fragment
-    }
-
     fun registerMainPermissions(onPermissionResult: ((permissions: Map<String, Boolean>) -> Unit)? = null) {
-        mainForActivityResult =
-            activity.registerForActivityResult(RequestMultiplePermissions()) { authorizedPermissions ->
-                onPermissionResult?.invoke(authorizedPermissions)
-                updateNotificationPermissionSetting()
-            }
+        mainForActivityResult = activity.registerForActivityResult(RequestMultiplePermissions()) { authorizedPermissions ->
+            onPermissionResult?.invoke(authorizedPermissions)
+            updateNotificationPermissionSetting()
+        }
     }
 
     private fun updateNotificationPermissionSetting() {
@@ -69,7 +58,7 @@ class PermissionUtils {
         updateNotificationPermissionSetting()
 
         val mainPermissions = getMainPermissions(mustRequireNotification = !localSettings.hasAlreadyEnabledNotifications)
-        if (!activity.hasPermissions(mainPermissions)) mainForActivityResult.launch(mainPermissions)
+        if (!activity.hasPermissions(mainPermissions)) mainForActivityResult?.launch(mainPermissions)
     }
 
     /**
@@ -92,9 +81,9 @@ class PermissionUtils {
     /**
      * Register storage permission only for Android API below 29.
      */
-    fun registerDownloadManagerPermission() {
+    fun registerDownloadManagerPermission(fragment: Fragment) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            storageForActivityResult = fragment?.registerForActivityResult(RequestPermission()) { hasPermission ->
+            storageForActivityResult = fragment.registerForActivityResult(RequestPermission()) { hasPermission ->
                 if (hasPermission) downloadCallback?.invoke()
             }
         }
