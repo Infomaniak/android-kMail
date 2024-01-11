@@ -39,6 +39,7 @@ import com.infomaniak.mail.data.models.ai.AiPromptOpeningStatus
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.observeNotNull
+import com.infomaniak.mail.utils.updateNavigationBarColor
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.FragmentScoped
 import kotlinx.coroutines.delay
@@ -188,7 +189,7 @@ class NewMessageAiManager @Inject constructor(
 
         fun updateNavigationBarColor() {
             val backgroundColorRes = if (isVisible) R.color.backgroundColorSecondary else R.color.backgroundColor
-            activity.window.navigationBarColor = context.getColor(backgroundColorRes)
+            activity.window.updateNavigationBarColor(context.getColor(backgroundColorRes))
         }
 
         binding.aiPromptLayout.isVisible = isVisible

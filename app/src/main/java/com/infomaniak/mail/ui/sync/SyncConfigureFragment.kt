@@ -49,8 +49,8 @@ class SyncConfigureFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundColor)
+
         binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
 
         setupListeners()
