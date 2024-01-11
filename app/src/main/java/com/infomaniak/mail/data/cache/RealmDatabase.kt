@@ -18,7 +18,10 @@
 package com.infomaniak.mail.data.cache
 
 import android.content.Context
-import com.infomaniak.mail.data.models.*
+import com.infomaniak.mail.data.models.AppSettings
+import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Quotas
 import com.infomaniak.mail.data.models.addressBook.AddressBook
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient

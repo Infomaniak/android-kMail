@@ -18,7 +18,8 @@
 package com.infomaniak.mail.ui.main.thread.actions
 
 import android.app.Application
-import androidx.lifecycle.*
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.SavedStateHandle
 import com.infomaniak.mail.data.cache.mailboxContent.AttachmentController
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
