@@ -17,14 +17,7 @@
   -->
 <resources>
 
-    <!--
-        ~ Important: keep the 2/5 & 3/5 ratios between width & weight.
-        ~ The sum of these dimensions should be equal to 840dp.
-        ~ Why 840? Because Google says so here: https://developer.android.com/guide/topics/large-screens/support-different-screen-sizes
-        ~ The name of the `values-sw600dp-w840dp` folder should be 840 too.
-        ~ If we ever want to change this 840 value, we need to change it in both places.
-    -->
-    <dimen name="leftSlidingPaneWidth">336dp</dimen>
-    <dimen name="rightSlidingPaneWidth">504dp</dimen>
+    <!-- Whether the SlidingPaneLayout can display both panes, or not -->
+    <bool name="canDisplayBothPanes">true</bool>
 
 </resources>
