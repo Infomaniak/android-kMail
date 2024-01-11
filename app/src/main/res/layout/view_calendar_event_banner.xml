@@ -79,140 +79,179 @@
             app:drawableTint="@color/iconColor"
             tools:text="09:00-10:00 (CET)" />
 
-        <com.google.android.flexbox.FlexboxLayout
-            android:id="@+id/participationButtons"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/eventLocation"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/marginStandardMedium"
             android:layout_marginTop="@dimen/marginStandardMedium"
-            android:paddingStart="@dimen/marginStandardSmall"
-            android:paddingEnd="@dimen/marginStandardMedium"
-            app:flexWrap="wrap">
+            android:drawablePadding="@dimen/marginStandardMedium"
+            android:gravity="center_vertical"
+            app:drawableStartCompat="@drawable/ic_warning_big"
+            app:drawableTint="@color/iconColor"
+            tools:text="Genève" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/yesButton"
-                style="@style/CalendarParticipationButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/buttonYes"
-                android:theme="@style/CalendarYesTheme"
-                app:icon="@drawable/ic_check_rounded" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/maybeButton"
-                style="@style/CalendarParticipationButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/buttonMaybe"
-                android:theme="@style/CalendarMaybeTheme"
-                app:icon="@drawable/ic_calendar_maybe" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/noButton"
-                style="@style/CalendarParticipationButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/buttonNo"
-                android:theme="@style/CalendarNoTheme"
-                app:icon="@drawable/ic_calendar_no" />
-
-        </com.google.android.flexbox.FlexboxLayout>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/attendeesButton"
-            style="@style/TextButton"
+        <FrameLayout
+            android:id="@+id/attendanceLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/marginStandardSmall"
-            android:checkable="true"
-            android:gravity="start|center_vertical"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:paddingHorizontal="@dimen/marginStandardMedium"
-            android:text="@string/buttonAttendees"
-            app:backgroundTint="@android:color/transparent"
-            app:cornerRadius="@dimen/calendarCornerRadius"
-            app:icon="@drawable/ic_calendar_participants_chevron"
-            app:iconGravity="textEnd"
-            app:iconSize="@dimen/smallIconSize"
-            app:iconTint="?attr/colorPrimary"
-            app:rippleColor="@color/color_primary_translucent_ripple" />
+            android:layout_height="wrap_content">
 
-        <LinearLayout
-            android:id="@+id/attendeesSubMenu"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingBottom="@dimen/marginStandardMedium"
-            android:visibility="gone"
-            tools:visibility="visible">
+            <TextView
+                android:id="@+id/notPartOfAttendeesWarning"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/marginStandardMedium"
+                android:layout_marginTop="@dimen/marginStandardMedium"
+                android:drawablePadding="@dimen/marginStandardMedium"
+                android:gravity="center_vertical"
+                app:drawableStartCompat="@drawable/ic_social_media"
+                app:drawableTint="@color/iconColor"
+                tools:text="Vous ne faites pas partie des invités"
+                tools:visibility="gone" />
 
             <LinearLayout
-                android:id="@+id/organizerLayout"
+                android:id="@+id/attendeesLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:paddingVertical="@dimen/marginStandardSmall">
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
 
-                <com.infomaniak.mail.views.AvatarView
-                    android:id="@+id/organizerAvatar"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_marginStart="@dimen/marginStandardMedium"
-                    android:src="@drawable/ic_unknown_user_avatar"
-                    tools:src="@tools:sample/avatars[9]" />
-
-                <TextView
-                    android:id="@+id/organizerName"
-                    android:layout_width="wrap_content"
+                <com.google.android.flexbox.FlexboxLayout
+                    android:id="@+id/participationButtons"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/marginStandardMedium"
-                    tools:text="Lucien Cheval (Organisateur)" />
+                    android:layout_marginTop="@dimen/marginStandardMedium"
+                    android:paddingStart="@dimen/marginStandardSmall"
+                    android:paddingEnd="@dimen/marginStandardMedium"
+                    app:flexWrap="wrap">
 
-            </LinearLayout>
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/yesButton"
+                        style="@style/CalendarParticipationButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/buttonYes"
+                        android:theme="@style/CalendarYesTheme"
+                        app:icon="@drawable/ic_check_rounded" />
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/allAttendeesButton"
-                style="@style/CardViewMail"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="48dp"
-                app:cardCornerRadius="@dimen/calendarCornerRadius">
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/maybeButton"
+                        style="@style/CalendarParticipationButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/buttonMaybe"
+                        android:theme="@style/CalendarMaybeTheme"
+                        app:icon="@drawable/ic_calendar_maybe" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/noButton"
+                        style="@style/CalendarParticipationButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/buttonNo"
+                        android:theme="@style/CalendarNoTheme"
+                        app:icon="@drawable/ic_calendar_no" />
+
+                </com.google.android.flexbox.FlexboxLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/attendeesButton"
+                    style="@style/TextButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/marginStandardSmall"
+                    android:checkable="true"
+                    android:gravity="start|center_vertical"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:paddingHorizontal="@dimen/marginStandardMedium"
+                    android:text="@string/buttonAttendees"
+                    app:backgroundTint="@android:color/transparent"
+                    app:cornerRadius="@dimen/calendarCornerRadius"
+                    app:icon="@drawable/ic_calendar_participants_chevron"
+                    app:iconGravity="textEnd"
+                    app:iconSize="@dimen/smallIconSize"
+                    app:iconTint="?attr/colorPrimary"
+                    app:rippleColor="@color/color_primary_translucent_ripple" />
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:id="@+id/attendeesSubMenu"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:gravity="center_vertical">
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    tools:visibility="visible">
 
-                    <!-- 15dp as marginStart is 1 less than 16 and is here to account for the fact that the first avatar of the list has a
-                        stroke which offsets the actual circle representing the avatar by 1-->
-                    <com.infomaniak.mail.ui.main.thread.calendar.ManyAvatarsView
-                        android:id="@+id/manyAvatarsView"
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:id="@+id/organizerLayout"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="15dp"
-                        app:statusBackgroundColor="@color/backgroundColor"
-                        app:strokeColor="@color/backgroundColor"
-                        app:strokeWidth="2dp" />
+                        android:gravity="center_vertical"
+                        android:paddingVertical="@dimen/marginStandardSmall">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                        <com.infomaniak.mail.views.AvatarView
+                            android:id="@+id/organizerAvatar"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:layout_marginStart="@dimen/marginStandardMedium"
+                            android:src="@drawable/ic_unknown_user_avatar"
+                            tools:src="@tools:sample/avatars[9]" />
+
+                        <TextView
+                            android:id="@+id/organizerName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="@dimen/marginStandardSmall"
+                            tools:text="Lucien Cheval (Organisateur)" />
+
+                    </LinearLayout>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/allAttendeesButton"
+                        style="@style/CardViewMail"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/marginStandardMedium"
-                        android:text="@string/buttonSee"
-                        android:textColor="?attr/colorPrimary" />
+                        android:minHeight="48dp"
+                        app:cardCornerRadius="@dimen/calendarCornerRadius">
 
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:gravity="center_vertical">
+
+                            <!-- 15dp as marginStart is 1 less than 16 and is here to account for the fact that the first avatar of the list has a
+                                stroke which offsets the actual circle representing the avatar by 1-->
+                            <com.infomaniak.mail.ui.main.thread.calendar.ManyAvatarsView
+                                android:id="@+id/manyAvatarsView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="15dp"
+                                app:statusBackgroundColor="@color/backgroundColor"
+                                app:strokeColor="@color/backgroundColor"
+                                app:strokeWidth="2dp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/marginStandardMedium"
+                                android:text="@string/buttonSee"
+                                android:textColor="?attr/colorPrimary" />
+
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
                 </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-        </LinearLayout>
+            </LinearLayout>
+        </FrameLayout>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/addToCalendarButton"
             style="@style/TextButtonPrimaryMedium"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/marginStandardMedium"
-            android:layout_marginBottom="@dimen/marginStandardMedium"
+            android:layout_marginHorizontal="@dimen/marginStandardMedium"
+            android:layout_marginVertical="@dimen/marginStandardMedium"
             android:text="@string/buttonAddToMyCalendar" />
 
     </LinearLayout>

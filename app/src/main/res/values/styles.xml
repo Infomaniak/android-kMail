@@ -285,6 +285,7 @@
         <item name="android:paddingTop">@dimen/marginStandardSmall</item>
         <item name="android:textColor">@color/secondaryTextColor</item>
         <item name="backgroundTint">@android:color/transparent</item>
+        <item name="cornerRadius">@dimen/textButtonCornerRadius</item>
         <item name="iconPadding">@dimen/marginStandardSmall</item>
         <item name="iconSize">@dimen/mediumIconSize</item>
         <item name="iconTint">?attr/calendarChipSelectedStrokeColor</item>
