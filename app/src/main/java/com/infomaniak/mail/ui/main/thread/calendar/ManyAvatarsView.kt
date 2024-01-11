@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.thread.calendar
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
@@ -28,6 +29,7 @@ import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.databinding.ViewManyAvatarsBinding
 import com.infomaniak.mail.utils.getColorOrNull
 import com.infomaniak.mail.utils.getTransparentColor
+import com.infomaniak.mail.utils.setInnerStrokeWidth
 
 class ManyAvatarsView @JvmOverloads constructor(
     context: Context,
@@ -51,8 +53,8 @@ class ManyAvatarsView @JvmOverloads constructor(
                 avatar2.init(strokeColor, strokeWidthFloat, statusBackgroundColor)
                 avatar3.init(strokeColor, strokeWidthFloat, statusBackgroundColor)
 
-                additionalPeople.strokeWidth = strokeWidthInt
-                additionalPeople.strokeColor = strokeColor ?: context.getTransparentColor()
+                additionalPeople.setInnerStrokeWidth(strokeWidthFloat)
+                additionalPeople.strokeColor = ColorStateList.valueOf(strokeColor ?: context.getTransparentColor())
             }
         }
     }

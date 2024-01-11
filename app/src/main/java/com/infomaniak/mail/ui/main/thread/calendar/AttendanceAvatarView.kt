@@ -30,6 +30,7 @@ import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.databinding.ViewAttendanceAvatarBinding
 import com.infomaniak.mail.utils.getColorOrNull
 import com.infomaniak.mail.utils.getTransparentColor
+import com.infomaniak.mail.utils.setInnerStrokeWidth
 
 class AttendanceAvatarView @JvmOverloads constructor(
     context: Context,
@@ -43,6 +44,7 @@ class AttendanceAvatarView @JvmOverloads constructor(
         get() = binding.avatarImage.strokeWidth
         set(value) {
             binding.avatarImage.strokeWidth = value
+            binding.attendanceIcon.setInnerStrokeWidth(value)
         }
 
     var strokeColor: Int?
