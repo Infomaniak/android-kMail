@@ -17,10 +17,7 @@
   -->
 <resources>
 
-    <!-- Whether we are on a tablet, or not -->
-    <bool name="isTablet">false</bool>
-
-    <!-- Whether we are on a tablet in landscape mode, or not -->
-    <bool name="isTabletInLandscape">false</bool>
+    <!-- Whether the SlidingPaneLayout can display both panes, or not -->
+    <bool name="canDisplayBothPanes">false</bool>
 
 </resources>
