@@ -21,8 +21,8 @@ import com.infomaniak.mail.data.api.FlatteningSubBodiesSerializer
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.EmbeddedRealmObject
 import io.realm.kotlin.types.RealmList
-import kotlinx.serialization.*
-import kotlinx.serialization.json.*
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 @Serializable
 class Body : EmbeddedRealmObject {
