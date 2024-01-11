@@ -1,10 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak Mail - Android
+  ~ Copyright (C) 2024 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="16dp"
     android:height="16dp"
     android:viewportWidth="16"
     android:viewportHeight="16">
-  <path
-      android:pathData="M16,8C16,12.418 12.418,16 8,16C3.582,16 0,12.418 0,8C0,3.582 3.582,0 8,0C12.418,0 16,3.582 16,8ZM11.577,4.423C11.785,4.631 11.785,4.969 11.577,5.177L8.754,8L11.577,10.823C11.785,11.031 11.785,11.369 11.577,11.577C11.369,11.785 11.031,11.785 10.823,11.577L8,8.754L5.177,11.577C4.969,11.785 4.631,11.785 4.423,11.577C4.215,11.369 4.215,11.031 4.423,10.823L7.246,8L4.423,5.177C4.215,4.969 4.215,4.631 4.423,4.423C4.631,4.215 4.969,4.215 5.177,4.423L8,7.246L10.823,4.423C11.031,4.215 11.369,4.215 11.577,4.423Z"
-      android:fillColor="#000000"
-      android:fillType="evenOdd"/>
+    <path
+        android:fillColor="#000000"
+        android:fillType="evenOdd"
+        android:pathData="M16,8C16,12.418 12.418,16 8,16C3.582,16 0,12.418 0,8C0,3.582 3.582,0 8,0C12.418,0 16,3.582 16,8ZM11.577,4.423C11.785,4.631 11.785,4.969 11.577,5.177L8.754,8L11.577,10.823C11.785,11.031 11.785,11.369 11.577,11.577C11.369,11.785 11.031,11.785 10.823,11.577L8,8.754L5.177,11.577C4.969,11.785 4.631,11.785 4.423,11.577C4.215,11.369 4.215,11.031 4.423,10.823L7.246,8L4.423,5.177C4.215,4.969 4.215,4.631 4.423,4.423C4.631,4.215 4.969,4.215 5.177,4.423L8,7.246L10.823,4.423C11.031,4.215 11.369,4.215 11.577,4.423Z" />
 </vector>

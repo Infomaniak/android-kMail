@@ -85,8 +85,6 @@ class Attendee() : EmbeddedRealmObject, Correspondent {
             writeInt(if (value) 1 else 0)
         }
 
-        private fun Parcel.customReadBoolean(): Boolean {
-            return readInt() != 0
-        }
+        private fun Parcel.customReadBoolean(): Boolean = readInt() != 0
     }
 }

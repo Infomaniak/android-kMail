@@ -1,4 +1,4 @@
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
   ~ Copyright (C) 2023-2024 Infomaniak Network SA
   ~
@@ -186,7 +186,6 @@
 
                     <!-- 15dp as marginStart is 1 less than 16 and is here to account for the fact that the first avatar of the list has a
                         stroke which offsets the actual circle representing the avatar by 1-->
-                    <!--TODO : Color of stroke-->
                     <com.infomaniak.mail.ui.main.thread.calendar.ManyAvatarsView
                         android:id="@+id/manyAvatarsView"
                         android:layout_width="wrap_content"

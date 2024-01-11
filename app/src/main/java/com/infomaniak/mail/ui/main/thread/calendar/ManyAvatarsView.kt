@@ -32,7 +32,7 @@ import com.infomaniak.mail.utils.getTransparentColor
 class ManyAvatarsView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     private val binding by lazy { ViewManyAvatarsBinding.inflate(LayoutInflater.from(context), this, true) }
@@ -73,12 +73,12 @@ class ManyAvatarsView @JvmOverloads constructor(
     }
 
     private fun updateAttendeesUi(): Unit = with(binding) {
-        avatar1.setupAttendee(0)
-        avatar2.setupAttendee(1)
-        avatar3.setupAttendee(2)
+        avatar1.setupAttendee(index = 0)
+        avatar2.setupAttendee(index = 1)
+        avatar3.setupAttendee(index = 2)
 
         additionalPeople.isVisible = attendees.count() > 3
-        val extraPeopleCount = (attendees.count() - 3).coerceAtMost(99)
+        val extraPeopleCount = (attendees.count() - 3).coerceAtMost(MAX_DISPLAYED_ADDITIONAL_ATTENDEES)
         additionalPeopleCount.text = "+$extraPeopleCount"
     }
 
@@ -86,5 +86,9 @@ class ManyAvatarsView @JvmOverloads constructor(
         val isDisplayed = attendees.lastIndex >= index
         isVisible = isDisplayed
         if (isDisplayed) setAttendee(attendees[index])
+    }
+
+    companion object {
+        private const val MAX_DISPLAYED_ADDITIONAL_ATTENDEES = 99
     }
 }
