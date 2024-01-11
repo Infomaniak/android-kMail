@@ -18,7 +18,7 @@
 <resources>
 
     <!--
-        ~ Important: keep the 2/5 & 3/5 ratios between width & weight.
+        ~ Important: keep the 2/5 & 3/5 ratios between these widths.
         ~ The sum of these dimensions should be equal to 840dp.
         ~ Why 840? Because Google says so here: https://developer.android.com/guide/topics/large-screens/support-different-screen-sizes
         ~ The name of the `values-sw600dp-w840dp` folder should be 840 too.
