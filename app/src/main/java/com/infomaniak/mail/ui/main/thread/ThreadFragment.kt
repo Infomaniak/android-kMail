@@ -57,10 +57,10 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.*
+import com.infomaniak.mail.ui.main.thread.ThreadAdapter.*
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.OpenThreadResult
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.AttachmentIntentUtils.DOWNLOAD_ATTACHMENT_RESULT
 import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipients
 import com.infomaniak.mail.utils.UiUtils.dividerDrawable
 import dagger.hilt.android.AndroidEntryPoint
@@ -272,7 +272,7 @@ class ThreadFragment : Fragment() {
     private fun shouldLoadDistantResources(): Boolean = localSettings.externalContent == ExternalContent.ALWAYS && isNotInSpam
 
     private fun observeOpenAttachment() {
-        getBackNavigationResult(DOWNLOAD_ATTACHMENT_RESULT, ::startActivity)
+        getBackNavigationResult(AttachmentIntentUtils.DOWNLOAD_ATTACHMENT_RESULT, ::startActivity)
     }
 
     private fun initAdapter() {
@@ -320,15 +320,15 @@ class ThreadFragment : Fragment() {
                 // When adding a phone number to contacts, Google decodes this value in case it's url-encoded. But I could not
                 // reproduce this issue when manually creating a url-encoded href. If this is triggered, fix it by also
                 // decoding it at that step.
-                if (type == ThreadAdapter.ContextMenuType.PHONE && data.contains('%')) Sentry.withScope { scope ->
+                if (type == ContextMenuType.PHONE && data.contains('%')) Sentry.withScope { scope ->
                     scope.level = SentryLevel.ERROR
                     Sentry.captureMessage("Google was right, phone numbers can be url-encoded. Needs to be fixed")
                 }
 
                 when (type) {
-                    ThreadAdapter.ContextMenuType.LINK -> linkContextualMenuAlertDialog.show(data)
-                    ThreadAdapter.ContextMenuType.EMAIL -> emailContextualMenuAlertDialog.show(data)
-                    ThreadAdapter.ContextMenuType.PHONE -> phoneContextualMenuAlertDialog.show(data)
+                    ContextMenuType.LINK -> linkContextualMenuAlertDialog.show(data)
+                    ContextMenuType.EMAIL -> emailContextualMenuAlertDialog.show(data)
+                    ContextMenuType.PHONE -> phoneContextualMenuAlertDialog.show(data)
                 }
             }
         )
