@@ -389,9 +389,9 @@ class MainActivity : BaseActivity() {
 
     private fun setupSnackBar() {
 
-        fun getAnchor(): View? = when (navController.currentDestination?.id) {
-            R.id.threadListFragment, R.id.searchFragment -> (currentFragment as? TwoPaneFragment)?.getAnchor()
-            else -> null
+        fun getAnchor(): View? {
+            val fragment = currentFragment
+            return if (fragment is TwoPaneFragment) fragment.getAnchor() else null
         }
 
         mainViewModel.snackBarManager.setup(
