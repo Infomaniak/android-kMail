@@ -454,6 +454,48 @@ class ThreadListAdapter @Inject constructor(
         }
     }
 
+    private fun formatList(
+        threads: List<Thread>,
+        context: Context,
+        folderRole: FolderRole?,
+        threadDensity: ThreadDensity,
+    ) = mutableListOf<Any>().apply {
+
+        if ((folderRole == FolderRole.TRASH || folderRole == FolderRole.SPAM) && threads.isNotEmpty()) {
+            add(folderRole)
+        }
+
+        if (threadDensity == COMPACT) {
+            addAll(threads)
+        } else {
+            var previousSectionTitle = ""
+            threads.forEach { thread ->
+                val sectionTitle = thread.getSectionTitle(context)
+                when {
+                    sectionTitle != previousSectionTitle -> {
+                        add(sectionTitle)
+                        previousSectionTitle = sectionTitle
+                    }
+                    // displaySeeAllButton -> formattedList.add(folder.threadCount - 3) // TODO: Handle Intelligent Mailbox
+                }
+                add(thread)
+            }
+        }
+    }
+
+    private fun Thread.getSectionTitle(context: Context): String = with(date.toDate()) {
+        return when {
+            isInTheFuture() -> context.getString(R.string.comingSoon)
+            isToday() -> context.getString(R.string.threadListSectionToday)
+            isYesterday() -> context.getString(R.string.messageDetailsYesterday)
+            isThisWeek() -> context.getString(R.string.threadListSectionThisWeek)
+            isLastWeek() -> context.getString(R.string.threadListSectionLastWeek)
+            isThisMonth() -> context.getString(R.string.threadListSectionThisMonth)
+            isThisYear() -> format(FULL_MONTH).capitalizeFirstChar()
+            else -> format(MONTH_AND_YEAR).capitalizeFirstChar()
+        }
+    }
+
     fun updateFolderRole(newRole: FolderRole?) {
         folderRole = newRole
     }
@@ -499,48 +541,6 @@ class ThreadListAdapter @Inject constructor(
 
         private const val FULL_MONTH = "MMMM"
         private const val MONTH_AND_YEAR = "MMMM yyyy"
-
-        private fun formatList(
-            threads: List<Thread>,
-            context: Context,
-            folderRole: FolderRole?,
-            threadDensity: ThreadDensity,
-        ) = mutableListOf<Any>().apply {
-
-            if ((folderRole == FolderRole.TRASH || folderRole == FolderRole.SPAM) && threads.isNotEmpty()) {
-                add(folderRole)
-            }
-
-            if (threadDensity == COMPACT) {
-                addAll(threads)
-            } else {
-                var previousSectionTitle = ""
-                threads.forEach { thread ->
-                    val sectionTitle = thread.getSectionTitle(context)
-                    when {
-                        sectionTitle != previousSectionTitle -> {
-                            add(sectionTitle)
-                            previousSectionTitle = sectionTitle
-                        }
-                        // displaySeeAllButton -> formattedList.add(folder.threadCount - 3) // TODO: Handle Intelligent Mailbox
-                    }
-                    add(thread)
-                }
-            }
-        }
-
-        private fun Thread.getSectionTitle(context: Context): String = with(date.toDate()) {
-            return when {
-                isInTheFuture() -> context.getString(R.string.comingSoon)
-                isToday() -> context.getString(R.string.threadListSectionToday)
-                isYesterday() -> context.getString(R.string.messageDetailsYesterday)
-                isThisWeek() -> context.getString(R.string.threadListSectionThisWeek)
-                isLastWeek() -> context.getString(R.string.threadListSectionLastWeek)
-                isThisMonth() -> context.getString(R.string.threadListSectionThisMonth)
-                isThisYear() -> format(FULL_MONTH).capitalizeFirstChar()
-                else -> format(MONTH_AND_YEAR).capitalizeFirstChar()
-            }
-        }
     }
 
     class ThreadListViewHolder(val binding: ViewBinding) : ViewHolder(binding.root) {

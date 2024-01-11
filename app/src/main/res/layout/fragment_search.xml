@@ -47,6 +47,11 @@
             </com.google.android.material.appbar.MaterialToolbar>
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
+        <!--
+            Don't remove this presumably useless ID.
+            By giving it an ID, the HorizontalScrollView will retain how much it has scrolled when the activity is recreated.
+            Without the ID, it resets to 0 every time.
+        -->
         <HorizontalScrollView
             android:id="@+id/horizontalScrollViewDummyId"
             android:layout_width="match_parent"

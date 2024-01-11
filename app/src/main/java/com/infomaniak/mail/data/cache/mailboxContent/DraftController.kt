@@ -84,7 +84,7 @@ class DraftController @Inject constructor(
             DraftMode.REPLY, DraftMode.REPLY_ALL -> {
                 draft.inReplyToUid = previousMessage.uid
 
-                val (toList, ccList) = previousMessage.getRecipientsForReplyTo(draftMode == DraftMode.REPLY_ALL)
+                val (toList, ccList) = previousMessage.getRecipientsForReplyTo(replyAll = draftMode == DraftMode.REPLY_ALL)
                 draft.to = toList.toRealmList()
                 draft.cc = ccList.toRealmList()
 

@@ -155,7 +155,7 @@ class MainActivity : BaseActivity() {
 
         override fun onDrawerOpened(drawerView: View) {
             if (hasDragged) trackMenuDrawerEvent("openByGesture", TrackerAction.DRAG)
-            colorSystemBarsWithMenuDrawer()
+            colorSystemBarsWithMenuDrawer(FULLY_SLID)
             (binding.menuDrawerFragmentContainer.getFragment() as? MenuDrawerFragment)?.onDrawerOpened()
         }
 
@@ -343,7 +343,7 @@ class MainActivity : BaseActivity() {
 
         mainViewModel.checkAppUpdateStatus()
 
-        if (binding.drawerLayout.isOpen) colorSystemBarsWithMenuDrawer()
+        if (binding.drawerLayout.isOpen) colorSystemBarsWithMenuDrawer(FULLY_SLID)
     }
 
     private fun handleOnBackPressed() = with(binding) {
@@ -467,7 +467,7 @@ class MainActivity : BaseActivity() {
         binding.drawerLayout.setDrawerLockMode(drawerLockMode)
     }
 
-    private fun colorSystemBarsWithMenuDrawer(@FloatRange(0.0, 1.0) slideOffset: Float = FULLY_SLID) = with(window) {
+    private fun colorSystemBarsWithMenuDrawer(@FloatRange(0.0, 1.0) slideOffset: Float) = with(window) {
         if (slideOffset == FULLY_SLID) {
             statusBarColor = menuDrawerBackgroundColor
             updateNavigationBarColor(menuDrawerBackgroundColor)
