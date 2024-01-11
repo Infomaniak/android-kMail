@@ -79,6 +79,7 @@
             app:drawableTint="@color/iconColor"
             tools:text="09:00-10:00 (CET)" />
 
+        <!--TODO : Use correct 'pin' icon-->
         <TextView
             android:id="@+id/eventLocation"
             android:layout_width="wrap_content"
