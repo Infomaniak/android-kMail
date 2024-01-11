@@ -42,7 +42,6 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.text.toSpannable
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.*
 import androidx.navigation.NavDirections
 import androidx.navigation.NavOptions
@@ -437,52 +436,10 @@ fun Fragment.changeToolbarColorOnScroll(
     shouldUpdateStatusBar: (() -> Boolean) = { true },
     otherUpdates: ((color: Int) -> Unit)? = null,
 ) {
-    requireContext().changeToolbarColorOnScroll(
-        toolbar,
-        nestedScrollView,
-        loweredColor,
-        elevatedColor,
-        shouldUpdateStatusBar,
-        otherUpdates,
-        viewLifecycleOwner.lifecycle,
-        requireActivity(),
-    )
-}
-
-fun FragmentActivity.changeToolbarColorOnScroll(
-    toolbar: MaterialToolbar,
-    nestedScrollView: NestedScrollView,
-    @ColorRes loweredColor: Int = R.color.toolbarLoweredColor,
-    @ColorRes elevatedColor: Int = R.color.toolbarElevatedColor,
-    shouldUpdateStatusBar: (() -> Boolean) = { true },
-    otherUpdates: ((color: Int) -> Unit)? = null,
-) {
-    changeToolbarColorOnScroll(
-        toolbar,
-        nestedScrollView,
-        loweredColor,
-        elevatedColor,
-        shouldUpdateStatusBar,
-        otherUpdates,
-        lifecycle,
-        this,
-    )
-}
-
-private fun Context.changeToolbarColorOnScroll(
-    toolbar: MaterialToolbar,
-    nestedScrollView: NestedScrollView,
-    @ColorRes loweredColor: Int,
-    @ColorRes elevatedColor: Int,
-    shouldUpdateStatusBar: (() -> Boolean),
-    otherUpdates: ((color: Int) -> Unit)?,
-    lifecycle: Lifecycle,
-    activity: Activity,
-) {
     var valueAnimator: ValueAnimator? = null
-    var oldColor = getColor(loweredColor)
+    var oldColor = requireContext().getColor(loweredColor)
 
-    lifecycle.addObserver(object : LifecycleEventObserver {
+    viewLifecycleOwner.lifecycle.addObserver(object : LifecycleEventObserver {
         override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
             if (event == Lifecycle.Event.ON_DESTROY) valueAnimator?.cancel()
         }
@@ -502,7 +459,7 @@ private fun Context.changeToolbarColorOnScroll(
         valueAnimator = UiUtils.animateColorChange(oldColor, newColor, animate = true) { color ->
             oldColor = color
             toolbar.setBackgroundColor(color)
-            if (shouldUpdateStatusBar()) activity.window.statusBarColor = color
+            if (shouldUpdateStatusBar()) requireActivity().window.statusBarColor = color
             otherUpdates?.invoke(color)
         }
     }
