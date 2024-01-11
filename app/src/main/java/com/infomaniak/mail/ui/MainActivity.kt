@@ -91,8 +91,6 @@ class MainActivity : BaseActivity() {
     private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private val mainViewModel: MainViewModel by viewModels()
 
-    private val permissionUtils by lazy { PermissionUtils(this).also(::registerMainPermissions) }
-
     private val backgroundColor: Int by lazy { getColor(R.color.backgroundColor) }
     private val backgroundHeaderColor: Int by lazy { getColor(R.color.backgroundHeaderColor) }
     private val menuDrawerBackgroundColor: Int by lazy { getColor(R.color.menuDrawerBackgroundColor) }
@@ -150,6 +148,9 @@ class MainActivity : BaseActivity() {
     @Inject
     lateinit var titleDialog: TitleAlertDialog
 
+    @Inject
+    lateinit var permissionUtils: PermissionUtils
+
     private val drawerListener = object : DrawerLayout.DrawerListener {
 
         var hasDragged = false
@@ -184,6 +185,7 @@ class MainActivity : BaseActivity() {
 
         setContentView(binding.root)
         handleOnBackPressed()
+        registerMainPermissions()
 
         observeNetworkStatus()
         observeDeletedMessages()
@@ -413,7 +415,7 @@ class MainActivity : BaseActivity() {
         (menuDrawerFragmentContainer.getFragment() as? MenuDrawerFragment)?.exitDrawer = { drawerLayout.close() }
     }
 
-    private fun registerMainPermissions(permissionUtils: PermissionUtils) {
+    private fun registerMainPermissions() {
         permissionUtils.registerMainPermissions { permissionsResults ->
             if (permissionsResults[Manifest.permission.READ_CONTACTS] == true) mainViewModel.updateUserInfo()
         }

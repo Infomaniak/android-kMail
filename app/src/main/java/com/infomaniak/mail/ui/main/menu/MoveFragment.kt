@@ -135,7 +135,6 @@ class MoveFragment : MenuFoldersFragment() {
     }
 
     override fun onFolderCollapse(folderId: String, shouldCollapse: Boolean) = Unit
-    override fun onCollapseTransition(shouldExclude: Boolean) = Unit
 
     private fun setSearchBarUi(allFolders: List<Folder>) = with(binding) {
         searchResultsList.adapter = searchResultsAdapter

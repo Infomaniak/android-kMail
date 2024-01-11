@@ -22,6 +22,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.transition.ChangeBounds
 import android.transition.Fade
+import android.transition.Fade.*
 import android.transition.TransitionManager
 import android.transition.TransitionSet
 import android.view.LayoutInflater
@@ -211,14 +212,10 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
         menuDrawerViewModel.toggleFolderCollapsingState(folderId, shouldCollapse)
     }
 
-    override fun onCollapseTransition(shouldExclude: Boolean) {
-        addMenuDrawerTransition(shouldExclude, shouldFade = false)
-    }
-
     private fun addMenuDrawerTransition(shouldExclude: Boolean = false, shouldFade: Boolean = true) {
         val transition = TransitionSet()
             .addTransition(ChangeBounds())
-            .also { if (shouldFade) it.addTransition(Fade(Fade.IN)) }
+            .also { if (shouldFade) it.addTransition(Fade(IN)) }
             .excludeTarget(RecyclerView::class.java, shouldExclude)
             .setDuration(MENU_DRAWER_TRANSITION_DURATION)
 
@@ -287,7 +284,6 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
             val newCurrentFolderId = currentFolder?.id ?: return@observe
             binding.customFoldersList.post {
                 customFoldersAdapter.setFolders(customFolders, newCurrentFolderId)
-                onCollapseTransition(shouldExclude = true)
             }
         }
     }

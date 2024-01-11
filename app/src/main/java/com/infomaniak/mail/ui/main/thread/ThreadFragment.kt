@@ -97,6 +97,9 @@ class ThreadFragment : Fragment() {
     @Inject
     lateinit var phoneContextualMenuAlertDialog: PhoneContextualMenuAlertDialog
 
+    @Inject
+    lateinit var permissionUtils: PermissionUtils
+
     private var _binding: FragmentThreadBinding? = null
     private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
 
@@ -106,7 +109,6 @@ class ThreadFragment : Fragment() {
 
     private val twoPaneFragment inline get() = parentFragment as TwoPaneFragment
     private val threadAdapter inline get() = binding.messagesList.adapter as ThreadAdapter
-    private val permissionUtils by lazy { PermissionUtils(this) }
     private val isNotInSpam by lazy { mainViewModel.currentFolder.value?.role != FolderRole.SPAM }
 
     // TODO: This is probably too global as a trigger. Find something more refined?
@@ -135,7 +137,7 @@ class ThreadFragment : Fragment() {
         setupAdapter()
         setupDialogs()
         listenToGlobalLayoutChanges()
-        permissionUtils.registerDownloadManagerPermission()
+        permissionUtils.registerDownloadManagerPermission(fragment = this)
 
         observeLightThemeToggle()
         observeThreadLive()
@@ -217,7 +219,6 @@ class ThreadFragment : Fragment() {
             },
             onDownloadAllClicked = { message ->
                 trackAttachmentActionsEvent("downloadAll")
-                mainViewModel.snackBarManager.setValue(getString(R.string.snackbarDownloadInProgress))
                 downloadAllAttachments(message)
             },
             onReplyClicked = { message ->

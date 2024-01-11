@@ -40,6 +40,7 @@ import com.infomaniak.mail.utils.AttachmentIntentUtils.getIntentOrGoToPlaystore
 import com.infomaniak.mail.utils.AttachmentIntentUtils.openWithIntent
 import com.infomaniak.mail.utils.PermissionUtils
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import com.infomaniak.lib.core.R as RCore
 
 @AndroidEntryPoint
@@ -49,7 +50,8 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
     private val mainViewModel: MainViewModel by activityViewModels()
     private val attachmentActionsViewModel: AttachmentActionsViewModel by viewModels()
 
-    private val permissionUtils by lazy { PermissionUtils(this) }
+    @Inject
+    lateinit var permissionUtils: PermissionUtils
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetAttachmentActionsBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -63,6 +65,7 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
             return@with
         }
 
+        permissionUtils.registerDownloadManagerPermission(this@AttachmentActionsBottomSheetDialog)
         binding.attachmentDetails.setDetails(attachment)
         setupListeners(attachment)
     }
@@ -80,9 +83,8 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
             trackAttachmentActionsEvent("saveToKDrive")
             attachment.executeIntent(SAVE_TO_DRIVE)
         }
-        deviceItem.setClosingOnClickListener {
+        deviceItem.setOnClickListener {
             trackAttachmentActionsEvent("download")
-            mainViewModel.snackBarManager.setValue(getString(R.string.snackbarDownloadInProgress))
             scheduleDownloadManager(attachment.downloadUrl, attachment.name)
         }
     }
@@ -110,9 +112,14 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private fun scheduleDownloadManager(downloadUrl: String, filename: String) {
         if (permissionUtils.hasDownloadManagerPermission) {
-            mainViewModel.scheduleDownload(downloadUrl, filename)
+            scheduleDownloadAndPopBack(downloadUrl, filename)
         } else {
-            permissionUtils.requestDownloadManagerPermission { mainViewModel.scheduleDownload(downloadUrl, filename) }
+            permissionUtils.requestDownloadManagerPermission { scheduleDownloadAndPopBack(downloadUrl, filename) }
         }
+    }
+
+    private fun scheduleDownloadAndPopBack(downloadUrl: String, filename: String) {
+        mainViewModel.scheduleDownload(downloadUrl, filename)
+        findNavController().popBackStack()
     }
 }
