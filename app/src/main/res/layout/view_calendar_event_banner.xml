@@ -104,9 +104,9 @@
                 android:layout_marginTop="@dimen/marginStandardMedium"
                 android:drawablePadding="@dimen/marginStandardMedium"
                 android:gravity="center_vertical"
+                android:text="@string/calendarNotInvited"
                 app:drawableStartCompat="@drawable/ic_social_media"
                 app:drawableTint="@color/iconColor"
-                tools:text="Vous ne faites pas partie des invités"
                 tools:visibility="gone" />
 
             <LinearLayout
