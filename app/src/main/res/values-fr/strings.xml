@@ -496,9 +496,9 @@
     <string name="syncInstalled">Installée</string>
     <string name="syncStartDescription">Activez les calendriers et carnets d’adresses dans kSync, que vous souhaitez synchroniser sur votre téléphone.</string>
     <plurals name="threadListDeletionConfirmationAlertDescription">
-        <item quantity="one">Etes-vous sûr de vouloir supprimer ce message définitivement ?</item>
-        <item quantity="other">Etes-vous sûr de vouloir supprimer ces messages définitivement ?</item>
-        <item quantity="many">Etes-vous sûr de vouloir supprimer ces messages définitivement ?</item>
+        <item quantity="one">Êtes-vous sûr de vouloir supprimer ce message définitivement ?</item>
+        <item quantity="other">Êtes-vous sûr de vouloir supprimer ces messages définitivement ?</item>
+        <item quantity="many">Êtes-vous sûr de vouloir supprimer ces messages définitivement ?</item>
     </plurals>
     <plurals name="threadListDeletionConfirmationAlertTitle">
         <item quantity="one">Supprimer %d message</item>
@@ -506,7 +506,7 @@
         <item quantity="many">Supprimer %d de messages</item>
     </plurals>
     <string name="threadListEmptyDraftButton">Vider les brouillons</string>
-    <string name="threadListEmptyFolderAlertDescription">Etes-vous sûr de vouloir supprimer définitivement tous les messages de ce dossier ?</string>
+    <string name="threadListEmptyFolderAlertDescription">Êtes-vous sûr de vouloir supprimer définitivement tous les messages de ce dossier ?</string>
     <string name="threadListEmptySpamButton">Vider les spams</string>
     <string name="threadListEmptyTrashButton">Vider la corbeille</string>
     <string name="threadListHeaderLastUpdate">Mis à jour %s</string>
