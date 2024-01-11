@@ -104,7 +104,7 @@ class SearchFragment : Fragment() {
 
         searchViewModel.executePendingSearch()
 
-        setupThreadListAdapter()
+        setupAdapter()
         setupListeners()
         setFoldersDropdownUi()
         setAttachmentsUi()
@@ -128,7 +128,7 @@ class SearchFragment : Fragment() {
         super.onDestroyView()
     }
 
-    private fun setupThreadListAdapter() {
+    private fun setupAdapter() {
         threadListAdapter(folderRole = null)
     }
 
