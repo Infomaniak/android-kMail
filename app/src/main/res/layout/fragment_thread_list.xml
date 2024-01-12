@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2022-2023 Infomaniak Network SA
+  ~ Copyright (C) 2022-2024 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -15,276 +15,289 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.infomaniak.mail.ui.main.NoAnimSlidingPaneLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/threadListSlidingPaneLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.main.folder.ThreadListFragment">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appBarLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="@dimen/leftSlidingPaneWidth"
+        android:layout_height="match_parent"
+        android:layout_weight="@integer/leftSlidingPaneWeight">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appBarLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <FrameLayout
-                android:id="@+id/toolbarLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <com.google.android.material.appbar.MaterialToolbar
-                    android:id="@+id/toolbar"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:contentInsetEnd="0dp"
-                    app:navigationContentDescription="@string/contentDescriptionButtonMenu"
-                    app:navigationIcon="@drawable/ic_burger"
-                    tools:title="Boîte de réception"
-                    tools:visibility="visible">
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="end"
-                        android:orientation="horizontal">
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/searchButton"
-                            style="@style/IconButton"
-                            android:contentDescription="@string/searchFieldPlaceholder"
-                            app:icon="@drawable/ic_search_big"
-                            app:iconTint="?android:attr/colorPrimary" />
-
-                        <com.infomaniak.mail.views.AvatarView
-                            android:id="@+id/userAvatar"
-                            android:layout_width="wrap_content"
-                            android:layout_height="48dp"
-                            android:layout_gravity="center"
-                            android:layout_marginEnd="@dimen/marginStandardMedium"
-                            app:inset="@dimen/marginStandardSmall"
-                            tools:src="@tools:sample/avatars[12]" />
-
-                    </LinearLayout>
-                </com.google.android.material.appbar.MaterialToolbar>
-
-                <com.google.android.material.appbar.MaterialToolbar
-                    android:id="@+id/toolbarSelection"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:visibility="gone"
-                    app:contentInsetEnd="0dp"
-                    app:contentInsetStart="0dp"
-                    app:navigationIcon="@null"
-                    tools:visibility="gone">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:gravity="center_vertical">
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/cancel"
-                            style="@style/TextButtonSecondary"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/buttonCancel" />
-
-                        <TextView
-                            android:id="@+id/selectedCount"
-                            style="@style/H1"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:ellipsize="end"
-                            android:gravity="center"
-                            android:lines="1"
-                            tools:text="2 sélectionnés" />
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/selectAll"
-                            style="@style/TextButtonSecondary"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/buttonSelectAll" />
-
-                    </LinearLayout>
-                </com.google.android.material.appbar.MaterialToolbar>
-            </FrameLayout>
-
-            <LinearLayout
-                android:id="@+id/updatedAtLayout"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/marginStandardMedium"
-                android:layout_marginBottom="@dimen/marginStandardMedium"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/unreadCountChip"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/toolbarLayout">
-
-                <TextView
-                    android:id="@+id/noNetwork"
-                    style="@style/BodySmall.Warning"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:drawablePadding="@dimen/marginStandardSmall"
-                    android:text="@string/noNetwork"
-                    android:visibility="gone"
-                    app:drawableStartCompat="@drawable/ic_no_network"
-                    tools:visibility="visible" />
-
-                <TextView
-                    android:id="@+id/updatedAt"
-                    style="@style/BodySmall.Secondary"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:ellipsize="end"
-                    android:lines="1"
-                    tools:text="@string/noUpdatedAt" />
-
-            </LinearLayout>
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/unreadCountChip"
-                style="@style/UnreadChip"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/marginStandardMedium"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="@id/updatedAtLayout"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/updatedAtLayout"
-                tools:closeIcon="@null"
-                tools:text="2 non lus"
-                tools:visibility="visible" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/background"
-        style="@style/BackdropCardview"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/appBarLayout">
-
-        <androidx.coordinatorlayout.widget.CoordinatorLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-                android:id="@+id/swipeRefreshLayout"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <FrameLayout
+                    android:id="@+id/toolbarLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:nestedScrollingEnabled="true">
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
+                    <com.google.android.material.appbar.MaterialToolbar
+                        android:id="@+id/toolbar"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                        android:layout_height="wrap_content"
+                        app:contentInsetEnd="0dp"
+                        app:navigationContentDescription="@string/contentDescriptionButtonMenu"
+                        app:navigationIcon="@drawable/ic_burger"
+                        tools:title="Boîte de réception">
 
-                        <TextView
-                            android:id="@+id/updateDownloadedText"
-                            style="@style/BodySmall"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginHorizontal="@dimen/marginStandardMedium"
-                            android:layout_marginTop="@dimen/marginStandardMedium"
-                            android:text="@string/updateReadyTitle"
-                            app:layout_constraintEnd_toStartOf="@+id/installUpdate"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/installUpdate"
-                            style="@style/TextButton"
+                        <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/buttonInstall"
-                            app:icon="@drawable/ic_app_update"
-                            app:iconPadding="@dimen/marginStandardSmall"
-                            app:iconSize="@dimen/marginStandardMedium"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            android:layout_gravity="end"
+                            android:orientation="horizontal">
 
-                        <com.google.android.material.divider.MaterialDivider
-                            android:id="@+id/installUpdateDivider"
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            app:dividerColor="@color/divider"
-                            app:layout_constraintTop_toBottomOf="@id/installUpdate" />
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/searchButton"
+                                style="@style/IconButton"
+                                android:contentDescription="@string/searchFieldPlaceholder"
+                                app:icon="@drawable/ic_search_big"
+                                app:iconTint="?android:attr/colorPrimary" />
 
-                        <androidx.constraintlayout.widget.Group
-                            android:id="@+id/installUpdateGroup"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:visibility="gone"
-                            app:constraint_referenced_ids="installUpdate, installUpdateDivider, updateDownloadedText"
-                            tools:visibility="visible" />
+                            <com.infomaniak.mail.views.AvatarView
+                                android:id="@+id/userAvatar"
+                                android:layout_width="wrap_content"
+                                android:layout_height="48dp"
+                                android:layout_gravity="center"
+                                android:layout_marginEnd="@dimen/marginStandardMedium"
+                                app:inset="@dimen/marginStandardSmall"
+                                tools:src="@tools:sample/avatars[12]" />
 
-                        <com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
-                            android:id="@+id/threadsList"
-                            android:layout_width="match_parent"
-                            android:layout_height="0dp"
-                            android:clipToPadding="false"
-                            android:paddingBottom="@dimen/recyclerViewPaddingBottom"
-                            app:behind_swiped_item_icon_margin="@dimen/marginStandard"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/installUpdateDivider"
-                            tools:listitem="@layout/cardview_thread_item"
-                            tools:visibility="gone" />
+                        </LinearLayout>
+                    </com.google.android.material.appbar.MaterialToolbar>
 
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    <com.infomaniak.mail.ui.main.EmptyStateView
-                        android:id="@+id/emptyStateView"
+                    <com.google.android.material.appbar.MaterialToolbar
+                        android:id="@+id/toolbarSelection"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:visibility="gone"
-                        tools:description="@string/emptyStateInboxDescription"
-                        tools:icon="@drawable/ic_empty_state_folder"
-                        tools:title="@string/emptyStateInboxTitle"
+                        app:contentInsetEnd="0dp"
+                        app:contentInsetStart="0dp"
+                        app:navigationIcon="@null">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center_vertical">
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/cancel"
+                                style="@style/TextButtonSecondary"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/buttonCancel" />
+
+                            <TextView
+                                android:id="@+id/selectedCount"
+                                style="@style/H1"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:ellipsize="end"
+                                android:gravity="center"
+                                android:lines="1"
+                                tools:text="2 sélectionnés" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/selectAll"
+                                style="@style/TextButtonSecondary"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/buttonSelectAll" />
+
+                        </LinearLayout>
+                    </com.google.android.material.appbar.MaterialToolbar>
+                </FrameLayout>
+
+                <LinearLayout
+                    android:id="@+id/updatedAtLayout"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/marginStandardMedium"
+                    android:layout_marginBottom="@dimen/marginStandardMedium"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/unreadCountChip"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/toolbarLayout">
+
+                    <TextView
+                        android:id="@+id/noNetwork"
+                        style="@style/BodySmall.Warning"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawablePadding="@dimen/marginStandardSmall"
+                        android:text="@string/noNetwork"
+                        android:visibility="gone"
+                        app:drawableStartCompat="@drawable/ic_no_network"
                         tools:visibility="visible" />
 
-                </FrameLayout>
-            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+                    <TextView
+                        android:id="@+id/updatedAt"
+                        style="@style/BodySmall.Secondary"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:lines="1"
+                        tools:text="@string/noUpdatedAt" />
 
-            <com.infomaniak.mail.views.BottomQuickActionBarView
-                android:id="@+id/quickActionBar"
+                </LinearLayout>
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/unreadCountChip"
+                    style="@style/UnreadChip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/marginStandardMedium"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="@id/updatedAtLayout"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/updatedAtLayout"
+                    tools:closeIcon="@null"
+                    tools:text="2 non lus"
+                    tools:visibility="visible" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/background"
+            style="@style/BackdropCardview"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/appBarLayout">
+
+            <androidx.coordinatorlayout.widget.CoordinatorLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:visibility="gone"
-                app:menu="@menu/multiselection_menu"
-                tools:visibility="visible" />
+                android:layout_height="match_parent">
 
-        </androidx.coordinatorlayout.widget.CoordinatorLayout>
-    </com.google.android.material.card.MaterialCardView>
+                <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                    android:id="@+id/swipeRefreshLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/newMessageFab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/marginStandard"
-        android:layout_marginBottom="@dimen/marginStandard"
-        android:text="@string/buttonNewMessage"
-        app:icon="@drawable/ic_pencil"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="true">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+
+                            <TextView
+                                android:id="@+id/updateDownloadedText"
+                                style="@style/BodySmall"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                                android:layout_marginTop="@dimen/marginStandardMedium"
+                                android:text="@string/updateReadyTitle"
+                                app:layout_constraintEnd_toStartOf="@+id/installUpdate"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/installUpdate"
+                                style="@style/TextButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/buttonInstall"
+                                app:icon="@drawable/ic_app_update"
+                                app:iconPadding="@dimen/marginStandardSmall"
+                                app:iconSize="@dimen/marginStandardMedium"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <com.google.android.material.divider.MaterialDivider
+                                android:id="@+id/installUpdateDivider"
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                app:dividerColor="@color/divider"
+                                app:layout_constraintTop_toBottomOf="@id/installUpdate" />
+
+                            <androidx.constraintlayout.widget.Group
+                                android:id="@+id/installUpdateGroup"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:visibility="gone"
+                                app:constraint_referenced_ids="installUpdate, installUpdateDivider, updateDownloadedText"
+                                tools:visibility="visible" />
+
+                            <com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
+                                android:id="@+id/threadsList"
+                                android:layout_width="match_parent"
+                                android:layout_height="0dp"
+                                android:clipToPadding="false"
+                                android:paddingBottom="@dimen/recyclerViewPaddingBottom"
+                                app:behind_swiped_item_icon_margin="@dimen/marginStandard"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintTop_toBottomOf="@id/installUpdateDivider"
+                                tools:listitem="@layout/cardview_thread_item"
+                                tools:visibility="gone" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <com.infomaniak.mail.ui.main.EmptyStateView
+                            android:id="@+id/emptyStateView"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:visibility="gone"
+                            tools:description="@string/emptyStateInboxDescription"
+                            tools:icon="@drawable/ic_empty_state_folder"
+                            tools:title="@string/emptyStateInboxTitle"
+                            tools:visibility="visible" />
+
+                    </FrameLayout>
+                </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+                <com.infomaniak.mail.views.BottomQuickActionBarView
+                    android:id="@+id/quickActionBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:visibility="gone"
+                    app:menu="@menu/multiselection_menu"
+                    tools:visibility="visible" />
+
+            </androidx.coordinatorlayout.widget.CoordinatorLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+            android:id="@+id/newMessageFab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/marginStandard"
+            android:layout_marginBottom="@dimen/marginStandard"
+            android:text="@string/buttonNewMessage"
+            app:icon="@drawable/ic_pencil"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/threadHostFragment"
+        android:name="com.infomaniak.mail.ui.main.thread.ThreadFragment"
+        android:layout_width="@dimen/rightSlidingPaneWidth"
+        android:layout_height="match_parent"
+        android:layout_weight="@integer/rightSlidingPaneWeight" />
+
+</com.infomaniak.mail.ui.main.NoAnimSlidingPaneLayout>

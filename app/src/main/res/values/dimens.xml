@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2022-2023 Infomaniak Network SA
+  ~ Copyright (C) 2022-2024 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -16,6 +16,16 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
+
+    <!--
+        TODO: When we'll be able to recreate the Activity in `onConfigurationChanged`,
+            we should probably use different layouts in portrait & landscape instead of these hardcoded values.
+    -->
+    <!-- Important: keep the 2/5 & 3/5 ratios between these widths. -->
+    <dimen name="leftSlidingPaneWidth">2000dp</dimen>
+    <dimen name="rightSlidingPaneWidth">3000dp</dimen>
+    <integer name="leftSlidingPaneWeight">2</integer>
+    <integer name="rightSlidingPaneWeight">3</integer>
 
     <!-- View sizes -->
     <dimen name="accountAvatarSize">110dp</dimen>

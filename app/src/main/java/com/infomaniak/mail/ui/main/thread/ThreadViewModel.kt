@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2023 Infomaniak Network SA
+ * Copyright (C) 2022-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,71 +47,66 @@ class ThreadViewModel @Inject constructor(
     private val mailboxController: MailboxController,
     private val messageController: MessageController,
     private val refreshController: RefreshController,
-    private val savedStateHandle: SavedStateHandle,
     private val sharedUtils: SharedUtils,
     private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
+
+    private var threadLiveJob: Job? = null
+    private var messagesLiveJob: Job? = null
     private var fetchMessagesJob: Job? = null
 
-    private val threadUid inline get() = savedStateHandle.get<String>(ThreadFragmentArgs::threadUid.name)!!
-    private val mailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
-
-    val quickActionBarClicks = SingleLiveEvent<Pair<Message, Int>>()
+    val quickActionBarClicks = SingleLiveEvent<QuickActionBarResult>()
 
     var deletedMessagesUids = mutableSetOf<String>()
     val failedMessagesUids = SingleLiveEvent<List<String>>()
 
-    val threadLive = liveData(ioCoroutineContext) {
-        emitSource(threadController.getThreadAsync(threadUid).map { it.obj }.asLiveData())
-    }
+    val threadLive = MutableLiveData<Thread?>()
+    val messagesLive = MutableLiveData<List<Message>>()
 
-    private val splitBodies = mutableMapOf<String, SplitBody>()
-
-    val messagesLive = liveData(ioCoroutineContext) {
-
-        suspend fun splitBody(message: Message): Message = withContext(ioDispatcher) {
-            if (message.body == null) return@withContext message
-
-            return@withContext message.apply {
-                body?.let {
-                    val isNotAlreadySplit = !splitBodies.contains(message.uid)
-                    if (isNotAlreadySplit) splitBodies[message.uid] = MessageBodyUtils.splitContentAndQuote(it)
-                    splitBody = splitBodies[message.uid]
-                }
-            }
-        }
-
-        messageController.getSortedAndNotDeletedMessagesAsync(threadUid)
-            ?.map { results -> results.list.map { splitBody(it) } }
-            ?.asLiveData()
-            ?.let { emitSource(it) }
-    }
+    private val mailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
 
     private val currentMailboxLive = mailboxController.getMailboxAsync(
         AccountUtils.currentUserId,
         AccountUtils.currentMailboxId,
     ).map { it.obj }.asLiveData(ioCoroutineContext)
 
-    fun assembleSubjectData(mergedContactsLive: LiveData<MergedContactDictionary>): LiveData<SubjectDataResult> {
-        return MediatorLiveData<SubjectDataResult>().apply {
-            addSource(threadLive) { thread ->
-                value = SubjectDataResult(thread, value?.mergedContacts, value?.mailbox)
-            }
-
-            addSource(mergedContactsLive) { mergedContacts ->
-                value = SubjectDataResult(value?.thread, mergedContacts, value?.mailbox)
-            }
-
-            addSource(currentMailboxLive) { mailbox ->
-                value = SubjectDataResult(value?.thread, value?.mergedContacts, mailbox)
-            }
+    fun reassignThreadLive(threadUid: String) {
+        threadLiveJob?.cancel()
+        threadLiveJob = viewModelScope.launch(ioCoroutineContext) {
+            threadController.getThreadAsync(threadUid).map { it.obj }.collect(threadLive::postValue)
         }
     }
 
-    fun openThread() = liveData(ioCoroutineContext) {
+    fun reassignMessagesLive(threadUid: String) {
+        messagesLiveJob?.cancel()
+        messagesLiveJob = viewModelScope.launch(ioCoroutineContext) {
+
+            val cachedSplitBodies = mutableMapOf<String, SplitBody>()
+
+            suspend fun splitBody(message: Message): Message = withContext(ioDispatcher) {
+                if (message.body == null) return@withContext message
+
+                message.apply {
+                    body?.let {
+                        val isNotAlreadySplit = !cachedSplitBodies.contains(message.uid)
+                        if (isNotAlreadySplit) cachedSplitBodies[message.uid] = MessageBodyUtils.splitContentAndQuote(it)
+                        splitBody = cachedSplitBodies[message.uid]
+                    }
+                }
+
+                return@withContext message
+            }
+
+            messageController.getSortedAndNotDeletedMessagesAsync(threadUid)
+                ?.map { results -> results.list.map { splitBody(it) } }
+                ?.collect(messagesLive::postValue)
+        }
+    }
+
+    fun openThread(threadUid: String) = liveData(ioCoroutineContext) {
 
         val thread = threadController.getThread(threadUid) ?: run {
             emit(null)
@@ -148,6 +143,24 @@ class ThreadViewModel @Inject constructor(
         }
     }
 
+    fun assembleSubjectData(mergedContactsLive: LiveData<MergedContactDictionary>): LiveData<SubjectDataResult> {
+
+        return MediatorLiveData<SubjectDataResult>().apply {
+
+            addSource(threadLive) { thread ->
+                value = SubjectDataResult(thread, value?.mergedContacts, value?.mailbox)
+            }
+
+            addSource(mergedContactsLive) { mergedContacts ->
+                value = SubjectDataResult(value?.thread, mergedContacts, value?.mailbox)
+            }
+
+            addSource(currentMailboxLive) { mailbox ->
+                value = SubjectDataResult(value?.thread, value?.mergedContacts, mailbox)
+            }
+        }
+    }
+
     fun fetchMessagesHeavyData(messages: List<Message>) {
         fetchMessagesJob?.cancel()
         fetchMessagesJob = viewModelScope.launch(ioCoroutineContext) {
@@ -162,7 +175,11 @@ class ThreadViewModel @Inject constructor(
                 //  leading to an infinite shimmering effect that we cannot escape from.
                 delay(100L)
 
-                deletedMessagesUids.addAll(deleted)
+                deletedMessagesUids.apply {
+                    clear()
+                    addAll(deleted)
+                }
+
                 failedMessagesUids.postValue(failed)
             }
         }
@@ -170,7 +187,7 @@ class ThreadViewModel @Inject constructor(
 
     fun deleteDraft(message: Message, mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
         val realm = mailboxContentRealm()
-        val thread = ThreadController.getThread(threadUid, realm) ?: return@launch
+        val thread = threadLive.value ?: return@launch
         val messages = messageController.getMessageAndDuplicates(thread, message)
         val isSuccess = ApiRepository.deleteMessages(mailbox.uuid, messages.getUids()).isSuccess()
         if (isSuccess) {
@@ -184,9 +201,9 @@ class ThreadViewModel @Inject constructor(
     }
 
     fun clickOnQuickActionBar(menuId: Int) = viewModelScope.launch(ioCoroutineContext) {
-        val thread = threadController.getThread(threadUid) ?: return@launch
+        val thread = threadLive.value ?: return@launch
         val message = messageController.getLastMessageToExecuteAction(thread)
-        quickActionBarClicks.postValue(message to menuId)
+        quickActionBarClicks.postValue(QuickActionBarResult(thread.uid, message, menuId))
     }
 
     data class SubjectDataResult(
@@ -200,5 +217,11 @@ class ThreadViewModel @Inject constructor(
         val isExpandedMap: MutableMap<String, Boolean>,
         val initialSetOfExpandedMessagesUids: Set<String>,
         val isThemeTheSameMap: MutableMap<String, Boolean>,
+    )
+
+    data class QuickActionBarResult(
+        val threadUid: String,
+        val message: Message,
+        val menuId: Int,
     )
 }

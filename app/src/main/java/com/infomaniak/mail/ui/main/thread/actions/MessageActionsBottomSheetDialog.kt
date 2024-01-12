@@ -20,7 +20,6 @@ package com.infomaniak.mail.ui.main.thread.actions
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
@@ -126,7 +125,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 override fun onReadUnread() {
                     trackBottomSheetMessageActionsEvent(ACTION_MARK_AS_SEEN_NAME, message.isSeen)
                     mainViewModel.toggleMessageSeenStatus(threadUid, message)
-                    findNavController().popBackStack(R.id.threadFragment, inclusive = true)
+                    twoPaneViewModel.closeThread()
                 }
 
                 override fun onMove() {

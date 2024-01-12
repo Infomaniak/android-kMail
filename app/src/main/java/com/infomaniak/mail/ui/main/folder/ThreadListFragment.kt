@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2023 Infomaniak Network SA
+ * Copyright (C) 2022-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.folder
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.text.format.DateUtils
@@ -30,8 +31,6 @@ import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.distinctUntilChanged
 import androidx.navigation.fragment.findNavController
@@ -67,9 +66,10 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
-import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
+import com.infomaniak.mail.ui.main.NoAnimSlidingPaneLayout
 import com.infomaniak.mail.ui.main.settings.swipe.SwipeActionsSettingsFragment
+import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
@@ -86,14 +86,15 @@ import javax.inject.Inject
 import com.infomaniak.lib.core.R as RCore
 
 @AndroidEntryPoint
-class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
+class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private var _binding: FragmentThreadListBinding? = null
     val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
 
     private val navigationArgs: ThreadListFragmentArgs by navArgs()
-    private val mainViewModel: MainViewModel by activityViewModels()
     private val threadListViewModel: ThreadListViewModel by viewModels()
+
+    override val slidingPaneLayout: NoAnimSlidingPaneLayout get() = binding.threadListSlidingPaneLayout
 
     private val threadListMultiSelection by lazy { ThreadListMultiSelection() }
 
@@ -102,12 +103,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     @Inject
     lateinit var localSettings: LocalSettings
-
-    // TODO: When we'll update DragDropSwipeRecyclerViewLib, we'll need to make the adapter nullable.
-    //  For now it causes a memory leak, because we can't remove the strong reference
-    //  between the ThreadList's RecyclerView and its Adapter as it throws an NPE.
-    @Inject
-    lateinit var threadListAdapter: ThreadListAdapter
 
     @Inject
     lateinit var draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler
@@ -164,18 +159,53 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         observeUpdateInstall()
     }.getOrDefault(Unit)
 
+    override fun getAnchor(): View? {
+        return if (isOnlyRightShown()) {
+            _binding?.threadHostFragment?.getFragment<ThreadFragment?>()?.getAnchor()
+        } else {
+            _binding?.newMessageFab
+        }
+    }
+
+    override fun doAfterFolderChanged() {
+        navigateFromNotificationToThread()
+    }
+
+    private fun navigateFromNotificationToThread() {
+        arguments?.consumeKeyIfProvided(navigationArgs::openThreadUid.name) { threadUid ->
+
+            // Select Thread in ThreadList
+            with(threadListAdapter) {
+                getItemPosition(threadUid)
+                    ?.let { position -> selectNewThread(position, threadUid) }
+                    ?: run { preselectNewThread(threadUid) }
+            }
+
+            // If we are coming from a Notification, we need to navigate to ThreadFragment.
+            twoPaneViewModel.openThread(threadUid)
+        }
+    }
+
     private fun navigateFromNotificationToNewMessage() {
-        // Here, we use `arguments` instead of `navigationArgs` because we need mutable data.
-        if (arguments?.getString(navigationArgs::replyToMessageUid.name) != null) {
-            // If we are coming from the Reply action of a Notification, we need to navigate to NewMessageActivity
+        arguments?.consumeKeyIfProvided(navigationArgs::replyToMessageUid.name) { replyToMessageUid ->
+
+            // If we clicked on the "Reply" action of a Notification, we need to navigate to NewMessageActivity.
             safeNavigateToNewMessageActivity(
                 NewMessageActivityArgs(
                     draftMode = navigationArgs.draftMode,
-                    previousMessageUid = navigationArgs.replyToMessageUid,
+                    previousMessageUid = replyToMessageUid,
                     notificationId = navigationArgs.notificationId,
                 ).toBundle(),
             )
-            arguments?.remove(navigationArgs::replyToMessageUid.name)
+        }
+    }
+
+    // We remove the key from the `arguments` to prevent it from triggering again. To do this we need to use
+    // `arguments` instead of `navigationArgs` so the data can be mutated.
+    private fun Bundle.consumeKeyIfProvided(key: String, block: (String) -> Unit) {
+        getString(key)?.let {
+            remove(key)
+            block(it)
         }
     }
 
@@ -189,6 +219,17 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         refreshThreadsIfNotificationsAreDisabled()
         updateSwipeActionsAccordingToSettings()
         canRefreshThreads = true
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+
+        val statusBarColor = if (twoPaneViewModel.isThreadOpen && !canDisplayBothPanes()) {
+            R.color.backgroundColor
+        } else {
+            R.color.backgroundHeaderColor
+        }
+        requireActivity().window.statusBarColor = requireContext().getColor(statusBarColor)
     }
 
     private fun refreshThreadsIfNotificationsAreDisabled() = with(mainViewModel) {
@@ -265,7 +306,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
             stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
 
-            onThreadClicked = { thread -> navigateToThread(thread, mainViewModel) }
+            onThreadClicked = ::navigateToThread
 
             onFlushClicked = { dialogTitle ->
 
@@ -299,7 +340,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         toolbar.setNavigationOnClickListener {
             trackMenuDrawerEvent("openByButton")
-            (activity as? MainActivity)?.binding?.drawerLayout?.open()
+            (requireActivity() as MainActivity).openDrawerLayout()
         }
 
         cancel.setOnClickListener {
@@ -313,9 +354,11 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         searchButton.setOnClickListener {
             safeNavigate(
+                // We need a valid Folder ID for the API call to not fail, but the value itself won't be used.
+                // So if we don't have any, we use a hardcoded one (corresponding to "INBOX" folder).
                 ThreadListFragmentDirections.actionThreadListFragmentToSearchFragment(
-                    dummyFolderId = mainViewModel.currentFolderId ?: "eJzz9HPyjwAABGYBgQ--", // Hardcoded INBOX folder
-                )
+                    dummyFolderId = mainViewModel.currentFolderId ?: "eJzz9HPyjwAABGYBgQ--"
+                ),
             )
         }
 
@@ -498,6 +541,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
             waitingBeforeNotifyAdapter = threadListViewModel.isRecoveringFinished
 
+            deletedItemsIndices = ::removeMultiSelectItems
+
             afterUpdateAdapter = { threads ->
                 if (currentFilter.value == ThreadFilter.UNSEEN && threads.isEmpty()) {
                     currentFilter.value = ThreadFilter.ALL
@@ -562,6 +607,19 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         threadListViewModel.updatedAtTrigger.observe(viewLifecycleOwner) { updateUpdatedAt() }
     }
 
+    private fun observerDraftsActionsCompletedWorks() {
+
+        fun observeDraftsActions() {
+            draftsActionsWorkerScheduler.getCompletedWorkInfoLiveData().observe(viewLifecycleOwner) {
+                mainViewModel.currentFolder.value?.let { folder ->
+                    if (folder.isValid() && folder.role == FolderRole.DRAFT) mainViewModel.forceRefreshThreads()
+                }
+            }
+        }
+
+        WorkerUtils.flushWorkersBefore(requireContext(), viewLifecycleOwner, ::observeDraftsActions)
+    }
+
     private fun observeFlushFolderTrigger() {
         mainViewModel.flushFolderTrigger.observe(viewLifecycleOwner) { descriptionDialog.resetLoadingAndDismiss() }
     }
@@ -580,24 +638,12 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                     onFailure = {
                         Sentry.captureException(it)
                         localSettings.resetUpdateSettings()
+
                         mainViewModel.snackBarManager.setValue(getString(RCore.string.errorUpdateInstall))
                     },
                 )
             }
         }
-    }
-
-    private fun observerDraftsActionsCompletedWorks() {
-
-        fun observeDraftsActions() {
-            draftsActionsWorkerScheduler.getCompletedWorkInfoLiveData().observe(viewLifecycleOwner) {
-                mainViewModel.currentFolder.value?.let { folder ->
-                    if (folder.isValid() && folder.role == FolderRole.DRAFT) mainViewModel.forceRefreshThreads()
-                }
-            }
-        }
-
-        WorkerUtils.flushWorkersBefore(requireContext(), viewLifecycleOwner, ::observeDraftsActions)
     }
 
     private fun checkLastUpdateDay() {
@@ -632,6 +678,18 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         val folderName = folder.getLocalizedName(binding.context)
         SentryLog.i("UI", "Received folder name: $folderName")
         binding.toolbar.title = folderName
+    }
+
+    private fun removeMultiSelectItems(deletedIndices: IntArray) = with(mainViewModel) {
+        if (isMultiSelectOn) {
+            val previousThreads = threadListAdapter.dataSet.filterIsInstance<Thread>()
+            var shouldPublish = false
+            deletedIndices.forEach {
+                val isRemoved = mainViewModel.selectedThreads.remove(previousThreads[it])
+                if (isRemoved) shouldPublish = true
+            }
+            if (shouldPublish) publishSelectedItems()
+        }
     }
 
     private fun updateThreadsVisibility() = with(threadListViewModel) {

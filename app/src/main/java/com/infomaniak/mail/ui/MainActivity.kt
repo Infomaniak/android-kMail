@@ -66,10 +66,12 @@ import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.firebase.RegisterFirebaseBroadcastReceiver
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.TitleAlertDialog
+import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.ui.newMessage.NewMessageActivity
 import com.infomaniak.mail.ui.sync.SyncAutoConfigActivity
 import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.UiUtils.progressivelyColorSystemBars
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Breadcrumb
@@ -86,8 +88,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : BaseActivity() {
 
-    // This binding is not private because it's used in ThreadListFragment (`(activity as? MainActivity)?.binding`)
-    val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
+    private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private val mainViewModel: MainViewModel by viewModels()
 
     private val backgroundColor: Int by lazy { getColor(R.color.backgroundColor) }
@@ -129,6 +130,12 @@ class MainActivity : BaseActivity() {
         trackInAppUpdateEvent(if (isUserWantingUpdates) DISCOVER_NOW else DISCOVER_LATER)
     }
 
+    private val currentFragment
+        get() = supportFragmentManager
+            .findFragmentById(R.id.mainHostFragment)
+            ?.childFragmentManager
+            ?.primaryNavigationFragment
+
     @Inject
     lateinit var draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler
 
@@ -154,7 +161,7 @@ class MainActivity : BaseActivity() {
 
         override fun onDrawerOpened(drawerView: View) {
             if (hasDragged) trackMenuDrawerEvent("openByGesture", TrackerAction.DRAG)
-            colorSystemBarsWithMenuDrawer(FULLY_SLID)
+            colorSystemBarsWithMenuDrawer(UiUtils.FULLY_SLID)
             (binding.menuDrawerFragmentContainer.getFragment() as? MenuDrawerFragment)?.onDrawerOpened()
         }
 
@@ -342,7 +349,7 @@ class MainActivity : BaseActivity() {
 
         mainViewModel.checkAppUpdateStatus()
 
-        if (binding.drawerLayout.isOpen) colorSystemBarsWithMenuDrawer(FULLY_SLID)
+        if (binding.drawerLayout.isOpen) colorSystemBarsWithMenuDrawer(UiUtils.FULLY_SLID)
     }
 
     private fun handleOnBackPressed() = with(binding) {
@@ -356,11 +363,8 @@ class MainActivity : BaseActivity() {
         }
 
         fun popBack() {
-            if (navController.currentDestination?.id == R.id.threadListFragment) {
-                finish()
-            } else {
-                navController.popBackStack()
-            }
+            val fragment = currentFragment
+            if (fragment is TwoPaneFragment) fragment.handleOnBackPressed() else navController.popBackStack()
         }
 
         onBackPressedDispatcher.addCallback(this@MainActivity) {
@@ -384,10 +388,10 @@ class MainActivity : BaseActivity() {
     }
 
     private fun setupSnackBar() {
-        fun getAnchor(): View? = when (navController.currentDestination?.id) {
-            R.id.threadListFragment -> findViewById(R.id.newMessageFab)
-            R.id.threadFragment -> findViewById(R.id.quickActionBar)
-            else -> null
+
+        fun getAnchor(): View? {
+            val fragment = currentFragment
+            return if (fragment is TwoPaneFragment) fragment.getAnchor() else null
         }
 
         mainViewModel.snackBarManager.setup(
@@ -422,43 +426,40 @@ class MainActivity : BaseActivity() {
     private fun onDestinationChanged(destination: NavDestination, arguments: Bundle?) {
 
         SentryDebug.addNavigationBreadcrumb(destination.displayName, arguments)
+        trackDestination(destination)
 
+        updateColorsWhenDestinationChanged(destination.id)
         setDrawerLockMode(destination.id == R.id.threadListFragment)
 
-        when (destination.id) {
+        previousDestinationId = destination.id
+    }
+
+    private fun updateColorsWhenDestinationChanged(destinationId: Int) {
+
+        when (destinationId) {
             R.id.junkBottomSheetDialog,
             R.id.messageActionsBottomSheetDialog,
             R.id.replyBottomSheetDialog,
             R.id.detailedContactBottomSheetDialog,
-            R.id.threadFragment,
             R.id.threadActionsBottomSheetDialog,
             R.id.attachmentActionsBottomSheetDialog,
             R.id.downloadAttachmentProgressDialog -> null
             R.id.searchFragment -> R.color.backgroundColor
             else -> R.color.backgroundHeaderColor
-        }?.let {
-            window.statusBarColor = getColor(it)
+        }?.let { statusBarColor ->
+            window.statusBarColor = getColor(statusBarColor)
         }
 
-        val colorRes = when (destination.id) {
-            R.id.threadFragment -> R.color.elevatedBackground
+        when (destinationId) {
             R.id.messageActionsBottomSheetDialog,
             R.id.replyBottomSheetDialog,
             R.id.detailedContactBottomSheetDialog,
             R.id.threadActionsBottomSheetDialog -> R.color.backgroundColorSecondary
-            R.id.threadListFragment -> {
-                if (mainViewModel.isMultiSelectOn) R.color.elevatedBackground else R.color.backgroundColor
-            }
+            R.id.threadListFragment -> if (mainViewModel.isMultiSelectOn) R.color.elevatedBackground else R.color.backgroundColor
             else -> R.color.backgroundColor
+        }.let { navigationBarColor ->
+            window.updateNavigationBarColor(getColor(navigationBarColor))
         }
-
-        window.updateNavigationBarColor(getColor(colorRes))
-
-        trackDestination(destination)
-
-        if (destination.id == R.id.threadListFragment && previousDestinationId == R.id.threadFragment) showAppReview()
-
-        previousDestinationId = destination.id
     }
 
     fun setDrawerLockMode(isUnlocked: Boolean) {
@@ -466,14 +467,14 @@ class MainActivity : BaseActivity() {
         binding.drawerLayout.setDrawerLockMode(drawerLockMode)
     }
 
-    private fun colorSystemBarsWithMenuDrawer(@FloatRange(0.0, 1.0) slideOffset: Float) = with(window) {
-        if (slideOffset == FULLY_SLID) {
-            statusBarColor = menuDrawerBackgroundColor
-            updateNavigationBarColor(menuDrawerBackgroundColor)
-        } else {
-            statusBarColor = UiUtils.pointBetweenColors(backgroundHeaderColor, menuDrawerBackgroundColor, slideOffset)
-            updateNavigationBarColor(UiUtils.pointBetweenColors(backgroundColor, menuDrawerBackgroundColor, slideOffset))
-        }
+    private fun colorSystemBarsWithMenuDrawer(@FloatRange(0.0, 1.0) slideOffset: Float) {
+        window.progressivelyColorSystemBars(
+            slideOffset = slideOffset,
+            statusBarColorFrom = backgroundHeaderColor,
+            statusBarColorTo = menuDrawerBackgroundColor,
+            navBarColorFrom = backgroundColor,
+            navBarColorTo = menuDrawerBackgroundColor,
+        )
     }
 
     private fun initAppUpdateManager() {
@@ -555,6 +556,10 @@ class MainActivity : BaseActivity() {
         syncAutoConfigActivityResultLauncher.launch(Intent(this, SyncAutoConfigActivity::class.java))
     }
 
+    fun openDrawerLayout() {
+        binding.drawerLayout.open()
+    }
+
     fun getConfettiContainer(): ViewGroup = binding.easterEggConfettiContainer
 
     companion object {
@@ -562,7 +567,5 @@ class MainActivity : BaseActivity() {
         const val SYNC_AUTO_CONFIG_KEY = "syncAutoConfigKey"
         const val SYNC_AUTO_CONFIG_SUCCESS = "syncAutoConfigSuccess"
         const val SYNC_AUTO_CONFIG_ALREADY_SYNC = "syncAutoConfigAlreadySync"
-
-        private const val FULLY_SLID = 1.0f
     }
 }

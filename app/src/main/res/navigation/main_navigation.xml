@@ -26,12 +26,34 @@
         android:name="com.infomaniak.mail.ui.main.folder.ThreadListFragment"
         android:label="ThreadListFragment"
         tools:layout="@layout/fragment_thread_list">
+
+        <!-- Region Notification: Click to open Thread -->
+        <argument
+            android:name="openThreadUid"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+        <!-- Endregion -->
+
+        <!-- Region Notification: Click on Reply -->
+        <argument
+            android:name="replyToMessageUid"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="draftMode"
+            android:defaultValue="REPLY"
+            app:argType="com.infomaniak.mail.data.models.draft.Draft$DraftMode" />
+        <argument
+            android:name="notificationId"
+            android:defaultValue="-1"
+            app:argType="integer" />
+        <!-- Endregion -->
+
         <action
             android:id="@+id/action_threadListFragment_to_searchFragment"
             app:destination="@id/searchFragment" />
-        <action
-            android:id="@+id/action_threadListFragment_to_threadFragment"
-            app:destination="@id/threadFragment" />
         <action
             android:id="@+id/action_threadListFragment_to_accountFragment"
             app:destination="@id/accountFragment" />
@@ -53,22 +75,6 @@
         <action
             android:id="@+id/action_threadListFragment_to_invalidPasswordFragment"
             app:destination="@id/invalidPasswordFragment" />
-
-        <!-- Region Notification: Click on Reply -->
-        <argument
-            android:name="replyToMessageUid"
-            android:defaultValue="@null"
-            app:argType="string"
-            app:nullable="true" />
-        <argument
-            android:name="draftMode"
-            android:defaultValue="REPLY"
-            app:argType="com.infomaniak.mail.data.models.draft.Draft$DraftMode" />
-        <argument
-            android:name="notificationId"
-            android:defaultValue="-1"
-            app:argType="integer" />
-        <!-- Endregion -->
     </fragment>
 
     <activity
@@ -147,40 +153,6 @@
         <action
             android:id="@+id/action_searchFragment_to_detailedContactBottomSheetDialog"
             app:destination="@id/detailedContactBottomSheetDialog" />
-        <action
-            android:id="@+id/action_searchFragment_to_threadFragment"
-            app:destination="@id/threadFragment" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/threadFragment"
-        android:name="com.infomaniak.mail.ui.main.thread.ThreadFragment"
-        android:label="ThreadFragment"
-        tools:layout="@layout/cardview_thread_item">
-        <argument
-            android:name="threadUid"
-            app:argType="string" />
-        <action
-            android:id="@+id/action_threadFragment_to_messageActionsBottomSheetDialog"
-            app:destination="@id/messageActionsBottomSheetDialog" />
-        <action
-            android:id="@+id/action_threadFragment_to_threadActionsBottomSheetDialog"
-            app:destination="@id/threadActionsBottomSheetDialog" />
-        <action
-            android:id="@+id/action_threadFragment_to_replyBottomSheetDialog"
-            app:destination="@id/replyBottomSheetDialog" />
-        <action
-            android:id="@+id/action_threadFragment_to_detailedContactBottomSheetDialog"
-            app:destination="@id/detailedContactBottomSheetDialog" />
-        <action
-            android:id="@+id/action_threadFragment_to_junkBottomSheetDialog"
-            app:destination="@id/junkBottomSheetDialog" />
-        <action
-            android:id="@+id/action_threadFragment_to_downloadAttachmentProgressDialog"
-            app:destination="@id/downloadAttachmentProgressDialog" />
-        <action
-            android:id="@+id/action_threadFragment_to_attachmentActionsBottomSheetDialog"
-            app:destination="@id/attachmentActionsBottomSheetDialog" />
     </fragment>
 
     <dialog
@@ -487,7 +459,7 @@
             app:argType="integer" />
         <!-- Endregion -->
 
-        <!-- Region Notification: Click on Notif -->
+        <!-- Region Notification: Click to open Thread -->
         <argument
             android:name="openThreadUid"
             android:defaultValue="@null"

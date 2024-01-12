@@ -144,7 +144,7 @@ class ThreadListMultiSelection {
     }
 
     private fun lockDrawerAndSwipe(isMultiSelectOn: Boolean) = with(threadListFragment) {
-        (activity as MainActivity).setDrawerLockMode(!isMultiSelectOn)
+        (requireActivity() as MainActivity).setDrawerLockMode(!isMultiSelectOn)
         if (isMultiSelectOn) {
             binding.threadsList.apply {
                 disableSwipeDirection(DirectionFlag.LEFT)
@@ -158,7 +158,7 @@ class ThreadListMultiSelection {
     private fun hideUnreadChip(isMultiSelectOn: Boolean) = runCatchingRealm {
         val thereAreUnread = mainViewModel.currentFolderLive.value?.let { it.unreadCountLocal > 0 } == true
         threadListFragment.binding.unreadCountChip.isVisible = thereAreUnread && !isMultiSelectOn
-    }.getOrDefault(Unit)
+    }
 
     private fun displayMultiSelectActions(isMultiSelectOn: Boolean) = with(threadListFragment.binding) {
         newMessageFab.isGone = isMultiSelectOn

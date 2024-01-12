@@ -18,6 +18,7 @@ lottie = "6.3.0"
 navigation = "2.7.6"
 realmKotlin = "1.13.0"
 sentryAndroidFragment = "7.1.0"
+slidingPaneLayout = "1.2.0"
 testRunner = "1.5.2"
 webkit = "1.9.0"
 workConcurrentFutures = "1.1.0"
@@ -40,6 +41,7 @@ lottie = { module = "com.airbnb.android:lottie", version.ref = "lottie" }
 navigation-safeargs = { module = "androidx.navigation:navigation-safe-args-gradle-plugin", version.ref = "navigation" }
 realm-kotlin-base = { module = "io.realm.kotlin:library-base", version.ref = "realmKotlin" }
 sentry-android-fragment = { module = "io.sentry:sentry-android-fragment", version.ref = "sentryAndroidFragment" }
+slidingpanelayout = { module = "androidx.slidingpanelayout:slidingpanelayout", version.ref = "slidingPaneLayout" }
 webkit = { module = "androidx.webkit:webkit", version.ref = "webkit" }
 work-concurrent-futures = { module = "androidx.concurrent:concurrent-futures-ktx", version.ref = "workConcurrentFutures" }
 work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }

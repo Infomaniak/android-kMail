@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2023 Infomaniak Network SA
+ * Copyright (C) 2022-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,9 +31,12 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.cache.mailboxContent.*
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController
+import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshCallbacks
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
+import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.mailboxInfo.PermissionsController
 import com.infomaniak.mail.data.cache.mailboxInfo.QuotasController
@@ -50,7 +53,6 @@ import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.SnackBarManager
 import com.infomaniak.mail.ui.main.SnackBarManager.UndoData
-import com.infomaniak.mail.ui.main.folder.ThreadListViewModel
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
@@ -75,7 +77,6 @@ import com.infomaniak.lib.core.R as RCore
 class MainViewModel @Inject constructor(
     application: Application,
     private val addressBookController: AddressBookController,
-    private val draftController: DraftController,
     private val folderController: FolderController,
     private val localSettings: LocalSettings,
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
@@ -954,11 +955,6 @@ class MainViewModel @Inject constructor(
 
     fun getMessage(messageUid: String) = liveData(ioCoroutineContext) {
         emit(messageController.getMessage(messageUid)!!)
-    }
-
-    fun navigateToSelectedDraft(message: Message) = liveData(ioCoroutineContext) {
-        val localUuid = draftController.getDraftByMessageUid(message.uid)?.localUuid
-        emit(ThreadListViewModel.SelectedDraft(localUuid, message.draftResource, message.uid))
     }
 
     fun selectOrUnselectAll() {

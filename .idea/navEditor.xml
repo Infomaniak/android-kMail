@@ -1029,12 +1029,12 @@
             <LayoutPositions>
               <option name="myPositions">
                 <map>
-                  <entry key="syncInstallFragment">
+                  <entry key="syncConfigureFragment">
                     <value>
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="256" />
+                            <option name="x" value="12" />
                             <option name="y" value="12" />
                           </Point>
                         </option>
@@ -1052,7 +1052,7 @@
                         </option>
                         <option name="myPositions">
                           <map>
-                            <entry key="action_syncOnboardingFragment_to_syncInstallFragment">
+                            <entry key="action_syncOnboardingFragment_to_syncConfigureFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
