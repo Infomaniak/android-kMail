@@ -25,7 +25,6 @@ import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -111,21 +110,6 @@ class ThreadFragment : Fragment() {
     private val threadAdapter inline get() = binding.messagesList.adapter as ThreadAdapter
     private val isNotInSpam by lazy { mainViewModel.currentFolder.value?.role != FolderRole.SPAM }
 
-    // TODO: This is probably too global as a trigger. Find something more refined?
-    private val globalLayoutListener by lazy {
-        OnGlobalLayoutListener {
-            runCatching {
-                binding.toolbar.apply {
-                    if (twoPaneFragment.areBothShown()) {
-                        if (navigationIcon != null) navigationIcon = null
-                    } else {
-                        if (navigationIcon == null) setNavigationIcon(R.drawable.ic_navigation_default)
-                    }
-                }
-            }
-        }
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentThreadBinding.inflate(inflater, container, false).also { _binding = it }.root
     }
@@ -136,7 +120,6 @@ class ThreadFragment : Fragment() {
         setupUi()
         setupAdapter()
         setupDialogs()
-        listenToGlobalLayoutChanges()
         permissionUtils.registerDownloadManagerPermission(fragment = this)
 
         observeLightThemeToggle()
@@ -153,25 +136,18 @@ class ThreadFragment : Fragment() {
     override fun onConfigurationChanged(newConfig: Configuration) {
         threadAdapter.reRenderMails()
         super.onConfigurationChanged(newConfig)
+        updateNavigationIcon()
     }
 
     override fun onDestroyView() {
-        removeGlobalLayoutListener()
         threadAdapter.resetCallbacks()
         super.onDestroyView()
         _binding = null
     }
 
-    private fun listenToGlobalLayoutChanges() {
-        binding.toolbar.viewTreeObserver.addOnGlobalLayoutListener(globalLayoutListener)
-    }
-
-    private fun removeGlobalLayoutListener() {
-        binding.toolbar.viewTreeObserver.removeOnGlobalLayoutListener(globalLayoutListener)
-    }
-
     private fun setupUi() = with(binding) {
 
+        updateNavigationIcon()
         toolbar.setNavigationOnClickListener { twoPaneViewModel.closeThread() }
 
         val defaultTextColor = context.getColor(R.color.primaryTextColor)
@@ -195,6 +171,16 @@ class ThreadFragment : Fragment() {
             shouldUpdateStatusBar = twoPaneFragment::isOnlyRightShown,
             otherUpdates = { color -> appBar.backgroundTintList = ColorStateList.valueOf(color) },
         )
+    }
+
+    private fun updateNavigationIcon() {
+        binding.toolbar.apply {
+            if (canDisplayBothPanes()) {
+                if (navigationIcon != null) navigationIcon = null
+            } else {
+                if (navigationIcon == null) setNavigationIcon(R.drawable.ic_navigation_default)
+            }
+        }
     }
 
     private fun setupAdapter() = with(binding.messagesList) {

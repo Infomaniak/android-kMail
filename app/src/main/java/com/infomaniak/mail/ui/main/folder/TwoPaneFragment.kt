@@ -185,8 +185,6 @@ abstract class TwoPaneFragment : Fragment() {
 
         threadListAdapter?.selectNewThread(newPosition = null, threadUid = null)
 
-        // TODO: We can see that the ThreadFragment's content is changing, while the pane is closing.
-        //  Maybe we need to delay the transaction? Or better: start it when the pane is fully closed?
         childFragmentManager.beginTransaction().replace(R.id.threadHostFragment, ThreadFragment()).commit()
     }
 }
