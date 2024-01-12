@@ -245,18 +245,29 @@
     </array>
 
     <array name="snowColors">
-        <item name="snowColor1">#FFFFFF</item>
-        <item name="snowColor2">#F7FDFE</item>
-        <item name="snowColor3">#EFFBFE</item>
-        <item name="snowColor4">#E7F9FD</item>
-        <item name="snowColor5">#DFF7FC</item>
-        <item name="snowColor6">#D7F5FC</item>
-        <item name="snowColor7">#CEF3FB</item>
-        <item name="snowColor8">#C6F1FB</item>
-        <item name="snowColor9">#BEEFFA</item>
-        <item name="snowColor10">#B6EDF9</item>
-        <item name="snowColor11">#AEEBF9</item>
-        <item name="snowColor12">#A6E9F8</item>
+        <item>#FFFFFF</item>
+        <item>#F7FDFE</item>
+        <item>#EFFBFE</item>
+        <item>#E7F9FD</item>
+        <item>#DFF7FC</item>
+        <item>#D7F5FC</item>
+        <item>#CEF3FB</item>
+        <item>#C6F1FB</item>
+        <item>#BEEFFA</item>
+        <item>#B6EDF9</item>
+        <item>#AEEBF9</item>
+        <item>#A6E9F8</item>
+    </array>
+
+    <array name="coloredSnowColors">
+        <item>#FFADAD</item>
+        <item>#FFD6A5</item>
+        <item>#FDFFB6</item>
+        <item>#CAFFBF</item>
+        <item>#9BF6FF</item>
+        <item>#A0C4FF</item>
+        <item>#BDB2FF</item>
+        <item>#FFC6FF</item>
     </array>
 
 </resources>

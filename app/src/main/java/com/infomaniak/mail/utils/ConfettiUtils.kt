@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023 Infomaniak Network SA
+ * Copyright (C) 2023-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,9 +28,38 @@ import com.infomaniak.lib.confetti.R as RConfetti
 
 object ConfettiUtils {
 
+    private const val EASTER_EGG_CONFETTI_TRIGGER_TAPS = 3
+    private const val EASTER_EGG_CONFETTI_TRIGGER_DELAY = 1_000L
+
     private const val EMISSION = 1_000_000.0f
 
-    fun triggerEasterEggConfetti(container: ViewGroup, matomoValue: String): Unit = with(container.context) {
+    private var easterEggConfettiCount = 0
+    private var easterEggConfettiTime = 0L
+
+    fun onEasterEggConfettiClicked(container: ViewGroup?, type: ConfettiType, matomoValue: String) {
+
+        if (container == null) return
+
+        val currentTime = System.currentTimeMillis()
+
+        if (easterEggConfettiTime == 0L || currentTime - easterEggConfettiTime > EASTER_EGG_CONFETTI_TRIGGER_DELAY) {
+            easterEggConfettiTime = currentTime
+            easterEggConfettiCount = 1
+        } else {
+            easterEggConfettiCount++
+        }
+
+        if (easterEggConfettiCount == EASTER_EGG_CONFETTI_TRIGGER_TAPS) {
+            easterEggConfettiCount = 0
+            triggerEasterEggConfetti(container, type, matomoValue)
+        }
+    }
+
+    private fun triggerEasterEggConfetti(
+        container: ViewGroup,
+        type: ConfettiType,
+        matomoValue: String,
+    ) = with(container.context) {
 
         Sentry.withScope { scope ->
             scope.level = SentryLevel.INFO
@@ -62,7 +91,10 @@ object ConfettiUtils {
             displayConfetti(config, source, container)
         }
 
-        fun displaySnow() {
+        fun displaySnow(colored: Boolean = false) {
+
+            val colors = resources.getIntArray(if (colored) R.array.coloredSnowColors else R.array.snowColors)
+
             val config = ConfettiConfig(
                 duration = 5_000L,
                 velocityX = none,
@@ -70,7 +102,7 @@ object ConfettiUtils {
                 velocityY = normal,
                 velocityDeviationY = slow,
                 accelerationY = none,
-                colors = resources.getIntArray(R.array.snowColors),
+                colors = colors,
                 useGaussian = false,
             )
             val size = resources.getDimensionPixelOffset(RConfetti.dimen.confetti_size)
@@ -113,13 +145,12 @@ object ConfettiUtils {
             displayConfetti(config, sourceRight, container)
         }
 
-        when ((0..2).random()) {
-            0 -> displayTada()
-            1 -> displaySnow()
-            else -> if (isInPortrait()) {
-                displaySingleGeneva()
-            } else {
-                displayDoubleGeneva()
+        when (type) {
+            ConfettiType.COLORED_SNOW -> displaySnow(colored = true)
+            ConfettiType.INFOMANIAK -> when ((0..2).random()) {
+                0 -> displayTada()
+                1 -> displaySnow()
+                else -> if (isInPortrait()) displaySingleGeneva() else displayDoubleGeneva()
             }
         }
     }
@@ -134,6 +165,11 @@ object ConfettiUtils {
             .setVelocityY(velocityY, velocityDeviationY)
             .setAccelerationY(accelerationY)
             .animate(useGaussian)
+    }
+
+    enum class ConfettiType {
+        COLORED_SNOW,
+        INFOMANIAK,
     }
 
     @Suppress("ArrayInDataClass")
