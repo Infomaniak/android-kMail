@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,7 +53,6 @@ import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.main.MailboxListFragment
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.ConfettiUtils.ConfettiType
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -174,11 +173,7 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
         }
 
         appVersionName.setOnClickListener {
-            ConfettiUtils.onEasterEggConfettiClicked(
-                container = (activity as? MainActivity)?.getConfettiContainer(),
-                type = ConfettiType.INFOMANIAK,
-                matomoValue = "MenuDrawer",
-            )
+            (requireActivity() as MainActivity).onEasterEggConfettiClicked(matomoValue = "MenuDrawer")
         }
     }
 

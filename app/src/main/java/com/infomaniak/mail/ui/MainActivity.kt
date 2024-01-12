@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.View
-import android.view.ViewGroup
 import android.webkit.WebView
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
@@ -97,6 +96,8 @@ class MainActivity : BaseActivity() {
     private val registerFirebaseBroadcastReceiver by lazy { RegisterFirebaseBroadcastReceiver() }
 
     private var previousDestinationId: Int? = null
+    private var easterEggConfettiCount = 0
+    private var easterEggConfettiTime = 0L
 
     private val navController by lazy {
         (supportFragmentManager.findFragmentById(R.id.mainHostFragment) as NavHostFragment).navController
@@ -560,12 +561,30 @@ class MainActivity : BaseActivity() {
         binding.drawerLayout.open()
     }
 
-    fun getConfettiContainer(): ViewGroup = binding.easterEggConfettiContainer
+    fun onEasterEggConfettiClicked(matomoValue: String) {
+
+        val currentTime = System.currentTimeMillis()
+
+        if (easterEggConfettiTime == 0L || currentTime - easterEggConfettiTime > EASTER_EGG_CONFETTI_TRIGGER_DELAY) {
+            easterEggConfettiTime = currentTime
+            easterEggConfettiCount = 1
+        } else {
+            easterEggConfettiCount++
+        }
+
+        if (easterEggConfettiCount == EASTER_EGG_CONFETTI_TRIGGER_TAPS) {
+            easterEggConfettiCount = 0
+            ConfettiUtils.triggerEasterEggConfetti(binding.easterEggConfettiContainer, matomoValue)
+        }
+    }
 
     companion object {
         const val DRAFT_ACTION_KEY = "draftAction"
         const val SYNC_AUTO_CONFIG_KEY = "syncAutoConfigKey"
         const val SYNC_AUTO_CONFIG_SUCCESS = "syncAutoConfigSuccess"
         const val SYNC_AUTO_CONFIG_ALREADY_SYNC = "syncAutoConfigAlreadySync"
+
+        private const val EASTER_EGG_CONFETTI_TRIGGER_TAPS = 3
+        private const val EASTER_EGG_CONFETTI_TRIGGER_DELAY = 1_000L
     }
 }
