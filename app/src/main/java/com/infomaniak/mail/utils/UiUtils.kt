@@ -121,13 +121,17 @@ object UiUtils {
         nameTextView: TextView,
         emailTextView: TextView,
         ignoreIsMe: Boolean = false,
-    ) = with(correspondent) {
+    ): Boolean = with(correspondent) {
         val (name, email) = nameTextView.context.getPrettyNameAndEmail(correspondent, ignoreIsMe)
         nameTextView.text = name
+
+        val filledSingleField = email == null
         emailTextView.apply {
             text = email
-            isGone = email == null
+            isGone = filledSingleField
         }
+
+        filledSingleField
     }
 
     fun animateColorChange(

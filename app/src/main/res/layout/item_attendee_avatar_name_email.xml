@@ -16,6 +16,7 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
@@ -24,7 +25,9 @@
         android:id="@+id/avatarNameEmailView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:avatar="@tools:sample/avatars[15]"
+        android:layout_marginVertical="@dimen/marginStandardSmall"
+        app:displayAsAttendee="true"
+        tools:avatar="@tools:sample/avatars"
         tools:email="brooklynn.chen@ik.me"
         tools:name="@tools:sample/full_names" />
 

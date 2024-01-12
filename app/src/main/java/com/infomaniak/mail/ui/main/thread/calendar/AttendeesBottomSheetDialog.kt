@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.thread.calendar
 
+import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -25,8 +26,12 @@ import androidx.navigation.fragment.navArgs
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.lib.core.utils.toPx
+import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetAttendeesBinding
+import com.infomaniak.mail.utils.UiUtils
+
 
 class AttendeesBottomSheetDialog : BottomSheetDialogFragment() {
 
@@ -43,5 +48,10 @@ class AttendeesBottomSheetDialog : BottomSheetDialogFragment() {
         val attendees = navigationArgs.attendees.toList()
         title.text = context.getString(R.string.attendeesListTitle, attendees.count())
         attendeeRecyclerView.adapter = AttendeesAdapter(attendees)
+
+        val dividerItemDecorator = DividerItemDecorator(
+            InsetDrawable(UiUtils.dividerDrawable(context), 16.toPx(), 0, 16.toPx(), 0)
+        )
+        attendeeRecyclerView.addItemDecoration(dividerItemDecorator)
     }
 }

@@ -33,7 +33,7 @@ class AttendeesAdapter(
 
     override fun onBindViewHolder(holder: AttendeesViewHolder, position: Int): Unit = with(holder.binding) {
         val attendee = attendees[position]
-        holder.binding.avatarNameEmailView.setCorrespondent(attendee)
+        holder.binding.avatarNameEmailView.setAttendee(attendee)
     }
 
     override fun getItemCount(): Int = attendees.count()
