@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2023 Infomaniak Network SA
+  ~ Copyright (C) 2023-2024 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -44,9 +44,9 @@
         app:layout_constraintEnd_toEndOf="@id/avatarEndEdge"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:strokeColor="#0f0"
-        app:strokeWidth="1dp"
-        tools:src="@tools:sample/avatars" />
+        tools:src="@tools:sample/avatars"
+        tools:strokeColor="#0f0"
+        tools:strokeWidth="1dp" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/attendanceIconTopEdge"
@@ -66,16 +66,16 @@
         android:id="@+id/attendanceIcon"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:padding="0.5dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@id/attendanceIconStartEdge"
         app:layout_constraintTop_toTopOf="@id/attendanceIconTopEdge"
         app:shapeAppearance="@style/CircleImageView"
-        app:strokeWidth="1dp"
         tools:background="@color/white"
+        tools:padding="0.5dp"
         tools:src="@drawable/ic_calendar_no"
         tools:strokeColor="#0f0"
+        tools:strokeWidth="1dp"
         tools:tint="@color/redDestructiveAction" />
 
 </merge>

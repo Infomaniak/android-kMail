@@ -33,7 +33,7 @@
         tools:src="@tools:sample/avatars"
         tools:statusBackgroundColor="@color/backgroundColor"
         tools:strokeColor="@color/backgroundColor"
-        tools:strokeWidth="2dp"
+        tools:strokeWidth="1dp"
         tools:visibility="visible" />
 
     <!-- -9dp is -8dp and we remove one more dp to account for the stroke width of each avatar -->
@@ -48,7 +48,7 @@
         tools:src="@tools:sample/avatars"
         tools:statusBackgroundColor="@color/backgroundColor"
         tools:strokeColor="@color/backgroundColor"
-        tools:strokeWidth="2dp"
+        tools:strokeWidth="1dp"
         tools:visibility="visible" />
 
     <com.infomaniak.mail.ui.main.thread.calendar.AttendanceAvatarView
@@ -62,35 +62,35 @@
         tools:src="@tools:sample/avatars"
         tools:statusBackgroundColor="@color/backgroundColor"
         tools:strokeColor="@color/backgroundColor"
-        tools:strokeWidth="2dp"
+        tools:strokeWidth="1dp"
         tools:visibility="visible" />
 
-    <!-- 34dp becomes 32dp after adding 1dp for the stroke width on each side -->
-    <com.google.android.material.card.MaterialCardView
+    <!--34dp becomes 32dp after adding 1dp for the stroke width on each side -->
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/additionalPeople"
         android:layout_width="34dp"
         android:layout_height="34dp"
         android:layout_marginStart="-9dp"
+        android:src="@color/manyAvatarsAdditionalPeopleBackground"
         android:visibility="gone"
-        app:cardBackgroundColor="@color/manyAvatarsAdditionalPeopleBackground"
         app:layout_constraintStart_toEndOf="@id/avatar3"
         app:layout_constraintTop_toTopOf="parent"
         app:shapeAppearance="@style/CircleImageView"
-        app:strokeWidth="0dp"
-        tools:visibility="visible">
+        tools:padding="0.5dp"
+        tools:strokeColor="@color/white"
+        tools:strokeWidth="1dp"
+        tools:visibility="visible" />
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+    <TextView
+        android:id="@+id/additionalPeopleCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textColor="@color/onColorfulBackground"
+        app:layout_constraintBottom_toBottomOf="@id/additionalPeople"
+        app:layout_constraintEnd_toEndOf="@id/additionalPeople"
+        app:layout_constraintStart_toStartOf="@id/additionalPeople"
+        app:layout_constraintTop_toTopOf="@id/additionalPeople"
+        tools:text="+12" />
 
-            <TextView
-                android:id="@+id/additionalPeopleCount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:textColor="@color/onColorfulBackground"
-                tools:text="+12" />
-
-        </FrameLayout>
-    </com.google.android.material.card.MaterialCardView>
 </androidx.constraintlayout.widget.ConstraintLayout>

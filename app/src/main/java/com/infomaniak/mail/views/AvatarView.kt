@@ -37,10 +37,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.Correspondent
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.databinding.ViewAvatarBinding
-import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.MergedContactDictionary
-import com.infomaniak.mail.utils.getColorOrNull
-import com.infomaniak.mail.utils.getTransparentColor
+import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.views.itemViews.AvatarMergedContactData
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -66,7 +63,7 @@ class AvatarView @JvmOverloads constructor(
     var strokeWidth: Float
         get() = binding.avatarImage.strokeWidth
         set(value) {
-            binding.avatarImage.strokeWidth = value
+            binding.avatarImage.setInnerStrokeWidth(value)
         }
 
     var strokeColor: Int?
@@ -81,14 +78,7 @@ class AvatarView @JvmOverloads constructor(
             strokeWidth = strokeWidthInt.toFloat()
             strokeColor = getColorOrNull(R.styleable.AvatarView_strokeColor)
 
-            binding.avatarImage.apply {
-                setImageDrawable(getDrawable(R.styleable.AvatarView_android_src))
-                val padding = getDimensionPixelOffset(R.styleable.AvatarView_padding, 0)
-                setPaddingRelative(padding, padding, padding, padding)
-
-                val halfStrokeWidth = strokeWidthInt / 2
-                setPaddingRelative(halfStrokeWidth, halfStrokeWidth, halfStrokeWidth, halfStrokeWidth)
-            }
+            binding.avatarImage.setImageDrawable(getDrawable(R.styleable.AvatarView_android_src))
 
             val inset = getDimensionPixelOffset(R.styleable.AvatarView_inset, 0)
             setPaddingRelative(inset, inset, inset, inset)

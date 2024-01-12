@@ -54,6 +54,7 @@ import com.airbnb.lottie.SimpleColorFilter
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.color.MaterialColors
+import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.infomaniak.lib.core.api.ApiController
@@ -106,6 +107,7 @@ import org.jsoup.nodes.Document
 import java.util.Calendar
 import java.util.Date
 import java.util.Scanner
+import kotlin.math.roundToInt
 
 //region Type alias
 // Explanation of this Map: Map<Email, Map<Name, MergedContact>>
@@ -614,3 +616,9 @@ fun Fragment.bindAlertToViewLifecycle(alertDialog: BaseAlertDialog) {
 fun Context.getTransparentColor() = getColor(android.R.color.transparent)
 
 fun TypedArray.getColorOrNull(index: Int): Int? = runCatching { getColorOrThrow(index) }.getOrNull()
+
+fun ShapeableImageView.setInnerStrokeWidth(strokeWidth: Float) {
+    this.strokeWidth = strokeWidth
+    val halfStrokeWidth = (strokeWidth / 2.0f).roundToInt()
+    setPaddingRelative(halfStrokeWidth, halfStrokeWidth, halfStrokeWidth, halfStrokeWidth)
+}

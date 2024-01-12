@@ -168,6 +168,8 @@
     <string name="buttonUnselectAll">Nessuno</string>
     <string name="buttonValid">Convalidare</string>
     <string name="buttonYes">Sì</string>
+    <string name="calendarAllDayLong">Tutta la giornata</string>
+    <string name="calendarNotInvited">Non fai parte degli invitati</string>
     <string name="calendarOrganizerName">%s (Organizzatore)</string>
     <string name="ccTitle">Cc:</string>
     <string name="comingSoon">Prossimamente…</string>

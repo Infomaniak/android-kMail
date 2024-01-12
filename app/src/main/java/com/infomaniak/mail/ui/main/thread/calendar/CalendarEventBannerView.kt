@@ -45,13 +45,17 @@ class CalendarEventBannerView @JvmOverloads constructor(
             eventName.text = "Réunion Produit"
             eventDate.text = "Mardi 28 novembre 2023"
             eventHour.text = "09:00-10:00 (CET)"
+            eventLocation.text = "Genève"
 
             yesButton.handleChoiceButtonBehavior()
             maybeButton.handleChoiceButtonBehavior()
             noButton.handleChoiceButtonBehavior()
 
+            attendanceLayout.isGone = attendees.isEmpty()
+            val iAmPartOfAttendees = attendees.any { it.isMe() }
+            attendeesLayout.isVisible = iAmPartOfAttendees
+            notPartOfAttendeesWarning.isGone = iAmPartOfAttendees
             attendeesButton.apply {
-                isGone = attendees.isEmpty()
                 addOnCheckedChangeListener { _, isChecked ->
                     attendeesSubMenu.isVisible = isChecked
                 }

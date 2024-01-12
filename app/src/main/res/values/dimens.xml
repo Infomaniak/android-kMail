@@ -70,7 +70,7 @@
     <integer name="aiPromptAnimationDuration">300</integer>
 
     <!-- Calendar events -->
-    <dimen name="calendarCornerRadius">8dp</dimen>
+    <dimen name="calendarCornerRadius">@dimen/textButtonCornerRadius</dimen>
 
     <!-- Other -->
     <dimen name="roundCornerRadius">100dp</dimen>
