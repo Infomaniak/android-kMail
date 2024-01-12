@@ -619,6 +619,6 @@ fun TypedArray.getColorOrNull(index: Int): Int? = runCatching { getColorOrThrow(
 
 fun ShapeableImageView.setInnerStrokeWidth(strokeWidth: Float) {
     this.strokeWidth = strokeWidth
-    val halfStrokeWidth = (strokeWidth / 2).roundToInt()
+    val halfStrokeWidth = (strokeWidth / 2.0f).roundToInt()
     setPaddingRelative(halfStrokeWidth, halfStrokeWidth, halfStrokeWidth, halfStrokeWidth)
 }
