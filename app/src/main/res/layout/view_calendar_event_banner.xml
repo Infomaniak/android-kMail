@@ -88,7 +88,7 @@
             android:layout_marginTop="@dimen/marginStandardMedium"
             android:drawablePadding="@dimen/marginStandardMedium"
             android:gravity="center_vertical"
-            app:drawableStartCompat="@drawable/ic_warning_big"
+            app:drawableStartCompat="@drawable/ic_location_pin"
             app:drawableTint="@color/iconColor"
             tools:text="Genève" />
 
