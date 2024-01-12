@@ -37,11 +37,13 @@ import com.infomaniak.mail.MatomoMail.trackEasterEggEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentAccountBinding
 import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.MailboxListFragment
 import com.infomaniak.mail.ui.main.menu.MailboxesAdapter
 import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.ConfettiUtils.ConfettiType
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -107,6 +109,14 @@ class AccountFragment : Fragment(), MailboxListFragment {
                 text = user.displayName
             }
             mail.text = user.email
+        }
+
+        avatar.setOnClickListener {
+            ConfettiUtils.onEasterEggConfettiClicked(
+                container = (activity as? MainActivity)?.getConfettiContainer(),
+                type = ConfettiType.COLORED_SNOW,
+                matomoValue = "Avatar",
+            )
         }
 
         showEasterEggHalloween()
