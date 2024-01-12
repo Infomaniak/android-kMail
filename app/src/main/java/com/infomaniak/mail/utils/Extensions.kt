@@ -393,9 +393,12 @@ fun Context.getLocalizedNameOrAllFolders(folder: Folder?): String {
     return folder?.getLocalizedName(context = this) ?: getString(R.string.searchFilterFolder)
 }
 
-fun Context.getInfomaniakLogin(): InfomaniakLogin {
-    return InfomaniakLogin(context = this, appUID = BuildConfig.APPLICATION_ID, clientID = BuildConfig.CLIENT_ID)
-}
+fun Context.getInfomaniakLogin() = InfomaniakLogin(
+    context = this,
+    appUID = BuildConfig.APPLICATION_ID,
+    clientID = BuildConfig.CLIENT_ID,
+    accessType = null
+)
 
 fun Window.updateNavigationBarColor(color: Int) {
     if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O) navigationBarColor = color

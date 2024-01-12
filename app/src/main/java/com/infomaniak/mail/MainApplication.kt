@@ -209,6 +209,7 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
                 clientId = BuildConfig.CLIENT_ID,
             )
             apiErrorCodes = ErrorCode.apiErrorCodes
+            accessType = null
         }
     }
 
