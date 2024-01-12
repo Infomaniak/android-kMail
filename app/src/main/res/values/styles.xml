@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2022-2023 Infomaniak Network SA
+  ~ Copyright (C) 2022-2024 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -63,6 +63,10 @@
 
     <style name="Body.Error">
         <item name="android:textColor">@color/redDestructiveAction</item>
+    </style>
+
+    <style name="Body.Warning">
+        <item name="android:textColor">@color/orangeWarning</item>
     </style>
 
     <style name="BodySmallMedium">
@@ -269,6 +273,36 @@
         <item name="cornerRadius">0dp</item>
         <item name="iconPadding">@dimen/marginStandardMedium</item>
         <item name="iconSize">@dimen/marginStandard</item>
+    </style>
+
+    <style name="CalendarParticipationButton" parent="BodyMedium">
+        <item name="android:checkable">true</item>
+        <item name="android:layout_marginStart">@dimen/marginStandardSmall</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:paddingBottom">@dimen/marginStandardSmall</item>
+        <item name="android:paddingEnd">@dimen/alternativeMargin</item>
+        <item name="android:paddingStart">@dimen/alternativeMargin</item>
+        <item name="android:paddingTop">@dimen/marginStandardSmall</item>
+        <item name="android:textColor">@color/secondaryTextColor</item>
+        <item name="backgroundTint">@android:color/transparent</item>
+        <item name="iconPadding">@dimen/marginStandardSmall</item>
+        <item name="iconSize">@dimen/mediumIconSize</item>
+        <item name="iconTint">?attr/calendarChipSelectedStrokeColor</item>
+        <item name="rippleColor">@color/color_primary_translucent_ripple</item>
+        <item name="strokeColor">@color/button_calendar_participation_stroke_color</item>
+        <item name="strokeWidth">1dp</item>
+    </style>
+
+    <style name="CalendarYesTheme">
+        <item name="calendarChipSelectedStrokeColor">@color/green_success</item>
+    </style>
+
+    <style name="CalendarMaybeTheme">
+        <item name="calendarChipSelectedStrokeColor">@color/iconColorSecondaryText</item>
+    </style>
+
+    <style name="CalendarNoTheme">
+        <item name="calendarChipSelectedStrokeColor">@color/redDestructiveAction</item>
     </style>
 
     <!-- Cardview -->

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2022-2023 Infomaniak Network SA
+  ~ Copyright (C) 2022-2024 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -389,6 +389,16 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/alerts" />
 
+        <com.infomaniak.mail.ui.main.thread.calendar.CalendarEventBannerView
+            android:id="@+id/calendarEvent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/marginStandardMedium"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/alertsBottomDivider" />
+
         <include
             android:id="@+id/attachmentLayout"
             layout="@layout/layout_attachments"
@@ -398,7 +408,7 @@
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/alertsBottomDivider"
+            app:layout_constraintTop_toBottomOf="@id/calendarEvent"
             app:layout_goneMarginTop="0dp"
             tools:visibility="visible" />
 
@@ -473,8 +483,7 @@
                 android:fontFamily="@font/suisseintl_regular_italic"
                 android:text="@string/errorLoadingMessage"
                 android:textColor="@color/secondaryTextColor"
-                android:visibility="gone"
-                tools:visibility="visible" />
+                android:visibility="gone" />
 
             <!-- `focusableInTouchMode` is set to false to prevent the WebView from automatically scrolling a small amount for no
             reason when long pressing it -->

@@ -25,6 +25,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import android.content.res.TypedArray
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -39,6 +40,7 @@ import android.view.inputmethod.EditorInfo
 import android.webkit.WebView
 import androidx.annotation.*
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.content.res.getColorOrThrow
 import androidx.core.text.toSpannable
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
@@ -608,3 +610,7 @@ private fun Spannable.setClickableSpan(startIndex: Int, endIndex: Int, onClick: 
 fun Fragment.bindAlertToViewLifecycle(alertDialog: BaseAlertDialog) {
     alertDialog.bindAlertToLifecycle(viewLifecycleOwner)
 }
+
+fun Context.getTransparentColor() = getColor(android.R.color.transparent)
+
+fun TypedArray.getColorOrNull(index: Int): Int? = runCatching { getColorOrThrow(index) }.getOrNull()

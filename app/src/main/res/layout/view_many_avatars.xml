@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak Mail - Android
+  ~ Copyright (C) 2023-2024 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <!-- 38dp are necessary so the actual avatar is 32dp after adding 4dp for the offset status and adding 1dp for the
+    stroke width on each side -->
+    <com.infomaniak.mail.ui.main.thread.calendar.AttendanceAvatarView
+        android:id="@+id/avatar1"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@tools:sample/avatars"
+        tools:statusBackgroundColor="@color/backgroundColor"
+        tools:strokeColor="@color/backgroundColor"
+        tools:strokeWidth="2dp"
+        tools:visibility="visible" />
+
+    <!-- -9dp is -8dp and we remove one more dp to account for the stroke width of each avatar -->
+    <com.infomaniak.mail.ui.main.thread.calendar.AttendanceAvatarView
+        android:id="@+id/avatar2"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        android:layout_marginStart="-9dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toEndOf="@id/avatar1"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@tools:sample/avatars"
+        tools:statusBackgroundColor="@color/backgroundColor"
+        tools:strokeColor="@color/backgroundColor"
+        tools:strokeWidth="2dp"
+        tools:visibility="visible" />
+
+    <com.infomaniak.mail.ui.main.thread.calendar.AttendanceAvatarView
+        android:id="@+id/avatar3"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        android:layout_marginStart="-9dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toEndOf="@id/avatar2"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@tools:sample/avatars"
+        tools:statusBackgroundColor="@color/backgroundColor"
+        tools:strokeColor="@color/backgroundColor"
+        tools:strokeWidth="2dp"
+        tools:visibility="visible" />
+
+    <!-- 34dp becomes 32dp after adding 1dp for the stroke width on each side -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/additionalPeople"
+        android:layout_width="34dp"
+        android:layout_height="34dp"
+        android:layout_marginStart="-9dp"
+        android:visibility="gone"
+        app:cardBackgroundColor="@color/manyAvatarsAdditionalPeopleBackground"
+        app:layout_constraintStart_toEndOf="@id/avatar3"
+        app:layout_constraintTop_toTopOf="parent"
+        app:shapeAppearance="@style/CircleImageView"
+        app:strokeWidth="0dp"
+        tools:visibility="visible">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/additionalPeopleCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textColor="@color/onColorfulBackground"
+                tools:text="+12" />
+
+        </FrameLayout>
+    </com.google.android.material.card.MaterialCardView>
+</androidx.constraintlayout.widget.ConstraintLayout>
