@@ -206,13 +206,13 @@ class ThreadListAdapter @Inject constructor(
 
         multiSelection?.let { listener ->
             selectionCardView.setOnLongClickListener {
-                onThreadClickWithAbilityToOpenMultiSelection(listener, thread)
+                onThreadClickWithAbilityToOpenMultiSelection(thread, listener, TrackerAction.LONG_PRESS)
                 true
             }
             expeditorAvatar.apply {
-                setOnClickListener { onThreadClickWithAbilityToOpenMultiSelection(listener, thread) }
+                setOnClickListener { onThreadClickWithAbilityToOpenMultiSelection(thread, listener, TrackerAction.CLICK) }
                 setOnLongClickListener {
-                    onThreadClickWithAbilityToOpenMultiSelection(listener, thread)
+                    onThreadClickWithAbilityToOpenMultiSelection(thread, listener, TrackerAction.LONG_PRESS)
                     true
                 }
             }
@@ -222,17 +222,21 @@ class ThreadListAdapter @Inject constructor(
     }
 
     private fun CardviewThreadItemBinding.onThreadClickWithAbilityToOpenMultiSelection(
-        listener: MultiSelectionListener<Thread>,
         thread: Thread,
+        listener: MultiSelectionListener<Thread>,
+        action: TrackerAction,
     ) {
-        val hasOpened = openMultiSelectionIfClosed(listener)
+        val hasOpened = openMultiSelectionIfClosed(listener, action)
         toggleMultiSelectedThread(thread, shouldUpdateSelectedUi = !hasOpened)
     }
 
-    private fun CardviewThreadItemBinding.openMultiSelectionIfClosed(listener: MultiSelectionListener<Thread>): Boolean {
+    private fun CardviewThreadItemBinding.openMultiSelectionIfClosed(
+        listener: MultiSelectionListener<Thread>,
+        action: TrackerAction,
+    ): Boolean {
         val shouldOpen = !listener.isEnabled
         if (shouldOpen) {
-            context.trackMultiSelectionEvent("enable", TrackerAction.LONG_PRESS)
+            context.trackMultiSelectionEvent("enable", action)
             listener.isEnabled = true
         }
         return shouldOpen
