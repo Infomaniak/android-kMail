@@ -15,23 +15,14 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.infomaniak.mail.views.BottomSheetScaffoldingView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".ui.main.thread.calendar.AttendeesBottomSheetDialog">
-
-    <include layout="@layout/view_bottom_sheet_separator" />
-
-    <TextView
-        android:id="@+id/title"
-        style="@style/BodyMedium"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        tools:text="@string/attendeesListTitle" />
+    app:useDefaultLayout="false"
+    tools:context=".ui.main.thread.calendar.AttendeesBottomSheetDialog"
+    tools:title="@string/attendeesListTitle">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/attendeeRecyclerView"
@@ -42,4 +33,4 @@
         tools:itemCount="5"
         tools:listitem="@layout/item_attendee_avatar_name_email" />
 
-</LinearLayout>
+</com.infomaniak.mail.views.BottomSheetScaffoldingView>
