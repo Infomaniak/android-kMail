@@ -89,7 +89,7 @@ class AvatarNameEmailView @JvmOverloads constructor(
     private fun ViewAvatarNameEmailBinding.setNameAndEmail(correspondent: Correspondent) {
         val filledSingleField = fillInUserNameAndEmail(correspondent, userName, userEmail, ignoreIsMe = !processNameAndEmail)
         if (displayAsAttendee) {
-            val userNameTextColor = if (filledSingleField) R.style.Body_Secondary else R.style.BodyMedium
+            val userNameTextColor = if (filledSingleField) R.style.AvatarNameEmailSecondary else R.style.AvatarNameEmailPrimary
             userName.setTextAppearance(userNameTextColor)
         }
     }

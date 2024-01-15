@@ -66,7 +66,7 @@
 
         <TextView
             android:id="@+id/userName"
-            style="@style/BodyMedium"
+            style="@style/AvatarNameEmailPrimary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ellipsize="end"
@@ -75,7 +75,7 @@
 
         <TextView
             android:id="@+id/userEmail"
-            style="@style/Body.Secondary"
+            style="@style/AvatarNameEmailSecondary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
