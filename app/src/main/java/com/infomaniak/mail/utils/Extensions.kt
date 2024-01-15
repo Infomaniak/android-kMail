@@ -397,7 +397,7 @@ fun Context.getInfomaniakLogin() = InfomaniakLogin(
     context = this,
     appUID = BuildConfig.APPLICATION_ID,
     clientID = BuildConfig.CLIENT_ID,
-    accessType = null
+    accessType = null,
 )
 
 fun Window.updateNavigationBarColor(color: Int) {
