@@ -55,17 +55,22 @@ class BottomSheetScaffoldingView @JvmOverloads constructor(
     private var centerHorizontally: Boolean = false
     private var childContainer: ViewGroup
 
+    var title: CharSequence?
+        get() = binding.titleTextView.text
+        set(value) {
+            binding.titleTextView.apply {
+                text = value
+                isVisible = value != null
+            }
+        }
+
     init {
         binding = ViewBottomSheetScaffoldingBinding.inflate(LayoutInflater.from(context), this, true)
         isBindingInflated = true
 
         with(binding) {
             attrs?.getAttributes(context, R.styleable.BottomSheetScaffoldingView) {
-                title.apply {
-                    val titleValue = getString(R.styleable.BottomSheetScaffoldingView_title)
-                    text = titleValue
-                    isVisible = titleValue != null
-                }
+                title = getString(R.styleable.BottomSheetScaffoldingView_title)
 
                 useDefaultLayout = getBoolean(R.styleable.BottomSheetScaffoldingView_useDefaultLayout, useDefaultLayout)
                 centerHorizontally = getBoolean(R.styleable.BottomSheetScaffoldingView_centerHorizontally, centerHorizontally)

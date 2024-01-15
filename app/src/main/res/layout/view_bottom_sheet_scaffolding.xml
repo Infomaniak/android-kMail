@@ -25,7 +25,7 @@
     <include layout="@layout/view_bottom_sheet_separator" />
 
     <TextView
-        android:id="@+id/title"
+        android:id="@+id/titleTextView"
         style="@style/BodyMedium"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
