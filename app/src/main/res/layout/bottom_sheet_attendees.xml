@@ -15,7 +15,7 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -23,29 +23,23 @@
     android:orientation="vertical"
     tools:context=".ui.main.thread.calendar.AttendeesBottomSheetDialog">
 
-    <LinearLayout
+    <include layout="@layout/view_bottom_sheet_separator" />
+
+    <TextView
+        android:id="@+id/title"
+        style="@style/BodyMedium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        tools:text="@string/attendeesListTitle" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/attendeeRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/marginStandardSmall"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:itemCount="5"
+        tools:listitem="@layout/item_attendee_avatar_name_email" />
 
-        <include layout="@layout/view_bottom_sheet_separator" />
-
-        <TextView
-            android:id="@+id/title"
-            style="@style/BodyMedium"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            tools:text="@string/attendeesListTitle" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/attendeeRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/marginStandardSmall"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:itemCount="5"
-            tools:listitem="@layout/item_attendee_avatar_name_email" />
-
-    </LinearLayout>
-</androidx.core.widget.NestedScrollView>
+</LinearLayout>
