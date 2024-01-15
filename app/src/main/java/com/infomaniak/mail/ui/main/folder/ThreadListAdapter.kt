@@ -202,17 +202,17 @@ class ThreadListAdapter @Inject constructor(
             if (unseenMessagesCount == 0) setThreadUiRead() else setThreadUiUnread()
         }
 
-        selectionCardView.setOnClickListener { chooseWhatToDoWhenClicked(thread, position) }
+        selectionCardView.setOnClickListener { onThreadClicked(thread, position) }
 
         multiSelection?.let { listener ->
             selectionCardView.setOnLongClickListener {
-                onViewThatCanOpenMultiSelectionClick(listener, thread)
+                onThreadClickWithAbilityToOpenMultiSelection(listener, thread)
                 true
             }
             expeditorAvatar.apply {
-                setOnClickListener { onViewThatCanOpenMultiSelectionClick(listener, thread) }
+                setOnClickListener { onThreadClickWithAbilityToOpenMultiSelection(listener, thread) }
                 setOnLongClickListener {
-                    onViewThatCanOpenMultiSelectionClick(listener, thread)
+                    onThreadClickWithAbilityToOpenMultiSelection(listener, thread)
                     true
                 }
             }
@@ -221,7 +221,7 @@ class ThreadListAdapter @Inject constructor(
         updateSelectedUi(thread)
     }
 
-    private fun CardviewThreadItemBinding.onViewThatCanOpenMultiSelectionClick(
+    private fun CardviewThreadItemBinding.onThreadClickWithAbilityToOpenMultiSelection(
         listener: MultiSelectionListener<Thread>,
         thread: Thread,
     ) {
@@ -242,7 +242,7 @@ class ThreadListAdapter @Inject constructor(
         if (threadUid == openedThreadUid) openedThreadPosition = position
     }
 
-    private fun CardviewThreadItemBinding.chooseWhatToDoWhenClicked(thread: Thread, position: Int) {
+    private fun CardviewThreadItemBinding.onThreadClicked(thread: Thread, position: Int) {
         if (multiSelection?.isEnabled == true) {
             toggleMultiSelectedThread(thread)
         } else {
