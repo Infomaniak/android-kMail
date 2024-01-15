@@ -100,7 +100,13 @@ class AvatarView @JvmOverloads constructor(
         avatarMergedContactData.mergedContactLiveData.removeObserver(mergedContactObserver)
     }
 
-    override fun setOnClickListener(onClickListener: OnClickListener?) = binding.root.setOnClickListener(onClickListener)
+    override fun setOnClickListener(onClickListener: OnClickListener?) {
+        binding.root.setOnClickListener(onClickListener)
+    }
+
+    override fun setOnLongClickListener(onLongClickListener: OnLongClickListener?) {
+        binding.root.setOnLongClickListener(onLongClickListener)
+    }
 
     fun loadAvatar(user: User): Disposable = with(binding.avatarImage) {
         contentDescription = user.email

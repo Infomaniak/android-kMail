@@ -202,21 +202,42 @@ class ThreadListAdapter @Inject constructor(
             if (unseenMessagesCount == 0) setThreadUiRead() else setThreadUiUnread()
         }
 
-        selectionCardView.setOnClickListener { chooseWhatToDoWhenClicked(thread, position) }
+        selectionCardView.setOnClickListener {
+            chooseWhatToDoWhenClicked(thread, position)
+        }
 
         multiSelection?.let { listener ->
             selectionCardView.setOnLongClickListener {
-                val isClosed = !listener.isEnabled
-                if (isClosed) {
-                    context.trackMultiSelectionEvent("enable", TrackerAction.LONG_PRESS)
-                    listener.isEnabled = true
-                }
-                toggleMultiSelectedThread(thread, shouldUpdateSelectedUi = !isClosed)
+                onViewThatCanOpenMultiSelectionClick(listener, thread)
+                true
+            }
+            expeditorAvatar.setOnClickListener {
+                onViewThatCanOpenMultiSelectionClick(listener, thread)
+            }
+            expeditorAvatar.setOnLongClickListener {
+                onViewThatCanOpenMultiSelectionClick(listener, thread)
                 true
             }
         }
 
         updateSelectedUi(thread)
+    }
+
+    private fun CardviewThreadItemBinding.onViewThatCanOpenMultiSelectionClick(
+        listener: MultiSelectionListener<Thread>,
+        thread: Thread,
+    ) {
+        val hasOpened = openMultiSelectionIfClosed(listener)
+        toggleMultiSelectedThread(thread, shouldUpdateSelectedUi = !hasOpened)
+    }
+
+    private fun CardviewThreadItemBinding.openMultiSelectionIfClosed(listener: MultiSelectionListener<Thread>): Boolean {
+        val shouldOpen = !listener.isEnabled
+        if (shouldOpen) {
+            context.trackMultiSelectionEvent("enable", TrackerAction.LONG_PRESS)
+            listener.isEnabled = true
+        }
+        return shouldOpen
     }
 
     private fun refreshCachedSelectedPosition(threadUid: String, position: Int) {
