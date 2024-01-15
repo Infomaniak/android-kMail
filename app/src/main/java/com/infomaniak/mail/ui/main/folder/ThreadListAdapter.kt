@@ -206,9 +206,12 @@ class ThreadListAdapter @Inject constructor(
 
         multiSelection?.let { listener ->
             selectionCardView.setOnLongClickListener {
-                context.trackMultiSelectionEvent("enable", TrackerAction.LONG_PRESS)
-                if (!listener.isEnabled) listener.isEnabled = true
-                toggleMultiSelectedThread(thread, shouldUpdateSelectedUi = false)
+                val isClosed = !listener.isEnabled
+                if (isClosed) {
+                    context.trackMultiSelectionEvent("enable", TrackerAction.LONG_PRESS)
+                    listener.isEnabled = true
+                }
+                toggleMultiSelectedThread(thread, shouldUpdateSelectedUi = !isClosed)
                 true
             }
         }
