@@ -103,14 +103,13 @@ class AvatarView @JvmOverloads constructor(
     override fun setOnClickListener(onClickListener: OnClickListener?) = binding.root.setOnClickListener(onClickListener)
 
     fun loadAvatar(user: User): Disposable = with(binding.avatarImage) {
-        val color = context.getColor(R.color.onColorfulBackground)
         contentDescription = user.email
         loadAvatar(
             backgroundColor = context.getBackgroundColorBasedOnId(user.id, R.array.AvatarColors),
             avatarUrl = user.avatar,
             initials = user.getInitials(),
             imageLoader = context.simpleImageLoader,
-            initialsColor = color,
+            initialsColor = context.getColor(R.color.onColorfulBackground),
         )
     }
 
