@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2023 Infomaniak Network SA
+  ~ Copyright (C) 2023-2024 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -15,51 +15,43 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.infomaniak.mail.views.BottomSheetScaffoldingView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    tools:context=".ui.main.thread.actions.AttachmentActionsBottomSheetDialog">
 
-    <LinearLayout
+    <com.infomaniak.mail.views.AttachmentDetailsView
+        android:id="@+id/attachmentDetails"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingBottom="@dimen/marginStandardMedium">
+        android:layout_marginEnd="@dimen/marginStandardMedium"
+        android:layout_marginBottom="@dimen/marginStandard"
+        app:displayStyle="bottomSheet" />
 
-        <include layout="@layout/view_bottom_sheet_separator" />
+    <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
+        android:id="@+id/openWithItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:icon="@drawable/ic_open_with"
+        app:text="@string/openWith"
+        app:visibleDivider="false" />
 
-        <com.infomaniak.mail.views.AttachmentDetailsView
-            android:id="@+id/attachmentDetails"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/marginStandardMedium"
-            android:layout_marginBottom="@dimen/marginStandard"
-            app:displayStyle="bottomSheet" />
+    <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
+        android:id="@+id/kDriveItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:icon="@drawable/ic_kdrive"
+        app:keepIconTint="true"
+        app:text="@string/saveToDriveItem" />
 
-        <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
-            android:id="@+id/openWithItem"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:icon="@drawable/ic_open_with"
-            app:text="@string/openWith"
-            app:visibleDivider="false" />
+    <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
+        android:id="@+id/deviceItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:icon="@drawable/ic_import"
+        app:iconTint="?attr/colorPrimary"
+        app:text="@string/saveToDriveDeviceItem" />
 
-        <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
-            android:id="@+id/kDriveItem"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:icon="@drawable/ic_kdrive"
-            app:keepIconTint="true"
-            app:text="@string/saveToDriveItem" />
-
-        <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
-            android:id="@+id/deviceItem"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:icon="@drawable/ic_import"
-            app:iconTint="?attr/colorPrimary"
-            app:text="@string/saveToDriveDeviceItem" />
-
-    </LinearLayout>
-</androidx.core.widget.NestedScrollView>
+</com.infomaniak.mail.views.BottomSheetScaffoldingView>

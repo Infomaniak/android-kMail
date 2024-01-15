@@ -171,4 +171,10 @@
         </attr>
     </declare-styleable>
 
+    <declare-styleable name="BottomSheetScaffoldingView">
+        <attr name="title" />
+        <attr name="useDefaultLayout" format="boolean" />
+        <attr name="centerHorizontally" format="boolean" />
+    </declare-styleable>
+
 </resources>

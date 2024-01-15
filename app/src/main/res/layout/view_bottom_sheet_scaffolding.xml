@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2022-2024 Infomaniak Network SA
+  ~ Copyright (C) 2024 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -15,18 +15,23 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<com.infomaniak.mail.views.BottomSheetScaffoldingView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.main.thread.actions.ReplyBottomSheetDialog">
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/marginStandardMedium">
 
-    <com.infomaniak.mail.ui.main.thread.actions.MainActionsView
-        android:id="@+id/mainActions"
-        android:layout_width="match_parent"
+    <include layout="@layout/view_bottom_sheet_separator" />
+
+    <TextView
+        android:id="@+id/title"
+        style="@style/BodyMedium"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/marginStandardMedium"
-        app:menu="@menu/main_actions_reply_menu" />
+        android:layout_gravity="center_horizontal"
+        tools:text="This bottom sheet's title" />
 
-</com.infomaniak.mail.views.BottomSheetScaffoldingView>
+    <!--Here will be added the children of the bottom sheet scaffolding-->
+
+</LinearLayout>

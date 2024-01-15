@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2022-2023 Infomaniak Network SA
+  ~ Copyright (C) 2022-2024 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -15,53 +15,43 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.infomaniak.mail.views.BottomSheetScaffoldingView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context=".ui.main.thread.DetailedContactBottomSheetDialog">
 
-    <LinearLayout
+    <com.infomaniak.mail.ui.main.AvatarNameEmailView
+        android:id="@+id/contactDetails"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingBottom="@dimen/marginStandardMedium">
+        app:processNameAndEmail="false"
+        tools:avatar="@tools:sample/avatars[10]"
+        tools:email="steph.guy@ik.me"
+        tools:name="@tools:sample/full_names" />
 
-        <include layout="@layout/view_bottom_sheet_separator" />
+    <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
+        android:id="@+id/writeMail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/marginStandardMedium"
+        app:icon="@drawable/ic_contact_action_write"
+        app:text="@string/contactActionWriteEmail"
+        app:visibleDivider="false" />
 
-        <com.infomaniak.mail.ui.main.AvatarNameEmailView
-            android:id="@+id/contactDetails"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:processNameAndEmail="false"
-            tools:avatar="@tools:sample/avatars[10]"
-            tools:email="steph.guy@ik.me"
-            tools:name="@tools:sample/full_names" />
+    <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
+        android:id="@+id/addToContacts"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:icon="@drawable/ic_contact_action_add_user"
+        app:text="@string/contactActionAddToContacts" />
 
-        <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
-            android:id="@+id/writeMail"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/marginStandardMedium"
-            app:icon="@drawable/ic_contact_action_write"
-            app:text="@string/contactActionWriteEmail"
-            app:visibleDivider="false" />
+    <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
+        android:id="@+id/copyAddress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:icon="@drawable/ic_contact_action_copy"
+        app:text="@string/contactActionCopyEmailAddress" />
 
-        <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
-            android:id="@+id/addToContacts"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:icon="@drawable/ic_contact_action_add_user"
-            app:text="@string/contactActionAddToContacts" />
-
-        <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
-            android:id="@+id/copyAddress"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:icon="@drawable/ic_contact_action_copy"
-            app:text="@string/contactActionCopyEmailAddress" />
-
-    </LinearLayout>
-</androidx.core.widget.NestedScrollView>
+</com.infomaniak.mail.views.BottomSheetScaffoldingView>
