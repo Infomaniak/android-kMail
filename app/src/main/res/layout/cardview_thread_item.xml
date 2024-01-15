@@ -45,6 +45,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingEnd="@dimen/marginStandardMedium"
+            tools:ignore="RtlSymmetry"
             tools:layout_marginBottom="@dimen/marginStandardSmall"
             tools:layout_marginTop="@dimen/marginStandardSmall">
 
