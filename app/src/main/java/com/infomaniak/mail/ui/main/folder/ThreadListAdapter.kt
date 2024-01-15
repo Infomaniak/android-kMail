@@ -202,21 +202,19 @@ class ThreadListAdapter @Inject constructor(
             if (unseenMessagesCount == 0) setThreadUiRead() else setThreadUiUnread()
         }
 
-        selectionCardView.setOnClickListener {
-            chooseWhatToDoWhenClicked(thread, position)
-        }
+        selectionCardView.setOnClickListener { chooseWhatToDoWhenClicked(thread, position) }
 
         multiSelection?.let { listener ->
             selectionCardView.setOnLongClickListener {
                 onViewThatCanOpenMultiSelectionClick(listener, thread)
                 true
             }
-            expeditorAvatar.setOnClickListener {
-                onViewThatCanOpenMultiSelectionClick(listener, thread)
-            }
-            expeditorAvatar.setOnLongClickListener {
-                onViewThatCanOpenMultiSelectionClick(listener, thread)
-                true
+            expeditorAvatar.apply {
+                setOnClickListener { onViewThatCanOpenMultiSelectionClick(listener, thread) }
+                setOnLongClickListener {
+                    onViewThatCanOpenMultiSelectionClick(listener, thread)
+                    true
+                }
             }
         }
 
