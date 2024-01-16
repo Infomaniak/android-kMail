@@ -102,6 +102,7 @@ class SearchFragment : TwoPaneFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundColor)
 
         searchViewModel.executePendingSearch()
 

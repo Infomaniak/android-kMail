@@ -437,39 +437,9 @@ class MainActivity : BaseActivity() {
         SentryDebug.addNavigationBreadcrumb(destination.displayName, arguments)
         trackDestination(destination)
 
-        updateColorsWhenDestinationChanged(destination.id)
         setDrawerLockMode(isLocked = destination.id != R.id.threadListFragment)
 
         previousDestinationId = destination.id
-    }
-
-    private fun updateColorsWhenDestinationChanged(destinationId: Int) {
-
-        when (destinationId) {
-            R.id.junkBottomSheetDialog,
-            R.id.messageActionsBottomSheetDialog,
-            R.id.replyBottomSheetDialog,
-            R.id.detailedContactBottomSheetDialog,
-            R.id.threadActionsBottomSheetDialog,
-            R.id.attachmentActionsBottomSheetDialog,
-            R.id.downloadAttachmentProgressDialog,
-            R.id.attendeesBottomSheetDialog -> null
-            R.id.searchFragment -> R.color.backgroundColor
-            else -> R.color.backgroundHeaderColor
-        }?.let { statusBarColor ->
-            window.statusBarColor = getColor(statusBarColor)
-        }
-
-        when (destinationId) {
-            R.id.messageActionsBottomSheetDialog,
-            R.id.replyBottomSheetDialog,
-            R.id.detailedContactBottomSheetDialog,
-            R.id.threadActionsBottomSheetDialog -> R.color.backgroundColorSecondary
-            R.id.threadListFragment -> if (mainViewModel.isMultiSelectOn) R.color.elevatedBackground else R.color.backgroundColor
-            else -> R.color.backgroundColor
-        }.let { navigationBarColor ->
-            window.updateNavigationBarColor(getColor(navigationBarColor))
-        }
     }
 
     fun setDrawerLockMode(isLocked: Boolean) {
