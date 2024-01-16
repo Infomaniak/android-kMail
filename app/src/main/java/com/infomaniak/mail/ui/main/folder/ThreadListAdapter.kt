@@ -202,28 +202,51 @@ class ThreadListAdapter @Inject constructor(
             if (unseenMessagesCount == 0) setThreadUiRead() else setThreadUiUnread()
         }
 
-        selectionCardView.setOnClickListener { chooseWhatToDoWhenClicked(thread, position) }
+        selectionCardView.setOnClickListener { onThreadClicked(thread, position) }
 
         multiSelection?.let { listener ->
             selectionCardView.setOnLongClickListener {
-                val isClosed = !listener.isEnabled
-                if (isClosed) {
-                    context.trackMultiSelectionEvent("enable", TrackerAction.LONG_PRESS)
-                    listener.isEnabled = true
-                }
-                toggleMultiSelectedThread(thread, shouldUpdateSelectedUi = !isClosed)
+                onThreadClickWithAbilityToOpenMultiSelection(thread, listener, TrackerAction.LONG_PRESS)
                 true
+            }
+            expeditorAvatar.apply {
+                setOnClickListener { onThreadClickWithAbilityToOpenMultiSelection(thread, listener, TrackerAction.CLICK) }
+                setOnLongClickListener {
+                    onThreadClickWithAbilityToOpenMultiSelection(thread, listener, TrackerAction.LONG_PRESS)
+                    true
+                }
             }
         }
 
         updateSelectedUi(thread)
     }
 
+    private fun CardviewThreadItemBinding.onThreadClickWithAbilityToOpenMultiSelection(
+        thread: Thread,
+        listener: MultiSelectionListener<Thread>,
+        action: TrackerAction,
+    ) {
+        val hasOpened = openMultiSelectionIfClosed(listener, action)
+        toggleMultiSelectedThread(thread, shouldUpdateSelectedUi = !hasOpened)
+    }
+
+    private fun CardviewThreadItemBinding.openMultiSelectionIfClosed(
+        listener: MultiSelectionListener<Thread>,
+        action: TrackerAction,
+    ): Boolean {
+        val shouldOpen = !listener.isEnabled
+        if (shouldOpen) {
+            context.trackMultiSelectionEvent("enable", action)
+            listener.isEnabled = true
+        }
+        return shouldOpen
+    }
+
     private fun refreshCachedSelectedPosition(threadUid: String, position: Int) {
         if (threadUid == openedThreadUid) openedThreadPosition = position
     }
 
-    private fun CardviewThreadItemBinding.chooseWhatToDoWhenClicked(thread: Thread, position: Int) {
+    private fun CardviewThreadItemBinding.onThreadClicked(thread: Thread, position: Int) {
         if (multiSelection?.isEnabled == true) {
             toggleMultiSelectedThread(thread)
         } else {
