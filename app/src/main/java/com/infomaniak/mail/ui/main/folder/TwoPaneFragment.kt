@@ -120,8 +120,8 @@ abstract class TwoPaneFragment : Fragment() {
         twoPaneViewModel.currentThreadUid.observe(viewLifecycleOwner) { threadUid ->
             val isOpeningThread = threadUid != null
             if (isOpeningThread) {
-                val hasPaneOpened = slidingPaneLayout.openPaneNoAnimation()
-                if (hasPaneOpened) requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundColor)
+                val hasOpened = slidingPaneLayout.openPaneNoAnimation()
+                if (hasOpened) requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundColor)
             } else {
                 resetPanes()
             }
@@ -159,9 +159,9 @@ abstract class TwoPaneFragment : Fragment() {
 
     private fun resetPanes() = with(requireActivity()) {
 
-        val isClosing = slidingPaneLayout.closePaneNoAnimation()
+        val hasClosed = slidingPaneLayout.closePaneNoAnimation()
 
-        if (isClosing) {
+        if (hasClosed) {
             if (this@TwoPaneFragment is ThreadListFragment) window.statusBarColor = getColor(R.color.backgroundHeaderColor)
             window.updateNavigationBarColor(getColor(R.color.backgroundColor))
         }
