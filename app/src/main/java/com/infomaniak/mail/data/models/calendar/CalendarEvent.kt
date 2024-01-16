@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-@file:UseSerializers(RealmListKSerializer::class, RealmInstantSerializer::class)
+@file:UseSerializers(RealmListKSerializer::class, CalendarRealmInstantSerializer::class)
 
 package com.infomaniak.mail.data.models.calendar
 
-import com.infomaniak.mail.data.api.RealmInstantSerializer
+import com.infomaniak.mail.data.api.CalendarRealmInstantSerializer
 import com.infomaniak.mail.utils.toRealmInstant
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.serializers.RealmListKSerializer
