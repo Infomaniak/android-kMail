@@ -51,10 +51,10 @@ class AvatarView @JvmOverloads constructor(
 
     private val binding by lazy { ViewAvatarBinding.inflate(LayoutInflater.from(context), this, true) }
 
-    private var savedCorrespondent: Correspondent? = null
+    private var currentCorrespondent: Correspondent? = null
 
     private val mergedContactObserver = Observer<MergedContactDictionary> { contacts ->
-        savedCorrespondent?.let { correspondent -> loadAvatarUsingDictionary(correspondent, contacts) }
+        currentCorrespondent?.let { correspondent -> loadAvatarUsingDictionary(correspondent, contacts) }
     }
 
     @Inject
@@ -120,7 +120,7 @@ class AvatarView @JvmOverloads constructor(
             // Avoid lateinit property has not been initialized in preview
             val contactsFromViewModel = if (isInEditMode) emptyMap() else avatarMergedContactData.mergedContactLiveData.value
             loadAvatarUsingDictionary(correspondent, contacts = contactsFromViewModel ?: emptyMap())
-            savedCorrespondent = correspondent
+            currentCorrespondent = correspondent
         }
     }
 
@@ -129,6 +129,7 @@ class AvatarView @JvmOverloads constructor(
     }
 
     fun loadUnknownUserAvatar() {
+        currentCorrespondent = null
         binding.avatarImage.load(R.drawable.ic_unknown_user_avatar)
     }
 
