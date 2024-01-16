@@ -53,10 +53,12 @@ class CalendarEventBannerView @JvmOverloads constructor(
             maybeButton.handleChoiceButtonBehavior()
             noButton.handleChoiceButtonBehavior()
 
-            attendanceLayout.isGone = attendees.isEmpty()
             val iAmPartOfAttendees = attendees.any { it.isMe() }
-            attendeesLayout.isVisible = iAmPartOfAttendees
             notPartOfAttendeesWarning.isGone = iAmPartOfAttendees
+            participationButtons.isVisible = iAmPartOfAttendees
+
+            attendeesLayout.isGone = attendees.isEmpty()
+
             attendeesButton.apply {
                 addOnCheckedChangeListener { _, isChecked ->
                     attendeesSubMenu.isVisible = isChecked
