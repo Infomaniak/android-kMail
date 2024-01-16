@@ -238,7 +238,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="@dimen/marginStandardMedium"
+                                android:layout_marginStart="@dimen/marginStandardSmall"
                                 android:text="@string/buttonSee"
                                 android:textColor="?attr/colorPrimary" />
 
