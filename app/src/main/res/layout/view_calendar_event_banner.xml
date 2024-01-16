@@ -255,7 +255,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/marginStandardMedium"
             android:layout_marginVertical="@dimen/marginStandardMedium"
-            android:text="@string/buttonAddToMyCalendar" />
+            android:text="@string/buttonOpenMyCalendar" />
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
