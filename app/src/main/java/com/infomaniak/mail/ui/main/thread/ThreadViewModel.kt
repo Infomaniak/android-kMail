@@ -36,6 +36,7 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.MessageBodyUtils.SplitBody
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.sentry.Sentry
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -216,6 +217,14 @@ class ThreadViewModel @Inject constructor(
 
                     if (calendarEventResponse.isSuccess()) {
                         messageController.updateCalendarEvent(message.uid, calendarEventResponse.data!!, realm = this)
+                    } else {
+                        Sentry.withScope { scope ->
+                            scope.setExtra("ics attachment mimeType", icsAttachment.mimeType)
+                            scope.setExtra("ics attachment size", icsAttachment.size.toString())
+                            scope.setExtra("ics attachment partId", icsAttachment.partId)
+                            scope.setExtra("http error code", calendarEventResponse.error?.code.toString())
+                            Sentry.captureMessage("Failed loading calendar event")
+                        }
                     }
                 }
             }
