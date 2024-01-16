@@ -18,6 +18,7 @@
 package com.infomaniak.mail.workers
 
 import android.content.Context
+import androidx.annotation.StringRes
 import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
 import androidx.lifecycle.LiveData
@@ -172,11 +173,14 @@ class DraftsActionsWorker @AssistedInject constructor(
                         mailboxContentRealm.executeRealmCallbacks(realmActionsOnDraft)
                         throw exception
                     }
-                    is ApiErrorException -> {
-                        exception.handleApiErrors(draft)?.also {
-                            if (isTargetDraft) {
-                                trackedDraftErrorMessageResId = it
-                                isTrackedDraftSuccess = false
+                    is ApiErrorException, is UploadMissingLocalFileException -> {
+                        if (draft.messageUid.isNullOrEmpty()) realmActionsOnDraft.add(deleteDraftCallback(draft))
+                        if (isTargetDraft) {
+                            isTrackedDraftSuccess = false
+                            trackedDraftErrorMessageResId = if (exception is ApiErrorException) {
+                                ErrorCode.getTranslateResForDrafts(exception.errorCode)
+                            } else {
+                                (exception as UploadMissingLocalFileException).errorRes
                             }
                         }
                     }
@@ -207,11 +211,6 @@ class DraftsActionsWorker @AssistedInject constructor(
         writeBlocking {
             realmActionsOnDraft.forEach { realmAction -> realmAction(this) }
         }
-    }
-
-    private fun ApiErrorException.handleApiErrors(draft: Draft): Int? = mailboxContentRealm.writeBlocking {
-        findLatest(draft)?.let(::delete)
-        return@writeBlocking ErrorCode.getTranslateResForDrafts(errorCode)
     }
 
     private fun showDraftErrorNotification(
@@ -270,7 +269,10 @@ class DraftsActionsWorker @AssistedInject constructor(
         val attachmentsToUploadCount = attachmentsToUpload.count()
         if (attachmentsToUploadCount > 0) {
             SentryLog.d(ATTACHMENT_TAG, "Uploading $attachmentsToUploadCount attachments")
-            SentryLog.d(ATTACHMENT_TAG, "Attachments Uuids to localUris : ${attachmentsToUpload.map { it.uuid to it.name }}}")
+            SentryLog.d(
+                tag = ATTACHMENT_TAG,
+                msg = "Attachments Uuids to localUris : ${attachmentsToUpload.map { it.uuid to it.uploadLocalUri }}}",
+            )
         }
 
         attachmentsToUpload.forEach { attachment ->
@@ -299,7 +301,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         val attachmentFile = getUploadLocalFile().also {
             if (it?.exists() != true) {
                 SentryLog.d(ATTACHMENT_TAG, "No local file for attachment $name")
-                return
+                throw UploadMissingLocalFileException()
             }
         }
         val headers = HttpUtils.getHeaders(contentType = null).newBuilder()
@@ -421,6 +423,9 @@ class DraftsActionsWorker @AssistedInject constructor(
                         Sentry.withScope { scope ->
                             scope.level = SentryLevel.ERROR
                             Sentry.captureMessage("Return JSON for SendDraft API call was modified")
+                            Sentry.setExtra("Is data null ?", "${data == null}")
+                            Sentry.setExtra("Error code", error?.code.toString())
+                            Sentry.setExtra("Error description", error?.description.toString())
                         }
                     }
                     else -> {
@@ -505,6 +510,11 @@ class DraftsActionsWorker @AssistedInject constructor(
         fun getCompletedAndFailedInfoLiveData(): LiveData<MutableList<WorkInfo>> {
             return WorkerUtils.getWorkInfoLiveData(TAG, workManager, listOf(WorkInfo.State.SUCCEEDED, WorkInfo.State.FAILED))
         }
+    }
+
+    private class UploadMissingLocalFileException : Exception() {
+        @StringRes
+        val errorRes: Int = R.string.errorCorruptAttachment
     }
 
     companion object {
