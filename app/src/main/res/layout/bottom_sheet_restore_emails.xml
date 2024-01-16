@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2023 Infomaniak Network SA
+  ~ Copyright (C) 2023-2024 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -15,60 +15,53 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.infomaniak.mail.views.BottomSheetScaffoldingView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    tools:context=".ui.main.menu.RestoreEmailsBottomSheetDialog">
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/title"
+        style="@style/H2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingBottom="@dimen/marginStandardMedium">
+        android:layout_marginHorizontal="@dimen/marginStandardMedium"
+        android:layout_marginBottom="@dimen/marginStandardMedium"
+        android:text="@string/restoreEmailsTitle" />
 
-        <include layout="@layout/view_bottom_sheet_separator" />
+    <TextView
+        android:id="@+id/description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/marginStandardMedium"
+        android:text="@string/restoreEmailsText" />
 
-        <TextView
-            android:id="@+id/title"
-            style="@style/H2"
+    <com.infomaniak.lib.core.views.EndIconTextInputLayout
+        android:id="@+id/datePicker"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/marginStandardMedium"
+        android:layout_marginBottom="@dimen/marginStandardMedium">
+
+        <AutoCompleteTextView
+            android:id="@+id/datePickerText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/marginStandardMedium"
-            android:layout_marginBottom="@dimen/marginStandardMedium"
-            android:text="@string/restoreEmailsTitle" />
+            android:hint="@string/restoreEmailsBackupDate"
+            android:inputType="none" />
 
-        <TextView
-            android:id="@+id/description"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/marginStandardMedium"
-            android:text="@string/restoreEmailsText" />
+    </com.infomaniak.lib.core.views.EndIconTextInputLayout>
 
-        <com.infomaniak.lib.core.views.EndIconTextInputLayout
-            android:id="@+id/datePicker"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/marginStandardMedium"
-            android:layout_marginBottom="@dimen/marginStandardMedium">
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/restoreMailsButton"
+        style="@style/TextButtonPrimary"
+        android:layout_width="match_parent"
+        android:layout_marginHorizontal="@dimen/marginStandardMedium"
+        android:layout_marginTop="@dimen/marginStandardMedium"
+        android:layout_marginBottom="@dimen/marginStandardSmall"
+        android:enabled="false"
+        android:text="@string/buttonConfirmRestoreEmails" />
 
-            <AutoCompleteTextView
-                android:id="@+id/datePickerText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/restoreEmailsBackupDate"
-                android:inputType="none" />
-
-        </com.infomaniak.lib.core.views.EndIconTextInputLayout>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/restoreMailsButton"
-            style="@style/TextButtonPrimary"
-            android:layout_width="match_parent"
-            android:layout_marginHorizontal="@dimen/marginStandardMedium"
-            android:layout_marginTop="@dimen/marginStandardMedium"
-            android:layout_marginBottom="@dimen/marginStandardSmall"
-            android:enabled="false"
-            android:text="@string/buttonConfirmRestoreEmails" />
-    </LinearLayout>
-</androidx.core.widget.NestedScrollView>
+</com.infomaniak.mail.views.BottomSheetScaffoldingView>
