@@ -32,6 +32,6 @@
         android:layout_gravity="center_horizontal"
         tools:text="This bottom sheet's title" />
 
-    <!--Here will be added the children of the bottom sheet scaffolding-->
+    <!-- Here will be added the children of the bottom sheet scaffolding -->
 
 </LinearLayout>

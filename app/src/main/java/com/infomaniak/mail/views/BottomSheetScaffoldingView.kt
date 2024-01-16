@@ -37,7 +37,7 @@ import com.infomaniak.lib.core.R as RCore
 class BottomSheetScaffoldingView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     private val binding: ViewBottomSheetScaffoldingBinding
@@ -71,7 +71,6 @@ class BottomSheetScaffoldingView @JvmOverloads constructor(
         with(binding) {
             attrs?.getAttributes(context, R.styleable.BottomSheetScaffoldingView) {
                 title = getString(R.styleable.BottomSheetScaffoldingView_title)
-
                 useDefaultLayout = getBoolean(R.styleable.BottomSheetScaffoldingView_useDefaultLayout, useDefaultLayout)
                 centerHorizontally = getBoolean(R.styleable.BottomSheetScaffoldingView_centerHorizontally, centerHorizontally)
             }
@@ -83,17 +82,11 @@ class BottomSheetScaffoldingView @JvmOverloads constructor(
     private fun ViewBottomSheetScaffoldingBinding.initChildContainer(context: Context): ViewGroup {
         return if (useDefaultLayout) {
             val nestedScrollView = NestedScrollView(context).apply {
-                layoutParams = ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                )
+                layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
             }
 
             val linearLayout = LinearLayout(context).apply {
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                )
+                layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
                 orientation = LinearLayout.VERTICAL
                 if (centerHorizontally) gravity = Gravity.CENTER_HORIZONTAL
                 setMarginsRelative(bottom = context.resources.getDimensionPixelSize(RCore.dimen.marginStandardMedium))
@@ -105,10 +98,7 @@ class BottomSheetScaffoldingView @JvmOverloads constructor(
             linearLayout
         } else {
             val frameLayout = FrameLayout(context).apply {
-                layoutParams = LayoutParams(
-                    LayoutParams.MATCH_PARENT,
-                    LayoutParams.WRAP_CONTENT,
-                )
+                layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
             }
 
             root.addView(frameLayout)
