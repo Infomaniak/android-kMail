@@ -123,7 +123,7 @@ abstract class TwoPaneFragment : Fragment() {
                 val hasPaneOpened = slidingPaneLayout.openPaneNoAnimation()
                 if (hasPaneOpened) requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundColor)
             } else {
-                resetPanes(threadListAdapter)
+                resetPanes()
             }
         }
     }
@@ -174,7 +174,7 @@ abstract class TwoPaneFragment : Fragment() {
         }
     }
 
-    private fun resetPanes(threadListAdapter: ThreadListAdapter?) = with(requireActivity()) {
+    private fun resetPanes() = with(requireActivity()) {
 
         val isClosing = slidingPaneLayout.closePaneNoAnimation()
 
@@ -183,7 +183,7 @@ abstract class TwoPaneFragment : Fragment() {
             window.updateNavigationBarColor(getColor(R.color.backgroundColor))
         }
 
-        threadListAdapter?.selectNewThread(newPosition = null, threadUid = null)
+        threadListAdapter.selectNewThread(newPosition = null, threadUid = null)
 
         childFragmentManager.beginTransaction().replace(R.id.threadHostFragment, ThreadFragment()).commit()
     }
