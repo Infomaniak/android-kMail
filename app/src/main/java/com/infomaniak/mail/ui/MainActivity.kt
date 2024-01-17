@@ -44,6 +44,7 @@ import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.Utils.toEnumOrThrow
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
+import com.infomaniak.lib.core.utils.hasPermissions
 import com.infomaniak.lib.core.utils.year
 import com.infomaniak.lib.stores.StoreUtils.checkUpdateIsAvailable
 import com.infomaniak.lib.stores.StoreUtils.initAppUpdateManager
@@ -205,12 +206,7 @@ class MainActivity : BaseActivity() {
 
         loadCurrentMailbox()
 
-        if (localSettings.appLaunches == 0) {
-            // TODO make this only after login
-            navController.navigate(R.id.permissionsOnboardingPagerFragment)
-        } else {
-            permissionUtils.requestMainPermissionsIfNeeded()
-        }
+        managePermissionsRequesting()
 
         initAppUpdateManager()
     }
@@ -485,6 +481,16 @@ class MainActivity : BaseActivity() {
             navBarColorFrom = backgroundColor,
             navBarColorTo = menuDrawerBackgroundColor,
         )
+    }
+
+    private fun managePermissionsRequesting() {
+        if (!hasPermissions(PermissionUtils.getMainPermissions(mustRequireNotification = true))) {
+            if (localSettings.appLaunches == 0) {
+                navController.navigate(R.id.permissionsOnboardingPagerFragment)
+            } else {
+                permissionUtils.requestMainPermissionsIfNeeded()
+            }
+        }
     }
 
     private fun initAppUpdateManager() {
