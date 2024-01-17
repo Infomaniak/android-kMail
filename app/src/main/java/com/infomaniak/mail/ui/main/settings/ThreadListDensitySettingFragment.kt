@@ -21,18 +21,20 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity.*
 import com.infomaniak.mail.databinding.FragmentThreadListDensitySettingBinding
+import com.infomaniak.mail.ui.main.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ThreadListDensitySettingFragment : Fragment() {
+class ThreadListDensitySettingFragment : BaseFragment() {
+
+    override val statusBarColor = R.color.backgroundHeaderColor
 
     private var binding: FragmentThreadListDensitySettingBinding by safeBinding()
 

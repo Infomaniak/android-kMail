@@ -25,7 +25,6 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
@@ -36,9 +35,12 @@ import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentSyncConfigureBinding
 import com.infomaniak.mail.ui.MainActivity
+import com.infomaniak.mail.ui.main.BaseFragment
 import com.infomaniak.mail.utils.isUserAlreadySynchronized
 
-class SyncConfigureFragment : Fragment() {
+class SyncConfigureFragment : BaseFragment() {
+
+    override val statusBarColor = R.color.backgroundColor
 
     private var binding: FragmentSyncConfigureBinding by safeBinding()
     private val syncAutoConfigViewModel: SyncAutoConfigViewModel by activityViewModels()
@@ -49,10 +51,7 @@ class SyncConfigureFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundColor)
-
         binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
-
         setupListeners()
     }
 

@@ -89,6 +89,8 @@ import com.infomaniak.lib.core.R as RCore
 @AndroidEntryPoint
 class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListener {
 
+    override val statusBarColor = R.color.backgroundHeaderColor
+
     private var _binding: FragmentThreadListBinding? = null
     val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
 
@@ -133,7 +135,6 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         navigateFromNotificationToNewMessage()
 
         super.onViewCreated(view, savedInstanceState)
-        requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundHeaderColor)
 
         threadListViewModel.deleteSearchData()
         bindAlertToViewLifecycle(descriptionDialog)

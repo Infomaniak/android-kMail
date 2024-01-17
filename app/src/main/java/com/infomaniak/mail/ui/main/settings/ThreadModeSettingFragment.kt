@@ -21,7 +21,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.trackEvent
@@ -32,12 +31,15 @@ import com.infomaniak.mail.data.LocalSettings.ThreadMode.CONVERSATION
 import com.infomaniak.mail.data.LocalSettings.ThreadMode.MESSAGE
 import com.infomaniak.mail.databinding.FragmentThreadModeSettingBinding
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
+import com.infomaniak.mail.ui.main.BaseFragment
 import com.infomaniak.mail.utils.bindAlertToViewLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ThreadModeSettingFragment : Fragment() {
+class ThreadModeSettingFragment : BaseFragment() {
+
+    override val statusBarColor = R.color.backgroundHeaderColor
 
     @Inject
     lateinit var localSettings: LocalSettings

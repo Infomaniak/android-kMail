@@ -25,10 +25,8 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
-import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.mail.BuildConfig
@@ -38,13 +36,16 @@ import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.databinding.FragmentNewAccountBinding
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
+import com.infomaniak.mail.ui.main.BaseFragment
 import com.infomaniak.mail.utils.LoginUtils
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class NewAccountFragment : Fragment() {
+class NewAccountFragment : BaseFragment() {
+
+    override val statusBarColor = R.color.backgroundColor
 
     private var binding: FragmentNewAccountBinding by safeBinding()
     private val introViewModel: IntroViewModel by activityViewModels()
@@ -81,7 +82,6 @@ class NewAccountFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
-        requireActivity().window.statusBarColor = context.getColor(R.color.backgroundColor)
 
         selectIllustrationAccordingToTheme()
 

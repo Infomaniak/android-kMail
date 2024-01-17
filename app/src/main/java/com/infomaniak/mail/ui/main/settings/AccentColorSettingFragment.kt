@@ -23,7 +23,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isGone
-import androidx.fragment.app.Fragment
 import com.google.android.material.color.DynamicColors
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.safeBinding
@@ -33,11 +32,14 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.data.LocalSettings.AccentColor.*
 import com.infomaniak.mail.databinding.FragmentAccentColorSettingBinding
+import com.infomaniak.mail.ui.main.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class AccentColorSettingFragment : Fragment() {
+class AccentColorSettingFragment : BaseFragment() {
+
+    override val statusBarColor = R.color.backgroundHeaderColor
 
     private var binding: FragmentAccentColorSettingBinding by safeBinding()
 

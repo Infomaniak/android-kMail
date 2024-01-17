@@ -40,6 +40,7 @@ import com.infomaniak.mail.data.models.ai.AiPromptOpeningStatus
 import com.infomaniak.mail.databinding.DialogAiReplaceContentBinding
 import com.infomaniak.mail.databinding.FragmentAiPropositionBinding
 import com.infomaniak.mail.ui.alertDialogs.AiDescriptionAlertDialog
+import com.infomaniak.mail.ui.main.BaseFragment
 import com.infomaniak.mail.ui.newMessage.AiViewModel.PropositionStatus
 import com.infomaniak.mail.ui.newMessage.AiViewModel.Shortcut
 import com.infomaniak.mail.utils.SimpleIconPopupMenu
@@ -53,7 +54,9 @@ import javax.inject.Inject
 import com.infomaniak.lib.core.R as RCore
 
 @AndroidEntryPoint
-class AiPropositionFragment : Fragment() {
+class AiPropositionFragment : BaseFragment() {
+
+    override val statusBarColor = R.color.backgroundColor
 
     private var _binding: FragmentAiPropositionBinding? = null
     private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
@@ -85,7 +88,6 @@ class AiPropositionFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
-        requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundColor)
 
         handleBackDispatcher()
         setUi()

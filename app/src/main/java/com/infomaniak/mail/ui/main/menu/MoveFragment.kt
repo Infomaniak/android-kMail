@@ -46,6 +46,8 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MoveFragment : MenuFoldersFragment() {
 
+    override val statusBarColor = R.color.backgroundHeaderColor
+
     private var binding: FragmentMoveBinding by safeBinding()
     private val navigationArgs: MoveFragmentArgs by navArgs()
     private val moveViewModel: MoveViewModel by viewModels()

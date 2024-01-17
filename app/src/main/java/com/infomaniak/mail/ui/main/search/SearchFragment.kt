@@ -62,6 +62,8 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class SearchFragment : TwoPaneFragment() {
 
+    override val statusBarColor = R.color.backgroundColor
+
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
 
@@ -102,7 +104,6 @@ class SearchFragment : TwoPaneFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundColor)
 
         searchViewModel.executePendingSearch()
 

@@ -59,8 +59,9 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
 
+    override val statusBarColor = null
+
     private var _binding: FragmentMenuDrawerBinding? = null
-    private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
     private val menuDrawerViewModel: MenuDrawerViewModel by viewModels()
 
     var exitDrawer: (() -> Unit)? = null

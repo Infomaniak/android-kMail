@@ -21,16 +21,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentMailboxSettingsBinding
+import com.infomaniak.mail.ui.main.BaseFragment
 import com.infomaniak.mail.ui.main.settings.ItemSettingView
 import com.infomaniak.mail.utils.animatedNavigation
 import com.infomaniak.mail.utils.notYetImplemented
 
-class MailboxSettingsFragment : Fragment() {
+class MailboxSettingsFragment : BaseFragment() {
+
+    override val statusBarColor = R.color.backgroundHeaderColor
 
     private var binding: FragmentMailboxSettingsBinding by safeBinding()
     private val navigationArgs: MailboxSettingsFragmentArgs by navArgs()

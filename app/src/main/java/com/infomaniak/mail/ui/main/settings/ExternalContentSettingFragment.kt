@@ -21,7 +21,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
@@ -30,11 +29,14 @@ import com.infomaniak.mail.data.LocalSettings.ExternalContent
 import com.infomaniak.mail.data.LocalSettings.ExternalContent.ALWAYS
 import com.infomaniak.mail.data.LocalSettings.ExternalContent.ASK_ME
 import com.infomaniak.mail.databinding.FragmentExternalContentSettingBinding
+import com.infomaniak.mail.ui.main.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ExternalContentSettingFragment : Fragment() {
+class ExternalContentSettingFragment : BaseFragment() {
+
+    override val statusBarColor = R.color.backgroundHeaderColor
 
     private var binding: FragmentExternalContentSettingBinding by safeBinding()
 

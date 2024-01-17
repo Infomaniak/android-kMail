@@ -21,16 +21,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentAiEngineSettingBinding
 import com.infomaniak.mail.databinding.LayoutAiEngineChoiceBinding
+import com.infomaniak.mail.ui.main.BaseFragment
 import com.infomaniak.mail.utils.SharedUtils
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class AiEngineSettingFragment : Fragment() {
+class AiEngineSettingFragment : BaseFragment() {
+
+    override val statusBarColor = R.color.backgroundHeaderColor
 
     private var binding: FragmentAiEngineSettingBinding by safeBinding()
     private var choiceBinding: LayoutAiEngineChoiceBinding by safeBinding()

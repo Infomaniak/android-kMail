@@ -39,7 +39,6 @@ import androidx.constraintlayout.widget.Group
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.webkit.WebSettingsCompat
@@ -58,6 +57,7 @@ import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
+import com.infomaniak.mail.ui.main.BaseFragment
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.utils.*
@@ -73,7 +73,9 @@ import java.util.UUID
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class NewMessageFragment : Fragment() {
+class NewMessageFragment : BaseFragment() {
+
+    override val statusBarColor = R.color.newMessageBackgroundColor
 
     private var _binding: FragmentNewMessageBinding? = null
     private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
@@ -240,7 +242,6 @@ class NewMessageFragment : Fragment() {
     private fun initUi() = with(binding) {
         addressListPopupWindow = ListPopupWindow(binding.root.context)
 
-        resetStatusBarColor()
         toolbar.setNavigationOnClickListener { activity?.onBackPressedDispatcher?.onBackPressed() }
         changeToolbarColorOnScroll(toolbar, compositionNestedScrollView)
 
@@ -267,10 +268,6 @@ class NewMessageFragment : Fragment() {
             scrim.isClickable = false
             aiManager.closeAiPrompt()
         }
-    }
-
-    private fun resetStatusBarColor() {
-        requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundColor)
     }
 
     private fun initDraftAndViewModel() {
