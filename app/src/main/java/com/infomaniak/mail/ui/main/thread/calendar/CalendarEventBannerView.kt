@@ -32,6 +32,7 @@ import com.infomaniak.mail.data.models.calendar.CalendarEvent
 import com.infomaniak.mail.databinding.ViewCalendarEventBannerBinding
 import com.infomaniak.mail.utils.UiUtils.getPrettyNameAndEmail
 import com.infomaniak.mail.utils.toDate
+import io.sentry.Sentry
 import java.time.format.FormatStyle
 import java.util.Date
 
@@ -107,7 +108,18 @@ class CalendarEventBannerView @JvmOverloads constructor(
     }
 
     private fun displayOrganizer(attendees: List<Attendee>) = with(binding) {
-        val organizer = attendees.singleOrNull(Attendee::isOrganizer)
+        val organizers = attendees.filter(Attendee::isOrganizer)
+        if (organizers.count() > 1) {
+            Sentry.withScope { scope ->
+                scope.setExtra("amount of organizer", organizers.count().toString())
+                scope.setExtra("have same email", organizers.all { it.email == organizers[0].email }.toString())
+                scope.setExtra("have same name", organizers.all { it.name == organizers[0].name }.toString())
+                Sentry.captureMessage("Found more than one organizer for this event")
+            }
+        }
+
+        val organizer = organizers.firstOrNull()
+
         organizerLayout.isGone = organizer == null
 
         organizer?.let { attendee ->
