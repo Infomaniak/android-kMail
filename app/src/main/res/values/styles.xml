@@ -602,4 +602,8 @@
         <item name="android:popupBackground">@drawable/background_popup</item>
     </style>
 
+    <style name="AvatarNameEmailPrimary" parent="BodyMedium" />
+
+    <style name="AvatarNameEmailSecondary" parent="Body.Secondary" />
+
 </resources>

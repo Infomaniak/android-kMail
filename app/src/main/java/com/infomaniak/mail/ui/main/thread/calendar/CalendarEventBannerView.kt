@@ -37,6 +37,8 @@ class CalendarEventBannerView @JvmOverloads constructor(
 
     private val binding by lazy { ViewCalendarEventBannerBinding.inflate(LayoutInflater.from(context), this, true) }
 
+    private var navigateToAttendeesBottomSheet: ((List<Attendee>) -> Unit)? = null
+
     private val attendees = listOf<Attendee>() // TODO : Use real data instead
 
     init {
@@ -62,9 +64,13 @@ class CalendarEventBannerView @JvmOverloads constructor(
             }
 
             displayOrganizer()
-            allAttendeesButton.setOnClickListener {/* TODO */ }
+            allAttendeesButton.setOnClickListener { navigateToAttendeesBottomSheet?.invoke(attendees) }
             manyAvatarsView.setAttendees(attendees)
         }
+    }
+
+    fun initCallback(navigateToAttendeesBottomSheet: (List<Attendee>) -> Unit) {
+        this.navigateToAttendeesBottomSheet = navigateToAttendeesBottomSheet
     }
 
     private fun MaterialButton.handleChoiceButtonBehavior() {

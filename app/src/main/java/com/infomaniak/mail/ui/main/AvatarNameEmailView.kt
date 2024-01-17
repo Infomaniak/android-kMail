@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023 Infomaniak Network SA
+ * Copyright (C) 2023-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,12 +26,14 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.core.text.toSpannable
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.data.models.correspondent.Correspondent
 import com.infomaniak.mail.data.models.correspondent.MergedContact
-import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ViewAvatarNameEmailBinding
 import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
 import com.infomaniak.mail.utils.getAttributeColor
@@ -46,10 +48,11 @@ class AvatarNameEmailView @JvmOverloads constructor(
     private val binding by lazy { ViewAvatarNameEmailBinding.inflate(LayoutInflater.from(context), this, true) }
 
     private var processNameAndEmail = true
+    private var displayAsAttendee = false
 
     init {
-        attrs?.getAttributes(context, R.styleable.AvatarNameEmailView) {
-            with(binding) {
+        with(binding) {
+            attrs?.getAttributes(context, R.styleable.AvatarNameEmailView) {
                 getDimensionPixelSize(R.styleable.AvatarNameEmailView_padding, NOT_SET).takeIf { it != NOT_SET }?.let {
                     userAvatar.setMarginsRelative(start = it)
                     textLayout.setMarginsRelative(end = it)
@@ -60,13 +63,17 @@ class AvatarNameEmailView @JvmOverloads constructor(
                 userEmail.text = getString(R.styleable.AvatarNameEmailView_email)
 
                 processNameAndEmail = getBoolean(R.styleable.AvatarNameEmailView_processNameAndEmail, processNameAndEmail)
+                displayAsAttendee = getBoolean(R.styleable.AvatarNameEmailView_displayAsAttendee, displayAsAttendee)
             }
+
+            attendeeAvatar.isVisible = displayAsAttendee
+            userAvatar.isGone = displayAsAttendee
         }
     }
 
-    fun setRecipient(recipient: Recipient) = with(binding) {
-        userAvatar.loadAvatar(recipient)
-        setNameAndEmail(recipient)
+    fun setCorrespondent(correspondent: Correspondent) = with(binding) {
+        userAvatar.loadAvatar(correspondent)
+        setNameAndEmail(correspondent)
     }
 
     fun setMergedContact(mergedContact: MergedContact) = with(binding) {
@@ -74,8 +81,17 @@ class AvatarNameEmailView @JvmOverloads constructor(
         setNameAndEmail(mergedContact)
     }
 
+    fun setAttendee(attendee: Attendee) = with(binding) {
+        attendeeAvatar.setAttendee(attendee)
+        setNameAndEmail(attendee)
+    }
+
     private fun ViewAvatarNameEmailBinding.setNameAndEmail(correspondent: Correspondent) {
-        fillInUserNameAndEmail(correspondent, userName, userEmail, ignoreIsMe = !processNameAndEmail)
+        val filledSingleField = fillInUserNameAndEmail(correspondent, userName, userEmail, ignoreIsMe = !processNameAndEmail)
+        if (displayAsAttendee) {
+            val userNameTextColor = if (filledSingleField) R.style.AvatarNameEmailSecondary else R.style.AvatarNameEmailPrimary
+            userName.setTextAppearance(userNameTextColor)
+        }
     }
 
     fun setAutocompleteUnknownContact(searchQuery: String) = with(binding) {

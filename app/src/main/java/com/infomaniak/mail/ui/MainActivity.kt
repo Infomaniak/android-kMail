@@ -443,7 +443,8 @@ class MainActivity : BaseActivity() {
             R.id.detailedContactBottomSheetDialog,
             R.id.threadActionsBottomSheetDialog,
             R.id.attachmentActionsBottomSheetDialog,
-            R.id.downloadAttachmentProgressDialog -> null
+            R.id.downloadAttachmentProgressDialog,
+            R.id.attendeesBottomSheetDialog -> null
             R.id.searchFragment -> R.color.backgroundColor
             else -> R.color.backgroundHeaderColor
         }?.let { statusBarColor ->

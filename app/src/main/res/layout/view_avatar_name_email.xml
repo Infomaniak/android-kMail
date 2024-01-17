@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2023 Infomaniak Network SA
+  ~ Copyright (C) 2023-2024 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -22,16 +22,34 @@
     android:layout_height="wrap_content"
     android:background="?selectableItemBackground">
 
-    <com.infomaniak.mail.views.AvatarView
-        android:id="@+id/userAvatar"
-        android:layout_width="@dimen/userAvatarSizeLarge"
-        android:layout_height="@dimen/userAvatarSizeLarge"
+    <FrameLayout
+        android:id="@+id/avatarLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginVertical="@dimen/marginStandardSmall"
         android:layout_marginStart="@dimen/marginStandardMedium"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:src="@tools:sample/avatars" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.infomaniak.mail.views.AvatarView
+            android:id="@+id/userAvatar"
+            android:layout_width="@dimen/userAvatarSizeLarge"
+            android:layout_height="@dimen/userAvatarSizeLarge"
+            android:visibility="gone"
+            tools:src="@tools:sample/avatars" />
+
+        <com.infomaniak.mail.ui.main.thread.calendar.AttendanceAvatarView
+            android:id="@+id/attendeeAvatar"
+            android:layout_width="@dimen/userAvatarSizeLarge"
+            android:layout_height="@dimen/userAvatarSizeLarge"
+            android:visibility="gone"
+            app:statusBackgroundColor="@color/backgroundColorSecondary"
+            app:strokeWidth="1dp"
+            tools:src="@tools:sample/avatars"
+            tools:visibility="visible" />
+
+    </FrameLayout>
 
     <LinearLayout
         android:id="@+id/textLayout"
@@ -40,15 +58,15 @@
         android:layout_marginStart="@dimen/marginStandardSmall"
         android:layout_marginEnd="@dimen/marginStandardMedium"
         android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="@id/userAvatar"
+        app:layout_constraintBottom_toBottomOf="@id/avatarLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintStart_toEndOf="@id/userAvatar"
-        app:layout_constraintTop_toTopOf="@id/userAvatar">
+        app:layout_constraintStart_toEndOf="@id/avatarLayout"
+        app:layout_constraintTop_toTopOf="@id/avatarLayout">
 
         <TextView
             android:id="@+id/userName"
-            style="@style/BodyMedium"
+            style="@style/AvatarNameEmailPrimary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ellipsize="end"
@@ -57,7 +75,7 @@
 
         <TextView
             android:id="@+id/userEmail"
-            style="@style/Body.Secondary"
+            style="@style/AvatarNameEmailSecondary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"

@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2023 Infomaniak Network SA
+ * Copyright (C) 2022-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,6 +39,7 @@ import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Attachment.*
+import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.message.Message.*
@@ -70,6 +71,7 @@ class ThreadAdapter(
     onMenuClicked: (Message) -> Unit,
     onAllExpandedMessagesLoaded: () -> Unit,
     navigateToNewMessageActivity: (Uri) -> Unit,
+    navigateToAttendeeBottomSheet: (List<Attendee>) -> Unit,
     promptLink: (String, ContextMenuType) -> Unit,
 ) : ListAdapter<Message, ThreadViewHolder>(MessageDiffCallback()) {
 
@@ -111,6 +113,7 @@ class ThreadAdapter(
             onMenuClicked,
             onAllExpandedMessagesLoaded,
             navigateToNewMessageActivity,
+            navigateToAttendeeBottomSheet,
             promptLink,
         )
     }
@@ -163,10 +166,17 @@ class ThreadAdapter(
 
         bindHeader(message)
         bindAlerts(message.uid)
+        bindCalendarEvent()
         bindAttachment(message)
         bindContent(message)
 
         onExpandOrCollapseMessage(message, shouldTrack = false)
+    }
+
+    private fun ThreadViewHolder.bindCalendarEvent() {
+        binding.calendarEvent.initCallback { attendees ->
+            threadAdapterCallbacks?.navigateToAttendeeBottomSheet?.invoke(attendees)
+        }
     }
 
     private fun initMapForNewMessage(message: Message, position: Int) {
@@ -647,6 +657,7 @@ class ThreadAdapter(
         var onMenuClicked: (Message) -> Unit,
         var onAllExpandedMessagesLoaded: () -> Unit,
         var navigateToNewMessageActivity: (Uri) -> Unit,
+        var navigateToAttendeeBottomSheet: (List<Attendee>) -> Unit,
         var promptLink: (String, ContextMenuType) -> Unit,
     )
 
