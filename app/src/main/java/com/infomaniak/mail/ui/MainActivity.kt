@@ -256,7 +256,10 @@ class MainActivity : BaseActivity() {
                     with(workInfo.outputData) {
                         refreshDraftFolderIfNeeded()
                         val errorRes = getInt(DraftsActionsWorker.ERROR_MESSAGE_RESID_KEY, 0)
-                        if (errorRes > 0) mainViewModel.snackBarManager.setValue(getString(errorRes))
+                        if (errorRes > 0) {
+                            showSendingSnackBarTimer.cancel()
+                            mainViewModel.snackBarManager.setValue(getString(errorRes))
+                        }
                     }
                 }
             }
