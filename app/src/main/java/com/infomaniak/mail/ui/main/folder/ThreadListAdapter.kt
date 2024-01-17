@@ -251,7 +251,9 @@ class ThreadListAdapter @Inject constructor(
             toggleMultiSelectedThread(thread)
         } else {
             onThreadClicked?.invoke(thread)
-            if (thread.uid != openedThreadUid) selectNewThread(position, thread.uid)
+            // If the Thread is `onlyOneDraft`, we'll directly navigate to the NewMessageActivity.
+            // It means that we won't go to the ThreadFragment, so there's no need to select anything.
+            if (thread.uid != openedThreadUid && !thread.isOnlyOneDraft) selectNewThread(position, thread.uid)
         }
     }
 

@@ -41,7 +41,7 @@ class TwoPaneViewModel @Inject constructor(
     private val draftController: DraftController,
 ) : ViewModel() {
 
-    val currentThreadUid = MutableLiveData<String?>(null)
+    val currentThreadUid = MutableLiveData<String?>()
 
     inline val isThreadOpen get() = currentThreadUid.value != null
     val rightPaneFolderName = MutableLiveData<String>()
