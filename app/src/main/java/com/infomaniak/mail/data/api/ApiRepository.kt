@@ -379,14 +379,9 @@ object ApiRepository : ApiRepositoryCore() {
         return HttpClient.okHttpClient.newBuilder().build().newCall(request).execute()
     }
 
-    fun getAttachmentCalendarEvent(
-        currentMailboxUuid: String,
-        currentFolderId: String,
-        messageId: Int,
-        attachmentPartId: String,
-    ): ApiResponse<CalendarEventResponse> {
+    fun getAttachmentCalendarEvent(resource: String): ApiResponse<CalendarEventResponse> {
         return callApi(
-            url = ApiRoutes.calendarEvent(currentMailboxUuid, currentFolderId, messageId, attachmentPartId),
+            url = ApiRoutes.calendarEvent(resource),
             method = GET,
             okHttpClient = HttpClient.okHttpClientLongTimeout
         )

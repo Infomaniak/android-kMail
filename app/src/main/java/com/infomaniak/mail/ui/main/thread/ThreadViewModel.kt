@@ -198,22 +198,19 @@ class ThreadViewModel @Inject constructor(
                 messages.forEach { message ->
                     if (!message.isFullyDownloaded()) return@forEach // Only treat message that have their attachments downloaded
 
-                    val isNewMessage = treatedMessagesForCalendarEvent.add(message.uid)
-                    Log.i("gibran", "fetchCalendarEvents - isNewMessage: ${isNewMessage}")
-                    if (!isNewMessage) return@forEach
+                    val alreadyTreated = !treatedMessagesForCalendarEvent.add(message.uid)
+                    Log.i("gibran", "fetchCalendarEvents - alreadyTreated: ${alreadyTreated}")
+                    if (alreadyTreated) return@forEach
 
                     val icsAttachments = message.attachments.filter { it.mimeType == "application/ics" }
                     if (icsAttachments.count() != 1) return@forEach
 
                     val icsAttachment = icsAttachments.single()
 
-                    Log.i("gibran", "fetchCalendarEvents - Gotta fetch the attachment with attachmentPartId: ${icsAttachment.partId}")
-                    val calendarEventResponse = ApiRepository.getAttachmentCalendarEvent(
-                        currentMailboxUuid,
-                        message.folderId,
-                        message.shortUid,
-                        icsAttachment.partId
-                    )
+                    Log.i("gibran", "fetchCalendarEvents - Gotta fetch the attachment with resource: ${icsAttachment.resource}")
+                    val calendarEventResponse = icsAttachment.resource?.let { resource ->
+                        ApiRepository.getAttachmentCalendarEvent(resource)
+                    } ?: return@forEach
 
                     if (calendarEventResponse.isSuccess()) {
                         messageController.updateCalendarEvent(message.uid, calendarEventResponse.data!!, realm = this)
@@ -221,8 +218,7 @@ class ThreadViewModel @Inject constructor(
                         Sentry.withScope { scope ->
                             scope.setExtra("ics attachment mimeType", icsAttachment.mimeType)
                             scope.setExtra("ics attachment size", icsAttachment.size.toString())
-                            scope.setExtra("ics attachment partId", icsAttachment.partId)
-                            scope.setExtra("http error code", calendarEventResponse.error?.code.toString())
+                            scope.setExtra("error code", calendarEventResponse.error?.code.toString())
                             Sentry.captureMessage("Failed loading calendar event")
                         }
                     }

@@ -38,8 +38,6 @@ import java.io.File
 @Serializable
 class Attachment : EmbeddedRealmObject {
 
-    @SerialName("part_id")
-    var partId: String = "" // TODO : migration??
     var uuid: String = ""
     @SerialName("mime_type")
     var mimeType: String = ""
