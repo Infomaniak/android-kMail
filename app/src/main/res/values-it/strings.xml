@@ -117,7 +117,6 @@
     <string name="buttonAccountSwitch">Modifica del conto</string>
     <string name="buttonAddAccount">Aggiungere un account</string>
     <string name="buttonAddEmailAddress">Aggiungere un indirizzo e-mail</string>
-    <string name="buttonAddToMyCalendar">Aggiungi al mio calendario</string>
     <string name="buttonAttachMailbox">Aggiungi l’indirizzo e-mail</string>
     <string name="buttonAttachment">Aggiungere un allegato</string>
     <string name="buttonAttendees">Partecipanti</string>
@@ -150,6 +149,7 @@
     <string name="buttonMoreStorage">Ottenere più spazio di archiviazione</string>
     <string name="buttonNewMessage">Nuovo messaggio</string>
     <string name="buttonNo">No</string>
+    <string name="buttonOpenMyCalendar">Apri nel mio calendario</string>
     <string name="buttonRefuse">Rifiuti</string>
     <string name="buttonRequestPassword">Richiesta password</string>
     <string name="buttonRestoreEmails">Ripristino delle e-mail</string>
