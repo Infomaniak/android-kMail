@@ -216,9 +216,7 @@ class ThreadFragment : Fragment() {
             },
             onAllExpandedMessagesLoaded = ::scrollToFirstUnseenMessage,
             navigateToNewMessageActivity = { twoPaneViewModel.navigateToNewMessage(mailToUri = it) },
-            navigateToAttendeeBottomSheet = { attendees ->
-                twoPaneViewModel.navigateToAttendees(attendees.toTypedArray())
-            },
+            navigateToAttendeeBottomSheet = { attendees -> twoPaneViewModel.navigateToAttendees(attendees.toTypedArray()) },
             promptLink = { data, type ->
                 // When adding a phone number to contacts, Google decodes this value in case it's url-encoded. But I could not
                 // reproduce this issue when manually creating a url-encoded href. If this is triggered, fix it by also

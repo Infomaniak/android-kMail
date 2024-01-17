@@ -20,23 +20,23 @@ package com.infomaniak.mail.ui.main.thread.calendar
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.databinding.ItemAttendeeAvatarNameEmailBinding
+import com.infomaniak.mail.ui.main.thread.calendar.AttendeesAdapter.AttendeesViewHolder
 
-class AttendeesAdapter(
-    private val attendees: List<Attendee>
-) : RecyclerView.Adapter<AttendeesAdapter.AttendeesViewHolder>() {
+class AttendeesAdapter(private val attendees: List<Attendee>) : RecyclerView.Adapter<AttendeesViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AttendeesViewHolder {
         return AttendeesViewHolder(ItemAttendeeAvatarNameEmailBinding.inflate(LayoutInflater.from(parent.context), parent, false))
     }
 
-    override fun onBindViewHolder(holder: AttendeesViewHolder, position: Int): Unit = with(holder.binding) {
+    override fun onBindViewHolder(holder: AttendeesViewHolder, position: Int) {
         val attendee = attendees[position]
         holder.binding.avatarNameEmailView.setAttendee(attendee)
     }
 
     override fun getItemCount(): Int = attendees.count()
 
-    class AttendeesViewHolder(val binding: ItemAttendeeAvatarNameEmailBinding) : RecyclerView.ViewHolder(binding.root)
+    class AttendeesViewHolder(val binding: ItemAttendeeAvatarNameEmailBinding) : ViewHolder(binding.root)
 }

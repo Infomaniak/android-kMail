@@ -32,7 +32,6 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetAttendeesBinding
 import com.infomaniak.mail.utils.UiUtils
 
-
 class AttendeesBottomSheetDialog : BottomSheetDialogFragment() {
 
     private var binding: BottomSheetAttendeesBinding by safeBinding()

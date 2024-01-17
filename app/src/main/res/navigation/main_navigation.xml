@@ -590,7 +590,7 @@
     <dialog
         android:id="@+id/attendeesBottomSheetDialog"
         android:name="com.infomaniak.mail.ui.main.thread.calendar.AttendeesBottomSheetDialog"
-        android:label="bottom_sheet_attendees"
+        android:label="AttendeesBottomSheetDialog"
         tools:layout="@layout/bottom_sheet_attendees">
         <argument
             android:name="attendees"
