@@ -85,10 +85,10 @@ class CalendarEventBannerView @JvmOverloads constructor(
         val organizer = attendees.singleOrNull(Attendee::isOrganizer)
         organizerLayout.isGone = organizer == null
 
-        organizer?.let {
-            organizerAvatar.loadAvatar(organizer)
+        organizer?.let { attendee ->
+            organizerAvatar.loadAvatar(attendee)
 
-            val (name, _) = context.getPrettyNameAndEmail(organizer)
+            val (name, _) = context.getPrettyNameAndEmail(attendee)
             organizerName.text = context.getString(R.string.calendarOrganizerName, name)
         }
     }
