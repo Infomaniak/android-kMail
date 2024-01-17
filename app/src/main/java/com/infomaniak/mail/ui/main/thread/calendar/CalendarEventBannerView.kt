@@ -66,13 +66,11 @@ class CalendarEventBannerView @JvmOverloads constructor(
 
         eventName.text = calendarEvent.title
 
-        eventDate.text = if (startDate.isSameDayAs(endDate)) {
-            startDate.formatFullDate()
+        if (startDate.isSameDayAs(endDate)) {
+            eventDate.text = "${startDate.formatFullDate()}\n${startDate.formatShortHour()} - ${endDate.formatShortHour()}"
         } else {
-            "${startDate.formatMediumDate()} - ${endDate.formatMediumDate()}"
+            eventDate.text = "${startDate.formatMediumDateHour()} -\n${endDate.formatMediumDateHour()}"
         }
-
-        eventHour.text = "${startDate.formatShortHour()} - ${endDate.formatShortHour()}"
 
         eventLocation.apply {
             isVisible = calendarEvent.location != null
@@ -130,19 +128,19 @@ class CalendarEventBannerView @JvmOverloads constructor(
         }
     }
 
+    private fun Date.formatMediumDateHour(): String {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            formatWithLocal(FormatStyle.MEDIUM, FormatData.BOTH)
+        } else {
+            format("$FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR $FORMAT_DATE_HOUR_MINUTE") // Fallback on unambiguous format
+        }
+    }
+
     private fun Date.formatFullDate(): String {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             formatWithLocal(FormatStyle.FULL, FormatData.DATE)
         } else {
             format(FORMAT_FULL_DATE) // Fallback on day, month, year ordering for everyone
-        }
-    }
-
-    private fun Date.formatMediumDate(): String {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            formatWithLocal(FormatStyle.MEDIUM, FormatData.DATE)
-        } else {
-            format(FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR) // Fallback on textual day, day, month, year ordering for everyone
         }
     }
 
