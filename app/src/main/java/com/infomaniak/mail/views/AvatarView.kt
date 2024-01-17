@@ -29,6 +29,7 @@ import coil.imageLoader
 import coil.load
 import coil.request.Disposable
 import com.infomaniak.lib.core.models.user.User
+import com.infomaniak.lib.core.utils.CoilUtils.simpleImageLoader
 import com.infomaniak.lib.core.utils.UtilsUi.getBackgroundColorBasedOnId
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.loadAvatar
@@ -111,7 +112,7 @@ class AvatarView @JvmOverloads constructor(
             backgroundColor = context.getBackgroundColorBasedOnId(user.id, R.array.AvatarColors),
             avatarUrl = user.avatar,
             initials = user.getInitials(),
-            imageLoader = context.imageLoader,
+            imageLoader = context.simpleImageLoader,
             initialsColor = context.getColor(R.color.onColorfulBackground),
         )
     }
