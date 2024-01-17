@@ -82,11 +82,11 @@ class BottomSheetScaffoldingView @JvmOverloads constructor(
     private fun ViewBottomSheetScaffoldingBinding.initChildContainer(context: Context): ViewGroup {
         return if (useDefaultLayout) {
             val nestedScrollView = NestedScrollView(context).apply {
-                layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+                layoutParams = createMatchWrapLayoutParams()
             }
 
             val linearLayout = LinearLayout(context).apply {
-                layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+                layoutParams = createMatchWrapLayoutParams()
                 orientation = LinearLayout.VERTICAL
                 if (centerHorizontally) gravity = Gravity.CENTER_HORIZONTAL
                 setMarginsRelative(bottom = context.resources.getDimensionPixelSize(RCore.dimen.marginStandardMedium))
@@ -97,15 +97,11 @@ class BottomSheetScaffoldingView @JvmOverloads constructor(
 
             linearLayout
         } else {
-            val frameLayout = FrameLayout(context).apply {
-                layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-            }
-
-            root.addView(frameLayout)
-
-            frameLayout
+            FrameLayout(context).apply { layoutParams = createMatchWrapLayoutParams() }.also(root::addView)
         }
     }
+
+    private fun createMatchWrapLayoutParams() = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
 
     override fun addView(child: View, index: Int, params: ViewGroup.LayoutParams?) {
         if (isBindingInflated) {
