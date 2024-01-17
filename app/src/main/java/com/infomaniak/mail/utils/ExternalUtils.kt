@@ -23,18 +23,22 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 
 object ExternalUtils {
+
     /**
      * Only returns a quantity of at most 2, used to differentiate between the singular or plural form of the dialog messages
      */
     fun Thread.findExternalRecipients(
         emailDictionary: MergedContactDictionary,
         aliases: List<String>,
+        trustedDomains: List<String>,
     ): Pair<String?, Int> {
         var externalRecipientEmail: String? = null
         var externalRecipientQuantity = 0
 
         messages.forEach { message ->
-            val (singleEmail, quantityForThisMessage) = findExternalRecipientInIterables(emailDictionary, aliases, message.from)
+            val (singleEmail, quantityForThisMessage) = findExternalRecipientInIterables(
+                emailDictionary, aliases, trustedDomains, message.from,
+            )
 
             externalRecipientQuantity += quantityForThisMessage
             if (externalRecipientQuantity > 1) return null to 2
@@ -48,11 +52,12 @@ object ExternalUtils {
     fun Draft.findExternalRecipientForNewMessage(
         aliases: List<String>,
         emailDictionary: MergedContactDictionary,
+        trustedDomains: List<String>,
     ): Pair<String?, Int> {
         val to = to.onlyAutomaticallyAddedOnes()
         val cc = cc.onlyAutomaticallyAddedOnes()
         val bcc = bcc.onlyAutomaticallyAddedOnes()
-        return findExternalRecipientInIterables(emailDictionary, aliases, to, cc, bcc)
+        return findExternalRecipientInIterables(emailDictionary, aliases, trustedDomains, to, cc, bcc)
     }
 
     private fun List<Recipient>.onlyAutomaticallyAddedOnes(): List<Recipient> = filter { !it.isManuallyEntered }
@@ -63,6 +68,7 @@ object ExternalUtils {
     private fun findExternalRecipientInIterables(
         emailDictionary: MergedContactDictionary,
         aliases: List<String>,
+        trustedDomains: List<String>,
         vararg recipientLists: Iterable<Recipient>,
     ): Pair<String?, Int> {
         var externalRecipientEmail: String? = null
@@ -70,7 +76,7 @@ object ExternalUtils {
 
         recipientLists.forEach { recipientList ->
             recipientList.forEach { recipient ->
-                if (recipient.isExternal(emailDictionary, aliases)) {
+                if (recipient.isExternal(emailDictionary, aliases, trustedDomains)) {
                     if (externalRecipientQuantity++ == 0) {
                         externalRecipientEmail = recipient.email
                     } else {

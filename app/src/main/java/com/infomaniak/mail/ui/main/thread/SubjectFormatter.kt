@@ -56,7 +56,9 @@ class SubjectFormatter @Inject constructor(private val appContext: Context) {
     ): CharSequence {
         if (!externalMailFlagEnabled) return previousContent
 
-        val (externalRecipientEmail, externalRecipientQuantity) = thread.findExternalRecipients(emailDictionary, aliases)
+        val (externalRecipientEmail, externalRecipientQuantity) = thread.findExternalRecipients(
+            emailDictionary, aliases, trustedDomains,
+        )
         if (externalRecipientQuantity == 0) return previousContent
 
         return postFixWithExternal(previousContent, externalRecipientQuantity, externalRecipientEmail, onExternalClicked)
@@ -135,6 +137,7 @@ class SubjectFormatter @Inject constructor(private val appContext: Context) {
         val emailDictionary: MergedContactDictionary,
         val aliases: List<String>,
         val externalMailFlagEnabled: Boolean,
+        val trustedDomains: List<String>,
     )
 
     data class EllipsizeConfiguration(

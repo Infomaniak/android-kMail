@@ -87,6 +87,10 @@ object ApiRoutes {
         return "$MAIL_API/api/securedProxy"
     }
 
+    fun externalMailInfo(mailboxHostingId: Int, mailboxName: String): String {
+        return "${securedProxy()}/1/mail_hostings/$mailboxHostingId/mailboxes/$mailboxName/external_mail_flag"
+    }
+
     fun updateMailboxPassword(mailboxId: Int): String {
         return "${securedProxy()}/cache/invalidation/profile/workspace/mailbox/$mailboxId/update_password"
     }

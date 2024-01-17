@@ -49,6 +49,7 @@ import com.infomaniak.mail.data.models.getMessages.ActivitiesResult
 import com.infomaniak.mail.data.models.getMessages.GetMessagesByUidsResult
 import com.infomaniak.mail.data.models.getMessages.NewMessagesResult
 import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.mailbox.MailboxExternalMailInfo
 import com.infomaniak.mail.data.models.mailbox.MailboxLinkedResult
 import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
 import com.infomaniak.mail.data.models.message.Message
@@ -146,6 +147,10 @@ object ApiRepository : ApiRepositoryCore() {
 
     fun getPermissions(mailboxLinkId: Int, mailboxHostingId: Int): ApiResponse<MailboxPermissions> {
         return callApi(ApiRoutes.permissions(mailboxLinkId, mailboxHostingId), GET)
+    }
+
+    fun getExternalMailInfo(mailboxHostingId: Int, mailboxName: String): ApiResponse<MailboxExternalMailInfo> {
+        return callApi(ApiRoutes.externalMailInfo(mailboxHostingId, mailboxName), GET)
     }
 
     fun markMessagesAsSeen(mailboxUuid: String, messagesUids: List<String>): ApiResponse<Unit> {

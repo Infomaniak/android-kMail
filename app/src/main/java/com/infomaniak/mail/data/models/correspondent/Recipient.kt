@@ -64,10 +64,9 @@ open class Recipient : EmbeddedRealmObject, Correspondent {
 
     // Computes if the Recipient is external, according to the required conditions.
     // Does not tell anything about how to display the Recipient chip when composing a new Message.
-    fun isExternal(emailDictionary: MergedContactDictionary, aliases: List<String>): Boolean {
+    fun isExternal(emailDictionary: MergedContactDictionary, aliases: List<String>, trustedDomains: List<String>): Boolean {
         val isUnknownContact = email !in emailDictionary
         val isMailerDaemon = """mailer-daemon@(?:.+\.)?infomaniak\.ch""".toRegex(RegexOption.IGNORE_CASE).matches(email)
-        val trustedDomains = listOf("@infomaniak.com", "@infomaniak.event", "@swisstransfer.com")
         val isUntrustedDomain = email.isEmail() && trustedDomains.none { email.endsWith(it) }
         val isAlias = email in aliases
 

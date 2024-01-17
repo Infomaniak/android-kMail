@@ -417,11 +417,16 @@ class RecipientFieldView @JvmOverloads constructor(
         return (if (recipientCount == 1) recipients.single().email else null) to recipientCount
     }
 
-    fun updateExternals(shouldWarnForExternal: Boolean, emailDictionary: MergedContactDictionary, aliases: List<String>) {
+    fun updateExternals(
+        shouldWarnForExternal: Boolean,
+        emailDictionary: MergedContactDictionary,
+        aliases: List<String>,
+        trustedDomains: List<String>,
+    ) {
         for (recipient in contactChipAdapter.getRecipients()) {
             if (recipient.isManuallyEntered) continue
 
-            val shouldDisplayAsExternal = shouldWarnForExternal && recipient.isExternal(emailDictionary, aliases)
+            val shouldDisplayAsExternal = shouldWarnForExternal && recipient.isExternal(emailDictionary, aliases, trustedDomains)
             recipient.initDisplayAsExternal(shouldDisplayAsExternal)
 
             updateCollapsedChipValues(isSelfCollapsed)

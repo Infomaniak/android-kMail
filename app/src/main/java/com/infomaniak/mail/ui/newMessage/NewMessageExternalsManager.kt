@@ -50,27 +50,40 @@ class NewMessageExternalsManager @Inject constructor() : NewMessageManager() {
     fun observeExternals(arrivedFromExistingDraft: Boolean) = with(newMessageViewModel) {
         Utils.waitInitMediator(initResult, mergedContacts).observe(viewLifecycleOwner) { (_, mergedContacts) ->
             val externalMailFlagEnabled = currentMailbox.externalMailFlagEnabled
+            val trustedDomains = currentMailbox.trustedDomains
             val shouldWarnForExternal = externalMailFlagEnabled && !arrivedFromExistingDraft
             val emailDictionary = mergedContacts.second
             val aliases = currentMailbox.aliases
 
-            updateFields(shouldWarnForExternal, emailDictionary, aliases)
-            updateBanner(shouldWarnForExternal, emailDictionary, aliases)
+            updateFields(shouldWarnForExternal, emailDictionary, aliases, trustedDomains)
+            updateBanner(shouldWarnForExternal, emailDictionary, aliases, trustedDomains)
         }
     }
 
-    private fun updateFields(shouldWarnForExternal: Boolean, emailDictionary: MergedContactDictionary, aliases: List<String>) {
+    private fun updateFields(
+        shouldWarnForExternal: Boolean,
+        emailDictionary: MergedContactDictionary,
+        aliases: List<String>,
+        trustedDomains: List<String>,
+    ) {
         with(binding) {
-            toField.updateExternals(shouldWarnForExternal, emailDictionary, aliases)
-            ccField.updateExternals(shouldWarnForExternal, emailDictionary, aliases)
-            bccField.updateExternals(shouldWarnForExternal, emailDictionary, aliases)
+            toField.updateExternals(shouldWarnForExternal, emailDictionary, aliases, trustedDomains)
+            ccField.updateExternals(shouldWarnForExternal, emailDictionary, aliases, trustedDomains)
+            bccField.updateExternals(shouldWarnForExternal, emailDictionary, aliases, trustedDomains)
         }
     }
 
-    private fun updateBanner(shouldWarnForExternal: Boolean, emailDictionary: MergedContactDictionary, aliases: List<String>) {
+    private fun updateBanner(
+        shouldWarnForExternal: Boolean,
+        emailDictionary: MergedContactDictionary,
+        aliases: List<String>,
+        trustedDomains: List<String>,
+    ) {
         with(newMessageViewModel) {
             if (shouldWarnForExternal && !isExternalBannerManuallyClosed) {
-                val (externalEmail, externalQuantity) = draft.findExternalRecipientForNewMessage(aliases, emailDictionary)
+                val (externalEmail, externalQuantity) = draft.findExternalRecipientForNewMessage(
+                    aliases, emailDictionary, trustedDomains,
+                )
                 externalRecipientCount.value = externalEmail to externalQuantity
             }
         }
