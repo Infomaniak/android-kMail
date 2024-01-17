@@ -133,6 +133,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         navigateFromNotificationToNewMessage()
 
         super.onViewCreated(view, savedInstanceState)
+        requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundHeaderColor)
 
         threadListViewModel.deleteSearchData()
         bindAlertToViewLifecycle(descriptionDialog)
