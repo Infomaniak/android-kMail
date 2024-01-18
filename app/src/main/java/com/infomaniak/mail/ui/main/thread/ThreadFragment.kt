@@ -63,6 +63,11 @@ import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ContextMenuType
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.OpenThreadResult
+import com.infomaniak.mail.ui.main.thread.actions.AttachmentActionsBottomSheetDialogArgs
+import com.infomaniak.mail.ui.main.thread.actions.MessageActionsBottomSheetDialogArgs
+import com.infomaniak.mail.ui.main.thread.actions.ReplyBottomSheetDialogArgs
+import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialogArgs
+import com.infomaniak.mail.ui.main.thread.calendar.AttendeesBottomSheetDialogArgs
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipients
 import com.infomaniak.mail.utils.UiUtils.dividerDrawable
@@ -186,7 +191,12 @@ class ThreadFragment : Fragment() {
     private fun setupAdapter() = with(binding.messagesList) {
         adapter = ThreadAdapter(
             shouldLoadDistantResources = shouldLoadDistantResources(),
-            onContactClicked = twoPaneViewModel::navigateToDetailContact,
+            onContactClicked = {
+                twoPaneViewModel.safeNavigate(
+                    resId = R.id.detailedContactBottomSheetDialog,
+                    args = DetailedContactBottomSheetDialogArgs(it).toBundle(),
+                )
+            },
             onDraftClicked = { message ->
                 trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
                 twoPaneViewModel.navigateToNewMessage(
@@ -201,7 +211,12 @@ class ThreadFragment : Fragment() {
                 mainViewModel.currentMailbox.value?.let { mailbox -> threadViewModel.deleteDraft(message, mailbox) }
             },
             onAttachmentClicked = { attachment ->
-                attachment.resource?.let(twoPaneViewModel::navigateToAttachmentActions)
+                attachment.resource?.let { resource ->
+                    twoPaneViewModel.safeNavigate(
+                        resId = R.id.attachmentActionsBottomSheetDialog,
+                        args = AttachmentActionsBottomSheetDialogArgs(resource).toBundle(),
+                    )
+                }
             },
             onDownloadAllClicked = { message ->
                 trackAttachmentActionsEvent("downloadAll")
@@ -216,7 +231,12 @@ class ThreadFragment : Fragment() {
             },
             onAllExpandedMessagesLoaded = ::scrollToFirstUnseenMessage,
             navigateToNewMessageActivity = { twoPaneViewModel.navigateToNewMessage(mailToUri = it) },
-            navigateToAttendeeBottomSheet = { attendees -> twoPaneViewModel.navigateToAttendees(attendees.toTypedArray()) },
+            navigateToAttendeeBottomSheet = { attendees ->
+                twoPaneViewModel.safeNavigate(
+                    resId = R.id.attendeesBottomSheetDialog,
+                    args = AttendeesBottomSheetDialogArgs(attendees.toTypedArray()).toBundle(),
+                )
+            },
             promptLink = { data, type ->
                 // When adding a phone number to contacts, Google decodes this value in case it's url-encoded. But I could not
                 // reproduce this issue when manually creating a url-encoded href. If this is triggered, fix it by also
@@ -328,10 +348,13 @@ class ThreadFragment : Fragment() {
                     )
                 }
                 R.id.quickActionMenu -> {
-                    navigateToThreadActions(
-                        threadUid = threadUid,
-                        shouldLoadDistantResources = shouldLoadDistantResources(lastMessageToReplyTo.uid),
-                        messageUidToReplyTo = lastMessageToReplyTo.uid,
+                    twoPaneViewModel.safeNavigate(
+                        resId = R.id.threadActionsBottomSheetDialog,
+                        args = ThreadActionsBottomSheetDialogArgs(
+                            threadUid = threadUid,
+                            shouldLoadDistantResources = shouldLoadDistantResources(lastMessageToReplyTo.uid),
+                            messageUidToReplyTo = lastMessageToReplyTo.uid,
+                        ).toBundle(),
                     )
                 }
             }
@@ -461,15 +484,22 @@ class ThreadFragment : Fragment() {
                 shouldLoadDistantResources = shouldLoadDistantResources,
             )
         } else {
-            navigateToReply(message.uid, shouldLoadDistantResources)
+            twoPaneViewModel.safeNavigate(
+                resId = R.id.replyBottomSheetDialog,
+                args = ReplyBottomSheetDialogArgs(message.uid, shouldLoadDistantResources).toBundle(),
+            )
         }
     }
 
     private fun Message.navigateToActionsBottomSheet() {
-        twoPaneViewModel.navigateToMessageAction(
-            messageUid = uid,
-            isThemeTheSame = threadAdapter.isThemeTheSameMap[uid] ?: return,
-            shouldLoadDistantResources = shouldLoadDistantResources(uid),
+        twoPaneViewModel.safeNavigate(
+            resId = R.id.messageActionsBottomSheetDialog,
+            MessageActionsBottomSheetDialogArgs(
+                messageUid = uid,
+                threadUid = twoPaneViewModel.currentThreadUid.value ?: return,
+                isThemeTheSame = threadAdapter.isThemeTheSameMap[uid] ?: return,
+                shouldLoadDistantResources = shouldLoadDistantResources(uid),
+            ).toBundle(),
         )
     }
 

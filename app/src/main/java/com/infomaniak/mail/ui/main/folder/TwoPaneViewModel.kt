@@ -18,21 +18,15 @@
 package com.infomaniak.mail.ui.main.folder
 
 import android.net.Uri
+import android.os.Bundle
+import androidx.annotation.IdRes
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
-import com.infomaniak.mail.data.models.calendar.Attendee
-import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.ui.main.thread.DetailedContactBottomSheetDialogArgs
-import com.infomaniak.mail.ui.main.thread.actions.AttachmentActionsBottomSheetDialogArgs
-import com.infomaniak.mail.ui.main.thread.actions.MessageActionsBottomSheetDialogArgs
-import com.infomaniak.mail.ui.main.thread.actions.ReplyBottomSheetDialogArgs
-import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialogArgs
-import com.infomaniak.mail.ui.main.thread.calendar.AttendeesBottomSheetDialogArgs
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -49,13 +43,8 @@ class TwoPaneViewModel @Inject constructor(
     val rightPaneFolderName = MutableLiveData<String>()
     var previousFolderId: String? = null
 
-    val attachmentActionsArgs = SingleLiveEvent<AttachmentActionsBottomSheetDialogArgs>()
     val newMessageArgs = SingleLiveEvent<NewMessageActivityArgs>()
-    val replyBottomSheetArgs = SingleLiveEvent<ReplyBottomSheetDialogArgs>()
-    val threadActionsArgs = SingleLiveEvent<ThreadActionsBottomSheetDialogArgs>()
-    val messageActionsArgs = SingleLiveEvent<MessageActionsBottomSheetDialogArgs>()
-    val detailedContactArgs = SingleLiveEvent<DetailedContactBottomSheetDialogArgs>()
-    val attendeesArgs = SingleLiveEvent<AttendeesBottomSheetDialogArgs>()
+    val navArgs = SingleLiveEvent<NavData>()
 
     fun openThread(uid: String) {
         currentThreadUid.value = uid
@@ -67,10 +56,6 @@ class TwoPaneViewModel @Inject constructor(
 
     fun openDraft(thread: Thread) {
         navigateToSelectedDraft(thread.messages.single())
-    }
-
-    fun navigateToAttachmentActions(resource: String) {
-        attachmentActionsArgs.value = AttachmentActionsBottomSheetDialogArgs(resource)
     }
 
     private fun navigateToSelectedDraft(message: Message) = runCatchingRealm {
@@ -104,28 +89,13 @@ class TwoPaneViewModel @Inject constructor(
         )
     }
 
-    fun navigateToReply(messageUid: String, shouldLoadDistantResources: Boolean) {
-        replyBottomSheetArgs.value = ReplyBottomSheetDialogArgs(messageUid, shouldLoadDistantResources)
+    fun safeNavigate(@IdRes resId: Int, args: Bundle?, className: String? = null) {
+        navArgs.value = NavData(resId = resId, args = args, className = className)
     }
 
-    fun navigateToThreadActions(threadUid: String, shouldLoadDistantResources: Boolean, messageUidToReplyTo: String) {
-        threadActionsArgs.value = ThreadActionsBottomSheetDialogArgs(threadUid, shouldLoadDistantResources, messageUidToReplyTo)
-    }
-
-    fun navigateToMessageAction(messageUid: String, isThemeTheSame: Boolean, shouldLoadDistantResources: Boolean) {
-        messageActionsArgs.value = MessageActionsBottomSheetDialogArgs(
-            messageUid = messageUid,
-            threadUid = currentThreadUid.value ?: return,
-            isThemeTheSame = isThemeTheSame,
-            shouldLoadDistantResources = shouldLoadDistantResources,
-        )
-    }
-
-    fun navigateToDetailContact(recipient: Recipient) {
-        detailedContactArgs.value = DetailedContactBottomSheetDialogArgs(recipient)
-    }
-
-    fun navigateToAttendees(attendees: Array<Attendee>) {
-        attendeesArgs.value = AttendeesBottomSheetDialogArgs(attendees)
-    }
+    data class NavData(
+        @IdRes val resId: Int,
+        val args: Bundle? = null,
+        val className: String?,
+    )
 }
