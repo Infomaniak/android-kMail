@@ -27,16 +27,23 @@ import androidx.core.view.isVisible
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.data.models.calendar.CalendarEvent
 import com.infomaniak.mail.databinding.ViewCalendarEventBannerBinding
+import com.infomaniak.mail.ui.main.SnackbarManager
+import com.infomaniak.mail.utils.AttachmentIntentUtils
+import com.infomaniak.mail.utils.AttachmentIntentUtils.openAttachment
 import com.infomaniak.mail.utils.UiUtils.getPrettyNameAndEmail
 import com.infomaniak.mail.utils.toDate
+import dagger.hilt.android.AndroidEntryPoint
 import io.realm.kotlin.types.RealmList
 import io.sentry.Sentry
 import java.time.format.FormatStyle
 import java.util.Date
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class CalendarEventBannerView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -46,6 +53,10 @@ class CalendarEventBannerView @JvmOverloads constructor(
     private val binding by lazy { ViewCalendarEventBannerBinding.inflate(LayoutInflater.from(context), this, true) }
 
     private var navigateToAttendeesBottomSheet: ((List<Attendee>) -> Unit)? = null
+    private var navigateToDownloadProgressDialog: (Attachment.(AttachmentIntentUtils.AttachmentIntentType) -> Unit)? = null
+
+    @Inject
+    lateinit var snackbarManager: SnackbarManager
 
     init {
         with(binding) {
@@ -57,7 +68,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
         }
     }
 
-    fun loadCalendarEvent(calendarEvent: CalendarEvent, hasBeenDeleted: Boolean) = with(binding) {
+    fun loadCalendarEvent(calendarEvent: CalendarEvent, hasBeenDeleted: Boolean, attachment: Attachment) = with(binding) {
         val startDate = calendarEvent.start.toDate()
         val endDate = calendarEvent.end.toDate()
 
@@ -70,6 +81,11 @@ class CalendarEventBannerView @JvmOverloads constructor(
         }
 
         setAttendees(calendarEvent.attendees)
+
+        addToCalendarButton.setOnClickListener {
+            val navigationCallback = navigateToDownloadProgressDialog ?: return@setOnClickListener
+            attachment.openAttachment(context, navigationCallback, snackbarManager)
+        }
     }
 
     private fun setWarnings(endDate: Date, hasBeenDeleted: Boolean) = with(binding) {
@@ -118,8 +134,12 @@ class CalendarEventBannerView @JvmOverloads constructor(
         manyAvatarsView.setAttendees(attendees)
     }
 
-    fun initCallback(navigateToAttendeesBottomSheet: (List<Attendee>) -> Unit) {
+    fun initCallback(
+        navigateToAttendeesBottomSheet: (List<Attendee>) -> Unit,
+        navigateToDownloadProgressDialog: Attachment.(AttachmentIntentUtils.AttachmentIntentType) -> Unit,
+    ) {
         this.navigateToAttendeesBottomSheet = navigateToAttendeesBottomSheet
+        this.navigateToDownloadProgressDialog = navigateToDownloadProgressDialog
     }
 
     private fun MaterialButton.handleChoiceButtonBehavior() {

@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.main.thread
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
+import android.os.Bundle
 import android.text.format.Formatter
 import android.view.*
 import android.webkit.WebView
@@ -46,6 +47,7 @@ import com.infomaniak.mail.data.models.message.Message.*
 import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.*
 import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.AttachmentIntentUtils.createDownloadDialogNavArgs
 import com.infomaniak.mail.utils.SharedUtils.Companion.createHtmlForPlainText
 import com.infomaniak.mail.utils.UiUtils.getPrettyNameAndEmail
 import com.infomaniak.mail.utils.Utils
@@ -72,6 +74,7 @@ class ThreadAdapter(
     onAllExpandedMessagesLoaded: () -> Unit,
     navigateToNewMessageActivity: (Uri) -> Unit,
     navigateToAttendeeBottomSheet: (List<Attendee>) -> Unit,
+    navigateToDownloadProgressDialog: (Int, Bundle) -> Unit,
     promptLink: (String, ContextMenuType) -> Unit,
 ) : ListAdapter<Message, ThreadViewHolder>(MessageDiffCallback()) {
 
@@ -114,6 +117,7 @@ class ThreadAdapter(
             onAllExpandedMessagesLoaded,
             navigateToNewMessageActivity,
             navigateToAttendeeBottomSheet,
+            navigateToDownloadProgressDialog,
             promptLink,
         )
     }
@@ -174,18 +178,28 @@ class ThreadAdapter(
     }
 
     private fun ThreadViewHolder.bindCalendarEvent(message: Message) {
+        val attachment = message.attachments.singleOrNull(Attachment::isCalendarEvent) ?: return
         val calendarEvent = message.latestCalendarEventResponse?.calendarEvent
+
         binding.calendarEvent.apply {
             isVisible = calendarEvent != null
 
             calendarEvent?.let {
                 val hasBeenDeleted = message.latestCalendarEventResponse!!.isUserStoredEventDeleted
-                loadCalendarEvent(it, hasBeenDeleted)
+                loadCalendarEvent(it, hasBeenDeleted, attachment)
             }
 
-            initCallback { attendees ->
-                threadAdapterCallbacks?.navigateToAttendeeBottomSheet?.invoke(attendees)
-            }
+            initCallback(
+                navigateToAttendeesBottomSheet = { attendees ->
+                    threadAdapterCallbacks?.navigateToAttendeeBottomSheet?.invoke(attendees)
+                },
+                navigateToDownloadProgressDialog = {
+                    threadAdapterCallbacks?.navigateToDownloadProgressDialog?.invoke(
+                        R.id.downloadAttachmentProgressDialog,
+                        attachment.createDownloadDialogNavArgs(AttachmentIntentUtils.AttachmentIntentType.OPEN_WITH),
+                    )
+                }
+            )
         }
     }
 
@@ -669,6 +683,7 @@ class ThreadAdapter(
         var onAllExpandedMessagesLoaded: () -> Unit,
         var navigateToNewMessageActivity: (Uri) -> Unit,
         var navigateToAttendeeBottomSheet: (List<Attendee>) -> Unit,
+        var navigateToDownloadProgressDialog: (Int, Bundle) -> Unit,
         var promptLink: (String, ContextMenuType) -> Unit,
     )
 
