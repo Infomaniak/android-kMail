@@ -25,6 +25,7 @@ import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.IdRes
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -192,7 +193,7 @@ class ThreadFragment : Fragment() {
         adapter = ThreadAdapter(
             shouldLoadDistantResources = shouldLoadDistantResources(),
             onContactClicked = {
-                twoPaneViewModel.safeNavigate(
+                safeNavigate(
                     resId = R.id.detailedContactBottomSheetDialog,
                     args = DetailedContactBottomSheetDialogArgs(it).toBundle(),
                 )
@@ -212,7 +213,7 @@ class ThreadFragment : Fragment() {
             },
             onAttachmentClicked = { attachment ->
                 attachment.resource?.let { resource ->
-                    twoPaneViewModel.safeNavigate(
+                    safeNavigate(
                         resId = R.id.attachmentActionsBottomSheetDialog,
                         args = AttachmentActionsBottomSheetDialogArgs(resource).toBundle(),
                     )
@@ -230,13 +231,13 @@ class ThreadFragment : Fragment() {
                 message.navigateToActionsBottomSheet()
             },
             onAllExpandedMessagesLoaded = ::scrollToFirstUnseenMessage,
-            navigateToNewMessageActivity = { twoPaneViewModel.navigateToNewMessage(mailToUri = it) },
             navigateToAttendeeBottomSheet = { attendees ->
-                twoPaneViewModel.safeNavigate(
+                safeNavigate(
                     resId = R.id.attendeesBottomSheetDialog,
                     args = AttendeesBottomSheetDialogArgs(attendees.toTypedArray()).toBundle(),
                 )
             },
+            navigateToNewMessageActivity = { twoPaneViewModel.navigateToNewMessage(mailToUri = it) },
             promptLink = { data, type ->
                 // When adding a phone number to contacts, Google decodes this value in case it's url-encoded. But I could not
                 // reproduce this issue when manually creating a url-encoded href. If this is triggered, fix it by also
@@ -336,19 +337,19 @@ class ThreadFragment : Fragment() {
         threadViewModel.failedMessagesUids.observe(viewLifecycleOwner, threadAdapter::updateFailedMessages)
     }
 
-    private fun observeQuickActionBarClicks() = with(twoPaneViewModel) {
+    private fun observeQuickActionBarClicks() {
         threadViewModel.quickActionBarClicks.observe(viewLifecycleOwner) { (threadUid, lastMessageToReplyTo, menuId) ->
             when (menuId) {
                 R.id.quickActionReply -> replyTo(lastMessageToReplyTo)
                 R.id.quickActionForward -> {
-                    navigateToNewMessage(
+                    twoPaneViewModel.navigateToNewMessage(
                         draftMode = DraftMode.FORWARD,
                         previousMessageUid = lastMessageToReplyTo.uid,
                         shouldLoadDistantResources = shouldLoadDistantResources(lastMessageToReplyTo.uid),
                     )
                 }
                 R.id.quickActionMenu -> {
-                    twoPaneViewModel.safeNavigate(
+                    safeNavigate(
                         resId = R.id.threadActionsBottomSheetDialog,
                         args = ThreadActionsBottomSheetDialogArgs(
                             threadUid = threadUid,
@@ -473,18 +474,18 @@ class ThreadFragment : Fragment() {
         scheduleDownloadManager(url, name)
     }
 
-    private fun replyTo(message: Message) = with(twoPaneViewModel) {
+    private fun replyTo(message: Message) {
 
         val shouldLoadDistantResources = shouldLoadDistantResources(message.uid)
 
         if (message.getRecipientsForReplyTo(replyAll = true).second.isEmpty()) {
-            navigateToNewMessage(
+            twoPaneViewModel.navigateToNewMessage(
                 draftMode = DraftMode.REPLY,
                 previousMessageUid = message.uid,
                 shouldLoadDistantResources = shouldLoadDistantResources,
             )
         } else {
-            twoPaneViewModel.safeNavigate(
+            safeNavigate(
                 resId = R.id.replyBottomSheetDialog,
                 args = ReplyBottomSheetDialogArgs(message.uid, shouldLoadDistantResources).toBundle(),
             )
@@ -492,7 +493,7 @@ class ThreadFragment : Fragment() {
     }
 
     private fun Message.navigateToActionsBottomSheet() {
-        twoPaneViewModel.safeNavigate(
+        safeNavigate(
             resId = R.id.messageActionsBottomSheetDialog,
             MessageActionsBottomSheetDialogArgs(
                 messageUid = uid,
@@ -577,6 +578,10 @@ class ThreadFragment : Fragment() {
     }
 
     fun getAnchor(): View? = _binding?.quickActionBar
+
+    private fun safeNavigate(@IdRes resId: Int, args: Bundle? = null) {
+        twoPaneViewModel.safeNavigate(resId, args)
+    }
 
     enum class HeaderState {
         ELEVATED,
