@@ -29,6 +29,7 @@ import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.LocalSettings.*
 import com.infomaniak.mail.databinding.FragmentPermissionsOnboardingBinding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -53,7 +54,7 @@ class PermissionsOnboardingFragment : Fragment() {
 
     private fun setPermissionUi() = with(binding) {
         val permission = if (navigationArgs.position == 0) PermissionType.CONTACTS else PermissionType.NOTIFICATIONS
-        iconLayout.setImageResource(permission.iconRes)
+        iconLayout.setImageResource(getIconResWithAccentColor(permission))
         title.setText(permission.titleRes)
         description.setText(permission.descritionRes)
         waveBackground.apply {
@@ -62,23 +63,36 @@ class PermissionsOnboardingFragment : Fragment() {
         }
     }
 
+
+    private fun getIconResWithAccentColor(permission: PermissionType) = when (localSettings.accentColor) {
+        AccentColor.PINK -> permission.pinkIconRes
+        AccentColor.BLUE -> permission.blueIconRes
+        AccentColor.SYSTEM -> permission.systemIconRes
+    }
+
     enum class PermissionType(
-        @DrawableRes val iconRes: Int,
+        @DrawableRes val pinkIconRes: Int,
+        @DrawableRes val blueIconRes: Int,
+        @DrawableRes val systemIconRes: Int,
         @StringRes val titleRes: Int,
         @StringRes val descritionRes: Int,
         @DrawableRes val waveRes: Int,
     ) {
         CONTACTS(
-            iconRes = R.drawable.illustration_onboarding_contacts,
+            pinkIconRes = R.drawable.illustration_onboarding_contacts,
+            blueIconRes = R.drawable.illustration_onboarding_contacts_blue,
+            systemIconRes = R.drawable.illustration_onboarding_contacts_material,
             titleRes = R.string.onBoardingContactsTitle,
             descritionRes = R.string.onBoardingContactsDescription,
-            waveRes = R.drawable.ic_back_wave_1
+            waveRes = R.drawable.ic_back_wave_1,
         ),
         NOTIFICATIONS(
-            iconRes = R.drawable.illustration_onboarding_notifications,
+            pinkIconRes = R.drawable.illustration_onboarding_notifications,
+            blueIconRes = R.drawable.illustration_onboarding_notifications_blue,
+            systemIconRes = R.drawable.illustration_onboarding_notifications_material,
             titleRes = R.string.onBoardingNotificationsTitle,
             descritionRes = R.string.onBoardingNotificationsDescription,
-            waveRes = R.drawable.ic_back_wave_2
+            waveRes = R.drawable.ic_back_wave_2,
         ),
     }
 }
