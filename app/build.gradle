@@ -45,7 +45,7 @@ android {
 
         resValue 'string', 'ATTACHMENTS_AUTHORITY', 'com.infomaniak.mail.attachments'
 
-        resourceConfigurations += ["de", "en", "es", "fr", "it"]
+        resourceConfigurations += ["en", "de", "es", "fr", "it"]
     }
 
     buildTypes {

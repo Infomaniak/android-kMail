@@ -22,7 +22,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDeepLinkBuilder
-import com.infomaniak.lib.core.extensions.setDefaultLocalIfNeeded
+import com.infomaniak.lib.core.extensions.setDefaultLocaleIfNeeded
 import com.infomaniak.mail.MatomoMail.trackNotificationActionEvent
 import com.infomaniak.mail.MatomoMail.trackUserId
 import com.infomaniak.mail.R
@@ -56,7 +56,7 @@ class LaunchActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setDefaultLocalIfNeeded()
+        setDefaultLocaleIfNeeded()
 
         handleNotificationDestinationIntent()
 

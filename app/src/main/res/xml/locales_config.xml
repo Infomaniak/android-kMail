@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Infomaniak kDrive - Android
+  ~ Infomaniak Mail - Android
   ~ Copyright (C) 2024 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
@@ -16,8 +16,8 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <locale-config xmlns:android="http://schemas.android.com/apk/res/android">
-    <locale android:name="de" />
     <locale android:name="en" />
+    <locale android:name="de" />
     <locale android:name="es" />
     <locale android:name="fr" />
     <locale android:name="it" />
