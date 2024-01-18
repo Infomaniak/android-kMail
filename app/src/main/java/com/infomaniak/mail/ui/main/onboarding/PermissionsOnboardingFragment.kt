@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.onboarding
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -27,18 +28,25 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentPermissionsOnboardingBinding
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class PermissionsOnboardingFragment : Fragment() {
 
     private var binding: FragmentPermissionsOnboardingBinding by safeBinding()
     private val navigationArgs: PermissionsOnboardingFragmentArgs by navArgs()
 
+    @Inject
+    lateinit var localSettings: LocalSettings
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentPermissionsOnboardingBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
         setPermissionUi()
     }
@@ -48,7 +56,10 @@ class PermissionsOnboardingFragment : Fragment() {
         iconLayout.setImageResource(permission.iconRes)
         title.setText(permission.titleRes)
         description.setText(permission.descritionRes)
-        waveBackground.setImageResource(permission.waveRes)
+        waveBackground.apply {
+            setImageResource(permission.waveRes)
+            imageTintList = ColorStateList.valueOf(localSettings.accentColor.getOnboardingSecondaryBackground(context))
+        }
     }
 
     enum class PermissionType(

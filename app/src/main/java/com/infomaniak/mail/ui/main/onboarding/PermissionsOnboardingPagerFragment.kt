@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.viewpager2.widget.ViewPager2
+import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
@@ -76,6 +77,8 @@ class PermissionsOnboardingPagerFragment : Fragment() {
                 1 -> permissionUtils.requestNotificationsPermissionIfNeeded { leaveOnboarding() }
             }
         }
+
+        requireActivity().window.statusBarColor = localSettings.accentColor.getOnboardingSecondaryBackground(context)
     }
 
     private fun ViewPager2.isLastPage() = adapter?.let { currentItem == it.itemCount - 1 } ?: true
