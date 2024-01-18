@@ -18,10 +18,9 @@
 package com.infomaniak.mail.ui.main.onboarding
 
 import androidx.lifecycle.ViewModel
-import com.infomaniak.mail.ui.main.onboarding.PermissionsOnboardingFragment.PermissionType
 
 
 class PermissionsOnboardingViewModel : ViewModel() {
 
-    var currentPermission: PermissionType = PermissionType.CONTACTS
+    var currentPermissionPosition: Int = 0
 }

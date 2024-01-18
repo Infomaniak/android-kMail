@@ -40,6 +40,7 @@ import javax.inject.Inject
 class PermissionsOnboardingPagerFragment : Fragment() {
 
     private var binding: FragmentPermissionsOnboardingPagerBinding by safeBinding()
+    private val permissionsOnboardingViewModel: PermissionsOnboardingViewModel by activityViewModels()
     private val mainViewModel: MainViewModel by activityViewModels()
 
     @Inject
@@ -63,10 +64,12 @@ class PermissionsOnboardingPagerFragment : Fragment() {
         permissionsViewpager.apply {
             adapter = PermissionsPagerAdapter(childFragmentManager, viewLifecycleOwner.lifecycle)
             isUserInputEnabled = false
+            setCurrentItem(permissionsOnboardingViewModel.currentPermissionPosition, false)
             removeOverScrollForApiBelow31()
         }
 
         continueButton.setOnClickListener {
+            permissionsOnboardingViewModel.currentPermissionPosition = permissionsViewpager.currentItem
             when (permissionsViewpager.currentItem) {
                 0 -> {
                     permissionUtils.requestReadContactsPermission { hasPermission ->
