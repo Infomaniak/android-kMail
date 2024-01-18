@@ -178,7 +178,7 @@ class ThreadAdapter(
     }
 
     private fun ThreadViewHolder.bindCalendarEvent(message: Message) {
-        val attachment = message.attachments.singleOrNull(Attachment::isCalendarEvent) ?: return
+        val attachment = message.calendarAttachment ?: return
         val calendarEvent = message.latestCalendarEventResponse?.calendarEvent
 
         binding.calendarEvent.apply {

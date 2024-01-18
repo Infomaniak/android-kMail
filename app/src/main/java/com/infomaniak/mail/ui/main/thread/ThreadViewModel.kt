@@ -28,7 +28,6 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
-import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
@@ -203,10 +202,7 @@ class ThreadViewModel @Inject constructor(
                     val alreadyTreated = !treatedMessagesForCalendarEvent.add(message.uid)
                     if (alreadyTreated) return@forEach
 
-                    val icsAttachments = message.attachments.filter(Attachment::isCalendarEvent)
-                    if (icsAttachments.count() != 1) return@forEach
-
-                    val icsAttachment = icsAttachments.single()
+                    val icsAttachment = message.calendarAttachment ?: return@forEach
 
                     val apiResponse = icsAttachment.resource?.let { resource ->
                         ApiRepository.getAttachmentCalendarEvent(resource)

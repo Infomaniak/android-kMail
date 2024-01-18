@@ -167,6 +167,8 @@ class Message : RealmObject {
             if (it == null) SentryLog.e("ThreadAdapter", "Message $uid has empty from")
         }
 
+    val calendarAttachment: Attachment? get() = attachments.singleOrNull(Attachment::isCalendarEvent)
+
     val dkimStatus: MessageDKIM get() = enumValueOfOrNull<MessageDKIM>(_dkimStatus) ?: MessageDKIM.VALID
 
     enum class MessageDKIM {
