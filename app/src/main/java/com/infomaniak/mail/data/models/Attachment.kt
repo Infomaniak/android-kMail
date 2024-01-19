@@ -60,7 +60,7 @@ class Attachment : EmbeddedRealmObject {
     var uploadLocalUri: String? = null
     //endregion
 
-    val isCalendarEvent: Boolean get() = mimeType == "application/ics"
+    val isCalendarEvent: Boolean get() = mimeType == "application/ics" || mimeType == "text/calendar"
 
     val disposition: AttachmentDisposition?
         get() = enumValueOfOrNull<AttachmentDisposition>(_disposition)
