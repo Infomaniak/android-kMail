@@ -44,6 +44,8 @@ class CalendarEventBannerView @JvmOverloads constructor(
 
     private val binding by lazy { ViewCalendarEventBannerBinding.inflate(LayoutInflater.from(context), this, true) }
 
+    private val allDayLong by lazy { context.getString(R.string.calendarAllDayLong) }
+
     private var navigateToAttendeesBottomSheet: ((List<Attendee>) -> Unit)? = null
 
     init {
@@ -63,14 +65,8 @@ class CalendarEventBannerView @JvmOverloads constructor(
         val endDate = calendarEvent.end.toDate()
 
         pastEventWarning.isVisible = startDate > Date()
-
         eventName.text = calendarEvent.title
-
-        if (startDate.isSameDayAs(endDate)) {
-            eventDate.text = "${startDate.formatFullDate()}\n${startDate.formatShortHour()} - ${endDate.formatShortHour()}"
-        } else {
-            eventDate.text = "${startDate.formatMediumDateHour()} -\n${endDate.formatMediumDateHour()}"
-        }
+        setEventHour(startDate, endDate, calendarEvent.isFullDay)
 
         eventLocation.apply {
             isVisible = calendarEvent.location != null
@@ -85,6 +81,36 @@ class CalendarEventBannerView @JvmOverloads constructor(
         displayOrganizer(calendarEvent.attendees)
         allAttendeesButton.setOnClickListener { navigateToAttendeesBottomSheet?.invoke(calendarEvent.attendees) }
         manyAvatarsView.setAttendees(calendarEvent.attendees)
+    }
+
+    private fun setEventHour(startDate: Date, endDate: Date, isFullDay: Boolean) = with(binding) {
+        var displayEndDate = endDate
+
+        // When receiving a full day event spanning two days, the start date will indicate let's say the 10th and then end day
+        // will indicate the 12th. Here we don't want to show the event starting the 10th and finishing the 12th but rather
+        // finishing the 11th. This also makes it so that single days events don't go from the 10th to the 11th but are only
+        // displayed as happening on the 10th.
+        if (isFullDay) {
+            val oneLessDay = endDate.addDays(-1)
+            if (oneLessDay >= startDate) displayEndDate = oneLessDay
+        }
+
+        val isSameDay = startDate.isSameDayAs(displayEndDate)
+
+        eventDate.text = when {
+            isSameDay && !isFullDay -> {
+                "${startDate.formatFullDate()}\n${startDate.formatShortHour()} - ${displayEndDate.formatShortHour()}"
+            }
+            isSameDay && isFullDay -> {
+                "${startDate.formatFullDate()}\n$allDayLong"
+            }
+            !isSameDay && !isFullDay -> {
+                "${startDate.formatMediumDateHour()} -\n${displayEndDate.formatMediumDateHour()}"
+            }
+            else -> {
+                "${startDate.formatMediumDate()} - ${displayEndDate.formatMediumDate()}\n$allDayLong"
+            }
+        }
     }
 
     fun initCallback(navigateToAttendeesBottomSheet: (List<Attendee>) -> Unit) {
@@ -133,6 +159,14 @@ class CalendarEventBannerView @JvmOverloads constructor(
             formatWithLocal(FormatStyle.MEDIUM, FormatData.BOTH)
         } else {
             format("$FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR $FORMAT_DATE_HOUR_MINUTE") // Fallback on unambiguous format
+        }
+    }
+
+    private fun Date.formatMediumDate(): String {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            formatWithLocal(FormatStyle.MEDIUM, FormatData.DATE)
+        } else {
+            format(FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR) // Fallback on textual day, day, month, year ordering for everyone
         }
     }
 

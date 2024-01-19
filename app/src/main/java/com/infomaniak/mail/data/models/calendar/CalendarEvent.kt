@@ -38,7 +38,7 @@ class CalendarEvent : EmbeddedRealmObject {
     var description: String = ""
     var location: String? = null
     @SerialName("fullday")
-    var fullDay: Boolean = false
+    var isFullDay: Boolean = false
     var start: RealmInstant = Date(0).toRealmInstant()
     var end: RealmInstant = Date(0).toRealmInstant()
     var timezone: String? = null
@@ -58,7 +58,7 @@ class CalendarEvent : EmbeddedRealmObject {
         if (title != other.title) return false
         if (description != other.description) return false
         if (location != other.location) return false
-        if (fullDay != other.fullDay) return false
+        if (isFullDay != other.isFullDay) return false
         if (start != other.start) return false
         if (end != other.end) return false
         if (timezone != other.timezone) return false
@@ -72,7 +72,7 @@ class CalendarEvent : EmbeddedRealmObject {
         result = 31 * result + title.hashCode()
         result = 31 * result + description.hashCode()
         result = 31 * result + (location?.hashCode() ?: 0)
-        result = 31 * result + fullDay.hashCode()
+        result = 31 * result + isFullDay.hashCode()
         result = 31 * result + start.hashCode()
         result = 31 * result + end.hashCode()
         result = 31 * result + (timezone?.hashCode() ?: 0)
