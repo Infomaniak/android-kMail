@@ -19,10 +19,12 @@ package com.infomaniak.mail.ui.main
 
 import android.os.Bundle
 import android.view.View
+import androidx.annotation.ColorRes
 import androidx.fragment.app.Fragment
 
 abstract class BaseFragment : Fragment() {
 
+    @get:ColorRes
     abstract val statusBarColor: Int?
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
