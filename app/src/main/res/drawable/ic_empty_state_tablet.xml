@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak Mail - Android
+  ~ Copyright (C) 2024 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="112dp"
+    android:height="80dp"
+    android:viewportWidth="112"
+    android:viewportHeight="80">
+    <path
+        android:fillColor="#FAFAFA"
+        android:pathData="M11.25,21.81H100.15V72.79C100.15,76.61 97.06,79.7 93.24,79.7H18.16C14.34,79.7 11.25,76.61 11.25,72.79V21.81Z"
+        android:strokeWidth="0.5"
+        android:strokeColor="#9F9F9F" />
+    <path
+        android:fillColor="#F1F1F1"
+        android:pathData="M52.85,55.26L11.7,21.81H99.69L58.55,55.26C56.89,56.61 54.51,56.61 52.85,55.26Z"
+        android:strokeWidth="0.5"
+        android:strokeColor="#9F9F9F" />
+    <path
+        android:fillColor="#F1F1F1"
+        android:pathData="M100.15,21.8L11.24,21.8L53.6,1.03C54.92,0.38 56.47,0.38 57.8,1.03L100.15,21.8Z"
+        android:strokeWidth="0.5"
+        android:strokeColor="#9F9F9F" />
+    <path
+        android:fillColor="#FAFAFA"
+        android:pathData="M58.88,47.06L92.38,79.75L19.07,79.75L52.57,47.06C54.32,45.34 57.12,45.34 58.88,47.06Z"
+        android:strokeWidth="0.5"
+        android:strokeColor="#9F9F9F" />
+</vector>

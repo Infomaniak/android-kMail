@@ -389,7 +389,7 @@ class ThreadFragment : Fragment() {
 
     private fun observeCurrentFolderName() {
         twoPaneViewModel.rightPaneFolderName.observe(viewLifecycleOwner) {
-            binding.emptyView.text = getString(R.string.noConversationSelected, it)
+            binding.emptyView.title = getString(R.string.noConversationSelected, it)
         }
     }
 
