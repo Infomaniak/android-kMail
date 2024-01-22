@@ -20,7 +20,9 @@ package com.infomaniak.mail.ui.main.folder
 import android.net.Uri
 import android.os.Bundle
 import androidx.annotation.IdRes
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
@@ -34,10 +36,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TwoPaneViewModel @Inject constructor(
+    private val state: SavedStateHandle,
     private val draftController: DraftController,
 ) : ViewModel() {
 
-    val currentThreadUid = MutableLiveData<String?>()
+    val currentThreadUid: LiveData<String?> = state.getLiveData(CURRENT_THREAD_UID_KEY)
 
     inline val isThreadOpen get() = currentThreadUid.value != null
     val rightPaneFolderName = MutableLiveData<String>()
@@ -47,11 +50,11 @@ class TwoPaneViewModel @Inject constructor(
     val navArgs = SingleLiveEvent<NavData>()
 
     fun openThread(uid: String) {
-        currentThreadUid.value = uid
+        state[CURRENT_THREAD_UID_KEY] = uid
     }
 
     fun closeThread() {
-        currentThreadUid.value = null
+        state[CURRENT_THREAD_UID_KEY] = null
     }
 
     fun openDraft(thread: Thread) {
@@ -93,4 +96,8 @@ class TwoPaneViewModel @Inject constructor(
         @IdRes val resId: Int,
         val args: Bundle,
     )
+
+    companion object {
+        private const val CURRENT_THREAD_UID_KEY = "currentThreadUidKey"
+    }
 }

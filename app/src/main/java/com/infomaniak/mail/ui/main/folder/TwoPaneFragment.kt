@@ -108,8 +108,8 @@ abstract class TwoPaneFragment : Fragment() {
             rightPaneFolderName.value = name
 
             if (folderId != previousFolderId) {
+                if (isThreadOpen && previousFolderId != null) closeThread()
                 previousFolderId = folderId
-                if (isThreadOpen) closeThread()
             }
 
             doAfterFolderChanged()
