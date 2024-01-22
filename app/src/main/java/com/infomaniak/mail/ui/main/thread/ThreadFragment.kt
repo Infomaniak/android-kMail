@@ -62,6 +62,7 @@ import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.*
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel
+import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel.NavData
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ContextMenuType
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.OpenThreadResult
 import com.infomaniak.mail.ui.main.thread.actions.AttachmentActionsBottomSheetDialogArgs
@@ -495,7 +496,7 @@ class ThreadFragment : Fragment() {
     private fun Message.navigateToActionsBottomSheet() {
         safeNavigate(
             resId = R.id.messageActionsBottomSheetDialog,
-            MessageActionsBottomSheetDialogArgs(
+            args = MessageActionsBottomSheetDialogArgs(
                 messageUid = uid,
                 threadUid = twoPaneViewModel.currentThreadUid.value ?: return,
                 isThemeTheSame = threadAdapter.isThemeTheSameMap[uid] ?: return,
@@ -579,8 +580,8 @@ class ThreadFragment : Fragment() {
 
     fun getAnchor(): View? = _binding?.quickActionBar
 
-    private fun safeNavigate(@IdRes resId: Int, args: Bundle? = null) {
-        twoPaneViewModel.safeNavigate(resId, args)
+    private fun safeNavigate(@IdRes resId: Int, args: Bundle) {
+        twoPaneViewModel.navArgs.value = NavData(resId, args)
     }
 
     enum class HeaderState {

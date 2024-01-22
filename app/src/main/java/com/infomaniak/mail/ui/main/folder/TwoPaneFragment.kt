@@ -135,8 +135,8 @@ abstract class TwoPaneFragment : Fragment() {
             safeNavigateToNewMessageActivity(args = it.toBundle())
         }
 
-        navArgs.observe(viewLifecycleOwner) { (resId, args, className) ->
-            this@TwoPaneFragment.safeNavigate(resId = resId, args = args, currentClassName = className)
+        navArgs.observe(viewLifecycleOwner) { (resId, args) ->
+            safeNavigate(resId, args)
         }
     }
 

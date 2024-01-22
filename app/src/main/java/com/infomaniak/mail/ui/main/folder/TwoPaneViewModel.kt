@@ -89,13 +89,8 @@ class TwoPaneViewModel @Inject constructor(
         )
     }
 
-    fun safeNavigate(@IdRes resId: Int, args: Bundle?, className: String? = null) {
-        navArgs.value = NavData(resId = resId, args = args, className = className)
-    }
-
     data class NavData(
         @IdRes val resId: Int,
-        val args: Bundle? = null,
-        val className: String?,
+        val args: Bundle,
     )
 }
