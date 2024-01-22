@@ -114,7 +114,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
     private fun setAttendees(attendees: RealmList<Attendee>) = with(binding) {
         val iAmPartOfAttendees = attendees.any { it.isMe() }
         notPartOfAttendeesWarning.isGone = iAmPartOfAttendees
-        participationButtons.isVisible = iAmPartOfAttendees
+        participationButtons.isVisible = iAmPartOfAttendees && false // TODO : Display this when buttons click are implemented
         attendeesLayout.isGone = attendees.isEmpty()
 
         displayOrganizer(attendees)
