@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.data.models.calendar
 
+import com.infomaniak.lib.core.utils.Utils
 import io.realm.kotlin.types.EmbeddedRealmObject
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -29,6 +30,11 @@ class CalendarEventResponse : EmbeddedRealmObject {
     var userStoredEventDeleted: Boolean = false
     @SerialName("attachment_event")
     private var attachmentEvent: CalendarEvent? = null
+    @SerialName("attachment_event_method")
+    private var _attachmentEventMethod: String? = null
+
+    val attachmentEventMethod: AttachmentEventMethod?
+        get() = Utils.enumValueOfOrNull<AttachmentEventMethod>(_attachmentEventMethod)
 
     val calendarEvent get() = userStoredEvent ?: attachmentEvent
 
@@ -52,5 +58,12 @@ class CalendarEventResponse : EmbeddedRealmObject {
         result = 31 * result + userStoredEventDeleted.hashCode()
         result = 31 * result + (attachmentEvent?.hashCode() ?: 0)
         return result
+    }
+
+    enum class AttachmentEventMethod {
+        PUBLISH,
+        REQUEST,
+        REPLY,
+        CANCEL,
     }
 }
