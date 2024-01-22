@@ -129,35 +129,14 @@ abstract class TwoPaneFragment : Fragment() {
     }
 
     private fun observeThreadNavigation() = with(twoPaneViewModel) {
-
         getBackNavigationResult(AttachmentIntentUtils.DOWNLOAD_ATTACHMENT_RESULT, ::startActivity)
-
-        attachmentActionsArgs.observe(viewLifecycleOwner) {
-            safeNavigate(resId = R.id.attachmentActionsBottomSheetDialog, args = it.toBundle())
-        }
 
         newMessageArgs.observe(viewLifecycleOwner) {
             safeNavigateToNewMessageActivity(args = it.toBundle())
         }
 
-        replyBottomSheetArgs.observe(viewLifecycleOwner) {
-            safeNavigate(resId = R.id.replyBottomSheetDialog, args = it.toBundle())
-        }
-
-        threadActionsArgs.observe(viewLifecycleOwner) {
-            safeNavigate(resId = R.id.threadActionsBottomSheetDialog, args = it.toBundle())
-        }
-
-        messageActionsArgs.observe(viewLifecycleOwner) {
-            safeNavigate(resId = R.id.messageActionsBottomSheetDialog, args = it.toBundle())
-        }
-
-        detailedContactArgs.observe(viewLifecycleOwner) {
-            safeNavigate(resId = R.id.detailedContactBottomSheetDialog, args = it.toBundle())
-        }
-
-        attendeesArgs.observe(viewLifecycleOwner) {
-            safeNavigate(resId = R.id.attendeesBottomSheetDialog, args = it.toBundle())
+        navArgs.observe(viewLifecycleOwner) { (resId, args) ->
+            safeNavigate(resId, args)
         }
     }
 
