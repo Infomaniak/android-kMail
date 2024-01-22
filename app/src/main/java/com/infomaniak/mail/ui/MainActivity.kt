@@ -69,6 +69,7 @@ import com.infomaniak.mail.ui.alertDialogs.TitleAlertDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
+import com.infomaniak.mail.ui.main.onboarding.PermissionsOnboardingPagerFragment
 import com.infomaniak.mail.ui.newMessage.NewMessageActivity
 import com.infomaniak.mail.ui.sync.SyncAutoConfigActivity
 import com.infomaniak.mail.utils.*
@@ -368,8 +369,11 @@ class MainActivity : BaseActivity() {
         }
 
         fun popBack() {
-            val fragment = currentFragment
-            if (fragment is TwoPaneFragment) fragment.handleOnBackPressed() else navController.popBackStack()
+            when (val fragment = currentFragment) {
+                is TwoPaneFragment -> fragment.handleOnBackPressed()
+                is PermissionsOnboardingPagerFragment -> fragment.leaveOnboarding()
+                else -> navController.popBackStack()
+            }
         }
 
         onBackPressedDispatcher.addCallback(this@MainActivity) {
@@ -485,8 +489,10 @@ class MainActivity : BaseActivity() {
 
     private fun managePermissionsRequesting() {
         if (!hasPermissions(PermissionUtils.getMainPermissions(mustRequireNotification = true))) {
-            if (localSettings.appLaunches == 0) {
-                navController.navigate(R.id.permissionsOnboardingPagerFragment)
+            if (localSettings.showPermissionsOnboarding) {
+                if (currentFragment !is PermissionsOnboardingPagerFragment) {
+                    navController.navigate(R.id.permissionsOnboardingPagerFragment)
+                }
             } else {
                 permissionUtils.requestMainPermissionsIfNeeded()
             }
@@ -518,7 +524,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun showSyncDiscovery() = with(localSettings) {
-        if (showSyncDiscoveryBottomSheet && appLaunches > 1 && !isUserAlreadySynchronized()) {
+        if (!showPermissionsOnboarding && showSyncDiscoveryBottomSheet && appLaunches > 1 && !isUserAlreadySynchronized()) {
             showSyncDiscoveryBottomSheet = false
             navController.navigate(R.id.syncDiscoveryBottomSheetDialog)
         }

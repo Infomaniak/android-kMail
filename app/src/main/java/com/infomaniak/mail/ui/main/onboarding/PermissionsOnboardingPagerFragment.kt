@@ -40,8 +40,8 @@ import javax.inject.Inject
 class PermissionsOnboardingPagerFragment : Fragment() {
 
     private var binding: FragmentPermissionsOnboardingPagerBinding by safeBinding()
-    private val permissionsOnboardingViewModel: PermissionsOnboardingViewModel by activityViewModels()
     private val mainViewModel: MainViewModel by activityViewModels()
+    private var currentPosition = 0
 
     @Inject
     lateinit var localSettings: LocalSettings
@@ -64,17 +64,21 @@ class PermissionsOnboardingPagerFragment : Fragment() {
         permissionsViewpager.apply {
             adapter = PermissionsPagerAdapter(childFragmentManager, viewLifecycleOwner.lifecycle)
             isUserInputEnabled = false
-            setCurrentItem(permissionsOnboardingViewModel.currentPermissionPosition, false)
+            savedInstanceState?.getInt(VIEW_PAGER_POSITION_KEY)?.let { setCurrentItem(it, false) }
             removeOverScrollForApiBelow31()
         }
 
         continueButton.setOnClickListener {
-            permissionsOnboardingViewModel.currentPermissionPosition = permissionsViewpager.currentItem
             when (permissionsViewpager.currentItem) {
                 0 -> {
                     permissionUtils.requestReadContactsPermission { hasPermission ->
                         if (hasPermission) mainViewModel.updateUserInfo()
-                        if (permissionsViewpager.isLastPage()) leaveOnboarding() else permissionsViewpager.currentItem += 1
+                        if (permissionsViewpager.isLastPage()) {
+                            leaveOnboarding()
+                        } else {
+                            currentPosition += 1
+                            permissionsViewpager.currentItem += 1
+                        }
                     }
                 }
                 1 -> permissionUtils.requestNotificationsPermissionIfNeeded { leaveOnboarding() }
@@ -84,9 +88,19 @@ class PermissionsOnboardingPagerFragment : Fragment() {
         requireActivity().window.statusBarColor = localSettings.accentColor.getOnboardingSecondaryBackground(context)
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putInt(VIEW_PAGER_POSITION_KEY, currentPosition)
+        super.onSaveInstanceState(outState)
+    }
+
     private fun ViewPager2.isLastPage() = adapter?.let { currentItem == it.itemCount - 1 } ?: true
 
-    private fun leaveOnboarding() {
+    fun leaveOnboarding() {
+        localSettings.showPermissionsOnboarding = false
         safeNavigate(R.id.threadListFragment)
+    }
+
+    companion object {
+        private const val VIEW_PAGER_POSITION_KEY = "viewPagerPositionKey"
     }
 }
