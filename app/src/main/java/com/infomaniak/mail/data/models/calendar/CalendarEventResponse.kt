@@ -41,7 +41,6 @@ class CalendarEventResponse : EmbeddedRealmObject {
     fun hasUserStoredEvent() = userStoredEvent != null
 
     fun hasAttachmentEvent() = attachmentEvent != null
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -50,13 +49,15 @@ class CalendarEventResponse : EmbeddedRealmObject {
 
         if (userStoredEvent != other.userStoredEvent) return false
         if (userStoredEventDeleted != other.userStoredEventDeleted) return false
-        return attachmentEvent == other.attachmentEvent
+        if (attachmentEvent != other.attachmentEvent) return false
+        return _attachmentEventMethod == other._attachmentEventMethod
     }
 
     override fun hashCode(): Int {
         var result = userStoredEvent?.hashCode() ?: 0
         result = 31 * result + userStoredEventDeleted.hashCode()
         result = 31 * result + (attachmentEvent?.hashCode() ?: 0)
+        result = 31 * result + (_attachmentEventMethod?.hashCode() ?: 0)
         return result
     }
 

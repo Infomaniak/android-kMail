@@ -124,7 +124,7 @@ class Message : RealmObject {
     @Transient
     var isDeletedOnApi: Boolean = false
     @Transient
-    var latestCalendarEventResponse: CalendarEventResponse? = null // TODO : Migration? If message already exists set it to null
+    var latestCalendarEventResponse: CalendarEventResponse? = null
     //endregion
 
     //region UI data (Transient & Ignore)

@@ -32,6 +32,7 @@ import com.infomaniak.mail.data.models.calendar.CalendarEvent
 import com.infomaniak.mail.databinding.ViewCalendarEventBannerBinding
 import com.infomaniak.mail.utils.UiUtils.getPrettyNameAndEmail
 import com.infomaniak.mail.utils.toDate
+import io.realm.kotlin.types.RealmList
 import io.sentry.Sentry
 import java.time.format.FormatStyle
 import java.util.Date
@@ -72,14 +73,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
             text = calendarEvent.location
         }
 
-        val iAmPartOfAttendees = calendarEvent.attendees.any { it.isMe() }
-        notPartOfAttendeesWarning.isGone = iAmPartOfAttendees
-        participationButtons.isVisible = iAmPartOfAttendees
-        attendeesLayout.isGone = calendarEvent.attendees.isEmpty()
-
-        displayOrganizer(calendarEvent.attendees)
-        allAttendeesButton.setOnClickListener { navigateToAttendeesBottomSheet?.invoke(calendarEvent.attendees) }
-        manyAvatarsView.setAttendees(calendarEvent.attendees)
+        setAttendees(calendarEvent.attendees)
     }
 
     private fun setWarnings(startDate: Date, hasBeenDeleted: Boolean) = with(binding) {
@@ -117,6 +111,17 @@ class CalendarEventBannerView @JvmOverloads constructor(
         }
     }
 
+    private fun setAttendees(attendees: RealmList<Attendee>) = with(binding) {
+        val iAmPartOfAttendees = attendees.any { it.isMe() }
+        notPartOfAttendeesWarning.isGone = iAmPartOfAttendees
+        participationButtons.isVisible = iAmPartOfAttendees
+        attendeesLayout.isGone = attendees.isEmpty()
+
+        displayOrganizer(attendees)
+        allAttendeesButton.setOnClickListener { navigateToAttendeesBottomSheet?.invoke(attendees) }
+        manyAvatarsView.setAttendees(attendees)
+    }
+
     fun initCallback(navigateToAttendeesBottomSheet: (List<Attendee>) -> Unit) {
         this.navigateToAttendeesBottomSheet = navigateToAttendeesBottomSheet
     }
@@ -142,7 +147,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
                 scope.setExtra("amount of organizer", organizers.count().toString())
                 scope.setExtra("have same email", organizers.all { it.email == organizers[0].email }.toString())
                 scope.setExtra("have same name", organizers.all { it.name == organizers[0].name }.toString())
-                Sentry.captureMessage("Found more than one organizer for this event")
+                Sentry.captureMessage("Found more than one organizer for an event")
             }
         }
 
