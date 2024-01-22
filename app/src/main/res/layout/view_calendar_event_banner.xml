@@ -35,6 +35,7 @@
             style="@style/BodyMedium"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/marginStandardMedium"
             android:background="@color/calendarHeaderBackground"
             android:drawablePadding="@dimen/marginStandardSmall"
             android:ellipsize="end"
@@ -45,17 +46,37 @@
             app:drawableStartCompat="@drawable/ic_calendar_infomaniak"
             tools:text="Réunion Produit" />
 
-        <TextView
-            android:id="@+id/pastEventWarning"
-            style="@style/Body.Warning"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginVertical="@dimen/marginStandardMedium"
-            android:layout_marginStart="@dimen/marginStandardMedium"
-            android:drawablePadding="@dimen/marginStandardMedium"
-            android:gravity="center_vertical"
-            android:text="@string/warningEventHasPassed"
-            app:drawableStartCompat="@drawable/ic_warning_big" />
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/pastEventWarning"
+                style="@style/Body.Warning"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/marginStandardMedium"
+                android:layout_marginBottom="@dimen/marginStandardMedium"
+                android:drawablePadding="@dimen/marginStandardMedium"
+                android:gravity="center_vertical"
+                android:text="@string/warningEventHasPassed"
+                app:drawableStartCompat="@drawable/ic_warning_big"
+                tools:visibility="gone" />
+
+            <TextView
+                android:id="@+id/canceledEventWarning"
+                style="@style/Body.Error"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/marginStandardMedium"
+                android:layout_marginBottom="@dimen/marginStandardMedium"
+                android:drawablePadding="@dimen/marginStandardMedium"
+                android:gravity="center_vertical"
+                android:text="@string/warningEventIsCancelled"
+                app:drawableStartCompat="@drawable/ic_warning_big"
+                app:drawableTint="@color/redDestructiveAction" />
+
+        </FrameLayout>
 
         <TextView
             android:id="@+id/eventDate"

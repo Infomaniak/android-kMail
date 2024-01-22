@@ -60,14 +60,13 @@ class CalendarEventBannerView @JvmOverloads constructor(
         }
     }
 
-    fun loadCalendarEvent(calendarEvent: CalendarEvent) = with(binding) {
+    fun loadCalendarEvent(calendarEvent: CalendarEvent, hasBeenDeleted: Boolean) = with(binding) {
         val startDate = calendarEvent.start.toDate()
         val endDate = calendarEvent.end.toDate()
 
-        pastEventWarning.isVisible = startDate > Date()
+        setWarnings(startDate, hasBeenDeleted)
         eventName.text = calendarEvent.title
         setEventHour(startDate, endDate, calendarEvent.isFullDay)
-
         eventLocation.apply {
             isVisible = calendarEvent.location != null
             text = calendarEvent.location
@@ -81,6 +80,11 @@ class CalendarEventBannerView @JvmOverloads constructor(
         displayOrganizer(calendarEvent.attendees)
         allAttendeesButton.setOnClickListener { navigateToAttendeesBottomSheet?.invoke(calendarEvent.attendees) }
         manyAvatarsView.setAttendees(calendarEvent.attendees)
+    }
+
+    private fun setWarnings(startDate: Date, hasBeenDeleted: Boolean) = with(binding) {
+        canceledEventWarning.isVisible = hasBeenDeleted
+        pastEventWarning.isVisible = !hasBeenDeleted && startDate > Date()
     }
 
     private fun setEventHour(startDate: Date, endDate: Date, isFullDay: Boolean) = with(binding) {

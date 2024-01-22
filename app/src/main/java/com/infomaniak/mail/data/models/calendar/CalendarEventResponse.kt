@@ -26,7 +26,7 @@ class CalendarEventResponse : EmbeddedRealmObject {
     @SerialName("user_stored_event")
     private var userStoredEvent: CalendarEvent? = null
     @SerialName("user_stored_event_deleted")
-    var userStoredEventDeleted: Boolean? = null
+    var userStoredEventDeleted: Boolean = false
     @SerialName("attachment_event")
     private var attachmentEvent: CalendarEvent? = null
 
