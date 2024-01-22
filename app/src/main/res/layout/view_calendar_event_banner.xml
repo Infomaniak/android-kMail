@@ -48,8 +48,8 @@
             style="@style/Body.Warning"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginVertical="@dimen/marginStandardMedium"
             android:layout_marginStart="@dimen/marginStandardMedium"
-            android:layout_marginTop="@dimen/marginStandardMedium"
             android:drawablePadding="@dimen/marginStandardMedium"
             android:gravity="center_vertical"
             android:text="@string/warningEventHasPassed"
@@ -60,7 +60,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/marginStandardMedium"
-            android:layout_marginTop="@dimen/marginStandardMedium"
+            android:layout_marginBottom="@dimen/marginStandardMedium"
             android:drawablePadding="@dimen/marginStandardMedium"
             android:gravity="center_vertical"
             app:drawableStartCompat="@drawable/ic_calendar"
@@ -72,20 +72,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/marginStandardMedium"
-            android:layout_marginTop="@dimen/marginStandardMedium"
+            android:layout_marginBottom="@dimen/marginStandardMedium"
             android:drawablePadding="@dimen/marginStandardMedium"
             android:gravity="center_vertical"
             app:drawableStartCompat="@drawable/ic_editor_clock"
             app:drawableTint="@color/iconColor"
             tools:text="09:00-10:00 (CET)" />
 
-        <!--TODO : Use correct 'pin' icon-->
         <TextView
             android:id="@+id/eventLocation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/marginStandardMedium"
-            android:layout_marginTop="@dimen/marginStandardMedium"
+            android:layout_marginBottom="@dimen/marginStandardMedium"
             android:drawablePadding="@dimen/marginStandardMedium"
             android:gravity="center_vertical"
             app:drawableStartCompat="@drawable/ic_location_pin"
@@ -109,7 +108,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/marginStandardMedium"
-                    android:layout_marginTop="@dimen/marginStandardMedium"
                     android:drawablePadding="@dimen/marginStandardMedium"
                     android:gravity="center_vertical"
                     android:text="@string/calendarNotInvited"
@@ -121,7 +119,6 @@
                     android:id="@+id/participationButtons"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/marginStandardMedium"
                     android:paddingStart="@dimen/marginStandardSmall"
                     android:paddingEnd="@dimen/marginStandardMedium"
                     app:flexWrap="wrap">
@@ -162,7 +159,6 @@
                 style="@style/TextButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/marginStandardSmall"
                 android:checkable="true"
                 android:gravity="start|center_vertical"
                 android:insetTop="0dp"
@@ -170,7 +166,7 @@
                 android:paddingHorizontal="@dimen/marginStandardMedium"
                 android:text="@string/buttonAttendees"
                 app:backgroundTint="@android:color/transparent"
-                app:cornerRadius="@dimen/calendarCornerRadius"
+                app:cornerRadius="0dp"
                 app:icon="@drawable/ic_calendar_participants_chevron"
                 app:iconGravity="textEnd"
                 app:iconSize="@dimen/smallIconSize"
@@ -181,6 +177,7 @@
                 android:id="@+id/attendeesSubMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/marginStandardMedium"
                 android:orientation="vertical"
                 android:visibility="gone"
                 tools:visibility="visible">
@@ -214,8 +211,7 @@
                     style="@style/CardViewMail"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:minHeight="48dp"
-                    app:cardCornerRadius="@dimen/calendarCornerRadius">
+                    android:minHeight="48dp">
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -239,7 +235,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/marginStandardSmall"
+                            android:layout_marginStart="@dimen/marginStandardVerySmall"
                             android:text="@string/buttonSee"
                             android:textColor="?attr/colorPrimary" />
 
@@ -254,7 +250,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/marginStandardMedium"
-            android:layout_marginVertical="@dimen/marginStandardMedium"
+            android:layout_marginBottom="@dimen/marginStandardMedium"
             android:text="@string/buttonOpenMyCalendar" />
 
     </LinearLayout>
