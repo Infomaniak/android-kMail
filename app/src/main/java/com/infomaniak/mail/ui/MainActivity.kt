@@ -349,9 +349,7 @@ class MainActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
         playServicesUtils.checkPlayServices(this)
-
         mainViewModel.checkAppUpdateStatus()
-
         if (binding.drawerLayout.isOpen) colorSystemBarsWithMenuDrawer(UiUtils.FULLY_SLID)
     }
 
