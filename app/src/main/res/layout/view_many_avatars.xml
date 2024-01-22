@@ -18,7 +18,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
     <!-- 38dp are necessary so the actual avatar is 32dp after adding 4dp for the offset status and adding 1dp for the
@@ -66,13 +66,16 @@
         tools:visibility="visible" />
 
     <!--34dp becomes 32dp after adding 1dp for the stroke width on each side -->
+    <!--This view has 4dp end margin to take up the same space as 32x32 avatars with their additional 4dp for the status-->
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/additionalPeople"
         android:layout_width="34dp"
         android:layout_height="34dp"
         android:layout_marginStart="-9dp"
+        android:layout_marginEnd="@dimen/marginStandardVerySmall"
         android:src="@color/manyAvatarsAdditionalPeopleBackground"
         android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/avatar3"
         app:layout_constraintTop_toTopOf="parent"
         app:shapeAppearance="@style/CircleImageView"
@@ -92,5 +95,11 @@
         app:layout_constraintStart_toStartOf="@id/additionalPeople"
         app:layout_constraintTop_toTopOf="@id/additionalPeople"
         tools:text="+12" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/additionalPeopleGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="additionalPeople,additionalPeopleCount" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

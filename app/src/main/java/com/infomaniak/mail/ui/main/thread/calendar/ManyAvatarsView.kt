@@ -79,7 +79,7 @@ class ManyAvatarsView @JvmOverloads constructor(
         avatar2.setupAttendee(index = 1)
         avatar3.setupAttendee(index = 2)
 
-        additionalPeople.isVisible = attendees.count() > 3
+        additionalPeopleGroup.isVisible = attendees.count() > 3
         val extraPeopleCount = (attendees.count() - 3).coerceAtMost(MAX_DISPLAYED_ADDITIONAL_ATTENDEES)
         additionalPeopleCount.text = "+$extraPeopleCount"
     }
