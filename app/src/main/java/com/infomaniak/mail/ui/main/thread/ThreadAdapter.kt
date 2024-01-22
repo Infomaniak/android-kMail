@@ -21,7 +21,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.text.format.Formatter
-import android.util.Log
 import android.view.*
 import android.webkit.WebView
 import android.webkit.WebView.HitTestResult
@@ -176,7 +175,6 @@ class ThreadAdapter(
 
     private fun ThreadViewHolder.bindCalendarEvent(message: Message) {
         val calendarEvent = message.latestCalendarEventResponse?.calendarEvent
-        Log.v("gibran", "bindCalendarEvent - binding thread with calendarEvent: ${calendarEvent}")
         binding.calendarEvent.apply {
             isVisible = calendarEvent != null
 
