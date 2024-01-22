@@ -77,21 +77,6 @@ abstract class TwoPaneFragment : Fragment() {
         observeThreadNavigation()
     }
 
-    override fun onResume() {
-        super.onResume()
-        ensureThreadDisplay()
-    }
-
-    /**
-     * If the app is force-killed by the system while it's in background and that a Thread was open, it won't re-open in the
-     * correct state. We must ensure that we display the correct UI (ex: we don't want to display an empty ThreadFragment).
-     */
-    private fun ensureThreadDisplay() {
-        if (!twoPaneViewModel.isThreadOpen) {
-            slidingPaneLayout.closePaneNoAnimation()
-        }
-    }
-
     private fun setupSlidingPane() = with(slidingPaneLayout) {
         lockMode = SlidingPaneLayout.LOCK_MODE_LOCKED
         addPanelSlideListener(object : SlidingPaneLayout.PanelSlideListener {
