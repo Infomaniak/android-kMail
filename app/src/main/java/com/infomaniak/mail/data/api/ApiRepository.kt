@@ -106,7 +106,7 @@ object ApiRepository : ApiRepositoryCore() {
     }
 
     fun getMailboxes(okHttpClient: OkHttpClient? = null): ApiResponse<List<Mailbox>> {
-        return callApi(ApiRoutes.mailbox(), GET, okHttpClient = okHttpClient ?: HttpClient.okHttpClient)
+        return callApi(ApiRoutes.mailboxes(), GET, okHttpClient = okHttpClient ?: HttpClient.okHttpClient)
     }
 
     fun addNewMailbox(mailAddress: String, password: String): ApiResponse<MailboxLinkedResult> {
