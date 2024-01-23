@@ -37,6 +37,7 @@ class CalendarEvent : EmbeddedRealmObject {
     /** Don't forget to update equals() and hashCode() if a field is added */
 
     //region Remote data
+    var id: Int = 0
     var type: String = ""
     var title: String = ""
     var location: String? = null
