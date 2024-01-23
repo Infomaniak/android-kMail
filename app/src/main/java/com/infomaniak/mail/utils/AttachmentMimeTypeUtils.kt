@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023 Infomaniak Network SA
+ * Copyright (C) 2023-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ object AttachmentMimeTypeUtils {
         "application/x-pdf"
     )
 
-    private val calendarMatches = mimeTypeSetOf(
+    val calendarMatches = mimeTypeSetOf(
         "application/ics",
         "text/calendar"
     )
@@ -136,7 +136,7 @@ object AttachmentMimeTypeUtils {
 
     private fun mimeTypeSetOf(vararg mimeTypes: String) = MimeTypeSet(mimeTypes.toSet())
 
-    private class MimeTypeSet(private val mimeTypes: Set<String>) : Set<String> by mimeTypes {
+    class MimeTypeSet(private val mimeTypes: Set<String>) : Set<String> by mimeTypes {
         override fun contains(element: String): Boolean = mimeTypes.any { mimeType -> element.startsWith(mimeType) }
     }
 }
