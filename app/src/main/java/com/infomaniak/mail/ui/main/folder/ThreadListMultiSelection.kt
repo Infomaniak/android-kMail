@@ -144,7 +144,7 @@ class ThreadListMultiSelection {
     }
 
     private fun lockDrawerAndSwipe(isMultiSelectOn: Boolean) = with(threadListFragment) {
-        (requireActivity() as MainActivity).setDrawerLockMode(!isMultiSelectOn)
+        (requireActivity() as MainActivity).setDrawerLockMode(isLocked = isMultiSelectOn)
         if (isMultiSelectOn) {
             binding.threadsList.apply {
                 disableSwipeDirection(DirectionFlag.LEFT)
