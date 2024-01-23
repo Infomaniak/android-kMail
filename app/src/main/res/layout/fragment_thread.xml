@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2022-2023 Infomaniak Network SA
+  ~ Copyright (C) 2022-2024 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -126,13 +126,12 @@
             app:menu="@menu/message_menu" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <TextView
+    <com.infomaniak.mail.ui.main.EmptyStateView
         android:id="@+id/emptyView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center"
-        android:visibility="visible"
-        tools:text="@string/noConversationSelected"
+        app:icon="@drawable/ic_empty_state_tablet"
+        tools:title="@string/noConversationSelected"
         tools:visibility="gone" />
 
 </FrameLayout>
