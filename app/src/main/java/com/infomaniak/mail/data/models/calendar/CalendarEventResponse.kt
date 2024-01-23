@@ -25,6 +25,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 class CalendarEventResponse : EmbeddedRealmObject {
 
+    //region Remote data
     @SerialName("user_stored_event")
     private var userStoredEvent: CalendarEvent? = null
     @SerialName("user_stored_event_deleted")
@@ -33,6 +34,7 @@ class CalendarEventResponse : EmbeddedRealmObject {
     private var attachmentEvent: CalendarEvent? = null
     @SerialName("attachment_event_method")
     private var _attachmentEventMethod: String? = null
+    //endregion
 
     val attachmentEventMethod: AttachmentEventMethod?
         get() = Utils.enumValueOfOrNull<AttachmentEventMethod>(_attachmentEventMethod)

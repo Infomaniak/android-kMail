@@ -32,6 +32,8 @@ import kotlinx.serialization.Serializable
 @Parcelize
 @Serializable
 class Attendee() : EmbeddedRealmObject, Correspondent {
+
+    //region Remote data
     @SerialName("address")
     override var email: String = ""
     override var name: String = ""
@@ -39,6 +41,7 @@ class Attendee() : EmbeddedRealmObject, Correspondent {
     var isOrganizer = false
     @SerialName("state")
     private var _state = ""
+    //endregion
 
     val state get() = AttendanceState.entries.firstOrNull { it.apiValue == _state } ?: AttendanceState.NEEDS_ACTION
 

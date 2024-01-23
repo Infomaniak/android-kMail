@@ -34,6 +34,7 @@ import java.util.Date
 @Serializable
 class CalendarEvent : EmbeddedRealmObject {
 
+    //region Remote data
     var type: String = ""
     var title: String = ""
     var description: String = ""
@@ -48,6 +49,7 @@ class CalendarEvent : EmbeddedRealmObject {
     @SerialName("timezone_end")
     private var timezoneEnd: String = ""
     var attendees: RealmList<Attendee> = realmListOf()
+    //endregion
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
