@@ -36,7 +36,6 @@ import com.infomaniak.mail.utils.AttachmentIntentUtils.openAttachment
 import com.infomaniak.mail.utils.UiUtils.getPrettyNameAndEmail
 import com.infomaniak.mail.utils.toDate
 import dagger.hilt.android.AndroidEntryPoint
-import io.realm.kotlin.types.RealmList
 import io.sentry.Sentry
 import java.time.format.FormatStyle
 import java.util.Date
@@ -67,11 +66,16 @@ class CalendarEventBannerView @JvmOverloads constructor(
         }
     }
 
-    fun loadCalendarEvent(calendarEvent: CalendarEvent, hasBeenDeleted: Boolean, attachment: Attachment) = with(binding) {
+    fun loadCalendarEvent(
+        calendarEvent: CalendarEvent,
+        isCanceled: Boolean,
+        shouldDisplayReplyOptions: Boolean,
+        attachment: Attachment,
+    ) = with(binding) {
         val startDate = calendarEvent.start.toDate()
         val endDate = calendarEvent.end.toDate()
 
-        setWarnings(endDate, hasBeenDeleted)
+        setWarnings(endDate, isCanceled)
         eventName.text = calendarEvent.title
         setEventHour(startDate, endDate, calendarEvent.isFullDay)
         eventLocation.apply {
@@ -79,16 +83,16 @@ class CalendarEventBannerView @JvmOverloads constructor(
             text = calendarEvent.location
         }
 
-        setAttendees(calendarEvent.attendees)
+        setAttendanceUi(calendarEvent, shouldDisplayReplyOptions)
 
         addToCalendarButton.setOnClickListener {
             attachment.openAttachment(context, navigateToDownloadProgressDialog ?: return@setOnClickListener, snackbarManager)
         }
     }
 
-    private fun setWarnings(endDate: Date, hasBeenDeleted: Boolean) = with(binding) {
-        canceledEventWarning.isVisible = hasBeenDeleted
-        pastEventWarning.isVisible = !hasBeenDeleted && Date() > endDate
+    private fun setWarnings(endDate: Date, isCanceled: Boolean) = with(binding) {
+        canceledEventWarning.isVisible = isCanceled
+        pastEventWarning.isVisible = !isCanceled && Date() > endDate
     }
 
     private fun setEventHour(startDate: Date, endDate: Date, isFullDay: Boolean) = with(binding) {
@@ -121,15 +125,14 @@ class CalendarEventBannerView @JvmOverloads constructor(
         }
     }
 
-    private fun setAttendees(attendees: RealmList<Attendee>) = with(binding) {
-        val iAmPartOfAttendees = attendees.any { it.isMe() }
-        notPartOfAttendeesWarning.isGone = iAmPartOfAttendees
-        participationButtons.isVisible = iAmPartOfAttendees && false // TODO : Display this when buttons click are implemented
-        attendeesLayout.isGone = attendees.isEmpty()
+    private fun setAttendanceUi(calendarEvent: CalendarEvent, shouldDisplayReplyOptions: Boolean) = with(binding) {
+        notPartOfAttendeesWarning.isGone = calendarEvent.iAmInvited
+        participationButtons.isVisible = shouldDisplayReplyOptions
+        attendeesLayout.isGone = calendarEvent.attendees.isEmpty()
 
-        displayOrganizer(attendees)
-        allAttendeesButton.setOnClickListener { navigateToAttendeesBottomSheet?.invoke(attendees) }
-        manyAvatarsView.setAttendees(attendees)
+        displayOrganizer(calendarEvent.attendees)
+        allAttendeesButton.setOnClickListener { navigateToAttendeesBottomSheet?.invoke(calendarEvent.attendees) }
+        manyAvatarsView.setAttendees(calendarEvent.attendees)
     }
 
     fun initCallback(

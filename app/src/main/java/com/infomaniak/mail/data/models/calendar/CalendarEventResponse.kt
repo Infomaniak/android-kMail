@@ -29,14 +29,25 @@ class CalendarEventResponse : EmbeddedRealmObject {
     @SerialName("user_stored_event")
     private var userStoredEvent: CalendarEvent? = null
     @SerialName("user_stored_event_deleted")
-    var isUserStoredEventDeleted: Boolean = false
+    private var isUserStoredEventDeleted: Boolean = false
     @SerialName("attachment_event")
     private var attachmentEvent: CalendarEvent? = null
     @SerialName("attachment_event_method")
     private var _attachmentEventMethod: String? = null
     //endregion
 
+    private val attachmentEventMethod: AttachmentEventMethod?
+        get() = Utils.enumValueOfOrNull<AttachmentEventMethod>(_attachmentEventMethod)
+
     val calendarEvent get() = userStoredEvent ?: attachmentEvent
+
+    val isCanceled get() = isUserStoredEventDeleted || attachmentEventMethod == AttachmentEventMethod.CANCEL
+
+    fun isReplyAuthorized(): Boolean {
+        return (attachmentEventMethod == null || attachmentEventMethod == AttachmentEventMethod.REQUEST)
+                && !isCanceled
+                && calendarEvent?.iAmInvited == true
+    }
 
     fun hasUserStoredEvent() = userStoredEvent != null
 

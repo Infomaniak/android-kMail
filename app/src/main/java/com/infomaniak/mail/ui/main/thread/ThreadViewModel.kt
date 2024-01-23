@@ -232,7 +232,7 @@ class ThreadViewModel @Inject constructor(
                     scope.level = SentryLevel.ERROR
                     scope.setExtra("message.uid", message.uid)
                     scope.setExtra("event has userStoredEvent", calendarEventResponse.hasUserStoredEvent().toString())
-                    scope.setExtra("event's userStoredEventDeleted", calendarEventResponse.isUserStoredEventDeleted.toString())
+                    scope.setExtra("event's isCanceled", calendarEventResponse.isCanceled.toString())
                     scope.setExtra("event has attachmentEvent", calendarEventResponse.hasAttachmentEvent().toString())
                     Sentry.captureMessage("Cannot find message by uid for fetched calendar event inside Realm")
                 }
