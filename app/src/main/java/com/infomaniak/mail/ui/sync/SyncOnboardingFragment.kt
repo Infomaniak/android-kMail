@@ -27,12 +27,19 @@ import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentSyncOnboardingBinding
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class SyncOnboardingFragment : Fragment() {
 
     private var binding: FragmentSyncOnboardingBinding by safeBinding()
     private val syncAutoConfigViewModel: SyncAutoConfigViewModel by activityViewModels()
+
+    @Inject
+    lateinit var localSettings: LocalSettings
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentSyncOnboardingBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -40,6 +47,8 @@ class SyncOnboardingFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        localSettings.showSyncDiscoveryBottomSheet = false
 
         with(requireActivity()) {
             window.statusBarColor = getColor(R.color.onboarding_secondary_background)
