@@ -477,6 +477,18 @@ fun Fragment.changeToolbarColorOnScroll(
     }
 }
 
+fun Fragment.setSystemBarsColors(
+    @ColorRes statusBarColor: Int? = R.color.backgroundHeaderColor,
+    @ColorRes navigationBarColor: Int? = R.color.backgroundColor,
+) {
+    statusBarColor?.let(requireContext()::getColor)?.let { requireActivity().window.statusBarColor = it }
+    navigationBarColor?.let(requireContext()::getColor)?.let(requireActivity().window::updateNavigationBarColor)
+}
+
+fun Window.updateNavigationBarColor(color: Int) {
+    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O) navigationBarColor = color
+}
+
 fun Activity.getMainApplication() = (application as MainApplication)
 
 fun Fragment.getStringWithBoldArg(@StringRes resId: Int, arg: String): Spanned {
