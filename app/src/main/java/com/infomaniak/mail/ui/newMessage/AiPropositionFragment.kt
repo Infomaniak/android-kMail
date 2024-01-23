@@ -32,7 +32,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
-import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.trackAiWriterEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -56,7 +55,8 @@ import com.infomaniak.lib.core.R as RCore
 @AndroidEntryPoint
 class AiPropositionFragment : Fragment() {
 
-    private var binding: FragmentAiPropositionBinding by safeBinding()
+    private var _binding: FragmentAiPropositionBinding? = null
+    private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
 
@@ -80,7 +80,7 @@ class AiPropositionFragment : Fragment() {
     lateinit var subjectReplacementDialog: AiDescriptionAlertDialog
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return FragmentAiPropositionBinding.inflate(inflater, container, false).also { binding = it }.root
+        return FragmentAiPropositionBinding.inflate(inflater, container, false).also { _binding = it }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
@@ -92,6 +92,12 @@ class AiPropositionFragment : Fragment() {
 
         if (aiViewModel.aiPropositionStatusLiveData.value == null) generateNewAiProposition()
         observeAiProposition()
+    }
+
+    override fun onDestroyView() {
+        TransitionManager.endTransitions(binding.nestedScrollView)
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onDestroy() {
