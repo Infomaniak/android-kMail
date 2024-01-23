@@ -44,6 +44,8 @@ android {
         buildConfigField 'String', 'GITHUB_REPO', '"android-mail"'
 
         resValue 'string', 'ATTACHMENTS_AUTHORITY', 'com.infomaniak.mail.attachments'
+
+        resourceConfigurations += ["en", "de", "es", "fr", "it"]
     }
 
     buildTypes {
@@ -61,8 +63,6 @@ android {
     kotlinOptions { jvmTarget = javaVersion }
 
     buildFeatures { viewBinding true }
-
-    androidResources { generateLocaleConfig true }
 
     flavorDimensions += 'distribution'
 
