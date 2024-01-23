@@ -21,20 +21,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentAiEngineChoiceBinding
 import com.infomaniak.mail.databinding.LayoutAiEngineChoiceBinding
-import com.infomaniak.mail.ui.main.BaseFragment
 import com.infomaniak.mail.utils.SharedUtils
+import com.infomaniak.mail.utils.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class AiEngineChoiceFragment : BaseFragment() {
-
-    override val statusBarColor = R.color.backgroundColor
+class AiEngineChoiceFragment : Fragment() {
 
     private var binding: FragmentAiEngineChoiceBinding by safeBinding()
     private var choiceBinding: LayoutAiEngineChoiceBinding by safeBinding()
@@ -50,6 +49,7 @@ class AiEngineChoiceFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setSystemBarsColors(statusBarColor = R.color.backgroundColor)
 
         binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
 

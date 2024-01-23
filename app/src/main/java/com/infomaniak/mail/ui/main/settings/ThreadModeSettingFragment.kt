@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.trackEvent
@@ -31,15 +32,13 @@ import com.infomaniak.mail.data.LocalSettings.ThreadMode.CONVERSATION
 import com.infomaniak.mail.data.LocalSettings.ThreadMode.MESSAGE
 import com.infomaniak.mail.databinding.FragmentThreadModeSettingBinding
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
-import com.infomaniak.mail.ui.main.BaseFragment
 import com.infomaniak.mail.utils.bindAlertToViewLifecycle
+import com.infomaniak.mail.utils.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ThreadModeSettingFragment : BaseFragment() {
-
-    override val statusBarColor = R.color.backgroundHeaderColor
+class ThreadModeSettingFragment : Fragment() {
 
     @Inject
     lateinit var localSettings: LocalSettings
@@ -56,6 +55,7 @@ class ThreadModeSettingFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding.radioGroup) {
         super.onViewCreated(view, savedInstanceState)
+        setSystemBarsColors()
 
         initBijectionTable(
             R.id.conversationMode to CONVERSATION,

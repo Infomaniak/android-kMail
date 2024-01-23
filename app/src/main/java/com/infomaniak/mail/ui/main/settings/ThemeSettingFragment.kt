@@ -24,6 +24,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode
 import androidx.core.view.isGone
+import androidx.fragment.app.Fragment
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
@@ -31,14 +32,12 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.Theme
 import com.infomaniak.mail.data.LocalSettings.Theme.*
 import com.infomaniak.mail.databinding.FragmentThemeSettingBinding
-import com.infomaniak.mail.ui.main.BaseFragment
+import com.infomaniak.mail.utils.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ThemeSettingFragment : BaseFragment() {
-
-    override val statusBarColor = R.color.backgroundHeaderColor
+class ThemeSettingFragment : Fragment() {
 
     private var binding: FragmentThemeSettingBinding by safeBinding()
 
@@ -51,6 +50,7 @@ class ThemeSettingFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding.radioGroup) {
         super.onViewCreated(view, savedInstanceState)
+        setSystemBarsColors()
 
         setSystemThemeVisibility()
 

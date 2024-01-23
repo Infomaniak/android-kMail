@@ -19,19 +19,19 @@ package com.infomaniak.mail.ui.main.menu
 
 import android.os.Bundle
 import android.view.View
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.InputAlertDialog
-import com.infomaniak.mail.ui.main.BaseFragment
 import com.infomaniak.mail.utils.bindAlertToViewLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-abstract class MenuFoldersFragment : BaseFragment() {
+abstract class MenuFoldersFragment : Fragment() {
 
     @Inject
     lateinit var defaultFolderAdapter: FolderAdapter

@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -39,7 +40,6 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
-import com.infomaniak.mail.ui.main.BaseFragment
 import com.infomaniak.mail.ui.main.MailboxListFragment
 import com.infomaniak.mail.ui.main.menu.MailboxesAdapter
 import com.infomaniak.mail.utils.*
@@ -54,9 +54,7 @@ import java.util.Date
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class AccountFragment : BaseFragment(), MailboxListFragment {
-
-    override val statusBarColor = R.color.backgroundHeaderColor
+class AccountFragment : Fragment(), MailboxListFragment {
 
     private var binding: FragmentAccountBinding by safeBinding()
     private val mainViewModel: MainViewModel by activityViewModels()
@@ -85,6 +83,7 @@ class AccountFragment : BaseFragment(), MailboxListFragment {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setSystemBarsColors()
 
         initUi()
         setupListeners()

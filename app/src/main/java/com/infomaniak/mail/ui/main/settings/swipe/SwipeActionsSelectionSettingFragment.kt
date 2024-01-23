@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.safeBinding
@@ -31,14 +32,12 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.SwipeAction
 import com.infomaniak.mail.data.LocalSettings.SwipeAction.*
 import com.infomaniak.mail.databinding.FragmentSwipeActionsSelectionSettingBinding
-import com.infomaniak.mail.ui.main.BaseFragment
+import com.infomaniak.mail.utils.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SwipeActionsSelectionSettingFragment : BaseFragment() {
-
-    override val statusBarColor = R.color.backgroundHeaderColor
+class SwipeActionsSelectionSettingFragment : Fragment() {
 
     private var binding: FragmentSwipeActionsSelectionSettingBinding by safeBinding()
     private val navigationArgs: SwipeActionsSelectionSettingFragmentArgs by navArgs()
@@ -52,6 +51,7 @@ class SwipeActionsSelectionSettingFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
+        setSystemBarsColors()
 
         val actionResId = navigationArgs.titleResId
         root.setTitle(actionResId)

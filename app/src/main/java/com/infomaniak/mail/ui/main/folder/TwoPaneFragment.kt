@@ -31,7 +31,6 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.ui.main.BaseFragment
 import com.infomaniak.mail.ui.main.NoAnimSlidingPaneLayout
 import com.infomaniak.mail.ui.main.search.SearchFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
@@ -42,7 +41,7 @@ import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 import com.infomaniak.mail.utils.updateNavigationBarColor
 import javax.inject.Inject
 
-abstract class TwoPaneFragment : BaseFragment() {
+abstract class TwoPaneFragment : Fragment() {
 
     val mainViewModel: MainViewModel by activityViewModels()
     val twoPaneViewModel: TwoPaneViewModel by activityViewModels()

@@ -22,6 +22,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.infomaniak.lib.applock.Utils.isKeyguardSecure
 import com.infomaniak.lib.applock.Utils.silentlyReverseSwitch
@@ -36,17 +37,15 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.databinding.FragmentSettingsBinding
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.ui.main.BaseFragment
 import com.infomaniak.mail.utils.animatedNavigation
 import com.infomaniak.mail.utils.launchSyncAutoConfigActivityForResult
 import com.infomaniak.mail.utils.observeNotNull
+import com.infomaniak.mail.utils.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SettingsFragment : BaseFragment() {
-
-    override val statusBarColor = R.color.backgroundHeaderColor
+class SettingsFragment : Fragment() {
 
     private var binding: FragmentSettingsBinding by safeBinding()
     private val mainViewModel: MainViewModel by activityViewModels()
@@ -60,6 +59,8 @@ class SettingsFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setSystemBarsColors()
+
         setupMailboxesAdapter()
         setupListeners()
         setSubtitlesInitialState()

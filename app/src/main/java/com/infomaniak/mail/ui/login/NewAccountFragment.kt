@@ -25,6 +25,7 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.safeBinding
@@ -36,16 +37,14 @@ import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.databinding.FragmentNewAccountBinding
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
-import com.infomaniak.mail.ui.main.BaseFragment
 import com.infomaniak.mail.utils.LoginUtils
+import com.infomaniak.mail.utils.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class NewAccountFragment : BaseFragment() {
-
-    override val statusBarColor = R.color.backgroundColor
+class NewAccountFragment : Fragment() {
 
     private var binding: FragmentNewAccountBinding by safeBinding()
     private val introViewModel: IntroViewModel by activityViewModels()
@@ -82,6 +81,7 @@ class NewAccountFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
+        setSystemBarsColors(statusBarColor = R.color.backgroundColor)
 
         selectIllustrationAccordingToTheme()
 

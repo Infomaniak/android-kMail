@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.safeNavigate
@@ -28,14 +29,12 @@ import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentSyncOnboardingBinding
-import com.infomaniak.mail.ui.main.BaseFragment
+import com.infomaniak.mail.utils.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SyncOnboardingFragment : BaseFragment() {
-
-    override val statusBarColor = R.color.onboarding_secondary_background
+class SyncOnboardingFragment : Fragment() {
 
     private var binding: FragmentSyncOnboardingBinding by safeBinding()
     private val syncAutoConfigViewModel: SyncAutoConfigViewModel by activityViewModels()
@@ -49,6 +48,8 @@ class SyncOnboardingFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setSystemBarsColors(statusBarColor = R.color.onboarding_secondary_background)
+
         binding.toolbar.setNavigationOnClickListener { requireActivity().finish() }
         localSettings.showSyncDiscoveryBottomSheet = false
         setupClickListener()

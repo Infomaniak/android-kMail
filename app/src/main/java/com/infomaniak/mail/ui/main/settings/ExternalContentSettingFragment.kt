@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
@@ -29,14 +30,12 @@ import com.infomaniak.mail.data.LocalSettings.ExternalContent
 import com.infomaniak.mail.data.LocalSettings.ExternalContent.ALWAYS
 import com.infomaniak.mail.data.LocalSettings.ExternalContent.ASK_ME
 import com.infomaniak.mail.databinding.FragmentExternalContentSettingBinding
-import com.infomaniak.mail.ui.main.BaseFragment
+import com.infomaniak.mail.utils.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ExternalContentSettingFragment : BaseFragment() {
-
-    override val statusBarColor = R.color.backgroundHeaderColor
+class ExternalContentSettingFragment : Fragment() {
 
     private var binding: FragmentExternalContentSettingBinding by safeBinding()
 
@@ -49,6 +48,7 @@ class ExternalContentSettingFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding.radioGroup) {
         super.onViewCreated(view, savedInstanceState)
+        setSystemBarsColors()
 
         initBijectionTable(
             R.id.always to ALWAYS,

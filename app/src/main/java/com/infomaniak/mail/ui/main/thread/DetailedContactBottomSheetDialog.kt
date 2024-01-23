@@ -25,6 +25,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.trackContactActionsEvent
+import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetDetailedContactBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.SnackbarManager
@@ -32,6 +33,7 @@ import com.infomaniak.mail.ui.main.thread.actions.ActionsBottomSheetDialog
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.copyRecipientEmailToClipboard
 import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
+import com.infomaniak.mail.utils.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -53,6 +55,8 @@ class DetailedContactBottomSheetDialog : ActionsBottomSheetDialog() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
+        setSystemBarsColors(statusBarColor = null, navigationBarColor = R.color.backgroundColorSecondary)
+
         contactDetails.setCorrespondent(navigationArgs.recipient)
         setupListeners()
     }

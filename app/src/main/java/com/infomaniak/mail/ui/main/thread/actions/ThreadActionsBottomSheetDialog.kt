@@ -43,10 +43,7 @@ import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.menu.MoveFragmentArgs
-import com.infomaniak.mail.utils.animatedNavigation
-import com.infomaniak.mail.utils.deleteWithConfirmationPopup
-import com.infomaniak.mail.utils.notYetImplemented
-import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
+import com.infomaniak.mail.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -67,6 +64,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(threadActionsViewModel) {
         super.onViewCreated(view, savedInstanceState)
+        setSystemBarsColors(statusBarColor = null, navigationBarColor = R.color.backgroundColorSecondary)
 
         threadLive.observe(viewLifecycleOwner) { thread ->
 

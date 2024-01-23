@@ -24,20 +24,19 @@ import android.view.ViewGroup
 import androidx.annotation.StringRes
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.SwipeAction
 import com.infomaniak.mail.databinding.FragmentSwipeActionsSettingsBinding
-import com.infomaniak.mail.ui.main.BaseFragment
 import com.infomaniak.mail.utils.animatedNavigation
+import com.infomaniak.mail.utils.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SwipeActionsSettingsFragment : BaseFragment() {
-
-    override val statusBarColor = R.color.backgroundHeaderColor
+class SwipeActionsSettingsFragment : Fragment() {
 
     private var binding: FragmentSwipeActionsSettingsBinding by safeBinding()
 
@@ -50,6 +49,7 @@ class SwipeActionsSettingsFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
+        setSystemBarsColors()
 
         with(localSettings) {
             swipeRightView.setSubtitle(swipeRight.nameRes)

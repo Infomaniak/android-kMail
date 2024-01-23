@@ -21,21 +21,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
-import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentSwitchUserBinding
-import com.infomaniak.mail.ui.main.BaseFragment
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.launchLoginActivity
+import com.infomaniak.mail.utils.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class SwitchUserFragment : BaseFragment() {
-
-    override val statusBarColor = R.color.backgroundHeaderColor
+class SwitchUserFragment : Fragment() {
 
     private var binding: FragmentSwitchUserBinding by safeBinding()
     private val switchUserViewModel: SwitchUserViewModel by viewModels()
@@ -50,6 +48,8 @@ class SwitchUserFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
+        setSystemBarsColors()
+
         setAdapter()
         setupOnClickListener()
         observeAccounts()

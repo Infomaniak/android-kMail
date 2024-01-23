@@ -40,13 +40,12 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.FragmentMoveBinding
 import com.infomaniak.mail.utils.handleEditorSearchAction
 import com.infomaniak.mail.utils.setOnClearTextClickListener
+import com.infomaniak.mail.utils.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class MoveFragment : MenuFoldersFragment() {
-
-    override val statusBarColor = R.color.backgroundHeaderColor
 
     private var binding: FragmentMoveBinding by safeBinding()
     private val navigationArgs: MoveFragmentArgs by navArgs()
@@ -74,6 +73,8 @@ class MoveFragment : MenuFoldersFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setSystemBarsColors()
+
         setupListeners()
         setupFolderAdapters()
         setupCreateFolderDialog()
