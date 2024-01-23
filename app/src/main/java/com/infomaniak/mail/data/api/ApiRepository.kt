@@ -383,7 +383,7 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(
             url = ApiRoutes.calendarEvent(resource),
             method = GET,
-            okHttpClient = HttpClient.okHttpClientLongTimeout
+            okHttpClient = HttpClient.okHttpClientLongTimeout,
         )
     }
 

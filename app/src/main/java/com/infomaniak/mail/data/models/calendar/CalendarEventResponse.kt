@@ -24,6 +24,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 class CalendarEventResponse : EmbeddedRealmObject {
+
     @SerialName("user_stored_event")
     private var userStoredEvent: CalendarEvent? = null
     @SerialName("user_stored_event_deleted")
@@ -41,6 +42,7 @@ class CalendarEventResponse : EmbeddedRealmObject {
     fun hasUserStoredEvent() = userStoredEvent != null
 
     fun hasAttachmentEvent() = attachmentEvent != null
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

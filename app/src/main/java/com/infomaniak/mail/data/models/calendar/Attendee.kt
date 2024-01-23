@@ -61,7 +61,7 @@ class Attendee() : EmbeddedRealmObject, Correspondent {
         ACCEPTED("ACCEPTED", R.drawable.ic_check_rounded, R.color.greenSuccess),
         NEEDS_ACTION("NEEDS-ACTION", null, null),
         TENTATIVE("TENTATIVE", R.drawable.ic_calendar_maybe, R.color.iconColorSecondaryText),
-        DECLINED("DECLINED", R.drawable.ic_calendar_no, R.color.redDestructiveAction), ;
+        DECLINED("DECLINED", R.drawable.ic_calendar_no, R.color.redDestructiveAction),
     }
 
     override fun equals(other: Any?): Boolean {

@@ -33,6 +33,7 @@ import java.util.Date
 
 @Serializable
 class CalendarEvent : EmbeddedRealmObject {
+
     var type: String = ""
     var title: String = ""
     var description: String = ""
