@@ -32,7 +32,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
-import com.infomaniak.mail.utils.canDisplayBothPanes
+import com.infomaniak.mail.utils.canDisplayOnlyOnePane
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -94,7 +94,7 @@ class TwoPaneViewModel @Inject constructor(
         )
     }
 
-    fun isInThreadInPhoneMode(context: Context): Boolean = isThreadOpen && !context.canDisplayBothPanes()
+    fun isInThreadInPhoneMode(context: Context): Boolean = isThreadOpen && context.canDisplayOnlyOnePane()
 
     data class NavData(
         @IdRes val resId: Int,

@@ -39,7 +39,6 @@ import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.utils.AttachmentIntentUtils
 import com.infomaniak.mail.utils.UiUtils.FULLY_SLID
 import com.infomaniak.mail.utils.UiUtils.progressivelyColorSystemBars
-import com.infomaniak.mail.utils.canDisplayBothPanes
 import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 import com.infomaniak.mail.utils.setSystemBarsColors
 import javax.inject.Inject
@@ -188,7 +187,9 @@ abstract class TwoPaneFragment : Fragment() {
     // TODO: When we'll add the feature of swiping between Threads, we'll need to check if this function is still needed.
     private fun updateDrawerLockMode() {
         if (this is ThreadListFragment) {
-            (requireActivity() as MainActivity).setDrawerLockMode(isLocked = twoPaneViewModel.isThreadOpen && !canDisplayBothPanes())
+            (requireActivity() as MainActivity).setDrawerLockMode(
+                isLocked = twoPaneViewModel.isInThreadInPhoneMode(requireContext()),
+            )
         }
     }
 }
