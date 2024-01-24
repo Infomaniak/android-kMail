@@ -76,6 +76,7 @@ import com.infomaniak.lib.core.R as RCore
 @HiltViewModel
 class MainViewModel @Inject constructor(
     application: Application,
+    avatarMergedContactData: AvatarMergedContactData,
     private val addressBookController: AddressBookController,
     private val folderController: FolderController,
     private val localSettings: LocalSettings,
@@ -88,7 +89,6 @@ class MainViewModel @Inject constructor(
     private val refreshController: RefreshController,
     private val sharedUtils: SharedUtils,
     private val threadController: ThreadController,
-    private val avatarMergedContactData: AvatarMergedContactData,
     private val snackbarManager: SnackbarManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
