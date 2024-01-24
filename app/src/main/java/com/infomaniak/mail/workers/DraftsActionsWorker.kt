@@ -85,7 +85,7 @@ class DraftsActionsWorker @AssistedInject constructor(
     private var userId: Int by Delegates.notNull()
     private var draftLocalUuid: String? = null
     private lateinit var userApiToken: String
-    private var isSnackBarFeedbackNeeded: Boolean = false
+    private var isSnackbarFeedbackNeeded: Boolean = false
 
     private val dateFormatWithTimezone by lazy { SimpleDateFormat(FORMAT_DATE_WITH_TIMEZONE, Locale.ROOT) }
 
@@ -103,7 +103,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         mailbox = mailboxController.getMailbox(userId, mailboxId) ?: return@withContext Result.failure()
         okHttpClient = AccountUtils.getHttpClient(userId)
 
-        isSnackBarFeedbackNeeded = !mainApplication.isAppInBackground
+        isSnackbarFeedbackNeeded = !mainApplication.isAppInBackground
 
         notifyNewDraftDetected()
 
@@ -123,7 +123,7 @@ class DraftsActionsWorker @AssistedInject constructor(
     private suspend fun notifyNewDraftDetected() {
         draftLocalUuid?.let { localUuid ->
             val draft = draftController.getDraft(localUuid) ?: return@let
-            if (draft.action == DraftAction.SEND && isSnackBarFeedbackNeeded) {
+            if (draft.action == DraftAction.SEND && isSnackbarFeedbackNeeded) {
                 setProgress(workDataOf(PROGRESS_DRAFT_ACTION_KEY to DraftAction.SEND.name))
             }
         }
@@ -238,7 +238,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         val biggestScheduledDate = scheduledDates.mapNotNull { dateFormatWithTimezone.parse(it)?.time }.maxOrNull()
 
         return if (haveAllDraftsSucceeded || isTrackedDraftSuccess == true) {
-            val outputData = if (isSnackBarFeedbackNeeded) {
+            val outputData = if (isSnackbarFeedbackNeeded) {
                 workDataOf(
                     REMOTE_DRAFT_UUID_KEY to draftLocalUuid?.let { remoteUuidOfTrackedDraft },
                     ASSOCIATED_MAILBOX_UUID_KEY to draftLocalUuid?.let { mailbox.uuid },
@@ -251,7 +251,7 @@ class DraftsActionsWorker @AssistedInject constructor(
             }
             Result.success(outputData)
         } else {
-            val outputData = if (isSnackBarFeedbackNeeded) {
+            val outputData = if (isSnackbarFeedbackNeeded) {
                 workDataOf(
                     ERROR_MESSAGE_RESID_KEY to trackedDraftErrorMessageResId,
                     BIGGEST_SCHEDULED_DATE_KEY to biggestScheduledDate,

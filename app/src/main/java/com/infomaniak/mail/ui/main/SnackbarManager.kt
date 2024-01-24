@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023 Infomaniak Network SA
+ * Copyright (C) 2023-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,11 +23,14 @@ import androidx.fragment.app.FragmentActivity
 import com.google.android.material.snackbar.Snackbar
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
+import javax.inject.Inject
+import javax.inject.Singleton
 import com.infomaniak.lib.core.R as RCore
 
-class SnackBarManager {
+@Singleton
+class SnackbarManager @Inject constructor() {
 
-    private val snackBarFeedback = SingleLiveEvent<SnackBarData>()
+    private val snackbarFeedback = SingleLiveEvent<SnackbarData>()
     private var previousSnackbar: Snackbar? = null
 
     // Give a CoordinatorLayout to `view` in order to support swipe to dismiss
@@ -36,8 +39,9 @@ class SnackBarManager {
         activity: FragmentActivity,
         getAnchor: (() -> View?)? = null,
         onUndoData: ((data: UndoData) -> Unit)? = null,
-    ) {
-        snackBarFeedback.observe(activity) { (title, undoData, buttonTitleRes, customBehavior) ->
+    ) = with(snackbarFeedback) {
+        removeObservers(activity)
+        observe(activity) { (title, undoData, buttonTitleRes, customBehavior) ->
             val action: (() -> Unit)? = if (undoData != null) {
                 { onUndoData?.invoke(undoData) }
             } else {
@@ -71,14 +75,14 @@ class SnackBarManager {
     }
 
     fun setValue(title: String, undoData: UndoData? = null, buttonTitle: Int? = null, customBehavior: (() -> Unit)? = null) {
-        snackBarFeedback.value = SnackBarData(title, undoData, buttonTitle, customBehavior)
+        snackbarFeedback.value = SnackbarData(title, undoData, buttonTitle, customBehavior)
     }
 
     fun postValue(title: String, undoData: UndoData? = null, buttonTitle: Int? = null, customBehavior: (() -> Unit)? = null) {
-        snackBarFeedback.postValue(SnackBarData(title, undoData, buttonTitle, customBehavior))
+        snackbarFeedback.postValue(SnackbarData(title, undoData, buttonTitle, customBehavior))
     }
 
-    private data class SnackBarData(
+    private data class SnackbarData(
         val title: String,
         val undoData: UndoData?,
         @StringRes val buttonTitle: Int?,

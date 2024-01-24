@@ -35,8 +35,8 @@ class LinkContextualMenuAlertDialog @Inject constructor(
         ContextualItem(R.string.contextMenuLinkOpen) { url, _ ->
             activityContext.openUrl(url)
         },
-        ContextualItem(R.string.contextMenuLinkCopy) { url, snackBarManager ->
-            activityContext.copyStringToClipboard(url, R.string.snackbarLinkCopiedToClipboard, snackBarManager)
+        ContextualItem(R.string.contextMenuLinkCopy) { url, snackbarManager ->
+            activityContext.copyStringToClipboard(url, R.string.snackbarLinkCopiedToClipboard, snackbarManager)
         },
         ContextualItem(R.string.contextMenuLinkShare) { url, _ ->
             activityContext.shareString(url)

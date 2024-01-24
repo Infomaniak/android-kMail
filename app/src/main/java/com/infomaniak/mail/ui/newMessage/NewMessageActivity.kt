@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2023 Infomaniak Network SA
+ * Copyright (C) 2022-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,10 +32,12 @@ import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.databinding.ActivityNewMessageBinding
 import com.infomaniak.mail.ui.BaseActivity
 import com.infomaniak.mail.ui.LaunchActivity
+import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.updateNavigationBarColor
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class NewMessageActivity : BaseActivity() {
@@ -46,6 +48,9 @@ class NewMessageActivity : BaseActivity() {
     private val navController by lazy {
         (supportFragmentManager.findFragmentById(R.id.newMessageHostFragment) as NavHostFragment).navController
     }
+
+    @Inject
+    lateinit var snackbarManager: SnackbarManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,7 +63,7 @@ class NewMessageActivity : BaseActivity() {
             return
         }
 
-        setupSnackBar()
+        setupSnackbar()
         setupSystemBars()
 
         setupNavController()
@@ -72,14 +77,14 @@ class NewMessageActivity : BaseActivity() {
         return true
     }
 
-    private fun setupSnackBar() {
+    private fun setupSnackbar() {
         fun getAnchor(): View? = when (navController.currentDestination?.id) {
             R.id.newMessageFragment -> findViewById(R.id.editor)
             R.id.aiPropositionFragment -> findViewById(R.id.aiPropositionBottomBar)
             else -> null
         }
 
-        newMessageViewModel.snackBarManager.setup(view = binding.root, activity = this, getAnchor = ::getAnchor)
+        snackbarManager.setup(view = binding.root, activity = this, getAnchor = ::getAnchor)
     }
 
     private fun setupSystemBars() {

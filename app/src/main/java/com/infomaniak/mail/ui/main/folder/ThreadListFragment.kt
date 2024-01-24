@@ -68,6 +68,7 @@ import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.NoAnimSlidingPaneLayout
+import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.settings.swipe.SwipeActionsSettingsFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
@@ -119,6 +120,9 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
 
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog
+
+    @Inject
+    lateinit var snackbarManager: SnackbarManager
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentThreadListBinding.inflate(inflater, container, false).also { _binding = it }.root
@@ -640,7 +644,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
                         Sentry.captureException(it)
                         localSettings.resetUpdateSettings()
 
-                        mainViewModel.snackBarManager.setValue(getString(RCore.string.errorUpdateInstall))
+                        snackbarManager.setValue(getString(RCore.string.errorUpdateInstall))
                     },
                 )
             }

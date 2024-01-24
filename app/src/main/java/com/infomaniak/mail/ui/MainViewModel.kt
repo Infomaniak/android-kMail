@@ -51,8 +51,8 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.di.IoDispatcher
-import com.infomaniak.mail.ui.main.SnackBarManager
-import com.infomaniak.mail.ui.main.SnackBarManager.UndoData
+import com.infomaniak.mail.ui.main.SnackbarManager
+import com.infomaniak.mail.ui.main.SnackbarManager.UndoData
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
@@ -76,6 +76,7 @@ import com.infomaniak.lib.core.R as RCore
 @HiltViewModel
 class MainViewModel @Inject constructor(
     application: Application,
+    avatarMergedContactData: AvatarMergedContactData,
     private val addressBookController: AddressBookController,
     private val folderController: FolderController,
     private val localSettings: LocalSettings,
@@ -88,7 +89,7 @@ class MainViewModel @Inject constructor(
     private val refreshController: RefreshController,
     private val sharedUtils: SharedUtils,
     private val threadController: ThreadController,
-    private val avatarMergedContactData: AvatarMergedContactData,
+    private val snackbarManager: SnackbarManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
@@ -106,8 +107,6 @@ class MainViewModel @Inject constructor(
     val newFolderResultTrigger = MutableLiveData<Unit>()
     val reportPhishingTrigger = SingleLiveEvent<Unit>()
     val canInstallUpdate = MutableLiveData(false)
-
-    val snackBarManager by lazy { SnackBarManager() }
 
     val mailboxesLive = mailboxController.getMailboxesAsync(AccountUtils.currentUserId).asLiveData(ioCoroutineContext)
 
@@ -368,7 +367,7 @@ class MainViewModel @Inject constructor(
             if (isSuccess()) {
                 forceRefreshThreads()
             } else {
-                snackBarManager.postValue(context.getString(translatedError))
+                snackbarManager.postValue(context.getString(translatedError))
             }
         }
     }
@@ -513,7 +512,7 @@ class MainViewModel @Inject constructor(
             context.getString(apiResponse.translatedError)
         }
 
-        snackBarManager.postValue(snackbarTitle, undoResource?.let { UndoData(it, undoFoldersIds, undoDestinationId) })
+        snackbarManager.postValue(snackbarTitle, undoResource?.let { UndoData(it, undoFoldersIds, undoDestinationId) })
     }
 
     private fun getMessagesToDelete(threads: List<Thread>, message: Message?) = when (message) {
@@ -530,12 +529,12 @@ class MainViewModel @Inject constructor(
             refreshFoldersAsync(mailbox, listOf(draftFolderId))
         }
 
-        showDraftDeletedSnackBar(apiResponse)
+        showDraftDeletedSnackbar(apiResponse)
     }
 
-    private fun showDraftDeletedSnackBar(apiResponse: ApiResponse<Unit>) {
+    private fun showDraftDeletedSnackbar(apiResponse: ApiResponse<Unit>) {
         val titleRes = if (apiResponse.isSuccess()) R.string.snackbarDraftDeleted else apiResponse.translateError()
-        snackBarManager.postValue(context.getString(titleRes))
+        snackbarManager.postValue(context.getString(titleRes))
     }
     //endregion
 
@@ -585,7 +584,7 @@ class MainViewModel @Inject constructor(
         }
 
         val undoData = apiResponse.data?.undoResource?.let { UndoData(it, undoFoldersIds, undoDestinationId) }
-        snackBarManager.postValue(snackbarTitle, undoData)
+        snackbarManager.postValue(snackbarTitle, undoData)
     }
     //endregion
 
@@ -813,7 +812,7 @@ class MainViewModel @Inject constructor(
             }
 
             reportPhishingTrigger.postValue(Unit)
-            snackBarManager.postValue(context.getString(snackbarTitle))
+            snackbarManager.postValue(context.getString(snackbarTitle))
         }
     }
     //endregion
@@ -826,7 +825,7 @@ class MainViewModel @Inject constructor(
 
             val snackbarTitle = if (isSuccess()) R.string.snackbarBlockUserConfirmation else translatedError
 
-            snackBarManager.postValue(context.getString(snackbarTitle))
+            snackbarManager.postValue(context.getString(snackbarTitle))
         }
     }
     //endregion
@@ -851,7 +850,7 @@ class MainViewModel @Inject constructor(
                 if (translatedError == 0) RCore.string.anErrorHasOccurred else translatedError
             }
 
-            snackBarManager.postValue(context.getString(snackbarTitle))
+            snackbarManager.postValue(context.getString(snackbarTitle))
         }
     }
     //endregion
@@ -867,7 +866,7 @@ class MainViewModel @Inject constructor(
             updateFolders(mailbox)
             apiResponse.data?.id
         } else {
-            snackBarManager.postValue(title = context.getString(apiResponse.translateError()), undoData = null)
+            snackbarManager.postValue(title = context.getString(apiResponse.translateError()), undoData = null)
             null
         }
     }
@@ -949,7 +948,7 @@ class MainViewModel @Inject constructor(
                 translatedError
             }
 
-            snackBarManager.postValue(context.getString(snackbarTitle))
+            snackbarManager.postValue(context.getString(snackbarTitle))
         }
     }
 
@@ -994,7 +993,7 @@ class MainViewModel @Inject constructor(
 
     fun handleDeletedMessages(uids: Set<String>) = viewModelScope.launch(ioCoroutineContext) {
 
-        snackBarManager.postValue(context.getString(R.string.snackbarDeletedConversation))
+        snackbarManager.postValue(context.getString(R.string.snackbarDeletedConversation))
 
         val mailbox = currentMailbox.value ?: return@launch
         val realm = mailboxContentRealm()
@@ -1021,7 +1020,7 @@ class MainViewModel @Inject constructor(
             RCore.string.errorDownload
         }
 
-        snackBarManager.postValue(context.getString(snackbarTitleRes))
+        snackbarManager.postValue(context.getString(snackbarTitleRes))
     }
 
     fun checkAppUpdateStatus() {

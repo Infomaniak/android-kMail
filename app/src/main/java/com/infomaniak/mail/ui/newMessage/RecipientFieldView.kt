@@ -45,12 +45,16 @@ import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ViewContactChipContextMenuBinding
 import com.infomaniak.mail.databinding.ViewRecipientFieldBinding
+import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.utils.MergedContactDictionary
 import com.infomaniak.mail.utils.UiUtils.dividerDrawable
 import com.infomaniak.mail.utils.isEmail
 import com.infomaniak.mail.utils.toggleChevron
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlin.math.min
 
+@AndroidEntryPoint
 class RecipientFieldView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -89,7 +93,9 @@ class RecipientFieldView @JvmOverloads constructor(
     private var onContactAdded: ((Recipient) -> Unit)? = null
     private var onCopyContactAddress: ((Recipient) -> Unit)? = null
     private var gotFocus: (() -> Unit)? = null
-    private var setSnackBar: ((Int) -> Unit) = {}
+
+    @Inject
+    lateinit var snackbarManager: SnackbarManager
 
     private var canCollapseEverything = false
     private var otherFieldsAreAllEmpty = true
@@ -132,10 +138,10 @@ class RecipientFieldView @JvmOverloads constructor(
                     if (input.isEmail()) {
                         addRecipient(email = input, name = input)
                     } else {
-                        setSnackBar(R.string.addUnknownRecipientInvalidEmail)
+                        snackbarManager.setValue(context.getString(R.string.addUnknownRecipientInvalidEmail))
                     }
                 },
-                setSnackBar = { setSnackBar(it) },
+                snackbarManager = snackbarManager,
             )
 
             contactChipAdapter = ContactChipAdapter(
@@ -309,7 +315,7 @@ class RecipientFieldView @JvmOverloads constructor(
 
     private fun addRecipient(email: String, name: String) {
         if (contactChipAdapter.itemCount > MAX_ALLOWED_RECIPIENT) {
-            setSnackBar(R.string.tooManyRecipients)
+            snackbarManager.setValue(context.getString(R.string.tooManyRecipients))
             return
         }
 
@@ -352,7 +358,6 @@ class RecipientFieldView @JvmOverloads constructor(
         onCopyContactAddressCallback: ((Recipient) -> Unit),
         gotFocusCallback: (() -> Unit),
         onToggleEverythingCallback: ((isCollapsed: Boolean) -> Unit)? = null,
-        setSnackBarCallback: (titleRes: Int) -> Unit,
     ) {
 
         val dividerItemDecorator = DividerItemDecorator(InsetDrawable(dividerDrawable(context), 16.toPx(), 0, 16.toPx(), 0))
@@ -368,8 +373,6 @@ class RecipientFieldView @JvmOverloads constructor(
         onCopyContactAddress = onCopyContactAddressCallback
 
         gotFocus = gotFocusCallback
-
-        setSnackBar = setSnackBarCallback
     }
 
     fun clearField() = binding.textInput.setText("")

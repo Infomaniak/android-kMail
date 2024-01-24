@@ -23,7 +23,7 @@ import androidx.appcompat.app.AlertDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.databinding.DialogLinkContextualMenuBinding
-import com.infomaniak.mail.ui.main.SnackBarManager
+import com.infomaniak.mail.ui.main.SnackbarManager
 import dagger.hilt.android.qualifiers.ActivityContext
 
 abstract class ContextualMenuAlertDialog(
@@ -35,12 +35,12 @@ abstract class ContextualMenuAlertDialog(
     val binding: DialogLinkContextualMenuBinding by lazy { DialogLinkContextualMenuBinding.inflate(activity.layoutInflater) }
     override val alertDialog: AlertDialog by lazy { initDialog() }
 
-    private lateinit var snackBarManager: SnackBarManager
+    private lateinit var snackbarManager: SnackbarManager
 
     private var dataToProcess = ""
 
-    fun initValues(snackBarManager: SnackBarManager) {
-        this.snackBarManager = snackBarManager
+    fun initValues(snackbarManager: SnackbarManager) {
+        this.snackbarManager = snackbarManager
     }
 
     private fun initDialog(): AlertDialog = with(binding) {
@@ -48,7 +48,7 @@ abstract class ContextualMenuAlertDialog(
 
         MaterialAlertDialogBuilder(context)
             .setCustomTitle(binding.root)
-            .setItems(stringItems) { _, index -> items[index].onClick(dataToProcess, snackBarManager) }
+            .setItems(stringItems) { _, index -> items[index].onClick(dataToProcess, snackbarManager) }
             .create()
     }
 
@@ -62,6 +62,6 @@ abstract class ContextualMenuAlertDialog(
 
     data class ContextualItem(
         @StringRes val titleRes: Int,
-        val onClick: (data: String, snackBarManager: SnackBarManager) -> Unit
+        val onClick: (data: String, snackbarManager: SnackbarManager) -> Unit
     )
 }

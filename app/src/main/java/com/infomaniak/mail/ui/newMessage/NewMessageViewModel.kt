@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2023 Infomaniak Network SA
+ * Copyright (C) 2022-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,7 +52,6 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
-import com.infomaniak.mail.ui.main.SnackBarManager
 import com.infomaniak.mail.ui.newMessage.NewMessageEditorManager.EditorAction
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.SignatureScore.*
@@ -115,7 +114,6 @@ class NewMessageViewModel @Inject constructor(
     val externalRecipientCount = SingleLiveEvent<Pair<String?, Int>>()
     var isExternalBannerManuallyClosed = false
 
-    val snackBarManager by lazy { SnackBarManager() }
     var shouldExecuteDraftActionWhenStopping = true
 
     private var snapshot: DraftSnapshot? = null
