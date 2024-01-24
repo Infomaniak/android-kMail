@@ -25,6 +25,7 @@ import android.transition.Slide
 import android.transition.TransitionManager
 import android.view.ViewGroup.FOCUS_BEFORE_DESCENDANTS
 import android.view.ViewGroup.FOCUS_BLOCK_DESCENDANTS
+import androidx.annotation.ColorInt
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -61,12 +62,14 @@ class NewMessageAiManager @Inject constructor(
 
     private val animationDuration by lazy { resources.getInteger(R.integer.aiPromptAnimationDuration).toLong() }
     private val scrimOpacity by lazy { ResourcesCompat.getFloat(context.resources, R.dimen.scrimOpacity) }
-    private val backgroundColor by lazy { context.getColor(R.color.backgroundColor) }
     private val black by lazy { context.getColor(RCore.color.black) }
 
     private var aiPromptFragment: AiPromptFragment? = null
 
     private var valueAnimator: ValueAnimator? = null
+
+    @ColorInt
+    var backgroundColor: Int? = null
 
     fun initValues(
         newMessageViewModel: NewMessageViewModel,
@@ -179,7 +182,8 @@ class NewMessageAiManager @Inject constructor(
             addUpdateListener { animator ->
                 val alpha = ((animator.animatedValue as Float) * 256.0f).roundToInt() / 256.0f
                 scrim.alpha = alpha
-                activity.window.statusBarColor = UiUtils.pointBetweenColors(backgroundColor, black, alpha)
+                val color = backgroundColor ?: context.getColor(R.color.backgroundColor)
+                activity.window.statusBarColor = UiUtils.pointBetweenColors(color, black, alpha)
             }
             start()
         }

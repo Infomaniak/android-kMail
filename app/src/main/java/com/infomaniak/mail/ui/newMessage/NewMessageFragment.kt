@@ -242,7 +242,11 @@ class NewMessageFragment : Fragment() {
         addressListPopupWindow = ListPopupWindow(binding.root.context)
 
         toolbar.setNavigationOnClickListener { activity?.onBackPressedDispatcher?.onBackPressed() }
-        changeToolbarColorOnScroll(toolbar, compositionNestedScrollView)
+        changeToolbarColorOnScroll(
+            toolbar = toolbar,
+            nestedScrollView = compositionNestedScrollView,
+            otherUpdates = { color -> aiManager.backgroundColor = color },
+        )
 
         if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
             WebSettingsCompat.setAlgorithmicDarkeningAllowed(signatureWebView.settings, true)
