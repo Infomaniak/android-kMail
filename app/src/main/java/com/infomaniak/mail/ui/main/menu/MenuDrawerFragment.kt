@@ -40,7 +40,6 @@ import com.infomaniak.lib.bugtracker.BugTrackerActivity
 import com.infomaniak.lib.bugtracker.BugTrackerActivityArgs
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.context
-import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackCreateFolderEvent
@@ -60,7 +59,8 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
 
-    private var binding: FragmentMenuDrawerBinding by safeBinding()
+    private var _binding: FragmentMenuDrawerBinding? = null
+    private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
     private val menuDrawerViewModel: MenuDrawerViewModel by viewModels()
 
     var exitDrawer: (() -> Unit)? = null
@@ -74,7 +74,7 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
     override val mailboxesAdapter get() = binding.mailboxList.adapter as MailboxesAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return FragmentMenuDrawerBinding.inflate(inflater, container, false).also { binding = it }.root
+        return FragmentMenuDrawerBinding.inflate(inflater, container, false).also { _binding = it }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -180,6 +180,12 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
                 matomoValue = "MenuDrawer",
             )
         }
+    }
+
+    override fun onDestroyView() {
+        TransitionManager.endTransitions(binding.drawerContentScrollView)
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun setupCreateFolderDialog() {

@@ -75,7 +75,8 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class NewMessageFragment : Fragment() {
 
-    private var binding: FragmentNewMessageBinding by safeBinding()
+    private var _binding: FragmentNewMessageBinding? = null
+    private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
     private val newMessageActivityArgs by lazy {
         // When opening this fragment via deeplink, it can happen that the navigation
         // extras aren't yet initialized, so we don't use the `navArgs` here.
@@ -122,7 +123,7 @@ class NewMessageFragment : Fragment() {
     lateinit var descriptionDialog: DescriptionAlertDialog
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return FragmentNewMessageBinding.inflate(inflater, container, false).also { binding = it }.root
+        return FragmentNewMessageBinding.inflate(inflater, container, false).also { _binding = it }.root
     }
 
     // This `SuppressLint` seems useless, but it's for the CI. Don't remove it.
@@ -221,7 +222,9 @@ class NewMessageFragment : Fragment() {
         quoteWebView = null
         signatureWebView?.destroyAndClearHistory()
         signatureWebView = null
+        TransitionManager.endTransitions(binding.root)
         super.onDestroyView()
+        _binding = null
     }
 
     private fun handleOnBackPressed() {

@@ -253,6 +253,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
 
     override fun onDestroyView() {
         showLoadingTimer.cancel()
+        TransitionManager.endTransitions(binding.root)
         super.onDestroyView()
         _binding = null
     }
