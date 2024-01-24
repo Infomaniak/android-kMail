@@ -124,7 +124,7 @@ object ApiRoutes {
     fun search(mailboxUuid: String, folderId: String, filters: String): String {
         return "${folder(mailboxUuid, folderId)}/message?thread=on&offset=0&$filters"
     }
-    //region Folder
+    //endregion
 
     //region Messages from Folder/Message
     private fun message(mailboxUuid: String, folderId: String, shortUid: Int): String {
@@ -144,7 +144,7 @@ object ApiRoutes {
     }
     //endregion
 
-    // Message from Folder/Mobile
+    //region Message from Folder/Mobile
     private fun getMessages(mailboxUuid: String, folderId: String): String {
         return "${folder(mailboxUuid, folderId)}/mobile"
     }
