@@ -42,7 +42,6 @@ class TwoPaneViewModel @Inject constructor(
 
     val currentThreadUid: LiveData<String?> = state.getLiveData(CURRENT_THREAD_UID_KEY)
 
-    inline val isThreadOpen get() = currentThreadUid.value != null
     val rightPaneFolderName = MutableLiveData<String>()
     var previousFolderId: String? = null
 
