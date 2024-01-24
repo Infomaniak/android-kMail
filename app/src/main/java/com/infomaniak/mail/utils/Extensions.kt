@@ -89,7 +89,7 @@ import com.infomaniak.mail.ui.main.folder.HeaderItemDecoration
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
 import com.infomaniak.mail.ui.main.thread.MessageWebViewClient
 import com.infomaniak.mail.ui.main.thread.RoundedBackgroundSpan
-import com.infomaniak.mail.ui.main.thread.ThreadFragment
+import com.infomaniak.mail.ui.main.thread.ThreadFragment.HeaderState
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.ui.noValidMailboxes.NoValidMailboxesActivity
 import com.infomaniak.mail.utils.AccountUtils.NO_MAILBOX_USER_ID_KEY
@@ -457,13 +457,13 @@ fun Fragment.changeToolbarColorOnScroll(
         }
     })
 
-    var headerColorState = ThreadFragment.HeaderState.LOWERED
+    var headerColorState = HeaderState.LOWERED
     nestedScrollView.setOnScrollChangeListener { view, _, _, _, _ ->
         val isAtTheTop = !view.canScrollVertically(-1)
-        if (headerColorState == ThreadFragment.HeaderState.ELEVATED && !isAtTheTop) return@setOnScrollChangeListener
+        if (headerColorState == HeaderState.ELEVATED && !isAtTheTop) return@setOnScrollChangeListener
 
         val newColor = view.context.getColor(if (isAtTheTop) loweredColor else elevatedColor)
-        headerColorState = if (isAtTheTop) ThreadFragment.HeaderState.LOWERED else ThreadFragment.HeaderState.ELEVATED
+        headerColorState = if (isAtTheTop) HeaderState.LOWERED else HeaderState.ELEVATED
 
         if (oldColor == newColor) return@setOnScrollChangeListener
 
