@@ -27,7 +27,7 @@ import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.databinding.ItemContactBinding
-import com.infomaniak.mail.ui.main.SnackBarManager
+import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.newMessage.ContactAdapter.ContactType.*
 import com.infomaniak.mail.ui.newMessage.ContactAdapter.ContactViewHolder
 import com.infomaniak.mail.utils.standardize
@@ -37,7 +37,7 @@ class ContactAdapter(
     private val usedContacts: MutableSet<String>,
     private val onContactClicked: (item: MergedContact) -> Unit,
     private val onAddUnrecognizedContact: () -> Unit,
-    private val snackBarManager: SnackBarManager,
+    private val snackbarManager: SnackbarManager,
 ) : Adapter<ContactViewHolder>() {
 
     private var allContacts: List<MergedContact> = emptyList()
@@ -79,7 +79,7 @@ class ContactAdapter(
         root.setOnClickListener {
             context.trackNewMessageEvent("addNewRecipient")
             if (usedContacts.contains(searchQuery)) {
-                snackBarManager.setValue(context.getString(R.string.addUnknownRecipientAlreadyUsed))
+                snackbarManager.setValue(context.getString(R.string.addUnknownRecipientAlreadyUsed))
             } else {
                 onAddUnrecognizedContact()
             }

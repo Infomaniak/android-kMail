@@ -27,7 +27,7 @@ import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.trackContactActionsEvent
 import com.infomaniak.mail.databinding.BottomSheetDetailedContactBinding
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.ui.main.SnackBarManager
+import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.thread.actions.ActionsBottomSheetDialog
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.copyRecipientEmailToClipboard
@@ -45,7 +45,7 @@ class DetailedContactBottomSheetDialog : ActionsBottomSheetDialog() {
     private val currentClassName: String by lazy { DetailedContactBottomSheetDialog::class.java.name }
 
     @Inject
-    lateinit var snackBarManager: SnackBarManager
+    lateinit var snackbarManager: SnackbarManager
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetDetailedContactBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -72,7 +72,7 @@ class DetailedContactBottomSheetDialog : ActionsBottomSheetDialog() {
         }
         copyAddress.setClosingOnClickListener {
             trackContactActionsEvent("copyEmailAddress")
-            copyRecipientEmailToClipboard(navigationArgs.recipient, snackBarManager)
+            copyRecipientEmailToClipboard(navigationArgs.recipient, snackbarManager)
         }
     }
 }

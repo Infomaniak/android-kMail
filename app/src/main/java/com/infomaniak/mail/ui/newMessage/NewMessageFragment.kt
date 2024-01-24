@@ -548,7 +548,7 @@ class NewMessageFragment : Fragment() {
 
     private fun tryToSendEmail() {
 
-        fun setSnackBarActivityResult() {
+        fun setSnackbarActivityResult() {
             val resultIntent = Intent()
             resultIntent.putExtra(MainActivity.DRAFT_ACTION_KEY, DraftAction.SEND.name)
             requireActivity().setResult(AppCompatActivity.RESULT_OK, resultIntent)
@@ -556,7 +556,7 @@ class NewMessageFragment : Fragment() {
 
         fun sendEmail() {
             newMessageViewModel.shouldSendInsteadOfSave = true
-            setSnackBarActivityResult()
+            setSnackbarActivityResult()
             requireActivity().finishAppAndRemoveTaskIfNeeded()
         }
 

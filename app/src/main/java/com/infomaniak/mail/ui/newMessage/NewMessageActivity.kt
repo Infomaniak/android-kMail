@@ -32,7 +32,7 @@ import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.databinding.ActivityNewMessageBinding
 import com.infomaniak.mail.ui.BaseActivity
 import com.infomaniak.mail.ui.LaunchActivity
-import com.infomaniak.mail.ui.main.SnackBarManager
+import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.updateNavigationBarColor
@@ -50,7 +50,7 @@ class NewMessageActivity : BaseActivity() {
     }
 
     @Inject
-    lateinit var snackBarManager: SnackBarManager
+    lateinit var snackbarManager: SnackbarManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,7 +63,7 @@ class NewMessageActivity : BaseActivity() {
             return
         }
 
-        setupSnackBar()
+        setupSnackbar()
         setupSystemBars()
 
         setupNavController()
@@ -77,14 +77,14 @@ class NewMessageActivity : BaseActivity() {
         return true
     }
 
-    private fun setupSnackBar() {
+    private fun setupSnackbar() {
         fun getAnchor(): View? = when (navController.currentDestination?.id) {
             R.id.newMessageFragment -> findViewById(R.id.editor)
             R.id.aiPropositionFragment -> findViewById(R.id.aiPropositionBottomBar)
             else -> null
         }
 
-        snackBarManager.setup(view = binding.root, activity = this, getAnchor = ::getAnchor)
+        snackbarManager.setup(view = binding.root, activity = this, getAnchor = ::getAnchor)
     }
 
     private fun setupSystemBars() {

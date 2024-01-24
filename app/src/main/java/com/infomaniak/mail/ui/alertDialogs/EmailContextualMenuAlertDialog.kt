@@ -38,8 +38,8 @@ class EmailContextualMenuAlertDialog @Inject constructor(
             val mailToUri = Uri.parse(WebView.SCHEME_MAILTO + email)
             (activityContext as MainActivity).navigateToNewMessageActivity(NewMessageActivityArgs(mailToUri = mailToUri).toBundle())
         },
-        ContextualItem(R.string.contextMenuEmailCopy) { email, snackBarManager ->
-            activityContext.copyStringToClipboard(email, R.string.snackbarEmailCopiedToClipboard, snackBarManager)
+        ContextualItem(R.string.contextMenuEmailCopy) { email, snackbarManager ->
+            activityContext.copyStringToClipboard(email, R.string.snackbarEmailCopiedToClipboard, snackbarManager)
         },
     )
 }

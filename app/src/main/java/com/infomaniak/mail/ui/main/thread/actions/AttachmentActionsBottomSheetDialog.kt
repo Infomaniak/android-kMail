@@ -33,7 +33,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.databinding.BottomSheetAttachmentActionsBinding
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.ui.main.SnackBarManager
+import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntentType
 import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntentType.OPEN_WITH
 import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntentType.SAVE_TO_DRIVE
@@ -55,7 +55,7 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
     lateinit var permissionUtils: PermissionUtils
 
     @Inject
-    lateinit var snackBarManager: SnackBarManager
+    lateinit var snackbarManager: SnackbarManager
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetAttachmentActionsBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -80,7 +80,7 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
             if (attachment.openWithIntent(context).hasSupportedApplications(context)) {
                 attachment.executeIntent(OPEN_WITH)
             } else {
-                snackBarManager.setValue(getString(RCore.string.errorNoSupportingAppFound))
+                snackbarManager.setValue(getString(RCore.string.errorNoSupportingAppFound))
             }
         }
         kDriveItem.setClosingOnClickListener {

@@ -60,7 +60,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.*
-import com.infomaniak.mail.ui.main.SnackBarManager
+import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel
 import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel.NavData
@@ -108,7 +108,7 @@ class ThreadFragment : Fragment() {
     lateinit var permissionUtils: PermissionUtils
 
     @Inject
-    lateinit var snackBarManager: SnackBarManager
+    lateinit var snackbarManager: SnackbarManager
 
     private var _binding: FragmentThreadBinding? = null
     private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
@@ -267,9 +267,9 @@ class ThreadFragment : Fragment() {
 
     private fun setupDialogs() {
         bindAlertToViewLifecycle(descriptionDialog)
-        linkContextualMenuAlertDialog.initValues(snackBarManager)
-        emailContextualMenuAlertDialog.initValues(snackBarManager)
-        phoneContextualMenuAlertDialog.initValues(snackBarManager)
+        linkContextualMenuAlertDialog.initValues(snackbarManager)
+        emailContextualMenuAlertDialog.initValues(snackbarManager)
+        phoneContextualMenuAlertDialog.initValues(snackbarManager)
     }
 
     private fun observeThreadOpening() = with(threadViewModel) {
@@ -381,11 +381,11 @@ class ThreadFragment : Fragment() {
             toolbarSubject.text = subject
 
             threadSubject.setOnLongClickListener {
-                context.copyStringToClipboard(subject, R.string.snackbarSubjectCopiedToClipboard, snackBarManager)
+                context.copyStringToClipboard(subject, R.string.snackbarSubjectCopiedToClipboard, snackbarManager)
                 true
             }
             toolbarSubject.setOnLongClickListener {
-                context.copyStringToClipboard(subject, R.string.snackbarSubjectCopiedToClipboard, snackBarManager)
+                context.copyStringToClipboard(subject, R.string.snackbarSubjectCopiedToClipboard, snackbarManager)
                 true
             }
         }

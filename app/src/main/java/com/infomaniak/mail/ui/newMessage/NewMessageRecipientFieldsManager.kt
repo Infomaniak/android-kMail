@@ -24,14 +24,14 @@ import com.infomaniak.lib.core.utils.showKeyboard
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
-import com.infomaniak.mail.ui.main.SnackBarManager
+import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType.*
 import com.infomaniak.mail.utils.copyRecipientEmailToClipboard
 import dagger.hilt.android.scopes.FragmentScoped
 import javax.inject.Inject
 
 @FragmentScoped
-class NewMessageRecipientFieldsManager @Inject constructor(private val snackBarManager: SnackBarManager) : NewMessageManager() {
+class NewMessageRecipientFieldsManager @Inject constructor(private val snackbarManager: SnackbarManager) : NewMessageManager() {
 
     private var _externalsManager: NewMessageExternalsManager? = null
     private inline val externalsManager: NewMessageExternalsManager get() = _externalsManager!!
@@ -57,7 +57,7 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackBarM
             onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(TO, hasOpened) },
             onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, TO) },
             onContactRemovedCallback = { recipient -> recipient.removeInViewModelAndUpdateBannerVisibility(TO) },
-            onCopyContactAddressCallback = { fragment.copyRecipientEmailToClipboard(it, snackBarManager) },
+            onCopyContactAddressCallback = { fragment.copyRecipientEmailToClipboard(it, snackbarManager) },
             gotFocusCallback = { fieldGotFocus(TO) },
             onToggleEverythingCallback = ::openAdvancedFields,
         )
@@ -67,7 +67,7 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackBarM
             onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(CC, hasOpened) },
             onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, CC) },
             onContactRemovedCallback = { recipient -> recipient.removeInViewModelAndUpdateBannerVisibility(CC) },
-            onCopyContactAddressCallback = { fragment.copyRecipientEmailToClipboard(it, snackBarManager) },
+            onCopyContactAddressCallback = { fragment.copyRecipientEmailToClipboard(it, snackbarManager) },
             gotFocusCallback = { fieldGotFocus(CC) },
         )
 
@@ -76,7 +76,7 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackBarM
             onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(BCC, hasOpened) },
             onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, BCC) },
             onContactRemovedCallback = { recipient -> recipient.removeInViewModelAndUpdateBannerVisibility(BCC) },
-            onCopyContactAddressCallback = { fragment.copyRecipientEmailToClipboard(it, snackBarManager) },
+            onCopyContactAddressCallback = { fragment.copyRecipientEmailToClipboard(it, snackbarManager) },
             gotFocusCallback = { fieldGotFocus(BCC) },
         )
     }

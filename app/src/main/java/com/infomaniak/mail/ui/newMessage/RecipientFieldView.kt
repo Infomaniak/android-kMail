@@ -45,7 +45,7 @@ import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ViewContactChipContextMenuBinding
 import com.infomaniak.mail.databinding.ViewRecipientFieldBinding
-import com.infomaniak.mail.ui.main.SnackBarManager
+import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.utils.MergedContactDictionary
 import com.infomaniak.mail.utils.UiUtils.dividerDrawable
 import com.infomaniak.mail.utils.isEmail
@@ -95,7 +95,7 @@ class RecipientFieldView @JvmOverloads constructor(
     private var gotFocus: (() -> Unit)? = null
 
     @Inject
-    lateinit var snackBarManager: SnackBarManager
+    lateinit var snackbarManager: SnackbarManager
 
     private var canCollapseEverything = false
     private var otherFieldsAreAllEmpty = true
@@ -138,10 +138,10 @@ class RecipientFieldView @JvmOverloads constructor(
                     if (input.isEmail()) {
                         addRecipient(email = input, name = input)
                     } else {
-                        snackBarManager.setValue(context.getString(R.string.addUnknownRecipientInvalidEmail))
+                        snackbarManager.setValue(context.getString(R.string.addUnknownRecipientInvalidEmail))
                     }
                 },
-                snackBarManager = snackBarManager,
+                snackbarManager = snackbarManager,
             )
 
             contactChipAdapter = ContactChipAdapter(
@@ -315,7 +315,7 @@ class RecipientFieldView @JvmOverloads constructor(
 
     private fun addRecipient(email: String, name: String) {
         if (contactChipAdapter.itemCount > MAX_ALLOWED_RECIPIENT) {
-            snackBarManager.setValue(context.getString(R.string.tooManyRecipients))
+            snackbarManager.setValue(context.getString(R.string.tooManyRecipients))
             return
         }
 

@@ -24,7 +24,7 @@ import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ActivitySyncAutoConfigBinding
 import com.infomaniak.mail.ui.BaseActivity
-import com.infomaniak.mail.ui.main.SnackBarManager
+import com.infomaniak.mail.ui.main.SnackbarManager
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -39,17 +39,17 @@ class SyncAutoConfigActivity : BaseActivity() {
     }
 
     @Inject
-    lateinit var snackBarManager: SnackBarManager
+    lateinit var snackbarManager: SnackbarManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        setupSnackBar()
+        setupSnackbar()
         setupNavController()
     }
 
-    private fun setupSnackBar() {
-        snackBarManager.setup(view = binding.root, activity = this)
+    private fun setupSnackbar() {
+        snackbarManager.setup(view = binding.root, activity = this)
     }
 
     private fun setupNavController() {

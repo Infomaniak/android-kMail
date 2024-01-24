@@ -45,8 +45,8 @@ class PhoneContextualMenuAlertDialog @Inject constructor(
         ContextualItem(R.string.contextMenuPhoneNumberAddContact) { phoneNumber, _ ->
             activityContext.addPhoneNumberToContacts(phoneNumber)
         },
-        ContextualItem(R.string.contextMenuPhoneNumberCopy) { phoneNumber, snackBarManager ->
-            activityContext.copyStringToClipboard(phoneNumber, R.string.snackbarPhoneNumberCopiedToClipboard, snackBarManager)
+        ContextualItem(R.string.contextMenuPhoneNumberCopy) { phoneNumber, snackbarManager ->
+            activityContext.copyStringToClipboard(phoneNumber, R.string.snackbarPhoneNumberCopiedToClipboard, snackbarManager)
         },
     )
 

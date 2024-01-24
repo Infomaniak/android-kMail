@@ -27,7 +27,7 @@ import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.di.IoDispatcher
-import com.infomaniak.mail.ui.main.SnackBarManager
+import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.context
@@ -41,7 +41,7 @@ import com.infomaniak.lib.core.R as RCore
 class SyncAutoConfigViewModel @Inject constructor(
     application: Application,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val snackBarManager: SnackBarManager,
+    private val snackbarManager: SnackbarManager,
 ) : AndroidViewModel(application) {
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
@@ -76,7 +76,7 @@ class SyncAutoConfigViewModel @Inject constructor(
         scope.ensureActive()
 
         return apiResponse.data?.password.also { password ->
-            if (password == null) snackBarManager.postValue(context.getString(R.string.errorGetCredentials))
+            if (password == null) snackbarManager.postValue(context.getString(R.string.errorGetCredentials))
         }
     }
 
@@ -93,7 +93,7 @@ class SyncAutoConfigViewModel @Inject constructor(
                 putExtra(SYNC_PASSWORD_KEY, infomaniakPassword)
             }.also(launchAutoSyncIntent)
         } else {
-            snackBarManager.postValue(context.getString(RCore.string.anErrorHasOccurred))
+            snackbarManager.postValue(context.getString(RCore.string.anErrorHasOccurred))
             SentryDebug.sendCredentialsIssue(infomaniakLogin, infomaniakPassword)
         }
     }

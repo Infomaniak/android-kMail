@@ -28,9 +28,9 @@ import javax.inject.Singleton
 import com.infomaniak.lib.core.R as RCore
 
 @Singleton
-class SnackBarManager @Inject constructor() {
+class SnackbarManager @Inject constructor() {
 
-    private val snackBarFeedback = SingleLiveEvent<SnackBarData>()
+    private val snackbarFeedback = SingleLiveEvent<SnackbarData>()
     private var previousSnackbar: Snackbar? = null
 
     // Give a CoordinatorLayout to `view` in order to support swipe to dismiss
@@ -40,8 +40,8 @@ class SnackBarManager @Inject constructor() {
         getAnchor: (() -> View?)? = null,
         onUndoData: ((data: UndoData) -> Unit)? = null,
     ) {
-        snackBarFeedback.removeObservers(activity)
-        snackBarFeedback.observe(activity) { (title, undoData, buttonTitleRes, customBehavior) ->
+        snackbarFeedback.removeObservers(activity)
+        snackbarFeedback.observe(activity) { (title, undoData, buttonTitleRes, customBehavior) ->
             val action: (() -> Unit)? = if (undoData != null) {
                 { onUndoData?.invoke(undoData) }
             } else {
@@ -75,14 +75,14 @@ class SnackBarManager @Inject constructor() {
     }
 
     fun setValue(title: String, undoData: UndoData? = null, buttonTitle: Int? = null, customBehavior: (() -> Unit)? = null) {
-        snackBarFeedback.value = SnackBarData(title, undoData, buttonTitle, customBehavior)
+        snackbarFeedback.value = SnackbarData(title, undoData, buttonTitle, customBehavior)
     }
 
     fun postValue(title: String, undoData: UndoData? = null, buttonTitle: Int? = null, customBehavior: (() -> Unit)? = null) {
-        snackBarFeedback.postValue(SnackBarData(title, undoData, buttonTitle, customBehavior))
+        snackbarFeedback.postValue(SnackbarData(title, undoData, buttonTitle, customBehavior))
     }
 
-    private data class SnackBarData(
+    private data class SnackbarData(
         val title: String,
         val undoData: UndoData?,
         @StringRes val buttonTitle: Int?,
