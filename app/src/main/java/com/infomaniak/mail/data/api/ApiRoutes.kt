@@ -154,11 +154,11 @@ object ApiRoutes {
     }
 
     fun getMessagesUids(mailboxUuid: String, folderId: String, info: PaginationInfo?): String {
-        val endpoint = "${getMessages(mailboxUuid, folderId)}/messages-uids"
-        val messages = "?messages=${Utils.PAGE_SIZE}"
+        val endpoint = "${getMessages(mailboxUuid, folderId)}/messages-uids?messages=${Utils.PAGE_SIZE}"
         val offset = info?.offsetUid?.let { "&uid_offset=$it" } ?: ""
         val direction = info?.direction?.let { "&direction=$it" } ?: ""
-        return "${endpoint}${messages}${offset}${direction}"
+
+        return "${endpoint}${offset}${direction}"
     }
 
     fun getMessagesByUids(mailboxUuid: String, folderId: String, uids: List<Int>): String {
