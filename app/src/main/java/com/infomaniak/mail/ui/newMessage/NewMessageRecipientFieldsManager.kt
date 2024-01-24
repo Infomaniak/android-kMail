@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023 Infomaniak Network SA
+ * Copyright (C) 2023-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,13 +24,14 @@ import com.infomaniak.lib.core.utils.showKeyboard
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
+import com.infomaniak.mail.ui.main.SnackBarManager
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType.*
 import com.infomaniak.mail.utils.copyRecipientEmailToClipboard
 import dagger.hilt.android.scopes.FragmentScoped
 import javax.inject.Inject
 
 @FragmentScoped
-class NewMessageRecipientFieldsManager @Inject constructor() : NewMessageManager() {
+class NewMessageRecipientFieldsManager @Inject constructor(private val snackBarManager: SnackBarManager) : NewMessageManager() {
 
     private var _externalsManager: NewMessageExternalsManager? = null
     private inline val externalsManager: NewMessageExternalsManager get() = _externalsManager!!
@@ -56,10 +57,9 @@ class NewMessageRecipientFieldsManager @Inject constructor() : NewMessageManager
             onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(TO, hasOpened) },
             onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, TO) },
             onContactRemovedCallback = { recipient -> recipient.removeInViewModelAndUpdateBannerVisibility(TO) },
-            onCopyContactAddressCallback = { fragment.copyRecipientEmailToClipboard(it, newMessageViewModel.snackBarManager) },
+            onCopyContactAddressCallback = { fragment.copyRecipientEmailToClipboard(it, snackBarManager) },
             gotFocusCallback = { fieldGotFocus(TO) },
             onToggleEverythingCallback = ::openAdvancedFields,
-            setSnackBarCallback = ::setSnackBar,
         )
 
         ccField.initRecipientField(
@@ -67,9 +67,8 @@ class NewMessageRecipientFieldsManager @Inject constructor() : NewMessageManager
             onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(CC, hasOpened) },
             onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, CC) },
             onContactRemovedCallback = { recipient -> recipient.removeInViewModelAndUpdateBannerVisibility(CC) },
-            onCopyContactAddressCallback = { fragment.copyRecipientEmailToClipboard(it, newMessageViewModel.snackBarManager) },
+            onCopyContactAddressCallback = { fragment.copyRecipientEmailToClipboard(it, snackBarManager) },
             gotFocusCallback = { fieldGotFocus(CC) },
-            setSnackBarCallback = ::setSnackBar,
         )
 
         bccField.initRecipientField(
@@ -77,9 +76,8 @@ class NewMessageRecipientFieldsManager @Inject constructor() : NewMessageManager
             onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(BCC, hasOpened) },
             onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, BCC) },
             onContactRemovedCallback = { recipient -> recipient.removeInViewModelAndUpdateBannerVisibility(BCC) },
-            onCopyContactAddressCallback = { fragment.copyRecipientEmailToClipboard(it, newMessageViewModel.snackBarManager) },
+            onCopyContactAddressCallback = { fragment.copyRecipientEmailToClipboard(it, snackBarManager) },
             gotFocusCallback = { fieldGotFocus(BCC) },
-            setSnackBarCallback = ::setSnackBar,
         )
     }
 
@@ -115,10 +113,6 @@ class NewMessageRecipientFieldsManager @Inject constructor() : NewMessageManager
     private fun openAdvancedFields(isCollapsed: Boolean) = with(binding) {
         cc.isGone = isCollapsed
         bcc.isGone = isCollapsed
-    }
-
-    private fun setSnackBar(titleRes: Int) {
-        newMessageViewModel.snackBarManager.setValue(context.getString(titleRes))
     }
 
     fun observeCcAndBccVisibility() = with(newMessageViewModel) {

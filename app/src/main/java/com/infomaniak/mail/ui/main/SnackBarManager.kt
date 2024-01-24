@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023 Infomaniak Network SA
+ * Copyright (C) 2023-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,9 +23,12 @@ import androidx.fragment.app.FragmentActivity
 import com.google.android.material.snackbar.Snackbar
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
+import javax.inject.Inject
+import javax.inject.Singleton
 import com.infomaniak.lib.core.R as RCore
 
-class SnackBarManager {
+@Singleton
+class SnackBarManager @Inject constructor() {
 
     private val snackBarFeedback = SingleLiveEvent<SnackBarData>()
     private var previousSnackbar: Snackbar? = null
@@ -37,6 +40,7 @@ class SnackBarManager {
         getAnchor: (() -> View?)? = null,
         onUndoData: ((data: UndoData) -> Unit)? = null,
     ) {
+        snackBarFeedback.removeObservers(activity)
         snackBarFeedback.observe(activity) { (title, undoData, buttonTitleRes, customBehavior) ->
             val action: (() -> Unit)? = if (undoData != null) {
                 { onUndoData?.invoke(undoData) }

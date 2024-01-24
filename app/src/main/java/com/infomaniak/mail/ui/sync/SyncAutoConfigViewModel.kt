@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023 Infomaniak Network SA
+ * Copyright (C) 2023-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,11 +41,11 @@ import com.infomaniak.lib.core.R as RCore
 class SyncAutoConfigViewModel @Inject constructor(
     application: Application,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val snackBarManager: SnackBarManager,
 ) : AndroidViewModel(application) {
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
     private var credentialsJob: Job? = null
-    val snackBarManager by lazy { SnackBarManager() }
 
     fun isSyncAppUpToDate(): Boolean = runCatching {
         val packageInfo = context.packageManager.getPackageInfo(SYNC_PACKAGE, PackageManager.GET_ACTIVITIES)

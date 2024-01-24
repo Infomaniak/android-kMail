@@ -89,6 +89,7 @@ class MainViewModel @Inject constructor(
     private val sharedUtils: SharedUtils,
     private val threadController: ThreadController,
     private val avatarMergedContactData: AvatarMergedContactData,
+    private val snackBarManager: SnackBarManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
@@ -106,8 +107,6 @@ class MainViewModel @Inject constructor(
     val newFolderResultTrigger = MutableLiveData<Unit>()
     val reportPhishingTrigger = SingleLiveEvent<Unit>()
     val canInstallUpdate = MutableLiveData(false)
-
-    val snackBarManager by lazy { SnackBarManager() }
 
     val mailboxesLive = mailboxController.getMailboxesAsync(AccountUtils.currentUserId).asLiveData(ioCoroutineContext)
 

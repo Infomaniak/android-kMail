@@ -66,6 +66,7 @@ import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.firebase.RegisterFirebaseBroadcastReceiver
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.TitleAlertDialog
+import com.infomaniak.mail.ui.main.SnackBarManager
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.ui.newMessage.NewMessageActivity
@@ -103,7 +104,7 @@ class MainActivity : BaseActivity() {
     }
 
     private val showSendingSnackBarTimer: CountDownTimer by lazy {
-        Utils.createRefreshTimer(1_000L) { mainViewModel.snackBarManager.setValue(getString(R.string.snackbarEmailSending)) }
+        Utils.createRefreshTimer(1_000L) { snackBarManager.setValue(getString(R.string.snackbarEmailSending)) }
     }
 
     private val newMessageActivityResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
@@ -118,7 +119,7 @@ class MainActivity : BaseActivity() {
     private val syncAutoConfigActivityResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         result.data?.getStringExtra(SYNC_AUTO_CONFIG_KEY)?.let { reason ->
             if (reason == SYNC_AUTO_CONFIG_ALREADY_SYNC) {
-                mainViewModel.snackBarManager.setValue(getString(R.string.errorUserAlreadySynchronized))
+                snackBarManager.setValue(getString(R.string.errorUserAlreadySynchronized))
             }
             navController.popBackStack(destinationId = R.id.threadListFragment, inclusive = false)
         }
@@ -150,6 +151,9 @@ class MainActivity : BaseActivity() {
 
     @Inject
     lateinit var permissionUtils: PermissionUtils
+
+    @Inject
+    lateinit var snackBarManager: SnackBarManager
 
     private val drawerListener = object : DrawerLayout.DrawerListener {
 
@@ -258,7 +262,7 @@ class MainActivity : BaseActivity() {
                         val errorRes = getInt(DraftsActionsWorker.ERROR_MESSAGE_RESID_KEY, 0)
                         if (errorRes > 0) {
                             showSendingSnackBarTimer.cancel()
-                            mainViewModel.snackBarManager.setValue(getString(errorRes))
+                            snackBarManager.setValue(getString(errorRes))
                         }
                     }
                 }
@@ -291,7 +295,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun showSavedDraftSnackBar(associatedMailboxUuid: String, remoteDraftUuid: String) {
-        mainViewModel.snackBarManager.setValue(
+        snackBarManager.setValue(
             title = getString(R.string.snackbarDraftSaved),
             buttonTitle = R.string.actionDelete,
             customBehavior = {
@@ -304,7 +308,7 @@ class MainActivity : BaseActivity() {
     // Still display the snackbar even if it took three times 10 seconds of timeout to succeed
     private fun showSentDraftSnackBar() {
         showSendingSnackBarTimer.cancel()
-        mainViewModel.snackBarManager.setValue(getString(R.string.snackbarEmailSent))
+        snackBarManager.setValue(getString(R.string.snackbarEmailSent))
     }
 
     private fun loadCurrentMailbox() {
@@ -395,7 +399,7 @@ class MainActivity : BaseActivity() {
             return if (fragment is TwoPaneFragment) fragment.getAnchor() else null
         }
 
-        mainViewModel.snackBarManager.setup(
+        snackBarManager.setup(
             view = binding.root,
             activity = this,
             getAnchor = ::getAnchor,

@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2023 Infomaniak Network SA
+ * Copyright (C) 2022-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.databinding.ItemContactBinding
+import com.infomaniak.mail.ui.main.SnackBarManager
 import com.infomaniak.mail.ui.newMessage.ContactAdapter.ContactType.*
 import com.infomaniak.mail.ui.newMessage.ContactAdapter.ContactViewHolder
 import com.infomaniak.mail.utils.standardize
@@ -36,7 +37,7 @@ class ContactAdapter(
     private val usedContacts: MutableSet<String>,
     private val onContactClicked: (item: MergedContact) -> Unit,
     private val onAddUnrecognizedContact: () -> Unit,
-    private val setSnackBar: (titleRes: Int) -> Unit,
+    private val snackBarManager: SnackBarManager,
 ) : Adapter<ContactViewHolder>() {
 
     private var allContacts: List<MergedContact> = emptyList()
@@ -77,7 +78,11 @@ class ContactAdapter(
         contactDetails.setAutocompleteUnknownContact(searchQuery)
         root.setOnClickListener {
             context.trackNewMessageEvent("addNewRecipient")
-            if (usedContacts.contains(searchQuery)) setSnackBar(R.string.addUnknownRecipientAlreadyUsed) else onAddUnrecognizedContact()
+            if (usedContacts.contains(searchQuery)) {
+                snackBarManager.setValue(context.getString(R.string.addUnknownRecipientAlreadyUsed))
+            } else {
+                onAddUnrecognizedContact()
+            }
         }
     }
 

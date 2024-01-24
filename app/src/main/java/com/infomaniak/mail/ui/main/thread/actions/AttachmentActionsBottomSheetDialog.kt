@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023 Infomaniak Network SA
+ * Copyright (C) 2023-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.databinding.BottomSheetAttachmentActionsBinding
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.main.SnackBarManager
 import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntentType
 import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntentType.OPEN_WITH
 import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntentType.SAVE_TO_DRIVE
@@ -52,6 +53,9 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
     @Inject
     lateinit var permissionUtils: PermissionUtils
+
+    @Inject
+    lateinit var snackBarManager: SnackBarManager
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetAttachmentActionsBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -76,7 +80,7 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
             if (attachment.openWithIntent(context).hasSupportedApplications(context)) {
                 attachment.executeIntent(OPEN_WITH)
             } else {
-                mainViewModel.snackBarManager.setValue(getString(RCore.string.errorNoSupportingAppFound))
+                snackBarManager.setValue(getString(RCore.string.errorNoSupportingAppFound))
             }
         }
         kDriveItem.setClosingOnClickListener {

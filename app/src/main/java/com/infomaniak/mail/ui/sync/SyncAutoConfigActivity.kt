@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023 Infomaniak Network SA
+ * Copyright (C) 2023-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,9 @@ import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ActivitySyncAutoConfigBinding
 import com.infomaniak.mail.ui.BaseActivity
+import com.infomaniak.mail.ui.main.SnackBarManager
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class SyncAutoConfigActivity : BaseActivity() {
@@ -36,6 +38,9 @@ class SyncAutoConfigActivity : BaseActivity() {
         (supportFragmentManager.findFragmentById(R.id.syncAutoConfigHostFragment) as NavHostFragment).navController
     }
 
+    @Inject
+    lateinit var snackBarManager: SnackBarManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -44,7 +49,7 @@ class SyncAutoConfigActivity : BaseActivity() {
     }
 
     private fun setupSnackBar() {
-        syncAutoConfigViewModel.snackBarManager.setup(view = binding.root, activity = this)
+        snackBarManager.setup(view = binding.root, activity = this)
     }
 
     private fun setupNavController() {
