@@ -189,7 +189,7 @@ class ThreadViewModel @Inject constructor(
         }
     }
 
-    fun fetchCalendarEvents(messages: List<Message>, currentMailboxUuid: String) {
+    fun fetchCalendarEvents(messages: List<Message>) {
         fetchCalendarEvent?.cancel()
         fetchCalendarEvent = viewModelScope.launch(ioCoroutineContext) {
             mailboxContentRealm().writeBlocking {

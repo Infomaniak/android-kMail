@@ -335,9 +335,8 @@ class ThreadFragment : Fragment() {
 
             threadViewModel.fetchMessagesHeavyData(messages)
 
-            val currentMailboxUuid = mainViewModel.currentMailbox.value!!.uuid
             if (threadViewModel.getCalendarEventTreatedMessageCount() != messages.count()) {
-                threadViewModel.fetchCalendarEvents(messages, currentMailboxUuid)
+                threadViewModel.fetchCalendarEvents(messages)
             }
         }
     }
