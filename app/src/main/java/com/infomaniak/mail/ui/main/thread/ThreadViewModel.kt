@@ -28,6 +28,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
+import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
@@ -192,6 +193,27 @@ class ThreadViewModel @Inject constructor(
         }
     }
 
+    fun deleteDraft(message: Message, mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
+        val realm = mailboxContentRealm()
+        val thread = threadLive.value ?: return@launch
+        val messages = messageController.getMessageAndDuplicates(thread, message)
+        val isSuccess = ApiRepository.deleteMessages(mailbox.uuid, messages.getUids()).isSuccess()
+        if (isSuccess) {
+            refreshController.refreshThreads(
+                refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
+                mailbox = mailbox,
+                folder = message.folder,
+                realm = realm,
+            )
+        }
+    }
+
+    fun clickOnQuickActionBar(menuId: Int) = viewModelScope.launch(ioCoroutineContext) {
+        val thread = threadLive.value ?: return@launch
+        val message = messageController.getLastMessageToExecuteAction(thread)
+        quickActionBarClicks.postValue(QuickActionBarResult(thread.uid, message, menuId))
+    }
+
     fun fetchCalendarEvents(messages: List<Message>) {
         fetchCalendarEventJob?.cancel()
         fetchCalendarEventJob = viewModelScope.launch(ioCoroutineContext) {
@@ -240,28 +262,25 @@ class ThreadViewModel @Inject constructor(
         }
     }
 
-    fun deleteDraft(message: Message, mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
-        val realm = mailboxContentRealm()
-        val thread = threadLive.value ?: return@launch
-        val messages = messageController.getMessageAndDuplicates(thread, message)
-        val isSuccess = ApiRepository.deleteMessages(mailbox.uuid, messages.getUids()).isSuccess()
-        if (isSuccess) {
-            refreshController.refreshThreads(
-                refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
-                mailbox = mailbox,
-                folder = message.folder,
-                realm = realm,
-            )
+    fun getCalendarEventTreatedMessageCount(): Int = treatedMessagesForCalendarEvent.count()
+
+    fun replyToCalendarEvent(attendanceState: Attendee.AttendanceState, message: Message) {
+        val calendarEventResponse = message.latestCalendarEventResponse!!
+
+        val response = ApiRepository.replyToCalendarEvent(
+            attendanceState,
+            useInfomaniakCalendarRoute = calendarEventResponse.hasInfomaniakCalendarEventAssociated(),
+            calendarEventId = calendarEventResponse.calendarEvent!!.id,
+            attachmentResource = message.calendarAttachment!!.resource ?: "",
+        )
+
+        if (response.isSuccess()) {
+            fetchCalendarEvents(listOf(message))
+        } else {
+
+            // TODO : Revert clicked button
         }
     }
-
-    fun clickOnQuickActionBar(menuId: Int) = viewModelScope.launch(ioCoroutineContext) {
-        val thread = threadLive.value ?: return@launch
-        val message = messageController.getLastMessageToExecuteAction(thread)
-        quickActionBarClicks.postValue(QuickActionBarResult(thread.uid, message, menuId))
-    }
-
-    fun getCalendarEventTreatedMessageCount(): Int = treatedMessagesForCalendarEvent.count()
 
     data class SubjectDataResult(
         val thread: Thread?,

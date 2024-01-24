@@ -49,6 +49,8 @@ class CalendarEventResponse : EmbeddedRealmObject {
                 && calendarEvent?.iAmInvited == true
     }
 
+    fun hasInfomaniakCalendarEventAssociated(): Boolean = userStoredEvent != null
+
     fun hasUserStoredEvent() = userStoredEvent != null
 
     fun hasAttachmentEvent() = attachmentEvent != null

@@ -76,6 +76,7 @@ class ThreadAdapter(
     navigateToNewMessageActivity: (Uri) -> Unit,
     navigateToAttendeeBottomSheet: (List<Attendee>) -> Unit,
     navigateToDownloadProgressDialog: (Int, Bundle) -> Unit,
+    replyToCalendarEvent: (Attendee.AttendanceState, message: Message) -> Unit,
     promptLink: (String, ContextMenuType) -> Unit,
 ) : ListAdapter<Message, ThreadViewHolder>(MessageDiffCallback()) {
 
@@ -119,6 +120,7 @@ class ThreadAdapter(
             navigateToNewMessageActivity,
             navigateToAttendeeBottomSheet,
             navigateToDownloadProgressDialog,
+            replyToCalendarEvent,
             promptLink,
         )
     }
@@ -186,9 +188,11 @@ class ThreadAdapter(
             isVisible = calendarEvent != null
 
             calendarEvent?.let {
-                val isCanceled = message.latestCalendarEventResponse!!.isCanceled
-                val shouldDisplayReplyOptions = message.latestCalendarEventResponse!!.isReplyAuthorized()
-                loadCalendarEvent(it, isCanceled, shouldDisplayReplyOptions, attachment)
+                val calendarEventResponse = message.latestCalendarEventResponse!!
+                val isCanceled = calendarEventResponse.isCanceled
+                val shouldDisplayReplyOptions = calendarEventResponse.isReplyAuthorized()
+                val hasInfomaniakCalendarEventAssociated = calendarEventResponse.hasInfomaniakCalendarEventAssociated()
+                loadCalendarEvent(it, isCanceled, shouldDisplayReplyOptions, attachment, hasInfomaniakCalendarEventAssociated)
             }
 
             initCallback(
@@ -201,6 +205,9 @@ class ThreadAdapter(
                         attachment.createDownloadDialogNavArgs(AttachmentIntentType.OPEN_WITH),
                     )
                 },
+                replyToCalendarEvent = { attendanceState ->
+                    threadAdapterCallbacks?.replyToCalendarEvent?.invoke(attendanceState, message)
+                }
             )
         }
     }
@@ -686,6 +693,7 @@ class ThreadAdapter(
         var navigateToNewMessageActivity: (Uri) -> Unit,
         var navigateToAttendeeBottomSheet: (List<Attendee>) -> Unit,
         var navigateToDownloadProgressDialog: (Int, Bundle) -> Unit,
+        var replyToCalendarEvent: (Attendee.AttendanceState, message: Message) -> Unit,
         var promptLink: (String, ContextMenuType) -> Unit,
     )
 

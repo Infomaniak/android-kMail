@@ -27,6 +27,7 @@ import androidx.core.view.isVisible
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.data.models.calendar.CalendarEvent
@@ -50,17 +51,22 @@ class CalendarEventBannerView @JvmOverloads constructor(
 
     private val binding by lazy { ViewCalendarEventBannerBinding.inflate(LayoutInflater.from(context), this, true) }
 
+    private var useInfomaniakCalendarRoute: Boolean = false
+    private var calendarEventId: Int = 0
+    private var attachmentResource: String = ""
+
     private var navigateToAttendeesBottomSheet: ((List<Attendee>) -> Unit)? = null
     private var navigateToDownloadProgressDialog: (() -> Unit)? = null
+    private var replyToCalendarEvent: ((Attendee.AttendanceState) -> Unit)? = null
 
     @Inject
     lateinit var snackbarManager: SnackbarManager
 
     init {
         with(binding) {
-            yesButton.handleChoiceButtonBehavior()
-            maybeButton.handleChoiceButtonBehavior()
-            noButton.handleChoiceButtonBehavior()
+            yesButton.handleChoiceButtonBehavior(Attendee.AttendanceState.ACCEPTED)
+            maybeButton.handleChoiceButtonBehavior(Attendee.AttendanceState.TENTATIVE)
+            noButton.handleChoiceButtonBehavior(Attendee.AttendanceState.DECLINED)
 
             attendeesButton.addOnCheckedChangeListener { _, isChecked -> attendeesSubMenu.isVisible = isChecked }
         }
@@ -71,7 +77,16 @@ class CalendarEventBannerView @JvmOverloads constructor(
         isCanceled: Boolean,
         shouldDisplayReplyOptions: Boolean,
         attachment: Attachment,
+        hasInfomaniakCalendarEventAssociated: Boolean,
     ) = with(binding) {
+        useInfomaniakCalendarRoute = hasInfomaniakCalendarEventAssociated
+        calendarEventId = calendarEvent.id
+        attachmentResource = attachment.resource ?: run {
+            // TODO: Check this sentry
+            Sentry.captureMessage("No attachment resource when trying to load calendar event")
+            return@with
+        }
+
         val startDate = calendarEvent.start.toDate()
         val endDate = calendarEvent.end.toDate()
 
@@ -138,16 +153,21 @@ class CalendarEventBannerView @JvmOverloads constructor(
     fun initCallback(
         navigateToAttendeesBottomSheet: (List<Attendee>) -> Unit,
         navigateToDownloadProgressDialog: () -> Unit,
+        replyToCalendarEvent: (Attendee.AttendanceState) -> Unit,
     ) {
         this.navigateToAttendeesBottomSheet = navigateToAttendeesBottomSheet
         this.navigateToDownloadProgressDialog = navigateToDownloadProgressDialog
+        this.replyToCalendarEvent = replyToCalendarEvent
     }
 
-    private fun MaterialButton.handleChoiceButtonBehavior() {
+    private fun MaterialButton.handleChoiceButtonBehavior(attendanceState: Attendee.AttendanceState) {
         setOnClickListener {
-            val changedSelectedButton = isChecked
-            if (changedSelectedButton) resetChoiceButtons()
-            isChecked = true
+            // TODO : Handle click color
+            // val changedSelectedButton = isChecked
+            // if (changedSelectedButton) resetChoiceButtons()
+            // isChecked = true
+
+            replyToCalendarEvent?.invoke(attendanceState)
         }
     }
 

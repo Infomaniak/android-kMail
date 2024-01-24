@@ -50,16 +50,6 @@ object ApiRoutes {
     }
     //endregion
 
-    //region Resource
-    fun resource(resource: String): String {
-        return "${MAIL_API}${resource}"
-    }
-
-    fun calendarEvent(resource: String): String {
-        return "${resource(resource)}?format=render"
-    }
-    //endregion
-
     //region Personal Information Manager
     private fun pim(): String {
         return "$MAIL_API/api/pim"
@@ -75,6 +65,20 @@ object ApiRoutes {
 
     fun contacts(): String {
         return "${contact()}/all?with=emails,details,others,contacted_times&filters=has_email"
+    }
+    //endregion
+
+    //region Calendar
+    fun calendarEvent(resource: String): String {
+        return "${resource(resource)}?format=render"
+    }
+
+    fun infomaniakCalendarEventReply(calendarEventId: Int): String {
+        return "${pim()}/event/$calendarEventId/reply"
+    }
+
+    fun icsCalendarEventReply(resource: String): String {
+        return "${resource(resource)}/reply"
     }
     //endregion
 
@@ -248,5 +252,9 @@ object ApiRoutes {
 
     fun ping(): String {
         return "$MAIL_API/api/ping-with-auth"
+    }
+
+    fun resource(resource: String): String {
+        return "${MAIL_API}${resource}"
     }
 }
