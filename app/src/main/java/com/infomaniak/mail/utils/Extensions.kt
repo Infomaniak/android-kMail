@@ -154,7 +154,8 @@ fun Date.isLastWeek(): Boolean {
 //region UI
 fun Context.isInPortrait(): Boolean = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
 
-fun Fragment.canDisplayBothPanes(): Boolean = requireContext().resources.getBoolean(R.bool.canDisplayBothPanes)
+fun Fragment.canDisplayBothPanes(): Boolean = requireContext().canDisplayBothPanes()
+fun Context.canDisplayBothPanes(): Boolean = resources.getBoolean(R.bool.canDisplayBothPanes)
 
 fun View.toggleChevron(
     isCollapsed: Boolean,
@@ -481,7 +482,7 @@ fun Fragment.setSystemBarsColors(
     navigationBarColor?.let(requireContext()::getColor)?.let(requireActivity().window::updateNavigationBarColor)
 }
 
-fun Window.updateNavigationBarColor(color: Int) {
+fun Window.updateNavigationBarColor(@ColorInt color: Int) {
     if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O) navigationBarColor = color
 }
 
