@@ -403,10 +403,6 @@ fun Context.getInfomaniakLogin() = InfomaniakLogin(
     accessType = null,
 )
 
-fun Window.updateNavigationBarColor(color: Int) {
-    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O) navigationBarColor = color
-}
-
 fun Fragment.copyRecipientEmailToClipboard(recipient: Recipient, snackbarManager: SnackbarManager) {
     requireContext().copyStringToClipboard(recipient.email, R.string.snackbarEmailCopiedToClipboard, snackbarManager)
 }

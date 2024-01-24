@@ -60,6 +60,7 @@ import kotlinx.coroutines.launch
 class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
 
     private var _binding: FragmentMenuDrawerBinding? = null
+    private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
     private val menuDrawerViewModel: MenuDrawerViewModel by viewModels()
 
     var exitDrawer: (() -> Unit)? = null
