@@ -92,7 +92,7 @@ object ApiRoutes {
     }
 
     fun mailboxes(): String {
-        return "${mailbox()}?with=aliases,unseen"
+        return "${mailbox()}?with=aliases,external_mail_flag_enabled,unseen"
     }
 
     fun permissions(linkId: Int, mailboxHostingId: Int): String {
