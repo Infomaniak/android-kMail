@@ -185,6 +185,7 @@ abstract class TwoPaneFragment : Fragment() {
         childFragmentManager.beginTransaction().replace(R.id.threadHostFragment, ThreadFragment()).commit()
     }
 
+    // TODO: When we'll add the feature of swiping between Threads, we'll need to check if this function is still needed.
     private fun updateDrawerLockMode() {
         if (this is ThreadListFragment) {
             (requireActivity() as MainActivity).setDrawerLockMode(isLocked = twoPaneViewModel.isThreadOpen && !canDisplayBothPanes())
