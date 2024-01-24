@@ -437,9 +437,29 @@ class MainActivity : BaseActivity() {
         SentryDebug.addNavigationBreadcrumb(destination.displayName, arguments)
         trackDestination(destination)
 
+        updateColorsWhenDestinationChanged()
         setDrawerLockMode(isLocked = destination.id != R.id.threadListFragment)
 
         previousDestinationId = destination.id
+    }
+
+    private fun updateColorsWhenDestinationChanged() {
+        when (previousDestinationId) {
+            R.id.threadActionsBottomSheetDialog,
+            R.id.messageActionsBottomSheetDialog,
+            R.id.replyBottomSheetDialog,
+            R.id.detailedContactBottomSheetDialog -> {
+                val fragment = currentFragment
+                if (fragment is TwoPaneFragment) {
+                    val navigationBarColor = if (fragment.isThreadOpen() && !canDisplayBothPanes()) {
+                        R.color.elevatedBackground
+                    } else {
+                        R.color.backgroundColor
+                    }
+                    window.updateNavigationBarColor(getColor(navigationBarColor))
+                }
+            }
+        }
     }
 
     fun setDrawerLockMode(isLocked: Boolean) {
