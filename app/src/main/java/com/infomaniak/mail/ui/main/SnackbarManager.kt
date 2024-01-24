@@ -39,9 +39,9 @@ class SnackbarManager @Inject constructor() {
         activity: FragmentActivity,
         getAnchor: (() -> View?)? = null,
         onUndoData: ((data: UndoData) -> Unit)? = null,
-    ) {
-        snackbarFeedback.removeObservers(activity)
-        snackbarFeedback.observe(activity) { (title, undoData, buttonTitleRes, customBehavior) ->
+    ) = with(snackbarFeedback) {
+        removeObservers(activity)
+        observe(activity) { (title, undoData, buttonTitleRes, customBehavior) ->
             val action: (() -> Unit)? = if (undoData != null) {
                 { onUndoData?.invoke(undoData) }
             } else {
