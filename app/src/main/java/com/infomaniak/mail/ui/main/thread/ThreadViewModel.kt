@@ -28,6 +28,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
+import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
@@ -35,7 +36,9 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.MessageBodyUtils.SplitBody
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.realm.kotlin.MutableRealm
 import io.sentry.Sentry
+import io.sentry.SentryLevel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -204,20 +207,37 @@ class ThreadViewModel @Inject constructor(
 
                     val icsAttachment = icsAttachments.single()
 
-                    val calendarEventResponse = icsAttachment.resource?.let { resource ->
+                    val apiResponse = icsAttachment.resource?.let { resource ->
                         ApiRepository.getAttachmentCalendarEvent(resource)
                     } ?: return@forEach
 
-                    if (calendarEventResponse.isSuccess()) {
-                        messageController.updateCalendarEvent(message.uid, calendarEventResponse.data!!, realm = this)
+                    if (apiResponse.isSuccess()) {
+                        updateCalendarEvent(message, apiResponse.data!!)
                     } else {
                         Sentry.withScope { scope ->
                             scope.setExtra("ics attachment mimeType", icsAttachment.mimeType)
                             scope.setExtra("ics attachment size", icsAttachment.size.toString())
-                            scope.setExtra("error code", calendarEventResponse.error?.code.toString())
+                            scope.setExtra("error code", apiResponse.error?.code.toString())
                             Sentry.captureMessage("Failed loading calendar event")
                         }
                     }
+                }
+            }
+        }
+    }
+
+    private fun MutableRealm.updateCalendarEvent(message: Message, calendarEventResponse: CalendarEventResponse) {
+        MessageController.updateMessage(message.uid, realm = this) { localMessage ->
+            localMessage?.let {
+                it.latestCalendarEventResponse = calendarEventResponse
+            } ?: run {
+                Sentry.withScope { scope ->
+                    scope.level = SentryLevel.ERROR
+                    scope.setExtra("message.uid", message.uid)
+                    scope.setExtra("event has userStoredEvent", calendarEventResponse.hasUserStoredEvent().toString())
+                    scope.setExtra("event's userStoredEventDeleted", calendarEventResponse.isUserStoredEventDeleted.toString())
+                    scope.setExtra("event has attachmentEvent", calendarEventResponse.hasAttachmentEvent().toString())
+                    Sentry.captureMessage("Cannot find message by uid for fetched calendar event inside Realm")
                 }
             }
         }

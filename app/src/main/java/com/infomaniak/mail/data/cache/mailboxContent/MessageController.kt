@@ -144,21 +144,6 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
     fun deleteSearchMessages(realm: MutableRealm) = with(realm) {
         delete(query<Message>("${Message::isFromSearch.name} == true").find())
     }
-
-    fun updateCalendarEvent(messageUid: String, calendarEventResponse: CalendarEventResponse, realm: MutableRealm) {
-        getMessage(messageUid, realm)?.let { message ->
-            message.latestCalendarEventResponse = calendarEventResponse
-        } ?: run {
-            Sentry.withScope { scope ->
-                scope.level = SentryLevel.ERROR
-                scope.setExtra("messageUid", messageUid)
-                scope.setExtra("event has userStoredEvent", calendarEventResponse.hasUserStoredEvent().toString())
-                scope.setExtra("event's userStoredEventDeleted", calendarEventResponse.isUserStoredEventDeleted.toString())
-                scope.setExtra("event has attachmentEvent", calendarEventResponse.hasAttachmentEvent().toString())
-                Sentry.captureMessage("Cannot find message by uid for fetched calendar event inside Realm")
-            }
-        }
-    }
     //endregion
 
     companion object {
@@ -211,6 +196,10 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
         //region Edit data
         fun upsertMessage(message: Message, realm: MutableRealm) {
             realm.copyToRealm(message, UpdatePolicy.ALL)
+        }
+
+        fun updateMessage(messageUid: String, realm: MutableRealm, onUpdate: (Message?) -> Unit) {
+            onUpdate(getMessage(messageUid, realm))
         }
 
         fun deleteMessage(message: Message, realm: MutableRealm) {
