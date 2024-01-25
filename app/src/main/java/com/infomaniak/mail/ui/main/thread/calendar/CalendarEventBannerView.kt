@@ -45,8 +45,6 @@ class CalendarEventBannerView @JvmOverloads constructor(
 
     private val binding by lazy { ViewCalendarEventBannerBinding.inflate(LayoutInflater.from(context), this, true) }
 
-    private val allDayLong by lazy { context.getString(R.string.calendarAllDayLong) }
-
     private var navigateToAttendeesBottomSheet: ((List<Attendee>) -> Unit)? = null
 
     init {
@@ -98,13 +96,13 @@ class CalendarEventBannerView @JvmOverloads constructor(
                 "${startDate.formatFullDate()}\n${startDate.formatShortHour()} - ${displayEndDate.formatShortHour()}"
             }
             isSameDay && isFullDay -> {
-                "${startDate.formatFullDate()}\n$allDayLong"
+                "${startDate.formatFullDate()}\n${context.getString(R.string.calendarAllDayLong)}"
             }
             !isSameDay && !isFullDay -> {
                 "${startDate.formatDateAndHour()} -\n${displayEndDate.formatDateAndHour()}"
             }
             else -> {
-                "${startDate.formatMediumDate()} - ${displayEndDate.formatMediumDate()}\n$allDayLong"
+                "${startDate.formatMediumDate()} - ${displayEndDate.formatMediumDate()}\n${context.getString(R.string.calendarAllDayLong)}"
             }
         }
     }
