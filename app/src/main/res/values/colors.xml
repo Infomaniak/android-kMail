@@ -101,7 +101,6 @@
     <color name="backgroundColorTertiary">@color/white</color>
     <color name="backgroundHeaderColor">@color/header_color_light</color>
     <color name="backgroundLoginWebviewColor">@color/background</color>
-    <color name="backgroundOnBoardingColor">@color/white</color>
     <color name="backgroundSnackbarColor">@color/orca</color>
     <color name="elevatedBackground">@color/swan</color>
     <color name="backgroundDisabledPrimaryButton">@color/shark</color>
@@ -109,6 +108,7 @@
     <color name="informationBlockBackground">@color/polar_bear</color>
     <color name="tabletSelectedBackground">@color/mouse</color>
 
+    <color name="backgroundOnBoardingColor">@color/backgroundColor</color>
     <color name="menuDrawerBackgroundColor">@color/backgroundColorSecondary</color>
     <color name="newMessageBackgroundColor">@color/backgroundColor</color>
     <color name="toolbarLoweredColor">@color/backgroundColor</color>
