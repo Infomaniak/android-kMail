@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2023 Infomaniak Network SA
+  ~ Copyright (C) 2023-2024 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -36,5 +36,18 @@
         android:name="com.infomaniak.mail.ui.login.NewAccountFragment"
         android:label="NewAccountFragment"
         tools:layout="@layout/fragment_new_account" />
+
+    <fragment
+        android:id="@+id/introFragment"
+        android:name="com.infomaniak.mail.ui.login.IntroFragment"
+        android:label="IntroFragment"
+        tools:layout="@layout/fragment_intro">
+        <argument
+            android:name="isFirstAccount"
+            app:argType="boolean" />
+        <argument
+            android:name="position"
+            app:argType="integer" />
+    </fragment>
 
 </navigation>
