@@ -32,7 +32,7 @@ import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.data.models.calendar.CalendarEvent
 import com.infomaniak.mail.databinding.ViewCalendarEventBannerBinding
 import com.infomaniak.mail.ui.main.SnackbarManager
-import com.infomaniak.mail.utils.AttachmentIntentUtils
+import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntentType
 import com.infomaniak.mail.utils.AttachmentIntentUtils.openAttachment
 import com.infomaniak.mail.utils.UiUtils.getPrettyNameAndEmail
 import com.infomaniak.mail.utils.toDate
@@ -53,7 +53,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
     private val binding by lazy { ViewCalendarEventBannerBinding.inflate(LayoutInflater.from(context), this, true) }
 
     private var navigateToAttendeesBottomSheet: ((List<Attendee>) -> Unit)? = null
-    private var navigateToDownloadProgressDialog: ((AttachmentIntentUtils.AttachmentIntentType) -> Unit)? = null
+    private var navigateToDownloadProgressDialog: ((AttachmentIntentType) -> Unit)? = null
 
     @Inject
     lateinit var snackbarManager: SnackbarManager
@@ -135,7 +135,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
 
     fun initCallback(
         navigateToAttendeesBottomSheet: (List<Attendee>) -> Unit,
-        navigateToDownloadProgressDialog: (AttachmentIntentUtils.AttachmentIntentType) -> Unit,
+        navigateToDownloadProgressDialog: (AttachmentIntentType) -> Unit,
     ) {
         this.navigateToAttendeesBottomSheet = navigateToAttendeesBottomSheet
         this.navigateToDownloadProgressDialog = navigateToDownloadProgressDialog

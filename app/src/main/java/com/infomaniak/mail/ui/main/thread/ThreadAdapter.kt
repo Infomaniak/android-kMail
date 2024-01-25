@@ -47,6 +47,7 @@ import com.infomaniak.mail.data.models.message.Message.*
 import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.*
 import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntentType
 import com.infomaniak.mail.utils.AttachmentIntentUtils.createDownloadDialogNavArgs
 import com.infomaniak.mail.utils.SharedUtils.Companion.createHtmlForPlainText
 import com.infomaniak.mail.utils.UiUtils.getPrettyNameAndEmail
@@ -196,9 +197,9 @@ class ThreadAdapter(
                 navigateToDownloadProgressDialog = {
                     threadAdapterCallbacks?.navigateToDownloadProgressDialog?.invoke(
                         R.id.downloadAttachmentProgressDialog,
-                        attachment.createDownloadDialogNavArgs(AttachmentIntentUtils.AttachmentIntentType.OPEN_WITH),
+                        attachment.createDownloadDialogNavArgs(AttachmentIntentType.OPEN_WITH),
                     )
-                }
+                },
             )
         }
     }
