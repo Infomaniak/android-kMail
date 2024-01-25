@@ -434,7 +434,7 @@ class MainActivity : BaseActivity() {
         trackDestination(destination)
 
         updateColorsWhenDestinationChanged(destination.id)
-        setDrawerLockMode(destination.id == R.id.threadListFragment)
+        setDrawerLockMode(isLocked = destination.id != R.id.threadListFragment)
 
         previousDestinationId = destination.id
     }
@@ -468,8 +468,8 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    fun setDrawerLockMode(isUnlocked: Boolean) {
-        val drawerLockMode = if (isUnlocked) DrawerLayout.LOCK_MODE_UNLOCKED else DrawerLayout.LOCK_MODE_LOCKED_CLOSED
+    fun setDrawerLockMode(isLocked: Boolean) {
+        val drawerLockMode = if (isLocked) DrawerLayout.LOCK_MODE_LOCKED_CLOSED else DrawerLayout.LOCK_MODE_UNLOCKED
         binding.drawerLayout.setDrawerLockMode(drawerLockMode)
     }
 
