@@ -29,7 +29,7 @@ class CalendarEventResponse : EmbeddedRealmObject {
     @SerialName("user_stored_event")
     private var userStoredEvent: CalendarEvent? = null
     @SerialName("user_stored_event_deleted")
-    var userStoredEventDeleted: Boolean = false
+    var isUserStoredEventDeleted: Boolean = false
     @SerialName("attachment_event")
     private var attachmentEvent: CalendarEvent? = null
     @SerialName("attachment_event_method")
@@ -52,16 +52,18 @@ class CalendarEventResponse : EmbeddedRealmObject {
         other as CalendarEventResponse
 
         if (userStoredEvent != other.userStoredEvent) return false
-        if (userStoredEventDeleted != other.userStoredEventDeleted) return false
+        if (isUserStoredEventDeleted != other.isUserStoredEventDeleted) return false
         if (attachmentEvent != other.attachmentEvent) return false
+
         return _attachmentEventMethod == other._attachmentEventMethod
     }
 
     override fun hashCode(): Int {
         var result = userStoredEvent?.hashCode() ?: 0
-        result = 31 * result + userStoredEventDeleted.hashCode()
+        result = 31 * result + isUserStoredEventDeleted.hashCode()
         result = 31 * result + (attachmentEvent?.hashCode() ?: 0)
         result = 31 * result + (_attachmentEventMethod?.hashCode() ?: 0)
+
         return result
     }
 

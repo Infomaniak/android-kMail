@@ -60,8 +60,8 @@
                 android:drawablePadding="@dimen/marginStandardMedium"
                 android:gravity="center_vertical"
                 android:text="@string/warningEventHasPassed"
-                app:drawableStartCompat="@drawable/ic_warning_big"
-                tools:visibility="gone" />
+                android:visibility="gone"
+                app:drawableStartCompat="@drawable/ic_warning_big" />
 
             <TextView
                 android:id="@+id/canceledEventWarning"
@@ -73,8 +73,10 @@
                 android:drawablePadding="@dimen/marginStandardMedium"
                 android:gravity="center_vertical"
                 android:text="@string/warningEventIsCancelled"
+                android:visibility="gone"
                 app:drawableStartCompat="@drawable/ic_warning_big"
-                app:drawableTint="@color/redDestructiveAction" />
+                app:drawableTint="@color/redDestructiveAction"
+                tools:visibility="visible" />
 
         </FrameLayout>
 

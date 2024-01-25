@@ -58,7 +58,7 @@ class ThreadViewModel @Inject constructor(
     private var threadLiveJob: Job? = null
     private var messagesLiveJob: Job? = null
     private var fetchMessagesJob: Job? = null
-    private var fetchCalendarEvent: Job? = null
+    private var fetchCalendarEventJob: Job? = null
 
     val quickActionBarClicks = SingleLiveEvent<QuickActionBarResult>()
 
@@ -190,8 +190,8 @@ class ThreadViewModel @Inject constructor(
     }
 
     fun fetchCalendarEvents(messages: List<Message>) {
-        fetchCalendarEvent?.cancel()
-        fetchCalendarEvent = viewModelScope.launch(ioCoroutineContext) {
+        fetchCalendarEventJob?.cancel()
+        fetchCalendarEventJob = viewModelScope.launch(ioCoroutineContext) {
             mailboxContentRealm().writeBlocking {
                 messages.forEach { message ->
                     if (!message.isFullyDownloaded()) return@forEach // Only treat message that have their attachments downloaded
@@ -244,9 +244,7 @@ class ThreadViewModel @Inject constructor(
         quickActionBarClicks.postValue(QuickActionBarResult(thread.uid, message, menuId))
     }
 
-    fun getCalendarEventTreatedMessageCount(): Int {
-        return treatedMessagesForCalendarEvent.count()
-    }
+    fun getCalendarEventTreatedMessageCount(): Int = treatedMessagesForCalendarEvent.count()
 
     data class SubjectDataResult(
         val thread: Thread?,

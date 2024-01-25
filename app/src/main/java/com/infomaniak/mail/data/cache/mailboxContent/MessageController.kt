@@ -153,7 +153,7 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
                 scope.level = SentryLevel.ERROR
                 scope.setExtra("messageUid", messageUid)
                 scope.setExtra("event has userStoredEvent", calendarEventResponse.hasUserStoredEvent().toString())
-                scope.setExtra("event's userStoredEventDeleted", calendarEventResponse.userStoredEventDeleted.toString())
+                scope.setExtra("event's userStoredEventDeleted", calendarEventResponse.isUserStoredEventDeleted.toString())
                 scope.setExtra("event has attachmentEvent", calendarEventResponse.hasAttachmentEvent().toString())
                 Sentry.captureMessage("Cannot find message by uid for fetched calendar event inside Realm")
             }

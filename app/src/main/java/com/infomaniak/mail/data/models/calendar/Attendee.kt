@@ -38,9 +38,9 @@ class Attendee() : EmbeddedRealmObject, Correspondent {
     override var email: String = ""
     override var name: String = ""
     @SerialName("organizer")
-    var isOrganizer = false
+    var isOrganizer: Boolean = false
     @SerialName("state")
-    private var _state = ""
+    private var _state: String = ""
     //endregion
 
     val state get() = AttendanceState.entries.firstOrNull { it.apiValue == _state } ?: AttendanceState.NEEDS_ACTION
@@ -48,12 +48,7 @@ class Attendee() : EmbeddedRealmObject, Correspondent {
     @delegate:Ignore
     override val initials by lazy { computeInitials() }
 
-    constructor(
-        email: String,
-        name: String,
-        isOrganizer: Boolean,
-        state: String,
-    ) : this() {
+    constructor(email: String, name: String, isOrganizer: Boolean, state: String) : this() {
         this.email = email
         this.name = name
         this.isOrganizer = isOrganizer
@@ -76,6 +71,7 @@ class Attendee() : EmbeddedRealmObject, Correspondent {
         if (email != other.email) return false
         if (name != other.name) return false
         if (isOrganizer != other.isOrganizer) return false
+
         return _state == other._state
     }
 
@@ -84,24 +80,25 @@ class Attendee() : EmbeddedRealmObject, Correspondent {
         result = 31 * result + name.hashCode()
         result = 31 * result + isOrganizer.hashCode()
         result = 31 * result + _state.hashCode()
+
         return result
     }
 
     companion object : Parceler<Attendee> {
-        override fun create(parcel: Parcel): Attendee {
-            val email = parcel.readString()!!
-            val name = parcel.readString()!!
-            val isOrganizer = parcel.customReadBoolean()
-            val state = parcel.readString()!!
+        override fun create(parcel: Parcel): Attendee = with(parcel) {
+            val email = readString()!!
+            val name = readString()!!
+            val isOrganizer = customReadBoolean()
+            val state = readString()!!
 
             return Attendee(email, name, isOrganizer, state)
         }
 
-        override fun Attendee.write(parcel: Parcel, flags: Int) {
-            parcel.writeString(email)
-            parcel.writeString(name)
-            parcel.customWriteBoolean(isOrganizer)
-            parcel.writeString(_state)
+        override fun Attendee.write(parcel: Parcel, flags: Int) = with(parcel) {
+            writeString(email)
+            writeString(name)
+            customWriteBoolean(isOrganizer)
+            writeString(_state)
         }
 
         private fun Parcel.customWriteBoolean(value: Boolean) {

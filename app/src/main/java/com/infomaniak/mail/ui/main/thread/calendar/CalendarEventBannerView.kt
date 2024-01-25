@@ -55,9 +55,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
             maybeButton.handleChoiceButtonBehavior()
             noButton.handleChoiceButtonBehavior()
 
-            attendeesButton.addOnCheckedChangeListener { _, isChecked ->
-                attendeesSubMenu.isVisible = isChecked
-            }
+            attendeesButton.addOnCheckedChangeListener { _, isChecked -> attendeesSubMenu.isVisible = isChecked }
         }
     }
 

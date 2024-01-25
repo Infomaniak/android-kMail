@@ -179,7 +179,7 @@ class ThreadAdapter(
             isVisible = calendarEvent != null
 
             calendarEvent?.let {
-                val hasBeenDeleted = message.latestCalendarEventResponse!!.userStoredEventDeleted
+                val hasBeenDeleted = message.latestCalendarEventResponse!!.isUserStoredEventDeleted
                 loadCalendarEvent(it, hasBeenDeleted)
             }
 

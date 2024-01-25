@@ -67,6 +67,7 @@ class CalendarEvent : EmbeddedRealmObject {
         if (timezone != other.timezone) return false
         if (timezoneStart != other.timezoneStart) return false
         if (timezoneEnd != other.timezoneEnd) return false
+
         return attendees == other.attendees
     }
 
@@ -82,6 +83,7 @@ class CalendarEvent : EmbeddedRealmObject {
         result = 31 * result + timezoneStart.hashCode()
         result = 31 * result + timezoneEnd.hashCode()
         result = 31 * result + attendees.hashCode()
+
         return result
     }
 }
