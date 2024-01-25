@@ -34,6 +34,8 @@ import java.util.Date
 @Serializable
 class CalendarEvent : EmbeddedRealmObject {
 
+    /** Don't forget to update equals() and hashCode() if a field is added */
+
     //region Remote data
     var type: String = ""
     var title: String = ""
@@ -50,6 +52,8 @@ class CalendarEvent : EmbeddedRealmObject {
     private var timezoneEnd: String = ""
     var attendees: RealmList<Attendee> = realmListOf()
     //endregion
+
+    /** Don't forget to update equals() and hashCode() if a field is added */
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
