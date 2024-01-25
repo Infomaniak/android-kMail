@@ -82,6 +82,7 @@ function normalizeElementWidths(elements, webViewWidth, messageUid) {
             reportOverScroll(document.documentElement.clientWidth, document.documentElement.scrollWidth, messageUid);
         }
     }
+    webviewFinishedLoading();
 }
 
 /**

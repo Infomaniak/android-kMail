@@ -23,12 +23,12 @@ import android.content.ClipDescription
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
-import android.text.*
+import android.text.InputFilter
+import android.text.Spanned
 import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewGroup.*
 import android.webkit.WebView
 import android.widget.ListPopupWindow
 import android.widget.PopupWindow
@@ -44,15 +44,19 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
-import com.infomaniak.lib.core.utils.*
+import com.infomaniak.lib.core.utils.FilePicker
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
+import com.infomaniak.lib.core.utils.isNightModeEnabled
+import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.LocalSettings.*
+import com.infomaniak.mail.data.LocalSettings.ExternalContent
 import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition.INLINE
-import com.infomaniak.mail.data.models.draft.Draft.*
+import com.infomaniak.mail.data.models.draft.Draft.DraftAction
+import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.MainActivity
@@ -61,14 +65,12 @@ import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.destroyAndClearHistory
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
-import kotlinx.coroutines.*
 import java.util.UUID
 import javax.inject.Inject
 
@@ -385,7 +387,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun WebView.loadContent(html: String, webViewGroup: Group) {
-        val processedHtml = webViewUtils.processHtmlForDisplay(html, context.isNightModeEnabled())
+        val processedHtml = webViewUtils.processHtmlForDisplay(html = html, isDisplayedInDarkMode = context.isNightModeEnabled())
         loadProcessedContent(processedHtml, webViewGroup)
     }
 

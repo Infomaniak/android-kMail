@@ -25,6 +25,7 @@ import android.webkit.WebView
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomDarkMode
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getFixStyleScript
@@ -44,18 +45,28 @@ class WebViewUtils(context: Context) {
     private val fixStyleScript by lazy { context.getFixStyleScript() }
     private val jsBridgeScript by lazy { context.getJsBridgeScript() }
 
-    fun processHtmlForDisplay(html: String, isDisplayedInDarkMode: Boolean): String = with(HtmlFormatter(html)) {
-        addCommonDisplayContent(isDisplayedInDarkMode)
+    fun processHtmlForDisplay(
+        context: Context? = null,
+        html: String,
+        isDisplayedInDarkMode: Boolean,
+        message: Message? = null,
+        isForPrinting: Boolean = false
+    ): String = with(HtmlFormatter(context = context, html = html, message = message)) {
+        addCommonDisplayContent(isDisplayedInDarkMode, isForPrinting)
         return@with inject()
     }
 
-    fun processSignatureHtmlForDisplay(html: String, isDisplayedInDarkMode: Boolean): String = with(HtmlFormatter(html)) {
-        addCommonDisplayContent(isDisplayedInDarkMode)
+    fun processSignatureHtmlForDisplay(
+        html: String,
+        isDisplayedInDarkMode: Boolean,
+        isForPrinting: Boolean = false
+    ): String = with(HtmlFormatter(html = html)) {
+        addCommonDisplayContent(isDisplayedInDarkMode, isForPrinting)
         registerCss(signatureVerticalMargin)
         return@with inject()
     }
 
-    private fun HtmlFormatter.addCommonDisplayContent(isDisplayedInDarkMode: Boolean) {
+    private fun HtmlFormatter.addCommonDisplayContent(isDisplayedInDarkMode: Boolean, isForPrint: Boolean) {
         if (isDisplayedInDarkMode) registerCss(customDarkMode, DARK_BACKGROUND_STYLE_ID)
         registerCss(improveRenderingStyle)
         registerCss(customStyle)
@@ -65,9 +76,15 @@ class WebViewUtils(context: Context) {
         registerScript(jsBridgeScript)
         registerBodyEncapsulation()
         registerBreakLongWords()
+        if (isForPrint) registerIsForPrint()
     }
 
-    class JavascriptBridge {
+    class JavascriptBridge(private val onWebViewFinishedLoading: (() -> Unit)? = null) {
+
+        @JavascriptInterface
+        fun webviewFinishedLoading() {
+            onWebViewFinishedLoading?.invoke()
+        }
 
         @JavascriptInterface
         fun reportOverScroll(clientWidth: Int, scrollWidth: Int, messageUid: String) {
@@ -100,7 +117,11 @@ class WebViewUtils(context: Context) {
 
     companion object {
         private const val DARK_BACKGROUND_STYLE_ID = "dark_background_style"
-        val jsBridge = JavascriptBridge() // TODO: Avoid excessive memory consumption with injection
+        var jsBridge: JavascriptBridge? = null // TODO: Avoid excessive memory consumption with injection
+
+        fun initJavascriptBridge(onWebViewFinishedLoading: (() -> Unit)? = null) {
+            jsBridge = JavascriptBridge(onWebViewFinishedLoading = onWebViewFinishedLoading)
+        }
 
         fun WebSettings.setupThreadWebViewSettings() {
             @SuppressLint("SetJavaScriptEnabled")

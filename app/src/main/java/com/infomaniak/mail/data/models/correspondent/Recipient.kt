@@ -74,6 +74,8 @@ open class Recipient : EmbeddedRealmObject, Correspondent {
         return isUnknownContact && !isMailerDaemon && isUntrustedDomain && !isAlias
     }
 
+    fun quotedDisplay(): String = "${("$name ").ifBlank { "" }}<$email>"
+
     override fun toString(): String = "($email -> $name)"
 
     override fun equals(other: Any?) = other === this || (other is Recipient && other.email == email && other.name == name)

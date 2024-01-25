@@ -17,11 +17,19 @@
  */
 package com.infomaniak.mail.ui.main.thread.actions
 
+import android.content.Context
 import android.os.Bundle
+import android.os.CancellationSignal
+import android.os.ParcelFileDescriptor
+import android.print.PageRange
+import android.print.PrintAttributes
+import android.print.PrintDocumentAdapter
+import android.print.PrintManager
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.isNightModeEnabled
+import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_DELETE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_FAVORITE_NAME
@@ -38,6 +46,7 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.menu.MoveFragmentArgs
+import com.infomaniak.mail.ui.main.thread.PrintMailFragmentArgs
 import com.infomaniak.mail.utils.animatedNavigation
 import com.infomaniak.mail.utils.deleteWithConfirmationPopup
 import com.infomaniak.mail.utils.notYetImplemented
@@ -59,7 +68,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(navigationArgs) {
         super.onViewCreated(view, savedInstanceState)
-
+        binding.print.isVisible = true
         mainViewModel.getMessage(messageUid).observe(viewLifecycleOwner) { message ->
 
             folderRole = mainViewModel.getActionFolderRole(message)
@@ -151,7 +160,11 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
                 override fun onPrint() {
                     trackBottomSheetMessageActionsEvent(ACTION_PRINT_NAME)
-                    notYetImplemented()
+                    safeNavigate(
+                        resId = R.id.printMailFragment,
+                        args = PrintMailFragmentArgs(threadUid, messageUid).toBundle(),
+                        currentClassName = MessageActionsBottomSheetDialog::class.java.name
+                    )
                 }
 
                 override fun onReportDisplayProblem() {

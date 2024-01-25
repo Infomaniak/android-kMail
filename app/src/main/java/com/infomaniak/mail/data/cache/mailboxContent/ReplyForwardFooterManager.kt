@@ -119,8 +119,6 @@ class ReplyForwardFooterManager @Inject constructor(private val appContext: Cont
         } ?: previousBody
     }
 
-    private fun Recipient.quotedDisplay(): String = "${("$name ").ifBlank { "" }}<$email>"
-
     private fun assembleForwardHtmlFooter(
         message: Message,
         previousFullBody: String,

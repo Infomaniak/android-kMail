@@ -21,18 +21,25 @@ import android.content.Context
 import androidx.annotation.RawRes
 import com.infomaniak.html.cleaner.HtmlSanitizer
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.message.Message
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
 import com.google.android.material.R as RMaterial
 
-class HtmlFormatter(private val html: String) {
+class HtmlFormatter(
+    private val context: Context? = null,
+    private val html: String,
+    private val message: Message? = null
+) {
+
     private val cssList = mutableListOf<Pair<String, String?>>()
     private val scripts = mutableListOf<String>()
     private var needsMetaViewport = false
     private var needsBodyEncapsulation = false
     private var breakLongWords = false
+    private var isForPrint = false
 
     fun registerCss(css: String, styleId: String? = null) {
         cssList.add(css to styleId)
@@ -54,6 +61,10 @@ class HtmlFormatter(private val html: String) {
         breakLongWords = true
     }
 
+    fun registerIsForPrint() {
+        isForPrint = true
+    }
+
     fun inject(): String = with(HtmlSanitizer.getInstance().sanitize(Jsoup.parse(html))) {
         outputSettings().prettyPrint(true)
         head().apply {
@@ -61,6 +72,8 @@ class HtmlFormatter(private val html: String) {
             injectMetaViewPort()
             injectScript()
         }
+
+        if (isForPrint && context != null) message?.let { MessageBodyUtils.addPrintHeader(context, it, this) }
 
         if (breakLongWords) body().breakLongStrings()
 
