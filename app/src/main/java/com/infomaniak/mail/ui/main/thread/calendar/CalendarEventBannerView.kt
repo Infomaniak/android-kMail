@@ -63,7 +63,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
         val startDate = calendarEvent.start.toDate()
         val endDate = calendarEvent.end.toDate()
 
-        setWarnings(startDate, hasBeenDeleted)
+        setWarnings(endDate, hasBeenDeleted)
         eventName.text = calendarEvent.title
         setEventHour(startDate, endDate, calendarEvent.isFullDay)
         eventLocation.apply {
@@ -74,9 +74,9 @@ class CalendarEventBannerView @JvmOverloads constructor(
         setAttendees(calendarEvent.attendees)
     }
 
-    private fun setWarnings(startDate: Date, hasBeenDeleted: Boolean) = with(binding) {
+    private fun setWarnings(endDate: Date, hasBeenDeleted: Boolean) = with(binding) {
         canceledEventWarning.isVisible = hasBeenDeleted
-        pastEventWarning.isVisible = !hasBeenDeleted && startDate > Date()
+        pastEventWarning.isVisible = !hasBeenDeleted && Date() > endDate
     }
 
     private fun setEventHour(startDate: Date, endDate: Date, isFullDay: Boolean) = with(binding) {
