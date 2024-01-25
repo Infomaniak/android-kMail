@@ -85,7 +85,7 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         openWithItem.setClosingOnClickListener {
             trackAttachmentActionsEvent("open")
             attachment.openAttachment(
-                context,
+                context = context,
                 navigateToDownloadProgressDialog = { navigateToDownloadProgressDialog(it) },
                 snackbarManager = snackbarManager
             )
@@ -93,8 +93,8 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         kDriveItem.setClosingOnClickListener {
             trackAttachmentActionsEvent("saveToKDrive")
             attachment.executeIntent(
-                context,
-                SAVE_TO_DRIVE,
+                context = context,
+                intentType = SAVE_TO_DRIVE,
                 navigateToDownloadProgressDialog = { navigateToDownloadProgressDialog(it) },
             )
         }

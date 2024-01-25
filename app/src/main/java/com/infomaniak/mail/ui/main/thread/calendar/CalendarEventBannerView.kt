@@ -53,7 +53,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
     private val binding by lazy { ViewCalendarEventBannerBinding.inflate(LayoutInflater.from(context), this, true) }
 
     private var navigateToAttendeesBottomSheet: ((List<Attendee>) -> Unit)? = null
-    private var navigateToDownloadProgressDialog: (Attachment.(AttachmentIntentUtils.AttachmentIntentType) -> Unit)? = null
+    private var navigateToDownloadProgressDialog: ((AttachmentIntentUtils.AttachmentIntentType) -> Unit)? = null
 
     @Inject
     lateinit var snackbarManager: SnackbarManager
@@ -83,8 +83,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
         setAttendees(calendarEvent.attendees)
 
         addToCalendarButton.setOnClickListener {
-            val navigationCallback = navigateToDownloadProgressDialog ?: return@setOnClickListener
-            attachment.openAttachment(context, navigationCallback, snackbarManager)
+            attachment.openAttachment(context, navigateToDownloadProgressDialog ?: return@setOnClickListener, snackbarManager)
         }
     }
 
@@ -136,7 +135,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
 
     fun initCallback(
         navigateToAttendeesBottomSheet: (List<Attendee>) -> Unit,
-        navigateToDownloadProgressDialog: Attachment.(AttachmentIntentUtils.AttachmentIntentType) -> Unit,
+        navigateToDownloadProgressDialog: (AttachmentIntentUtils.AttachmentIntentType) -> Unit,
     ) {
         this.navigateToAttendeesBottomSheet = navigateToAttendeesBottomSheet
         this.navigateToDownloadProgressDialog = navigateToDownloadProgressDialog

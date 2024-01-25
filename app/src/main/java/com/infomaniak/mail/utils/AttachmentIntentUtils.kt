@@ -58,7 +58,7 @@ object AttachmentIntentUtils {
         }
     }
 
-    fun Attachment.openWithIntent(context: Context): Intent {
+    private fun Attachment.openWithIntent(context: Context): Intent {
         val uri = FileProvider.getUriForFile(context, context.getString(R.string.ATTACHMENTS_AUTHORITY), getCacheFile(context))
         return Intent().apply {
             action = Intent.ACTION_VIEW
@@ -80,7 +80,7 @@ object AttachmentIntentUtils {
     fun Attachment.executeIntent(
         context: Context,
         intentType: AttachmentIntentType,
-        navigateToDownloadProgressDialog: Attachment.(intentType: AttachmentIntentType) -> Unit,
+        navigateToDownloadProgressDialog: (intentType: AttachmentIntentType) -> Unit,
     ) {
         if (hasUsableCache(context) || isInlineCachedFile(context)) {
             getIntentOrGoToPlaystore(context, intentType)?.let(context::startActivity)
@@ -91,7 +91,7 @@ object AttachmentIntentUtils {
 
     fun Attachment.openAttachment(
         context: Context,
-        navigateToDownloadProgressDialog: Attachment.(intentType: AttachmentIntentType) -> Unit,
+        navigateToDownloadProgressDialog: (intentType: AttachmentIntentType) -> Unit,
         snackbarManager: SnackbarManager,
     ) {
         if (openWithIntent(context).hasSupportedApplications(context)) {
