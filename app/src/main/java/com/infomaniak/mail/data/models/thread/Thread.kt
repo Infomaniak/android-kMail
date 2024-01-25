@@ -203,7 +203,7 @@ class Thread : RealmObject {
 
     private fun Date.formatNumericalDayMonthYear(): String {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            formatWithLocal(FormatStyle.SHORT, FormatData.DATE)
+            formatWithLocal(FormatData.DATE, FormatStyle.SHORT)
         } else {
             format(FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR) // Fallback on unambiguous date format for any local
         }

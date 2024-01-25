@@ -101,7 +101,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
                 "${startDate.formatFullDate()}\n$allDayLong"
             }
             !isSameDay && !isFullDay -> {
-                "${startDate.formatMediumDateHour()} -\n${displayEndDate.formatMediumDateHour()}"
+                "${startDate.formatDateAndHour()} -\n${displayEndDate.formatDateAndHour()}"
             }
             else -> {
                 "${startDate.formatMediumDate()} - ${displayEndDate.formatMediumDate()}\n$allDayLong"
@@ -161,9 +161,9 @@ class CalendarEventBannerView @JvmOverloads constructor(
         }
     }
 
-    private fun Date.formatMediumDateHour(): String {
+    private fun Date.formatDateAndHour(): String {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            formatWithLocal(FormatStyle.MEDIUM, FormatData.BOTH)
+            formatWithLocal(FormatData.BOTH, FormatStyle.MEDIUM, FormatStyle.SHORT)
         } else {
             format("$FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR $FORMAT_DATE_HOUR_MINUTE") // Fallback on unambiguous format
         }
@@ -171,7 +171,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
 
     private fun Date.formatMediumDate(): String {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            formatWithLocal(FormatStyle.MEDIUM, FormatData.DATE)
+            formatWithLocal(FormatData.DATE, FormatStyle.MEDIUM)
         } else {
             format(FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR) // Fallback on textual day, day, month, year ordering for everyone
         }
@@ -179,7 +179,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
 
     private fun Date.formatFullDate(): String {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            formatWithLocal(FormatStyle.FULL, FormatData.DATE)
+            formatWithLocal(FormatData.DATE, FormatStyle.FULL)
         } else {
             format(FORMAT_FULL_DATE) // Fallback on day, month, year ordering for everyone
         }
@@ -187,7 +187,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
 
     private fun Date.formatShortHour(): String {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            formatWithLocal(FormatStyle.SHORT, FormatData.HOUR)
+            formatWithLocal(FormatData.HOUR, FormatStyle.SHORT)
         } else {
             format(FORMAT_DATE_HOUR_MINUTE) // Fallback on 24 hours separated by colon format for everyone
         }
