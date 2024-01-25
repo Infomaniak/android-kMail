@@ -159,7 +159,7 @@ fun Date.isLastWeek(): Boolean {
 //region UI
 fun Context.isInPortrait(): Boolean = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
 
-private fun Context.canDisplayBothPanes(): Boolean = resources.getBoolean(R.bool.canDisplayBothPanes)
+fun Context.canDisplayBothPanes(): Boolean = resources.getBoolean(R.bool.canDisplayBothPanes)
 fun Fragment.canDisplayBothPanes(): Boolean = requireContext().canDisplayBothPanes()
 fun Context.canDisplayOnlyOnePane(): Boolean = !canDisplayBothPanes()
 fun Fragment.canDisplayOnlyOnePane(): Boolean = requireContext().canDisplayOnlyOnePane()
