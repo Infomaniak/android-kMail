@@ -276,12 +276,12 @@ class ThreadViewModel @Inject constructor(
 
         val response = ApiRepository.replyToCalendarEvent(
             attendanceState,
-            useInfomaniakCalendarRoute = calendarEventResponse.hasInfomaniakCalendarEventAssociated(),
+            useInfomaniakCalendarRoute = calendarEventResponse.hasAssociatedInfomaniakCalendarEvent(),
             calendarEventId = calendarEventResponse.calendarEvent!!.id,
             attachmentResource = message.calendarAttachment!!.resource ?: "",
         )
 
-        emit(response.isSuccess() && response.data == true)
+        emit(response.isSuccess() && response.data == true) // TODO : Handle api response when event is not inside infomaniak calendar
     }
 
     data class SubjectDataResult(

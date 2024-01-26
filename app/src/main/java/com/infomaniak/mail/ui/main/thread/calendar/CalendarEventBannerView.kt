@@ -54,7 +54,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
     private val binding by lazy { ViewCalendarEventBannerBinding.inflate(LayoutInflater.from(context), this, true) }
 
     private var useInfomaniakCalendarRoute: Boolean = false
-    private lateinit var savedAttendees: List<Attendee>
+    private var savedAttendees: List<Attendee> = emptyList()
     private var attachmentResource: String = ""
 
     private var navigateToAttendeesBottomSheet: ((List<Attendee>) -> Unit)? = null
@@ -84,13 +84,13 @@ class CalendarEventBannerView @JvmOverloads constructor(
         isCanceled: Boolean,
         shouldDisplayReplyOptions: Boolean,
         attachment: Attachment,
-        hasInfomaniakCalendarEventAssociated: Boolean,
+        hasAssociatedInfomaniakCalendarEvent: Boolean,
         shouldStartExpanded: Boolean,
     ) = with(binding) {
         savedAttendees = calendarEvent.attendees.copyFromRealm()
         userAttendanceState?.let { savedAttendees.findUser()?.manuallyOverrideAttendanceState(it) }
 
-        useInfomaniakCalendarRoute = hasInfomaniakCalendarEventAssociated
+        useInfomaniakCalendarRoute = hasAssociatedInfomaniakCalendarEvent
         attachmentResource = attachment.resource ?: run {
             // TODO: Check this sentry
             Sentry.captureMessage("No attachment resource when trying to load calendar event")
@@ -190,7 +190,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
 
             if (previouslyUnchecked) {
                 resetChoiceButtons()
-                updateThisUsersAttendance(attendanceState)
+                updateCurrentUsersAttendance(attendanceState)
                 replyToCalendarEvent?.invoke(attendanceState)
             }
 
@@ -198,7 +198,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
         }
     }
 
-    private fun updateThisUsersAttendance(attendanceState: AttendanceState) {
+    private fun updateCurrentUsersAttendance(attendanceState: AttendanceState) {
         savedAttendees.findUser()?.manuallyOverrideAttendanceState(attendanceState)
         binding.manyAvatarsView.setAttendees(savedAttendees)
     }

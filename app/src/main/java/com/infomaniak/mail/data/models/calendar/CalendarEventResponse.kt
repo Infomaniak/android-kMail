@@ -50,7 +50,7 @@ class CalendarEventResponse : EmbeddedRealmObject {
                 && calendarEvent?.attendees?.isUserIn() == true
     }
 
-    fun hasInfomaniakCalendarEventAssociated(): Boolean = userStoredEvent != null
+    fun hasAssociatedInfomaniakCalendarEvent(): Boolean = userStoredEvent != null
 
     fun hasUserStoredEvent() = userStoredEvent != null
 

@@ -79,7 +79,7 @@ class ThreadAdapter(
     navigateToNewMessageActivity: (Uri) -> Unit,
     navigateToAttendeeBottomSheet: (List<Attendee>) -> Unit,
     navigateToDownloadProgressDialog: (Int, Bundle) -> Unit,
-    replyToCalendarEvent: (AttendanceState, message: Message) -> Unit,
+    replyToCalendarEvent: (AttendanceState, Message) -> Unit,
     promptLink: (String, ContextMenuType) -> Unit,
 ) : ListAdapter<Message, ThreadViewHolder>(MessageDiffCallback()) {
 
@@ -200,7 +200,7 @@ class ThreadAdapter(
                     isCanceled = calendarEventResponse.isCanceled,
                     shouldDisplayReplyOptions = calendarEventResponse.isReplyAuthorized(),
                     attachment = attachment,
-                    hasInfomaniakCalendarEventAssociated = calendarEventResponse.hasInfomaniakCalendarEventAssociated(),
+                    hasAssociatedInfomaniakCalendarEvent = calendarEventResponse.hasAssociatedInfomaniakCalendarEvent(),
                     shouldStartExpanded = isCalendarEventExpandedMap[message.uid] ?: false,
                 )
             }
@@ -712,7 +712,7 @@ class ThreadAdapter(
         var navigateToNewMessageActivity: (Uri) -> Unit,
         var navigateToAttendeeBottomSheet: (List<Attendee>) -> Unit,
         var navigateToDownloadProgressDialog: (Int, Bundle) -> Unit,
-        var replyToCalendarEvent: (AttendanceState, message: Message) -> Unit,
+        var replyToCalendarEvent: (AttendanceState, Message) -> Unit,
         var promptLink: (String, ContextMenuType) -> Unit,
     )
 
