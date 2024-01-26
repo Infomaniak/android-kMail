@@ -36,9 +36,6 @@ class CalendarEventResponse : EmbeddedRealmObject {
     private var _attachmentEventMethod: String? = null
     //endregion
 
-    val attachmentEventMethod: AttachmentEventMethod?
-        get() = Utils.enumValueOfOrNull<AttachmentEventMethod>(_attachmentEventMethod)
-
     val calendarEvent get() = userStoredEvent ?: attachmentEvent
 
     fun hasUserStoredEvent() = userStoredEvent != null
