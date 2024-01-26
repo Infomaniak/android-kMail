@@ -251,6 +251,7 @@
     <string name="errorAlreadyLinkedMailbox">Cette adresse mail est déjà liée à votre compte</string>
     <string name="errorAtLeastOneRecipient">Il faut au minimum un destinataire</string>
     <string name="errorAttachmentNotFound">Pièce jointe introuvable</string>
+    <string name="errorCalendarChoiceCouldNotBeSent">Une erreur s’est produite lors de l’envoi de votre choix</string>
     <string name="errorCorruptAttachment">Échec du traitement du brouillon, une pièce jointe est corrompue</string>
     <string name="errorDraftNotFound">Brouillon introuvable</string>
     <string name="errorEditScheduledMessage">Impossible de modifier un message planifié ou envoyé</string>
@@ -462,6 +463,7 @@
     <string name="settingsTransferEmailsTitle">Transférer les e-mails</string>
     <string name="settingsTransferInBody">Dans le corps du message</string>
     <string name="snackbarBlockUserConfirmation">L’expéditeur est maintenant bloqué</string>
+    <string name="snackbarCalendarChoiceSent">Choix envoyé avec succès</string>
     <string name="snackbarContactSaved">Nouveau contact enregistré avec succès</string>
     <string name="snackbarDeletedConversation">La conversation n’existe plus</string>
     <string name="snackbarDisplayProblemReported">Problème d’affichage signalé</string>

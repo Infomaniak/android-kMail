@@ -249,6 +249,7 @@
     <string name="errorAlreadyLinkedMailbox">Esta dirección de correo electrónico ya está vinculada a su cuenta</string>
     <string name="errorAtLeastOneRecipient">Se precisa al menos un destinatario</string>
     <string name="errorAttachmentNotFound">No se ha encontrado el adjunto</string>
+    <string name="errorCalendarChoiceCouldNotBeSent">Se ha producido un error al enviar su elección</string>
     <string name="errorCorruptAttachment">No se ha podido gestionar el borrador, un archivo adjunto está dañado</string>
     <string name="errorDraftNotFound">No se puede encontrar el borrador</string>
     <string name="errorEditScheduledMessage">Imposible modificar un mensaje programado o enviado</string>
@@ -454,6 +455,7 @@
     <string name="settingsTransferEmailsTitle">Transferir correos electrónicos</string>
     <string name="settingsTransferInBody">En el cuerpo del mensaje</string>
     <string name="snackbarBlockUserConfirmation">El remitente está bloqueado</string>
+    <string name="snackbarCalendarChoiceSent">Elección enviada correctamente</string>
     <string name="snackbarContactSaved">Nuevo contacto registrado correctamente</string>
     <string name="snackbarDeletedConversation">La conversación ya no existe</string>
     <string name="snackbarDisplayProblemReported">Problema de visualización notificado</string>

@@ -252,9 +252,10 @@ class ThreadFragment : Fragment() {
                     message,
                 ).observe(viewLifecycleOwner) { successfullyUpdated ->
                     if (successfullyUpdated) {
+                        snackbarManager.setValue(getString(R.string.snackbarCalendarChoiceSent))
                         // updateRealmLocally() // TODO
                     } else {
-                        snackbarManager.setValue("Could not reply to the event") // TODO
+                        snackbarManager.setValue(getString(R.string.errorCalendarChoiceCouldNotBeSent))
                         threadAdapter.undoUserAttendanceClick(message)
                     }
                 }

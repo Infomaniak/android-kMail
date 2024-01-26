@@ -249,6 +249,7 @@
     <string name="errorAlreadyLinkedMailbox">Questo indirizzo e-mail è già collegato al vostro account</string>
     <string name="errorAtLeastOneRecipient">È richiesto almeno un destinatario</string>
     <string name="errorAttachmentNotFound">Allegato non trovato</string>
+    <string name="errorCalendarChoiceCouldNotBeSent">Si è verificato un errore durante l’invio della scelta</string>
     <string name="errorCorruptAttachment">Impossibile gestire la bozza, un allegato è danneggiato</string>
     <string name="errorDraftNotFound">Bozza non trovata</string>
     <string name="errorEditScheduledMessage">Impossibile modificare un messaggio pianificato o inviato</string>
@@ -454,6 +455,7 @@
     <string name="settingsTransferEmailsTitle">Trasferimento di e-mail</string>
     <string name="settingsTransferInBody">Nel corpo del messaggio</string>
     <string name="snackbarBlockUserConfirmation">Il mittente è ora bloccato</string>
+    <string name="snackbarCalendarChoiceSent">Scelta inviata con successo</string>
     <string name="snackbarContactSaved">Nuovo contatto registrato con successo</string>
     <string name="snackbarDeletedConversation">La conversazione non esiste più</string>
     <string name="snackbarDisplayProblemReported">Problema di visualizzazione segnalato</string>
