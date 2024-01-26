@@ -18,8 +18,6 @@
 package com.infomaniak.mail.ui.main.thread
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.graphics.Canvas
 import android.net.Uri
 import android.os.Bundle
 import android.text.format.Formatter
@@ -39,7 +37,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
-import com.infomaniak.lib.core.utils.*
+import com.infomaniak.lib.core.utils.context
+import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
@@ -56,7 +55,6 @@ import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntentType
 import com.infomaniak.mail.utils.AttachmentIntentUtils.createDownloadDialogNavArgs
 import com.infomaniak.mail.utils.SharedUtils.Companion.createHtmlForPlainText
 import com.infomaniak.mail.utils.UiUtils.getPrettyNameAndEmail
-import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.TEXT_HTML
 import com.infomaniak.mail.utils.Utils.TEXT_PLAIN
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
@@ -167,9 +165,6 @@ class ThreadAdapter(
                         isThemeTheSameMap[message.uid] = !isThemeTheSameMap[message.uid]!!
                         holder.toggleContentAndQuoteTheme(message.uid)
                     }
-                    NotifyType.TOGGLE_RECIPIENTS -> {
-                        holder.openRecipients()
-                    }
                     NotifyType.RE_RENDER -> reloadVisibleWebView()
                     NotifyType.FAILED_MESSAGE -> {
                         messageLoader.isGone = true
@@ -250,11 +245,6 @@ class ThreadAdapter(
         bodyWebView.toggleWebViewTheme(isThemeTheSame)
         fullMessageWebView.toggleWebViewTheme(isThemeTheSame)
         toggleFrameLayoutsTheme(isThemeTheSame)
-    }
-
-    private fun ThreadViewHolder.openRecipients() = with(binding) {
-        messageDetails.isVisible = true
-        recipientChevron.toggleChevron(false)
     }
 
     private fun ThreadViewHolder.loadContentAndQuote(message: Message) {
@@ -581,11 +571,6 @@ class ThreadAdapter(
         notifyItemChanged(index, NotifyType.TOGGLE_LIGHT_MODE)
     }
 
-    fun openRecipients(message: Message) {
-        val index = messages.indexOf(message)
-        notifyItemChanged(index, NotifyType.TOGGLE_RECIPIENTS)
-    }
-
     fun reRenderMails() {
         notifyItemRangeChanged(0, itemCount, NotifyType.RE_RENDER)
     }
@@ -608,7 +593,6 @@ class ThreadAdapter(
 
     private enum class NotifyType {
         TOGGLE_LIGHT_MODE,
-        TOGGLE_RECIPIENTS,
         RE_RENDER,
         FAILED_MESSAGE,
         ONLY_REBIND_CALENDAR_ATTENDANCE,

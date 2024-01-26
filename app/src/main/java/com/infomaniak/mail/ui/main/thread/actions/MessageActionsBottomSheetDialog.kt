@@ -69,6 +69,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(navigationArgs) {
         super.onViewCreated(view, savedInstanceState)
         binding.print.isVisible = true
+
         mainViewModel.getMessage(messageUid).observe(viewLifecycleOwner) { message ->
 
             folderRole = mainViewModel.getActionFolderRole(message)

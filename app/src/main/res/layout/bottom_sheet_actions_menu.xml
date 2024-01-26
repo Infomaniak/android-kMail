@@ -108,7 +108,7 @@
             app:icon="@drawable/ic_email_action_print"
             app:text="@string/actionPrint"
             app:visibleDivider="false"
-            tools:visibility="visible"/>
+            tools:visibility="visible" />
 
         <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
             android:id="@+id/reportDisplayProblem"

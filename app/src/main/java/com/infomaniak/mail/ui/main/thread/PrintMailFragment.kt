@@ -38,7 +38,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
 @AndroidEntryPoint
 class PrintMailFragment : Fragment() {
 
@@ -72,8 +71,10 @@ class PrintMailFragment : Fragment() {
         threadViewModel.messagesLive.observe(viewLifecycleOwner) { messages ->
             threadAdapter.submitList(messages.filter { it.uid == args.messageUid })
         }
-        threadViewModel.reassignThreadLive(args.openThreadUid!!)
-        threadViewModel.reassignMessagesLive(args.openThreadUid!!)
+        args.openThreadUid?.let { openThreadUid ->
+            threadViewModel.reassignThreadLive(openThreadUid)
+            threadViewModel.reassignMessagesLive(openThreadUid)
+        }
     }
 
     override fun onDestroyView() {
@@ -101,10 +102,11 @@ class PrintMailFragment : Fragment() {
     }
 
     private fun getWebViewToPrint(): WebView {
-        val firstMessageLayout = binding.messagesList[0]
-        val fullMessageWebView = firstMessageLayout.findViewById<WebView>(R.id.fullMessageWebView)
-        val bodyWebView = firstMessageLayout.findViewById<WebView>(R.id.bodyWebView)
+        with(binding.messagesList[0]) {
+            val fullMessageWebView = findViewById<WebView>(R.id.fullMessageWebView)
+            val bodyWebView = findViewById<WebView>(R.id.bodyWebView)
 
-        return if (fullMessageWebView.width != 0) fullMessageWebView else bodyWebView
+            return if (fullMessageWebView.width != 0) fullMessageWebView else bodyWebView
+        }
     }
 }
