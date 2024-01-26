@@ -220,29 +220,31 @@ class ThreadViewModel @Inject constructor(
         fetchCalendarEventJob?.cancel()
         fetchCalendarEventJob = viewModelScope.launch(ioCoroutineContext) {
             mailboxContentRealm().writeBlocking {
-                messages.forEach { message ->
-                    if (!message.isFullyDownloaded()) return@forEach // Only treat message that have their attachments downloaded
+                messages.forEach { message -> fetchCalendarEvent(message) }
+            }
+        }
+    }
 
-                    val alreadyTreated = !treatedMessagesForCalendarEvent.add(message.uid)
-                    if (alreadyTreated) return@forEach
+    private fun MutableRealm.fetchCalendarEvent(message: Message) {
+        if (!message.isFullyDownloaded()) return // Only treat message that have their attachments downloaded
 
-                    val icsAttachment = message.calendarAttachment ?: return@forEach
+        val alreadyTreated = !treatedMessagesForCalendarEvent.add(message.uid)
+        if (alreadyTreated) return
 
-                    val apiResponse = icsAttachment.resource?.let { resource ->
-                        ApiRepository.getAttachmentCalendarEvent(resource)
-                    } ?: return@forEach
+        val icsAttachment = message.calendarAttachment ?: return
 
-                    if (apiResponse.isSuccess()) {
-                        updateCalendarEvent(message, apiResponse.data!!)
-                    } else {
-                        Sentry.withScope { scope ->
-                            scope.setExtra("ics attachment mimeType", icsAttachment.mimeType)
-                            scope.setExtra("ics attachment size", icsAttachment.size.toString())
-                            scope.setExtra("error code", apiResponse.error?.code.toString())
-                            Sentry.captureMessage("Failed loading calendar event")
-                        }
-                    }
-                }
+        val apiResponse = icsAttachment.resource?.let { resource ->
+            ApiRepository.getAttachmentCalendarEvent(resource)
+        } ?: return
+
+        if (apiResponse.isSuccess()) {
+            updateCalendarEvent(message, apiResponse.data!!)
+        } else {
+            Sentry.withScope { scope ->
+                scope.setExtra("ics attachment mimeType", icsAttachment.mimeType)
+                scope.setExtra("ics attachment size", icsAttachment.size.toString())
+                scope.setExtra("error code", apiResponse.error?.code.toString())
+                Sentry.captureMessage("Failed loading calendar event")
             }
         }
     }
