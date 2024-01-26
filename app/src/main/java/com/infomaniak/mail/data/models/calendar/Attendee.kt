@@ -55,7 +55,7 @@ class Attendee() : EmbeddedRealmObject, Correspondent {
         _state = state
     }
 
-    fun manuallyUpdateAttendeeAfterReplying(newAttendanceState: AttendanceState) {
+    fun manuallyOverrideAttendanceState(newAttendanceState: AttendanceState) {
         _state = newAttendanceState.apiValue
     }
 

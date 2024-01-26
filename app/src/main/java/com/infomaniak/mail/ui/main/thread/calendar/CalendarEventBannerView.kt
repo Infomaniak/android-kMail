@@ -80,14 +80,17 @@ class CalendarEventBannerView @JvmOverloads constructor(
 
     fun loadCalendarEvent(
         calendarEvent: CalendarEvent,
+        userAttendanceState: AttendanceState?,
         isCanceled: Boolean,
         shouldDisplayReplyOptions: Boolean,
         attachment: Attachment,
         hasInfomaniakCalendarEventAssociated: Boolean,
         shouldStartExpanded: Boolean,
     ) = with(binding) {
-        useInfomaniakCalendarRoute = hasInfomaniakCalendarEventAssociated
         savedAttendees = calendarEvent.attendees.copyFromRealm()
+        userAttendanceState?.let { savedAttendees.findUser()?.manuallyOverrideAttendanceState(it) }
+
+        useInfomaniakCalendarRoute = hasInfomaniakCalendarEventAssociated
         attachmentResource = attachment.resource ?: run {
             // TODO: Check this sentry
             Sentry.captureMessage("No attachment resource when trying to load calendar event")
@@ -196,7 +199,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
     }
 
     private fun updateThisUsersAttendance(attendanceState: AttendanceState) {
-        savedAttendees.firstOrNull(Attendee::isMe)?.manuallyUpdateAttendeeAfterReplying(attendanceState)
+        savedAttendees.findUser()?.manuallyOverrideAttendanceState(attendanceState)
         binding.manyAvatarsView.setAttendees(savedAttendees)
     }
 

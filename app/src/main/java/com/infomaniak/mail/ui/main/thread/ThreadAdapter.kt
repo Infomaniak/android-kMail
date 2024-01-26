@@ -67,6 +67,7 @@ import com.google.android.material.R as RMaterial
 class ThreadAdapter(
     private val shouldLoadDistantResources: Boolean,
     private val isCalendarEventExpandedMap: MutableMap<String, Boolean>,
+    private val userAttendanceStateOverrideMap: MutableMap<String, AttendanceState>,
     onContactClicked: (contact: Recipient) -> Unit,
     onDeleteDraftClicked: (message: Message) -> Unit,
     onDraftClicked: (message: Message) -> Unit,
@@ -195,6 +196,7 @@ class ThreadAdapter(
 
                 loadCalendarEvent(
                     calendarEvent = it,
+                    userAttendanceState = userAttendanceStateOverrideMap[message.uid],
                     isCanceled = calendarEventResponse.isCanceled,
                     shouldDisplayReplyOptions = calendarEventResponse.isReplyAuthorized(),
                     attachment = attachment,

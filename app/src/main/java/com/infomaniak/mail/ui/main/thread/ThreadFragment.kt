@@ -199,6 +199,7 @@ class ThreadFragment : Fragment() {
         adapter = ThreadAdapter(
             shouldLoadDistantResources = shouldLoadDistantResources(),
             isCalendarEventExpandedMap = threadViewModel.isCalendarEventExpandedMap,
+            userAttendanceStateOverrideMap = threadViewModel.userAttendanceStateOverrideMap,
             onContactClicked = {
                 safeNavigate(
                     resId = R.id.detailedContactBottomSheetDialog,
@@ -253,7 +254,7 @@ class ThreadFragment : Fragment() {
                 ).observe(viewLifecycleOwner) { successfullyUpdated ->
                     if (successfullyUpdated) {
                         snackbarManager.setValue(getString(R.string.snackbarCalendarChoiceSent))
-                        // updateRealmLocally() // TODO
+                        threadViewModel.userAttendanceStateOverrideMap[message.uid] = attendanceState
                     } else {
                         snackbarManager.setValue(getString(R.string.errorCalendarChoiceCouldNotBeSent))
                         threadAdapter.undoUserAttendanceClick(message)

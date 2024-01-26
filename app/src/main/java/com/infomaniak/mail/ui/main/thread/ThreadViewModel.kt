@@ -70,6 +70,7 @@ class ThreadViewModel @Inject constructor(
 
     private val treatedMessagesForCalendarEvent = mutableSetOf<String>()
     val isCalendarEventExpandedMap = mutableMapOf<String, Boolean>()
+    val userAttendanceStateOverrideMap = mutableMapOf<String, AttendanceState>()
 
     var deletedMessagesUids = mutableSetOf<String>()
     val failedMessagesUids = SingleLiveEvent<List<String>>()
