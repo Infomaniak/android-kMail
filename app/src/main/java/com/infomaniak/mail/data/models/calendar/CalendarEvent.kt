@@ -50,8 +50,6 @@ class CalendarEvent : EmbeddedRealmObject {
 
     /** Don't forget to update equals() and hashCode() if a field is added */
 
-    val iAmInvited get() = attendees.any(Attendee::isMe)
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

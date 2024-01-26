@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.models.calendar
 
 import com.infomaniak.lib.core.utils.Utils
+import com.infomaniak.mail.utils.isUserIn
 import io.realm.kotlin.types.EmbeddedRealmObject
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -46,7 +47,7 @@ class CalendarEventResponse : EmbeddedRealmObject {
     fun isReplyAuthorized(): Boolean {
         return (attachmentEventMethod == null || attachmentEventMethod == AttachmentEventMethod.REQUEST)
                 && !isCanceled
-                && calendarEvent?.iAmInvited == true
+                && calendarEvent?.attendees?.isUserIn() == true
     }
 
     fun hasInfomaniakCalendarEventAssociated(): Boolean = userStoredEvent != null

@@ -71,6 +71,7 @@ import com.infomaniak.mail.data.LocalSettings.ThreadDensity
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.correspondent.Correspondent
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
@@ -627,6 +628,10 @@ fun ShapeableImageView.setInnerStrokeWidth(strokeWidth: Float) {
     val halfStrokeWidth = (strokeWidth / 2.0f).roundToInt()
     setPaddingRelative(halfStrokeWidth, halfStrokeWidth, halfStrokeWidth, halfStrokeWidth)
 }
+
+fun <T : Correspondent> List<T>.findUser(): T? = firstOrNull(Correspondent::isMe)
+
+fun List<Correspondent>.isUserIn(): Boolean = findUser() != null
 
 fun ViewPager2.removeOverScrollForApiBelow31() {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {

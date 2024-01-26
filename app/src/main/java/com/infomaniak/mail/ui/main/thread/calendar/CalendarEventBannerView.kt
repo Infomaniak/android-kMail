@@ -34,6 +34,7 @@ import com.infomaniak.mail.databinding.ViewCalendarEventBannerBinding
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.utils.AttachmentIntentUtils.openAttachment
 import com.infomaniak.mail.utils.UiUtils.getPrettyNameAndEmail
+import com.infomaniak.mail.utils.findUser
 import com.infomaniak.mail.utils.toDate
 import dagger.hilt.android.AndroidEntryPoint
 import io.realm.kotlin.ext.copyFromRealm
@@ -98,7 +99,8 @@ class CalendarEventBannerView @JvmOverloads constructor(
             text = calendarEvent.location
         }
 
-        setAttendanceUi(calendarEvent.iAmInvited, shouldDisplayReplyOptions)
+        val userAsAttendee = savedAttendees.findUser()
+        setAttendanceUi(userAsAttendee != null, shouldDisplayReplyOptions, userAsAttendee?.state)
 
         addToCalendarButton.setOnClickListener {
             attachment.openAttachment(context, navigateToDownloadProgressDialog ?: return@setOnClickListener, snackbarManager)
@@ -140,10 +142,18 @@ class CalendarEventBannerView @JvmOverloads constructor(
         }
     }
 
-    private fun setAttendanceUi(iAmInvited: Boolean, shouldDisplayReplyOptions: Boolean) = with(binding) {
+    private fun setAttendanceUi(
+        iAmInvited: Boolean,
+        shouldDisplayReplyOptions: Boolean,
+        attendanceState: Attendee.AttendanceState?,
+    ) = with(binding) {
         notPartOfAttendeesWarning.isGone = iAmInvited
         participationButtons.isVisible = shouldDisplayReplyOptions
         attendeesLayout.isGone = savedAttendees.isEmpty()
+
+        yesButton.isChecked = attendanceState == Attendee.AttendanceState.ACCEPTED
+        maybeButton.isChecked = attendanceState == Attendee.AttendanceState.TENTATIVE
+        noButton.isChecked = attendanceState == Attendee.AttendanceState.DECLINED
 
         displayOrganizer(savedAttendees)
         allAttendeesButton.setOnClickListener { navigateToAttendeesBottomSheet?.invoke(savedAttendees) }
