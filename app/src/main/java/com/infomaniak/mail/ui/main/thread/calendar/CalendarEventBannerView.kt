@@ -29,6 +29,7 @@ import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.calendar.Attendee
+import com.infomaniak.mail.data.models.calendar.Attendee.AttendanceState
 import com.infomaniak.mail.data.models.calendar.CalendarEvent
 import com.infomaniak.mail.databinding.ViewCalendarEventBannerBinding
 import com.infomaniak.mail.ui.main.SnackbarManager
@@ -58,7 +59,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
 
     private var navigateToAttendeesBottomSheet: ((List<Attendee>) -> Unit)? = null
     private var navigateToDownloadProgressDialog: (() -> Unit)? = null
-    private var replyToCalendarEvent: ((Attendee.AttendanceState) -> Unit)? = null
+    private var replyToCalendarEvent: ((AttendanceState) -> Unit)? = null
     private var onAttendeesButtonClicked: ((Boolean) -> Unit)? = null
 
     @Inject
@@ -66,9 +67,9 @@ class CalendarEventBannerView @JvmOverloads constructor(
 
     init {
         with(binding) {
-            yesButton.handleChoiceButtonBehavior(Attendee.AttendanceState.ACCEPTED)
-            maybeButton.handleChoiceButtonBehavior(Attendee.AttendanceState.TENTATIVE)
-            noButton.handleChoiceButtonBehavior(Attendee.AttendanceState.DECLINED)
+            yesButton.handleChoiceButtonBehavior(AttendanceState.ACCEPTED)
+            maybeButton.handleChoiceButtonBehavior(AttendanceState.TENTATIVE)
+            noButton.handleChoiceButtonBehavior(AttendanceState.DECLINED)
 
             attendeesButton.addOnCheckedChangeListener { _, isChecked ->
                 attendeesSubMenu.isVisible = isChecked
@@ -153,15 +154,15 @@ class CalendarEventBannerView @JvmOverloads constructor(
     private fun setAttendanceUi(
         iAmInvited: Boolean,
         shouldDisplayReplyOptions: Boolean,
-        attendanceState: Attendee.AttendanceState?,
+        attendanceState: AttendanceState?,
     ) = with(binding) {
         notPartOfAttendeesWarning.isGone = iAmInvited
         participationButtons.isVisible = shouldDisplayReplyOptions
         attendeesLayout.isGone = savedAttendees.isEmpty()
 
-        yesButton.isChecked = attendanceState == Attendee.AttendanceState.ACCEPTED
-        maybeButton.isChecked = attendanceState == Attendee.AttendanceState.TENTATIVE
-        noButton.isChecked = attendanceState == Attendee.AttendanceState.DECLINED
+        yesButton.isChecked = attendanceState == AttendanceState.ACCEPTED
+        maybeButton.isChecked = attendanceState == AttendanceState.TENTATIVE
+        noButton.isChecked = attendanceState == AttendanceState.DECLINED
 
         displayOrganizer(savedAttendees)
         allAttendeesButton.setOnClickListener { navigateToAttendeesBottomSheet?.invoke(savedAttendees) }
@@ -171,7 +172,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
     fun initCallback(
         navigateToAttendeesBottomSheet: (List<Attendee>) -> Unit,
         navigateToDownloadProgressDialog: () -> Unit,
-        replyToCalendarEvent: (Attendee.AttendanceState) -> Unit,
+        replyToCalendarEvent: (AttendanceState) -> Unit,
         onAttendeesButtonClicked: (Boolean) -> Unit,
     ) {
         this.navigateToAttendeesBottomSheet = navigateToAttendeesBottomSheet
@@ -180,7 +181,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
         this.onAttendeesButtonClicked = onAttendeesButtonClicked
     }
 
-    private fun MaterialButton.handleChoiceButtonBehavior(attendanceState: Attendee.AttendanceState) {
+    private fun MaterialButton.handleChoiceButtonBehavior(attendanceState: AttendanceState) {
         setOnClickListener {
             val previouslyUnchecked = isChecked
 
@@ -194,7 +195,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
         }
     }
 
-    private fun updateThisUsersAttendance(attendanceState: Attendee.AttendanceState) {
+    private fun updateThisUsersAttendance(attendanceState: AttendanceState) {
         savedAttendees.firstOrNull(Attendee::isMe)?.manuallyUpdateAttendeeAfterReplying(attendanceState)
         binding.manyAvatarsView.setAttendees(savedAttendees)
     }

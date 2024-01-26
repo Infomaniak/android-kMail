@@ -41,6 +41,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Attachment.*
 import com.infomaniak.mail.data.models.calendar.Attendee
+import com.infomaniak.mail.data.models.calendar.Attendee.AttendanceState
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.message.Message.*
@@ -77,7 +78,7 @@ class ThreadAdapter(
     navigateToNewMessageActivity: (Uri) -> Unit,
     navigateToAttendeeBottomSheet: (List<Attendee>) -> Unit,
     navigateToDownloadProgressDialog: (Int, Bundle) -> Unit,
-    replyToCalendarEvent: (Attendee.AttendanceState, message: Message) -> Unit,
+    replyToCalendarEvent: (AttendanceState, message: Message) -> Unit,
     promptLink: (String, ContextMenuType) -> Unit,
 ) : ListAdapter<Message, ThreadViewHolder>(MessageDiffCallback()) {
 
@@ -709,7 +710,7 @@ class ThreadAdapter(
         var navigateToNewMessageActivity: (Uri) -> Unit,
         var navigateToAttendeeBottomSheet: (List<Attendee>) -> Unit,
         var navigateToDownloadProgressDialog: (Int, Bundle) -> Unit,
-        var replyToCalendarEvent: (Attendee.AttendanceState, message: Message) -> Unit,
+        var replyToCalendarEvent: (AttendanceState, message: Message) -> Unit,
         var promptLink: (String, ContextMenuType) -> Unit,
     )
 

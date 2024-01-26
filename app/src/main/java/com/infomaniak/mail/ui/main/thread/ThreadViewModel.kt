@@ -30,6 +30,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMo
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.calendar.Attendee
+import com.infomaniak.mail.data.models.calendar.Attendee.AttendanceState
 import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
@@ -269,7 +270,7 @@ class ThreadViewModel @Inject constructor(
     fun getCalendarEventTreatedMessageCount(): Int = treatedMessagesForCalendarEvent.count()
 
     fun replyToCalendarEvent(
-        attendanceState: Attendee.AttendanceState,
+        attendanceState: AttendanceState,
         message: Message,
     ) = liveData<Boolean>(ioCoroutineContext) {
         val calendarEventResponse = message.latestCalendarEventResponse!!
