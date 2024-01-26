@@ -98,25 +98,19 @@ object MessageBodyUtils {
     }
 
     fun addPrintHeader(context: Context, message: Message, htmlDocument: Document) {
+        htmlDocument.body()
+            .attr("style", "margin: 40px")
         htmlDocument.body().insertChildren(0, createPrintHeader(context, message))
     }
 
     private fun createPrintHeader(context: Context, message: Message): Element {
         val rootHeaderDiv = Element("div")
-        val firstSeparator = Element("hr").attr("size", "1")
-            .attr("color", "black")
-            .attr("width", "100%")
-            .attr("style", "margin-bottom: 10px")
-        val secondSeparator = Element("hr").attr("size", "1")
-            .attr("color", "LightGray")
-            .attr("width", "100%")
-            .attr("style", "margin-top: 10px")
-            .attr("style", "margin-bottom: 10px")
+        val firstSeparator = Element("hr").attr("color", "black")
+        val secondSeparator = Element("hr").attr("color", "LightGray")
 
         val iconElement = Element("img")
-            .attr("src", "file:///android_asset/ic_logo_name.svg")
+            .attr("src", "file:///android_asset/icon_print_email.svg")
             .attr("width", "150")
-            .attr("style", "margin-bottom: 10px")
         rootHeaderDiv.insertChildren(0, iconElement)
         rootHeaderDiv.insertChildren(1, firstSeparator)
 
@@ -127,7 +121,8 @@ object MessageBodyUtils {
 
         rootHeaderDiv.insertChildren(3, secondSeparator)
 
-        val messageDetailsDiv = Element("div").attr("style", "margin-bottom: 40px")
+        val messageDetailsDiv = Element("div")
+            .attr("style", "margin-bottom: 40px; display: block")
         message.cc.let { cc ->
             messageDetailsDiv.insertPrintRecipientField(context.getString(R.string.ccTitle), *cc.toTypedArray())
         }
@@ -143,32 +138,25 @@ object MessageBodyUtils {
 
         rootHeaderDiv.insertChildren(4, messageDetailsDiv)
 
+        rootHeaderDiv.attr("style", "margin-bottom: 40px")
+
         return rootHeaderDiv
     }
 
     private fun Element.insertPrintRecipientField(prefix: String, vararg recipients: Recipient) {
         if (recipients.isEmpty()) return
 
-        val recipientsField = Element("div")
-        val fieldName = Element("b").appendText(prefix)
-        val fieldValue = Element("text").appendText(recipients.joinToString { it.quotedDisplay() })
-
-        recipientsField.insertChildren(0, fieldName)
-        recipientsField.insertChildren(1, fieldValue)
-
-        insertChildren(0, recipientsField)
+        insertChildren(0, insertField(prefix).appendText(recipients.joinToString { it.quotedDisplay() }))
     }
 
     private fun Element.insertPrintDateField(prefix: String, date: String) {
+        insertChildren(0, insertField(prefix).appendText(date))
+    }
 
-        val recipientsField = Element("div")
-        val fieldName = Element("b").appendText(prefix)
-        val fieldValue = Element("text").appendText(date)
+    private fun insertField(prefix: String) = with(Element("div")) {
+        val fieldName = Element("b").appendText(prefix).attr("style", "margin-right: 10px")
 
-        recipientsField.insertChildren(0, fieldName)
-        recipientsField.insertChildren(1, fieldValue)
-
-        insertChildren(0, recipientsField)
+        insertChildren(0, fieldName)
     }
 
     fun mergeSplitBodyAndSubBodies(body: String, subBodies: List<SubBody>, messageUid: String): String {

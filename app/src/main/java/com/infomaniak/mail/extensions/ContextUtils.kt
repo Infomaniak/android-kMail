@@ -23,7 +23,6 @@ import com.infomaniak.lib.core.utils.isThisYear
 import com.infomaniak.lib.core.utils.isToday
 import com.infomaniak.lib.core.utils.isYesterday
 import com.infomaniak.mail.R
-import com.infomaniak.mail.ui.main.thread.ThreadAdapter
 import java.util.Date
 
 private const val FORMAT_EMAIL_DATE_HOUR = "HH:mm"

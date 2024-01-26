@@ -526,7 +526,7 @@ class ThreadAdapter(
     // Automatically expand quotes of single message threads
     private fun ItemMessageBinding.setQuoteInitialCollapsedState(hasQuote: Boolean) {
         val isSingleMessageThread = itemCount == 1
-        val shouldBeExpanded = isSingleMessageThread && hasQuote
+        val shouldBeExpanded = isSingleMessageThread && hasQuote && !isForPrinting
 
         isQuoteCollapsed = !shouldBeExpanded
     }
