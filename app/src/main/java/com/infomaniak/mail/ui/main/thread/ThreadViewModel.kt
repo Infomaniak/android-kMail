@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui.main.thread
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.trackUserInfo
@@ -29,7 +28,6 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
-import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.data.models.calendar.Attendee.AttendanceState
 import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
 import com.infomaniak.mail.data.models.mailbox.Mailbox
@@ -221,10 +219,8 @@ class ThreadViewModel @Inject constructor(
     fun fetchCalendarEvents(messages: List<Message>) {
         fetchCalendarEventJob?.cancel()
         fetchCalendarEventJob = viewModelScope.launch(ioCoroutineContext) {
-            Log.i("gibran", "fetchCalendarEvents - gotta fetch calendar events for messages.map { it.subject }: ${messages.map { it.subject }}")
             mailboxContentRealm().writeBlocking {
                 messages.forEach { message ->
-                    // Log.i("gibran", "fetchCalendarEvents - message.subject: ${message.subject}")
                     if (!message.isFullyDownloaded()) return@forEach // Only treat message that have their attachments downloaded
 
                     val alreadyTreated = !treatedMessagesForCalendarEvent.add(message.uid)
