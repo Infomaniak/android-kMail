@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.main.thread.calendar
 import android.content.Context
 import android.os.Build
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.core.view.isGone
@@ -27,7 +28,6 @@ import androidx.core.view.isVisible
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.data.models.calendar.CalendarEvent
@@ -162,12 +162,16 @@ class CalendarEventBannerView @JvmOverloads constructor(
 
     private fun MaterialButton.handleChoiceButtonBehavior(attendanceState: Attendee.AttendanceState) {
         setOnClickListener {
-            // TODO : Handle click color
-            // val changedSelectedButton = isChecked
-            // if (changedSelectedButton) resetChoiceButtons()
-            // isChecked = true
+            val previouslyUnchecked = isChecked
+            Log.e("gibran", "handleChoiceButtonBehavior - detected click on attendanceState: ${attendanceState}")
+            Log.e("gibran", "handleChoiceButtonBehavior - the button was in this state when click triggered: previouslyUnchecked: ${previouslyUnchecked}")
 
-            replyToCalendarEvent?.invoke(attendanceState)
+            if (previouslyUnchecked) {
+                resetChoiceButtons()
+                replyToCalendarEvent?.invoke(attendanceState)
+            }
+
+            isChecked = true
         }
     }
 

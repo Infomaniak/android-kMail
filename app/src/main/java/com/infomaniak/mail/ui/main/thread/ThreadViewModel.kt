@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.thread
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.trackUserInfo
@@ -214,15 +215,19 @@ class ThreadViewModel @Inject constructor(
         quickActionBarClicks.postValue(QuickActionBarResult(thread.uid, message, menuId))
     }
 
-    fun fetchCalendarEvents(messages: List<Message>) {
+    fun fetchCalendarEvents(messages: List<Message>, forceFetch: Boolean = false) {
         fetchCalendarEventJob?.cancel()
         fetchCalendarEventJob = viewModelScope.launch(ioCoroutineContext) {
+            Log.i("gibran", "fetchCalendarEvents - gotta fetch calendar events for messages.map { it.subject }: ${messages.map { it.subject }}")
             mailboxContentRealm().writeBlocking {
                 messages.forEach { message ->
+                    // Log.i("gibran", "fetchCalendarEvents - message.subject: ${message.subject}")
                     if (!message.isFullyDownloaded()) return@forEach // Only treat message that have their attachments downloaded
 
-                    val alreadyTreated = !treatedMessagesForCalendarEvent.add(message.uid)
-                    if (alreadyTreated) return@forEach
+                    if (!forceFetch) {
+                        val alreadyTreated = !treatedMessagesForCalendarEvent.add(message.uid)
+                        if (alreadyTreated) return@forEach
+                    }
 
                     val icsAttachment = message.calendarAttachment ?: return@forEach
 
@@ -264,7 +269,10 @@ class ThreadViewModel @Inject constructor(
 
     fun getCalendarEventTreatedMessageCount(): Int = treatedMessagesForCalendarEvent.count()
 
-    fun replyToCalendarEvent(attendanceState: Attendee.AttendanceState, message: Message) {
+    fun replyToCalendarEvent(
+        attendanceState: Attendee.AttendanceState,
+        message: Message,
+    ) = viewModelScope.launch(ioCoroutineContext) {
         val calendarEventResponse = message.latestCalendarEventResponse!!
 
         val response = ApiRepository.replyToCalendarEvent(
@@ -275,7 +283,7 @@ class ThreadViewModel @Inject constructor(
         )
 
         if (response.isSuccess()) {
-            fetchCalendarEvents(listOf(message))
+            fetchCalendarEvents(listOf(message), forceFetch = true)
         } else {
 
             // TODO : Revert clicked button

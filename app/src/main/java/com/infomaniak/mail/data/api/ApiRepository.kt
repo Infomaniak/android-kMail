@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.data.api
 
+import android.util.Log
 import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.R
 import com.infomaniak.lib.core.api.ApiController
@@ -392,14 +393,17 @@ object ApiRepository : ApiRepositoryCore() {
         useInfomaniakCalendarRoute: Boolean,
         calendarEventId: Int,
         attachmentResource: String,
-    ): ApiResponse<CalendarEventResponse> {
+    ): ApiResponse<Boolean> {
+        Log.v("gibran", "replyToCalendarEvent: call to reply to API with attendanceState: $attendanceState");
         val body = mapOf("reply" to attendanceState.apiValue)
 
-        return if (useInfomaniakCalendarRoute) {
-            callApi(ApiRoutes.infomaniakCalendarEventReply(calendarEventId), GET, body)
+        val route = if (useInfomaniakCalendarRoute) {
+            ApiRoutes.infomaniakCalendarEventReply(calendarEventId)
         } else {
-            callApi(ApiRoutes.icsCalendarEventReply(attachmentResource), GET, body)
+            ApiRoutes.icsCalendarEventReply(attachmentResource)
         }
+
+        return callApi(route, POST, body)
     }
 
     /**
