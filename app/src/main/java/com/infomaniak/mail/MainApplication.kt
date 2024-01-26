@@ -23,7 +23,6 @@ import android.app.PendingIntent
 import android.content.Intent
 import android.os.Build
 import android.os.StrictMode
-import android.os.StrictMode.ThreadPolicy
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorkerFactory
@@ -68,7 +67,6 @@ import org.matomo.sdk.Tracker
 import java.util.Date
 import java.util.UUID
 import javax.inject.Inject
-
 
 @HiltAndroidApp
 open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycleObserver, Configuration.Provider {
