@@ -215,7 +215,7 @@ class ThreadViewModel @Inject constructor(
         quickActionBarClicks.postValue(QuickActionBarResult(thread.uid, message, menuId))
     }
 
-    fun fetchCalendarEvents(messages: List<Message>, forceFetch: Boolean = false) {
+    fun fetchCalendarEvents(messages: List<Message>) {
         fetchCalendarEventJob?.cancel()
         fetchCalendarEventJob = viewModelScope.launch(ioCoroutineContext) {
             Log.i("gibran", "fetchCalendarEvents - gotta fetch calendar events for messages.map { it.subject }: ${messages.map { it.subject }}")
@@ -224,10 +224,8 @@ class ThreadViewModel @Inject constructor(
                     // Log.i("gibran", "fetchCalendarEvents - message.subject: ${message.subject}")
                     if (!message.isFullyDownloaded()) return@forEach // Only treat message that have their attachments downloaded
 
-                    if (!forceFetch) {
-                        val alreadyTreated = !treatedMessagesForCalendarEvent.add(message.uid)
-                        if (alreadyTreated) return@forEach
-                    }
+                    val alreadyTreated = !treatedMessagesForCalendarEvent.add(message.uid)
+                    if (alreadyTreated) return@forEach
 
                     val icsAttachment = message.calendarAttachment ?: return@forEach
 
