@@ -65,6 +65,7 @@ import com.google.android.material.R as RMaterial
 
 class ThreadAdapter(
     private val shouldLoadDistantResources: Boolean,
+    private val isCalendarEventExpandedMap: MutableMap<String, Boolean>,
     onContactClicked: (contact: Recipient) -> Unit,
     onDeleteDraftClicked: (message: Message) -> Unit,
     onDraftClicked: (message: Message) -> Unit,
@@ -190,10 +191,15 @@ class ThreadAdapter(
 
             calendarEvent?.let {
                 val calendarEventResponse = message.latestCalendarEventResponse!!
-                val isCanceled = calendarEventResponse.isCanceled
-                val shouldDisplayReplyOptions = calendarEventResponse.isReplyAuthorized()
-                val hasInfomaniakCalendarEventAssociated = calendarEventResponse.hasInfomaniakCalendarEventAssociated()
-                loadCalendarEvent(it, isCanceled, shouldDisplayReplyOptions, attachment, hasInfomaniakCalendarEventAssociated)
+
+                loadCalendarEvent(
+                    calendarEvent = it,
+                    isCanceled = calendarEventResponse.isCanceled,
+                    shouldDisplayReplyOptions = calendarEventResponse.isReplyAuthorized(),
+                    attachment = attachment,
+                    hasInfomaniakCalendarEventAssociated = calendarEventResponse.hasInfomaniakCalendarEventAssociated(),
+                    shouldStartExpanded = isCalendarEventExpandedMap[message.uid] ?: false,
+                )
             }
 
             initCallback(
@@ -208,7 +214,10 @@ class ThreadAdapter(
                 },
                 replyToCalendarEvent = { attendanceState ->
                     threadAdapterCallbacks?.replyToCalendarEvent?.invoke(attendanceState, message)
-                }
+                },
+                onAttendeesButtonClicked = { isExpanded ->
+                    isCalendarEventExpandedMap[message.uid] = isExpanded
+                },
             )
         }
     }

@@ -59,6 +59,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
     private var navigateToAttendeesBottomSheet: ((List<Attendee>) -> Unit)? = null
     private var navigateToDownloadProgressDialog: (() -> Unit)? = null
     private var replyToCalendarEvent: ((Attendee.AttendanceState) -> Unit)? = null
+    private var onAttendeesButtonClicked: ((Boolean) -> Unit)? = null
 
     @Inject
     lateinit var snackbarManager: SnackbarManager
@@ -69,7 +70,10 @@ class CalendarEventBannerView @JvmOverloads constructor(
             maybeButton.handleChoiceButtonBehavior(Attendee.AttendanceState.TENTATIVE)
             noButton.handleChoiceButtonBehavior(Attendee.AttendanceState.DECLINED)
 
-            attendeesButton.addOnCheckedChangeListener { _, isChecked -> attendeesSubMenu.isVisible = isChecked }
+            attendeesButton.addOnCheckedChangeListener { _, isChecked ->
+                attendeesSubMenu.isVisible = isChecked
+                onAttendeesButtonClicked?.invoke(isChecked)
+            }
         }
     }
 
@@ -79,6 +83,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
         shouldDisplayReplyOptions: Boolean,
         attachment: Attachment,
         hasInfomaniakCalendarEventAssociated: Boolean,
+        shouldStartExpanded: Boolean,
     ) = with(binding) {
         useInfomaniakCalendarRoute = hasInfomaniakCalendarEventAssociated
         savedAttendees = calendarEvent.attendees.copyFromRealm()
@@ -98,6 +103,9 @@ class CalendarEventBannerView @JvmOverloads constructor(
             isVisible = calendarEvent.location?.isNotBlank() == true
             text = calendarEvent.location
         }
+
+        attendeesButton.isChecked = shouldStartExpanded
+        attendeesSubMenu.isVisible = shouldStartExpanded
 
         val userAsAttendee = savedAttendees.findUser()
         setAttendanceUi(userAsAttendee != null, shouldDisplayReplyOptions, userAsAttendee?.state)
@@ -164,10 +172,12 @@ class CalendarEventBannerView @JvmOverloads constructor(
         navigateToAttendeesBottomSheet: (List<Attendee>) -> Unit,
         navigateToDownloadProgressDialog: () -> Unit,
         replyToCalendarEvent: (Attendee.AttendanceState) -> Unit,
+        onAttendeesButtonClicked: (Boolean) -> Unit,
     ) {
         this.navigateToAttendeesBottomSheet = navigateToAttendeesBottomSheet
         this.navigateToDownloadProgressDialog = navigateToDownloadProgressDialog
         this.replyToCalendarEvent = replyToCalendarEvent
+        this.onAttendeesButtonClicked = onAttendeesButtonClicked
     }
 
     private fun MaterialButton.handleChoiceButtonBehavior(attendanceState: Attendee.AttendanceState) {

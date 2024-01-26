@@ -198,6 +198,7 @@ class ThreadFragment : Fragment() {
     private fun setupAdapter() = with(binding.messagesList) {
         adapter = ThreadAdapter(
             shouldLoadDistantResources = shouldLoadDistantResources(),
+            isCalendarEventExpandedMap = threadViewModel.isCalendarEventExpandedMap,
             onContactClicked = {
                 safeNavigate(
                     resId = R.id.detailedContactBottomSheetDialog,

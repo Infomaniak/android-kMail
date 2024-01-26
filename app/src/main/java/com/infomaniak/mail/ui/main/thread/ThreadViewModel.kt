@@ -68,6 +68,7 @@ class ThreadViewModel @Inject constructor(
     val quickActionBarClicks = SingleLiveEvent<QuickActionBarResult>()
 
     private val treatedMessagesForCalendarEvent = mutableSetOf<String>()
+    val isCalendarEventExpandedMap = mutableMapOf<String, Boolean>()
 
     var deletedMessagesUids = mutableSetOf<String>()
     val failedMessagesUids = SingleLiveEvent<List<String>>()
