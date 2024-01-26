@@ -272,7 +272,7 @@ class ThreadViewModel @Inject constructor(
     fun replyToCalendarEvent(
         attendanceState: Attendee.AttendanceState,
         message: Message,
-    ) = viewModelScope.launch(ioCoroutineContext) {
+    ) = liveData<Boolean>(ioCoroutineContext) {
         val calendarEventResponse = message.latestCalendarEventResponse!!
 
         val response = ApiRepository.replyToCalendarEvent(
@@ -282,12 +282,7 @@ class ThreadViewModel @Inject constructor(
             attachmentResource = message.calendarAttachment!!.resource ?: "",
         )
 
-        if (response.isSuccess()) {
-            fetchCalendarEvents(listOf(message), forceFetch = true)
-        } else {
-
-            // TODO : Revert clicked button
-        }
+        emit(response.isSuccess() && response.data == true)
     }
 
     data class SubjectDataResult(

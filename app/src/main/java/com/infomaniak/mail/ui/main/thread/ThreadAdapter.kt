@@ -162,6 +162,7 @@ class ThreadAdapter(
                     failedLoadingErrorMessage.isVisible = true
                     if (isExpandedMap[message.uid] == true) onExpandedMessageLoaded(message.uid)
                 }
+                NotifyType.FAILED_CALENDAR_REPLY -> holder.bindCalendarEvent(message)
             }
         }
     }.getOrDefault(Unit)
@@ -590,10 +591,16 @@ class ThreadAdapter(
         threadAdapterCallbacks = null
     }
 
+    fun undoUserAttendanceClick(message: Message) {
+        val indexOfMessage = messages.indexOfFirst { it.uid == message.uid }.takeIf { it >= 0 }
+        indexOfMessage?.let { notifyItemChanged(it, NotifyType.FAILED_CALENDAR_REPLY) }
+    }
+
     private enum class NotifyType {
         TOGGLE_LIGHT_MODE,
         RE_RENDER,
         FAILED_MESSAGE,
+        FAILED_CALENDAR_REPLY,
     }
 
     enum class ContextMenuType {

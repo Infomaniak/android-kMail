@@ -245,7 +245,19 @@ class ThreadFragment : Fragment() {
             },
             navigateToNewMessageActivity = { twoPaneViewModel.navigateToNewMessage(mailToUri = it) },
             navigateToDownloadProgressDialog = ::safeNavigate,
-            replyToCalendarEvent = threadViewModel::replyToCalendarEvent,
+            replyToCalendarEvent = { attendanceState, message ->
+                threadViewModel.replyToCalendarEvent(
+                    attendanceState,
+                    message,
+                ).observe(viewLifecycleOwner) { successfullyUpdated ->
+                    if (successfullyUpdated) {
+                        // updateRealmLocally() // TODO
+                    } else {
+                        snackbarManager.setValue("Could not reply to the event") // TODO
+                        threadAdapter.undoUserAttendanceClick(message)
+                    }
+                }
+            },
             promptLink = { data, type ->
                 // When adding a phone number to contacts, Google decodes this value in case it's url-encoded. But I could not
                 // reproduce this issue when manually creating a url-encoded href. If this is triggered, fix it by also
@@ -326,7 +338,7 @@ class ThreadFragment : Fragment() {
 
     private fun observeMessagesLive() = with(threadViewModel) {
         messagesLive.observe(viewLifecycleOwner) { messages ->
-            Log.e("gibran", "observeMessagesLive: observed messages change and submitting list", );
+            Log.e("gibran", "observeMessagesLive: observed messages change and submitting list");
             SentryLog.i("UI", "Received ${messages.count()} messages")
 
             if (messages.isEmpty()) {
