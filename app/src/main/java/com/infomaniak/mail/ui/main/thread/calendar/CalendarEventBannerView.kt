@@ -26,6 +26,8 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.lib.core.utils.*
+import com.infomaniak.mail.MatomoMail.toFloat
+import com.infomaniak.mail.MatomoMail.trackCalendarEventEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.calendar.Attendee
@@ -73,9 +75,12 @@ class CalendarEventBannerView @JvmOverloads constructor(
             maybeButton.handleChoiceButtonBehavior(AttendanceState.TENTATIVE)
             noButton.handleChoiceButtonBehavior(AttendanceState.DECLINED)
 
-            attendeesButton.addOnCheckedChangeListener { _, isChecked ->
-                attendeesSubMenu.isVisible = isChecked
-                onAttendeesButtonClicked?.invoke(isChecked)
+            attendeesButton.apply {
+                setOnClickListener { trackCalendarEventEvent("attendees", attendeesButton.isChecked.toFloat()) }
+                addOnCheckedChangeListener { _, isChecked ->
+                    attendeesSubMenu.isVisible = isChecked
+                    onAttendeesButtonClicked?.invoke(isChecked)
+                }
             }
         }
     }
@@ -114,6 +119,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
         setAttendanceUi(calendarEvent.attendees, shouldDisplayReplyOptions)
 
         addToCalendarButton.setOnClickListener {
+            trackCalendarEventEvent("openInMyCalendar")
             attachment.openAttachment(context, navigateToDownloadProgressDialog ?: return@setOnClickListener, snackbarManager)
         }
     }
@@ -170,7 +176,10 @@ class CalendarEventBannerView @JvmOverloads constructor(
         noButton.isChecked = attendanceState == AttendanceState.DECLINED
 
         displayOrganizer(attendees)
-        allAttendeesButton.setOnClickListener { navigateToAttendeesBottomSheet?.invoke(attendees) }
+        allAttendeesButton.setOnClickListener {
+            trackCalendarEventEvent("seeAllAttendees")
+            navigateToAttendeesBottomSheet?.invoke(attendees)
+        }
         manyAvatarsView.setAttendees(attendees)
     }
 
@@ -188,6 +197,8 @@ class CalendarEventBannerView @JvmOverloads constructor(
 
     private fun MaterialButton.handleChoiceButtonBehavior(attendanceState: AttendanceState) {
         setOnClickListener {
+            trackCalendarEventEvent(attendanceState.matomoValue!!)
+
             // Do nothing if it was already selected
             if (isChecked) {
                 resetChoiceButtons()

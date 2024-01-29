@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2023 Infomaniak Network SA
+ * Copyright (C) 2022-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@ package com.infomaniak.mail
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavDestination
 import com.infomaniak.lib.core.MatomoCore
@@ -246,6 +247,10 @@ object MatomoMail : MatomoCore {
 
     fun Context.trackInAppUpdateEvent(name: String) {
         trackEvent("inAppUpdate", name)
+    }
+
+    fun View.trackCalendarEventEvent(name: String, value: Float? = null) {
+        context.trackEvent("calendarEvent", name, value = value)
     }
 
     // We need to invert this logical value to keep a coherent value for analytics because actions
