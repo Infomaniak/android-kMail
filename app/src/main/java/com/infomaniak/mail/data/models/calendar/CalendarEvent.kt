@@ -39,17 +39,11 @@ class CalendarEvent : EmbeddedRealmObject {
     //region Remote data
     var type: String = ""
     var title: String = ""
-    var description: String = ""
     var location: String? = null
     @SerialName("fullday")
     var isFullDay: Boolean = false
     var start: RealmInstant = Date(0).toRealmInstant()
     var end: RealmInstant = Date(0).toRealmInstant()
-    var timezone: String? = null
-    @SerialName("timezone_start")
-    private var timezoneStart: String = ""
-    @SerialName("timezone_end")
-    private var timezoneEnd: String = ""
     var attendees: RealmList<Attendee> = realmListOf()
     //endregion
 
@@ -63,14 +57,10 @@ class CalendarEvent : EmbeddedRealmObject {
 
         if (type != other.type) return false
         if (title != other.title) return false
-        if (description != other.description) return false
         if (location != other.location) return false
         if (isFullDay != other.isFullDay) return false
         if (start != other.start) return false
         if (end != other.end) return false
-        if (timezone != other.timezone) return false
-        if (timezoneStart != other.timezoneStart) return false
-        if (timezoneEnd != other.timezoneEnd) return false
 
         return attendees == other.attendees
     }
@@ -78,14 +68,10 @@ class CalendarEvent : EmbeddedRealmObject {
     override fun hashCode(): Int {
         var result = type.hashCode()
         result = 31 * result + title.hashCode()
-        result = 31 * result + description.hashCode()
         result = 31 * result + (location?.hashCode() ?: 0)
         result = 31 * result + isFullDay.hashCode()
         result = 31 * result + start.hashCode()
         result = 31 * result + end.hashCode()
-        result = 31 * result + (timezone?.hashCode() ?: 0)
-        result = 31 * result + timezoneStart.hashCode()
-        result = 31 * result + timezoneEnd.hashCode()
         result = 31 * result + attendees.hashCode()
 
         return result
