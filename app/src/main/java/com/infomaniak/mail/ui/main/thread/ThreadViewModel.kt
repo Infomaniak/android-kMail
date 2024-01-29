@@ -281,7 +281,7 @@ class ThreadViewModel @Inject constructor(
             attachmentResource = message.calendarAttachment!!.resource ?: "",
         )
 
-        emit(response.isSuccess() && response.data == true) // TODO : Handle api response when event is not inside infomaniak calendar
+        emit(response.isSuccess())
     }
 
     data class SubjectDataResult(

@@ -38,6 +38,7 @@ import com.infomaniak.mail.data.models.ai.AiResult
 import com.infomaniak.mail.data.models.ai.ContextMessage
 import com.infomaniak.mail.data.models.ai.UserMessage
 import com.infomaniak.mail.data.models.calendar.Attendee
+import com.infomaniak.mail.data.models.calendar.CalendarEvent
 import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
 import com.infomaniak.mail.data.models.correspondent.Contact
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -392,16 +393,16 @@ object ApiRepository : ApiRepositoryCore() {
         useInfomaniakCalendarRoute: Boolean,
         calendarEventId: Int,
         attachmentResource: String,
-    ): ApiResponse<Boolean> {
+    ): ApiResponse<*> {
         val body = mapOf("reply" to attendanceState.apiValue)
 
-        val route = if (useInfomaniakCalendarRoute) {
-            ApiRoutes.infomaniakCalendarEventReply(calendarEventId)
+        val response: ApiResponse<*> = if (useInfomaniakCalendarRoute) {
+            callApi<ApiResponse<Boolean>>(ApiRoutes.infomaniakCalendarEventReply(calendarEventId), POST, body)
         } else {
-            ApiRoutes.icsCalendarEventReply(attachmentResource)
+            callApi<ApiResponse<Map<String, CalendarEvent>>>(ApiRoutes.icsCalendarEventReply(attachmentResource), POST, body)
         }
 
-        return callApi(route, POST, body)
+        return response
     }
 
     /**
