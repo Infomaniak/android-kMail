@@ -63,7 +63,6 @@ class PermissionsOnboardingFragment : Fragment() {
         }
     }
 
-
     private fun getIconResWithAccentColor(permission: PermissionType) = when (localSettings.accentColor) {
         AccentColor.PINK -> permission.pinkIconRes
         AccentColor.BLUE -> permission.blueIconRes

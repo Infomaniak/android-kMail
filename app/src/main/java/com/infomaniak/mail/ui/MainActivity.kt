@@ -488,14 +488,14 @@ class MainActivity : BaseActivity() {
     }
 
     private fun managePermissionsRequesting() {
-        if (!hasPermissions(PermissionUtils.getMainPermissions(mustRequireNotification = true))) {
-            if (localSettings.showPermissionsOnboarding) {
-                if (currentFragment !is PermissionsOnboardingPagerFragment) {
-                    navController.navigate(R.id.permissionsOnboardingPagerFragment)
-                }
-            } else {
-                permissionUtils.requestMainPermissionsIfNeeded()
+        if (hasPermissions(PermissionUtils.getMainPermissions(mustRequireNotification = true))) return
+
+        if (localSettings.showPermissionsOnboarding) {
+            if (currentFragment !is PermissionsOnboardingPagerFragment) {
+                navController.navigate(R.id.permissionsOnboardingPagerFragment)
             }
+        } else {
+            permissionUtils.requestMainPermissionsIfNeeded()
         }
     }
 
