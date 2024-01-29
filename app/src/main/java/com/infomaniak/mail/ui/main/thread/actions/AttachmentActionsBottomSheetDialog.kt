@@ -88,7 +88,7 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
             attachment.openAttachment(
                 context = context,
                 navigateToDownloadProgressDialog = { navigateToDownloadProgressDialog(OPEN_WITH) },
-                snackbarManager = snackbarManager
+                snackbarManager = snackbarManager,
             )
         }
         kDriveItem.setClosingOnClickListener {
