@@ -65,7 +65,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
         eventName.text = calendarEvent.title
         setEventHour(startDate, endDate, calendarEvent.isFullDay)
         eventLocation.apply {
-            isVisible = calendarEvent.location != null
+            isVisible = calendarEvent.location?.isNotBlank() == true
             text = calendarEvent.location
         }
 
