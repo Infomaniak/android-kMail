@@ -34,6 +34,7 @@ import com.infomaniak.mail.databinding.BottomSheetAttachmentActionsBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntentType
+import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntentType.OPEN_WITH
 import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntentType.SAVE_TO_DRIVE
 import com.infomaniak.mail.utils.AttachmentIntentUtils.createDownloadDialogNavArgs
 import com.infomaniak.mail.utils.AttachmentIntentUtils.executeIntent
@@ -86,7 +87,7 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
             trackAttachmentActionsEvent("open")
             attachment.openAttachment(
                 context = context,
-                navigateToDownloadProgressDialog = { navigateToDownloadProgressDialog(it) },
+                navigateToDownloadProgressDialog = { navigateToDownloadProgressDialog(OPEN_WITH) },
                 snackbarManager = snackbarManager
             )
         }
@@ -95,7 +96,7 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
             attachment.executeIntent(
                 context = context,
                 intentType = SAVE_TO_DRIVE,
-                navigateToDownloadProgressDialog = { navigateToDownloadProgressDialog(it) },
+                navigateToDownloadProgressDialog = { navigateToDownloadProgressDialog(SAVE_TO_DRIVE) },
             )
         }
         deviceItem.setOnClickListener {
