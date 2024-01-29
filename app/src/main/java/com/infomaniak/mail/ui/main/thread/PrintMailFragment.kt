@@ -101,12 +101,9 @@ class PrintMailFragment : Fragment() {
         )
     }
 
-    private fun getWebViewToPrint(): WebView {
-        with(binding.messagesList[0]) {
-            val fullMessageWebView = findViewById<WebView>(R.id.fullMessageWebView)
-            val bodyWebView = findViewById<WebView>(R.id.bodyWebView)
+    private fun getWebViewToPrint(): WebView = with(binding.messagesList[0]) { findViewById(R.id.bodyWebView) }
+}
 
-            return if (fullMessageWebView.width != 0) fullMessageWebView else bodyWebView
         }
     }
 }
