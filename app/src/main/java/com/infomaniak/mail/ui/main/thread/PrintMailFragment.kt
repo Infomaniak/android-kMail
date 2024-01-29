@@ -103,7 +103,3 @@ class PrintMailFragment : Fragment() {
 
     private fun getWebViewToPrint(): WebView = with(binding.messagesList[0]) { findViewById(R.id.bodyWebView) }
 }
-
-        }
-    }
-}
