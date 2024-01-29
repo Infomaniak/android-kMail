@@ -30,19 +30,12 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentPrintMailBinding
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@AndroidEntryPoint
 class PrintMailFragment : Fragment() {
-
-    @Inject
-    lateinit var localSettings: LocalSettings
 
     private var _binding: FragmentPrintMailBinding? = null
     private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
