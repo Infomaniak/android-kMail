@@ -146,7 +146,13 @@ object MessageBodyUtils {
     private fun Element.insertPrintRecipientField(prefix: String, vararg recipients: Recipient) {
         if (recipients.isEmpty()) return
 
-        insertChildren(0, insertField(prefix).appendText(recipients.joinToString { it.quotedDisplay() }))
+        insertChildren(0,
+            insertField(prefix).appendText(
+                recipients.joinToString { recipient ->
+                    recipient.quotedDisplay()
+                }
+            )
+        )
     }
 
     private fun Element.insertPrintDateField(prefix: String, date: String) {
