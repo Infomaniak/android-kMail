@@ -24,7 +24,6 @@ import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.message.SubBody
 import com.infomaniak.mail.extensions.formatNumericalDayMonthYearWithTime
-import com.infomaniak.mail.extensions.mailFormattedDate
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineScope
