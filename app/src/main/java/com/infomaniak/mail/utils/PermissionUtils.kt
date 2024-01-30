@@ -84,6 +84,7 @@ class PermissionUtils @Inject constructor(private val activity: FragmentActivity
 
     /**
      * Register notifications permission only for Android API above or equal 33 and if user never manually disabled it.
+     * Manually disabled means the permission was granted at one point, but is no more.
      */
     fun registerNotificationsPermissionIfNeeded(fragment: Fragment) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !localSettings.hasAlreadyEnabledNotifications) {
@@ -96,6 +97,7 @@ class PermissionUtils @Inject constructor(private val activity: FragmentActivity
 
     /**
      * Request notifications permission only for Android API above or equal 33 and if user never manually disabled it.
+     * Manually disabled means the permission was granted at one point, but is no more.
      */
     fun requestNotificationsPermissionIfNeeded(notificationsCallback: (Boolean) -> Unit) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !localSettings.hasAlreadyEnabledNotifications) {
@@ -137,7 +139,8 @@ class PermissionUtils @Inject constructor(private val activity: FragmentActivity
         private const val STORAGE_PERMISSION = Manifest.permission.WRITE_EXTERNAL_STORAGE
 
         /**
-         * If the user has manually disabled notifications permissions, stop requesting it.
+         * The field 'mustRequireNotification' is for when the user has manually disabled notifications permissions,
+         * so we need to stop requesting it.
          * Manually disabled means the permission was granted at one point, but is no more.
          */
         fun getMainPermissions(mustRequireNotification: Boolean): Array<String> {

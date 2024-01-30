@@ -56,6 +56,8 @@ class PermissionsOnboardingPagerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
+        requireActivity().window.statusBarColor = localSettings.accentColor.getOnboardingSecondaryBackground(context)
+
         permissionUtils.apply {
             registerReadContactsPermission(fragment = this@PermissionsOnboardingPagerFragment)
             registerNotificationsPermissionIfNeeded(fragment = this@PermissionsOnboardingPagerFragment)
@@ -84,8 +86,6 @@ class PermissionsOnboardingPagerFragment : Fragment() {
                 1 -> permissionUtils.requestNotificationsPermissionIfNeeded { leaveOnboarding() }
             }
         }
-
-        requireActivity().window.statusBarColor = localSettings.accentColor.getOnboardingSecondaryBackground(context)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

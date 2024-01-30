@@ -17,22 +17,16 @@
  */
 package com.infomaniak.mail.ui.main.onboarding
 
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.infomaniak.mail.utils.PermissionUtils
 
-class PermissionsPagerAdapter(
-    manager: FragmentManager,
-    lifecycle: Lifecycle,
-) : FragmentStateAdapter(manager, lifecycle) {
+class PermissionsPagerAdapter(manager: FragmentManager, lifecycle: Lifecycle) : FragmentStateAdapter(manager, lifecycle) {
 
     override fun getItemCount() = PermissionUtils.getMainPermissions(mustRequireNotification = true).count()
 
-    override fun createFragment(position: Int): Fragment {
-        return PermissionsOnboardingFragment().apply {
-            arguments = PermissionsOnboardingFragmentArgs(position).toBundle()
-        }
+    override fun createFragment(position: Int) = PermissionsOnboardingFragment().apply {
+        arguments = PermissionsOnboardingFragmentArgs(position).toBundle()
     }
 }

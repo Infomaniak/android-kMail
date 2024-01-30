@@ -600,12 +600,14 @@
     <fragment
         android:id="@+id/permissionsOnboardingPagerFragment"
         android:name="com.infomaniak.mail.ui.main.onboarding.PermissionsOnboardingPagerFragment"
-        android:label="PermissionsOnboardingPagerFragment" />
+        android:label="PermissionsOnboardingPagerFragment"
+        tools:layout="@layout/fragment_permissions_onboarding_pager" />
 
     <fragment
         android:id="@+id/permissionsOnboardingFragment"
         android:name="com.infomaniak.mail.ui.main.onboarding.PermissionsOnboardingFragment"
-        android:label="PermissionsOnboardingFragment">
+        android:label="PermissionsOnboardingFragment"
+        tools:layout="@layout/fragment_permissions_onboarding">
         <argument
             android:name="position"
             app:argType="integer" />
