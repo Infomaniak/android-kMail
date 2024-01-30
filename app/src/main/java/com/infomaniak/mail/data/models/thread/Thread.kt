@@ -20,7 +20,6 @@
 package com.infomaniak.mail.data.models.thread
 
 import android.content.Context
-import android.os.Build
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.MatomoMail.SEARCH_FOLDER_FILTER_NAME
 import com.infomaniak.mail.R
@@ -30,6 +29,7 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.extensions.formatNumericalDayMonthYear
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.isSmallerThanDays
 import com.infomaniak.mail.utils.toDate

@@ -23,6 +23,7 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.message.SubBody
+import com.infomaniak.mail.extensions.formatNumericalDayMonthYearWithTime
 import com.infomaniak.mail.extensions.mailFormattedDate
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -126,7 +127,7 @@ object MessageBodyUtils {
         messageDetailsDiv.insertPrintRecipientField(context.getString(R.string.toTitle), * message.to.toTypedArray())
         message.sender?.let { messageDetailsDiv.insertPrintRecipientField(context.getString(R.string.fromTitle), it) }
 
-        val formattedDate = context.mailFormattedDate(message.date.toDate()).toString()
+        val formattedDate = message.date.toDate().formatNumericalDayMonthYearWithTime()
         messageDetailsDiv.insertPrintDateField(context.getString(R.string.dateTitle), formattedDate)
 
         rootHeaderDiv.insertChildren(4, messageDetailsDiv)
