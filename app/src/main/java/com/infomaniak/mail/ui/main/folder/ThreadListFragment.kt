@@ -232,7 +232,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
 
-        val statusBarColor = if (isThreadOpen() && !canDisplayBothPanes()) {
+        val statusBarColor = if (twoPaneViewModel.isInThreadInPhoneMode(requireContext())) {
             R.color.backgroundColor
         } else {
             R.color.backgroundHeaderColor

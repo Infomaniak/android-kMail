@@ -68,7 +68,6 @@ abstract class TwoPaneFragment : Fragment() {
     fun areBothShown() = !isOnlyOneShown()
     fun isOnlyLeftShown() = isOnlyOneShown() && !slidingPaneLayout.isOpen
     fun isOnlyRightShown() = isOnlyOneShown() && slidingPaneLayout.isOpen
-    fun isThreadOpen() = twoPaneViewModel.currentThreadUid.value != null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -109,7 +108,7 @@ abstract class TwoPaneFragment : Fragment() {
             rightPaneFolderName.value = name
 
             if (folderId != previousFolderId) {
-                if (isThreadOpen() && previousFolderId != null) closeThread()
+                if (isThreadOpen && previousFolderId != null) closeThread()
                 previousFolderId = folderId
             }
 

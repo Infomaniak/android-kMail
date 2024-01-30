@@ -148,6 +148,7 @@ class ThreadFragment : Fragment() {
         threadAdapter.reRenderMails()
         super.onConfigurationChanged(newConfig)
         updateNavigationIcon()
+        updateElevatedStatusBarColor()
     }
 
     override fun onDestroyView() {
@@ -191,6 +192,17 @@ class ThreadFragment : Fragment() {
             } else {
                 if (navigationIcon == null) setNavigationIcon(R.drawable.ic_navigation_default)
             }
+        }
+    }
+
+    private fun updateElevatedStatusBarColor() {
+        if (twoPaneViewModel.isInThreadInPhoneMode(requireContext())) {
+            val statusBarColor = if (binding.messagesListNestedScrollView.isAtTheTop()) {
+                R.color.toolbarLoweredColor
+            } else {
+                R.color.toolbarElevatedColor
+            }
+            setSystemBarsColors(statusBarColor = statusBarColor, navigationBarColor = null)
         }
     }
 
