@@ -249,8 +249,8 @@ object MatomoMail : MatomoCore {
         trackEvent("inAppUpdate", name)
     }
 
-    fun View.trackCalendarEventEvent(name: String, value: Float? = null) {
-        context.trackEvent("calendarEvent", name, value = value)
+    fun View.trackCalendarEventEvent(name: String, value: Boolean? = null) {
+        context.trackEvent("calendarEvent", name, value = value?.toFloat())
     }
 
     // We need to invert this logical value to keep a coherent value for analytics because actions

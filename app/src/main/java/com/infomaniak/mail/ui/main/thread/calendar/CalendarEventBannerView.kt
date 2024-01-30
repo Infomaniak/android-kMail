@@ -26,7 +26,6 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.lib.core.utils.*
-import com.infomaniak.mail.MatomoMail.toFloat
 import com.infomaniak.mail.MatomoMail.trackCalendarEventEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
@@ -76,7 +75,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
             noButton.handleChoiceButtonBehavior(AttendanceState.DECLINED)
 
             attendeesButton.apply {
-                setOnClickListener { trackCalendarEventEvent("attendees", attendeesButton.isChecked.toFloat()) }
+                setOnClickListener { trackCalendarEventEvent("attendees", attendeesButton.isChecked) }
                 addOnCheckedChangeListener { _, isChecked ->
                     attendeesSubMenu.isVisible = isChecked
                     onAttendeesButtonClicked?.invoke(isChecked)
