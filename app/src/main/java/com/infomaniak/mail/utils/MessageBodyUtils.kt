@@ -104,6 +104,7 @@ object MessageBodyUtils {
     }
 
     private fun createPrintHeader(context: Context, message: Message): Element {
+        val elementsToInsert = mutableListOf<Element>()
         val rootHeaderDiv = Element("div")
         val firstSeparator = Element("hr").attr("color", "black")
         val secondSeparator = Element("hr").attr("color", "LightGray")
@@ -111,15 +112,15 @@ object MessageBodyUtils {
         val iconElement = Element("img")
             .attr("src", "file:///android_asset/icon_print_email.svg")
             .attr("width", "150")
-        rootHeaderDiv.insertChildren(0, iconElement)
-        rootHeaderDiv.insertChildren(1, firstSeparator)
+        elementsToInsert.add(iconElement)
+        elementsToInsert.add(firstSeparator)
 
         message.subject?.let { subject ->
             val subjectElement = Element("b").appendText(subject)
-            rootHeaderDiv.insertChildren(2, subjectElement)
+            elementsToInsert.add(subjectElement)
         }
 
-        rootHeaderDiv.insertChildren(3, secondSeparator)
+        elementsToInsert.add(secondSeparator)
 
         val messageDetailsDiv = Element("div").attr("style", "margin-bottom: 40px; display: block")
         messageDetailsDiv.insertPrintRecipientField(context.getString(R.string.ccTitle), *message.cc.toTypedArray())
@@ -129,9 +130,11 @@ object MessageBodyUtils {
         val formattedDate = message.date.toDate().formatNumericalDayMonthYearWithTime()
         messageDetailsDiv.insertPrintDateField(context.getString(R.string.dateTitle), formattedDate)
 
-        rootHeaderDiv.insertChildren(4, messageDetailsDiv)
+        elementsToInsert.add(messageDetailsDiv)
 
         rootHeaderDiv.attr("style", "margin-bottom: 40px")
+
+        rootHeaderDiv.insertChildren(0, elementsToInsert)
 
         return rootHeaderDiv
     }
