@@ -67,6 +67,7 @@ class LocalSettings private constructor(context: Context) : SharedValues {
     var showSyncDiscoveryBottomSheet by sharedValue("showSyncDiscoveryBottomSheetKey", true)
     var appReviewLaunches by sharedValue("appReviewLaunchesKey", DEFAULT_APP_REVIEW_LAUNCHES)
     var showAppReviewDialog by sharedValue("showAppReviewDialogKey", true)
+    var showPermissionsOnboarding by sharedValue("showPermissionsOnboardingKey", true)
 
     fun removeSettings() = sharedPreferences.transaction { clear() }
 

@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
@@ -45,6 +44,7 @@ import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.Utils.toEnumOrThrow
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
+import com.infomaniak.lib.core.utils.hasPermissions
 import com.infomaniak.lib.core.utils.year
 import com.infomaniak.lib.stores.StoreUtils.checkUpdateIsAvailable
 import com.infomaniak.lib.stores.StoreUtils.initAppUpdateManager
@@ -69,6 +69,7 @@ import com.infomaniak.mail.ui.alertDialogs.TitleAlertDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
+import com.infomaniak.mail.ui.main.onboarding.PermissionsOnboardingPagerFragment
 import com.infomaniak.mail.ui.newMessage.NewMessageActivity
 import com.infomaniak.mail.ui.sync.SyncAutoConfigActivity
 import com.infomaniak.mail.utils.*
@@ -206,7 +207,7 @@ class MainActivity : BaseActivity() {
 
         loadCurrentMailbox()
 
-        permissionUtils.requestMainPermissionsIfNeeded()
+        managePermissionsRequesting()
 
         initAppUpdateManager()
     }
@@ -368,8 +369,11 @@ class MainActivity : BaseActivity() {
         }
 
         fun popBack() {
-            val fragment = currentFragment
-            if (fragment is TwoPaneFragment) fragment.handleOnBackPressed() else navController.popBackStack()
+            when (val fragment = currentFragment) {
+                is TwoPaneFragment -> fragment.handleOnBackPressed()
+                is PermissionsOnboardingPagerFragment -> fragment.leaveOnboarding()
+                else -> navController.popBackStack()
+            }
         }
 
         onBackPressedDispatcher.addCallback(this@MainActivity) {
@@ -422,7 +426,7 @@ class MainActivity : BaseActivity() {
 
     private fun registerMainPermissions() {
         permissionUtils.registerMainPermissions { permissionsResults ->
-            if (permissionsResults[Manifest.permission.READ_CONTACTS] == true) mainViewModel.updateUserInfo()
+            if (permissionsResults[PermissionUtils.READ_CONTACTS_PERMISSION] == true) mainViewModel.updateUserInfo()
         }
     }
 
@@ -483,6 +487,18 @@ class MainActivity : BaseActivity() {
         )
     }
 
+    private fun managePermissionsRequesting() {
+        if (hasPermissions(PermissionUtils.getMainPermissions(mustRequireNotification = true))) return
+
+        if (localSettings.showPermissionsOnboarding) {
+            if (currentFragment !is PermissionsOnboardingPagerFragment) {
+                navController.navigate(R.id.permissionsOnboardingPagerFragment)
+            }
+        } else {
+            permissionUtils.requestMainPermissionsIfNeeded()
+        }
+    }
+
     private fun initAppUpdateManager() {
         initAppUpdateManager(
             context = this,
@@ -508,7 +524,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun showSyncDiscovery() = with(localSettings) {
-        if (showSyncDiscoveryBottomSheet && appLaunches > 1 && !isUserAlreadySynchronized()) {
+        if (!showPermissionsOnboarding && showSyncDiscoveryBottomSheet && appLaunches > 1 && !isUserAlreadySynchronized()) {
             showSyncDiscoveryBottomSheet = false
             navController.navigate(R.id.syncDiscoveryBottomSheetDialog)
         }

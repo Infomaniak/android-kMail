@@ -355,9 +355,13 @@
     <string name="notificationTitleCouldNotSaveDraft">Le brouillon n’a pas pu être sauvegardé</string>
     <string name="notificationTitleCouldNotSendDraft">L’e-mail n’a pas pu être envoyé</string>
     <string name="notificationTitleDelete">Supprimé</string>
+    <string name="onBoardingContactsDescription">Cet accès permettra d’écrire facilement à vos contacts depuis Infomaniak Mail.\nNous respectons vos données et vos contacts ne seront pas utilisés à d’autres fins.</string>
+    <string name="onBoardingContactsTitle">Autoriser l’app à accéder à vos contacts</string>
     <string name="onBoardingDescription2">Personnalisez librement vos raccourcis dans les paramètres de l’app.</string>
     <string name="onBoardingDescription3">Archivez, supprimez, déplacez ou mettez en favoris plusieurs messages en une fois.</string>
     <string name="onBoardingDescription4">Créez une adresse gratuite ou connectez-vous à un compte Infomaniak existant.</string>
+    <string name="onBoardingNotificationsDescription">Ne manquez plus aucun e-mail important et soyez en mesure de répondre rapidement en activant les notifications.</string>
+    <string name="onBoardingNotificationsTitle">Autoriser les notifications</string>
     <string name="onBoardingTitle1">Choisissez votre thème</string>
     <string name="onBoardingTitle2">Gagnez du temps avec les actions de balayage</string>
     <string name="onBoardingTitle3">Appuyez quelques secondes sur un message pour en sélectionner plusieurs</string>
