@@ -47,33 +47,28 @@ class PrintMailFragment : Fragment() {
     private var _binding: FragmentPrintMailBinding? = null
     private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
 
-    private val threadAdapter inline get() = binding.messagesList.adapter as ThreadAdapter
-
+    private val navigationArgs: PrintMailFragmentArgs by navArgs()
     private val threadViewModel: ThreadViewModel by viewModels()
-
-    private val args: PrintMailFragmentArgs by navArgs()
+    private val threadAdapter inline get() = binding.messagesList.adapter as ThreadAdapter
 
     private var subject = ""
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return FragmentPrintMailBinding.inflate(inflater, container, false).also {
-            _binding = it
-        }.root
+        return FragmentPrintMailBinding.inflate(inflater, container, false).also { _binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(threadViewModel) {
         super.onViewCreated(view, savedInstanceState)
-
         setupAdapter()
-        threadViewModel.threadLive.observe(viewLifecycleOwner) { thread ->
-            thread?.subject?.let { subject -> this.subject = subject }
+        threadLive.observe(viewLifecycleOwner) { thread ->
+            thread?.subject?.let { subject = it }
         }
-        threadViewModel.messagesLive.observe(viewLifecycleOwner) { messages ->
-            threadAdapter.submitList(messages.filter { it.uid == args.messageUid })
+        messagesLive.observe(viewLifecycleOwner) { messages ->
+            threadAdapter.submitList(messages.filter { it.uid == navigationArgs.messageUid })
         }
-        args.openThreadUid?.let { openThreadUid ->
-            threadViewModel.reassignThreadLive(openThreadUid)
-            threadViewModel.reassignMessagesLive(openThreadUid)
+        navigationArgs.openThreadUid?.let {
+            reassignThreadLive(it)
+            reassignMessagesLive(it)
         }
     }
 
@@ -97,7 +92,7 @@ class PrintMailFragment : Fragment() {
                     val printManager = requireContext().getSystemService(Context.PRINT_SERVICE) as PrintManager
                     printManager.print(subject, webViewPrintAdapter, null)
                 }
-            }
+            },
         )
     }
 

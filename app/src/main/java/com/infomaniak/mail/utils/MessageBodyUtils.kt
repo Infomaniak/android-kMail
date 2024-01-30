@@ -121,17 +121,10 @@ object MessageBodyUtils {
 
         rootHeaderDiv.insertChildren(3, secondSeparator)
 
-        val messageDetailsDiv = Element("div")
-            .attr("style", "margin-bottom: 40px; display: block")
-        message.cc.let { cc ->
-            messageDetailsDiv.insertPrintRecipientField(context.getString(R.string.ccTitle), *cc.toTypedArray())
-        }
-        message.to.let { to ->
-            messageDetailsDiv.insertPrintRecipientField(context.getString(R.string.toTitle), *to.toTypedArray())
-        }
-        message.sender?.let { sender ->
-            messageDetailsDiv.insertPrintRecipientField(context.getString(R.string.fromTitle), sender)
-        }
+        val messageDetailsDiv = Element("div").attr("style", "margin-bottom: 40px; display: block")
+        messageDetailsDiv.insertPrintRecipientField(context.getString(R.string.ccTitle), *message.cc.toTypedArray())
+        messageDetailsDiv.insertPrintRecipientField(context.getString(R.string.toTitle), * message.to.toTypedArray())
+        message.sender?.let { messageDetailsDiv.insertPrintRecipientField(context.getString(R.string.fromTitle), it) }
 
         val formattedDate = context.mailFormattedDate(message.date.toDate()).toString()
         messageDetailsDiv.insertPrintDateField(context.getString(R.string.dateTitle), formattedDate)
@@ -146,12 +139,11 @@ object MessageBodyUtils {
     private fun Element.insertPrintRecipientField(prefix: String, vararg recipients: Recipient) {
         if (recipients.isEmpty()) return
 
-        insertChildren(0,
+        insertChildren(
+            0,
             insertField(prefix).appendText(
-                recipients.joinToString { recipient ->
-                    recipient.quotedDisplay()
-                }
-            )
+                recipients.joinToString { recipient -> recipient.quotedDisplay() }
+            ),
         )
     }
 

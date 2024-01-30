@@ -30,7 +30,7 @@ private const val FORMAT_EMAIL_DATE_SHORT_DATE = "d MMM"
 private const val FORMAT_EMAIL_DATE_LONG_DATE = "d MMM yyyy"
 
 fun Context.mailFormattedDate(date: Date): CharSequence = with(date) {
-    return when {
+    return@with when {
         isToday() -> format(FORMAT_EMAIL_DATE_HOUR)
         isYesterday() -> getString(
             R.string.messageDetailsDateAt,
@@ -47,7 +47,7 @@ fun Context.mailFormattedDate(date: Date): CharSequence = with(date) {
 }
 
 fun Context.mostDetailedDate(date: Date): String = with(date) {
-    return getString(
+    return@with getString(
         R.string.messageDetailsDateAt,
         format(FORMAT_EMAIL_DATE_LONG_DATE),
         format(FORMAT_EMAIL_DATE_HOUR),

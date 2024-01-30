@@ -141,6 +141,7 @@ class ThreadAdapter(
         return ThreadViewHolder(
             ItemMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false),
             shouldLoadDistantResources,
+            isForPrinting,
             threadAdapterCallbacks?.onContactClicked,
             threadAdapterCallbacks?.onAttachmentClicked,
         )
@@ -150,12 +151,12 @@ class ThreadAdapter(
         with(holder.binding) {
             if (payloads.isEmpty()) {
                 super.onBindViewHolder(holder, position, payloads)
-                return
+                return@runCatchingRealm
             }
             payloads.forEach { payload ->
                 if (payload !is NotifyType) {
                     super.onBindViewHolder(holder, position, payloads)
-                    return
+                    return@runCatchingRealm
                 }
 
                 val message = messages[position]
@@ -639,6 +640,7 @@ class ThreadAdapter(
     class ThreadViewHolder(
         val binding: ItemMessageBinding,
         private val shouldLoadDistantResources: Boolean,
+        private val isForPrinting: Boolean,
         onContactClicked: ((contact: Recipient) -> Unit)?,
         onAttachmentClicked: ((attachment: Attachment) -> Unit)?,
     ) : ViewHolder(binding.root) {
@@ -655,7 +657,7 @@ class ThreadAdapter(
         val fullMessageWebViewClient get() = _fullMessageWebViewClient!!
 
         init {
-            WebView.enableSlowWholeDocumentDraw()
+            if (isForPrinting) WebView.enableSlowWholeDocumentDraw()
             with(binding) {
                 fromRecyclerView.adapter = fromAdapter
                 toRecyclerView.adapter = toAdapter

@@ -31,7 +31,7 @@ import com.google.android.material.R as RMaterial
 class HtmlFormatter(
     private val context: Context? = null,
     private val html: String,
-    private val message: Message? = null
+    private val message: Message? = null,
 ) {
 
     private val cssList = mutableListOf<Pair<String, String?>>()
@@ -73,7 +73,9 @@ class HtmlFormatter(
             injectScript()
         }
 
-        if (isForPrint && context != null) message?.let { MessageBodyUtils.addPrintHeader(context, it, this) }
+        if (isForPrint && context != null && message != null) {
+            MessageBodyUtils.addPrintHeader(context, message, this)
+        }
 
         if (breakLongWords) body().breakLongStrings()
 

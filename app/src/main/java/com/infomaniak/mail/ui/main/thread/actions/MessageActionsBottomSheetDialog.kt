@@ -164,7 +164,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     safeNavigate(
                         resId = R.id.printMailFragment,
                         args = PrintMailFragmentArgs(threadUid, messageUid).toBundle(),
-                        currentClassName = MessageActionsBottomSheetDialog::class.java.name
+                        currentClassName = MessageActionsBottomSheetDialog::class.java.name,
                     )
                 }
 

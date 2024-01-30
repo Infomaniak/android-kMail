@@ -50,7 +50,7 @@ class WebViewUtils(context: Context) {
         html: String,
         isDisplayedInDarkMode: Boolean,
         message: Message? = null,
-        isForPrinting: Boolean = false
+        isForPrinting: Boolean = false,
     ): String = with(HtmlFormatter(context = context, html = html, message = message)) {
         addCommonDisplayContent(isDisplayedInDarkMode, isForPrinting)
         return@with inject()
@@ -59,7 +59,7 @@ class WebViewUtils(context: Context) {
     fun processSignatureHtmlForDisplay(
         html: String,
         isDisplayedInDarkMode: Boolean,
-        isForPrinting: Boolean = false
+        isForPrinting: Boolean = false,
     ): String = with(HtmlFormatter(html = html)) {
         addCommonDisplayContent(isDisplayedInDarkMode, isForPrinting)
         registerCss(signatureVerticalMargin)
