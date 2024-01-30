@@ -110,9 +110,8 @@ dependencies {
     implementation libs.sentry.android.fragment
 
     // Test
-    androidTestImplementation libs.test.runner
-    testImplementation 'org.junit.jupiter:junit-jupiter'
-    testRuntimeOnly libs.junit.jupiter.engine
+    testImplementation libs.junit
+    androidTestImplementation libs.ext.junit
 
     // Debug
     if (enableLeakCanary) debugImplementation libs.leakcanary.android

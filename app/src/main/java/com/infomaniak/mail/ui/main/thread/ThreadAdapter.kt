@@ -165,7 +165,11 @@ class ThreadAdapter(
                     failedLoadingErrorMessage.isVisible = true
                     if (isExpandedMap[message.uid] == true) onExpandedMessageLoaded(message.uid)
                 }
-                NotifyType.FAILED_CALENDAR_REPLY -> holder.bindCalendarEvent(message)
+                NotifyType.BIND_CALENDAR_EVENT -> holder.bindCalendarEvent(message)
+                NotifyType.BIND_ONLY_CALENDAR_ATTENDANCE -> {
+                    val attendees = message.latestCalendarEventResponse?.calendarEvent?.attendees
+                    // holder.binding.calendarEvent.updateAttendance(attendees) // TODO
+                }
             }
         }
     }.getOrDefault(Unit)
@@ -605,14 +609,15 @@ class ThreadAdapter(
 
     fun undoUserAttendanceClick(message: Message) {
         val indexOfMessage = messages.indexOfFirst { it.uid == message.uid }.takeIf { it >= 0 }
-        indexOfMessage?.let { notifyItemChanged(it, NotifyType.FAILED_CALENDAR_REPLY) }
+        indexOfMessage?.let { notifyItemChanged(it, NotifyType.BIND_CALENDAR_EVENT) }
     }
 
     private enum class NotifyType {
         TOGGLE_LIGHT_MODE,
         RE_RENDER,
         FAILED_MESSAGE,
-        FAILED_CALENDAR_REPLY,
+        BIND_CALENDAR_EVENT,
+        BIND_ONLY_CALENDAR_ATTENDANCE,
     }
 
     enum class ContextMenuType {
@@ -621,15 +626,35 @@ class ThreadAdapter(
         PHONE,
     }
 
-    private class MessageDiffCallback : DiffUtil.ItemCallback<Message>() {
+    class MessageDiffCallback : DiffUtil.ItemCallback<Message>() {
         override fun areItemsTheSame(oldMessage: Message, newMessage: Message): Boolean {
             return oldMessage.uid == newMessage.uid
         }
 
         override fun areContentsTheSame(oldMessage: Message, newMessage: Message): Boolean {
-            return newMessage.body?.value == oldMessage.body?.value &&
-                    newMessage.splitBody == oldMessage.splitBody &&
+            return areMessageContentsTheSameExceptCalendar(oldMessage, newMessage) &&
                     newMessage.latestCalendarEventResponse == oldMessage.latestCalendarEventResponse
+        }
+
+        override fun getChangePayload(oldItem: Message, newItem: Message): Any? {
+            // If everything but attendees is the same, then we know the only thing that could've changed is attendees
+            return if (everythingButAttendeesIsTheSame(oldItem, newItem)) NotifyType.BIND_ONLY_CALENDAR_ATTENDANCE else null
+        }
+
+        companion object {
+            fun everythingButAttendeesIsTheSame(oldItem: Message, newItem: Message): Boolean {
+                val newCalendarEventResponse = newItem.latestCalendarEventResponse
+                val oldCalendarEventResponse = oldItem.latestCalendarEventResponse
+
+                return (areMessageContentsTheSameExceptCalendar(oldItem, newItem) &&
+                        !(newCalendarEventResponse == null && oldCalendarEventResponse == null)
+                        && newCalendarEventResponse?.everythingButAttendeesIsTheSame(oldCalendarEventResponse) == true)
+            }
+
+            private fun areMessageContentsTheSameExceptCalendar(oldMessage: Message, newMessage: Message): Boolean {
+                return newMessage.body?.value == oldMessage.body?.value &&
+                        newMessage.splitBody == oldMessage.splitBody
+            }
         }
     }
 

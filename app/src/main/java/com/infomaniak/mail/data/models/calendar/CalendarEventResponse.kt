@@ -24,7 +24,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-class CalendarEventResponse : EmbeddedRealmObject {
+class CalendarEventResponse() : EmbeddedRealmObject {
 
     //region Remote data
     @SerialName("user_stored_event")
@@ -36,6 +36,18 @@ class CalendarEventResponse : EmbeddedRealmObject {
     @SerialName("attachment_event_method")
     private var _attachmentEventMethod: String? = null
     //endregion
+
+    constructor(
+        userStoredEvent: CalendarEvent?,
+        isUserStoredEventDeleted: Boolean,
+        attachmentEvent: CalendarEvent?,
+        attachmentEventMethod: String?
+    ) : this() {
+        this.userStoredEvent = userStoredEvent
+        this.isUserStoredEventDeleted = isUserStoredEventDeleted
+        this.attachmentEvent = attachmentEvent
+        this._attachmentEventMethod = attachmentEventMethod
+    }
 
     private val attachmentEventMethod: AttachmentEventMethod?
         get() = Utils.enumValueOfOrNull<AttachmentEventMethod>(_attachmentEventMethod)
@@ -55,6 +67,22 @@ class CalendarEventResponse : EmbeddedRealmObject {
     fun hasUserStoredEvent() = userStoredEvent != null
 
     fun hasAttachmentEvent() = attachmentEvent != null
+
+    fun everythingButAttendeesIsTheSame(other: CalendarEventResponse?): Boolean {
+        if (other == null) return false
+
+        if (isUserStoredEventDeleted != other.isUserStoredEventDeleted) return false
+        if (_attachmentEventMethod != other._attachmentEventMethod) return false
+
+        val c1 = calendarEvent
+        val c2 = other.calendarEvent
+
+        if (c1 == null && c2 == null) return true
+        if (c1 == null) return false
+        if (c2 == null) return false
+
+        return c1.everythingButAttendeesIsTheSame(c2)
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
