@@ -18,19 +18,16 @@
 package com.infomaniak.mail.utils
 
 import android.content.Context
-import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.message.SubBody
-import com.infomaniak.mail.extensions.formatNumericalDayMonthYearWithTime
+import com.infomaniak.mail.utils.PrintHeaderUtils.createPrintHeader
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ensureActive
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.jsoup.nodes.Element
 
 object MessageBodyUtils {
 
@@ -98,66 +95,10 @@ object MessageBodyUtils {
     }
 
     fun addPrintHeader(context: Context, message: Message, htmlDocument: Document) {
-        htmlDocument.body()
-            .attr("style", "margin: 40px")
-        htmlDocument.body().insertChildren(0, createPrintHeader(context, message))
-    }
-
-    private fun createPrintHeader(context: Context, message: Message): Element {
-        val elementsToInsert = mutableListOf<Element>()
-        val rootHeaderDiv = Element("div")
-        val firstSeparator = Element("hr").attr("color", "black")
-        val secondSeparator = Element("hr").attr("color", "LightGray")
-
-        val iconElement = Element("img")
-            .attr("src", "file:///android_asset/icon_print_email.svg")
-            .attr("width", "150")
-        elementsToInsert.add(iconElement)
-        elementsToInsert.add(firstSeparator)
-
-        message.subject?.let { subject ->
-            val subjectElement = Element("b").appendText(subject)
-            elementsToInsert.add(subjectElement)
+        htmlDocument.body().apply {
+            attr("style", "margin: 40px")
+            insertChildren(0, createPrintHeader(context, message))
         }
-
-        elementsToInsert.add(secondSeparator)
-
-        val messageDetailsDiv = Element("div").attr("style", "margin-bottom: 40px; display: block")
-        messageDetailsDiv.insertPrintRecipientField(context.getString(R.string.ccTitle), *message.cc.toTypedArray())
-        messageDetailsDiv.insertPrintRecipientField(context.getString(R.string.toTitle), * message.to.toTypedArray())
-        message.sender?.let { messageDetailsDiv.insertPrintRecipientField(context.getString(R.string.fromTitle), it) }
-
-        val formattedDate = message.date.toDate().formatNumericalDayMonthYearWithTime()
-        messageDetailsDiv.insertPrintDateField(context.getString(R.string.dateTitle), formattedDate)
-
-        elementsToInsert.add(messageDetailsDiv)
-
-        rootHeaderDiv.attr("style", "margin-bottom: 40px")
-
-        rootHeaderDiv.insertChildren(0, elementsToInsert)
-
-        return rootHeaderDiv
-    }
-
-    private fun Element.insertPrintRecipientField(prefix: String, vararg recipients: Recipient) {
-        if (recipients.isEmpty()) return
-
-        insertChildren(
-            0,
-            insertField(prefix).appendText(
-                recipients.joinToString { recipient -> recipient.quotedDisplay() }
-            ),
-        )
-    }
-
-    private fun Element.insertPrintDateField(prefix: String, date: String) {
-        insertChildren(0, insertField(prefix).appendText(date))
-    }
-
-    private fun insertField(prefix: String) = with(Element("div")) {
-        val fieldName = Element("b").appendText(prefix).attr("style", "margin-right: 10px")
-
-        insertChildren(0, fieldName)
     }
 
     fun mergeSplitBodyAndSubBodies(body: String, subBodies: List<SubBody>, messageUid: String): String {

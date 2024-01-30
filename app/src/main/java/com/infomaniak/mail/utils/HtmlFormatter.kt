@@ -243,6 +243,8 @@ class HtmlFormatter(
 
         fun Context.getSignatureMarginStyle(): String = loadCss(R.raw.signature_margins)
 
+        fun Context.getPrintMailStyle(): String = loadCss(R.raw.print_email)
+
         fun Context.getResizeScript(): String = loadScript(
             R.raw.munge_email,
             listOf("MESSAGE_SELECTOR" to "#$KMAIL_MESSAGE_ID")

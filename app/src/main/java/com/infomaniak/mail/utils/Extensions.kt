@@ -224,7 +224,7 @@ fun WebView.initWebViewClientAndBridge(
 ): MessageWebViewClient {
 
     WebViewUtils.initJavascriptBridge(onWebViewFinishedLoading)
-    WebViewUtils.jsBridge?.let { jsBridge -> addJavascriptInterface(jsBridge, "kmail") }
+    addJavascriptInterface(WebViewUtils.jsBridge, "kmail")
 
     val cidDictionary = mutableMapOf<String, Attachment>().apply {
         attachments.forEach {

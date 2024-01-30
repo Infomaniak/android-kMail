@@ -94,7 +94,7 @@ class ReplyForwardFooterManager @Inject constructor(private val appContext: Cont
         }
     }
 
-    private fun Message.fromName(): String = sender?.quotedDisplay() ?: appContext.getString(R.string.unknownRecipientTitle)
+    private fun Message.fromName(): String = sender?.quotedDisplayName() ?: appContext.getString(R.string.unknownRecipientTitle)
 
     private fun getHtmlDocument(message: Message): Document? {
         val html = message.body?.let { body ->
@@ -181,7 +181,7 @@ class ReplyForwardFooterManager @Inject constructor(private val appContext: Cont
     }
 
     private fun formatRecipientList(recipientList: List<Recipient>): String? {
-        return if (recipientList.isNotEmpty()) recipientList.joinToString { it.quotedDisplay() } else null
+        return if (recipientList.isNotEmpty()) recipientList.joinToString { it.quotedDisplayName() } else null
     }
 
     companion object {

@@ -17,14 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.thread.actions
 
-import android.content.Context
 import android.os.Bundle
-import android.os.CancellationSignal
-import android.os.ParcelFileDescriptor
-import android.print.PageRange
-import android.print.PrintAttributes
-import android.print.PrintDocumentAdapter
-import android.print.PrintManager
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.navigation.fragment.navArgs

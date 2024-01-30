@@ -243,8 +243,8 @@ class ThreadFragment : Fragment() {
             onAttachmentClicked = { attachment ->
                 attachment.resource?.let { resource ->
                     safeNavigate(
-                        resId = R.id.attachmentActionsBottomSheetDialog,
-                        args = AttachmentActionsBottomSheetDialogArgs(resource).toBundle(),
+                        resId = R.id.detailedContactBottomSheetDialog,
+                        args = DetailedContactBottomSheetDialogArgs(it).toBundle(),
                     )
                 }
             },
@@ -291,12 +291,13 @@ class ThreadFragment : Fragment() {
                     Sentry.captureMessage("Google was right, phone numbers can be url-encoded. Needs to be fixed")
                 }
 
-                when (type) {
-                    ContextMenuType.LINK -> linkContextualMenuAlertDialog.show(data)
-                    ContextMenuType.EMAIL -> emailContextualMenuAlertDialog.show(data)
-                    ContextMenuType.PHONE -> phoneContextualMenuAlertDialog.show(data)
-                }
-            },
+                    when (type) {
+                        ContextMenuType.LINK -> linkContextualMenuAlertDialog.show(data)
+                        ContextMenuType.EMAIL -> emailContextualMenuAlertDialog.show(data)
+                        ContextMenuType.PHONE -> phoneContextualMenuAlertDialog.show(data)
+                    }
+                },
+            ),
         )
 
         addItemDecoration(DividerItemDecorator(InsetDrawable(dividerDrawable(context), 0)))

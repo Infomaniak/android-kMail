@@ -74,7 +74,7 @@ open class Recipient : EmbeddedRealmObject, Correspondent {
         return isUnknownContact && !isMailerDaemon && isUntrustedDomain && !isAlias
     }
 
-    fun quotedDisplay(): String = "${("$name ").ifBlank { "" }}<$email>"
+    fun quotedDisplayName(): String = "${("$name ").ifBlank { "" }}<$email>"
 
     override fun toString(): String = "($email -> $name)"
 

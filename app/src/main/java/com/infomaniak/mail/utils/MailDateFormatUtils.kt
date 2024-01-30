@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.extensions
+package com.infomaniak.mail.utils
 
 import android.content.Context
 import com.infomaniak.lib.core.utils.format
@@ -25,31 +25,34 @@ import com.infomaniak.lib.core.utils.isYesterday
 import com.infomaniak.mail.R
 import java.util.Date
 
-private const val FORMAT_EMAIL_DATE_HOUR = "HH:mm"
-private const val FORMAT_EMAIL_DATE_SHORT_DATE = "d MMM"
-private const val FORMAT_EMAIL_DATE_LONG_DATE = "d MMM yyyy"
+object MailDateFormatUtils {
 
-fun Context.mailFormattedDate(date: Date): CharSequence = with(date) {
-    return@with when {
-        isToday() -> format(FORMAT_EMAIL_DATE_HOUR)
-        isYesterday() -> getString(
-            R.string.messageDetailsDateAt,
-            getString(R.string.messageDetailsYesterday),
-            format(FORMAT_EMAIL_DATE_HOUR),
-        )
-        isThisYear() -> getString(
-            R.string.messageDetailsDateAt,
-            format(FORMAT_EMAIL_DATE_SHORT_DATE),
-            format(FORMAT_EMAIL_DATE_HOUR),
-        )
-        else -> this@mailFormattedDate.mostDetailedDate(date = this@with)
+    private const val FORMAT_EMAIL_DATE_HOUR = "HH:mm"
+    private const val FORMAT_EMAIL_DATE_SHORT_DATE = "d MMM"
+    private const val FORMAT_EMAIL_DATE_LONG_DATE = "d MMM yyyy"
+
+    fun mailFormattedDate(context: Context, date: Date): CharSequence = with(date) {
+        return@with when {
+            isToday() -> format(FORMAT_EMAIL_DATE_HOUR)
+            isYesterday() -> context.getString(
+                R.string.messageDetailsDateAt,
+                context.getString(R.string.messageDetailsYesterday),
+                format(FORMAT_EMAIL_DATE_HOUR),
+            )
+            isThisYear() -> context.getString(
+                R.string.messageDetailsDateAt,
+                format(FORMAT_EMAIL_DATE_SHORT_DATE),
+                format(FORMAT_EMAIL_DATE_HOUR),
+            )
+            else -> mostDetailedDate(context, date = this@with)
+        }
     }
-}
 
-fun Context.mostDetailedDate(date: Date): String = with(date) {
-    return@with getString(
-        R.string.messageDetailsDateAt,
-        format(FORMAT_EMAIL_DATE_LONG_DATE),
-        format(FORMAT_EMAIL_DATE_HOUR),
-    )
+    fun mostDetailedDate(context: Context, date: Date): String = with(date) {
+        return@with context.getString(
+            R.string.messageDetailsDateAt,
+            format(FORMAT_EMAIL_DATE_LONG_DATE),
+            format(FORMAT_EMAIL_DATE_HOUR),
+        )
+    }
 }

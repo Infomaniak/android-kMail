@@ -29,6 +29,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentPrintMailBinding
@@ -41,28 +42,23 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class PrintMailFragment : Fragment() {
 
-    @Inject
-    lateinit var localSettings: LocalSettings
-
-    private var _binding: FragmentPrintMailBinding? = null
-    private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
+    private var binding: FragmentPrintMailBinding by safeBinding()
 
     private val navigationArgs: PrintMailFragmentArgs by navArgs()
     private val threadViewModel: ThreadViewModel by viewModels()
     private val threadAdapter inline get() = binding.messagesList.adapter as ThreadAdapter
 
-    private var subject = ""
+
+    @Inject
+    lateinit var localSettings: LocalSettings
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return FragmentPrintMailBinding.inflate(inflater, container, false).also { _binding = it }.root
+        return FragmentPrintMailBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(threadViewModel) {
         super.onViewCreated(view, savedInstanceState)
         setupAdapter()
-        threadLive.observe(viewLifecycleOwner) { thread ->
-            thread?.subject?.let { subject = it }
-        }
         messagesLive.observe(viewLifecycleOwner) { messages ->
             threadAdapter.submitList(messages.filter { it.uid == navigationArgs.messageUid })
         }
@@ -70,11 +66,6 @@ class PrintMailFragment : Fragment() {
             reassignThreadLive(it)
             reassignMessagesLive(it)
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 
     override fun onPause() {
@@ -86,14 +77,18 @@ class PrintMailFragment : Fragment() {
         adapter = ThreadAdapter(
             shouldLoadDistantResources = true,
             isForPrinting = true,
-            onBodyWebviewFinishedLoading = {
-                CoroutineScope(Dispatchers.Main).launch {
-                    val webViewPrintAdapter = getWebViewToPrint().createPrintDocumentAdapter(subject)
-                    val printManager = requireContext().getSystemService(Context.PRINT_SERVICE) as PrintManager
-                    printManager.print(subject, webViewPrintAdapter, null)
-                }
-            },
+            ThreadAdapter.getThreadAdapterCallback(onBodyWebViewFinishedLoading = { startPrintingView() }),
         )
+    }
+
+    private fun startPrintingView() {
+        CoroutineScope(Dispatchers.Main).launch {
+            threadViewModel.threadLive.value?.subject?.let { subject ->
+                val webViewPrintAdapter = getWebViewToPrint().createPrintDocumentAdapter(subject)
+                val printManager = requireContext().getSystemService(Context.PRINT_SERVICE) as PrintManager
+                printManager.print(subject, webViewPrintAdapter, null)
+            }
+        }
     }
 
     private fun getWebViewToPrint(): WebView = with(binding.messagesList[0]) { findViewById(R.id.bodyWebView) }
