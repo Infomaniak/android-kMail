@@ -34,6 +34,8 @@ import com.infomaniak.mail.utils.HtmlFormatter.Companion.getJsBridgeScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getPrintMailStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getResizeScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getSignatureMarginStyle
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class WebViewUtils(context: Context) {
 

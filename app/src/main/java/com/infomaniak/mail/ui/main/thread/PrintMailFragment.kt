@@ -17,9 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
-import android.content.Context
 import android.os.Bundle
-import android.print.PrintManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -34,9 +32,6 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentPrintMailBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -46,6 +41,7 @@ class PrintMailFragment : Fragment() {
 
     private val navigationArgs: PrintMailFragmentArgs by navArgs()
     private val threadViewModel: ThreadViewModel by viewModels()
+    private val printMailViewModel: PrintMailViewModel by viewModels()
     private val threadAdapter inline get() = binding.messagesList.adapter as ThreadAdapter
 
 
@@ -84,12 +80,8 @@ class PrintMailFragment : Fragment() {
     }
 
     private fun startPrintingView() {
-        CoroutineScope(Dispatchers.Main).launch {
-            threadViewModel.threadLive.value?.subject?.let { subject ->
-                val webViewPrintAdapter = getWebViewToPrint().createPrintDocumentAdapter(subject)
-                val printManager = requireContext().getSystemService(Context.PRINT_SERVICE) as PrintManager
-                printManager.print(subject, webViewPrintAdapter, null)
-            }
+        threadViewModel.threadLive.value?.subject?.let { subject ->
+            printMailViewModel.startPrintingService(requireActivity(), subject, getWebViewToPrint())
         }
     }
 
