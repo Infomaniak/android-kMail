@@ -698,37 +698,5 @@ class ThreadAdapter(
             HitTestResult.SRC_ANCHOR_TYPE to ContextMenuType.LINK,
             HitTestResult.SRC_IMAGE_ANCHOR_TYPE to ContextMenuType.LINK,
         )
-
-        fun getThreadAdapterCallback(
-            onBodyWebViewFinishedLoading: (() -> Unit)? = null,
-            onContactClicked: ((contact: Recipient) -> Unit)? = null,
-            onDeleteDraftClicked: ((message: Message) -> Unit)? = null,
-            onDraftClicked: ((message: Message) -> Unit)? = null,
-            onAttachmentClicked: ((attachment: Attachment) -> Unit)? = null,
-            onDownloadAllClicked: ((message: Message) -> Unit)? = null,
-            onReplyClicked: ((Message) -> Unit)? = null,
-            onMenuClicked: ((Message) -> Unit)? = null,
-            onAllExpandedMessagesLoaded: (() -> Unit)? = null,
-            navigateToNewMessageActivity: ((Uri) -> Unit)? = null,
-            navigateToAttendeeBottomSheet: ((List<Attendee>) -> Unit)? = null,
-            navigateToDownloadProgressDialog,
-            replyToCalendarEvent,
-            promptLink: ((String, ContextMenuType) -> Unit)? = null,
-        ) = ThreadAdapterCallbacks(
-            onBodyWebViewFinishedLoading,
-            onContactClicked,
-            onDeleteDraftClicked,
-            onDraftClicked,
-            onAttachmentClicked,
-            onDownloadAllClicked,
-            onReplyClicked,
-            onMenuClicked,
-            onAllExpandedMessagesLoaded,
-            navigateToNewMessageActivity,
-            navigateToAttendeeBottomSheet,
-            navigateToDownloadProgressDialog,
-            replyToCalendarEvent,
-            promptLink,
-        )
     }
 }

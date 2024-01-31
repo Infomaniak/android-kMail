@@ -77,7 +77,9 @@ class PrintMailFragment : Fragment() {
         adapter = ThreadAdapter(
             shouldLoadDistantResources = true,
             isForPrinting = true,
-            ThreadAdapter.getThreadAdapterCallback(onBodyWebViewFinishedLoading = { startPrintingView() }),
+            ThreadAdapter.ThreadAdapterCallbacks(
+                onBodyWebViewFinishedLoading = { startPrintingView() },
+            ),
         )
     }
 
