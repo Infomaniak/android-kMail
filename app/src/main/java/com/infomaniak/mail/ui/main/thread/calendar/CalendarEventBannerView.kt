@@ -38,7 +38,6 @@ import com.infomaniak.mail.utils.UiUtils.getPrettyNameAndEmail
 import com.infomaniak.mail.utils.findUser
 import com.infomaniak.mail.utils.toDate
 import dagger.hilt.android.AndroidEntryPoint
-import io.realm.kotlin.ext.copyFromRealm
 import io.sentry.Sentry
 import java.time.format.FormatStyle
 import java.util.Date
@@ -54,7 +53,10 @@ class CalendarEventBannerView @JvmOverloads constructor(
     private val binding by lazy { ViewCalendarEventBannerBinding.inflate(LayoutInflater.from(context), this, true) }
 
     private var useInfomaniakCalendarRoute: Boolean = false
-    private var savedAttendees: List<Attendee> = emptyList()
+    // This value can be saved locally because it's used in only used in one situation. It's used when calling setAttendanceUi
+    // from onlyUpdateAttendance. The method onlyUpdateAttendance could only have been called if shouldDisplayReplyOptions hasn't
+    // changed since the last loadCalendarEvent call so it's safe to use it here.
+    private var shouldDisplayReplyOptions: Boolean = false
     private var attachmentResource: String = ""
 
     private var navigateToAttendeesBottomSheet: ((List<Attendee>) -> Unit)? = null
@@ -80,15 +82,13 @@ class CalendarEventBannerView @JvmOverloads constructor(
 
     fun loadCalendarEvent(
         calendarEvent: CalendarEvent,
-        userAttendanceState: AttendanceState?,
         isCanceled: Boolean,
         shouldDisplayReplyOptions: Boolean,
         attachment: Attachment,
         hasAssociatedInfomaniakCalendarEvent: Boolean,
         shouldStartExpanded: Boolean,
     ) = with(binding) {
-        savedAttendees = calendarEvent.attendees.copyFromRealm()
-        userAttendanceState?.let { savedAttendees.findUser()?.manuallyOverrideAttendanceState(it) }
+        this@CalendarEventBannerView.shouldDisplayReplyOptions = shouldDisplayReplyOptions
 
         useInfomaniakCalendarRoute = hasAssociatedInfomaniakCalendarEvent
         attachmentResource = attachment.resource ?: run {
@@ -111,12 +111,15 @@ class CalendarEventBannerView @JvmOverloads constructor(
         attendeesButton.isChecked = shouldStartExpanded
         attendeesSubMenu.isVisible = shouldStartExpanded
 
-        val userAsAttendee = savedAttendees.findUser()
-        setAttendanceUi(userAsAttendee != null, shouldDisplayReplyOptions, userAsAttendee?.state)
+        setAttendanceUi(calendarEvent.attendees, shouldDisplayReplyOptions)
 
         addToCalendarButton.setOnClickListener {
             attachment.openAttachment(context, navigateToDownloadProgressDialog ?: return@setOnClickListener, snackbarManager)
         }
+    }
+
+    fun onlyUpdateAttendance(attendees: List<Attendee>) {
+        setAttendanceUi(attendees, shouldDisplayReplyOptions)
     }
 
     private fun setWarnings(endDate: Date, isCanceled: Boolean) = with(binding) {
@@ -154,22 +157,22 @@ class CalendarEventBannerView @JvmOverloads constructor(
         }
     }
 
-    private fun setAttendanceUi(
-        iAmInvited: Boolean,
-        shouldDisplayReplyOptions: Boolean,
-        attendanceState: AttendanceState?,
-    ) = with(binding) {
+    private fun setAttendanceUi(attendees: List<Attendee>, shouldDisplayReplyOptions: Boolean) = with(binding) {
+        val userAsAttendee = attendees.findUser()
+        val iAmInvited = userAsAttendee != null
+
         notPartOfAttendeesWarning.isGone = iAmInvited
         participationButtons.isVisible = shouldDisplayReplyOptions
-        attendeesLayout.isGone = savedAttendees.isEmpty()
+        attendeesLayout.isGone = attendees.isEmpty()
 
+        val attendanceState = userAsAttendee?.state
         yesButton.isChecked = attendanceState == AttendanceState.ACCEPTED
         maybeButton.isChecked = attendanceState == AttendanceState.TENTATIVE
         noButton.isChecked = attendanceState == AttendanceState.DECLINED
 
-        displayOrganizer(savedAttendees)
-        allAttendeesButton.setOnClickListener { navigateToAttendeesBottomSheet?.invoke(savedAttendees) }
-        manyAvatarsView.setAttendees(savedAttendees)
+        displayOrganizer(attendees)
+        allAttendeesButton.setOnClickListener { navigateToAttendeesBottomSheet?.invoke(attendees) }
+        manyAvatarsView.setAttendees(attendees)
     }
 
     fun initCallback(
@@ -190,17 +193,11 @@ class CalendarEventBannerView @JvmOverloads constructor(
 
             if (previouslyUnchecked) {
                 resetChoiceButtons()
-                updateCurrentUsersAttendance(attendanceState)
                 replyToCalendarEvent?.invoke(attendanceState)
             }
 
             isChecked = true
         }
-    }
-
-    private fun updateCurrentUsersAttendance(attendanceState: AttendanceState) {
-        savedAttendees.findUser()?.manuallyOverrideAttendanceState(attendanceState)
-        binding.manyAvatarsView.setAttendees(savedAttendees)
     }
 
     private fun resetChoiceButtons() = with(binding) {

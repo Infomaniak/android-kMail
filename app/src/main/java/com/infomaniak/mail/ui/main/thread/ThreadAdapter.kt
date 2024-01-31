@@ -67,7 +67,6 @@ import com.google.android.material.R as RMaterial
 class ThreadAdapter(
     private val shouldLoadDistantResources: Boolean,
     private val isCalendarEventExpandedMap: MutableMap<String, Boolean>,
-    private val userAttendanceStateOverrideMap: MutableMap<String, AttendanceState>,
     onContactClicked: (contact: Recipient) -> Unit,
     onDeleteDraftClicked: (message: Message) -> Unit,
     onDraftClicked: (message: Message) -> Unit,
@@ -165,10 +164,9 @@ class ThreadAdapter(
                     failedLoadingErrorMessage.isVisible = true
                     if (isExpandedMap[message.uid] == true) onExpandedMessageLoaded(message.uid)
                 }
-                NotifyType.BIND_CALENDAR_EVENT -> holder.bindCalendarEvent(message)
-                NotifyType.BIND_ONLY_CALENDAR_ATTENDANCE -> {
+                NotifyType.ONLY_REBIND_CALENDAR_ATTENDANCE -> {
                     val attendees = message.latestCalendarEventResponse?.calendarEvent?.attendees
-                    // holder.binding.calendarEvent.updateAttendance(attendees) // TODO
+                    holder.binding.calendarEvent.onlyUpdateAttendance(attendees ?: emptyList())
                 }
             }
         }
@@ -200,7 +198,6 @@ class ThreadAdapter(
 
                 loadCalendarEvent(
                     calendarEvent = it,
-                    userAttendanceState = userAttendanceStateOverrideMap[message.uid],
                     isCanceled = calendarEventResponse.isCanceled,
                     shouldDisplayReplyOptions = calendarEventResponse.isReplyAuthorized(),
                     attachment = attachment,
@@ -609,15 +606,14 @@ class ThreadAdapter(
 
     fun undoUserAttendanceClick(message: Message) {
         val indexOfMessage = messages.indexOfFirst { it.uid == message.uid }.takeIf { it >= 0 }
-        indexOfMessage?.let { notifyItemChanged(it, NotifyType.BIND_CALENDAR_EVENT) }
+        indexOfMessage?.let { notifyItemChanged(it, NotifyType.ONLY_REBIND_CALENDAR_ATTENDANCE) }
     }
 
     private enum class NotifyType {
         TOGGLE_LIGHT_MODE,
         RE_RENDER,
         FAILED_MESSAGE,
-        BIND_CALENDAR_EVENT,
-        BIND_ONLY_CALENDAR_ATTENDANCE,
+        ONLY_REBIND_CALENDAR_ATTENDANCE,
     }
 
     enum class ContextMenuType {
@@ -638,7 +634,7 @@ class ThreadAdapter(
 
         override fun getChangePayload(oldItem: Message, newItem: Message): Any? {
             // If everything but attendees is the same, then we know the only thing that could've changed is attendees
-            return if (everythingButAttendeesIsTheSame(oldItem, newItem)) NotifyType.BIND_ONLY_CALENDAR_ATTENDANCE else null
+            return if (everythingButAttendeesIsTheSame(oldItem, newItem)) NotifyType.ONLY_REBIND_CALENDAR_ATTENDANCE else null
         }
 
         companion object {

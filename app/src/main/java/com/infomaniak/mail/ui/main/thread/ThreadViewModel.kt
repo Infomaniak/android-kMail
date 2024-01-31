@@ -68,7 +68,6 @@ class ThreadViewModel @Inject constructor(
 
     private val treatedMessagesForCalendarEvent = mutableSetOf<String>()
     val isCalendarEventExpandedMap = mutableMapOf<String, Boolean>()
-    val userAttendanceStateOverrideMap = mutableMapOf<String, AttendanceState>()
 
     var deletedMessagesUids = mutableSetOf<String>()
     val failedMessagesUids = SingleLiveEvent<List<String>>()
@@ -216,20 +215,22 @@ class ThreadViewModel @Inject constructor(
         quickActionBarClicks.postValue(QuickActionBarResult(thread.uid, message, menuId))
     }
 
-    fun fetchCalendarEvents(messages: List<Message>) {
+    fun fetchCalendarEvents(messages: List<Message>, forceFetch: Boolean = false) {
         fetchCalendarEventJob?.cancel()
         fetchCalendarEventJob = viewModelScope.launch(ioCoroutineContext) {
             mailboxContentRealm().writeBlocking {
-                messages.forEach { message -> fetchCalendarEvent(message) }
+                messages.forEach { message -> fetchCalendarEvent(message, forceFetch) }
             }
         }
     }
 
-    private fun MutableRealm.fetchCalendarEvent(message: Message) {
+    private fun MutableRealm.fetchCalendarEvent(message: Message, forceFetch: Boolean) {
         if (!message.isFullyDownloaded()) return // Only treat message that have their attachments downloaded
 
-        val alreadyTreated = !treatedMessagesForCalendarEvent.add(message.uid)
-        if (alreadyTreated) return
+        if (!forceFetch) {
+            val alreadyTreated = !treatedMessagesForCalendarEvent.add(message.uid)
+            if (alreadyTreated) return
+        }
 
         val icsAttachment = message.calendarAttachment ?: return
 
