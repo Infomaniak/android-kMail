@@ -27,7 +27,6 @@ import android.widget.ImageView
 import androidx.lifecycle.Observer
 import coil.imageLoader
 import coil.load
-import coil.request.Disposable
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.utils.CoilUtils.simpleImageLoader
 import com.infomaniak.lib.core.utils.UtilsUi.getBackgroundColorBasedOnId
@@ -106,7 +105,7 @@ class AvatarView @JvmOverloads constructor(
         binding.root.setOnLongClickListener(onLongClickListener)
     }
 
-    fun loadAvatar(user: User): Disposable = with(binding.avatarImage) {
+    fun loadAvatar(user: User) = with(binding.avatarImage) {
         contentDescription = user.email
         loadAvatar(
             backgroundColor = context.getBackgroundColorBasedOnId(user.id, R.array.AvatarColors),
@@ -149,8 +148,8 @@ class AvatarView @JvmOverloads constructor(
         binding.avatarImage.baseLoadAvatar(correspondent = mergedContact ?: correspondent)
     }
 
-    private fun ImageView.baseLoadAvatar(correspondent: Correspondent): Disposable {
-        return if (correspondent.shouldDisplayUserAvatar()) {
+    private fun ImageView.baseLoadAvatar(correspondent: Correspondent) {
+        if (correspondent.shouldDisplayUserAvatar()) {
             this@AvatarView.loadAvatar(AccountUtils.currentUser!!)
         } else {
             val avatar = (correspondent as? MergedContact)?.avatar
