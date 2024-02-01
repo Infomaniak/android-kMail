@@ -503,6 +503,7 @@
     <string name="spamFolder">Spam</string>
     <string name="startActivityCantHandleAction">Aucune application n’a été trouvée pour gérer cette action</string>
     <string name="subjectTitle">Objet :</string>
+    <string name="superCollapsedBlock">Voir tout (%d)</string>
     <string name="syncCalendarsAndContactsDescription">Consultez vos contacts et calendriers directement depuis votre appareil.</string>
     <string name="syncCalendarsAndContactsTitle">Synchronisation des calendriers et contacts</string>
     <string name="syncFragmentTitle">Synchroniser vos calendriers et contacts</string>

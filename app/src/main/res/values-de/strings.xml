@@ -492,6 +492,7 @@
     <string name="spamFolder">Spam</string>
     <string name="startActivityCantHandleAction">Es wurde keine Anwendung gefunden, die diese Aktion bearbeitet</string>
     <string name="subjectTitle">Thema:</string>
+    <string name="superCollapsedBlock">Alle sehen (%d)</string>
     <string name="syncCalendarsAndContactsDescription">Sehen Sie sich Ihre Kontakte und Kalender direkt auf Ihrem Gerät an.</string>
     <string name="syncCalendarsAndContactsTitle">Synchronisierung von Kalendern und Kontakten</string>
     <string name="syncFragmentTitle">Synchronisieren Sie Ihre Kalender und Kontakte</string>

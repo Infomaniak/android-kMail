@@ -354,22 +354,18 @@ class ThreadFragment : Fragment() {
 
     private fun observeMessagesLive() = with(threadViewModel) {
 
-        messagesLive.observe(viewLifecycleOwner) { messages ->
-            SentryLog.i("UI", "Received ${messages.count()} messages")
+        messagesLive.observe(viewLifecycleOwner) { (items, messagesToFetch) ->
+            SentryLog.i("UI", "Received ${items.count()} messages")
 
-            if (messages.isEmpty()) {
+            if (items.isEmpty()) {
                 mainViewModel.deletedMessages.value = deletedMessagesUids
                 twoPaneViewModel.closeThread()
                 return@observe
             }
 
-            threadAdapter.submitList(messages)
-
-            threadViewModel.fetchMessagesHeavyData(messages)
-
-            if (threadViewModel.getCalendarEventTreatedMessageCount() != messages.count()) {
-                threadViewModel.fetchCalendarEvents(messages)
-            }
+            threadAdapter.submitList(items)
+            fetchMessagesHeavyData(messagesToFetch)
+            fetchCalendarEvents(items)
         }
     }
 
@@ -558,7 +554,7 @@ class ThreadFragment : Fragment() {
             messagesListNestedScrollView.scrollY = messagesListNestedScrollView.maxScrollAmount
         }
 
-        val indexToScroll = threadAdapter.messages.indexOfFirst { threadAdapter.isExpandedMap[it.uid] == true }
+        val indexToScroll = threadAdapter.items.indexOfFirst { it is Message && threadAdapter.isExpandedMap[it.uid] == true }
 
         // If no Message is expanded (e.g. the last Message of the Thread is a Draft),
         // we want to automatically scroll to the very bottom.
@@ -570,9 +566,9 @@ class ThreadFragment : Fragment() {
                 Sentry.withScope { scope ->
                     scope.level = SentryLevel.WARNING
                     scope.setExtra("indexToScroll", indexToScroll.toString())
-                    scope.setExtra("messageCount", threadAdapter.messages.count().toString())
+                    scope.setExtra("messageCount", threadAdapter.items.count().toString())
                     scope.setExtra("isExpandedMap", threadAdapter.isExpandedMap.toString())
-                    scope.setExtra("isLastMessageDraft", threadAdapter.messages.lastOrNull()?.isDraft.toString())
+                    scope.setExtra("isLastMessageDraft", (threadAdapter.items.lastOrNull() as Message?)?.isDraft.toString())
                     Sentry.captureMessage("Target child for scroll in ThreadFragment is null. Fallback to scrolling to bottom")
                 }
                 scrollToBottom()

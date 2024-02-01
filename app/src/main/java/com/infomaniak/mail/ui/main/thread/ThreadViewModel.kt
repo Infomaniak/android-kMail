@@ -34,6 +34,7 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.ui.main.thread.ThreadAdapter.SuperCollapsedBlock
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.MessageBodyUtils.SplitBody
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
@@ -41,6 +42,7 @@ import com.infomaniak.mail.utils.extensions.context
 import com.infomaniak.mail.utils.extensions.getUids
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.MutableRealm
+import io.realm.kotlin.notifications.ResultsChange
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.*
@@ -76,7 +78,10 @@ class ThreadViewModel @Inject constructor(
     val failedMessagesUids = SingleLiveEvent<List<String>>()
 
     val threadLive = MutableLiveData<Thread?>()
-    val messagesLive = MutableLiveData<List<Message>>()
+    val messagesLive = MutableLiveData<Pair<List<Any>, List<Message>>>()
+
+    private var cachedSplitBodies = mutableMapOf<String, SplitBody>()
+    private var superCollapsedBlock: MutableSet<String>? = null
 
     private val mailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
 
@@ -96,26 +101,70 @@ class ThreadViewModel @Inject constructor(
         messagesLiveJob?.cancel()
         messagesLiveJob = viewModelScope.launch(ioCoroutineContext) {
 
-            val cachedSplitBodies = mutableMapOf<String, SplitBody>()
-
-            suspend fun splitBody(message: Message): Message = withContext(ioDispatcher) {
-                if (message.body == null) return@withContext message
-
-                message.apply {
-                    body?.let {
-                        val isNotAlreadySplit = !cachedSplitBodies.contains(message.uid)
-                        if (isNotAlreadySplit) cachedSplitBodies[message.uid] = MessageBodyUtils.splitContentAndQuote(it)
-                        splitBody = cachedSplitBodies[message.uid]
-                    }
-                }
-
-                return@withContext message
-            }
+            cachedSplitBodies = mutableMapOf()
+            superCollapsedBlock = null
 
             messageController.getSortedAndNotDeletedMessagesAsync(threadUid)
-                ?.map { results -> results.list.map { splitBody(it) } }
+                ?.map(::mapRealmMessagesResult)
                 ?.collect(messagesLive::postValue)
         }
+    }
+
+    private suspend fun mapRealmMessagesResult(results: ResultsChange<Message>): Pair<List<Any>, List<Message>> {
+
+        val shouldAddSuperCollapsedBlock =
+            (superCollapsedBlock == null && results.list.count() >= SUPER_COLLAPSE_BLOCK_MESSAGES_LIMIT).also {
+                if (it) superCollapsedBlock = mutableSetOf()
+            }
+
+        val messagesCount = results.list.count()
+        val items = mutableListOf<Any>()
+        val messagesToFetch = mutableListOf<Message>()
+
+        suspend fun addMessage(message: Message) {
+            splitBody(message).let {
+                items += it
+                if (!it.isFullyDownloaded()) messagesToFetch += it
+            }
+        }
+
+        results.list.forEachIndexed { index, message ->
+            if (shouldAddSuperCollapsedBlock) {
+                when {
+                    index == 0 -> {
+                        addMessage(message)
+                    }
+                    index > 0 && index < messagesCount - 2 -> {
+                        superCollapsedBlock!!.add(message.uid)
+                    }
+                    index == messagesCount - 2 -> {
+                        items += SuperCollapsedBlock(superCollapsedBlock!!)
+                        addMessage(message)
+                    }
+                    index == messagesCount - 1 -> {
+                        addMessage(message)
+                    }
+                }
+            } else {
+                addMessage(message)
+            }
+        }
+
+        return items to messagesToFetch
+    }
+
+    private suspend fun splitBody(message: Message): Message = withContext(ioDispatcher) {
+        if (message.body == null) return@withContext message
+
+        message.apply {
+            body?.let {
+                val isNotAlreadySplit = !cachedSplitBodies.contains(message.uid)
+                if (isNotAlreadySplit) cachedSplitBodies[message.uid] = MessageBodyUtils.splitContentAndQuote(it)
+                splitBody = cachedSplitBodies[message.uid]
+            }
+        }
+
+        return@withContext message
     }
 
     fun openThread(threadUid: String) = liveData(ioCoroutineContext) {
@@ -218,11 +267,11 @@ class ThreadViewModel @Inject constructor(
         quickActionBarClicks.postValue(QuickActionBarResult(thread.uid, message, menuId))
     }
 
-    fun fetchCalendarEvents(messages: List<Message>, forceFetch: Boolean = false) {
+    fun fetchCalendarEvents(items: List<Any>, forceFetch: Boolean = false) {
         fetchCalendarEventJob?.cancel()
         fetchCalendarEventJob = viewModelScope.launch(ioCoroutineContext) {
             mailboxContentRealm().writeBlocking {
-                messages.forEach { message -> fetchCalendarEvent(message, forceFetch) }
+                items.forEach { item -> if (item is Message) fetchCalendarEvent(item, forceFetch) }
             }
         }
     }
@@ -304,4 +353,8 @@ class ThreadViewModel @Inject constructor(
         val message: Message,
         val menuId: Int,
     )
+
+    companion object {
+        private const val SUPER_COLLAPSE_BLOCK_MESSAGES_LIMIT = 5
+    }
 }
