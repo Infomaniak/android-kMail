@@ -59,11 +59,16 @@ class Attendee() : EmbeddedRealmObject, Correspondent {
         _state = newAttendanceState.apiValue
     }
 
-    enum class AttendanceState(val apiValue: String, @DrawableRes val icon: Int?, @ColorRes val iconColor: Int?) {
-        ACCEPTED("ACCEPTED", R.drawable.ic_check_rounded, R.color.greenSuccess),
-        NEEDS_ACTION("NEEDS-ACTION", null, null),
-        TENTATIVE("TENTATIVE", R.drawable.ic_calendar_maybe, R.color.iconColorSecondaryText),
-        DECLINED("DECLINED", R.drawable.ic_calendar_no, R.color.redDestructiveAction),
+    enum class AttendanceState(
+        val apiValue: String,
+        @DrawableRes val icon: Int?,
+        @ColorRes val iconColor: Int?,
+        val matomoValue: String?,
+    ) {
+        ACCEPTED("ACCEPTED", R.drawable.ic_check_rounded, R.color.greenSuccess, "replyYes"),
+        NEEDS_ACTION("NEEDS-ACTION", null, null, null),
+        TENTATIVE("TENTATIVE", R.drawable.ic_calendar_maybe, R.color.iconColorSecondaryText, "replyMaybe"),
+        DECLINED("DECLINED", R.drawable.ic_calendar_no, R.color.redDestructiveAction, "replyNo"),
     }
 
     override fun equals(other: Any?): Boolean {
