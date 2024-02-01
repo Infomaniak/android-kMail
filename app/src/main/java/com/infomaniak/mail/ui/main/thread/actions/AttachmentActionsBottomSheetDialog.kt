@@ -25,7 +25,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.context
-import com.infomaniak.lib.core.utils.hasSupportedApplications
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
@@ -37,12 +36,12 @@ import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntentType
 import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntentType.OPEN_WITH
 import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntentType.SAVE_TO_DRIVE
-import com.infomaniak.mail.utils.AttachmentIntentUtils.getIntentOrGoToPlaystore
-import com.infomaniak.mail.utils.AttachmentIntentUtils.openWithIntent
+import com.infomaniak.mail.utils.AttachmentIntentUtils.createDownloadDialogNavArgs
+import com.infomaniak.mail.utils.AttachmentIntentUtils.executeIntent
+import com.infomaniak.mail.utils.AttachmentIntentUtils.openAttachment
 import com.infomaniak.mail.utils.PermissionUtils
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import com.infomaniak.lib.core.R as RCore
 
 @AndroidEntryPoint
 class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
@@ -75,43 +74,35 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
     }
 
     private fun setupListeners(attachment: Attachment) = with(binding) {
+
+        fun navigateToDownloadProgressDialog(attachmentIntentType: AttachmentIntentType) {
+            safeNavigate(
+                resId = R.id.downloadAttachmentProgressDialog,
+                args = attachment.createDownloadDialogNavArgs(attachmentIntentType),
+                currentClassName = AttachmentActionsBottomSheetDialog::class.java.name,
+            )
+        }
+
         openWithItem.setClosingOnClickListener {
             trackAttachmentActionsEvent("open")
-            if (attachment.openWithIntent(context).hasSupportedApplications(context)) {
-                attachment.executeIntent(OPEN_WITH)
-            } else {
-                snackbarManager.setValue(getString(RCore.string.errorNoSupportingAppFound))
-            }
+            attachment.openAttachment(
+                context = context,
+                navigateToDownloadProgressDialog = { navigateToDownloadProgressDialog(OPEN_WITH) },
+                snackbarManager = snackbarManager,
+            )
         }
         kDriveItem.setClosingOnClickListener {
             trackAttachmentActionsEvent("saveToKDrive")
-            attachment.executeIntent(SAVE_TO_DRIVE)
+            attachment.executeIntent(
+                context = context,
+                intentType = SAVE_TO_DRIVE,
+                navigateToDownloadProgressDialog = { navigateToDownloadProgressDialog(SAVE_TO_DRIVE) },
+            )
         }
         deviceItem.setOnClickListener {
             trackAttachmentActionsEvent("download")
             scheduleDownloadManager(attachment.downloadUrl, attachment.name)
         }
-    }
-
-    private fun Attachment.executeIntent(intentType: AttachmentIntentType) {
-        if (hasUsableCache(requireContext()) || isInlineCachedFile(requireContext())) {
-            getIntentOrGoToPlaystore(requireContext(), intentType)?.let(::startActivity)
-        } else {
-            navigateToDownloadProgressDialog(intentType)
-        }
-    }
-
-    private fun Attachment.navigateToDownloadProgressDialog(intentType: AttachmentIntentType) {
-        safeNavigate(
-            resId = R.id.downloadAttachmentProgressDialog,
-            args = DownloadAttachmentProgressDialogArgs(
-                attachmentResource = resource!!,
-                attachmentName = name,
-                attachmentType = getFileTypeFromMimeType(),
-                intentType = intentType,
-            ).toBundle(),
-            currentClassName = AttachmentActionsBottomSheetDialog::class.java.name,
-        )
     }
 
     private fun scheduleDownloadManager(downloadUrl: String, filename: String) {

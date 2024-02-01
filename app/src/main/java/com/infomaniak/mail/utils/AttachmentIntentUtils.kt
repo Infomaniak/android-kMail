@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023 Infomaniak Network SA
+ * Copyright (C) 2023-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,10 +21,14 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Bundle
 import androidx.core.content.FileProvider
 import com.infomaniak.lib.core.utils.goToPlayStore
+import com.infomaniak.lib.core.utils.hasSupportedApplications
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.ui.main.SnackbarManager
+import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialogArgs
 import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntentType.OPEN_WITH
 import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntentType.SAVE_TO_DRIVE
 import io.sentry.Sentry
@@ -54,7 +58,7 @@ object AttachmentIntentUtils {
         }
     }
 
-    fun Attachment.openWithIntent(context: Context): Intent {
+    private fun Attachment.openWithIntent(context: Context): Intent {
         val uri = FileProvider.getUriForFile(context, context.getString(R.string.ATTACHMENTS_AUTHORITY), getCacheFile(context))
         return Intent().apply {
             action = Intent.ACTION_VIEW
@@ -71,6 +75,39 @@ object AttachmentIntentUtils {
             context.goToPlayStore(DRIVE_PACKAGE)
             null
         }
+    }
+
+    fun Attachment.executeIntent(
+        context: Context,
+        intentType: AttachmentIntentType,
+        navigateToDownloadProgressDialog: () -> Unit,
+    ) {
+        if (hasUsableCache(context) || isInlineCachedFile(context)) {
+            getIntentOrGoToPlaystore(context, intentType)?.let(context::startActivity)
+        } else {
+            navigateToDownloadProgressDialog()
+        }
+    }
+
+    fun Attachment.openAttachment(
+        context: Context,
+        navigateToDownloadProgressDialog: () -> Unit,
+        snackbarManager: SnackbarManager,
+    ) {
+        if (openWithIntent(context).hasSupportedApplications(context)) {
+            executeIntent(context, OPEN_WITH, navigateToDownloadProgressDialog)
+        } else {
+            snackbarManager.setValue(context.getString(com.infomaniak.lib.core.R.string.errorNoSupportingAppFound))
+        }
+    }
+
+    fun Attachment.createDownloadDialogNavArgs(intentType: AttachmentIntentType): Bundle {
+        return DownloadAttachmentProgressDialogArgs(
+            attachmentResource = resource!!,
+            attachmentName = name,
+            attachmentType = getFileTypeFromMimeType(),
+            intentType = intentType,
+        ).toBundle()
     }
 
     enum class AttachmentIntentType {

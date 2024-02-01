@@ -202,10 +202,7 @@ class ThreadViewModel @Inject constructor(
                     val alreadyTreated = !treatedMessagesForCalendarEvent.add(message.uid)
                     if (alreadyTreated) return@forEach
 
-                    val icsAttachments = message.attachments.filter { it.mimeType == "application/ics" }
-                    if (icsAttachments.count() != 1) return@forEach
-
-                    val icsAttachment = icsAttachments.single()
+                    val icsAttachment = message.calendarAttachment ?: return@forEach
 
                     val apiResponse = icsAttachment.resource?.let { resource ->
                         ApiRepository.getAttachmentCalendarEvent(resource)

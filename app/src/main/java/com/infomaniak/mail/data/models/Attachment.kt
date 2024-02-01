@@ -38,6 +38,7 @@ import java.io.File
 @Serializable
 class Attachment : EmbeddedRealmObject {
 
+    //region Remote data
     var uuid: String = ""
     @SerialName("mime_type")
     var mimeType: String = ""
@@ -52,11 +53,14 @@ class Attachment : EmbeddedRealmObject {
     var resource: String? = null
     @SerialName("drive_url")
     var driveUrl: String? = null
+    //endregion
 
     //region Local data (Transient)
     @Transient
     var uploadLocalUri: String? = null
     //endregion
+
+    val isCalendarEvent: Boolean get() = mimeType == "application/ics"
 
     val disposition: AttachmentDisposition?
         get() = enumValueOfOrNull<AttachmentDisposition>(_disposition)
