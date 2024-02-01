@@ -51,6 +51,8 @@ import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadViewHolder
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntentType
 import com.infomaniak.mail.utils.AttachmentIntentUtils.createDownloadDialogNavArgs
+import com.infomaniak.mail.utils.MailDateFormatUtils.mailFormattedDate
+import com.infomaniak.mail.utils.MailDateFormatUtils.mostDetailedDate
 import com.infomaniak.mail.utils.SharedUtils.Companion.createHtmlForPlainText
 import com.infomaniak.mail.utils.UiUtils.getPrettyNameAndEmail
 import com.infomaniak.mail.utils.Utils.TEXT_HTML
@@ -67,7 +69,7 @@ import com.google.android.material.R as RMaterial
 class ThreadAdapter(
     private val shouldLoadDistantResources: Boolean,
     private val isForPrinting: Boolean = false,
-	private val isCalendarEventExpandedMap: MutableMap<String, Boolean>,
+    private val isCalendarEventExpandedMap: MutableMap<String, Boolean> = mutableMapOf(),
     private var threadAdapterCallbacks: ThreadAdapterCallbacks? = null,
 ) : ListAdapter<Message, ThreadViewHolder>(MessageDiffCallback()) {
 
@@ -684,8 +686,8 @@ class ThreadAdapter(
         var onAllExpandedMessagesLoaded: (() -> Unit)? = null,
         var navigateToNewMessageActivity: ((Uri) -> Unit)? = null,
         var navigateToAttendeeBottomSheet: ((List<Attendee>) -> Unit)? = null,
-		var navigateToDownloadProgressDialog: (Int, Bundle) -> Unit,
-        var replyToCalendarEvent: (AttendanceState, Message) -> Unit,
+		var navigateToDownloadProgressDialog: ((Int, Bundle) -> Unit)? = null,
+        var replyToCalendarEvent: ((AttendanceState, Message) -> Unit)? = null,
         var promptLink: ((String, ContextMenuType) -> Unit)? = null,
     )
 
