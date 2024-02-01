@@ -45,7 +45,7 @@ class CalendarEventResponseTest {
         // If nothing changed at all, no change should be detected
         assertTrue(ThreadAdapter.MessageDiffCallback.everythingButAttendeesIsTheSame(message, message))
 
-        // If data inside the Message have changed, like its heavy data being downloaded, then we need to detect the change
+        // If data inside the Message have changed, like its heavy data being downloaded, the change must be detected
         val filledBody = Body().apply {
             value = "<html><body>Hello</body></html>"
             type = "text/html"
@@ -84,7 +84,7 @@ class CalendarEventResponseTest {
         // If nothing changed at all, no change should be detected
         assertTrue(response.everythingButAttendeesIsTheSame(response))
 
-        // If data inside the CalendarEventResponse have changed, like the event being deleted, then we need to detect the change
+        // If data inside the CalendarEventResponse have changed, like the event being deleted, the change must be detected
         val otherThingsButAttendeesChanged = getBasicCalendarEventResponse(userStoredEvent1, true)
         assertFalse(response.everythingButAttendeesIsTheSame(otherThingsButAttendeesChanged))
 
@@ -105,7 +105,7 @@ class CalendarEventResponseTest {
         // If nothing changed at all, no change should be detected
         assertTrue(event.everythingButAttendeesIsTheSame(event))
 
-        // If data inside the CalendarEvent have changed, like the date of the event, then we need to detect the change
+        // If data inside the CalendarEvent have changed, like the date of the event, the change must be detected
         val otherThingsButAttendeesHaveChanged = getBasicCalendarEvent(AttendanceState.TENTATIVE).apply {
             end = tomorrow
         }
