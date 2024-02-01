@@ -389,22 +389,31 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/alerts" />
 
+        <Space
+            android:id="@+id/alertsBottomMargin"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/marginStandardMedium"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/alertsBottomDivider" />
+
         <com.infomaniak.mail.ui.main.thread.calendar.CalendarEventBannerView
             android:id="@+id/calendarEvent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/marginStandardMedium"
+            android:paddingBottom="@dimen/marginStandardMedium"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/alertsBottomDivider" />
+            app:layout_constraintTop_toBottomOf="@id/alertsBottomMargin"
+            tools:visibility="visible" />
 
         <include
             android:id="@+id/attachmentLayout"
             layout="@layout/layout_attachments"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -539,9 +548,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="gone"
-            app:constraint_referenced_ids="alertsBottomDivider,alerts,alertsTopDivider"
+            app:constraint_referenced_ids="alertsBottomDivider,alerts,alertsTopDivider,alertsBottomMargin"
             tools:visibility="visible" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 </LinearLayout>
