@@ -15,18 +15,78 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingVertical="@dimen/marginStandardSmall">
+    android:paddingVertical="@dimen/marginStandardSmall"
+    android:tag="SuperCollapsedBlock">
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@color/border"
+        app:layout_constraintBottom_toTopOf="@id/midLeft"
+        app:layout_constraintEnd_toStartOf="@id/superCollapsedBlock"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <View
+        android:id="@+id/midLeft"
+        android:layout_width="0dp"
+        android:layout_height="8dp"
+        android:background="@color/elevatedBackground"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/superCollapsedBlock"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@color/border"
+        app:layout_constraintEnd_toStartOf="@id/superCollapsedBlock"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/midLeft" />
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@color/border"
+        app:layout_constraintBottom_toTopOf="@id/midRight"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/superCollapsedBlock" />
+
+    <View
+        android:id="@+id/midRight"
+        android:layout_width="0dp"
+        android:layout_height="8dp"
+        android:background="@color/elevatedBackground"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/superCollapsedBlock"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@color/border"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/superCollapsedBlock"
+        app:layout_constraintTop_toBottomOf="@id/midRight" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/superCollapsedBlock"
-        style="@style/TextButton"
+        style="@style/TextButtonSecondaryMedium"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:padding="@dimen/marginStandardMedium"
+        android:fontFamily="@font/suisseintl_regular"
+        app:cornerRadius="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:strokeColor="@color/border"
+        app:strokeWidth="1dp"
         tools:text="@string/superCollapsedBlock" />
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
