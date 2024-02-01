@@ -171,7 +171,10 @@ class ThreadAdapter(
     private fun SuperCollapsedBlockViewHolder.bindSuperCollapsedBlock(item: SuperCollapsedBlock) {
         with(binding.superCollapsedBlock) {
             text = context.getString(R.string.superCollapsedBlock, item.messagesUids.count())
-            setOnClickListener { threadAdapterCallbacks?.onSuperCollapsedBlockClicked?.invoke() }
+            setOnClickListener {
+                text = context.getString(R.string.loadingText)
+                threadAdapterCallbacks?.onSuperCollapsedBlockClicked?.invoke()
+            }
         }
     }
 
