@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2023 Infomaniak Network SA
+ * Copyright (C) 2022-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,9 @@ import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Quotas
 import com.infomaniak.mail.data.models.addressBook.AddressBook
+import com.infomaniak.mail.data.models.calendar.Attendee
+import com.infomaniak.mail.data.models.calendar.CalendarEvent
+import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
@@ -159,7 +162,7 @@ object RealmDatabase {
         //region Configurations versions
         const val USER_INFO_SCHEMA_VERSION = 1L
         const val MAILBOX_INFO_SCHEMA_VERSION = 4L
-        const val MAILBOX_CONTENT_SCHEMA_VERSION = 8L
+        const val MAILBOX_CONTENT_SCHEMA_VERSION = 9L
         //endregion
 
         //region Configurations names
@@ -192,6 +195,9 @@ object RealmDatabase {
             Body::class,
             SubBody::class,
             Attachment::class,
+            CalendarEventResponse::class,
+            CalendarEvent::class,
+            Attendee::class,
             Signature::class,
         )
         //endregion

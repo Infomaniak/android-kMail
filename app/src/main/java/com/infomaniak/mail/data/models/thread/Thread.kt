@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2023 Infomaniak Network SA
+ * Copyright (C) 2022-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,8 +51,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.UseSerializers
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Date
 
@@ -205,12 +203,9 @@ class Thread : RealmObject {
 
     private fun Date.formatNumericalDayMonthYear(): String {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // Adapts order of day, month and year according to the locale
-            val shortDateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)
-            toInstant().atZone(ZoneId.systemDefault()).toLocalDate().format(shortDateFormatter)
+            formatWithLocal(FormatData.DATE, FormatStyle.SHORT)
         } else {
-            // Fallback on unambiguous date format for any locale
-            format(FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR)
+            format(FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR) // Fallback on unambiguous date format for any local
         }
     }
 

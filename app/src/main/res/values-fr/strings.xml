@@ -71,8 +71,8 @@
     <string name="aiPromptAnswer">Dites à l’assistant comment il peut vous aider à répondre à cet e-mail.</string>
     <string name="aiPromptExample1">un e-mail de remerciement pour un cadeau de bienvenue</string>
     <string name="aiPromptExample2">un e-mail de confirmation de réservation d’hôtel</string>
-    <string name="aiPromptExample3">un e-mail de remerciement pour une invitation à un événement</string>
-    <string name="aiPromptExample4">un e-mail d’invitation à un événement d’entreprise</string>
+    <string name="aiPromptExample3">un e-mail de remerciement pour une invitation à un évènement</string>
+    <string name="aiPromptExample4">un e-mail d’invitation à un évènement d’entreprise</string>
     <string name="aiPromptExample5">un e-mail de demande de rendez-vous avec un client important</string>
     <string name="aiPromptGenerationLoader">L’assistant est en train d’écrire</string>
     <string name="aiPromptPlaceholder">Dites à l’assistant à la rédaction ce que vous souhaitez écrire. Par exemple \"%s\".</string>
@@ -543,6 +543,7 @@
     <string name="urlEntryTitle">Créer un lien hypertexte</string>
     <string name="urlPlaceholder">URL</string>
     <string name="urlUserReportAndroid">https://feedback.userreport.com/91aeb5c2-f609-4b9c-9787-755e83ed940c/</string>
-    <string name="warningEventHasPassed">Cet événement est déjà passé</string>
+    <string name="warningEventHasPassed">Cet évènement est déjà passé</string>
+    <string name="warningEventIsCancelled">Cet évènement a été annulé</string>
     <string name="workInProgressTitle">Disponible prochainement</string>
 </resources>

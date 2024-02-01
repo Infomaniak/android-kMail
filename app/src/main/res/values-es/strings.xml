@@ -530,5 +530,6 @@
     <string name="urlPlaceholder">URL</string>
     <string name="urlUserReportAndroid">https://feedback.userreport.com/f0daec0a-6950-4891-a064-7d040bdce127/</string>
     <string name="warningEventHasPassed">Este acontecimiento ya ha pasado</string>
+    <string name="warningEventIsCancelled">Este evento ha sido cancelado</string>
     <string name="workInProgressTitle">Disponible en breve</string>
 </resources>

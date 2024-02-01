@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2023 Infomaniak Network SA
+ * Copyright (C) 2022-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,6 +33,8 @@ import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmSingleQuery
 import io.realm.kotlin.query.Sort
+import io.sentry.Sentry
+import io.sentry.SentryLevel
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -193,6 +195,10 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
         //region Edit data
         fun upsertMessage(message: Message, realm: MutableRealm) {
             realm.copyToRealm(message, UpdatePolicy.ALL)
+        }
+
+        fun updateMessage(messageUid: String, realm: MutableRealm, onUpdate: (Message?) -> Unit) {
+            onUpdate(getMessage(messageUid, realm))
         }
 
         fun deleteMessage(message: Message, realm: MutableRealm) {

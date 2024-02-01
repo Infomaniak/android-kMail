@@ -166,16 +166,26 @@ class ThreadAdapter(
 
         bindHeader(message)
         bindAlerts(message.uid)
-        bindCalendarEvent()
+        bindCalendarEvent(message)
         bindAttachment(message)
         bindContent(message)
 
         onExpandOrCollapseMessage(message, shouldTrack = false)
     }
 
-    private fun ThreadViewHolder.bindCalendarEvent() {
-        binding.calendarEvent.initCallback { attendees ->
-            threadAdapterCallbacks?.navigateToAttendeeBottomSheet?.invoke(attendees)
+    private fun ThreadViewHolder.bindCalendarEvent(message: Message) {
+        val calendarEvent = message.latestCalendarEventResponse?.calendarEvent
+        binding.calendarEvent.apply {
+            isVisible = calendarEvent != null
+
+            calendarEvent?.let {
+                val hasBeenDeleted = message.latestCalendarEventResponse!!.isUserStoredEventDeleted
+                loadCalendarEvent(it, hasBeenDeleted)
+            }
+
+            initCallback { attendees ->
+                threadAdapterCallbacks?.navigateToAttendeeBottomSheet?.invoke(attendees)
+            }
         }
     }
 
@@ -576,7 +586,8 @@ class ThreadAdapter(
 
         override fun areContentsTheSame(oldMessage: Message, newMessage: Message): Boolean {
             return newMessage.body?.value == oldMessage.body?.value &&
-                    newMessage.splitBody == oldMessage.splitBody
+                    newMessage.splitBody == oldMessage.splitBody &&
+                    newMessage.latestCalendarEventResponse == oldMessage.latestCalendarEventResponse
         }
     }
 

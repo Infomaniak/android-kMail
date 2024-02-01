@@ -322,9 +322,7 @@ class ThreadFragment : Fragment() {
     }
 
     private fun observeMessagesLive() = with(threadViewModel) {
-
         messagesLive.observe(viewLifecycleOwner) { messages ->
-
             SentryLog.i("UI", "Received ${messages.count()} messages")
 
             if (messages.isEmpty()) {
@@ -333,8 +331,13 @@ class ThreadFragment : Fragment() {
                 return@observe
             }
 
-            fetchMessagesHeavyData(messages)
             threadAdapter.submitList(messages)
+
+            threadViewModel.fetchMessagesHeavyData(messages)
+
+            if (threadViewModel.getCalendarEventTreatedMessageCount() != messages.count()) {
+                threadViewModel.fetchCalendarEvents(messages)
+            }
         }
     }
 
