@@ -82,7 +82,7 @@ class Mailbox : RealmObject {
     private var _featureFlags: RealmSet<String> = realmSetOf()
     //endregion
 
-    //region (Transient & Ignore)
+    //region UI data (Transient & Ignore)
     @Transient
     @Ignore
     val featureFlags = FeatureFlagSet()
