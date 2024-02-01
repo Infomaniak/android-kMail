@@ -82,6 +82,7 @@ class ThreadViewModel @Inject constructor(
 
     private var cachedSplitBodies = mutableMapOf<String, SplitBody>()
     private var superCollapsedBlock: MutableSet<String>? = null
+    var hasUserClickedTheSuperCollapsedBlock = false
 
     private val mailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
 
@@ -112,7 +113,8 @@ class ThreadViewModel @Inject constructor(
 
     private suspend fun mapRealmMessagesResult(results: ResultsChange<Message>): Pair<List<Any>, List<Message>> {
 
-        val shouldDisplaySuperCollapsedBlock = results.list.count() >= SUPER_COLLAPSE_BLOCK_MESSAGES_LIMIT
+        val shouldDisplaySuperCollapsedBlock =
+            results.list.count() >= SUPER_COLLAPSE_BLOCK_MESSAGES_LIMIT && !hasUserClickedTheSuperCollapsedBlock
         val shouldCreateSuperCollapsedBlock = (shouldDisplaySuperCollapsedBlock && superCollapsedBlock == null).also {
             if (it) superCollapsedBlock = mutableSetOf()
         }

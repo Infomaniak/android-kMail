@@ -249,6 +249,7 @@ class ThreadFragment : Fragment() {
                 },
                 onMenuClicked = { message -> message.navigateToActionsBottomSheet() },
                 onAllExpandedMessagesLoaded = ::scrollToFirstUnseenMessage,
+                onSuperCollapsedBlockClicked = ::expandSuperCollapsedBlock,
                 navigateToAttendeeBottomSheet = { attendees ->
                     safeNavigate(
                         resId = R.id.attendeesBottomSheetDialog,
@@ -576,6 +577,11 @@ class ThreadFragment : Fragment() {
                 messagesListNestedScrollView.scrollY = targetChild.top
             }
         }
+    }
+
+    private fun expandSuperCollapsedBlock() = with(threadViewModel) {
+        hasUserClickedTheSuperCollapsedBlock = true
+        reassignMessagesLive(twoPaneViewModel.currentThreadUid.value!!)
     }
 
     private fun shouldLoadDistantResources(messageUid: String): Boolean {

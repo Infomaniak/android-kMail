@@ -168,8 +168,11 @@ class ThreadAdapter(
         }
     }
 
-    private fun SuperCollapsedBlockViewHolder.bindSuperCollapsedBlock(item: SuperCollapsedBlock) = with(binding) {
-        superCollapsedBlock.text = context.getString(R.string.superCollapsedBlock, item.messagesUids.count())
+    private fun SuperCollapsedBlockViewHolder.bindSuperCollapsedBlock(item: SuperCollapsedBlock) {
+        with(binding.superCollapsedBlock) {
+            text = context.getString(R.string.superCollapsedBlock, item.messagesUids.count())
+            setOnClickListener { threadAdapterCallbacks?.onSuperCollapsedBlockClicked?.invoke() }
+        }
     }
 
     private fun MessageViewHolder.bindMail(message: Message, position: Int) {
@@ -653,6 +656,7 @@ class ThreadAdapter(
         var onReplyClicked: ((Message) -> Unit)? = null,
         var onMenuClicked: ((Message) -> Unit)? = null,
         var onAllExpandedMessagesLoaded: (() -> Unit)? = null,
+        var onSuperCollapsedBlockClicked: (() -> Unit)? = null,
         var navigateToNewMessageActivity: ((Uri) -> Unit)? = null,
         var navigateToAttendeeBottomSheet: ((List<Attendee>) -> Unit)? = null,
         var navigateToDownloadProgressDialog: ((Attachment, AttachmentIntentType) -> Unit)? = null,
