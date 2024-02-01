@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2023 Infomaniak Network SA
+ * Copyright (C) 2022-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -97,6 +97,7 @@ class ThreadController @Inject constructor(
                     isFullyDownloaded = localMessage?.isFullyDownloaded() ?: false,
                     isTrashed = folderRole == FolderRole.TRASH,
                     isFromSearch = localMessage == null,
+                    latestCalendarEventResponse = localMessage?.latestCalendarEventResponse,
                     draftLocalUuid = localMessage?.draftLocalUuid,
                 )
 
@@ -257,6 +258,7 @@ class ThreadController @Inject constructor(
                                     isTrashed = localMessage.isTrashed,
                                     isFromSearch = localMessage.isFromSearch,
                                     draftLocalUuid = remoteMessage.getDraftLocalUuid(realm),
+                                    latestCalendarEventResponse = localMessage.latestCalendarEventResponse,
                                     messageIds = localMessage.messageIds,
                                 )
                                 MessageController.upsertMessage(remoteMessage, realm = this)

@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023 Infomaniak Network SA
+ * Copyright (C) 2023-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -708,6 +708,7 @@ class RefreshController @Inject constructor(
             isTrashed = folder.role == FolderRole.TRASH,
             isFromSearch = false,
             draftLocalUuid = null,
+            latestCalendarEventResponse = null,
         )
 
         if (existingMessage == null) folder.messages.add(remoteMessage)

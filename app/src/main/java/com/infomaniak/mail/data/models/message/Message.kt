@@ -195,6 +195,7 @@ class Message : RealmObject {
         isTrashed: Boolean,
         isFromSearch: Boolean,
         draftLocalUuid: String?,
+        latestCalendarEventResponse: CalendarEventResponse?,
         messageIds: RealmSet<String>? = null,
     ) {
         this.date = date
@@ -204,6 +205,7 @@ class Message : RealmObject {
         this.isFromSearch = isFromSearch
         this.messageIds = messageIds ?: computeMessageIds()
         shortUid = uid.toShortUid()
+        this.latestCalendarEventResponse = latestCalendarEventResponse
     }
 
     fun keepHeavyData(message: Message) {
