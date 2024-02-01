@@ -255,6 +255,6 @@ object ApiRoutes {
     }
 
     fun resource(resource: String): String {
-        return "${MAIL_API}${resource}"
+        return "$MAIL_API$resource"
     }
 }

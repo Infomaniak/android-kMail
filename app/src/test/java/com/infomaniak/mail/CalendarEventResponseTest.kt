@@ -57,7 +57,7 @@ class CalendarEventResponseTest {
         }
         assertFalse(ThreadAdapter.MessageDiffCallback.everythingButAttendeesIsTheSame(message, otherThingsButAttendeesChanged))
 
-        // If only the attendance state of Attendees has changed in the Message, we need to not detect the change
+        // If only the attendance state of Attendees has changed in the Message, the change must NOT be detected
         val userStoredEvent2 = getBasicCalendarEvent(AttendanceState.ACCEPTED)
         val response2 = getBasicCalendarEventResponse(userStoredEvent2, false)
         val onlyAttendeesChanged = Message().apply {
@@ -67,7 +67,7 @@ class CalendarEventResponseTest {
         }
         assertTrue(ThreadAdapter.MessageDiffCallback.everythingButAttendeesIsTheSame(message, onlyAttendeesChanged))
 
-        // If both the attendance state and another field has changed, it needs to detect the change
+        // If both the attendance state and another field has changed, the change must be detected
         val otherThingsAndAttendeesChanged = Message().apply {
             body = filledBody
             splitBody = null
@@ -88,12 +88,12 @@ class CalendarEventResponseTest {
         val otherThingsButAttendeesChanged = getBasicCalendarEventResponse(userStoredEvent1, true)
         assertFalse(response.everythingButAttendeesIsTheSame(otherThingsButAttendeesChanged))
 
-        // If only the attendance state of Attendees has changed in the CalendarEventResponse, we need to not detect the change
+        // If only the attendance state of Attendees has changed in the CalendarEventResponse, the change must NOT be detected
         val userStoredEvent2 = getBasicCalendarEvent(AttendanceState.ACCEPTED)
         val onlyAttendeesChanged = getBasicCalendarEventResponse(userStoredEvent2, false)
         assertTrue(response.everythingButAttendeesIsTheSame(onlyAttendeesChanged))
 
-        // If both the attendance state and another field has changed, it needs to detect the change
+        // If both the attendance state and another field has changed, the change must be detected
         val otherThingsAndAttendeesChanged = getBasicCalendarEventResponse(userStoredEvent2, true)
         assertFalse(response.everythingButAttendeesIsTheSame(otherThingsAndAttendeesChanged))
     }
@@ -111,11 +111,11 @@ class CalendarEventResponseTest {
         }
         assertFalse(event.everythingButAttendeesIsTheSame(otherThingsButAttendeesHaveChanged))
 
-        // If only the attendance state of Attendees has changed in the CalendarEvent, we need to not detect the change
+        // If only the attendance state of Attendees has changed in the CalendarEvent, the change must NOT be detected
         val onlyAttendeesChanged = getBasicCalendarEvent(AttendanceState.ACCEPTED)
         assertTrue(event.everythingButAttendeesIsTheSame(onlyAttendeesChanged))
 
-        // If both the attendance state and another field has changed, it needs to detect the change
+        // If both the attendance state and another field has changed, the change must be detected
         val otherThingsAndAttendeesChanged = getBasicCalendarEvent(AttendanceState.ACCEPTED).apply {
             end = tomorrow
         }

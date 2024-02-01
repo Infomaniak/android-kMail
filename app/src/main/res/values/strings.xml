@@ -255,7 +255,7 @@
     <string name="errorAlreadyLinkedMailbox">This email address is already linked to your account</string>
     <string name="errorAtLeastOneRecipient">At least one recipient is required</string>
     <string name="errorAttachmentNotFound">Attachment cannot be found</string>
-    <string name="errorCalendarChoiceCouldNotBeSent">An error occurred while sending your choice</string>
+    <string name="errorCalendarChoiceCouldNotBeSent">An error has occurred while sending your answer</string>
     <string name="errorCorruptAttachment">Failed to handle draft, an attachment is corrupted</string>
     <string name="errorDraftNotFound">Draft cannot be found</string>
     <string name="errorEditScheduledMessage">Scheduled or sent messages cannot be edited</string>
@@ -461,7 +461,7 @@
     <string name="settingsTransferEmailsTitle">Transfer emails</string>
     <string name="settingsTransferInBody">In the message body</string>
     <string name="snackbarBlockUserConfirmation">Sender is now blocked</string>
-    <string name="snackbarCalendarChoiceSent">Choice sent successfully</string>
+    <string name="snackbarCalendarChoiceSent">Response taken into account</string>
     <string name="snackbarContactSaved">New contact successfully registered</string>
     <string name="snackbarDeletedConversation">Conversation no longer exists</string>
     <string name="snackbarDisplayProblemReported">Display problem reported</string>

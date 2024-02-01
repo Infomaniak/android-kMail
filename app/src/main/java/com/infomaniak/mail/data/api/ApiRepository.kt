@@ -37,7 +37,7 @@ import com.infomaniak.mail.data.models.ai.AiMessage
 import com.infomaniak.mail.data.models.ai.AiResult
 import com.infomaniak.mail.data.models.ai.ContextMessage
 import com.infomaniak.mail.data.models.ai.UserMessage
-import com.infomaniak.mail.data.models.calendar.Attendee
+import com.infomaniak.mail.data.models.calendar.Attendee.AttendanceState
 import com.infomaniak.mail.data.models.calendar.CalendarEvent
 import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
 import com.infomaniak.mail.data.models.correspondent.Contact
@@ -382,27 +382,22 @@ object ApiRepository : ApiRepositoryCore() {
     }
 
     fun getAttachmentCalendarEvent(resource: String): ApiResponse<CalendarEventResponse> {
-        return callApi(
-            url = ApiRoutes.calendarEvent(resource),
-            method = GET,
-        )
+        return callApi(url = ApiRoutes.calendarEvent(resource), method = GET)
     }
 
     fun replyToCalendarEvent(
-        attendanceState: Attendee.AttendanceState,
+        attendanceState: AttendanceState,
         useInfomaniakCalendarRoute: Boolean,
         calendarEventId: Int,
         attachmentResource: String,
     ): ApiResponse<*> {
         val body = mapOf("reply" to attendanceState.apiValue)
 
-        val response: ApiResponse<*> = if (useInfomaniakCalendarRoute) {
+        return if (useInfomaniakCalendarRoute) {
             callApi<ApiResponse<Boolean>>(ApiRoutes.infomaniakCalendarEventReply(calendarEventId), POST, body)
         } else {
             callApi<ApiResponse<Map<String, CalendarEvent>>>(ApiRoutes.icsCalendarEventReply(attachmentResource), POST, body)
         }
-
-        return response
     }
 
     /**

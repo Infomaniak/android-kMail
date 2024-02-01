@@ -258,7 +258,8 @@ class ThreadViewModel @Inject constructor(
                 Sentry.withScope { scope ->
                     scope.level = SentryLevel.ERROR
                     scope.setExtra("message.uid", message.uid)
-                    scope.setExtra("event has userStoredEvent", calendarEventResponse.hasUserStoredEvent().toString())
+                    val hasUserStoredEvent = calendarEventResponse.hasAssociatedInfomaniakCalendarEvent()
+                    scope.setExtra("event has userStoredEvent", hasUserStoredEvent.toString())
                     scope.setExtra("event's isCanceled", calendarEventResponse.isCanceled.toString())
                     scope.setExtra("event has attachmentEvent", calendarEventResponse.hasAttachmentEvent().toString())
                     Sentry.captureMessage("Cannot find message by uid for fetched calendar event inside Realm")
@@ -269,10 +270,7 @@ class ThreadViewModel @Inject constructor(
 
     fun getCalendarEventTreatedMessageCount(): Int = treatedMessagesForCalendarEvent.count()
 
-    fun replyToCalendarEvent(
-        attendanceState: AttendanceState,
-        message: Message,
-    ) = liveData<Boolean>(ioCoroutineContext) {
+    fun replyToCalendarEvent(attendanceState: AttendanceState, message: Message) = liveData(ioCoroutineContext) {
         val calendarEventResponse = message.latestCalendarEventResponse!!
 
         val response = ApiRepository.replyToCalendarEvent(

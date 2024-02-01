@@ -53,9 +53,9 @@ class CalendarEventBannerView @JvmOverloads constructor(
     private val binding by lazy { ViewCalendarEventBannerBinding.inflate(LayoutInflater.from(context), this, true) }
 
     private var useInfomaniakCalendarRoute: Boolean = false
-    // This value can be saved locally because it's used in only used in one situation. It's used when calling setAttendanceUi
-    // from onlyUpdateAttendance. The method onlyUpdateAttendance could only have been called if shouldDisplayReplyOptions hasn't
-    // changed since the last loadCalendarEvent call so it's safe to use it here.
+    // This value can be saved locally because it's only used in one situation : when calling setAttendanceUi() from
+    // onlyUpdateAttendance(). The method onlyUpdateAttendance() can only be called if shouldDisplayReplyOptions hasn't changed
+    // since the last loadCalendarEvent() call so it's safe to use it here.
     private var shouldDisplayReplyOptions: Boolean = false
     private var attachmentResource: String = ""
 
@@ -159,9 +159,8 @@ class CalendarEventBannerView @JvmOverloads constructor(
 
     private fun setAttendanceUi(attendees: List<Attendee>, shouldDisplayReplyOptions: Boolean) = with(binding) {
         val userAsAttendee = attendees.findUser()
-        val iAmInvited = userAsAttendee != null
 
-        notPartOfAttendeesWarning.isGone = iAmInvited
+        notPartOfAttendeesWarning.isVisible = userAsAttendee == null
         participationButtons.isVisible = shouldDisplayReplyOptions
         attendeesLayout.isGone = attendees.isEmpty()
 
@@ -189,9 +188,8 @@ class CalendarEventBannerView @JvmOverloads constructor(
 
     private fun MaterialButton.handleChoiceButtonBehavior(attendanceState: AttendanceState) {
         setOnClickListener {
-            val previouslyUnchecked = isChecked
-
-            if (previouslyUnchecked) {
+            // Do nothing if it was already selected
+            if (isChecked) {
                 resetChoiceButtons()
                 replyToCalendarEvent?.invoke(attendanceState)
             }

@@ -251,7 +251,7 @@
     <string name="errorAlreadyLinkedMailbox">Cette adresse mail est déjà liée à votre compte</string>
     <string name="errorAtLeastOneRecipient">Il faut au minimum un destinataire</string>
     <string name="errorAttachmentNotFound">Pièce jointe introuvable</string>
-    <string name="errorCalendarChoiceCouldNotBeSent">Une erreur s’est produite lors de l’envoi de votre choix</string>
+    <string name="errorCalendarChoiceCouldNotBeSent">Une erreur s’est produite lors de l’envoi de votre réponse</string>
     <string name="errorCorruptAttachment">Échec du traitement du brouillon, une pièce jointe est corrompue</string>
     <string name="errorDraftNotFound">Brouillon introuvable</string>
     <string name="errorEditScheduledMessage">Impossible de modifier un message planifié ou envoyé</string>
@@ -398,6 +398,14 @@
     <string name="settingsAccentColorDescription">Choisissez la couleur d’accentuation de l’application</string>
     <string name="settingsAiEngineDescription">Sélectionnez votre assistant à la rédaction</string>
     <string name="settingsAppLock">Verrouillage de l’application</string>
+    <string name="settingsAutoAdvanceDescription">Sélectionnez ce que vous souhaitez afficher lorsqu’un message est archivé ou supprimé\u0020</string>
+    <string name="settingsAutoAdvanceFollowingThreadDescription">Afficher la conversation suivante après archivage ou suppression</string>
+    <string name="settingsAutoAdvanceFollowingThreadTitle">Conversation suivante</string>
+    <string name="settingsAutoAdvanceListOfThreadsDescription">Afficher la liste des conversations après archivage ou suppression</string>
+    <string name="settingsAutoAdvanceListOfThreadsTitle">Liste des conversations</string>
+    <string name="settingsAutoAdvancePreviousThreadDescription">Afficher la conversation précédente après archivage ou suppression</string>
+    <string name="settingsAutoAdvancePreviousThreadTitle">Conversation précédente</string>
+    <string name="settingsAutoAdvanceTitle">Avance Automatique</string>
     <string name="settingsCancellationPeriodDescription">Vous avez la possibilité d’annuler l’envoi de votre e-mail jusqu’à 30 secondes</string>
     <string name="settingsCancellationPeriodTitle">Délai d’annulation d’envoi</string>
     <string name="settingsDefault">Par défaut</string>
@@ -463,7 +471,7 @@
     <string name="settingsTransferEmailsTitle">Transférer les e-mails</string>
     <string name="settingsTransferInBody">Dans le corps du message</string>
     <string name="snackbarBlockUserConfirmation">L’expéditeur est maintenant bloqué</string>
-    <string name="snackbarCalendarChoiceSent">Choix envoyé avec succès</string>
+    <string name="snackbarCalendarChoiceSent">Réponse prise en compte</string>
     <string name="snackbarContactSaved">Nouveau contact enregistré avec succès</string>
     <string name="snackbarDeletedConversation">La conversation n’existe plus</string>
     <string name="snackbarDisplayProblemReported">Problème d’affichage signalé</string>

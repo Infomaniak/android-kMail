@@ -76,6 +76,7 @@ class CalendarEvent() : EmbeddedRealmObject {
         if (location != other.location) return false
         if (isFullDay != other.isFullDay) return false
         if (start != other.start) return false
+
         return end == other.end
     }
 
@@ -83,9 +84,7 @@ class CalendarEvent() : EmbeddedRealmObject {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as CalendarEvent
-
-        if (!everythingButAttendeesIsTheSame(other)) return false
+        if (!everythingButAttendeesIsTheSame(other as CalendarEvent)) return false
 
         return attendees == other.attendees
     }

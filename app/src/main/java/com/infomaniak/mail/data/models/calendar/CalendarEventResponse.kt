@@ -41,7 +41,7 @@ class CalendarEventResponse() : EmbeddedRealmObject {
         userStoredEvent: CalendarEvent?,
         isUserStoredEventDeleted: Boolean,
         attachmentEvent: CalendarEvent?,
-        attachmentEventMethod: String?
+        attachmentEventMethod: String?,
     ) : this() {
         this.userStoredEvent = userStoredEvent
         this.isUserStoredEventDeleted = isUserStoredEventDeleted
@@ -64,8 +64,6 @@ class CalendarEventResponse() : EmbeddedRealmObject {
 
     fun hasAssociatedInfomaniakCalendarEvent(): Boolean = userStoredEvent != null
 
-    fun hasUserStoredEvent() = userStoredEvent != null
-
     fun hasAttachmentEvent() = attachmentEvent != null
 
     fun everythingButAttendeesIsTheSame(other: CalendarEventResponse?): Boolean {
@@ -78,8 +76,7 @@ class CalendarEventResponse() : EmbeddedRealmObject {
         val c2 = other.calendarEvent
 
         if (c1 == null && c2 == null) return true
-        if (c1 == null) return false
-        if (c2 == null) return false
+        if (c1 == null || c2 == null) return false
 
         return c1.everythingButAttendeesIsTheSame(c2)
     }

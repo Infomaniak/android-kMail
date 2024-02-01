@@ -165,8 +165,8 @@ class ThreadAdapter(
                     if (isExpandedMap[message.uid] == true) onExpandedMessageLoaded(message.uid)
                 }
                 NotifyType.ONLY_REBIND_CALENDAR_ATTENDANCE -> {
-                    val attendees = message.latestCalendarEventResponse?.calendarEvent?.attendees
-                    holder.binding.calendarEvent.onlyUpdateAttendance(attendees ?: emptyList())
+                    val attendees = message.latestCalendarEventResponse?.calendarEvent?.attendees ?: emptyList()
+                    holder.binding.calendarEvent.onlyUpdateAttendance(attendees)
                 }
             }
         }
@@ -219,9 +219,7 @@ class ThreadAdapter(
                 replyToCalendarEvent = { attendanceState ->
                     threadAdapterCallbacks?.replyToCalendarEvent?.invoke(attendanceState, message)
                 },
-                onAttendeesButtonClicked = { isExpanded ->
-                    isCalendarEventExpandedMap[message.uid] = isExpanded
-                },
+                onAttendeesButtonClicked = { isExpanded -> isCalendarEventExpandedMap[message.uid] = isExpanded },
             )
         }
     }
