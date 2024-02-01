@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023 Infomaniak Network SA
+ * Copyright (C) 2023-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,24 +25,24 @@ object AttachmentMimeTypeUtils {
         "application/pdf",
         "application/acrobat",
         "application/nappdf",
-        "application/x-pdf"
+        "application/x-pdf",
     )
 
-    private val calendarMatches = mimeTypeSetOf(
+    val calendarMatches = mimeTypeSetOf(
         "application/ics",
-        "text/calendar"
+        "text/calendar",
     )
 
     private val vcardMatches = mimeTypeSetOf(
         "text/vcard",
         "text/directory",
-        "text/x-vcard"
+        "text/x-vcard",
     )
 
     private val imageMatches = mimeTypeSetOf(
         "image/",
         "application/postscript",
-        "application/x-font-type1"
+        "application/x-font-type1",
     )
 
     private val audioMatches = mimeTypeSetOf("audio/")
@@ -52,7 +52,7 @@ object AttachmentMimeTypeUtils {
         "model/vnd.mts",
         "application/mxf",
         "application/vnd.rn-realmedia",
-        "application/x-shockwave-flash"
+        "application/x-shockwave-flash",
     )
 
     private val sheetMatches = mimeTypeSetOf(
@@ -61,7 +61,7 @@ object AttachmentMimeTypeUtils {
         "application/msexcel",
         "application/x-msexcel",
         "application/vnd.openxmlformats-officedocument.spreadsheetml",
-        "application/vnd.oasis.opendocument.spreadsheet"
+        "application/vnd.oasis.opendocument.spreadsheet",
     )
 
     private val pointMatches = mimeTypeSetOf(
@@ -70,7 +70,7 @@ object AttachmentMimeTypeUtils {
         "application/vnd.ms-powerpoint",
         "application/x-mspowerpoint",
         "application/vnd.openxmlformats-officedocument.presentationml",
-        "application/vnd.oasis.opendocument.presentation"
+        "application/vnd.oasis.opendocument.presentation",
     )
 
     private val textMatches = mimeTypeSetOf(
@@ -79,7 +79,7 @@ object AttachmentMimeTypeUtils {
         "application/msword",
         "application/vnd.ms-word",
         "application/vnd.oasis.opendocument.text",
-        "application/vnd.openxmlformats-officedocument.wordprocessingml"
+        "application/vnd.openxmlformats-officedocument.wordprocessingml",
     )
 
     private val archiveMatches = mimeTypeSetOf(
@@ -101,13 +101,13 @@ object AttachmentMimeTypeUtils {
         "application/x-bzip2",
         "application/java-archive",
         "application/x-rar-compressed",
-        "application/application/x-tar"
+        "application/application/x-tar",
     )
 
     private val codeMatches = mimeTypeSetOf(
         "text/", // Beware of the order, this must come after every other "text/"
         "application/json",
-        "application/xml"
+        "application/xml",
     )
 
     private val fontMatches = mimeTypeSetOf(
@@ -115,7 +115,7 @@ object AttachmentMimeTypeUtils {
         "application/vnd.afpc.foca-codedfont",
         "application/vnd.font-fontforge-sfd",
         "application/vnd.ms-fontobject",
-        "application/font-tdpfr"
+        "application/font-tdpfr",
     )
 
     fun getFileTypeFromMimeType(mimeType: String): AttachmentType = when (mimeType) {
@@ -136,7 +136,7 @@ object AttachmentMimeTypeUtils {
 
     private fun mimeTypeSetOf(vararg mimeTypes: String) = MimeTypeSet(mimeTypes.toSet())
 
-    private class MimeTypeSet(private val mimeTypes: Set<String>) : Set<String> by mimeTypes {
+    class MimeTypeSet(private val mimeTypes: Set<String>) : Set<String> by mimeTypes {
         override fun contains(element: String): Boolean = mimeTypes.any { mimeType -> element.startsWith(mimeType) }
     }
 }
