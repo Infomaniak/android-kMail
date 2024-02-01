@@ -249,6 +249,7 @@
     <string name="errorAlreadyLinkedMailbox">Diese E-Mail-Adresse ist bereits mit Ihrem Konto verknüpft</string>
     <string name="errorAtLeastOneRecipient">Es ist mindestens ein Empfänger erforderlich</string>
     <string name="errorAttachmentNotFound">Dateianhang unauffindbar</string>
+    <string name="errorCalendarChoiceCouldNotBeSent">Beim Senden Ihrer Antwort ist ein Fehler aufgetreten</string>
     <string name="errorCorruptAttachment">Der Entwurf konnte nicht bearbeitet werden, ein Anhang ist beschädigt</string>
     <string name="errorDraftNotFound">Entwurf unauffindbar</string>
     <string name="errorEditScheduledMessage">Geplante oder versendete Nachrichten können nicht geändert werden</string>
@@ -454,6 +455,7 @@
     <string name="settingsTransferEmailsTitle">E-Mails übertragen</string>
     <string name="settingsTransferInBody">Im Nachrichtentext</string>
     <string name="snackbarBlockUserConfirmation">Absender ist jetzt blockiert</string>
+    <string name="snackbarCalendarChoiceSent">Antwort berücksichtigt</string>
     <string name="snackbarContactSaved">Neuer Kontakt erfolgreich registriert</string>
     <string name="snackbarDeletedConversation">Unterhaltung existiert nicht mehr</string>
     <string name="snackbarDisplayProblemReported">Anzeigeproblem gemeldet</string>

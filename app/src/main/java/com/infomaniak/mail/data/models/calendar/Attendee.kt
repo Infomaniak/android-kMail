@@ -55,6 +55,10 @@ class Attendee() : EmbeddedRealmObject, Correspondent {
         _state = state
     }
 
+    fun manuallyOverrideAttendanceState(newAttendanceState: AttendanceState) {
+        _state = newAttendanceState.apiValue
+    }
+
     enum class AttendanceState(val apiValue: String, @DrawableRes val icon: Int?, @ColorRes val iconColor: Int?) {
         ACCEPTED("ACCEPTED", R.drawable.ic_check_rounded, R.color.greenSuccess),
         NEEDS_ACTION("NEEDS-ACTION", null, null),

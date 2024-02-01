@@ -29,14 +29,15 @@ import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.calendar.Attendee
+import com.infomaniak.mail.data.models.calendar.Attendee.AttendanceState
 import com.infomaniak.mail.data.models.calendar.CalendarEvent
 import com.infomaniak.mail.databinding.ViewCalendarEventBannerBinding
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.utils.AttachmentIntentUtils.openAttachment
 import com.infomaniak.mail.utils.UiUtils.getPrettyNameAndEmail
+import com.infomaniak.mail.utils.findUser
 import com.infomaniak.mail.utils.toDate
 import dagger.hilt.android.AndroidEntryPoint
-import io.realm.kotlin.types.RealmList
 import io.sentry.Sentry
 import java.time.format.FormatStyle
 import java.util.Date
@@ -51,27 +52,55 @@ class CalendarEventBannerView @JvmOverloads constructor(
 
     private val binding by lazy { ViewCalendarEventBannerBinding.inflate(LayoutInflater.from(context), this, true) }
 
+    private var useInfomaniakCalendarRoute: Boolean = false
+    // This value can be saved locally because it's only used in one situation : when calling setAttendanceUi() from
+    // onlyUpdateAttendance(). The method onlyUpdateAttendance() can only be called if shouldDisplayReplyOptions hasn't changed
+    // since the last loadCalendarEvent() call so it's safe to use it here.
+    private var shouldDisplayReplyOptions: Boolean = false
+    private var attachmentResource: String = ""
+
     private var navigateToAttendeesBottomSheet: ((List<Attendee>) -> Unit)? = null
     private var navigateToDownloadProgressDialog: (() -> Unit)? = null
+    private var replyToCalendarEvent: ((AttendanceState) -> Unit)? = null
+    private var onAttendeesButtonClicked: ((Boolean) -> Unit)? = null
 
     @Inject
     lateinit var snackbarManager: SnackbarManager
 
     init {
         with(binding) {
-            yesButton.handleChoiceButtonBehavior()
-            maybeButton.handleChoiceButtonBehavior()
-            noButton.handleChoiceButtonBehavior()
+            yesButton.handleChoiceButtonBehavior(AttendanceState.ACCEPTED)
+            maybeButton.handleChoiceButtonBehavior(AttendanceState.TENTATIVE)
+            noButton.handleChoiceButtonBehavior(AttendanceState.DECLINED)
 
-            attendeesButton.addOnCheckedChangeListener { _, isChecked -> attendeesSubMenu.isVisible = isChecked }
+            attendeesButton.addOnCheckedChangeListener { _, isChecked ->
+                attendeesSubMenu.isVisible = isChecked
+                onAttendeesButtonClicked?.invoke(isChecked)
+            }
         }
     }
 
-    fun loadCalendarEvent(calendarEvent: CalendarEvent, hasBeenDeleted: Boolean, attachment: Attachment) = with(binding) {
+    fun loadCalendarEvent(
+        calendarEvent: CalendarEvent,
+        isCanceled: Boolean,
+        shouldDisplayReplyOptions: Boolean,
+        attachment: Attachment,
+        hasAssociatedInfomaniakCalendarEvent: Boolean,
+        shouldStartExpanded: Boolean,
+    ) = with(binding) {
+        this@CalendarEventBannerView.shouldDisplayReplyOptions = shouldDisplayReplyOptions
+
+        useInfomaniakCalendarRoute = hasAssociatedInfomaniakCalendarEvent
+        attachmentResource = attachment.resource ?: run {
+            // TODO: Check this sentry
+            Sentry.captureMessage("No attachment resource when trying to load calendar event")
+            return@with
+        }
+
         val startDate = calendarEvent.start.toDate()
         val endDate = calendarEvent.end.toDate()
 
-        setWarnings(endDate, hasBeenDeleted)
+        setWarnings(endDate, isCanceled)
         eventName.text = calendarEvent.title
         setEventHour(startDate, endDate, calendarEvent.isFullDay)
         eventLocation.apply {
@@ -79,16 +108,23 @@ class CalendarEventBannerView @JvmOverloads constructor(
             text = calendarEvent.location
         }
 
-        setAttendees(calendarEvent.attendees)
+        attendeesButton.isChecked = shouldStartExpanded
+        attendeesSubMenu.isVisible = shouldStartExpanded
+
+        setAttendanceUi(calendarEvent.attendees, shouldDisplayReplyOptions)
 
         addToCalendarButton.setOnClickListener {
             attachment.openAttachment(context, navigateToDownloadProgressDialog ?: return@setOnClickListener, snackbarManager)
         }
     }
 
-    private fun setWarnings(endDate: Date, hasBeenDeleted: Boolean) = with(binding) {
-        canceledEventWarning.isVisible = hasBeenDeleted
-        pastEventWarning.isVisible = !hasBeenDeleted && Date() > endDate
+    fun onlyUpdateAttendance(attendees: List<Attendee>) {
+        setAttendanceUi(attendees, shouldDisplayReplyOptions)
+    }
+
+    private fun setWarnings(endDate: Date, isCanceled: Boolean) = with(binding) {
+        canceledEventWarning.isVisible = isCanceled
+        pastEventWarning.isVisible = !isCanceled && Date() > endDate
     }
 
     private fun setEventHour(startDate: Date, endDate: Date, isFullDay: Boolean) = with(binding) {
@@ -121,11 +157,17 @@ class CalendarEventBannerView @JvmOverloads constructor(
         }
     }
 
-    private fun setAttendees(attendees: RealmList<Attendee>) = with(binding) {
-        val iAmPartOfAttendees = attendees.any { it.isMe() }
-        notPartOfAttendeesWarning.isGone = iAmPartOfAttendees
-        participationButtons.isVisible = iAmPartOfAttendees && false // TODO : Display this when buttons click are implemented
+    private fun setAttendanceUi(attendees: List<Attendee>, shouldDisplayReplyOptions: Boolean) = with(binding) {
+        val userAsAttendee = attendees.findUser()
+
+        notPartOfAttendeesWarning.isVisible = userAsAttendee == null
+        participationButtons.isVisible = shouldDisplayReplyOptions
         attendeesLayout.isGone = attendees.isEmpty()
+
+        val attendanceState = userAsAttendee?.state
+        yesButton.isChecked = attendanceState == AttendanceState.ACCEPTED
+        maybeButton.isChecked = attendanceState == AttendanceState.TENTATIVE
+        noButton.isChecked = attendanceState == AttendanceState.DECLINED
 
         displayOrganizer(attendees)
         allAttendeesButton.setOnClickListener { navigateToAttendeesBottomSheet?.invoke(attendees) }
@@ -135,15 +177,23 @@ class CalendarEventBannerView @JvmOverloads constructor(
     fun initCallback(
         navigateToAttendeesBottomSheet: (List<Attendee>) -> Unit,
         navigateToDownloadProgressDialog: () -> Unit,
+        replyToCalendarEvent: (AttendanceState) -> Unit,
+        onAttendeesButtonClicked: (Boolean) -> Unit,
     ) {
         this.navigateToAttendeesBottomSheet = navigateToAttendeesBottomSheet
         this.navigateToDownloadProgressDialog = navigateToDownloadProgressDialog
+        this.replyToCalendarEvent = replyToCalendarEvent
+        this.onAttendeesButtonClicked = onAttendeesButtonClicked
     }
 
-    private fun MaterialButton.handleChoiceButtonBehavior() {
+    private fun MaterialButton.handleChoiceButtonBehavior(attendanceState: AttendanceState) {
         setOnClickListener {
-            val changedSelectedButton = isChecked
-            if (changedSelectedButton) resetChoiceButtons()
+            // Do nothing if it was already selected
+            if (isChecked) {
+                resetChoiceButtons()
+                replyToCalendarEvent?.invoke(attendanceState)
+            }
+
             isChecked = true
         }
     }

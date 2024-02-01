@@ -32,11 +32,12 @@ import kotlinx.serialization.UseSerializers
 import java.util.Date
 
 @Serializable
-class CalendarEvent : EmbeddedRealmObject {
+class CalendarEvent() : EmbeddedRealmObject {
 
     /** Don't forget to update equals() and hashCode() if a field is added */
 
     //region Remote data
+    var id: Int = 0
     var type: String = ""
     var title: String = ""
     var location: String? = null
@@ -47,20 +48,43 @@ class CalendarEvent : EmbeddedRealmObject {
     var attendees: RealmList<Attendee> = realmListOf()
     //endregion
 
+    constructor(
+        id: Int,
+        type: String,
+        title: String,
+        location: String?,
+        isFullDay: Boolean,
+        start: RealmInstant,
+        end: RealmInstant,
+        attendees: RealmList<Attendee>,
+    ) : this() {
+        this.id = id
+        this.type = type
+        this.title = title
+        this.location = location
+        this.isFullDay = isFullDay
+        this.start = start
+        this.end = end
+        this.attendees = attendees
+    }
+
     /** Don't forget to update equals() and hashCode() if a field is added */
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as CalendarEvent
-
+    fun everythingButAttendeesIsTheSame(other: CalendarEvent): Boolean {
         if (type != other.type) return false
         if (title != other.title) return false
         if (location != other.location) return false
         if (isFullDay != other.isFullDay) return false
         if (start != other.start) return false
-        if (end != other.end) return false
+
+        return end == other.end
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        if (!everythingButAttendeesIsTheSame(other as CalendarEvent)) return false
 
         return attendees == other.attendees
     }

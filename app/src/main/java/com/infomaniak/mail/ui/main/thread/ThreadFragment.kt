@@ -197,6 +197,7 @@ class ThreadFragment : Fragment() {
     private fun setupAdapter() = with(binding.messagesList) {
         adapter = ThreadAdapter(
             shouldLoadDistantResources = shouldLoadDistantResources(),
+            isCalendarEventExpandedMap = threadViewModel.isCalendarEventExpandedMap,
             onContactClicked = {
                 safeNavigate(
                     resId = R.id.detailedContactBottomSheetDialog,
@@ -244,6 +245,20 @@ class ThreadFragment : Fragment() {
             },
             navigateToNewMessageActivity = { twoPaneViewModel.navigateToNewMessage(mailToUri = it) },
             navigateToDownloadProgressDialog = ::safeNavigate,
+            replyToCalendarEvent = { attendanceState, message ->
+                threadViewModel.replyToCalendarEvent(
+                    attendanceState,
+                    message,
+                ).observe(viewLifecycleOwner) { successfullyUpdated ->
+                    if (successfullyUpdated) {
+                        snackbarManager.setValue(getString(R.string.snackbarCalendarChoiceSent))
+                        threadViewModel.fetchCalendarEvents(listOf(message), forceFetch = true)
+                    } else {
+                        snackbarManager.setValue(getString(R.string.errorCalendarChoiceCouldNotBeSent))
+                        threadAdapter.undoUserAttendanceClick(message)
+                    }
+                }
+            },
             promptLink = { data, type ->
                 // When adding a phone number to contacts, Google decodes this value in case it's url-encoded. But I could not
                 // reproduce this issue when manually creating a url-encoded href. If this is triggered, fix it by also

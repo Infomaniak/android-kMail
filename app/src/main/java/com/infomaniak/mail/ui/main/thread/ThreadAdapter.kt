@@ -41,6 +41,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Attachment.*
 import com.infomaniak.mail.data.models.calendar.Attendee
+import com.infomaniak.mail.data.models.calendar.Attendee.AttendanceState
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.message.Message.*
@@ -65,6 +66,7 @@ import com.google.android.material.R as RMaterial
 
 class ThreadAdapter(
     private val shouldLoadDistantResources: Boolean,
+    private val isCalendarEventExpandedMap: MutableMap<String, Boolean>,
     onContactClicked: (contact: Recipient) -> Unit,
     onDeleteDraftClicked: (message: Message) -> Unit,
     onDraftClicked: (message: Message) -> Unit,
@@ -76,6 +78,7 @@ class ThreadAdapter(
     navigateToNewMessageActivity: (Uri) -> Unit,
     navigateToAttendeeBottomSheet: (List<Attendee>) -> Unit,
     navigateToDownloadProgressDialog: (Int, Bundle) -> Unit,
+    replyToCalendarEvent: (AttendanceState, Message) -> Unit,
     promptLink: (String, ContextMenuType) -> Unit,
 ) : ListAdapter<Message, ThreadViewHolder>(MessageDiffCallback()) {
 
@@ -119,6 +122,7 @@ class ThreadAdapter(
             navigateToNewMessageActivity,
             navigateToAttendeeBottomSheet,
             navigateToDownloadProgressDialog,
+            replyToCalendarEvent,
             promptLink,
         )
     }
@@ -160,6 +164,10 @@ class ThreadAdapter(
                     failedLoadingErrorMessage.isVisible = true
                     if (isExpandedMap[message.uid] == true) onExpandedMessageLoaded(message.uid)
                 }
+                NotifyType.ONLY_REBIND_CALENDAR_ATTENDANCE -> {
+                    val attendees = message.latestCalendarEventResponse?.calendarEvent?.attendees ?: emptyList()
+                    holder.binding.calendarEvent.onlyUpdateAttendance(attendees)
+                }
             }
         }
     }.getOrDefault(Unit)
@@ -186,8 +194,16 @@ class ThreadAdapter(
             isVisible = calendarEvent != null
 
             calendarEvent?.let {
-                val hasBeenDeleted = message.latestCalendarEventResponse!!.isUserStoredEventDeleted
-                loadCalendarEvent(it, hasBeenDeleted, attachment)
+                val calendarEventResponse = message.latestCalendarEventResponse!!
+
+                loadCalendarEvent(
+                    calendarEvent = it,
+                    isCanceled = calendarEventResponse.isCanceled,
+                    shouldDisplayReplyOptions = calendarEventResponse.isReplyAuthorized(),
+                    attachment = attachment,
+                    hasAssociatedInfomaniakCalendarEvent = calendarEventResponse.hasAssociatedInfomaniakCalendarEvent(),
+                    shouldStartExpanded = isCalendarEventExpandedMap[message.uid] ?: false,
+                )
             }
 
             initCallback(
@@ -200,6 +216,10 @@ class ThreadAdapter(
                         attachment.createDownloadDialogNavArgs(AttachmentIntentType.OPEN_WITH),
                     )
                 },
+                replyToCalendarEvent = { attendanceState ->
+                    threadAdapterCallbacks?.replyToCalendarEvent?.invoke(attendanceState, message)
+                },
+                onAttendeesButtonClicked = { isExpanded -> isCalendarEventExpandedMap[message.uid] = isExpanded },
             )
         }
     }
@@ -582,10 +602,16 @@ class ThreadAdapter(
         threadAdapterCallbacks = null
     }
 
+    fun undoUserAttendanceClick(message: Message) {
+        val indexOfMessage = messages.indexOfFirst { it.uid == message.uid }.takeIf { it >= 0 }
+        indexOfMessage?.let { notifyItemChanged(it, NotifyType.ONLY_REBIND_CALENDAR_ATTENDANCE) }
+    }
+
     private enum class NotifyType {
         TOGGLE_LIGHT_MODE,
         RE_RENDER,
         FAILED_MESSAGE,
+        ONLY_REBIND_CALENDAR_ATTENDANCE,
     }
 
     enum class ContextMenuType {
@@ -594,15 +620,35 @@ class ThreadAdapter(
         PHONE,
     }
 
-    private class MessageDiffCallback : DiffUtil.ItemCallback<Message>() {
+    class MessageDiffCallback : DiffUtil.ItemCallback<Message>() {
         override fun areItemsTheSame(oldMessage: Message, newMessage: Message): Boolean {
             return oldMessage.uid == newMessage.uid
         }
 
         override fun areContentsTheSame(oldMessage: Message, newMessage: Message): Boolean {
-            return newMessage.body?.value == oldMessage.body?.value &&
-                    newMessage.splitBody == oldMessage.splitBody &&
+            return areMessageContentsTheSameExceptCalendar(oldMessage, newMessage) &&
                     newMessage.latestCalendarEventResponse == oldMessage.latestCalendarEventResponse
+        }
+
+        override fun getChangePayload(oldItem: Message, newItem: Message): Any? {
+            // If everything but attendees is the same, then we know the only thing that could've changed is attendees
+            return if (everythingButAttendeesIsTheSame(oldItem, newItem)) NotifyType.ONLY_REBIND_CALENDAR_ATTENDANCE else null
+        }
+
+        companion object {
+            fun everythingButAttendeesIsTheSame(oldItem: Message, newItem: Message): Boolean {
+                val newCalendarEventResponse = newItem.latestCalendarEventResponse
+                val oldCalendarEventResponse = oldItem.latestCalendarEventResponse
+
+                return (areMessageContentsTheSameExceptCalendar(oldItem, newItem) &&
+                        !(newCalendarEventResponse == null && oldCalendarEventResponse == null)
+                        && newCalendarEventResponse?.everythingButAttendeesIsTheSame(oldCalendarEventResponse) == true)
+            }
+
+            private fun areMessageContentsTheSameExceptCalendar(oldMessage: Message, newMessage: Message): Boolean {
+                return newMessage.body?.value == oldMessage.body?.value &&
+                        newMessage.splitBody == oldMessage.splitBody
+            }
         }
     }
 
@@ -685,6 +731,7 @@ class ThreadAdapter(
         var navigateToNewMessageActivity: (Uri) -> Unit,
         var navigateToAttendeeBottomSheet: (List<Attendee>) -> Unit,
         var navigateToDownloadProgressDialog: (Int, Bundle) -> Unit,
+        var replyToCalendarEvent: (AttendanceState, Message) -> Unit,
         var promptLink: (String, ContextMenuType) -> Unit,
     )
 

@@ -167,7 +167,7 @@ class Message : RealmObject {
             if (it == null) SentryLog.e("ThreadAdapter", "Message $uid has empty from")
         }
 
-    val calendarAttachment: Attachment? get() = attachments.firstOrNull(Attachment::isCalendarEvent)
+    val calendarAttachment: Attachment? get() = if (isDraft) null else attachments.firstOrNull(Attachment::isCalendarEvent)
 
     val dkimStatus: MessageDKIM get() = enumValueOfOrNull<MessageDKIM>(_dkimStatus) ?: MessageDKIM.VALID
 
@@ -195,6 +195,7 @@ class Message : RealmObject {
         isTrashed: Boolean,
         isFromSearch: Boolean,
         draftLocalUuid: String?,
+        latestCalendarEventResponse: CalendarEventResponse?,
         messageIds: RealmSet<String>? = null,
     ) {
         this.date = date
@@ -204,6 +205,7 @@ class Message : RealmObject {
         this.isFromSearch = isFromSearch
         this.messageIds = messageIds ?: computeMessageIds()
         shortUid = uid.toShortUid()
+        this.latestCalendarEventResponse = latestCalendarEventResponse
     }
 
     fun keepHeavyData(message: Message) {

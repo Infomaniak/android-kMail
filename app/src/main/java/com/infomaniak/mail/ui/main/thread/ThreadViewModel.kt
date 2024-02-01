@@ -28,6 +28,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
+import com.infomaniak.mail.data.models.calendar.Attendee.AttendanceState
 import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
@@ -66,6 +67,7 @@ class ThreadViewModel @Inject constructor(
     val quickActionBarClicks = SingleLiveEvent<QuickActionBarResult>()
 
     private val treatedMessagesForCalendarEvent = mutableSetOf<String>()
+    val isCalendarEventExpandedMap = mutableMapOf<String, Boolean>()
 
     var deletedMessagesUids = mutableSetOf<String>()
     val failedMessagesUids = SingleLiveEvent<List<String>>()
@@ -192,54 +194,6 @@ class ThreadViewModel @Inject constructor(
         }
     }
 
-    fun fetchCalendarEvents(messages: List<Message>) {
-        fetchCalendarEventJob?.cancel()
-        fetchCalendarEventJob = viewModelScope.launch(ioCoroutineContext) {
-            mailboxContentRealm().writeBlocking {
-                messages.forEach { message ->
-                    if (!message.isFullyDownloaded()) return@forEach // Only treat message that have their attachments downloaded
-
-                    val alreadyTreated = !treatedMessagesForCalendarEvent.add(message.uid)
-                    if (alreadyTreated) return@forEach
-
-                    val icsAttachment = message.calendarAttachment ?: return@forEach
-
-                    val apiResponse = icsAttachment.resource?.let { resource ->
-                        ApiRepository.getAttachmentCalendarEvent(resource)
-                    } ?: return@forEach
-
-                    if (apiResponse.isSuccess()) {
-                        updateCalendarEvent(message, apiResponse.data!!)
-                    } else {
-                        Sentry.withScope { scope ->
-                            scope.setExtra("ics attachment mimeType", icsAttachment.mimeType)
-                            scope.setExtra("ics attachment size", icsAttachment.size.toString())
-                            scope.setExtra("error code", apiResponse.error?.code.toString())
-                            Sentry.captureMessage("Failed loading calendar event")
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private fun MutableRealm.updateCalendarEvent(message: Message, calendarEventResponse: CalendarEventResponse) {
-        MessageController.updateMessage(message.uid, realm = this) { localMessage ->
-            localMessage?.let {
-                it.latestCalendarEventResponse = calendarEventResponse
-            } ?: run {
-                Sentry.withScope { scope ->
-                    scope.level = SentryLevel.ERROR
-                    scope.setExtra("message.uid", message.uid)
-                    scope.setExtra("event has userStoredEvent", calendarEventResponse.hasUserStoredEvent().toString())
-                    scope.setExtra("event's userStoredEventDeleted", calendarEventResponse.isUserStoredEventDeleted.toString())
-                    scope.setExtra("event has attachmentEvent", calendarEventResponse.hasAttachmentEvent().toString())
-                    Sentry.captureMessage("Cannot find message by uid for fetched calendar event inside Realm")
-                }
-            }
-        }
-    }
-
     fun deleteDraft(message: Message, mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
         val realm = mailboxContentRealm()
         val thread = threadLive.value ?: return@launch
@@ -261,7 +215,73 @@ class ThreadViewModel @Inject constructor(
         quickActionBarClicks.postValue(QuickActionBarResult(thread.uid, message, menuId))
     }
 
+    fun fetchCalendarEvents(messages: List<Message>, forceFetch: Boolean = false) {
+        fetchCalendarEventJob?.cancel()
+        fetchCalendarEventJob = viewModelScope.launch(ioCoroutineContext) {
+            mailboxContentRealm().writeBlocking {
+                messages.forEach { message -> fetchCalendarEvent(message, forceFetch) }
+            }
+        }
+    }
+
+    private fun MutableRealm.fetchCalendarEvent(message: Message, forceFetch: Boolean) {
+        if (!message.isFullyDownloaded()) return // Only treat message that have their attachments downloaded
+
+        if (!forceFetch) {
+            val alreadyTreated = !treatedMessagesForCalendarEvent.add(message.uid)
+            if (alreadyTreated) return
+        }
+
+        val icsAttachment = message.calendarAttachment ?: return
+
+        val apiResponse = icsAttachment.resource?.let { resource ->
+            ApiRepository.getAttachmentCalendarEvent(resource)
+        } ?: return
+
+        if (apiResponse.isSuccess()) {
+            updateCalendarEvent(message, apiResponse.data!!)
+        } else {
+            Sentry.withScope { scope ->
+                scope.setExtra("ics attachment mimeType", icsAttachment.mimeType)
+                scope.setExtra("ics attachment size", icsAttachment.size.toString())
+                scope.setExtra("error code", apiResponse.error?.code.toString())
+                Sentry.captureMessage("Failed loading calendar event")
+            }
+        }
+    }
+
+    private fun MutableRealm.updateCalendarEvent(message: Message, calendarEventResponse: CalendarEventResponse) {
+        MessageController.updateMessage(message.uid, realm = this) { localMessage ->
+            localMessage?.let {
+                it.latestCalendarEventResponse = calendarEventResponse
+            } ?: run {
+                Sentry.withScope { scope ->
+                    scope.level = SentryLevel.ERROR
+                    scope.setExtra("message.uid", message.uid)
+                    val hasUserStoredEvent = calendarEventResponse.hasAssociatedInfomaniakCalendarEvent()
+                    scope.setExtra("event has userStoredEvent", hasUserStoredEvent.toString())
+                    scope.setExtra("event's isCanceled", calendarEventResponse.isCanceled.toString())
+                    scope.setExtra("event has attachmentEvent", calendarEventResponse.hasAttachmentEvent().toString())
+                    Sentry.captureMessage("Cannot find message by uid for fetched calendar event inside Realm")
+                }
+            }
+        }
+    }
+
     fun getCalendarEventTreatedMessageCount(): Int = treatedMessagesForCalendarEvent.count()
+
+    fun replyToCalendarEvent(attendanceState: AttendanceState, message: Message) = liveData(ioCoroutineContext) {
+        val calendarEventResponse = message.latestCalendarEventResponse!!
+
+        val response = ApiRepository.replyToCalendarEvent(
+            attendanceState,
+            useInfomaniakCalendarRoute = calendarEventResponse.hasAssociatedInfomaniakCalendarEvent(),
+            calendarEventId = calendarEventResponse.calendarEvent!!.id,
+            attachmentResource = message.calendarAttachment!!.resource ?: "",
+        )
+
+        emit(response.isSuccess())
+    }
 
     data class SubjectDataResult(
         val thread: Thread?,
