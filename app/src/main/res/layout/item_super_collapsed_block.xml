@@ -24,62 +24,31 @@
     android:tag="SuperCollapsedBlock">
 
     <View
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/border"
-        app:layout_constraintBottom_toTopOf="@id/midLeft"
-        app:layout_constraintEnd_toStartOf="@id/superCollapsedBlock"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintBottom_toTopOf="@id/mid" />
 
     <View
-        android:id="@+id/midLeft"
-        android:layout_width="0dp"
+        android:id="@+id/mid"
+        android:layout_width="match_parent"
         android:layout_height="8dp"
         android:background="@color/elevatedBackground"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/superCollapsedBlock"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <View
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/border"
-        app:layout_constraintEnd_toStartOf="@id/superCollapsedBlock"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/midLeft" />
-
-    <View
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:background="@color/border"
-        app:layout_constraintBottom_toTopOf="@id/midRight"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/superCollapsedBlock" />
-
-    <View
-        android:id="@+id/midRight"
-        android:layout_width="0dp"
-        android:layout_height="8dp"
-        android:background="@color/elevatedBackground"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/superCollapsedBlock"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <View
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:background="@color/border"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/superCollapsedBlock"
-        app:layout_constraintTop_toBottomOf="@id/midRight" />
+        app:layout_constraintTop_toBottomOf="@id/mid" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/superCollapsedBlock"
         style="@style/TextButtonSecondaryMedium"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:backgroundTint="@color/backgroundColor"
         android:fontFamily="@font/suisseintl_regular"
         app:cornerRadius="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -89,4 +58,5 @@
         app:strokeColor="@color/border"
         app:strokeWidth="1dp"
         tools:text="@string/superCollapsedBlock" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
