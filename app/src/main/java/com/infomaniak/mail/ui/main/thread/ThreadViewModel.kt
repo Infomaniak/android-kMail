@@ -112,10 +112,10 @@ class ThreadViewModel @Inject constructor(
 
     private suspend fun mapRealmMessagesResult(results: ResultsChange<Message>): Pair<List<Any>, List<Message>> {
 
-        val shouldAddSuperCollapsedBlock =
-            (superCollapsedBlock == null && results.list.count() >= SUPER_COLLAPSE_BLOCK_MESSAGES_LIMIT).also {
-                if (it) superCollapsedBlock = mutableSetOf()
-            }
+        val shouldDisplaySuperCollapsedBlock = results.list.count() >= SUPER_COLLAPSE_BLOCK_MESSAGES_LIMIT
+        val shouldCreateSuperCollapsedBlock = (shouldDisplaySuperCollapsedBlock && superCollapsedBlock == null).also {
+            if (it) superCollapsedBlock = mutableSetOf()
+        }
 
         val messagesCount = results.list.count()
         val items = mutableListOf<Any>()
@@ -128,26 +128,61 @@ class ThreadViewModel @Inject constructor(
             }
         }
 
-        results.list.forEachIndexed { index, message ->
-            if (shouldAddSuperCollapsedBlock) {
+        suspend fun mapListWithNewSuperCollapsedBlock() {
+            results.list.forEachIndexed { index, message ->
                 when {
-                    index == 0 -> {
+                    index == 0 -> { // First Message
                         addMessage(message)
                     }
-                    index > 0 && index < messagesCount - 2 -> {
+                    index > 0 && index < messagesCount - 2 -> { // All Messages that should go in block
                         superCollapsedBlock!!.add(message.uid)
                     }
-                    index == messagesCount - 2 -> {
+                    index == messagesCount - 2 -> { // First Message not in block
                         items += SuperCollapsedBlock(superCollapsedBlock!!)
                         addMessage(message)
                     }
-                    index == messagesCount - 1 -> {
+                    else -> { // All following Messages (theoretically, only 1 Message)
                         addMessage(message)
                     }
                 }
-            } else {
-                addMessage(message)
             }
+        }
+
+        suspend fun mapListWithExistingSuperCollapsedBlock() {
+            var blockHasNotBeenBroken = true
+            results.list.forEachIndexed { index, message ->
+                when {
+                    index == 0 -> { // First Message
+                        addMessage(message)
+                    }
+                    superCollapsedBlock?.contains(message.uid) == true && blockHasNotBeenBroken -> { // All Messages already in block
+                        // No-op
+                    }
+                    superCollapsedBlock?.contains(message.uid) == false && blockHasNotBeenBroken -> { // First Message not in block
+                        blockHasNotBeenBroken = false
+                        items += SuperCollapsedBlock(superCollapsedBlock!!)
+                        addMessage(message)
+                    }
+                    else -> { // All following Messages
+                        if (superCollapsedBlock?.contains(message.uid) == true) superCollapsedBlock?.remove(message.uid)
+                        addMessage(message)
+                    }
+                }
+            }
+        }
+
+        suspend fun mapFullList() {
+            results.list.map { addMessage(it) }
+        }
+
+        if (shouldDisplaySuperCollapsedBlock) {
+            if (shouldCreateSuperCollapsedBlock) {
+                mapListWithNewSuperCollapsedBlock()
+            } else {
+                mapListWithExistingSuperCollapsedBlock()
+            }
+        } else {
+            mapFullList()
         }
 
         return items to messagesToFetch
