@@ -237,7 +237,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         } else {
             R.color.backgroundHeaderColor
         }
-        requireActivity().window.statusBarColor = requireContext().getColor(statusBarColor)
+        setSystemBarsColors(statusBarColor = statusBarColor, navigationBarColor = null)
     }
 
     private fun refreshThreadsIfNotificationsAreDisabled() = with(mainViewModel) {

@@ -38,7 +38,7 @@ import com.infomaniak.mail.utils.AttachmentIntentUtils
 import com.infomaniak.mail.utils.UiUtils.FULLY_SLID
 import com.infomaniak.mail.utils.UiUtils.progressivelyColorSystemBars
 import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
-import com.infomaniak.mail.utils.updateNavigationBarColor
+import com.infomaniak.mail.utils.setSystemBarsColors
 import javax.inject.Inject
 
 abstract class TwoPaneFragment : Fragment() {
@@ -121,7 +121,7 @@ abstract class TwoPaneFragment : Fragment() {
             val isOpeningThread = threadUid != null
             if (isOpeningThread) {
                 val hasOpened = slidingPaneLayout.openPaneNoAnimation()
-                if (hasOpened) requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundColor)
+                if (hasOpened) setSystemBarsColors(statusBarColor = R.color.backgroundColor, navigationBarColor = null)
             } else {
                 resetPanes()
             }
@@ -157,13 +157,15 @@ abstract class TwoPaneFragment : Fragment() {
         }
     }
 
-    private fun resetPanes() = with(requireActivity()) {
+    private fun resetPanes() {
 
         val hasClosed = slidingPaneLayout.closePaneNoAnimation()
 
         if (hasClosed) {
-            if (this@TwoPaneFragment is ThreadListFragment) window.statusBarColor = getColor(R.color.backgroundHeaderColor)
-            window.updateNavigationBarColor(getColor(R.color.backgroundColor))
+            setSystemBarsColors(
+                statusBarColor = if (this@TwoPaneFragment is ThreadListFragment) R.color.backgroundHeaderColor else null,
+                navigationBarColor = R.color.backgroundColor,
+            )
         }
 
         threadListAdapter.selectNewThread(newPosition = null, threadUid = null)
