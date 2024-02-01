@@ -40,16 +40,13 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.work.Data
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.networking.LiveDataNetworkStatus
-import com.infomaniak.lib.core.utils.SentryLog
+import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.Utils.toEnumOrThrow
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
-import com.infomaniak.lib.core.utils.hasPermissions
-import com.infomaniak.lib.core.utils.year
-import com.infomaniak.lib.stores.StoreUtils.checkUpdateIsAvailable
-import com.infomaniak.lib.stores.StoreUtils.initAppUpdateManager
+import com.infomaniak.lib.stores.InAppUpdateManager
+import com.infomaniak.lib.stores.StoreUtils
 import com.infomaniak.lib.stores.StoreUtils.launchInAppReview
-import com.infomaniak.lib.stores.StoreUtils.unregisterAppUpdateListener
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.DISCOVER_LATER
 import com.infomaniak.mail.MatomoMail.DISCOVER_NOW
@@ -156,6 +153,9 @@ class MainActivity : BaseActivity() {
 
     @Inject
     lateinit var snackbarManager: SnackbarManager
+
+    @Inject
+    lateinit var inAppUpdateManager: InAppUpdateManager
 
     private val drawerListener = object : DrawerLayout.DrawerListener {
 
@@ -348,14 +348,12 @@ class MainActivity : BaseActivity() {
             appReviewLaunches--
         }
 
-        showUpdateAvailable()
         showSyncDiscovery()
     }
 
     override fun onResume() {
         super.onResume()
         playServicesUtils.checkPlayServices(this)
-        mainViewModel.checkAppUpdateStatus()
         if (binding.drawerLayout.isOpen) colorSystemBarsWithMenuDrawer(UiUtils.FULLY_SLID)
     }
 
@@ -388,7 +386,6 @@ class MainActivity : BaseActivity() {
 
     override fun onStop() {
         descriptionDialog.resetLoadingAndDismiss()
-        unregisterAppUpdateListener()
         super.onStop()
     }
 
@@ -467,28 +464,17 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private fun initAppUpdateManager() {
-        initAppUpdateManager(
-            context = this,
-            onUpdateDownloaded = { mainViewModel.toggleAppUpdateStatus(isUpdateDownloaded = true) },
-            onUpdateInstalled = {
-                Sentry.captureMessage("InstallStateUpdateListener called ’state == INSTALLED’", SentryLevel.DEBUG)
-                mainViewModel.toggleAppUpdateStatus(isUpdateDownloaded = false)
-            },
-        )
-    }
-
-    private fun showUpdateAvailable() = with(localSettings) {
-        if (isUserWantingUpdates || (appLaunches != 0 && appLaunches % 10 == 0)) {
-            checkUpdateIsAvailable(
-                appId = BuildConfig.APPLICATION_ID,
-                versionCode = BuildConfig.VERSION_CODE,
-                inAppResultLauncher = inAppUpdateResultLauncher,
-                onFDroidResult = { updateIsAvailable ->
-                    if (updateIsAvailable) navController.navigate(R.id.updateAvailableBottomSheetDialog)
-                },
-            )
+    private fun initAppUpdateManager() = with(inAppUpdateManager) {
+        onFDroidResult = { updateIsAvailable ->
+            if (updateIsAvailable) navController.navigate(R.id.updateAvailableBottomSheetDialog)
         }
+
+        onInAppUpdateUiChange = { isUpdateDownloaded ->
+            SentryLog.d(StoreUtils.APP_UPDATE_TAG, "Must display update button : $isUpdateDownloaded")
+            mainViewModel.canInstallUpdate.value = isUpdateDownloaded
+        }
+
+        lifecycle.addObserver(observer = this)
     }
 
     private fun showSyncDiscovery() = with(localSettings) {
