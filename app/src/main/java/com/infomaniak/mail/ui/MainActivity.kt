@@ -435,33 +435,10 @@ class MainActivity : BaseActivity() {
     // This `SuppressLint` seems useless, but it's for the CI. Don't remove it.
     @SuppressLint("RestrictedApi")
     private fun onDestinationChanged(destination: NavDestination, arguments: Bundle?) {
-
         SentryDebug.addNavigationBreadcrumb(destination.displayName, arguments)
         trackDestination(destination)
-
-        updateColorsWhenDestinationChanged()
         setDrawerLockMode(isLocked = destination.id != R.id.threadListFragment)
-
         previousDestinationId = destination.id
-    }
-
-    private fun updateColorsWhenDestinationChanged() {
-        when (previousDestinationId) {
-            R.id.threadActionsBottomSheetDialog,
-            R.id.messageActionsBottomSheetDialog,
-            R.id.replyBottomSheetDialog,
-            R.id.detailedContactBottomSheetDialog -> {
-                val fragment = currentFragment
-                if (fragment is TwoPaneFragment) {
-                    val navigationBarColor = if (twoPaneViewModel.isInThreadInPhoneMode(context = this)) {
-                        R.color.elevatedBackground
-                    } else {
-                        R.color.backgroundColor
-                    }
-                    window.updateNavigationBarColor(getColor(navigationBarColor))
-                }
-            }
-        }
     }
 
     fun setDrawerLockMode(isLocked: Boolean) {

@@ -30,7 +30,6 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.databinding.BottomSheetReplyBinding
 import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
-import com.infomaniak.mail.utils.setSystemBarsColors
 
 open class ReplyBottomSheetDialog : ActionsBottomSheetDialog() {
 
@@ -45,7 +44,6 @@ open class ReplyBottomSheetDialog : ActionsBottomSheetDialog() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(navigationArgs) {
         super.onViewCreated(view, savedInstanceState)
-        setSystemBarsColors(statusBarColor = null, navigationBarColor = R.color.backgroundColorSecondary)
 
         binding.mainActions.setClosingOnClickListener { id: Int ->
             val replyMode = if (id == R.id.actionReplyAll) DraftMode.REPLY_ALL else DraftMode.REPLY
