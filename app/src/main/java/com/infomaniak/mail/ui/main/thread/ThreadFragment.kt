@@ -221,82 +221,84 @@ class ThreadFragment : Fragment() {
         adapter = ThreadAdapter(
             shouldLoadDistantResources = shouldLoadDistantResources(),
             isCalendarEventExpandedMap = threadViewModel.isCalendarEventExpandedMap,
-            onContactClicked = {
-                safeNavigate(
-                    resId = R.id.detailedContactBottomSheetDialog,
-                    args = DetailedContactBottomSheetDialogArgs(it).toBundle(),
-                )
-            },
-            onDraftClicked = { message ->
-                trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
-                twoPaneViewModel.navigateToNewMessage(
-                    arrivedFromExistingDraft = true,
-                    draftLocalUuid = message.draftLocalUuid,
-                    draftResource = message.draftResource,
-                    messageUid = message.uid,
-                )
-            },
-            onDeleteDraftClicked = { message ->
-                trackMessageActionsEvent("deleteDraft")
-                mainViewModel.currentMailbox.value?.let { mailbox -> threadViewModel.deleteDraft(message, mailbox) }
-            },
-            onAttachmentClicked = { attachment ->
-                attachment.resource?.let { resource ->
+            threadAdapterCallbacks = ThreadAdapter.ThreadAdapterCallbacks(
+                onContactClicked = {
                     safeNavigate(
-                        resId = R.id.attachmentActionsBottomSheetDialog,
-                        args = AttachmentActionsBottomSheetDialogArgs(resource).toBundle(),
+                        resId = R.id.detailedContactBottomSheetDialog,
+                        args = DetailedContactBottomSheetDialogArgs(it).toBundle(),
                     )
-                }
-            },
-            onDownloadAllClicked = { message ->
-                trackAttachmentActionsEvent("downloadAll")
-                downloadAllAttachments(message)
-            },
-            onReplyClicked = { message ->
-                trackMessageActionsEvent(ACTION_REPLY_NAME)
-                replyTo(message)
-            },
-            onMenuClicked = { message ->
-                message.navigateToActionsBottomSheet()
-            },
-            onAllExpandedMessagesLoaded = ::scrollToFirstUnseenMessage,
-            navigateToAttendeeBottomSheet = { attendees ->
-                safeNavigate(
-                    resId = R.id.attendeesBottomSheetDialog,
-                    args = AttendeesBottomSheetDialogArgs(attendees.toTypedArray()).toBundle(),
-                )
-            },
-            navigateToNewMessageActivity = { twoPaneViewModel.navigateToNewMessage(mailToUri = it) },
-            navigateToDownloadProgressDialog = ::safeNavigate,
-            replyToCalendarEvent = { attendanceState, message ->
-                threadViewModel.replyToCalendarEvent(
-                    attendanceState,
-                    message,
-                ).observe(viewLifecycleOwner) { successfullyUpdated ->
-                    if (successfullyUpdated) {
-                        snackbarManager.setValue(getString(R.string.snackbarCalendarChoiceSent))
-                        threadViewModel.fetchCalendarEvents(listOf(message), forceFetch = true)
-                    } else {
-                        snackbarManager.setValue(getString(R.string.errorCalendarChoiceCouldNotBeSent))
-                        threadAdapter.undoUserAttendanceClick(message)
+                },
+                onDraftClicked = { message ->
+                    trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
+                    twoPaneViewModel.navigateToNewMessage(
+                        arrivedFromExistingDraft = true,
+                        draftLocalUuid = message.draftLocalUuid,
+                        draftResource = message.draftResource,
+                        messageUid = message.uid,
+                    )
+                },
+                onDeleteDraftClicked = { message ->
+                    trackMessageActionsEvent("deleteDraft")
+                    mainViewModel.currentMailbox.value?.let { mailbox -> threadViewModel.deleteDraft(message, mailbox) }
+                },
+                onAttachmentClicked = { attachment ->
+                    attachment.resource?.let { resource ->
+                        safeNavigate(
+                            resId = R.id.attachmentActionsBottomSheetDialog,
+                            args = AttachmentActionsBottomSheetDialogArgs(resource).toBundle(),
+                        )
                     }
-                }
-            },
-            promptLink = { data, type ->
-                // When adding a phone number to contacts, Google decodes this value in case it's url-encoded. But I could not
-                // reproduce this issue when manually creating a url-encoded href. If this is triggered, fix it by also
-                // decoding it at that step.
-                if (type == ContextMenuType.PHONE && data.contains('%')) Sentry.withScope { scope ->
-                    scope.level = SentryLevel.ERROR
-                    Sentry.captureMessage("Google was right, phone numbers can be url-encoded. Needs to be fixed")
-                }
+                },
+                onDownloadAllClicked = { message ->
+                    trackAttachmentActionsEvent("downloadAll")
+                    downloadAllAttachments(message)
+                },
+                onReplyClicked = { message ->
+                    trackMessageActionsEvent(ACTION_REPLY_NAME)
+                    replyTo(message)
+                },
+                onMenuClicked = { message ->
+                    message.navigateToActionsBottomSheet()
+                },
+                onAllExpandedMessagesLoaded = ::scrollToFirstUnseenMessage,
+                navigateToAttendeeBottomSheet = { attendees ->
+                    safeNavigate(
+                        resId = R.id.attendeesBottomSheetDialog,
+                        args = AttendeesBottomSheetDialogArgs(attendees.toTypedArray()).toBundle(),
+                    )
+                },
+                navigateToNewMessageActivity = { twoPaneViewModel.navigateToNewMessage(mailToUri = it) },
+                navigateToDownloadProgressDialog = ::safeNavigate,
+                replyToCalendarEvent = { attendanceState, message ->
+                    threadViewModel.replyToCalendarEvent(
+                        attendanceState,
+                        message,
+                    ).observe(viewLifecycleOwner) { successfullyUpdated ->
+                        if (successfullyUpdated) {
+                            snackbarManager.setValue(getString(R.string.snackbarCalendarChoiceSent))
+                            threadViewModel.fetchCalendarEvents(listOf(message), forceFetch = true)
+                        } else {
+                            snackbarManager.setValue(getString(R.string.errorCalendarChoiceCouldNotBeSent))
+                            threadAdapter.undoUserAttendanceClick(message)
+                        }
+                    }
+                },
+                promptLink = { data, type ->
+                    // When adding a phone number to contacts, Google decodes this value in case it's url-encoded. But I could not
+                    // reproduce this issue when manually creating a url-encoded href. If this is triggered, fix it by also
+                    // decoding it at that step.
+                    if (type == ContextMenuType.PHONE && data.contains('%')) Sentry.withScope { scope ->
+                        scope.level = SentryLevel.ERROR
+                        Sentry.captureMessage("Google was right, phone numbers can be url-encoded. Needs to be fixed")
+                    }
 
-                when (type) {
-                    ContextMenuType.LINK -> linkContextualMenuAlertDialog.show(data)
-                    ContextMenuType.EMAIL -> emailContextualMenuAlertDialog.show(data)
-                    ContextMenuType.PHONE -> phoneContextualMenuAlertDialog.show(data)
-                }
-            },
+                    when (type) {
+                        ContextMenuType.LINK -> linkContextualMenuAlertDialog.show(data)
+                        ContextMenuType.EMAIL -> emailContextualMenuAlertDialog.show(data)
+                        ContextMenuType.PHONE -> phoneContextualMenuAlertDialog.show(data)
+                    }
+                },
+            ),
         )
 
         addItemDecoration(DividerItemDecorator(InsetDrawable(dividerDrawable(context), 0)))

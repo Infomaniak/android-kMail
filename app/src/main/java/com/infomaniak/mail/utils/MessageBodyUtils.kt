@@ -17,8 +17,11 @@
  */
 package com.infomaniak.mail.utils
 
+import android.content.Context
 import com.infomaniak.mail.data.models.message.Body
+import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.message.SubBody
+import com.infomaniak.mail.utils.PrintHeaderUtils.createPrintHeader
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineScope
@@ -89,6 +92,13 @@ object MessageBodyUtils {
         }
 
         return htmlDocument.outerHtml() to quotes
+    }
+
+    fun addPrintHeader(context: Context, message: Message, htmlDocument: Document) {
+        htmlDocument.body().apply {
+            attr("style", "margin: 40px")
+            insertChildren(0, createPrintHeader(context, message))
+        }
     }
 
     fun mergeSplitBodyAndSubBodies(body: String, subBodies: List<SubBody>, messageUid: String): String {

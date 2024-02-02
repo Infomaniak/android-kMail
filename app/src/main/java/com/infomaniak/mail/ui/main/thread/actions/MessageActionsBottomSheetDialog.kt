@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2023 Infomaniak Network SA
+ * Copyright (C) 2022-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@ import android.view.View
 import androidx.core.view.isVisible
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.isNightModeEnabled
+import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_DELETE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_FAVORITE_NAME
@@ -38,6 +39,7 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.menu.MoveFragmentArgs
+import com.infomaniak.mail.ui.main.thread.PrintMailFragmentArgs
 import com.infomaniak.mail.utils.animatedNavigation
 import com.infomaniak.mail.utils.deleteWithConfirmationPopup
 import com.infomaniak.mail.utils.notYetImplemented
@@ -59,6 +61,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(navigationArgs) {
         super.onViewCreated(view, savedInstanceState)
+        binding.print.isVisible = true
 
         mainViewModel.getMessage(messageUid).observe(viewLifecycleOwner) { message ->
 
@@ -151,7 +154,11 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
                 override fun onPrint() {
                     trackBottomSheetMessageActionsEvent(ACTION_PRINT_NAME)
-                    notYetImplemented()
+                    safeNavigate(
+                        resId = R.id.printMailFragment,
+                        args = PrintMailFragmentArgs(threadUid, messageUid).toBundle(),
+                        currentClassName = MessageActionsBottomSheetDialog::class.java.name,
+                    )
                 }
 
                 override fun onReportDisplayProblem() {

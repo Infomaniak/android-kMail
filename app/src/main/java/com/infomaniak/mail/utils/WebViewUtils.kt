@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023 Infomaniak Network SA
+ * Copyright (C) 2023-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,13 +25,17 @@ import android.webkit.WebView
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomDarkMode
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getFixStyleScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getImproveRenderingStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getJsBridgeScript
+import com.infomaniak.mail.utils.HtmlFormatter.Companion.getPrintMailStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getResizeScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getSignatureMarginStyle
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class WebViewUtils(context: Context) {
 
@@ -39,17 +43,38 @@ class WebViewUtils(context: Context) {
     private val improveRenderingStyle by lazy { context.getImproveRenderingStyle() }
     private val customStyle by lazy { context.getCustomStyle() }
     private val signatureVerticalMargin by lazy { context.getSignatureMarginStyle() }
+    private val printMailStyle by lazy { context.getPrintMailStyle() }
 
     private val resizeScript by lazy { context.getResizeScript() }
     private val fixStyleScript by lazy { context.getFixStyleScript() }
     private val jsBridgeScript by lazy { context.getJsBridgeScript() }
 
-    fun processHtmlForDisplay(html: String, isDisplayedInDarkMode: Boolean): String = with(HtmlFormatter(html)) {
+    fun processHtmlForPrint(
+        context: Context? = null,
+        html: String,
+        isDisplayedInDarkMode: Boolean,
+        message: Message? = null
+    ): String = with(HtmlFormatter(context = context, html = html, message = message)) {
+        addCommonDisplayContent(isDisplayedInDarkMode)
+        registerIsForPrint()
+        registerCss(printMailStyle)
+        return@with inject()
+    }
+
+    fun processHtmlForDisplay(
+        context: Context? = null,
+        html: String,
+        isDisplayedInDarkMode: Boolean,
+        message: Message? = null
+    ): String = with(HtmlFormatter(context = context, html = html, message = message)) {
         addCommonDisplayContent(isDisplayedInDarkMode)
         return@with inject()
     }
 
-    fun processSignatureHtmlForDisplay(html: String, isDisplayedInDarkMode: Boolean): String = with(HtmlFormatter(html)) {
+    fun processSignatureHtmlForDisplay(
+        html: String,
+        isDisplayedInDarkMode: Boolean
+    ): String = with(HtmlFormatter(html = html)) {
         addCommonDisplayContent(isDisplayedInDarkMode)
         registerCss(signatureVerticalMargin)
         return@with inject()
@@ -67,7 +92,7 @@ class WebViewUtils(context: Context) {
         registerBreakLongWords()
     }
 
-    class JavascriptBridge {
+    class JavascriptBridge(private val onWebViewFinishedLoading: (() -> Unit)? = null) {
 
         @JavascriptInterface
         fun reportOverScroll(clientWidth: Int, scrollWidth: Int, messageUid: String) {
@@ -86,6 +111,11 @@ class WebViewUtils(context: Context) {
             SentryDebug.sendJavaScriptError(errorName, errorMessage, correctErrorStack, messageUid)
         }
 
+        @JavascriptInterface
+        fun webviewFinishedLoading() {
+            onWebViewFinishedLoading?.invoke()
+        }
+
         private fun fixStackTraceLineNumber(errorStack: String, scriptFirstLine: String): String {
             var correctErrorStack = errorStack
             val matches = "about:blank:([0-9]+):".toRegex().findAll(correctErrorStack)
@@ -100,7 +130,12 @@ class WebViewUtils(context: Context) {
 
     companion object {
         private const val DARK_BACKGROUND_STYLE_ID = "dark_background_style"
-        val jsBridge = JavascriptBridge() // TODO: Avoid excessive memory consumption with injection
+
+        lateinit var jsBridge: JavascriptBridge // TODO: Avoid excessive memory consumption with injection
+
+        fun initJavascriptBridge(onWebViewFinishedLoading: (() -> Unit)? = null) {
+            jsBridge = JavascriptBridge(onWebViewFinishedLoading = onWebViewFinishedLoading)
+        }
 
         fun WebSettings.setupThreadWebViewSettings() {
             @SuppressLint("SetJavaScriptEnabled")

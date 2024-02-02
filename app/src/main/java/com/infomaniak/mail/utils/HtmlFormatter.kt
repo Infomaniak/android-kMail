@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023 Infomaniak Network SA
+ * Copyright (C) 2023-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,18 +21,25 @@ import android.content.Context
 import androidx.annotation.RawRes
 import com.infomaniak.html.cleaner.HtmlSanitizer
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.message.Message
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
 import com.google.android.material.R as RMaterial
 
-class HtmlFormatter(private val html: String) {
+class HtmlFormatter(
+    private val context: Context? = null,
+    private val html: String,
+    private val message: Message? = null,
+) {
+
     private val cssList = mutableListOf<Pair<String, String?>>()
     private val scripts = mutableListOf<String>()
     private var needsMetaViewport = false
     private var needsBodyEncapsulation = false
     private var breakLongWords = false
+    private var isForPrint = false
 
     fun registerCss(css: String, styleId: String? = null) {
         cssList.add(css to styleId)
@@ -54,12 +61,20 @@ class HtmlFormatter(private val html: String) {
         breakLongWords = true
     }
 
+    fun registerIsForPrint() {
+        isForPrint = true
+    }
+
     fun inject(): String = with(HtmlSanitizer.getInstance().sanitize(Jsoup.parse(html))) {
         outputSettings().prettyPrint(true)
         head().apply {
             injectCss()
             injectMetaViewPort()
             injectScript()
+        }
+
+        if (isForPrint && context != null && message != null) {
+            MessageBodyUtils.addPrintHeader(context, message, this)
         }
 
         if (breakLongWords) body().breakLongStrings()
@@ -227,6 +242,8 @@ class HtmlFormatter(private val html: String) {
         )
 
         fun Context.getSignatureMarginStyle(): String = loadCss(R.raw.signature_margins)
+
+        fun Context.getPrintMailStyle(): String = loadCss(R.raw.print_email)
 
         fun Context.getResizeScript(): String = loadScript(
             R.raw.munge_email,

@@ -18,11 +18,13 @@
 package com.infomaniak.mail.ui.main.thread
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.text.format.Formatter
-import android.view.*
+import android.view.LayoutInflater
+import android.view.ScaleGestureDetector
+import android.view.ViewConfiguration
+import android.view.ViewGroup
 import android.webkit.WebView
 import android.webkit.WebView.HitTestResult
 import android.widget.FrameLayout
@@ -32,27 +34,27 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.*
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
-import com.infomaniak.lib.core.utils.*
+import com.infomaniak.lib.core.utils.context
+import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
-import com.infomaniak.mail.data.models.Attachment.*
 import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.data.models.calendar.Attendee.AttendanceState
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.data.models.message.Message.*
 import com.infomaniak.mail.databinding.ItemMessageBinding
-import com.infomaniak.mail.ui.main.thread.ThreadAdapter.*
+import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadViewHolder
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntentType
 import com.infomaniak.mail.utils.AttachmentIntentUtils.createDownloadDialogNavArgs
+import com.infomaniak.mail.utils.MailDateFormatUtils.mailFormattedDate
+import com.infomaniak.mail.utils.MailDateFormatUtils.mostDetailedDate
 import com.infomaniak.mail.utils.SharedUtils.Companion.createHtmlForPlainText
 import com.infomaniak.mail.utils.UiUtils.getPrettyNameAndEmail
-import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.TEXT_HTML
 import com.infomaniak.mail.utils.Utils.TEXT_PLAIN
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
@@ -61,25 +63,14 @@ import com.infomaniak.mail.utils.WebViewUtils.Companion.toggleWebViewTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.*
+import java.util.Date
 import com.google.android.material.R as RMaterial
 
 class ThreadAdapter(
     private val shouldLoadDistantResources: Boolean,
-    private val isCalendarEventExpandedMap: MutableMap<String, Boolean>,
-    onContactClicked: (contact: Recipient) -> Unit,
-    onDeleteDraftClicked: (message: Message) -> Unit,
-    onDraftClicked: (message: Message) -> Unit,
-    onAttachmentClicked: (attachment: Attachment) -> Unit,
-    onDownloadAllClicked: (message: Message) -> Unit,
-    onReplyClicked: (Message) -> Unit,
-    onMenuClicked: (Message) -> Unit,
-    onAllExpandedMessagesLoaded: () -> Unit,
-    navigateToNewMessageActivity: (Uri) -> Unit,
-    navigateToAttendeeBottomSheet: (List<Attendee>) -> Unit,
-    navigateToDownloadProgressDialog: (Int, Bundle) -> Unit,
-    replyToCalendarEvent: (AttendanceState, Message) -> Unit,
-    promptLink: (String, ContextMenuType) -> Unit,
+    private val isForPrinting: Boolean = false,
+    private val isCalendarEventExpandedMap: MutableMap<String, Boolean> = mutableMapOf(),
+    private var threadAdapterCallbacks: ThreadAdapterCallbacks? = null,
 ) : ListAdapter<Message, ThreadViewHolder>(MessageDiffCallback()) {
 
     inline val messages: MutableList<Message> get() = currentList
@@ -92,7 +83,6 @@ class ThreadAdapter(
     private val manuallyAllowedMessageUids = mutableSetOf<String>()
     var isThemeTheSameMap = mutableMapOf<String, Boolean>()
 
-    private var threadAdapterCallbacks: ThreadAdapterCallbacks? = null
 
     private lateinit var recyclerView: RecyclerView
     private val webViewUtils by lazy { WebViewUtils(recyclerView.context) }
@@ -108,24 +98,6 @@ class ThreadAdapter(
             val textId = if (isQuoteCollapsed) R.string.messageShowQuotedText else R.string.messageHideQuotedText
             quoteButton.text = context.getString(textId)
         }
-
-    init {
-        threadAdapterCallbacks = ThreadAdapterCallbacks(
-            onContactClicked,
-            onDeleteDraftClicked,
-            onDraftClicked,
-            onAttachmentClicked,
-            onDownloadAllClicked,
-            onReplyClicked,
-            onMenuClicked,
-            onAllExpandedMessagesLoaded,
-            navigateToNewMessageActivity,
-            navigateToAttendeeBottomSheet,
-            navigateToDownloadProgressDialog,
-            replyToCalendarEvent,
-            promptLink,
-        )
-    }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         this.recyclerView = recyclerView
@@ -273,7 +245,7 @@ class ThreadAdapter(
         }
 
         var styledBody = if (type == TEXT_PLAIN) createHtmlForPlainText(bodyWebView) else bodyWebView
-        styledBody = processMailDisplay(styledBody, uid)
+        styledBody = processMailDisplay(styledBody, uid, isForPrinting)
 
         settings.setupThreadWebViewSettings()
         setupZoomListeners()
@@ -281,9 +253,13 @@ class ThreadAdapter(
         loadDataWithBaseURL("", styledBody, TEXT_HTML, Utils.UTF_8, "")
     }
 
-    private fun WebView.processMailDisplay(styledBody: String, uid: String): String {
-        val isDisplayedInDark = context.isNightModeEnabled() && isThemeTheSameMap[uid] == true
-        return webViewUtils.processHtmlForDisplay(styledBody, isDisplayedInDark)
+    private fun WebView.processMailDisplay(styledBody: String, uid: String, isForPrinting: Boolean): String {
+        val isDisplayedInDark = context.isNightModeEnabled() && isThemeTheSameMap[uid] == true && !isForPrinting
+        return if (isForPrinting) {
+            webViewUtils.processHtmlForPrint(context, styledBody, isDisplayedInDark, messages.first())
+        } else {
+            webViewUtils.processHtmlForDisplay(context, styledBody, isDisplayedInDark, messages.first())
+        }
     }
 
     private fun WebView.setupZoomListeners() {
@@ -325,7 +301,7 @@ class ThreadAdapter(
                     ?: run { context.getString(R.string.unknownRecipientTitle) }
                 setTextAppearance(R.style.BodyMedium)
             }
-            shortMessageDate.text = context.mailFormattedDate(messageDate)
+            shortMessageDate.text = mailFormattedDate(context, messageDate)
         }
 
         message.sender?.let { recipient ->
@@ -340,31 +316,6 @@ class ThreadAdapter(
         handleHeaderClick(message)
         handleExpandDetailsClick(message)
         bindRecipientDetails(message, messageDate)
-    }
-
-    private fun Context.mailFormattedDate(date: Date): CharSequence = with(date) {
-        return when {
-            isToday() -> format(FORMAT_EMAIL_DATE_HOUR)
-            isYesterday() -> getString(
-                R.string.messageDetailsDateAt,
-                getString(R.string.messageDetailsYesterday),
-                format(FORMAT_EMAIL_DATE_HOUR),
-            )
-            isThisYear() -> getString(
-                R.string.messageDetailsDateAt,
-                format(FORMAT_EMAIL_DATE_SHORT_DATE),
-                format(FORMAT_EMAIL_DATE_HOUR),
-            )
-            else -> this@mailFormattedDate.mostDetailedDate(date = this@with)
-        }
-    }
-
-    private fun Context.mostDetailedDate(date: Date): String = with(date) {
-        return getString(
-            R.string.messageDetailsDateAt,
-            format(FORMAT_EMAIL_DATE_LONG_DATE),
-            format(FORMAT_EMAIL_DATE_HOUR),
-        )
     }
 
     private fun ItemMessageBinding.setDetailedFieldsVisibility(message: Message) {
@@ -413,7 +364,7 @@ class ThreadAdapter(
         bccGroup.isVisible = bccIsNotEmpty
         if (bccIsNotEmpty) bccAdapter.updateList(message.bcc.toList())
 
-        detailedMessageDate.text = context.mostDetailedDate(messageDate)
+        detailedMessageDate.text = mostDetailedDate(context, messageDate)
     }
 
     private fun ThreadViewHolder.bindAlerts(messageUid: String) = with(binding) {
@@ -487,6 +438,7 @@ class ThreadAdapter(
             message,
             threadAdapterCallbacks?.navigateToNewMessageActivity,
             onPageFinished = { onExpandedMessageLoaded(message.uid) },
+            onWebViewFinishedLoading = { threadAdapterCallbacks?.onBodyWebViewFinishedLoading?.invoke() },
         )
 
         // If the view holder got recreated while the fragment is not destroyed, keep the user's choice effective
@@ -532,7 +484,7 @@ class ThreadAdapter(
     // Automatically expand quotes of single message threads
     private fun ItemMessageBinding.setQuoteInitialCollapsedState(hasQuote: Boolean) {
         val isSingleMessageThread = itemCount == 1
-        val shouldBeExpanded = isSingleMessageThread && hasQuote
+        val shouldBeExpanded = isSingleMessageThread && hasQuote && !isForPrinting
 
         isQuoteCollapsed = !shouldBeExpanded
     }
@@ -684,6 +636,7 @@ class ThreadAdapter(
             message: Message,
             navigateToNewMessageActivity: ((Uri) -> Unit)?,
             onPageFinished: () -> Unit,
+            onWebViewFinishedLoading: () -> Unit,
         ) {
 
             fun promptUserForDistantImages() {
@@ -698,6 +651,7 @@ class ThreadAdapter(
                     onBlockedResourcesDetected = ::promptUserForDistantImages,
                     navigateToNewMessageActivity = navigateToNewMessageActivity,
                     onPageFinished = onPageFinished,
+                    onWebViewFinishedLoading = onWebViewFinishedLoading
                 )
                 _fullMessageWebViewClient = binding.fullMessageWebView.initWebViewClientAndBridge(
                     attachments = message.attachments,
@@ -705,6 +659,7 @@ class ThreadAdapter(
                     shouldLoadDistantResources = shouldLoadDistantResources,
                     onBlockedResourcesDetected = ::promptUserForDistantImages,
                     navigateToNewMessageActivity = navigateToNewMessageActivity,
+                    onWebViewFinishedLoading = onWebViewFinishedLoading
                 )
             }
         }
@@ -719,26 +674,24 @@ class ThreadAdapter(
         }
     }
 
-    private data class ThreadAdapterCallbacks(
-        var onContactClicked: (contact: Recipient) -> Unit,
-        var onDeleteDraftClicked: (message: Message) -> Unit,
-        var onDraftClicked: (message: Message) -> Unit,
-        var onAttachmentClicked: (attachment: Attachment) -> Unit,
-        var onDownloadAllClicked: (message: Message) -> Unit,
-        var onReplyClicked: (Message) -> Unit,
-        var onMenuClicked: (Message) -> Unit,
-        var onAllExpandedMessagesLoaded: () -> Unit,
-        var navigateToNewMessageActivity: (Uri) -> Unit,
-        var navigateToAttendeeBottomSheet: (List<Attendee>) -> Unit,
-        var navigateToDownloadProgressDialog: (Int, Bundle) -> Unit,
-        var replyToCalendarEvent: (AttendanceState, Message) -> Unit,
-        var promptLink: (String, ContextMenuType) -> Unit,
+    data class ThreadAdapterCallbacks(
+        var onBodyWebViewFinishedLoading: (() -> Unit)? = null,
+        var onContactClicked: ((contact: Recipient) -> Unit)? = null,
+        var onDeleteDraftClicked: ((message: Message) -> Unit)? = null,
+        var onDraftClicked: ((message: Message) -> Unit)? = null,
+        var onAttachmentClicked: ((attachment: Attachment) -> Unit)? = null,
+        var onDownloadAllClicked: ((message: Message) -> Unit)? = null,
+        var onReplyClicked: ((Message) -> Unit)? = null,
+        var onMenuClicked: ((Message) -> Unit)? = null,
+        var onAllExpandedMessagesLoaded: (() -> Unit)? = null,
+        var navigateToNewMessageActivity: ((Uri) -> Unit)? = null,
+        var navigateToAttendeeBottomSheet: ((List<Attendee>) -> Unit)? = null,
+        var navigateToDownloadProgressDialog: ((Int, Bundle) -> Unit)? = null,
+        var replyToCalendarEvent: ((AttendanceState, Message) -> Unit)? = null,
+        var promptLink: ((String, ContextMenuType) -> Unit)? = null,
     )
 
     companion object {
-        private const val FORMAT_EMAIL_DATE_HOUR = "HH:mm"
-        private const val FORMAT_EMAIL_DATE_SHORT_DATE = "d MMM"
-        private const val FORMAT_EMAIL_DATE_LONG_DATE = "d MMM yyyy"
 
         private val contextMenuTypeForHitTestResultType = mapOf(
             HitTestResult.PHONE_TYPE to ContextMenuType.PHONE,
