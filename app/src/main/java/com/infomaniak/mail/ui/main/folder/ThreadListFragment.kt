@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.main.folder
 
-import android.content.res.Configuration
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.text.format.DateUtils
@@ -227,17 +226,6 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         refreshThreadsIfNotificationsAreDisabled()
         updateSwipeActionsAccordingToSettings()
         canRefreshThreads = true
-    }
-
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-
-        val statusBarColor = if (twoPaneViewModel.isInThreadInPhoneMode(requireContext())) {
-            R.color.backgroundColor
-        } else {
-            R.color.backgroundHeaderColor
-        }
-        setSystemBarsColors(statusBarColor = statusBarColor, navigationBarColor = null)
     }
 
     private fun refreshThreadsIfNotificationsAreDisabled() = with(mainViewModel) {
