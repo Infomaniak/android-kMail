@@ -243,6 +243,10 @@ class SearchFragment : TwoPaneFragment() {
             onThreadClicked = { thread ->
                 with(searchViewModel) {
                     if (!isLengthTooShort(currentSearchQuery)) history.value = currentSearchQuery
+                    binding.searchBar.searchTextInput.apply {
+                        hideKeyboard()
+                        clearFocus()
+                    }
                     navigateToThread(thread)
                 }
             }
