@@ -82,6 +82,7 @@ abstract class TwoPaneFragment : Fragment() {
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         updateDrawerLockMode()
+        ensureThreadIsDisplayed(newConfig.orientation)
     }
 
     private fun setupSlidingPane() = with(slidingPaneLayout) {
@@ -190,6 +191,12 @@ abstract class TwoPaneFragment : Fragment() {
             (requireActivity() as MainActivity).setDrawerLockMode(
                 isLocked = twoPaneViewModel.isInThreadInPhoneMode(requireContext()),
             )
+        }
+    }
+
+    private fun ensureThreadIsDisplayed(orientation: Int) {
+        if (orientation == Configuration.ORIENTATION_PORTRAIT && twoPaneViewModel.isInThreadInPhoneMode(requireContext())) {
+            slidingPaneLayout.openPaneNoAnimation()
         }
     }
 }
