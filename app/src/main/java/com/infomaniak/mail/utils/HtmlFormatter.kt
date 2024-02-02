@@ -29,9 +29,8 @@ import org.jsoup.nodes.TextNode
 import com.google.android.material.R as RMaterial
 
 class HtmlFormatter(
-    private val context: Context? = null,
     private val html: String,
-    private val message: Message? = null,
+    private val printData: PrintData? = null
 ) {
 
     private val cssList = mutableListOf<Pair<String, String?>>()
@@ -73,8 +72,8 @@ class HtmlFormatter(
             injectScript()
         }
 
-        if (isForPrint && context != null && message != null) {
-            MessageBodyUtils.addPrintHeader(context, message, this)
+        printData?.let {
+            MessageBodyUtils.addPrintHeader(it.context, it.message, this)
         }
 
         if (breakLongWords) body().breakLongStrings()
@@ -178,6 +177,8 @@ class HtmlFormatter(
         empty()
         appendElement("div").id(KMAIL_MESSAGE_ID).appendChildren(bodyContent)
     }
+
+    data class PrintData(val context: Context, val message: Message)
 
     companion object {
         private const val PRIMARY_COLOR_CODE = "--kmail-primary-color"

@@ -50,23 +50,19 @@ class WebViewUtils(context: Context) {
     private val jsBridgeScript by lazy { context.getJsBridgeScript() }
 
     fun processHtmlForPrint(
-        context: Context? = null,
         html: String,
-        isDisplayedInDarkMode: Boolean,
-        message: Message? = null
-    ): String = with(HtmlFormatter(context = context, html = html, message = message)) {
-        addCommonDisplayContent(isDisplayedInDarkMode)
+        printData: HtmlFormatter.PrintData
+        ): String = with(HtmlFormatter(html = html, printData = printData)) {
+        addCommonDisplayContent(isDisplayedInDarkMode = false)
         registerIsForPrint()
         registerCss(printMailStyle)
         return@with inject()
     }
 
     fun processHtmlForDisplay(
-        context: Context? = null,
         html: String,
         isDisplayedInDarkMode: Boolean,
-        message: Message? = null
-    ): String = with(HtmlFormatter(context = context, html = html, message = message)) {
+    ): String = with(HtmlFormatter(html = html)) {
         addCommonDisplayContent(isDisplayedInDarkMode)
         return@with inject()
     }
