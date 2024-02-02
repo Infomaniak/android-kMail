@@ -199,17 +199,17 @@ class ThreadFragment : Fragment() {
     private fun updateStatusBarColor() {
 
         val statusBarColor = when {
-            twoPaneViewModel.isInThreadInPhoneMode(requireContext()) -> {
+            twoPaneViewModel.isInThreadInPhoneMode(requireContext()) -> { // Phone mode in Thread
                 if (binding.messagesListNestedScrollView.isAtTheTop()) {
                     R.color.toolbarLoweredColor
                 } else {
                     R.color.toolbarElevatedColor
                 }
             }
-            twoPaneFragment is ThreadListFragment -> {
+            twoPaneFragment is ThreadListFragment -> { // Tablet mode in ThreadList
                 R.color.backgroundHeaderColor
             }
-            else -> {
+            else -> { // Tablet mode in Search
                 R.color.backgroundColor
             }
         }
