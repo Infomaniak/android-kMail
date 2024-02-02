@@ -51,11 +51,8 @@ import com.infomaniak.mail.ui.main.NoAnimSlidingPaneLayout
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.search.SearchFolderAdapter.SearchFolderElement
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
+import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
-import com.infomaniak.mail.utils.addStickyDateDecoration
-import com.infomaniak.mail.utils.getLocalizedNameOrAllFolders
-import com.infomaniak.mail.utils.handleEditorSearchAction
-import com.infomaniak.mail.utils.setOnClearTextClickListener
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -102,6 +99,7 @@ class SearchFragment : TwoPaneFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setSystemBarsColors(statusBarColor = R.color.backgroundColor)
 
         searchViewModel.executePendingSearch()
 

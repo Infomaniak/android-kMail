@@ -28,6 +28,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentAiEngineChoiceBinding
 import com.infomaniak.mail.databinding.LayoutAiEngineChoiceBinding
 import com.infomaniak.mail.utils.SharedUtils
+import com.infomaniak.mail.utils.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -48,7 +49,7 @@ class AiEngineChoiceFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundColor)
+        setSystemBarsColors(statusBarColor = R.color.backgroundColor)
 
         binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
 

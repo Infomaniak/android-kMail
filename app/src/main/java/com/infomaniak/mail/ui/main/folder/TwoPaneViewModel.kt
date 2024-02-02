@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.folder
 
+import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import androidx.annotation.IdRes
@@ -31,6 +32,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
+import com.infomaniak.mail.utils.canDisplayBothPanes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -91,6 +93,8 @@ class TwoPaneViewModel @Inject constructor(
             mailToUri = mailToUri,
         )
     }
+
+    fun isInThreadInPhoneMode(context: Context): Boolean = isThreadOpen && !context.canDisplayBothPanes()
 
     data class NavData(
         @IdRes val resId: Int,

@@ -42,7 +42,6 @@
     <color name="backgroundColorTertiary">@color/orca</color>
     <color name="backgroundHeaderColor">#212121</color>
     <color name="backgroundLoginWebviewColor">@color/black</color>
-    <color name="backgroundOnBoardingColor">@color/black</color>
     <color name="backgroundSnackbarColor">@color/rabbit</color>
     <color name="elevatedBackground">@color/bat</color>
     <color name="backgroundDisabledPrimaryButton">@color/elephant</color>

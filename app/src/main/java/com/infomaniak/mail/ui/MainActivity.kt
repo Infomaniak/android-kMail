@@ -306,7 +306,7 @@ class MainActivity : BaseActivity() {
         )
     }
 
-    // Still display the snackbar even if it took three times 10 seconds of timeout to succeed
+    // Still display the Snackbar even if it took three times 10 seconds of timeout to succeed
     private fun showSentDraftSnackbar() {
         showSendingSnackbarTimer.cancel()
         snackbarManager.setValue(getString(R.string.snackbarEmailSent))
@@ -433,43 +433,10 @@ class MainActivity : BaseActivity() {
     // This `SuppressLint` seems useless, but it's for the CI. Don't remove it.
     @SuppressLint("RestrictedApi")
     private fun onDestinationChanged(destination: NavDestination, arguments: Bundle?) {
-
         SentryDebug.addNavigationBreadcrumb(destination.displayName, arguments)
         trackDestination(destination)
-
-        updateColorsWhenDestinationChanged(destination.id)
         setDrawerLockMode(isLocked = destination.id != R.id.threadListFragment)
-
         previousDestinationId = destination.id
-    }
-
-    private fun updateColorsWhenDestinationChanged(destinationId: Int) {
-
-        when (destinationId) {
-            R.id.junkBottomSheetDialog,
-            R.id.messageActionsBottomSheetDialog,
-            R.id.replyBottomSheetDialog,
-            R.id.detailedContactBottomSheetDialog,
-            R.id.threadActionsBottomSheetDialog,
-            R.id.attachmentActionsBottomSheetDialog,
-            R.id.downloadAttachmentProgressDialog,
-            R.id.attendeesBottomSheetDialog -> null
-            R.id.searchFragment -> R.color.backgroundColor
-            else -> R.color.backgroundHeaderColor
-        }?.let { statusBarColor ->
-            window.statusBarColor = getColor(statusBarColor)
-        }
-
-        when (destinationId) {
-            R.id.messageActionsBottomSheetDialog,
-            R.id.replyBottomSheetDialog,
-            R.id.detailedContactBottomSheetDialog,
-            R.id.threadActionsBottomSheetDialog -> R.color.backgroundColorSecondary
-            R.id.threadListFragment -> if (mainViewModel.isMultiSelectOn) R.color.elevatedBackground else R.color.backgroundColor
-            else -> R.color.backgroundColor
-        }.let { navigationBarColor ->
-            window.updateNavigationBarColor(getColor(navigationBarColor))
-        }
     }
 
     fun setDrawerLockMode(isLocked: Boolean) {

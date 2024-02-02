@@ -37,6 +37,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentSyncConfigureBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.utils.isUserAlreadySynchronized
+import com.infomaniak.mail.utils.setSystemBarsColors
 
 class SyncConfigureFragment : Fragment() {
 
@@ -49,10 +50,9 @@ class SyncConfigureFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundColor)
+        setSystemBarsColors(statusBarColor = R.color.backgroundColor)
 
         binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
-
         setupListeners()
     }
 

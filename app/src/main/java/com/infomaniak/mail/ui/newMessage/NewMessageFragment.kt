@@ -130,6 +130,7 @@ class NewMessageFragment : Fragment() {
     @SuppressLint("RestrictedApi")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
+        setSystemBarsColors(statusBarColor = R.color.newMessageBackgroundColor)
 
         SentryDebug.addNavigationBreadcrumb(
             name = findNavController().currentDestination?.displayName ?: "newMessageFragment",
@@ -240,7 +241,6 @@ class NewMessageFragment : Fragment() {
     private fun initUi() = with(binding) {
         addressListPopupWindow = ListPopupWindow(binding.root.context)
 
-        resetStatusBarColor()
         toolbar.setNavigationOnClickListener { activity?.onBackPressedDispatcher?.onBackPressed() }
         changeToolbarColorOnScroll(toolbar, compositionNestedScrollView)
 
@@ -267,10 +267,6 @@ class NewMessageFragment : Fragment() {
             scrim.isClickable = false
             aiManager.closeAiPrompt()
         }
-    }
-
-    private fun resetStatusBarColor() {
-        requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundColor)
     }
 
     private fun initDraftAndViewModel() {

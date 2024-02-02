@@ -29,6 +29,7 @@ import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentSyncOnboardingBinding
+import com.infomaniak.mail.utils.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -47,14 +48,10 @@ class SyncOnboardingFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setSystemBarsColors(statusBarColor = R.color.onboarding_secondary_background)
 
+        binding.toolbar.setNavigationOnClickListener { requireActivity().finish() }
         localSettings.showSyncDiscoveryBottomSheet = false
-
-        with(requireActivity()) {
-            window.statusBarColor = getColor(R.color.onboarding_secondary_background)
-            binding.toolbar.setNavigationOnClickListener { finish() }
-        }
-
         setupClickListener()
     }
 

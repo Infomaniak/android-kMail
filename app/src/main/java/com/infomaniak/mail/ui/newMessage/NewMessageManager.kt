@@ -17,7 +17,7 @@
  */
 package com.infomaniak.mail.ui.newMessage
 
-import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.Lifecycle.Event
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
@@ -55,8 +55,8 @@ abstract class NewMessageManager {
     }
 
     private fun onFreeReferences(setReferencesToNull: () -> Unit) {
-        viewLifecycleOwner.lifecycle.addObserver(LifecycleEventObserver { _: LifecycleOwner, event: Lifecycle.Event ->
-            if (event == Lifecycle.Event.ON_DESTROY) setReferencesToNull()
+        viewLifecycleOwner.lifecycle.addObserver(LifecycleEventObserver { _: LifecycleOwner, event: Event ->
+            if (event == Event.ON_DESTROY) setReferencesToNull()
         })
     }
 }

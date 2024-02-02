@@ -35,7 +35,6 @@ import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SentryDebug
-import com.infomaniak.mail.utils.updateNavigationBarColor
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -64,8 +63,6 @@ class NewMessageActivity : BaseActivity() {
         }
 
         setupSnackbar()
-        setupSystemBars()
-
         setupNavController()
     }
 
@@ -85,14 +82,6 @@ class NewMessageActivity : BaseActivity() {
         }
 
         snackbarManager.setup(view = binding.root, activity = this, getAnchor = ::getAnchor)
-    }
-
-    private fun setupSystemBars() {
-        val backgroundColor = getColor(R.color.newMessageBackgroundColor)
-        window.apply {
-            statusBarColor = backgroundColor
-            updateNavigationBarColor(backgroundColor)
-        }
     }
 
     private fun setupNavController() {

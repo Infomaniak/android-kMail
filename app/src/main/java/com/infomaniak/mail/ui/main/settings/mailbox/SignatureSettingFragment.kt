@@ -28,6 +28,7 @@ import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.databinding.FragmentSignatureSettingBinding
+import com.infomaniak.mail.utils.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 import io.realm.kotlin.ext.copyFromRealm
 
@@ -45,6 +46,7 @@ class SignatureSettingFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(signatureSettingViewModel) {
         super.onViewCreated(view, savedInstanceState)
+        setSystemBarsColors()
 
         setupAdapter(mailbox)
 

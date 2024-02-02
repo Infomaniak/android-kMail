@@ -44,7 +44,11 @@ import androidx.core.content.res.getColorOrThrow
 import androidx.core.text.toSpannable
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.*
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.Lifecycle.Event
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
 import androidx.navigation.NavDirections
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
@@ -89,7 +93,7 @@ import com.infomaniak.mail.ui.main.folder.HeaderItemDecoration
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
 import com.infomaniak.mail.ui.main.thread.MessageWebViewClient
 import com.infomaniak.mail.ui.main.thread.RoundedBackgroundSpan
-import com.infomaniak.mail.ui.main.thread.ThreadFragment
+import com.infomaniak.mail.ui.main.thread.ThreadFragment.HeaderState
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.ui.noValidMailboxes.NoValidMailboxesActivity
 import com.infomaniak.mail.utils.AccountUtils.NO_MAILBOX_USER_ID_KEY
@@ -110,6 +114,7 @@ import org.jsoup.nodes.Document
 import java.util.Calendar
 import java.util.Date
 import java.util.Scanner
+import kotlin.collections.set
 import kotlin.math.roundToInt
 
 //region Type alias
@@ -154,7 +159,8 @@ fun Date.isLastWeek(): Boolean {
 //region UI
 fun Context.isInPortrait(): Boolean = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
 
-fun Fragment.canDisplayBothPanes(): Boolean = requireContext().resources.getBoolean(R.bool.canDisplayBothPanes)
+fun Fragment.canDisplayBothPanes(): Boolean = requireContext().canDisplayBothPanes()
+fun Context.canDisplayBothPanes(): Boolean = resources.getBoolean(R.bool.canDisplayBothPanes)
 
 fun View.toggleChevron(
     isCollapsed: Boolean,
@@ -403,10 +409,6 @@ fun Context.getInfomaniakLogin() = InfomaniakLogin(
     accessType = null,
 )
 
-fun Window.updateNavigationBarColor(color: Int) {
-    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O) navigationBarColor = color
-}
-
 fun Fragment.copyRecipientEmailToClipboard(recipient: Recipient, snackbarManager: SnackbarManager) {
     requireContext().copyStringToClipboard(recipient.email, R.string.snackbarEmailCopiedToClipboard, snackbarManager)
 }
@@ -440,6 +442,8 @@ inline infix fun <reified E : Enum<E>, V> ((E) -> V).enumValueFrom(value: V): E?
     return enumValues<E>().firstOrNull { this(it) == value }
 }
 
+fun View.isAtTheTop(): Boolean = !canScrollVertically(-1)
+
 fun Fragment.changeToolbarColorOnScroll(
     toolbar: MaterialToolbar,
     nestedScrollView: NestedScrollView,
@@ -450,22 +454,23 @@ fun Fragment.changeToolbarColorOnScroll(
 ) {
     var valueAnimator: ValueAnimator? = null
     var oldColor = requireContext().getColor(loweredColor)
+    var headerColorState = HeaderState.LOWERED
 
     viewLifecycleOwner.lifecycle.addObserver(object : LifecycleEventObserver {
-        override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
-            if (event == Lifecycle.Event.ON_DESTROY) valueAnimator?.cancel()
+        override fun onStateChanged(source: LifecycleOwner, event: Event) {
+            if (event == Event.ON_DESTROY) valueAnimator?.cancel()
         }
     })
 
-    var headerColorState = ThreadFragment.HeaderState.LOWERED
     nestedScrollView.setOnScrollChangeListener { view, _, _, _, _ ->
-        val isAtTheTop = !view.canScrollVertically(-1)
-        if (headerColorState == ThreadFragment.HeaderState.ELEVATED && !isAtTheTop) return@setOnScrollChangeListener
+
+        val isAtTheTop = view.isAtTheTop()
+        if (!isAtTheTop && headerColorState == HeaderState.ELEVATED) return@setOnScrollChangeListener
+
+        headerColorState = if (isAtTheTop) HeaderState.LOWERED else HeaderState.ELEVATED
 
         val newColor = view.context.getColor(if (isAtTheTop) loweredColor else elevatedColor)
-        headerColorState = if (isAtTheTop) ThreadFragment.HeaderState.LOWERED else ThreadFragment.HeaderState.ELEVATED
-
-        if (oldColor == newColor) return@setOnScrollChangeListener
+        if (newColor == oldColor) return@setOnScrollChangeListener
 
         valueAnimator?.cancel()
         valueAnimator = UiUtils.animateColorChange(oldColor, newColor, animate = true) { color ->
@@ -475,6 +480,18 @@ fun Fragment.changeToolbarColorOnScroll(
             otherUpdates?.invoke(color)
         }
     }
+}
+
+fun Fragment.setSystemBarsColors(
+    @ColorRes statusBarColor: Int? = R.color.backgroundHeaderColor,
+    @ColorRes navigationBarColor: Int? = R.color.backgroundColor,
+) {
+    statusBarColor?.let(requireContext()::getColor)?.let { requireActivity().window.statusBarColor = it }
+    navigationBarColor?.let(requireContext()::getColor)?.let(requireActivity().window::updateNavigationBarColor)
+}
+
+fun Window.updateNavigationBarColor(@ColorInt color: Int) {
+    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O) navigationBarColor = color
 }
 
 fun Activity.getMainApplication() = (application as MainApplication)

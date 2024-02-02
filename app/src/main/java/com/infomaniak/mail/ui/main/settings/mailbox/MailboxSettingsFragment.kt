@@ -29,6 +29,7 @@ import com.infomaniak.mail.databinding.FragmentMailboxSettingsBinding
 import com.infomaniak.mail.ui.main.settings.ItemSettingView
 import com.infomaniak.mail.utils.animatedNavigation
 import com.infomaniak.mail.utils.notYetImplemented
+import com.infomaniak.mail.utils.setSystemBarsColors
 
 class MailboxSettingsFragment : Fragment() {
 
@@ -41,6 +42,8 @@ class MailboxSettingsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setSystemBarsColors()
+
         binding.root.setTitle(navigationArgs.mailboxEmail)
         setSubtitlesInitialState()
         setupListeners()

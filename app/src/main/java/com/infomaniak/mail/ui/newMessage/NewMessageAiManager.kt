@@ -21,6 +21,7 @@ import android.animation.FloatEvaluator
 import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.Context
+import android.graphics.drawable.ColorDrawable
 import android.transition.Slide
 import android.transition.TransitionManager
 import android.view.ViewGroup.FOCUS_BEFORE_DESCENDANTS
@@ -29,6 +30,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.shape.MaterialShapeDrawable
 import com.infomaniak.lib.core.utils.hideKeyboard
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.MatomoMail.trackAiWriterEvent
@@ -61,7 +63,6 @@ class NewMessageAiManager @Inject constructor(
 
     private val animationDuration by lazy { resources.getInteger(R.integer.aiPromptAnimationDuration).toLong() }
     private val scrimOpacity by lazy { ResourcesCompat.getFloat(context.resources, R.dimen.scrimOpacity) }
-    private val backgroundColor by lazy { context.getColor(R.color.backgroundColor) }
     private val black by lazy { context.getColor(RCore.color.black) }
 
     private var aiPromptFragment: AiPromptFragment? = null
@@ -177,9 +178,14 @@ class NewMessageAiManager @Inject constructor(
         valueAnimator = ValueAnimator.ofObject(FloatEvaluator(), startOpacity, endOpacity).apply {
             duration = animationDuration
             addUpdateListener { animator ->
+
                 val alpha = ((animator.animatedValue as Float) * 256.0f).roundToInt() / 256.0f
+                val toolbarColor = (binding.toolbar.background as? ColorDrawable?)?.color
+                    ?: (binding.toolbar.background as? MaterialShapeDrawable?)?.fillColor?.defaultColor
+                    ?: context.getColor(R.color.backgroundColor)
+
                 scrim.alpha = alpha
-                activity.window.statusBarColor = UiUtils.pointBetweenColors(backgroundColor, black, alpha)
+                activity.window.statusBarColor = UiUtils.pointBetweenColors(toolbarColor, black, alpha)
             }
             start()
         }

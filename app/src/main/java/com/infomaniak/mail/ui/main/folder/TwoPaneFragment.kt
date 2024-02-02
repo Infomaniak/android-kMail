@@ -38,13 +38,13 @@ import com.infomaniak.mail.utils.AttachmentIntentUtils
 import com.infomaniak.mail.utils.UiUtils.FULLY_SLID
 import com.infomaniak.mail.utils.UiUtils.progressivelyColorSystemBars
 import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
-import com.infomaniak.mail.utils.updateNavigationBarColor
+import com.infomaniak.mail.utils.setSystemBarsColors
 import javax.inject.Inject
 
 abstract class TwoPaneFragment : Fragment() {
 
     val mainViewModel: MainViewModel by activityViewModels()
-    val twoPaneViewModel: TwoPaneViewModel by activityViewModels()
+    protected val twoPaneViewModel: TwoPaneViewModel by activityViewModels()
 
     protected abstract val slidingPaneLayout: NoAnimSlidingPaneLayout
 
@@ -120,8 +120,8 @@ abstract class TwoPaneFragment : Fragment() {
         twoPaneViewModel.currentThreadUid.observe(viewLifecycleOwner) { threadUid ->
             val isOpeningThread = threadUid != null
             if (isOpeningThread) {
-                val hasPaneOpened = slidingPaneLayout.openPaneNoAnimation()
-                if (hasPaneOpened) requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundColor)
+                val hasOpened = slidingPaneLayout.openPaneNoAnimation()
+                if (hasOpened) setSystemBarsColors(statusBarColor = R.color.backgroundColor, navigationBarColor = null)
             } else {
                 resetPanes()
             }
@@ -157,13 +157,15 @@ abstract class TwoPaneFragment : Fragment() {
         }
     }
 
-    private fun resetPanes() = with(requireActivity()) {
+    private fun resetPanes() {
 
-        val isClosing = slidingPaneLayout.closePaneNoAnimation()
+        val hasClosed = slidingPaneLayout.closePaneNoAnimation()
 
-        if (isClosing) {
-            if (this@TwoPaneFragment is ThreadListFragment) window.statusBarColor = getColor(R.color.backgroundHeaderColor)
-            window.updateNavigationBarColor(getColor(R.color.backgroundColor))
+        if (hasClosed) {
+            setSystemBarsColors(
+                statusBarColor = if (this@TwoPaneFragment is ThreadListFragment) R.color.backgroundHeaderColor else null,
+                navigationBarColor = R.color.backgroundColor,
+            )
         }
 
         threadListAdapter.selectNewThread(newPosition = null, threadUid = null)

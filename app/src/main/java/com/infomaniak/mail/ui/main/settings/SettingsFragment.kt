@@ -40,6 +40,7 @@ import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.animatedNavigation
 import com.infomaniak.mail.utils.launchSyncAutoConfigActivityForResult
 import com.infomaniak.mail.utils.observeNotNull
+import com.infomaniak.mail.utils.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -58,6 +59,8 @@ class SettingsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setSystemBarsColors()
+
         setupMailboxesAdapter()
         setupListeners()
         setSubtitlesInitialState()

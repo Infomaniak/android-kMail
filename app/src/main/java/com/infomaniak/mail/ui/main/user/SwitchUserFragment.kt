@@ -29,6 +29,7 @@ import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.databinding.FragmentSwitchUserBinding
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.launchLoginActivity
+import com.infomaniak.mail.utils.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -47,6 +48,8 @@ class SwitchUserFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
+        setSystemBarsColors()
+
         setAdapter()
         setupOnClickListener()
         observeAccounts()

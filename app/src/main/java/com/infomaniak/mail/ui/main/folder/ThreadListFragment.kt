@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.main.folder
 
-import android.content.res.Configuration
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.text.format.DateUtils
@@ -133,6 +132,10 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         navigateFromNotificationToNewMessage()
 
         super.onViewCreated(view, savedInstanceState)
+        setSystemBarsColors(
+            statusBarColor = R.color.backgroundHeaderColor,
+            navigationBarColor = if (mainViewModel.isMultiSelectOn) R.color.elevatedBackground else R.color.backgroundColor,
+        )
 
         threadListViewModel.deleteSearchData()
         bindAlertToViewLifecycle(descriptionDialog)
@@ -223,17 +226,6 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         refreshThreadsIfNotificationsAreDisabled()
         updateSwipeActionsAccordingToSettings()
         canRefreshThreads = true
-    }
-
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-
-        val statusBarColor = if (twoPaneViewModel.isThreadOpen && !canDisplayBothPanes()) {
-            R.color.backgroundColor
-        } else {
-            R.color.backgroundHeaderColor
-        }
-        requireActivity().window.statusBarColor = requireContext().getColor(statusBarColor)
     }
 
     private fun refreshThreadsIfNotificationsAreDisabled() = with(mainViewModel) {

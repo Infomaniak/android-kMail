@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui.sync
 
 import android.os.Bundle
-import androidx.activity.viewModels
 import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.R
@@ -32,7 +31,6 @@ import javax.inject.Inject
 class SyncAutoConfigActivity : BaseActivity() {
 
     private val binding by lazy { ActivitySyncAutoConfigBinding.inflate(layoutInflater) }
-    private val syncAutoConfigViewModel: SyncAutoConfigViewModel by viewModels()
 
     private val navController by lazy {
         (supportFragmentManager.findFragmentById(R.id.syncAutoConfigHostFragment) as NavHostFragment).navController

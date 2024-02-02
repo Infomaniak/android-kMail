@@ -26,6 +26,7 @@ import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.databinding.FragmentAiEngineSettingBinding
 import com.infomaniak.mail.databinding.LayoutAiEngineChoiceBinding
 import com.infomaniak.mail.utils.SharedUtils
+import com.infomaniak.mail.utils.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -46,6 +47,8 @@ class AiEngineSettingFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setSystemBarsColors()
+
         sharedUtils.manageAiEngineSettings(this, choiceBinding.radioGroup, "settingsAiEngine")
     }
 }

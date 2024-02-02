@@ -501,19 +501,6 @@
             app:argType="boolean" />
     </activity>
 
-    <fragment
-        android:id="@+id/introFragment"
-        android:name="com.infomaniak.mail.ui.login.IntroFragment"
-        android:label="IntroFragment"
-        tools:layout="@layout/fragment_intro">
-        <argument
-            android:name="isFirstAccount"
-            app:argType="boolean" />
-        <argument
-            android:name="position"
-            app:argType="integer" />
-    </fragment>
-
     <dialog
         android:id="@+id/downloadAttachmentProgressDialog"
         android:name="com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialog"
