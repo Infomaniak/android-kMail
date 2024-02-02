@@ -154,7 +154,7 @@ class ThreadController @Inject constructor(
         }
 
         private fun getSearchThreadsQuery(realm: TypedRealm): RealmQuery<Thread> {
-            return realm.query("${Thread::isFromSearch.name} == true")
+            return realm.query<Thread>("${Thread::isFromSearch.name} == true").sort(Thread::date.name, Sort.DESCENDING)
         }
 
         private fun getUnreadThreadsCountQuery(folder: Folder): RealmScalarQuery<Long> {
