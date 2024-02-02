@@ -108,6 +108,12 @@ class Message : RealmObject {
     //endregion
 
     //region Local data (Transient)
+
+    // ------------- !IMPORTANT! -------------
+    // Every field that is added in this Transient region should be declared in 'initLocalValue()' too
+    // to avoid loosing data when updating from API.
+    // If the Field is a "heavy data" (i.e an embedded object), it should also be added in 'keepHeavyData()'
+
     @Transient
     @PersistedName("isFullyDownloaded")
     private var _isFullyDownloaded: Boolean = false
@@ -210,6 +216,7 @@ class Message : RealmObject {
 
     fun keepHeavyData(message: Message) {
         attachments = message.attachments.copyFromRealm().toRealmList()
+        latestCalendarEventResponse = message.latestCalendarEventResponse?.copyFromRealm(UInt.MAX_VALUE)
         body = message.body?.copyFromRealm()
 
         // TODO: Those are unused for now, but if we ever want to use them, we need to save them here.
