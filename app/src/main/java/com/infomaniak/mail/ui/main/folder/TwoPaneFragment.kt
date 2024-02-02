@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.folder
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -30,6 +31,7 @@ import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.NoAnimSlidingPaneLayout
 import com.infomaniak.mail.ui.main.search.SearchFragment
@@ -77,6 +79,11 @@ abstract class TwoPaneFragment : Fragment() {
         observeThreadNavigation()
     }
 
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        updateDrawerLockMode()
+    }
+
     private fun setupSlidingPane() = with(slidingPaneLayout) {
         lockMode = SlidingPaneLayout.LOCK_MODE_LOCKED
         addPanelSlideListener(object : SlidingPaneLayout.PanelSlideListener {
@@ -121,7 +128,10 @@ abstract class TwoPaneFragment : Fragment() {
             val isOpeningThread = threadUid != null
             if (isOpeningThread) {
                 val hasOpened = slidingPaneLayout.openPaneNoAnimation()
-                if (hasOpened) setSystemBarsColors(statusBarColor = R.color.backgroundColor, navigationBarColor = null)
+                if (hasOpened) {
+                    updateDrawerLockMode()
+                    setSystemBarsColors(statusBarColor = R.color.backgroundColor, navigationBarColor = null)
+                }
             } else {
                 resetPanes()
             }
@@ -160,6 +170,7 @@ abstract class TwoPaneFragment : Fragment() {
     private fun resetPanes() {
 
         val hasClosed = slidingPaneLayout.closePaneNoAnimation()
+        updateDrawerLockMode()
 
         if (hasClosed) {
             setSystemBarsColors(
@@ -171,5 +182,14 @@ abstract class TwoPaneFragment : Fragment() {
         threadListAdapter.selectNewThread(newPosition = null, threadUid = null)
 
         childFragmentManager.beginTransaction().replace(R.id.threadHostFragment, ThreadFragment()).commit()
+    }
+
+    // TODO: When we'll add the feature of swiping between Threads, we'll need to check if this function is still needed.
+    private fun updateDrawerLockMode() {
+        if (this is ThreadListFragment) {
+            (requireActivity() as MainActivity).setDrawerLockMode(
+                isLocked = twoPaneViewModel.isInThreadInPhoneMode(requireContext()),
+            )
+        }
     }
 }
