@@ -20,8 +20,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingVertical="@dimen/marginStandardSmall"
-    android:tag="SuperCollapsedBlock">
+    android:paddingVertical="@dimen/marginStandardSmall">
 
     <View
         android:layout_width="match_parent"

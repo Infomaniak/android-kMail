@@ -91,6 +91,12 @@ class ThreadViewModel @Inject constructor(
         AccountUtils.currentMailboxId,
     ).map { it.obj }.asLiveData(ioCoroutineContext)
 
+    fun resetMessagesCache() {
+        cachedSplitBodies = mutableMapOf()
+        superCollapsedBlock = null
+        hasUserClickedTheSuperCollapsedBlock = false
+    }
+
     fun reassignThreadLive(threadUid: String) {
         threadLiveJob?.cancel()
         threadLiveJob = viewModelScope.launch(ioCoroutineContext) {
@@ -101,10 +107,6 @@ class ThreadViewModel @Inject constructor(
     fun reassignMessagesLive(threadUid: String) {
         messagesLiveJob?.cancel()
         messagesLiveJob = viewModelScope.launch(ioCoroutineContext) {
-
-            cachedSplitBodies = mutableMapOf()
-            superCollapsedBlock = null
-
             messageController.getSortedAndNotDeletedMessagesAsync(threadUid)
                 ?.map(::mapRealmMessagesResult)
                 ?.collect(messagesLive::postValue)

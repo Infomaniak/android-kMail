@@ -33,7 +33,8 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import androidx.recyclerview.widget.RecyclerView.*
+import androidx.viewbinding.ViewBinding
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
 import com.infomaniak.lib.core.utils.context
@@ -65,13 +66,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.Date
 import com.google.android.material.R as RMaterial
+import com.infomaniak.lib.core.R as RCore
 
 class ThreadAdapter(
     private val shouldLoadDistantResources: Boolean,
     private val isForPrinting: Boolean = false,
     private val isCalendarEventExpandedMap: MutableMap<String, Boolean> = mutableMapOf(),
     private var threadAdapterCallbacks: ThreadAdapterCallbacks? = null,
-) : ListAdapter<Any, ViewHolder>(MessageDiffCallback()) {
+) : ListAdapter<Any, ThreadAdapterViewHolder>(MessageDiffCallback()) {
 
     inline val items: MutableList<Any> get() = currentList
 
@@ -115,7 +117,7 @@ class ThreadAdapter(
         }
     }.getOrDefault(super.getItemViewType(position))
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ThreadAdapterViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         return if (viewType == R.layout.item_message) {
             MessageViewHolder(
@@ -130,7 +132,7 @@ class ThreadAdapter(
         }
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) = runCatchingRealm {
+    override fun onBindViewHolder(holder: ThreadAdapterViewHolder, position: Int, payloads: MutableList<Any>) = runCatchingRealm {
 
         val payload = payloads.firstOrNull()
         if (payload !is NotifyType) {
@@ -159,8 +161,17 @@ class ThreadAdapter(
         }
     }.getOrDefault(Unit)
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ThreadAdapterViewHolder, position: Int) {
+
         val item = items[position]
+        val previousItem = if (position > 0) items[position - 1] else null
+
+        holder.binding.root.tag = if (item is SuperCollapsedBlock || previousItem is SuperCollapsedBlock) {
+            holder.binding.context.getString(RCore.string.ignoreDivider)
+        } else {
+            null
+        }
+
         if (item is Message) {
             (holder as MessageViewHolder).bindMail(item, position)
         } else {
@@ -674,15 +685,19 @@ class ThreadAdapter(
 
     data class SuperCollapsedBlock(val messagesUids: Set<String>)
 
-    class SuperCollapsedBlockViewHolder(val binding: ItemSuperCollapsedBlockBinding) : ViewHolder(binding.root)
+    abstract class ThreadAdapterViewHolder(open val binding: ViewBinding) : ViewHolder(binding.root)
 
-    class MessageViewHolder(
-        val binding: ItemMessageBinding,
+    private class SuperCollapsedBlockViewHolder(
+        override val binding: ItemSuperCollapsedBlockBinding,
+    ) : ThreadAdapterViewHolder(binding)
+
+    private class MessageViewHolder(
+        override val binding: ItemMessageBinding,
         private val shouldLoadDistantResources: Boolean,
         onContactClicked: ((contact: Recipient) -> Unit)?,
         onAttachmentClicked: ((attachment: Attachment) -> Unit)?,
         onAttachmentOptionsClicked: ((attachment: Attachment) -> Unit)?,
-    ) : ViewHolder(binding.root) {
+    ) : ThreadAdapterViewHolder(binding) {
 
         val fromAdapter = DetailedRecipientAdapter(onContactClicked)
         val toAdapter = DetailedRecipientAdapter(onContactClicked)
