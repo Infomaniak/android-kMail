@@ -28,9 +28,7 @@ import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
 import com.google.android.material.R as RMaterial
 
-class HtmlFormatter(
-    private val html: String,
-) {
+class HtmlFormatter(private val html: String) {
 
     private val cssList = mutableListOf<Pair<String, String?>>()
     private val scripts = mutableListOf<String>()
@@ -59,8 +57,8 @@ class HtmlFormatter(
         breakLongWords = true
     }
 
-    fun registerIsForPrint(printData: PrintData?) {
-        this.printData = printData
+    fun registerIsForPrint(data: PrintData?) {
+        printData = data
     }
 
     fun inject(): String = with(HtmlSanitizer.getInstance().sanitize(Jsoup.parse(html))) {
