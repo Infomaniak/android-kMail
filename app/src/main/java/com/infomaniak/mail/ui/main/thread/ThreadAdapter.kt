@@ -46,7 +46,7 @@ import com.infomaniak.mail.data.models.calendar.Attendee.AttendanceState
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.ItemMessageBinding
-import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadViewHolder
+import com.infomaniak.mail.ui.main.thread.ThreadAdapter.MessageViewHolder
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntentType
 import com.infomaniak.mail.utils.MailDateFormatUtils.mailFormattedDate
@@ -69,18 +69,20 @@ class ThreadAdapter(
     private val isForPrinting: Boolean = false,
     private val isCalendarEventExpandedMap: MutableMap<String, Boolean> = mutableMapOf(),
     private var threadAdapterCallbacks: ThreadAdapterCallbacks? = null,
-) : ListAdapter<Message, ThreadViewHolder>(MessageDiffCallback()) {
+) : ListAdapter<Message, MessageViewHolder>(MessageDiffCallback()) {
 
     inline val messages: MutableList<Message> get() = currentList
 
     var isExpandedMap = mutableMapOf<String, Boolean>()
+
+    //region Auto-scroll at Thread opening
     var initialSetOfExpandedMessagesUids = setOf<String>()
     private val currentSetOfLoadedExpandedMessagesUids = mutableSetOf<String>()
     private var hasNotScrolledYet = true
+    //endregion
 
     private val manuallyAllowedMessageUids = mutableSetOf<String>()
     var isThemeTheSameMap = mutableMapOf<String, Boolean>()
-
 
     private lateinit var recyclerView: RecyclerView
     private val webViewUtils by lazy { WebViewUtils(recyclerView.context) }
@@ -104,8 +106,8 @@ class ThreadAdapter(
 
     override fun getItemCount(): Int = runCatchingRealm { messages.count() }.getOrDefault(0)
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ThreadViewHolder {
-        return ThreadViewHolder(
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
+        return MessageViewHolder(
             ItemMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false),
             shouldLoadDistantResources,
             threadAdapterCallbacks?.onContactClicked,
@@ -114,12 +116,12 @@ class ThreadAdapter(
         )
     }
 
-    override fun onBindViewHolder(holder: ThreadViewHolder, position: Int, payloads: MutableList<Any>) = runCatchingRealm {
+    override fun onBindViewHolder(holder: MessageViewHolder, position: Int, payloads: MutableList<Any>) = runCatchingRealm {
         with(holder.binding) {
             val payload = payloads.firstOrNull()
             if (payload !is NotifyType) {
                 super.onBindViewHolder(holder, position, payloads)
-                return
+                return@runCatchingRealm
             }
 
             val message = messages[position]
@@ -143,7 +145,7 @@ class ThreadAdapter(
         }
     }.getOrDefault(Unit)
 
-    override fun onBindViewHolder(holder: ThreadViewHolder, position: Int) = with(holder) {
+    override fun onBindViewHolder(holder: MessageViewHolder, position: Int) = with(holder) {
         val message = messages[position]
 
         initMapForNewMessage(message, position)
@@ -157,7 +159,7 @@ class ThreadAdapter(
         onExpandOrCollapseMessage(message, shouldTrack = false)
     }
 
-    private fun ThreadViewHolder.bindCalendarEvent(message: Message) {
+    private fun MessageViewHolder.bindCalendarEvent(message: Message) {
         val calendarAttachment = message.calendarAttachment ?: return
         val calendarEvent = message.latestCalendarEventResponse?.calendarEvent
 
@@ -200,14 +202,14 @@ class ThreadAdapter(
         if (isThemeTheSameMap[message.uid] == null) isThemeTheSameMap[message.uid] = true
     }
 
-    private fun ThreadViewHolder.toggleContentAndQuoteTheme(messageUid: String) = with(binding) {
+    private fun MessageViewHolder.toggleContentAndQuoteTheme(messageUid: String) = with(binding) {
         val isThemeTheSame = isThemeTheSameMap[messageUid]!!
         bodyWebView.toggleWebViewTheme(isThemeTheSame)
         fullMessageWebView.toggleWebViewTheme(isThemeTheSame)
         toggleFrameLayoutsTheme(isThemeTheSame)
     }
 
-    private fun ThreadViewHolder.loadContentAndQuote(message: Message) {
+    private fun MessageViewHolder.loadContentAndQuote(message: Message) {
         val body = message.body
         val splitBody = message.splitBody
 
@@ -221,16 +223,16 @@ class ThreadAdapter(
         }
     }
 
-    private fun ThreadViewHolder.loadBodyInWebView(uid: String, body: String, type: String) = with(binding) {
+    private fun MessageViewHolder.loadBodyInWebView(uid: String, body: String, type: String) = with(binding) {
         bodyWebView.applyWebViewContent(uid, body, type)
     }
 
-    private fun ThreadViewHolder.loadQuoteInWebView(uid: String, quote: String?, type: String) = with(binding) {
+    private fun MessageViewHolder.loadQuoteInWebView(uid: String, quote: String?, type: String) = with(binding) {
         if (quote == null) return@with
         fullMessageWebView.applyWebViewContent(uid, quote, type)
     }
 
-    private fun ThreadViewHolder.toggleWebViews(message: Message) = with(binding) {
+    private fun MessageViewHolder.toggleWebViews(message: Message) = with(binding) {
         isQuoteCollapsed = !isQuoteCollapsed
         loadContentAndQuote(message)
     }
@@ -279,7 +281,7 @@ class ThreadAdapter(
         }
     }
 
-    private fun ThreadViewHolder.bindHeader(message: Message) = with(binding) {
+    private fun MessageViewHolder.bindHeader(message: Message) = with(binding) {
         val messageDate = message.date.toDate()
 
         if (message.isDraft) {
@@ -321,7 +323,7 @@ class ThreadAdapter(
         bccGroup.isVisible = message.bcc.isNotEmpty()
     }
 
-    private fun ThreadViewHolder.handleHeaderClick(message: Message) = with(binding) {
+    private fun MessageViewHolder.handleHeaderClick(message: Message) = with(binding) {
         messageHeader.setOnClickListener {
             if (isExpandedMap[message.uid] == true) {
                 isExpandedMap[message.uid] = false
@@ -347,7 +349,7 @@ class ThreadAdapter(
         }
     }
 
-    private fun ThreadViewHolder.bindRecipientDetails(message: Message, messageDate: Date) = with(binding) {
+    private fun MessageViewHolder.bindRecipientDetails(message: Message, messageDate: Date) = with(binding) {
 
         fromAdapter.updateList(message.from.toList())
         toAdapter.updateList(message.to.toList())
@@ -363,7 +365,7 @@ class ThreadAdapter(
         detailedMessageDate.text = mostDetailedDate(context, messageDate)
     }
 
-    private fun ThreadViewHolder.bindAlerts(messageUid: String) = with(binding) {
+    private fun MessageViewHolder.bindAlerts(messageUid: String) = with(binding) {
         distantImagesAlert.onAction1 {
             bodyWebViewClient.unblockDistantResources()
             fullMessageWebViewClient.unblockDistantResources()
@@ -388,7 +390,7 @@ class ThreadAdapter(
     private fun ItemMessageBinding.areOneOrMoreAlertsVisible() = alerts.children.any { it.isVisible }
 
     @SuppressLint("SetTextI18n")
-    private fun ThreadViewHolder.bindAttachment(message: Message) = with(binding) {
+    private fun MessageViewHolder.bindAttachment(message: Message) = with(binding) {
         val attachments = message.attachments
         val fileSize = formatAttachmentFileSize(attachments)
         attachmentLayout.attachmentsSizeText.text = context.resources.getQuantityString(
@@ -413,12 +415,12 @@ class ThreadAdapter(
         return Formatter.formatShortFileSize(context, totalAttachmentsFileSizeInBytes)
     }
 
-    private fun ThreadViewHolder.bindContent(message: Message) {
+    private fun MessageViewHolder.bindContent(message: Message) {
         binding.messageLoader.isVisible = message.splitBody == null
         message.splitBody?.let { splitBody -> bindBody(message, hasQuote = splitBody.quote != null) }
     }
 
-    private fun ThreadViewHolder.bindBody(message: Message, hasQuote: Boolean) = with(binding) {
+    private fun MessageViewHolder.bindBody(message: Message, hasQuote: Boolean) = with(binding) {
         bodyWebView.setupLinkContextualMenu { data, type ->
             threadAdapterCallbacks?.promptLink?.invoke(data, type)
         }
@@ -495,7 +497,7 @@ class ThreadAdapter(
         }
     }
 
-    private fun ThreadViewHolder.onExpandOrCollapseMessage(message: Message, shouldTrack: Boolean = true) = with(binding) {
+    private fun MessageViewHolder.onExpandOrCollapseMessage(message: Message, shouldTrack: Boolean = true) = with(binding) {
         val isExpanded = isExpandedMap[message.uid]!!
 
         if (shouldTrack) context.trackMessageEvent("openMessage", isExpanded)
@@ -579,7 +581,7 @@ class ThreadAdapter(
         }
 
         override fun getChangePayload(oldItem: Message, newItem: Message): Any? {
-            // If everything but attendees is the same, then we know the only thing that could've changed is attendees
+            // If everything but Attendees is the same, then we know the only thing that could've changed is Attendees.
             return if (everythingButAttendeesIsTheSame(oldItem, newItem)) NotifyType.ONLY_REBIND_CALENDAR_ATTENDANCE else null
         }
 
@@ -600,7 +602,25 @@ class ThreadAdapter(
         }
     }
 
-    class ThreadViewHolder(
+    data class ThreadAdapterCallbacks(
+        var onBodyWebViewFinishedLoading: (() -> Unit)? = null,
+        var onContactClicked: ((contact: Recipient) -> Unit)? = null,
+        var onDeleteDraftClicked: ((message: Message) -> Unit)? = null,
+        var onDraftClicked: ((message: Message) -> Unit)? = null,
+        var onAttachmentClicked: ((attachment: Attachment) -> Unit)? = null,
+        var onAttachmentOptionsClicked: ((attachment: Attachment) -> Unit)? = null,
+        var onDownloadAllClicked: ((message: Message) -> Unit)? = null,
+        var onReplyClicked: ((Message) -> Unit)? = null,
+        var onMenuClicked: ((Message) -> Unit)? = null,
+        var onAllExpandedMessagesLoaded: (() -> Unit)? = null,
+        var navigateToNewMessageActivity: ((Uri) -> Unit)? = null,
+        var navigateToAttendeeBottomSheet: ((List<Attendee>) -> Unit)? = null,
+        var navigateToDownloadProgressDialog: ((Attachment, AttachmentIntentType) -> Unit)? = null,
+        var replyToCalendarEvent: ((AttendanceState, Message) -> Unit)? = null,
+        var promptLink: ((String, ContextMenuType) -> Unit)? = null,
+    )
+
+    class MessageViewHolder(
         val binding: ItemMessageBinding,
         private val shouldLoadDistantResources: Boolean,
         onContactClicked: ((contact: Recipient) -> Unit)?,
@@ -673,24 +693,6 @@ class ThreadAdapter(
             }
         }
     }
-
-    data class ThreadAdapterCallbacks(
-        var onBodyWebViewFinishedLoading: (() -> Unit)? = null,
-        var onContactClicked: ((contact: Recipient) -> Unit)? = null,
-        var onDeleteDraftClicked: ((message: Message) -> Unit)? = null,
-        var onDraftClicked: ((message: Message) -> Unit)? = null,
-        var onAttachmentClicked: ((attachment: Attachment) -> Unit)? = null,
-        var onAttachmentOptionsClicked: ((attachment: Attachment) -> Unit)? = null,
-        var onDownloadAllClicked: ((message: Message) -> Unit)? = null,
-        var onReplyClicked: ((Message) -> Unit)? = null,
-        var onMenuClicked: ((Message) -> Unit)? = null,
-        var onAllExpandedMessagesLoaded: (() -> Unit)? = null,
-        var navigateToNewMessageActivity: ((Uri) -> Unit)? = null,
-        var navigateToAttendeeBottomSheet: ((List<Attendee>) -> Unit)? = null,
-        var navigateToDownloadProgressDialog: ((Attachment, AttachmentIntentType) -> Unit)? = null,
-        var replyToCalendarEvent: ((AttendanceState, Message) -> Unit)? = null,
-        var promptLink: ((String, ContextMenuType) -> Unit)? = null,
-    )
 
     companion object {
 

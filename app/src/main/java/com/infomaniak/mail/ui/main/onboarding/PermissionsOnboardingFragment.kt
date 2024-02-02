@@ -29,7 +29,7 @@ import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.LocalSettings.*
+import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.databinding.FragmentPermissionsOnboardingBinding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject

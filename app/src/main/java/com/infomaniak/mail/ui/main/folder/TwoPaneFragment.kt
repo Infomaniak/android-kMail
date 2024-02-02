@@ -86,7 +86,9 @@ abstract class TwoPaneFragment : Fragment() {
     }
 
     private fun setupSlidingPane() = with(slidingPaneLayout) {
+
         lockMode = SlidingPaneLayout.LOCK_MODE_LOCKED
+
         addPanelSlideListener(object : SlidingPaneLayout.PanelSlideListener {
             override fun onPanelOpened(panel: View) = Unit
             override fun onPanelClosed(panel: View) = Unit
