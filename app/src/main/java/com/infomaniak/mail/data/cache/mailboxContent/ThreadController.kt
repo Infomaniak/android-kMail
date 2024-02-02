@@ -98,6 +98,7 @@ class ThreadController @Inject constructor(
                     isTrashed = folderRole == FolderRole.TRASH,
                     isFromSearch = localMessage == null,
                     draftLocalUuid = localMessage?.draftLocalUuid,
+                    latestCalendarEventResponse = null,
                 )
 
                 localMessage?.let(remoteMessage::keepHeavyData)

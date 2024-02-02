@@ -201,7 +201,7 @@ class Message : RealmObject {
         isTrashed: Boolean,
         isFromSearch: Boolean,
         draftLocalUuid: String?,
-        latestCalendarEventResponse: CalendarEventResponse? = null,
+        latestCalendarEventResponse: CalendarEventResponse?,
         messageIds: RealmSet<String>? = null,
     ) {
         this.date = date

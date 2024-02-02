@@ -708,6 +708,7 @@ class RefreshController @Inject constructor(
             isTrashed = folder.role == FolderRole.TRASH,
             isFromSearch = false,
             draftLocalUuid = null,
+            latestCalendarEventResponse = null,
         )
 
         if (existingMessage == null) folder.messages.add(remoteMessage)
