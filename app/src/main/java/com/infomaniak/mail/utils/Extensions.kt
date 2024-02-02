@@ -467,10 +467,10 @@ fun Fragment.changeToolbarColorOnScroll(
         val isAtTheTop = view.isAtTheTop()
         if (!isAtTheTop && headerColorState == HeaderState.ELEVATED) return@setOnScrollChangeListener
 
+        headerColorState = if (isAtTheTop) HeaderState.LOWERED else HeaderState.ELEVATED
+
         val newColor = view.context.getColor(if (isAtTheTop) loweredColor else elevatedColor)
         if (newColor == oldColor) return@setOnScrollChangeListener
-
-        headerColorState = if (isAtTheTop) HeaderState.LOWERED else HeaderState.ELEVATED
 
         valueAnimator?.cancel()
         valueAnimator = UiUtils.animateColorChange(oldColor, newColor, animate = true) { color ->
