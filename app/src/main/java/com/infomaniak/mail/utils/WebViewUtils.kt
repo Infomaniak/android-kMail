@@ -25,7 +25,6 @@ import android.webkit.WebView
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomDarkMode
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getFixStyleScript
@@ -34,8 +33,6 @@ import com.infomaniak.mail.utils.HtmlFormatter.Companion.getJsBridgeScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getPrintMailStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getResizeScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getSignatureMarginStyle
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 class WebViewUtils(context: Context) {
 
@@ -50,31 +47,27 @@ class WebViewUtils(context: Context) {
     private val jsBridgeScript by lazy { context.getJsBridgeScript() }
 
     fun processHtmlForPrint(
-        context: Context? = null,
         html: String,
-        isDisplayedInDarkMode: Boolean,
-        message: Message? = null
-    ): String = with(HtmlFormatter(context = context, html = html, message = message)) {
-        addCommonDisplayContent(isDisplayedInDarkMode)
-        registerIsForPrint()
+        printData: HtmlFormatter.PrintData,
+    ): String = with(HtmlFormatter(html)) {
+        addCommonDisplayContent(isDisplayedInDarkMode = false)
+        registerIsForPrint(printData)
         registerCss(printMailStyle)
         return@with inject()
     }
 
     fun processHtmlForDisplay(
-        context: Context? = null,
         html: String,
         isDisplayedInDarkMode: Boolean,
-        message: Message? = null
-    ): String = with(HtmlFormatter(context = context, html = html, message = message)) {
+    ): String = with(HtmlFormatter(html)) {
         addCommonDisplayContent(isDisplayedInDarkMode)
         return@with inject()
     }
 
     fun processSignatureHtmlForDisplay(
         html: String,
-        isDisplayedInDarkMode: Boolean
-    ): String = with(HtmlFormatter(html = html)) {
+        isDisplayedInDarkMode: Boolean,
+    ): String = with(HtmlFormatter(html)) {
         addCommonDisplayContent(isDisplayedInDarkMode)
         registerCss(signatureVerticalMargin)
         return@with inject()
