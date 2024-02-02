@@ -195,7 +195,7 @@ class Message : RealmObject {
         isTrashed: Boolean,
         isFromSearch: Boolean,
         draftLocalUuid: String?,
-        latestCalendarEventResponse: CalendarEventResponse?,
+        latestCalendarEventResponse: CalendarEventResponse? = null,
         messageIds: RealmSet<String>? = null,
     ) {
         this.date = date
@@ -210,6 +210,7 @@ class Message : RealmObject {
 
     fun keepHeavyData(message: Message) {
         attachments = message.attachments.copyFromRealm().toRealmList()
+        latestCalendarEventResponse = message.latestCalendarEventResponse?.copyFromRealm(UInt.MAX_VALUE)
         body = message.body?.copyFromRealm()
 
         // TODO: Those are unused for now, but if we ever want to use them, we need to save them here.
