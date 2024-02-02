@@ -79,7 +79,6 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setSystemBarsColors(statusBarColor = null)
 
         displayVersion()
         setupListeners()

@@ -68,7 +68,6 @@ import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.TitleAlertDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
-import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.ui.main.onboarding.PermissionsOnboardingPagerFragment
 import com.infomaniak.mail.ui.newMessage.NewMessageActivity
@@ -93,7 +92,6 @@ class MainActivity : BaseActivity() {
 
     private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private val mainViewModel: MainViewModel by viewModels()
-    private val twoPaneViewModel: TwoPaneViewModel by viewModels()
 
     private val backgroundColor: Int by lazy { getColor(R.color.backgroundColor) }
     private val backgroundHeaderColor: Int by lazy { getColor(R.color.backgroundHeaderColor) }
