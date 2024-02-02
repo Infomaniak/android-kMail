@@ -19,7 +19,6 @@ package com.infomaniak.mail.ui.main.thread
 
 import android.annotation.SuppressLint
 import android.net.Uri
-import android.os.Bundle
 import android.text.format.Formatter
 import android.view.LayoutInflater
 import android.view.ScaleGestureDetector
@@ -159,7 +158,7 @@ class ThreadAdapter(
     }
 
     private fun ThreadViewHolder.bindCalendarEvent(message: Message) {
-        val attachment = message.calendarAttachment ?: return
+        val calendarAttachment = message.calendarAttachment ?: return
         val calendarEvent = message.latestCalendarEventResponse?.calendarEvent
 
         binding.calendarEvent.apply {
@@ -172,7 +171,7 @@ class ThreadAdapter(
                     calendarEvent = it,
                     isCanceled = calendarEventResponse.isCanceled,
                     shouldDisplayReplyOptions = calendarEventResponse.isReplyAuthorized(),
-                    attachment = attachment,
+                    attachment = calendarAttachment,
                     hasAssociatedInfomaniakCalendarEvent = calendarEventResponse.hasAssociatedInfomaniakCalendarEvent(),
                     shouldStartExpanded = isCalendarEventExpandedMap[message.uid] ?: false,
                 )
@@ -182,11 +181,8 @@ class ThreadAdapter(
                 navigateToAttendeesBottomSheet = { attendees ->
                     threadAdapterCallbacks?.navigateToAttendeeBottomSheet?.invoke(attendees)
                 },
-                navigateToDownloadProgressDialog = {
-                    threadAdapterCallbacks?.navigateToDownloadProgressDialog?.invoke(
-                        R.id.downloadAttachmentProgressDialog,
-                        attachment.createDownloadDialogNavArgs(AttachmentIntentType.OPEN_WITH),
-                    )
+                navigateToDownloadProgressDialog = { attachment, attachmentIntentType ->
+                    threadAdapterCallbacks?.navigateToDownloadProgressDialog?.invoke(attachment, attachmentIntentType)
                 },
                 replyToCalendarEvent = { attendanceState ->
                     threadAdapterCallbacks?.replyToCalendarEvent?.invoke(attendanceState, message)
@@ -686,7 +682,7 @@ class ThreadAdapter(
         var onAllExpandedMessagesLoaded: (() -> Unit)? = null,
         var navigateToNewMessageActivity: ((Uri) -> Unit)? = null,
         var navigateToAttendeeBottomSheet: ((List<Attendee>) -> Unit)? = null,
-        var navigateToDownloadProgressDialog: ((Int, Bundle) -> Unit)? = null,
+        var navigateToDownloadProgressDialog: ((Attachment, AttachmentIntentType) -> Unit)? = null,
         var replyToCalendarEvent: ((AttendanceState, Message) -> Unit)? = null,
         var promptLink: ((String, ContextMenuType) -> Unit)? = null,
     )

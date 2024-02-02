@@ -80,18 +80,18 @@ object AttachmentIntentUtils {
     fun Attachment.executeIntent(
         context: Context,
         intentType: AttachmentIntentType,
-        navigateToDownloadProgressDialog: () -> Unit,
+        navigateToDownloadProgressDialog: (Attachment, AttachmentIntentType) -> Unit,
     ) {
         if (hasUsableCache(context) || isInlineCachedFile(context)) {
             getIntentOrGoToPlaystore(context, intentType)?.let(context::startActivity)
         } else {
-            navigateToDownloadProgressDialog()
+            navigateToDownloadProgressDialog(this, intentType)
         }
     }
 
     fun Attachment.openAttachment(
         context: Context,
-        navigateToDownloadProgressDialog: () -> Unit,
+        navigateToDownloadProgressDialog: (Attachment, AttachmentIntentType) -> Unit,
         snackbarManager: SnackbarManager,
     ) {
         if (openWithIntent(context).hasSupportedApplications(context)) {

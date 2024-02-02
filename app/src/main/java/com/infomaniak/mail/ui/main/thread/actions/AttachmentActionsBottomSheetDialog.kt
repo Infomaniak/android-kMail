@@ -26,20 +26,16 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.safeBinding
-import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
-import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.databinding.BottomSheetAttachmentActionsBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntentType
-import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntentType.OPEN_WITH
-import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntentType.SAVE_TO_DRIVE
-import com.infomaniak.mail.utils.AttachmentIntentUtils.createDownloadDialogNavArgs
 import com.infomaniak.mail.utils.AttachmentIntentUtils.executeIntent
 import com.infomaniak.mail.utils.AttachmentIntentUtils.openAttachment
 import com.infomaniak.mail.utils.PermissionUtils
+import com.infomaniak.mail.utils.navigateToDownloadProgressDialog
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -75,19 +71,11 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private fun setupListeners(attachment: Attachment) = with(binding) {
 
-        fun navigateToDownloadProgressDialog(attachmentIntentType: AttachmentIntentType) {
-            safeNavigate(
-                resId = R.id.downloadAttachmentProgressDialog,
-                args = attachment.createDownloadDialogNavArgs(attachmentIntentType),
-                currentClassName = AttachmentActionsBottomSheetDialog::class.java.name,
-            )
-        }
-
         openWithItem.setClosingOnClickListener {
             trackAttachmentActionsEvent("open")
             attachment.openAttachment(
                 context = context,
-                navigateToDownloadProgressDialog = { navigateToDownloadProgressDialog(OPEN_WITH) },
+                navigateToDownloadProgressDialog = ::navigateToDownloadProgressDialog,
                 snackbarManager = snackbarManager,
             )
         }
@@ -95,8 +83,8 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
             trackAttachmentActionsEvent("saveToKDrive")
             attachment.executeIntent(
                 context = context,
-                intentType = SAVE_TO_DRIVE,
-                navigateToDownloadProgressDialog = { navigateToDownloadProgressDialog(SAVE_TO_DRIVE) },
+                intentType = AttachmentIntentType.SAVE_TO_DRIVE,
+                navigateToDownloadProgressDialog = ::navigateToDownloadProgressDialog,
             )
         }
         deviceItem.setOnClickListener {
