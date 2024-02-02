@@ -18,18 +18,11 @@
 package com.infomaniak.mail.utils
 
 import android.content.Context
-import android.os.Build
-import com.infomaniak.lib.core.utils.FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME
-import com.infomaniak.lib.core.utils.FORMAT_FULL_DATE_WITH_HOUR
-import com.infomaniak.lib.core.utils.format
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.MailDateFormatUtils.formatForHeader
 import org.jsoup.nodes.Element
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
 import java.util.Date
 
 object PrintHeaderUtils {
