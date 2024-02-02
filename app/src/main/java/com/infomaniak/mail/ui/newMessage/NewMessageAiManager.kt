@@ -21,15 +21,16 @@ import android.animation.FloatEvaluator
 import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.Context
+import android.graphics.drawable.ColorDrawable
 import android.transition.Slide
 import android.transition.TransitionManager
 import android.view.ViewGroup.FOCUS_BEFORE_DESCENDANTS
 import android.view.ViewGroup.FOCUS_BLOCK_DESCENDANTS
-import androidx.annotation.ColorInt
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.shape.MaterialShapeDrawable
 import com.infomaniak.lib.core.utils.hideKeyboard
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.MatomoMail.trackAiWriterEvent
@@ -67,9 +68,6 @@ class NewMessageAiManager @Inject constructor(
     private var aiPromptFragment: AiPromptFragment? = null
 
     private var valueAnimator: ValueAnimator? = null
-
-    @ColorInt
-    var backgroundColor: Int? = null
 
     fun initValues(
         newMessageViewModel: NewMessageViewModel,
@@ -180,10 +178,14 @@ class NewMessageAiManager @Inject constructor(
         valueAnimator = ValueAnimator.ofObject(FloatEvaluator(), startOpacity, endOpacity).apply {
             duration = animationDuration
             addUpdateListener { animator ->
+
                 val alpha = ((animator.animatedValue as Float) * 256.0f).roundToInt() / 256.0f
+                val toolbarColor = (binding.toolbar.background as? ColorDrawable?)?.color
+                    ?: (binding.toolbar.background as? MaterialShapeDrawable?)?.fillColor?.defaultColor
+                    ?: context.getColor(R.color.backgroundColor)
+
                 scrim.alpha = alpha
-                val color = backgroundColor ?: context.getColor(R.color.backgroundColor)
-                activity.window.statusBarColor = UiUtils.pointBetweenColors(color, black, alpha)
+                activity.window.statusBarColor = UiUtils.pointBetweenColors(toolbarColor, black, alpha)
             }
             start()
         }
