@@ -18,11 +18,10 @@
 package com.infomaniak.mail.utils
 
 import android.content.Context
-import com.infomaniak.lib.core.utils.format
-import com.infomaniak.lib.core.utils.isThisYear
-import com.infomaniak.lib.core.utils.isToday
-import com.infomaniak.lib.core.utils.isYesterday
+import android.os.Build
+import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.R
+import java.time.format.FormatStyle
 import java.util.Date
 
 object MailDateFormatUtils {
@@ -54,5 +53,13 @@ object MailDateFormatUtils {
             format(FORMAT_EMAIL_DATE_LONG_DATE),
             format(FORMAT_EMAIL_DATE_HOUR),
         )
+    }
+
+    fun Date.formatForHeader(): String {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            formatWithLocal(FormatData.BOTH, FormatStyle.FULL, FormatStyle.SHORT)
+        } else {
+            format(FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME)
+        }
     }
 }

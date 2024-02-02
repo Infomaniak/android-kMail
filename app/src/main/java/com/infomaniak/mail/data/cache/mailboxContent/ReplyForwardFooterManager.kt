@@ -23,6 +23,7 @@ import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.ui.main.thread.MessageWebViewClient
+import com.infomaniak.mail.utils.MailDateFormatUtils.formatForHeader
 import com.infomaniak.mail.utils.MessageBodyUtils
 import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.Utils
@@ -58,7 +59,7 @@ class ReplyForwardFooterManager @Inject constructor(private val appContext: Cont
     }
 
     fun createReplyFooter(message: Message): String {
-        val date = message.date.toDate()
+        val date = message.date.toDate().formatForHeader()
         val from = message.fromName()
         val messageReplyHeader = appContext.getString(R.string.messageReplyHeader, date, from)
 
@@ -134,7 +135,7 @@ class ReplyForwardFooterManager @Inject constructor(private val appContext: Cont
         return parseAndWrapElementInNewDocument(forwardRoot).apply {
             addAndEscapeTextLine("---------- $messageForwardHeader ---------")
             addAndEscapeTextLine("$fromTitle ${message.fromName()}")
-            addAndEscapeTextLine("$dateTitle ${message.date.toDate()}")
+            addAndEscapeTextLine("$dateTitle ${message.date.toDate().formatForHeader()}")
             addAndEscapeTextLine("$subjectTitle ${message.subject}")
             addAndEscapeRecipientLine(toTitle, message.to)
             addAndEscapeRecipientLine(ccTitle, message.cc)

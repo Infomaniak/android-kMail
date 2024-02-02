@@ -19,11 +19,13 @@ package com.infomaniak.mail.utils
 
 import android.content.Context
 import android.os.Build
+import com.infomaniak.lib.core.utils.FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME
 import com.infomaniak.lib.core.utils.FORMAT_FULL_DATE_WITH_HOUR
 import com.infomaniak.lib.core.utils.format
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.utils.MailDateFormatUtils.formatForHeader
 import org.jsoup.nodes.Element
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -75,24 +77,12 @@ object PrintHeaderUtils {
     }
 
     private fun Element.insertPrintDateField(prefix: String, date: Date) {
-        val formattedDate = date.formatNumericalDayMonthYearWithTime()
-        insertChildren(0, insertField(prefix).appendText(formattedDate))
+        insertChildren(0, insertField(prefix).appendText(date.formatForHeader()))
     }
 
     private fun insertField(prefix: String) = with(Element("div")) {
         val fieldName = Element("b").appendText(prefix).attr("style", "margin-right: 10px")
 
         insertChildren(0, fieldName)
-    }
-
-    //TODO To change when Gibran's PR will be merged
-    private fun Date.formatNumericalDayMonthYearWithTime(): String {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val shortDateFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
-            toInstant().atZone(ZoneId.systemDefault()).format(shortDateFormatter)
-        } else {
-            // Fallback on unambiguous date format for any locale
-            format(FORMAT_FULL_DATE_WITH_HOUR)
-        }
     }
 }
