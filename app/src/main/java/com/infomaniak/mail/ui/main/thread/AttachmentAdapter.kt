@@ -32,6 +32,7 @@ class AttachmentAdapter(
     private val shouldDisplayCloseButton: Boolean = false,
     private val onDelete: ((position: Int, itemCountLeft: Int) -> Unit)? = null,
     private val onAttachmentClicked: ((Attachment) -> Unit)? = null,
+    private val onAttachmentOptionsClicked: ((Attachment) -> Unit)? = null,
 ) : Adapter<AttachmentViewHolder>() {
 
     private var attachments: MutableList<Attachment> = mutableListOf()
@@ -49,6 +50,7 @@ class AttachmentAdapter(
 
         attachmentDetails.setDetails(attachment)
         onAttachmentClicked?.let { root.setOnClickListener { it(attachment) } }
+        onAttachmentOptionsClicked?.let { moreButton.setOnClickListener { it(attachment) } }
         toggleEndIconVisibility(shouldDisplayCloseButton)
 
         if (shouldDisplayCloseButton) {

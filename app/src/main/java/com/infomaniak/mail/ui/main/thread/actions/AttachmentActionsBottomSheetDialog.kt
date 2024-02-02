@@ -72,7 +72,7 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
     private fun setupListeners(attachment: Attachment) = with(binding) {
 
         openWithItem.setClosingOnClickListener {
-            trackAttachmentActionsEvent("open")
+            trackAttachmentActionsEvent("openFromBottomsheet")
             attachment.openAttachment(
                 context = context,
                 navigateToDownloadProgressDialog = ::navigateToDownloadProgressDialog,

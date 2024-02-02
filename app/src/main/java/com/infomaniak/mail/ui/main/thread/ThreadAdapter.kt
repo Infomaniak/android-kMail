@@ -49,7 +49,6 @@ import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadViewHolder
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntentType
-import com.infomaniak.mail.utils.AttachmentIntentUtils.createDownloadDialogNavArgs
 import com.infomaniak.mail.utils.MailDateFormatUtils.mailFormattedDate
 import com.infomaniak.mail.utils.MailDateFormatUtils.mostDetailedDate
 import com.infomaniak.mail.utils.SharedUtils.Companion.createHtmlForPlainText
@@ -111,6 +110,7 @@ class ThreadAdapter(
             shouldLoadDistantResources,
             threadAdapterCallbacks?.onContactClicked,
             threadAdapterCallbacks?.onAttachmentClicked,
+            threadAdapterCallbacks?.onAttachmentOptionsClicked,
         )
     }
 
@@ -605,13 +605,17 @@ class ThreadAdapter(
         private val shouldLoadDistantResources: Boolean,
         onContactClicked: ((contact: Recipient) -> Unit)?,
         onAttachmentClicked: ((attachment: Attachment) -> Unit)?,
+        onAttachmentOptionsClicked: ((attachment: Attachment) -> Unit)?,
     ) : ViewHolder(binding.root) {
 
         val fromAdapter = DetailedRecipientAdapter(onContactClicked)
         val toAdapter = DetailedRecipientAdapter(onContactClicked)
         val ccAdapter = DetailedRecipientAdapter(onContactClicked)
         val bccAdapter = DetailedRecipientAdapter(onContactClicked)
-        val attachmentAdapter = AttachmentAdapter { onAttachmentClicked?.invoke(it) }
+        val attachmentAdapter = AttachmentAdapter(
+            onAttachmentClicked = { onAttachmentClicked?.invoke(it) },
+            onAttachmentOptionsClicked = { onAttachmentOptionsClicked?.invoke(it) },
+        )
 
         private var _bodyWebViewClient: MessageWebViewClient? = null
         private var _fullMessageWebViewClient: MessageWebViewClient? = null
@@ -676,6 +680,7 @@ class ThreadAdapter(
         var onDeleteDraftClicked: ((message: Message) -> Unit)? = null,
         var onDraftClicked: ((message: Message) -> Unit)? = null,
         var onAttachmentClicked: ((attachment: Attachment) -> Unit)? = null,
+        var onAttachmentOptionsClicked: ((attachment: Attachment) -> Unit)? = null,
         var onDownloadAllClicked: ((message: Message) -> Unit)? = null,
         var onReplyClicked: ((Message) -> Unit)? = null,
         var onMenuClicked: ((Message) -> Unit)? = null,

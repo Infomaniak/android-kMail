@@ -66,7 +66,9 @@ import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel
 import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel.NavData
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ContextMenuType
+import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterCallbacks
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.OpenThreadResult
+import com.infomaniak.mail.ui.main.thread.actions.AttachmentActionsBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.MessageActionsBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.ReplyBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialogArgs
@@ -221,7 +223,7 @@ class ThreadFragment : Fragment() {
         adapter = ThreadAdapter(
             shouldLoadDistantResources = shouldLoadDistantResources(),
             isCalendarEventExpandedMap = threadViewModel.isCalendarEventExpandedMap,
-            threadAdapterCallbacks = ThreadAdapter.ThreadAdapterCallbacks(
+            threadAdapterCallbacks = ThreadAdapterCallbacks(
                 onContactClicked = {
                     safeNavigate(
                         resId = R.id.detailedContactBottomSheetDialog,
@@ -250,12 +252,14 @@ class ThreadFragment : Fragment() {
                         },
                         snackbarManager = snackbarManager,
                     )
-                    // attachment.resource?.let { resource ->
-                    //     safeNavigate(
-                    //         resId = R.id.attachmentActionsBottomSheetDialog,
-                    //         args = AttachmentActionsBottomSheetDialogArgs(resource).toBundle(),
-                    //     )
-                    // }
+                },
+                onAttachmentOptionsClicked = {
+                    it.resource?.let { resource ->
+                        safeNavigate(
+                            resId = R.id.attachmentActionsBottomSheetDialog,
+                            args = AttachmentActionsBottomSheetDialogArgs(resource).toBundle(),
+                        )
+                    }
                 },
                 onDownloadAllClicked = { message ->
                     trackAttachmentActionsEvent("downloadAll")
