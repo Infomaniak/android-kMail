@@ -686,7 +686,7 @@ class ThreadAdapter(
         var onAllExpandedMessagesLoaded: (() -> Unit)? = null,
         var navigateToNewMessageActivity: ((Uri) -> Unit)? = null,
         var navigateToAttendeeBottomSheet: ((List<Attendee>) -> Unit)? = null,
-		var navigateToDownloadProgressDialog: ((Int, Bundle) -> Unit)? = null,
+        var navigateToDownloadProgressDialog: ((Int, Bundle) -> Unit)? = null,
         var replyToCalendarEvent: ((AttendanceState, Message) -> Unit)? = null,
         var promptLink: ((String, ContextMenuType) -> Unit)? = null,
     )

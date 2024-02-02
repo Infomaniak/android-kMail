@@ -64,11 +64,6 @@ class PrintMailFragment : Fragment() {
         }
     }
 
-    override fun onPause() {
-        super.onPause()
-        findNavController().popBackStack()
-    }
-
     private fun setupAdapter() = with(binding.messagesList) {
         adapter = ThreadAdapter(
             shouldLoadDistantResources = true,
@@ -81,7 +76,9 @@ class PrintMailFragment : Fragment() {
 
     private fun startPrintingView() {
         threadViewModel.threadLive.value?.subject?.let { subject ->
-            printMailViewModel.startPrintingService(requireActivity(), subject, getWebViewToPrint())
+            printMailViewModel.startPrintingService(requireActivity(), subject, getWebViewToPrint()) {
+                findNavController().popBackStack()
+            }
         }
     }
 

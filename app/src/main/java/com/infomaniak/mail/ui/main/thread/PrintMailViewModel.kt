@@ -20,6 +20,12 @@ package com.infomaniak.mail.ui.main.thread
 
 import android.app.Application
 import android.content.Context
+import android.os.Bundle
+import android.os.CancellationSignal
+import android.os.ParcelFileDescriptor
+import android.print.PageRange
+import android.print.PrintAttributes
+import android.print.PrintDocumentAdapter
 import android.print.PrintManager
 import android.webkit.WebView
 import androidx.lifecycle.AndroidViewModel
@@ -29,13 +35,46 @@ import kotlinx.coroutines.launch
 
 class PrintMailViewModel(application: Application) : AndroidViewModel(application) {
 
-    fun startPrintingService(activityContext: Context, subject: String?, webView: WebView) {
+    fun startPrintingService(activityContext: Context, subject: String?, webView: WebView, onFinish: () -> Unit) {
         viewModelScope.launch(Dispatchers.Main) {
             subject?.let { subject ->
-                val webViewPrintAdapter = webView.createPrintDocumentAdapter(subject)
+                val webViewPrintAdapter = PrintAdapterWrapper(webView.createPrintDocumentAdapter(subject), onFinish)
                 val printManager = activityContext.getSystemService(Context.PRINT_SERVICE) as PrintManager
                 printManager.print(subject, webViewPrintAdapter, null)
             }
+        }
+    }
+
+    private class PrintAdapterWrapper(
+        private val printAdapter: PrintDocumentAdapter,
+        private val onFinish: () -> Unit
+    ) : PrintDocumentAdapter() {
+        override fun onLayout(
+            oldAttributes: PrintAttributes?,
+            newAttributes: PrintAttributes?,
+            cancellationSignal: CancellationSignal?,
+            callback: LayoutResultCallback?,
+            extras: Bundle?
+        ) {
+            printAdapter.onLayout(oldAttributes, newAttributes, cancellationSignal, callback, extras)
+        }
+
+        override fun onWrite(
+            pages: Array<out PageRange>?,
+            destination: ParcelFileDescriptor?,
+            cancellationSignal: CancellationSignal?,
+            callback: WriteResultCallback?
+        ) {
+            printAdapter.onWrite(pages, destination, cancellationSignal, callback)
+        }
+
+        override fun onFinish() {
+            printAdapter.onFinish()
+            onFinish.invoke()
+        }
+
+        override fun onStart() {
+            printAdapter.onStart()
         }
     }
 }
