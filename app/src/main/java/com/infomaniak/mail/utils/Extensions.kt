@@ -28,7 +28,6 @@ import android.content.res.Configuration
 import android.content.res.TypedArray
 import android.net.Uri
 import android.os.Build
-import android.os.Bundle
 import android.text.Html
 import android.text.Spannable
 import android.text.Spanned
@@ -49,9 +48,6 @@ import androidx.lifecycle.Lifecycle.Event
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
-import androidx.navigation.NavDirections
-import androidx.navigation.NavOptions
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.airbnb.lottie.LottieAnimationView
@@ -78,15 +74,10 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.Correspondent
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
-import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.BaseAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.login.IlluColors.IlluColors
-import com.infomaniak.mail.ui.login.LoginActivity
-import com.infomaniak.mail.ui.login.LoginActivityArgs
-import com.infomaniak.mail.ui.login.NoMailboxActivity
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.folder.DateSeparatorItemDecoration
 import com.infomaniak.mail.ui.main.folder.HeaderItemDecoration
@@ -94,12 +85,6 @@ import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
 import com.infomaniak.mail.ui.main.thread.MessageWebViewClient
 import com.infomaniak.mail.ui.main.thread.RoundedBackgroundSpan
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.HeaderState
-import com.infomaniak.mail.ui.main.thread.actions.AttachmentActionsBottomSheetDialog
-import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
-import com.infomaniak.mail.ui.noValidMailboxes.NoValidMailboxesActivity
-import com.infomaniak.mail.utils.AccountUtils.NO_MAILBOX_USER_ID_KEY
-import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntentType
-import com.infomaniak.mail.utils.AttachmentIntentUtils.createDownloadDialogNavArgs
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.Utils.kSyncAccountUri
 import io.realm.kotlin.MutableRealm
@@ -248,57 +233,6 @@ fun WebView.initWebViewClientAndBridge(
     ).also {
         webViewClient = it
     }
-}
-//endregion
-
-//region Navigation
-fun Fragment.animatedNavigation(directions: NavDirections, currentClassName: String? = null) {
-    if (canNavigate(currentClassName)) findNavController().navigate(directions, getAnimatedNavOptions())
-}
-
-fun Fragment.animatedNavigation(@IdRes resId: Int, args: Bundle? = null, currentClassName: String? = null) {
-    if (canNavigate(currentClassName)) findNavController().navigate(resId, args, getAnimatedNavOptions())
-}
-
-fun getAnimatedNavOptions() = NavOptions
-    .Builder()
-    .setEnterAnim(R.anim.fragment_swipe_enter)
-    .setExitAnim(R.anim.fragment_swipe_exit)
-    .setPopEnterAnim(R.anim.fragment_swipe_pop_enter)
-    .setPopExitAnim(R.anim.fragment_swipe_pop_exit)
-    .build()
-
-fun Fragment.safeNavigateToNewMessageActivity(
-    draftMode: DraftMode,
-    previousMessageUid: String,
-    currentClassName: String? = null,
-    shouldLoadDistantResources: Boolean = false,
-) {
-    safeNavigateToNewMessageActivity(
-        args = NewMessageActivityArgs(
-            arrivedFromExistingDraft = false,
-            draftMode = draftMode,
-            previousMessageUid = previousMessageUid,
-            shouldLoadDistantResources = shouldLoadDistantResources,
-        ).toBundle(),
-        currentClassName = currentClassName,
-    )
-}
-
-fun Fragment.safeNavigateToNewMessageActivity(args: Bundle? = null, currentClassName: String? = null) {
-    if (canNavigate(currentClassName)) (requireActivity() as MainActivity).navigateToNewMessageActivity(args)
-}
-
-fun Fragment.navigateToDownloadProgressDialog(
-    attachment: Attachment,
-    attachmentIntentType: AttachmentIntentType,
-    currentClassName: String = AttachmentActionsBottomSheetDialog::class.java.name,
-) {
-    safeNavigate(
-        resId = R.id.downloadAttachmentProgressDialog,
-        args = attachment.createDownloadDialogNavArgs(attachmentIntentType),
-        currentClassName = currentClassName,
-    )
 }
 //endregion
 
@@ -527,38 +461,6 @@ fun Context.isUserAlreadySynchronized(): Boolean {
     return contentResolver.query(uri, null, null, null, null)?.use { cursor ->
         cursor.count > 0
     } ?: false
-}
-
-fun Context.getLoginActivityIntent(args: LoginActivityArgs? = null, shouldClearStack: Boolean = false): Intent {
-    return Intent(this, LoginActivity::class.java).apply {
-        if (shouldClearStack) clearStack()
-        args?.toBundle()?.let(::putExtras)
-    }
-}
-
-fun Context.launchLoginActivity(args: LoginActivityArgs? = null) {
-    getLoginActivityIntent(args).also(::startActivity)
-}
-
-fun Context.launchNoValidMailboxesActivity() {
-    Intent(this, NoValidMailboxesActivity::class.java).apply {
-        clearStack()
-    }.also(::startActivity)
-}
-
-fun Context.launchNoMailboxActivity(userId: Int? = null, shouldStartLoginActivity: Boolean = false) {
-    val noMailboxActivityIntent = Intent(this, NoMailboxActivity::class.java).putExtra(NO_MAILBOX_USER_ID_KEY, userId)
-    val intentsArray = if (shouldStartLoginActivity) {
-        arrayOf(getLoginActivityIntent(shouldClearStack = true), noMailboxActivityIntent)
-    } else {
-        arrayOf(noMailboxActivityIntent)
-    }
-
-    startActivities(intentsArray)
-}
-
-fun Fragment.launchSyncAutoConfigActivityForResult() {
-    (requireActivity() as MainActivity).navigateToSyncAutoConfigActivity()
 }
 
 fun TextInputLayout.setOnClearTextClickListener(trackerCallback: () -> Unit) {
