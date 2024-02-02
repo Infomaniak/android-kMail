@@ -30,7 +30,6 @@ import com.google.android.material.R as RMaterial
 
 class HtmlFormatter(
     private val html: String,
-    private val printData: PrintData? = null
 ) {
 
     private val cssList = mutableListOf<Pair<String, String?>>()
@@ -38,7 +37,7 @@ class HtmlFormatter(
     private var needsMetaViewport = false
     private var needsBodyEncapsulation = false
     private var breakLongWords = false
-    private var isForPrint = false
+    private var printData: PrintData? = null
 
     fun registerCss(css: String, styleId: String? = null) {
         cssList.add(css to styleId)
@@ -60,8 +59,8 @@ class HtmlFormatter(
         breakLongWords = true
     }
 
-    fun registerIsForPrint() {
-        isForPrint = true
+    fun registerIsForPrint(printData: PrintData?) {
+        this.printData = printData
     }
 
     fun inject(): String = with(HtmlSanitizer.getInstance().sanitize(Jsoup.parse(html))) {
@@ -72,9 +71,7 @@ class HtmlFormatter(
             injectScript()
         }
 
-        printData?.let {
-            MessageBodyUtils.addPrintHeader(it.context, it.message, this)
-        }
+        printData?.let { MessageBodyUtils.addPrintHeader(it.context, it.message, this) }
 
         if (breakLongWords) body().breakLongStrings()
 
