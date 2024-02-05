@@ -18,7 +18,7 @@
 package com.infomaniak.mail.di
 
 import androidx.fragment.app.FragmentActivity
-import com.infomaniak.lib.stores.InAppUpdateManager
+import com.infomaniak.lib.stores.updatemanagers.InAppUpdateManager
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.DISCOVER_LATER
 import com.infomaniak.mail.MatomoMail.DISCOVER_NOW

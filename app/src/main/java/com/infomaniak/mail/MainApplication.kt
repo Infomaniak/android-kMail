@@ -43,6 +43,7 @@ import com.infomaniak.lib.core.utils.clearStack
 import com.infomaniak.lib.core.utils.hasPermissions
 import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.lib.login.ApiToken
+import com.infomaniak.lib.stores.AppUpdateScheduler
 import com.infomaniak.mail.MatomoMail.buildTracker
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.UrlTraceInterceptor
@@ -50,7 +51,6 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.workers.AppUpdateWorker
 import com.infomaniak.mail.workers.SyncMailboxesWorker
 import dagger.hilt.android.HiltAndroidApp
 import io.sentry.SentryEvent
@@ -102,7 +102,7 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
     lateinit var syncMailboxesWorkerScheduler: SyncMailboxesWorker.Scheduler
 
     @Inject
-    lateinit var appUpdateWorkerScheduler: AppUpdateWorker.Scheduler
+    lateinit var appUpdateWorkerScheduler: AppUpdateScheduler
 
     @Inject
     @IoDispatcher

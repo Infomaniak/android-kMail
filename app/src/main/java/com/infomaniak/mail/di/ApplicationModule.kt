@@ -21,6 +21,7 @@ import android.app.Application
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.WorkManager
+import com.infomaniak.lib.stores.AppUpdateScheduler
 import com.infomaniak.lib.stores.StoresLocalSettings
 import com.infomaniak.mail.MainApplication
 import com.infomaniak.mail.data.LocalSettings
@@ -66,4 +67,11 @@ object ApplicationModule {
     @Provides
     @Singleton
     fun providesStoresLocalSettings(appContext: Context): StoresLocalSettings = StoresLocalSettings.getInstance(appContext)
+
+    @Provides
+    @Singleton
+    fun providesAppUpdateWorkerScheduler(
+        appContext: Context,
+        workManager: WorkManager,
+    ): AppUpdateScheduler = AppUpdateScheduler(appContext, workManager)
 }
