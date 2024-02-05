@@ -51,7 +51,9 @@
     <color name="blue_mail_on_primary_dark">#061C35</color>
 
     <color name="background_color_light">@color/white</color>
+    <color name="partially_transparent_background_color_light">#40FFFFFF</color>
     <color name="background_color_dark">#101010</color>
+    <color name="partially_transparent_background_color_dark">#40101010</color>
 
     <color name="yellow_light">#FFC10A</color>
     <color name="yellow_dark">#FFDF9E</color>
@@ -97,6 +99,7 @@
     <!-- Backgrounds -->
     <color name="searchBarBackgroundColor">@color/polar_bear</color>
     <color name="backgroundColor">@color/background_color_light</color>
+    <color name="partiallyTransparentBackgroundColor">@color/partially_transparent_background_color_light</color>
     <color name="backgroundColorSecondary">@color/white</color>
     <color name="backgroundColorTertiary">@color/white</color>
     <color name="backgroundHeaderColor">@color/header_color_light</color>
