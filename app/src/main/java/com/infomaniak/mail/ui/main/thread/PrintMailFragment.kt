@@ -31,6 +31,7 @@ import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentPrintMailBinding
+import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterCallbacks
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -68,7 +69,7 @@ class PrintMailFragment : Fragment() {
         adapter = ThreadAdapter(
             shouldLoadDistantResources = true,
             isForPrinting = true,
-            threadAdapterCallbacks = ThreadAdapter.ThreadAdapterCallbacks(
+            threadAdapterCallbacks = ThreadAdapterCallbacks(
                 onBodyWebViewFinishedLoading = { startPrintingView() },
             ),
         )

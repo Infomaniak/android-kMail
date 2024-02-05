@@ -66,6 +66,7 @@ import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel
 import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel.NavData
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ContextMenuType
+import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterCallbacks
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.OpenThreadResult
 import com.infomaniak.mail.ui.main.thread.actions.AttachmentActionsBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.MessageActionsBottomSheetDialogArgs
@@ -73,6 +74,7 @@ import com.infomaniak.mail.ui.main.thread.actions.ReplyBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.calendar.AttendeesBottomSheetDialogArgs
 import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.AttachmentIntentUtils.openAttachment
 import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipients
 import com.infomaniak.mail.utils.UiUtils.dividerDrawable
 import dagger.hilt.android.AndroidEntryPoint
@@ -221,7 +223,7 @@ class ThreadFragment : Fragment() {
         adapter = ThreadAdapter(
             shouldLoadDistantResources = shouldLoadDistantResources(),
             isCalendarEventExpandedMap = threadViewModel.isCalendarEventExpandedMap,
-            threadAdapterCallbacks = ThreadAdapter.ThreadAdapterCallbacks(
+            threadAdapterCallbacks = ThreadAdapterCallbacks(
                 onContactClicked = {
                     safeNavigate(
                         resId = R.id.detailedContactBottomSheetDialog,
@@ -241,8 +243,18 @@ class ThreadFragment : Fragment() {
                     trackMessageActionsEvent("deleteDraft")
                     mainViewModel.currentMailbox.value?.let { mailbox -> threadViewModel.deleteDraft(message, mailbox) }
                 },
-                onAttachmentClicked = { attachment ->
-                    attachment.resource?.let { resource ->
+                onAttachmentClicked = {
+                    trackAttachmentActionsEvent("open")
+                    it.openAttachment(
+                        context = requireContext(),
+                        navigateToDownloadProgressDialog = { attachment, attachmentIntentType ->
+                            navigateToDownloadProgressDialog(attachment, attachmentIntentType, ThreadFragment::class.java.name)
+                        },
+                        snackbarManager = snackbarManager,
+                    )
+                },
+                onAttachmentOptionsClicked = {
+                    it.resource?.let { resource ->
                         safeNavigate(
                             resId = R.id.attachmentActionsBottomSheetDialog,
                             args = AttachmentActionsBottomSheetDialogArgs(resource).toBundle(),
@@ -257,9 +269,7 @@ class ThreadFragment : Fragment() {
                     trackMessageActionsEvent(ACTION_REPLY_NAME)
                     replyTo(message)
                 },
-                onMenuClicked = { message ->
-                    message.navigateToActionsBottomSheet()
-                },
+                onMenuClicked = { message -> message.navigateToActionsBottomSheet() },
                 onAllExpandedMessagesLoaded = ::scrollToFirstUnseenMessage,
                 navigateToAttendeeBottomSheet = { attendees ->
                     safeNavigate(
@@ -268,7 +278,9 @@ class ThreadFragment : Fragment() {
                     )
                 },
                 navigateToNewMessageActivity = { twoPaneViewModel.navigateToNewMessage(mailToUri = it) },
-                navigateToDownloadProgressDialog = ::safeNavigate,
+                navigateToDownloadProgressDialog = { attachment, attachmentIntentType ->
+                    navigateToDownloadProgressDialog(attachment, attachmentIntentType, ThreadFragment::class.java.name)
+                },
                 replyToCalendarEvent = { attendanceState, message ->
                     threadViewModel.replyToCalendarEvent(
                         attendanceState,

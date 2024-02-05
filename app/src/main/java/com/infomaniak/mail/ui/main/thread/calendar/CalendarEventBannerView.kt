@@ -34,6 +34,7 @@ import com.infomaniak.mail.data.models.calendar.Attendee.AttendanceState
 import com.infomaniak.mail.data.models.calendar.CalendarEvent
 import com.infomaniak.mail.databinding.ViewCalendarEventBannerBinding
 import com.infomaniak.mail.ui.main.SnackbarManager
+import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntentType
 import com.infomaniak.mail.utils.AttachmentIntentUtils.openAttachment
 import com.infomaniak.mail.utils.UiUtils.getPrettyNameAndEmail
 import com.infomaniak.mail.utils.findUser
@@ -61,7 +62,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
     private var attachmentResource: String = ""
 
     private var navigateToAttendeesBottomSheet: ((List<Attendee>) -> Unit)? = null
-    private var navigateToDownloadProgressDialog: (() -> Unit)? = null
+    private var navigateToDownloadProgressDialog: ((Attachment, AttachmentIntentType) -> Unit)? = null
     private var replyToCalendarEvent: ((AttendanceState) -> Unit)? = null
     private var onAttendeesButtonClicked: ((Boolean) -> Unit)? = null
 
@@ -184,7 +185,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
 
     fun initCallback(
         navigateToAttendeesBottomSheet: (List<Attendee>) -> Unit,
-        navigateToDownloadProgressDialog: () -> Unit,
+        navigateToDownloadProgressDialog: (Attachment, AttachmentIntentType) -> Unit,
         replyToCalendarEvent: (AttendanceState) -> Unit,
         onAttendeesButtonClicked: (Boolean) -> Unit,
     ) {

@@ -19,7 +19,6 @@ package com.infomaniak.mail.ui.main.thread
 
 import android.annotation.SuppressLint
 import android.net.Uri
-import android.os.Bundle
 import android.text.format.Formatter
 import android.view.LayoutInflater
 import android.view.ScaleGestureDetector
@@ -50,7 +49,6 @@ import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadViewHolder
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntentType
-import com.infomaniak.mail.utils.AttachmentIntentUtils.createDownloadDialogNavArgs
 import com.infomaniak.mail.utils.MailDateFormatUtils.mailFormattedDate
 import com.infomaniak.mail.utils.MailDateFormatUtils.mostDetailedDate
 import com.infomaniak.mail.utils.SharedUtils.Companion.createHtmlForPlainText
@@ -112,6 +110,7 @@ class ThreadAdapter(
             shouldLoadDistantResources,
             threadAdapterCallbacks?.onContactClicked,
             threadAdapterCallbacks?.onAttachmentClicked,
+            threadAdapterCallbacks?.onAttachmentOptionsClicked,
         )
     }
 
@@ -159,7 +158,7 @@ class ThreadAdapter(
     }
 
     private fun ThreadViewHolder.bindCalendarEvent(message: Message) {
-        val attachment = message.calendarAttachment ?: return
+        val calendarAttachment = message.calendarAttachment ?: return
         val calendarEvent = message.latestCalendarEventResponse?.calendarEvent
 
         binding.calendarEvent.apply {
@@ -172,7 +171,7 @@ class ThreadAdapter(
                     calendarEvent = it,
                     isCanceled = calendarEventResponse.isCanceled,
                     shouldDisplayReplyOptions = calendarEventResponse.isReplyAuthorized(),
-                    attachment = attachment,
+                    attachment = calendarAttachment,
                     hasAssociatedInfomaniakCalendarEvent = calendarEventResponse.hasAssociatedInfomaniakCalendarEvent(),
                     shouldStartExpanded = isCalendarEventExpandedMap[message.uid] ?: false,
                 )
@@ -182,11 +181,8 @@ class ThreadAdapter(
                 navigateToAttendeesBottomSheet = { attendees ->
                     threadAdapterCallbacks?.navigateToAttendeeBottomSheet?.invoke(attendees)
                 },
-                navigateToDownloadProgressDialog = {
-                    threadAdapterCallbacks?.navigateToDownloadProgressDialog?.invoke(
-                        R.id.downloadAttachmentProgressDialog,
-                        attachment.createDownloadDialogNavArgs(AttachmentIntentType.OPEN_WITH),
-                    )
+                navigateToDownloadProgressDialog = { attachment, attachmentIntentType ->
+                    threadAdapterCallbacks?.navigateToDownloadProgressDialog?.invoke(attachment, attachmentIntentType)
                 },
                 replyToCalendarEvent = { attendanceState ->
                     threadAdapterCallbacks?.replyToCalendarEvent?.invoke(attendanceState, message)
@@ -609,13 +605,17 @@ class ThreadAdapter(
         private val shouldLoadDistantResources: Boolean,
         onContactClicked: ((contact: Recipient) -> Unit)?,
         onAttachmentClicked: ((attachment: Attachment) -> Unit)?,
+        onAttachmentOptionsClicked: ((attachment: Attachment) -> Unit)?,
     ) : ViewHolder(binding.root) {
 
         val fromAdapter = DetailedRecipientAdapter(onContactClicked)
         val toAdapter = DetailedRecipientAdapter(onContactClicked)
         val ccAdapter = DetailedRecipientAdapter(onContactClicked)
         val bccAdapter = DetailedRecipientAdapter(onContactClicked)
-        val attachmentAdapter = AttachmentAdapter { onAttachmentClicked?.invoke(it) }
+        val attachmentAdapter = AttachmentAdapter(
+            onAttachmentClicked = { onAttachmentClicked?.invoke(it) },
+            onAttachmentOptionsClicked = { onAttachmentOptionsClicked?.invoke(it) },
+        )
 
         private var _bodyWebViewClient: MessageWebViewClient? = null
         private var _fullMessageWebViewClient: MessageWebViewClient? = null
@@ -680,13 +680,14 @@ class ThreadAdapter(
         var onDeleteDraftClicked: ((message: Message) -> Unit)? = null,
         var onDraftClicked: ((message: Message) -> Unit)? = null,
         var onAttachmentClicked: ((attachment: Attachment) -> Unit)? = null,
+        var onAttachmentOptionsClicked: ((attachment: Attachment) -> Unit)? = null,
         var onDownloadAllClicked: ((message: Message) -> Unit)? = null,
         var onReplyClicked: ((Message) -> Unit)? = null,
         var onMenuClicked: ((Message) -> Unit)? = null,
         var onAllExpandedMessagesLoaded: (() -> Unit)? = null,
         var navigateToNewMessageActivity: ((Uri) -> Unit)? = null,
         var navigateToAttendeeBottomSheet: ((List<Attendee>) -> Unit)? = null,
-        var navigateToDownloadProgressDialog: ((Int, Bundle) -> Unit)? = null,
+        var navigateToDownloadProgressDialog: ((Attachment, AttachmentIntentType) -> Unit)? = null,
         var replyToCalendarEvent: ((AttendanceState, Message) -> Unit)? = null,
         var promptLink: ((String, ContextMenuType) -> Unit)? = null,
     )
