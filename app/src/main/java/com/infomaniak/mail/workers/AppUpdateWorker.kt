@@ -25,7 +25,7 @@ import androidx.work.WorkInfo.State
 import com.google.common.util.concurrent.ListenableFuture
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.stores.StoreUtils
-import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.lib.stores.StoresLocalSettings
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.PlayServicesUtils
 import dagger.assisted.Assisted
@@ -41,7 +41,7 @@ import javax.inject.Singleton
 class AppUpdateWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted params: WorkerParameters,
-    private val localSettings: LocalSettings,
+    private val storesLocalSettings: StoresLocalSettings,
 ) : ListenableWorker(appContext, params) {
 
     override fun startWork(): ListenableFuture<Result> {
@@ -49,12 +49,12 @@ class AppUpdateWorker @AssistedInject constructor(
 
         return CallbackToFutureAdapter.getFuture { completer ->
 
-            localSettings.hasAppUpdateDownloaded = false
+            storesLocalSettings.hasAppUpdateDownloaded = false
             StoreUtils.installDownloadedUpdate(
                 onSuccess = { completer.setResult(Result.success()) },
                 onFailure = { exception ->
                     Sentry.captureException(exception)
-                    localSettings.resetUpdateSettings()
+                    storesLocalSettings.resetUpdateSettings()
                     completer.setResult(Result.failure())
                 },
             )
@@ -70,12 +70,12 @@ class AppUpdateWorker @AssistedInject constructor(
     class Scheduler @Inject constructor(
         private val playServicesUtils: PlayServicesUtils,
         private val workManager: WorkManager,
-        private val localSettings: LocalSettings,
+        private val storesLocalSettings: StoresLocalSettings,
         @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     ) {
 
         suspend fun scheduleWorkIfNeeded() = withContext(ioDispatcher) {
-            if (playServicesUtils.areGooglePlayServicesAvailable() && localSettings.hasAppUpdateDownloaded) {
+            if (playServicesUtils.areGooglePlayServicesAvailable() && storesLocalSettings.hasAppUpdateDownloaded) {
                 SentryLog.d(TAG, "Work scheduled")
 
                 val workRequest = OneTimeWorkRequestBuilder<AppUpdateWorker>()

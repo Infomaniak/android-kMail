@@ -26,7 +26,6 @@ import android.view.ViewGroup
 import android.webkit.WebView
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
-import androidx.activity.result.contract.ActivityResultContracts.StartIntentSenderForResult
 import androidx.activity.viewModels
 import androidx.annotation.FloatRange
 import androidx.core.view.isVisible
@@ -48,13 +47,10 @@ import com.infomaniak.lib.stores.InAppUpdateManager
 import com.infomaniak.lib.stores.StoreUtils
 import com.infomaniak.lib.stores.StoreUtils.launchInAppReview
 import com.infomaniak.mail.BuildConfig
-import com.infomaniak.mail.MatomoMail.DISCOVER_LATER
-import com.infomaniak.mail.MatomoMail.DISCOVER_NOW
 import com.infomaniak.mail.MatomoMail.trackAppReviewEvent
 import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.MatomoMail.trackEasterEggEvent
 import com.infomaniak.mail.MatomoMail.trackEvent
-import com.infomaniak.mail.MatomoMail.trackInAppUpdateEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -122,12 +118,6 @@ class MainActivity : BaseActivity() {
             }
             navController.popBackStack(destinationId = R.id.threadListFragment, inclusive = false)
         }
-    }
-
-    private val inAppUpdateResultLauncher = registerForActivityResult(StartIntentSenderForResult()) { result ->
-        val isUserWantingUpdates = result.resultCode == RESULT_OK
-        localSettings.isUserWantingUpdates = isUserWantingUpdates
-        trackInAppUpdateEvent(if (isUserWantingUpdates) DISCOVER_NOW else DISCOVER_LATER)
     }
 
     private val currentFragment

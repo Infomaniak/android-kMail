@@ -21,6 +21,7 @@ import android.app.Application
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.WorkManager
+import com.infomaniak.lib.stores.StoresLocalSettings
 import com.infomaniak.mail.MainApplication
 import com.infomaniak.mail.data.LocalSettings
 import dagger.Module
@@ -61,4 +62,8 @@ object ApplicationModule {
     @Provides
     @Singleton
     fun providesLocalSettings(appContext: Context): LocalSettings = LocalSettings.getInstance(appContext)
+
+    @Provides
+    @Singleton
+    fun providesStoresLocalSettings(appContext: Context): StoresLocalSettings = StoresLocalSettings.getInstance(appContext)
 }

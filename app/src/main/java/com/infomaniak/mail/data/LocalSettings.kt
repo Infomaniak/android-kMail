@@ -27,7 +27,6 @@ import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.SharedValues
 import com.infomaniak.lib.core.utils.sharedValue
 import com.infomaniak.lib.core.utils.transaction
-import com.infomaniak.lib.stores.StoreUtils.APP_UPDATE_TAG
 import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_DELETE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_FAVORITE_NAME
@@ -49,8 +48,6 @@ class LocalSettings private constructor(context: Context) : SharedValues {
     var askEmailAcknowledgement by sharedValue("askEmailAcknowledgmentKey", false)
     var hasAlreadyEnabledNotifications by sharedValue("hasAlreadyEnabledNotificationsKey", false)
     var isAppLocked by sharedValue("isAppLockedKey", false)
-    var isUserWantingUpdates by sharedValue("isUserWantingUpdatesKey", true)
-    var hasAppUpdateDownloaded by sharedValue("hasAppUpdateDownloaded", false)
     var aiEngine by sharedValue("aiEngineKey", AiEngine.FALCON)
     var threadDensity by sharedValue("threadDensityKey", ThreadDensity.LARGE)
     var theme by sharedValue("themeKey", if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) Theme.LIGHT else Theme.SYSTEM)
@@ -70,12 +67,6 @@ class LocalSettings private constructor(context: Context) : SharedValues {
     var showPermissionsOnboarding by sharedValue("showPermissionsOnboardingKey", true)
 
     fun removeSettings() = sharedPreferences.transaction { clear() }
-
-    fun resetUpdateSettings() {
-        SentryLog.d(APP_UPDATE_TAG, "Reset update settings")
-        isUserWantingUpdates = false // This avoid the user being instantly reprompted to download update
-        hasAppUpdateDownloaded = false
-    }
 
     fun getSwipeAction(@StringRes nameRes: Int): SwipeAction = when (nameRes) {
         R.string.settingsSwipeRight -> swipeRight
