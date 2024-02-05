@@ -179,13 +179,13 @@ class ThreadAdapter(
         }
     }
 
-    private fun SuperCollapsedBlockViewHolder.bindSuperCollapsedBlock(item: SuperCollapsedBlock) {
-        with(binding.superCollapsedBlock) {
-            text = context.getString(R.string.superCollapsedBlock, item.messagesUids.count())
-            setOnClickListener {
-                text = context.getString(R.string.loadingText)
-                threadAdapterCallbacks?.onSuperCollapsedBlockClicked?.invoke()
-            }
+    private fun SuperCollapsedBlockViewHolder.bindSuperCollapsedBlock(
+        item: SuperCollapsedBlock,
+    ) = with(binding.superCollapsedBlock) {
+        text = context.getString(R.string.superCollapsedBlock, item.messagesUids.count())
+        setOnClickListener {
+            text = context.getString(R.string.loadingText)
+            threadAdapterCallbacks?.onSuperCollapsedBlockClicked?.invoke()
         }
     }
 
@@ -615,22 +615,27 @@ class ThreadAdapter(
     class MessageDiffCallback : DiffUtil.ItemCallback<Any>() {
 
         override fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean {
-            return if (oldItem is Message) {
-                newItem is Message && newItem.uid == oldItem.uid
-            } else {
-                newItem is SuperCollapsedBlock
+            return when (oldItem) {
+                is Message -> newItem is Message && newItem.uid == oldItem.uid
+                is SuperCollapsedBlock -> newItem is SuperCollapsedBlock
+                else -> false
             }
         }
 
         override fun areContentsTheSame(oldItem: Any, newItem: Any): Boolean {
-            return if (oldItem is Message) {
-                newItem is Message &&
-                        areMessageContentsTheSameExceptCalendar(oldItem, newItem) &&
-                        newItem.latestCalendarEventResponse == oldItem.latestCalendarEventResponse
-            } else {
-                newItem is SuperCollapsedBlock &&
-                        oldItem is SuperCollapsedBlock &&
-                        newItem.messagesUids.count() == oldItem.messagesUids.count()
+            return when (oldItem) {
+                is Message -> {
+                    newItem is Message &&
+                            areMessageContentsTheSameExceptCalendar(oldItem, newItem) &&
+                            newItem.latestCalendarEventResponse == oldItem.latestCalendarEventResponse
+                }
+                is SuperCollapsedBlock -> {
+                    newItem is SuperCollapsedBlock &&
+                            newItem.messagesUids.count() == oldItem.messagesUids.count()
+                }
+                else -> {
+                    false
+                }
             }
         }
 
