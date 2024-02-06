@@ -74,7 +74,7 @@ import com.infomaniak.mail.ui.main.thread.actions.ReplyBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.calendar.AttendeesBottomSheetDialogArgs
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.AttachmentIntentUtils.openAttachment
+import com.infomaniak.mail.utils.extensions.AttachmentExt.openAttachment
 import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipients
 import com.infomaniak.mail.utils.UiUtils.dividerDrawable
 import com.infomaniak.mail.utils.extensions.*

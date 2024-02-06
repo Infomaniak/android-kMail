@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.utils
+package com.infomaniak.mail.utils.extensions
 
 import android.content.ComponentName
 import android.content.Context
@@ -29,17 +29,18 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialogArgs
-import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntentType.OPEN_WITH
-import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntentType.SAVE_TO_DRIVE
+import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType.OPEN_WITH
+import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType.SAVE_TO_DRIVE
 import io.sentry.Sentry
 
-object AttachmentIntentUtils {
+object AttachmentExt {
 
     private const val DRIVE_PACKAGE = "com.infomaniak.drive"
     private const val SAVE_EXTERNAL_ACTIVITY_CLASS = "com.infomaniak.drive.ui.SaveExternalFilesActivity"
 
     const val DOWNLOAD_ATTACHMENT_RESULT = "download_attachment_result"
 
+    //region Intent
     private fun canSaveOnKDrive(context: Context) = runCatching {
         val packageInfo = context.packageManager.getPackageInfo(DRIVE_PACKAGE, PackageManager.GET_ACTIVITIES)
         packageInfo.activities.any { it.name == SAVE_EXTERNAL_ACTIVITY_CLASS }
@@ -67,7 +68,7 @@ object AttachmentIntentUtils {
         }
     }
 
-    fun Attachment.getIntentOrGoToPlaystore(context: Context, intentType: AttachmentIntentType) = when (intentType) {
+    fun Attachment.getIntentOrGoToPlayStore(context: Context, intentType: AttachmentIntentType) = when (intentType) {
         OPEN_WITH -> openWithIntent(context)
         SAVE_TO_DRIVE -> if (canSaveOnKDrive(context)) {
             saveToDriveIntent(context)
@@ -83,7 +84,7 @@ object AttachmentIntentUtils {
         navigateToDownloadProgressDialog: (Attachment, AttachmentIntentType) -> Unit,
     ) {
         if (hasUsableCache(context) || isInlineCachedFile(context)) {
-            getIntentOrGoToPlaystore(context, intentType)?.let(context::startActivity)
+            getIntentOrGoToPlayStore(context, intentType)?.let(context::startActivity)
         } else {
             navigateToDownloadProgressDialog(this, intentType)
         }
@@ -109,6 +110,7 @@ object AttachmentIntentUtils {
             intentType = intentType,
         ).toBundle()
     }
+    //endregion
 
     enum class AttachmentIntentType {
         OPEN_WITH, SAVE_TO_DRIVE

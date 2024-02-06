@@ -48,7 +48,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.MessageViewHolder
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntentType
+import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType
 import com.infomaniak.mail.utils.MailDateFormatUtils.mailFormattedDate
 import com.infomaniak.mail.utils.MailDateFormatUtils.mostDetailedDate
 import com.infomaniak.mail.utils.SharedUtils.Companion.createHtmlForPlainText
