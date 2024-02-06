@@ -96,6 +96,6 @@ class RoundedBackgroundSpan(
         private const val LEFT_MARGIN = 4
         private const val PADDING = 16
         private const val VERTICAL_OFFSET = 4
-        private const val CORNER_RADIUS = 6.0f
+        private const val CORNER_RADIUS = 10f
     }
 }

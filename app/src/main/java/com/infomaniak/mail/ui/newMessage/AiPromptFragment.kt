@@ -24,6 +24,7 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.text.toSpannable
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -83,7 +84,7 @@ class AiPromptFragment : Fragment() {
         setCorrectSheetMargins()
 
         aiPromptTitle.text = requireContext().postfixWithTag(
-            getString(R.string.aiPromptTitle),
+            getString(R.string.aiPromptTitle).toSpannable(),
             R.string.aiPromptTag,
             R.color.aiBetaTagBackground,
             R.color.aiBetaTagTextColor,

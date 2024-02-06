@@ -87,6 +87,10 @@
     <!-- Calendar events -->
     <color name="calendarHeaderBackground">@color/orca</color>
 
+    <!-- Thread -->
+    <color name="textColorFolderName">@color/shark</color>
+    <color name="backgroundFolderName">@color/orca</color>
+
     <!-- Swipe actions -->
     <color name="swipeDelete">@color/redDestructiveAction</color>
     <color name="swipeMove">@color/fougere_dark</color>

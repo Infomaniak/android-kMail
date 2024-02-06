@@ -25,7 +25,9 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import android.content.res.Resources
 import android.content.res.TypedArray
+import android.graphics.Paint
 import android.net.Uri
 import android.os.Build
 import android.text.Html
@@ -492,7 +494,7 @@ inline val AndroidViewModel.context: Context get() = getApplication()
 val TextInputEditText.trimmedText inline get() = text?.trim().toString()
 
 fun Context.postfixWithTag(
-    original: CharSequence,
+    original: Spannable,
     @StringRes tagRes: Int,
     @ColorRes backgroundColorRes: Int,
     @ColorRes textColorRes: Int,
@@ -503,13 +505,13 @@ fun Context.postfixWithTag(
  * Do not forget to set `movementMethod = LinkMovementMethod.getInstance()` on a TextView to make the tag clickable
  */
 fun Context.postfixWithTag(
-    original: CharSequence,
+    original: Spannable,
     tag: String,
     @ColorRes backgroundColorRes: Int,
     @ColorRes textColorRes: Int,
     onClicked: (() -> Unit)? = null,
 ): Spannable {
-    val postfixed = "${original}${Utils.TAG_SEPARATOR}${tag}"
+    val postfixed = TextUtils.concat(original, Utils.TAG_SEPARATOR + tag)
 
     return postfixed.toSpannable().apply {
         val startIndex = original.length + Utils.TAG_SEPARATOR.length
@@ -519,6 +521,28 @@ fun Context.postfixWithTag(
         onClicked?.let { setClickableSpan(startIndex, endIndex, it) }
     }
 }
+
+/*private fun test() {
+    val text = "This is a very long string that will be ellipsized in the middle."
+    val paint = TextPaint(Paint.ANTI_ALIAS_FLAG)
+    paint.textSize = 12f // Set the text size according to your needs
+    val width = Resources.getSystem().displayMetrics.widthPixels
+    //val layout = StaticLayout(text, paint, width, Layout.Alignment.ALIGN_NORMAL, 1f, 0f, false)
+    val layout = StaticLayout.Builder.obtain(text, 0, 0, paint, width).build()
+
+    val spannable = SpannableString(text)
+    val ellipsisCount = layout.lineCount - 1
+    if (ellipsisCount > 0) {
+        val ellipsisWidth = layout.ellipsizedWidth
+        val fullWidth = layout.getLineWidth(0)
+        val ellipsisStart = (fullWidth - ellipsisWidth) / 2
+        val spanStart = layout.getOffsetForHorizontal(0, ellipsisStart)
+        val spanEnd = spanStart + ellipsisCount
+        spannable.setSpan(CustomTypefaceSpan("", paint), spanStart, spanEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+    }
+
+    textView.text = spannable
+}*/
 
 private fun Spannable.setTagSpan(
     context: Context,

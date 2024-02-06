@@ -144,6 +144,7 @@ class SearchFragment : TwoPaneFragment() {
 
     private fun setupAdapter() {
         threadListAdapter(folderRole = null)
+        threadListAdapter.setFolderNameVisibility(true)
     }
 
     private fun setupListeners() = with(binding) {

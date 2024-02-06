@@ -86,6 +86,7 @@ class ThreadListAdapter @Inject constructor(
     private var swipingIsAuthorized: Boolean = true
     private var displaySeeAllButton = false // TODO: Manage this for intelligent mailbox
     private var isLoadMoreDisplayed = false
+    private var isFolderNameVisible: Boolean = false
 
     var onThreadClicked: ((thread: Thread) -> Unit)? = null
     var onFlushClicked: ((dialogTitle: String) -> Unit)? = null
@@ -119,6 +120,8 @@ class ThreadListAdapter @Inject constructor(
         this.recyclerView = recyclerView
     }
 
+    private fun shouldDisplayFolderName(folderName: String) = isFolderNameVisible && folderName.isNotEmpty()
+
     override fun getItemViewType(position: Int): Int = runCatchingRealm {
         val item = dataSet[position]
         return when {
@@ -137,6 +140,10 @@ class ThreadListAdapter @Inject constructor(
             else -> super.getItemId(position)
         }
     }.getOrDefault(super.getItemId(position))
+
+    fun setFolderNameVisibility(isVisible: Boolean) {
+        isFolderNameVisible = isVisible
+    }
 
     fun getItemPosition(threadUid: String): Int? {
         return dataSet
@@ -169,6 +176,8 @@ class ThreadListAdapter @Inject constructor(
             val binding = holder.binding as CardviewThreadItemBinding
             val thread = dataSet[position] as Thread
             binding.updateSelectedUi(thread)
+        } else {
+            super.onBindViewHolder(holder, position, payloads)
         }
     }.getOrDefault(Unit)
 
@@ -183,6 +192,11 @@ class ThreadListAdapter @Inject constructor(
     }
 
     private fun CardviewThreadItemBinding.displayThread(thread: Thread, position: Int) {
+        val folderName = thread.messages.first().folder.name
+        if (shouldDisplayFolderName(folderName)) {
+            folderNameView.isVisible = true
+            folderNameView.text = folderName
+        }
 
         refreshCachedSelectedPosition(thread.uid, position) // If item changed position, update cached position.
         setupThreadDensityDependentUi()
