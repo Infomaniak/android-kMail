@@ -46,10 +46,10 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ViewContactChipContextMenuBinding
 import com.infomaniak.mail.databinding.ViewRecipientFieldBinding
 import com.infomaniak.mail.ui.main.SnackbarManager
-import com.infomaniak.mail.utils.MergedContactDictionary
+import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 import com.infomaniak.mail.utils.UiUtils.dividerDrawable
-import com.infomaniak.mail.utils.isEmail
-import com.infomaniak.mail.utils.toggleChevron
+import com.infomaniak.mail.utils.extensions.isEmail
+import com.infomaniak.mail.utils.extensions.toggleChevron
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.math.min

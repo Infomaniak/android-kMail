@@ -38,8 +38,8 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
-import com.infomaniak.mail.utils.deleteWithConfirmationPopup
-import com.infomaniak.mail.utils.updateNavigationBarColor
+import com.infomaniak.mail.utils.extensions.deleteWithConfirmationPopup
+import com.infomaniak.mail.utils.extensions.updateNavigationBarColor
 
 class ThreadListMultiSelection {
 

@@ -18,8 +18,8 @@
 package com.infomaniak.mail.data.models.correspondent
 
 import android.os.Parcel
-import com.infomaniak.mail.utils.MergedContactDictionary
-import com.infomaniak.mail.utils.isEmail
+import com.infomaniak.mail.utils.extensions.MergedContactDictionary
+import com.infomaniak.mail.utils.extensions.isEmail
 import io.realm.kotlin.types.EmbeddedRealmObject
 import io.realm.kotlin.types.annotations.Ignore
 import kotlinx.parcelize.Parceler

@@ -35,6 +35,9 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
+import com.infomaniak.mail.utils.extensions.getApiException
+import com.infomaniak.mail.utils.extensions.getFoldersIds
+import com.infomaniak.mail.utils.extensions.getUids
 import io.realm.kotlin.Realm
 import io.sentry.Sentry
 import org.jsoup.Jsoup

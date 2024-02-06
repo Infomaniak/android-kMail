@@ -27,7 +27,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentSendSettingsBinding
 import com.infomaniak.mail.utils.animatedNavigation
-import com.infomaniak.mail.utils.notYetImplemented
+import com.infomaniak.mail.utils.extensions.notYetImplemented
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

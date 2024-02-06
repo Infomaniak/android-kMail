@@ -20,6 +20,7 @@ package com.infomaniak.mail.utils
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 
 object ExternalUtils {
     /**

@@ -40,7 +40,7 @@ import com.infomaniak.mail.utils.AttachmentIntentUtils
 import com.infomaniak.mail.utils.UiUtils.FULLY_SLID
 import com.infomaniak.mail.utils.UiUtils.progressivelyColorSystemBars
 import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
-import com.infomaniak.mail.utils.setSystemBarsColors
+import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import javax.inject.Inject
 
 abstract class TwoPaneFragment : Fragment() {

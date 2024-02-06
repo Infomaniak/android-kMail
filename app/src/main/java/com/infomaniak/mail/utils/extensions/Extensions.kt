@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.utils
+package com.infomaniak.mail.utils.extensions
 
 import android.animation.Animator
 import android.animation.ValueAnimator
@@ -85,6 +85,8 @@ import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
 import com.infomaniak.mail.ui.main.thread.MessageWebViewClient
 import com.infomaniak.mail.ui.main.thread.RoundedBackgroundSpan
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.HeaderState
+import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.Utils.kSyncAccountUri
 import io.realm.kotlin.MutableRealm

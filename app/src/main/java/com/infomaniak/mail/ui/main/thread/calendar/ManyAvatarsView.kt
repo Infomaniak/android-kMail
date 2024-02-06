@@ -27,9 +27,9 @@ import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.databinding.ViewManyAvatarsBinding
-import com.infomaniak.mail.utils.getColorOrNull
-import com.infomaniak.mail.utils.getTransparentColor
-import com.infomaniak.mail.utils.setInnerStrokeWidth
+import com.infomaniak.mail.utils.extensions.getColorOrNull
+import com.infomaniak.mail.utils.extensions.getTransparentColor
+import com.infomaniak.mail.utils.extensions.setInnerStrokeWidth
 
 class ManyAvatarsView @JvmOverloads constructor(
     context: Context,

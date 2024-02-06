@@ -33,6 +33,7 @@ import com.infomaniak.mail.utils.HtmlFormatter.Companion.getJsBridgeScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getPrintMailStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getResizeScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getSignatureMarginStyle
+import com.infomaniak.mail.utils.extensions.readRawResource
 
 class WebViewUtils(context: Context) {
 

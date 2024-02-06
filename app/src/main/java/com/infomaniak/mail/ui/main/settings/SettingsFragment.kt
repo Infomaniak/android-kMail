@@ -39,8 +39,8 @@ import com.infomaniak.mail.databinding.FragmentSettingsBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.animatedNavigation
 import com.infomaniak.mail.utils.launchSyncAutoConfigActivityForResult
-import com.infomaniak.mail.utils.observeNotNull
-import com.infomaniak.mail.utils.setSystemBarsColors
+import com.infomaniak.mail.utils.extensions.observeNotNull
+import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

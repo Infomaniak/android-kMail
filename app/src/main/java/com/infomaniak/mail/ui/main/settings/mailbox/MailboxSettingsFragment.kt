@@ -28,8 +28,8 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentMailboxSettingsBinding
 import com.infomaniak.mail.ui.main.settings.ItemSettingView
 import com.infomaniak.mail.utils.animatedNavigation
-import com.infomaniak.mail.utils.notYetImplemented
-import com.infomaniak.mail.utils.setSystemBarsColors
+import com.infomaniak.mail.utils.extensions.notYetImplemented
+import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 
 class MailboxSettingsFragment : Fragment() {
 

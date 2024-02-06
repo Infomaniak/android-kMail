@@ -27,7 +27,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.EmailForwarding
 import com.infomaniak.mail.databinding.FragmentForwardMailsSettingBinding
-import com.infomaniak.mail.utils.notYetImplemented
+import com.infomaniak.mail.utils.extensions.notYetImplemented
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

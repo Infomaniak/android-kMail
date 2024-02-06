@@ -21,7 +21,7 @@ import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.di.UserInfoRealm
-import com.infomaniak.mail.utils.update
+import com.infomaniak.mail.utils.extensions.update
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.notifications.ResultsChange

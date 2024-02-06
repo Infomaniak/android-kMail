@@ -18,7 +18,7 @@
 package com.infomaniak.mail.data.models.calendar
 
 import com.infomaniak.lib.core.utils.Utils
-import com.infomaniak.mail.utils.isUserIn
+import com.infomaniak.mail.utils.extensions.isUserIn
 import io.realm.kotlin.types.EmbeddedRealmObject
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

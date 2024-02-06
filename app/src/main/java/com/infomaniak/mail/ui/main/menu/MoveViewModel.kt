@@ -24,10 +24,10 @@ import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.di.IoDispatcher
-import com.infomaniak.mail.utils.context
+import com.infomaniak.mail.utils.extensions.context
 import com.infomaniak.mail.utils.coroutineContext
-import com.infomaniak.mail.utils.getCustomMenuFolders
-import com.infomaniak.mail.utils.standardize
+import com.infomaniak.mail.utils.extensions.getCustomMenuFolders
+import com.infomaniak.mail.utils.extensions.standardize
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import javax.inject.Inject

@@ -40,6 +40,8 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior
 import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior.NotificationType
+import com.infomaniak.mail.utils.extensions.getApiException
+import com.infomaniak.mail.utils.extensions.getUids
 import dagger.hilt.android.AndroidEntryPoint
 import io.realm.kotlin.Realm
 import io.sentry.Sentry

@@ -22,7 +22,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.viewbinding.ViewBinding
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.R
-import com.infomaniak.mail.utils.toggleChevron
+import com.infomaniak.mail.utils.extensions.toggleChevron
 
 interface CollapsableItem {
 

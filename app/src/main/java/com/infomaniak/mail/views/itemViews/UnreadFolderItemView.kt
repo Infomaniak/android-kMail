@@ -21,7 +21,7 @@ import android.content.Context
 import android.util.AttributeSet
 import androidx.core.view.isVisible
 import com.infomaniak.mail.R
-import com.infomaniak.mail.utils.toggleChevron
+import com.infomaniak.mail.utils.extensions.toggleChevron
 import com.infomaniak.mail.views.CollapsableItem
 
 class UnreadFolderItemView @JvmOverloads constructor(

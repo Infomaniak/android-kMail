@@ -30,7 +30,7 @@ import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.thread.actions.ActionsBottomSheetDialog
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
-import com.infomaniak.mail.utils.copyRecipientEmailToClipboard
+import com.infomaniak.mail.utils.extensions.copyRecipientEmailToClipboard
 import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject

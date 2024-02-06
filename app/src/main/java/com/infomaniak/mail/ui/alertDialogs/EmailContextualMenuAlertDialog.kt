@@ -23,7 +23,7 @@ import android.webkit.WebView
 import com.infomaniak.mail.R
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
-import com.infomaniak.mail.utils.copyStringToClipboard
+import com.infomaniak.mail.utils.extensions.copyStringToClipboard
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject

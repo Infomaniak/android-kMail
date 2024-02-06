@@ -41,8 +41,8 @@ import com.infomaniak.mail.databinding.FragmentIntroBinding
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.login.IlluColors.changeIllustrationColors
 import com.infomaniak.mail.utils.UiUtils
-import com.infomaniak.mail.utils.enumValueFrom
-import com.infomaniak.mail.utils.repeatFrame
+import com.infomaniak.mail.utils.extensions.enumValueFrom
+import com.infomaniak.mail.utils.extensions.repeatFrame
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay

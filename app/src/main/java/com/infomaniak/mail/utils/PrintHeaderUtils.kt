@@ -22,6 +22,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.MailDateFormatUtils.formatForHeader
+import com.infomaniak.mail.utils.extensions.toDate
 import org.jsoup.nodes.Element
 import java.util.Date
 
