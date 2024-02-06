@@ -27,8 +27,8 @@ import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
-import com.infomaniak.mail.utils.extensions.context
 import com.infomaniak.mail.utils.coroutineContext
+import com.infomaniak.mail.utils.extensions.context
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject

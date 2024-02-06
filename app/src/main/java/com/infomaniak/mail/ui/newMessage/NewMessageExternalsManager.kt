@@ -23,8 +23,8 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
 import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipientForNewMessage
-import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 import com.infomaniak.mail.utils.Utils
+import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 import dagger.hilt.android.scopes.FragmentScoped
 import javax.inject.Inject
 

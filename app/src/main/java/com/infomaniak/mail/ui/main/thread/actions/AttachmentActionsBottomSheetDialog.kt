@@ -31,10 +31,10 @@ import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.databinding.BottomSheetAttachmentActionsBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.SnackbarManager
+import com.infomaniak.mail.utils.PermissionUtils
 import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType
 import com.infomaniak.mail.utils.extensions.AttachmentExt.executeIntent
 import com.infomaniak.mail.utils.extensions.AttachmentExt.openAttachment
-import com.infomaniak.mail.utils.PermissionUtils
 import com.infomaniak.mail.utils.extensions.navigateToDownloadProgressDialog
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject

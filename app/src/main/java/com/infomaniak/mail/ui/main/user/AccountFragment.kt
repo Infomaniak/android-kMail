@@ -42,8 +42,11 @@ import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.MailboxListFragment
 import com.infomaniak.mail.ui.main.menu.MailboxesAdapter
-import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.ConfettiUtils
 import com.infomaniak.mail.utils.ConfettiUtils.ConfettiType
+import com.infomaniak.mail.utils.LogoutUser
+import com.infomaniak.mail.utils.PlayServicesUtils
 import com.infomaniak.mail.utils.extensions.animatedNavigation
 import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
