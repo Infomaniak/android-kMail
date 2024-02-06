@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023 Infomaniak Network SA
+ * Copyright (C) 2023-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -325,9 +325,15 @@ class AiPropositionFragment : Fragment() {
         }
     }
 
+    private fun setGenerationLoaderVisible(isVisible: Boolean) = with(binding) {
+        generationLoaderText.isVisible = isVisible
+        generationLoaderProgressBar.isVisible = isVisible
+        generationLoaderGradient.isVisible = isVisible
+    }
+
     private fun displayLoadingVisibility() = with(binding) {
         loadingPlaceholder.isVisible = true
-        generationLoader.isVisible = true
+        setGenerationLoaderVisible(true)
 
         propositionTextView.isGone = true
         buttonLayout.isInvisible = true
@@ -340,7 +346,7 @@ class AiPropositionFragment : Fragment() {
 
     private fun displayPropositionVisibility() = with(binding) {
         loadingPlaceholder.isGone = true
-        generationLoader.isGone = true
+        setGenerationLoaderVisible(false)
 
         propositionTextView.isVisible = true
         buttonLayout.isVisible = true
@@ -374,7 +380,7 @@ class AiPropositionFragment : Fragment() {
             retryButton.isGone = true
         }
 
-        generationLoader.isGone = true
+        setGenerationLoaderVisible(false)
 
         errorBlock.isVisible = true
 

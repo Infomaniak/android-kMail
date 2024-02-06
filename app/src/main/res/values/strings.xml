@@ -80,7 +80,7 @@
     <string name="aiPromptExample3">a thank-you email for an invitation to an event</string>
     <string name="aiPromptExample4">an invitation to a company event</string>
     <string name="aiPromptExample5">an email requesting an appointment with an important customer</string>
-    <string name="aiPromptGenerationLoader">The AI writing assistant is composing</string>
+    <string name="aiPromptGenerationLoader">The AI writing assistant is composing…</string>
     <string name="aiPromptPlaceholder">Tell the AI writing assistant what you want to write. For example, \"%s\".</string>
     <string name="aiPromptTag">Beta</string>
     <string name="aiPromptTitle">The AI writing assistant</string>

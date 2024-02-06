@@ -74,7 +74,7 @@
     <string name="aiPromptExample3">un’e-mail di ringraziamento per un invito a un evento</string>
     <string name="aiPromptExample4">un invito a un evento aziendale</string>
     <string name="aiPromptExample5">un’e-mail di richiesta di incontro con un cliente importante</string>
-    <string name="aiPromptGenerationLoader">L’assistente sta scrivendo</string>
+    <string name="aiPromptGenerationLoader">L’assistente sta scrivendo…</string>
     <string name="aiPromptPlaceholder">Comunica all’assistente di scrittura cosa vuoi scrivere. Ad esempio, \"%s\".</string>
     <string name="aiPromptTag">Beta</string>
     <string name="aiPromptTitle">Assistente di scrittura</string>

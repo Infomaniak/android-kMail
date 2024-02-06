@@ -38,6 +38,7 @@
     <!-- Backgrounds -->
     <color name="searchBarBackgroundColor">@color/orca</color>
     <color name="backgroundColor">@color/background_color_dark</color>
+    <color name="partiallyTransparentBackgroundColor">@color/partially_transparent_background_color_dark</color>
     <color name="backgroundColorSecondary">@color/bat</color>
     <color name="backgroundColorTertiary">@color/orca</color>
     <color name="backgroundHeaderColor">#212121</color>

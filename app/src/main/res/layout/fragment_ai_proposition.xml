@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2023 Infomaniak Network SA
+  ~ Copyright (C) 2023-2024 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -27,6 +27,9 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:navigationIcon="@drawable/ic_close_big"
         app:navigationIconTint="@color/iconColor"
         app:titleCentered="true"
@@ -37,7 +40,10 @@
         android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        app:layout_constraintBottom_toTopOf="@id/aiPropositionBottomBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -86,13 +92,41 @@
 
     </androidx.core.widget.NestedScrollView>
 
+    <ImageView
+        android:id="@+id/generationLoaderGradient"
+        android:layout_width="match_parent"
+        android:layout_height="136dp"
+        android:importantForAccessibility="no"
+        android:src="@drawable/ai_proposition_loader_gradient"
+        app:layout_constraintBottom_toTopOf="@id/aiPropositionBottomBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintVertical_bias="1"
+        tools:visibility="gone" />
+
+    <ProgressBar
+        android:id="@+id/generationLoaderProgressBar"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginBottom="@dimen/marginStandard"
+        android:indeterminate="true"
+        app:layout_constraintBottom_toTopOf="@id/aiPropositionBottomBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:visibility="gone" />
+
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/aiPropositionBottomBar"
         style="@style/CardViewMail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        app:cardElevation="@dimen/newMessageBottomBarElevation">
+        app:cardElevation="@dimen/newMessageBottomBarElevation"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -145,29 +179,15 @@
 
                 </LinearLayout>
 
-                <LinearLayout
-                    android:id="@+id/generationLoader"
-                    android:layout_width="wrap_content"
+                <TextView
+                    android:id="@+id/generationLoaderText"
+                    style="@style/BodyMedium.Tertiary"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical|end"
-                    android:orientation="horizontal"
-                    tools:visibility="gone">
-
-                    <TextView
-                        style="@style/BodyMedium.Tertiary"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginEnd="@dimen/marginStandardMedium"
-                        android:text="@string/aiPromptGenerationLoader" />
-
-                    <ProgressBar
-                        android:layout_width="@dimen/marginStandardMedium"
-                        android:layout_height="@dimen/marginStandardMedium"
-                        android:layout_gravity="center_vertical"
-                        android:indeterminate="true" />
-
-                </LinearLayout>
+                    android:layout_gravity="center_vertical"
+                    android:gravity="end|center_vertical"
+                    android:text="@string/aiPromptGenerationLoader"
+                    tools:visibility="gone" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/retryButton"
@@ -181,4 +201,4 @@
             </FrameLayout>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
