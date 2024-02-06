@@ -21,6 +21,7 @@
     <string name="notification_channel_id_draft_service" translatable="false">draft_service_channel_id</string>
     <string name="notification_channel_id_general" translatable="false">general_channel_id</string>
     <string name="notification_channel_id_sync_messages_service" translatable="false">sync_messages_service_channel_id</string>
+    <string name="ignoreDivider" translatable="false">IGNORE_DIVIDER</string>
 
     <string name="accentColorBlueTitle">Blue</string>
     <string name="accentColorPinkTitle">Pink</string>

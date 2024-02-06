@@ -360,10 +360,10 @@ class RecipientFieldView @JvmOverloads constructor(
         onToggleEverythingCallback: ((isCollapsed: Boolean) -> Unit)? = null,
     ) {
 
-        val dividerItemDecorator = DividerItemDecorator(InsetDrawable(dividerDrawable(context), 16.toPx(), 0, 16.toPx(), 0))
+        val divider = DividerItemDecorator(InsetDrawable(dividerDrawable(context), 16.toPx(), 0, 16.toPx(), 0))
 
         autoCompletedContacts = autoComplete
-        autoCompletedContacts.addItemDecoration(dividerItemDecorator)
+        autoCompletedContacts.addItemDecoration(divider)
         autoCompletedContacts.adapter = contactAdapter
 
         onToggleEverything = onToggleEverythingCallback

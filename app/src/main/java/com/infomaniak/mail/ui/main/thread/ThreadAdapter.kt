@@ -66,7 +66,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.Date
 import com.google.android.material.R as RMaterial
-import com.infomaniak.lib.core.R as RCore
 
 class ThreadAdapter(
     private val shouldLoadDistantResources: Boolean,
@@ -166,7 +165,7 @@ class ThreadAdapter(
         val item = items[position]
 
         holder.binding.root.tag = if (item is SuperCollapsedBlock || (item is Message && item.shouldHideDivider)) {
-            holder.binding.context.getString(RCore.string.ignoreDivider)
+            holder.binding.context.getString(R.string.ignoreDivider)
         } else {
             null
         }

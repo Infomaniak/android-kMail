@@ -292,7 +292,14 @@ class ThreadFragment : Fragment() {
             ),
         )
 
-        addItemDecoration(DividerItemDecorator(InsetDrawable(dividerDrawable(context), 0)))
+        addItemDecoration(
+            DividerItemDecorator(
+                divider = InsetDrawable(dividerDrawable(context), 0),
+                shouldIgnoreView = { view ->
+                    view.tag == context.getString(R.string.ignoreDivider)
+                },
+            ),
+        )
         recycledViewPool.setMaxRecycledViews(0, 0)
         threadAdapter.stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
     }
