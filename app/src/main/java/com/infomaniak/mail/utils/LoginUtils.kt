@@ -34,6 +34,8 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.login.LoginActivity
 import com.infomaniak.mail.utils.Utils.MailboxErrorCode
+import com.infomaniak.mail.utils.extensions.launchNoMailboxActivity
+import com.infomaniak.mail.utils.extensions.launchNoValidMailboxesActivity
 import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch

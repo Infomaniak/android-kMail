@@ -30,6 +30,8 @@ import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.appSettings.AppSettingsController
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.utils.extensions.launchNoMailboxActivity
+import com.infomaniak.mail.utils.extensions.launchNoValidMailboxesActivity
 import io.sentry.Sentry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.invoke
