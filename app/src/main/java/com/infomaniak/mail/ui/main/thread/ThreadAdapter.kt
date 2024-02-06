@@ -164,9 +164,8 @@ class ThreadAdapter(
     override fun onBindViewHolder(holder: ThreadAdapterViewHolder, position: Int) {
 
         val item = items[position]
-        val previousItem = if (position > 0) items[position - 1] else null
 
-        holder.binding.root.tag = if (item is SuperCollapsedBlock || previousItem is SuperCollapsedBlock) {
+        holder.binding.root.tag = if (item is SuperCollapsedBlock || (item is Message && item.shouldHideDivider)) {
             holder.binding.context.getString(RCore.string.ignoreDivider)
         } else {
             null
@@ -659,7 +658,8 @@ class ThreadAdapter(
 
             private fun areMessageContentsTheSameExceptCalendar(oldMessage: Message, newMessage: Message): Boolean {
                 return newMessage.body?.value == oldMessage.body?.value &&
-                        newMessage.splitBody == oldMessage.splitBody
+                        newMessage.splitBody == oldMessage.splitBody &&
+                        newMessage.shouldHideDivider == oldMessage.shouldHideDivider
             }
         }
     }

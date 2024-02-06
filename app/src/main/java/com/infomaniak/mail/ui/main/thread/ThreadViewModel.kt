@@ -110,8 +110,8 @@ class ThreadViewModel @Inject constructor(
             messageController.getSortedAndNotDeletedMessagesAsync(threadUid)
                 ?.map(::mapRealmMessagesResult)
                 ?.collect(messagesLive::postValue)
+                }
         }
-    }
 
     private suspend fun mapRealmMessagesResult(results: ResultsChange<Message>): Pair<List<Any>, List<Message>> {
 
@@ -143,7 +143,7 @@ class ThreadViewModel @Inject constructor(
                     }
                     index == messagesCount - 2 -> { // First Message not in block
                         items += SuperCollapsedBlock(superCollapsedBlock!!)
-                        addMessage(message)
+                        addMessage(message.apply { shouldHideDivider = true })
                     }
                     else -> { // All following Messages (theoretically, only 1 Message)
                         addMessage(message)
@@ -165,7 +165,7 @@ class ThreadViewModel @Inject constructor(
                     superCollapsedBlock?.contains(message.uid) == false && blockHasNotBeenBroken -> { // First Message not in block
                         blockHasNotBeenBroken = false
                         items += SuperCollapsedBlock(superCollapsedBlock!!)
-                        addMessage(message)
+                        addMessage(message.apply { shouldHideDivider = true })
                     }
                     else -> { // All following Messages
                         if (superCollapsedBlock?.contains(message.uid) == true) superCollapsedBlock?.remove(message.uid)

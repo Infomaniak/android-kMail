@@ -144,6 +144,9 @@ class Message : RealmObject {
     @Transient
     @Ignore
     var splitBody: MessageBodyUtils.SplitBody? = null
+    @Transient
+    @Ignore
+    var shouldHideDivider: Boolean = false
     //endregion
 
     val threads by backlinks(Thread::messages)
