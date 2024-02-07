@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.bottomSheetDialogs
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.activityViewModels
@@ -38,6 +39,8 @@ class UpdateAvailableBottomSheetDialog : InformationBottomSheetDialog() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
+        storesViewModel.isUpdateBottomSheetShown = true
+
         title.setText(RCore.string.updateAvailableTitle)
         description.text = resources.getString(RCore.string.updateAvailableDescription, context.getAppName())
         infoIllustration.setBackgroundResource(R.drawable.ic_update_logo)
@@ -57,5 +60,10 @@ class UpdateAvailableBottomSheetDialog : InformationBottomSheetDialog() {
             storesViewModel.set(StoresSettingsRepository.IS_USER_WANTING_UPDATES_KEY, false)
             dismiss()
         }
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        storesViewModel.isUpdateBottomSheetShown = false
+        super.onDismiss(dialog)
     }
 }
