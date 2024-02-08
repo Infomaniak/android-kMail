@@ -27,7 +27,7 @@ import com.infomaniak.mail.utils.MailDateFormatUtils.formatForHeader
 import com.infomaniak.mail.utils.MessageBodyUtils
 import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.Utils
-import com.infomaniak.mail.utils.toDate
+import com.infomaniak.mail.utils.extensions.toDate
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element

@@ -34,11 +34,11 @@ import com.infomaniak.mail.data.models.calendar.Attendee.AttendanceState
 import com.infomaniak.mail.data.models.calendar.CalendarEvent
 import com.infomaniak.mail.databinding.ViewCalendarEventBannerBinding
 import com.infomaniak.mail.ui.main.SnackbarManager
-import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntentType
-import com.infomaniak.mail.utils.AttachmentIntentUtils.openAttachment
 import com.infomaniak.mail.utils.UiUtils.getPrettyNameAndEmail
-import com.infomaniak.mail.utils.findUser
-import com.infomaniak.mail.utils.toDate
+import com.infomaniak.mail.utils.extensions.AttachmentExtensions.AttachmentIntentType
+import com.infomaniak.mail.utils.extensions.AttachmentExtensions.openAttachment
+import com.infomaniak.mail.utils.extensions.findUser
+import com.infomaniak.mail.utils.extensions.toDate
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import java.time.format.FormatStyle

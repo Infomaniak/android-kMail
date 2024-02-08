@@ -40,7 +40,7 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.utils.LoginUtils
 import com.infomaniak.mail.utils.UiUtils
-import com.infomaniak.mail.utils.removeOverScrollForApiBelow31
+import com.infomaniak.mail.utils.extensions.removeOverScrollForApiBelow31
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject

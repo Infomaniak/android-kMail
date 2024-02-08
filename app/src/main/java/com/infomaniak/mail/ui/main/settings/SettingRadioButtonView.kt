@@ -28,7 +28,7 @@ import androidx.core.view.isVisible
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewSettingRadioButtonBinding
-import com.infomaniak.mail.utils.getAttributeColor
+import com.infomaniak.mail.utils.extensions.getAttributeColor
 import com.google.android.material.R as RMaterial
 
 class SettingRadioButtonView @JvmOverloads constructor(

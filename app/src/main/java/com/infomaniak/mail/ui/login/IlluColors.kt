@@ -26,7 +26,7 @@ import com.google.android.material.color.utilities.Hct
 import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings.*
-import com.infomaniak.mail.utils.changePathColor
+import com.infomaniak.mail.utils.extensions.changePathColor
 
 object IlluColors {
 

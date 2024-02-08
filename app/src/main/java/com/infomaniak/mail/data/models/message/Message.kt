@@ -32,8 +32,8 @@ import com.infomaniak.mail.data.models.getMessages.ActivitiesResult.MessageFlags
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.MessageBodyUtils
-import com.infomaniak.mail.utils.toRealmInstant
-import com.infomaniak.mail.utils.toShortUid
+import com.infomaniak.mail.utils.extensions.toRealmInstant
+import com.infomaniak.mail.utils.extensions.toShortUid
 import io.realm.kotlin.ext.*
 import io.realm.kotlin.serializers.RealmListKSerializer
 import io.realm.kotlin.types.*

@@ -30,7 +30,7 @@ import com.infomaniak.mail.databinding.ItemContactBinding
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.newMessage.ContactAdapter.ContactType.*
 import com.infomaniak.mail.ui.newMessage.ContactAdapter.ContactViewHolder
-import com.infomaniak.mail.utils.standardize
+import com.infomaniak.mail.utils.extensions.standardize
 
 @SuppressLint("NotifyDataSetChanged")
 class ContactAdapter(

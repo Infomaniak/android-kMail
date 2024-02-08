@@ -32,7 +32,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
-import com.infomaniak.mail.utils.canDisplayOnlyOnePane
+import com.infomaniak.mail.utils.extensions.canDisplayOnlyOnePane
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 

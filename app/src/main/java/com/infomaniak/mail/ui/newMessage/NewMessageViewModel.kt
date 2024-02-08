@@ -58,6 +58,10 @@ import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.SignatureScore.*
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
 import com.infomaniak.mail.utils.Utils
+import com.infomaniak.mail.utils.extensions.context
+import com.infomaniak.mail.utils.extensions.htmlToText
+import com.infomaniak.mail.utils.extensions.isEmail
+import com.infomaniak.mail.utils.extensions.textToHtml
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm

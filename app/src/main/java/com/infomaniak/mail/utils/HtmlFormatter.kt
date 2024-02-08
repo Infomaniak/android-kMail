@@ -22,6 +22,8 @@ import androidx.annotation.RawRes
 import com.infomaniak.html.cleaner.HtmlSanitizer
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.utils.extensions.getAttributeColor
+import com.infomaniak.mail.utils.extensions.readRawResource
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node

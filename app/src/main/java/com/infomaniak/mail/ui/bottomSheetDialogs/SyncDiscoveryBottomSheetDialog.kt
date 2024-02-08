@@ -19,7 +19,7 @@ package com.infomaniak.mail.ui.bottomSheetDialogs
 
 import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
 import com.infomaniak.mail.R
-import com.infomaniak.mail.utils.launchSyncAutoConfigActivityForResult
+import com.infomaniak.mail.utils.extensions.launchSyncAutoConfigActivityForResult
 
 class SyncDiscoveryBottomSheetDialog : DiscoveryBottomSheetDialog() {
 

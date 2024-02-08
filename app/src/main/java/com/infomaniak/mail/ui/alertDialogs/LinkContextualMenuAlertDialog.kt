@@ -20,8 +20,8 @@ package com.infomaniak.mail.ui.alertDialogs
 import android.content.Context
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.mail.R
-import com.infomaniak.mail.utils.copyStringToClipboard
-import com.infomaniak.mail.utils.shareString
+import com.infomaniak.mail.utils.extensions.copyStringToClipboard
+import com.infomaniak.mail.utils.extensions.shareString
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject

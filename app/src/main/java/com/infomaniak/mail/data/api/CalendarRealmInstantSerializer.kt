@@ -18,8 +18,8 @@
 package com.infomaniak.mail.data.api
 
 import com.infomaniak.lib.core.utils.FORMAT_DATE_WITH_TIMEZONE
-import com.infomaniak.mail.utils.toDate
-import com.infomaniak.mail.utils.toRealmInstant
+import com.infomaniak.mail.utils.extensions.toDate
+import com.infomaniak.mail.utils.extensions.toRealmInstant
 import io.realm.kotlin.types.RealmInstant
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind

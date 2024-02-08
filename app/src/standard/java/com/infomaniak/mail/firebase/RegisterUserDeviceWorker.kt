@@ -25,7 +25,7 @@ import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.throwErrorAsException
+import com.infomaniak.mail.utils.extensions.throwErrorAsException
 import com.infomaniak.mail.workers.BaseCoroutineWorker
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject

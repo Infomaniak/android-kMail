@@ -48,7 +48,6 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.MessageViewHolder
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.AttachmentIntentUtils.AttachmentIntentType
 import com.infomaniak.mail.utils.MailDateFormatUtils.mailFormattedDate
 import com.infomaniak.mail.utils.MailDateFormatUtils.mostDetailedDate
 import com.infomaniak.mail.utils.SharedUtils.Companion.createHtmlForPlainText
@@ -58,6 +57,8 @@ import com.infomaniak.mail.utils.Utils.TEXT_PLAIN
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupThreadWebViewSettings
 import com.infomaniak.mail.utils.WebViewUtils.Companion.toggleWebViewTheme
+import com.infomaniak.mail.utils.extensions.*
+import com.infomaniak.mail.utils.extensions.AttachmentExtensions.AttachmentIntentType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

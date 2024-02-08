@@ -37,9 +37,14 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.di.IoDispatcher
-import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.NotificationPayload
 import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior
 import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior.NotificationType
+import com.infomaniak.mail.utils.NotificationUtils
+import com.infomaniak.mail.utils.SharedUtils
+import com.infomaniak.mail.utils.extensions.getApiException
+import com.infomaniak.mail.utils.extensions.getUids
 import dagger.hilt.android.AndroidEntryPoint
 import io.realm.kotlin.Realm
 import io.sentry.Sentry

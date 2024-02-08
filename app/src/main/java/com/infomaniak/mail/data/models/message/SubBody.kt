@@ -21,7 +21,7 @@ package com.infomaniak.mail.data.models.message
 
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.models.correspondent.Recipient
-import com.infomaniak.mail.utils.toRealmInstant
+import com.infomaniak.mail.utils.extensions.toRealmInstant
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.serializers.RealmListKSerializer
 import io.realm.kotlin.types.EmbeddedRealmObject

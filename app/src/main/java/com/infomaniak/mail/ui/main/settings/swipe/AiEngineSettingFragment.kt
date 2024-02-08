@@ -26,7 +26,7 @@ import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.databinding.FragmentAiEngineSettingBinding
 import com.infomaniak.mail.databinding.LayoutAiEngineChoiceBinding
 import com.infomaniak.mail.utils.SharedUtils
-import com.infomaniak.mail.utils.setSystemBarsColors
+import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

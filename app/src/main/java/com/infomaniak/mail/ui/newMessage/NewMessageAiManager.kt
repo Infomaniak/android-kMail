@@ -40,8 +40,8 @@ import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.ai.AiPromptOpeningStatus
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.utils.UiUtils
-import com.infomaniak.mail.utils.observeNotNull
-import com.infomaniak.mail.utils.updateNavigationBarColor
+import com.infomaniak.mail.utils.extensions.observeNotNull
+import com.infomaniak.mail.utils.extensions.updateNavigationBarColor
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.FragmentScoped
 import kotlinx.coroutines.delay

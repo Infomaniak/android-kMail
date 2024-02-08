@@ -41,7 +41,7 @@ import com.infomaniak.mail.databinding.ActivityLoginBinding
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.Utils.MailboxErrorCode
-import com.infomaniak.mail.utils.getInfomaniakLogin
+import com.infomaniak.mail.utils.extensions.getInfomaniakLogin
 import dagger.hilt.android.AndroidEntryPoint
 import com.infomaniak.lib.core.R as RCore
 

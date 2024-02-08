@@ -26,6 +26,7 @@ import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.models.correspondent.Contact
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 import io.sentry.Sentry
 
 object ContactUtils {

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.utils
+package com.infomaniak.mail.utils.extensions
 
 import android.content.Context
 import android.content.Intent
@@ -38,7 +38,8 @@ import com.infomaniak.mail.ui.login.NoMailboxActivity
 import com.infomaniak.mail.ui.main.thread.actions.AttachmentActionsBottomSheetDialog
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.ui.noValidMailboxes.NoValidMailboxesActivity
-import com.infomaniak.mail.utils.AttachmentIntentUtils.createDownloadDialogNavArgs
+import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.extensions.AttachmentExtensions.createDownloadDialogNavArgs
 
 fun getAnimatedNavOptions() = NavOptions
     .Builder()
@@ -79,7 +80,7 @@ fun Fragment.safeNavigateToNewMessageActivity(args: Bundle? = null, currentClass
 
 fun Fragment.navigateToDownloadProgressDialog(
     attachment: Attachment,
-    attachmentIntentType: AttachmentIntentUtils.AttachmentIntentType,
+    attachmentIntentType: AttachmentExtensions.AttachmentIntentType,
     currentClassName: String = AttachmentActionsBottomSheetDialog::class.java.name,
 ) {
     safeNavigate(

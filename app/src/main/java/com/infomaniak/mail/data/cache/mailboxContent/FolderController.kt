@@ -21,8 +21,8 @@ import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
-import com.infomaniak.mail.utils.copyListToRealm
-import com.infomaniak.mail.utils.flattenFolderChildren
+import com.infomaniak.mail.utils.extensions.copyListToRealm
+import com.infomaniak.mail.utils.extensions.flattenFolderChildren
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm

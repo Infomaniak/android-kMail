@@ -33,6 +33,8 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior
 import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior.NotificationType
+import com.infomaniak.mail.utils.extensions.formatSubject
+import com.infomaniak.mail.utils.extensions.removeLineBreaksFromHtml
 import io.realm.kotlin.Realm
 import io.sentry.SentryLevel
 import okhttp3.OkHttpClient

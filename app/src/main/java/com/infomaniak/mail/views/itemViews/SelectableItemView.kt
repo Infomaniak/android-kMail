@@ -22,7 +22,7 @@ import android.graphics.Color
 import android.util.AttributeSet
 import androidx.appcompat.content.res.AppCompatResources
 import com.infomaniak.mail.R
-import com.infomaniak.mail.utils.getAttributeColor
+import com.infomaniak.mail.utils.extensions.getAttributeColor
 import com.google.android.material.R as RMaterial
 
 sealed class SelectableItemView @JvmOverloads constructor(

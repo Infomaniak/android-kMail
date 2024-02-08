@@ -36,6 +36,9 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.MessageBodyUtils.SplitBody
+import com.infomaniak.mail.utils.extensions.MergedContactDictionary
+import com.infomaniak.mail.utils.extensions.context
+import com.infomaniak.mail.utils.extensions.getUids
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.MutableRealm
 import io.sentry.Sentry

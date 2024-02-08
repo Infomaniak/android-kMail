@@ -36,8 +36,8 @@ import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentSyncConfigureBinding
 import com.infomaniak.mail.ui.MainActivity
-import com.infomaniak.mail.utils.isUserAlreadySynchronized
-import com.infomaniak.mail.utils.setSystemBarsColors
+import com.infomaniak.mail.utils.extensions.isUserAlreadySynchronized
+import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 
 class SyncConfigureFragment : Fragment() {
 

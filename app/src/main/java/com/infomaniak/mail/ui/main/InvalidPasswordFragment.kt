@@ -32,9 +32,9 @@ import com.infomaniak.mail.MatomoMail.trackInvalidPasswordMailboxEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentInvalidPasswordBinding
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
-import com.infomaniak.mail.utils.bindAlertToViewLifecycle
-import com.infomaniak.mail.utils.getStringWithBoldArg
-import com.infomaniak.mail.utils.trimmedText
+import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
+import com.infomaniak.mail.utils.extensions.getStringWithBoldArg
+import com.infomaniak.mail.utils.extensions.trimmedText
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

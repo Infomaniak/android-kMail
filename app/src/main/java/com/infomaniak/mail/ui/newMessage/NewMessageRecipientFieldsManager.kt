@@ -26,7 +26,7 @@ import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType.*
-import com.infomaniak.mail.utils.copyRecipientEmailToClipboard
+import com.infomaniak.mail.utils.extensions.copyRecipientEmailToClipboard
 import dagger.hilt.android.scopes.FragmentScoped
 import javax.inject.Inject
 

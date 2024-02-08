@@ -26,7 +26,7 @@ import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentCancelDelaySettingBinding
-import com.infomaniak.mail.utils.notYetImplemented
+import com.infomaniak.mail.utils.extensions.notYetImplemented
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

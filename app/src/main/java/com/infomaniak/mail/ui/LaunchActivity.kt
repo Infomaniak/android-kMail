@@ -33,7 +33,7 @@ import com.infomaniak.mail.ui.login.LoginActivityArgs
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentArgs
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SentryDebug
-import com.infomaniak.mail.utils.launchLoginActivity
+import com.infomaniak.mail.utils.extensions.launchLoginActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch

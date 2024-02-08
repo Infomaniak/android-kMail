@@ -45,6 +45,8 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.SharedUtils.Companion.updateSignatures
+import com.infomaniak.mail.utils.extensions.getApiException
+import com.infomaniak.mail.utils.extensions.throwErrorAsException
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import io.realm.kotlin.MutableRealm

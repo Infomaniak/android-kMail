@@ -32,6 +32,7 @@ import androidx.core.graphics.toColorInt
 import androidx.core.view.isGone
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.Correspondent
+import com.infomaniak.mail.utils.extensions.updateNavigationBarColor
 
 object UiUtils {
 

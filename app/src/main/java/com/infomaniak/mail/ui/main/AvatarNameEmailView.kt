@@ -36,7 +36,7 @@ import com.infomaniak.mail.data.models.correspondent.Correspondent
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.databinding.ViewAvatarNameEmailBinding
 import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
-import com.infomaniak.mail.utils.getAttributeColor
+import com.infomaniak.mail.utils.extensions.getAttributeColor
 import com.google.android.material.R as RMaterial
 
 class AvatarNameEmailView @JvmOverloads constructor(

@@ -30,8 +30,12 @@ import com.infomaniak.mail.ui.login.IlluColors.Category
 import com.infomaniak.mail.ui.login.IlluColors.IlluColors
 import com.infomaniak.mail.ui.login.IlluColors.getPaletteFor
 import com.infomaniak.mail.ui.login.IlluColors.keyPath
-import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.AccountUtils.NO_MAILBOX_USER_ID_KEY
+import com.infomaniak.mail.utils.LogoutUser
+import com.infomaniak.mail.utils.PlayServicesUtils
+import com.infomaniak.mail.utils.extensions.changePathColor
+import com.infomaniak.mail.utils.extensions.repeatFrame
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch

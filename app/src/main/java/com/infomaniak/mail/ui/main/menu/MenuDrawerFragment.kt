@@ -53,6 +53,9 @@ import com.infomaniak.mail.ui.main.MailboxListFragment
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ConfettiUtils.ConfettiType
+import com.infomaniak.mail.utils.extensions.launchSyncAutoConfigActivityForResult
+import com.infomaniak.mail.utils.extensions.observeNotNull
+import com.infomaniak.mail.utils.extensions.toggleChevron
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 

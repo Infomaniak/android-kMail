@@ -24,8 +24,8 @@ import android.provider.ContactsContract
 import android.webkit.WebView
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.Utils
-import com.infomaniak.mail.utils.copyStringToClipboard
-import com.infomaniak.mail.utils.safeStartActivity
+import com.infomaniak.mail.utils.extensions.copyStringToClipboard
+import com.infomaniak.mail.utils.extensions.safeStartActivity
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject

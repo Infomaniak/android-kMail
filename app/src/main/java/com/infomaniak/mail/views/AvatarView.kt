@@ -36,7 +36,11 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.Correspondent
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.databinding.ViewAvatarBinding
-import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.extensions.MergedContactDictionary
+import com.infomaniak.mail.utils.extensions.getColorOrNull
+import com.infomaniak.mail.utils.extensions.getTransparentColor
+import com.infomaniak.mail.utils.extensions.setInnerStrokeWidth
 import com.infomaniak.mail.views.itemViews.AvatarMergedContactData
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject

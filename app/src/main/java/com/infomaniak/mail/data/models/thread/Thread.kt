@@ -31,9 +31,9 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.isSmallerThanDays
-import com.infomaniak.mail.utils.toDate
-import com.infomaniak.mail.utils.toRealmInstant
+import com.infomaniak.mail.utils.extensions.isSmallerThanDays
+import com.infomaniak.mail.utils.extensions.toDate
+import com.infomaniak.mail.utils.extensions.toRealmInstant
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm

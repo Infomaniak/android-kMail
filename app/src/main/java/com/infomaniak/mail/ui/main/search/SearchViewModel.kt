@@ -34,7 +34,11 @@ import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.data.models.thread.ThreadResult
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.search.SearchFragment.VisibilityMode
-import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.SearchUtils
+import com.infomaniak.mail.utils.coroutineContext
+import com.infomaniak.mail.utils.extensions.context
+import com.infomaniak.mail.utils.extensions.getMenuFolders
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.sentry.Sentry
 import kotlinx.coroutines.*

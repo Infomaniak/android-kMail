@@ -30,7 +30,7 @@ import com.infomaniak.lib.core.utils.showKeyboard
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.DialogInputBinding
 import com.infomaniak.mail.di.IoDispatcher
-import com.infomaniak.mail.utils.trimmedText
+import com.infomaniak.mail.utils.extensions.trimmedText
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.*

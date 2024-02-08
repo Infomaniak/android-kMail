@@ -35,8 +35,8 @@ import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentAttachMailboxBinding
 import com.infomaniak.mail.utils.ErrorCode
-import com.infomaniak.mail.utils.isEmail
-import com.infomaniak.mail.utils.trimmedText
+import com.infomaniak.mail.utils.extensions.isEmail
+import com.infomaniak.mail.utils.extensions.trimmedText
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

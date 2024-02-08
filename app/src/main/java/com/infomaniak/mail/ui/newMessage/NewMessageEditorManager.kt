@@ -29,8 +29,8 @@ import com.infomaniak.mail.MatomoMail
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
-import com.infomaniak.mail.utils.getAttributeColor
-import com.infomaniak.mail.utils.notYetImplemented
+import com.infomaniak.mail.utils.extensions.getAttributeColor
+import com.infomaniak.mail.utils.extensions.notYetImplemented
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.FragmentScoped
 import javax.inject.Inject

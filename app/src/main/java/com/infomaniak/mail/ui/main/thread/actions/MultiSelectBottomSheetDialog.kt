@@ -38,8 +38,8 @@ import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection.Companion.getReadIconAndShortText
-import com.infomaniak.mail.utils.animatedNavigation
-import com.infomaniak.mail.utils.deleteWithConfirmationPopup
+import com.infomaniak.mail.utils.extensions.animatedNavigation
+import com.infomaniak.mail.utils.extensions.deleteWithConfirmationPopup
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

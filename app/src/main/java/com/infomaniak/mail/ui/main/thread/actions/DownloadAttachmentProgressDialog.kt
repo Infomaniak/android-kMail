@@ -32,8 +32,8 @@ import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.setBackNavigationResult
 import com.infomaniak.mail.databinding.DialogDownloadProgressBinding
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.utils.AttachmentIntentUtils
-import com.infomaniak.mail.utils.AttachmentIntentUtils.getIntentOrGoToPlaystore
+import com.infomaniak.mail.utils.extensions.AttachmentExtensions
+import com.infomaniak.mail.utils.extensions.AttachmentExtensions.getIntentOrGoToPlayStore
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -68,8 +68,8 @@ class DownloadAttachmentProgressDialog : DialogFragment() {
             if (cachedAttachment == null) {
                 popBackStackWithError()
             } else {
-                cachedAttachment.getIntentOrGoToPlaystore(requireContext(), navigationArgs.intentType)?.let { openWithIntent ->
-                    setBackNavigationResult(AttachmentIntentUtils.DOWNLOAD_ATTACHMENT_RESULT, openWithIntent)
+                cachedAttachment.getIntentOrGoToPlayStore(requireContext(), navigationArgs.intentType)?.let { openWithIntent ->
+                    setBackNavigationResult(AttachmentExtensions.DOWNLOAD_ATTACHMENT_RESULT, openWithIntent)
                 } ?: run { findNavController().popBackStack() }
             }
         }

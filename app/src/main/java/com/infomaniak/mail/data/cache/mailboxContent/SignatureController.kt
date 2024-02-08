@@ -20,7 +20,7 @@ package com.infomaniak.mail.data.cache.mailboxContent
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.signature.Signature
-import com.infomaniak.mail.utils.update
+import com.infomaniak.mail.utils.extensions.update
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.query

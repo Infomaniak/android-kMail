@@ -24,7 +24,7 @@ import androidx.core.view.isVisible
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.UiUtils
-import com.infomaniak.mail.utils.getAttributeColor
+import com.infomaniak.mail.utils.extensions.getAttributeColor
 import com.google.android.material.R as RMaterial
 
 abstract class UnreadItemView @JvmOverloads constructor(
