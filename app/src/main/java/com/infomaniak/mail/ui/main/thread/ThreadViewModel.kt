@@ -50,6 +50,9 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import kotlin.collections.set
 
+typealias ThreadAdapterItems = List<Any>
+typealias MessagesWithoutHeavyData = List<Message>
+
 @HiltViewModel
 class ThreadViewModel @Inject constructor(
     application: Application,
@@ -78,7 +81,7 @@ class ThreadViewModel @Inject constructor(
     val failedMessagesUids = SingleLiveEvent<List<String>>()
 
     val threadLive = MutableLiveData<Thread?>()
-    val messagesLive = MutableLiveData<Pair<List<Any>, List<Message>>>()
+    val messagesLive = MutableLiveData<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>>()
 
     private var cachedSplitBodies = mutableMapOf<String, SplitBody>()
     private var superCollapsedBlock: MutableSet<String>? = null
@@ -110,20 +113,20 @@ class ThreadViewModel @Inject constructor(
             messageController.getSortedAndNotDeletedMessagesAsync(threadUid)
                 ?.map(::mapRealmMessagesResult)
                 ?.collect(messagesLive::postValue)
-                }
         }
+    }
 
-    private suspend fun mapRealmMessagesResult(results: ResultsChange<Message>): Pair<List<Any>, List<Message>> {
-
-        val shouldDisplaySuperCollapsedBlock =
-            results.list.count() >= SUPER_COLLAPSE_BLOCK_MESSAGES_LIMIT && !hasUserClickedTheSuperCollapsedBlock
-        val shouldCreateSuperCollapsedBlock = (shouldDisplaySuperCollapsedBlock && superCollapsedBlock == null).also {
-            if (it) superCollapsedBlock = mutableSetOf()
-        }
+    private suspend fun mapRealmMessagesResult(results: ResultsChange<Message>): Pair<ThreadAdapterItems, MessagesWithoutHeavyData> {
 
         val messagesCount = results.list.count()
         val items = mutableListOf<Any>()
         val messagesToFetch = mutableListOf<Message>()
+
+        val shouldDisplaySuperCollapsedBlock =
+            messagesCount >= SUPER_COLLAPSE_BLOCK_MESSAGES_LIMIT && !hasUserClickedTheSuperCollapsedBlock
+        val shouldCreateSuperCollapsedBlock = (shouldDisplaySuperCollapsedBlock && superCollapsedBlock == null).also {
+            if (it) superCollapsedBlock = mutableSetOf()
+        }
 
         suspend fun addMessage(message: Message) {
             splitBody(message).let {
@@ -176,15 +179,11 @@ class ThreadViewModel @Inject constructor(
         }
 
         suspend fun mapFullList() {
-            results.list.map { addMessage(it) }
+            results.list.forEach { addMessage(it) }
         }
 
         if (shouldDisplaySuperCollapsedBlock) {
-            if (shouldCreateSuperCollapsedBlock) {
-                mapListWithNewSuperCollapsedBlock()
-            } else {
-                mapListWithExistingSuperCollapsedBlock()
-            }
+            if (shouldCreateSuperCollapsedBlock) mapListWithNewSuperCollapsedBlock() else mapListWithExistingSuperCollapsedBlock()
         } else {
             mapFullList()
         }

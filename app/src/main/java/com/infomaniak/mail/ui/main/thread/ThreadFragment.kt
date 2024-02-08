@@ -295,9 +295,7 @@ class ThreadFragment : Fragment() {
         addItemDecoration(
             DividerItemDecorator(
                 divider = InsetDrawable(dividerDrawable(context), 0),
-                shouldIgnoreView = { view ->
-                    view.tag == context.getString(R.string.ignoreDivider)
-                },
+                shouldIgnoreView = { view -> view.tag == ThreadAdapter.IGNORE_DIVIDER_TAG },
             ),
         )
         recycledViewPool.setMaxRecycledViews(0, 0)
@@ -373,7 +371,8 @@ class ThreadFragment : Fragment() {
             }
 
             threadAdapter.submitList(items)
-            fetchMessagesHeavyData(messagesToFetch)
+            if (messagesToFetch.isNotEmpty()) fetchMessagesHeavyData(messagesToFetch)
+
             fetchCalendarEvents(items)
         }
     }
