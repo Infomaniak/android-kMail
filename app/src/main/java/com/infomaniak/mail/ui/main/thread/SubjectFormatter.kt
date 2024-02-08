@@ -24,7 +24,6 @@ import android.text.Spannable
 import android.text.StaticLayout
 import android.text.TextPaint
 import android.text.TextUtils
-import android.util.TypedValue
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.text.toSpannable
 import com.infomaniak.mail.MatomoMail.trackExternalEvent
@@ -143,12 +142,7 @@ object SubjectFormatter {
 
     private fun getTagsTextPaint(context: Context) : TextPaint {
         val tagsTextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
-        val tagsTextDimension = 12f
-        tagsTextPaint.textSize = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_SP,
-            tagsTextDimension,
-            Resources.getSystem().displayMetrics
-        )
+        tagsTextPaint.textSize = context.resources.getDimension(R.dimen.externalTagTextSize)
         tagsTextPaint.typeface = ResourcesCompat.getFont(context, R.font.tag_font)
         tagsTextPaint.density
 
