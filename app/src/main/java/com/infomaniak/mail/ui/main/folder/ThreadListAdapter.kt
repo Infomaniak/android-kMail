@@ -121,8 +121,6 @@ class ThreadListAdapter @Inject constructor(
         this.recyclerView = recyclerView
     }
 
-    private fun shouldDisplayFolderName(folderName: String) = isFolderNameVisible && folderName.isNotEmpty()
-
     override fun getItemViewType(position: Int): Int = runCatchingRealm {
         val item = dataSet[position]
         return when {
@@ -189,6 +187,8 @@ class ThreadListAdapter @Inject constructor(
             DisplayType.SEE_ALL_BUTTON.layout -> (this as ItemThreadSeeAllButtonBinding).displaySeeAllButton(item)
         }
     }
+
+    private fun shouldDisplayFolderName(folderName: String) = isFolderNameVisible && folderName.isNotEmpty()
 
     private fun CardviewThreadItemBinding.displayThread(thread: Thread, position: Int) {
         val folderName = getFolderName(thread)
