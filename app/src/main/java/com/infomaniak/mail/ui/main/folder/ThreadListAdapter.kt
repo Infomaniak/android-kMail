@@ -177,8 +177,6 @@ class ThreadListAdapter @Inject constructor(
             val binding = holder.binding as CardviewThreadItemBinding
             val thread = dataSet[position] as Thread
             binding.updateSelectedUi(thread)
-        } else {
-            super.onBindViewHolder(holder, position, payloads)
         }
     }.getOrDefault(Unit)
 
