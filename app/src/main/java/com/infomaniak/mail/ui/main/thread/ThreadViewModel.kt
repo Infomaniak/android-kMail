@@ -225,7 +225,7 @@ class ThreadViewModel @Inject constructor(
     }
 
     private fun MutableRealm.fetchCalendarEvent(message: Message, forceFetch: Boolean) {
-        if (!message.isFullyDownloaded()) return // Only treat message that have their attachments downloaded
+        if (!message.isFullyDownloaded()) return // Only treat message that have their Attachments downloaded
 
         if (!forceFetch) {
             val alreadyTreated = !treatedMessagesForCalendarEvent.add(message.uid)

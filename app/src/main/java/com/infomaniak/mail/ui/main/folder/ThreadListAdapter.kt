@@ -118,40 +118,6 @@ class ThreadListAdapter @Inject constructor(
         this.recyclerView = recyclerView
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ThreadListViewHolder {
-        val layoutInflater = LayoutInflater.from(parent.context)
-        val binding = when (viewType) {
-            R.layout.item_thread_date_separator -> ItemThreadDateSeparatorBinding.inflate(layoutInflater, parent, false)
-            R.layout.item_thread_flush_folder_button -> ItemThreadFlushFolderButtonBinding.inflate(layoutInflater, parent, false)
-            R.layout.item_thread_load_more_button -> ItemThreadLoadMoreButtonBinding.inflate(layoutInflater, parent, false)
-            R.layout.item_thread_see_all_button -> ItemThreadSeeAllButtonBinding.inflate(layoutInflater, parent, false)
-            else -> CardviewThreadItemBinding.inflate(layoutInflater, parent, false)
-        }
-
-        return ThreadListViewHolder(binding)
-    }
-
-    override fun onBindViewHolder(holder: ThreadListViewHolder, position: Int, payloads: MutableList<Any>) = runCatchingRealm {
-        val payload = payloads.firstOrNull()
-        if (payload == NotificationType.SELECTED_STATE && holder.itemViewType == DisplayType.THREAD.layout) {
-            val binding = holder.binding as CardviewThreadItemBinding
-            val thread = dataSet[position] as Thread
-            binding.updateSelectedUi(thread)
-        } else {
-            super.onBindViewHolder(holder, position, payloads)
-        }
-    }.getOrDefault(Unit)
-
-    override fun onBindViewHolder(item: Any, viewHolder: ThreadListViewHolder, position: Int) = with(viewHolder.binding) {
-        when (getItemViewType(position)) {
-            DisplayType.THREAD.layout -> (this as CardviewThreadItemBinding).displayThread(item as Thread, position)
-            DisplayType.DATE_SEPARATOR.layout -> (this as ItemThreadDateSeparatorBinding).displayDateSeparator(item as String)
-            DisplayType.FLUSH_FOLDER_BUTTON.layout -> (this as ItemThreadFlushFolderButtonBinding).displayFlushFolderButton(item as FolderRole)
-            DisplayType.LOAD_MORE_BUTTON.layout -> (this as ItemThreadLoadMoreButtonBinding).displayLoadMoreButton()
-            DisplayType.SEE_ALL_BUTTON.layout -> (this as ItemThreadSeeAllButtonBinding).displaySeeAllButton(item)
-        }
-    }
-
     override fun getItemViewType(position: Int): Int = runCatchingRealm {
         val item = dataSet[position]
         return when {
@@ -175,6 +141,44 @@ class ThreadListAdapter @Inject constructor(
         return dataSet
             .indexOfFirst { it is Thread && it.uid == threadUid }
             .takeIf { position -> position != -1 }
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ThreadListViewHolder {
+        val layoutInflater = LayoutInflater.from(parent.context)
+        val binding = when (viewType) {
+            R.layout.item_thread_date_separator -> ItemThreadDateSeparatorBinding.inflate(layoutInflater, parent, false)
+            R.layout.item_thread_flush_folder_button -> ItemThreadFlushFolderButtonBinding.inflate(layoutInflater, parent, false)
+            R.layout.item_thread_load_more_button -> ItemThreadLoadMoreButtonBinding.inflate(layoutInflater, parent, false)
+            R.layout.item_thread_see_all_button -> ItemThreadSeeAllButtonBinding.inflate(layoutInflater, parent, false)
+            else -> CardviewThreadItemBinding.inflate(layoutInflater, parent, false)
+        }
+
+        return ThreadListViewHolder(binding)
+    }
+
+    override fun onBindViewHolder(holder: ThreadListViewHolder, position: Int, payloads: MutableList<Any>) = runCatchingRealm {
+
+        val payload = payloads.firstOrNull()
+        if (payload !is NotificationType) {
+            super.onBindViewHolder(holder, position, payloads)
+            return@runCatchingRealm
+        }
+
+        if (payload == NotificationType.SELECTED_STATE && holder.itemViewType == DisplayType.THREAD.layout) {
+            val binding = holder.binding as CardviewThreadItemBinding
+            val thread = dataSet[position] as Thread
+            binding.updateSelectedUi(thread)
+        }
+    }.getOrDefault(Unit)
+
+    override fun onBindViewHolder(item: Any, viewHolder: ThreadListViewHolder, position: Int) = with(viewHolder.binding) {
+        when (getItemViewType(position)) {
+            DisplayType.THREAD.layout -> (this as CardviewThreadItemBinding).displayThread(item as Thread, position)
+            DisplayType.DATE_SEPARATOR.layout -> (this as ItemThreadDateSeparatorBinding).displayDateSeparator(item as String)
+            DisplayType.FLUSH_FOLDER_BUTTON.layout -> (this as ItemThreadFlushFolderButtonBinding).displayFlushFolderButton(item as FolderRole)
+            DisplayType.LOAD_MORE_BUTTON.layout -> (this as ItemThreadLoadMoreButtonBinding).displayLoadMoreButton()
+            DisplayType.SEE_ALL_BUTTON.layout -> (this as ItemThreadSeeAllButtonBinding).displaySeeAllButton(item)
+        }
     }
 
     private fun CardviewThreadItemBinding.displayThread(thread: Thread, position: Int) {

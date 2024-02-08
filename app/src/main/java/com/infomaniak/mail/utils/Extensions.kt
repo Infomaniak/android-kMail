@@ -409,14 +409,15 @@ fun Fragment.changeToolbarColorOnScroll(
     var oldColor = requireContext().getColor(loweredColor)
     var headerColorState = HeaderState.LOWERED
 
-    viewLifecycleOwner.lifecycle.addObserver(object : LifecycleEventObserver {
-        override fun onStateChanged(source: LifecycleOwner, event: Event) {
-            if (event == Event.ON_DESTROY) valueAnimator?.cancel()
-        }
-    })
+    viewLifecycleOwner.lifecycle.addObserver(
+        object : LifecycleEventObserver {
+            override fun onStateChanged(source: LifecycleOwner, event: Event) {
+                if (event == Event.ON_DESTROY) valueAnimator?.cancel()
+            }
+        },
+    )
 
     nestedScrollView.setOnScrollChangeListener { view, _, _, _, _ ->
-
         val isAtTheTop = view.isAtTheTop()
         if (!isAtTheTop && headerColorState == HeaderState.ELEVATED) return@setOnScrollChangeListener
 

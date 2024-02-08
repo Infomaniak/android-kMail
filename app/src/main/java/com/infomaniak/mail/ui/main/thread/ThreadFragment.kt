@@ -331,9 +331,6 @@ class ThreadFragment : Fragment() {
 
             displayThreadView()
 
-            reassignThreadLive(threadUid)
-            reassignMessagesLive(threadUid)
-
             openThread(threadUid).observe(viewLifecycleOwner) { result ->
 
                 if (result == null) {
@@ -343,6 +340,9 @@ class ThreadFragment : Fragment() {
 
                 initUi(threadUid, folderRole = mainViewModel.getActionFolderRole(result.thread))
                 initAdapter(result)
+
+                reassignThreadLive(threadUid)
+                reassignMessagesLive(threadUid)
             }
         }
     }
@@ -375,6 +375,7 @@ class ThreadFragment : Fragment() {
     }
 
     private fun observeMessagesLive() = with(threadViewModel) {
+
         messagesLive.observe(viewLifecycleOwner) { messages ->
             SentryLog.i("UI", "Received ${messages.count()} messages")
 

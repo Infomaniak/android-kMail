@@ -33,8 +33,6 @@ import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmSingleQuery
 import io.realm.kotlin.query.Sort
-import io.sentry.Sentry
-import io.sentry.SentryLevel
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

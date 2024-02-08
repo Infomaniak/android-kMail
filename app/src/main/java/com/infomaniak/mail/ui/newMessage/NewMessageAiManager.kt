@@ -202,7 +202,6 @@ class NewMessageAiManager @Inject constructor(
         updateNavigationBarColor()
     }
 
-
     private fun observeAiFeatureFlagUpdates() {
         newMessageViewModel.currentMailboxLive.observeNotNull(viewLifecycleOwner) { mailbox ->
             val isAiEnabled = mailbox.featureFlags.contains(FeatureFlag.AI)
@@ -223,7 +222,6 @@ class NewMessageAiManager @Inject constructor(
         resetAiProposition()
         fragment.safeNavigate(NewMessageFragmentDirections.actionNewMessageFragmentToAiPropositionFragment())
     }
-
 
     fun openAiPrompt() {
         aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(isOpened = true)

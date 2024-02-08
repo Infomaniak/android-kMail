@@ -69,12 +69,12 @@ object ApiRoutes {
     //endregion
 
     //region Calendar
-    fun calendarEvent(resource: String): String {
-        return "${resource(resource)}?format=render"
-    }
-
     fun infomaniakCalendarEventReply(calendarEventId: Int): String {
         return "${pim()}/event/$calendarEventId/reply"
+    }
+
+    fun calendarEvent(resource: String): String {
+        return "${resource(resource)}?format=render"
     }
 
     fun icsCalendarEventReply(resource: String): String {

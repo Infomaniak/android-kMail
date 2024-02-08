@@ -45,7 +45,6 @@ class PrintMailFragment : Fragment() {
     private val printMailViewModel: PrintMailViewModel by viewModels()
     private val threadAdapter inline get() = binding.messagesList.adapter as ThreadAdapter
 
-
     @Inject
     lateinit var localSettings: LocalSettings
 
