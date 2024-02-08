@@ -501,12 +501,20 @@ fun Context.postfixWithTag(
     onClicked: (() -> Unit)? = null,
 ) = postfixWithTag(original, getString(tagRes), backgroundColorRes, textColorRes, onClicked)
 
+fun Context.postfixWithTag(
+    original: Spannable,
+    tag: String,
+    @ColorRes backgroundColorRes: Int,
+    @ColorRes textColorRes: Int,
+    onClicked: (() -> Unit)? = null,
+) = postfixWithTag(original, tag as CharSequence, backgroundColorRes, textColorRes, onClicked)
+
 /**
  * Do not forget to set `movementMethod = LinkMovementMethod.getInstance()` on a TextView to make the tag clickable
  */
 fun Context.postfixWithTag(
     original: Spannable,
-    tag: String,
+    tag: CharSequence,
     @ColorRes backgroundColorRes: Int,
     @ColorRes textColorRes: Int,
     onClicked: (() -> Unit)? = null,
@@ -521,28 +529,6 @@ fun Context.postfixWithTag(
         onClicked?.let { setClickableSpan(startIndex, endIndex, it) }
     }
 }
-
-/*private fun test() {
-    val text = "This is a very long string that will be ellipsized in the middle."
-    val paint = TextPaint(Paint.ANTI_ALIAS_FLAG)
-    paint.textSize = 12f // Set the text size according to your needs
-    val width = Resources.getSystem().displayMetrics.widthPixels
-    //val layout = StaticLayout(text, paint, width, Layout.Alignment.ALIGN_NORMAL, 1f, 0f, false)
-    val layout = StaticLayout.Builder.obtain(text, 0, 0, paint, width).build()
-
-    val spannable = SpannableString(text)
-    val ellipsisCount = layout.lineCount - 1
-    if (ellipsisCount > 0) {
-        val ellipsisWidth = layout.ellipsizedWidth
-        val fullWidth = layout.getLineWidth(0)
-        val ellipsisStart = (fullWidth - ellipsisWidth) / 2
-        val spanStart = layout.getOffsetForHorizontal(0, ellipsisStart)
-        val spanEnd = spanStart + ellipsisCount
-        spannable.setSpan(CustomTypefaceSpan("", paint), spanStart, spanEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-    }
-
-    textView.text = spannable
-}*/
 
 private fun Spannable.setTagSpan(
     context: Context,

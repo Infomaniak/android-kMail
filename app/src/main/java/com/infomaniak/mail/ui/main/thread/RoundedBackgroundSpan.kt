@@ -37,6 +37,7 @@ class RoundedBackgroundSpan(
     private val textTypeface: Typeface,
     private val fontSize: Float,
 ) : ReplacementSpan(), LineHeightSpan {
+
     override fun getSize(paint: Paint, text: CharSequence?, start: Int, end: Int, fm: FontMetricsInt?): Int {
         paint.setGivenTextStyle()
         return (LEFT_MARGIN + PADDING + paint.measureText(text, start, end) + PADDING).toInt()

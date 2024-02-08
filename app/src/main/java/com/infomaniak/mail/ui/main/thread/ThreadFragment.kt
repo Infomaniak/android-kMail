@@ -19,21 +19,14 @@ package com.infomaniak.mail.ui.main.thread
 
 import android.content.res.ColorStateList
 import android.content.res.Configuration
-import android.content.res.Resources
-import android.graphics.Paint
 import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
-import android.text.*
 import android.text.method.LinkMovementMethod
-import android.util.DisplayMetrics
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.IdRes
-import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.ColorUtils
-import androidx.core.text.toSpannable
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -52,19 +45,16 @@ import com.infomaniak.mail.MatomoMail.ACTION_REPLY_NAME
 import com.infomaniak.mail.MatomoMail.OPEN_ACTION_BOTTOM_SHEET
 import com.infomaniak.mail.MatomoMail.OPEN_FROM_DRAFT_NAME
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
-import com.infomaniak.mail.MatomoMail.trackExternalEvent
 import com.infomaniak.mail.MatomoMail.trackMessageActionsEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.MatomoMail.trackThreadActionsEvent
 import com.infomaniak.mail.R
-import com.infomaniak.lib.core.R as CoreR
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ExternalContent
 import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.*
@@ -413,12 +403,21 @@ class ThreadFragment : Fragment() {
     private fun observeSubjectUpdateTriggers() = with(binding) {
         threadViewModel.assembleSubjectData(mainViewModel.mergedContactsLive).observe(viewLifecycleOwner) { result ->
 
-            val (subject, spannedSubject) = computeSubject(
-                thread = result.thread ?: return@observe,
-                emailDictionary = result.mergedContacts ?: emptyMap(),
-                aliases = result.mailbox?.aliases ?: emptyList(),
-                externalMailFlagEnabled = result.mailbox?.externalMailFlagEnabled ?: false,
-            )
+            val (subject, spannedSubject) = SubjectFormatter.computeSubject(
+                context = requireContext(),
+                subjectData = SubjectFormatter.SubjectData(
+                    thread = result.thread ?: return@observe,
+                    emailDictionary = result.mergedContacts ?: emptyMap(),
+                    aliases = result.mailbox?.aliases ?: emptyList(),
+                    externalMailFlagEnabled = result.mailbox?.externalMailFlagEnabled ?: false
+                ),
+            ) { description ->
+                informationDialog.show(
+                    title = R.string.externalDialogTitleExpeditor,
+                    description = description,
+                    confirmButtonText = R.string.externalDialogConfirmButton,
+                )
+            }
 
             threadSubject.text = spannedSubject
             toolbarSubject.text = subject
@@ -588,102 +587,6 @@ class ThreadFragment : Fragment() {
     }
 
     private fun shouldLoadDistantResources(): Boolean = localSettings.externalContent == ExternalContent.ALWAYS && isNotInSpam
-
-    private fun computeSubject(
-        thread: Thread,
-        emailDictionary: MergedContactDictionary,
-        aliases: List<String>,
-        externalMailFlagEnabled: Boolean,
-    ): Pair<String, CharSequence> = with(binding) {
-        val subject = context.formatSubject(thread.subject)
-        getFolderName(subject, true, thread.messages.first().folder.name)
-
-        var spannedSubject: Pair<String, CharSequence>? = null
-        if (!externalMailFlagEnabled) spannedSubject = subject to subject
-
-        val (externalRecipientEmail, externalRecipientQuantity) = thread.findExternalRecipients(emailDictionary, aliases)
-        if (externalRecipientQuantity == 0) spannedSubject = subject to subject
-
-        val spannedSubjectWithExternal = createSpannedSubjectWithExternal(
-            subject,
-            externalRecipientEmail,
-            externalRecipientQuantity
-        )
-
-        getSpannedFolderName(thread, spannedSubjectWithExternal)?.let {
-            spannedSubject = subject to it
-
-        }
-
-
-        return spannedSubject!!
-    }
-
-    private fun createSpannedSubjectWithExternal(
-        subject: String,
-        externalRecipientEmail: String?,
-        externalRecipientQuantity: Int
-    ) : Spannable {
-        return requireContext().postfixWithTag(
-            subject.toSpannable(),
-            R.string.externalTag,
-            R.color.externalTagBackground,
-            R.color.externalTagOnBackground,
-        ) {
-            trackExternalEvent("threadTag")
-
-            val description = resources.getQuantityString(
-                R.plurals.externalDialogDescriptionExpeditor,
-                externalRecipientQuantity,
-                externalRecipientEmail,
-            )
-
-            informationDialog.show(
-                title = R.string.externalDialogTitleExpeditor,
-                description = description,
-                confirmButtonText = R.string.externalDialogConfirmButton,
-            )
-        }
-    }
-
-    private fun getFolderName(subject: String, hasExternalTag: Boolean, fullFolderName: String) {
-        val subjectPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
-        subjectPaint.textSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 18f, Resources.getSystem().displayMetrics)
-        subjectPaint.typeface = ResourcesCompat.getFont(requireContext(), com.infomaniak.lib.core.R.font.suisseintl_semibold)
-
-        val subjectTagsPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
-        subjectTagsPaint.textSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-            requireContext().resources.getDimension(R.dimen.externalTagTextSize), Resources.getSystem().displayMetrics)
-
-        val externalString = if (hasExternalTag) getString(R.string.externalTag) else ""
-
-        val width = Resources.getSystem().displayMetrics.widthPixels - (requireContext().resources.getDimensionPixelSize(CoreR.dimen.marginStandardMedium) * 2)
-        val subjectLayout = StaticLayout.Builder.obtain(subject, 0, subject.length, subjectPaint, width).build()
-        val externalTagLayout = StaticLayout.Builder.obtain(externalString, 0, externalString.length, subjectTagsPaint, width).build()
-        val fullFolderNameLayout = StaticLayout.Builder.obtain(fullFolderName, 0, fullFolderName.length, subjectTagsPaint, width).build()
-        val totalLines = subjectLayout.lineCount + externalTagLayout.lineCount + fullFolderNameLayout.lineCount - 1
-        if (totalLines > 0) {
-            
-        }
-
-       // textView.text = spannable
-    }
-
-    private fun getSpannedFolderName(thread: Thread, spannedSubjectWithExternal: Spannable): Spannable? {
-        val folderName = thread.messages.first().folder.name
-        return if (folderName.isNotEmpty()) {
-            requireContext().postfixWithTag(
-                spannedSubjectWithExternal,
-                folderName,
-                R.color.backgroundFolderName,
-                R.color.textColorFolderName,
-            ) {
-                trackExternalEvent("threadTag")
-            }
-        } else {
-            null
-        }
-    }
 
     fun getAnchor(): View? = _binding?.quickActionBar
 
