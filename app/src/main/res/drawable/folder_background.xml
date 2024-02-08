@@ -21,7 +21,6 @@
         android:width="42dp"
         android:height="@dimen/marginStandardVerySmall" />
     <corners android:radius="4dp" />
-    <!--<solid android:color="#f1f1f1" />-->
     <solid android:color="@color/backgroundFolderName" />
     <padding
         android:bottom="4dp"
