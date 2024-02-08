@@ -35,8 +35,8 @@ import com.infomaniak.mail.data.models.calendar.CalendarEvent
 import com.infomaniak.mail.databinding.ViewCalendarEventBannerBinding
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.utils.UiUtils.getPrettyNameAndEmail
-import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType
-import com.infomaniak.mail.utils.extensions.AttachmentExt.openAttachment
+import com.infomaniak.mail.utils.extensions.AttachmentExtensions.AttachmentIntentType
+import com.infomaniak.mail.utils.extensions.AttachmentExtensions.openAttachment
 import com.infomaniak.mail.utils.extensions.findUser
 import com.infomaniak.mail.utils.extensions.toDate
 import dagger.hilt.android.AndroidEntryPoint

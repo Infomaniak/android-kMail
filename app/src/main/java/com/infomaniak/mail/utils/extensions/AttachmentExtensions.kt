@@ -29,11 +29,11 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialogArgs
-import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType.OPEN_WITH
-import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType.SAVE_TO_DRIVE
+import com.infomaniak.mail.utils.extensions.AttachmentExtensions.AttachmentIntentType.OPEN_WITH
+import com.infomaniak.mail.utils.extensions.AttachmentExtensions.AttachmentIntentType.SAVE_TO_DRIVE
 import io.sentry.Sentry
 
-object AttachmentExt {
+object AttachmentExtensions {
 
     private const val DRIVE_PACKAGE = "com.infomaniak.drive"
     private const val SAVE_EXTERNAL_ACTIVITY_CLASS = "com.infomaniak.drive.ui.SaveExternalFilesActivity"

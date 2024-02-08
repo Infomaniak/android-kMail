@@ -58,7 +58,7 @@ import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupThreadWebViewSettings
 import com.infomaniak.mail.utils.WebViewUtils.Companion.toggleWebViewTheme
 import com.infomaniak.mail.utils.extensions.*
-import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType
+import com.infomaniak.mail.utils.extensions.AttachmentExtensions.AttachmentIntentType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

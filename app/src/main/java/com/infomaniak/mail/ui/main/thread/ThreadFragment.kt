@@ -77,7 +77,7 @@ import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipients
 import com.infomaniak.mail.utils.PermissionUtils
 import com.infomaniak.mail.utils.UiUtils.dividerDrawable
 import com.infomaniak.mail.utils.extensions.*
-import com.infomaniak.mail.utils.extensions.AttachmentExt.openAttachment
+import com.infomaniak.mail.utils.extensions.AttachmentExtensions.openAttachment
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel

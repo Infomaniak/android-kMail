@@ -38,7 +38,7 @@ import com.infomaniak.mail.ui.main.search.SearchFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.utils.UiUtils.FULLY_SLID
 import com.infomaniak.mail.utils.UiUtils.progressivelyColorSystemBars
-import com.infomaniak.mail.utils.extensions.AttachmentExt
+import com.infomaniak.mail.utils.extensions.AttachmentExtensions
 import com.infomaniak.mail.utils.extensions.safeNavigateToNewMessageActivity
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import javax.inject.Inject
@@ -142,7 +142,7 @@ abstract class TwoPaneFragment : Fragment() {
     }
 
     private fun observeThreadNavigation() = with(twoPaneViewModel) {
-        getBackNavigationResult(AttachmentExt.DOWNLOAD_ATTACHMENT_RESULT, ::startActivity)
+        getBackNavigationResult(AttachmentExtensions.DOWNLOAD_ATTACHMENT_RESULT, ::startActivity)
 
         newMessageArgs.observe(viewLifecycleOwner) {
             safeNavigateToNewMessageActivity(args = it.toBundle())
