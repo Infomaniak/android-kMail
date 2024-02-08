@@ -31,9 +31,9 @@ import com.infomaniak.mail.MatomoMail.trackExternalEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipients
-import com.infomaniak.mail.utils.MergedContactDictionary
-import com.infomaniak.mail.utils.formatSubject
-import com.infomaniak.mail.utils.postfixWithTag
+import com.infomaniak.mail.utils.extensions.MergedContactDictionary
+import com.infomaniak.mail.utils.extensions.formatSubject
+import com.infomaniak.mail.utils.extensions.postfixWithTag
 import com.infomaniak.lib.core.R as CoreR
 
 object SubjectFormatter {
@@ -62,7 +62,7 @@ object SubjectFormatter {
         val folderName = getFolderName(
             context,
             subject,
-            thread.messages.first().folder.name,
+            getFolderName(thread),
             externalRecipientQuantity != 0
         )
         getSpannedFolderName(context, folderName, spannedSubjectWithExternal)?.let { spannedFolderName ->
@@ -71,6 +71,8 @@ object SubjectFormatter {
 
         return spannedSubject!!
     }
+
+    fun getFolderName(thread: Thread) = if (thread.messages.size > 1) "" else thread.messages.first().folder.name
 
     private fun createSpannedSubjectWithExternal(
         context: Context,

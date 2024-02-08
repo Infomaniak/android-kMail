@@ -53,6 +53,7 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.*
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter.ThreadListViewHolder
+import com.infomaniak.mail.ui.main.thread.SubjectFormatter.getFolderName
 import com.infomaniak.mail.utils.RealmChangesBinding
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.*
@@ -192,7 +193,7 @@ class ThreadListAdapter @Inject constructor(
     }
 
     private fun CardviewThreadItemBinding.displayThread(thread: Thread, position: Int) {
-        val folderName = thread.messages.first().folder.name
+        val folderName = getFolderName(thread)
         if (shouldDisplayFolderName(folderName)) {
             folderNameView.isVisible = true
             folderNameView.text = folderName

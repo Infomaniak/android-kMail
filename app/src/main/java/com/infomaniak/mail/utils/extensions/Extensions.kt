@@ -33,6 +33,7 @@ import android.os.Build
 import android.text.Html
 import android.text.Spannable
 import android.text.Spanned
+import android.text.TextUtils
 import android.text.style.ClickableSpan
 import android.util.Patterns
 import android.view.View
