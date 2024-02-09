@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
+import android.content.Context
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController.Companion.getFolder
@@ -80,6 +81,7 @@ class ThreadController @Inject constructor(
      * @return A list of search Threads. The search only returns Messages from SPAM or TRASH if we explicitly selected those folders
      */
     suspend fun initAndGetSearchFolderThreads(
+        context: Context,
         remoteThreads: List<Thread>,
         filterFolder: Folder?,
     ): List<Thread> = withContext(ioDispatcher) {
@@ -115,7 +117,7 @@ class ThreadController @Inject constructor(
                 ensureActive()
                 if (remoteThread.messages.size == 1) {
                     val folderId = remoteThread.messages.first().folderId
-                    getFolder(folderId, this@writeBlocking)?.let { folder -> remoteThread.folderName = folder.name }
+                    getFolder(folderId, this@writeBlocking)?.let { folder -> remoteThread.folderName = folder.getLocalizedName(context) }
                 }
                 remoteThread.isFromSearch = true
 
