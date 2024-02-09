@@ -241,9 +241,7 @@
                     android:textSize="12sp"
                     android:visibility="gone"
                     android:layout_marginEnd="@dimen/marginStandardSmall"
-                    app:layout_goneMarginEnd="0dp"
                     app:layout_constrainedWidth="true"
-                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintBottom_toBottomOf="@id/mailSubject"
                     app:layout_constraintEnd_toStartOf="@id/iconAttachment"
                     app:layout_constraintWidth_max="100dp"
@@ -255,7 +253,6 @@
                     android:layout_width="@dimen/mediumIconSize"
                     android:layout_height="@dimen/mediumIconSize"
                     android:layout_marginEnd="@dimen/marginStandardSmall"
-                    app:layout_goneMarginEnd="0dp"
                     android:contentDescription="@string/contentDescriptionIconAttachments"
                     android:src="@drawable/ic_attachment"
                     android:visibility="gone"
@@ -264,14 +261,13 @@
                     app:layout_constraintTop_toTopOf="@id/iconFavorite"
                     app:tint="@color/iconColorPrimaryText"
                     app:layout_constraintHorizontal_chainStyle="packed"
-                    tools:visibility="visible" />
+                    tools:visibility="gone" />
 
                 <ImageView
                     android:id="@+id/iconCalendar"
                     android:layout_width="@dimen/mediumIconSize"
                     android:layout_height="@dimen/mediumIconSize"
                     android:layout_marginEnd="@dimen/marginStandardSmall"
-                    app:layout_goneMarginEnd="0dp"
                     android:contentDescription="@string/contentDescriptionIconCalendar"
                     android:src="@drawable/ic_calendar"
                     android:visibility="gone"
@@ -279,14 +275,12 @@
                     app:layout_constraintEnd_toStartOf="@id/iconFavorite"
                     app:layout_constraintTop_toTopOf="@id/iconFavorite"
                     app:tint="@color/iconColorPrimaryText"
-                    tools:visibility="visible" />
+                    tools:visibility="gone" />
 
                 <ImageView
                     android:id="@+id/iconFavorite"
                     android:layout_width="@dimen/mediumIconSize"
                     android:layout_height="@dimen/mediumIconSize"
-                    android:layout_marginEnd="@dimen/marginStandardSmall"
-                    app:layout_goneMarginEnd="0dp"
                     android:contentDescription="@string/contentDescriptionIconFavorite"
                     android:src="@drawable/ic_star_filled"
                     android:visibility="gone"
@@ -304,7 +298,7 @@
                     android:ellipsize="end"
                     android:lines="1"
                     app:layout_constrainedWidth="true"
-                    app:layout_constraintEnd_toStartOf="@id/folder_name_view"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/mailSubject"
                     tools:text="@tools:sample/lorem/random" />

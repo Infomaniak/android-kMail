@@ -71,7 +71,7 @@ object SubjectFormatter {
         return spannedSubject!!
     }
 
-    fun getFolderName(thread: Thread) = if (thread.messages.size > 1) "" else thread.messages.first().folder.name
+    fun getFolderName(thread: Thread) = if (thread.messages.size > 1) "" else thread.folderName
 
     private fun createSpannedSubjectWithExternal(
         context: Context,

@@ -84,6 +84,8 @@ class Thread : RealmObject {
     @Transient
     var folderId: String = ""
     @Transient
+    var folderName: String = ""
+    @Transient
     var duplicates: RealmList<Message> = realmListOf()
     @Transient
     var messagesIds: RealmSet<String> = realmSetOf()
