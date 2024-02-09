@@ -219,34 +219,33 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/marginStandardVerySmall"
+                    android:layout_marginEnd="@dimen/marginStandardSmall"
                     android:ellipsize="end"
                     android:lines="1"
-                    android:layout_marginEnd="@dimen/marginStandardSmall"
-                    app:layout_constraintEnd_toStartOf="@id/folder_name_view"
+                    app:layout_constraintEnd_toStartOf="@id/folderNameView"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/expeditor"
                     tools:text="@tools:sample/lorem[10]" />
 
                 <TextView
-                    android:id="@+id/folder_name_view"
+                    android:id="@+id/folderNameView"
                     style="@style/BodySmall.Secondary"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:ellipsize="end"
-                    android:maxEms="12"
-                    android:lines="1"
+                    android:layout_marginEnd="@dimen/marginStandardSmall"
                     android:background="@drawable/folder_background"
+                    android:ellipsize="end"
+                    android:lines="1"
                     android:textAlignment="center"
                     android:textColor="@color/textColorFolderName"
                     android:textSize="12sp"
                     android:visibility="gone"
-                    android:layout_marginEnd="@dimen/marginStandardSmall"
-                    app:layout_constrainedWidth="true"
                     app:layout_constraintBottom_toBottomOf="@id/mailSubject"
                     app:layout_constraintEnd_toStartOf="@id/iconAttachment"
                     app:layout_constraintWidth_max="100dp"
-                    tools:visibility="visible"
-                    tools:text="Folder name" />
+                    app:layout_goneMarginEnd="0dp"
+                    tools:text="Folder name"
+                    tools:visibility="visible" />
 
                 <ImageView
                     android:id="@+id/iconAttachment"
@@ -260,8 +259,7 @@
                     app:layout_constraintEnd_toStartOf="@id/iconCalendar"
                     app:layout_constraintTop_toTopOf="@id/iconFavorite"
                     app:tint="@color/iconColorPrimaryText"
-                    app:layout_constraintHorizontal_chainStyle="packed"
-                    tools:visibility="gone" />
+                    tools:visibility="visible" />
 
                 <ImageView
                     android:id="@+id/iconCalendar"
@@ -275,7 +273,7 @@
                     app:layout_constraintEnd_toStartOf="@id/iconFavorite"
                     app:layout_constraintTop_toTopOf="@id/iconFavorite"
                     app:tint="@color/iconColorPrimaryText"
-                    tools:visibility="gone" />
+                    tools:visibility="visible" />
 
                 <ImageView
                     android:id="@+id/iconFavorite"
