@@ -110,10 +110,12 @@ class ThreadListAdapter @Inject constructor(
         folderRole: FolderRole?,
         onSwipeFinished: (() -> Unit)? = null,
         multiSelection: MultiSelectionListener<Thread>? = null,
+        isFolderNameVisible: Boolean = false
     ) {
         this.folderRole = folderRole
         this.onSwipeFinished = onSwipeFinished
         this.multiSelection = multiSelection
+        this.isFolderNameVisible = isFolderNameVisible
     }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
@@ -139,10 +141,6 @@ class ThreadListAdapter @Inject constructor(
             else -> super.getItemId(position)
         }
     }.getOrDefault(super.getItemId(position))
-
-    fun setFolderNameVisibility(isVisible: Boolean) {
-        isFolderNameVisible = isVisible
-    }
 
     fun getItemPosition(threadUid: String): Int? {
         return dataSet
