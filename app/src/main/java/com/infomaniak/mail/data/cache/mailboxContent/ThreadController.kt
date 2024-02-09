@@ -115,7 +115,7 @@ class ThreadController @Inject constructor(
                 ensureActive()
                 if (remoteThread.messages.size == 1) {
                     val folderId = remoteThread.messages.first().folderId
-                    getFolder(folderId, this@writeBlocking)?.let { remoteThread.folderName = it.name }
+                    getFolder(folderId, this@writeBlocking)?.let { folder -> remoteThread.folderName = folder.name }
                 }
                 remoteThread.isFromSearch = true
 
