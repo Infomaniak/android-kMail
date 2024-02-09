@@ -463,8 +463,6 @@ class MainActivity : BaseActivity() {
             SentryLog.d(StoreUtils.APP_UPDATE_TAG, "Must display update button : $isUpdateDownloaded")
             mainViewModel.canInstallUpdate.value = isUpdateDownloaded
         }
-
-        lifecycle.addObserver(observer = this)
     }
 
     private fun showSyncDiscovery() = with(localSettings) {
