@@ -108,6 +108,9 @@ class ThreadFragment : Fragment() {
     lateinit var permissionUtils: PermissionUtils
 
     @Inject
+    lateinit var subjectFormatter: SubjectFormatter
+
+    @Inject
     lateinit var snackbarManager: SnackbarManager
 
     private var _binding: FragmentThreadBinding? = null
@@ -402,8 +405,7 @@ class ThreadFragment : Fragment() {
     private fun observeSubjectUpdateTriggers() = with(binding) {
         threadViewModel.assembleSubjectData(mainViewModel.mergedContactsLive).observe(viewLifecycleOwner) { result ->
 
-            val (subject, spannedSubject) = SubjectFormatter.generateSubjectContent(
-                context = requireContext(),
+            val (subjectWithoutTags, subjectWithTags) = subjectFormatter.generateSubjectContent(
                 subjectData = SubjectFormatter.SubjectData(
                     thread = result.thread ?: return@observe,
                     emailDictionary = result.mergedContacts ?: emptyMap(),
@@ -418,15 +420,15 @@ class ThreadFragment : Fragment() {
                 )
             }
 
-            threadSubject.text = spannedSubject
-            toolbarSubject.text = subject
+            threadSubject.text = subjectWithTags
+            toolbarSubject.text = subjectWithoutTags
 
             threadSubject.setOnLongClickListener {
-                context.copyStringToClipboard(subject, R.string.snackbarSubjectCopiedToClipboard, snackbarManager)
+                context.copyStringToClipboard(subjectWithoutTags, R.string.snackbarSubjectCopiedToClipboard, snackbarManager)
                 true
             }
             toolbarSubject.setOnLongClickListener {
-                context.copyStringToClipboard(subject, R.string.snackbarSubjectCopiedToClipboard, snackbarManager)
+                context.copyStringToClipboard(subjectWithoutTags, R.string.snackbarSubjectCopiedToClipboard, snackbarManager)
                 true
             }
         }

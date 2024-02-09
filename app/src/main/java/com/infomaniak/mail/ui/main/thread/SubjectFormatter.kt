@@ -19,164 +19,114 @@ package com.infomaniak.mail.ui.main.thread
 
 import android.content.Context
 import android.content.res.Resources
-import android.graphics.Paint
-import android.text.Spannable
 import android.text.StaticLayout
-import android.text.TextPaint
 import android.text.TextUtils
-import androidx.core.content.res.ResourcesCompat
-import androidx.core.text.toSpannable
 import com.infomaniak.mail.MatomoMail.trackExternalEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipients
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
+import com.infomaniak.mail.utils.extensions.TagColor
 import com.infomaniak.mail.utils.extensions.formatSubject
 import com.infomaniak.mail.utils.extensions.postfixWithTag
+import javax.inject.Inject
+import javax.inject.Singleton
 import com.infomaniak.lib.core.R as CoreR
 
-object SubjectFormatter {
+@Singleton
+class SubjectFormatter @Inject constructor(private val context: Context) {
 
     fun generateSubjectContent(
-        context: Context,
         subjectData: SubjectData,
-        onTagClicked: (String) -> Unit
+        onExternalClicked: (String) -> Unit
     ): Pair<String, CharSequence> = with(subjectData) {
         val subject = context.formatSubject(thread.subject)
 
-        var spannedSubject: Pair<String, CharSequence>? = null
-        if (!externalMailFlagEnabled) spannedSubject = subject to subject
+        val spannedSubjectWithExternal = handleExternals(subject, onExternalClicked)
+
+        val spannedSubjectWithFolder = handleFolders(
+            spannedSubjectWithExternal,
+            getEllipsizeConfiguration(spannedSubjectWithExternal, getFolderName(thread))
+        )
+
+        return subject to spannedSubjectWithFolder
+    }
+
+    private fun SubjectData.handleExternals(
+        previousContent: String,
+        onExternalClicked: (String) -> Unit
+    ): CharSequence {
+        if (!externalMailFlagEnabled) return previousContent
 
         val (externalRecipientEmail, externalRecipientQuantity) = thread.findExternalRecipients(emailDictionary, aliases)
-        if (externalRecipientQuantity == 0) spannedSubject = subject to subject
+        if (externalRecipientQuantity == 0) return previousContent
 
-        val spannedSubjectWithExternal = createSpannedSubjectWithExternal(
-            context,
-            subject,
-            externalRecipientEmail,
-            externalRecipientQuantity,
-            onTagClicked
-        )
-
-        val folderName = getFolderName(
-            context,
-            subject,
-            getFolderName(thread),
-            externalRecipientQuantity != 0
-        )
-        getSpannedFolderName(context, folderName, spannedSubjectWithExternal)?.let { spannedFolderName ->
-            spannedSubject = subject to spannedFolderName
-        }
-
-        return spannedSubject!!
+        return postFixWithExternal(previousContent, externalRecipientQuantity, externalRecipientEmail, onExternalClicked)
     }
 
-    fun getFolderName(thread: Thread) = if (thread.messages.size > 1) "" else thread.folderName
-
-    private fun createSpannedSubjectWithExternal(
-        context: Context,
-        subject: String,
-        externalRecipientEmail: String?,
+    private fun postFixWithExternal(
+        previousContent: CharSequence,
         externalRecipientQuantity: Int,
-        onTagClicked: (String) -> Unit
-    ): Spannable {
-        return context.postfixWithTag(
-            subject.toSpannable(),
-            R.string.externalTag,
-            R.color.externalTagBackground,
-            R.color.externalTagOnBackground,
-        ) {
-            context.trackExternalEvent("threadTag")
+        externalRecipientEmail: String?,
+        onExternalClicked: (String) -> Unit
+    ) = context.postfixWithTag(
+        previousContent,
+        R.string.externalTag,
+        TagColor(R.color.externalTagBackground, R.color.externalTagOnBackground)
+    ) {
+        context.trackExternalEvent("threadTag")
 
-            val description = context.resources.getQuantityString(
-                R.plurals.externalDialogDescriptionExpeditor,
-                externalRecipientQuantity,
-                externalRecipientEmail,
-            )
-            onTagClicked(description)
-        }
-    }
-
-    private fun getSpannedFolderName(
-        context: Context,
-        folderName: CharSequence?,
-        spannedSubjectWithExternal: Spannable
-    ): Spannable? {
-        return if (!folderName.isNullOrEmpty()) {
-            context.postfixWithTag(
-                spannedSubjectWithExternal,
-                folderName,
-                R.color.backgroundFolderName,
-                R.color.textColorFolderName,
-            ) {
-                context.trackExternalEvent("threadTag")
-            }
-        } else {
-            null
-        }
-    }
-
-    private fun getFolderName(
-        context: Context,
-        subject: String,
-        fullFolderName: String,
-        hasExternalTag: Boolean
-    ): CharSequence {
-
-        val (subjectAndExternalLayout, fullSubjectLayout, folderNameLayout) = getStaticLayouts(
-            context,
-            subject,
-            fullFolderName,
-            hasExternalTag
+        val description = context.resources.getQuantityString(
+            R.plurals.externalDialogDescriptionExpeditor,
+            externalRecipientQuantity,
+            externalRecipientEmail,
         )
-
-        // In case we know that the folder name take more than one line, we insert a break line to have more space
-        // If in any case, the folder name take more than the width of the screen, the string will be ellipsized
-        // the middle.
-        return if (fullSubjectLayout.lineCount - subjectAndExternalLayout.lineCount > 0) {
-            "\n ${folderNameLayout.text}"
-        } else {
-            fullFolderName
-        }
+        onExternalClicked(description)
     }
 
-    private fun getTagsTextPaint(context: Context) : TextPaint {
-        val tagsTextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
-        tagsTextPaint.textSize = context.resources.getDimension(R.dimen.externalTagTextSize)
-        tagsTextPaint.typeface = ResourcesCompat.getFont(context, R.font.tag_font)
-        tagsTextPaint.density
+    private fun SubjectData.handleFolders(
+        previousContent: CharSequence,
+        ellipsizeTag: EllipsizeConfiguration
+    ): CharSequence {
+        val folderName = getFolderName(thread)
+        if (folderName.isEmpty()) return previousContent
 
-        return tagsTextPaint
+        return postFixWithFolder(previousContent, folderName, ellipsizeTag)
     }
 
-    private fun getStaticLayouts(
-        context: Context,
-        subjectString: String,
-        fullFolderName: String,
-        hasExternalTag: Boolean
-    ) : StaticLayouts {
-        val tagsTextPaint = getTagsTextPaint(context)
+    private fun postFixWithFolder(
+        previousContent: CharSequence,
+        folderName: String,
+        ellipsizeTag: EllipsizeConfiguration
+    ) = context.postfixWithTag(
+        previousContent,
+        folderName,
+        TagColor(R.color.folderNameBackground, R.color.folderNameTextColor),
+        ellipsizeTag
+    )
 
+    private fun getFolderName(thread: Thread) = if (thread.messages.size > 1) "" else thread.folderName
+
+    private fun getEllipsizeConfiguration(previousContent: CharSequence, tag: String): EllipsizeConfiguration {
         val paddingsInPixels = (context.resources.getDimension(CoreR.dimen.marginStandard) * 2).toInt()
         val width = Resources.getSystem().displayMetrics.widthPixels - paddingsInPixels
+        val tagsTextPaint = RoundedBackgroundSpan.getTagsPaint(context)
 
-        val externalString = if (hasExternalTag) context.getString(R.string.externalTag) else ""
-        val subjectAndExternalString = subjectString + externalString
-        val fullString = subjectString + externalString + fullFolderName
+        val layoutBeforeAddingTag = StaticLayout.Builder.obtain(
+            previousContent,
+            0,
+            previousContent.length,
+            tagsTextPaint,
+            width
+        ).build()
 
-        val folderNameLayout =
-            StaticLayout.Builder.obtain(fullFolderName, 0, fullFolderName.length, tagsTextPaint, width)
-                .setEllipsizedWidth(width)
-                .setEllipsize(TextUtils.TruncateAt.MIDDLE)
-                .setMaxLines(1)
-                .build()
+        val fullString = "$previousContent $tag"
+        val layoutAfterAddingTag = StaticLayout.Builder.obtain(fullString, 0, fullString.length, tagsTextPaint, width).build()
 
-        val subjectAndExternalLayout =
-            StaticLayout.Builder.obtain(subjectAndExternalString, 0, subjectAndExternalString.length, tagsTextPaint, width)
-                .build()
-        val fullSubjectLayout = StaticLayout.Builder.obtain(fullString, 0, fullString.length, tagsTextPaint, width).build()
-
-        return StaticLayouts(subjectAndExternalLayout, fullSubjectLayout, folderNameLayout)
+        val positionLastChar = layoutBeforeAddingTag.getPrimaryHorizontal(previousContent.length).toInt()
+        val linesCountDifferent = layoutAfterAddingTag.lineCount != layoutBeforeAddingTag.lineCount
+        val maxWidth = if (layoutAfterAddingTag.lineCount != layoutBeforeAddingTag.lineCount) width else width - positionLastChar
+        return EllipsizeConfiguration(maxWidth, TextUtils.TruncateAt.MIDDLE, linesCountDifferent)
     }
 
     data class SubjectData(
@@ -186,9 +136,9 @@ object SubjectFormatter {
         val externalMailFlagEnabled: Boolean
     )
 
-    private data class StaticLayouts(
-        val subjectAndExternalLayout: StaticLayout,
-        val fullSubjectLayout: StaticLayout,
-        val folderNameLayout: StaticLayout
+    data class EllipsizeConfiguration(
+        val maxWidth: Int,
+        val truncateAt: TextUtils.TruncateAt = TextUtils.TruncateAt.MIDDLE,
+        val withNewLine: Boolean = false
     )
 }

@@ -32,6 +32,8 @@
     <dimen name="noMailTextViewSize">300dp</dimen>
     <dimen name="searchViewHeight">38dp</dimen>
     <dimen name="smallCornerRadius">6dp</dimen>
+    <dimen name="subjectTagRadius">4dp</dimen>
+    <dimen name="subjectTagMaxSize">150dp</dimen>
     <dimen name="userAvatarSizeLarge">40dp</dimen>
     <dimen name="messageDividerHeight">6dp</dimen>
     <dimen name="smallIconSize">12dp</dimen>

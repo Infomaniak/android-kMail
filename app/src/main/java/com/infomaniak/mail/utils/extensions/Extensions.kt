@@ -25,15 +25,10 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
-import android.content.res.Resources
 import android.content.res.TypedArray
-import android.graphics.Paint
 import android.net.Uri
 import android.os.Build
-import android.text.Html
-import android.text.Spannable
-import android.text.Spanned
-import android.text.TextUtils
+import android.text.*
 import android.text.style.ClickableSpan
 import android.util.Patterns
 import android.view.View
@@ -87,9 +82,11 @@ import com.infomaniak.mail.ui.main.folder.HeaderItemDecoration
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
 import com.infomaniak.mail.ui.main.thread.MessageWebViewClient
 import com.infomaniak.mail.ui.main.thread.RoundedBackgroundSpan
+import com.infomaniak.mail.ui.main.thread.SubjectFormatter
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.HeaderState
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.Utils
+import com.infomaniak.mail.utils.Utils.TAG_SEPARATOR
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.Utils.kSyncAccountUri
 import io.realm.kotlin.MutableRealm
@@ -495,38 +492,57 @@ inline val AndroidViewModel.context: Context get() = getApplication()
 val TextInputEditText.trimmedText inline get() = text?.trim().toString()
 
 fun Context.postfixWithTag(
-    original: Spannable,
+    original: CharSequence,
     @StringRes tagRes: Int,
-    @ColorRes backgroundColorRes: Int,
-    @ColorRes textColorRes: Int,
+    tagColor: TagColor,
+    ellipsizeConfiguration: SubjectFormatter.EllipsizeConfiguration? = null,
     onClicked: (() -> Unit)? = null,
-) = postfixWithTag(original, getString(tagRes), backgroundColorRes, textColorRes, onClicked)
-
-fun Context.postfixWithTag(
-    original: Spannable,
-    tag: String,
-    @ColorRes backgroundColorRes: Int,
-    @ColorRes textColorRes: Int,
-    onClicked: (() -> Unit)? = null,
-) = postfixWithTag(original, tag as CharSequence, backgroundColorRes, textColorRes, onClicked)
+) = postfixWithTag(
+    original = original,
+    tag = getString(tagRes),
+    tagColor = tagColor,
+    ellipsizeConfiguration = ellipsizeConfiguration,
+    onClicked = onClicked
+)
 
 /**
  * Do not forget to set `movementMethod = LinkMovementMethod.getInstance()` on a TextView to make the tag clickable
  */
 fun Context.postfixWithTag(
-    original: Spannable,
+    original: CharSequence = "",
     tag: CharSequence,
-    @ColorRes backgroundColorRes: Int,
-    @ColorRes textColorRes: Int,
+    tagColor: TagColor,
+    ellipsizeConfiguration: SubjectFormatter.EllipsizeConfiguration? = null,
     onClicked: (() -> Unit)? = null,
 ): Spannable {
-    val postfixed = TextUtils.concat(original, Utils.TAG_SEPARATOR + tag)
 
-    return postfixed.toSpannable().apply {
-        val startIndex = original.length + Utils.TAG_SEPARATOR.length
-        val endIndex = startIndex + tag.length
+    fun getConfiguredTag(): CharSequence {
+        return if (ellipsizeConfiguration != null) {
+            val textPaint = RoundedBackgroundSpan.getTagsPaint(this)
+            with(ellipsizeConfiguration) {
+                val tagNameLayout =
+                    StaticLayout.Builder.obtain(tag, 0, tag.length, textPaint, maxWidth)
+                        .setEllipsizedWidth(maxWidth)
+                        .setEllipsize(truncateAt)
+                        .setMaxLines(1)
+                        .build()
+                if (withNewLine) "$TAG_SEPARATOR\n${tagNameLayout.text}" else "$TAG_SEPARATOR${tagNameLayout.text}"
+            }
+        } else {
+            "$TAG_SEPARATOR$tag"
+        }
+    }
 
-        setTagSpan(this@postfixWithTag, startIndex, endIndex, backgroundColorRes, textColorRes)
+    val modifiedTag = getConfiguredTag()
+    val postFixed = TextUtils.concat(original, modifiedTag)
+
+    return postFixed.toSpannable().apply {
+        val startIndex = original.length + TAG_SEPARATOR.length
+        val endIndex = startIndex + modifiedTag.length - TAG_SEPARATOR.length
+
+        with(tagColor) {
+            setTagSpan(this@postfixWithTag, startIndex, endIndex, backgroundColorRes, textColorRes)
+        }
         onClicked?.let { setClickableSpan(startIndex, endIndex, it) }
     }
 }
@@ -548,6 +564,7 @@ private fun Spannable.setTagSpan(
             textColor = textColor,
             textTypeface = textTypeface,
             fontSize = textSize,
+            cornerRadius = context.resources.getDimension(R.dimen.subjectTagRadius)
         ),
         startIndex,
         endIndex,
@@ -592,3 +609,5 @@ fun ViewPager2.removeOverScrollForApiBelow31() {
         (getChildAt(0) as? RecyclerView)?.overScrollMode = View.OVER_SCROLL_NEVER
     }
 }
+
+data class TagColor(@ColorRes val backgroundColorRes: Int, @ColorRes val textColorRes: Int)

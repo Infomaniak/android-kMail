@@ -44,6 +44,7 @@ import com.infomaniak.mail.ui.alertDialogs.AiDescriptionAlertDialog
 import com.infomaniak.mail.ui.newMessage.AiViewModel.PropositionStatus
 import com.infomaniak.mail.ui.newMessage.AiViewModel.Shortcut
 import com.infomaniak.mail.utils.SimpleIconPopupMenu
+import com.infomaniak.mail.utils.extensions.TagColor
 import com.infomaniak.mail.utils.extensions.changeToolbarColorOnScroll
 import com.infomaniak.mail.utils.extensions.postfixWithTag
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
@@ -155,10 +156,9 @@ class AiPropositionFragment : Fragment() {
         toolbar.apply {
             setNavigationOnClickListener { trackDismissalAndPopBack() }
             title = requireContext().postfixWithTag(
-                getString(R.string.aiPromptTitle).toSpannable(),
+                getString(R.string.aiPromptTitle),
                 R.string.aiPromptTag,
-                R.color.aiBetaTagBackground,
-                R.color.aiBetaTagTextColor
+                TagColor(R.color.aiBetaTagBackground, R.color.aiBetaTagTextColor)
             )
         }
     }

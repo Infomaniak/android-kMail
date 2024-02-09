@@ -17,13 +17,17 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
+import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Paint.FontMetricsInt
 import android.graphics.RectF
 import android.graphics.Typeface
+import android.text.TextPaint
 import android.text.style.LineHeightSpan
 import android.text.style.ReplacementSpan
+import androidx.core.content.res.ResourcesCompat
+import com.infomaniak.mail.R
 
 /**
  * A span to create a rounded background on a text.
@@ -36,6 +40,7 @@ class RoundedBackgroundSpan(
     private val textColor: Int,
     private val textTypeface: Typeface,
     private val fontSize: Float,
+    private val cornerRadius: Float = CORNER_RADIUS
 ) : ReplacementSpan(), LineHeightSpan {
 
     override fun getSize(paint: Paint, text: CharSequence?, start: Int, end: Int, fm: FontMetricsInt?): Int {
@@ -65,7 +70,7 @@ class RoundedBackgroundSpan(
         )
 
         paint.color = backgroundColor
-        canvas.drawRoundRect(rect, CORNER_RADIUS, CORNER_RADIUS, paint)
+        canvas.drawRoundRect(rect, cornerRadius, cornerRadius, paint)
 
         paint.setGivenTextStyle()
         canvas.drawText(
@@ -98,5 +103,11 @@ class RoundedBackgroundSpan(
         private const val PADDING = 16
         private const val VERTICAL_OFFSET = 4
         private const val CORNER_RADIUS = 10f
+
+        fun getTagsPaint(context: Context) = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = ResourcesCompat.getColor(context.resources, R.color.folderNameTextColor, null)
+            textSize = context.resources.getDimension(R.dimen.externalTagTextSize)
+            typeface = ResourcesCompat.getFont(context, R.font.tag_font)
+        }
     }
 }

@@ -88,8 +88,8 @@
     <color name="calendarHeaderBackground">@color/orca</color>
 
     <!-- Thread -->
-    <color name="textColorFolderName">@color/shark</color>
-    <color name="backgroundFolderName">@color/orca</color>
+    <color name="folderNameTextColor">@color/shark</color>
+    <color name="folderNameBackground">@color/orca</color>
 
     <!-- Swipe actions -->
     <color name="swipeDelete">@color/redDestructiveAction</color>

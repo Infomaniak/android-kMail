@@ -21,6 +21,7 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Canvas
 import android.os.Build
+import android.text.TextUtils
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.view.View
@@ -53,7 +54,7 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.*
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter.ThreadListViewHolder
-import com.infomaniak.mail.ui.main.thread.SubjectFormatter.getFolderName
+import com.infomaniak.mail.ui.main.thread.SubjectFormatter
 import com.infomaniak.mail.utils.RealmChangesBinding
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.*
@@ -87,7 +88,6 @@ class ThreadListAdapter @Inject constructor(
     private var swipingIsAuthorized: Boolean = true
     private var displaySeeAllButton = false // TODO: Manage this for intelligent mailbox
     private var isLoadMoreDisplayed = false
-    private var isFolderNameVisible: Boolean = false
 
     var onThreadClicked: ((thread: Thread) -> Unit)? = null
     var onFlushClicked: ((dialogTitle: String) -> Unit)? = null
@@ -96,6 +96,7 @@ class ThreadListAdapter @Inject constructor(
     private var folderRole: FolderRole? = null
     private var onSwipeFinished: (() -> Unit)? = null
     private var multiSelection: MultiSelectionListener<Thread>? = null
+    private var isFolderNameVisible: Boolean = false
 
     //region Tablet mode
     private var openedThreadPosition: Int? = null
@@ -189,10 +190,18 @@ class ThreadListAdapter @Inject constructor(
     private fun shouldDisplayFolderName(folderName: String) = isFolderNameVisible && folderName.isNotEmpty()
 
     private fun CardviewThreadItemBinding.displayThread(thread: Thread, position: Int) {
-        val folderName = getFolderName(thread)
-        if (shouldDisplayFolderName(folderName)) {
+        if (shouldDisplayFolderName(thread.folderName)) {
             folderNameView.isVisible = true
-            folderNameView.text = folderName
+            folderNameView.text = context.postfixWithTag(
+                tag = thread.folderName,
+                tagColor = TagColor(R.color.folderNameBackground, R.color.folderNameTextColor),
+                ellipsizeConfiguration = SubjectFormatter.EllipsizeConfiguration(
+                    maxWidth = context.resources.getDimension(R.dimen.subjectTagMaxSize).toInt(),
+                    truncateAt = TextUtils.TruncateAt.END
+                ),
+            )
+        } else {
+            folderNameView.isVisible = false
         }
 
         refreshCachedSelectedPosition(thread.uid, position) // If item changed position, update cached position.

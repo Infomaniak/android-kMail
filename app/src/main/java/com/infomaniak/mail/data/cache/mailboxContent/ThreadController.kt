@@ -46,6 +46,7 @@ import okhttp3.OkHttpClient
 import javax.inject.Inject
 
 class ThreadController @Inject constructor(
+    private val context: Context,
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
@@ -81,7 +82,6 @@ class ThreadController @Inject constructor(
      * @return A list of search Threads. The search only returns Messages from SPAM or TRASH if we explicitly selected those folders
      */
     suspend fun initAndGetSearchFolderThreads(
-        context: Context,
         remoteThreads: List<Thread>,
         filterFolder: Folder?,
     ): List<Thread> = withContext(ioDispatcher) {
@@ -115,9 +115,11 @@ class ThreadController @Inject constructor(
             val searchFolder = FolderController.getOrCreateSearchFolder(realm = this)
             remoteThreads.map { remoteThread ->
                 ensureActive()
+                val firstMessageFolderId = remoteThread.messages.single().folderId
                 if (remoteThread.messages.size == 1) {
-                    val folderId = remoteThread.messages.first().folderId
-                    getFolder(folderId, this@writeBlocking)?.let { folder -> remoteThread.folderName = folder.getLocalizedName(context) }
+                    getFolder(firstMessageFolderId, this@writeBlocking)?.let { folder ->
+                        remoteThread.folderName = folder.getLocalizedName(context)
+                    }
                 }
                 remoteThread.isFromSearch = true
 
