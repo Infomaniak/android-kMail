@@ -37,7 +37,7 @@ import com.infomaniak.lib.core.R as CoreR
 
 object SubjectFormatter {
 
-    fun computeSubject(
+    fun generateSubjectContent(
         context: Context,
         subjectData: SubjectData,
         onTagClicked: (String) -> Unit

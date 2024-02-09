@@ -402,7 +402,7 @@ class ThreadFragment : Fragment() {
     private fun observeSubjectUpdateTriggers() = with(binding) {
         threadViewModel.assembleSubjectData(mainViewModel.mergedContactsLive).observe(viewLifecycleOwner) { result ->
 
-            val (subject, spannedSubject) = SubjectFormatter.computeSubject(
+            val (subject, spannedSubject) = SubjectFormatter.generateSubjectContent(
                 context = requireContext(),
                 subjectData = SubjectFormatter.SubjectData(
                     thread = result.thread ?: return@observe,
