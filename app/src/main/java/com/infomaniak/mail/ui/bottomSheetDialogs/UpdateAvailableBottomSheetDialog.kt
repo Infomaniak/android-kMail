@@ -19,23 +19,21 @@ package com.infomaniak.mail.ui.bottomSheetDialogs
 
 import android.os.Bundle
 import android.view.View
+import androidx.fragment.app.activityViewModels
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.getAppName
 import com.infomaniak.lib.core.utils.goToPlayStore
-import com.infomaniak.lib.stores.StoresLocalSettings
+import com.infomaniak.lib.stores.StoresSettingsRepository
+import com.infomaniak.lib.stores.StoresViewModel
 import com.infomaniak.mail.MatomoMail.DISCOVER_LATER
 import com.infomaniak.mail.MatomoMail.DISCOVER_NOW
 import com.infomaniak.mail.MatomoMail.trackAppUpdateEvent
 import com.infomaniak.mail.R
-import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 import com.infomaniak.lib.core.R as RCore
 
-@AndroidEntryPoint
 class UpdateAvailableBottomSheetDialog : InformationBottomSheetDialog() {
 
-    @Inject
-    lateinit var storesLocalSettings: StoresLocalSettings
+    private val storesViewModel: StoresViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
@@ -48,7 +46,7 @@ class UpdateAvailableBottomSheetDialog : InformationBottomSheetDialog() {
             trackAppUpdateEvent(DISCOVER_NOW)
             setText(RCore.string.buttonUpdate)
             setOnClickListener {
-                storesLocalSettings.isUserWantingUpdates = true
+                storesViewModel.set(StoresSettingsRepository.IS_USER_WANTING_UPDATES_KEY, true)
                 requireContext().goToPlayStore()
                 dismiss()
             }
@@ -56,7 +54,7 @@ class UpdateAvailableBottomSheetDialog : InformationBottomSheetDialog() {
 
         secondaryActionButton.setOnClickListener {
             trackAppUpdateEvent(DISCOVER_LATER)
-            storesLocalSettings.isUserWantingUpdates = false
+            storesViewModel.set(StoresSettingsRepository.IS_USER_WANTING_UPDATES_KEY, false)
             dismiss()
         }
     }

@@ -22,7 +22,7 @@ import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.WorkManager
 import com.infomaniak.lib.stores.AppUpdateScheduler
-import com.infomaniak.lib.stores.StoresLocalSettings
+import com.infomaniak.lib.stores.StoresSettingsRepository
 import com.infomaniak.mail.MainApplication
 import com.infomaniak.mail.data.LocalSettings
 import dagger.Module
@@ -66,7 +66,7 @@ object ApplicationModule {
 
     @Provides
     @Singleton
-    fun providesStoresLocalSettings(appContext: Context): StoresLocalSettings = StoresLocalSettings.getInstance(appContext)
+    fun providesStoresSettingsRepository(appContext: Context): StoresSettingsRepository = StoresSettingsRepository(appContext)
 
     @Provides
     @Singleton
