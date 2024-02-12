@@ -46,10 +46,8 @@ import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListen
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollState
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.utils.*
-import com.infomaniak.lib.stores.StoreUtils
-import com.infomaniak.lib.stores.StoreUtils.APP_UPDATE_TAG
+import com.infomaniak.lib.stores.InAppUpdateManager
 import com.infomaniak.mail.MatomoMail.trackEvent
-import com.infomaniak.mail.MatomoMail.trackInAppUpdateEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
@@ -103,6 +101,10 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
     private var lastUpdatedDate: Date? = null
     private var previousCustomFolderId: String? = null
 
+    private val showLoadingTimer: CountDownTimer by lazy { Utils.createRefreshTimer(onTimerFinish = ::showRefreshLayout) }
+
+    private var canRefreshThreads = false
+
     @Inject
     lateinit var localSettings: LocalSettings
 
@@ -115,15 +117,14 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
     @Inject
     lateinit var playServicesUtils: PlayServicesUtils
 
-    private val showLoadingTimer: CountDownTimer by lazy { Utils.createRefreshTimer(onTimerFinish = ::showRefreshLayout) }
-
-    private var canRefreshThreads = false
-
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog
 
     @Inject
     lateinit var snackbarManager: SnackbarManager
+
+    @Inject
+    lateinit var inAppUpdateManager: InAppUpdateManager
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentThreadListBinding.inflate(inflater, container, false).also { _binding = it }.root
@@ -625,23 +626,8 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
 
     private fun observeUpdateInstall() = with(binding) {
         mainViewModel.canInstallUpdate.observe(viewLifecycleOwner) { isUpdateDownloaded ->
-            SentryLog.d(APP_UPDATE_TAG, "Must display update button : $isUpdateDownloaded")
             installUpdateGroup.isVisible = isUpdateDownloaded
-            installUpdate.setOnClickListener {
-                SentryLog.d(APP_UPDATE_TAG, "Install downloaded Update from button")
-                context.trackInAppUpdateEvent("installUpdate")
-                mainViewModel.canInstallUpdate.value = false
-                localSettings.hasAppUpdateDownloaded = false
-
-                StoreUtils.installDownloadedUpdate(
-                    onFailure = {
-                        Sentry.captureException(it)
-                        localSettings.resetUpdateSettings()
-
-                        snackbarManager.setValue(getString(RCore.string.errorUpdateInstall))
-                    },
-                )
-            }
+            installUpdate.setOnClickListener { inAppUpdateManager.installDownloadedUpdate() }
         }
     }
 

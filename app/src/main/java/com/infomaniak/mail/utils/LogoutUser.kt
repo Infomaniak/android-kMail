@@ -23,6 +23,7 @@ import androidx.work.WorkManager
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.utils.SentryLog
+import com.infomaniak.lib.stores.StoresLocalSettings
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.appSettings.AppSettingsController
@@ -42,6 +43,7 @@ class LogoutUser @Inject constructor(
     private val localSettings: LocalSettings,
     private val mailboxController: MailboxController,
     private val playServicesUtils: PlayServicesUtils,
+    private val storesLocalSettings: StoresLocalSettings,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
 
@@ -81,6 +83,7 @@ class LogoutUser @Inject constructor(
     private fun resetSettings() {
         AppSettingsController.removeAppSettings()
         localSettings.removeSettings()
+        storesLocalSettings.removeSettings()
         with(WorkManager.getInstance(appContext)) {
             cancelAllWork()
             pruneWork()

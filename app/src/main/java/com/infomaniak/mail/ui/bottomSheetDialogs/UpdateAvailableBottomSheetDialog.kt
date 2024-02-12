@@ -22,11 +22,11 @@ import android.view.View
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.getAppName
 import com.infomaniak.lib.core.utils.goToPlayStore
+import com.infomaniak.lib.stores.StoresLocalSettings
 import com.infomaniak.mail.MatomoMail.DISCOVER_LATER
 import com.infomaniak.mail.MatomoMail.DISCOVER_NOW
 import com.infomaniak.mail.MatomoMail.trackAppUpdateEvent
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.LocalSettings
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import com.infomaniak.lib.core.R as RCore
@@ -35,7 +35,7 @@ import com.infomaniak.lib.core.R as RCore
 class UpdateAvailableBottomSheetDialog : InformationBottomSheetDialog() {
 
     @Inject
-    lateinit var localSettings: LocalSettings
+    lateinit var storesLocalSettings: StoresLocalSettings
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
@@ -48,7 +48,7 @@ class UpdateAvailableBottomSheetDialog : InformationBottomSheetDialog() {
             trackAppUpdateEvent(DISCOVER_NOW)
             setText(RCore.string.buttonUpdate)
             setOnClickListener {
-                localSettings.isUserWantingUpdates = true
+                storesLocalSettings.isUserWantingUpdates = true
                 requireContext().goToPlayStore()
                 dismiss()
             }
@@ -56,7 +56,7 @@ class UpdateAvailableBottomSheetDialog : InformationBottomSheetDialog() {
 
         secondaryActionButton.setOnClickListener {
             trackAppUpdateEvent(DISCOVER_LATER)
-            localSettings.isUserWantingUpdates = false
+            storesLocalSettings.isUserWantingUpdates = false
             dismiss()
         }
     }

@@ -26,7 +26,6 @@ import android.view.ViewGroup
 import android.webkit.WebView
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
-import androidx.activity.result.contract.ActivityResultContracts.StartIntentSenderForResult
 import androidx.activity.viewModels
 import androidx.annotation.FloatRange
 import androidx.core.view.isVisible
@@ -40,24 +39,18 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.work.Data
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.networking.LiveDataNetworkStatus
-import com.infomaniak.lib.core.utils.SentryLog
+import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.Utils.toEnumOrThrow
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
-import com.infomaniak.lib.core.utils.hasPermissions
-import com.infomaniak.lib.core.utils.year
-import com.infomaniak.lib.stores.StoreUtils.checkUpdateIsAvailable
-import com.infomaniak.lib.stores.StoreUtils.initAppUpdateManager
+import com.infomaniak.lib.stores.InAppUpdateManager
+import com.infomaniak.lib.stores.StoreUtils
 import com.infomaniak.lib.stores.StoreUtils.launchInAppReview
-import com.infomaniak.lib.stores.StoreUtils.unregisterAppUpdateListener
 import com.infomaniak.mail.BuildConfig
-import com.infomaniak.mail.MatomoMail.DISCOVER_LATER
-import com.infomaniak.mail.MatomoMail.DISCOVER_NOW
 import com.infomaniak.mail.MatomoMail.trackAppReviewEvent
 import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.MatomoMail.trackEasterEggEvent
 import com.infomaniak.mail.MatomoMail.trackEvent
-import com.infomaniak.mail.MatomoMail.trackInAppUpdateEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -127,12 +120,6 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private val inAppUpdateResultLauncher = registerForActivityResult(StartIntentSenderForResult()) { result ->
-        val isUserWantingUpdates = result.resultCode == RESULT_OK
-        localSettings.isUserWantingUpdates = isUserWantingUpdates
-        trackInAppUpdateEvent(if (isUserWantingUpdates) DISCOVER_NOW else DISCOVER_LATER)
-    }
-
     private val currentFragment
         get() = supportFragmentManager
             .findFragmentById(R.id.mainHostFragment)
@@ -156,6 +143,9 @@ class MainActivity : BaseActivity() {
 
     @Inject
     lateinit var snackbarManager: SnackbarManager
+
+    @Inject
+    lateinit var inAppUpdateManager: InAppUpdateManager
 
     private val drawerListener = object : DrawerLayout.DrawerListener {
 
@@ -348,14 +338,12 @@ class MainActivity : BaseActivity() {
             appReviewLaunches--
         }
 
-        showUpdateAvailable()
         showSyncDiscovery()
     }
 
     override fun onResume() {
         super.onResume()
         playServicesUtils.checkPlayServices(this)
-        mainViewModel.checkAppUpdateStatus()
         if (binding.drawerLayout.isOpen) colorSystemBarsWithMenuDrawer(UiUtils.FULLY_SLID)
     }
 
@@ -388,7 +376,6 @@ class MainActivity : BaseActivity() {
 
     override fun onStop() {
         descriptionDialog.resetLoadingAndDismiss()
-        unregisterAppUpdateListener()
         super.onStop()
     }
 
@@ -467,27 +454,14 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private fun initAppUpdateManager() {
-        initAppUpdateManager(
-            context = this,
-            onUpdateDownloaded = { mainViewModel.toggleAppUpdateStatus(isUpdateDownloaded = true) },
-            onUpdateInstalled = {
-                Sentry.captureMessage("InstallStateUpdateListener called ’state == INSTALLED’", SentryLevel.DEBUG)
-                mainViewModel.toggleAppUpdateStatus(isUpdateDownloaded = false)
-            },
-        )
-    }
+    private fun initAppUpdateManager() = with(inAppUpdateManager) {
+        onFDroidResult = { updateIsAvailable ->
+            if (updateIsAvailable) navController.navigate(R.id.updateAvailableBottomSheetDialog)
+        }
 
-    private fun showUpdateAvailable() = with(localSettings) {
-        if (isUserWantingUpdates || (appLaunches != 0 && appLaunches % 10 == 0)) {
-            checkUpdateIsAvailable(
-                appId = BuildConfig.APPLICATION_ID,
-                versionCode = BuildConfig.VERSION_CODE,
-                inAppResultLauncher = inAppUpdateResultLauncher,
-                onFDroidResult = { updateIsAvailable ->
-                    if (updateIsAvailable) navController.navigate(R.id.updateAvailableBottomSheetDialog)
-                },
-            )
+        onInAppUpdateUiChange = { isUpdateDownloaded ->
+            SentryLog.d(StoreUtils.APP_UPDATE_TAG, "Must display update button : $isUpdateDownloaded")
+            mainViewModel.canInstallUpdate.value = isUpdateDownloaded
         }
     }
 
