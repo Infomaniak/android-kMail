@@ -110,6 +110,11 @@
             android:theme="@style/AppThemeLock" />
 
         <activity
+            android:name="com.infomaniak.lib.stores.updaterequired.UpdateRequiredActivity"
+            android:exported="false"
+            android:theme="@style/AppThemeUpdateRequired" />
+
+        <activity
             android:name=".ui.login.NoMailboxActivity"
             android:configChanges="orientation|screenSize"
             android:exported="false" />

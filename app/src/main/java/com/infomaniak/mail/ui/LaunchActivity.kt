@@ -23,9 +23,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDeepLinkBuilder
 import com.infomaniak.lib.core.extensions.setDefaultLocaleIfNeeded
+import com.infomaniak.lib.core.networking.HttpClient
+import com.infomaniak.lib.stores.updaterequired.UpdateRequiredActivity
+import com.infomaniak.lib.stores.updaterequired.data.api.ApiRepositoryStores
+import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackNotificationActionEvent
 import com.infomaniak.mail.MatomoMail.trackUserId
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
@@ -53,12 +58,16 @@ class LaunchActivity : AppCompatActivity() {
     @MainDispatcher
     lateinit var mainDispatcher: CoroutineDispatcher
 
+    @Inject
+    lateinit var localSettings: LocalSettings
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setDefaultLocaleIfNeeded()
 
         handleNotificationDestinationIntent()
+        checkUpdateIsRequired()
 
         lifecycleScope.launch(ioDispatcher) {
             val user = AccountUtils.requestCurrentUser()
@@ -120,6 +129,20 @@ class LaunchActivity : AppCompatActivity() {
                 if (AccountUtils.currentUserId != it.userId) AccountUtils.currentUserId = it.userId
                 if (AccountUtils.currentMailboxId != it.mailboxId) AccountUtils.currentMailboxId = it.mailboxId
                 SentryDebug.addNotificationBreadcrumb("SyncMessages notification has been clicked")
+            }
+        }
+    }
+
+    private fun checkUpdateIsRequired() = lifecycleScope.launch(ioDispatcher) {
+        val appVersionResponse = ApiRepositoryStores.getAppVersion(
+            BuildConfig.APPLICATION_ID,
+            HttpClient.okHttpClientNoTokenInterceptor,
+        )
+
+        if (appVersionResponse.data?.mustRequireUpdate(BuildConfig.VERSION_NAME) == true) {
+            withContext(mainDispatcher) {
+                UpdateRequiredActivity.startUpdateRequiredActivity(this@LaunchActivity, localSettings.accentColor.theme)
+                finish()
             }
         }
     }
