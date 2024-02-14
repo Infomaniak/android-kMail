@@ -23,9 +23,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDeepLinkBuilder
 import com.infomaniak.lib.core.extensions.setDefaultLocaleIfNeeded
-import com.infomaniak.lib.core.networking.HttpClient
-import com.infomaniak.lib.stores.updaterequired.UpdateRequiredActivity
-import com.infomaniak.lib.stores.updaterequired.data.api.ApiRepositoryStores
+import com.infomaniak.lib.stores.StoreUtils.checkUpdateIsRequired
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackNotificationActionEvent
 import com.infomaniak.mail.MatomoMail.trackUserId
@@ -67,7 +65,12 @@ class LaunchActivity : AppCompatActivity() {
         setDefaultLocaleIfNeeded()
 
         handleNotificationDestinationIntent()
-        checkUpdateIsRequired()
+        checkUpdateIsRequired(
+            BuildConfig.APPLICATION_ID,
+            BuildConfig.VERSION_NAME,
+            BuildConfig.VERSION_CODE,
+            localSettings.accentColor.theme,
+        )
 
         lifecycleScope.launch(ioDispatcher) {
             val user = AccountUtils.requestCurrentUser()
@@ -129,20 +132,6 @@ class LaunchActivity : AppCompatActivity() {
                 if (AccountUtils.currentUserId != it.userId) AccountUtils.currentUserId = it.userId
                 if (AccountUtils.currentMailboxId != it.mailboxId) AccountUtils.currentMailboxId = it.mailboxId
                 SentryDebug.addNotificationBreadcrumb("SyncMessages notification has been clicked")
-            }
-        }
-    }
-
-    private fun checkUpdateIsRequired() = lifecycleScope.launch(ioDispatcher) {
-        val appVersionResponse = ApiRepositoryStores.getAppVersion(
-            BuildConfig.APPLICATION_ID,
-            HttpClient.okHttpClientNoTokenInterceptor,
-        )
-
-        if (appVersionResponse.data?.mustRequireUpdate(BuildConfig.VERSION_NAME) == true) {
-            withContext(mainDispatcher) {
-                UpdateRequiredActivity.startUpdateRequiredActivity(this@LaunchActivity, localSettings.accentColor.theme)
-                finish()
             }
         }
     }

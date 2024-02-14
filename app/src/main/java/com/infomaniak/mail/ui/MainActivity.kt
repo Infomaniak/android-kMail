@@ -44,6 +44,7 @@ import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.Utils.toEnumOrThrow
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.stores.StoreUtils
+import com.infomaniak.lib.stores.StoreUtils.checkUpdateIsRequired
 import com.infomaniak.lib.stores.StoreUtils.launchInAppReview
 import com.infomaniak.lib.stores.updatemanagers.InAppUpdateManager
 import com.infomaniak.mail.BuildConfig
@@ -82,6 +83,7 @@ import java.util.Calendar
 import java.util.Date
 import java.util.UUID
 import javax.inject.Inject
+import com.infomaniak.lib.core.R as RCore
 
 @AndroidEntryPoint
 class MainActivity : BaseActivity() {
@@ -184,6 +186,13 @@ class MainActivity : BaseActivity() {
         setContentView(binding.root)
         handleOnBackPressed()
         registerMainPermissions()
+
+        checkUpdateIsRequired(
+            BuildConfig.APPLICATION_ID,
+            BuildConfig.VERSION_NAME,
+            BuildConfig.VERSION_CODE,
+            localSettings.accentColor.theme,
+        )
 
         observeNetworkStatus()
         observeDeletedMessages()
@@ -464,7 +473,7 @@ class MainActivity : BaseActivity() {
             onInstallStart = { trackInAppUpdateEvent("installUpdate") },
             onInstallFailure = {
                 Sentry.captureException(it)
-                snackbarManager.setValue(getString(com.infomaniak.lib.core.R.string.errorUpdateInstall))
+                snackbarManager.setValue(getString(RCore.string.errorUpdateInstall))
             },
             onInAppUpdateUiChange = { isUpdateDownloaded ->
                 SentryLog.d(StoreUtils.APP_UPDATE_TAG, "Must display update button : $isUpdateDownloaded")
