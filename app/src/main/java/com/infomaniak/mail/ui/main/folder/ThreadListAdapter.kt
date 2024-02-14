@@ -190,19 +190,8 @@ class ThreadListAdapter @Inject constructor(
     private fun shouldDisplayFolderName(folderName: String) = isFolderNameVisible && folderName.isNotEmpty()
 
     private fun CardviewThreadItemBinding.displayThread(thread: Thread, position: Int) {
-        if (shouldDisplayFolderName(thread.folderName)) {
-            folderNameView.isVisible = true
-            folderNameView.text = context.postfixWithTag(
-                tag = thread.folderName,
-                tagColor = TagColor(R.color.folderNameBackground, R.color.folderNameTextColor),
-                ellipsizeConfiguration = SubjectFormatter.EllipsizeConfiguration(
-                    maxWidth = context.resources.getDimension(R.dimen.subjectTagMaxSize).toInt(),
-                    truncateAt = TextUtils.TruncateAt.END
-                ),
-            )
-        } else {
-            folderNameView.isVisible = false
-        }
+
+        displayFolderName(thread)
 
         refreshCachedSelectedPosition(thread.uid, position) // If item changed position, update cached position.
         setupThreadDensityDependentUi()
@@ -244,6 +233,24 @@ class ThreadListAdapter @Inject constructor(
         }
 
         updateSelectedUi(thread)
+    }
+
+    private fun CardviewThreadItemBinding.displayFolderName(thread: Thread) {
+        val folderNameView = if (localSettings.threadDensity == COMPACT) folderNameCompactMode else folderNameExpandMode
+        if (shouldDisplayFolderName(thread.folderName)) {
+            folderNameView.isVisible = true
+            folderNameView.text = context.postfixWithTag(
+                tag = thread.folderName,
+                tagColor = TagColor(R.color.folderNameBackground, R.color.folderNameTextColor),
+                ellipsizeConfiguration = SubjectFormatter.EllipsizeConfiguration(
+                    maxWidth = context.resources.getDimension(R.dimen.subjectTagMaxSize).toInt(),
+                    truncateAt = TextUtils.TruncateAt.END
+                ),
+            )
+        } else {
+            folderNameExpandMode.isVisible = false
+            folderNameCompactMode.isVisible = false
+        }
     }
 
     private fun CardviewThreadItemBinding.onThreadClickWithAbilityToOpenMultiSelection(

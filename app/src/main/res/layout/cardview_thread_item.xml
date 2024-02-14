@@ -219,16 +219,15 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/marginStandardVerySmall"
-                    android:layout_marginEnd="@dimen/marginStandardSmall"
                     android:ellipsize="end"
                     android:lines="1"
-                    app:layout_constraintEnd_toStartOf="@id/folderNameView"
+                    app:layout_constraintEnd_toStartOf="@id/folderNameCompactMode"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/expeditor"
                     tools:text="@tools:sample/lorem[10]" />
 
                 <TextView
-                    android:id="@+id/folderNameView"
+                    android:id="@+id/folderNameCompactMode"
                     style="@style/BodySmall.Secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
@@ -254,7 +253,7 @@
                     android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="@id/mailSubject"
                     app:layout_constraintEnd_toStartOf="@id/iconCalendar"
-                    app:layout_constraintStart_toEndOf="@id/folderNameView"
+                    app:layout_constraintStart_toEndOf="@id/folderNameCompactMode"
                     app:layout_constraintTop_toTopOf="@id/mailSubject"
                     app:tint="@color/iconColorPrimaryText"
                     tools:visibility="visible" />
@@ -297,10 +296,26 @@
                     android:ellipsize="end"
                     android:lines="1"
                     app:layout_constrainedWidth="true"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/folderNameExpandMode"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/mailSubject"
                     tools:text="@tools:sample/lorem/random" />
+
+                <TextView
+                    android:id="@+id/folderNameExpandMode"
+                    style="@style/BodySmall.Secondary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="@id/mailBodyPreview"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="1"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    app:layout_constraintTop_toTopOf="@id/mailBodyPreview"
+                    tools:background="@color/grey_background"
+                    tools:gravity="center"
+                    tools:text="Folder name"
+                    tools:visibility="gone" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
