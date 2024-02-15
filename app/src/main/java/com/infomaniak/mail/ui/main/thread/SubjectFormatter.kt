@@ -123,7 +123,7 @@ class SubjectFormatter @Inject constructor(private val context: Context) {
             width
         ).build()
 
-        // Colors are not used but here, we just need to compute the tag layouts
+        // Colors are not taken into account here. We only call postfixWithTag to compute the layout size
         val stringAfterAddingTag = context.postfixWithTag(
             previousContent,
             tag,
