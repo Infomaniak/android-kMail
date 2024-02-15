@@ -80,7 +80,7 @@ class ThreadController @Inject constructor(
      */
     suspend fun initAndGetSearchFolderThreads(
         remoteThreads: List<Thread>,
-        folderRole: FolderRole?,
+        filterFolder: Folder?,
     ): List<Thread> = withContext(ioDispatcher) {
 
         fun MutableRealm.keepOldMessagesAndAddToSearchFolder(remoteThread: Thread, searchFolder: Folder) {
@@ -95,7 +95,7 @@ class ThreadController @Inject constructor(
                 remoteMessage.initLocalValues(
                     date = localMessage?.date ?: remoteMessage.date,
                     isFullyDownloaded = localMessage?.isFullyDownloaded() ?: false,
-                    isTrashed = folderRole == FolderRole.TRASH,
+                    isTrashed = filterFolder?.role == FolderRole.TRASH,
                     isFromSearch = localMessage == null,
                     draftLocalUuid = localMessage?.draftLocalUuid,
                     latestCalendarEventResponse = null,
@@ -113,7 +113,13 @@ class ThreadController @Inject constructor(
             remoteThreads.map { remoteThread ->
                 ensureActive()
                 remoteThread.isFromSearch = true
-                remoteThread.folderId = remoteThread.messages.first().folderId
+
+                val folderId = if (remoteThread.messages.count() == 1) {
+                    remoteThread.messages.single().folderId
+                } else {
+                    filterFolder!!.id
+                }
+                remoteThread.folderId = folderId
 
                 keepOldMessagesAndAddToSearchFolder(remoteThread, searchFolder)
 
