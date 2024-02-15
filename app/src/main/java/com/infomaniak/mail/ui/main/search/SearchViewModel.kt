@@ -64,7 +64,7 @@ class SearchViewModel @Inject constructor(
     /** Needed to pass API request's validation, but won't be used by the API */
     private val dummyFolderId inline get() = savedStateHandle.get<String>(SearchFragmentArgs::dummyFolderId.name)!!
 
-    var currentFolder: Folder? = null
+    var filterFolder: Folder? = null
         private set
     var currentSearchQuery: String = ""
         private set
@@ -95,7 +95,7 @@ class SearchViewModel @Inject constructor(
 
     fun executePendingSearch() = viewModelScope.launch(ioCoroutineContext) {
         val hasPendingSearch = (lastExecutedSearchQuery != currentSearchQuery)
-                || (lastExecutedFolder != currentFolder)
+                || (lastExecutedFolder != filterFolder)
                 || (lastExecutedFilters != currentFilters)
 
         if (hasPendingSearch) search()
@@ -111,7 +111,7 @@ class SearchViewModel @Inject constructor(
     }
 
     fun selectFolder(folder: Folder?) = viewModelScope.launch(ioCoroutineContext) {
-        search(folder = folder.also { currentFolder = it })
+        search(folder = folder.also { filterFolder = it })
     }
 
     fun setFilter(filter: ThreadFilter, isEnabled: Boolean = true) = viewModelScope.launch(ioCoroutineContext) {
@@ -164,7 +164,7 @@ class SearchViewModel @Inject constructor(
         query: String = currentSearchQuery,
         saveInHistory: Boolean = false,
         filters: Set<ThreadFilter> = currentFilters,
-        folder: Folder? = currentFolder,
+        folder: Folder? = filterFolder,
         shouldGetNextPage: Boolean = false,
     ) = withContext(ioCoroutineContext) {
         searchJob?.cancel()
@@ -191,7 +191,7 @@ class SearchViewModel @Inject constructor(
 
         val newFilters = if (folder == null) filters else (filters + ThreadFilter.FOLDER)
 
-        return if (newFilters.isEmpty() && query.isNullOrBlank() && currentFolder == null) {
+        return if (newFilters.isEmpty() && query.isNullOrBlank() && filterFolder == null) {
             searchUtils.deleteRealmSearchData()
             visibilityMode.postValue(VisibilityMode.RECENT_SEARCHES)
             null
