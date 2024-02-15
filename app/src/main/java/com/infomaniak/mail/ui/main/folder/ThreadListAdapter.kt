@@ -190,7 +190,7 @@ class ThreadListAdapter @Inject constructor(
     private fun shouldDisplayFolderName(folderName: String) = isFolderNameVisible && folderName.isNotEmpty()
 
     private fun CardviewThreadItemBinding.displayThread(thread: Thread, position: Int) {
-
+        resetFolderNameVisibility()
         displayFolderName(thread)
 
         refreshCachedSelectedPosition(thread.uid, position) // If item changed position, update cached position.
@@ -248,9 +248,13 @@ class ThreadListAdapter @Inject constructor(
                 ),
             )
         } else {
-            folderNameExpandMode.isVisible = false
-            folderNameCompactMode.isVisible = false
+            resetFolderNameVisibility()
         }
+    }
+
+    private fun CardviewThreadItemBinding.resetFolderNameVisibility() {
+        folderNameExpandMode.isVisible = false
+        folderNameCompactMode.isVisible = false
     }
 
     private fun CardviewThreadItemBinding.onThreadClickWithAbilityToOpenMultiSelection(
