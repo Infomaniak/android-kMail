@@ -190,12 +190,12 @@ class ThreadListAdapter @Inject constructor(
     private fun shouldDisplayFolderName(folderName: String) = isFolderNameVisible && folderName.isNotEmpty()
 
     private fun CardviewThreadItemBinding.displayThread(thread: Thread, position: Int) {
-        resetFolderNameVisibility()
-        displayFolderName(thread)
 
         refreshCachedSelectedPosition(thread.uid, position) // If item changed position, update cached position.
         setupThreadDensityDependentUi()
         displayAvatar(thread)
+
+        displayFolderName(thread)
 
         with(thread) {
             expeditor.text = formatRecipientNames(computeDisplayedRecipients())
@@ -236,15 +236,18 @@ class ThreadListAdapter @Inject constructor(
     }
 
     private fun CardviewThreadItemBinding.displayFolderName(thread: Thread) {
+        resetFolderNameVisibility()
+
         val folderNameView = if (localSettings.threadDensity == COMPACT) folderNameCompactMode else folderNameExpandMode
         if (shouldDisplayFolderName(thread.folderName)) {
             folderNameView.isVisible = true
             folderNameView.text = context.postfixWithTag(
                 tag = thread.folderName,
-                tagColor = TagColor(R.color.folderNameBackground, R.color.folderNameTextColor),
+                tagColor = TagColor(R.color.tagBackground, R.color.tagTextColor),
                 ellipsizeConfiguration = SubjectFormatter.EllipsizeConfiguration(
-                    maxWidth = context.resources.getDimension(R.dimen.subjectTagMaxSize).toInt(),
-                    truncateAt = TextUtils.TruncateAt.END
+                    maxWidth = context.resources.getDimension(R.dimen.folderNameTagMaxSize).toInt(),
+                    truncateAt = TextUtils.TruncateAt.END,
+                    tagTextPaint = SubjectFormatter.getTagsPaint(context)
                 ),
             )
         } else {

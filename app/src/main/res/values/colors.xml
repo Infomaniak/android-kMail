@@ -165,8 +165,8 @@
     <color name="manyAvatarsAdditionalPeopleBackground">@color/iconColorSecondaryText</color>
 
     <!-- Thread -->
-    <color name="folderNameTextColor">@color/elephant</color>
-    <color name="folderNameBackground">@color/polar_bear</color>
+    <color name="tagTextColor">@color/elephant</color>
+    <color name="tagBackground">@color/polar_bear</color>
 
     <!-- Swipe actions -->
     <color name="swipeDelete">@color/redDestructiveAction</color>

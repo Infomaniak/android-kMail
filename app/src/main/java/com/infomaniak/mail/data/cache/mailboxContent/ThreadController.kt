@@ -20,7 +20,6 @@ package com.infomaniak.mail.data.cache.mailboxContent
 import android.content.Context
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.cache.mailboxContent.FolderController.Companion.getFolder
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.message.Message
@@ -115,16 +114,15 @@ class ThreadController @Inject constructor(
             val searchFolder = FolderController.getOrCreateSearchFolder(realm = this)
             remoteThreads.map { remoteThread ->
                 ensureActive()
-                val firstMessageFolderId = remoteThread.messages.single().folderId
-                if (remoteThread.messages.size == 1) {
-                    getFolder(firstMessageFolderId, this@writeBlocking)?.let { folder ->
-                        remoteThread.folderName = folder.getLocalizedName(context)
-                    }
-                }
+
                 remoteThread.isFromSearch = true
 
                 val folderId = if (remoteThread.messages.count() == 1) {
-                    remoteThread.messages.single().folderId
+                    val firstMessageFolderId = remoteThread.messages.single().folderId
+                    FolderController.getFolder(firstMessageFolderId, this@writeBlocking)?.let { folder ->
+                        remoteThread.folderName = folder.getLocalizedName(context)
+                    }
+                    firstMessageFolderId
                 } else {
                     filterFolder!!.id
                 }

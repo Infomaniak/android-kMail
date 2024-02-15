@@ -30,17 +30,14 @@ import androidx.core.content.res.ResourcesCompat
 import com.infomaniak.mail.R
 
 /**
- * A span to create a rounded background on a text.
- *
- * If radius is set, it generates a rounded background.
- * If radius is null, it generates a circle background.
+ * A span to create a rounded background with the specified radius on a text.
  */
 class RoundedBackgroundSpan(
     private val backgroundColor: Int,
     private val textColor: Int,
     private val textTypeface: Typeface,
     private val fontSize: Float,
-    private val cornerRadius: Float = CORNER_RADIUS
+    private val cornerRadius: Float
 ) : ReplacementSpan(), LineHeightSpan {
 
     override fun getSize(paint: Paint, text: CharSequence?, start: Int, end: Int, fm: FontMetricsInt?): Int {
@@ -102,12 +99,5 @@ class RoundedBackgroundSpan(
         private const val LEFT_MARGIN = 4
         private const val PADDING = 16
         private const val VERTICAL_OFFSET = 4
-        private const val CORNER_RADIUS = 10f
-
-        fun getTagsPaint(context: Context) = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = ResourcesCompat.getColor(context.resources, R.color.folderNameTextColor, null)
-            textSize = context.resources.getDimension(R.dimen.externalTagTextSize)
-            typeface = ResourcesCompat.getFont(context, R.font.tag_font)
-        }
     }
 }

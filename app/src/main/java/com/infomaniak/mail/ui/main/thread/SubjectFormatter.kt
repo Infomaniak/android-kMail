@@ -19,8 +19,11 @@ package com.infomaniak.mail.ui.main.thread
 
 import android.content.Context
 import android.content.res.Resources
+import android.graphics.Paint
 import android.text.StaticLayout
+import android.text.TextPaint
 import android.text.TextUtils
+import androidx.core.content.res.ResourcesCompat
 import com.infomaniak.mail.MatomoMail.trackExternalEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.thread.Thread
@@ -31,7 +34,7 @@ import com.infomaniak.mail.utils.extensions.formatSubject
 import com.infomaniak.mail.utils.extensions.postfixWithTag
 import javax.inject.Inject
 import javax.inject.Singleton
-import com.infomaniak.lib.core.R as CoreR
+import com.infomaniak.lib.core.R as RCore
 
 @Singleton
 class SubjectFormatter @Inject constructor(private val context: Context) {
@@ -97,20 +100,20 @@ class SubjectFormatter @Inject constructor(private val context: Context) {
     private fun postFixWithFolder(
         previousContent: CharSequence,
         folderName: String,
-        ellipsizeTag: EllipsizeConfiguration
+        ellipsizeConfiguration: EllipsizeConfiguration
     ) = context.postfixWithTag(
         previousContent,
         folderName,
-        TagColor(R.color.folderNameBackground, R.color.folderNameTextColor),
-        ellipsizeTag
+        TagColor(R.color.tagBackground, R.color.tagTextColor),
+        ellipsizeConfiguration
     )
 
     private fun getFolderName(thread: Thread) = if (thread.messages.size > 1) "" else thread.folderName
 
     private fun getEllipsizeConfiguration(previousContent: CharSequence, tag: String): EllipsizeConfiguration {
-        val paddingsInPixels = (context.resources.getDimension(CoreR.dimen.marginStandard) * 2).toInt()
+        val paddingsInPixels = (context.resources.getDimension(R.dimen.threadHorizontalMargin) * 2).toInt()
         val width = Resources.getSystem().displayMetrics.widthPixels - paddingsInPixels
-        val tagsTextPaint = RoundedBackgroundSpan.getTagsPaint(context)
+        val tagsTextPaint = getTagsPaint(context)
 
         val layoutBeforeAddingTag = StaticLayout.Builder.obtain(
             previousContent,
@@ -120,13 +123,20 @@ class SubjectFormatter @Inject constructor(private val context: Context) {
             width
         ).build()
 
-        val fullString = "$previousContent $tag"
-        val layoutAfterAddingTag = StaticLayout.Builder.obtain(fullString, 0, fullString.length, tagsTextPaint, width).build()
+        // Colors are not used but here, we just need to compute the tag layouts
+        val stringAfterAddingTag = context.postfixWithTag(
+            previousContent,
+            tag,
+            TagColor(RCore.color.black, RCore.color.black)
+        )
+
+        val layoutAfterAddingTag =
+            StaticLayout.Builder.obtain(stringAfterAddingTag, 0, stringAfterAddingTag.length, tagsTextPaint, width).build()
 
         val positionLastChar = layoutBeforeAddingTag.getPrimaryHorizontal(previousContent.length).toInt()
         val linesCountDifferent = layoutAfterAddingTag.lineCount != layoutBeforeAddingTag.lineCount
-        val maxWidth = if (layoutAfterAddingTag.lineCount != layoutBeforeAddingTag.lineCount) width else width - positionLastChar
-        return EllipsizeConfiguration(maxWidth, TextUtils.TruncateAt.MIDDLE, linesCountDifferent)
+        val maxWidth = if (linesCountDifferent) width else width - positionLastChar
+        return EllipsizeConfiguration(maxWidth, TextUtils.TruncateAt.MIDDLE, linesCountDifferent, tagsTextPaint)
     }
 
     data class SubjectData(
@@ -139,6 +149,15 @@ class SubjectFormatter @Inject constructor(private val context: Context) {
     data class EllipsizeConfiguration(
         val maxWidth: Int,
         val truncateAt: TextUtils.TruncateAt = TextUtils.TruncateAt.MIDDLE,
-        val withNewLine: Boolean = false
+        val withNewLine: Boolean = false,
+        val tagTextPaint: TextPaint
     )
+
+    companion object {
+
+        fun getTagsPaint(context: Context) = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
+            textSize = context.resources.getDimension(R.dimen.tagTextSize)
+            typeface = ResourcesCompat.getFont(context, R.font.tag_font)
+        }
+    }
 }

@@ -238,7 +238,7 @@
                     app:layout_constraintHorizontal_chainStyle="packed"
                     app:layout_constraintStart_toEndOf="@id/mailSubject"
                     app:layout_constraintTop_toTopOf="@id/mailSubject"
-                    tools:background="@color/grey_background"
+                    tools:background="@color/tagBackground"
                     tools:gravity="center"
                     tools:text="Folder name"
                     tools:visibility="visible" />

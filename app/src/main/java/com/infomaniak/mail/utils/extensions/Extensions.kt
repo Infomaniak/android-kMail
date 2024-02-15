@@ -83,6 +83,7 @@ import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
 import com.infomaniak.mail.ui.main.thread.MessageWebViewClient
 import com.infomaniak.mail.ui.main.thread.RoundedBackgroundSpan
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter
+import com.infomaniak.mail.ui.main.thread.SubjectFormatter.Companion.getTagsPaint
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.HeaderState
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.Utils
@@ -518,7 +519,7 @@ fun Context.postfixWithTag(
 
     fun getConfiguredTag(): CharSequence {
         return if (ellipsizeConfiguration != null) {
-            val textPaint = RoundedBackgroundSpan.getTagsPaint(this)
+            val textPaint = getTagsPaint(this)
             with(ellipsizeConfiguration) {
                 val tagNameLayout =
                     StaticLayout.Builder.obtain(tag, 0, tag.length, textPaint, maxWidth)
@@ -557,14 +558,14 @@ private fun Spannable.setTagSpan(
     val backgroundColor = context.getColor(backgroundColorRes)
     val textColor = context.getColor(textColorRes)
     val textTypeface = ResourcesCompat.getFont(context, R.font.tag_font)!!
-    val textSize = context.resources.getDimensionPixelSize(R.dimen.externalTagTextSize).toFloat()
+    val textSize = context.resources.getDimensionPixelSize(R.dimen.tagTextSize).toFloat()
     setSpan(
         RoundedBackgroundSpan(
             backgroundColor = backgroundColor,
             textColor = textColor,
             textTypeface = textTypeface,
             fontSize = textSize,
-            cornerRadius = context.resources.getDimension(R.dimen.subjectTagRadius)
+            cornerRadius = context.resources.getDimension(R.dimen.tagRadius)
         ),
         startIndex,
         endIndex,
