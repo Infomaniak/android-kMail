@@ -128,9 +128,13 @@ class ThreadListMultiSelection {
         }
 
         mainViewModel.selectedThreadsLiveData.observe(viewLifecycleOwner) { selectedThreads ->
-            updateSelectedCount(selectedThreads)
-            updateSelectAllLabel()
-            updateMultiSelectActionsStatus(selectedThreads)
+            if (selectedThreads.isEmpty()) {
+                mainViewModel.isMultiSelectOn = false
+            } else {
+                updateSelectedCount(selectedThreads)
+                updateSelectAllLabel()
+                updateMultiSelectActionsStatus(selectedThreads)
+            }
         }
     }
 
