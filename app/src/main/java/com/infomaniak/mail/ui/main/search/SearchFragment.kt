@@ -174,8 +174,8 @@ class SearchFragment : TwoPaneFragment() {
             popupMenu.setAdapter(searchAdapter)
 
             updateFolderDropDownUi(
-                folder = searchViewModel.currentFolder,
-                title = requireContext().getLocalizedNameOrAllFolders(searchViewModel.currentFolder),
+                folder = searchViewModel.filterFolder,
+                title = requireContext().getLocalizedNameOrAllFolders(searchViewModel.filterFolder),
             )
         }
 

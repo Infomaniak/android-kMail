@@ -70,17 +70,17 @@ class ThreadController @Inject constructor(
     }
 
     /**
-     * Initialize and retrieve the search threads obtained from the API.
+     * Initialize and retrieve the search Threads obtained from the API.
      * - Format the remote threads to make them compatible with the existing logic.
      * - Preserve old message data if it already exists locally.
      * - Handle duplicates using the existing logic.
-     * @param remoteThreads The list of API threads that need to be processed.
-     * @param folderRole The role of the selected folder. This is only useful when selecting the spam or trash folder.
-     * @return A list of search threads. The search only returns messages from spam or trash if we explicitly selected those folders
+     * @param remoteThreads The list of API Threads that need to be processed.
+     * @param filterFolder The selected Folder on which we filter the Search.
+     * @return A list of search Threads. The search only returns Messages from SPAM or TRASH if we explicitly selected those folders
      */
     suspend fun initAndGetSearchFolderThreads(
         remoteThreads: List<Thread>,
-        folderRole: FolderRole?,
+        filterFolder: Folder?,
     ): List<Thread> = withContext(ioDispatcher) {
 
         fun MutableRealm.keepOldMessagesAndAddToSearchFolder(remoteThread: Thread, searchFolder: Folder) {
@@ -90,12 +90,12 @@ class ThreadController @Inject constructor(
 
                 val localMessage = MessageController.getMessage(remoteMessage.uid, realm = this)
 
-                // The Search only returns Messages from SPAM or TRASH if we explicitly selected those folders,
-                // which is the reason why we can compute `isSpam` and `isTrashed` values so loosely.
+                // The Search only returns Messages from TRASH if we explicitly selected this folder,
+                // which is the reason why we can compute the `isTrashed` value so loosely.
                 remoteMessage.initLocalValues(
                     date = localMessage?.date ?: remoteMessage.date,
                     isFullyDownloaded = localMessage?.isFullyDownloaded() ?: false,
-                    isTrashed = folderRole == FolderRole.TRASH,
+                    isTrashed = filterFolder?.role == FolderRole.TRASH,
                     isFromSearch = localMessage == null,
                     draftLocalUuid = localMessage?.draftLocalUuid,
                     latestCalendarEventResponse = null,
@@ -113,7 +113,13 @@ class ThreadController @Inject constructor(
             remoteThreads.map { remoteThread ->
                 ensureActive()
                 remoteThread.isFromSearch = true
-                remoteThread.folderId = remoteThread.messages.first().folderId
+
+                val folderId = if (remoteThread.messages.count() == 1) {
+                    remoteThread.messages.single().folderId
+                } else {
+                    filterFolder!!.id
+                }
+                remoteThread.folderId = folderId
 
                 keepOldMessagesAndAddToSearchFolder(remoteThread, searchFolder)
 
