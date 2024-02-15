@@ -134,9 +134,9 @@ class SubjectFormatter @Inject constructor(private val context: Context) {
             StaticLayout.Builder.obtain(stringAfterAddingTag, 0, stringAfterAddingTag.length, tagsTextPaint, width).build()
 
         val positionLastChar = layoutBeforeAddingTag.getPrimaryHorizontal(previousContent.length).toInt()
-        val linesCountDifferent = layoutAfterAddingTag.lineCount != layoutBeforeAddingTag.lineCount
-        val maxWidth = if (linesCountDifferent) width else width - positionLastChar
-        return EllipsizeConfiguration(maxWidth, TextUtils.TruncateAt.MIDDLE, linesCountDifferent, tagsTextPaint)
+        val areLinesCountDifferent = layoutAfterAddingTag.lineCount != layoutBeforeAddingTag.lineCount
+        val maxWidth = if (areLinesCountDifferent) width else width - positionLastChar
+        return EllipsizeConfiguration(maxWidth, TextUtils.TruncateAt.MIDDLE, areLinesCountDifferent, tagsTextPaint)
     }
 
     data class SubjectData(

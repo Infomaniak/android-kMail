@@ -517,7 +517,7 @@ fun Context.postfixWithTag(
     onClicked: (() -> Unit)? = null,
 ): Spannable {
 
-    fun getConfiguredTag(): CharSequence {
+    fun getEllipsizedTag(): String {
         return if (ellipsizeConfiguration != null) {
             val textPaint = getTagsPaint(this)
             with(ellipsizeConfiguration) {
@@ -534,12 +534,12 @@ fun Context.postfixWithTag(
         }
     }
 
-    val modifiedTag = getConfiguredTag()
-    val postFixed = TextUtils.concat(original, modifiedTag)
+    val ellipsizedTag = getEllipsizedTag()
+    val postFixed = TextUtils.concat(original, ellipsizedTag)
 
     return postFixed.toSpannable().apply {
         val startIndex = original.length + TAG_SEPARATOR.length
-        val endIndex = startIndex + modifiedTag.length - TAG_SEPARATOR.length
+        val endIndex = startIndex + ellipsizedTag.length - TAG_SEPARATOR.length
 
         with(tagColor) {
             setTagSpan(this@postfixWithTag, startIndex, endIndex, backgroundColorRes, textColorRes)

@@ -238,6 +238,7 @@
                     app:layout_constraintHorizontal_chainStyle="packed"
                     app:layout_constraintStart_toEndOf="@id/mailSubject"
                     app:layout_constraintTop_toTopOf="@id/mailSubject"
+                    tools:textColor="@color/tagTextColor"
                     tools:background="@color/tagBackground"
                     tools:gravity="center"
                     tools:text="Folder name"
@@ -312,7 +313,8 @@
                     app:layout_constraintHorizontal_bias="1"
                     app:layout_constraintHorizontal_chainStyle="packed"
                     app:layout_constraintTop_toTopOf="@id/mailBodyPreview"
-                    tools:background="@color/grey_background"
+                    tools:textColor="@color/tagTextColor"
+                    tools:background="@color/tagBackground"
                     tools:gravity="center"
                     tools:text="Folder name"
                     tools:visibility="gone" />
