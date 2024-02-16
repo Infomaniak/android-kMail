@@ -633,7 +633,7 @@ class NewMessageViewModel @Inject constructor(
     private fun saveDraftToLocal(action: DraftAction) {
         SentryLog.d("Draft", "Save Draft to local")
 
-        draft.subject?.takeIf { it.length > SUBJECT_MAX_LENGTH }?.let { draft.subject = it.substring(0, SUBJECT_MAX_LENGTH) }
+        draft.subject = draft.subject?.take(SUBJECT_MAX_LENGTH)
         draft.body = draft.uiBody.textToHtml() + (draft.uiSignature ?: "") + (draft.uiQuote ?: "")
         draft.action = action
 
