@@ -609,5 +609,3 @@ fun ViewPager2.removeOverScrollForApiBelow31() {
         (getChildAt(0) as? RecyclerView)?.overScrollMode = View.OVER_SCROLL_NEVER
     }
 }
-
-data class TagColor(@ColorRes val backgroundColorRes: Int, @ColorRes val textColorRes: Int)

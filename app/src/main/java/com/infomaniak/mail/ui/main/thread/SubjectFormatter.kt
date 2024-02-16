@@ -23,13 +23,13 @@ import android.graphics.Paint
 import android.text.StaticLayout
 import android.text.TextPaint
 import android.text.TextUtils.*
+import androidx.annotation.ColorRes
 import androidx.core.content.res.ResourcesCompat
 import com.infomaniak.mail.MatomoMail.trackExternalEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipients
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
-import com.infomaniak.mail.utils.extensions.TagColor
 import com.infomaniak.mail.utils.extensions.formatSubject
 import com.infomaniak.mail.utils.extensions.postfixWithTag
 import javax.inject.Inject
@@ -152,6 +152,8 @@ class SubjectFormatter @Inject constructor(private val context: Context) {
         val withNewLine: Boolean = false,
         val tagTextPaint: TextPaint,
     )
+
+    data class TagColor(@ColorRes val backgroundColorRes: Int, @ColorRes val textColorRes: Int)
 
     companion object {
 
