@@ -17,9 +17,9 @@
  */
 package com.infomaniak.mail.firebase
 
+import com.infomaniak.lib.core.BuildConfig.INFOMANIAK_API_V1
 import com.infomaniak.lib.core.api.ApiController.ApiMethod.POST
 import com.infomaniak.lib.core.models.ApiResponse
-import com.infomaniak.mail.BuildConfig.INFOMANIAK_API_V1
 import com.infomaniak.mail.data.api.ApiRepository
 import okhttp3.OkHttpClient
 

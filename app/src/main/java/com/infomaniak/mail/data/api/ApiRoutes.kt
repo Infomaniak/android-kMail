@@ -17,7 +17,7 @@
  */
 package com.infomaniak.mail.data.api
 
-import com.infomaniak.mail.BuildConfig.INFOMANIAK_API_V1
+import com.infomaniak.lib.core.BuildConfig.INFOMANIAK_API_V1
 import com.infomaniak.mail.BuildConfig.MAIL_API
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.PaginationInfo
 import com.infomaniak.mail.utils.Utils
