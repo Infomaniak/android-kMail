@@ -47,8 +47,6 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.SwipeAction
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity
-import com.infomaniak.mail.data.LocalSettings.ThreadDensity.COMPACT
-import com.infomaniak.mail.data.LocalSettings.ThreadDensity.LARGE
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.thread.Thread
@@ -238,7 +236,7 @@ class ThreadListAdapter @Inject constructor(
     private fun CardviewThreadItemBinding.displayFolderName(thread: Thread) {
         resetFolderNameVisibility()
 
-        val folderNameView = if (localSettings.threadDensity == COMPACT) folderNameCompactMode else folderNameExpandMode
+        val folderNameView = if (localSettings.threadDensity == ThreadDensity.COMPACT) folderNameCompactMode else folderNameExpandMode
         if (shouldDisplayFolderName(thread.folderName)) {
             folderNameView.isVisible = true
             folderNameView.text = context.postfixWithTag(
@@ -336,27 +334,27 @@ class ThreadListAdapter @Inject constructor(
 
         multiSelection?.let {
             with(localSettings) {
-                expeditorAvatar.isVisible = !isMultiSelected && threadDensity == LARGE
+                expeditorAvatar.isVisible = !isMultiSelected && threadDensity == ThreadDensity.LARGE
                 checkMarkLayout.isVisible = it.isEnabled
                 checkedState.isVisible = isMultiSelected
-                uncheckedState.isVisible = !isMultiSelected && threadDensity != LARGE
+                uncheckedState.isVisible = !isMultiSelected && threadDensity != ThreadDensity.LARGE
             }
         }
     }
 
     private fun CardviewThreadItemBinding.setupThreadDensityDependentUi() = with(localSettings) {
-        val margin = if (threadDensity == COMPACT) threadMarginCompact else threadMarginOther
+        val margin = if (threadDensity == ThreadDensity.COMPACT) threadMarginCompact else threadMarginOther
         threadCard.setMarginsRelative(top = margin, bottom = margin)
 
-        expeditorAvatar.isVisible = threadDensity == LARGE
-        mailBodyPreview.isGone = threadDensity == COMPACT
+        expeditorAvatar.isVisible = threadDensity == ThreadDensity.LARGE
+        mailBodyPreview.isGone = threadDensity == ThreadDensity.COMPACT
 
         checkMarkBackground.reshapeToDensity()
         uncheckedState.reshapeToDensity()
     }
 
     private fun ImageView.reshapeToDensity() {
-        val checkMarkSize = if (localSettings.threadDensity == LARGE) checkMarkSizeLarge else checkMarkSizeOther
+        val checkMarkSize = if (localSettings.threadDensity == ThreadDensity.LARGE) checkMarkSizeLarge else checkMarkSizeOther
         layoutParams.apply {
             width = checkMarkSize
             height = checkMarkSize
@@ -576,7 +574,7 @@ class ThreadListAdapter @Inject constructor(
             add(folderRole)
         }
 
-        if (threadDensity == COMPACT) {
+        if (threadDensity == ThreadDensity.COMPACT) {
             if (multiSelection?.selectedItems?.let(threads::containsAll) == false) {
                 multiSelection?.selectedItems?.removeAll { !threads.contains(it) }
             }
