@@ -21,6 +21,7 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Canvas
 import android.os.Build
+import android.text.Spannable
 import android.text.TextUtils
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
@@ -244,15 +245,7 @@ class ThreadListAdapter @Inject constructor(
         if (shouldDisplayFolderName(thread.folderName)) {
             folderNameView.apply {
                 isVisible = true
-                text = context.postfixWithTag(
-                    tag = thread.folderName,
-                    tagColor = TagColor(R.color.tagBackground, R.color.tagTextColor),
-                    ellipsizeConfiguration = SubjectFormatter.EllipsizeConfiguration(
-                        maxWidth = context.resources.getDimension(R.dimen.folderNameTagMaxSize).toInt(),
-                        truncateAt = TextUtils.TruncateAt.END,
-                        tagTextPaint = SubjectFormatter.getTagsPaint(context)
-                    ),
-                )
+                text = computeFolderName(thread)
             }
         } else {
             resetFolderNameVisibility()
@@ -260,6 +253,18 @@ class ThreadListAdapter @Inject constructor(
     }
 
     private fun shouldDisplayFolderName(folderName: String) = isFolderNameVisible && folderName.isNotEmpty()
+
+    private fun CardviewThreadItemBinding.computeFolderName(thread: Thread): Spannable {
+        return context.postfixWithTag(
+            tag = thread.folderName,
+            tagColor = TagColor(R.color.tagBackground, R.color.tagTextColor),
+            ellipsizeConfiguration = SubjectFormatter.EllipsizeConfiguration(
+                maxWidth = context.resources.getDimension(R.dimen.folderNameTagMaxSize).toInt(),
+                truncateAt = TextUtils.TruncateAt.END,
+                tagTextPaint = SubjectFormatter.getTagsPaint(context)
+            ),
+        )
+    }
 
     private fun CardviewThreadItemBinding.resetFolderNameVisibility() {
         folderNameExpandMode.isVisible = false
