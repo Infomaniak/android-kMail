@@ -20,17 +20,11 @@ package com.infomaniak.mail.di
 import androidx.fragment.app.FragmentActivity
 import com.infomaniak.lib.stores.updatemanagers.InAppUpdateManager
 import com.infomaniak.mail.BuildConfig
-import com.infomaniak.mail.MatomoMail.DISCOVER_LATER
-import com.infomaniak.mail.MatomoMail.DISCOVER_NOW
-import com.infomaniak.mail.MatomoMail.trackInAppUpdateEvent
-import com.infomaniak.mail.ui.main.SnackbarManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
 import dagger.hilt.android.scopes.ActivityScoped
-import io.sentry.Sentry
-import com.infomaniak.lib.core.R as RCore
 
 @Module
 @InstallIn(ActivityComponent::class)
@@ -38,15 +32,9 @@ object ActivityModule {
 
     @ActivityScoped
     @Provides
-    fun provideInAppUpdateManager(activity: FragmentActivity, snackbarManager: SnackbarManager) = InAppUpdateManager(
+    fun provideInAppUpdateManager(activity: FragmentActivity) = InAppUpdateManager(
         activity = activity,
         appId = BuildConfig.APPLICATION_ID,
         versionCode = BuildConfig.VERSION_CODE,
-        onUserChoice = { isWantingUpdate -> activity.trackInAppUpdateEvent(if (isWantingUpdate) DISCOVER_NOW else DISCOVER_LATER) },
-        onInstallStart = { activity.trackInAppUpdateEvent("installUpdate") },
-        onInstallFailure = {
-            Sentry.captureException(it)
-            snackbarManager.setValue(activity.getString(RCore.string.errorUpdateInstall))
-        },
     )
 }

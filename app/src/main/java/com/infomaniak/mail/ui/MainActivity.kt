@@ -47,10 +47,12 @@ import com.infomaniak.lib.stores.StoreUtils
 import com.infomaniak.lib.stores.StoreUtils.launchInAppReview
 import com.infomaniak.lib.stores.updatemanagers.InAppUpdateManager
 import com.infomaniak.mail.BuildConfig
+import com.infomaniak.mail.MatomoMail
 import com.infomaniak.mail.MatomoMail.trackAppReviewEvent
 import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.MatomoMail.trackEasterEggEvent
 import com.infomaniak.mail.MatomoMail.trackEvent
+import com.infomaniak.mail.MatomoMail.trackInAppUpdateEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -454,15 +456,24 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private fun initAppUpdateManager() = with(inAppUpdateManager) {
-        onFDroidResult = { updateIsAvailable ->
-            if (updateIsAvailable) navController.navigate(R.id.updateAvailableBottomSheetDialog)
-        }
-
-        onInAppUpdateUiChange = { isUpdateDownloaded ->
-            SentryLog.d(StoreUtils.APP_UPDATE_TAG, "Must display update button : $isUpdateDownloaded")
-            mainViewModel.canInstallUpdate.value = isUpdateDownloaded
-        }
+    private fun initAppUpdateManager() {
+        inAppUpdateManager.init(
+            onUserChoice = { isWantingUpdate ->
+                trackInAppUpdateEvent(if (isWantingUpdate) MatomoMail.DISCOVER_NOW else MatomoMail.DISCOVER_LATER)
+            },
+            onInstallStart = { trackInAppUpdateEvent("installUpdate") },
+            onInstallFailure = {
+                Sentry.captureException(it)
+                snackbarManager.setValue(getString(com.infomaniak.lib.core.R.string.errorUpdateInstall))
+            },
+            onInAppUpdateUiChange = { isUpdateDownloaded ->
+                SentryLog.d(StoreUtils.APP_UPDATE_TAG, "Must display update button : $isUpdateDownloaded")
+                mainViewModel.canInstallUpdate.value = isUpdateDownloaded
+            },
+            onFDroidResult = { updateIsAvailable ->
+                if (updateIsAvailable) navController.navigate(R.id.updateAvailableBottomSheetDialog)
+            },
+        )
     }
 
     private fun showSyncDiscovery() = with(localSettings) {
