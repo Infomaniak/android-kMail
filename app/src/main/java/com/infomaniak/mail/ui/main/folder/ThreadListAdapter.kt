@@ -185,8 +185,6 @@ class ThreadListAdapter @Inject constructor(
         }
     }
 
-    private fun shouldDisplayFolderName(folderName: String) = isFolderNameVisible && folderName.isNotEmpty()
-
     private fun CardviewThreadItemBinding.displayThread(thread: Thread, position: Int) {
 
         refreshCachedSelectedPosition(thread.uid, position) // If item changed position, update cached position.
@@ -234,24 +232,34 @@ class ThreadListAdapter @Inject constructor(
     }
 
     private fun CardviewThreadItemBinding.displayFolderName(thread: Thread) {
-        resetFolderNameVisibility()
 
-        val folderNameView = if (localSettings.threadDensity == ThreadDensity.COMPACT) folderNameCompactMode else folderNameExpandMode
+        val folderNameView = if (localSettings.threadDensity == ThreadDensity.COMPACT) {
+            folderNameExpandMode.isGone = true
+            folderNameCompactMode
+        } else {
+            folderNameCompactMode.isGone = true
+            folderNameExpandMode
+        }
+
         if (shouldDisplayFolderName(thread.folderName)) {
-            folderNameView.isVisible = true
-            folderNameView.text = context.postfixWithTag(
-                tag = thread.folderName,
-                tagColor = TagColor(R.color.tagBackground, R.color.tagTextColor),
-                ellipsizeConfiguration = SubjectFormatter.EllipsizeConfiguration(
-                    maxWidth = context.resources.getDimension(R.dimen.folderNameTagMaxSize).toInt(),
-                    truncateAt = TextUtils.TruncateAt.END,
-                    tagTextPaint = SubjectFormatter.getTagsPaint(context)
-                ),
-            )
+            folderNameView.apply {
+                isVisible = true
+                text = context.postfixWithTag(
+                    tag = thread.folderName,
+                    tagColor = TagColor(R.color.tagBackground, R.color.tagTextColor),
+                    ellipsizeConfiguration = SubjectFormatter.EllipsizeConfiguration(
+                        maxWidth = context.resources.getDimension(R.dimen.folderNameTagMaxSize).toInt(),
+                        truncateAt = TextUtils.TruncateAt.END,
+                        tagTextPaint = SubjectFormatter.getTagsPaint(context)
+                    ),
+                )
+            }
         } else {
             resetFolderNameVisibility()
         }
     }
+
+    private fun shouldDisplayFolderName(folderName: String) = isFolderNameVisible && folderName.isNotEmpty()
 
     private fun CardviewThreadItemBinding.resetFolderNameVisibility() {
         folderNameExpandMode.isVisible = false
