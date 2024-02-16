@@ -503,7 +503,7 @@ fun Context.postfixWithTag(
     tag = getString(tagRes),
     tagColor = tagColor,
     ellipsizeConfiguration = ellipsizeConfiguration,
-    onClicked = onClicked
+    onClicked = onClicked,
 )
 
 /**
@@ -521,12 +521,11 @@ fun Context.postfixWithTag(
         return if (ellipsizeConfiguration != null) {
             val textPaint = getTagsPaint(this)
             with(ellipsizeConfiguration) {
-                val tagNameLayout =
-                    StaticLayout.Builder.obtain(tag, 0, tag.length, textPaint, maxWidth)
-                        .setEllipsizedWidth(maxWidth)
-                        .setEllipsize(truncateAt)
-                        .setMaxLines(1)
-                        .build()
+                val tagNameLayout = StaticLayout.Builder.obtain(tag, 0, tag.length, textPaint, maxWidth)
+                    .setEllipsizedWidth(maxWidth)
+                    .setEllipsize(truncateAt)
+                    .setMaxLines(1)
+                    .build()
                 if (withNewLine) "$TAG_SEPARATOR\n${tagNameLayout.text}" else "$TAG_SEPARATOR${tagNameLayout.text}"
             }
         } else {
@@ -565,7 +564,7 @@ private fun Spannable.setTagSpan(
             textColor = textColor,
             textTypeface = textTypeface,
             fontSize = textSize,
-            cornerRadius = context.resources.getDimension(R.dimen.tagRadius)
+            cornerRadius = context.resources.getDimension(R.dimen.tagRadius),
         ),
         startIndex,
         endIndex,

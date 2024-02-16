@@ -22,7 +22,7 @@ import android.content.res.ColorStateList
 import android.graphics.Canvas
 import android.os.Build
 import android.text.Spannable
-import android.text.TextUtils
+import android.text.TextUtils.*
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.view.View
@@ -260,15 +260,15 @@ class ThreadListAdapter @Inject constructor(
             tagColor = TagColor(R.color.tagBackground, R.color.tagTextColor),
             ellipsizeConfiguration = SubjectFormatter.EllipsizeConfiguration(
                 maxWidth = context.resources.getDimension(R.dimen.folderNameTagMaxSize).toInt(),
-                truncateAt = TextUtils.TruncateAt.END,
-                tagTextPaint = SubjectFormatter.getTagsPaint(context)
+                truncateAt = TruncateAt.END,
+                tagTextPaint = SubjectFormatter.getTagsPaint(context),
             ),
         )
     }
 
     private fun CardviewThreadItemBinding.resetFolderNameVisibility() {
-        folderNameExpandMode.isVisible = false
-        folderNameCompactMode.isVisible = false
+        folderNameExpandMode.isGone = true
+        folderNameCompactMode.isGone = true
     }
 
     private fun CardviewThreadItemBinding.onThreadClickWithAbilityToOpenMultiSelection(

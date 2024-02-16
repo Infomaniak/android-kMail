@@ -22,7 +22,7 @@ import android.content.res.Resources
 import android.graphics.Paint
 import android.text.StaticLayout
 import android.text.TextPaint
-import android.text.TextUtils
+import android.text.TextUtils.*
 import androidx.core.content.res.ResourcesCompat
 import com.infomaniak.mail.MatomoMail.trackExternalEvent
 import com.infomaniak.mail.R
@@ -41,7 +41,7 @@ class SubjectFormatter @Inject constructor(private val context: Context) {
 
     fun generateSubjectContent(
         subjectData: SubjectData,
-        onExternalClicked: (String) -> Unit
+        onExternalClicked: (String) -> Unit,
     ): Pair<String, CharSequence> = with(subjectData) {
         val subject = context.formatSubject(thread.subject)
 
@@ -49,7 +49,7 @@ class SubjectFormatter @Inject constructor(private val context: Context) {
 
         val spannedSubjectWithFolder = handleFolders(
             spannedSubjectWithExternal,
-            getEllipsizeConfiguration(spannedSubjectWithExternal, getFolderName(thread))
+            getEllipsizeConfiguration(spannedSubjectWithExternal, getFolderName(thread)),
         )
 
         return subject to spannedSubjectWithFolder
@@ -57,7 +57,7 @@ class SubjectFormatter @Inject constructor(private val context: Context) {
 
     private fun SubjectData.handleExternals(
         previousContent: String,
-        onExternalClicked: (String) -> Unit
+        onExternalClicked: (String) -> Unit,
     ): CharSequence {
         if (!externalMailFlagEnabled) return previousContent
 
@@ -71,11 +71,11 @@ class SubjectFormatter @Inject constructor(private val context: Context) {
         previousContent: CharSequence,
         externalRecipientQuantity: Int,
         externalRecipientEmail: String?,
-        onExternalClicked: (String) -> Unit
+        onExternalClicked: (String) -> Unit,
     ) = context.postfixWithTag(
         previousContent,
         R.string.externalTag,
-        TagColor(R.color.externalTagBackground, R.color.externalTagOnBackground)
+        TagColor(R.color.externalTagBackground, R.color.externalTagOnBackground),
     ) {
         context.trackExternalEvent("threadTag")
 
@@ -89,7 +89,7 @@ class SubjectFormatter @Inject constructor(private val context: Context) {
 
     private fun SubjectData.handleFolders(
         previousContent: CharSequence,
-        ellipsizeTag: EllipsizeConfiguration
+        ellipsizeTag: EllipsizeConfiguration,
     ): CharSequence {
         val folderName = getFolderName(thread)
         if (folderName.isEmpty()) return previousContent
@@ -100,12 +100,12 @@ class SubjectFormatter @Inject constructor(private val context: Context) {
     private fun postFixWithFolder(
         previousContent: CharSequence,
         folderName: String,
-        ellipsizeConfiguration: EllipsizeConfiguration
+        ellipsizeConfiguration: EllipsizeConfiguration,
     ) = context.postfixWithTag(
         previousContent,
         folderName,
         TagColor(R.color.tagBackground, R.color.tagTextColor),
-        ellipsizeConfiguration
+        ellipsizeConfiguration,
     )
 
     private fun getFolderName(thread: Thread) = if (thread.messages.size > 1) "" else thread.folderName
@@ -120,14 +120,14 @@ class SubjectFormatter @Inject constructor(private val context: Context) {
             0,
             previousContent.length,
             tagsTextPaint,
-            width
+            width,
         ).build()
 
         // Colors are not taken into account here. We only call postfixWithTag to compute the layout size
         val stringAfterAddingTag = context.postfixWithTag(
             previousContent,
             tag,
-            TagColor(RCore.color.black, RCore.color.black)
+            TagColor(RCore.color.black, RCore.color.black),
         )
 
         val layoutAfterAddingTag =
@@ -136,21 +136,21 @@ class SubjectFormatter @Inject constructor(private val context: Context) {
         val positionLastChar = layoutBeforeAddingTag.getPrimaryHorizontal(previousContent.length).toInt()
         val areLinesCountDifferent = layoutAfterAddingTag.lineCount != layoutBeforeAddingTag.lineCount
         val maxWidth = if (areLinesCountDifferent) width else width - positionLastChar
-        return EllipsizeConfiguration(maxWidth, TextUtils.TruncateAt.MIDDLE, areLinesCountDifferent, tagsTextPaint)
+        return EllipsizeConfiguration(maxWidth, TruncateAt.MIDDLE, areLinesCountDifferent, tagsTextPaint)
     }
 
     data class SubjectData(
         val thread: Thread,
         val emailDictionary: MergedContactDictionary,
         val aliases: List<String>,
-        val externalMailFlagEnabled: Boolean
+        val externalMailFlagEnabled: Boolean,
     )
 
     data class EllipsizeConfiguration(
         val maxWidth: Int,
-        val truncateAt: TextUtils.TruncateAt = TextUtils.TruncateAt.MIDDLE,
+        val truncateAt: TruncateAt = TruncateAt.MIDDLE,
         val withNewLine: Boolean = false,
-        val tagTextPaint: TextPaint
+        val tagTextPaint: TextPaint,
     )
 
     companion object {

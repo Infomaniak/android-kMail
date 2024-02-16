@@ -158,7 +158,7 @@ class AiPropositionFragment : Fragment() {
             title = requireContext().postfixWithTag(
                 getString(R.string.aiPromptTitle),
                 R.string.aiPromptTag,
-                TagColor(R.color.aiBetaTagBackground, R.color.aiBetaTagTextColor)
+                TagColor(R.color.aiBetaTagBackground, R.color.aiBetaTagTextColor),
             )
         }
     }

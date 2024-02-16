@@ -117,6 +117,7 @@ class ThreadController @Inject constructor(
 
                 remoteThread.isFromSearch = true
 
+                // If we only have one message, we want to display its folder name.
                 val folderId = if (remoteThread.messages.count() == 1) {
                     val firstMessageFolderId = remoteThread.messages.single().folderId
                     FolderController.getFolder(firstMessageFolderId, this@writeBlocking)?.let { folder ->
