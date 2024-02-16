@@ -17,17 +17,13 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
-import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Paint.FontMetricsInt
 import android.graphics.RectF
 import android.graphics.Typeface
-import android.text.TextPaint
 import android.text.style.LineHeightSpan
 import android.text.style.ReplacementSpan
-import androidx.core.content.res.ResourcesCompat
-import com.infomaniak.mail.R
 
 /**
  * A span to create a rounded background with the specified radius on a text.
@@ -37,7 +33,7 @@ class RoundedBackgroundSpan(
     private val textColor: Int,
     private val textTypeface: Typeface,
     private val fontSize: Float,
-    private val cornerRadius: Float
+    private val cornerRadius: Float,
 ) : ReplacementSpan(), LineHeightSpan {
 
     override fun getSize(paint: Paint, text: CharSequence?, start: Int, end: Int, fm: FontMetricsInt?): Int {

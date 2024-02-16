@@ -82,7 +82,7 @@ import com.infomaniak.mail.ui.main.folder.HeaderItemDecoration
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
 import com.infomaniak.mail.ui.main.thread.MessageWebViewClient
 import com.infomaniak.mail.ui.main.thread.RoundedBackgroundSpan
-import com.infomaniak.mail.ui.main.thread.SubjectFormatter
+import com.infomaniak.mail.ui.main.thread.SubjectFormatter.*
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.Companion.getTagsPaint
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.HeaderState
 import com.infomaniak.mail.utils.*
@@ -496,7 +496,7 @@ fun Context.postfixWithTag(
     original: CharSequence,
     @StringRes tagRes: Int,
     tagColor: TagColor,
-    ellipsizeConfiguration: SubjectFormatter.EllipsizeConfiguration? = null,
+    ellipsizeConfiguration: EllipsizeConfiguration? = null,
     onClicked: (() -> Unit)? = null,
 ) = postfixWithTag(
     original = original,
@@ -513,7 +513,7 @@ fun Context.postfixWithTag(
     original: CharSequence = "",
     tag: CharSequence,
     tagColor: TagColor,
-    ellipsizeConfiguration: SubjectFormatter.EllipsizeConfiguration? = null,
+    ellipsizeConfiguration: EllipsizeConfiguration? = null,
     onClicked: (() -> Unit)? = null,
 ): Spannable {
 

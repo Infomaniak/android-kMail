@@ -24,7 +24,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.addCallback
-import androidx.core.text.toSpannable
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
@@ -156,9 +155,9 @@ class AiPropositionFragment : Fragment() {
         toolbar.apply {
             setNavigationOnClickListener { trackDismissalAndPopBack() }
             title = requireContext().postfixWithTag(
-                getString(R.string.aiPromptTitle),
-                R.string.aiPromptTag,
-                TagColor(R.color.aiBetaTagBackground, R.color.aiBetaTagTextColor),
+                original = getString(R.string.aiPromptTitle),
+                tagRes = R.string.aiPromptTag,
+                tagColor = TagColor(R.color.aiBetaTagBackground, R.color.aiBetaTagTextColor),
             )
         }
     }

@@ -48,8 +48,8 @@ class SubjectFormatter @Inject constructor(private val context: Context) {
         val spannedSubjectWithExternal = handleExternals(subject, onExternalClicked)
 
         val spannedSubjectWithFolder = handleFolders(
-            spannedSubjectWithExternal,
-            getEllipsizeConfiguration(spannedSubjectWithExternal, getFolderName(thread)),
+            previousContent = spannedSubjectWithExternal,
+            ellipsizeTag = getEllipsizeConfiguration(spannedSubjectWithExternal, getFolderName(thread)),
         )
 
         return subject to spannedSubjectWithFolder
@@ -134,9 +134,9 @@ class SubjectFormatter @Inject constructor(private val context: Context) {
             StaticLayout.Builder.obtain(stringAfterAddingTag, 0, stringAfterAddingTag.length, tagsTextPaint, width).build()
 
         val positionLastChar = layoutBeforeAddingTag.getPrimaryHorizontal(previousContent.length).toInt()
-        val areLinesCountDifferent = layoutAfterAddingTag.lineCount != layoutBeforeAddingTag.lineCount
-        val maxWidth = if (areLinesCountDifferent) width else width - positionLastChar
-        return EllipsizeConfiguration(maxWidth, TruncateAt.MIDDLE, areLinesCountDifferent, tagsTextPaint)
+        val isLinesCountDifferent = layoutAfterAddingTag.lineCount != layoutBeforeAddingTag.lineCount
+        val maxWidth = if (isLinesCountDifferent) width else width - positionLastChar
+        return EllipsizeConfiguration(maxWidth, TruncateAt.MIDDLE, isLinesCountDifferent, tagsTextPaint)
     }
 
     data class SubjectData(

@@ -110,7 +110,7 @@ class ThreadListAdapter @Inject constructor(
         folderRole: FolderRole?,
         onSwipeFinished: (() -> Unit)? = null,
         multiSelection: MultiSelectionListener<Thread>? = null,
-        isFolderNameVisible: Boolean = false
+        isFolderNameVisible: Boolean = false,
     ) {
         this.folderRole = folderRole
         this.onSwipeFinished = onSwipeFinished

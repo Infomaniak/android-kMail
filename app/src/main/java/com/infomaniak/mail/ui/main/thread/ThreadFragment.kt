@@ -420,8 +420,8 @@ class ThreadFragment : Fragment() {
                 )
             }
 
-            threadSubject.text = subjectWithTags
             toolbarSubject.text = subjectWithoutTags
+            threadSubject.text = subjectWithTags
 
             threadSubject.setOnLongClickListener {
                 context.copyStringToClipboard(subjectWithoutTags, R.string.snackbarSubjectCopiedToClipboard, snackbarManager)
