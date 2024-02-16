@@ -633,6 +633,7 @@ class NewMessageViewModel @Inject constructor(
     private fun saveDraftToLocal(action: DraftAction) {
         SentryLog.d("Draft", "Save Draft to local")
 
+        draft.subject?.takeIf { it.length > SUBJECT_MAX_LENGTH }?.let { draft.subject = it.substring(0, SUBJECT_MAX_LENGTH) }
         draft.body = draft.uiBody.textToHtml() + (draft.uiSignature ?: "") + (draft.uiQuote ?: "")
         draft.action = action
 
@@ -733,5 +734,6 @@ class NewMessageViewModel @Inject constructor(
     companion object {
         private const val DELAY_BEFORE_AUTO_SAVING_DRAFT = 1_000L
         private const val FILE_SIZE_25_MB = 25L * 1_024L * 1_024L
+        private const val SUBJECT_MAX_LENGTH = 998
     }
 }
