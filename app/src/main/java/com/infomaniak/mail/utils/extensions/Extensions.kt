@@ -149,10 +149,29 @@ fun Date.isLastWeek(): Boolean {
 //region UI
 fun Context.isInPortrait(): Boolean = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
 
-fun Context.canDisplayBothPanes(): Boolean = resources.getBoolean(R.bool.canDisplayBothPanes)
-fun Fragment.canDisplayBothPanes(): Boolean = requireContext().canDisplayBothPanes()
-fun Context.canDisplayOnlyOnePane(): Boolean = !canDisplayBothPanes()
-fun Fragment.canDisplayOnlyOnePane(): Boolean = requireContext().canDisplayOnlyOnePane()
+// fun Context.isTablet(): Boolean = resources.getBoolean(R.bool.canDisplayBothPanes)
+// fun Fragment.isTablet(): Boolean = requireContext().isTablet()
+//
+// fun Context.isPhone(): Boolean = !isTablet()
+// fun Fragment.isPhone(): Boolean = !isTablet()
+//
+// fun Context.isTabletInLandscape(): Boolean = resources.getBoolean(R.bool.shouldDisplayBothPanes)
+// fun Fragment.isTabletInLandscape(): Boolean = requireContext().isTabletInLandscape()
+
+fun Context.isPhone(): Boolean = resources.getBoolean(R.bool.isPhone)
+fun Fragment.isPhone(): Boolean = requireContext().isPhone()
+
+fun Context.isTabletInPortrait(): Boolean = resources.getBoolean(R.bool.isTabletInPortrait)
+fun Fragment.isTabletInPortrait(): Boolean = requireContext().isTabletInPortrait()
+
+fun Context.isTabletInLandscape(): Boolean = resources.getBoolean(R.bool.isTabletInLandscape)
+fun Fragment.isTabletInLandscape(): Boolean = requireContext().isTabletInLandscape()
+
+// fun Context.canDisplayBothPanes(): Boolean = resources.getBoolean(R.bool.canDisplayBothPanes)
+// fun Fragment.canDisplayBothPanes(): Boolean = requireContext().canDisplayBothPanes()
+// fun Context.shouldDisplayBothPanes(): Boolean = resources.getBoolean(R.bool.shouldDisplayBothPanes)
+// fun Fragment.shouldDisplayBothPanes(): Boolean = requireContext().shouldDisplayBothPanes()
+// fun Context.canDisplayOnlyOnePane(): Boolean = !canDisplayBothPanes()
 
 fun View.toggleChevron(
     isCollapsed: Boolean,

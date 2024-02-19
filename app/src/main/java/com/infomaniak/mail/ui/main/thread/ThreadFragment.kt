@@ -22,6 +22,7 @@ import android.content.res.Configuration
 import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -61,7 +62,6 @@ import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.*
 import com.infomaniak.mail.ui.main.SnackbarManager
-import com.infomaniak.mail.ui.main.folder.ThreadListFragment
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel
 import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel.NavData
@@ -114,7 +114,7 @@ class ThreadFragment : Fragment() {
     @Inject
     lateinit var snackbarManager: SnackbarManager
 
-    private var _binding: FragmentThreadBinding? = null
+    var _binding: FragmentThreadBinding? = null
     private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
 
     private val mainViewModel: MainViewModel by activityViewModels()
@@ -152,7 +152,6 @@ class ThreadFragment : Fragment() {
         threadAdapter.reRenderMails()
         super.onConfigurationChanged(newConfig)
         updateNavigationIcon()
-        updateStatusBarColor()
     }
 
     override fun onDestroyView() {
@@ -184,40 +183,20 @@ class ThreadFragment : Fragment() {
         changeToolbarColorOnScroll(
             toolbar,
             messagesListNestedScrollView,
-            shouldUpdateStatusBar = twoPaneViewModel::isOnlyRightShown,
+            shouldUpdateStatusBar = twoPaneFragment::isOnlyRightShown,
             otherUpdates = { color -> appBar.backgroundTintList = ColorStateList.valueOf(color) },
         )
     }
 
     private fun updateNavigationIcon() {
         binding.toolbar.apply {
-            if (canDisplayBothPanes()) {
+            Log.e("TOTO", "updateNavigationIcon: ${isTabletInLandscape()}")
+            if (isTabletInLandscape()) {
                 if (navigationIcon != null) navigationIcon = null
             } else {
                 if (navigationIcon == null) setNavigationIcon(R.drawable.ic_navigation_default)
             }
         }
-    }
-
-    private fun updateStatusBarColor() {
-
-        val statusBarColor = when {
-            twoPaneViewModel.isInThreadInPhoneMode(requireContext()) -> { // Phone mode in Thread
-                if (binding.messagesListNestedScrollView.isAtTheTop()) {
-                    R.color.toolbarLoweredColor
-                } else {
-                    R.color.toolbarElevatedColor
-                }
-            }
-            twoPaneFragment is ThreadListFragment -> { // Tablet mode in ThreadList
-                R.color.backgroundHeaderColor
-            }
-            else -> { // Tablet mode in Search
-                R.color.backgroundColor
-            }
-        }
-
-        setSystemBarsColors(statusBarColor = statusBarColor, navigationBarColor = null)
     }
 
     private fun setupAdapter() = with(binding.messagesList) {
@@ -462,7 +441,7 @@ class ThreadFragment : Fragment() {
 
     private fun initUi(threadUid: String, folderRole: FolderRole?) = with(binding) {
 
-        if (twoPaneViewModel.isOnlyOneShown) {
+        if (twoPaneFragment.isOnlyOneShown()) {
             requireActivity().window.updateNavigationBarColor(context.getColor(R.color.elevatedBackground))
         }
 

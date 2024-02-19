@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.main.folder
 
-import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import androidx.annotation.IdRes
@@ -32,7 +31,6 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
-import com.infomaniak.mail.utils.extensions.canDisplayOnlyOnePane
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -51,9 +49,9 @@ class TwoPaneViewModel @Inject constructor(
     val newMessageArgs = SingleLiveEvent<NewMessageActivityArgs>()
     val navArgs = SingleLiveEvent<NavData>()
 
-    var isOnlyOneShown: Boolean = true
-    var isOnlyLeftShown: Boolean = true
-    var isOnlyRightShown: Boolean = false
+    // var isOnlyOneShown: Boolean = true
+    // var isOnlyLeftShown: Boolean = true
+    // var isOnlyRightShown: Boolean = false
 
     fun openThread(uid: String) {
         state[CURRENT_THREAD_UID_KEY] = uid
@@ -98,7 +96,7 @@ class TwoPaneViewModel @Inject constructor(
         )
     }
 
-    fun isInThreadInPhoneMode(context: Context): Boolean = isThreadOpen && context.canDisplayOnlyOnePane()
+    // fun isInThreadInPhoneMode(context: Context): Boolean = isThreadOpen && context.canDisplayOnlyOnePane()
 
     data class NavData(
         @IdRes val resId: Int,

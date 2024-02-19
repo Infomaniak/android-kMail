@@ -22,7 +22,10 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.getBackNavigationResult
@@ -37,9 +40,7 @@ import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.search.SearchFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
-import com.infomaniak.mail.utils.extensions.AttachmentExtensions
-import com.infomaniak.mail.utils.extensions.safeNavigateToNewMessageActivity
-import com.infomaniak.mail.utils.extensions.setSystemBarsColors
+import com.infomaniak.mail.utils.extensions.*
 import javax.inject.Inject
 import kotlin.math.min
 
@@ -54,17 +55,14 @@ abstract class TwoPaneFragment : Fragment() {
     @Inject
     lateinit var threadListAdapter: ThreadListAdapter
 
-    private val leftStatusBarColor: Int by lazy {
-        requireContext().getColor(if (this is ThreadListFragment) R.color.backgroundHeaderColor else R.color.backgroundColor)
-    }
-    private val leftNavigationBarColor: Int by lazy { requireContext().getColor(R.color.backgroundColor) }
-    private val rightStatusBarColor: Int by lazy { requireContext().getColor(R.color.backgroundColor) }
-    private val rightNavigationBarColor: Int by lazy { requireContext().getColor(R.color.elevatedBackground) }
-
     abstract fun getLeftPane(): View?
-    abstract fun getRightPane(): View?
+    abstract fun getRightPane(): FragmentContainerView?
     abstract fun getAnchor(): View?
     open fun doAfterFolderChanged() = Unit
+
+    fun isOnlyOneShown(): Boolean = isPhone() || isTabletInPortrait()
+    fun isOnlyLeftShown(): Boolean = isOnlyOneShown() && !twoPaneViewModel.isThreadOpen
+    fun isOnlyRightShown(): Boolean = isOnlyOneShown() && twoPaneViewModel.isThreadOpen
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -76,8 +74,9 @@ abstract class TwoPaneFragment : Fragment() {
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        updateDrawerLockMode()
         updateTwoPaneVisibilities()
+        updateDrawerLockMode()
+        updateStatusBarColor()
     }
 
     private fun observeCurrentFolder() = with(twoPaneViewModel) {
@@ -107,7 +106,7 @@ abstract class TwoPaneFragment : Fragment() {
             updateDrawerLockMode()
             val isOpeningThread = threadUid != null
             if (isOpeningThread) {
-                setSystemBarsColors(statusBarColor = R.color.backgroundColor, navigationBarColor = null)
+                if (isOnlyRightShown()) setSystemBarsColors(statusBarColor = R.color.backgroundColor, navigationBarColor = null)
             } else {
                 resetPanes()
             }
@@ -128,7 +127,7 @@ abstract class TwoPaneFragment : Fragment() {
 
     fun handleOnBackPressed() {
         when {
-            twoPaneViewModel.isOnlyRightShown -> twoPaneViewModel.closeThread()
+            isOnlyRightShown() -> twoPaneViewModel.closeThread()
             this is ThreadListFragment -> requireActivity().finish()
             else -> findNavController().popBackStack()
         }
@@ -145,33 +144,41 @@ abstract class TwoPaneFragment : Fragment() {
 
     private fun resetPanes() {
 
-        setSystemBarsColors(
-            statusBarColor = if (this@TwoPaneFragment is ThreadListFragment) R.color.backgroundHeaderColor else null,
-            navigationBarColor = R.color.backgroundColor,
-        )
+        if (isOnlyLeftShown()) {
+            setSystemBarsColors(
+                statusBarColor = if (this@TwoPaneFragment is ThreadListFragment) R.color.backgroundHeaderColor else null,
+                navigationBarColor = R.color.backgroundColor,
+            )
+        }
 
         threadListAdapter.selectNewThread(newPosition = null, threadUid = null)
 
         childFragmentManager.beginTransaction().replace(R.id.threadHostFragment, ThreadFragment()).commit()
     }
 
-    // TODO: When we'll add the feature of swiping between Threads, we'll need to check if this function is still needed.
-    private fun updateDrawerLockMode() {
-        if (this is ThreadListFragment) {
-            (requireActivity() as MainActivity).setDrawerLockMode(
-                isLocked = twoPaneViewModel.isInThreadInPhoneMode(requireContext()),
-            )
-        }
-    }
-
     private fun updateTwoPaneVisibilities() = with(requireActivity().application.resources.displayMetrics) {
 
         val (leftWidth, rightWidth) = computeTwoPaneWidths(widthPixels, heightPixels, twoPaneViewModel.isThreadOpen)
 
-        getLeftPane()?.layoutParams?.width = leftWidth
-        getRightPane()?.layoutParams?.width = rightWidth
+        getLeftPane()?.let { leftPane ->
+            if (leftWidth == 0) {
+                leftPane.isGone = true
+            } else {
+                leftPane.layoutParams?.width = leftWidth
+                leftPane.isVisible = true
+            }
+        }
 
-        Log.e("TOTO", "onConfigurationChanged | leftWidth:$leftWidth | rightWidth: $rightWidth")
+        getRightPane()?.let { rightPane ->
+            if (rightWidth == 0) {
+                rightPane.isGone = true
+            } else {
+                rightPane.layoutParams?.width = rightWidth
+                rightPane.isVisible = true
+            }
+        }
+
+        Log.e("TOTO", "updateTwoPaneVisibilities | leftWidth:$leftWidth | rightWidth: $rightWidth")
     }
 
     private fun computeTwoPaneWidths(
@@ -179,6 +186,10 @@ abstract class TwoPaneFragment : Fragment() {
         heightPixels: Int,
         isThreadOpen: Boolean,
     ): Pair<Int, Int> = with(twoPaneViewModel) {
+
+        val can = resources.getBoolean(R.bool.canDisplayBothPanes)
+        val should = resources.getBoolean(R.bool.shouldDisplayBothPanes)
+        Log.e("TOTO", "computeTwoPaneWidths | can: $can | should: $should")
 
         val smallestSupportedSize = resources.getInteger(R.integer.smallestSupportedSize).toPx()
         val minimumRequiredWidth = resources.getInteger(R.integer.minimumRequiredWidth).toPx()
@@ -191,21 +202,49 @@ abstract class TwoPaneFragment : Fragment() {
             smallestWidth < smallestSupportedSize || // If height in Landscape is too small to correctly display Tablet Mode.
             widthPixels < minimumRequiredWidth // If screen is big enough to display Tablet Mode, but currently in Portrait.
         ) {
-            isOnlyOneShown = true
+            // isOnlyOneShown = true
             if (isThreadOpen) {
-                isOnlyLeftShown = false
-                isOnlyRightShown = true
+                // isOnlyLeftShown = false
+                // isOnlyRightShown = true
                 0 to widthPixels
             } else {
-                isOnlyLeftShown = true
-                isOnlyRightShown = false
+                // isOnlyLeftShown = true
+                // isOnlyRightShown = false
                 widthPixels to 0
             }
         } else { // Screen is big enough and in Landscape, so we can finally display Tablet Mode.
-            isOnlyOneShown = false
-            isOnlyLeftShown = false
-            isOnlyRightShown = false
+            // isOnlyOneShown = false
+            // isOnlyLeftShown = false
+            // isOnlyRightShown = false
             (leftPaneWidthRatio * widthPixels).toInt() to (rightPaneWidthRatio * widthPixels).toInt()
         }
+    }
+
+    // TODO: When we'll add the feature of swiping between Threads, we'll need to check if this function is still needed.
+    private fun updateDrawerLockMode() {
+        if (this is ThreadListFragment) {
+            (requireActivity() as MainActivity).setDrawerLockMode(isLocked = isOnlyRightShown())
+        }
+    }
+
+    private fun updateStatusBarColor() {
+
+        val statusBarColor = when {
+            isOnlyRightShown() -> { // Phone mode in Thread
+                if (getRightPane()?.getFragment<ThreadFragment?>()?._binding?.messagesListNestedScrollView?.isAtTheTop() == true) {
+                    R.color.toolbarLoweredColor
+                } else {
+                    R.color.toolbarElevatedColor
+                }
+            }
+            this is ThreadListFragment -> { // Tablet mode in ThreadList
+                R.color.backgroundHeaderColor
+            }
+            else -> { // Tablet mode in Search
+                R.color.backgroundColor
+            }
+        }
+
+        setSystemBarsColors(statusBarColor = statusBarColor, navigationBarColor = null)
     }
 }

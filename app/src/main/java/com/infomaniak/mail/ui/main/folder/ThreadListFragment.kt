@@ -30,6 +30,7 @@ import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.distinctUntilChanged
 import androidx.navigation.fragment.findNavController
@@ -168,10 +169,10 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
 
     override fun getLeftPane(): View? = _binding?.threadsCoordinatorLayout
 
-    override fun getRightPane(): View? = _binding?.threadHostFragment
+    override fun getRightPane(): FragmentContainerView? = _binding?.threadHostFragment
 
     override fun getAnchor(): View? {
-        return if (twoPaneViewModel.isOnlyRightShown) {
+        return if (isOnlyRightShown()) {
             _binding?.threadHostFragment?.getFragment<ThreadFragment?>()?.getAnchor()
         } else {
             _binding?.newMessageFab
