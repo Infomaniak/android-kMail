@@ -104,7 +104,7 @@ class SubjectFormatter @Inject constructor(private val context: Context) {
     ) = context.postfixWithTag(
         previousContent,
         folderName,
-        TagColor(R.color.tagBackground, R.color.tagTextColor),
+        TagColor(R.color.folderTagBackground, R.color.folderTagTextColor),
         ellipsizeConfiguration,
     )
 

@@ -256,7 +256,7 @@ class ThreadListAdapter @Inject constructor(
     private fun CardviewThreadItemBinding.computeFolderName(thread: Thread): Spannable {
         return context.postfixWithTag(
             tag = thread.folderName,
-            tagColor = TagColor(R.color.tagBackground, R.color.tagTextColor),
+            tagColor = TagColor(R.color.folderTagBackground, R.color.folderTagTextColor),
             ellipsizeConfiguration = SubjectFormatter.EllipsizeConfiguration(
                 maxWidth = context.resources.getDimension(R.dimen.folderNameTagMaxSize).toInt(),
                 truncateAt = TruncateAt.END,
