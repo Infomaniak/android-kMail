@@ -265,11 +265,6 @@ class ThreadListAdapter @Inject constructor(
         )
     }
 
-    private fun CardviewThreadItemBinding.resetFolderNameVisibility() {
-        folderNameExpandMode.isGone = true
-        folderNameCompactMode.isGone = true
-    }
-
     private fun CardviewThreadItemBinding.onThreadClickWithAbilityToOpenMultiSelection(
         thread: Thread,
         listener: MultiSelectionListener<Thread>,
