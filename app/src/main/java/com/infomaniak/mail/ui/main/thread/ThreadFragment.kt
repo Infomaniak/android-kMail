@@ -184,7 +184,7 @@ class ThreadFragment : Fragment() {
         changeToolbarColorOnScroll(
             toolbar,
             messagesListNestedScrollView,
-            shouldUpdateStatusBar = twoPaneFragment::isOnlyRightShown,
+            shouldUpdateStatusBar = twoPaneViewModel::isOnlyRightShown,
             otherUpdates = { color -> appBar.backgroundTintList = ColorStateList.valueOf(color) },
         )
     }
@@ -462,7 +462,7 @@ class ThreadFragment : Fragment() {
 
     private fun initUi(threadUid: String, folderRole: FolderRole?) = with(binding) {
 
-        if (twoPaneFragment.isOnlyOneShown()) {
+        if (twoPaneViewModel.isOnlyOneShown) {
             requireActivity().window.updateNavigationBarColor(context.getColor(R.color.elevatedBackground))
         }
 

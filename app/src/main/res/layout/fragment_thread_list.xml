@@ -23,13 +23,8 @@
     android:orientation="horizontal"
     tools:context=".ui.main.folder.ThreadListFragment">
 
-    <com.infomaniak.mail.ui.main.NoAnimSlidingPaneLayout
-        android:id="@+id/threadListSlidingPaneLayout"
-        android:layout_width="0dp"
-        android:layout_height="0dp" />
-
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/leftPane"
+        android:id="@+id/threadsCoordinatorLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 

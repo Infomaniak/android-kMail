@@ -25,7 +25,6 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import androidx.slidingpanelayout.widget.SlidingPaneLayout
 import com.infomaniak.lib.core.utils.getBackNavigationResult
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.utils.toPx
@@ -36,11 +35,8 @@ import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.ui.main.NoAnimSlidingPaneLayout
 import com.infomaniak.mail.ui.main.search.SearchFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
-import com.infomaniak.mail.utils.UiUtils.FULLY_SLID
-import com.infomaniak.mail.utils.UiUtils.progressivelyColorSystemBars
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions
 import com.infomaniak.mail.utils.extensions.safeNavigateToNewMessageActivity
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
@@ -51,8 +47,6 @@ abstract class TwoPaneFragment : Fragment() {
 
     val mainViewModel: MainViewModel by activityViewModels()
     protected val twoPaneViewModel: TwoPaneViewModel by activityViewModels()
-
-    protected abstract val slidingPaneLayout: NoAnimSlidingPaneLayout
 
     // TODO: When we'll update DragDropSwipeRecyclerViewLib, we'll need to make the adapter nullable.
     //  For now it causes a memory leak, because we can't remove the strong reference
@@ -72,15 +66,9 @@ abstract class TwoPaneFragment : Fragment() {
     abstract fun getAnchor(): View?
     open fun doAfterFolderChanged() = Unit
 
-    fun isOnlyOneShown() = slidingPaneLayout.isSlideable
-    fun areBothShown() = !isOnlyOneShown()
-    fun isOnlyLeftShown() = isOnlyOneShown() && !slidingPaneLayout.isOpen
-    fun isOnlyRightShown() = isOnlyOneShown() && slidingPaneLayout.isOpen
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         updateTwoPaneVisibilities()
-        setupSlidingPane()
         observeCurrentFolder()
         observeThreadUid()
         observeThreadNavigation()
@@ -90,59 +78,6 @@ abstract class TwoPaneFragment : Fragment() {
         super.onConfigurationChanged(newConfig)
         updateDrawerLockMode()
         updateTwoPaneVisibilities()
-        ensureThreadIsDisplayed(newConfig.orientation)
-    }
-
-    private fun updateTwoPaneVisibilities() = with(requireActivity().application.resources.displayMetrics) {
-
-        val (leftWidth, rightWidth) = computeTwoPaneWidths(widthPixels, heightPixels, twoPaneViewModel.isThreadOpen)
-
-        getLeftPane()?.layoutParams?.width = leftWidth
-        getRightPane()?.layoutParams?.width = rightWidth
-
-        Log.e("TOTO", "onConfigurationChanged | leftWidth:$leftWidth | rightWidth: $rightWidth")
-    }
-
-    private fun computeTwoPaneWidths(widthPixels: Int, heightPixels: Int, isThreadOpen: Boolean): Pair<Int, Int> {
-
-        val smallestSupportedSize = resources.getInteger(R.integer.smallestSupportedSize).toPx()
-        val minimumRequiredWidth = resources.getInteger(R.integer.minimumRequiredWidth).toPx()
-        val leftPaneWidthRatio = ResourcesCompat.getFloat(resources, R.dimen.leftPaneWidthRatio)
-        val rightPaneWidthRatio = ResourcesCompat.getFloat(resources, R.dimen.rightPaneWidthRatio)
-
-        val smallestWidth = min(widthPixels, heightPixels)
-
-        return when {
-            smallestWidth < smallestSupportedSize -> { // If height in Landscape is too small to correctly display Tablet Mode
-                if (isThreadOpen) 0 to widthPixels else widthPixels to 0
-            }
-            widthPixels < minimumRequiredWidth -> { // If screen is big enough to display Tablet Mode, but currently in Portrait
-                if (isThreadOpen) 0 to widthPixels else widthPixels to 0
-            }
-            else -> { // Screen is big enough and in Landscape
-                (leftPaneWidthRatio * widthPixels).toInt() to (rightPaneWidthRatio * widthPixels).toInt()
-            }
-        }
-    }
-
-    private fun setupSlidingPane() = with(slidingPaneLayout) {
-
-        lockMode = SlidingPaneLayout.LOCK_MODE_LOCKED
-
-        addPanelSlideListener(object : SlidingPaneLayout.PanelSlideListener {
-            override fun onPanelOpened(panel: View) = Unit
-            override fun onPanelClosed(panel: View) = Unit
-
-            override fun onPanelSlide(panel: View, slideOffset: Float) {
-                requireActivity().window.progressivelyColorSystemBars(
-                    slideOffset = FULLY_SLID - slideOffset,
-                    statusBarColorFrom = leftStatusBarColor,
-                    statusBarColorTo = rightStatusBarColor,
-                    navBarColorFrom = leftNavigationBarColor,
-                    navBarColorTo = rightNavigationBarColor,
-                )
-            }
-        })
     }
 
     private fun observeCurrentFolder() = with(twoPaneViewModel) {
@@ -168,13 +103,11 @@ abstract class TwoPaneFragment : Fragment() {
 
     private fun observeThreadUid() {
         twoPaneViewModel.currentThreadUid.observe(viewLifecycleOwner) { threadUid ->
+            updateTwoPaneVisibilities()
+            updateDrawerLockMode()
             val isOpeningThread = threadUid != null
             if (isOpeningThread) {
-                val hasOpened = slidingPaneLayout.openPaneNoAnimation()
-                if (hasOpened) {
-                    updateDrawerLockMode()
-                    setSystemBarsColors(statusBarColor = R.color.backgroundColor, navigationBarColor = null)
-                }
+                setSystemBarsColors(statusBarColor = R.color.backgroundColor, navigationBarColor = null)
             } else {
                 resetPanes()
             }
@@ -195,7 +128,7 @@ abstract class TwoPaneFragment : Fragment() {
 
     fun handleOnBackPressed() {
         when {
-            isOnlyRightShown() -> twoPaneViewModel.closeThread()
+            twoPaneViewModel.isOnlyRightShown -> twoPaneViewModel.closeThread()
             this is ThreadListFragment -> requireActivity().finish()
             else -> findNavController().popBackStack()
         }
@@ -212,15 +145,10 @@ abstract class TwoPaneFragment : Fragment() {
 
     private fun resetPanes() {
 
-        val hasClosed = slidingPaneLayout.closePaneNoAnimation()
-        updateDrawerLockMode()
-
-        if (hasClosed) {
-            setSystemBarsColors(
-                statusBarColor = if (this@TwoPaneFragment is ThreadListFragment) R.color.backgroundHeaderColor else null,
-                navigationBarColor = R.color.backgroundColor,
-            )
-        }
+        setSystemBarsColors(
+            statusBarColor = if (this@TwoPaneFragment is ThreadListFragment) R.color.backgroundHeaderColor else null,
+            navigationBarColor = R.color.backgroundColor,
+        )
 
         threadListAdapter.selectNewThread(newPosition = null, threadUid = null)
 
@@ -236,9 +164,48 @@ abstract class TwoPaneFragment : Fragment() {
         }
     }
 
-    private fun ensureThreadIsDisplayed(orientation: Int) {
-        if (orientation == Configuration.ORIENTATION_PORTRAIT && twoPaneViewModel.isInThreadInPhoneMode(requireContext())) {
-            slidingPaneLayout.openPaneNoAnimation()
+    private fun updateTwoPaneVisibilities() = with(requireActivity().application.resources.displayMetrics) {
+
+        val (leftWidth, rightWidth) = computeTwoPaneWidths(widthPixels, heightPixels, twoPaneViewModel.isThreadOpen)
+
+        getLeftPane()?.layoutParams?.width = leftWidth
+        getRightPane()?.layoutParams?.width = rightWidth
+
+        Log.e("TOTO", "onConfigurationChanged | leftWidth:$leftWidth | rightWidth: $rightWidth")
+    }
+
+    private fun computeTwoPaneWidths(
+        widthPixels: Int,
+        heightPixels: Int,
+        isThreadOpen: Boolean,
+    ): Pair<Int, Int> = with(twoPaneViewModel) {
+
+        val smallestSupportedSize = resources.getInteger(R.integer.smallestSupportedSize).toPx()
+        val minimumRequiredWidth = resources.getInteger(R.integer.minimumRequiredWidth).toPx()
+        val leftPaneWidthRatio = ResourcesCompat.getFloat(resources, R.dimen.leftPaneWidthRatio)
+        val rightPaneWidthRatio = ResourcesCompat.getFloat(resources, R.dimen.rightPaneWidthRatio)
+
+        val smallestWidth = min(widthPixels, heightPixels)
+
+        return if (
+            smallestWidth < smallestSupportedSize || // If height in Landscape is too small to correctly display Tablet Mode.
+            widthPixels < minimumRequiredWidth // If screen is big enough to display Tablet Mode, but currently in Portrait.
+        ) {
+            isOnlyOneShown = true
+            if (isThreadOpen) {
+                isOnlyLeftShown = false
+                isOnlyRightShown = true
+                0 to widthPixels
+            } else {
+                isOnlyLeftShown = true
+                isOnlyRightShown = false
+                widthPixels to 0
+            }
+        } else { // Screen is big enough and in Landscape, so we can finally display Tablet Mode.
+            isOnlyOneShown = false
+            isOnlyLeftShown = false
+            isOnlyRightShown = false
+            (leftPaneWidthRatio * widthPixels).toInt() to (rightPaneWidthRatio * widthPixels).toInt()
         }
     }
 }

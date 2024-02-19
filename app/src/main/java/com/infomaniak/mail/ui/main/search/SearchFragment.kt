@@ -47,7 +47,6 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentSearchBinding
-import com.infomaniak.mail.ui.main.NoAnimSlidingPaneLayout
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.search.SearchFolderAdapter.SearchFolderElement
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
@@ -63,8 +62,6 @@ class SearchFragment : TwoPaneFragment() {
     private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
 
     private val searchViewModel: SearchViewModel by viewModels()
-
-    override val slidingPaneLayout: NoAnimSlidingPaneLayout get() = binding.searchSlidingPaneLayout
 
     @Inject
     lateinit var localSettings: LocalSettings
@@ -128,12 +125,12 @@ class SearchFragment : TwoPaneFragment() {
         _binding = null
     }
 
-    override fun getLeftPane(): View? = _binding?.leftPane
+    override fun getLeftPane(): View? = _binding?.threadsCoordinatorLayout
 
     override fun getRightPane(): View? = _binding?.threadHostFragment
 
     override fun getAnchor(): View? {
-        return if (isOnlyLeftShown()) {
+        return if (twoPaneViewModel.isOnlyLeftShown) {
             null
         } else {
             _binding?.threadHostFragment?.getFragment<ThreadFragment?>()?.getAnchor()

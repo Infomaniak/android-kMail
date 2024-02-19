@@ -63,7 +63,6 @@ import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
-import com.infomaniak.mail.ui.main.NoAnimSlidingPaneLayout
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.settings.swipe.SwipeActionsSettingsFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
@@ -93,8 +92,6 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
 
     private val navigationArgs: ThreadListFragmentArgs by navArgs()
     private val threadListViewModel: ThreadListViewModel by viewModels()
-
-    override val slidingPaneLayout: NoAnimSlidingPaneLayout get() = binding.threadListSlidingPaneLayout
 
     private val threadListMultiSelection by lazy { ThreadListMultiSelection() }
 
@@ -169,12 +166,12 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         observeUpdateInstall()
     }.getOrDefault(Unit)
 
-    override fun getLeftPane(): View? = _binding?.leftPane
+    override fun getLeftPane(): View? = _binding?.threadsCoordinatorLayout
 
     override fun getRightPane(): View? = _binding?.threadHostFragment
 
     override fun getAnchor(): View? {
-        return if (isOnlyRightShown()) {
+        return if (twoPaneViewModel.isOnlyRightShown) {
             _binding?.threadHostFragment?.getFragment<ThreadFragment?>()?.getAnchor()
         } else {
             _binding?.newMessageFab
