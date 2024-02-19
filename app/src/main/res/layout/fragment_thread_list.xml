@@ -296,7 +296,8 @@
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/threadHostFragment"
         android:name="com.infomaniak.mail.ui.main.thread.ThreadFragment"
-        android:layout_width="0dp"
-        android:layout_height="match_parent" />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 
 </LinearLayout>

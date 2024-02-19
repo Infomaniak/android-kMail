@@ -19,7 +19,6 @@ package com.infomaniak.mail.ui.main.folder
 
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
@@ -30,7 +29,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.getBackNavigationResult
 import com.infomaniak.lib.core.utils.safeNavigate
-import com.infomaniak.lib.core.utils.toPx
 import com.infomaniak.mail.MatomoMail.OPEN_FROM_DRAFT_NAME
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
@@ -42,7 +40,6 @@ import com.infomaniak.mail.ui.main.search.SearchFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.utils.extensions.*
 import javax.inject.Inject
-import kotlin.math.min
 
 abstract class TwoPaneFragment : Fragment() {
 
@@ -156,15 +153,18 @@ abstract class TwoPaneFragment : Fragment() {
         childFragmentManager.beginTransaction().replace(R.id.threadHostFragment, ThreadFragment()).commit()
     }
 
-    private fun updateTwoPaneVisibilities() = with(requireActivity().application.resources.displayMetrics) {
+    private fun updateTwoPaneVisibilities() {
 
-        val (leftWidth, rightWidth) = computeTwoPaneWidths(widthPixels, heightPixels, twoPaneViewModel.isThreadOpen)
+        val (leftWidth, rightWidth) = computeTwoPaneWidths(
+            widthPixels = requireActivity().application.resources.displayMetrics.widthPixels,
+            isThreadOpen = twoPaneViewModel.isThreadOpen,
+        )
 
         getLeftPane()?.let { leftPane ->
             if (leftWidth == 0) {
                 leftPane.isGone = true
             } else {
-                leftPane.layoutParams?.width = leftWidth
+                if (leftPane.width != leftWidth) leftPane.layoutParams?.width = leftWidth
                 leftPane.isVisible = true
             }
         }
@@ -173,50 +173,21 @@ abstract class TwoPaneFragment : Fragment() {
             if (rightWidth == 0) {
                 rightPane.isGone = true
             } else {
-                rightPane.layoutParams?.width = rightWidth
+                if (rightPane.width != rightWidth) rightPane.layoutParams?.width = rightWidth
                 rightPane.isVisible = true
             }
         }
-
-        Log.e("TOTO", "updateTwoPaneVisibilities | leftWidth:$leftWidth | rightWidth: $rightWidth")
     }
 
-    private fun computeTwoPaneWidths(
-        widthPixels: Int,
-        heightPixels: Int,
-        isThreadOpen: Boolean,
-    ): Pair<Int, Int> = with(twoPaneViewModel) {
+    private fun computeTwoPaneWidths(widthPixels: Int, isThreadOpen: Boolean): Pair<Int, Int> = with(twoPaneViewModel) {
 
-        val can = resources.getBoolean(R.bool.canDisplayBothPanes)
-        val should = resources.getBoolean(R.bool.shouldDisplayBothPanes)
-        Log.e("TOTO", "computeTwoPaneWidths | can: $can | should: $should")
-
-        val smallestSupportedSize = resources.getInteger(R.integer.smallestSupportedSize).toPx()
-        val minimumRequiredWidth = resources.getInteger(R.integer.minimumRequiredWidth).toPx()
         val leftPaneWidthRatio = ResourcesCompat.getFloat(resources, R.dimen.leftPaneWidthRatio)
         val rightPaneWidthRatio = ResourcesCompat.getFloat(resources, R.dimen.rightPaneWidthRatio)
 
-        val smallestWidth = min(widthPixels, heightPixels)
-
-        return if (
-            smallestWidth < smallestSupportedSize || // If height in Landscape is too small to correctly display Tablet Mode.
-            widthPixels < minimumRequiredWidth // If screen is big enough to display Tablet Mode, but currently in Portrait.
-        ) {
-            // isOnlyOneShown = true
-            if (isThreadOpen) {
-                // isOnlyLeftShown = false
-                // isOnlyRightShown = true
-                0 to widthPixels
-            } else {
-                // isOnlyLeftShown = true
-                // isOnlyRightShown = false
-                widthPixels to 0
-            }
-        } else { // Screen is big enough and in Landscape, so we can finally display Tablet Mode.
-            // isOnlyOneShown = false
-            // isOnlyLeftShown = false
-            // isOnlyRightShown = false
+        return if (isTabletInLandscape()) {
             (leftPaneWidthRatio * widthPixels).toInt() to (rightPaneWidthRatio * widthPixels).toInt()
+        } else {
+            if (isThreadOpen) 0 to widthPixels else widthPixels to 0
         }
     }
 

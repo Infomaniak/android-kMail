@@ -17,18 +17,7 @@
   -->
 <resources>
 
-    <!--
-        TODO: When we'll be able to recreate the Activity in `onConfigurationChanged`,
-            we should probably use different layouts in portrait & landscape instead of these hardcoded values.
-    -->
-    <!-- Important: keep the 2/5 & 3/5 ratios between these widths. -->
     <!-- TODO: Rename left/right with start/end. -->
-    <dimen name="leftSlidingPaneWidth">2000dp</dimen>
-    <dimen name="rightSlidingPaneWidth">3000dp</dimen>
-    <integer name="leftSlidingPaneWeight">2</integer>
-    <integer name="rightSlidingPaneWeight">3</integer>
-    <integer name="smallestSupportedSize">600</integer>
-    <integer name="minimumRequiredWidth">840</integer>
     <dimen name="leftPaneWidthRatio">0.4</dimen>
     <dimen name="rightPaneWidthRatio">0.6</dimen>
 

@@ -49,10 +49,6 @@ class TwoPaneViewModel @Inject constructor(
     val newMessageArgs = SingleLiveEvent<NewMessageActivityArgs>()
     val navArgs = SingleLiveEvent<NavData>()
 
-    // var isOnlyOneShown: Boolean = true
-    // var isOnlyLeftShown: Boolean = true
-    // var isOnlyRightShown: Boolean = false
-
     fun openThread(uid: String) {
         state[CURRENT_THREAD_UID_KEY] = uid
     }
@@ -95,8 +91,6 @@ class TwoPaneViewModel @Inject constructor(
             mailToUri = mailToUri,
         )
     }
-
-    // fun isInThreadInPhoneMode(context: Context): Boolean = isThreadOpen && context.canDisplayOnlyOnePane()
 
     data class NavData(
         @IdRes val resId: Int,
