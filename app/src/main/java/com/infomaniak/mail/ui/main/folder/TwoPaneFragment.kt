@@ -19,13 +19,16 @@ package com.infomaniak.mail.ui.main.folder
 
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.slidingpanelayout.widget.SlidingPaneLayout
 import com.infomaniak.lib.core.utils.getBackNavigationResult
 import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.lib.core.utils.toPx
 import com.infomaniak.mail.MatomoMail.OPEN_FROM_DRAFT_NAME
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
@@ -42,6 +45,7 @@ import com.infomaniak.mail.utils.extensions.AttachmentExtensions
 import com.infomaniak.mail.utils.extensions.safeNavigateToNewMessageActivity
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import javax.inject.Inject
+import kotlin.math.min
 
 abstract class TwoPaneFragment : Fragment() {
 
@@ -63,6 +67,8 @@ abstract class TwoPaneFragment : Fragment() {
     private val rightStatusBarColor: Int by lazy { requireContext().getColor(R.color.backgroundColor) }
     private val rightNavigationBarColor: Int by lazy { requireContext().getColor(R.color.elevatedBackground) }
 
+    abstract fun getLeftPane(): View?
+    abstract fun getRightPane(): View?
     abstract fun getAnchor(): View?
     open fun doAfterFolderChanged() = Unit
 
@@ -73,6 +79,7 @@ abstract class TwoPaneFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        updateTwoPaneVisibilities()
         setupSlidingPane()
         observeCurrentFolder()
         observeThreadUid()
@@ -82,7 +89,40 @@ abstract class TwoPaneFragment : Fragment() {
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         updateDrawerLockMode()
+        updateTwoPaneVisibilities()
         ensureThreadIsDisplayed(newConfig.orientation)
+    }
+
+    private fun updateTwoPaneVisibilities() = with(requireActivity().application.resources.displayMetrics) {
+
+        val (leftWidth, rightWidth) = computeTwoPaneWidths(widthPixels, heightPixels, twoPaneViewModel.isThreadOpen)
+
+        getLeftPane()?.layoutParams?.width = leftWidth
+        getRightPane()?.layoutParams?.width = rightWidth
+
+        Log.e("TOTO", "onConfigurationChanged | leftWidth:$leftWidth | rightWidth: $rightWidth")
+    }
+
+    private fun computeTwoPaneWidths(widthPixels: Int, heightPixels: Int, isThreadOpen: Boolean): Pair<Int, Int> {
+
+        val smallestSupportedSize = resources.getInteger(R.integer.smallestSupportedSize).toPx()
+        val minimumRequiredWidth = resources.getInteger(R.integer.minimumRequiredWidth).toPx()
+        val leftPaneWidthRatio = ResourcesCompat.getFloat(resources, R.dimen.leftPaneWidthRatio)
+        val rightPaneWidthRatio = ResourcesCompat.getFloat(resources, R.dimen.rightPaneWidthRatio)
+
+        val smallestWidth = min(widthPixels, heightPixels)
+
+        return when {
+            smallestWidth < smallestSupportedSize -> { // If height in Landscape is too small to correctly display Tablet Mode
+                if (isThreadOpen) 0 to widthPixels else widthPixels to 0
+            }
+            widthPixels < minimumRequiredWidth -> { // If screen is big enough to display Tablet Mode, but currently in Portrait
+                if (isThreadOpen) 0 to widthPixels else widthPixels to 0
+            }
+            else -> { // Screen is big enough and in Landscape
+                (leftPaneWidthRatio * widthPixels).toInt() to (rightPaneWidthRatio * widthPixels).toInt()
+            }
+        }
     }
 
     private fun setupSlidingPane() = with(slidingPaneLayout) {

@@ -169,6 +169,10 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         observeUpdateInstall()
     }.getOrDefault(Unit)
 
+    override fun getLeftPane(): View? = _binding?.leftPane
+
+    override fun getRightPane(): View? = _binding?.threadHostFragment
+
     override fun getAnchor(): View? {
         return if (isOnlyRightShown()) {
             _binding?.threadHostFragment?.getFragment<ThreadFragment?>()?.getAnchor()

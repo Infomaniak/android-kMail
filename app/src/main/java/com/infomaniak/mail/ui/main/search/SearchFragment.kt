@@ -128,6 +128,10 @@ class SearchFragment : TwoPaneFragment() {
         _binding = null
     }
 
+    override fun getLeftPane(): View? = _binding?.leftPane
+
+    override fun getRightPane(): View? = _binding?.threadHostFragment
+
     override fun getAnchor(): View? {
         return if (isOnlyLeftShown()) {
             null

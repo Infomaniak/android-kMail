@@ -15,18 +15,23 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<com.infomaniak.mail.ui.main.NoAnimSlidingPaneLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/threadListSlidingPaneLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="horizontal"
     tools:context=".ui.main.folder.ThreadListFragment">
 
+    <com.infomaniak.mail.ui.main.NoAnimSlidingPaneLayout
+        android:id="@+id/threadListSlidingPaneLayout"
+        android:layout_width="0dp"
+        android:layout_height="0dp" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="@dimen/leftSlidingPaneWidth"
-        android:layout_height="match_parent"
-        android:layout_weight="@integer/leftSlidingPaneWeight">
+        android:id="@+id/leftPane"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/appBarLayout"
@@ -296,8 +301,7 @@
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/threadHostFragment"
         android:name="com.infomaniak.mail.ui.main.thread.ThreadFragment"
-        android:layout_width="@dimen/rightSlidingPaneWidth"
-        android:layout_height="match_parent"
-        android:layout_weight="@integer/rightSlidingPaneWeight" />
+        android:layout_width="0dp"
+        android:layout_height="match_parent" />
 
-</com.infomaniak.mail.ui.main.NoAnimSlidingPaneLayout>
+</LinearLayout>
