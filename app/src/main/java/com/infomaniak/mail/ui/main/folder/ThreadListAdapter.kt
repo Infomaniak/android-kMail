@@ -22,7 +22,7 @@ import android.content.res.ColorStateList
 import android.graphics.Canvas
 import android.os.Build
 import android.text.Spannable
-import android.text.TextUtils.*
+import android.text.TextUtils.TruncateAt
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.view.View
@@ -234,22 +234,20 @@ class ThreadListAdapter @Inject constructor(
     }
 
     private fun CardviewThreadItemBinding.displayFolderName(thread: Thread) {
+        val isCompactMode = localSettings.threadDensity == ThreadDensity.COMPACT
 
-        val folderNameView = if (localSettings.threadDensity == ThreadDensity.COMPACT) {
-            folderNameExpandMode.isGone = true
-            folderNameCompactMode
-        } else {
-            folderNameCompactMode.isGone = true
-            folderNameExpandMode
+        fun setFolderNameVisibility(isVisible: Boolean) {
+            folderNameExpandMode.isVisible = !isCompactMode && isVisible
+            folderNameCompactMode.isVisible = isCompactMode && isVisible
         }
 
+        val folderNameView = if (isCompactMode) folderNameCompactMode else folderNameExpandMode
+
         if (shouldDisplayFolderName(thread.folderName)) {
-            folderNameView.apply {
-                isVisible = true
-                text = computeFolderName(thread)
-            }
+            folderNameView.text = computeFolderName(thread)
+            setFolderNameVisibility(isVisible = true)
         } else {
-            resetFolderNameVisibility()
+            setFolderNameVisibility(isVisible = false)
         }
     }
 
