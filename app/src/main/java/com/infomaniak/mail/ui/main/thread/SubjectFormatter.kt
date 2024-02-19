@@ -46,11 +46,7 @@ class SubjectFormatter @Inject constructor(private val context: Context) {
         val subject = context.formatSubject(thread.subject)
 
         val spannedSubjectWithExternal = handleExternals(subject, onExternalClicked)
-
-        val spannedSubjectWithFolder = handleFolders(
-            previousContent = spannedSubjectWithExternal,
-            ellipsizeTag = getEllipsizeConfiguration(spannedSubjectWithExternal, getFolderName(thread)),
-        )
+        val spannedSubjectWithFolder = handleFolders(spannedSubjectWithExternal)
 
         return subject to spannedSubjectWithFolder
     }
@@ -87,13 +83,11 @@ class SubjectFormatter @Inject constructor(private val context: Context) {
         onExternalClicked(description)
     }
 
-    private fun SubjectData.handleFolders(
-        previousContent: CharSequence,
-        ellipsizeTag: EllipsizeConfiguration,
-    ): CharSequence {
+    private fun SubjectData.handleFolders(previousContent: CharSequence): CharSequence {
         val folderName = getFolderName(thread)
         if (folderName.isEmpty()) return previousContent
 
+        val ellipsizeTag = getEllipsizeConfiguration(previousContent, folderName)
         return postFixWithFolder(previousContent, folderName, ellipsizeTag)
     }
 

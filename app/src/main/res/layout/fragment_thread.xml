@@ -56,7 +56,7 @@
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/iconFavorite"
                     style="@style/IconButton"
-                    android:layout_marginEnd="@dimen/marginStandardMedium"
+                    android:layout_marginEnd="@dimen/threadHorizontalMargin"
                     android:contentDescription="@string/actionStar"
                     app:icon="@drawable/ic_star" />
 
@@ -88,7 +88,7 @@
                         style="@style/H2"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                        android:layout_marginHorizontal="@dimen/threadHorizontalMargin"
                         android:layout_marginBottom="@dimen/marginStandardMedium"
                         tools:text="@tools:sample/lorem[7]" />
 

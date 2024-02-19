@@ -44,7 +44,7 @@
     <dimen name="textButtonPrimaryHeight">56dp</dimen>
     <dimen name="textButtonPrimaryMediumHeight">40dp</dimen>
     <dimen name="mediumButtonHorizontalMargin">20dp</dimen>
-    <dimen name="threadHorizontalMargin">@dimen/marginStandard</dimen>
+    <dimen name="threadHorizontalMargin">@dimen/marginStandardMedium</dimen>
 
     <!-- Menu Drawer -->
     <dimen name="decoratedItemViewHeight">48dp</dimen>
