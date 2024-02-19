@@ -22,7 +22,7 @@ import android.content.res.Resources
 import android.graphics.Paint
 import android.text.StaticLayout
 import android.text.TextPaint
-import android.text.TextUtils.*
+import android.text.TextUtils.TruncateAt
 import androidx.annotation.ColorRes
 import androidx.core.content.res.ResourcesCompat
 import com.infomaniak.mail.MatomoMail.trackExternalEvent
@@ -34,7 +34,6 @@ import com.infomaniak.mail.utils.extensions.formatSubject
 import com.infomaniak.mail.utils.extensions.postfixWithTag
 import javax.inject.Inject
 import javax.inject.Singleton
-import com.infomaniak.lib.core.R as RCore
 
 @Singleton
 class SubjectFormatter @Inject constructor(private val context: Context) {
@@ -87,14 +86,14 @@ class SubjectFormatter @Inject constructor(private val context: Context) {
         val folderName = getFolderName(thread)
         if (folderName.isEmpty()) return previousContent
 
-        val ellipsizeTag = getEllipsizeConfiguration(previousContent, folderName)
+        val ellipsizeTag = getEllipsizeConfiguration(folderName)
         return postFixWithFolder(previousContent, folderName, ellipsizeTag)
     }
 
     private fun postFixWithFolder(
         previousContent: CharSequence,
         folderName: String,
-        ellipsizeConfiguration: EllipsizeConfiguration,
+        ellipsizeConfiguration: EllipsizeConfiguration?,
     ) = context.postfixWithTag(
         previousContent,
         folderName,
@@ -104,33 +103,16 @@ class SubjectFormatter @Inject constructor(private val context: Context) {
 
     private fun getFolderName(thread: Thread) = if (thread.messages.size > 1) "" else thread.folderName
 
-    private fun getEllipsizeConfiguration(previousContent: CharSequence, tag: String): EllipsizeConfiguration {
+    private fun getEllipsizeConfiguration(tag: String): EllipsizeConfiguration? {
         val paddingsInPixels = (context.resources.getDimension(R.dimen.threadHorizontalMargin) * 2).toInt()
         val width = Resources.getSystem().displayMetrics.widthPixels - paddingsInPixels
-        val tagsTextPaint = getTagsPaint(context)
 
-        val layoutBeforeAddingTag = StaticLayout.Builder.obtain(
-            previousContent,
-            0,
-            previousContent.length,
-            tagsTextPaint,
-            width,
-        ).build()
+        val tagTextPaint = getTagsPaint(context)
+        val layoutWithTag = StaticLayout.Builder.obtain(tag, 0, tag.length, tagTextPaint, width).build()
 
-        // Colors are not taken into account here. We only call postfixWithTag to compute the layout size
-        val stringAfterAddingTag = context.postfixWithTag(
-            previousContent,
-            tag,
-            TagColor(RCore.color.black, RCore.color.black),
-        )
-
-        val layoutAfterAddingTag =
-            StaticLayout.Builder.obtain(stringAfterAddingTag, 0, stringAfterAddingTag.length, tagsTextPaint, width).build()
-
-        val positionLastChar = layoutBeforeAddingTag.getPrimaryHorizontal(previousContent.length).toInt()
-        val isLinesCountDifferent = layoutAfterAddingTag.lineCount != layoutBeforeAddingTag.lineCount
-        val maxWidth = if (isLinesCountDifferent) width else width - positionLastChar
-        return EllipsizeConfiguration(maxWidth, TruncateAt.MIDDLE, isLinesCountDifferent, tagsTextPaint)
+        return layoutWithTag.takeIf { it.lineCount > 1 }?.let {
+            EllipsizeConfiguration(width, TruncateAt.MIDDLE, withNewLine = true)
+        }
     }
 
     data class SubjectData(
@@ -144,7 +126,6 @@ class SubjectFormatter @Inject constructor(private val context: Context) {
         val maxWidth: Int,
         val truncateAt: TruncateAt = TruncateAt.MIDDLE,
         val withNewLine: Boolean = false,
-        val tagTextPaint: TextPaint,
     )
 
     data class TagColor(@ColorRes val backgroundColorRes: Int, @ColorRes val textColorRes: Int)

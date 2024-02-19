@@ -260,7 +260,6 @@ class ThreadListAdapter @Inject constructor(
             ellipsizeConfiguration = SubjectFormatter.EllipsizeConfiguration(
                 maxWidth = context.resources.getDimension(R.dimen.folderNameTagMaxSize).toInt(),
                 truncateAt = TruncateAt.END,
-                tagTextPaint = SubjectFormatter.getTagsPaint(context),
             ),
         )
     }
