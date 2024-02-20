@@ -167,7 +167,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         observeUpdateInstall()
     }.getOrDefault(Unit)
 
-    override fun getLeftPane(): View? = _binding?.threadsCoordinatorLayout
+    override fun getLeftPane(): View? = _binding?.threadsConstraintLayout
 
     override fun getRightPane(): FragmentContainerView? = _binding?.threadHostFragment
 

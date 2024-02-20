@@ -17,7 +17,7 @@
   -->
 <resources>
 
-    <!-- TODO: Rename left/right with start/end. -->
+    <!-- TwoPane layout -->
     <dimen name="leftPaneWidthRatio">0.4</dimen>
     <dimen name="rightPaneWidthRatio">0.6</dimen>
 

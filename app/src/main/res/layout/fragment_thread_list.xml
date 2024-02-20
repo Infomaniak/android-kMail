@@ -24,7 +24,7 @@
     tools:context=".ui.main.folder.ThreadListFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/threadsCoordinatorLayout"
+        android:id="@+id/threadsConstraintLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 

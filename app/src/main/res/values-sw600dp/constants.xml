@@ -17,6 +17,10 @@
   -->
 <resources>
 
+    <!--
+        ~ Why is this file in the `-sw600dp` variant of `values` folder?
+        ~ Because Google says so: https://developer.android.com/guide/topics/large-screens/support-different-screen-sizes
+    -->
     <bool name="isPhone">false</bool>
     <bool name="isTabletInPortrait">true</bool>
     <bool name="isTabletInLandscape">false</bool>
