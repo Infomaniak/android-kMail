@@ -40,9 +40,11 @@ import com.infomaniak.mail.utils.MessageBodyUtils.SplitBody
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 import com.infomaniak.mail.utils.extensions.context
 import com.infomaniak.mail.utils.extensions.getUids
+import com.infomaniak.mail.utils.extensions.indexOfFirstOrNull
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.notifications.ResultsChange
+import io.realm.kotlin.query.RealmResults
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.*
@@ -83,6 +85,7 @@ class ThreadViewModel @Inject constructor(
     val threadLive = MutableLiveData<Thread?>()
     val messagesLive = MutableLiveData<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>>()
 
+    private var indexOfFirstUnreadMessage: Int? = null
     private var cachedSplitBodies = mutableMapOf<String, SplitBody>()
     private var superCollapsedBlock: MutableSet<String>? = null
     var hasUserClickedTheSuperCollapsedBlock = false
@@ -95,6 +98,7 @@ class ThreadViewModel @Inject constructor(
     ).map { it.obj }.asLiveData(ioCoroutineContext)
 
     fun resetMessagesCache() {
+        indexOfFirstUnreadMessage = null
         cachedSplitBodies = mutableMapOf()
         superCollapsedBlock = null
         hasUserClickedTheSuperCollapsedBlock = false
@@ -118,15 +122,11 @@ class ThreadViewModel @Inject constructor(
 
     private suspend fun mapRealmMessagesResult(results: ResultsChange<Message>): Pair<ThreadAdapterItems, MessagesWithoutHeavyData> {
 
-        val messagesCount = results.list.count()
         val items = mutableListOf<Any>()
         val messagesToFetch = mutableListOf<Message>()
-
-        val shouldDisplaySuperCollapsedBlock =
-            messagesCount >= SUPER_COLLAPSE_BLOCK_MESSAGES_LIMIT && !hasUserClickedTheSuperCollapsedBlock
-        val shouldCreateSuperCollapsedBlock = (shouldDisplaySuperCollapsedBlock && superCollapsedBlock == null).also {
-            if (it) superCollapsedBlock = mutableSetOf()
-        }
+        val firstIndexAfterBlock = computeFirstIndexAfterBlock(results.list)
+        val shouldDisplaySuperCollapsedBlock = shouldSuperCollapsedBlockBeDisplayed(results.list.count(), firstIndexAfterBlock)
+        val shouldCreateSuperCollapsedBlock = shouldSuperCollapsedBlockBeCreated(shouldDisplaySuperCollapsedBlock)
 
         suspend fun addMessage(message: Message) {
             splitBody(message).let {
@@ -137,18 +137,18 @@ class ThreadViewModel @Inject constructor(
 
         suspend fun mapListWithNewSuperCollapsedBlock() {
             results.list.forEachIndexed { index, message ->
-                when {
-                    index == 0 -> { // First Message
+                when (index) {
+                    0 -> { // First Message
                         addMessage(message)
                     }
-                    index > 0 && index < messagesCount - 2 -> { // All Messages that should go in block
+                    in 1..<firstIndexAfterBlock -> { // All Messages that should go in block
                         superCollapsedBlock!!.add(message.uid)
                     }
-                    index == messagesCount - 2 -> { // First Message not in block
+                    firstIndexAfterBlock -> { // First Message not in block
                         items += SuperCollapsedBlock(superCollapsedBlock!!)
                         addMessage(message.apply { shouldHideDivider = true })
                     }
-                    else -> { // All following Messages (theoretically, only 1 Message)
+                    else -> { // All following Messages
                         addMessage(message)
                     }
                 }
@@ -191,6 +191,31 @@ class ThreadViewModel @Inject constructor(
         return items to messagesToFetch
     }
 
+    private fun computeFirstIndexAfterBlock(list: RealmResults<Message>): Int {
+        val fallbackIndex = list.count() - 2
+        val firstUnreadIndex = indexOfFirstUnreadMessage ?: fallbackIndex
+        return minOf(firstUnreadIndex, fallbackIndex)
+    }
+
+    /**
+     * Before trying to create the SuperCollapsedBlock, we need these required Messages that will be displayed:
+     * - The 1st Message will always be displayed.
+     * - The last 2 Messages will always be displayed.
+     * - If there's any unread Message in between, it will be displayed (hence, all following Messages will be displayed too).
+     * After all these Messages are displayed, if there's at least 2 remaining Messages, they're gonna be collapsed in the SuperCollapsedBlock.
+     */
+    private fun shouldSuperCollapsedBlockBeDisplayed(messagesCount: Int, firstIndexAfterBlock: Int): Boolean {
+        return messagesCount >= SUPER_COLLAPSED_BLOCK_MINIMUM_MESSAGES_LIMIT && // At least 5 Messages in the Thread
+                firstIndexAfterBlock >= SUPER_COLLAPSED_BLOCK_FIRST_INDEX_LIMIT && // At least 2 Messages in the SuperCollapsedBlock
+                !hasUserClickedTheSuperCollapsedBlock // SuperCollapsedBlock hasn't been expanded by the user
+    }
+
+    private fun shouldSuperCollapsedBlockBeCreated(shouldDisplaySuperCollapsedBlock: Boolean): Boolean {
+        return (shouldDisplaySuperCollapsedBlock && superCollapsedBlock == null).also {
+            if (it) superCollapsedBlock = mutableSetOf()
+        }
+    }
+
     private suspend fun splitBody(message: Message): Message = withContext(ioDispatcher) {
         if (message.body == null) return@withContext message
 
@@ -226,7 +251,10 @@ class ThreadViewModel @Inject constructor(
 
         emit(OpenThreadResult(thread, isExpandedMap, initialSetOfExpandedMessagesUids, isThemeTheSameMap))
 
-        if (thread.unseenMessagesCount > 0) sharedUtils.markAsSeen(mailbox, listOf(thread))
+        if (thread.unseenMessagesCount > 0) {
+            indexOfFirstUnreadMessage = thread.messages.indexOfFirstOrNull { !it.isSeen }
+            sharedUtils.markAsSeen(mailbox, listOf(thread))
+        }
     }
 
     private fun sendMatomoAndSentryAboutThreadMessagesCount(thread: Thread) {
@@ -393,6 +421,7 @@ class ThreadViewModel @Inject constructor(
     )
 
     companion object {
-        private const val SUPER_COLLAPSE_BLOCK_MESSAGES_LIMIT = 5
+        private const val SUPER_COLLAPSED_BLOCK_MINIMUM_MESSAGES_LIMIT = 5
+        private const val SUPER_COLLAPSED_BLOCK_FIRST_INDEX_LIMIT = 3
     }
 }
