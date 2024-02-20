@@ -143,7 +143,7 @@ abstract class TwoPaneFragment : Fragment() {
 
         if (isOnlyLeftShown()) {
             setSystemBarsColors(
-                statusBarColor = if (this@TwoPaneFragment is ThreadListFragment) R.color.backgroundHeaderColor else null,
+                statusBarColor = if (this@TwoPaneFragment is ThreadListFragment) R.color.backgroundHeaderColor else R.color.backgroundColor,
                 navigationBarColor = R.color.backgroundColor,
             )
         }
