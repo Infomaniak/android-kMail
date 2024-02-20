@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.main.folder
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
+import androidx.annotation.ColorRes
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -52,6 +53,8 @@ abstract class TwoPaneFragment : Fragment() {
     @Inject
     lateinit var threadListAdapter: ThreadListAdapter
 
+    @ColorRes
+    abstract fun getStatusBarColor(): Int
     abstract fun getLeftPane(): View?
     abstract fun getRightPane(): FragmentContainerView?
     abstract fun getAnchor(): View?
@@ -142,10 +145,7 @@ abstract class TwoPaneFragment : Fragment() {
     private fun resetPanes() {
 
         if (isOnlyLeftShown()) {
-            setSystemBarsColors(
-                statusBarColor = if (this@TwoPaneFragment is ThreadListFragment) R.color.backgroundHeaderColor else R.color.backgroundColor,
-                navigationBarColor = R.color.backgroundColor,
-            )
+            setSystemBarsColors(statusBarColor = getStatusBarColor(), navigationBarColor = R.color.backgroundColor)
         }
 
         threadListAdapter.selectNewThread(newPosition = null, threadUid = null)
@@ -200,20 +200,14 @@ abstract class TwoPaneFragment : Fragment() {
 
     private fun updateStatusBarColor() {
 
-        val statusBarColor = when {
-            isOnlyRightShown() -> { // Thread (in Phone mode)
-                if (getRightPane()?.getFragment<ThreadFragment?>()?._binding?.messagesListNestedScrollView?.isAtTheTop() == true) {
-                    R.color.toolbarLoweredColor
-                } else {
-                    R.color.toolbarElevatedColor
-                }
+        val statusBarColor = if (isOnlyRightShown()) { // Thread (in Phone mode)
+            if (getRightPane()?.getFragment<ThreadFragment?>()?._binding?.messagesListNestedScrollView?.isAtTheTop() == true) {
+                R.color.toolbarLoweredColor
+            } else {
+                R.color.toolbarElevatedColor
             }
-            this is ThreadListFragment -> { // ThreadList
-                R.color.backgroundHeaderColor
-            }
-            else -> { // Search
-                R.color.backgroundColor
-            }
+        } else { // ThreadList or Search
+            getStatusBarColor()
         }
 
         setSystemBarsColors(statusBarColor = statusBarColor, navigationBarColor = null)

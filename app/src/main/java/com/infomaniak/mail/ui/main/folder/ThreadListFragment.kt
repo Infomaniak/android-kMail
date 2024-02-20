@@ -24,6 +24,7 @@ import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
@@ -166,6 +167,9 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         observeFlushFolderTrigger()
         observeUpdateInstall()
     }.getOrDefault(Unit)
+
+    @ColorRes
+    override fun getStatusBarColor(): Int = R.color.backgroundHeaderColor
 
     override fun getLeftPane(): View? = _binding?.threadsConstraintLayout
 

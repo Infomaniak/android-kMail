@@ -24,6 +24,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ListPopupWindow
 import android.widget.PopupWindow
+import androidx.annotation.ColorRes
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
@@ -125,6 +126,9 @@ class SearchFragment : TwoPaneFragment() {
         super.onDestroyView()
         _binding = null
     }
+
+    @ColorRes
+    override fun getStatusBarColor(): Int = R.color.backgroundColor
 
     override fun getLeftPane(): View? = _binding?.threadsCoordinatorLayout
 
