@@ -113,7 +113,7 @@ class ThreadFragment : Fragment() {
     @Inject
     lateinit var snackbarManager: SnackbarManager
 
-    var _binding: FragmentThreadBinding? = null
+    private var _binding: FragmentThreadBinding? = null
     private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
 
     private val mainViewModel: MainViewModel by activityViewModels()
@@ -618,6 +618,8 @@ class ThreadFragment : Fragment() {
     }
 
     fun getAnchor(): View? = _binding?.quickActionBar
+
+    fun isScrolledToTheTop(): Boolean? = _binding?.messagesListNestedScrollView?.isAtTheTop()
 
     private fun safeNavigate(@IdRes resId: Int, args: Bundle) {
         twoPaneViewModel.navArgs.value = NavData(resId, args)

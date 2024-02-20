@@ -201,7 +201,7 @@ abstract class TwoPaneFragment : Fragment() {
     private fun updateStatusBarColor() {
 
         val statusBarColor = if (isOnlyRightShown()) { // Thread (in Phone mode)
-            if (getRightPane()?.getFragment<ThreadFragment?>()?._binding?.messagesListNestedScrollView?.isAtTheTop() == true) {
+            if (getRightPane()?.getFragment<ThreadFragment?>()?.isScrolledToTheTop() == true) {
                 R.color.toolbarLoweredColor
             } else {
                 R.color.toolbarElevatedColor
