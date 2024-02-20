@@ -112,6 +112,8 @@ class ThreadController @Inject constructor(
 
         return@withContext mailboxContentRealm().writeBlocking {
             val searchFolder = FolderController.getOrCreateSearchFolder(realm = this)
+            val cachedFolderIds = mutableMapOf<String, String>()
+
             remoteThreads.map { remoteThread ->
                 ensureActive()
 
@@ -120,9 +122,7 @@ class ThreadController @Inject constructor(
                 // If we only have 1 Message, we want to display its Folder name.
                 val folderId = if (remoteThread.messages.count() == 1) {
                     val firstMessageFolderId = remoteThread.messages.single().folderId
-                    FolderController.getFolder(firstMessageFolderId, this@writeBlocking)?.let { folder ->
-                        remoteThread.folderName = folder.getLocalizedName(context)
-                    }
+                    setFolderName(firstMessageFolderId, remoteThread, cachedFolderIds)
                     firstMessageFolderId
                 } else {
                     filterFolder!!.id
@@ -134,6 +134,19 @@ class ThreadController @Inject constructor(
                 return@map remoteThread
             }.also(searchFolder.threads::addAll)
         }
+    }
+
+    private fun MutableRealm.setFolderName(
+        firstMessageFolderId: String,
+        remoteThread: Thread,
+        cachedFolderIds: MutableMap<String, String>,
+    ) {
+        val folderName = cachedFolderIds[firstMessageFolderId]
+            ?: FolderController.getFolder(firstMessageFolderId, this)
+                ?.getLocalizedName(context)
+                ?.also { cachedFolderIds[firstMessageFolderId] = it }
+
+        folderName?.let { remoteThread.folderName = it }
     }
     //endregion
 
