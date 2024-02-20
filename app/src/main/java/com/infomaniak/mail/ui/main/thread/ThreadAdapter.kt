@@ -142,23 +142,29 @@ class ThreadAdapter(
         val item = items[position]
         if (item is Message && holder is MessageViewHolder) with(holder.binding) {
             when (payload) {
-                NotifyType.TOGGLE_LIGHT_MODE -> {
-                    isThemeTheSameMap[item.uid] = !isThemeTheSameMap[item.uid]!!
-                    holder.toggleContentAndQuoteTheme(item.uid)
-                }
+                NotifyType.TOGGLE_LIGHT_MODE -> holder.handleToggleLightModePayload(item.uid)
                 NotifyType.RE_RENDER -> reloadVisibleWebView()
-                NotifyType.FAILED_MESSAGE -> {
-                    messageLoader.isGone = true
-                    failedLoadingErrorMessage.isVisible = true
-                    if (isExpandedMap[item.uid] == true) onExpandedMessageLoaded(item.uid)
-                }
-                NotifyType.ONLY_REBIND_CALENDAR_ATTENDANCE -> {
-                    val attendees = item.latestCalendarEventResponse?.calendarEvent?.attendees ?: emptyList()
-                    holder.binding.calendarEvent.onlyUpdateAttendance(attendees)
-                }
+                NotifyType.FAILED_MESSAGE -> handleFailedMessagePayload(item.uid)
+                NotifyType.ONLY_REBIND_CALENDAR_ATTENDANCE -> handleCalendarAttendancePayload(item)
             }
         }
     }.getOrDefault(Unit)
+
+    private fun MessageViewHolder.handleToggleLightModePayload(messageUid: String) {
+        isThemeTheSameMap[messageUid] = !isThemeTheSameMap[messageUid]!!
+        toggleContentAndQuoteTheme(messageUid)
+    }
+
+    private fun ItemMessageBinding.handleFailedMessagePayload(messageUid: String) {
+        messageLoader.isGone = true
+        failedLoadingErrorMessage.isVisible = true
+        if (isExpandedMap[messageUid] == true) onExpandedMessageLoaded(messageUid)
+    }
+
+    private fun ItemMessageBinding.handleCalendarAttendancePayload(message: Message) {
+        val attendees = message.latestCalendarEventResponse?.calendarEvent?.attendees ?: emptyList()
+        calendarEvent.onlyUpdateAttendance(attendees)
+    }
 
     override fun onBindViewHolder(holder: ThreadAdapterViewHolder, position: Int) {
 
