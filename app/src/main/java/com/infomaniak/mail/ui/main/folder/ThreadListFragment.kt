@@ -24,12 +24,14 @@ import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.distinctUntilChanged
 import androidx.navigation.fragment.findNavController
@@ -63,7 +65,6 @@ import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
-import com.infomaniak.mail.ui.main.NoAnimSlidingPaneLayout
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.settings.swipe.SwipeActionsSettingsFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
@@ -93,8 +94,6 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
 
     private val navigationArgs: ThreadListFragmentArgs by navArgs()
     private val threadListViewModel: ThreadListViewModel by viewModels()
-
-    override val slidingPaneLayout: NoAnimSlidingPaneLayout get() = binding.threadListSlidingPaneLayout
 
     private val threadListMultiSelection by lazy { ThreadListMultiSelection() }
 
@@ -168,6 +167,13 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         observeFlushFolderTrigger()
         observeUpdateInstall()
     }.getOrDefault(Unit)
+
+    @ColorRes
+    override fun getStatusBarColor(): Int = R.color.backgroundHeaderColor
+
+    override fun getLeftPane(): View? = _binding?.threadsConstraintLayout
+
+    override fun getRightPane(): FragmentContainerView? = _binding?.threadHostFragment
 
     override fun getAnchor(): View? {
         return if (isOnlyRightShown()) {

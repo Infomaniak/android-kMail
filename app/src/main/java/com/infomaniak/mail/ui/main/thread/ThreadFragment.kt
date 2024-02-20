@@ -61,7 +61,6 @@ import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.*
 import com.infomaniak.mail.ui.main.SnackbarManager
-import com.infomaniak.mail.ui.main.folder.ThreadListFragment
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel
 import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel.NavData
@@ -152,7 +151,6 @@ class ThreadFragment : Fragment() {
         threadAdapter.reRenderMails()
         super.onConfigurationChanged(newConfig)
         updateNavigationIcon()
-        updateStatusBarColor()
     }
 
     override fun onDestroyView() {
@@ -191,33 +189,12 @@ class ThreadFragment : Fragment() {
 
     private fun updateNavigationIcon() {
         binding.toolbar.apply {
-            if (canDisplayBothPanes()) {
+            if (isTabletInLandscape()) {
                 if (navigationIcon != null) navigationIcon = null
             } else {
                 if (navigationIcon == null) setNavigationIcon(R.drawable.ic_navigation_default)
             }
         }
-    }
-
-    private fun updateStatusBarColor() {
-
-        val statusBarColor = when {
-            twoPaneViewModel.isInThreadInPhoneMode(requireContext()) -> { // Phone mode in Thread
-                if (binding.messagesListNestedScrollView.isAtTheTop()) {
-                    R.color.toolbarLoweredColor
-                } else {
-                    R.color.toolbarElevatedColor
-                }
-            }
-            twoPaneFragment is ThreadListFragment -> { // Tablet mode in ThreadList
-                R.color.backgroundHeaderColor
-            }
-            else -> { // Tablet mode in Search
-                R.color.backgroundColor
-            }
-        }
-
-        setSystemBarsColors(statusBarColor = statusBarColor, navigationBarColor = null)
     }
 
     private fun setupAdapter() = with(binding.messagesList) {
@@ -641,6 +618,8 @@ class ThreadFragment : Fragment() {
     }
 
     fun getAnchor(): View? = _binding?.quickActionBar
+
+    fun isScrolledToTheTop(): Boolean? = _binding?.messagesListNestedScrollView?.isAtTheTop()
 
     private fun safeNavigate(@IdRes resId: Int, args: Bundle) {
         twoPaneViewModel.navArgs.value = NavData(resId, args)

@@ -24,9 +24,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ListPopupWindow
 import android.widget.PopupWindow
+import androidx.annotation.ColorRes
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
+import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -47,7 +49,6 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentSearchBinding
-import com.infomaniak.mail.ui.main.NoAnimSlidingPaneLayout
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.search.SearchFolderAdapter.SearchFolderElement
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
@@ -63,8 +64,6 @@ class SearchFragment : TwoPaneFragment() {
     private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
 
     private val searchViewModel: SearchViewModel by viewModels()
-
-    override val slidingPaneLayout: NoAnimSlidingPaneLayout get() = binding.searchSlidingPaneLayout
 
     @Inject
     lateinit var localSettings: LocalSettings
@@ -127,6 +126,13 @@ class SearchFragment : TwoPaneFragment() {
         super.onDestroyView()
         _binding = null
     }
+
+    @ColorRes
+    override fun getStatusBarColor(): Int = R.color.backgroundColor
+
+    override fun getLeftPane(): View? = _binding?.threadsCoordinatorLayout
+
+    override fun getRightPane(): FragmentContainerView? = _binding?.threadHostFragment
 
     override fun getAnchor(): View? {
         return if (isOnlyLeftShown()) {

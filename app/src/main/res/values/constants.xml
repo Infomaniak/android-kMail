@@ -17,7 +17,8 @@
   -->
 <resources>
 
-    <!-- Whether the SlidingPaneLayout can display both panes, or not -->
-    <bool name="canDisplayBothPanes">false</bool>
+    <bool name="isPhone">true</bool>
+    <bool name="isTabletInPortrait">false</bool>
+    <bool name="isTabletInLandscape">false</bool>
 
 </resources>

@@ -149,10 +149,12 @@ fun Date.isLastWeek(): Boolean {
 //region UI
 fun Context.isInPortrait(): Boolean = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
 
-fun Context.canDisplayBothPanes(): Boolean = resources.getBoolean(R.bool.canDisplayBothPanes)
-fun Fragment.canDisplayBothPanes(): Boolean = requireContext().canDisplayBothPanes()
-fun Context.canDisplayOnlyOnePane(): Boolean = !canDisplayBothPanes()
-fun Fragment.canDisplayOnlyOnePane(): Boolean = requireContext().canDisplayOnlyOnePane()
+// If height in Landscape is too small to correctly display Tablet Mode, even in landscape.
+fun Fragment.isPhone(): Boolean = requireContext().resources.getBoolean(R.bool.isPhone)
+// If screen is big enough to display Tablet Mode, but currently in portrait, so currently not big enough.
+fun Fragment.isTabletInPortrait(): Boolean = requireContext().resources.getBoolean(R.bool.isTabletInPortrait)
+// Screen is big enough, and in landscape, so we can finally display Tablet Mode! o/
+fun Fragment.isTabletInLandscape(): Boolean = requireContext().resources.getBoolean(R.bool.isTabletInLandscape)
 
 fun View.toggleChevron(
     isCollapsed: Boolean,
